@@ -48,8 +48,8 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -153,8 +153,6 @@ public class RoutineProcessor extends AbstractProcessor {
 
     private String mMethodVoid;
 
-    private TypeElement mProxyElement;
-
     /**
      * Prints the stacktrace of the specified throwable into a string.
      *
@@ -172,18 +170,7 @@ public class RoutineProcessor extends AbstractProcessor {
     @Override
     public Set<String> getSupportedAnnotationTypes() {
 
-        final List<TypeElement> annotationElements = getSupportedAnnotationElements();
-        final HashSet<String> annotationTypes = new HashSet<String>(annotationElements.size());
-
-        for (final TypeElement annotationElement : annotationElements) {
-
-            if (annotationElement != null) {
-
-                annotationTypes.add(annotationElement.getQualifiedName().toString());
-            }
-        }
-
-        return annotationTypes;
+        return Collections.singleton("com.github.dm.jrt.proxy.annotation.Proxy");
     }
 
     @Override
@@ -198,13 +185,12 @@ public class RoutineProcessor extends AbstractProcessor {
     public synchronized void init(final ProcessingEnvironment processingEnv) {
 
         super.init(processingEnv);
-        routineType = getTypeFromName(Routine.class.getCanonicalName()).asType();
-        invocationChannelType =
-                getTypeFromName(InvocationChannel.class.getCanonicalName()).asType();
-        outputChannelType = getTypeFromName(OutputChannel.class.getCanonicalName()).asType();
-        iterableType = getTypeFromName(Iterable.class.getCanonicalName()).asType();
-        listType = getTypeFromName(List.class.getCanonicalName()).asType();
-        objectType = getTypeFromName(Object.class.getCanonicalName()).asType();
+        routineType = getMirrorFromName(Routine.class.getCanonicalName());
+        invocationChannelType = getMirrorFromName(InvocationChannel.class.getCanonicalName());
+        outputChannelType = getMirrorFromName(OutputChannel.class.getCanonicalName());
+        iterableType = getMirrorFromName(Iterable.class.getCanonicalName());
+        listType = getMirrorFromName(List.class.getCanonicalName());
+        objectType = getMirrorFromName(Object.class.getCanonicalName());
     }
 
     @Override
@@ -216,6 +202,8 @@ public class RoutineProcessor extends AbstractProcessor {
 
             return false;
         }
+
+        final Types typeUtils = processingEnv.getTypeUtils();
 
         for (final TypeElement annotationElement : getSupportedAnnotationElements()) {
 
@@ -238,7 +226,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
                 for (final TypeMirror typeMirror : classElement.getInterfaces()) {
 
-                    final Element superElement = processingEnv.getTypeUtils().asElement(typeMirror);
+                    final Element superElement = typeUtils.asElement(typeMirror);
 
                     if (superElement != null) {
 
@@ -252,7 +240,8 @@ public class RoutineProcessor extends AbstractProcessor {
                 if (targetElement != null) {
 
                     createProxy(annotationElement, classElement,
-                                getTypeFromName(targetElement.toString()), methodElements);
+                                typeUtils.asElement(getMirrorFromName(targetElement.toString())),
+                                methodElements);
                 }
             }
         }
@@ -698,7 +687,7 @@ public class RoutineProcessor extends AbstractProcessor {
     @NotNull
     @SuppressWarnings("UnusedParameters")
     protected String getDefaultClassPrefix(@NotNull final TypeElement annotationElement,
-            @NotNull final TypeElement element, @NotNull final TypeElement targetElement) {
+            @NotNull final TypeElement element, @NotNull final Element targetElement) {
 
         String defaultPrefix = null;
 
@@ -725,7 +714,7 @@ public class RoutineProcessor extends AbstractProcessor {
     @NotNull
     @SuppressWarnings("UnusedParameters")
     protected String getDefaultClassSuffix(@NotNull final TypeElement annotationElement,
-            @NotNull final TypeElement element, @NotNull final TypeElement targetElement) {
+            @NotNull final TypeElement element, @NotNull final Element targetElement) {
 
         String defaultSuffix = null;
 
@@ -769,7 +758,7 @@ public class RoutineProcessor extends AbstractProcessor {
     @NotNull
     @SuppressWarnings({"ConstantConditions", "UnusedParameters"})
     protected String getGeneratedClassName(@NotNull final TypeElement annotationElement,
-            @NotNull final TypeElement element, @NotNull final TypeElement targetElement) {
+            @NotNull final TypeElement element, @NotNull final Element targetElement) {
 
         String className =
                 (String) getAnnotationValue(element, annotationElement.asType(), "className");
@@ -800,7 +789,7 @@ public class RoutineProcessor extends AbstractProcessor {
     @NotNull
     @SuppressWarnings({"ConstantConditions", "UnusedParameters"})
     protected String getGeneratedClassPackage(@NotNull final TypeElement annotationElement,
-            @NotNull final TypeElement element, @NotNull final TypeElement targetElement) {
+            @NotNull final TypeElement element, @NotNull final Element targetElement) {
 
         String classPackage =
                 (String) getAnnotationValue(element, annotationElement.asType(), "classPackage");
@@ -824,7 +813,7 @@ public class RoutineProcessor extends AbstractProcessor {
     @NotNull
     @SuppressWarnings({"ConstantConditions", "UnusedParameters"})
     protected String getGeneratedClassPrefix(@NotNull final TypeElement annotationElement,
-            @NotNull final TypeElement element, @NotNull final TypeElement targetElement) {
+            @NotNull final TypeElement element, @NotNull final Element targetElement) {
 
         final String classPrefix =
                 (String) getAnnotationValue(element, annotationElement.asType(), "classPrefix");
@@ -843,7 +832,7 @@ public class RoutineProcessor extends AbstractProcessor {
     @NotNull
     @SuppressWarnings({"ConstantConditions", "UnusedParameters"})
     protected String getGeneratedClassSuffix(@NotNull final TypeElement annotationElement,
-            @NotNull final TypeElement element, @NotNull final TypeElement targetElement) {
+            @NotNull final TypeElement element, @NotNull final Element targetElement) {
 
         final String classSuffix =
                 (String) getAnnotationValue(element, annotationElement.asType(), "classSuffix");
@@ -886,7 +875,8 @@ public class RoutineProcessor extends AbstractProcessor {
         final TypeMirror outputChannelType = this.outputChannelType;
         final TypeMirror targetType = targetParameter.asType();
         final TypeMirror targetTypeErasure = typeUtils.erasure(targetType);
-        final TypeElement annotationElement = getTypeFromName(Input.class.getCanonicalName());
+        final Element annotationElement =
+                typeUtils.asElement(getMirrorFromName(Input.class.getCanonicalName()));
         final TypeMirror annotationType = annotationElement.asType();
         final TypeMirror targetMirror =
                 (TypeMirror) getAnnotationValue(targetParameter, annotationType, "value");
@@ -1433,6 +1423,90 @@ public class RoutineProcessor extends AbstractProcessor {
     }
 
     /**
+     * Gets the element with the specified name.
+     *
+     * @param typeName the type name.
+     * @return the element.
+     */
+    protected TypeMirror getMirrorFromName(@NotNull final String typeName) {
+
+        final Types typeUtils = processingEnv.getTypeUtils();
+        final String name = normalizeTypeName(typeName);
+
+        if (char.class.getCanonicalName().equals(name)) {
+
+            return typeUtils.getPrimitiveType(TypeKind.CHAR);
+
+        } else if (byte.class.getCanonicalName().equals(name)) {
+
+            return typeUtils.getPrimitiveType(TypeKind.BYTE);
+
+        } else if (boolean.class.getCanonicalName().equals(name)) {
+
+            return typeUtils.getPrimitiveType(TypeKind.BOOLEAN);
+
+        } else if (short.class.getCanonicalName().equals(name)) {
+
+            return typeUtils.getPrimitiveType(TypeKind.SHORT);
+
+        } else if (int.class.getCanonicalName().equals(name)) {
+
+            return typeUtils.getPrimitiveType(TypeKind.INT);
+
+        } else if (long.class.getCanonicalName().equals(name)) {
+
+            return typeUtils.getPrimitiveType(TypeKind.LONG);
+
+        } else if (float.class.getCanonicalName().equals(name)) {
+
+            return typeUtils.getPrimitiveType(TypeKind.FLOAT);
+
+        } else if (double.class.getCanonicalName().equals(name)) {
+
+            return typeUtils.getPrimitiveType(TypeKind.DOUBLE);
+
+        } else if (void.class.getCanonicalName().equals(name)) {
+
+            return typeUtils.getPrimitiveType(TypeKind.VOID);
+
+        } else if (char[].class.getCanonicalName().equals(name)) {
+
+            return typeUtils.getArrayType(typeUtils.getPrimitiveType(TypeKind.CHAR));
+
+        } else if (byte[].class.getCanonicalName().equals(name)) {
+
+            return typeUtils.getArrayType(typeUtils.getPrimitiveType(TypeKind.BYTE));
+
+        } else if (boolean[].class.getCanonicalName().equals(name)) {
+
+            return typeUtils.getArrayType(typeUtils.getPrimitiveType(TypeKind.BOOLEAN));
+
+        } else if (short[].class.getCanonicalName().equals(name)) {
+
+            return typeUtils.getArrayType(typeUtils.getPrimitiveType(TypeKind.SHORT));
+
+        } else if (int[].class.getCanonicalName().equals(name)) {
+
+            return typeUtils.getArrayType(typeUtils.getPrimitiveType(TypeKind.INT));
+
+        } else if (long[].class.getCanonicalName().equals(name)) {
+
+            return typeUtils.getArrayType(typeUtils.getPrimitiveType(TypeKind.LONG));
+
+        } else if (float[].class.getCanonicalName().equals(name)) {
+
+            return typeUtils.getArrayType(typeUtils.getPrimitiveType(TypeKind.FLOAT));
+
+        } else if (double[].class.getCanonicalName().equals(name)) {
+
+            return typeUtils.getArrayType(typeUtils.getPrimitiveType(TypeKind.DOUBLE));
+        }
+
+        final TypeElement typeElement = processingEnv.getElementUtils().getTypeElement(name);
+        return (typeElement != null) ? typeElement.asType() : null;
+    }
+
+    /**
      * Gets the return output transfer mode.
      *
      * @param methodElement       the method element.
@@ -1528,7 +1602,7 @@ public class RoutineProcessor extends AbstractProcessor {
     @NotNull
     @SuppressWarnings("UnusedParameters")
     protected String getSourceName(@NotNull final TypeElement annotationElement,
-            @NotNull final TypeElement element, @NotNull final TypeElement targetElement) {
+            @NotNull final TypeElement element, @NotNull final Element targetElement) {
 
         final StringBuilder builder = new StringBuilder(
                 getGeneratedClassPackage(annotationElement, element, targetElement));
@@ -1553,23 +1627,15 @@ public class RoutineProcessor extends AbstractProcessor {
     @SuppressWarnings("unchecked")
     protected List<TypeElement> getSupportedAnnotationElements() {
 
-        if (mProxyElement == null) {
+        final Types typeUtils = processingEnv.getTypeUtils();
+        final ArrayList<TypeElement> elements = new ArrayList<TypeElement>();
 
-            mProxyElement = getTypeFromName("com.github.dm.jrt.proxy.annotation.Proxy");
+        for (final String name : getSupportedAnnotationTypes()) {
+
+            elements.add((TypeElement) typeUtils.asElement(getMirrorFromName(name)));
         }
 
-        return Collections.singletonList(mProxyElement);
-    }
-
-    /**
-     * Gets the type element with the specified name.
-     *
-     * @param typeName the type name.
-     * @return the type element.
-     */
-    protected TypeElement getTypeFromName(@NotNull final String typeName) {
-
-        return processingEnv.getElementUtils().getTypeElement(normalizeTypeName(typeName));
+        return elements;
     }
 
     /**
@@ -1670,7 +1736,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
     @SuppressWarnings("PointlessBooleanExpression")
     private void createProxy(@NotNull final TypeElement annotationElement,
-            @NotNull final TypeElement element, @NotNull final TypeElement targetElement,
+            @NotNull final TypeElement element, @NotNull final Element targetElement,
             @NotNull final List<ExecutableElement> methodElements) {
 
         Writer writer = null;
@@ -1752,8 +1818,9 @@ public class RoutineProcessor extends AbstractProcessor {
     }
 
     @NotNull
+    @SuppressWarnings({"ConstantConditions", "unchecked"})
     private ExecutableElement findMatchingMethod(@NotNull final ExecutableElement methodElement,
-            @NotNull final TypeElement targetElement) {
+            @NotNull final Element targetElement) {
 
         String methodName = methodElement.getSimpleName().toString();
         ExecutableElement targetMethod = null;
@@ -1778,29 +1845,156 @@ public class RoutineProcessor extends AbstractProcessor {
             }
         }
 
+        final Types typeUtils = processingEnv.getTypeUtils();
+        final TypeMirror inputAnnotationType = getMirrorFromName(Input.class.getCanonicalName());
+        final TypeMirror inputsAnnotationType = getMirrorFromName(Inputs.class.getCanonicalName());
+
         if (targetMethod == null) {
 
-            final Types typeUtils = processingEnv.getTypeUtils();
-            final TypeMirror asyncAnnotationType =
-                    getTypeFromName(Input.class.getCanonicalName()).asType();
-            final List<? extends VariableElement> interfaceTypeParameters =
-                    methodElement.getParameters();
-            final int length = interfaceTypeParameters.size();
+            if (methodElement.getAnnotation(Inputs.class) != null) {
 
-            for (final ExecutableElement targetMethodElement : ElementFilter.methodsIn(
-                    targetElement.getEnclosedElements())) {
+                final List<?> annotationParams =
+                        (List<?>) getAnnotationValue(methodElement, inputsAnnotationType, "value");
+                final int length = annotationParams.size();
 
-                if (!methodName.equals(targetMethodElement.getSimpleName().toString())) {
+                for (final ExecutableElement targetMethodElement : ElementFilter.methodsIn(
+                        targetElement.getEnclosedElements())) {
 
-                    continue;
+                    if (!methodName.equals(targetMethodElement.getSimpleName().toString())) {
+
+                        continue;
+                    }
+
+                    final List<? extends VariableElement> classTypeParameters =
+                            targetMethodElement.getParameters();
+
+                    if (length == classTypeParameters.size()) {
+
+                        boolean matches = true;
+
+                        for (int i = 0; i < length; ++i) {
+
+                            final TypeMirror annotationParam =
+                                    getMirrorFromName(annotationParams.get(i).toString());
+                            final TypeMirror paramMirror = classTypeParameters.get(i).asType();
+
+                            if (!typeUtils.isSameType(typeUtils.erasure(annotationParam),
+                                                      typeUtils.erasure(paramMirror))) {
+
+                                matches = false;
+                                break;
+                            }
+                        }
+
+                        if (matches) {
+
+                            targetMethod = targetMethodElement;
+                            break;
+                        }
+                    }
                 }
 
+            } else {
+
+                final List<? extends VariableElement> interfaceTypeParameters =
+                        methodElement.getParameters();
+                final int length = interfaceTypeParameters.size();
+
+                for (final ExecutableElement targetMethodElement : ElementFilter.methodsIn(
+                        targetElement.getEnclosedElements())) {
+
+                    if (!methodName.equals(targetMethodElement.getSimpleName().toString())) {
+
+                        continue;
+                    }
+
+                    final List<? extends VariableElement> classTypeParameters =
+                            targetMethodElement.getParameters();
+
+                    if (length == classTypeParameters.size()) {
+
+                        boolean matches = true;
+
+                        for (int i = 0; i < length; ++i) {
+
+                            Object value = null;
+                            final VariableElement variableElement = interfaceTypeParameters.get(i);
+
+                            if (variableElement.getAnnotation(Input.class) != null) {
+
+                                value = getAnnotationValue(variableElement, inputAnnotationType,
+                                                           "value");
+                            }
+
+                            final TypeMirror paramMirror = classTypeParameters.get(i).asType();
+
+                            if (!typeUtils.isSameType(typeUtils.erasure(
+                                                              (value != null) ? (TypeMirror) value
+                                                                      : variableElement.asType()),
+                                                      typeUtils.erasure(paramMirror))) {
+
+                                matches = false;
+                                break;
+                            }
+                        }
+
+                        if (matches) {
+
+                            targetMethod = targetMethodElement;
+                            break;
+                        }
+                    }
+                }
+            }
+
+        } else {
+
+            if (methodElement.getAnnotation(Inputs.class) != null) {
+
+                final List<?> annotationParams =
+                        (List<?>) getAnnotationValue(methodElement, inputsAnnotationType, "value");
+                final int length = annotationParams.size();
                 final List<? extends VariableElement> classTypeParameters =
-                        targetMethodElement.getParameters();
+                        targetMethod.getParameters();
 
                 if (length == classTypeParameters.size()) {
 
-                    boolean matches = true;
+                    for (int i = 0; i < length; ++i) {
+
+                        if (getMirrorFromName(annotationParams.get(i).toString()) == null) {
+
+                            throw new NullPointerException(
+                                    annotationParams.get(i).toString() + " - "
+                                            + typeUtils.asElement(
+                                            typeUtils.getPrimitiveType(TypeKind.CHAR)));
+                        }
+
+                        final TypeMirror annotationParam =
+                                getMirrorFromName(annotationParams.get(i).toString());
+                        final TypeMirror paramMirror = classTypeParameters.get(i).asType();
+
+                        if (!typeUtils.isSameType(typeUtils.erasure(annotationParam),
+                                                  typeUtils.erasure(paramMirror))) {
+
+                            targetMethod = null;
+                            break;
+                        }
+                    }
+
+                } else {
+
+                    targetMethod = null;
+                }
+
+            } else {
+
+                final List<? extends VariableElement> interfaceTypeParameters =
+                        methodElement.getParameters();
+                final int length = interfaceTypeParameters.size();
+                final List<? extends VariableElement> classTypeParameters =
+                        targetMethod.getParameters();
+
+                if (length == classTypeParameters.size()) {
 
                     for (int i = 0; i < length; ++i) {
 
@@ -1809,26 +2003,25 @@ public class RoutineProcessor extends AbstractProcessor {
 
                         if (variableElement.getAnnotation(Input.class) != null) {
 
-                            value = getAnnotationValue(variableElement, asyncAnnotationType,
+                            value = getAnnotationValue(variableElement, inputAnnotationType,
                                                        "value");
                         }
+
+                        final TypeMirror paramMirror = classTypeParameters.get(i).asType();
 
                         if (!typeUtils.isSameType(typeUtils.erasure(
                                                           (value != null) ? (TypeMirror) value
                                                                   : variableElement.asType()),
-                                                  typeUtils.erasure(
-                                                          classTypeParameters.get(i).asType()))) {
+                                                  typeUtils.erasure(paramMirror))) {
 
-                            matches = false;
+                            targetMethod = null;
                             break;
                         }
                     }
 
-                    if (matches) {
+                } else {
 
-                        targetMethod = targetMethodElement;
-                        break;
-                    }
+                    targetMethod = null;
                 }
             }
         }
@@ -1874,8 +2067,8 @@ public class RoutineProcessor extends AbstractProcessor {
     }
 
     private void writeMethod(@NotNull final Writer writer, @NotNull final TypeElement element,
-            @NotNull final TypeElement targetElement,
-            @NotNull final ExecutableElement methodElement, final int count) throws IOException {
+            @NotNull final Element targetElement, @NotNull final ExecutableElement methodElement,
+            final int count) throws IOException {
 
         final Types typeUtils = processingEnv.getTypeUtils();
         final TypeMirror outputChannelType = this.outputChannelType;

@@ -18,14 +18,16 @@ import com.github.dm.jrt.processor.RoutineProcessor;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.Types;
 
 /**
  * Annotation processor used to generate proxy classes enabling method asynchronous invocations,
@@ -68,19 +70,35 @@ public class ContextRoutineProcessor extends RoutineProcessor {
     private TypeElement mV4ProxyElement;
 
     @Override
+    public Set<String> getSupportedAnnotationTypes() {
+
+        final HashSet<String> types = new HashSet<String>(super.getSupportedAnnotationTypes());
+        types.add("com.github.dm.jrt.android.proxy.annotation.ServiceProxy");
+        types.add("com.github.dm.jrt.android.proxy.annotation.V4Proxy");
+        types.add("com.github.dm.jrt.android.proxy.annotation.V11Proxy");
+        return types;
+    }
+
+    @Override
     public synchronized void init(final ProcessingEnvironment processingEnv) {
 
         super.init(processingEnv);
-        mIdAnnotationType =
-                getTypeFromName("com.github.dm.jrt.android.annotation.LoaderId").asType();
+        mIdAnnotationType = getMirrorFromName("com.github.dm.jrt.android.annotation.LoaderId");
         mClashAnnotationType =
-                getTypeFromName("com.github.dm.jrt.android.annotation.ClashResolution").asType();
-        mInputClashAnnotationType = getTypeFromName(
-                "com.github.dm.jrt.android.annotation.InputClashResolution").asType();
+                getMirrorFromName("com.github.dm.jrt.android.annotation.ClashResolution");
+        mInputClashAnnotationType =
+                getMirrorFromName("com.github.dm.jrt.android.annotation.InputClashResolution");
         mCacheAnnotationType =
-                getTypeFromName("com.github.dm.jrt.android.annotation.CacheStrategy").asType();
+                getMirrorFromName("com.github.dm.jrt.android.annotation.CacheStrategy");
         mStaleTimeAnnotationType =
-                getTypeFromName("com.github.dm.jrt.android.annotation.ResultStaleTime").asType();
+                getMirrorFromName("com.github.dm.jrt.android.annotation.ResultStaleTime");
+        final Types typeUtils = processingEnv.getTypeUtils();
+        mServiceProxyElement = (TypeElement) typeUtils.asElement(
+                getMirrorFromName("com.github.dm.jrt.android.proxy.annotation.ServiceProxy"));
+        mV4ProxyElement = (TypeElement) typeUtils.asElement(
+                getMirrorFromName("com.github.dm.jrt.android.proxy.annotation.V4Proxy"));
+        mV11ProxyElement = (TypeElement) typeUtils.asElement(
+                getMirrorFromName("com.github.dm.jrt.android.proxy.annotation.V11Proxy"));
     }
 
     @NotNull
@@ -210,27 +228,10 @@ public class ContextRoutineProcessor extends RoutineProcessor {
     @NotNull
     @Override
     protected String getSourceName(@NotNull final TypeElement annotationElement,
-            @NotNull final TypeElement element, @NotNull final TypeElement targetElement) {
+            @NotNull final TypeElement element, @NotNull final Element targetElement) {
 
         mCurrentAnnotationElement = annotationElement;
         return super.getSourceName(annotationElement, element, targetElement);
-    }
-
-    @NotNull
-    @Override
-    protected List<TypeElement> getSupportedAnnotationElements() {
-
-        if ((mServiceProxyElement == null) || (mV4ProxyElement == null) || (mV11ProxyElement
-                == null)) {
-
-            mServiceProxyElement =
-                    getTypeFromName("com.github.dm.jrt.android.proxy.annotation.ServiceProxy");
-            mV4ProxyElement = getTypeFromName("com.github.dm.jrt.android.proxy.annotation.V4Proxy");
-            mV11ProxyElement =
-                    getTypeFromName("com.github.dm.jrt.android.proxy.annotation.V11Proxy");
-        }
-
-        return Arrays.asList(mServiceProxyElement, mV4ProxyElement, mV11ProxyElement);
     }
 
     @SuppressWarnings("unchecked")

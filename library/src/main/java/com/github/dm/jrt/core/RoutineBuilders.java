@@ -976,6 +976,11 @@ public class RoutineBuilders {
             }
 
             targetMethod = Reflection.findMethod(targetClass, name, targetParameterTypes);
+
+        } else {
+
+            // Validate method parameters
+            Reflection.findMethod(targetClass, targetMethod.getName(), targetParameterTypes);
         }
 
         return targetMethod;

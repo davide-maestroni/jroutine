@@ -32,7 +32,12 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 /**
+ * Abstract implementation of a functional routine.
+ * <p/>
  * Created by davide-maestroni on 10/16/2015.
+ *
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
 abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
         implements FunctionalRoutine<IN, OUT>, Configurable<FunctionalRoutine<IN, OUT>> {
@@ -60,14 +65,6 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
     public FunctionalRoutine<IN, OUT> asyncFilter(@NotNull final Predicate<? super OUT> predicate) {
 
         return andThenFilter(predicate, DelegationType.ASYNC);
-    }
-
-    @NotNull
-    public <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> asyncLift(
-            @NotNull final Function<? super FunctionalRoutine<IN, OUT>, ? extends Routine<BEFORE,
-                    AFTER>> function) {
-
-        return lift(function, DelegationType.ASYNC);
     }
 
     @NotNull
@@ -123,7 +120,7 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
     }
 
     @NotNull
-    public <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> lift(
+    public <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> flatLift(
             @NotNull final Function<? super FunctionalRoutine<IN, OUT>, ? extends
                     FunctionalRoutine<BEFORE, AFTER>> function) {
 
@@ -135,14 +132,6 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
             @NotNull final Predicate<? super OUT> predicate) {
 
         return andThenFilter(predicate, DelegationType.PARALLEL);
-    }
-
-    @NotNull
-    public <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> parallelLift(
-            @NotNull final Function<? super FunctionalRoutine<IN, OUT>, ? extends Routine<BEFORE,
-                    AFTER>> function) {
-
-        return lift(function, DelegationType.PARALLEL);
     }
 
     @NotNull
@@ -175,29 +164,6 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
     }
 
     @NotNull
-    public <AFTER> FunctionalRoutine<IN, AFTER> parallelReduce(
-            @NotNull final BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
-                    consumer) {
-
-        return parallelMap(JRoutine.on(Functions.consumerFactory(consumer))
-                                   .invocations()
-                                   .with(mConfiguration)
-                                   .set()
-                                   .buildRoutine());
-    }
-
-    @NotNull
-    public <AFTER> FunctionalRoutine<IN, AFTER> parallelReduce(
-            @NotNull final Function<? super List<? extends OUT>, AFTER> function) {
-
-        return parallelMap(JRoutine.on(Functions.functionFactory(function))
-                                   .invocations()
-                                   .with(mConfiguration)
-                                   .set()
-                                   .buildRoutine());
-    }
-
-    @NotNull
     public FunctionalRoutine<IN, OUT> syncAccumulate(
             @NotNull final BiFunction<? super OUT, ? super OUT, ? extends OUT> function) {
 
@@ -208,14 +174,6 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
     public FunctionalRoutine<IN, OUT> syncFilter(@NotNull final Predicate<? super OUT> predicate) {
 
         return andThenFilter(predicate, DelegationType.SYNC);
-    }
-
-    @NotNull
-    public <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> syncLift(
-            @NotNull final Function<? super FunctionalRoutine<IN, OUT>, ? extends Routine<BEFORE,
-                    AFTER>> function) {
-
-        return lift(function, DelegationType.SYNC);
     }
 
     @NotNull
@@ -290,26 +248,19 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
         return this;
     }
 
+    /**
+     * Concatenates a functional routine based on the specified instance to this one.
+     * <p/>
+     * Note that the passed routine will be invoked in an asynchronous mode.
+     *
+     * @param routine        the routine instance.
+     * @param delegationType the delegation type.
+     * @param <AFTER>        the concatenation output type.
+     * @return the concatenated functional routine.
+     */
     @NotNull
     protected abstract <AFTER> FunctionalRoutine<IN, AFTER> andThen(
             @NotNull Routine<? super OUT, AFTER> routine, @NotNull DelegationType delegationType);
-
-    /**
-     * Returns the builder invocation configuration.
-     *
-     * @return the invocation configuration.
-     */
-    @NotNull
-    protected InvocationConfiguration getBuilderConfiguration() {
-
-        return mConfiguration;
-    }
-
-    @NotNull
-    protected abstract <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> lift(
-            @NotNull final Function<? super FunctionalRoutine<IN, OUT>, ? extends Routine<BEFORE,
-                    AFTER>> function,
-            @NotNull final DelegationType delegationType);
 
     @NotNull
     private FunctionalRoutine<IN, OUT> andThenAccumulate(

@@ -25,7 +25,6 @@ import com.github.dm.jrt.functional.Functions;
 import com.github.dm.jrt.functional.Predicate;
 import com.github.dm.jrt.functional.Supplier;
 import com.github.dm.jrt.invocation.CommandInvocation;
-import com.github.dm.jrt.invocation.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.routine.FunctionalRoutine;
 import com.github.dm.jrt.routine.Routine;
@@ -45,253 +44,86 @@ class DefaultFunctionalRoutineBuilder
     private InvocationConfiguration mConfiguration = InvocationConfiguration.DEFAULT_CONFIGURATION;
 
     @NotNull
-    public <OUT> FunctionalRoutine<Void, OUT> async(
-            @NotNull final CommandInvocation<OUT> invocation) {
-
-        return asyncMap(
-                JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine());
-    }
-
-    @NotNull
-    public <OUT> FunctionalRoutine<Void, OUT> async(@NotNull final Supplier<OUT> supplier) {
-
-        return async(Functions.supplierCommand(supplier));
-    }
-
-    @NotNull
-    public <IN> FunctionalRoutine<IN, IN> asyncAccumulate(
+    public <IN> FunctionalRoutine<IN, IN> accumulate(
             @NotNull final BiFunction<? super IN, ? super IN, ? extends IN> function) {
 
-        return asyncMap(JRoutine.on(AccumulateInvocation.functionFactory(function))
-                                .invocations()
-                                .with(mConfiguration)
-                                .set()
-                                .buildRoutine());
+        return map(JRoutine.on(AccumulateInvocation.functionFactory(function))
+                           .invocations()
+                           .with(mConfiguration)
+                           .set()
+                           .buildRoutine());
     }
 
     @NotNull
-    public <IN> FunctionalRoutine<IN, IN> asyncFilter(
-            @NotNull final Predicate<? super IN> predicate) {
+    public <IN> FunctionalRoutine<IN, IN> filter(@NotNull final Predicate<? super IN> predicate) {
 
-        return asyncMap(JRoutine.on(Functions.predicateFilter(predicate))
-                                .invocations()
-                                .with(mConfiguration)
-                                .set()
-                                .buildRoutine());
+        return map(JRoutine.on(Functions.predicateFilter(predicate))
+                           .invocations()
+                           .with(mConfiguration)
+                           .set()
+                           .buildRoutine());
     }
 
     @NotNull
-    public <IN, OUT> FunctionalRoutine<IN, OUT> asyncMap(
-            @NotNull final BiConsumer<IN, ? super ResultChannel<OUT>> consumer) {
-
-        return asyncMap(Functions.consumerFilter(consumer));
-    }
-
-    @NotNull
-    public <IN, OUT> FunctionalRoutine<IN, OUT> asyncMap(
-            @NotNull final FilterInvocation<IN, OUT> invocation) {
-
-        return asyncMap(
-                JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine());
-    }
-
-    @NotNull
-    public <IN, OUT> FunctionalRoutine<IN, OUT> asyncMap(
-            @NotNull final Function<IN, OUT> function) {
-
-        return asyncMap(Functions.functionFilter(function));
-    }
-
-    @NotNull
-    public <IN, OUT> FunctionalRoutine<IN, OUT> asyncMap(@NotNull final Routine<IN, OUT> routine) {
-
-        return map(routine, DelegationType.ASYNC);
-    }
-
-    @NotNull
-    public <IN, OUT> FunctionalRoutine<IN, OUT> asyncReduce(
-            @NotNull final BiConsumer<? super List<? extends IN>, ? super ResultChannel<OUT>>
-                    consumer) {
-
-        return asyncMap(JRoutine.on(Functions.consumerFactory(consumer))
-                                .invocations()
-                                .with(mConfiguration)
-                                .set()
-                                .buildRoutine());
-    }
-
-    @NotNull
-    public <IN, OUT> FunctionalRoutine<IN, OUT> asyncReduce(
-            @NotNull final Function<? super List<? extends IN>, OUT> function) {
-
-        return asyncMap(JRoutine.on(Functions.functionFactory(function))
-                                .invocations()
-                                .with(mConfiguration)
-                                .set()
-                                .buildRoutine());
-    }
-
-    @NotNull
-    public <OUT> FunctionalRoutine<Void, OUT> parallel(
+    public <OUT> FunctionalRoutine<Void, OUT> from(
             @NotNull final CommandInvocation<OUT> invocation) {
 
-        return parallelMap(
-                JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine());
+        return map(JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine());
     }
 
     @NotNull
-    public <OUT> FunctionalRoutine<Void, OUT> parallel(@NotNull final Supplier<OUT> supplier) {
+    public <OUT> FunctionalRoutine<Void, OUT> from(@NotNull final Supplier<OUT> supplier) {
 
-        return parallel(Functions.supplierCommand(supplier));
+        return from(Functions.supplierCommand(supplier));
     }
 
     @NotNull
-    public <IN> FunctionalRoutine<IN, IN> parallelFilter(
-            @NotNull final Predicate<? super IN> predicate) {
-
-        return parallelMap(JRoutine.on(Functions.predicateFilter(predicate))
-                                   .invocations()
-                                   .with(mConfiguration)
-                                   .set()
-                                   .buildRoutine());
-    }
-
-    @NotNull
-    public <IN, OUT> FunctionalRoutine<IN, OUT> parallelMap(
+    public <IN, OUT> FunctionalRoutine<IN, OUT> map(
             @NotNull final BiConsumer<IN, ? super ResultChannel<OUT>> consumer) {
 
-        return parallelMap(Functions.consumerFilter(consumer));
+        return map(Functions.consumerFilter(consumer));
     }
 
     @NotNull
-    public <IN, OUT> FunctionalRoutine<IN, OUT> parallelMap(
+    public <IN, OUT> FunctionalRoutine<IN, OUT> map(
             @NotNull final FilterInvocation<IN, OUT> invocation) {
 
-        return parallelMap(
-                JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine());
+        return map(JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine());
     }
 
     @NotNull
-    public <IN, OUT> FunctionalRoutine<IN, OUT> parallelMap(
-            @NotNull final Function<IN, OUT> function) {
+    public <IN, OUT> FunctionalRoutine<IN, OUT> map(@NotNull final Function<IN, OUT> function) {
 
-        return parallelMap(Functions.functionFilter(function));
+        return map(Functions.functionFilter(function));
     }
 
     @NotNull
-    public <IN, OUT> FunctionalRoutine<IN, OUT> parallelMap(
-            @NotNull final Routine<IN, OUT> routine) {
+    public <IN, OUT> FunctionalRoutine<IN, OUT> map(@NotNull final Routine<IN, OUT> routine) {
 
-        return map(routine, DelegationType.PARALLEL);
+        return new DefaultFunctionalRoutine<IN, OUT>(mConfiguration, routine);
     }
 
     @NotNull
-    public <IN, OUT> FunctionalRoutine<IN, OUT> parallelReduce(
+    public <IN, OUT> FunctionalRoutine<IN, OUT> reduce(
             @NotNull final BiConsumer<? super List<? extends IN>, ? super ResultChannel<OUT>>
                     consumer) {
 
-        return parallelMap(JRoutine.on(Functions.consumerFactory(consumer))
-                                   .invocations()
-                                   .with(mConfiguration)
-                                   .set()
-                                   .buildRoutine());
+        return map(JRoutine.on(Functions.consumerFactory(consumer))
+                           .invocations()
+                           .with(mConfiguration)
+                           .set()
+                           .buildRoutine());
     }
 
     @NotNull
-    public <IN, OUT> FunctionalRoutine<IN, OUT> parallelReduce(
+    public <IN, OUT> FunctionalRoutine<IN, OUT> reduce(
             @NotNull final Function<? super List<? extends IN>, OUT> function) {
 
-        return parallelMap(JRoutine.on(Functions.functionFactory(function))
-                                   .invocations()
-                                   .with(mConfiguration)
-                                   .set()
-                                   .buildRoutine());
-    }
-
-    @NotNull
-    public <OUT> FunctionalRoutine<Void, OUT> sync(
-            @NotNull final CommandInvocation<OUT> invocation) {
-
-        return syncMap(
-                JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine());
-    }
-
-    @NotNull
-    public <OUT> FunctionalRoutine<Void, OUT> sync(@NotNull final Supplier<OUT> supplier) {
-
-        return sync(Functions.supplierCommand(supplier));
-    }
-
-    @NotNull
-    public <IN> FunctionalRoutine<IN, IN> syncAccumulate(
-            @NotNull final BiFunction<? super IN, ? super IN, ? extends IN> function) {
-
-        return syncMap(JRoutine.on(AccumulateInvocation.functionFactory(function))
-                               .invocations()
-                               .with(mConfiguration)
-                               .set()
-                               .buildRoutine());
-    }
-
-    @NotNull
-    public <IN> FunctionalRoutine<IN, IN> syncFilter(
-            @NotNull final Predicate<? super IN> predicate) {
-
-        return syncMap(JRoutine.on(Functions.predicateFilter(predicate))
-                               .invocations()
-                               .with(mConfiguration)
-                               .set()
-                               .buildRoutine());
-    }
-
-    @NotNull
-    public <IN, OUT> FunctionalRoutine<IN, OUT> syncMap(
-            @NotNull final BiConsumer<IN, ? super ResultChannel<OUT>> consumer) {
-
-        return syncMap(Functions.consumerFilter(consumer));
-    }
-
-    @NotNull
-    public <IN, OUT> FunctionalRoutine<IN, OUT> syncMap(
-            @NotNull final FilterInvocation<IN, OUT> invocation) {
-
-        return syncMap(
-                JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine());
-    }
-
-    @NotNull
-    public <IN, OUT> FunctionalRoutine<IN, OUT> syncMap(@NotNull final Function<IN, OUT> function) {
-
-        return syncMap(Functions.functionFilter(function));
-    }
-
-    @NotNull
-    public <IN, OUT> FunctionalRoutine<IN, OUT> syncMap(@NotNull final Routine<IN, OUT> routine) {
-
-        return map(routine, DelegationType.SYNC);
-    }
-
-    @NotNull
-    public <IN, OUT> FunctionalRoutine<IN, OUT> syncReduce(
-            @NotNull final BiConsumer<? super List<? extends IN>, ? super ResultChannel<OUT>>
-                    consumer) {
-
-        return syncMap(JRoutine.on(Functions.consumerFactory(consumer))
-                               .invocations()
-                               .with(mConfiguration)
-                               .set()
-                               .buildRoutine());
-    }
-
-    @NotNull
-    public <IN, OUT> FunctionalRoutine<IN, OUT> syncReduce(
-            @NotNull final Function<? super List<? extends IN>, OUT> function) {
-
-        return syncMap(JRoutine.on(Functions.functionFactory(function))
-                               .invocations()
-                               .with(mConfiguration)
-                               .set()
-                               .buildRoutine());
+        return map(JRoutine.on(Functions.functionFactory(function))
+                           .invocations()
+                           .with(mConfiguration)
+                           .set()
+                           .buildRoutine());
     }
 
     @NotNull
@@ -312,12 +144,5 @@ class DefaultFunctionalRoutineBuilder
 
         mConfiguration = configuration;
         return this;
-    }
-
-    @NotNull
-    private <IN, OUT> FunctionalRoutine<IN, OUT> map(@NotNull final Routine<IN, OUT> routine,
-            @NotNull final DelegationType delegationType) {
-
-        return new DefaultFunctionalRoutine<IN, OUT>(mConfiguration, routine, delegationType);
     }
 }

@@ -36,31 +36,7 @@ import java.util.List;
 public interface FunctionalRoutineBuilder extends ConfigurableBuilder<FunctionalRoutineBuilder> {
 
     /**
-     * Creates a new functional routine based on the specified command invocation.
-     * <p/>
-     * Note that the created routine will be invoked in an asynchronous mode.
-     *
-     * @param invocation the command invocation instance.
-     * @param <OUT>      the output data type.
-     * @return the functional routine.
-     */
-    @NotNull
-    <OUT> FunctionalRoutine<Void, OUT> async(@NotNull CommandInvocation<OUT> invocation);
-
-    /**
-     * Creates a new functional routine based on the specified supplier.
-     * <p/>
-     * Note that the created routine will be invoked in an asynchronous mode.
-     *
-     * @param supplier the supplier instance.
-     * @param <OUT>    the output data type.
-     * @return the functional routine.
-     */
-    @NotNull
-    <OUT> FunctionalRoutine<Void, OUT> async(@NotNull Supplier<OUT> supplier);
-
-    /**
-     * Creates a new functional routine based on the specified bi-function.<br/>
+     * Creates a new functional routine based on the specified accumulate function.<br/>
      * The input will be accumulated as follows:
      * <pre>
      *     <code>
@@ -69,156 +45,48 @@ public interface FunctionalRoutineBuilder extends ConfigurableBuilder<Functional
      *     </code>
      * </pre>
      * The accumulated value will be passed as result only when the routine invocation completes.
-     * <p/>
-     * Note that the created routine will be invoked in an asynchronous mode.
      *
      * @param function the bi-function instance.
      * @param <IN>     the input data type.
      * @return the functional routine.
      */
     @NotNull
-    <IN> FunctionalRoutine<IN, IN> asyncAccumulate(
+    <IN> FunctionalRoutine<IN, IN> accumulate(
             @NotNull BiFunction<? super IN, ? super IN, ? extends IN> function);
 
     /**
      * Creates a new functional routine based on the specified predicate.<br/>
      * The input will be filtered accordingly to the result returned by the predicate.
-     * <p/>
-     * Note that the created routine will be invoked in an asynchronous mode.
      *
      * @param predicate the predicate instance.
      * @param <IN>      the input data type.
      * @return the functional routine.
      */
     @NotNull
-    <IN> FunctionalRoutine<IN, IN> asyncFilter(@NotNull Predicate<? super IN> predicate);
-
-    /**
-     * Creates a new functional routine based on the specified consumer.
-     * <p/>
-     * Note that the created routine will be invoked in an asynchronous mode.
-     *
-     * @param consumer the bi-consumer instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the functional routine.
-     */
-    @NotNull
-    <IN, OUT> FunctionalRoutine<IN, OUT> asyncMap(
-            @NotNull BiConsumer<IN, ? super ResultChannel<OUT>> consumer);
-
-    /**
-     * Creates a new functional routine based on the specified filter invocation.
-     * <p/>
-     * Note that the created routine will be invoked in an asynchronous mode.
-     *
-     * @param invocation the filter invocation instance.
-     * @param <IN>       the input data type.
-     * @param <OUT>      the output data type.
-     * @return the functional routine.
-     */
-    @NotNull
-    <IN, OUT> FunctionalRoutine<IN, OUT> asyncMap(@NotNull FilterInvocation<IN, OUT> invocation);
-
-    /**
-     * Creates a new functional routine based on the specified function.
-     * <p/>
-     * Note that the created routine will be invoked in an asynchronous mode.
-     *
-     * @param function the function instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the functional routine.
-     */
-    @NotNull
-    <IN, OUT> FunctionalRoutine<IN, OUT> asyncMap(@NotNull Function<IN, OUT> function);
-
-    /**
-     * Creates a new functional routine wrapping specified one.
-     * <p/>
-     * Note that the created routine will be invoked in an asynchronous mode.
-     *
-     * @param routine the routine instance.
-     * @param <IN>    the input data type.
-     * @param <OUT>   the output data type.
-     * @return the functional routine.
-     */
-    @NotNull
-    <IN, OUT> FunctionalRoutine<IN, OUT> asyncMap(@NotNull Routine<IN, OUT> routine);
-
-    /**
-     * Creates a new functional routine based on the specified bi-consumer.<br/>
-     * The inputs will be reduced by applying the consumer only when the routine invocation
-     * completes.
-     * <p/>
-     * Note that the created routine will be invoked in an asynchronous mode.
-     *
-     * @param consumer the bi-consumer instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the functional routine.
-     */
-    @NotNull
-    <IN, OUT> FunctionalRoutine<IN, OUT> asyncReduce(
-            @NotNull BiConsumer<? super List<? extends IN>, ? super ResultChannel<OUT>> consumer);
-
-    /**
-     * Creates a new functional routine based on the specified function.<br/>
-     * The inputs will be reduced by applying the function only when the routine invocation
-     * completes.
-     * <p/>
-     * Note that the created routine will be invoked in an asynchronous mode.
-     *
-     * @param function the function instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the functional routine.
-     */
-    @NotNull
-    <IN, OUT> FunctionalRoutine<IN, OUT> asyncReduce(
-            @NotNull Function<? super List<? extends IN>, OUT> function);
+    <IN> FunctionalRoutine<IN, IN> filter(@NotNull Predicate<? super IN> predicate);
 
     /**
      * Creates a new functional routine based on the specified command invocation.
-     * <p/>
-     * Note that the created routine will be invoked in a parallel mode.
      *
      * @param invocation the command invocation instance.
      * @param <OUT>      the output data type.
      * @return the functional routine.
      */
     @NotNull
-    <OUT> FunctionalRoutine<Void, OUT> parallel(@NotNull CommandInvocation<OUT> invocation);
+    <OUT> FunctionalRoutine<Void, OUT> from(@NotNull CommandInvocation<OUT> invocation);
 
     /**
      * Creates a new functional routine based on the specified supplier.
-     * <p/>
-     * Note that the created routine will be invoked in a parallel mode.
      *
      * @param supplier the supplier instance.
      * @param <OUT>    the output data type.
      * @return the functional routine.
      */
     @NotNull
-    <OUT> FunctionalRoutine<Void, OUT> parallel(@NotNull Supplier<OUT> supplier);
-
-    /**
-     * Creates a new functional routine based on the specified predicate.<br/>
-     * The input will be filtered accordingly to the result returned by the predicate.
-     * <p/>
-     * Note that the created routine will be invoked in a parallel mode.
-     *
-     * @param predicate the predicate instance.
-     * @param <IN>      the input data type.
-     * @return the functional routine.
-     */
-    @NotNull
-    <IN> FunctionalRoutine<IN, IN> parallelFilter(@NotNull Predicate<? super IN> predicate);
+    <OUT> FunctionalRoutine<Void, OUT> from(@NotNull Supplier<OUT> supplier);
 
     /**
      * Creates a new functional routine based on the specified consumer.
-     * <p/>
-     * Note that the created routine will be invoked in a parallel mode.
      *
      * @param consumer the bi-consumer instance.
      * @param <IN>     the input data type.
@@ -226,13 +94,11 @@ public interface FunctionalRoutineBuilder extends ConfigurableBuilder<Functional
      * @return the functional routine.
      */
     @NotNull
-    <IN, OUT> FunctionalRoutine<IN, OUT> parallelMap(
+    <IN, OUT> FunctionalRoutine<IN, OUT> map(
             @NotNull BiConsumer<IN, ? super ResultChannel<OUT>> consumer);
 
     /**
      * Creates a new functional routine based on the specified filter invocation.
-     * <p/>
-     * Note that the created routine will be invoked in a parallel mode.
      *
      * @param invocation the filter invocation instance.
      * @param <IN>       the input data type.
@@ -240,12 +106,10 @@ public interface FunctionalRoutineBuilder extends ConfigurableBuilder<Functional
      * @return the functional routine.
      */
     @NotNull
-    <IN, OUT> FunctionalRoutine<IN, OUT> parallelMap(@NotNull FilterInvocation<IN, OUT> invocation);
+    <IN, OUT> FunctionalRoutine<IN, OUT> map(@NotNull FilterInvocation<IN, OUT> invocation);
 
     /**
      * Creates a new functional routine based on the specified function.
-     * <p/>
-     * Note that the created routine will be invoked in a parallel mode.
      *
      * @param function the function instance.
      * @param <IN>     the input data type.
@@ -253,12 +117,10 @@ public interface FunctionalRoutineBuilder extends ConfigurableBuilder<Functional
      * @return the functional routine.
      */
     @NotNull
-    <IN, OUT> FunctionalRoutine<IN, OUT> parallelMap(@NotNull Function<IN, OUT> function);
+    <IN, OUT> FunctionalRoutine<IN, OUT> map(@NotNull Function<IN, OUT> function);
 
     /**
      * Creates a new functional routine wrapping specified one.
-     * <p/>
-     * Note that the created routine will be invoked in a parallel mode.
      *
      * @param routine the routine instance.
      * @param <IN>    the input data type.
@@ -266,14 +128,12 @@ public interface FunctionalRoutineBuilder extends ConfigurableBuilder<Functional
      * @return the functional routine.
      */
     @NotNull
-    <IN, OUT> FunctionalRoutine<IN, OUT> parallelMap(@NotNull Routine<IN, OUT> routine);
+    <IN, OUT> FunctionalRoutine<IN, OUT> map(@NotNull Routine<IN, OUT> routine);
 
     /**
      * Creates a new functional routine based on the specified bi-consumer.<br/>
      * The inputs will be reduced by applying the consumer only when the routine invocation
      * completes.
-     * <p/>
-     * Note that the created routine will be invoked in a parallel mode.
      *
      * @param consumer the bi-consumer instance.
      * @param <IN>     the input data type.
@@ -281,15 +141,13 @@ public interface FunctionalRoutineBuilder extends ConfigurableBuilder<Functional
      * @return the functional routine.
      */
     @NotNull
-    <IN, OUT> FunctionalRoutine<IN, OUT> parallelReduce(
+    <IN, OUT> FunctionalRoutine<IN, OUT> reduce(
             @NotNull BiConsumer<? super List<? extends IN>, ? super ResultChannel<OUT>> consumer);
 
     /**
      * Creates a new functional routine based on the specified function.<br/>
      * The inputs will be reduced by applying the function only when the routine invocation
      * completes.
-     * <p/>
-     * Note that the created routine will be invoked in a parallel mode.
      *
      * @param function the function instance.
      * @param <IN>     the input data type.
@@ -297,149 +155,6 @@ public interface FunctionalRoutineBuilder extends ConfigurableBuilder<Functional
      * @return the functional routine.
      */
     @NotNull
-    <IN, OUT> FunctionalRoutine<IN, OUT> parallelReduce(
-            @NotNull Function<? super List<? extends IN>, OUT> function);
-
-    /**
-     * Creates a new functional routine based on the specified command invocation.
-     * <p/>
-     * Note that the created routine will be invoked in a synchronous mode.
-     *
-     * @param invocation the command invocation instance.
-     * @param <OUT>      the output data type.
-     * @return the functional routine.
-     */
-    @NotNull
-    <OUT> FunctionalRoutine<Void, OUT> sync(@NotNull CommandInvocation<OUT> invocation);
-
-    /**
-     * Creates a new functional routine based on the specified supplier.
-     * <p/>
-     * Note that the created routine will be invoked in a synchronous mode.
-     *
-     * @param supplier the supplier instance.
-     * @param <OUT>    the output data type.
-     * @return the functional routine.
-     */
-    @NotNull
-    <OUT> FunctionalRoutine<Void, OUT> sync(@NotNull Supplier<OUT> supplier);
-
-    /**
-     * Creates a new functional routine based on the specified bi-function.<br/>
-     * The input will be accumulated as follows:
-     * <pre>
-     *     <code>
-     *
-     *         acc = function.apply(acc, input);
-     *     </code>
-     * </pre>
-     * The accumulated value will be passed as result only when the routine invocation completes.
-     * <p/>
-     * Note that the created routine will be invoked in a synchronous mode.
-     *
-     * @param function the bi-function instance.
-     * @param <IN>     the input data type.
-     * @return the functional routine.
-     */
-    @NotNull
-    <IN> FunctionalRoutine<IN, IN> syncAccumulate(
-            @NotNull BiFunction<? super IN, ? super IN, ? extends IN> function);
-
-    /**
-     * Creates a new functional routine based on the specified predicate.<br/>
-     * The input will be filtered accordingly to the result returned by the predicate.
-     * <p/>
-     * Note that the created routine will be invoked in an asynchronous mode.
-     *
-     * @param predicate the predicate instance.
-     * @param <IN>      the input data type.
-     * @return the functional routine.
-     */
-    @NotNull
-    <IN> FunctionalRoutine<IN, IN> syncFilter(@NotNull Predicate<? super IN> predicate);
-
-    /**
-     * Creates a new functional routine based on the specified consumer.
-     * <p/>
-     * Note that the created routine will be invoked in a synchronous mode.
-     *
-     * @param consumer the bi-consumer instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the functional routine.
-     */
-    @NotNull
-    <IN, OUT> FunctionalRoutine<IN, OUT> syncMap(
-            @NotNull BiConsumer<IN, ? super ResultChannel<OUT>> consumer);
-
-    /**
-     * Creates a new functional routine based on the specified filter invocation.
-     * <p/>
-     * Note that the created routine will be invoked in a synchronous mode.
-     *
-     * @param invocation the filter invocation instance.
-     * @param <IN>       the input data type.
-     * @param <OUT>      the output data type.
-     * @return the functional routine.
-     */
-    @NotNull
-    <IN, OUT> FunctionalRoutine<IN, OUT> syncMap(@NotNull FilterInvocation<IN, OUT> invocation);
-
-    /**
-     * Creates a new functional routine based on the specified function.
-     * <p/>
-     * Note that the created routine will be invoked in a synchronous mode.
-     *
-     * @param function the function instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the functional routine.
-     */
-    @NotNull
-    <IN, OUT> FunctionalRoutine<IN, OUT> syncMap(@NotNull Function<IN, OUT> function);
-
-    /**
-     * Creates a new functional routine wrapping specified one.
-     * <p/>
-     * Note that the created routine will be invoked in a synchronous mode.
-     *
-     * @param routine the routine instance.
-     * @param <IN>    the input data type.
-     * @param <OUT>   the output data type.
-     * @return the functional routine.
-     */
-    @NotNull
-    <IN, OUT> FunctionalRoutine<IN, OUT> syncMap(@NotNull Routine<IN, OUT> routine);
-
-    /**
-     * Creates a new functional routine based on the specified bi-consumer.<br/>
-     * The inputs will be reduced by applying the consumer only when the routine invocation
-     * completes.
-     * <p/>
-     * Note that the created routine will be invoked in a synchronous mode.
-     *
-     * @param consumer the bi-consumer instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the functional routine.
-     */
-    @NotNull
-    <IN, OUT> FunctionalRoutine<IN, OUT> syncReduce(
-            @NotNull BiConsumer<? super List<? extends IN>, ? super ResultChannel<OUT>> consumer);
-
-    /**
-     * Creates a new functional routine based on the specified function.<br/>
-     * The inputs will be reduced by applying the function only when the routine invocation
-     * completes.
-     * <p/>
-     * Note that the created routine will be invoked in a synchronous mode.
-     *
-     * @param function the function instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the functional routine.
-     */
-    @NotNull
-    <IN, OUT> FunctionalRoutine<IN, OUT> syncReduce(
+    <IN, OUT> FunctionalRoutine<IN, OUT> reduce(
             @NotNull Function<? super List<? extends IN>, OUT> function);
 }

@@ -28,16 +28,17 @@ import com.github.dm.jrt.routine.Routine;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static com.github.dm.jrt.core.Channels.asyncStream;
-import static com.github.dm.jrt.core.Channels.parallelStream;
 import static com.github.dm.jrt.core.Channels.syncStream;
 
 /**
+ * Default implementation of a functional routine.
+ * <p/>
  * Created by davide-maestroni on 10/16/2015.
+ *
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
 class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine<IN, OUT> {
-
-    private final DelegationType mDelegationType;
 
     private final Routine<IN, OUT> mRoutine;
 
@@ -45,36 +46,47 @@ class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine<IN, OU
      * Constructor.
      *
      * @param configuration the invocation configuration.
+     * @param routine       the backing routine instance.
      */
+    @SuppressWarnings("ConstantConditions")
     DefaultFunctionalRoutine(@NotNull final InvocationConfiguration configuration,
-            @NotNull final Routine<IN, OUT> routine, @NotNull final DelegationType delegationType) {
+            @NotNull final Routine<IN, OUT> routine) {
 
         super(configuration);
+
+        if (routine == null) {
+
+            throw new NullPointerException("the backing routine must not be null");
+        }
+
         mRoutine = routine;
-        mDelegationType = delegationType;
     }
 
     @NotNull
-    @Override
-    protected <AFTER> FunctionalRoutine<IN, AFTER> andThen(
-            @NotNull final Routine<? super OUT, AFTER> routine,
-            @NotNull final DelegationType delegationType) {
+    public <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> lift(
+            @NotNull final Function<? super FunctionalRoutine<IN, OUT>, ? extends Routine<BEFORE,
+                    AFTER>> function) {
 
-        return new AfterFunctionalRoutine<IN, OUT, AFTER>(getBuilderConfiguration(), this,
-                                                          mDelegationType, routine, delegationType);
+        return new DefaultFunctionalRoutine<BEFORE, AFTER>(getConfiguration(),
+                                                           function.apply(this));
     }
 
     @NotNull
     @Override
     protected Invocation<IN, OUT> newInvocation(@NotNull final InvocationType type) {
 
-        return new DelegatingInvocation<IN, OUT>(mRoutine, mDelegationType);
+        return new DelegatingInvocation<IN, OUT>(mRoutine, DelegationType.SYNC);
     }
 
+    /**
+     * Functional routine implementation concatenating two different routines.
+     *
+     * @param <IN>    the input data type.
+     * @param <OUT>   the output data type.
+     * @param <AFTER> the concatenation output type.
+     */
     private static class AfterFunctionalRoutine<IN, OUT, AFTER>
             extends AbstractFunctionalRoutine<IN, AFTER> {
-
-        private final DelegationType mAfterDelegationType;
 
         private final Routine<? super OUT, AFTER> mAfterRoutine;
 
@@ -85,37 +97,32 @@ class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine<IN, OU
         /**
          * Constructor.
          *
-         * @param configuration the invocation configuration.
+         * @param configuration  the invocation configuration.
+         * @param routine        the backing routine instance.
+         * @param afterRoutine   the concatenated routine instance.
+         * @param delegationType the concatenated delegation type.
          */
         @SuppressWarnings("ConstantConditions")
         private AfterFunctionalRoutine(@NotNull final InvocationConfiguration configuration,
                 @NotNull final FunctionalRoutine<IN, OUT> routine,
-                @NotNull final DelegationType delegationType,
                 @NotNull final Routine<? super OUT, AFTER> afterRoutine,
-                @NotNull final DelegationType afterDelegationType) {
+                @NotNull final DelegationType delegationType) {
 
             super(configuration);
 
             if (afterRoutine == null) {
 
-                throw new NullPointerException("the after routine must not be null");
+                throw new NullPointerException("the concatenated routine must not be null");
+            }
+
+            if (delegationType == null) {
+
+                throw new NullPointerException("the concatenated delegation type must not be null");
             }
 
             mRoutine = routine;
-            mDelegationType = delegationType;
             mAfterRoutine = afterRoutine;
-            mAfterDelegationType = afterDelegationType;
-        }
-
-        @NotNull
-        @Override
-        protected <BEFORE, NEXT> FunctionalRoutine<BEFORE, NEXT> lift(
-                @NotNull final Function<? super FunctionalRoutine<IN, AFTER>, ? extends
-                        Routine<BEFORE, NEXT>> function,
-                @NotNull final DelegationType delegationType) {
-
-            return new DefaultFunctionalRoutine<BEFORE, NEXT>(getBuilderConfiguration(),
-                                                              function.apply(this), delegationType);
+            mDelegationType = delegationType;
         }
 
         @NotNull
@@ -124,23 +131,35 @@ class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine<IN, OU
                 @NotNull final Routine<? super AFTER, NEXT> routine,
                 @NotNull final DelegationType delegationType) {
 
-            return new AfterFunctionalRoutine<IN, AFTER, NEXT>(getBuilderConfiguration(), this,
-                                                               DelegationType.SYNC, routine,
+            return new AfterFunctionalRoutine<IN, AFTER, NEXT>(getConfiguration(), this, routine,
                                                                delegationType);
+        }
+
+        @NotNull
+        public <BEFORE, NEXT> FunctionalRoutine<BEFORE, NEXT> lift(
+                @NotNull final Function<? super FunctionalRoutine<IN, AFTER>, ? extends
+                        Routine<BEFORE, NEXT>> function) {
+
+            return new DefaultFunctionalRoutine<BEFORE, NEXT>(getConfiguration(),
+                                                              function.apply(this));
         }
 
         @NotNull
         @Override
         protected Invocation<IN, AFTER> newInvocation(@NotNull final InvocationType type) {
 
-            return new AfterInvocation<IN, OUT, AFTER>(mRoutine, mDelegationType, mAfterRoutine,
-                                                       mAfterDelegationType);
+            return new AfterInvocation<IN, OUT, AFTER>(mRoutine, mAfterRoutine, mDelegationType);
         }
     }
 
+    /**
+     * Invocation implementation concatenating two different routines.
+     *
+     * @param <IN>    the input data type.
+     * @param <OUT>   the output data type.
+     * @param <AFTER> the concatenation output type.
+     */
     private static class AfterInvocation<IN, OUT, AFTER> implements Invocation<IN, AFTER> {
-
-        private final DelegationType mAfterDelegationType;
 
         private final Routine<? super OUT, AFTER> mAfterRoutine;
 
@@ -152,15 +171,20 @@ class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine<IN, OU
 
         private OutputChannel<AFTER> mOutputChannel;
 
+        /**
+         * Constructor.
+         *
+         * @param routine        the backing routine instance.
+         * @param afterRoutine   the concatenated routine instance.
+         * @param delegationType the concatenated delegation type.
+         */
         private AfterInvocation(@NotNull final FunctionalRoutine<IN, OUT> routine,
-                @NotNull final DelegationType delegationType,
                 @NotNull final Routine<? super OUT, AFTER> afterRoutine,
-                @NotNull final DelegationType afterDelegationType) {
+                @NotNull final DelegationType delegationType) {
 
             mRoutine = routine;
-            mDelegationType = delegationType;
             mAfterRoutine = afterRoutine;
-            mAfterDelegationType = afterDelegationType;
+            mDelegationType = delegationType;
         }
 
         public void onAbort(@Nullable final RoutineException reason) {
@@ -176,19 +200,15 @@ class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine<IN, OU
 
         public void onInitialize() {
 
+            final StreamingChannel<IN, OUT> streamingChannel = syncStream(mRoutine);
             final DelegationType delegationType = mDelegationType;
-            final StreamingChannel<IN, OUT> streamingChannel =
-                    (delegationType == DelegationType.ASYNC) ? asyncStream(mRoutine)
-                            : (delegationType == DelegationType.PARALLEL) ? parallelStream(mRoutine)
-                                    : syncStream(mRoutine);
-            final DelegationType afterDelegationType = mAfterDelegationType;
 
-            if (afterDelegationType == DelegationType.ASYNC) {
+            if (delegationType == DelegationType.ASYNC) {
 
                 mOutputChannel = streamingChannel.passTo(mAfterRoutine.asyncInvoke()).result();
                 mInputChannel = streamingChannel;
 
-            } else if (afterDelegationType == DelegationType.PARALLEL) {
+            } else if (delegationType == DelegationType.PARALLEL) {
 
                 mOutputChannel = streamingChannel.passTo(mAfterRoutine.parallelInvoke()).result();
                 mInputChannel = streamingChannel;
@@ -233,12 +253,11 @@ class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine<IN, OU
 
     @NotNull
     @Override
-    protected <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> lift(
-            @NotNull final Function<? super FunctionalRoutine<IN, OUT>, ? extends Routine<BEFORE,
-                    AFTER>> function,
+    protected <AFTER> FunctionalRoutine<IN, AFTER> andThen(
+            @NotNull final Routine<? super OUT, AFTER> routine,
             @NotNull final DelegationType delegationType) {
 
-        return new DefaultFunctionalRoutine<BEFORE, AFTER>(getBuilderConfiguration(),
-                                                           function.apply(this), delegationType);
+        return new AfterFunctionalRoutine<IN, OUT, AFTER>(getConfiguration(), this, routine,
+                                                          delegationType);
     }
 }

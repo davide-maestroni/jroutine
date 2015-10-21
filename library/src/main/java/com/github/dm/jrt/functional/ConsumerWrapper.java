@@ -29,7 +29,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  *
  * @param <IN> the input data type.
  */
-public class ConsumerChain<IN> implements Consumer<IN> {
+public class ConsumerWrapper<IN> implements Consumer<IN> {
 
     private final List<Consumer<?>> mConsumers;
 
@@ -38,7 +38,7 @@ public class ConsumerChain<IN> implements Consumer<IN> {
      *
      * @param consumers the list of wrapped consumers.
      */
-    ConsumerChain(@NotNull final List<Consumer<?>> consumers) {
+    ConsumerWrapper(@NotNull final List<Consumer<?>> consumers) {
 
         if (consumers.isEmpty()) {
 
@@ -67,7 +67,7 @@ public class ConsumerChain<IN> implements Consumer<IN> {
     @NotNull
     @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
             justification = "class comparison with == is done")
-    public ConsumerChain<IN> andThen(@NotNull final Consumer<? super IN> after) {
+    public ConsumerWrapper<IN> andThen(@NotNull final Consumer<? super IN> after) {
 
         final Class<? extends Consumer> consumerClass = after.getClass();
         final List<Consumer<?>> consumers = mConsumers;
@@ -75,16 +75,16 @@ public class ConsumerChain<IN> implements Consumer<IN> {
                 new ArrayList<Consumer<?>>(consumers.size() + 1);
         newConsumers.addAll(consumers);
 
-        if (consumerClass == ConsumerChain.class) {
+        if (consumerClass == ConsumerWrapper.class) {
 
-            newConsumers.addAll(((ConsumerChain<?>) after).mConsumers);
+            newConsumers.addAll(((ConsumerWrapper<?>) after).mConsumers);
 
         } else {
 
             newConsumers.add(after);
         }
 
-        return new ConsumerChain<IN>(newConsumers);
+        return new ConsumerWrapper<IN>(newConsumers);
     }
 
     /**
@@ -131,7 +131,7 @@ public class ConsumerChain<IN> implements Consumer<IN> {
             return false;
         }
 
-        final ConsumerChain<?> that = (ConsumerChain<?>) o;
+        final ConsumerWrapper<?> that = (ConsumerWrapper<?>) o;
         final List<Consumer<?>> thisConsumers = mConsumers;
         final List<Consumer<?>> thatConsumers = that.mConsumers;
         final int size = thisConsumers.size();

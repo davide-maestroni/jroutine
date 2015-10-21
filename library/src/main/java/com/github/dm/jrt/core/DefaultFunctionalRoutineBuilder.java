@@ -17,21 +17,14 @@ import com.github.dm.jrt.builder.FunctionalRoutineBuilder;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.Builder;
 import com.github.dm.jrt.builder.InvocationConfiguration.Configurable;
-import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.functional.BiConsumer;
-import com.github.dm.jrt.functional.BiFunction;
-import com.github.dm.jrt.functional.Function;
 import com.github.dm.jrt.functional.Functions;
-import com.github.dm.jrt.functional.Predicate;
 import com.github.dm.jrt.functional.Supplier;
 import com.github.dm.jrt.invocation.CommandInvocation;
-import com.github.dm.jrt.invocation.FilterInvocation;
+import com.github.dm.jrt.invocation.PassingInvocation;
 import com.github.dm.jrt.routine.FunctionalRoutine;
 import com.github.dm.jrt.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 /**
  * Default implementation of a functional routine builder.
@@ -44,86 +37,29 @@ class DefaultFunctionalRoutineBuilder
     private InvocationConfiguration mConfiguration = InvocationConfiguration.DEFAULT_CONFIGURATION;
 
     @NotNull
-    public <IN> FunctionalRoutine<IN, IN> accumulate(
-            @NotNull final BiFunction<? super IN, ? super IN, ? extends IN> function) {
-
-        return map(JRoutine.on(AccumulateInvocation.functionFactory(function))
-                           .invocations()
-                           .with(mConfiguration)
-                           .set()
-                           .buildRoutine());
-    }
-
-    @NotNull
-    public <IN> FunctionalRoutine<IN, IN> filter(@NotNull final Predicate<? super IN> predicate) {
-
-        return map(JRoutine.on(Functions.predicateFilter(predicate))
-                           .invocations()
-                           .with(mConfiguration)
-                           .set()
-                           .buildRoutine());
-    }
-
-    @NotNull
-    public <OUT> FunctionalRoutine<Void, OUT> from(
+    public <OUT> FunctionalRoutine<Void, OUT> buildFrom(
             @NotNull final CommandInvocation<OUT> invocation) {
 
-        return map(JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine());
+        final Routine<Void, OUT> routine =
+                JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine();
+        return new DefaultFunctionalRoutine<Void, OUT>(mConfiguration, routine);
     }
 
     @NotNull
-    public <OUT> FunctionalRoutine<Void, OUT> from(@NotNull final Supplier<OUT> supplier) {
+    public <OUT> FunctionalRoutine<Void, OUT> buildFrom(@NotNull final Supplier<OUT> supplier) {
 
-        return from(Functions.supplierCommand(supplier));
+        return buildFrom(Functions.supplierCommand(supplier));
     }
 
     @NotNull
-    public <IN, OUT> FunctionalRoutine<IN, OUT> map(
-            @NotNull final BiConsumer<IN, ? super ResultChannel<OUT>> consumer) {
+    public <DATA> FunctionalRoutine<DATA, DATA> buildRoutine() {
 
-        return map(Functions.consumerFilter(consumer));
-    }
-
-    @NotNull
-    public <IN, OUT> FunctionalRoutine<IN, OUT> map(
-            @NotNull final FilterInvocation<IN, OUT> invocation) {
-
-        return map(JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine());
-    }
-
-    @NotNull
-    public <IN, OUT> FunctionalRoutine<IN, OUT> map(@NotNull final Function<IN, OUT> function) {
-
-        return map(Functions.functionFilter(function));
-    }
-
-    @NotNull
-    public <IN, OUT> FunctionalRoutine<IN, OUT> map(@NotNull final Routine<IN, OUT> routine) {
-
-        return new DefaultFunctionalRoutine<IN, OUT>(mConfiguration, routine);
-    }
-
-    @NotNull
-    public <IN, OUT> FunctionalRoutine<IN, OUT> reduce(
-            @NotNull final BiConsumer<? super List<? extends IN>, ? super ResultChannel<OUT>>
-                    consumer) {
-
-        return map(JRoutine.on(Functions.consumerFactory(consumer))
-                           .invocations()
-                           .with(mConfiguration)
-                           .set()
-                           .buildRoutine());
-    }
-
-    @NotNull
-    public <IN, OUT> FunctionalRoutine<IN, OUT> reduce(
-            @NotNull final Function<? super List<? extends IN>, OUT> function) {
-
-        return map(JRoutine.on(Functions.functionFactory(function))
-                           .invocations()
-                           .with(mConfiguration)
-                           .set()
-                           .buildRoutine());
+        final Routine<DATA, DATA> routine = JRoutine.on(PassingInvocation.<DATA>factoryOf())
+                                                    .invocations()
+                                                    .with(mConfiguration)
+                                                    .set()
+                                                    .buildRoutine();
+        return new DefaultFunctionalRoutine<DATA, DATA>(mConfiguration, routine);
     }
 
     @NotNull

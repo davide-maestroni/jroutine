@@ -22,7 +22,7 @@ import org.junit.Test;
 import static com.github.dm.jrt.core.OutputConsumerBuilder.onComplete;
 import static com.github.dm.jrt.core.OutputConsumerBuilder.onError;
 import static com.github.dm.jrt.core.OutputConsumerBuilder.onOutput;
-import static com.github.dm.jrt.functional.Functions.consumerChain;
+import static com.github.dm.jrt.functional.Functions.wrapConsumer;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -60,7 +60,7 @@ public class OutputConsumerBuilderTest {
         consumer1.reset();
         consumer2.reset();
         outputConsumer =
-                onComplete(consumer1).andThenComplete(consumerChain(consumer2).andThen(consumer3));
+                onComplete(consumer1).andThenComplete(wrapConsumer(consumer2).andThen(consumer3));
         outputConsumer.onOutput("test");
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(consumer2.isCalled()).isFalse();
@@ -161,7 +161,7 @@ public class OutputConsumerBuilderTest {
         consumer1.reset();
         consumer2.reset();
         outputConsumer =
-                onError(consumer1).andThenError(consumerChain(consumer2).andThen(consumer3));
+                onError(consumer1).andThenError(wrapConsumer(consumer2).andThen(consumer3));
         outputConsumer.onOutput("test");
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(consumer2.isCalled()).isFalse();
@@ -262,7 +262,7 @@ public class OutputConsumerBuilderTest {
         consumer1.reset();
         consumer2.reset();
         outputConsumer =
-                onOutput(consumer1).andThenOutput(consumerChain(consumer2).andThen(consumer3));
+                onOutput(consumer1).andThenOutput(wrapConsumer(consumer2).andThen(consumer3));
         outputConsumer.onError(new RoutineException());
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(consumer2.isCalled()).isFalse();

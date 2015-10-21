@@ -29,7 +29,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  *
  * @param <IN> the input data type.
  */
-public class PredicateChain<IN> implements Predicate<IN> {
+public class PredicateWrapper<IN> implements Predicate<IN> {
 
     private static final Predicate<?> AND_PREDICATE = new Predicate<Object>() {
 
@@ -82,7 +82,7 @@ public class PredicateChain<IN> implements Predicate<IN> {
      * @param predicates the list of wrapped predicates.
      */
     @SuppressWarnings("ConstantConditions")
-    PredicateChain(@NotNull final Predicate<? super IN> predicate,
+    PredicateWrapper(@NotNull final Predicate<? super IN> predicate,
             @NotNull final List<Predicate<?>> predicates) {
 
         if (predicate == null) {
@@ -109,7 +109,7 @@ public class PredicateChain<IN> implements Predicate<IN> {
     @NotNull
     @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
             justification = "class comparison with == is done")
-    public PredicateChain<IN> and(@NotNull final Predicate<? super IN> other) {
+    public PredicateWrapper<IN> and(@NotNull final Predicate<? super IN> other) {
 
         final Class<? extends Predicate> otherClass = other.getClass();
         final List<Predicate<?>> predicates = mPredicates;
@@ -119,9 +119,9 @@ public class PredicateChain<IN> implements Predicate<IN> {
         newPredicates.addAll(predicates);
         newPredicates.add(AND_PREDICATE);
 
-        if (otherClass == PredicateChain.class) {
+        if (otherClass == PredicateWrapper.class) {
 
-            newPredicates.addAll(((PredicateChain<?>) other).mPredicates);
+            newPredicates.addAll(((PredicateWrapper<?>) other).mPredicates);
 
         } else {
 
@@ -129,7 +129,7 @@ public class PredicateChain<IN> implements Predicate<IN> {
         }
 
         newPredicates.add(CLOSE_PREDICATE);
-        return new PredicateChain<IN>(new AndPredicate<IN>(mPredicate, other), newPredicates);
+        return new PredicateWrapper<IN>(new AndPredicate<IN>(mPredicate, other), newPredicates);
     }
 
     /**
@@ -176,7 +176,7 @@ public class PredicateChain<IN> implements Predicate<IN> {
             return false;
         }
 
-        final PredicateChain<?> that = (PredicateChain<?>) o;
+        final PredicateWrapper<?> that = (PredicateWrapper<?>) o;
         final List<Predicate<?>> thisPredicates = mPredicates;
         final List<Predicate<?>> thatPredicates = that.mPredicates;
         final int size = thisPredicates.size();
@@ -204,7 +204,7 @@ public class PredicateChain<IN> implements Predicate<IN> {
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public PredicateChain<IN> negate() {
+    public PredicateWrapper<IN> negate() {
 
         final List<Predicate<?>> predicates = mPredicates;
         final int size = predicates.size();
@@ -256,7 +256,7 @@ public class PredicateChain<IN> implements Predicate<IN> {
             }
         }
 
-        return new PredicateChain<IN>(new NegatePredicate<IN>(mPredicate), newPredicates);
+        return new PredicateWrapper<IN>(new NegatePredicate<IN>(mPredicate), newPredicates);
     }
 
     /**
@@ -269,7 +269,7 @@ public class PredicateChain<IN> implements Predicate<IN> {
     @NotNull
     @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
             justification = "class comparison with == is done")
-    public PredicateChain<IN> or(@NotNull final Predicate<? super IN> other) {
+    public PredicateWrapper<IN> or(@NotNull final Predicate<? super IN> other) {
 
         final Class<? extends Predicate> otherClass = other.getClass();
         final List<Predicate<?>> predicates = mPredicates;
@@ -279,9 +279,9 @@ public class PredicateChain<IN> implements Predicate<IN> {
         newPredicates.addAll(predicates);
         newPredicates.add(OR_PREDICATE);
 
-        if (otherClass == PredicateChain.class) {
+        if (otherClass == PredicateWrapper.class) {
 
-            newPredicates.addAll(((PredicateChain<?>) other).mPredicates);
+            newPredicates.addAll(((PredicateWrapper<?>) other).mPredicates);
 
         } else {
 
@@ -289,7 +289,7 @@ public class PredicateChain<IN> implements Predicate<IN> {
         }
 
         newPredicates.add(CLOSE_PREDICATE);
-        return new PredicateChain<IN>(new OrPredicate<IN>(mPredicate, other), newPredicates);
+        return new PredicateWrapper<IN>(new OrPredicate<IN>(mPredicate, other), newPredicates);
     }
 
     /**

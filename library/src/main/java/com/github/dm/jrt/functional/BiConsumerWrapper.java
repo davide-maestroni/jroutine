@@ -30,7 +30,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * @param <IN1> the first input data type.
  * @param <IN2> the second input data type.
  */
-public class BiConsumerChain<IN1, IN2> implements BiConsumer<IN1, IN2> {
+public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2> {
 
     private final List<BiConsumer<?, ?>> mConsumers;
 
@@ -39,7 +39,7 @@ public class BiConsumerChain<IN1, IN2> implements BiConsumer<IN1, IN2> {
      *
      * @param consumers the list of wrapped consumers.
      */
-    BiConsumerChain(@NotNull final List<BiConsumer<?, ?>> consumers) {
+    BiConsumerWrapper(@NotNull final List<BiConsumer<?, ?>> consumers) {
 
         if (consumers.isEmpty()) {
 
@@ -68,7 +68,7 @@ public class BiConsumerChain<IN1, IN2> implements BiConsumer<IN1, IN2> {
     @NotNull
     @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
             justification = "class comparison with == is done")
-    public BiConsumerChain<IN1, IN2> andThen(
+    public BiConsumerWrapper<IN1, IN2> andThen(
             @NotNull final BiConsumer<? super IN1, ? super IN2> after) {
 
         final Class<? extends BiConsumer> consumerClass = after.getClass();
@@ -77,16 +77,16 @@ public class BiConsumerChain<IN1, IN2> implements BiConsumer<IN1, IN2> {
                 new ArrayList<BiConsumer<?, ?>>(consumers.size() + 1);
         newConsumers.addAll(consumers);
 
-        if (consumerClass == BiConsumerChain.class) {
+        if (consumerClass == BiConsumerWrapper.class) {
 
-            newConsumers.addAll(((BiConsumerChain<?, ?>) after).mConsumers);
+            newConsumers.addAll(((BiConsumerWrapper<?, ?>) after).mConsumers);
 
         } else {
 
             newConsumers.add(after);
         }
 
-        return new BiConsumerChain<IN1, IN2>(newConsumers);
+        return new BiConsumerWrapper<IN1, IN2>(newConsumers);
     }
 
     /**
@@ -133,7 +133,7 @@ public class BiConsumerChain<IN1, IN2> implements BiConsumer<IN1, IN2> {
             return false;
         }
 
-        final BiConsumerChain<?, ?> that = (BiConsumerChain<?, ?>) o;
+        final BiConsumerWrapper<?, ?> that = (BiConsumerWrapper<?, ?>) o;
         final List<BiConsumer<?, ?>> thisConsumers = mConsumers;
         final List<BiConsumer<?, ?>> thatConsumers = that.mConsumers;
         final int size = thisConsumers.size();

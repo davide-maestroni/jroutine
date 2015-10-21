@@ -13,20 +13,11 @@
  */
 package com.github.dm.jrt.builder;
 
-import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.functional.BiConsumer;
-import com.github.dm.jrt.functional.BiFunction;
-import com.github.dm.jrt.functional.Function;
-import com.github.dm.jrt.functional.Predicate;
 import com.github.dm.jrt.functional.Supplier;
 import com.github.dm.jrt.invocation.CommandInvocation;
-import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.routine.FunctionalRoutine;
-import com.github.dm.jrt.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 /**
  * Interface defining a builder of functional routines.
@@ -36,125 +27,32 @@ import java.util.List;
 public interface FunctionalRoutineBuilder extends ConfigurableBuilder<FunctionalRoutineBuilder> {
 
     /**
-     * Creates a new functional routine based on the specified accumulate function.<br/>
-     * The input will be accumulated as follows:
-     * <pre>
-     *     <code>
-     *
-     *         acc = function.apply(acc, input);
-     *     </code>
-     * </pre>
-     * The accumulated value will be passed as result only when the routine invocation completes.
-     *
-     * @param function the bi-function instance.
-     * @param <IN>     the input data type.
-     * @return the functional routine.
-     */
-    @NotNull
-    <IN> FunctionalRoutine<IN, IN> accumulate(
-            @NotNull BiFunction<? super IN, ? super IN, ? extends IN> function);
-
-    /**
-     * Creates a new functional routine based on the specified predicate.<br/>
-     * The input will be filtered accordingly to the result returned by the predicate.
-     *
-     * @param predicate the predicate instance.
-     * @param <IN>      the input data type.
-     * @return the functional routine.
-     */
-    @NotNull
-    <IN> FunctionalRoutine<IN, IN> filter(@NotNull Predicate<? super IN> predicate);
-
-    /**
-     * Creates a new functional routine based on the specified command invocation.
+     * Builds and returns a new functional routine generating outputs from the specified command
+     * invocation.
      *
      * @param invocation the command invocation instance.
      * @param <OUT>      the output data type.
-     * @return the functional routine.
+     * @return the newly created routine instance.
      */
     @NotNull
-    <OUT> FunctionalRoutine<Void, OUT> from(@NotNull CommandInvocation<OUT> invocation);
+    <OUT> FunctionalRoutine<Void, OUT> buildFrom(@NotNull CommandInvocation<OUT> invocation);
 
     /**
-     * Creates a new functional routine based on the specified supplier.
+     * Builds and returns a new functional routine generating outputs from the specified supplier.
      *
      * @param supplier the supplier instance.
      * @param <OUT>    the output data type.
-     * @return the functional routine.
+     * @return the newly created routine instance.
      */
     @NotNull
-    <OUT> FunctionalRoutine<Void, OUT> from(@NotNull Supplier<OUT> supplier);
+    <OUT> FunctionalRoutine<Void, OUT> buildFrom(@NotNull Supplier<OUT> supplier);
 
     /**
-     * Creates a new functional routine based on the specified consumer.
+     * Builds and returns a functional routine.
      *
-     * @param consumer the bi-consumer instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the functional routine.
+     * @param <DATA> the data type.
+     * @return the newly created routine instance.
      */
     @NotNull
-    <IN, OUT> FunctionalRoutine<IN, OUT> map(
-            @NotNull BiConsumer<IN, ? super ResultChannel<OUT>> consumer);
-
-    /**
-     * Creates a new functional routine based on the specified filter invocation.
-     *
-     * @param invocation the filter invocation instance.
-     * @param <IN>       the input data type.
-     * @param <OUT>      the output data type.
-     * @return the functional routine.
-     */
-    @NotNull
-    <IN, OUT> FunctionalRoutine<IN, OUT> map(@NotNull FilterInvocation<IN, OUT> invocation);
-
-    /**
-     * Creates a new functional routine based on the specified function.
-     *
-     * @param function the function instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the functional routine.
-     */
-    @NotNull
-    <IN, OUT> FunctionalRoutine<IN, OUT> map(@NotNull Function<IN, OUT> function);
-
-    /**
-     * Creates a new functional routine wrapping specified one.
-     *
-     * @param routine the routine instance.
-     * @param <IN>    the input data type.
-     * @param <OUT>   the output data type.
-     * @return the functional routine.
-     */
-    @NotNull
-    <IN, OUT> FunctionalRoutine<IN, OUT> map(@NotNull Routine<IN, OUT> routine);
-
-    /**
-     * Creates a new functional routine based on the specified bi-consumer.<br/>
-     * The inputs will be reduced by applying the consumer only when the routine invocation
-     * completes.
-     *
-     * @param consumer the bi-consumer instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the functional routine.
-     */
-    @NotNull
-    <IN, OUT> FunctionalRoutine<IN, OUT> reduce(
-            @NotNull BiConsumer<? super List<? extends IN>, ? super ResultChannel<OUT>> consumer);
-
-    /**
-     * Creates a new functional routine based on the specified function.<br/>
-     * The inputs will be reduced by applying the function only when the routine invocation
-     * completes.
-     *
-     * @param function the function instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the functional routine.
-     */
-    @NotNull
-    <IN, OUT> FunctionalRoutine<IN, OUT> reduce(
-            @NotNull Function<? super List<? extends IN>, OUT> function);
+    <DATA> FunctionalRoutine<DATA, DATA> buildRoutine();
 }

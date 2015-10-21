@@ -34,16 +34,16 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  */
 public class Functions {
 
-    private static final BiConsumerChain<?, ?> sBiSink =
-            biConsumerChain(new BiConsumer<Object, Object>() {
+    private static final BiConsumerWrapper<?, ?> sBiSink =
+            wrapBiConsumer(new BiConsumer<Object, Object>() {
 
                 public void accept(final Object in1, final Object in2) {
 
                 }
             });
 
-    private static final FunctionChain<?, ?> sIdentity =
-            functionChain(new Function<Object, Object>() {
+    private static final FunctionWrapper<?, ?> sIdentity =
+            wrapFunction(new Function<Object, Object>() {
 
                 public Object apply(final Object in) {
 
@@ -51,8 +51,8 @@ public class Functions {
                 }
             });
 
-    private static final BiFunctionChain<?, ?, ?> sFirst =
-            biFunctionChain(new BiFunction<Object, Object, Object>() {
+    private static final BiFunctionWrapper<?, ?, ?> sFirst =
+            wrapBiFunction(new BiFunction<Object, Object, Object>() {
 
                 public Object apply(final Object in1, final Object in2) {
 
@@ -60,7 +60,7 @@ public class Functions {
                 }
             });
 
-    private static final PredicateChain<?> sNegative = predicateChain(new Predicate<Object>() {
+    private static final PredicateWrapper<?> sNegative = wrapPredicate(new Predicate<Object>() {
 
         public boolean test(final Object o) {
 
@@ -68,7 +68,7 @@ public class Functions {
         }
     });
 
-    private static final PredicateChain<?> sNotNull = predicateChain(new Predicate<Object>() {
+    private static final PredicateWrapper<?> sNotNull = wrapPredicate(new Predicate<Object>() {
 
         public boolean test(final Object o) {
 
@@ -76,12 +76,12 @@ public class Functions {
         }
     });
 
-    private static final PredicateChain<?> sIsNull = sNotNull.negate();
+    private static final PredicateWrapper<?> sIsNull = sNotNull.negate();
 
-    private static final PredicateChain<?> sPositive = sNegative.negate();
+    private static final PredicateWrapper<?> sPositive = sNegative.negate();
 
-    private static final BiFunctionChain<?, ?, ?> sSecond =
-            biFunctionChain(new BiFunction<Object, Object, Object>() {
+    private static final BiFunctionWrapper<?, ?, ?> sSecond =
+            wrapBiFunction(new BiFunction<Object, Object, Object>() {
 
                 public Object apply(final Object in1, final Object in2) {
 
@@ -89,7 +89,7 @@ public class Functions {
                 }
             });
 
-    private static final ConsumerChain<?> sSink = consumerChain(new Consumer<Object>() {
+    private static final ConsumerWrapper<?> sSink = wrapConsumer(new Consumer<Object>() {
 
         public void accept(final Object in) {
 
@@ -104,64 +104,6 @@ public class Functions {
     }
 
     /**
-     * Wraps the specified bi-consumer instance so to provide additional features.<br/>
-     * The returned object will support concatenation and comparison.
-     * <p/>
-     * Note that the passed object is expected to behave like a function, that is, it must not
-     * retain a mutable internal state.<br/>
-     * Note also that any external object used inside the function must be synchronized in order to
-     * avoid concurrency issues.
-     *
-     * @param consumer the bi-consumer instance.
-     * @param <IN1>    the first input data type.
-     * @param <IN2>    the second input data type.
-     * @return the bi-consumer chain.
-     */
-    @NotNull
-    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
-            justification = "class comparison with == is done")
-    public static <IN1, IN2> BiConsumerChain<IN1, IN2> biConsumerChain(
-            @NotNull final BiConsumer<IN1, IN2> consumer) {
-
-        if (consumer.getClass() == BiConsumerChain.class) {
-
-            return (BiConsumerChain<IN1, IN2>) consumer;
-        }
-
-        return new BiConsumerChain<IN1, IN2>(Collections.<BiConsumer<?, ?>>singletonList(consumer));
-    }
-
-    /**
-     * Wraps the specified bi-function instance so to provide additional features.<br/>
-     * The returned object will support concatenation and comparison.
-     * <p/>
-     * Note that the passed object is expected to behave like a function, that is, it must not
-     * retain a mutable internal state.<br/>
-     * Note also that any external object used inside the function must be synchronized in order to
-     * avoid concurrency issues.
-     *
-     * @param function the bi-function instance.
-     * @param <IN1>    the first input data type.
-     * @param <IN2>    the second input data type.
-     * @param <OUT>    the output data type.
-     * @return the bi-function chain.
-     */
-    @NotNull
-    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
-            justification = "class comparison with == is done")
-    public static <IN1, IN2, OUT> BiFunctionChain<IN1, IN2, OUT> biFunctionChain(
-            @NotNull final BiFunction<IN1, IN2, OUT> function) {
-
-        if (function.getClass() == BiFunctionChain.class) {
-
-            return (BiFunctionChain<IN1, IN2, OUT>) function;
-        }
-
-        return new BiFunctionChain<IN1, IN2, OUT>(function,
-                                                  functionChain(Functions.<OUT>identity()));
-    }
-
-    /**
      * Returns a bi-consumer chain just discarding the passed inputs.<br/>
      * The returned object will support concatenation and comparison.
      *
@@ -171,9 +113,9 @@ public class Functions {
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <IN1, IN2> BiConsumerChain<IN1, IN2> biSink() {
+    public static <IN1, IN2> BiConsumerWrapper<IN1, IN2> biSink() {
 
-        return (BiConsumerChain<IN1, IN2>) sBiSink;
+        return (BiConsumerWrapper<IN1, IN2>) sBiSink;
     }
 
     /**
@@ -185,41 +127,15 @@ public class Functions {
      * @return the supplier chain.
      */
     @NotNull
-    public static <OUT> SupplierChain<OUT> constant(final OUT result) {
+    public static <OUT> SupplierWrapper<OUT> constant(final OUT result) {
 
-        return supplierChain(new Supplier<OUT>() {
+        return wrapSupplier(new Supplier<OUT>() {
 
             public OUT get() {
 
                 return result;
             }
         });
-    }
-
-    /**
-     * Wraps the specified consumer instance so to provide additional features.<br/>
-     * The returned object will support concatenation and comparison.
-     * <p/>
-     * Note that the passed object is expected to behave like a function, that is, it must not
-     * retain a mutable internal state.<br/>
-     * Note also that any external object used inside the function must be synchronized in order to
-     * avoid concurrency issues.
-     *
-     * @param consumer the consumer instance.
-     * @param <IN>     the input data type.
-     * @return the consumer chain.
-     */
-    @NotNull
-    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
-            justification = "class comparison with == is done")
-    public static <IN> ConsumerChain<IN> consumerChain(@NotNull final Consumer<IN> consumer) {
-
-        if (consumer.getClass() == ConsumerChain.class) {
-
-            return (ConsumerChain<IN>) consumer;
-        }
-
-        return new ConsumerChain<IN>(Collections.<Consumer<?>>singletonList(consumer));
     }
 
     /**
@@ -240,7 +156,7 @@ public class Functions {
     public static <OUT> CommandInvocation<OUT> consumerCommand(
             @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
 
-        return new ConsumerCommandInvocation<OUT>(consumerChain(consumer));
+        return new ConsumerCommandInvocation<OUT>(wrapConsumer(consumer));
     }
 
     /**
@@ -263,7 +179,7 @@ public class Functions {
             @NotNull final BiConsumer<? super List<? extends IN>, ? super ResultChannel<OUT>>
                     consumer) {
 
-        return new ConsumerInvocationFactory<IN, OUT>(biConsumerChain(consumer));
+        return new ConsumerInvocationFactory<IN, OUT>(wrapBiConsumer(consumer));
     }
 
     /**
@@ -285,7 +201,7 @@ public class Functions {
     public static <IN, OUT> FilterInvocation<IN, OUT> consumerFilter(
             @NotNull final BiConsumer<? super IN, ? super ResultChannel<OUT>> consumer) {
 
-        return new ConsumerFilterInvocation<IN, OUT>(biConsumerChain(consumer));
+        return new ConsumerFilterInvocation<IN, OUT>(wrapBiConsumer(consumer));
     }
 
     /**
@@ -298,37 +214,9 @@ public class Functions {
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <IN1, IN2> BiFunctionChain<IN1, IN2, IN1> first() {
+    public static <IN1, IN2> BiFunctionWrapper<IN1, IN2, IN1> first() {
 
-        return (BiFunctionChain<IN1, IN2, IN1>) sFirst;
-    }
-
-    /**
-     * Wraps the specified function instance so to provide additional features.<br/>
-     * The returned object will support concatenation and comparison.
-     * <p/>
-     * Note that the passed object is expected to behave like a function, that is, it must not
-     * retain a mutable internal state.<br/>
-     * Note also that any external object used inside the function must be synchronized in order to
-     * avoid concurrency issues.
-     *
-     * @param function the function instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the function chain.
-     */
-    @NotNull
-    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
-            justification = "class comparison with == is done")
-    public static <IN, OUT> FunctionChain<IN, OUT> functionChain(
-            @NotNull final Function<IN, OUT> function) {
-
-        if (function.getClass() == FunctionChain.class) {
-
-            return (FunctionChain<IN, OUT>) function;
-        }
-
-        return new FunctionChain<IN, OUT>(Collections.<Function<?, ?>>singletonList(function));
+        return (BiFunctionWrapper<IN1, IN2, IN1>) sFirst;
     }
 
     /**
@@ -350,7 +238,7 @@ public class Functions {
     public static <IN, OUT> InvocationFactory<IN, OUT> functionFactory(
             @NotNull final Function<? super List<? extends IN>, OUT> function) {
 
-        return new FunctionInvocationFactory<IN, OUT>(functionChain(function));
+        return new FunctionInvocationFactory<IN, OUT>(wrapFunction(function));
     }
 
     /**
@@ -372,7 +260,7 @@ public class Functions {
     public static <IN, OUT> FilterInvocation<IN, OUT> functionFilter(
             @NotNull final Function<? super IN, OUT> function) {
 
-        return new FunctionFilterInvocation<IN, OUT>(functionChain(function));
+        return new FunctionFilterInvocation<IN, OUT>(wrapFunction(function));
     }
 
     /**
@@ -384,9 +272,9 @@ public class Functions {
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <IN> FunctionChain<IN, IN> identity() {
+    public static <IN> FunctionWrapper<IN, IN> identity() {
 
-        return (FunctionChain<IN, IN>) sIdentity;
+        return (FunctionWrapper<IN, IN>) sIdentity;
     }
 
     /**
@@ -398,9 +286,9 @@ public class Functions {
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <IN> PredicateChain<IN> isNull() {
+    public static <IN> PredicateWrapper<IN> isNull() {
 
-        return (PredicateChain<IN>) sIsNull;
+        return (PredicateWrapper<IN>) sIsNull;
     }
 
     /**
@@ -412,9 +300,9 @@ public class Functions {
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <IN> PredicateChain<IN> negative() {
+    public static <IN> PredicateWrapper<IN> negative() {
 
-        return (PredicateChain<IN>) sNegative;
+        return (PredicateWrapper<IN>) sNegative;
     }
 
     /**
@@ -426,9 +314,9 @@ public class Functions {
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <IN> PredicateChain<IN> notNull() {
+    public static <IN> PredicateWrapper<IN> notNull() {
 
-        return (PredicateChain<IN>) sNotNull;
+        return (PredicateWrapper<IN>) sNotNull;
     }
 
     /**
@@ -440,36 +328,9 @@ public class Functions {
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <IN> PredicateChain<IN> positive() {
+    public static <IN> PredicateWrapper<IN> positive() {
 
-        return (PredicateChain<IN>) sPositive;
-    }
-
-    /**
-     * Wraps the specified predicate instance so to provide additional features.<br/>
-     * The returned object will support concatenation and comparison.
-     * <p/>
-     * Note that the passed object is expected to behave like a function, that is, it must not
-     * retain a mutable internal state.<br/>
-     * Note also that any external object used inside the function must be synchronized in order to
-     * avoid concurrency issues.
-     *
-     * @param predicate the predicate instance.
-     * @param <IN>      the input data type.
-     * @return the predicate chain.
-     */
-    @NotNull
-    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
-            justification = "class comparison with == is done")
-    public static <IN> PredicateChain<IN> predicateChain(@NotNull final Predicate<IN> predicate) {
-
-        if (predicate.getClass() == PredicateChain.class) {
-
-            return (PredicateChain<IN>) predicate;
-        }
-
-        return new PredicateChain<IN>(predicate,
-                                      Collections.<Predicate<?>>singletonList(predicate));
+        return (PredicateWrapper<IN>) sPositive;
     }
 
     /**
@@ -492,7 +353,7 @@ public class Functions {
     public static <IN> FilterInvocation<IN, IN> predicateFilter(
             @NotNull final Predicate<? super IN> predicate) {
 
-        return new PredicateFilterInvocation<IN>(predicateChain(predicate));
+        return new PredicateFilterInvocation<IN>(wrapPredicate(predicate));
     }
 
     /**
@@ -505,9 +366,9 @@ public class Functions {
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <IN1, IN2> BiFunctionChain<IN1, IN2, IN2> second() {
+    public static <IN1, IN2> BiFunctionWrapper<IN1, IN2, IN2> second() {
 
-        return (BiFunctionChain<IN1, IN2, IN2>) sSecond;
+        return (BiFunctionWrapper<IN1, IN2, IN2>) sSecond;
     }
 
     /**
@@ -519,35 +380,9 @@ public class Functions {
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <IN> ConsumerChain<IN> sink() {
+    public static <IN> ConsumerWrapper<IN> sink() {
 
-        return (ConsumerChain<IN>) sSink;
-    }
-
-    /**
-     * Wraps the specified supplier instance so to provide additional features.<br/>
-     * The returned object will support concatenation and comparison.
-     * <p/>
-     * Note that the passed object is expected to behave like a function, that is, it must not
-     * retain a mutable internal state.<br/>
-     * Note also that any external object used inside the function must be synchronized in order to
-     * avoid concurrency issues.
-     *
-     * @param supplier the supplier instance.
-     * @param <OUT>    the output data type.
-     * @return the supplier chain.
-     */
-    @NotNull
-    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
-            justification = "class comparison with == is done")
-    public static <OUT> SupplierChain<OUT> supplierChain(@NotNull final Supplier<OUT> supplier) {
-
-        if (supplier.getClass() == SupplierChain.class) {
-
-            return (SupplierChain<OUT>) supplier;
-        }
-
-        return new SupplierChain<OUT>(supplier, Functions.<OUT>identity());
+        return (ConsumerWrapper<IN>) sSink;
     }
 
     /**
@@ -568,7 +403,7 @@ public class Functions {
     public static <OUT> CommandInvocation<OUT> supplierCommand(
             @NotNull final Supplier<OUT> supplier) {
 
-        return new SupplierCommandInvocation<OUT>(supplierChain(supplier));
+        return new SupplierCommandInvocation<OUT>(wrapSupplier(supplier));
     }
 
     /**
@@ -590,7 +425,173 @@ public class Functions {
     public static <IN, OUT> InvocationFactory<IN, OUT> supplierFactory(
             @NotNull final Supplier<? extends Invocation<IN, OUT>> supplier) {
 
-        return new SupplierInvocationFactory<IN, OUT>(supplierChain(supplier));
+        return new SupplierInvocationFactory<IN, OUT>(wrapSupplier(supplier));
+    }
+
+    /**
+     * Wraps the specified bi-consumer instance so to provide additional features.<br/>
+     * The returned object will support concatenation and comparison.
+     * <p/>
+     * Note that the passed object is expected to behave like a function, that is, it must not
+     * retain a mutable internal state.<br/>
+     * Note also that any external object used inside the function must be synchronized in order to
+     * avoid concurrency issues.
+     *
+     * @param consumer the bi-consumer instance.
+     * @param <IN1>    the first input data type.
+     * @param <IN2>    the second input data type.
+     * @return the wrapped bi-consumer.
+     */
+    @NotNull
+    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
+            justification = "class comparison with == is done")
+    public static <IN1, IN2> BiConsumerWrapper<IN1, IN2> wrapBiConsumer(
+            @NotNull final BiConsumer<IN1, IN2> consumer) {
+
+        if (consumer.getClass() == BiConsumerWrapper.class) {
+
+            return (BiConsumerWrapper<IN1, IN2>) consumer;
+        }
+
+        return new BiConsumerWrapper<IN1, IN2>(
+                Collections.<BiConsumer<?, ?>>singletonList(consumer));
+    }
+
+    /**
+     * Wraps the specified bi-function instance so to provide additional features.<br/>
+     * The returned object will support concatenation and comparison.
+     * <p/>
+     * Note that the passed object is expected to behave like a function, that is, it must not
+     * retain a mutable internal state.<br/>
+     * Note also that any external object used inside the function must be synchronized in order to
+     * avoid concurrency issues.
+     *
+     * @param function the bi-function instance.
+     * @param <IN1>    the first input data type.
+     * @param <IN2>    the second input data type.
+     * @param <OUT>    the output data type.
+     * @return the wrapped bi-function.
+     */
+    @NotNull
+    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
+            justification = "class comparison with == is done")
+    public static <IN1, IN2, OUT> BiFunctionWrapper<IN1, IN2, OUT> wrapBiFunction(
+            @NotNull final BiFunction<IN1, IN2, OUT> function) {
+
+        if (function.getClass() == BiFunctionWrapper.class) {
+
+            return (BiFunctionWrapper<IN1, IN2, OUT>) function;
+        }
+
+        return new BiFunctionWrapper<IN1, IN2, OUT>(function,
+                                                    wrapFunction(Functions.<OUT>identity()));
+    }
+
+    /**
+     * Wraps the specified consumer instance so to provide additional features.<br/>
+     * The returned object will support concatenation and comparison.
+     * <p/>
+     * Note that the passed object is expected to behave like a function, that is, it must not
+     * retain a mutable internal state.<br/>
+     * Note also that any external object used inside the function must be synchronized in order to
+     * avoid concurrency issues.
+     *
+     * @param consumer the consumer instance.
+     * @param <IN>     the input data type.
+     * @return the wrapped consumer.
+     */
+    @NotNull
+    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
+            justification = "class comparison with == is done")
+    public static <IN> ConsumerWrapper<IN> wrapConsumer(@NotNull final Consumer<IN> consumer) {
+
+        if (consumer.getClass() == ConsumerWrapper.class) {
+
+            return (ConsumerWrapper<IN>) consumer;
+        }
+
+        return new ConsumerWrapper<IN>(Collections.<Consumer<?>>singletonList(consumer));
+    }
+
+    /**
+     * Wraps the specified function instance so to provide additional features.<br/>
+     * The returned object will support concatenation and comparison.
+     * <p/>
+     * Note that the passed object is expected to behave like a function, that is, it must not
+     * retain a mutable internal state.<br/>
+     * Note also that any external object used inside the function must be synchronized in order to
+     * avoid concurrency issues.
+     *
+     * @param function the function instance.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the wrapped function.
+     */
+    @NotNull
+    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
+            justification = "class comparison with == is done")
+    public static <IN, OUT> FunctionWrapper<IN, OUT> wrapFunction(
+            @NotNull final Function<IN, OUT> function) {
+
+        if (function.getClass() == FunctionWrapper.class) {
+
+            return (FunctionWrapper<IN, OUT>) function;
+        }
+
+        return new FunctionWrapper<IN, OUT>(Collections.<Function<?, ?>>singletonList(function));
+    }
+
+    /**
+     * Wraps the specified predicate instance so to provide additional features.<br/>
+     * The returned object will support concatenation and comparison.
+     * <p/>
+     * Note that the passed object is expected to behave like a function, that is, it must not
+     * retain a mutable internal state.<br/>
+     * Note also that any external object used inside the function must be synchronized in order to
+     * avoid concurrency issues.
+     *
+     * @param predicate the predicate instance.
+     * @param <IN>      the input data type.
+     * @return the wrapped predicate.
+     */
+    @NotNull
+    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
+            justification = "class comparison with == is done")
+    public static <IN> PredicateWrapper<IN> wrapPredicate(@NotNull final Predicate<IN> predicate) {
+
+        if (predicate.getClass() == PredicateWrapper.class) {
+
+            return (PredicateWrapper<IN>) predicate;
+        }
+
+        return new PredicateWrapper<IN>(predicate,
+                                        Collections.<Predicate<?>>singletonList(predicate));
+    }
+
+    /**
+     * Wraps the specified supplier instance so to provide additional features.<br/>
+     * The returned object will support concatenation and comparison.
+     * <p/>
+     * Note that the passed object is expected to behave like a function, that is, it must not
+     * retain a mutable internal state.<br/>
+     * Note also that any external object used inside the function must be synchronized in order to
+     * avoid concurrency issues.
+     *
+     * @param supplier the supplier instance.
+     * @param <OUT>    the output data type.
+     * @return the wrapped supplier.
+     */
+    @NotNull
+    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
+            justification = "class comparison with == is done")
+    public static <OUT> SupplierWrapper<OUT> wrapSupplier(@NotNull final Supplier<OUT> supplier) {
+
+        if (supplier.getClass() == SupplierWrapper.class) {
+
+            return (SupplierWrapper<OUT>) supplier;
+        }
+
+        return new SupplierWrapper<OUT>(supplier, Functions.<OUT>identity());
     }
 
     /**
@@ -600,7 +601,7 @@ public class Functions {
      */
     private static class ConsumerCommandInvocation<OUT> extends CommandInvocation<OUT> {
 
-        private final ConsumerChain<? super ResultChannel<OUT>> mConsumer;
+        private final ConsumerWrapper<? super ResultChannel<OUT>> mConsumer;
 
         /**
          * Constructor.
@@ -608,7 +609,7 @@ public class Functions {
          * @param consumer the consumer instance.
          */
         public ConsumerCommandInvocation(
-                @NotNull final ConsumerChain<? super ResultChannel<OUT>> consumer) {
+                @NotNull final ConsumerWrapper<? super ResultChannel<OUT>> consumer) {
 
             if (!consumer.hasStaticContext()) {
 
@@ -656,7 +657,7 @@ public class Functions {
      */
     private static class ConsumerFilterInvocation<IN, OUT> extends FilterInvocation<IN, OUT> {
 
-        private final BiConsumerChain<? super IN, ? super ResultChannel<OUT>> mConsumer;
+        private final BiConsumerWrapper<? super IN, ? super ResultChannel<OUT>> mConsumer;
 
         /**
          * Constructor.
@@ -664,7 +665,7 @@ public class Functions {
          * @param consumer the consumer instance.
          */
         private ConsumerFilterInvocation(
-                @NotNull final BiConsumerChain<? super IN, ? super ResultChannel<OUT>> consumer) {
+                @NotNull final BiConsumerWrapper<? super IN, ? super ResultChannel<OUT>> consumer) {
 
             if (!consumer.hasStaticContext()) {
 
@@ -713,7 +714,7 @@ public class Functions {
      */
     private static class ConsumerInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
-        private final BiConsumerChain<? super List<? extends IN>, ? super ResultChannel<OUT>>
+        private final BiConsumerWrapper<? super List<? extends IN>, ? super ResultChannel<OUT>>
                 mConsumer;
 
         /**
@@ -722,7 +723,7 @@ public class Functions {
          * @param consumer the consumer instance.
          */
         private ConsumerInvocationFactory(
-                @NotNull final BiConsumerChain<? super List<? extends IN>, ? super
+                @NotNull final BiConsumerWrapper<? super List<? extends IN>, ? super
                         ResultChannel<OUT>> consumer) {
 
             if (!consumer.hasStaticContext()) {
@@ -781,14 +782,14 @@ public class Functions {
      */
     private static class FunctionFilterInvocation<IN, OUT> extends FilterInvocation<IN, OUT> {
 
-        private final FunctionChain<? super IN, OUT> mFunction;
+        private final FunctionWrapper<? super IN, OUT> mFunction;
 
         /**
          * Constructor.
          *
          * @param function the function instance.
          */
-        private FunctionFilterInvocation(@NotNull final FunctionChain<? super IN, OUT> function) {
+        private FunctionFilterInvocation(@NotNull final FunctionWrapper<? super IN, OUT> function) {
 
             if (!function.hasStaticContext()) {
 
@@ -836,7 +837,7 @@ public class Functions {
      */
     private static class FunctionInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
-        private final FunctionChain<? super List<? extends IN>, OUT> mFunction;
+        private final FunctionWrapper<? super List<? extends IN>, OUT> mFunction;
 
         /**
          * Constructor.
@@ -844,7 +845,7 @@ public class Functions {
          * @param function the function instance.
          */
         private FunctionInvocationFactory(
-                @NotNull final FunctionChain<? super List<? extends IN>, OUT> function) {
+                @NotNull final FunctionWrapper<? super List<? extends IN>, OUT> function) {
 
             if (!function.hasStaticContext()) {
 
@@ -901,14 +902,14 @@ public class Functions {
      */
     private static class PredicateFilterInvocation<IN> extends FilterInvocation<IN, IN> {
 
-        private final PredicateChain<? super IN> mPredicate;
+        private final PredicateWrapper<? super IN> mPredicate;
 
         /**
          * Constructor.
          *
          * @param predicate the predicate instance.
          */
-        private PredicateFilterInvocation(@NotNull final PredicateChain<? super IN> predicate) {
+        private PredicateFilterInvocation(@NotNull final PredicateWrapper<? super IN> predicate) {
 
             if (!predicate.hasStaticContext()) {
 
@@ -958,14 +959,14 @@ public class Functions {
      */
     private static class SupplierCommandInvocation<OUT> extends CommandInvocation<OUT> {
 
-        private final SupplierChain<OUT> mSupplier;
+        private final SupplierWrapper<OUT> mSupplier;
 
         /**
          * Constructor.
          *
          * @param supplier the supplier instance.
          */
-        public SupplierCommandInvocation(@NotNull final SupplierChain<OUT> supplier) {
+        public SupplierCommandInvocation(@NotNull final SupplierWrapper<OUT> supplier) {
 
             if (!supplier.hasStaticContext()) {
 
@@ -1013,7 +1014,7 @@ public class Functions {
      */
     private static class SupplierInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
-        private final SupplierChain<? extends Invocation<IN, OUT>> mSupplier;
+        private final SupplierWrapper<? extends Invocation<IN, OUT>> mSupplier;
 
         /**
          * Constructor.
@@ -1021,7 +1022,7 @@ public class Functions {
          * @param supplier the supplier function.
          */
         private SupplierInvocationFactory(
-                @NotNull final SupplierChain<? extends Invocation<IN, OUT>> supplier) {
+                @NotNull final SupplierWrapper<? extends Invocation<IN, OUT>> supplier) {
 
             if (!supplier.hasStaticContext()) {
 

@@ -20,31 +20,31 @@ import org.jetbrains.annotations.NotNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
- * Created by davide-maestroni on 10/16/2015.
+ * Class wrapping a supplier instance.
+ * <p/>
+ * Created by davide-maestroni on 10/11/2015.
  *
- * @param <IN1> the first input data type.
- * @param <IN2> the second input data type.
  * @param <OUT> the output data type.
  */
-public class BiFunctionChain<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OUT> {
+public class SupplierWrapper<OUT> implements Supplier<OUT> {
 
-    private final BiFunction<IN1, IN2, ?> mBiFunction;
+    private final FunctionWrapper<?, OUT> mFunction;
 
-    private final FunctionChain<?, OUT> mFunction;
+    private final Supplier<?> mSupplier;
 
     /**
      * Constructor.
      *
-     * @param biFunction the initial wrapped supplier.
-     * @param function   the concatenated function chain.
+     * @param supplier the initial wrapped supplier.
+     * @param function the concatenated function chain.
      */
     @SuppressWarnings("ConstantConditions")
-    BiFunctionChain(@NotNull final BiFunction<IN1, IN2, ?> biFunction,
-            @NotNull final FunctionChain<?, OUT> function) {
+    SupplierWrapper(@NotNull final Supplier<?> supplier,
+            @NotNull final FunctionWrapper<?, OUT> function) {
 
-        if (biFunction == null) {
+        if (supplier == null) {
 
-            throw new NullPointerException("the bi-function instance must not be null");
+            throw new NullPointerException("the supplier instance must not be null");
         }
 
         if (function == null) {
@@ -52,13 +52,13 @@ public class BiFunctionChain<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OUT>
             throw new NullPointerException("the function chain must not be null");
         }
 
-        mBiFunction = biFunction;
+        mSupplier = supplier;
         mFunction = function;
     }
 
     /**
-     * Returns a composed bi-function chain that first applies this function to its input, and then
-     * applies the after function to the result.
+     * Returns a composed supplier chain that first gets this supplier result, and then applies
+     * the after function to it.
      *
      * @param after   the function to apply after this function is applied.
      * @param <AFTER> the type of output of the after function.
@@ -67,16 +67,16 @@ public class BiFunctionChain<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OUT>
     @NotNull
     @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
             justification = "class comparison with == is done")
-    public <AFTER> BiFunctionChain<IN1, IN2, AFTER> andThen(
+    public <AFTER> SupplierWrapper<AFTER> andThen(
             @NotNull final Function<? super OUT, AFTER> after) {
 
-        return new BiFunctionChain<IN1, IN2, AFTER>(mBiFunction, mFunction.andThen(after));
+        return new SupplierWrapper<AFTER>(mSupplier, mFunction.andThen(after));
     }
 
     @SuppressWarnings("unchecked")
-    public OUT apply(final IN1 in1, final IN2 in2) {
+    public OUT get() {
 
-        return ((FunctionChain<Object, OUT>) mFunction).apply(mBiFunction.apply(in1, in2));
+        return ((Function<Object, OUT>) mFunction).apply(mSupplier.get());
     }
 
     /**
@@ -86,14 +86,14 @@ public class BiFunctionChain<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OUT>
      */
     public boolean hasStaticContext() {
 
-        final BiFunction<IN1, IN2, ?> biFunction = mBiFunction;
-        return Reflection.hasStaticContext(biFunction.getClass()) && mFunction.hasStaticContext();
+        final Supplier<?> supplier = mSupplier;
+        return Reflection.hasStaticContext(supplier.getClass()) && mFunction.hasStaticContext();
     }
 
     @Override
     public int hashCode() {
 
-        int result = mBiFunction.getClass().hashCode();
+        int result = mSupplier.getClass().hashCode();
         result = 31 * result + mFunction.hashCode();
         return result;
     }
@@ -111,8 +111,8 @@ public class BiFunctionChain<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OUT>
             return false;
         }
 
-        final BiFunctionChain<?, ?, ?> that = (BiFunctionChain<?, ?, ?>) o;
-        return (mBiFunction.getClass() == that.mBiFunction.getClass()) && mFunction.equals(
+        final SupplierWrapper<?> that = (SupplierWrapper<?>) o;
+        return (mSupplier.getClass() == that.mSupplier.getClass()) && mFunction.equals(
                 that.mFunction);
     }
 }

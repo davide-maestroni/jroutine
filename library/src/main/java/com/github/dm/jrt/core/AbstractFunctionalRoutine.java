@@ -31,6 +31,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+import static com.github.dm.jrt.functional.Functions.consumerFilter;
+import static com.github.dm.jrt.functional.Functions.functionFilter;
+
 /**
  * Abstract implementation of a functional routine.
  * <p/>
@@ -46,12 +49,10 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
 
     /**
      * Constructor.
-     *
-     * @param configuration the invocation configuration.
      */
-    AbstractFunctionalRoutine(@NotNull final InvocationConfiguration configuration) {
+    AbstractFunctionalRoutine() {
 
-        super(configuration);
+        super(InvocationConfiguration.DEFAULT_CONFIGURATION);
     }
 
     @NotNull
@@ -71,7 +72,7 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
     public <AFTER> FunctionalRoutine<IN, AFTER> asyncMap(
             @NotNull final BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer) {
 
-        return asyncMap(Functions.consumerFilter(consumer));
+        return asyncMap(consumerFilter(consumer));
     }
 
     @NotNull
@@ -86,7 +87,7 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
     public <AFTER> FunctionalRoutine<IN, AFTER> asyncMap(
             @NotNull final Function<? super OUT, AFTER> function) {
 
-        return asyncMap(Functions.functionFilter(function));
+        return asyncMap(functionFilter(function));
     }
 
     @NotNull
@@ -138,7 +139,7 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
     public <AFTER> FunctionalRoutine<IN, AFTER> parallelMap(
             @NotNull final BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer) {
 
-        return parallelMap(Functions.consumerFilter(consumer));
+        return parallelMap(consumerFilter(consumer));
     }
 
     @NotNull
@@ -153,7 +154,7 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
     public <AFTER> FunctionalRoutine<IN, AFTER> parallelMap(
             @NotNull final Function<? super OUT, AFTER> function) {
 
-        return parallelMap(Functions.functionFilter(function));
+        return parallelMap(functionFilter(function));
     }
 
     @NotNull
@@ -180,7 +181,7 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
     public <AFTER> FunctionalRoutine<IN, AFTER> syncMap(
             @NotNull final BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer) {
 
-        return syncMap(Functions.consumerFilter(consumer));
+        return syncMap(consumerFilter(consumer));
     }
 
     @NotNull
@@ -195,7 +196,7 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
     public <AFTER> FunctionalRoutine<IN, AFTER> syncMap(
             @NotNull final Function<? super OUT, AFTER> function) {
 
-        return syncMap(Functions.functionFilter(function));
+        return syncMap(functionFilter(function));
     }
 
     @NotNull

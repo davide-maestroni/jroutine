@@ -13,7 +13,6 @@
  */
 package com.github.dm.jrt.core;
 
-import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
@@ -45,14 +44,10 @@ class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine<IN, OU
     /**
      * Constructor.
      *
-     * @param configuration the invocation configuration.
-     * @param routine       the backing routine instance.
+     * @param routine the backing routine instance.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultFunctionalRoutine(@NotNull final InvocationConfiguration configuration,
-            @NotNull final Routine<IN, OUT> routine) {
-
-        super(configuration);
+    DefaultFunctionalRoutine(@NotNull final Routine<IN, OUT> routine) {
 
         if (routine == null) {
 
@@ -67,8 +62,7 @@ class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine<IN, OU
             @NotNull final Function<? super FunctionalRoutine<IN, OUT>, ? extends Routine<BEFORE,
                     AFTER>> function) {
 
-        return new DefaultFunctionalRoutine<BEFORE, AFTER>(getConfiguration(),
-                                                           function.apply(this));
+        return new DefaultFunctionalRoutine<BEFORE, AFTER>(function.apply(this));
     }
 
     @NotNull
@@ -97,18 +91,14 @@ class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine<IN, OU
         /**
          * Constructor.
          *
-         * @param configuration  the invocation configuration.
          * @param routine        the backing routine instance.
          * @param afterRoutine   the concatenated routine instance.
          * @param delegationType the concatenated delegation type.
          */
         @SuppressWarnings("ConstantConditions")
-        private AfterFunctionalRoutine(@NotNull final InvocationConfiguration configuration,
-                @NotNull final FunctionalRoutine<IN, OUT> routine,
+        private AfterFunctionalRoutine(@NotNull final FunctionalRoutine<IN, OUT> routine,
                 @NotNull final Routine<? super OUT, AFTER> afterRoutine,
                 @NotNull final DelegationType delegationType) {
-
-            super(configuration);
 
             if (afterRoutine == null) {
 
@@ -131,8 +121,7 @@ class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine<IN, OU
                 @NotNull final Routine<? super AFTER, NEXT> routine,
                 @NotNull final DelegationType delegationType) {
 
-            return new AfterFunctionalRoutine<IN, AFTER, NEXT>(getConfiguration(), this, routine,
-                                                               delegationType);
+            return new AfterFunctionalRoutine<IN, AFTER, NEXT>(this, routine, delegationType);
         }
 
         @NotNull
@@ -140,8 +129,7 @@ class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine<IN, OU
                 @NotNull final Function<? super FunctionalRoutine<IN, AFTER>, ? extends
                         Routine<BEFORE, NEXT>> function) {
 
-            return new DefaultFunctionalRoutine<BEFORE, NEXT>(getConfiguration(),
-                                                              function.apply(this));
+            return new DefaultFunctionalRoutine<BEFORE, NEXT>(function.apply(this));
         }
 
         @NotNull
@@ -257,7 +245,6 @@ class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine<IN, OU
             @NotNull final Routine<? super OUT, AFTER> routine,
             @NotNull final DelegationType delegationType) {
 
-        return new AfterFunctionalRoutine<IN, OUT, AFTER>(getConfiguration(), this, routine,
-                                                          delegationType);
+        return new AfterFunctionalRoutine<IN, OUT, AFTER>(this, routine, delegationType);
     }
 }

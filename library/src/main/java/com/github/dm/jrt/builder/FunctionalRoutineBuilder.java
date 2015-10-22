@@ -13,6 +13,8 @@
  */
 package com.github.dm.jrt.builder;
 
+import com.github.dm.jrt.channel.ResultChannel;
+import com.github.dm.jrt.functional.Consumer;
 import com.github.dm.jrt.functional.Supplier;
 import com.github.dm.jrt.invocation.CommandInvocation;
 import com.github.dm.jrt.routine.FunctionalRoutine;
@@ -36,6 +38,17 @@ public interface FunctionalRoutineBuilder extends ConfigurableBuilder<Functional
      */
     @NotNull
     <OUT> FunctionalRoutine<Void, OUT> buildFrom(@NotNull CommandInvocation<OUT> invocation);
+
+    /**
+     * Builds and returns a new functional routine generating outputs from the specified consumer.
+     *
+     * @param consumer the consumer instance.
+     * @param <OUT>    the output data type.
+     * @return the newly created routine instance.
+     */
+    @NotNull
+    <OUT> FunctionalRoutine<Void, OUT> buildFrom(
+            @NotNull Consumer<? super ResultChannel<OUT>> consumer);
 
     /**
      * Builds and returns a new functional routine generating outputs from the specified supplier.

@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * Interface defining a functional routine, that is, a routine concatenating map and reduce
  * functions.<br/>
- * Each function in the channel is backed by a sub-routine instance that can have its own specific
+ * Each function in the channel is backed by a sub-routine instance, that can have its own specific
  * configuration and invocation mode.
  * <p/>
  * Note that, when at least one reduce function is part of the concatenation, the results will be
@@ -49,7 +49,7 @@ public interface FunctionalRoutine<IN, OUT>
      * <pre>
      *     <code>
      *
-     *         acc = function.apply(acc, output);
+     *         acc = function.apply(acc, input);
      *     </code>
      * </pre>
      * The accumulated value will be passed as result only when the routine invocation completes.
@@ -65,7 +65,7 @@ public interface FunctionalRoutine<IN, OUT>
 
     /**
      * Concatenates a functional routine based on the specified predicate to this ones.<br/>
-     * The output will be filtered accordingly to the result returned by the predicate.
+     * The output will be filtered according to the result returned by the predicate.
      * <p/>
      * Note that the created routine will be invoked in an asynchronous mode.
      *
@@ -127,7 +127,7 @@ public interface FunctionalRoutine<IN, OUT>
 
     /**
      * Concatenates a functional routine based on the specified reducing consumer to this one.<br/>
-     * The outputs will be reduced by applying the function only when the routine invocation
+     * The outputs will be reduced by applying the function, only when the routine invocation
      * completes.
      * <p/>
      * Note that the created routine will be invoked in an asynchronous mode.
@@ -143,7 +143,7 @@ public interface FunctionalRoutine<IN, OUT>
 
     /**
      * Concatenates a functional routine based on the specified reducing function to this one.<br/>
-     * The outputs will be reduced by applying the function only when the routine invocation
+     * The outputs will be reduced by applying the function, only when the routine invocation
      * completes.
      * <p/>
      * Note that the created routine will be invoked in an asynchronous mode.
@@ -160,7 +160,7 @@ public interface FunctionalRoutine<IN, OUT>
      * Lifts this functional routine by applying the specified function.
      *
      * @param function the function instance.
-     * @param <BEFORE> the lifting output type.
+     * @param <BEFORE> the lifting input type.
      * @param <AFTER>  the lifting output type.
      * @return the lifted functional routine.
      */
@@ -171,11 +171,9 @@ public interface FunctionalRoutine<IN, OUT>
 
     /**
      * Lifts this functional routine by applying the specified function.
-     * <p/>
-     * Note that the created routine will be invoked in an asynchronous mode.
      *
      * @param function the function instance.
-     * @param <BEFORE> the lifting output type.
+     * @param <BEFORE> the lifting input type.
      * @param <AFTER>  the lifting output type.
      * @return the lifted functional routine.
      */
@@ -186,7 +184,7 @@ public interface FunctionalRoutine<IN, OUT>
 
     /**
      * Concatenates a functional routine based on the specified predicate to this ones.<br/>
-     * The output will be filtered accordingly to the result returned by the predicate.
+     * The output will be filtered according to the result returned by the predicate.
      * <p/>
      * Note that the created routine will be invoked in a parallel mode.
      *
@@ -255,7 +253,7 @@ public interface FunctionalRoutine<IN, OUT>
      * <pre>
      *     <code>
      *
-     *         acc = function.apply(acc, output);
+     *         acc = function.apply(acc, input);
      *     </code>
      * </pre>
      * The accumulated value will be passed as result only when the routine invocation completes.
@@ -271,7 +269,7 @@ public interface FunctionalRoutine<IN, OUT>
 
     /**
      * Concatenates a functional routine based on the specified predicate to this ones.<br/>
-     * The output will be filtered accordingly to the result returned by the predicate.
+     * The output will be filtered according to the result returned by the predicate.
      * <p/>
      * Note that the created routine will be invoked in a synchronous mode.
      *
@@ -334,7 +332,7 @@ public interface FunctionalRoutine<IN, OUT>
 
     /**
      * Concatenates a functional routine based on the specified reducing consumer to this one.<br/>
-     * The outputs will be reduced by applying the function only when the routine invocation
+     * The outputs will be reduced by applying the function, only when the routine invocation
      * completes.
      * <p/>
      * Note that the created routine will be invoked in a synchronous mode.
@@ -350,7 +348,7 @@ public interface FunctionalRoutine<IN, OUT>
 
     /**
      * Concatenates a functional routine based on the specified reducing function to this one.<br/>
-     * The outputs will be reduced by applying the function only when the routine invocation
+     * The outputs will be reduced by applying the function, only when the routine invocation
      * completes.
      * <p/>
      * Note that the created routine will be invoked in a synchronous mode.

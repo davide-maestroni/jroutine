@@ -17,14 +17,17 @@ import com.github.dm.jrt.builder.FunctionalRoutineBuilder;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.Builder;
 import com.github.dm.jrt.builder.InvocationConfiguration.Configurable;
-import com.github.dm.jrt.functional.Functions;
+import com.github.dm.jrt.channel.ResultChannel;
+import com.github.dm.jrt.functional.Consumer;
 import com.github.dm.jrt.functional.Supplier;
 import com.github.dm.jrt.invocation.CommandInvocation;
 import com.github.dm.jrt.invocation.PassingInvocation;
 import com.github.dm.jrt.routine.FunctionalRoutine;
-import com.github.dm.jrt.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
+
+import static com.github.dm.jrt.functional.Functions.consumerCommand;
+import static com.github.dm.jrt.functional.Functions.supplierCommand;
 
 /**
  * Default implementation of a functional routine builder.
@@ -40,26 +43,32 @@ class DefaultFunctionalRoutineBuilder
     public <OUT> FunctionalRoutine<Void, OUT> buildFrom(
             @NotNull final CommandInvocation<OUT> invocation) {
 
-        final Routine<Void, OUT> routine =
-                JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine();
-        return new DefaultFunctionalRoutine<Void, OUT>(mConfiguration, routine);
+        return new DefaultFunctionalRoutine<Void, OUT>(
+                JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine());
+    }
+
+    @NotNull
+    public <OUT> FunctionalRoutine<Void, OUT> buildFrom(
+            @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
+
+        return buildFrom(consumerCommand(consumer));
     }
 
     @NotNull
     public <OUT> FunctionalRoutine<Void, OUT> buildFrom(@NotNull final Supplier<OUT> supplier) {
 
-        return buildFrom(Functions.supplierCommand(supplier));
+        return buildFrom(supplierCommand(supplier));
     }
 
     @NotNull
     public <DATA> FunctionalRoutine<DATA, DATA> buildRoutine() {
 
-        final Routine<DATA, DATA> routine = JRoutine.on(PassingInvocation.<DATA>factoryOf())
-                                                    .invocations()
-                                                    .with(mConfiguration)
-                                                    .set()
-                                                    .buildRoutine();
-        return new DefaultFunctionalRoutine<DATA, DATA>(mConfiguration, routine);
+        return new DefaultFunctionalRoutine<DATA, DATA>(
+                JRoutine.on(PassingInvocation.<DATA>factoryOf())
+                        .invocations()
+                        .with(mConfiguration)
+                        .set()
+                        .buildRoutine());
     }
 
     @NotNull

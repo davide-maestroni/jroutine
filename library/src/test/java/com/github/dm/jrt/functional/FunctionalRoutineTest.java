@@ -15,10 +15,8 @@ package com.github.dm.jrt.functional;
 
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.core.JRoutine;
 import com.github.dm.jrt.invocation.CommandInvocation;
 import com.github.dm.jrt.invocation.FilterInvocation;
-import com.github.dm.jrt.routine.FunctionalRoutine;
 import com.github.dm.jrt.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
@@ -112,6 +110,24 @@ public class FunctionalRoutineTest {
 
     private static void internalTestLift() {
 
+        assertThat(JRoutine.functional()
+                           .<String>buildRoutine()
+                           .thenLift(
+                                   new Function<FunctionalRoutine<String, String>,
+                                           FunctionalRoutine<String, String>>() {
+
+                                       public FunctionalRoutine<String, String> apply(
+                                               final FunctionalRoutine<String, String> routine) {
+
+                                           return JRoutine.functional()
+                                                          .<String>buildRoutine()
+                                                          .thenSyncFilter(notNull())
+                                                          .thenAsyncMap(routine);
+                                       }
+                                   })
+                           .asyncCall("test1", null, "test2", null)
+                           .afterMax(seconds(3))
+                           .all()).containsExactly("test1", "test2");
         assertThat(JRoutine.functional()
                            .<String>buildRoutine()
                            .thenAsyncMap(new FilterInvocation<String, String>() {
@@ -827,11 +843,11 @@ public class FunctionalRoutineTest {
                     .buildRoutine()
                     .thenAsyncMap(new FilterInvocation<Object, Object>() {
 
-                                      public void onInput(final Object input,
-                                              @NotNull final ResultChannel<Object> result) {
+                        public void onInput(final Object input,
+                                @NotNull final ResultChannel<Object> result) {
 
-                                      }
-                                  });
+                        }
+                    });
 
             fail();
 
@@ -863,11 +879,11 @@ public class FunctionalRoutineTest {
                     .buildRoutine()
                     .thenSyncMap(new FilterInvocation<Object, Object>() {
 
-                                     public void onInput(final Object input,
-                                             @NotNull final ResultChannel<Object> result) {
+                        public void onInput(final Object input,
+                                @NotNull final ResultChannel<Object> result) {
 
-                                     }
-                                 });
+                        }
+                    });
 
             fail();
 

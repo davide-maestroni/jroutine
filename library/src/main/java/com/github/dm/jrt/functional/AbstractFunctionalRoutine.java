@@ -11,20 +11,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.dm.jrt.core;
+package com.github.dm.jrt.functional;
 
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.Builder;
 import com.github.dm.jrt.builder.InvocationConfiguration.Configurable;
 import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.functional.BiConsumer;
-import com.github.dm.jrt.functional.BiFunction;
-import com.github.dm.jrt.functional.Function;
-import com.github.dm.jrt.functional.Functions;
-import com.github.dm.jrt.functional.Predicate;
+import com.github.dm.jrt.core.AbstractRoutine;
 import com.github.dm.jrt.invocation.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.invocation.FilterInvocation;
-import com.github.dm.jrt.routine.FunctionalRoutine;
 import com.github.dm.jrt.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
@@ -100,8 +95,11 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
     public <AFTER> FunctionalRoutine<IN, AFTER> thenAsyncMap(
             @NotNull final FilterInvocation<? super OUT, AFTER> invocation) {
 
-        return thenAsyncMap(
-                JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine());
+        return thenAsyncMap(com.github.dm.jrt.core.JRoutine.on(invocation)
+                                                           .invocations()
+                                                           .with(mConfiguration)
+                                                           .set()
+                                                           .buildRoutine());
     }
 
     @NotNull
@@ -123,22 +121,22 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
             @NotNull final BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
                     consumer) {
 
-        return thenAsyncMap(JRoutine.on(Functions.consumerFactory(consumer))
-                                    .invocations()
-                                    .with(mConfiguration)
-                                    .set()
-                                    .buildRoutine());
+        return thenAsyncMap(com.github.dm.jrt.core.JRoutine.on(Functions.consumerFactory(consumer))
+                                                           .invocations()
+                                                           .with(mConfiguration)
+                                                           .set()
+                                                           .buildRoutine());
     }
 
     @NotNull
     public <AFTER> FunctionalRoutine<IN, AFTER> thenAsyncReduce(
             @NotNull final Function<? super List<? extends OUT>, AFTER> function) {
 
-        return thenAsyncMap(JRoutine.on(Functions.functionFactory(function))
-                                    .invocations()
-                                    .with(mConfiguration)
-                                    .set()
-                                    .buildRoutine());
+        return thenAsyncMap(com.github.dm.jrt.core.JRoutine.on(Functions.functionFactory(function))
+                                                           .invocations()
+                                                           .with(mConfiguration)
+                                                           .set()
+                                                           .buildRoutine());
     }
 
     @NotNull
@@ -167,8 +165,11 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
     public <AFTER> FunctionalRoutine<IN, AFTER> thenParallelMap(
             @NotNull final FilterInvocation<? super OUT, AFTER> invocation) {
 
-        return thenParallelMap(
-                JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine());
+        return thenParallelMap(com.github.dm.jrt.core.JRoutine.on(invocation)
+                                                              .invocations()
+                                                              .with(mConfiguration)
+                                                              .set()
+                                                              .buildRoutine());
     }
 
     @NotNull
@@ -210,8 +211,11 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
     public <AFTER> FunctionalRoutine<IN, AFTER> thenSyncMap(
             @NotNull final FilterInvocation<? super OUT, AFTER> invocation) {
 
-        return thenSyncMap(
-                JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine());
+        return thenSyncMap(com.github.dm.jrt.core.JRoutine.on(invocation)
+                                                          .invocations()
+                                                          .with(mConfiguration)
+                                                          .set()
+                                                          .buildRoutine());
     }
 
     @NotNull
@@ -233,22 +237,22 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
             @NotNull final BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
                     consumer) {
 
-        return thenSyncMap(JRoutine.on(Functions.consumerFactory(consumer))
-                                   .invocations()
-                                   .with(mConfiguration)
-                                   .set()
-                                   .buildRoutine());
+        return thenSyncMap(com.github.dm.jrt.core.JRoutine.on(Functions.consumerFactory(consumer))
+                                                          .invocations()
+                                                          .with(mConfiguration)
+                                                          .set()
+                                                          .buildRoutine());
     }
 
     @NotNull
     public <AFTER> FunctionalRoutine<IN, AFTER> thenSyncReduce(
             @NotNull final Function<? super List<? extends OUT>, AFTER> function) {
 
-        return thenSyncMap(JRoutine.on(Functions.functionFactory(function))
-                                   .invocations()
-                                   .with(mConfiguration)
-                                   .set()
-                                   .buildRoutine());
+        return thenSyncMap(com.github.dm.jrt.core.JRoutine.on(Functions.functionFactory(function))
+                                                          .invocations()
+                                                          .with(mConfiguration)
+                                                          .set()
+                                                          .buildRoutine());
     }
 
     /**
@@ -270,11 +274,12 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
             @NotNull final BiFunction<? super OUT, ? super OUT, ? extends OUT> function,
             @NotNull final DelegationType delegationType) {
 
-        return andThen(JRoutine.on(AccumulateInvocation.functionFactory(function))
-                               .invocations()
-                               .with(mConfiguration)
-                               .set()
-                               .buildRoutine(), delegationType);
+        return andThen(
+                com.github.dm.jrt.core.JRoutine.on(AccumulateInvocation.functionFactory(function))
+                                               .invocations()
+                                               .with(mConfiguration)
+                                               .set()
+                                               .buildRoutine(), delegationType);
     }
 
     @NotNull
@@ -282,10 +287,10 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
             @NotNull final Predicate<? super OUT> predicate,
             @NotNull final DelegationType delegationType) {
 
-        return andThen(JRoutine.on(Functions.predicateFilter(predicate))
-                               .invocations()
-                               .with(mConfiguration)
-                               .set()
-                               .buildRoutine(), delegationType);
+        return andThen(com.github.dm.jrt.core.JRoutine.on(Functions.predicateFilter(predicate))
+                                                      .invocations()
+                                                      .with(mConfiguration)
+                                                      .set()
+                                                      .buildRoutine(), delegationType);
     }
 }

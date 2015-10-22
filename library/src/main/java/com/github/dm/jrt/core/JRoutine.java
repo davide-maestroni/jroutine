@@ -13,7 +13,6 @@
  */
 package com.github.dm.jrt.core;
 
-import com.github.dm.jrt.builder.FunctionalRoutineBuilder;
 import com.github.dm.jrt.builder.IOChannelBuilder;
 import com.github.dm.jrt.builder.ObjectRoutineBuilder;
 import com.github.dm.jrt.builder.RoutineBuilder;
@@ -156,17 +155,6 @@ public class JRoutine {
      */
     protected JRoutine() {
 
-    }
-
-    /**
-     * Returns a function routine builder.
-     *
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public static FunctionalRoutineBuilder functional() {
-
-        return new DefaultFunctionalRoutineBuilder();
     }
 
     /**

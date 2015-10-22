@@ -24,8 +24,8 @@ import org.jetbrains.annotations.NotNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
- * This utility class extends the base one in order to support additional routine builders specific
- * to the Android platform.<br/>
+ * Utility class extending the base one in order to support additional routine builders specific to
+ * the Android platform.<br/>
  * Routine invocations created through the returned builders can be safely restored after a change
  * in the configuration, so to avoid duplicated calls and memory leaks. Be aware, though, that the
  * invocation results will be dispatched on the configured looper thread, no matter the calling one

@@ -23,8 +23,8 @@ import org.jetbrains.annotations.NotNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
- * This utility class extends the base one in order to support additional routine builders specific
- * to the Android platform.<br/>
+ * Utility class extending the base one in order to support additional routine builders specific to
+ * the Android platform.<br/>
  * Routine invocations created through the returned builder will be executed inside a service
  * specified by the service context. Be aware, though, that the invocation results will be
  * dispatched into the configured looper, so that, waiting for the outputs on the very same looper

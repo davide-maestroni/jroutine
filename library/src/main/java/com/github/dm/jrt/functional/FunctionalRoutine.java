@@ -11,15 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.dm.jrt.routine;
+package com.github.dm.jrt.functional;
 
 import com.github.dm.jrt.builder.ConfigurableBuilder;
 import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.functional.BiConsumer;
-import com.github.dm.jrt.functional.BiFunction;
-import com.github.dm.jrt.functional.Function;
-import com.github.dm.jrt.functional.Predicate;
 import com.github.dm.jrt.invocation.FilterInvocation;
+import com.github.dm.jrt.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
 

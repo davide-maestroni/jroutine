@@ -11,13 +11,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.dm.jrt.builder;
+package com.github.dm.jrt.functional;
 
+import com.github.dm.jrt.builder.ConfigurableBuilder;
 import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.functional.Consumer;
-import com.github.dm.jrt.functional.Supplier;
 import com.github.dm.jrt.invocation.CommandInvocation;
-import com.github.dm.jrt.routine.FunctionalRoutine;
 
 import org.jetbrains.annotations.NotNull;
 

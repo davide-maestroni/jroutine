@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.dm.jrt.functional;
+package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.channel.ResultChannel;
@@ -24,7 +24,6 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static com.github.dm.jrt.functional.Functions.notNull;
 import static com.github.dm.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -121,7 +120,7 @@ public class FunctionalRoutineTest {
 
                                            return JRoutine.functional()
                                                           .<String>buildRoutine()
-                                                          .thenSyncFilter(notNull())
+                                                          .thenSyncFilter(Functions.notNull())
                                                           .thenAsyncMap(routine);
                                        }
                                    })
@@ -147,7 +146,7 @@ public class FunctionalRoutineTest {
 
                                            return JRoutine.functional()
                                                           .<String>buildRoutine()
-                                                          .thenSyncFilter(notNull())
+                                                          .thenSyncFilter(Functions.notNull())
                                                           .thenAsyncMap(routine);
                                        }
                                    })
@@ -173,7 +172,7 @@ public class FunctionalRoutineTest {
 
                                            return JRoutine.functional()
                                                           .<String>buildRoutine()
-                                                          .thenSyncFilter(notNull())
+                                                          .thenSyncFilter(Functions.notNull())
                                                           .thenAsyncMap(routine);
                                        }
                                    })
@@ -590,19 +589,19 @@ public class FunctionalRoutineTest {
 
         assertThat(JRoutine.functional()
                            .buildRoutine()
-                           .thenAsyncFilter(notNull())
+                           .thenAsyncFilter(Functions.notNull())
                            .asyncCall(null, "test")
                            .afterMax(seconds(3))
                            .all()).containsExactly("test");
         assertThat(JRoutine.functional()
                            .buildRoutine()
-                           .thenParallelFilter(notNull())
+                           .thenParallelFilter(Functions.notNull())
                            .asyncCall(null, "test")
                            .afterMax(seconds(3))
                            .all()).containsExactly("test");
         assertThat(JRoutine.functional()
                            .buildRoutine()
-                           .thenSyncFilter(notNull())
+                           .thenSyncFilter(Functions.notNull())
                            .asyncCall(null, "test")
                            .afterMax(seconds(3))
                            .all()).containsExactly("test");

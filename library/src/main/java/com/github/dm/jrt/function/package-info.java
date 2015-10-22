@@ -11,22 +11,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.dm.jrt.functional;
-
 /**
- * Interface representing a predicate (boolean-valued function) of one argument.
+ * Functional interfaces and utility classes.
  * <p/>
- * Created by davide-maestroni on 10/16/2015.
- *
- * @param <IN> the input data type.
+ * Created by davide-maestroni on 09/22/2015.
  */
-public interface Predicate<IN> {
-
-    /**
-     * Evaluates this predicate on the given argument.
-     *
-     * @param in the input argument.
-     * @return true if the input argument matches the predicate, otherwise false.
-     */
-    boolean test(IN in);
-}
+package com.github.dm.jrt.function;

@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.dm.jrt.functional;
+package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.invocation.Invocation;
@@ -20,7 +20,7 @@ import com.github.dm.jrt.invocation.TemplateInvocation;
 
 import org.jetbrains.annotations.NotNull;
 
-import static com.github.dm.jrt.functional.Functions.wrapBiFunction;
+import static com.github.dm.jrt.function.Functions.wrapBiFunction;
 
 /**
  * Invocation implementation accumulating the result returned by a bi-function instance.

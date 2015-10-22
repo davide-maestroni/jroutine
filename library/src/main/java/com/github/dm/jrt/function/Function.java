@@ -11,9 +11,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.github.dm.jrt.function;
+
 /**
- * Functional interfaces and utility classes.
+ * Interface representing a function that accepts one argument and produces a result.
  * <p/>
- * Created by davide-maestroni on 09/22/2015.
+ * Created by davide-maestroni on 09/21/2015.
+ *
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-package com.github.dm.jrt.functional;
+public interface Function<IN, OUT> {
+
+    /**
+     * Applies this function to the given argument.
+     *
+     * @param in the input argument.
+     * @return the function result.
+     */
+    OUT apply(IN in);
+}

@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.dm.jrt.functional;
+package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.Builder;
@@ -23,8 +23,8 @@ import com.github.dm.jrt.invocation.PassingInvocation;
 
 import org.jetbrains.annotations.NotNull;
 
-import static com.github.dm.jrt.functional.Functions.consumerCommand;
-import static com.github.dm.jrt.functional.Functions.supplierCommand;
+import static com.github.dm.jrt.function.Functions.consumerCommand;
+import static com.github.dm.jrt.function.Functions.supplierCommand;
 
 /**
  * Default implementation of a functional routine builder.

@@ -11,18 +11,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.dm.jrt.core;
+package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.channel.RoutineException;
-import com.github.dm.jrt.functional.Consumer;
-import com.github.dm.jrt.functional.Functions;
 
 import org.junit.Test;
 
-import static com.github.dm.jrt.core.OutputConsumerBuilder.onComplete;
-import static com.github.dm.jrt.core.OutputConsumerBuilder.onError;
-import static com.github.dm.jrt.core.OutputConsumerBuilder.onOutput;
-import static com.github.dm.jrt.functional.Functions.wrapConsumer;
+import static com.github.dm.jrt.function.Functions.wrapConsumer;
+import static com.github.dm.jrt.function.OutputConsumerBuilder.onComplete;
+import static com.github.dm.jrt.function.OutputConsumerBuilder.onError;
+import static com.github.dm.jrt.function.OutputConsumerBuilder.onOutput;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 

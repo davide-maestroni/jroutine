@@ -11,25 +11,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.dm.jrt.functional;
+package com.github.dm.jrt.function;
 
 /**
- * Interface representing an operation that accepts two input arguments and produces a result.
+ * Interface representing an operation that accepts two input arguments and returns no result.
  * <p/>
- * Created by davide-maestroni on 10/16/2015.
+ * Created by davide-maestroni on 09/21/2015.
  *
  * @param <IN1> the first input data type.
  * @param <IN2> the second input data type.
- * @param <OUT> the output data type.
  */
-public interface BiFunction<IN1, IN2, OUT> {
+public interface BiConsumer<IN1, IN2> {
 
     /**
-     * Applies this function to the given arguments.
+     * Performs this operation on the given arguments.
      *
      * @param in1 the first input argument.
      * @param in2 the second input argument.
-     * @return the function result.
      */
-    OUT apply(IN1 in1, IN2 in2);
+    void accept(IN1 in1, IN2 in2);
 }

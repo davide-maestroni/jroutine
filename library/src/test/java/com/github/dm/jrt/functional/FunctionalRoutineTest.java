@@ -18,6 +18,7 @@ import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.core.JRoutine;
 import com.github.dm.jrt.invocation.CommandInvocation;
 import com.github.dm.jrt.invocation.FilterInvocation;
+import com.github.dm.jrt.routine.FunctionalRoutine;
 import com.github.dm.jrt.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
@@ -36,6 +37,34 @@ import static org.junit.Assert.fail;
  * Created by davide-maestroni on 10/22/2015.
  */
 public class FunctionalRoutineTest {
+
+    public static void internalTestAccumulate() {
+
+        assertThat(JRoutine.functional()
+                           .<String>buildRoutine()
+                           .asyncAccumulate(new BiFunction<String, String, String>() {
+
+                               public String apply(final String s, final String s2) {
+
+                                   return s + s2;
+                               }
+                           })
+                           .asyncCall("test1", "test2", "test3")
+                           .afterMax(seconds(3))
+                           .all()).containsExactly("test1test2test3");
+        assertThat(JRoutine.functional()
+                           .<String>buildRoutine()
+                           .syncAccumulate(new BiFunction<String, String, String>() {
+
+                               public String apply(final String s, final String s2) {
+
+                                   return s + s2;
+                               }
+                           })
+                           .asyncCall("test1", "test2", "test3")
+                           .afterMax(seconds(3))
+                           .all()).containsExactly("test1test2test3");
+    }
 
     private static void internalTestBuilder() {
 
@@ -79,6 +108,61 @@ public class FunctionalRoutineTest {
                            .asyncCall()
                            .afterMax(seconds(3))
                            .all()).containsExactly("test1", "test2", "test3");
+    }
+
+    private static void internalTestLift() {
+
+        assertThat(JRoutine.functional()
+                           .<String>buildRoutine()
+                           .asyncMap(new FilterInvocation<String, String>() {
+
+                               public void onInput(final String input,
+                                       @NotNull final ResultChannel<String> result) {
+
+                                   result.pass(input.toUpperCase());
+                               }
+                           })
+                           .flatLift(
+                                   new Function<FunctionalRoutine<String, String>,
+                                           FunctionalRoutine<String, String>>() {
+
+                                       public FunctionalRoutine<String, String> apply(
+                                               final FunctionalRoutine<String, String> routine) {
+
+                                           return JRoutine.functional()
+                                                          .<String>buildRoutine()
+                                                          .syncFilter(notNull())
+                                                          .asyncMap(routine);
+                                       }
+                                   })
+                           .asyncCall("test1", null, "test2", null)
+                           .afterMax(seconds(3))
+                           .all()).containsExactly("TEST1", "TEST2");
+        assertThat(JRoutine.functional()
+                           .<String>buildRoutine()
+                           .asyncMap(new FilterInvocation<String, String>() {
+
+                               public void onInput(final String input,
+                                       @NotNull final ResultChannel<String> result) {
+
+                                   result.pass(input.toUpperCase());
+                               }
+                           })
+                           .lift(new Function<FunctionalRoutine<String, String>, Routine<String,
+                                   String>>() {
+
+                               public FunctionalRoutine<String, String> apply(
+                                       final FunctionalRoutine<String, String> routine) {
+
+                                   return JRoutine.functional()
+                                                  .<String>buildRoutine()
+                                                  .syncFilter(notNull())
+                                                  .asyncMap(routine);
+                               }
+                           })
+                           .asyncCall("test1", null, "test2", null)
+                           .afterMax(seconds(3))
+                           .all()).containsExactly("TEST1", "TEST2");
     }
 
     private static void internalTestMapConsumer() {
@@ -280,6 +364,119 @@ public class FunctionalRoutineTest {
                            .all()).containsExactly("test1test2test3");
     }
 
+    private static void internalTestReduceFunction() {
+
+        assertThat(JRoutine.functional()
+                           .<String>buildRoutine()
+                           .asyncReduce(new Function<List<? extends String>, String>() {
+
+                               public String apply(final List<? extends String> strings) {
+
+                                   final StringBuilder builder = new StringBuilder();
+
+                                   for (final String string : strings) {
+
+                                       builder.append(string);
+                                   }
+
+                                   return builder.toString();
+                               }
+                           })
+                           .asyncCall("test1", "test2", "test3")
+                           .afterMax(seconds(3))
+                           .all()).containsExactly("test1test2test3");
+        assertThat(JRoutine.functional()
+                           .<String>buildRoutine()
+                           .syncReduce(new Function<List<? extends String>, String>() {
+
+                               public String apply(final List<? extends String> strings) {
+
+                                   final StringBuilder builder = new StringBuilder();
+
+                                   for (final String string : strings) {
+
+                                       builder.append(string);
+                                   }
+
+                                   return builder.toString();
+                               }
+                           })
+                           .asyncCall("test1", "test2", "test3")
+                           .afterMax(seconds(3))
+                           .all()).containsExactly("test1test2test3");
+    }
+
+    @Test
+    public void testAccumulate() {
+
+        internalTestAccumulate();
+    }
+
+    @Test
+    public void testAccumulateContextError() {
+
+        try {
+
+            JRoutine.functional()
+                    .buildRoutine()
+                    .asyncAccumulate(new BiFunction<Object, Object, Object>() {
+
+                        public Object apply(final Object o, final Object o2) {
+
+                            return null;
+                        }
+                    });
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.functional()
+                    .buildRoutine()
+                    .syncAccumulate(new BiFunction<Object, Object, Object>() {
+
+                        public Object apply(final Object o, final Object o2) {
+
+                            return null;
+                        }
+                    });
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testAccumulateNullPointerError() {
+
+        try {
+
+            JRoutine.functional().buildRoutine().asyncAccumulate(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.functional().buildRoutine().syncAccumulate(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
     @Test
     public void testBuilder() {
 
@@ -473,6 +670,37 @@ public class FunctionalRoutineTest {
         try {
 
             JRoutine.functional().buildRoutine().syncFilter(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testLift() {
+
+        internalTestLift();
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testLiftNullPointerError() {
+
+        try {
+
+            JRoutine.functional().buildRoutine().flatLift(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.functional().buildRoutine().lift(null);
 
             fail();
 
@@ -908,6 +1136,73 @@ public class FunctionalRoutineTest {
             JRoutine.functional()
                     .buildRoutine()
                     .syncReduce((BiConsumer<List<?>, ResultChannel<Object>>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testReduceFunction() {
+
+        internalTestReduceFunction();
+    }
+
+    @Test
+    public void testReduceFunctionContextError() {
+
+        try {
+
+            JRoutine.functional().buildRoutine().asyncReduce(new Function<List<?>, Object>() {
+
+                public Object apply(final List<?> objects) {
+
+                    return null;
+                }
+            });
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.functional().buildRoutine().syncReduce(new Function<List<?>, Object>() {
+
+                public Object apply(final List<?> objects) {
+
+                    return null;
+                }
+            });
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testReduceFunctionNullPointerError() {
+
+        try {
+
+            JRoutine.functional().buildRoutine().asyncReduce((Function<List<?>, Object>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.functional().buildRoutine().syncReduce((Function<List<?>, Object>) null);
 
             fail();
 

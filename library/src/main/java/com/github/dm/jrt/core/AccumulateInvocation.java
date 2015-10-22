@@ -15,11 +15,14 @@ package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.functional.BiFunction;
+import com.github.dm.jrt.functional.BiFunctionWrapper;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.invocation.TemplateInvocation;
 
 import org.jetbrains.annotations.NotNull;
+
+import static com.github.dm.jrt.functional.Functions.wrapBiFunction;
 
 /**
  * Invocation implementation accumulating the result returned by a bi-function instance.
@@ -59,7 +62,7 @@ class AccumulateInvocation<IN> extends TemplateInvocation<IN, IN> {
     public static <IN> InvocationFactory<IN, IN> functionFactory(
             @NotNull final BiFunction<? super IN, ? super IN, ? extends IN> function) {
 
-        return new AccumulateInvocationFactory<IN>(function);
+        return new AccumulateInvocationFactory<IN>(wrapBiFunction(function));
     }
 
     @Override
@@ -109,7 +112,13 @@ class AccumulateInvocation<IN> extends TemplateInvocation<IN, IN> {
          * @param function the bi-function instance.
          */
         private AccumulateInvocationFactory(
-                @NotNull final BiFunction<? super IN, ? super IN, ? extends IN> function) {
+                @NotNull final BiFunctionWrapper<? super IN, ? super IN, ? extends IN> function) {
+
+            if (!function.hasStaticContext()) {
+
+                throw new IllegalArgumentException(
+                        "the bi-function class must have a static context: " + function.getClass());
+            }
 
             mFunction = function;
         }

@@ -58,7 +58,7 @@ class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine<IN, OU
     }
 
     @NotNull
-    public <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> lift(
+    public <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> thenLift(
             @NotNull final Function<? super FunctionalRoutine<IN, OUT>, ? extends Routine<BEFORE,
                     AFTER>> function) {
 
@@ -125,7 +125,7 @@ class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine<IN, OU
         }
 
         @NotNull
-        public <BEFORE, NEXT> FunctionalRoutine<BEFORE, NEXT> lift(
+        public <BEFORE, NEXT> FunctionalRoutine<BEFORE, NEXT> thenLift(
                 @NotNull final Function<? super FunctionalRoutine<IN, AFTER>, ? extends
                         Routine<BEFORE, NEXT>> function) {
 

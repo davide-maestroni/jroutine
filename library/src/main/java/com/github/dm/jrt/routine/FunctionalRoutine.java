@@ -60,7 +60,7 @@ public interface FunctionalRoutine<IN, OUT>
      * @return the concatenated functional routine.
      */
     @NotNull
-    FunctionalRoutine<IN, OUT> asyncAccumulate(
+    FunctionalRoutine<IN, OUT> thenAsyncAccumulate(
             @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
 
     /**
@@ -73,7 +73,7 @@ public interface FunctionalRoutine<IN, OUT>
      * @return the concatenated functional routine.
      */
     @NotNull
-    FunctionalRoutine<IN, OUT> asyncFilter(@NotNull Predicate<? super OUT> predicate);
+    FunctionalRoutine<IN, OUT> thenAsyncFilter(@NotNull Predicate<? super OUT> predicate);
 
     /**
      * Concatenates a functional routine based on the specified consumer to this one.
@@ -85,7 +85,7 @@ public interface FunctionalRoutine<IN, OUT>
      * @return the concatenated functional routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> asyncMap(
+    <AFTER> FunctionalRoutine<IN, AFTER> thenAsyncMap(
             @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
 
     /**
@@ -98,7 +98,7 @@ public interface FunctionalRoutine<IN, OUT>
      * @return the concatenated functional routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> asyncMap(
+    <AFTER> FunctionalRoutine<IN, AFTER> thenAsyncMap(
             @NotNull FilterInvocation<? super OUT, AFTER> invocation);
 
     /**
@@ -111,7 +111,8 @@ public interface FunctionalRoutine<IN, OUT>
      * @return the concatenated functional routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> asyncMap(@NotNull Function<? super OUT, AFTER> function);
+    <AFTER> FunctionalRoutine<IN, AFTER> thenAsyncMap(
+            @NotNull Function<? super OUT, AFTER> function);
 
     /**
      * Concatenates a functional routine based on the specified instance to this one.
@@ -123,7 +124,7 @@ public interface FunctionalRoutine<IN, OUT>
      * @return the concatenated functional routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> asyncMap(@NotNull Routine<? super OUT, AFTER> routine);
+    <AFTER> FunctionalRoutine<IN, AFTER> thenAsyncMap(@NotNull Routine<? super OUT, AFTER> routine);
 
     /**
      * Concatenates a functional routine based on the specified reducing consumer to this one.<br/>
@@ -137,7 +138,7 @@ public interface FunctionalRoutine<IN, OUT>
      * @return the concatenated functional routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> asyncReduce(
+    <AFTER> FunctionalRoutine<IN, AFTER> thenAsyncReduce(
             @NotNull BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
                     consumer);
 
@@ -153,7 +154,7 @@ public interface FunctionalRoutine<IN, OUT>
      * @return the concatenated functional routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> asyncReduce(
+    <AFTER> FunctionalRoutine<IN, AFTER> thenAsyncReduce(
             @NotNull Function<? super List<? extends OUT>, AFTER> function);
 
     /**
@@ -165,7 +166,7 @@ public interface FunctionalRoutine<IN, OUT>
      * @return the lifted functional routine.
      */
     @NotNull
-    <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> flatLift(
+    <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> thenFlatLift(
             @NotNull Function<? super FunctionalRoutine<IN, OUT>, ? extends
                     FunctionalRoutine<BEFORE, AFTER>> function);
 
@@ -178,7 +179,7 @@ public interface FunctionalRoutine<IN, OUT>
      * @return the lifted functional routine.
      */
     @NotNull
-    <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> lift(
+    <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> thenLift(
             @NotNull Function<? super FunctionalRoutine<IN, OUT>, ? extends Routine<BEFORE,
                     AFTER>> function);
 
@@ -192,7 +193,7 @@ public interface FunctionalRoutine<IN, OUT>
      * @return the concatenated functional routine.
      */
     @NotNull
-    FunctionalRoutine<IN, OUT> parallelFilter(@NotNull Predicate<? super OUT> predicate);
+    FunctionalRoutine<IN, OUT> thenParallelFilter(@NotNull Predicate<? super OUT> predicate);
 
     /**
      * Concatenates a functional routine based on the specified consumer to this one.
@@ -204,7 +205,7 @@ public interface FunctionalRoutine<IN, OUT>
      * @return the concatenated functional routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> parallelMap(
+    <AFTER> FunctionalRoutine<IN, AFTER> thenParallelMap(
             @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
 
 
@@ -218,7 +219,7 @@ public interface FunctionalRoutine<IN, OUT>
      * @return the concatenated functional routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> parallelMap(
+    <AFTER> FunctionalRoutine<IN, AFTER> thenParallelMap(
             @NotNull FilterInvocation<? super OUT, AFTER> invocation);
 
     /**
@@ -231,7 +232,7 @@ public interface FunctionalRoutine<IN, OUT>
      * @return the concatenated functional routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> parallelMap(
+    <AFTER> FunctionalRoutine<IN, AFTER> thenParallelMap(
             @NotNull Function<? super OUT, AFTER> function);
 
     /**
@@ -244,7 +245,8 @@ public interface FunctionalRoutine<IN, OUT>
      * @return the concatenated functional routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> parallelMap(@NotNull Routine<? super OUT, AFTER> routine);
+    <AFTER> FunctionalRoutine<IN, AFTER> thenParallelMap(
+            @NotNull Routine<? super OUT, AFTER> routine);
 
     /**
      * Concatenates a functional routine based on the specified accumulate function to this one.
@@ -264,7 +266,7 @@ public interface FunctionalRoutine<IN, OUT>
      * @return the concatenated functional routine.
      */
     @NotNull
-    FunctionalRoutine<IN, OUT> syncAccumulate(
+    FunctionalRoutine<IN, OUT> thenSyncAccumulate(
             @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
 
     /**
@@ -277,7 +279,7 @@ public interface FunctionalRoutine<IN, OUT>
      * @return the concatenated functional routine.
      */
     @NotNull
-    FunctionalRoutine<IN, OUT> syncFilter(@NotNull Predicate<? super OUT> predicate);
+    FunctionalRoutine<IN, OUT> thenSyncFilter(@NotNull Predicate<? super OUT> predicate);
 
     /**
      * Concatenates a functional routine based on the specified consumer to this one.
@@ -289,7 +291,7 @@ public interface FunctionalRoutine<IN, OUT>
      * @return the concatenated functional routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> syncMap(
+    <AFTER> FunctionalRoutine<IN, AFTER> thenSyncMap(
             @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
 
 
@@ -303,7 +305,7 @@ public interface FunctionalRoutine<IN, OUT>
      * @return the concatenated functional routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> syncMap(
+    <AFTER> FunctionalRoutine<IN, AFTER> thenSyncMap(
             @NotNull FilterInvocation<? super OUT, AFTER> invocation);
 
     /**
@@ -316,7 +318,8 @@ public interface FunctionalRoutine<IN, OUT>
      * @return the concatenated functional routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> syncMap(@NotNull Function<? super OUT, AFTER> function);
+    <AFTER> FunctionalRoutine<IN, AFTER> thenSyncMap(
+            @NotNull Function<? super OUT, AFTER> function);
 
     /**
      * Concatenates a functional routine based on the specified instance to this one.
@@ -328,7 +331,7 @@ public interface FunctionalRoutine<IN, OUT>
      * @return the concatenated functional routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> syncMap(@NotNull Routine<? super OUT, AFTER> routine);
+    <AFTER> FunctionalRoutine<IN, AFTER> thenSyncMap(@NotNull Routine<? super OUT, AFTER> routine);
 
     /**
      * Concatenates a functional routine based on the specified reducing consumer to this one.<br/>
@@ -342,7 +345,7 @@ public interface FunctionalRoutine<IN, OUT>
      * @return the concatenated functional routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> syncReduce(
+    <AFTER> FunctionalRoutine<IN, AFTER> thenSyncReduce(
             @NotNull BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
                     consumer);
 
@@ -358,6 +361,6 @@ public interface FunctionalRoutine<IN, OUT>
      * @return the concatenated functional routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> syncReduce(
+    <AFTER> FunctionalRoutine<IN, AFTER> thenSyncReduce(
             @NotNull Function<? super List<? extends OUT>, AFTER> function);
 }

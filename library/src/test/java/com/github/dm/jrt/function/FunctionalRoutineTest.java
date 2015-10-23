@@ -1093,6 +1093,21 @@ public class FunctionalRoutineTest {
     }
 
     @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testNullPointer() {
+
+        try {
+
+            new DefaultFunctionalRoutine<Object, Object>(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
     public void testReduceConsumer() {
 
         internalTestReduceConsumer();

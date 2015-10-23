@@ -19,8 +19,6 @@ import com.github.dm.jrt.channel.RoutineException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static com.github.dm.jrt.function.Functions.wrapConsumer;
-
 /**
  * Utility class used to build output consumer based on consumer functions.
  * <p/>
@@ -39,63 +37,33 @@ public class OutputConsumerBuilder<OUT> implements OutputConsumer<OUT> {
     /**
      * Constructor.
      *
-     * @param onOutput   the output consumer.
-     * @param onError    the error consumer.
      * @param onComplete the complete consumer.
+     * @param onError    the error consumer.
+     * @param onOutput   the output consumer.
      */
-    private OutputConsumerBuilder(@NotNull final ConsumerWrapper<OUT> onOutput,
+    @SuppressWarnings("ConstantConditions")
+    OutputConsumerBuilder(@NotNull final ConsumerWrapper<Void> onComplete,
             @NotNull final ConsumerWrapper<RoutineException> onError,
-            @NotNull final ConsumerWrapper<Void> onComplete) {
+            @NotNull final ConsumerWrapper<OUT> onOutput) {
+
+        if (onComplete == null) {
+
+            throw new NullPointerException("the complete consumer must not be null");
+        }
+
+        if (onError == null) {
+
+            throw new NullPointerException("the error consumer must not be null");
+        }
+
+        if (onOutput == null) {
+
+            throw new NullPointerException("the output consumer must not be null");
+        }
 
         mOnOutput = onOutput;
         mOnError = onError;
         mOnComplete = onComplete;
-    }
-
-    /**
-     * Returns an output consumer builder employing the specified consumer function to handle the
-     * invocation completion.
-     *
-     * @param consumer the consumer function.
-     * @return the builder instance.
-     */
-    @NotNull
-    public static OutputConsumerBuilder<Object> onComplete(@NotNull final Consumer<Void> consumer) {
-
-        return new OutputConsumerBuilder<Object>(Functions.sink(),
-                                                 Functions.<RoutineException>sink(),
-                                                 wrapConsumer(consumer));
-    }
-
-    /**
-     * Returns an output consumer builder employing the specified consumer function to handle the
-     * invocation errors.
-     *
-     * @param consumer the consumer function.
-     * @return the builder instance.
-     */
-    @NotNull
-    public static OutputConsumerBuilder<Object> onError(
-            @NotNull final Consumer<RoutineException> consumer) {
-
-        return new OutputConsumerBuilder<Object>(Functions.sink(), wrapConsumer(consumer),
-                                                 Functions.<Void>sink());
-    }
-
-    /**
-     * Returns an output consumer builder employing the specified consumer function to handle the
-     * invocation outputs.
-     *
-     * @param consumer the consumer function.
-     * @param <OUT>    the output data type.
-     * @return the builder instance.
-     */
-    @NotNull
-    public static <OUT> OutputConsumerBuilder<OUT> onOutput(@NotNull final Consumer<OUT> consumer) {
-
-        return new OutputConsumerBuilder<OUT>(wrapConsumer(consumer),
-                                              Functions.<RoutineException>sink(),
-                                              Functions.<Void>sink());
     }
 
     /**
@@ -108,7 +76,7 @@ public class OutputConsumerBuilder<OUT> implements OutputConsumer<OUT> {
     @NotNull
     public OutputConsumerBuilder<OUT> andThenComplete(@NotNull final Consumer<Void> consumer) {
 
-        return new OutputConsumerBuilder<OUT>(mOnOutput, mOnError, mOnComplete.andThen(consumer));
+        return new OutputConsumerBuilder<OUT>(mOnComplete.andThen(consumer), mOnError, mOnOutput);
     }
 
     /**
@@ -122,7 +90,7 @@ public class OutputConsumerBuilder<OUT> implements OutputConsumer<OUT> {
     public OutputConsumerBuilder<OUT> andThenError(
             @NotNull final Consumer<? super RoutineException> consumer) {
 
-        return new OutputConsumerBuilder<OUT>(mOnOutput, mOnError.andThen(consumer), mOnComplete);
+        return new OutputConsumerBuilder<OUT>(mOnComplete, mOnError.andThen(consumer), mOnOutput);
     }
 
     /**
@@ -135,7 +103,7 @@ public class OutputConsumerBuilder<OUT> implements OutputConsumer<OUT> {
     @NotNull
     public OutputConsumerBuilder<OUT> andThenOutput(@NotNull final Consumer<? super OUT> consumer) {
 
-        return new OutputConsumerBuilder<OUT>(mOnOutput.andThen(consumer), mOnError, mOnComplete);
+        return new OutputConsumerBuilder<OUT>(mOnComplete, mOnError, mOnOutput.andThen(consumer));
     }
 
     public void onComplete() {

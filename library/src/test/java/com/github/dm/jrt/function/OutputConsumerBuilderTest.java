@@ -17,10 +17,11 @@ import com.github.dm.jrt.channel.RoutineException;
 
 import org.junit.Test;
 
+import static com.github.dm.jrt.function.Functions.onComplete;
+import static com.github.dm.jrt.function.Functions.onError;
+import static com.github.dm.jrt.function.Functions.onOutput;
+import static com.github.dm.jrt.function.Functions.sink;
 import static com.github.dm.jrt.function.Functions.wrapConsumer;
-import static com.github.dm.jrt.function.OutputConsumerBuilder.onComplete;
-import static com.github.dm.jrt.function.OutputConsumerBuilder.onError;
-import static com.github.dm.jrt.function.OutputConsumerBuilder.onOutput;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -30,6 +31,42 @@ import static org.junit.Assert.fail;
  * Created by davide-maestroni on 09/24/2015.
  */
 public class OutputConsumerBuilderTest {
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testNullPointer() {
+
+        try {
+
+            new OutputConsumerBuilder<Object>(Functions.<Void>sink(),
+                                              Functions.<RoutineException>sink(), null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new OutputConsumerBuilder<Object>(Functions.<Void>sink(), null, sink());
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new OutputConsumerBuilder<Object>(null, Functions.<RoutineException>sink(), sink());
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
 
     @Test
     public void testOnComplete() {

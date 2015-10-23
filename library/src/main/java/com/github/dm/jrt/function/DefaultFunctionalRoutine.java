@@ -105,7 +105,7 @@ class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine<IN, OU
 
             if (delegationType == null) {
 
-                throw new NullPointerException("the concatenated delegation type must not be null");
+                throw new NullPointerException("the delegation type must not be null");
             }
 
             mRoutine = routine;

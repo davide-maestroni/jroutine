@@ -14,6 +14,7 @@
 package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.channel.ResultChannel;
+import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.invocation.CommandInvocation;
 import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.invocation.FunctionInvocation;
@@ -37,9 +38,7 @@ public class Functions {
     private static final BiConsumerWrapper<?, ?> sBiSink =
             wrapBiConsumer(new BiConsumer<Object, Object>() {
 
-                public void accept(final Object in1, final Object in2) {
-
-                }
+                public void accept(final Object in1, final Object in2) {}
             });
 
     private static final FunctionWrapper<?, ?> sIdentity =
@@ -91,9 +90,7 @@ public class Functions {
 
     private static final ConsumerWrapper<?> sSink = wrapConsumer(new Consumer<Object>() {
 
-        public void accept(final Object in) {
-
-        }
+        public void accept(final Object in) {}
     });
 
     /**
@@ -328,6 +325,52 @@ public class Functions {
     public static <IN> PredicateWrapper<IN> notNull() {
 
         return (PredicateWrapper<IN>) sNotNull;
+    }
+
+    /**
+     * Returns an output consumer builder employing the specified consumer function to handle the
+     * invocation completion.
+     *
+     * @param consumer the consumer function.
+     * @return the builder instance.
+     */
+    @NotNull
+    public static OutputConsumerBuilder<Object> onComplete(@NotNull final Consumer<Void> consumer) {
+
+        return new OutputConsumerBuilder<Object>(wrapConsumer(consumer),
+                                                 Functions.<RoutineException>sink(),
+                                                 Functions.sink());
+    }
+
+    /**
+     * Returns an output consumer builder employing the specified consumer function to handle the
+     * invocation errors.
+     *
+     * @param consumer the consumer function.
+     * @return the builder instance.
+     */
+    @NotNull
+    public static OutputConsumerBuilder<Object> onError(
+            @NotNull final Consumer<RoutineException> consumer) {
+
+        return new OutputConsumerBuilder<Object>(Functions.<Void>sink(), wrapConsumer(consumer),
+                                                 Functions.sink());
+    }
+
+    /**
+     * Returns an output consumer builder employing the specified consumer function to handle the
+     * invocation outputs.
+     *
+     * @param consumer the consumer function.
+     * @param <OUT>    the output data type.
+     * @return the builder instance.
+     */
+    @NotNull
+    public static <OUT> OutputConsumerBuilder<OUT> onOutput(@NotNull final Consumer<OUT> consumer) {
+
+        return new OutputConsumerBuilder<OUT>(Functions.<Void>sink(),
+                                              Functions.<RoutineException>sink(),
+                                              wrapConsumer(consumer));
     }
 
     /**

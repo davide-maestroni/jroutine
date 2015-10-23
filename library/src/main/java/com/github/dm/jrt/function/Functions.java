@@ -119,6 +119,17 @@ public class Functions {
     }
 
     /**
+     * Returns a functional routine builder.
+     *
+     * @return the routine builder instance.
+     */
+    @NotNull
+    public static FunctionalRoutineBuilder builder() {
+
+        return new DefaultFunctionalRoutineBuilder();
+    }
+
+    /**
      * Returns a supplier chain always returning the same result.<br/>
      * The returned object will support concatenation and comparison.
      *

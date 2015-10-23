@@ -553,7 +553,7 @@ public class TimeDurationTest {
                 TimeDuration.ZERO);
         final long future = System.currentTimeMillis() + 177777;
         assertThat(TimeDuration.timeSinceMillis(future)).isEqualTo(TimeDuration.ZERO);
-        TimeDuration.seconds(1).sleepAtLeast();
+        TimeDuration.millis(1100).sleepAtLeast();
         assertThat(TimeDuration.timeSinceMillis(past).toSeconds()).isGreaterThanOrEqualTo(181);
     }
 
@@ -567,7 +567,7 @@ public class TimeDurationTest {
                 TimeDuration.ZERO);
         final long future = System.nanoTime() + 177777777777l;
         assertThat(TimeDuration.timeSinceNanos(future)).isEqualTo(TimeDuration.ZERO);
-        TimeDuration.seconds(1).sleepAtLeast();
+        TimeDuration.millis(1100).sleepAtLeast();
         assertThat(TimeDuration.timeSinceNanos(past).toSeconds()).isGreaterThanOrEqualTo(181);
     }
 

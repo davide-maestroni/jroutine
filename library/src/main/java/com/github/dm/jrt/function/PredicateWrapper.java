@@ -31,45 +31,15 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  */
 public class PredicateWrapper<IN> implements Predicate<IN> {
 
-    private static final Predicate<?> AND_PREDICATE = new Predicate<Object>() {
+    private static final LogicalPredicate AND_PREDICATE = new LogicalPredicate();
 
-        public boolean test(final Object o) {
+    private static final LogicalPredicate CLOSE_PREDICATE = new LogicalPredicate();
 
-            throw new UnsupportedOperationException("should never be called");
-        }
-    };
+    private static final LogicalPredicate NEGATE_PREDICATE = new LogicalPredicate();
 
-    private static final Predicate<?> CLOSE_PREDICATE = new Predicate<Object>() {
+    private static final LogicalPredicate OPEN_PREDICATE = new LogicalPredicate();
 
-        public boolean test(final Object o) {
-
-            throw new UnsupportedOperationException("should never be called");
-        }
-    };
-
-    private static final Predicate<?> NEGATE_PREDICATE = new Predicate<Object>() {
-
-        public boolean test(final Object o) {
-
-            throw new UnsupportedOperationException("should never be called");
-        }
-    };
-
-    private static final Predicate<?> OPEN_PREDICATE = new Predicate<Object>() {
-
-        public boolean test(final Object o) {
-
-            throw new UnsupportedOperationException("should never be called");
-        }
-    };
-
-    private static final Predicate<?> OR_PREDICATE = new Predicate<Object>() {
-
-        public boolean test(final Object o) {
-
-            throw new UnsupportedOperationException("should never be called");
-        }
-    };
+    private static final LogicalPredicate OR_PREDICATE = new LogicalPredicate();
 
     private final Predicate<? super IN> mPredicate;
 
@@ -319,6 +289,17 @@ public class PredicateWrapper<IN> implements Predicate<IN> {
         public boolean test(final IN in) {
 
             return mPredicate.test(in) && mOther.test(in);
+        }
+    }
+
+    /**
+     * Class indicating a logical operation (like AND and OR).
+     */
+    private static class LogicalPredicate implements Predicate<Object> {
+
+        public boolean test(final Object o) {
+
+            throw new UnsupportedOperationException("should never be called");
         }
     }
 

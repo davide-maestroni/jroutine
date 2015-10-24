@@ -342,7 +342,7 @@ public class OutputConsumerBuilderTest {
 
         try {
 
-            onOutput(Functions.sink()).andThenComplete(null);
+            onOutput(sink()).andThenComplete(null);
 
             fail();
 
@@ -352,7 +352,7 @@ public class OutputConsumerBuilderTest {
 
         try {
 
-            onOutput(Functions.sink()).andThenError(null);
+            onOutput(sink()).andThenError(null);
 
             fail();
 
@@ -362,7 +362,7 @@ public class OutputConsumerBuilderTest {
 
         try {
 
-            onOutput(Functions.sink()).andThenOutput(null);
+            onOutput(sink()).andThenOutput(null);
 
             fail();
 

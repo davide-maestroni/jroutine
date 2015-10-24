@@ -29,7 +29,7 @@
                                                      .withSharedFields()
                                                      .set()
                                                      .invocations()
-                                                     .withReadTimeout(TimeDuration.INFINITY)
+                                                     .withReadTimeout(seconds(3))
                                                      .set()
                                                      .buildProxy(AsyncMain.class);
                 final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(args)));
@@ -100,7 +100,7 @@
                                                             .withSharedFields()
                                                             .set()
                                                             .invocations()
-                                                            .withReadTimeout(TimeDuration.INFINITY)
+                                                            .withReadTimeout(seconds(3))
                                                             .set()
                                                             .buildProxy();
                 final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(args)));

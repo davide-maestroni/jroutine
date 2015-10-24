@@ -19,13 +19,15 @@
 
             public static void main(final String[] args) {
 
-                final Routine&lt;String, Integer&gt; parseRoutine = on(factoryOf(Parse.class)).buildRoutine();
-                final Routine&lt;Integer, Integer&gt; squareRoutine = on(factoryOf(Square.class)).buildRoutine();
+                final Routine&lt;String, Integer&gt; parseRoutine =
+                        JRoutine.on(factoryOf(Parse.class)).buildRoutine();
+                final Routine&lt;Integer, Integer&gt; squareRoutine =
+                        JRoutine.on(factoryOf(Square.class)).buildRoutine();
                 final Routine&lt;Integer, Double&gt; meanRoutine =
-                        on(factoryOf(SquareRootMean.class)).buildRoutine();
+                        JRoutine.on(factoryOf(SquareRootMean.class)).buildRoutine();
                 final Double rms =
                         meanRoutine.asyncCall(squareRoutine.parallelCall(parseRoutine.parallelCall(args)))
-                                   .afterMax(seconds(1))
+                                   .afterMax(seconds(3))
                                    .next();
                 System.out.println(rms);
                 System.exit(0);
@@ -96,13 +98,14 @@
 
             public static void main(final String[] args) {
 
-                final Routine&lt;String, Integer&gt; parseRoutine = on(new Parse()).buildRoutine();
-                final Routine&lt;Integer, Integer&gt; squareRoutine = on(new Square()).buildRoutine();
-                final Routine&lt;Integer, Double&gt; meanRoutine = on(new SquareRootMeanFactory()).buildRoutine();
+                final Routine&lt;String, Integer&gt; parseRoutine = JRoutine.on(new Parse()).buildRoutine();
+                final Routine&lt;Integer, Integer&gt; squareRoutine = JRoutine.on(new Square()).buildRoutine();
+                final Routine&lt;Integer, Double&gt; meanRoutine =
+                        JRoutine.on(new SquareRootMeanFactory()).buildRoutine();
 
                 final Double rms =
                         meanRoutine.asyncCall(squareRoutine.parallelCall(parseRoutine.parallelCall(args)))
-                                   .afterMax(seconds(1))
+                                   .afterMax(seconds(3))
                                    .next();
                 System.out.println(rms);
                 System.exit(0);
@@ -187,13 +190,12 @@
 
             public static void main(final String[] args) {
 
-                final ClassRoutineBuilder builder =
-                        on(classOfType(Main.class)).proxies()
-                                                   .withSharedFields()
-                                                   .set()
-                                                   .invocations()
-                                                   .withExecutionTimeout(TimeDuration.INFINITY)
-                                                   .set();
+                final ClassRoutineBuilder builder = JRoutine.on(classOfType(Main.class)).proxies()
+                                                            .withSharedFields()
+                                                            .set()
+                                                            .invocations()
+                                                            .withReadTimeout(seconds(3))
+                                                            .set();
                 final Routine&lt;String, Integer&gt; parseRoutine = builder.aliasMethod(PARSE);
                 final Routine&lt;Integer, Integer&gt; squareRoutine = builder.aliasMethod(SQUARE);
                 final Routine&lt;List&lt;Integer&gt;, Double&gt; meanRoutine = builder.aliasMethod(MEAN);
@@ -247,13 +249,14 @@
             public static void main(final String[] args) {
 
                 final Main main = new Main();
-                final AsyncMain proxy = on(instance(main)).proxies()
-                                                          .withSharedFields()
-                                                          .set()
-                                                          .invocations()
-                                                          .withExecutionTimeout(TimeDuration.INFINITY)
-                                                          .set()
-                                                          .buildProxy(AsyncMain.class);
+                final AsyncMain proxy = JRoutine.on(instance(main))
+                                                .proxies()
+                                                .withSharedFields()
+                                                .set()
+                                                .invocations()
+                                                .withReadTimeout(seconds(3))
+                                                .set()
+                                                .buildProxy(AsyncMain.class);
                 final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(args)));
                 System.out.println(rms);
                 System.exit(0);
@@ -300,6 +303,64 @@
 
                 double squareRootMean(
                         &commat;Input(value = List.class, mode = InputMode.COLLECTION) OutputChannel&lt;Integer&gt; values);
+            }
+        }
+    </code>
+</pre>
+<b>Example 5:</b> via functional routine.
+<p>
+    The library provides an additional functional notation to build routines.<br/>
+    Note that the passed instances are expected to behave like functions (that is, no variable state and no side effects), for this reason they are required to have a static context.<br/>
+    The lambda notation used in the example is just for demonstration purpose. In order to compile with Java 7 or below, explicit object creation must be employed.<br/>
+    In fact, the interfaces defined in the "function" package are conceptually <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/FunctionalInterface.html" target="_blank">functional interfaces</a>.
+</p>
+<pre>
+    <code>
+        public class Main {
+
+            public static void main(final String[] args) {
+
+                final FunctionalRoutine&lt;String, Double&gt; meanRoutine =
+                        Functions.builder()
+                                 .&lt;String&gt;buildRoutine()
+                                 .thenParallelMap((Function) (s) -&gt; {
+
+                                         return Integer.parseInt(s);
+                                 })
+                                 .thenParallelMap((Function) (integer) -&gt; {
+
+                                         return integer * integer;
+                                 })
+                                 .thenSyncMap((Function) (integer) -&gt; {
+
+                                         return new SumData(integer, 1);
+                                 })
+                                 .thenAsyncAccumulate((BiFunction) (data1, data2) -&gt; {
+
+                                         return new SumData(data1.sum + data2.sum,
+                                                            data1.count + data2.count);
+                                 })
+                                 .thenSyncMap((Function) (sumData) -&gt; {
+
+                                         return Math.sqrt((double) sumData.sum / sumData.count);
+                                 });
+
+                final Double rms = meanRoutine.asyncCall(args).afterMax(seconds(1)).next();
+                System.out.println(rms);
+                System.exit(0);
+            }
+
+            private static class SumData {
+
+                private final int count;
+
+                private final int sum;
+
+                private SumData(final int sum, final int count) {
+
+                    this.sum = sum;
+                    this.count = count;
+                }
             }
         }
     </code>

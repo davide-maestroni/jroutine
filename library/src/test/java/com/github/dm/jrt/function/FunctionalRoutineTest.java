@@ -202,9 +202,6 @@ public class FunctionalRoutineTest {
                             .all()).containsExactly("TEST1", "TEST2");
         assertThat(Functions.builder()
                             .<String>buildRoutine()
-                            .invocations()
-                            .withOutputOrder(OrderType.BY_CALL)
-                            .set()
                             .thenParallelMap(new BiConsumer<String, ResultChannel<String>>() {
 
                                 public void accept(final String s,
@@ -215,7 +212,7 @@ public class FunctionalRoutineTest {
                             })
                             .asyncCall("test1", "test2")
                             .afterMax(seconds(3))
-                            .all()).containsExactly("TEST1", "TEST2");
+                            .all()).containsOnly("TEST1", "TEST2");
         assertThat(Functions.builder()
                             .<String>buildRoutine()
                             .invocations()
@@ -254,9 +251,6 @@ public class FunctionalRoutineTest {
                             .all()).containsExactly("TEST1", "TEST2");
         assertThat(Functions.builder()
                             .<String>buildRoutine()
-                            .invocations()
-                            .withOutputOrder(OrderType.BY_CALL)
-                            .set()
                             .thenParallelMap(new FilterInvocation<String, String>() {
 
                                 public void onInput(final String input,
@@ -267,7 +261,7 @@ public class FunctionalRoutineTest {
                             })
                             .asyncCall("test1", "test2")
                             .afterMax(seconds(3))
-                            .all()).containsExactly("TEST1", "TEST2");
+                            .all()).containsOnly("TEST1", "TEST2");
         assertThat(Functions.builder()
                             .<String>buildRoutine()
                             .invocations()
@@ -305,9 +299,6 @@ public class FunctionalRoutineTest {
                             .all()).containsExactly("TEST1", "TEST2");
         assertThat(Functions.builder()
                             .<String>buildRoutine()
-                            .invocations()
-                            .withOutputOrder(OrderType.BY_CALL)
-                            .set()
                             .thenParallelMap(new Function<String, String>() {
 
                                 public String apply(final String s) {
@@ -317,7 +308,7 @@ public class FunctionalRoutineTest {
                             })
                             .asyncCall("test1", "test2")
                             .afterMax(seconds(3))
-                            .all()).containsExactly("TEST1", "TEST2");
+                            .all()).containsOnly("TEST1", "TEST2");
         assertThat(Functions.builder()
                             .<String>buildRoutine()
                             .invocations()
@@ -1039,13 +1030,10 @@ public class FunctionalRoutineTest {
                             .all()).containsExactly("TEST1", "TEST2");
         assertThat(Functions.builder()
                             .<String>buildRoutine()
-                            .invocations()
-                            .withOutputOrder(OrderType.BY_CALL)
-                            .set()
                             .thenParallelMap(routine)
                             .asyncCall("test1", "test2")
                             .afterMax(seconds(3))
-                            .all()).containsExactly("TEST1", "TEST2");
+                            .all()).containsOnly("TEST1", "TEST2");
         assertThat(Functions.builder()
                             .<String>buildRoutine()
                             .invocations()

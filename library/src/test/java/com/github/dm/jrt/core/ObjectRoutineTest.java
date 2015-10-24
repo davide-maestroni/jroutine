@@ -1207,13 +1207,21 @@ public class ObjectRoutineTest {
         final TestClass2 test2 = new TestClass2();
         final ObjectRoutineBuilder builder =
                 JRoutine.on(instance(test2)).invocations().withReadTimeout(seconds(2)).set();
-
         long startTime = System.currentTimeMillis();
 
         OutputChannel<Object> getOne =
-                builder.proxies().withSharedFields("1").set().method("getOne").asyncCall();
+                builder.proxies().withSharedFields().set().method("getOne").asyncCall();
         OutputChannel<Object> getTwo =
-                builder.proxies().withSharedFields("2").set().method("getTwo").asyncCall();
+                builder.proxies().withSharedFields().set().method("getTwo").asyncCall();
+
+        assertThat(getOne.checkComplete()).isTrue();
+        assertThat(getTwo.checkComplete()).isTrue();
+        assertThat(System.currentTimeMillis() - startTime).isLessThan(1000);
+
+        startTime = System.currentTimeMillis();
+
+        getOne = builder.proxies().withSharedFields("1").set().method("getOne").asyncCall();
+        getTwo = builder.proxies().withSharedFields("2").set().method("getTwo").asyncCall();
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
@@ -1232,17 +1240,69 @@ public class ObjectRoutineTest {
     @Test
     public void testSharedFields2() throws NoSuchMethodException {
 
+        final TestClass2 test2 = new TestClass2();
+        final ObjectRoutineBuilder builder =
+                JRoutine.on(instance(test2)).invocations().withReadTimeout(seconds(2)).set();
+        long startTime = System.currentTimeMillis();
+
+        OutputChannel<Object> getOne = builder.method("getOne").asyncCall();
+        OutputChannel<Object> getTwo =
+                builder.proxies().withSharedFields().set().method("getTwo").asyncCall();
+
+        assertThat(getOne.checkComplete()).isTrue();
+        assertThat(getTwo.checkComplete()).isTrue();
+        assertThat(System.currentTimeMillis() - startTime).isLessThan(1000);
+
+        startTime = System.currentTimeMillis();
+
+        getOne = builder.proxies().withSharedFields("1", "2").set().method("getOne").asyncCall();
+        getTwo = builder.proxies().withSharedFields().set().method("getTwo").asyncCall();
+
+        assertThat(getOne.checkComplete()).isTrue();
+        assertThat(getTwo.checkComplete()).isTrue();
+        assertThat(System.currentTimeMillis() - startTime).isLessThan(1000);
+
+        startTime = System.currentTimeMillis();
+
+        getOne = builder.proxies().withSharedFields("1", "2").set().method("getOne").asyncCall();
+        getTwo = builder.method("getTwo").asyncCall();
+
+        assertThat(getOne.checkComplete()).isTrue();
+        assertThat(getTwo.checkComplete()).isTrue();
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
+
+        startTime = System.currentTimeMillis();
+
+        getOne = builder.proxies().withSharedFields("1", "2").set().method("getOne").asyncCall();
+        getTwo = builder.proxies().withSharedFields("2").set().method("getTwo").asyncCall();
+
+        assertThat(getOne.checkComplete()).isTrue();
+        assertThat(getTwo.checkComplete()).isTrue();
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
+    }
+
+    @Test
+    public void testSharedFieldsStatic() throws NoSuchMethodException {
+
         final ObjectRoutineBuilder builder = JRoutine.on(classOfType(TestStatic2.class))
                                                      .invocations()
                                                      .withReadTimeout(seconds(2))
                                                      .set();
-
         long startTime = System.currentTimeMillis();
 
         OutputChannel<Object> getOne =
-                builder.proxies().withSharedFields("1").set().method("getOne").asyncCall();
+                builder.proxies().withSharedFields().set().method("getOne").asyncCall();
         OutputChannel<Object> getTwo =
-                builder.proxies().withSharedFields("2").set().method("getTwo").asyncCall();
+                builder.proxies().withSharedFields().set().method("getTwo").asyncCall();
+
+        assertThat(getOne.checkComplete()).isTrue();
+        assertThat(getTwo.checkComplete()).isTrue();
+        assertThat(System.currentTimeMillis() - startTime).isLessThan(1000);
+
+        startTime = System.currentTimeMillis();
+
+        getOne = builder.proxies().withSharedFields("1").set().method("getOne").asyncCall();
+        getTwo = builder.proxies().withSharedFields("2").set().method("getTwo").asyncCall();
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();
@@ -1252,6 +1312,51 @@ public class ObjectRoutineTest {
 
         getOne = builder.method("getOne").asyncCall();
         getTwo = builder.method("getTwo").asyncCall();
+
+        assertThat(getOne.checkComplete()).isTrue();
+        assertThat(getTwo.checkComplete()).isTrue();
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
+    }
+
+    @Test
+    public void testSharedFieldsStatic2() throws NoSuchMethodException {
+
+        final ObjectRoutineBuilder builder = JRoutine.on(classOfType(TestStatic2.class))
+                                                     .invocations()
+                                                     .withReadTimeout(seconds(2))
+                                                     .set();
+        long startTime = System.currentTimeMillis();
+
+        OutputChannel<Object> getOne = builder.method("getOne").asyncCall();
+        OutputChannel<Object> getTwo =
+                builder.proxies().withSharedFields().set().method("getTwo").asyncCall();
+
+        assertThat(getOne.checkComplete()).isTrue();
+        assertThat(getTwo.checkComplete()).isTrue();
+        assertThat(System.currentTimeMillis() - startTime).isLessThan(1000);
+
+        startTime = System.currentTimeMillis();
+
+        getOne = builder.proxies().withSharedFields("1", "2").set().method("getOne").asyncCall();
+        getTwo = builder.proxies().withSharedFields().set().method("getTwo").asyncCall();
+
+        assertThat(getOne.checkComplete()).isTrue();
+        assertThat(getTwo.checkComplete()).isTrue();
+        assertThat(System.currentTimeMillis() - startTime).isLessThan(1000);
+
+        startTime = System.currentTimeMillis();
+
+        getOne = builder.proxies().withSharedFields("1", "2").set().method("getOne").asyncCall();
+        getTwo = builder.method("getTwo").asyncCall();
+
+        assertThat(getOne.checkComplete()).isTrue();
+        assertThat(getTwo.checkComplete()).isTrue();
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(1000);
+
+        startTime = System.currentTimeMillis();
+
+        getOne = builder.proxies().withSharedFields("1", "2").set().method("getOne").asyncCall();
+        getTwo = builder.proxies().withSharedFields("2").set().method("getTwo").asyncCall();
 
         assertThat(getOne.checkComplete()).isTrue();
         assertThat(getTwo.checkComplete()).isTrue();

@@ -41,8 +41,6 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
     private TypeMirror mClashAnnotationType;
 
-    private TypeElement mCurrentAnnotationElement;
-
     private String mHeaderService;
 
     private String mHeaderV11;
@@ -103,10 +101,11 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
     @NotNull
     @Override
-    protected String buildRoutineFieldsInit(final int size) {
+    protected String buildRoutineFieldsInit(@NotNull final TypeElement annotationElement,
+            @NotNull final TypeElement element, @NotNull final Element targetElement,
+            final int size) {
 
         final TypeElement serviceProxyElement = mServiceProxyElement;
-        final TypeElement annotationElement = mCurrentAnnotationElement;
 
         final StringBuilder builder = new StringBuilder();
 
@@ -133,13 +132,13 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
     @NotNull
     @Override
-    @SuppressWarnings("UnusedParameters")
-    protected String getHeaderTemplate() throws IOException {
+    protected String getHeaderTemplate(@NotNull final TypeElement annotationElement,
+            @NotNull final TypeElement element, @NotNull final Element targetElement) throws
+            IOException {
 
         final TypeElement serviceProxyElement = mServiceProxyElement;
         final TypeElement v4ProxyElement = mV4ProxyElement;
         final TypeElement v11ProxyElement = mV11ProxyElement;
-        final TypeElement annotationElement = mCurrentAnnotationElement;
 
         if (annotationElement == serviceProxyElement) {
 
@@ -169,16 +168,17 @@ public class ContextRoutineProcessor extends RoutineProcessor {
             return mHeaderV11;
         }
 
-        return super.getHeaderTemplate();
+        return super.getHeaderTemplate(annotationElement, element, targetElement);
     }
+
 
     @NotNull
     @Override
-    @SuppressWarnings("UnusedParameters")
-    protected String getMethodHeaderTemplate(@NotNull final ExecutableElement methodElement,
-            final int count) throws IOException {
+    protected String getMethodHeaderTemplate(@NotNull final TypeElement annotationElement,
+            @NotNull final TypeElement element, @NotNull final Element targetElement,
+            @NotNull final ExecutableElement methodElement, final int count) throws IOException {
 
-        if (mCurrentAnnotationElement != mServiceProxyElement) {
+        if (annotationElement != mServiceProxyElement) {
 
             if (mMethodHeaderV1 == null) {
 
@@ -199,7 +199,8 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
     @NotNull
     @Override
-    protected String getMethodInvocationFooterTemplate(
+    protected String getMethodInvocationFooterTemplate(@NotNull final TypeElement annotationElement,
+            @NotNull final TypeElement element, @NotNull final Element targetElement,
             @NotNull final ExecutableElement methodElement, final int count) throws IOException {
 
         if (mMethodInvocationFooter == null) {
@@ -213,7 +214,8 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
     @NotNull
     @Override
-    protected String getMethodInvocationHeaderTemplate(
+    protected String getMethodInvocationHeaderTemplate(@NotNull final TypeElement annotationElement,
+            @NotNull final TypeElement element, @NotNull final Element targetElement,
             @NotNull final ExecutableElement methodElement, final int count) throws IOException {
 
         if (mMethodInvocationHeader == null) {
@@ -223,15 +225,6 @@ public class ContextRoutineProcessor extends RoutineProcessor {
         }
 
         return mMethodInvocationHeader;
-    }
-
-    @NotNull
-    @Override
-    protected String getSourceName(@NotNull final TypeElement annotationElement,
-            @NotNull final TypeElement element, @NotNull final Element targetElement) {
-
-        mCurrentAnnotationElement = annotationElement;
-        return super.getSourceName(annotationElement, element, targetElement);
     }
 
     @SuppressWarnings("unchecked")

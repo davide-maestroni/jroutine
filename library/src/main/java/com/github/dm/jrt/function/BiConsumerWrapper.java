@@ -59,7 +59,7 @@ public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2> {
     }
 
     /**
-     * Returns a composed bi-consumer chain that performs, in sequence, this operation followed
+     * Returns a composed bi-consumer wrapper that performs, in sequence, this operation followed
      * by the after operation.
      *
      * @param after the operation to perform after this operation.
@@ -90,9 +90,9 @@ public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2> {
     }
 
     /**
-     * Checks if this bi-consumer chain has a static context.
+     * Checks if the bi-consumers wrapped by this instance have a static context.
      *
-     * @return whether this instance has a static context.
+     * @return whether the bi-consumers have a static context.
      */
     public boolean hasStaticContext() {
 

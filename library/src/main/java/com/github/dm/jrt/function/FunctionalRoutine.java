@@ -28,7 +28,7 @@ import java.util.List;
  * Each function in the channel is backed by a sub-routine instance, that can have its own specific
  * configuration and invocation mode.
  * <p/>
- * Note that, when at least one reduce function is part of the concatenation, the results will be
+ * Note that, if at least one reduce function is part of the concatenation, the results will be
  * propagated only when the invocation completes.
  * <p/>
  * Created by davide-maestroni on 10/16/2015.

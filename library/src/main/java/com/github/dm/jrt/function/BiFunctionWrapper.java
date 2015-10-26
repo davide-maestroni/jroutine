@@ -20,6 +20,8 @@ import org.jetbrains.annotations.NotNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
+ * Class wrapping a bi-function instance.
+ * <p/>
  * Created by davide-maestroni on 10/16/2015.
  *
  * @param <IN1> the first input data type.
@@ -49,7 +51,7 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
 
         if (function == null) {
 
-            throw new NullPointerException("the function chain must not be null");
+            throw new NullPointerException("the function wrapper must not be null");
         }
 
         mBiFunction = biFunction;
@@ -57,12 +59,12 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
     }
 
     /**
-     * Returns a composed bi-function chain that first applies this function to its input, and then
-     * applies the after function to the result.
+     * Returns a composed bi-function wrapper that first applies this function to its input, and
+     * then applies the after function to the result.
      *
      * @param after   the function to apply after this function is applied.
      * @param <AFTER> the type of output of the after function.
-     * @return the composed function.
+     * @return the composed bi-function.
      */
     @NotNull
     @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
@@ -80,9 +82,9 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
     }
 
     /**
-     * Checks if this supplier chain has a static context.
+     * Checks if the functions wrapped by this instance have a static context.
      *
-     * @return whether this instance has a static context.
+     * @return whether the functions have a static context.
      */
     public boolean hasStaticContext() {
 

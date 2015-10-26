@@ -58,7 +58,7 @@ public class ConsumerWrapper<IN> implements Consumer<IN> {
     }
 
     /**
-     * Returns a composed consumer chain that performs, in sequence, this operation followed by
+     * Returns a composed consumer wrapper that performs, in sequence, this operation followed by
      * the after operation.
      *
      * @param after the operation to perform after this operation.
@@ -88,9 +88,9 @@ public class ConsumerWrapper<IN> implements Consumer<IN> {
     }
 
     /**
-     * Checks if this consumer chain has a static context.
+     * Checks if the consumers wrapped by this instance have a static context.
      *
-     * @return whether this instance has a static context.
+     * @return whether the consumers have a static context.
      */
     public boolean hasStaticContext() {
 

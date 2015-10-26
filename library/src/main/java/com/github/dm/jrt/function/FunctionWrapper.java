@@ -50,7 +50,7 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT> {
     }
 
     /**
-     * Returns a composed function chain that first applies this function to its input, and then
+     * Returns a composed function wrapper that first applies this function to its input, and then
      * applies the after function to the result.
      *
      * @param after   the function to apply after this function is applied.
@@ -95,7 +95,7 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT> {
     }
 
     /**
-     * Returns a composed function chain that first applies the before function to its input,
+     * Returns a composed function wrapper that first applies the before function to its input,
      * and then applies this function to the result.
      *
      * @param before   the function to apply before this function is applied.
@@ -127,9 +127,9 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT> {
     }
 
     /**
-     * Checks if this function chain has a static context.
+     * Checks if the functions wrapped by this instance have a static context.
      *
-     * @return whether this instance has a static context.
+     * @return whether the functions have a static context.
      */
     public boolean hasStaticContext() {
 

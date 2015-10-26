@@ -70,8 +70,8 @@ public class PredicateWrapper<IN> implements Predicate<IN> {
     }
 
     /**
-     * Returns a composed predicate that represents a short-circuiting logical AND of this predicate
-     * and another.
+     * Returns a composed predicate wrapper that represents a short-circuiting logical AND of this
+     * predicate and another.
      *
      * @param other a predicate that will be logically-ANDed with this predicate.
      * @return the composed predicate.
@@ -103,9 +103,9 @@ public class PredicateWrapper<IN> implements Predicate<IN> {
     }
 
     /**
-     * Checks if this consumer chain has a static context.
+     * Checks if the predicates wrapped by this instance have a static context.
      *
-     * @return whether this instance has a static context.
+     * @return whether the predicates have a static context.
      */
     public boolean hasStaticContext() {
 
@@ -168,7 +168,7 @@ public class PredicateWrapper<IN> implements Predicate<IN> {
     }
 
     /**
-     * Returns a predicate that represents the logical negation of this predicate.
+     * Returns a predicate wrapper that represents the logical negation of this predicate.
      *
      * @return the negated predicate.
      */
@@ -226,12 +226,20 @@ public class PredicateWrapper<IN> implements Predicate<IN> {
             }
         }
 
-        return new PredicateWrapper<IN>(new NegatePredicate<IN>(mPredicate), newPredicates);
+        final Predicate<? super IN> predicate = mPredicate;
+
+        if (predicate instanceof NegatePredicate) {
+
+            return new PredicateWrapper<IN>(((NegatePredicate<? super IN>) predicate).mPredicate,
+                                            newPredicates);
+        }
+
+        return new PredicateWrapper<IN>(new NegatePredicate<IN>(predicate), newPredicates);
     }
 
     /**
-     * Returns a composed predicate that represents a short-circuiting logical OR of this predicate
-     * and another.
+     * Returns a composed predicate wrapper that represents a short-circuiting logical OR of this
+     * predicate and another.
      *
      * @param other a predicate that will be logically-ORed with this predicate.
      * @return the composed predicate.

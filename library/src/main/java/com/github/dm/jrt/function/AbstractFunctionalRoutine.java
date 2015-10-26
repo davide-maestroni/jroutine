@@ -250,8 +250,6 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
 
     /**
      * Concatenates a functional routine based on the specified instance to this one.
-     * <p/>
-     * Note that the passed routine will be invoked in an asynchronous mode.
      *
      * @param routine        the routine instance.
      * @param delegationType the delegation type.

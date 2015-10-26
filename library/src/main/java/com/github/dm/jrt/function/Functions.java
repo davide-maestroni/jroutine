@@ -101,12 +101,12 @@ public class Functions {
     }
 
     /**
-     * Returns a bi-consumer chain just discarding the passed inputs.<br/>
+     * Returns a bi-consumer wrapper just discarding the passed inputs.<br/>
      * The returned object will support concatenation and comparison.
      *
      * @param <IN1> the first input data type.
      * @param <IN2> the second input data type.
-     * @return the bi-consumer chain.
+     * @return the bi-consumer wrapper.
      */
     @NotNull
     @SuppressWarnings("unchecked")
@@ -127,12 +127,12 @@ public class Functions {
     }
 
     /**
-     * Returns a supplier chain always returning the same result.<br/>
+     * Returns a supplier wrapper always returning the same result.<br/>
      * The returned object will support concatenation and comparison.
      *
      * @param result the result.
      * @param <OUT>  the output data type.
-     * @return the supplier chain.
+     * @return the supplier wrapper.
      */
     @NotNull
     public static <OUT> SupplierWrapper<OUT> constant(final OUT result) {
@@ -213,12 +213,12 @@ public class Functions {
     }
 
     /**
-     * Returns a bi-function chain just returning the first passed argument.<br/>
+     * Returns a bi-function wrapper just returning the first passed argument.<br/>
      * The returned object will support concatenation and comparison.
      *
      * @param <IN1> the first input data type.
      * @param <IN2> the second input data type.
-     * @return the bi-function chain.
+     * @return the bi-function wrapper.
      */
     @NotNull
     @SuppressWarnings("unchecked")
@@ -272,11 +272,11 @@ public class Functions {
     }
 
     /**
-     * Returns the identity function.<br/>
+     * Returns the identity function wrapper.<br/>
      * The returned object will support concatenation and comparison.
      *
      * @param <IN> the input data type.
-     * @return the function chain.
+     * @return the function wrapper.
      */
     @NotNull
     @SuppressWarnings("unchecked")
@@ -286,11 +286,11 @@ public class Functions {
     }
 
     /**
-     * Returns a predicate chain returning true when the passed argument is null.<br/>
+     * Returns a predicate wrapper returning true when the passed argument is null.<br/>
      * The returned object will support concatenation and comparison.
      *
      * @param <IN> the input data type.
-     * @return the predicate chain.
+     * @return the predicate wrapper.
      */
     @NotNull
     @SuppressWarnings("unchecked")
@@ -300,11 +300,11 @@ public class Functions {
     }
 
     /**
-     * Returns a predicate chain always returning the false.<br/>
+     * Returns a predicate wrapper always returning the false.<br/>
      * The returned object will support concatenation and comparison.
      *
      * @param <IN> the input data type.
-     * @return the predicate chain.
+     * @return the predicate wrapper.
      */
     @NotNull
     @SuppressWarnings("unchecked")
@@ -314,11 +314,11 @@ public class Functions {
     }
 
     /**
-     * Returns a predicate chain returning true when the passed argument is not null.<br/>
+     * Returns a predicate wrapper returning true when the passed argument is not null.<br/>
      * The returned object will support concatenation and comparison.
      *
      * @param <IN> the input data type.
-     * @return the predicate chain.
+     * @return the predicate wrapper.
      */
     @NotNull
     @SuppressWarnings("unchecked")
@@ -374,11 +374,11 @@ public class Functions {
     }
 
     /**
-     * Returns a predicate chain always returning the true.<br/>
+     * Returns a predicate wrapper always returning the true.<br/>
      * The returned object will support concatenation and comparison.
      *
      * @param <IN> the input data type.
-     * @return the predicate chain.
+     * @return the predicate wrapper.
      */
     @NotNull
     @SuppressWarnings("unchecked")
@@ -411,12 +411,12 @@ public class Functions {
     }
 
     /**
-     * Returns a bi-function chain just returning the second passed argument.<br/>
+     * Returns a bi-function wrapper just returning the second passed argument.<br/>
      * The returned object will support concatenation and comparison.
      *
      * @param <IN1> the first input data type.
      * @param <IN2> the second input data type.
-     * @return the bi-function chain.
+     * @return the bi-function wrapper.
      */
     @NotNull
     @SuppressWarnings("unchecked")
@@ -426,11 +426,11 @@ public class Functions {
     }
 
     /**
-     * Returns a consumer chain just discarding the passed inputs.<br/>
+     * Returns a consumer wrapper just discarding the passed inputs.<br/>
      * The returned object will support concatenation and comparison.
      *
      * @param <IN> the input data type.
-     * @return the consumer chain.
+     * @return the consumer wrapper.
      */
     @NotNull
     @SuppressWarnings("unchecked")
@@ -740,7 +740,6 @@ public class Functions {
 
             return mConsumer.hashCode();
         }
-
 
         @Override
         public boolean equals(final Object o) {

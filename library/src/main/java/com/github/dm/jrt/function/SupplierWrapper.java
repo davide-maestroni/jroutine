@@ -57,7 +57,7 @@ public class SupplierWrapper<OUT> implements Supplier<OUT> {
     }
 
     /**
-     * Returns a composed supplier chain that first gets this supplier result, and then applies
+     * Returns a composed supplier wrapper that first gets this supplier result, and then applies
      * the after function to it.
      *
      * @param after   the function to apply after this function is applied.
@@ -80,9 +80,9 @@ public class SupplierWrapper<OUT> implements Supplier<OUT> {
     }
 
     /**
-     * Checks if this supplier chain has a static context.
+     * Checks if the supplier and functions wrapped by this instance have a static context.
      *
-     * @return whether this instance has a static context.
+     * @return whether the supplier and functions have a static context.
      */
     public boolean hasStaticContext() {
 

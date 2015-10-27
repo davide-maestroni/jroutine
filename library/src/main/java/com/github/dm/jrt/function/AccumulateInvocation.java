@@ -121,6 +121,29 @@ class AccumulateInvocation<IN> extends TemplateInvocation<IN, IN> {
             mFunction = function;
         }
 
+        @Override
+        public int hashCode() {
+
+            return mFunction.hashCode();
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if (!(o instanceof AccumulateInvocationFactory)) {
+
+                return false;
+            }
+
+            final AccumulateInvocationFactory<?> that = (AccumulateInvocationFactory<?>) o;
+            return mFunction.equals(that.mFunction);
+        }
+
         @NotNull
         @Override
         public Invocation<IN, IN> newInvocation() {

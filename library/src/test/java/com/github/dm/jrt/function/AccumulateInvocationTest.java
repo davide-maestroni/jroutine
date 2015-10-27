@@ -14,6 +14,7 @@
 package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.core.JRoutine;
+import com.github.dm.jrt.invocation.InvocationFactory;
 
 import org.junit.Test;
 
@@ -52,12 +53,15 @@ public class AccumulateInvocationTest {
     public void testFactoryEquals() {
 
         final BiFunction<String, String, String> function = createFunction();
+        final InvocationFactory<String, String> factory = functionFactory(function);
         final BiFunction<String, String, String> first = first();
+        assertThat(factory).isEqualTo(factory);
+        assertThat(factory).isEqualTo(functionFactory(function));
         assertThat(functionFactory(function)).isEqualTo(functionFactory(function));
         assertThat(functionFactory(first)).isEqualTo(functionFactory(first));
-        assertThat(functionFactory(function)).isNotEqualTo(functionFactory(first));
-        assertThat(functionFactory(function)).isNotEqualTo("");
-        assertThat(functionFactory(function).hashCode()).isEqualTo(
-                functionFactory(function).hashCode());
+        assertThat(factory).isNotEqualTo(functionFactory(first));
+        assertThat(factory).isNotEqualTo("");
+        assertThat(factory.hashCode()).isEqualTo(functionFactory(function).hashCode());
+        assertThat(factory.hashCode()).isNotEqualTo(functionFactory(first).hashCode());
     }
 }

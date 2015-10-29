@@ -160,19 +160,6 @@ public interface StreamingChannel<IN, OUT> extends IOChannel<IN, OUT> {
     StreamingChannel<IN, OUT> close();
 
     /**
-     * Creates a new streaming channel which is the concatenation of this channel and the specified
-     * one.
-     * <p/>
-     * Note that the passed channel will be closed as a result of the call.
-     *
-     * @param channel the channel to concatenate after this one.
-     * @param <AFTER> the concatenation output type.
-     * @return the concatenated channel.
-     */
-    @NotNull
-    <AFTER> StreamingChannel<IN, AFTER> append(@NotNull IOChannel<? super OUT, AFTER> channel);
-
-    /**
      * Creates a new streaming channel which is the concatenation of the specified channel and this
      * one.
      * <p/>
@@ -183,6 +170,19 @@ public interface StreamingChannel<IN, OUT> extends IOChannel<IN, OUT> {
      * @return the concatenated channel.
      */
     @NotNull
-    <BEFORE> StreamingChannel<BEFORE, OUT> prepend(
+    <BEFORE> StreamingChannel<BEFORE, OUT> combine(
             @NotNull IOChannel<BEFORE, ? extends IN> channel);
+
+    /**
+     * Creates a new streaming channel which is the concatenation of this channel and the specified
+     * one.
+     * <p/>
+     * Note that the passed channel will be closed as a result of the call.
+     *
+     * @param channel the channel to concatenate after this one.
+     * @param <AFTER> the concatenation output type.
+     * @return the concatenated channel.
+     */
+    @NotNull
+    <AFTER> StreamingChannel<IN, AFTER> concat(@NotNull IOChannel<? super OUT, AFTER> channel);
 }

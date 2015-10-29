@@ -29,7 +29,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  *
  * @param <IN> the input data type.
  */
-public class ConsumerChain<IN> implements Consumer<IN> {
+public class ConsumerWrapper<IN> implements Consumer<IN> {
 
     private final List<Consumer<?>> mConsumers;
 
@@ -38,21 +38,16 @@ public class ConsumerChain<IN> implements Consumer<IN> {
      *
      * @param consumers the list of wrapped consumers.
      */
-    ConsumerChain(@NotNull final List<Consumer<?>> consumers) {
+    ConsumerWrapper(@NotNull final List<Consumer<?>> consumers) {
 
         if (consumers.isEmpty()) {
 
-            throw new IllegalArgumentException("the list of consumer must not be empty");
+            throw new IllegalArgumentException("the list of consumers must not be empty");
         }
 
         mConsumers = consumers;
     }
 
-    /**
-     * Performs this operation on the given argument.
-     *
-     * @param in the input argument.
-     */
     @SuppressWarnings("unchecked")
     public void accept(final IN in) {
 
@@ -63,7 +58,7 @@ public class ConsumerChain<IN> implements Consumer<IN> {
     }
 
     /**
-     * Returns a composed consumer chain that performs, in sequence, this operation followed by
+     * Returns a composed consumer wrapper that performs, in sequence, this operation followed by
      * the after operation.
      *
      * @param after the operation to perform after this operation.
@@ -72,7 +67,7 @@ public class ConsumerChain<IN> implements Consumer<IN> {
     @NotNull
     @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
             justification = "class comparison with == is done")
-    public ConsumerChain<IN> andThen(@NotNull final Consumer<? super IN> after) {
+    public ConsumerWrapper<IN> andThen(@NotNull final Consumer<? super IN> after) {
 
         final Class<? extends Consumer> consumerClass = after.getClass();
         final List<Consumer<?>> consumers = mConsumers;
@@ -80,22 +75,22 @@ public class ConsumerChain<IN> implements Consumer<IN> {
                 new ArrayList<Consumer<?>>(consumers.size() + 1);
         newConsumers.addAll(consumers);
 
-        if (consumerClass == ConsumerChain.class) {
+        if (consumerClass == ConsumerWrapper.class) {
 
-            newConsumers.addAll(((ConsumerChain<?>) after).mConsumers);
+            newConsumers.addAll(((ConsumerWrapper<?>) after).mConsumers);
 
         } else {
 
             newConsumers.add(after);
         }
 
-        return new ConsumerChain<IN>(newConsumers);
+        return new ConsumerWrapper<IN>(newConsumers);
     }
 
     /**
-     * Checks if this consumer chain has a static context.
+     * Checks if the consumers wrapped by this instance have a static context.
      *
-     * @return whether this instance has a static context.
+     * @return whether the consumers have a static context.
      */
     public boolean hasStaticContext() {
 
@@ -136,7 +131,7 @@ public class ConsumerChain<IN> implements Consumer<IN> {
             return false;
         }
 
-        final ConsumerChain<?> that = (ConsumerChain<?>) o;
+        final ConsumerWrapper<?> that = (ConsumerWrapper<?>) o;
         final List<Consumer<?>> thisConsumers = mConsumers;
         final List<Consumer<?>> thatConsumers = that.mConsumers;
         final int size = thisConsumers.size();

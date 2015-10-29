@@ -11,18 +11,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.dm.jrt.core;
+package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.channel.RoutineException;
-import com.github.dm.jrt.function.Consumer;
-import com.github.dm.jrt.function.Functions;
 
 import org.junit.Test;
 
-import static com.github.dm.jrt.core.OutputConsumerBuilder.onComplete;
-import static com.github.dm.jrt.core.OutputConsumerBuilder.onError;
-import static com.github.dm.jrt.core.OutputConsumerBuilder.onOutput;
-import static com.github.dm.jrt.function.Functions.consumerChain;
+import static com.github.dm.jrt.function.Functions.onComplete;
+import static com.github.dm.jrt.function.Functions.onError;
+import static com.github.dm.jrt.function.Functions.onOutput;
+import static com.github.dm.jrt.function.Functions.sink;
+import static com.github.dm.jrt.function.Functions.wrapConsumer;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -32,6 +31,42 @@ import static org.junit.Assert.fail;
  * Created by davide-maestroni on 09/24/2015.
  */
 public class OutputConsumerBuilderTest {
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testNullPointer() {
+
+        try {
+
+            new OutputConsumerBuilder<Object>(Functions.<Void>sink(),
+                                              Functions.<RoutineException>sink(), null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new OutputConsumerBuilder<Object>(Functions.<Void>sink(), null, sink());
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new OutputConsumerBuilder<Object>(null, Functions.<RoutineException>sink(), sink());
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
 
     @Test
     public void testOnComplete() {
@@ -60,7 +95,7 @@ public class OutputConsumerBuilderTest {
         consumer1.reset();
         consumer2.reset();
         outputConsumer =
-                onComplete(consumer1).andThenComplete(consumerChain(consumer2).andThen(consumer3));
+                onComplete(consumer1).andThenComplete(wrapConsumer(consumer2).andThen(consumer3));
         outputConsumer.onOutput("test");
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(consumer2.isCalled()).isFalse();
@@ -161,7 +196,7 @@ public class OutputConsumerBuilderTest {
         consumer1.reset();
         consumer2.reset();
         outputConsumer =
-                onError(consumer1).andThenError(consumerChain(consumer2).andThen(consumer3));
+                onError(consumer1).andThenError(wrapConsumer(consumer2).andThen(consumer3));
         outputConsumer.onOutput("test");
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(consumer2.isCalled()).isFalse();
@@ -262,7 +297,7 @@ public class OutputConsumerBuilderTest {
         consumer1.reset();
         consumer2.reset();
         outputConsumer =
-                onOutput(consumer1).andThenOutput(consumerChain(consumer2).andThen(consumer3));
+                onOutput(consumer1).andThenOutput(wrapConsumer(consumer2).andThen(consumer3));
         outputConsumer.onError(new RoutineException());
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(consumer2.isCalled()).isFalse();
@@ -307,7 +342,7 @@ public class OutputConsumerBuilderTest {
 
         try {
 
-            onOutput(Functions.sink()).andThenComplete(null);
+            onOutput(sink()).andThenComplete(null);
 
             fail();
 
@@ -317,7 +352,7 @@ public class OutputConsumerBuilderTest {
 
         try {
 
-            onOutput(Functions.sink()).andThenError(null);
+            onOutput(sink()).andThenError(null);
 
             fail();
 
@@ -327,7 +362,7 @@ public class OutputConsumerBuilderTest {
 
         try {
 
-            onOutput(Functions.sink()).andThenOutput(null);
+            onOutput(sink()).andThenOutput(null);
 
             fail();
 

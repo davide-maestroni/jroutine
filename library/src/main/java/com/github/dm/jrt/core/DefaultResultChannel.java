@@ -145,8 +145,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         mHandler = handler;
         mRunner = runner;
         mResultOrder = configuration.getOutputOrderTypeOr(OrderType.BY_CHANCE);
-        mExecutionTimeout = configuration.getTimeoutOr(ZERO);
-        mTimeoutActionType = configuration.getTimeoutActionOr(TimeoutActionType.THROW);
+        mExecutionTimeout = configuration.getReadTimeoutOr(ZERO);
+        mTimeoutActionType = configuration.getReadTimeoutActionOr(TimeoutActionType.THROW);
         mMaxOutput = configuration.getOutputMaxSizeOr(Integer.MAX_VALUE);
         mOutputTimeout = configuration.getOutputTimeoutOr(ZERO);
         mOutputQueue = new NestedQueue<Object>() {
@@ -804,7 +804,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             throw new InvocationDeadlockException();
         }
 
-        if (isTimeout || outputQueue.isEmpty()) {
+        if (isTimeout) {
 
             logger.wrn("reading output timeout: [%s] => [%s]", timeout, action);
 
@@ -1285,6 +1285,17 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
             } catch (final NoSuchElementException ignored) {
 
+                mSubLogger.wrn("reading output timeout: [%s] => [%s]", timeout, timeoutAction);
+
+                if (timeoutAction == TimeoutActionType.THROW) {
+
+                    throw new ExecutionTimeoutException("timeout while waiting for outputs");
+
+                } else if (timeoutAction == TimeoutActionType.ABORT) {
+
+                    abort();
+                    throw new AbortException(null);
+                }
             }
 
             return results;
@@ -1347,6 +1358,17 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
                 } catch (final NoSuchElementException ignored) {
 
+                    mSubLogger.wrn("skipping output timeout: [%s] => [%s]", timeout, timeoutAction);
+
+                    if (timeoutAction == TimeoutActionType.THROW) {
+
+                        throw new ExecutionTimeoutException("timeout while waiting for outputs");
+
+                    } else if (timeoutAction == TimeoutActionType.ABORT) {
+
+                        abort();
+                        throw new AbortException(null);
+                    }
                 }
             }
 

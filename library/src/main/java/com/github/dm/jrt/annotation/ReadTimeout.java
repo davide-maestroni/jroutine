@@ -43,7 +43,7 @@ import java.util.concurrent.TimeUnit;
  *         -keepattributes RuntimeVisibleAnnotations
  *
  *         -keepclassmembers class ** {
- *              &#64;com.github.dm.jrt.annotation.Timeout *;
+ *              &#64;com.github.dm.jrt.annotation.ReadTimeout *;
  *         }
  *     </code>
  * </pre>
@@ -55,7 +55,7 @@ import java.util.concurrent.TimeUnit;
 @Inherited
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Timeout {
+public @interface ReadTimeout {
 
     /**
      * The time unit of the timeout for an invocation instance to produce a result.

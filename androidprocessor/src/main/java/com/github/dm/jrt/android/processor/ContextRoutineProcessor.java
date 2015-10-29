@@ -18,14 +18,16 @@ import com.github.dm.jrt.processor.RoutineProcessor;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.Types;
 
 /**
  * Annotation processor used to generate proxy classes enabling method asynchronous invocations,
@@ -38,8 +40,6 @@ public class ContextRoutineProcessor extends RoutineProcessor {
     private TypeMirror mCacheAnnotationType;
 
     private TypeMirror mClashAnnotationType;
-
-    private TypeElement mCurrentAnnotationElement;
 
     private String mHeaderService;
 
@@ -68,27 +68,44 @@ public class ContextRoutineProcessor extends RoutineProcessor {
     private TypeElement mV4ProxyElement;
 
     @Override
+    public Set<String> getSupportedAnnotationTypes() {
+
+        final HashSet<String> types = new HashSet<String>();
+        types.add("com.github.dm.jrt.android.proxy.annotation.ServiceProxy");
+        types.add("com.github.dm.jrt.android.proxy.annotation.V4Proxy");
+        types.add("com.github.dm.jrt.android.proxy.annotation.V11Proxy");
+        return types;
+    }
+
+    @Override
     public synchronized void init(final ProcessingEnvironment processingEnv) {
 
         super.init(processingEnv);
-        mIdAnnotationType =
-                getTypeFromName("com.github.dm.jrt.android.annotation.LoaderId").asType();
+        mIdAnnotationType = getMirrorFromName("com.github.dm.jrt.android.annotation.LoaderId");
         mClashAnnotationType =
-                getTypeFromName("com.github.dm.jrt.android.annotation.ClashResolution").asType();
-        mInputClashAnnotationType = getTypeFromName(
-                "com.github.dm.jrt.android.annotation.InputClashResolution").asType();
+                getMirrorFromName("com.github.dm.jrt.android.annotation.ClashResolution");
+        mInputClashAnnotationType =
+                getMirrorFromName("com.github.dm.jrt.android.annotation.InputClashResolution");
         mCacheAnnotationType =
-                getTypeFromName("com.github.dm.jrt.android.annotation.CacheStrategy").asType();
+                getMirrorFromName("com.github.dm.jrt.android.annotation.CacheStrategy");
         mStaleTimeAnnotationType =
-                getTypeFromName("com.github.dm.jrt.android.annotation.ResultStaleTime").asType();
+                getMirrorFromName("com.github.dm.jrt.android.annotation.ResultStaleTime");
+        final Types typeUtils = processingEnv.getTypeUtils();
+        mServiceProxyElement = (TypeElement) typeUtils.asElement(
+                getMirrorFromName("com.github.dm.jrt.android.proxy.annotation.ServiceProxy"));
+        mV4ProxyElement = (TypeElement) typeUtils.asElement(
+                getMirrorFromName("com.github.dm.jrt.android.proxy.annotation.V4Proxy"));
+        mV11ProxyElement = (TypeElement) typeUtils.asElement(
+                getMirrorFromName("com.github.dm.jrt.android.proxy.annotation.V11Proxy"));
     }
 
     @NotNull
     @Override
-    protected String buildRoutineFieldsInit(final int size) {
+    protected String buildRoutineFieldsInit(@NotNull final TypeElement annotationElement,
+            @NotNull final TypeElement element, @NotNull final Element targetElement,
+            final int size) {
 
         final TypeElement serviceProxyElement = mServiceProxyElement;
-        final TypeElement annotationElement = mCurrentAnnotationElement;
 
         final StringBuilder builder = new StringBuilder();
 
@@ -115,13 +132,13 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
     @NotNull
     @Override
-    @SuppressWarnings("UnusedParameters")
-    protected String getHeaderTemplate() throws IOException {
+    protected String getHeaderTemplate(@NotNull final TypeElement annotationElement,
+            @NotNull final TypeElement element, @NotNull final Element targetElement) throws
+            IOException {
 
         final TypeElement serviceProxyElement = mServiceProxyElement;
         final TypeElement v4ProxyElement = mV4ProxyElement;
         final TypeElement v11ProxyElement = mV11ProxyElement;
-        final TypeElement annotationElement = mCurrentAnnotationElement;
 
         if (annotationElement == serviceProxyElement) {
 
@@ -151,16 +168,17 @@ public class ContextRoutineProcessor extends RoutineProcessor {
             return mHeaderV11;
         }
 
-        return super.getHeaderTemplate();
+        return super.getHeaderTemplate(annotationElement, element, targetElement);
     }
+
 
     @NotNull
     @Override
-    @SuppressWarnings("UnusedParameters")
-    protected String getMethodHeaderTemplate(@NotNull final ExecutableElement methodElement,
-            final int count) throws IOException {
+    protected String getMethodHeaderTemplate(@NotNull final TypeElement annotationElement,
+            @NotNull final TypeElement element, @NotNull final Element targetElement,
+            @NotNull final ExecutableElement methodElement, final int count) throws IOException {
 
-        if (mCurrentAnnotationElement != mServiceProxyElement) {
+        if (annotationElement != mServiceProxyElement) {
 
             if (mMethodHeaderV1 == null) {
 
@@ -181,7 +199,8 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
     @NotNull
     @Override
-    protected String getMethodInvocationFooterTemplate(
+    protected String getMethodInvocationFooterTemplate(@NotNull final TypeElement annotationElement,
+            @NotNull final TypeElement element, @NotNull final Element targetElement,
             @NotNull final ExecutableElement methodElement, final int count) throws IOException {
 
         if (mMethodInvocationFooter == null) {
@@ -195,7 +214,8 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
     @NotNull
     @Override
-    protected String getMethodInvocationHeaderTemplate(
+    protected String getMethodInvocationHeaderTemplate(@NotNull final TypeElement annotationElement,
+            @NotNull final TypeElement element, @NotNull final Element targetElement,
             @NotNull final ExecutableElement methodElement, final int count) throws IOException {
 
         if (mMethodInvocationHeader == null) {
@@ -205,32 +225,6 @@ public class ContextRoutineProcessor extends RoutineProcessor {
         }
 
         return mMethodInvocationHeader;
-    }
-
-    @NotNull
-    @Override
-    protected String getSourceName(@NotNull final TypeElement annotationElement,
-            @NotNull final TypeElement element, @NotNull final TypeElement targetElement) {
-
-        mCurrentAnnotationElement = annotationElement;
-        return super.getSourceName(annotationElement, element, targetElement);
-    }
-
-    @NotNull
-    @Override
-    protected List<TypeElement> getSupportedAnnotationElements() {
-
-        if ((mServiceProxyElement == null) || (mV4ProxyElement == null) || (mV11ProxyElement
-                == null)) {
-
-            mServiceProxyElement =
-                    getTypeFromName("com.github.dm.jrt.android.proxy.annotation.ServiceProxy");
-            mV4ProxyElement = getTypeFromName("com.github.dm.jrt.android.proxy.annotation.V4Proxy");
-            mV11ProxyElement =
-                    getTypeFromName("com.github.dm.jrt.android.proxy.annotation.V11Proxy");
-        }
-
-        return Arrays.asList(mServiceProxyElement, mV4ProxyElement, mV11ProxyElement);
     }
 
     @SuppressWarnings("unchecked")

@@ -240,6 +240,18 @@ public final class ProxyConfiguration {
         }
 
         /**
+         * Sets the shared field names to empty, that is, no field is shared.
+         *
+         * @return this builder.
+         */
+        @NotNull
+        public Builder<TYPE> withSharedFields() {
+
+            mFieldNames = Collections.emptyList();
+            return this;
+        }
+
+        /**
          * Sets the shared field names. A null value means that all fields are shared.
          *
          * @param fieldNames the field names.

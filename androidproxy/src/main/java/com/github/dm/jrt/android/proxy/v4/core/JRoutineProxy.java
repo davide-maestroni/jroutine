@@ -16,6 +16,8 @@ package com.github.dm.jrt.android.proxy.v4.core;
 import com.github.dm.jrt.android.core.ContextInvocationTarget;
 import com.github.dm.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
 import com.github.dm.jrt.android.v4.core.LoaderContext;
+import com.github.dm.jrt.annotation.ReadTimeout;
+import com.github.dm.jrt.annotation.ReadTimeoutAction;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -53,8 +55,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * @see com.github.dm.jrt.annotation.OutputTimeout OutputTimeout
  * @see com.github.dm.jrt.annotation.Priority Priority
  * @see com.github.dm.jrt.annotation.SharedFields SharedFields
- * @see com.github.dm.jrt.annotation.Timeout Timeout
- * @see com.github.dm.jrt.annotation.TimeoutAction TimeoutAction
+ * @see ReadTimeout ReadTimeout
+ * @see ReadTimeoutAction ReadTimeoutAction
  */
 @SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS",
         justification = "utility class extending the functions of another utility class")

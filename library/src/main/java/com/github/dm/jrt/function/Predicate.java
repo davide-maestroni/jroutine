@@ -14,18 +14,19 @@
 package com.github.dm.jrt.function;
 
 /**
- * Interface representing an operation that accepts an input argument and returns no result.
+ * Interface representing a predicate (boolean-valued function) of one argument.
  * <p/>
- * Created by davide-maestroni on 09/21/2015.
+ * Created by davide-maestroni on 10/16/2015.
  *
  * @param <IN> the input data type.
  */
-public interface Consumer<IN> {
+public interface Predicate<IN> {
 
     /**
-     * Performs this operation on the given argument.
+     * Evaluates this predicate on the given argument.
      *
      * @param in the input argument.
+     * @return true if the input argument matches the predicate, otherwise false.
      */
-    void accept(IN in);
+    boolean test(IN in);
 }

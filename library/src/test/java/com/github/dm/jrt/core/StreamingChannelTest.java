@@ -215,7 +215,7 @@ public class StreamingChannelTest {
                 JRoutine.on(new StringLength()).buildRoutine();
         assertThat(asyncStream(stringLength).pass("test").afterMax(seconds(10)).next()).isEqualTo(
                 4);
-        assertThat(asyncStream(doubleString).append(asyncStream(stringLength))
+        assertThat(asyncStream(doubleString).concat(asyncStream(stringLength))
                                             .pass("test")
                                             .afterMax(seconds(10))
                                             .next()).isEqualTo(8);
@@ -269,6 +269,7 @@ public class StreamingChannelTest {
 
                 streamingChannel.after(1, TimeUnit.MILLISECONDS)
                                 .after(TimeDuration.millis(200))
+                                .orderByCall()
                                 .pass("test1", "test2")
                                 .pass(Collections.singleton("test3"))
                                 .close();
@@ -585,8 +586,8 @@ public class StreamingChannelTest {
         final StreamingChannel<Object, Object> streamingChannel = asyncStream(
                 JRoutine.on(PassingInvocation.factoryOf())
                         .invocations()
-                        .withTimeout(millis(10))
-                        .withTimeoutAction(TimeoutActionType.EXIT)
+                        .withReadTimeout(millis(10))
+                        .withReadTimeoutAction(TimeoutActionType.EXIT)
                         .set());
 
         assertThat(streamingChannel.all()).isEmpty();
@@ -598,8 +599,8 @@ public class StreamingChannelTest {
         final StreamingChannel<Object, Object> streamingChannel = asyncStream(
                 JRoutine.on(PassingInvocation.factoryOf())
                         .invocations()
-                        .withTimeout(millis(10))
-                        .withTimeoutAction(TimeoutActionType.ABORT)
+                        .withReadTimeout(millis(10))
+                        .withReadTimeoutAction(TimeoutActionType.ABORT)
                         .set());
 
         try {
@@ -619,8 +620,8 @@ public class StreamingChannelTest {
         final StreamingChannel<Object, Object> streamingChannel = asyncStream(
                 JRoutine.on(PassingInvocation.factoryOf())
                         .invocations()
-                        .withTimeout(millis(10))
-                        .withTimeoutAction(TimeoutActionType.THROW)
+                        .withReadTimeout(millis(10))
+                        .withReadTimeoutAction(TimeoutActionType.THROW)
                         .set());
 
         try {
@@ -681,7 +682,7 @@ public class StreamingChannelTest {
                 JRoutine.on(new StringLength()).buildRoutine();
         assertThat(asyncStream(stringLength).pass("test").afterMax(seconds(10)).next()).isEqualTo(
                 4);
-        assertThat(asyncStream(stringLength).prepend(asyncStream(doubleString))
+        assertThat(asyncStream(stringLength).combine(asyncStream(doubleString))
                                             .pass("test")
                                             .afterMax(seconds(10))
                                             .next()).isEqualTo(8);

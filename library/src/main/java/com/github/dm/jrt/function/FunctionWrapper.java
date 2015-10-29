@@ -30,7 +30,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public class FunctionChain<IN, OUT> implements Function<IN, OUT> {
+public class FunctionWrapper<IN, OUT> implements Function<IN, OUT> {
 
     private final List<Function<?, ?>> mFunctions;
 
@@ -39,13 +39,18 @@ public class FunctionChain<IN, OUT> implements Function<IN, OUT> {
      *
      * @param functions the list of wrapped functions.
      */
-    FunctionChain(@NotNull final List<Function<?, ?>> functions) {
+    FunctionWrapper(@NotNull final List<Function<?, ?>> functions) {
+
+        if (functions.isEmpty()) {
+
+            throw new IllegalArgumentException("the list of functions must not be empty");
+        }
 
         mFunctions = functions;
     }
 
     /**
-     * Returns a composed function chain that first applies this function to its input, and then
+     * Returns a composed function wrapper that first applies this function to its input, and then
      * applies the after function to the result.
      *
      * @param after   the function to apply after this function is applied.
@@ -55,7 +60,7 @@ public class FunctionChain<IN, OUT> implements Function<IN, OUT> {
     @NotNull
     @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
             justification = "class comparison with == is done")
-    public <AFTER> FunctionChain<IN, AFTER> andThen(
+    public <AFTER> FunctionWrapper<IN, AFTER> andThen(
             @NotNull final Function<? super OUT, AFTER> after) {
 
         final Class<? extends Function> functionClass = after.getClass();
@@ -64,24 +69,18 @@ public class FunctionChain<IN, OUT> implements Function<IN, OUT> {
                 new ArrayList<Function<?, ?>>(functions.size() + 1);
         newFunctions.addAll(functions);
 
-        if (functionClass == FunctionChain.class) {
+        if (functionClass == FunctionWrapper.class) {
 
-            newFunctions.addAll(((FunctionChain<?, ?>) after).mFunctions);
+            newFunctions.addAll(((FunctionWrapper<?, ?>) after).mFunctions);
 
         } else {
 
             newFunctions.add(after);
         }
 
-        return new FunctionChain<IN, AFTER>(newFunctions);
+        return new FunctionWrapper<IN, AFTER>(newFunctions);
     }
 
-    /**
-     * Applies this function to the given argument.
-     *
-     * @param in the input argument.
-     * @return the function result.
-     */
     @SuppressWarnings("unchecked")
     public OUT apply(final IN in) {
 
@@ -96,7 +95,7 @@ public class FunctionChain<IN, OUT> implements Function<IN, OUT> {
     }
 
     /**
-     * Returns a composed function chain that first applies the before function to its input,
+     * Returns a composed function wrapper that first applies the before function to its input,
      * and then applies this function to the result.
      *
      * @param before   the function to apply before this function is applied.
@@ -106,7 +105,7 @@ public class FunctionChain<IN, OUT> implements Function<IN, OUT> {
     @NotNull
     @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
             justification = "class comparison with == is done")
-    public <BEFORE> FunctionChain<BEFORE, OUT> compose(
+    public <BEFORE> FunctionWrapper<BEFORE, OUT> compose(
             @NotNull final Function<BEFORE, ? extends IN> before) {
 
         final Class<? extends Function> functionClass = before.getClass();
@@ -114,9 +113,9 @@ public class FunctionChain<IN, OUT> implements Function<IN, OUT> {
         final ArrayList<Function<?, ?>> newFunctions =
                 new ArrayList<Function<?, ?>>(functions.size() + 1);
 
-        if (functionClass == FunctionChain.class) {
+        if (functionClass == FunctionWrapper.class) {
 
-            newFunctions.addAll(((FunctionChain<?, ?>) before).mFunctions);
+            newFunctions.addAll(((FunctionWrapper<?, ?>) before).mFunctions);
 
         } else {
 
@@ -124,13 +123,13 @@ public class FunctionChain<IN, OUT> implements Function<IN, OUT> {
         }
 
         newFunctions.addAll(functions);
-        return new FunctionChain<BEFORE, OUT>(newFunctions);
+        return new FunctionWrapper<BEFORE, OUT>(newFunctions);
     }
 
     /**
-     * Checks if this function chain has a static context.
+     * Checks if the functions wrapped by this instance have a static context.
      *
-     * @return whether this instance has a static context.
+     * @return whether the functions have a static context.
      */
     public boolean hasStaticContext() {
 
@@ -173,7 +172,7 @@ public class FunctionChain<IN, OUT> implements Function<IN, OUT> {
             return false;
         }
 
-        final FunctionChain<?, ?> that = (FunctionChain<?, ?>) o;
+        final FunctionWrapper<?, ?> that = (FunctionWrapper<?, ?>) o;
         final List<Function<?, ?>> thisFunctions = mFunctions;
         final List<Function<?, ?>> thatFunctions = that.mFunctions;
         final int size = thisFunctions.size();

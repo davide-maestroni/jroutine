@@ -236,8 +236,8 @@ public final class ChannelConfiguration {
      */
     public TimeDuration getReadTimeoutOr(@Nullable final TimeDuration valueIfNotSet) {
 
-        final TimeDuration passTimeout = mReadTimeout;
-        return (passTimeout != null) ? passTimeout : valueIfNotSet;
+        final TimeDuration readTimeout = mReadTimeout;
+        return (readTimeout != null) ? readTimeout : valueIfNotSet;
     }
 
     @Override
@@ -356,8 +356,8 @@ public final class ChannelConfiguration {
 
         return InvocationConfiguration.builder()
                                       .withRunner(getAsyncRunnerOr(null))
-                                      .withTimeout(getReadTimeoutOr(null))
-                                      .withTimeoutAction(getReadTimeoutActionOr(null))
+                                      .withReadTimeout(getReadTimeoutOr(null))
+                                      .withReadTimeoutAction(getReadTimeoutActionOr(null))
                                       .withLog(getLogOr(null))
                                       .withLogLevel(getLogLevelOr(null))
                                       .set();
@@ -418,7 +418,7 @@ public final class ChannelConfiguration {
 
         private LogLevel mLogLevel;
 
-        private TimeDuration mPassTimeout;
+        private TimeDuration mReadTimeout;
 
         private TimeoutActionType mTimeoutActionType;
 
@@ -493,11 +493,11 @@ public final class ChannelConfiguration {
                 withAsyncRunner(asyncRunner);
             }
 
-            final TimeDuration passTimeout = configuration.mReadTimeout;
+            final TimeDuration readTimeout = configuration.mReadTimeout;
 
-            if (passTimeout != null) {
+            if (readTimeout != null) {
 
-                withReadTimeout(passTimeout);
+                withReadTimeout(readTimeout);
             }
 
             final TimeoutActionType timeoutActionType = configuration.mTimeoutActionType;
@@ -682,7 +682,7 @@ public final class ChannelConfiguration {
         @NotNull
         public Builder<TYPE> withReadTimeout(@Nullable final TimeDuration timeout) {
 
-            mPassTimeout = timeout;
+            mReadTimeout = timeout;
             return this;
         }
 
@@ -706,7 +706,7 @@ public final class ChannelConfiguration {
         @NotNull
         private ChannelConfiguration buildConfiguration() {
 
-            return new ChannelConfiguration(mAsyncRunner, mPassTimeout, mTimeoutActionType,
+            return new ChannelConfiguration(mAsyncRunner, mReadTimeout, mTimeoutActionType,
                                             mChannelOrderType, mChannelMaxSize, mChannelTimeout,
                                             mLog, mLogLevel);
         }
@@ -714,7 +714,7 @@ public final class ChannelConfiguration {
         private void setConfiguration(@NotNull final ChannelConfiguration configuration) {
 
             mAsyncRunner = configuration.mAsyncRunner;
-            mPassTimeout = configuration.mReadTimeout;
+            mReadTimeout = configuration.mReadTimeout;
             mTimeoutActionType = configuration.mTimeoutActionType;
             mChannelOrderType = configuration.mChannelOrderType;
             mChannelMaxSize = configuration.mChannelMaxSize;

@@ -200,8 +200,8 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         final OutputChannel<String> channel = JRoutine.with(serviceFrom(getActivity()))
                                                       .on(factoryOf(StringDelay.class))
                                                       .invocations()
-                                                      .withTimeout(millis(10))
-                                                      .withTimeoutAction(TimeoutActionType.EXIT)
+                                                      .withReadTimeout(millis(10))
+                                                      .withReadTimeoutAction(TimeoutActionType.EXIT)
                                                       .set()
                                                       .asyncCall("test1");
         assertThat(channel.all()).isEmpty();
@@ -213,8 +213,9 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         final OutputChannel<String> channel = JRoutine.with(serviceFrom(getActivity()))
                                                       .on(factoryOf(StringDelay.class))
                                                       .invocations()
-                                                      .withTimeout(millis(10))
-                                                      .withTimeoutAction(TimeoutActionType.ABORT)
+                                                      .withReadTimeout(millis(10))
+                                                      .withReadTimeoutAction(
+                                                              TimeoutActionType.ABORT)
                                                       .set()
                                                       .asyncCall("test2");
 
@@ -236,8 +237,9 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         final OutputChannel<String> channel = JRoutine.with(serviceFrom(getActivity()))
                                                       .on(factoryOf(StringDelay.class))
                                                       .invocations()
-                                                      .withTimeout(millis(10))
-                                                      .withTimeoutAction(TimeoutActionType.THROW)
+                                                      .withReadTimeout(millis(10))
+                                                      .withReadTimeoutAction(
+                                                              TimeoutActionType.THROW)
                                                       .set()
                                                       .asyncCall("test3");
 

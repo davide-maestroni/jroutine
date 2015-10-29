@@ -26,9 +26,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  *
  * @param <OUT> the output data type.
  */
-public class SupplierChain<OUT> implements Supplier<OUT> {
+public class SupplierWrapper<OUT> implements Supplier<OUT> {
 
-    private final FunctionChain<?, OUT> mFunction;
+    private final FunctionWrapper<?, OUT> mFunction;
 
     private final Supplier<?> mSupplier;
 
@@ -39,8 +39,8 @@ public class SupplierChain<OUT> implements Supplier<OUT> {
      * @param function the concatenated function chain.
      */
     @SuppressWarnings("ConstantConditions")
-    SupplierChain(@NotNull final Supplier<?> supplier,
-            @NotNull final FunctionChain<?, OUT> function) {
+    SupplierWrapper(@NotNull final Supplier<?> supplier,
+            @NotNull final FunctionWrapper<?, OUT> function) {
 
         if (supplier == null) {
 
@@ -57,7 +57,7 @@ public class SupplierChain<OUT> implements Supplier<OUT> {
     }
 
     /**
-     * Returns a composed supplier chain that first gets this supplier result, and then applies
+     * Returns a composed supplier wrapper that first gets this supplier result, and then applies
      * the after function to it.
      *
      * @param after   the function to apply after this function is applied.
@@ -67,16 +67,12 @@ public class SupplierChain<OUT> implements Supplier<OUT> {
     @NotNull
     @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
             justification = "class comparison with == is done")
-    public <AFTER> SupplierChain<AFTER> andThen(@NotNull final Function<? super OUT, AFTER> after) {
+    public <AFTER> SupplierWrapper<AFTER> andThen(
+            @NotNull final Function<? super OUT, AFTER> after) {
 
-        return new SupplierChain<AFTER>(mSupplier, mFunction.andThen(after));
+        return new SupplierWrapper<AFTER>(mSupplier, mFunction.andThen(after));
     }
 
-    /**
-     * Gets a result.
-     *
-     * @return a result.
-     */
     @SuppressWarnings("unchecked")
     public OUT get() {
 
@@ -84,9 +80,9 @@ public class SupplierChain<OUT> implements Supplier<OUT> {
     }
 
     /**
-     * Checks if this supplier chain has a static context.
+     * Checks if the supplier and functions wrapped by this instance have a static context.
      *
-     * @return whether this instance has a static context.
+     * @return whether the supplier and functions have a static context.
      */
     public boolean hasStaticContext() {
 
@@ -115,7 +111,7 @@ public class SupplierChain<OUT> implements Supplier<OUT> {
             return false;
         }
 
-        final SupplierChain<?> that = (SupplierChain<?>) o;
+        final SupplierWrapper<?> that = (SupplierWrapper<?>) o;
         return (mSupplier.getClass() == that.mSupplier.getClass()) && mFunction.equals(
                 that.mFunction);
     }

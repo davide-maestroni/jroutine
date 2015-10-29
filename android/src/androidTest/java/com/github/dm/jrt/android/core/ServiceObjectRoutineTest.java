@@ -27,9 +27,9 @@ import com.github.dm.jrt.annotation.Invoke;
 import com.github.dm.jrt.annotation.Invoke.InvocationMode;
 import com.github.dm.jrt.annotation.Output;
 import com.github.dm.jrt.annotation.Output.OutputMode;
+import com.github.dm.jrt.annotation.ReadTimeout;
+import com.github.dm.jrt.annotation.ReadTimeoutAction;
 import com.github.dm.jrt.annotation.SharedFields;
-import com.github.dm.jrt.annotation.Timeout;
-import com.github.dm.jrt.annotation.TimeoutAction;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.builder.ProxyConfiguration;
@@ -84,7 +84,8 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                                                         .withRunner(Runners.poolRunner())
                                                         .withMaxInstances(1)
                                                         .withCoreInstances(1)
-                                                        .withTimeoutAction(TimeoutActionType.EXIT)
+                                                        .withReadTimeoutAction(
+                                                                TimeoutActionType.EXIT)
                                                         .withLogLevel(LogLevel.DEBUG)
                                                         .withLog(new NullLog())
                                                         .set()
@@ -108,7 +109,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         final SumItf sumAsync = JRoutine.with(serviceFrom(getActivity()))
                                         .on(instanceOf(Sum.class))
                                         .invocations()
-                                        .withTimeout(timeout)
+                                        .withReadTimeout(timeout)
                                         .set()
                                         .buildProxy(SumItf.class);
         final IOChannel<Integer, Integer> channel3 = JRoutine.io().buildChannel();
@@ -138,7 +139,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         final CountItf countAsync = JRoutine.with(serviceFrom(getActivity()))
                                             .on(instanceOf(Count.class))
                                             .invocations()
-                                            .withTimeout(timeout)
+                                            .withReadTimeout(timeout)
                                             .set()
                                             .buildProxy(CountItf.class);
         assertThat(countAsync.count(3).all()).containsExactly(0, 1, 2);
@@ -379,7 +380,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
             JRoutine.with(serviceFrom(getActivity()))
                     .on(instanceOf(TestClass.class))
                     .invocations()
-                    .withTimeout(INFINITY)
+                    .withReadTimeout(INFINITY)
                     .set()
                     .buildProxy(TestItf.class)
                     .throwException(null);
@@ -395,7 +396,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
             JRoutine.with(serviceFrom(getActivity()))
                     .on(instanceOf(TestClass.class))
                     .invocations()
-                    .withTimeout(INFINITY)
+                    .withReadTimeout(INFINITY)
                     .set()
                     .buildProxy(TestItf.class)
                     .throwException1(null);
@@ -411,7 +412,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
             JRoutine.with(serviceFrom(getActivity()))
                     .on(instanceOf(TestClass.class))
                     .invocations()
-                    .withTimeout(INFINITY)
+                    .withReadTimeout(INFINITY)
                     .set()
                     .buildProxy(TestItf.class)
                     .throwException2(null);
@@ -623,7 +624,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         final Itf itf = JRoutine.with(serviceFrom(getActivity()))
                                 .on(instanceOf(Impl.class))
                                 .invocations()
-                                .withTimeout(INFINITY)
+                                .withReadTimeout(INFINITY)
                                 .set()
                                 .buildProxy(Itf.class);
 
@@ -899,7 +900,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                 JRoutine.with(serviceFrom(getActivity(), TestService.class))
                         .on(instanceOf(TestClass2.class))
                         .invocations()
-                        .withTimeout(seconds(10))
+                        .withReadTimeout(seconds(10))
                         .set();
 
         long startTime = System.currentTimeMillis();
@@ -928,7 +929,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         assertThat(JRoutine.with(serviceFrom(getActivity()))
                            .on(instanceOf(TestTimeout.class))
                            .invocations()
-                           .withTimeout(seconds(10))
+                           .withReadTimeout(seconds(10))
                            .set()
                            .aliasMethod("test")
                            .asyncCall()
@@ -939,7 +940,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
             JRoutine.with(serviceFrom(getActivity()))
                     .on(instanceOf(TestTimeout.class))
                     .invocations()
-                    .withTimeoutAction(TimeoutActionType.THROW)
+                    .withReadTimeoutAction(TimeoutActionType.THROW)
                     .set()
                     .aliasMethod("test")
                     .asyncCall()
@@ -954,7 +955,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         assertThat(JRoutine.with(serviceFrom(getActivity()))
                            .on(instanceOf(TestTimeout.class))
                            .invocations()
-                           .withTimeout(seconds(10))
+                           .withReadTimeout(seconds(10))
                            .set()
                            .method("getInt")
                            .asyncCall()
@@ -965,7 +966,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
             JRoutine.with(serviceFrom(getActivity()))
                     .on(instanceOf(TestTimeout.class))
                     .invocations()
-                    .withTimeoutAction(TimeoutActionType.THROW)
+                    .withReadTimeoutAction(TimeoutActionType.THROW)
                     .set()
                     .method("getInt")
                     .asyncCall()
@@ -980,7 +981,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         assertThat(JRoutine.with(serviceFrom(getActivity()))
                            .on(instanceOf(TestTimeout.class))
                            .invocations()
-                           .withTimeout(seconds(10))
+                           .withReadTimeout(seconds(10))
                            .set()
                            .method(TestTimeout.class.getMethod("getInt"))
                            .asyncCall()
@@ -991,7 +992,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
             JRoutine.with(serviceFrom(getActivity()))
                     .on(instanceOf(TestTimeout.class))
                     .invocations()
-                    .withTimeoutAction(TimeoutActionType.THROW)
+                    .withReadTimeoutAction(TimeoutActionType.THROW)
                     .set()
                     .method(TestTimeout.class.getMethod("getInt"))
                     .asyncCall()
@@ -1006,7 +1007,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         assertThat(JRoutine.with(serviceFrom(getActivity()))
                            .on(instanceOf(TestTimeout.class))
                            .invocations()
-                           .withTimeout(seconds(10))
+                           .withReadTimeout(seconds(10))
                            .set()
                            .buildProxy(TestTimeoutItf.class)
                            .getInt()).containsExactly(31);
@@ -1016,7 +1017,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
             JRoutine.with(serviceFrom(getActivity()))
                     .on(instanceOf(TestTimeout.class))
                     .invocations()
-                    .withTimeoutAction(TimeoutActionType.THROW)
+                    .withReadTimeoutAction(TimeoutActionType.THROW)
                     .set()
                     .buildProxy(TestTimeoutItf.class)
                     .getInt();
@@ -1475,12 +1476,12 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
     private interface IncItf {
 
-        @Timeout(10000)
+        @ReadTimeout(10000)
         @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.COLLECTION)
         int[] inc(@Input(value = int.class, mode = InputMode.ELEMENT) int... i);
 
-        @Timeout(10000)
+        @ReadTimeout(10000)
         @Alias("inc")
         @Invoke(InvocationMode.PARALLEL)
         @Output
@@ -1489,21 +1490,21 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
     private interface SquareItf {
 
-        @Timeout(value = 10, unit = TimeUnit.SECONDS)
+        @ReadTimeout(value = 10, unit = TimeUnit.SECONDS)
         int compute(int i);
 
         @Alias("compute")
         @Output(OutputMode.COLLECTION)
-        @Timeout(10000)
+        @ReadTimeout(10000)
         int[] compute1(int length);
 
         @Alias("compute")
         @Output(OutputMode.COLLECTION)
-        @Timeout(10000)
+        @ReadTimeout(10000)
         List<Integer> compute2(int length);
 
         @Alias("compute")
-        @Timeout(10000)
+        @ReadTimeout(10000)
         int computeAsync(@Input(int.class) OutputChannel<Integer> i);
 
         @SharedFields({})
@@ -1595,7 +1596,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
     private interface TestTimeoutItf {
 
         @Output(OutputMode.COLLECTION)
-        @TimeoutAction(TimeoutActionType.ABORT)
+        @ReadTimeoutAction(TimeoutActionType.ABORT)
         List<Integer> getInt();
     }
 
@@ -1869,7 +1870,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
     private static class TestTimeout {
 
         @Alias("test")
-        @TimeoutAction(TimeoutActionType.EXIT)
+        @ReadTimeoutAction(TimeoutActionType.EXIT)
         public int getInt() throws InterruptedException {
 
             Thread.sleep(100);

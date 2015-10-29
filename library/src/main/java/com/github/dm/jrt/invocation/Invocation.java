@@ -83,6 +83,7 @@ import org.jetbrains.annotations.Nullable;
  * Any exception escaping the invocation methods, unless it extends the base
  * {@link com.github.dm.jrt.channel.RoutineException RoutineException}, will be wrapped as the cause
  * of an {@link com.github.dm.jrt.invocation.InvocationException InvocationException} instance.
+ * // TODO: 18/10/15 resultchannel close
  * <p/>
  * Created by davide-maestroni on 09/07/2014.
  *

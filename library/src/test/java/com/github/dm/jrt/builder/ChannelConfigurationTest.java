@@ -274,8 +274,8 @@ public class ChannelConfigurationTest {
                 InvocationConfiguration.builder();
         final InvocationConfiguration invocationConfiguration =
                 builder.withRunner(Runners.syncRunner())
-                       .withTimeout(millis(100))
-                       .withTimeoutAction(TimeoutActionType.ABORT)
+                       .withReadTimeout(millis(100))
+                       .withReadTimeoutAction(TimeoutActionType.ABORT)
                        .withLog(Logs.nullLog())
                        .withLogLevel(LogLevel.SILENT)
                        .withInputOrder(OrderType.BY_CALL)
@@ -302,8 +302,8 @@ public class ChannelConfigurationTest {
                 InvocationConfiguration.builder();
         final InvocationConfiguration invocationConfiguration =
                 builder.withRunner(Runners.syncRunner())
-                       .withTimeout(millis(100))
-                       .withTimeoutAction(TimeoutActionType.ABORT)
+                       .withReadTimeout(millis(100))
+                       .withReadTimeoutAction(TimeoutActionType.ABORT)
                        .withLog(Logs.nullLog())
                        .withLogLevel(LogLevel.SILENT)
                        .set();
@@ -327,8 +327,8 @@ public class ChannelConfigurationTest {
                 InvocationConfiguration.builder();
         final InvocationConfiguration invocationConfiguration =
                 builder.withRunner(Runners.syncRunner())
-                       .withTimeout(millis(100))
-                       .withTimeoutAction(TimeoutActionType.ABORT)
+                       .withReadTimeout(millis(100))
+                       .withReadTimeoutAction(TimeoutActionType.ABORT)
                        .withLog(Logs.nullLog())
                        .withLogLevel(LogLevel.SILENT)
                        .withOutputOrder(OrderType.BY_CALL)

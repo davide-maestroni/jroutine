@@ -101,6 +101,21 @@ public class ProxyRoutineTest {
     }
 
     @Test
+    public void testAnnotationGenerics() {
+
+        final Size size = new Size();
+        final SizeItf proxy = JRoutine.on(instance(size)).buildProxy(SizeItf.class);
+        assertThat(
+                proxy.getSize(Arrays.asList("test1", "test2", "test3")).afterMax(seconds(3)).next())
+                .isEqualTo(3);
+        assertThat(proxy.getSize()
+                        .pass(Arrays.asList("test1", "test2", "test3"))
+                        .result()
+                        .afterMax(seconds(3))
+                        .next()).isEqualTo(3);
+    }
+
+    @Test
     public void testClassStaticMethod() {
 
         final TestStatic testStatic = JRoutineProxy.on(classOfType(TestClass.class))
@@ -1037,6 +1052,16 @@ public class ProxyRoutineTest {
         OutputChannel<String> passNormal(String s);
     }
 
+    @Proxy(Size.class)
+    public interface SizeItf {
+
+        @Inputs(List.class)
+        InvocationChannel<List<String>, Integer> getSize();
+
+        @Output
+        OutputChannel<Integer> getSize(List<String> l);
+    }
+
     @Proxy(TestClass2.class)
     public interface TestClassAsync {
 
@@ -1220,6 +1245,20 @@ public class ProxyRoutineTest {
         public String pass(final String s) {
 
             return s;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public static class Size {
+
+        public int getSize(final List<String> l) {
+
+            return l.size();
+        }
+
+        public int getSize(final String s) {
+
+            return s.length();
         }
     }
 

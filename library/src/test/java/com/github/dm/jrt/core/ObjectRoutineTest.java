@@ -159,6 +159,21 @@ public class ObjectRoutineTest {
     }
 
     @Test
+    public void testAnnotationGenerics() {
+
+        final Size size = new Size();
+        final SizeItf proxy = JRoutine.on(instance(size)).buildProxy(SizeItf.class);
+        assertThat(
+                proxy.getSize(Arrays.asList("test1", "test2", "test3")).afterMax(seconds(3)).next())
+                .isEqualTo(3);
+        assertThat(proxy.getSize()
+                        .pass(Arrays.asList("test1", "test2", "test3"))
+                        .result()
+                        .afterMax(seconds(3))
+                        .next()).isEqualTo(3);
+    }
+
+    @Test
     public void testAsyncInputProxyRoutine() {
 
         final TimeDuration timeout = seconds(1);
@@ -2031,6 +2046,15 @@ public class ObjectRoutineTest {
         OutputChannel<String> passNormal(String s);
     }
 
+    private interface SizeItf {
+
+        @Inputs(List.class)
+        InvocationChannel<List<String>, Integer> getSize();
+
+        @Output
+        OutputChannel<Integer> getSize(List<String> l);
+    }
+
     private interface SquareItf {
 
         @ReadTimeout(value = 1, unit = TimeUnit.SECONDS)
@@ -2349,6 +2373,20 @@ public class ObjectRoutineTest {
         public String pass(final String s) {
 
             return s;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private static class Size {
+
+        public int getSize(final List<String> l) {
+
+            return l.size();
+        }
+
+        public int getSize(final String s) {
+
+            return s.length();
         }
     }
 

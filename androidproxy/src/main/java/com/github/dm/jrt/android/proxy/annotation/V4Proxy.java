@@ -29,9 +29,9 @@ import java.lang.annotation.Target;
  * interface will be generated according to the specific annotation attributes.
  * <p/>
  * The routines used for calling the methods will honor the attributes specified in any optional
- * {@link com.github.dm.jrt.annotation com.github.dm.jrt.annotation.*} as well as
- * {@link com.github.dm.jrt.android.annotation com.github.dm.jrt.android.annotation.*} annotations
- * defined for each interface method.
+ * <i>{@code com.github.dm.jrt.annotation.*}</i> as well as
+ * <i>{@code com.github.dm.jrt.android.annotation.*}</i> annotations defined for each interface
+ * method.
  * <p/>
  * Remember also that, in order for the annotation to properly work at run time, you will need to
  * add the following rules to your Proguard file (if employing it for shrinking or obfuscation):

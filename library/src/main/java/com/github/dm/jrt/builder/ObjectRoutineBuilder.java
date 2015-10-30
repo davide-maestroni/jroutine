@@ -41,8 +41,8 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
     /**
      * Returns a routine used to call the method whose identifying name is specified in a
      * {@link com.github.dm.jrt.annotation.Alias Alias} annotation.<br/>
-     * Optional {@link com.github.dm.jrt.annotation com.github.dm.jrt.annotation.*} method
-     * annotations will be honored as well.<br/>
+     * Optional <i>{@code com.github.dm.jrt.annotation.*}</i> method annotations will be honored as
+     * well.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * Note that it is up to the caller to ensure that the input data are passed to the routine in
@@ -77,9 +77,8 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
     /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.
      * <p/>
-     * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.github.dm.jrt.annotation com.github.dm.jrt.annotation.*} annotations.
-     * <br/>
+     * The routines used for calling the methods will honor the attributes specified in any optional
+     * <i>{@code com.github.dm.jrt.annotation.*}</i> annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * In case the wrapped object does not implement the specified interface, the alias annotation
@@ -120,9 +119,8 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
     /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.
      * <p/>
-     * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.github.dm.jrt.annotation com.github.dm.jrt.annotation.*} annotations.
-     * <br/>
+     * The routines used for calling the methods will honor the attributes specified in any optional
+     * <i>{@code com.github.dm.jrt.annotation.*}</i> annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * In case the wrapped object does not implement the specified interface, the alias annotation
@@ -165,8 +163,7 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
      * <p/>
      * The method is searched via reflection ignoring a name specified in a
      * {@link com.github.dm.jrt.annotation.Alias Alias} annotation. Though, optional
-     * {@link com.github.dm.jrt.annotation com.github.dm.jrt.annotation.*} method annotations will
-     * be honored.<br/>
+     * <i>{@code com.github.dm.jrt.annotation.*}</i> method annotations will be honored.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * Note that it is up to the caller to ensure that the input data are passed to the routine in
@@ -202,8 +199,7 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
      * <p/>
      * The method is invoked ignoring a name specified in a
      * {@link com.github.dm.jrt.annotation.Alias Alias} annotation. Though, optional
-     * {@link com.github.dm.jrt.annotation com.github.dm.jrt.annotation.*} method annotations will
-     * be honored.<br/>
+     * <i>{@code com.github.dm.jrt.annotation.*}</i> method annotations will be honored.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * Note that it is up to the caller to ensure that the input data are passed to the routine in

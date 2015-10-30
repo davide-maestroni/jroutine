@@ -31,9 +31,8 @@ public interface ProxyObjectBuilder<TYPE> extends ConfigurableBuilder<ProxyObjec
     /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.
      * <p/>
-     * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.github.dm.jrt.annotation com.github.dm.jrt.annotation.*} annotations.
-     * <br/>
+     * The routines used for calling the methods will honor the attributes specified in any optional
+     * <i>{@code com.github.dm.jrt.annotation.*}</i> annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * The proxy object is created through code generation based on the interfaces annotated with

@@ -37,9 +37,9 @@ public interface LoaderObjectRoutineBuilder
     /**
      * Returns a routine used to call the method whose identifying name is specified in an
      * {@link com.github.dm.jrt.annotation.Alias Alias} annotation.<br/>
-     * Optional {@link com.github.dm.jrt.annotation com.github.dm.jrt.annotation.*} as well as
-     * {@link com.github.dm.jrt.android.annotation com.github.dm.jrt.android.annotation.*} method
-     * annotations will be honored.<br/>
+     * Optional <i>{@code com.github.dm.jrt.annotation.*}</i> as well as
+     * <i>{@code com.github.dm.jrt.android.annotation.*}</i> method annotations will be honored.
+     * <br/>
      * Note that such annotations will override any configuration set through the builder.
      *
      * @param name  the name specified in the annotation.
@@ -76,11 +76,9 @@ public interface LoaderObjectRoutineBuilder
     /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.
      * <p/>
-     * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.github.dm.jrt.annotation com.github.dm.jrt.annotation.*} as well as
-     * {@link com.github.dm.jrt.android.annotation com.github.dm.jrt.android.annotation.*}
-     * annotations.
-     * <br/>
+     * The routines used for calling the methods will honor the attributes specified in any optional
+     * <i>{@code com.github.dm.jrt.annotation.*}</i> as well as
+     * <i>{@code com.github.dm.jrt.android.annotation.*}</i> annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      *
      * @param itf    the token of the interface implemented by the return object.
@@ -117,11 +115,9 @@ public interface LoaderObjectRoutineBuilder
     /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.
      * <p/>
-     * The routines used for calling the methods will honor the attributes specified in any
-     * optional {@link com.github.dm.jrt.annotation com.github.dm.jrt.annotation.*} as well as
-     * {@link com.github.dm.jrt.android.annotation com.github.dm.jrt.android.annotation.*}
-     * annotations.
-     * <br/>
+     * The routines used for calling the methods will honor the attributes specified in any optional
+     * <i>{@code com.github.dm.jrt.annotation.*}</i> as well as
+     * <i>{@code com.github.dm.jrt.android.annotation.*}</i> annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      *
      * @param itf    the token of the interface implemented by the return object.
@@ -160,9 +156,9 @@ public interface LoaderObjectRoutineBuilder
      * <p/>
      * The method is searched via reflection ignoring a name specified in an
      * {@link com.github.dm.jrt.annotation.Alias Alias} annotation. Though, optional
-     * {@link com.github.dm.jrt.annotation com.github.dm.jrt.annotation.*} as well as
-     * {@link com.github.dm.jrt.android.annotation com.github.dm.jrt.android.annotation.*} method
-     * annotations will be honored.<br/>
+     * <i>{@code com.github.dm.jrt.annotation.*}</i> as well as
+     * <i>{@code com.github.dm.jrt.android.annotation.*}</i> method annotations will be honored.
+     * <br/>
      * Note that such annotations will override any configuration set through the builder.
      *
      * @param name           the method name.
@@ -203,9 +199,9 @@ public interface LoaderObjectRoutineBuilder
      * <p/>
      * The method is invoked ignoring a name specified in an
      * {@link com.github.dm.jrt.annotation.Alias Alias} annotation. Though, optional
-     * {@link com.github.dm.jrt.annotation com.github.dm.jrt.annotation.*} as well as
-     * {@link com.github.dm.jrt.android.annotation com.github.dm.jrt.android.annotation.*} method
-     * annotations will be honored.<br/>
+     * <i>{@code com.github.dm.jrt.annotation.*}</i> as well as
+     * <i>{@code com.github.dm.jrt.android.annotation.*}</i> method annotations will be honored.
+     * <br/>
      * Note that such annotations will override any configuration set through the builder.
      *
      * @param method the method instance.

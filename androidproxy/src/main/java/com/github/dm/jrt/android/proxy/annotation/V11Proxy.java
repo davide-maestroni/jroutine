@@ -29,9 +29,9 @@ import java.lang.annotation.Target;
  * interface will be generated according to the specific annotation attributes.
  * <p/>
  * The routines used for calling the methods will honor the attributes specified in any optional
- * {@link com.github.dm.jrt.annotation com.github.dm.jrt.annotation.*} as well as
- * {@link com.github.dm.jrt.android.annotation com.github.dm.jrt.android.annotation.*} annotations
- * defined for each interface method.
+ * <i>{@code com.github.dm.jrt.annotation.*}</i> as well as
+ * <i>{@code com.github.dm.jrt.android.annotation.*}</i> annotations defined for each interface
+ * method.
  * <p/>
  * See {@link com.github.dm.jrt.android.proxy.annotation.V4Proxy V4Proxy} for support of API levels
  * less than {@link android.os.Build.VERSION_CODES#HONEYCOMB 11}.

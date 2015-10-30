@@ -25,8 +25,7 @@ import java.lang.annotation.Target;
  * interface will be generated according to the specific annotation attributes.
  * <p/>
  * The routines used for calling the methods will honor the attributes specified in any optional
- * {@link com.github.dm.jrt.annotation com.github.dm.jrt.annotation.*} annotations defined for each
- * interface method.
+ * <i>{@code com.github.dm.jrt.annotation.*}</i> annotations defined for each interface method.
  * <p/>
  * Special care must be taken when dealing with proxies of generic classes. First of all, the
  * proxy interface must declare the same generic types as the wrapped class or interface.

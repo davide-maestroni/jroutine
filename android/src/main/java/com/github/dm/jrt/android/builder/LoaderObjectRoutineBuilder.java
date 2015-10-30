@@ -47,7 +47,8 @@ public interface LoaderObjectRoutineBuilder
      * @param <OUT> the output data type.
      * @return the routine.
      * @throws java.lang.IllegalArgumentException if the specified method is not found.
-     * @see com.github.dm.jrt.android.annotation Android Annotations
+     * @see <a href='{@docRoot}/com/github/dm/jrt/android/annotation/package-summary.html'>
+     * Android Annotations</a>
      * @see com.github.dm.jrt.annotation Annotations
      */
     @NotNull
@@ -66,7 +67,8 @@ public interface LoaderObjectRoutineBuilder
      * @return the proxy object.
      * @throws java.lang.IllegalArgumentException if the specified class token does not represent an
      *                                            interface.
-     * @see com.github.dm.jrt.android.annotation Android Annotations
+     * @see <a href='{@docRoot}/com/github/dm/jrt/android/annotation/package-summary.html'>
+     * Android Annotations</a>
      * @see com.github.dm.jrt.annotation Annotations
      */
     @NotNull
@@ -85,7 +87,8 @@ public interface LoaderObjectRoutineBuilder
      * @return the proxy object.
      * @throws java.lang.IllegalArgumentException if the specified class does not represent an
      *                                            interface.
-     * @see com.github.dm.jrt.android.annotation Android Annotations
+     * @see <a href='{@docRoot}/com/github/dm/jrt/android/annotation/package-summary.html'>
+     * Android Annotations</a>
      * @see com.github.dm.jrt.annotation Annotations
      */
     @NotNull
@@ -107,7 +110,8 @@ public interface LoaderObjectRoutineBuilder
      * @param <OUT>          the output data type.
      * @return the routine.
      * @throws java.lang.IllegalArgumentException if no matching method is found.
-     * @see com.github.dm.jrt.android.annotation Android Annotations
+     * @see <a href='{@docRoot}/com/github/dm/jrt/android/annotation/package-summary.html'>
+     * Android Annotations</a>
      * @see com.github.dm.jrt.annotation Annotations
      */
     @NotNull
@@ -128,7 +132,8 @@ public interface LoaderObjectRoutineBuilder
      * @param <IN>   the input data type.
      * @param <OUT>  the output data type.
      * @return the routine.
-     * @see com.github.dm.jrt.android.annotation Android Annotations
+     * @see <a href='{@docRoot}/com/github/dm/jrt/android/annotation/package-summary.html'>
+     * Android Annotations</a>
      * @see com.github.dm.jrt.annotation Annotations
      */
     @NotNull

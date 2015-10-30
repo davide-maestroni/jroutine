@@ -24,8 +24,6 @@ import java.lang.reflect.Method;
  * Interface defining a builder of routines wrapping an object methods.
  * <p/>
  * Created by davide-maestroni on 03/07/2015.
- *
- * @see com.github.dm.jrt.annotation Annotations
  */
 public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineBuilder>,
         ProxyConfigurableBuilder<ObjectRoutineBuilder> {
@@ -45,7 +43,7 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
      * @param <OUT> the output data type.
      * @return the routine.
      * @throws java.lang.IllegalArgumentException if the specified method is not found.
-     * @see com.github.dm.jrt.annotation Annotations
+     * @see <a href='{@docRoot}/com/github/dm/jrt/annotation/package-summary.html'>Annotations</a>
      */
     @NotNull
     <IN, OUT> Routine<IN, OUT> aliasMethod(@NotNull String name);
@@ -71,7 +69,7 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
      * @return the proxy object.
      * @throws java.lang.IllegalArgumentException if the specified class token does not represent an
      *                                            interface.
-     * @see com.github.dm.jrt.annotation Annotations
+     * @see <a href='{@docRoot}/com/github/dm/jrt/annotation/package-summary.html'>Annotations</a>
      */
     @NotNull
     <TYPE> TYPE buildProxy(@NotNull ClassToken<TYPE> itf);
@@ -97,7 +95,7 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
      * @return the proxy object.
      * @throws java.lang.IllegalArgumentException if the specified class does not represent an
      *                                            interface.
-     * @see com.github.dm.jrt.annotation Annotations
+     * @see <a href='{@docRoot}/com/github/dm/jrt/annotation/package-summary.html'>Annotations</a>
      */
     @NotNull
     <TYPE> TYPE buildProxy(@NotNull Class<TYPE> itf);
@@ -117,7 +115,7 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
      * @param parameterTypes the method parameter types.
      * @return the routine.
      * @throws java.lang.IllegalArgumentException if no matching method is found.
-     * @see com.github.dm.jrt.annotation Annotations
+     * @see <a href='{@docRoot}/com/github/dm/jrt/annotation/package-summary.html'>Annotations</a>
      */
     @NotNull
     <IN, OUT> Routine<IN, OUT> method(@NotNull String name, @NotNull Class<?>... parameterTypes);
@@ -137,7 +135,7 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
      * @param <IN>   the input data type.
      * @param <OUT>  the output data type.
      * @return the routine.
-     * @see com.github.dm.jrt.annotation Annotations
+     * @see <a href='{@docRoot}/com/github/dm/jrt/annotation/package-summary.html'>Annotations</a>
      */
     @NotNull
     <IN, OUT> Routine<IN, OUT> method(@NotNull Method method);

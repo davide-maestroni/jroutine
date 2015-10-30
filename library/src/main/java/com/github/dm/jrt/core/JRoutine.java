@@ -130,7 +130,7 @@ import org.jetbrains.annotations.NotNull;
  * <p/>
  * Created by davide-maestroni on 09/07/2014.
  *
- * @see com.github.dm.jrt.annotation Annotations
+ * @see <a href='{@docRoot}/com/github/dm/jrt/annotation/package-summary.html'>Annotations</a>
  */
 public class JRoutine {
 

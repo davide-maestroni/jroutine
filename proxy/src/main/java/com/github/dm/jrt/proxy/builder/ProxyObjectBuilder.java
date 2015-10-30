@@ -39,23 +39,7 @@ public interface ProxyObjectBuilder<TYPE> extends ConfigurableBuilder<ProxyObjec
      * {@link com.github.dm.jrt.proxy.annotation.Proxy Proxy}.
      *
      * @return the proxy object.
-     * @see com.github.dm.jrt.annotation.Alias Alias
-     * @see com.github.dm.jrt.annotation.CoreInstances CoreInstances
-     * @see com.github.dm.jrt.annotation.Input Input
-     * @see com.github.dm.jrt.annotation.InputMaxSize InputMaxSize
-     * @see com.github.dm.jrt.annotation.InputOrder InputOrder
-     * @see com.github.dm.jrt.annotation.Inputs Inputs
-     * @see com.github.dm.jrt.annotation.InputTimeout InputTimeout
-     * @see com.github.dm.jrt.annotation.MaxInstances MaxInstances
-     * @see com.github.dm.jrt.annotation.Invoke Invoke
-     * @see com.github.dm.jrt.annotation.Output Output
-     * @see com.github.dm.jrt.annotation.OutputMaxSize OutputMaxSize
-     * @see com.github.dm.jrt.annotation.OutputOrder OutputOrder
-     * @see com.github.dm.jrt.annotation.OutputTimeout OutputTimeout
-     * @see com.github.dm.jrt.annotation.Priority Priority
-     * @see com.github.dm.jrt.annotation.ReadTimeout ReadTimeout
-     * @see com.github.dm.jrt.annotation.ReadTimeoutAction ReadTimeoutAction
-     * @see com.github.dm.jrt.annotation.SharedFields SharedFields
+     * @see com.github.dm.jrt.annotation Annotations
      */
     @NotNull
     TYPE buildProxy();

@@ -16,8 +16,6 @@ package com.github.dm.jrt.android.proxy.v4.core;
 import com.github.dm.jrt.android.core.ContextInvocationTarget;
 import com.github.dm.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
 import com.github.dm.jrt.android.v4.core.LoaderContext;
-import com.github.dm.jrt.annotation.ReadTimeout;
-import com.github.dm.jrt.annotation.ReadTimeoutAction;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -34,29 +32,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * <p/>
  * Created by davide-maestroni on 05/06/2015.
  *
- * @see com.github.dm.jrt.android.annotation.CacheStrategy CacheStrategy
- * @see com.github.dm.jrt.android.annotation.ClashResolution ClashResolution
- * @see com.github.dm.jrt.android.annotation.InputClashResolution InputClashResolution
- * @see com.github.dm.jrt.android.annotation.LoaderId LoaderId
- * @see com.github.dm.jrt.android.annotation.ResultStaleTime ResultStaleTime
+ * @see com.github.dm.jrt.android.annotation Android Annotations
  * @see com.github.dm.jrt.android.proxy.annotation.V4Proxy V4Proxy
- * @see com.github.dm.jrt.annotation.Alias Alias
- * @see com.github.dm.jrt.annotation.CoreInstances CoreInstances
- * @see com.github.dm.jrt.annotation.Input Input
- * @see com.github.dm.jrt.annotation.InputMaxSize InputMaxSize
- * @see com.github.dm.jrt.annotation.InputOrder InputOrder
- * @see com.github.dm.jrt.annotation.Inputs Inputs
- * @see com.github.dm.jrt.annotation.InputTimeout InputTimeout
- * @see com.github.dm.jrt.annotation.MaxInstances MaxInstances
- * @see com.github.dm.jrt.annotation.Invoke Invoke
- * @see com.github.dm.jrt.annotation.Output Output
- * @see com.github.dm.jrt.annotation.OutputMaxSize OutputMaxSize
- * @see com.github.dm.jrt.annotation.OutputOrder OutputOrder
- * @see com.github.dm.jrt.annotation.OutputTimeout OutputTimeout
- * @see com.github.dm.jrt.annotation.Priority Priority
- * @see com.github.dm.jrt.annotation.SharedFields SharedFields
- * @see ReadTimeout ReadTimeout
- * @see ReadTimeoutAction ReadTimeoutAction
+ * @see com.github.dm.jrt.annotation Annotations
  */
 @SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS",
         justification = "utility class extending the functions of another utility class")

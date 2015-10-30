@@ -1,7 +1,9 @@
+com.github.dm.jrt
 com.github.dm.jrt.annotation
 com.github.dm.jrt.builder
 com.github.dm.jrt.channel
 com.github.dm.jrt.core
+com.github.dm.jrt.function
 com.github.dm.jrt.invocation
 com.github.dm.jrt.log
 com.github.dm.jrt.routine

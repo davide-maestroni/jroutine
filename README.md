@@ -77,7 +77,7 @@ Please have a look at the [Wiki][wiki].
 
 ## Documentation
 
-Complete Javadoc with insights and examples is available for:
+Complete Javadoc with insights and examples is available:
 
 * [JRoutine][javadoc]
 * [JRoutine-Proxy][javadoc proxy]

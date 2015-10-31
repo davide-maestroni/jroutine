@@ -111,6 +111,7 @@ Please refer to the dedicated [Wiki page][wiki build].
 
 #### Compilation dependencies
 
+- IntelliJ IDEA Annotations ([Apache License v2.0][apache license])
 - [FindBugs][findbugs] annotations ([Lesser GNU Public License][lgpl license])
 - Android SDK ([Terms and Condition][android sdk])
 - Android Support Library ([Apache License v2.0][apache license])

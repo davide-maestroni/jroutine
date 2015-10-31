@@ -55,6 +55,7 @@ What the library has to offer is:
 * ***Automatic code generation***: as an alternative to reflection, existing methods can be made asynchronous through annotation pre-processing and compile-time code generation.
 * ***Nice handling of Android configuration changes***: the same paradigm is applied to the Android platform so to support background tasks surviving changes in the configuration of Activities or Fragments.
 * ***Seamlessly run in a remote Service***: invocations can be easily configured to run in a dedicated Android service.
+* ***Functional builder***: it is also possible to build routines by employing functional programming paradigms.
 
 And more:
 

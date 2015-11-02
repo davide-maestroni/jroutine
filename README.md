@@ -104,6 +104,10 @@ Feel free to contribute with your own [Routine][javadoc routine] or [Runner][jav
 
 Please refer to the dedicated [Wiki page][wiki build].
 
+## Proguard
+
+Please refer to the dedicated [Wiki page][wiki proguard].
+
 ## Dependencies
 
 #### Runtime dependencies
@@ -155,6 +159,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 [akka]:http://akka.io/
 [wiki]:https://github.com/davide-maestroni/jroutine/wiki
 [wiki build]:https://github.com/davide-maestroni/jroutine/wiki/Build-Instructions
+[wiki proguard]:https://github.com/davide-maestroni/jroutine/wiki/Proguard
 [sample]:https://github.com/davide-maestroni/jroutine/tree/master/sample
 [javadoc]:http://davide-maestroni.github.io/jroutine/javadoc/library
 [javadoc proxy]:http://davide-maestroni.github.io/jroutine/javadoc/proxy

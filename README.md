@@ -55,10 +55,11 @@ What the library has to offer is:
 * ***Automatic code generation***: as an alternative to reflection, existing methods can be made asynchronous through annotation pre-processing and compile-time code generation.
 * ***Nice handling of Android configuration changes***: the same paradigm is applied to the Android platform so to support background tasks surviving changes in the configuration of Activities or Fragments.
 * ***Seamlessly run in a remote Service***: invocations can be easily configured to run in a dedicated Android service.
+* ***Functional builder***: it is also possible to build routines by employing functional programming paradigms.
 
 And more:
 
-* ***< 300KB Jar***
+* ***350KB Jar***
 * ***Java 5+**** ***and Android 1.6+***
 * ***Nullity annotations***
 
@@ -76,7 +77,7 @@ Please have a look at the [Wiki][wiki].
 
 ## Documentation
 
-Complete Javadoc with insights and examples is available for:
+Complete Javadoc with insights and examples is available:
 
 * [JRoutine][javadoc]
 * [JRoutine-Proxy][javadoc proxy]
@@ -103,6 +104,10 @@ Feel free to contribute with your own [Routine][javadoc routine] or [Runner][jav
 
 Please refer to the dedicated [Wiki page][wiki build].
 
+## Proguard
+
+Please refer to the dedicated [Wiki page][wiki proguard].
+
 ## Dependencies
 
 #### Runtime dependencies
@@ -111,6 +116,7 @@ Please refer to the dedicated [Wiki page][wiki build].
 
 #### Compilation dependencies
 
+- IntelliJ IDEA Annotations ([Apache License v2.0][apache license])
 - [FindBugs][findbugs] annotations ([Lesser GNU Public License][lgpl license])
 - Android SDK ([Terms and Condition][android sdk])
 - Android Support Library ([Apache License v2.0][apache license])
@@ -153,6 +159,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 [akka]:http://akka.io/
 [wiki]:https://github.com/davide-maestroni/jroutine/wiki
 [wiki build]:https://github.com/davide-maestroni/jroutine/wiki/Build-Instructions
+[wiki proguard]:https://github.com/davide-maestroni/jroutine/wiki/Proguard
 [sample]:https://github.com/davide-maestroni/jroutine/tree/master/sample
 [javadoc]:http://davide-maestroni.github.io/jroutine/javadoc/library
 [javadoc proxy]:http://davide-maestroni.github.io/jroutine/javadoc/proxy

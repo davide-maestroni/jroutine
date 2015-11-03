@@ -77,13 +77,18 @@ import org.jetbrains.annotations.Nullable;
  * needed, so any associated resource can be safely released. Note that this method may never get
  * called if the routine is automatically garbage collected.
  * <p/>
+ * Keep in mind, when implementing an invocation class, that the result channel passed to the
+ * {@code onInput()} and {@code onResult()} methods will be closed as soon as the latter exits.<br/>
+ * Any further attempt to post results will generate an exception.<br/>
+ * It is anyway possible to keep on generating results by passing to the result channel an output or
+ * an I/O channel.
+ * <p/>
  * Be aware that there is no guarantee about how and when an invocation will produce a result. It
  * might return one or more output for each input, or no output at all.
  * <p/>
  * Any exception escaping the invocation methods, unless it extends the base
  * {@link com.github.dm.jrt.channel.RoutineException RoutineException}, will be wrapped as the cause
  * of an {@link com.github.dm.jrt.invocation.InvocationException InvocationException} instance.
- * // TODO: 18/10/15 resultchannel close
  * <p/>
  * Created by davide-maestroni on 09/07/2014.
  *

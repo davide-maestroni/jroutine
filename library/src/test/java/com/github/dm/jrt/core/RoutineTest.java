@@ -51,7 +51,7 @@ import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.invocation.PassingInvocation;
 import com.github.dm.jrt.invocation.TemplateInvocation;
-import com.github.dm.jrt.log.Log.LogLevel;
+import com.github.dm.jrt.log.Log.Level;
 import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.log.NullLog;
 import com.github.dm.jrt.routine.Routine;
@@ -205,7 +205,7 @@ public class RoutineTest {
         final AtomicBoolean isFailed = new AtomicBoolean(false);
         assertThat(JRoutine.on(new CloseInvocation(semaphore, isFailed))
                            .invocations()
-                           .withLogLevel(LogLevel.SILENT)
+                           .withLogLevel(Level.SILENT)
                            .set()
                            .asyncCall("test")
                            .afterMax(timeout)
@@ -1131,7 +1131,7 @@ public class RoutineTest {
 
             JRoutine.on(factoryOf(ConstructorException.class))
                     .invocations()
-                    .withLogLevel(LogLevel.SILENT)
+                    .withLogLevel(Level.SILENT)
                     .set()
                     .syncCall()
                     .all();
@@ -1601,7 +1601,7 @@ public class RoutineTest {
     @SuppressWarnings("ConstantConditions")
     public void testInvocationChannelError() {
 
-        final Logger logger = Logger.newLogger(new NullLog(), LogLevel.DEBUG, this);
+        final Logger logger = Logger.newLogger(new NullLog(), Level.DEBUG, this);
 
         try {
 
@@ -2084,7 +2084,7 @@ public class RoutineTest {
     @SuppressWarnings("ConstantConditions")
     public void testResultChannelError() {
 
-        final Logger logger = Logger.newLogger(new NullLog(), LogLevel.DEBUG, this);
+        final Logger logger = Logger.newLogger(new NullLog(), Level.DEBUG, this);
 
         try {
 
@@ -2161,7 +2161,7 @@ public class RoutineTest {
         final OutputChannel<String> channel =
                 JRoutine.on(factoryOf(DelayedInvocation.class, TimeDuration.ZERO))
                         .invocations()
-                        .withLogLevel(LogLevel.SILENT)
+                        .withLogLevel(Level.SILENT)
                         .set()
                         .syncCall();
 
@@ -2250,7 +2250,7 @@ public class RoutineTest {
         final Routine<String, String> routine1 =
                 JRoutine.on(factoryOf(DelayedInvocation.class, millis(100)))
                         .invocations()
-                        .withLogLevel(LogLevel.SILENT)
+                        .withLogLevel(Level.SILENT)
                         .set()
                         .buildRoutine();
         final Iterator<String> iterator =

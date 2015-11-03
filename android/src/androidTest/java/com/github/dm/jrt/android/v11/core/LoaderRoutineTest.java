@@ -43,7 +43,7 @@ import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.invocation.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.log.Log;
-import com.github.dm.jrt.log.Log.LogLevel;
+import com.github.dm.jrt.log.Log.Level;
 import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.util.ClassToken;
@@ -816,7 +816,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final ChannelConfiguration configuration = builder.withAsyncRunner(Runners.taskRunner())
                                                           .withChannelMaxSize(3)
                                                           .withChannelTimeout(seconds(10))
-                                                          .withLogLevel(LogLevel.DEBUG)
+                                                          .withLogLevel(Level.DEBUG)
                                                           .withLog(countLog)
                                                           .set();
         JRoutine.with(contextFrom(getActivity()))
@@ -1465,7 +1465,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                      .<String>factoryOf())
                                                          .invocations()
                                                          .withLog(Logs.androidLog())
-                                                         .withLogLevel(LogLevel.WARNING)
+                                                         .withLogLevel(Level.WARNING)
                                                          .set()
                                                          .buildRoutine();
         assertThat(routine1.syncCall("1", "2", "3", "4", "5").afterMax(timeout).all()).containsOnly(
@@ -1483,7 +1483,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                          .on(factoryOf(token2))
                                                          .invocations()
                                                          .withLog(Logs.androidLog())
-                                                         .withLogLevel(LogLevel.WARNING)
+                                                         .withLogLevel(Level.WARNING)
                                                          .set()
                                                          .buildRoutine();
         assertThat(routine2.syncCall("1", "2", "3", "4", "5").afterMax(timeout).all()).containsOnly(
@@ -1565,7 +1565,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                .withInputTimeout(seconds(10))
                                                                .withOutputMaxSize(3)
                                                                .withOutputTimeout(seconds(10))
-                                                               .withLogLevel(LogLevel.DEBUG)
+                                                               .withLogLevel(Level.DEBUG)
                                                                .withLog(countLog)
                                                                .set();
         JRoutine.with(contextFrom(getActivity()))

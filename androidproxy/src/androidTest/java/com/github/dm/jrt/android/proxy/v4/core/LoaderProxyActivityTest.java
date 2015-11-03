@@ -39,7 +39,7 @@ import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.log.Log;
-import com.github.dm.jrt.log.Log.LogLevel;
+import com.github.dm.jrt.log.Log.Level;
 import com.github.dm.jrt.log.NullLog;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.runner.Runner;
@@ -83,7 +83,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
                                                    .on(classOfType(TestClass.class))
                                                    .invocations()
                                                    .withRunner(Runners.poolRunner())
-                                                   .withLogLevel(LogLevel.DEBUG)
+                                                   .withLogLevel(Level.DEBUG)
                                                    .withLog(new NullLog())
                                                    .set()
                                                    .buildProxy(TestStatic.class);
@@ -173,7 +173,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
                                                    .on(instanceOf(TestClass.class))
                                                    .invocations()
                                                    .withRunner(Runners.poolRunner())
-                                                   .withLogLevel(LogLevel.DEBUG)
+                                                   .withLogLevel(Level.DEBUG)
                                                    .withLog(new NullLog())
                                                    .set()
                                                    .buildProxy(TestStatic.class);
@@ -190,7 +190,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
                                                  .on(instanceOf(TestClass.class))
                                                  .invocations()
                                                  .withRunner(runner)
-                                                 .withLogLevel(LogLevel.DEBUG)
+                                                 .withLogLevel(Level.DEBUG)
                                                  .withLog(log)
                                                  .set()
                                                  .buildProxy(ClassToken.tokenOf(TestProxy.class));
@@ -218,7 +218,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
         final NullLog log = new NullLog();
         final Runner runner = Runners.poolRunner();
         final InvocationConfiguration configuration =
-                builder().withRunner(runner).withLogLevel(LogLevel.DEBUG).withLog(log).set();
+                builder().withRunner(runner).withLogLevel(Level.DEBUG).withLog(log).set();
         final LoaderProxyObjectBuilder<TestProxy> builder =
                 com.github.dm.jrt.android.proxy.V4Proxy_TestActivity.with(
                         contextFrom(getActivity())).on(instanceOf(TestClass.class));
@@ -255,7 +255,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
         final NullLog log = new NullLog();
         final Runner runner = Runners.poolRunner();
         final InvocationConfiguration configuration =
-                builder().withRunner(runner).withLogLevel(LogLevel.DEBUG).withLog(log).set();
+                builder().withRunner(runner).withLogLevel(Level.DEBUG).withLog(log).set();
         final TestProxy testProxy = JRoutineProxy.with(contextFrom(getActivity()))
                                                  .on(instanceOf(TestClass.class))
                                                  .invocations()

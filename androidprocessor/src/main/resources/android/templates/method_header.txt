@@ -17,6 +17,7 @@
     private final com.github.dm.jrt.routine.Routine<?, ${resultClassName}> mRoutine${methodCount};
 
     @org.jetbrains.annotations.NotNull
+    @SuppressWarnings("unchecked")
     private com.github.dm.jrt.routine.Routine<?, ${resultClassName}> initRoutine${methodCount}(
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.ContextInvocationTarget<?> target,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.builder.InvocationConfiguration invocationConfiguration,
@@ -24,7 +25,7 @@
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.builder.ServiceConfiguration serviceConfiguration) {
 
         final com.github.dm.jrt.android.core.TargetInvocationFactory<Object, ${resultClassName}> targetFactory = com.github.dm.jrt.android.core.TargetInvocationFactory.factoryOf(
-                new com.github.dm.jrt.util.ClassToken<ContextInvocation${methodCount}${genericTypes}>() {}, ${sharedFields}, target);
+                (Class<? extends com.github.dm.jrt.android.invocation.ContextInvocation<Object, ${resultClassName}>>) new ContextInvocation${methodCount}${genericTypes}(${sharedFields}, target).getClass(), ${sharedFields}, target);
         return getBuilder(mContext, targetFactory).invocations()
                                                   .with(invocationConfiguration)
                                                   ${routineBuilderOptions}

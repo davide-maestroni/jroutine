@@ -26,7 +26,7 @@ import java.util.List;
 public class NullLog extends TemplateLog {
 
     @Override
-    protected void log(@NotNull final LogLevel level, @NotNull final List<Object> contexts,
+    protected void log(@NotNull final Level level, @NotNull final List<Object> contexts,
             @Nullable final String message, @Nullable final Throwable throwable) {
 
     }

@@ -38,7 +38,7 @@ import com.github.dm.jrt.core.AbstractRoutine;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.log.Log;
-import com.github.dm.jrt.log.Log.LogLevel;
+import com.github.dm.jrt.log.Log.Level;
 import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.runner.Runner;
 
@@ -107,7 +107,7 @@ public class InvocationService extends Service {
     @SuppressWarnings("unused")
     public InvocationService() {
 
-        this(Logger.getDefaultLog(), Logger.getDefaultLogLevel());
+        this(Logger.getDefaultLog(), Logger.getDefaultLevel());
     }
 
     /**
@@ -116,7 +116,7 @@ public class InvocationService extends Service {
      * @param log      the log instance.
      * @param logLevel the log level.
      */
-    public InvocationService(@Nullable final Log log, @Nullable final LogLevel logLevel) {
+    public InvocationService(@Nullable final Log log, @Nullable final Level logLevel) {
 
         mLogger = Logger.newLogger(log, logLevel, this);
     }
@@ -399,7 +399,7 @@ public class InvocationService extends Service {
             final int coreInvocations = data.getInt(KEY_CORE_INVOCATIONS);
             final int maxInvocations = data.getInt(KEY_MAX_INVOCATIONS);
             final OrderType outputOrderType = (OrderType) data.getSerializable(KEY_OUTPUT_ORDER);
-            final LogLevel logLevel = (LogLevel) data.getSerializable(KEY_LOG_LEVEL);
+            final Level logLevel = (Level) data.getSerializable(KEY_LOG_LEVEL);
             final Class<? extends Runner> runnerClass =
                     (Class<? extends Runner>) data.getSerializable(KEY_RUNNER_CLASS);
             final Class<? extends Log> logClass =
@@ -649,7 +649,7 @@ public class InvocationService extends Service {
 
         private final Class<? extends Log> mLogClass;
 
-        private final LogLevel mLogLevel;
+        private final Level mLogLevel;
 
         private final OrderType mOutputOrder;
 
@@ -668,7 +668,7 @@ public class InvocationService extends Service {
         private RoutineInfo(@NotNull final Class<? extends ContextInvocation<?, ?>> invocationClass,
                 @NotNull final Object[] factoryArgs, @Nullable final OrderType outputOrder,
                 @Nullable final Class<? extends Runner> runnerClass,
-                @Nullable final Class<? extends Log> logClass, @Nullable final LogLevel logLevel) {
+                @Nullable final Class<? extends Log> logClass, @Nullable final Level logLevel) {
 
             mInvocationClass = invocationClass;
             mFactoryArgs = factoryArgs;

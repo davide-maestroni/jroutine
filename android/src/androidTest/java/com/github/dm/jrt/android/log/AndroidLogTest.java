@@ -15,7 +15,7 @@ package com.github.dm.jrt.android.log;
 
 import android.test.AndroidTestCase;
 
-import com.github.dm.jrt.log.Log.LogLevel;
+import com.github.dm.jrt.log.Log.Level;
 import com.github.dm.jrt.log.Logger;
 
 /**
@@ -40,7 +40,7 @@ public class AndroidLogTest extends AndroidTestCase {
     public void testLogDbg() {
 
         final NullPointerException ex = new NullPointerException();
-        final Logger logger = Logger.newLogger(new AndroidLog(), LogLevel.DEBUG, this);
+        final Logger logger = Logger.newLogger(new AndroidLog(), Level.DEBUG, this);
 
         logger.dbg(ARGS[0]);
         logger.dbg(FORMAT0, ARGS[0]);
@@ -60,7 +60,7 @@ public class AndroidLogTest extends AndroidTestCase {
     public void testLogErr() {
 
         final NullPointerException ex = new NullPointerException();
-        final Logger logger = Logger.newLogger(new AndroidLog(), LogLevel.DEBUG, this);
+        final Logger logger = Logger.newLogger(new AndroidLog(), Level.DEBUG, this);
 
         logger.err(ARGS[0]);
         logger.err(FORMAT0, ARGS[0]);
@@ -80,7 +80,7 @@ public class AndroidLogTest extends AndroidTestCase {
     public void testLogWrn() {
 
         final NullPointerException ex = new NullPointerException();
-        final Logger logger = Logger.newLogger(new AndroidLog(), LogLevel.DEBUG, this);
+        final Logger logger = Logger.newLogger(new AndroidLog(), Level.DEBUG, this);
 
         logger.wrn(ARGS[0]);
         logger.wrn(FORMAT0, ARGS[0]);

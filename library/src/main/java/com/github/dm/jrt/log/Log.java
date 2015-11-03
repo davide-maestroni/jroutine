@@ -80,7 +80,7 @@ public interface Log {
     /**
      * Log levels enumeration from more to less verbose.
      */
-    enum LogLevel {
+    enum Level {
 
         /**
          * The most verbose log level.<br/>

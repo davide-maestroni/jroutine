@@ -23,7 +23,7 @@ import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.TimeoutException;
 import com.github.dm.jrt.invocation.PassingInvocation;
 import com.github.dm.jrt.log.Log;
-import com.github.dm.jrt.log.Log.LogLevel;
+import com.github.dm.jrt.log.Log.Level;
 import com.github.dm.jrt.log.NullLog;
 import com.github.dm.jrt.runner.Runners;
 import com.github.dm.jrt.util.TimeDuration;
@@ -487,7 +487,7 @@ public class IOChannelTest {
                                                           .withChannelTimeout(1,
                                                                               TimeUnit.MILLISECONDS)
                                                           .withChannelTimeout(seconds(1))
-                                                          .withLogLevel(LogLevel.DEBUG)
+                                                          .withLogLevel(Level.DEBUG)
                                                           .withLog(new NullLog())
                                                           .set()
                                                           .buildChannel();

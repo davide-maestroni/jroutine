@@ -1,7 +1,7 @@
 package com.github.dm.jrt.annotation;
 
 import com.github.dm.jrt.builder.InvocationConfiguration;
-import com.github.dm.jrt.log.Log.LogLevel;
+import com.github.dm.jrt.log.Log.Level;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -30,7 +30,7 @@ import java.lang.annotation.Target;
  *         -keepattributes RuntimeVisibleAnnotations
  *
  *         -keepclassmembers class ** {
- *              &#64;com.github.dm.jrt.annotation.Level *;
+ *              &#64;com.github.dm.jrt.annotation.LogLevel *;
  *         }
  *     </code>
  * </pre>
@@ -41,12 +41,12 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Level {
+public @interface LogLevel {
 
     /**
      * The routine log level.
      *
      * @return the log level.
      */
-    LogLevel value();
+    Level value();
 }

@@ -14,7 +14,7 @@
 package com.github.dm.jrt.builder;
 
 import com.github.dm.jrt.log.Log;
-import com.github.dm.jrt.log.Log.LogLevel;
+import com.github.dm.jrt.log.Log.Level;
 import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.runner.Runner;
 import com.github.dm.jrt.util.TimeDuration;
@@ -86,7 +86,7 @@ public final class InvocationConfiguration {
 
     private final Log mLog;
 
-    private final LogLevel mLogLevel;
+    private final Level mLogLevel;
 
     private final int mMaxInstances;
 
@@ -132,7 +132,7 @@ public final class InvocationConfiguration {
             @Nullable final OrderType inputOrderType, final int inputMaxSize,
             @Nullable final TimeDuration inputTimeout, @Nullable final OrderType outputOrderType,
             final int outputMaxSize, @Nullable final TimeDuration outputTimeout,
-            @Nullable final Log log, @Nullable final LogLevel logLevel) {
+            @Nullable final Log log, @Nullable final Level logLevel) {
 
         mRunner = runner;
         mPriority = priority;
@@ -241,9 +241,9 @@ public final class InvocationConfiguration {
      * @param valueIfNotSet the default value if none was set.
      * @return the log level.
      */
-    public LogLevel getLogLevelOr(@Nullable final LogLevel valueIfNotSet) {
+    public Level getLogLevelOr(@Nullable final Level valueIfNotSet) {
 
-        final LogLevel logLevel = mLogLevel;
+        final Level logLevel = mLogLevel;
         return (logLevel != null) ? logLevel : valueIfNotSet;
     }
 
@@ -654,7 +654,7 @@ public final class InvocationConfiguration {
 
         private Log mLog;
 
-        private LogLevel mLogLevel;
+        private Level mLogLevel;
 
         private int mMaxInstances;
 
@@ -858,7 +858,7 @@ public final class InvocationConfiguration {
          * @return this builder.
          */
         @NotNull
-        public Builder<TYPE> withLogLevel(@Nullable final LogLevel level) {
+        public Builder<TYPE> withLogLevel(@Nullable final Level level) {
 
             mLogLevel = level;
             return this;
@@ -1132,7 +1132,7 @@ public final class InvocationConfiguration {
                 withLog(log);
             }
 
-            final LogLevel logLevel = configuration.mLogLevel;
+            final Level logLevel = configuration.mLogLevel;
 
             if (logLevel != null) {
 

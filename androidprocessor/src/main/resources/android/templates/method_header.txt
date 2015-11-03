@@ -24,8 +24,9 @@
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.builder.ProxyConfiguration proxyConfiguration,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.builder.ServiceConfiguration serviceConfiguration) {
 
+        final java.util.List<String> sharedFields = ${sharedFields};
         final com.github.dm.jrt.android.core.TargetInvocationFactory<Object, ${resultClassName}> targetFactory = com.github.dm.jrt.android.core.TargetInvocationFactory.factoryOf(
-                (Class<? extends com.github.dm.jrt.android.invocation.ContextInvocation<Object, ${resultClassName}>>) new ContextInvocation${methodCount}${genericTypes}(${sharedFields}, target).getClass(), ${sharedFields}, target);
+                (Class<? extends com.github.dm.jrt.android.invocation.ContextInvocation<Object, ${resultClassName}>>) new ContextInvocation${methodCount}${genericTypes}(sharedFields, target).getClass(), sharedFields, target);
         return getBuilder(mContext, targetFactory).invocations()
                                                   .with(invocationConfiguration)
                                                   ${routineBuilderOptions}

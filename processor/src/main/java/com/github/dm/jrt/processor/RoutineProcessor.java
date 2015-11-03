@@ -2409,7 +2409,7 @@ public class RoutineProcessor extends AbstractProcessor {
         if (sharedFieldsAnnotation != null) {
 
             final String[] names = sharedFieldsAnnotation.value();
-            final StringBuilder builder = new StringBuilder("Arrays.asList(");
+            final StringBuilder builder = new StringBuilder("java.util.Arrays.asList(");
             final int length = names.length;
 
             for (int i = 0; i < length; ++i) {
@@ -2474,7 +2474,7 @@ public class RoutineProcessor extends AbstractProcessor {
         if (sharedFieldsAnnotation != null) {
 
             final String[] names = sharedFieldsAnnotation.value();
-            final StringBuilder builder = new StringBuilder("Arrays.asList(");
+            final StringBuilder builder = new StringBuilder("java.util.Arrays.asList(");
             final int length = names.length;
 
             for (int i = 0; i < length; ++i) {

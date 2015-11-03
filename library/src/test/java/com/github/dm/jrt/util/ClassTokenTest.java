@@ -87,7 +87,6 @@ public class ClassTokenTest {
     }
 
     @Test
-    @SuppressWarnings("ObjectEqualsNull")
     public void testListEquals() {
 
         final ClassToken<List<String>> classToken2 = new ClassToken<List<String>>() {};
@@ -144,7 +143,12 @@ public class ClassTokenTest {
     }
 
     @Test
-    @SuppressWarnings("ConstantConditions")
+    public void testProguard() {
+
+        assertThat(new ClassToken() {}.getRawClass()).isEqualTo(Object.class);
+    }
+
+    @Test
     public void testSubClassError() {
 
         try {

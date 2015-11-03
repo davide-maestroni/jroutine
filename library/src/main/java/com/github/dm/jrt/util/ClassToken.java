@@ -27,15 +27,6 @@ import java.lang.reflect.Type;
  * The workaround consists in forcing the inheritance from a special generic class, then inspected
  * via reflection, to obtain the generic type rather than the class object.
  * <p/>
- * Remember that, in order for the workaround to properly work at run time, you will need to add the
- * following rule to your Proguard file (if employing it for shrinking or obfuscation):
- * <pre>
- *     <code>
- *
- *         -keepattributes Signature
- *     </code>
- * </pre>
- * <p/>
  * Created by davide-maestroni on 06/14/2014.
  *
  * @param <TYPE> the class type.
@@ -100,8 +91,6 @@ public abstract class ClassToken<TYPE> {
      * Gets the generic type of this token.
      *
      * @return the generic type.
-     * @throws java.lang.IllegalStateException if this class does not correctly extend a class
-     *                                         token.
      */
     @NotNull
     public final Type getGenericType() {
@@ -126,9 +115,7 @@ public abstract class ClassToken<TYPE> {
 
             } else {
 
-                throw new IllegalStateException(
-                        "the class does not correctly extend a class token: "
-                                + getClass().getName());
+                mGenericType = Object.class;
             }
         }
 

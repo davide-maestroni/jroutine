@@ -23,6 +23,7 @@ import com.github.dm.jrt.annotation.InputTimeout;
 import com.github.dm.jrt.annotation.Inputs;
 import com.github.dm.jrt.annotation.Invoke;
 import com.github.dm.jrt.annotation.Invoke.InvocationMode;
+import com.github.dm.jrt.annotation.Level;
 import com.github.dm.jrt.annotation.MaxInstances;
 import com.github.dm.jrt.annotation.Output;
 import com.github.dm.jrt.annotation.Output.OutputMode;
@@ -233,6 +234,7 @@ public class ObjectRoutineTest {
                          .withInputMaxSize(33)
                          .withInputOrder(OrderType.BY_DELAY)
                          .withInputTimeout(7777, TimeUnit.MICROSECONDS)
+                         .withLogLevel(LogLevel.WARNING)
                          .withMaxInstances(17)
                          .withOutputMaxSize(77)
                          .withOutputOrder(OrderType.BY_CALL)
@@ -1531,6 +1533,7 @@ public class ObjectRoutineTest {
         @InputMaxSize(33)
         @InputOrder(OrderType.BY_DELAY)
         @InputTimeout(value = 7777, unit = TimeUnit.MICROSECONDS)
+        @Level(LogLevel.WARNING)
         @MaxInstances(17)
         @OutputMaxSize(77)
         @OutputOrder(OrderType.BY_CALL)

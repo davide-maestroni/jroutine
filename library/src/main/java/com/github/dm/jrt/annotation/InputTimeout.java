@@ -14,7 +14,6 @@
 package com.github.dm.jrt.annotation;
 
 import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
@@ -52,7 +51,6 @@ import java.util.concurrent.TimeUnit;
  *
  * @see com.github.dm.jrt.builder.InvocationConfiguration InvocationConfiguration
  */
-@Inherited
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface InputTimeout {

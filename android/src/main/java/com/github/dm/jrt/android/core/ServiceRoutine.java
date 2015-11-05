@@ -43,7 +43,7 @@ import com.github.dm.jrt.core.TemplateRoutine;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.log.Log;
-import com.github.dm.jrt.log.Log.LogLevel;
+import com.github.dm.jrt.log.Log.Level;
 import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.runner.TemplateExecution;
@@ -218,7 +218,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
             mServiceConfiguration = serviceConfiguration;
             mLogger = logger;
             final Log log = logger.getLog();
-            final LogLevel logLevel = logger.getLogLevel();
+            final Level logLevel = logger.getLogLevel();
             final OrderType inputOrderType = invocationConfiguration.getInputOrderTypeOr(null);
             final int inputMaxSize =
                     invocationConfiguration.getInputMaxSizeOr(ChannelConfiguration.DEFAULT);

@@ -16,7 +16,6 @@ package com.github.dm.jrt.android.annotation;
 import com.github.dm.jrt.android.builder.LoaderConfiguration.ClashResolutionType;
 
 import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
@@ -53,7 +52,6 @@ import java.lang.annotation.Target;
  *
  * @see com.github.dm.jrt.android.builder.LoaderConfiguration LoaderConfiguration
  */
-@Inherited
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface InputClashResolution {

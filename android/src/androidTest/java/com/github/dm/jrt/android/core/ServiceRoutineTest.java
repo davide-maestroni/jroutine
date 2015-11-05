@@ -38,7 +38,7 @@ import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.invocation.PassingInvocation;
 import com.github.dm.jrt.log.Log;
-import com.github.dm.jrt.log.Log.LogLevel;
+import com.github.dm.jrt.log.Log.Level;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.util.ClassToken;
 import com.github.dm.jrt.util.TimeDuration;
@@ -185,7 +185,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                         .on(targetFactory)
                                                         .invocations()
                                                         .withInputOrder(OrderType.BY_CHANCE)
-                                                        .withLogLevel(LogLevel.DEBUG)
+                                                        .withLogLevel(Level.DEBUG)
                                                         .set()
                                                         .service()
                                                         .withLogClass(AndroidLog.class)
@@ -265,7 +265,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                          .on(targetFactory)
                                                          .invocations()
                                                          .withInputOrder(OrderType.BY_CHANCE)
-                                                         .withLogLevel(LogLevel.DEBUG)
+                                                         .withLogLevel(Level.DEBUG)
                                                          .set()
                                                          .service()
                                                          .withLogClass(AndroidLog.class)
@@ -289,7 +289,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                          .on(factoryOf(token))
                                                          .invocations()
                                                          .withOutputOrder(OrderType.BY_CHANCE)
-                                                         .withLogLevel(LogLevel.DEBUG)
+                                                         .withLogLevel(Level.DEBUG)
                                                          .set()
                                                          .service()
                                                          .withLogClass(AndroidLog.class)

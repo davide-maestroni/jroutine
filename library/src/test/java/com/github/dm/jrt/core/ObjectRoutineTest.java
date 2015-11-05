@@ -23,6 +23,7 @@ import com.github.dm.jrt.annotation.InputTimeout;
 import com.github.dm.jrt.annotation.Inputs;
 import com.github.dm.jrt.annotation.Invoke;
 import com.github.dm.jrt.annotation.Invoke.InvocationMode;
+import com.github.dm.jrt.annotation.LogLevel;
 import com.github.dm.jrt.annotation.MaxInstances;
 import com.github.dm.jrt.annotation.Output;
 import com.github.dm.jrt.annotation.Output.OutputMode;
@@ -46,7 +47,7 @@ import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.log.Log;
-import com.github.dm.jrt.log.Log.LogLevel;
+import com.github.dm.jrt.log.Log.Level;
 import com.github.dm.jrt.log.NullLog;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.runner.Execution;
@@ -121,7 +122,7 @@ public class ObjectRoutineTest {
                                                         .withCoreInstances(1)
                                                         .withReadTimeoutAction(
                                                                 TimeoutActionType.EXIT)
-                                                        .withLogLevel(LogLevel.DEBUG)
+                                                        .withLogLevel(Level.DEBUG)
                                                         .withLog(new NullLog())
                                                         .set()
                                                         .aliasMethod(TestClass.GET);
@@ -136,7 +137,7 @@ public class ObjectRoutineTest {
         final Routine<Object, Object> routine = JRoutine.on(classOfType(TestStatic.class))
                                                         .invocations()
                                                         .withRunner(Runners.poolRunner())
-                                                        .withLogLevel(LogLevel.DEBUG)
+                                                        .withLogLevel(Level.DEBUG)
                                                         .withLog(new NullLog())
                                                         .set()
                                                         .aliasMethod(TestStatic.GET);
@@ -233,6 +234,7 @@ public class ObjectRoutineTest {
                          .withInputMaxSize(33)
                          .withInputOrder(OrderType.BY_DELAY)
                          .withInputTimeout(7777, TimeUnit.MICROSECONDS)
+                         .withLogLevel(Level.WARNING)
                          .withMaxInstances(17)
                          .withOutputMaxSize(77)
                          .withOutputOrder(OrderType.BY_CALL)
@@ -800,7 +802,7 @@ public class ObjectRoutineTest {
         final Routine<Object, Object> routine = JRoutine.on(instance(test))
                                                         .invocations()
                                                         .withRunner(Runners.poolRunner())
-                                                        .withLogLevel(LogLevel.DEBUG)
+                                                        .withLogLevel(Level.DEBUG)
                                                         .withLog(new NullLog())
                                                         .set()
                                                         .aliasMethod(TestStatic.GET);
@@ -1094,7 +1096,7 @@ public class ObjectRoutineTest {
                                                          .invocations()
                                                          .withRunner(Runners.sharedRunner())
                                                          .withCoreInstances(16)
-                                                         .withLogLevel(LogLevel.DEBUG)
+                                                         .withLogLevel(Level.DEBUG)
                                                          .withLog(nullLog)
                                                          .set()
                                                          .aliasMethod(TestClass.GET);
@@ -1105,7 +1107,7 @@ public class ObjectRoutineTest {
                                                          .invocations()
                                                          .withRunner(Runners.sharedRunner())
                                                          .withCoreInstances(16)
-                                                         .withLogLevel(LogLevel.DEBUG)
+                                                         .withLogLevel(Level.DEBUG)
                                                          .withLog(nullLog)
                                                          .set()
                                                          .aliasMethod(TestClass.GET);
@@ -1117,7 +1119,7 @@ public class ObjectRoutineTest {
                                                          .invocations()
                                                          .withRunner(Runners.sharedRunner())
                                                          .withCoreInstances(32)
-                                                         .withLogLevel(LogLevel.DEBUG)
+                                                         .withLogLevel(Level.DEBUG)
                                                          .withLog(nullLog)
                                                          .set()
                                                          .aliasMethod(TestClass.GET);
@@ -1130,7 +1132,7 @@ public class ObjectRoutineTest {
                                                          .invocations()
                                                          .withRunner(Runners.sharedRunner())
                                                          .withCoreInstances(32)
-                                                         .withLogLevel(LogLevel.WARNING)
+                                                         .withLogLevel(Level.WARNING)
                                                          .withLog(nullLog)
                                                          .set()
                                                          .aliasMethod(TestClass.GET);
@@ -1142,7 +1144,7 @@ public class ObjectRoutineTest {
                                                          .invocations()
                                                          .withRunner(Runners.sharedRunner())
                                                          .withCoreInstances(32)
-                                                         .withLogLevel(LogLevel.WARNING)
+                                                         .withLogLevel(Level.WARNING)
                                                          .withLog(new NullLog())
                                                          .set()
                                                          .aliasMethod(TestClass.GET);
@@ -1159,7 +1161,7 @@ public class ObjectRoutineTest {
                                                          .invocations()
                                                          .withRunner(Runners.sharedRunner())
                                                          .withCoreInstances(16)
-                                                         .withLogLevel(LogLevel.DEBUG)
+                                                         .withLogLevel(Level.DEBUG)
                                                          .withLog(nullLog)
                                                          .set()
                                                          .aliasMethod(TestStatic.GET);
@@ -1170,7 +1172,7 @@ public class ObjectRoutineTest {
                                                          .invocations()
                                                          .withRunner(Runners.sharedRunner())
                                                          .withCoreInstances(16)
-                                                         .withLogLevel(LogLevel.DEBUG)
+                                                         .withLogLevel(Level.DEBUG)
                                                          .withLog(nullLog)
                                                          .set()
                                                          .aliasMethod(TestStatic.GET);
@@ -1182,7 +1184,7 @@ public class ObjectRoutineTest {
                                                          .invocations()
                                                          .withRunner(Runners.sharedRunner())
                                                          .withCoreInstances(32)
-                                                         .withLogLevel(LogLevel.DEBUG)
+                                                         .withLogLevel(Level.DEBUG)
                                                          .withLog(nullLog)
                                                          .set()
                                                          .aliasMethod(TestStatic.GET);
@@ -1195,7 +1197,7 @@ public class ObjectRoutineTest {
                                                          .invocations()
                                                          .withRunner(Runners.sharedRunner())
                                                          .withCoreInstances(32)
-                                                         .withLogLevel(LogLevel.WARNING)
+                                                         .withLogLevel(Level.WARNING)
                                                          .withLog(nullLog)
                                                          .set()
                                                          .aliasMethod(TestStatic.GET);
@@ -1207,7 +1209,7 @@ public class ObjectRoutineTest {
                                                          .invocations()
                                                          .withRunner(Runners.sharedRunner())
                                                          .withCoreInstances(32)
-                                                         .withLogLevel(LogLevel.WARNING)
+                                                         .withLogLevel(Level.WARNING)
                                                          .withLog(new NullLog())
                                                          .set()
                                                          .aliasMethod(TestStatic.GET);
@@ -1531,6 +1533,7 @@ public class ObjectRoutineTest {
         @InputMaxSize(33)
         @InputOrder(OrderType.BY_DELAY)
         @InputTimeout(value = 7777, unit = TimeUnit.MICROSECONDS)
+        @LogLevel(Level.WARNING)
         @MaxInstances(17)
         @OutputMaxSize(77)
         @OutputOrder(OrderType.BY_CALL)

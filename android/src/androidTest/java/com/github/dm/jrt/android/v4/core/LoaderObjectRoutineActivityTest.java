@@ -43,7 +43,7 @@ import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.log.Log;
-import com.github.dm.jrt.log.Log.LogLevel;
+import com.github.dm.jrt.log.Log.Level;
 import com.github.dm.jrt.log.NullLog;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.runner.Runners;
@@ -92,7 +92,7 @@ public class LoaderObjectRoutineActivityTest
                                                         .withCoreInstances(1)
                                                         .withReadTimeoutAction(
                                                                 TimeoutActionType.EXIT)
-                                                        .withLogLevel(LogLevel.DEBUG)
+                                                        .withLogLevel(Level.DEBUG)
                                                         .withLog(new NullLog())
                                                         .set()
                                                         .aliasMethod(TestClass.GET);
@@ -206,7 +206,7 @@ public class LoaderObjectRoutineActivityTest
                                                                .withOutputOrder(OrderType.BY_CHANCE)
                                                                .withOutputMaxSize(3)
                                                                .withOutputTimeout(seconds(10))
-                                                               .withLogLevel(LogLevel.DEBUG)
+                                                               .withLogLevel(Level.DEBUG)
                                                                .withLog(countLog)
                                                                .set();
         JRoutine.with(contextFrom(getActivity()))

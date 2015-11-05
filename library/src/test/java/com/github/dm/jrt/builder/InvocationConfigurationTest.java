@@ -16,7 +16,7 @@ package com.github.dm.jrt.builder;
 import com.github.dm.jrt.builder.InvocationConfiguration.Builder;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.builder.InvocationConfiguration.TimeoutActionType;
-import com.github.dm.jrt.log.Log.LogLevel;
+import com.github.dm.jrt.log.Log.Level;
 import com.github.dm.jrt.log.Logs;
 import com.github.dm.jrt.log.NullLog;
 import com.github.dm.jrt.runner.Runners;
@@ -276,9 +276,9 @@ public class InvocationConfigurationTest {
                                                                .withLog(new NullLog())
                                                                .withOutputMaxSize(100)
                                                                .set();
-        assertThat(configuration).isNotEqualTo(builder().withLogLevel(LogLevel.DEBUG).set());
-        assertThat(configuration.builderFrom().withLogLevel(LogLevel.WARNING).set()).isNotEqualTo(
-                builder().withLogLevel(LogLevel.WARNING).set());
+        assertThat(configuration).isNotEqualTo(builder().withLogLevel(Level.DEBUG).set());
+        assertThat(configuration.builderFrom().withLogLevel(Level.WARNING).set()).isNotEqualTo(
+                builder().withLogLevel(Level.WARNING).set());
     }
 
     @Test

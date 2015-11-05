@@ -39,7 +39,7 @@ import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.log.Log;
-import com.github.dm.jrt.log.Log.LogLevel;
+import com.github.dm.jrt.log.Log.Level;
 import com.github.dm.jrt.log.NullLog;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.runner.Runners;
@@ -86,7 +86,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                                                         .withCoreInstances(1)
                                                         .withReadTimeoutAction(
                                                                 TimeoutActionType.EXIT)
-                                                        .withLogLevel(LogLevel.DEBUG)
+                                                        .withLogLevel(Level.DEBUG)
                                                         .withLog(new NullLog())
                                                         .set()
                                                         .aliasMethod(TestClass.GET);

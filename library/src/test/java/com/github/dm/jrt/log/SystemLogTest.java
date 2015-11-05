@@ -13,7 +13,7 @@
  */
 package com.github.dm.jrt.log;
 
-import com.github.dm.jrt.log.Log.LogLevel;
+import com.github.dm.jrt.log.Log.Level;
 
 import org.junit.Test;
 
@@ -40,7 +40,7 @@ public class SystemLogTest {
     public void testLogDbg() {
 
         final NullPointerException ex = new NullPointerException();
-        final Logger logger = Logger.newLogger(new SystemLog(), LogLevel.DEBUG, this);
+        final Logger logger = Logger.newLogger(new SystemLog(), Level.DEBUG, this);
 
         logger.dbg(ARGS[0]);
         logger.dbg(FORMAT0, ARGS[0]);
@@ -61,7 +61,7 @@ public class SystemLogTest {
     public void testLogErr() {
 
         final NullPointerException ex = new NullPointerException();
-        final Logger logger = Logger.newLogger(new SystemLog(), LogLevel.DEBUG, this);
+        final Logger logger = Logger.newLogger(new SystemLog(), Level.DEBUG, this);
 
         logger.err(ARGS[0]);
         logger.err(FORMAT0, ARGS[0]);
@@ -82,7 +82,7 @@ public class SystemLogTest {
     public void testLogWrn() {
 
         final NullPointerException ex = new NullPointerException();
-        final Logger logger = Logger.newLogger(new SystemLog(), LogLevel.DEBUG, this);
+        final Logger logger = Logger.newLogger(new SystemLog(), Level.DEBUG, this);
 
         logger.wrn(ARGS[0]);
         logger.wrn(FORMAT0, ARGS[0]);

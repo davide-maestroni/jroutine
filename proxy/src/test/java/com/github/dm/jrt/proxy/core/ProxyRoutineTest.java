@@ -34,7 +34,7 @@ import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.core.JRoutine;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.log.Log;
-import com.github.dm.jrt.log.Log.LogLevel;
+import com.github.dm.jrt.log.Log.Level;
 import com.github.dm.jrt.log.NullLog;
 import com.github.dm.jrt.proxy.annotation.Proxy;
 import com.github.dm.jrt.proxy.builder.ProxyObjectBuilder;
@@ -121,7 +121,7 @@ public class ProxyRoutineTest {
         final TestStatic testStatic = JRoutineProxy.on(classOfType(TestClass.class))
                                                    .invocations()
                                                    .withRunner(Runners.poolRunner())
-                                                   .withLogLevel(LogLevel.DEBUG)
+                                                   .withLogLevel(Level.DEBUG)
                                                    .withLog(new NullLog())
                                                    .set()
                                                    .buildProxy(TestStatic.class);
@@ -212,7 +212,7 @@ public class ProxyRoutineTest {
         final TestStatic testStatic = JRoutineProxy.on(instance(test))
                                                    .invocations()
                                                    .withRunner(Runners.poolRunner())
-                                                   .withLogLevel(LogLevel.DEBUG)
+                                                   .withLogLevel(Level.DEBUG)
                                                    .withLog(new NullLog())
                                                    .set()
                                                    .buildProxy(TestStatic.class);
@@ -230,7 +230,7 @@ public class ProxyRoutineTest {
         final TestProxy testProxy = JRoutineProxy.on(instance(test))
                                                  .invocations()
                                                  .withRunner(runner)
-                                                 .withLogLevel(LogLevel.DEBUG)
+                                                 .withLogLevel(Level.DEBUG)
                                                  .withLog(log)
                                                  .set()
                                                  .buildProxy(tokenOf(TestProxy.class));
@@ -260,7 +260,7 @@ public class ProxyRoutineTest {
         final Runner runner = Runners.poolRunner();
         final TestClass test = new TestClass();
         final InvocationConfiguration configuration =
-                builder().withRunner(runner).withLogLevel(LogLevel.DEBUG).withLog(log).set();
+                builder().withRunner(runner).withLogLevel(Level.DEBUG).withLog(log).set();
         final ProxyObjectBuilder<TestProxy> builder =
                 com.github.dm.jrt.proxy.Proxy_Test.on(instance(test));
         final TestProxy testProxy = builder.invocations().with(configuration).set().buildProxy();
@@ -296,7 +296,7 @@ public class ProxyRoutineTest {
         final Runner runner = Runners.poolRunner();
         final TestClass test = new TestClass();
         final InvocationConfiguration configuration =
-                builder().withRunner(runner).withLogLevel(LogLevel.DEBUG).withLog(log).set();
+                builder().withRunner(runner).withLogLevel(Level.DEBUG).withLog(log).set();
         final TestProxy testProxy = JRoutineProxy.on(instance(test))
                                                  .invocations()
                                                  .with(configuration)

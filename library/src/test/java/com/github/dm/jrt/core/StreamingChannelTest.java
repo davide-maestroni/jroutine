@@ -26,7 +26,7 @@ import com.github.dm.jrt.channel.TimeoutException;
 import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.invocation.PassingInvocation;
 import com.github.dm.jrt.log.Log;
-import com.github.dm.jrt.log.Log.LogLevel;
+import com.github.dm.jrt.log.Log.Level;
 import com.github.dm.jrt.log.NullLog;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.util.TimeDuration;
@@ -531,7 +531,7 @@ public class StreamingChannelTest {
                         .withInputMaxSize(1)
                         .withInputTimeout(1, TimeUnit.MILLISECONDS)
                         .withInputTimeout(seconds(1))
-                        .withLogLevel(LogLevel.DEBUG)
+                        .withLogLevel(Level.DEBUG)
                         .withLog(new NullLog())
                         .set());
         channel.pass(-77L);

@@ -13,7 +13,7 @@
  */
 package com.github.dm.jrt.log;
 
-import com.github.dm.jrt.log.Log.LogLevel;
+import com.github.dm.jrt.log.Log.Level;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,16 +33,15 @@ import static com.github.dm.jrt.util.Reflection.asArgs;
  */
 public class Logger {
 
-    private static final int DEBUG_LEVEL = LogLevel.DEBUG.ordinal();
+    private static final int DEBUG_LEVEL = Level.DEBUG.ordinal();
 
-    private static final int ERROR_LEVEL = LogLevel.ERROR.ordinal();
+    private static final int ERROR_LEVEL = Level.ERROR.ordinal();
 
-    private static final int WARNING_LEVEL = LogLevel.WARNING.ordinal();
+    private static final int WARNING_LEVEL = Level.WARNING.ordinal();
 
     private static final AtomicReference<Log> sLog = new AtomicReference<Log>(Logs.systemLog());
 
-    private static final AtomicReference<LogLevel> sLogLevel =
-            new AtomicReference<LogLevel>(LogLevel.ERROR);
+    private static final AtomicReference<Level> sLogLevel = new AtomicReference<Level>(Level.ERROR);
 
     private final List<Object> mContextList;
 
@@ -52,7 +51,7 @@ public class Logger {
 
     private final Log mLog;
 
-    private final LogLevel mLogLevel;
+    private final Level mLogLevel;
 
     /**
      * Constructor.
@@ -62,13 +61,40 @@ public class Logger {
      * @param level    the log level.
      */
     private Logger(@NotNull final Object[] contexts, @Nullable final Log log,
-            @Nullable final LogLevel level) {
+            @Nullable final Level level) {
 
         mContexts = contexts.clone();
         mLog = (log == null) ? sLog.get() : log;
         mLogLevel = (level == null) ? sLogLevel.get() : level;
         mLevel = mLogLevel.ordinal();
         mContextList = Arrays.asList(mContexts);
+    }
+
+    /**
+     * Gets the default log level.
+     *
+     * @return the log level.
+     */
+    @NotNull
+    public static Level getDefaultLevel() {
+
+        return sLogLevel.get();
+    }
+
+    /**
+     * Sets the default log level.
+     *
+     * @param level the log level.
+     */
+    @SuppressWarnings("ConstantConditions")
+    public static void setDefaultLevel(@NotNull final Level level) {
+
+        if (level == null) {
+
+            throw new NullPointerException("the default log level must not be null");
+        }
+
+        sLogLevel.set(level);
     }
 
     /**
@@ -99,33 +125,6 @@ public class Logger {
     }
 
     /**
-     * Gets the default log level.
-     *
-     * @return the log level.
-     */
-    @NotNull
-    public static LogLevel getDefaultLogLevel() {
-
-        return sLogLevel.get();
-    }
-
-    /**
-     * Sets the default log level.
-     *
-     * @param level the log level.
-     */
-    @SuppressWarnings("ConstantConditions")
-    public static void setDefaultLogLevel(@NotNull final LogLevel level) {
-
-        if (level == null) {
-
-            throw new NullPointerException("the default log level must not be null");
-        }
-
-        sLogLevel.set(level);
-    }
-
-    /**
      * Creates a new logger.
      *
      * @param log     the log instance.
@@ -135,7 +134,7 @@ public class Logger {
      */
     @NotNull
     @SuppressWarnings("ConstantConditions")
-    public static Logger newLogger(@Nullable final Log log, @Nullable final LogLevel level,
+    public static Logger newLogger(@Nullable final Log log, @Nullable final Level level,
             @NotNull final Object context) {
 
         if (context == null) {
@@ -600,7 +599,7 @@ public class Logger {
      * @return the log level.
      */
     @NotNull
-    public LogLevel getLogLevel() {
+    public Level getLogLevel() {
 
         return mLogLevel;
     }

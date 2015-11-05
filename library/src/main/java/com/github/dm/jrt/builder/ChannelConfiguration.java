@@ -16,7 +16,7 @@ package com.github.dm.jrt.builder;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.log.Log;
-import com.github.dm.jrt.log.Log.LogLevel;
+import com.github.dm.jrt.log.Log.Level;
 import com.github.dm.jrt.runner.Runner;
 import com.github.dm.jrt.util.TimeDuration;
 
@@ -69,7 +69,7 @@ public final class ChannelConfiguration {
 
     private final Log mLog;
 
-    private final LogLevel mLogLevel;
+    private final Level mLogLevel;
 
     private final TimeDuration mReadTimeout;
 
@@ -93,7 +93,7 @@ public final class ChannelConfiguration {
             @Nullable final TimeDuration readTimeout, @Nullable final TimeoutActionType actionType,
             @Nullable final OrderType channelOrderType, final int channelMaxSize,
             @Nullable final TimeDuration channelTimeout, @Nullable final Log log,
-            @Nullable final LogLevel logLevel) {
+            @Nullable final Level logLevel) {
 
         mAsyncRunner = asyncRunner;
         mReadTimeout = readTimeout;
@@ -196,9 +196,9 @@ public final class ChannelConfiguration {
      * @param valueIfNotSet the default value if none was set.
      * @return the log level.
      */
-    public LogLevel getLogLevelOr(@Nullable final LogLevel valueIfNotSet) {
+    public Level getLogLevelOr(@Nullable final Level valueIfNotSet) {
 
-        final LogLevel logLevel = mLogLevel;
+        final Level logLevel = mLogLevel;
         return (logLevel != null) ? logLevel : valueIfNotSet;
     }
 
@@ -416,7 +416,7 @@ public final class ChannelConfiguration {
 
         private Log mLog;
 
-        private LogLevel mLogLevel;
+        private Level mLogLevel;
 
         private TimeDuration mReadTimeout;
 
@@ -535,7 +535,7 @@ public final class ChannelConfiguration {
                 withLog(log);
             }
 
-            final LogLevel logLevel = configuration.mLogLevel;
+            final Level logLevel = configuration.mLogLevel;
 
             if (logLevel != null) {
 
@@ -648,7 +648,7 @@ public final class ChannelConfiguration {
          * @return this builder.
          */
         @NotNull
-        public Builder<TYPE> withLogLevel(@Nullable final LogLevel level) {
+        public Builder<TYPE> withLogLevel(@Nullable final Level level) {
 
             mLogLevel = level;
             return this;

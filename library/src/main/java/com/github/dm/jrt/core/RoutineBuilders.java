@@ -23,6 +23,7 @@ import com.github.dm.jrt.annotation.InputTimeout;
 import com.github.dm.jrt.annotation.Inputs;
 import com.github.dm.jrt.annotation.Invoke;
 import com.github.dm.jrt.annotation.Invoke.InvocationMode;
+import com.github.dm.jrt.annotation.LogLevel;
 import com.github.dm.jrt.annotation.MaxInstances;
 import com.github.dm.jrt.annotation.Output;
 import com.github.dm.jrt.annotation.Output.OutputMode;
@@ -207,6 +208,7 @@ public class RoutineBuilders {
      * @see com.github.dm.jrt.annotation.InputMaxSize InputMaxSize
      * @see com.github.dm.jrt.annotation.InputOrder InputOrder
      * @see com.github.dm.jrt.annotation.InputTimeout InputTimeout
+     * @see com.github.dm.jrt.annotation.LogLevel LogLevel
      * @see com.github.dm.jrt.annotation.MaxInstances MaxInstances
      * @see com.github.dm.jrt.annotation.OutputMaxSize OutputMaxSize
      * @see com.github.dm.jrt.annotation.OutputOrder OutputOrder
@@ -247,6 +249,13 @@ public class RoutineBuilders {
         if (inputTimeoutAnnotation != null) {
 
             builder.withInputTimeout(inputTimeoutAnnotation.value(), inputTimeoutAnnotation.unit());
+        }
+
+        final LogLevel logLevelAnnotation = method.getAnnotation(LogLevel.class);
+
+        if (logLevelAnnotation != null) {
+
+            builder.withLogLevel(logLevelAnnotation.value());
         }
 
         final MaxInstances maxInstancesAnnotation = method.getAnnotation(MaxInstances.class);

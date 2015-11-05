@@ -23,6 +23,7 @@ import com.github.dm.jrt.annotation.InputTimeout;
 import com.github.dm.jrt.annotation.Inputs;
 import com.github.dm.jrt.annotation.Invoke;
 import com.github.dm.jrt.annotation.Invoke.InvocationMode;
+import com.github.dm.jrt.annotation.LogLevel;
 import com.github.dm.jrt.annotation.MaxInstances;
 import com.github.dm.jrt.annotation.Output;
 import com.github.dm.jrt.annotation.Output.OutputMode;
@@ -37,6 +38,7 @@ import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
+import com.github.dm.jrt.log.Log.Level;
 import com.github.dm.jrt.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
@@ -583,6 +585,17 @@ public class RoutineProcessor extends AbstractProcessor {
                    .append(TimeUnit.class.getCanonicalName())
                    .append(".")
                    .append(inputTimeoutAnnotation.unit())
+                   .append(")");
+        }
+
+        final LogLevel logLevelAnnotation = methodElement.getAnnotation(LogLevel.class);
+
+        if (logLevelAnnotation != null) {
+
+            builder.append(".withLogLevel(")
+                   .append(Level.class.getCanonicalName())
+                   .append(".")
+                   .append(logLevelAnnotation.value())
                    .append(")");
         }
 
@@ -2396,7 +2409,7 @@ public class RoutineProcessor extends AbstractProcessor {
         if (sharedFieldsAnnotation != null) {
 
             final String[] names = sharedFieldsAnnotation.value();
-            final StringBuilder builder = new StringBuilder("Arrays.asList(");
+            final StringBuilder builder = new StringBuilder("java.util.Arrays.asList(");
             final int length = names.length;
 
             for (int i = 0; i < length; ++i) {
@@ -2461,7 +2474,7 @@ public class RoutineProcessor extends AbstractProcessor {
         if (sharedFieldsAnnotation != null) {
 
             final String[] names = sharedFieldsAnnotation.value();
-            final StringBuilder builder = new StringBuilder("Arrays.asList(");
+            final StringBuilder builder = new StringBuilder("java.util.Arrays.asList(");
             final int length = names.length;
 
             for (int i = 0; i < length; ++i) {

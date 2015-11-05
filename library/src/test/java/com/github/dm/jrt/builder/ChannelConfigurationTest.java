@@ -16,7 +16,7 @@ package com.github.dm.jrt.builder;
 import com.github.dm.jrt.builder.ChannelConfiguration.Builder;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.builder.InvocationConfiguration.TimeoutActionType;
-import com.github.dm.jrt.log.Log.LogLevel;
+import com.github.dm.jrt.log.Log.Level;
 import com.github.dm.jrt.log.Logs;
 import com.github.dm.jrt.log.NullLog;
 import com.github.dm.jrt.runner.Runners;
@@ -102,7 +102,7 @@ public class ChannelConfigurationTest {
                                                             .withAsyncRunner(Runners.syncRunner())
                                                             .withLog(new NullLog())
                                                             .withChannelMaxSize(100)
-                                                            .withLogLevel(LogLevel.SILENT)
+                                                            .withLogLevel(Level.SILENT)
                                                             .withChannelTimeout(
                                                                     TimeDuration.seconds(1))
                                                             .withReadTimeout(
@@ -221,9 +221,9 @@ public class ChannelConfigurationTest {
                                                             .withLog(new NullLog())
                                                             .withChannelMaxSize(100)
                                                             .set();
-        assertThat(configuration).isNotEqualTo(builder().withLogLevel(LogLevel.DEBUG).set());
-        assertThat(configuration.builderFrom().withLogLevel(LogLevel.WARNING).set()).isNotEqualTo(
-                builder().withLogLevel(LogLevel.WARNING).set());
+        assertThat(configuration).isNotEqualTo(builder().withLogLevel(Level.DEBUG).set());
+        assertThat(configuration.builderFrom().withLogLevel(Level.WARNING).set()).isNotEqualTo(
+                builder().withLogLevel(Level.WARNING).set());
     }
 
     @Test
@@ -268,7 +268,7 @@ public class ChannelConfigurationTest {
                                                             .withReadTimeoutAction(
                                                                     TimeoutActionType.ABORT)
                                                             .withLog(Logs.nullLog())
-                                                            .withLogLevel(LogLevel.SILENT)
+                                                            .withLogLevel(Level.SILENT)
                                                             .set();
         final InvocationConfiguration.Builder<InvocationConfiguration> builder =
                 InvocationConfiguration.builder();
@@ -277,7 +277,7 @@ public class ChannelConfigurationTest {
                        .withReadTimeout(millis(100))
                        .withReadTimeoutAction(TimeoutActionType.ABORT)
                        .withLog(Logs.nullLog())
-                       .withLogLevel(LogLevel.SILENT)
+                       .withLogLevel(Level.SILENT)
                        .withInputOrder(OrderType.BY_CALL)
                        .withInputMaxSize(100)
                        .withInputTimeout(millis(33))
@@ -296,7 +296,7 @@ public class ChannelConfigurationTest {
                                                             .withReadTimeoutAction(
                                                                     TimeoutActionType.ABORT)
                                                             .withLog(Logs.nullLog())
-                                                            .withLogLevel(LogLevel.SILENT)
+                                                            .withLogLevel(Level.SILENT)
                                                             .set();
         final InvocationConfiguration.Builder<InvocationConfiguration> builder =
                 InvocationConfiguration.builder();
@@ -305,7 +305,7 @@ public class ChannelConfigurationTest {
                        .withReadTimeout(millis(100))
                        .withReadTimeoutAction(TimeoutActionType.ABORT)
                        .withLog(Logs.nullLog())
-                       .withLogLevel(LogLevel.SILENT)
+                       .withLogLevel(Level.SILENT)
                        .set();
         assertThat(configuration.toInvocationConfiguration()).isEqualTo(invocationConfiguration);
     }
@@ -321,7 +321,7 @@ public class ChannelConfigurationTest {
                                                             .withReadTimeoutAction(
                                                                     TimeoutActionType.ABORT)
                                                             .withLog(Logs.nullLog())
-                                                            .withLogLevel(LogLevel.SILENT)
+                                                            .withLogLevel(Level.SILENT)
                                                             .set();
         final InvocationConfiguration.Builder<InvocationConfiguration> builder =
                 InvocationConfiguration.builder();
@@ -330,7 +330,7 @@ public class ChannelConfigurationTest {
                        .withReadTimeout(millis(100))
                        .withReadTimeoutAction(TimeoutActionType.ABORT)
                        .withLog(Logs.nullLog())
-                       .withLogLevel(LogLevel.SILENT)
+                       .withLogLevel(Level.SILENT)
                        .withOutputOrder(OrderType.BY_CALL)
                        .withOutputMaxSize(100)
                        .withOutputTimeout(millis(33))

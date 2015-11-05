@@ -62,9 +62,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         ProxyConfiguration.Configurable<ServiceObjectRoutineBuilder>,
         ServiceConfiguration.Configurable<ServiceObjectRoutineBuilder> {
 
-    private static final ClassToken<ProxyInvocation> PROXY_TOKEN =
-            ClassToken.tokenOf(ProxyInvocation.class);
-
     private static final HashMap<String, Class<?>> sPrimitiveClassMap =
             new HashMap<String, Class<?>>();
 
@@ -159,6 +156,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     @NotNull
+    @SuppressWarnings("unchecked")
     public <IN, OUT> Routine<IN, OUT> aliasMethod(@NotNull final String name) {
 
         final ContextInvocationTarget<?> target = mTarget;
@@ -173,15 +171,16 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         final List<String> sharedFields =
                 fieldsWithShareAnnotation(mProxyConfiguration, targetMethod);
         final Object[] args = asArgs(sharedFields, target, name);
-        return JRoutine.with(mContext)
-                       .on(factoryOf(new MethodAliasToken<IN, OUT>(), args))
-                       .invocations()
-                       .with(configurationWithAnnotations(mInvocationConfiguration, targetMethod))
-                       .set()
-                       .service()
-                       .with(mServiceConfiguration)
-                       .set()
-                       .buildRoutine();
+        return (Routine<IN, OUT>) JRoutine.with(mContext)
+                                          .on(factoryOf(MethodAliasInvocation.class, args))
+                                          .invocations()
+                                          .with(configurationWithAnnotations(
+                                                  mInvocationConfiguration, targetMethod))
+                                          .set()
+                                          .service()
+                                          .with(mServiceConfiguration)
+                                          .set()
+                                          .buildRoutine();
     }
 
     @NotNull
@@ -205,6 +204,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     @NotNull
+    @SuppressWarnings("unchecked")
     public <IN, OUT> Routine<IN, OUT> method(@NotNull final String name,
             @NotNull final Class<?>... parameterTypes) {
 
@@ -213,15 +213,16 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         final List<String> sharedFields =
                 fieldsWithShareAnnotation(mProxyConfiguration, targetMethod);
         final Object[] args = asArgs(sharedFields, target, name, toNames(parameterTypes));
-        return JRoutine.with(mContext)
-                       .on(factoryOf(new MethodSignatureToken<IN, OUT>(), args))
-                       .invocations()
-                       .with(configurationWithAnnotations(mInvocationConfiguration, targetMethod))
-                       .set()
-                       .service()
-                       .with(mServiceConfiguration)
-                       .set()
-                       .buildRoutine();
+        return (Routine<IN, OUT>) JRoutine.with(mContext)
+                                          .on(factoryOf(MethodSignatureInvocation.class, args))
+                                          .invocations()
+                                          .with(configurationWithAnnotations(
+                                                  mInvocationConfiguration, targetMethod))
+                                          .set()
+                                          .service()
+                                          .with(mServiceConfiguration)
+                                          .set()
+                                          .buildRoutine();
     }
 
     @NotNull
@@ -295,11 +296,8 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
     /**
      * Alias method invocation.
-     *
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
      */
-    private static class MethodAliasInvocation<IN, OUT> extends FunctionContextInvocation<IN, OUT> {
+    private static class MethodAliasInvocation extends FunctionContextInvocation<Object, Object> {
 
         private final String mAliasName;
 
@@ -309,7 +307,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         private Object mInstance;
 
-        private Routine<IN, OUT> mRoutine;
+        private Routine<Object, Object> mRoutine;
 
         /**
          * Constructor.
@@ -348,10 +346,10 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         }
 
         @Override
-        protected void onCall(@NotNull final List<? extends IN> inputs,
-                @NotNull final ResultChannel<OUT> result) {
+        protected void onCall(@NotNull final List<?> inputs,
+                @NotNull final ResultChannel<Object> result) {
 
-            final Routine<IN, OUT> routine = mRoutine;
+            final Routine<Object, Object> routine = mRoutine;
 
             if ((routine == null) || (mInstance == null)) {
 
@@ -363,24 +361,10 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     /**
-     * Class token of a {@link MethodAliasInvocation MethodAliasInvocation}.
-     *
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
-     */
-    private static class MethodAliasToken<IN, OUT>
-            extends ClassToken<MethodAliasInvocation<IN, OUT>> {
-
-    }
-
-    /**
      * Invocation based on method signature.
-     *
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
      */
-    private static class MethodSignatureInvocation<IN, OUT>
-            extends FunctionContextInvocation<IN, OUT> {
+    private static class MethodSignatureInvocation
+            extends FunctionContextInvocation<Object, Object> {
 
         private final String mMethodName;
 
@@ -392,7 +376,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         private Object mInstance;
 
-        private Routine<IN, OUT> mRoutine;
+        private Routine<Object, Object> mRoutine;
 
         /**
          * Constructor.
@@ -414,10 +398,10 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         }
 
         @Override
-        protected void onCall(@NotNull final List<? extends IN> inputs,
-                @NotNull final ResultChannel<OUT> result) {
+        protected void onCall(@NotNull final List<?> inputs,
+                @NotNull final ResultChannel<Object> result) {
 
-            final Routine<IN, OUT> routine = mRoutine;
+            final Routine<Object, Object> routine = mRoutine;
 
             if ((routine == null) || (mInstance == null)) {
 
@@ -447,17 +431,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                 throw InvocationException.wrapIfNeeded(t);
             }
         }
-    }
-
-    /**
-     * Class token of a {@link MethodSignatureInvocation MethodSignatureInvocation}.
-     *
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
-     */
-    private static class MethodSignatureToken<IN, OUT>
-            extends ClassToken<MethodSignatureInvocation<IN, OUT>> {
-
     }
 
     /**
@@ -586,7 +559,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                                                 toNames(targetParameterTypes), inputMode,
                                                 outputMode);
             final TargetInvocationFactory<Object, Object> targetFactory =
-                    factoryOf(PROXY_TOKEN, factoryArgs);
+                    factoryOf(ProxyInvocation.class, factoryArgs);
             final InvocationConfiguration invocationConfiguration =
                     configurationWithAnnotations(mInvocationConfiguration, method);
             final Routine<Object, Object> routine = JRoutine.with(mContext)

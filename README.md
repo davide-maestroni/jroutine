@@ -86,28 +86,6 @@ Complete Javadoc with insights and examples is available:
 
 The project contains an additional [sample][sample] module showing how to implement a file downloader with just 3 classes.
 
-## Versioning Convention
-
-The library artifacts will follow a specific versioning convention. Each version will be identified by a major, a minor and a revision number.
-
-* ***Major Version***: the major version number will update when a stuctural change (more than some class renaming) takes place. All the dependent artifact major versions will be updated as well.
-* ***Minor Version***: the minor version number will update when backward compatibility is broken. All the dependent artifact minor versions will be updated as well.
-* ***Revision Number***: the revision number will update when non-breaking changes are made (typically bug fixing). The dependent artifacts will not be impacted.
-
-In terms of backward compatibility, it is hence safe to depend on a specific major and minor version, ignoring the revision number (like, for instance: *4.2.+*).
-
-## Further development
-
-Feel free to contribute with your own [Routine][javadoc routine] or [Runner][javadoc runner] implementations, in order to support more platforms other than Android.
-
-## Build instructions
-
-Please refer to the dedicated [Wiki page][wiki build].
-
-## Proguard
-
-Please refer to the dedicated [Wiki page][wiki proguard].
-
 ## Code generation
 
 In order to activate the proxy code generation through annotation pre-processors in a Java project, it is sufficient to include the proper artifact (see below).
@@ -137,6 +115,28 @@ dependencies {
     ...
 }
 ```
+
+## Further development
+
+Feel free to contribute with your own [Routine][javadoc routine] or [Runner][javadoc runner] implementations, in order to support more platforms other than Android.
+
+## Versioning Convention
+
+The library artifacts will follow a specific versioning convention. Each version will be identified by a major, a minor and a revision number.
+
+* ***Major Version***: the major version number will update when a stuctural change (more than some class renaming) takes place. All the dependent artifact major versions will be updated as well.
+* ***Minor Version***: the minor version number will update when backward compatibility is broken. All the dependent artifact minor versions will be updated as well.
+* ***Revision Number***: the revision number will update when non-breaking changes are made (typically bug fixing). The dependent artifacts will not be impacted.
+
+In terms of backward compatibility, it is hence safe to depend on a specific major and minor version, ignoring the revision number (like, for instance: *4.2.+*).
+
+## Build instructions
+
+Please refer to the dedicated [Wiki page][wiki build].
+
+## Proguard
+
+Please refer to the dedicated [Wiki page][wiki proguard].
 
 ## Dependencies
 

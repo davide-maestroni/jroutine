@@ -108,6 +108,36 @@ Please refer to the dedicated [Wiki page][wiki build].
 
 Please refer to the dedicated [Wiki page][wiki proguard].
 
+## Annotation pre-processor
+
+In order to activate the proxy code generation in a Java project, it is sufficient to include the proper artifact (see below).
+
+Note that, however, in an Android project, explicit use of an APT plugin is required. For example, the Gradle build file can be modified as follows:
+
+```
+buildscript {
+    ...
+    dependencies {
+        ...
+        classpath 'com.uphyca.gradle:gradle-android-apt-plugin:0.9.4'
+        ...
+    }
+}
+
+...
+apply plugin: 'android-apt'
+...
+
+dependencies {
+    ...
+    apt 'com.github.davide-maestroni:jroutine-processor:X.X.X'
+    apt 'com.github.davide-maestroni:jroutine-androidprocessor:X.X.X'
+    ...
+    compile 'com.github.davide-maestroni:jroutine-androidproxy:X.X.X'
+    ...
+}
+```
+
 ## Dependencies
 
 #### Runtime dependencies

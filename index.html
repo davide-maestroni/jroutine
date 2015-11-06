@@ -133,6 +133,36 @@ For anything else <a href="https://github.com/">GitHub</a> is a great source of 
 <p>Please have a look at the <a href="https://github.com/davide-maestroni/jroutine/wiki">Wiki</a>.</p>
 
 <h2>
+<a id="code-generation" class="anchor" href="#code-generation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Code generation</h2>
+
+<p>In order to activate the proxy code generation through annotation pre-processors in a Java project, it is sufficient to include the proper artifact (<a href="#artifacts">see below</a>).</p>
+
+<p>Note, however, that in an Android project explicit use of an APT plugin is required. For example, the Gradle build file can be modified as follows:</p>
+
+<pre><code>buildscript {
+    ...
+    dependencies {
+        ...
+        classpath 'com.uphyca.gradle:gradle-android-apt-plugin:0.9.4'
+        ...
+    }
+}
+
+...
+apply plugin: 'android-apt'
+...
+
+dependencies {
+    ...
+    apt 'com.github.davide-maestroni:jroutine-processor:X.X.X'
+    apt 'com.github.davide-maestroni:jroutine-androidprocessor:X.X.X'
+    ...
+    compile 'com.github.davide-maestroni:jroutine-androidproxy:X.X.X'
+    ...
+}
+</code></pre>
+
+<h2>
 <a id="documentation" class="anchor" href="#documentation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Documentation</h2>
 
 <p>Complete Javadoc with insights and examples is available:</p>

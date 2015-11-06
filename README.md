@@ -175,7 +175,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 
 **IT'S OPEN DUDE!**
 
-[artifacts]:https://github.com/davide-maestroni/jroutine#artifacts
+[artifacts]:#artifacts
 [apache license]:http://www.apache.org/licenses/LICENSE-2.0
 [eclipse license]:https://www.eclipse.org/legal/epl-v10.html
 [lgpl license]:http://www.gnu.org/licenses/lgpl.html

@@ -108,11 +108,11 @@ Please refer to the dedicated [Wiki page][wiki build].
 
 Please refer to the dedicated [Wiki page][wiki proguard].
 
-## Annotation pre-processor
+## Code generation
 
-In order to activate the proxy code generation in a Java project, it is sufficient to include the proper artifact (see below).
+In order to activate the proxy code generation through annotation pre-processors in a Java project, it is sufficient to include the proper artifact (see below).
 
-Note that, however, in an Android project, explicit use of an APT plugin is required. For example, the Gradle build file can be modified as follows:
+Note, however, that in an Android project explicit use of an APT plugin is required. For example, the Gradle build file can be modified as follows:
 
 ```
 buildscript {

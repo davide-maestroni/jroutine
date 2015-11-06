@@ -75,17 +75,6 @@ For anything else [GitHub][github] is a great source of inspiration.
 
 Please have a look at the [Wiki][wiki].
 
-## Documentation
-
-Complete Javadoc with insights and examples is available:
-
-* [JRoutine][javadoc]
-* [JRoutine-Proxy][javadoc proxy]
-* [JRoutine-Android][javadoc android]
-* [JRoutine-AndroidProxy][javadoc androidproxy]
-
-The project contains an additional [sample][sample] module showing how to implement a file downloader with just 3 classes.
-
 ## Code generation
 
 In order to activate the proxy code generation through annotation pre-processors in a Java project, it is sufficient to include the proper artifact (see below).
@@ -116,9 +105,16 @@ dependencies {
 }
 ```
 
-## Further development
+## Documentation
 
-Feel free to contribute with your own [Routine][javadoc routine] or [Runner][javadoc runner] implementations, in order to support more platforms other than Android.
+Complete Javadoc with insights and examples is available:
+
+* [JRoutine][javadoc]
+* [JRoutine-Proxy][javadoc proxy]
+* [JRoutine-Android][javadoc android]
+* [JRoutine-AndroidProxy][javadoc androidproxy]
+
+The project contains an additional [sample][sample] module showing how to implement a file downloader with just 3 classes.
 
 ## Versioning Convention
 
@@ -129,6 +125,10 @@ The library artifacts will follow a specific versioning convention. Each version
 * ***Revision Number***: the revision number will update when non-breaking changes are made (typically bug fixing). The dependent artifacts will not be impacted.
 
 In terms of backward compatibility, it is hence safe to depend on a specific major and minor version, ignoring the revision number (like, for instance: *4.2.+*).
+
+## Further development
+
+Feel free to contribute with your own [Routine][javadoc routine] or [Runner][javadoc runner] implementations, in order to support more platforms other than Android.
 
 ## Build instructions
 

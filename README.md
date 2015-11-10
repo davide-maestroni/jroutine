@@ -32,8 +32,8 @@ Among the many open source libraries, [RxJava][rxjava] is one of the preferred c
 Although [Reactive Extensions][reactivex] is a great tool for managing events and composing event listeners, it has not been clearly designed with parallel programming in mind.
 In fact, RxJava shows a few limits in this respect.
 The framework has once been compared, with a fitting example, to a line of domino pieces: once the first tile falls down, all the others are to follow, and there is no way to stop them other than to cut the line.
-Each time a background operation is required, the whole chain of observables/subscribers must be rebuilt from scratch, the chained functions are called recursively and many objects are created in the while.
-While such design works great for common events, it does not adapt so well to background tasks.
+Each time a background operation is required, the whole chain of observables/subscribers must be rebuilt from scratch and the chained functions get called recursively.
+While such design works great for simple events, it does not adapt so well to background tasks.
 After all, a network request does not really fit in the definition of "event".
 
 RxJava is still one of the best library for handling events, though, something specifically designed is needed to make parallel programming easily accessible and manageable.

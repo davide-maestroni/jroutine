@@ -528,7 +528,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
                             } catch (final Throwable t) {
 
-                                InvocationInterruptedException.ignoreIfPossible(t);
+                                InvocationInterruptedException.throwIfInterrupt(t);
                                 logger.wrn(t, "ignoring consumer exception (%s)", consumer);
                             }
 
@@ -1928,7 +1928,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
             } catch (final Throwable t) {
 
-                InvocationInterruptedException.ignoreIfPossible(t);
+                InvocationInterruptedException.throwIfInterrupt(t);
                 logger.wrn(t, "ignoring consumer exception (%s)", consumer);
             }
         }

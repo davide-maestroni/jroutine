@@ -272,7 +272,7 @@ public class ParcelableByteChannel {
         public static final Creator<ParcelableByteBuffer> CREATOR =
                 new Creator<ParcelableByteBuffer>() {
 
-                    public ParcelableByteBuffer createFromParcel(@NotNull final Parcel in) {
+                    public ParcelableByteBuffer createFromParcel(final Parcel in) {
 
                         final byte[] data = in.createByteArray();
 
@@ -324,7 +324,7 @@ public class ParcelableByteChannel {
         }
 
         @SuppressWarnings({"ResultOfMethodCallIgnored", "StatementWithEmptyBody"})
-        public void writeToParcel(@NotNull final Parcel dest, final int flags) {
+        public void writeToParcel(final Parcel dest, final int flags) {
 
             final ByteBuffer buffer = mBuffer;
 
@@ -470,7 +470,7 @@ public class ParcelableByteChannel {
         }
 
         @Override
-        public void mark(final int readlimit) {
+        public void mark(final int readLimit) {
 
         }
 

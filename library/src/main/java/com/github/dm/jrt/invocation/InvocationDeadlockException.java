@@ -31,7 +31,7 @@ public class InvocationDeadlockException extends DeadlockException {
      */
     public InvocationDeadlockException() {
 
-        super("cannot wait while no invocation instance is available");
+        this("cannot wait while no invocation instance is available");
     }
 
     /**

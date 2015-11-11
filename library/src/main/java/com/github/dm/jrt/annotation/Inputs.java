@@ -19,12 +19,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation is used to decorate methods that are to be invoked in an asynchronous way.<br/>
- * Note that the piece of code inside such methods will be automatically protected so to avoid
- * concurrency issues. Though, other parts of the code inside the same class will be not.<br/>
- * In order to prevent unexpected behaviors, it is advisable to avoid using the same class fields
- * (unless immutable) in protected and non-protected code, or to call synchronous methods through
- * routines as well.
+ * Through this annotation it is possible to indicate the original parameter types of the target
+ * object method.
  * <p/>
  * The only use case in which this annotation is useful, is when an interface is used as a proxy
  * of another class methods. The interface can take all its input parameters in an asynchronous way.
@@ -59,6 +55,13 @@ import java.lang.annotation.Target;
  * </pre>
  * <p/>
  * In such case, it is up to the caller to invoke it in the proper mode.
+ * <p/>
+ * This annotation is used to decorate methods that are to be invoked in an asynchronous way.<br/>
+ * Note that the piece of code inside such methods will be automatically protected so to avoid
+ * concurrency issues. Though, other parts of the code inside the same class will be not.<br/>
+ * In order to prevent unexpected behaviors, it is advisable to avoid using the same class fields
+ * (unless immutable) in protected and non-protected code, or to call synchronous methods through
+ * routines as well.
  * <p/>
  * Remember also that, in order for the annotation to properly work at run time, you will need to
  * add the following rules to your Proguard file (if employing it for shrinking or obfuscation):

@@ -20,15 +20,15 @@ import java.lang.annotation.Target;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * Through this annotation it is possible to indicate the timeout for a readable result to become
+ * available.
+ * <p/>
  * This annotation is used to decorate methods that are to be invoked in an asynchronous way.<br/>
  * Note that the piece of code inside such methods will be automatically protected so to avoid
  * concurrency issues. Though, other parts of the code inside the same class will be not.<br/>
  * In order to prevent unexpected behaviors, it is advisable to avoid using the same class fields
  * (unless immutable) in protected and non-protected code, or to call synchronous methods through
  * routines as well.
- * <p/>
- * Through this annotation, it is possible to indicate the timeout for a readable result to become
- * available.
  * <p/>
  * Finally, be aware that a method might need to be made accessible in order to be called. That
  * means that, in case a {@link java.lang.SecurityManager} is installed, a security exception might

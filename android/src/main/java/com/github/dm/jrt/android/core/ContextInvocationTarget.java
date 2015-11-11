@@ -138,14 +138,12 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
                 new Creator<ClassContextInvocationTarget>() {
 
                     @SuppressWarnings("unchecked")
-                    public ClassContextInvocationTarget createFromParcel(
-                            @NotNull final Parcel source) {
+                    public ClassContextInvocationTarget createFromParcel(final Parcel source) {
 
                         return new ClassContextInvocationTarget(
                                 (Class<?>) source.readSerializable());
                     }
 
-                    @NotNull
                     public ClassContextInvocationTarget[] newArray(final int size) {
 
                         return new ClassContextInvocationTarget[size];
@@ -225,7 +223,7 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
             return (mTargetClass == type);
         }
 
-        public void writeToParcel(@NotNull final Parcel dest, final int flags) {
+        public void writeToParcel(final Parcel dest, final int flags) {
 
             dest.writeSerializable(mTargetClass);
         }
@@ -245,15 +243,13 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
                 new Creator<ObjectContextInvocationTarget>() {
 
                     @SuppressWarnings("unchecked")
-                    public ObjectContextInvocationTarget createFromParcel(
-                            @NotNull final Parcel source) {
+                    public ObjectContextInvocationTarget createFromParcel(final Parcel source) {
 
                         return new ObjectContextInvocationTarget(
                                 (Class<?>) source.readSerializable(),
                                 source.readArray(ContextInvocationTarget.class.getClassLoader()));
                     }
 
-                    @NotNull
                     public ObjectContextInvocationTarget[] newArray(final int size) {
 
                         return new ObjectContextInvocationTarget[size];
@@ -372,7 +368,7 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
             return 0;
         }
 
-        public void writeToParcel(@NotNull final Parcel dest, final int flags) {
+        public void writeToParcel(final Parcel dest, final int flags) {
 
             dest.writeSerializable(mTargetClass);
             dest.writeArray(mFactoryArgs);

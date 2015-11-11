@@ -211,7 +211,7 @@ public class Channels extends com.github.dm.jrt.core.Channels {
         public static final Creator<ParcelableSelectable> CREATOR =
                 new Creator<ParcelableSelectable>() {
 
-                    public ParcelableSelectable createFromParcel(@NotNull final Parcel source) {
+                    public ParcelableSelectable createFromParcel(final Parcel source) {
 
                         return new ParcelableSelectable(source);
                     }
@@ -250,7 +250,7 @@ public class Channels extends com.github.dm.jrt.core.Channels {
             return 0;
         }
 
-        public void writeToParcel(@NotNull final Parcel dest, final int flags) {
+        public void writeToParcel(final Parcel dest, final int flags) {
 
             dest.writeValue(data);
             dest.writeInt(index);

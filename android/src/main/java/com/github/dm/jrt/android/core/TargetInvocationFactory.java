@@ -140,6 +140,11 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
         return factoryOf(tokenOf(targetInvocation), factoryArgs);
     }
 
+    /**
+     * Returns the factory arguments.
+     *
+     * @return the factory arguments.
+     */
     @NotNull
     public abstract Object[] getFactoryArgs();
 
@@ -166,13 +171,11 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
         public static final Creator<DefaultTargetInvocationFactory> CREATOR =
                 new Creator<DefaultTargetInvocationFactory>() {
 
-                    public DefaultTargetInvocationFactory createFromParcel(
-                            @NotNull final Parcel source) {
+                    public DefaultTargetInvocationFactory createFromParcel(final Parcel source) {
 
                         return new DefaultTargetInvocationFactory(source);
                     }
 
-                    @NotNull
                     public DefaultTargetInvocationFactory[] newArray(final int size) {
 
                         return new DefaultTargetInvocationFactory[size];
@@ -220,7 +223,7 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
             return 0;
         }
 
-        public void writeToParcel(@NotNull final Parcel dest, final int flags) {
+        public void writeToParcel(final Parcel dest, final int flags) {
 
             dest.writeSerializable(mTargetClass);
             dest.writeArray(mFactoryArgs);

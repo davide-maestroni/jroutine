@@ -41,7 +41,7 @@ public class InvocationInterruptedException extends InvocationException {
      *                                        {@code InvocationInterruptedException} or
      *                                        {@code InterruptedException}.
      */
-    public static void ignoreIfPossible(@Nullable final Throwable t) {
+    public static void throwIfInterrupt(@Nullable final Throwable t) {
 
         if (t instanceof InvocationInterruptedException) {
 

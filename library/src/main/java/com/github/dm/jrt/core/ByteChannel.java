@@ -43,7 +43,7 @@ public class ByteChannel {
     /**
      * The default buffer size in number of bytes.
      */
-    public static final int DEFAULT_BUFFER_SIZE = 1024 << 3;
+    public static final int DEFAULT_BUFFER_SIZE = 1024 << 4;
 
     /**
      * The default core pool size.
@@ -279,7 +279,7 @@ public class ByteChannel {
         public abstract void close();
 
         @Override
-        public abstract void mark(int readlimit);
+        public abstract void mark(int readLimit);
 
         @Override
         public abstract void reset();
@@ -593,12 +593,12 @@ public class ByteChannel {
         }
 
         @Override
-        public void mark(final int readlimit) {
+        public void mark(final int readLimit) {
 
             synchronized (mMutex) {
 
                 final int index = (mMarkIndex = mIndex);
-                mStreams.get(index).mark(readlimit);
+                mStreams.get(index).mark(readLimit);
             }
         }
 
@@ -999,7 +999,7 @@ public class ByteChannel {
         }
 
         @Override
-        public void mark(final int readlimit) {
+        public void mark(final int readLimit) {
 
             synchronized (mMutex) {
 

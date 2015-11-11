@@ -463,12 +463,11 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         public static final Creator<Data> CREATOR = new Creator<Data>() {
 
-            public Data createFromParcel(@NotNull final Parcel source) {
+            public Data createFromParcel(final Parcel source) {
 
                 return new Data();
             }
 
-            @NotNull
             public Data[] newArray(final int size) {
 
                 return new Data[size];
@@ -480,7 +479,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
             return 0;
         }
 
-        public void writeToParcel(@NotNull final Parcel dest, final int flags) {
+        public void writeToParcel(final Parcel dest, final int flags) {
 
         }
     }
@@ -498,14 +497,13 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         public static final Creator<MyParcelable> CREATOR = new Creator<MyParcelable>() {
 
-            public MyParcelable createFromParcel(@NotNull final Parcel source) {
+            public MyParcelable createFromParcel(final Parcel source) {
 
                 final int x = source.readInt();
                 final int y = source.readInt();
                 return new MyParcelable(x, y);
             }
 
-            @NotNull
             public MyParcelable[] newArray(final int size) {
 
                 return new MyParcelable[0];
@@ -553,7 +551,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
             return 0;
         }
 
-        public void writeToParcel(@NotNull final Parcel dest, final int flags) {
+        public void writeToParcel(final Parcel dest, final int flags) {
 
             dest.writeInt(mX);
             dest.writeInt(mY);

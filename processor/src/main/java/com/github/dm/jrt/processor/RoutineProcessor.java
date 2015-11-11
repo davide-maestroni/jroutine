@@ -356,7 +356,7 @@ public class RoutineProcessor extends AbstractProcessor {
     @SuppressWarnings("UnusedParameters")
     protected String buildInputOptions(@NotNull final TypeElement annotationElement,
             @NotNull final TypeElement element, @NotNull final Element targetElement,
-            final ExecutableElement methodElement, final InputMode inputMode) {
+            @NotNull final ExecutableElement methodElement, @Nullable final InputMode inputMode) {
 
         return ((inputMode == InputMode.CHANNEL) || (inputMode == InputMode.COLLECTION))
                 ? ".orderByCall()" : "";

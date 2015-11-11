@@ -1119,7 +1119,7 @@ public class RoutineBuilders {
 
             } catch (final InterruptedException e) {
 
-                InvocationInterruptedException.ignoreIfPossible(e);
+                InvocationInterruptedException.throwIfInterrupt(e);
             }
         }
 
@@ -1153,7 +1153,7 @@ public class RoutineBuilders {
 
             } catch (final InterruptedException e) {
 
-                InvocationInterruptedException.ignoreIfPossible(e);
+                InvocationInterruptedException.throwIfInterrupt(e);
             }
         }
 

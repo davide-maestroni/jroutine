@@ -32,8 +32,8 @@ Among the many open source libraries, [RxJava][rxjava] is one of the preferred c
 Although [Reactive Extensions][reactivex] is a great tool for managing events and composing event listeners, it has not been clearly designed with parallel programming in mind.
 In fact, RxJava shows a few limits in this respect.
 The framework has once been compared, with a fitting example, to a line of domino pieces: once the first tile falls down, all the others are to follow, and there is no way to stop them other than to cut the line.
-Each time a background operation is required, the whole chain of observables/subscribers must be rebuilt from scratch, the chained functions are called recursively and many objects are created in the while.
-While such design works great for common events, it does not adapt so well to background tasks.
+Each time a background operation is required, the whole chain of observables/subscribers must be rebuilt from scratch and the chained functions get called recursively.
+While such design works great for simple events, it does not adapt so well to background tasks.
 After all, a network request does not really fit in the definition of "event".
 
 RxJava is still one of the best library for handling events, though, something specifically designed is needed to make parallel programming easily accessible and manageable.
@@ -74,6 +74,36 @@ For anything else [GitHub][github] is a great source of inspiration.
 ## Usage
 
 Please have a look at the [Wiki][wiki].
+
+## Code generation
+
+In order to activate the proxy code generation through annotation pre-processors in a Java project, it is sufficient to include the proper artifact ([see below][artifacts]).
+
+Note, however, that in an Android project explicit use of an APT plugin is required. For example, the Gradle build file can be modified as follows:
+
+```
+buildscript {
+    ...
+    dependencies {
+        ...
+        classpath 'com.uphyca.gradle:gradle-android-apt-plugin:0.9.4'
+        ...
+    }
+}
+
+...
+apply plugin: 'android-apt'
+...
+
+dependencies {
+    ...
+    apt 'com.github.davide-maestroni:jroutine-processor:X.X.X'
+    apt 'com.github.davide-maestroni:jroutine-androidprocessor:X.X.X'
+    ...
+    compile 'com.github.davide-maestroni:jroutine-androidproxy:X.X.X'
+    ...
+}
+```
 
 ## Documentation
 
@@ -145,6 +175,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 
 **IT'S OPEN DUDE!**
 
+[artifacts]:#artifacts
 [apache license]:http://www.apache.org/licenses/LICENSE-2.0
 [eclipse license]:https://www.eclipse.org/legal/epl-v10.html
 [lgpl license]:http://www.gnu.org/licenses/lgpl.html

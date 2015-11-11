@@ -116,7 +116,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
 
         } catch (final Throwable t) {
 
-            InvocationInterruptedException.ignoreIfPossible(t);
+            InvocationInterruptedException.throwIfInterrupt(t);
             getLogger().wrn(t, "ignoring exception while destroying invocation instance");
         }
 

@@ -551,7 +551,7 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
 
                         error = new InvocationDeadlockException(
                                 "cannot wait for invocation instances on a synchronous runner "
-                                        + "thread");
+                                        + "thread\nTry increasing the max number of instances");
 
                     } else {
 

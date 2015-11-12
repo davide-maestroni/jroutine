@@ -158,7 +158,7 @@ class DynamicScheduledThreadExecutor extends ScheduledThreadPoolExecutor {
 
         @Override
         public boolean offer(final Runnable runnable, final long timeout,
-                @NotNull final TimeUnit timeUnit) throws InterruptedException {
+                final TimeUnit timeUnit) throws InterruptedException {
 
             return false;
         }

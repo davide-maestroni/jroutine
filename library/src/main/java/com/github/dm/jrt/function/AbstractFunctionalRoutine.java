@@ -80,7 +80,7 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
 
     @NotNull
     public FunctionalRoutine<IN, OUT> thenAsyncFilter(
-            @NotNull final com.github.dm.jrt.function.Predicate<? super OUT> predicate) {
+            @NotNull final Predicate<? super OUT> predicate) {
 
         return andThenFilter(predicate, DelegationType.ASYNC);
     }

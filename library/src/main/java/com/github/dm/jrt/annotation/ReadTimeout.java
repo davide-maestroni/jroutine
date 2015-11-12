@@ -40,7 +40,6 @@ import java.util.concurrent.TimeUnit;
  *     <code>
  *
  *         -keepattributes RuntimeVisibleAnnotations
- *
  *         -keepclassmembers class ** {
  *              &#64;com.github.dm.jrt.annotation.ReadTimeout *;
  *         }

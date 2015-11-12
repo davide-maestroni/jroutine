@@ -26,21 +26,12 @@ import org.jetbrains.annotations.Nullable;
 public class InvocationDeadlockException extends DeadlockException {
 
     /**
-     * Constructor.<br/>
-     * A default message will be set.
-     */
-    public InvocationDeadlockException() {
-
-        this("cannot wait while no invocation instance is available");
-    }
-
-    /**
      * Constructor.
      *
      * @param message the error message.
      */
     public InvocationDeadlockException(@Nullable final String message) {
 
-        super(message + "\nTry increasing the max number of instances");
+        super(message);
     }
 }

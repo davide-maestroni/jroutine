@@ -29,6 +29,6 @@ public class OutputDeadlockException extends DeadlockException {
      */
     public OutputDeadlockException(@Nullable final String message) {
 
-        super(message + "\nTry increasing the timeout or the max number of outputs");
+        super(message);
     }
 }

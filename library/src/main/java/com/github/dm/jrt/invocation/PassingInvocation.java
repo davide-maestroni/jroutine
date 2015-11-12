@@ -41,6 +41,7 @@ public class PassingInvocation<DATA> extends FilterInvocation<DATA, DATA> {
      * @param <DATA> the data type.
      * @return the factory.
      */
+    @NotNull
     @SuppressWarnings("unchecked")
     public static <DATA> InvocationFactory<DATA, DATA> factoryOf() {
 

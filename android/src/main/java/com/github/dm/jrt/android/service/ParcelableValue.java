@@ -16,6 +16,8 @@ package com.github.dm.jrt.android.service;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.jetbrains.annotations.Nullable;
+
 /**
  * Parcelable implementation wrapping a generic value.<br/>
  * Note that specified object must be among the ones supported by the
@@ -48,7 +50,7 @@ class ParcelableValue implements Parcelable {
      *
      * @param value the wrapped value.
      */
-    ParcelableValue(final Object value) {
+    ParcelableValue(@Nullable final Object value) {
 
         mValue = value;
     }

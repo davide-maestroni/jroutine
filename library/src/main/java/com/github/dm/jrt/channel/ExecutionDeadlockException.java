@@ -23,21 +23,12 @@ import org.jetbrains.annotations.Nullable;
 public class ExecutionDeadlockException extends DeadlockException {
 
     /**
-     * Constructor.<br/>
-     * A default message will be set.
-     */
-    public ExecutionDeadlockException() {
-
-        this("cannot wait on the invocation runner thread: " + Thread.currentThread());
-    }
-
-    /**
      * Constructor.
      *
      * @param message the error message.
      */
     public ExecutionDeadlockException(@Nullable final String message) {
 
-        super(message + "\nTry binding the output channel or employing a different runner");
+        super(message);
     }
 }

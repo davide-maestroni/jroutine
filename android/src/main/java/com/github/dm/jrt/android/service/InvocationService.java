@@ -622,7 +622,7 @@ public class InvocationService extends Service {
 
                     if (outMessenger == null) {
 
-                        logger.wrn("avoid aborting since reply messenger is null");
+                        logger.err("avoid aborting since reply messenger is null");
                         return;
                     }
 

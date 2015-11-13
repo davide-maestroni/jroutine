@@ -156,6 +156,7 @@ class InvocationOutputConsumer<OUT> extends TemplateOutputConsumer<OUT> {
      *
      * @return the result object.
      */
+    @NotNull
     InvocationResult<OUT> createResult() {
 
         // Need to create a new instance each time to trick the loader manager into thinking that a

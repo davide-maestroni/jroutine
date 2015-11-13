@@ -114,7 +114,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
             @Override
             public void close() {
 
-                // Prevents closing
+                // Preventing closing
             }
         };
         final int maxInputSize = mMaxInput;
@@ -366,7 +366,8 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
             mInputCount -= count;
             throw new InputDeadlockException(
-                    "cannot wait on the invocation runner thread: " + Thread.currentThread());
+                    "cannot wait on the invocation runner thread: " + Thread.currentThread()
+                            + "\nTry increasing the timeout or the max number of inputs");
         }
 
         try {

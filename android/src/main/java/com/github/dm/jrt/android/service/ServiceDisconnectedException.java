@@ -43,6 +43,7 @@ public class ServiceDisconnectedException extends RoutineException {
      *
      * @return the component name.
      */
+    @Nullable
     public ComponentName getName() {
 
         return mName;

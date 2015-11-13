@@ -770,6 +770,8 @@ public class Functions {
         private final BiConsumerWrapper<? super List<? extends IN>, ? super ResultChannel<OUT>>
                 mConsumer;
 
+        private final FunctionInvocation<IN, OUT> mInvocation;
+
         /**
          * Constructor.
          *
@@ -786,21 +788,22 @@ public class Functions {
             }
 
             mConsumer = consumer;
+            mInvocation = new FunctionInvocation<IN, OUT>() {
+
+                @Override
+                protected void onCall(@NotNull final List<? extends IN> inputs,
+                        @NotNull final ResultChannel<OUT> result) {
+
+                    consumer.accept(inputs, result);
+                }
+            };
         }
 
         @NotNull
         @Override
         public Invocation<IN, OUT> newInvocation() {
 
-            return new FunctionInvocation<IN, OUT>() {
-
-                @Override
-                protected void onCall(@NotNull final List<? extends IN> inputs,
-                        @NotNull final ResultChannel<OUT> result) {
-
-                    mConsumer.accept(inputs, result);
-                }
-            };
+            return mInvocation;
         }
 
         @Override
@@ -892,6 +895,8 @@ public class Functions {
 
         private final FunctionWrapper<? super List<? extends IN>, OUT> mFunction;
 
+        private final FunctionInvocation<IN, OUT> mInvocation;
+
         /**
          * Constructor.
          *
@@ -907,21 +912,22 @@ public class Functions {
             }
 
             mFunction = function;
+            mInvocation = new FunctionInvocation<IN, OUT>() {
+
+                @Override
+                protected void onCall(@NotNull final List<? extends IN> inputs,
+                        @NotNull final ResultChannel<OUT> result) {
+
+                    result.pass(function.apply(inputs));
+                }
+            };
         }
 
         @NotNull
         @Override
         public Invocation<IN, OUT> newInvocation() {
 
-            return new FunctionInvocation<IN, OUT>() {
-
-                @Override
-                protected void onCall(@NotNull final List<? extends IN> inputs,
-                        @NotNull final ResultChannel<OUT> result) {
-
-                    result.pass(mFunction.apply(inputs));
-                }
-            };
+            return mInvocation;
         }
 
         @Override

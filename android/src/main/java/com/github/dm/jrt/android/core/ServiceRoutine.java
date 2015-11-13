@@ -202,7 +202,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
          * @param serviceConfiguration    the service configuration.
          * @param logger                  the routine logger.
          */
-        private ServiceChannel(boolean isParallel, @NotNull final ServiceContext context,
+        private ServiceChannel(final boolean isParallel, @NotNull final ServiceContext context,
                 @NotNull final TargetInvocationFactory<IN, OUT> target,
                 @NotNull final InvocationConfiguration invocationConfiguration,
                 @NotNull final ServiceConfiguration serviceConfiguration,
@@ -416,7 +416,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
 
                         } catch (final Throwable t) {
 
-                            InvocationInterruptedException.ignoreIfPossible(t);
+                            InvocationInterruptedException.throwIfInterrupt(t);
                             mLogger.wrn(t, "unbinding failed (maybe the connection was leaked...)");
                         }
                     }

@@ -178,7 +178,7 @@ class LocalQueue {
         mLast = (last < first) ? last : last + shift;
     }
 
-    private void removeExecution(final Execution execution) {
+    private void removeExecution(@NotNull final Execution execution) {
 
         final Execution[] executions = mExecutions;
         final int length = executions.length;

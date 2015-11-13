@@ -19,6 +19,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Through this annotation it is possible to indicate that the result returned by the target object
+ * method must be dispatched in an asynchronous way.<br/>
+ * If, on the contrary, this annotation is missing, be aware that the proxy method will block until
+ * the target one completes, even if no result is expected (that is, the method returns a void
+ * result).
+ * <p/>
  * This annotation is used to decorate methods that are to be invoked in an asynchronous way.<br/>
  * Note that the piece of code inside such methods will be automatically protected so to avoid
  * concurrency issues. Though, other parts of the code inside the same class will be not.<br/>
@@ -68,7 +74,6 @@ import java.lang.annotation.Target;
  *     <code>
  *
  *         -keepattributes RuntimeVisibleAnnotations
- *
  *         -keepclassmembers class ** {
  *              &#64;com.github.dm.jrt.annotation.Output *;
  *         }

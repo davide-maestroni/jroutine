@@ -205,7 +205,6 @@ public interface FunctionalRoutine<IN, OUT>
     <AFTER> FunctionalRoutine<IN, AFTER> thenParallelMap(
             @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
 
-
     /**
      * Concatenates a functional routine based on the specified invocation to this one.
      * <p/>
@@ -290,7 +289,6 @@ public interface FunctionalRoutine<IN, OUT>
     @NotNull
     <AFTER> FunctionalRoutine<IN, AFTER> thenSyncMap(
             @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
-
 
     /**
      * Concatenates a functional routine based on the specified invocation to this one.

@@ -62,7 +62,7 @@ public abstract class ClassToken<TYPE> {
             throw new NullPointerException("the classification raw type must not be null");
         }
 
-        final ClassToken<TYPE> classToken = new GenericClassToken<TYPE>();
+        final ClassToken<TYPE> classToken = new DefaultClassToken<TYPE>();
         classToken.mGenericType = rawClass;
         classToken.mRawClass = rawClass;
         return classToken;
@@ -214,11 +214,11 @@ public abstract class ClassToken<TYPE> {
     }
 
     /**
-     * Generic class token implementation.
+     * Default class token implementation.
      *
      * @param <TYPE> the class type.
      */
-    private static class GenericClassToken<TYPE> extends ClassToken<TYPE> {
+    private static class DefaultClassToken<TYPE> extends ClassToken<TYPE> {
 
     }
 }

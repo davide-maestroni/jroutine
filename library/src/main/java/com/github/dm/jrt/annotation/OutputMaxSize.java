@@ -19,15 +19,15 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Through this annotation it is possible to indicate the maximum number of data buffered inside
+ * the output channel.
+ * <p/>
  * This annotation is used to decorate methods that are to be invoked in an asynchronous way.<br/>
  * Note that the piece of code inside such methods will be automatically protected so to avoid
  * concurrency issues. Though, other parts of the code inside the same class will be not.<br/>
  * In order to prevent unexpected behaviors, it is advisable to avoid using the same class fields
  * (unless immutable) in protected and non-protected code, or to call synchronous methods through
  * routines as well.
- * <p/>
- * Through this annotation, it is possible to indicate the maximum number of data buffered inside
- * the output channel.
  * <p/>
  * Finally, be aware that a method might need to be made accessible in order to be called. That
  * means that, in case a {@link java.lang.SecurityManager} is installed, a security exception might
@@ -39,7 +39,6 @@ import java.lang.annotation.Target;
  *     <code>
  *
  *         -keepattributes RuntimeVisibleAnnotations
- *
  *         -keepclassmembers class ** {
  *              &#64;com.github.dm.jrt.annotation.OutputMaxSize *;
  *         }

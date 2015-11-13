@@ -81,7 +81,6 @@ import java.lang.annotation.Target;
  *     <code>
  *
  *         -keepattributes RuntimeVisibleAnnotations
- *
  *         -keepclassmembers class ** {
  *              &#64;com.github.dm.jrt.proxy.annotation.Proxy *;
  *         }

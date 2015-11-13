@@ -145,7 +145,7 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
 
         } catch (final Throwable t) {
 
-            InvocationInterruptedException.ignoreIfPossible(t);
+            InvocationInterruptedException.throwIfInterrupt(t);
             mLogger.wrn(t, "ignoring exception while destroying invocation instance");
         }
 
@@ -198,6 +198,7 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
      *
      * @return the factory.
      */
+    @NotNull
     FunctionContextInvocationFactory<IN, OUT> getInvocationFactory() {
 
         return mInvocationFactory;

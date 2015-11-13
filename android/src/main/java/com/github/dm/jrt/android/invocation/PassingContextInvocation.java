@@ -42,6 +42,7 @@ public class PassingContextInvocation<DATA> extends FilterContextInvocation<DATA
      * @param <DATA> the data type.
      * @return the factory.
      */
+    @NotNull
     @SuppressWarnings("unchecked")
     public static <DATA> ContextInvocationFactory<DATA, DATA> factoryOf() {
 

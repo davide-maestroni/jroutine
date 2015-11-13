@@ -26,9 +26,10 @@ public interface Execution extends Runnable {
     /**
      * Checks if this execution might be canceled in the future.<br/>
      * Note that this is just an hint for the runner: if false is returned, the runner might not be
-     * able to cancel the execution when requested.
+     * able to cancel the execution when requested. On the other side, the runner may be unable to
+     * cancel the execution anyway, based on the internal status or specific implementation.
      *
-     * @return whether the execution is cancelable.
+     * @return whether the execution should be cancelable.
      */
     boolean mayBeCanceled();
 }

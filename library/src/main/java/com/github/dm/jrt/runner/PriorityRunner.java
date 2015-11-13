@@ -119,9 +119,9 @@ public class PriorityRunner {
         }
     }
 
-    private static int compareLong(long x, long y) {
+    private static int compareLong(final long l1, final long l2) {
 
-        return (x < y) ? -1 : ((x == y) ? 0 : 1);
+        return (l1 < l2) ? -1 : ((l1 == l2) ? 0 : 1);
     }
 
     /**
@@ -238,12 +238,12 @@ public class PriorityRunner {
         // Just don't care...
         private static final long serialVersionUID = -1;
 
-        public int compare(final PriorityExecution o1, final PriorityExecution o2) {
+        public int compare(final PriorityExecution e1, final PriorityExecution e2) {
 
-            final int thisPriority = o1.mPriority;
-            final long thisAge = o1.mAge;
-            final int thatPriority = o2.mPriority;
-            final long thatAge = o2.mAge;
+            final int thisPriority = e1.mPriority;
+            final long thisAge = e1.mAge;
+            final int thatPriority = e2.mPriority;
+            final long thatAge = e2.mAge;
 
             final int compare = compareLong(thatAge + thatPriority, thisAge + thisPriority);
             return (compare == 0) ? compareLong(thatAge, thisAge) : compare;

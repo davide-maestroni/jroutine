@@ -44,6 +44,11 @@ android {
         }
     }
 
+    dexOptions {
+        preDexLibraries false
+        javaMaxHeapSize "4G"
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_5
         targetCompatibility JavaVersion.VERSION_1_5

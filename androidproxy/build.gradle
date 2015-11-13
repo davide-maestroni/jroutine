@@ -45,6 +45,11 @@ android {
         }
     }
 
+    dexOptions {
+        preDexLibraries false
+        javaMaxHeapSize "4G"
+    }
+
     packagingOptions {
         exclude 'META-INF/services/javax.annotation.processing.Processor'
     }

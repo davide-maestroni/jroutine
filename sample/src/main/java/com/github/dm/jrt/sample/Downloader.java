@@ -39,14 +39,16 @@ import static com.github.dm.jrt.util.TimeDuration.seconds;
  */
 public class Downloader {
 
+    private static final Runner sReadRunner = Runners.poolRunner();
+
+    private static final Runner sWriteRunner = Runners.poolRunner(1);
+
     private final HashSet<URI> mDownloaded = new HashSet<URI>();
 
     private final HashMap<URI, OutputChannel<Boolean>> mDownloads =
             new HashMap<URI, OutputChannel<Boolean>>();
 
     private final Routine<URI, ByteBuffer> mReadConnection;
-
-    private final Runner mWriteRunner = Runners.poolRunner(1);
 
     /**
      * Constructor.
@@ -57,8 +59,11 @@ public class Downloader {
 
         // The read connection invocation is stateless so we can just use a single instance of it
         mReadConnection = JRoutine.on(new ReadConnection()).invocations()
-                // By setting the maximum number of parallel invocations we effectively limit the
-                // number of parallel downloads
+                // Since each download may take a long time to complete, we use a dedicated runner
+                .withRunner(sReadRunner)
+                        // By setting the maximum number of parallel invocations we effectively
+                        // limit the
+                        // number of parallel downloads
                 .withMaxInstances(maxParallelDownloads).set().buildRoutine();
     }
 
@@ -155,7 +160,7 @@ public class Downloader {
                             // Since we want to limit the number of allocated chunks, we have to
                             // make the writing happen in a dedicated runner, so that waiting for
                             // available space becomes allowed
-                            .withRunner(mWriteRunner)
+                            .withRunner(sWriteRunner)
                             .withInputMaxSize(32)
                             .withInputTimeout(seconds(30))
                             .set()

@@ -1,19 +1,15 @@
-# Cannot enable Docker...
-sudo: required
+# Enable Docker
+sudo: false
 
 # Android environment setup
 language: android
 android:
   components:
-    # Platform tools
-    - platform-tools
-    - tools
-
     # The BuildTools version
-    - build-tools-23.0.2
+    - build-tools-22.0.1
 
     # The SDK version
-    - android-23
+    - android-22
 
     # Extras
     - extra-android-support
@@ -25,8 +21,6 @@ env:
     - ANDROID_SDKS=android-10            ANDROID_TARGET=android-10  ANDROID_ABI=armeabi
     - ANDROID_SDKS=android-19,sysimg-19  ANDROID_TARGET=android-19  ANDROID_ABI=armeabi-v7a
     - ANDROID_SDKS=android-21,sysimg-21  ANDROID_TARGET=android-21  ANDROID_ABI=armeabi-v7a
-  global:
-    MALLOC_ARENA_MAX=2
 
 # Emulator Management: Create, Start and Wait
 before_install:

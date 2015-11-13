@@ -23,12 +23,12 @@ version = project.getProperty('releaseVersion')
 archivesBaseName = "${project.parent.name}-${project.name}"
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion '23.0.2'
+    compileSdkVersion 22
+    buildToolsVersion '22.0.1'
 
     defaultConfig {
         minSdkVersion 4
-        targetSdkVersion 23
+        targetSdkVersion 22
         versionCode Integer.parseInt(project.getProperty('releaseVersionCode'))
         versionName version
     }
@@ -58,7 +58,7 @@ android {
 dependencies {
     androidTestCompile 'org.assertj:assertj-core:1.7.1'
     apt project(':androidprocessor')
-    compile 'com.android.support:support-v4:23.1.1'
+    compile 'com.android.support:support-v4:22.2.1'
 }
 conditionalDependencies {
     compile name: 'proxy', artifact: { "${it.parent.name}-${it.name}" }

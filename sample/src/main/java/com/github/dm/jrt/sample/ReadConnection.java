@@ -40,6 +40,8 @@ public class ReadConnection extends FilterInvocation<URI, ByteBuffer> {
     @SuppressWarnings("StatementWithEmptyBody")
     public void onInput(final URI uri, @NotNull final ResultChannel<ByteBuffer> result) {
 
+        InputStream inputStream = null;
+
         try {
 
             final URLConnection connection = uri.toURL().openConnection();
@@ -54,7 +56,7 @@ public class ReadConnection extends FilterInvocation<URI, ByteBuffer> {
                 }
             }
 
-            final InputStream inputStream = connection.getInputStream();
+            inputStream = connection.getInputStream();
             // We employ the utility class dedicated to the optimized transfer of bytes through a
             // routine channel
             final BufferOutputStream outputStream =
@@ -75,6 +77,19 @@ public class ReadConnection extends FilterInvocation<URI, ByteBuffer> {
         } catch (final IOException e) {
 
             throw new InvocationException(e);
+
+        } finally {
+
+            if (inputStream != null) {
+
+                try {
+
+                    inputStream.close();
+
+                } catch (final IOException ignored) {
+
+                }
+            }
         }
     }
 }

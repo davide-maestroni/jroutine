@@ -328,7 +328,7 @@ public class ParcelableByteChannel {
 
                             } catch (final IOException ignored) {
 
-                                // It should never happens...
+                                // It should never happen...
                             }
                         }
 
@@ -381,7 +381,7 @@ public class ParcelableByteChannel {
 
                 } catch (final IOException ignored) {
 
-                    // It should never happens...
+                    // It should never happen...
                     dest.writeByteArray(EMPTY_ARRAY);
                 }
 
@@ -535,7 +535,7 @@ public class ParcelableByteChannel {
 
             if (channel == null) {
 
-                throw new NullPointerException("the input channel must not be null");
+                throw new NullPointerException("the I/O channel must not be null");
             }
 
             mChannel = channel;

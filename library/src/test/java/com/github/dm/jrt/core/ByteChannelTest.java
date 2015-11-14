@@ -786,8 +786,8 @@ public class ByteChannelTest {
 
         final IOChannel<ByteBuffer, ByteBuffer> channel = JRoutine.io().buildChannel();
         final ByteChannel byteChannel = ByteChannel.byteChannel();
-        final BufferOutputStream stream = byteChannel.passTo(channel);
-        assertThat(byteChannel.passTo(channel)).isSameAs(stream);
+        final BufferOutputStream stream = byteChannel.passTo(channel.asInput());
+        assertThat(byteChannel.passTo(channel.asInput())).isSameAs(stream);
     }
 
     @Test

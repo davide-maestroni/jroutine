@@ -74,8 +74,8 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
     /**
      * Returns a map of input channels accepting the input data identified by the specified indexes.
      * <br/>
-     * Note that the returned channels must be closed in order to ensure the completion of the
-     * invocation lifecycle.
+     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
+     * completion of the invocation lifecycle.
      *
      * @param channel the selectable channel.
      * @param indexes the array of indexes.
@@ -102,8 +102,8 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
     /**
      * Returns a map of input channels accepting the input data identified by the specified indexes.
      * <br/>
-     * Note that the returned channels must be closed in order to ensure the completion of the
-     * invocation lifecycle.
+     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
+     * completion of the invocation lifecycle.
      *
      * @param channel the selectable channel.
      * @param indexes the iterable returning the channel indexes.
@@ -129,8 +129,8 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
     /**
      * Returns a map of input channels accepting the input data identified by the specified indexes.
      * <br/>
-     * Note that the returned channels must be closed in order to ensure the completion of the
-     * invocation lifecycle.
+     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
+     * completion of the invocation lifecycle.
      *
      * @param startIndex the selectable start index.
      * @param rangeSize  the size of the range of indexes (must be positive).

@@ -43,9 +43,9 @@ public interface Runner {
      * Cancels the specified execution if not already run.<br/>
      * Note that the method will have no effect in case the runner does not maintain a queue or the
      * specified execution has been already processed at the moment of the call.<br/>
-     * Note also that, in case the same execution has been added more than one time to the runner
-     * queue, when the method returns, the queue will not contain the execution instance anymore,
-     * with the consequence that the {@link Execution#run()} method will never be called.
+     * Note also that, in case the same execution has been added more than once to the runner queue,
+     * when the method returns, the queue will not contain the execution instance anymore, with the
+     * consequence that the {@link Execution#run()} method will never be called.
      * <p/>
      * The implementation of this method is optional, still, it may greatly increase the performance
      * by avoiding to start invocations which are already aborted. The runner implementation can

@@ -13,6 +13,7 @@
  */
 package com.github.dm.jrt.core;
 
+import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InputChannel;
 import com.github.dm.jrt.util.WeakIdentityHashMap;
 
@@ -169,9 +170,7 @@ public class ByteChannel {
     }
 
     /**
-     * Returns the output stream used to write bytes into the specified channel.<br/>
-     * Note that, if the method is called more than one time, passing the same input channel, it
-     * will return the same output stream.
+     * Returns the output stream used to write bytes into the specified channel.
      *
      * @param channel the input channel to which pass the data.
      * @return the output stream.
@@ -195,6 +194,20 @@ public class ByteChannel {
         }
 
         return stream;
+    }
+
+    /**
+     * Returns the output stream used to write bytes into the specified channel.<br/>
+     * Note that the channel will be automatically closed as soon as the returned output stream is
+     * closed.
+     *
+     * @param channel the I/O channel to which pass the data.
+     * @return the output stream.
+     */
+    @NotNull
+    public BufferOutputStream passTo(@NotNull final IOChannel<? super ByteBuffer, ?> channel) {
+
+        return new IOBufferOutputStream(passTo(channel.asInput()), channel);
     }
 
     @NotNull
@@ -307,6 +320,73 @@ public class ByteChannel {
 
         @Override
         public abstract void close();
+    }
+
+    /**
+     * Implementation of a buffer output stream automatically closing the output I/O channel.
+     */
+    private static class IOBufferOutputStream extends BufferOutputStream {
+
+        private final IOChannel<? super ByteBuffer, ?> mIOChannel;
+
+        private final BufferOutputStream mOutputStream;
+
+        /**
+         * Constructor.
+         *
+         * @param wrapped the wrapped stream.
+         * @param channel the I/O channel.
+         */
+        private IOBufferOutputStream(@NotNull final BufferOutputStream wrapped,
+                @NotNull final IOChannel<? super ByteBuffer, ?> channel) {
+
+            mOutputStream = wrapped;
+            mIOChannel = channel;
+        }
+
+        @Override
+        public int write(@NotNull final InputStream in) throws IOException {
+
+            return mOutputStream.write(in);
+        }
+
+        @Override
+        public void write(final int b) throws IOException {
+
+            mOutputStream.write(b);
+        }
+
+        @Override
+        public void write(@NotNull final byte[] b) throws IOException {
+
+            mOutputStream.write(b);
+        }
+
+        @Override
+        public void write(@NotNull final byte[] b, final int off, final int len) throws
+                IOException {
+
+            mOutputStream.write(b, off, len);
+        }
+
+        @Override
+        public void flush() {
+
+            mOutputStream.flush();
+        }
+
+        @Override
+        public void close() {
+
+            try {
+
+                mOutputStream.close();
+
+            } finally {
+
+                mIOChannel.close();
+            }
+        }
     }
 
     /**
@@ -1045,6 +1125,19 @@ public class ByteChannel {
             mChannel = channel;
         }
 
+        @NotNull
+        private ByteBuffer getBuffer() {
+
+            final ByteBuffer byteBuffer = mBuffer;
+
+            if (byteBuffer != null) {
+
+                return byteBuffer;
+            }
+
+            return (mBuffer = acquire());
+        }
+
         /**
          * Writes some bytes into the output stream by reading them from the specified input stream.
          *
@@ -1273,19 +1366,6 @@ public class ByteChannel {
                 }
 
             } while (written < len);
-        }
-
-        @NotNull
-        private ByteBuffer getBuffer() {
-
-            final ByteBuffer byteBuffer = mBuffer;
-
-            if (byteBuffer != null) {
-
-                return byteBuffer;
-            }
-
-            return (mBuffer = acquire());
         }
     }
 }

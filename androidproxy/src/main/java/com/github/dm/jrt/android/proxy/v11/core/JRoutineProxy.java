@@ -36,7 +36,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * Created by davide-maestroni on 05/06/2015.
  *
  * @see com.github.dm.jrt.android.annotation Android Annotations
- * @see com.github.dm.jrt.android.proxy.annotation.V11Proxy V11Proxy
+ * @see com.github.dm.jrt.android.proxy.annotation.LoaderProxy LoaderProxy
  * @see com.github.dm.jrt.annotation Annotations
  */
 @SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS",

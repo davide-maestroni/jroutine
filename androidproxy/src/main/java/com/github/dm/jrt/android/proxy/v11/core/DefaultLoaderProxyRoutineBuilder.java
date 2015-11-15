@@ -15,7 +15,7 @@ package com.github.dm.jrt.android.proxy.v11.core;
 
 import com.github.dm.jrt.android.builder.LoaderConfiguration;
 import com.github.dm.jrt.android.core.ContextInvocationTarget;
-import com.github.dm.jrt.android.proxy.annotation.V11Proxy;
+import com.github.dm.jrt.android.proxy.annotation.LoaderProxy;
 import com.github.dm.jrt.android.proxy.builder.AbstractLoaderProxyObjectBuilder;
 import com.github.dm.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
@@ -85,10 +85,10 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
                     "the specified class is not an interface: " + itf.getName());
         }
 
-        if (!itf.isAnnotationPresent(V11Proxy.class)) {
+        if (!itf.isAnnotationPresent(LoaderProxy.class)) {
 
             throw new IllegalArgumentException(
-                    "the specified class is not annotated with " + V11Proxy.class.getName() + ": "
+                    "the specified class is not annotated with " + LoaderProxy.class.getName() + ": "
                             + itf.getName());
         }
 
@@ -238,7 +238,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
                 final LoaderContext context = mContext;
                 final ContextInvocationTarget<?> target = mTarget;
                 final Class<? super TYPE> interfaceClass = mInterfaceClass;
-                final V11Proxy annotation = interfaceClass.getAnnotation(V11Proxy.class);
+                final LoaderProxy annotation = interfaceClass.getAnnotation(LoaderProxy.class);
                 String packageName = annotation.classPackage();
 
                 if (packageName.equals(Proxy.DEFAULT)) {

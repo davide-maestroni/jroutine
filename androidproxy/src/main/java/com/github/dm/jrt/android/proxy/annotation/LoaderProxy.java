@@ -41,7 +41,7 @@ import java.lang.annotation.Target;
  *
  *         -keepattributes RuntimeVisibleAnnotations
  *         -keepclassmembers class ** {
- *              &#64;com.github.dm.jrt.android.proxy.annotation.V11Proxy *;
+ *              &#64;com.github.dm.jrt.android.proxy.annotation.LoaderProxy *;
  *         }
  *     </code>
  * </pre>
@@ -64,12 +64,12 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface V11Proxy {
+public @interface LoaderProxy {
 
     /**
      * Constant indicating the default generated class name prefix.
      */
-    String DEFAULT_CLASS_PREFIX = "V11Proxy_";
+    String DEFAULT_CLASS_PREFIX = "LoaderProxy_";
 
     /**
      * Constant indicating the default generated class name suffix.

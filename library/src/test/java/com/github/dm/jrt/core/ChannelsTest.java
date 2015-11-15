@@ -59,11 +59,11 @@ public class ChannelsTest {
                 JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         final InvocationChannel<Integer, Integer> channel2 =
                 JRoutine.on(PassingInvocation.<Integer>factoryOf()).asyncInvoke().orderByCall();
-        Channels.<Object>combine(channel1, channel2)
+        Channels.combine(channel1, channel2)
                 .pass(new Selectable<String>("test1", 0))
                 .pass(new Selectable<Integer>(1, 1))
                 .close();
-        Channels.<Object>combine(3, channel1, channel2)
+        Channels.combine(3, channel1, channel2)
                 .pass(new Selectable<String>("test2", 3))
                 .pass(new Selectable<Integer>(2, 4))
                 .close();

@@ -30,8 +30,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * The pre-processing is automatically triggered just by including the artifact of this class
  * module.
  * <p/>
- * See {@link com.github.dm.jrt.android.proxy.v4.core.JRoutineProxy JRoutineProxy} for support of
- * API levels less than {@link android.os.Build.VERSION_CODES#HONEYCOMB 11}.
+ * See {@link com.github.dm.jrt.android.proxy.v4.core.JRoutineProxyCompat JRoutineProxyCompat} for
+ * support of API levels less than {@link android.os.Build.VERSION_CODES#HONEYCOMB 11}.
  * <p/>
  * Created by davide-maestroni on 05/06/2015.
  *

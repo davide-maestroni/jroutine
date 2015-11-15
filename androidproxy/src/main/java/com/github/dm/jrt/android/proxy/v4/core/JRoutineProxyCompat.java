@@ -38,12 +38,12 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  */
 @SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS",
         justification = "utility class extending the functions of another utility class")
-public class JRoutineProxy extends com.github.dm.jrt.android.proxy.core.JRoutineProxy {
+public class JRoutineProxyCompat extends com.github.dm.jrt.android.proxy.core.JRoutineProxy {
 
     /**
      * Avoid direct instantiation.
      */
-    protected JRoutineProxy() {
+    protected JRoutineProxyCompat() {
 
     }
 

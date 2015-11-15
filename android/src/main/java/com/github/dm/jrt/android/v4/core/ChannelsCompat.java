@@ -15,6 +15,7 @@ package com.github.dm.jrt.android.v4.core;
 
 import android.support.v4.util.SparseArrayCompat;
 
+import com.github.dm.jrt.android.core.Channels;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InputChannel;
 import com.github.dm.jrt.channel.OutputChannel;
@@ -24,21 +25,17 @@ import com.github.dm.jrt.channel.RoutineException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 /**
  * Utility class for handling routine channels.
  * <p/>
  * Created by davide-maestroni on 08/03/2015.
  */
-@SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS",
-        justification = "utility class extending the functions of another utility class")
-public class Channels extends com.github.dm.jrt.android.core.Channels {
+public class ChannelsCompat extends Channels {
 
     /**
      * Avoid direct instantiation.
      */
-    protected Channels() {
+    protected ChannelsCompat() {
 
     }
 
@@ -135,7 +132,7 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
 
         for (final int index : indexes) {
 
-            channelMap.append(index, Channels.<DATA, IN>selectParcelable(channel, index));
+            channelMap.append(index, ChannelsCompat.<DATA, IN>selectParcelable(channel, index));
         }
 
         return channelMap;
@@ -163,7 +160,7 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
 
         for (final Integer index : indexes) {
 
-            channelMap.append(index, Channels.<DATA, IN>selectParcelable(channel, index));
+            channelMap.append(index, ChannelsCompat.<DATA, IN>selectParcelable(channel, index));
         }
 
         return channelMap;
@@ -198,7 +195,7 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
 
         for (int index = startIndex; index < rangeSize; index++) {
 
-            channelMap.append(index, Channels.<DATA, IN>selectParcelable(channel, index));
+            channelMap.append(index, ChannelsCompat.<DATA, IN>selectParcelable(channel, index));
         }
 
         return channelMap;

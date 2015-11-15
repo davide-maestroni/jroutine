@@ -133,9 +133,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  *     </code>
  * </pre>
  * <p/>
- * See {@link com.github.dm.jrt.android.v4.core.JRoutine JRoutine} for support of API levels less
- * than
- * {@value android.os.Build.VERSION_CODES#HONEYCOMB}.
+ * See {@link com.github.dm.jrt.android.v4.core.JRoutineCompat JRoutineCompat} for support of API
+ * levels less than {@value android.os.Build.VERSION_CODES#HONEYCOMB}.
  * <p/>
  * Created by davide-maestroni on 12/08/2014.
  */

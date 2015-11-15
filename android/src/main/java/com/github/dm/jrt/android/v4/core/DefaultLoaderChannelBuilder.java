@@ -82,13 +82,13 @@ class DefaultLoaderChannelBuilder
 
         if (component == null) {
 
-            final IOChannel<OUT, OUT> ioChannel = JRoutine.io().buildChannel();
+            final IOChannel<OUT, OUT> ioChannel = JRoutineCompat.io().buildChannel();
             ioChannel.abort(new MissingInvocationException(loaderId));
             return ioChannel.close();
         }
 
         final LoaderRoutineBuilder<Void, OUT> builder =
-                JRoutine.with(context).on(new MissingLoaderInvocationFactory<OUT>(loaderId));
+                JRoutineCompat.with(context).on(new MissingLoaderInvocationFactory<OUT>(loaderId));
         final InvocationConfiguration invocationConfiguration =
                 mChannelConfiguration.toOutputChannelConfiguration();
         final Logger logger = invocationConfiguration.newLogger(this);

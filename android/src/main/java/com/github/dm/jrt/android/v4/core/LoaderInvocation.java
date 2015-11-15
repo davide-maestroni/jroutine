@@ -400,8 +400,8 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
         final LoaderContextInvocationFactory<IN, OUT> factory =
                 new LoaderContextInvocationFactory<IN, OUT>(this, mLoaderId);
         final Routine<IN, OUT> routine =
-                JRoutine.on(fromFactory(loaderContext.getApplicationContext(), factory))
-                        .buildRoutine();
+                JRoutineCompat.on(fromFactory(loaderContext.getApplicationContext(), factory))
+                              .buildRoutine();
         routine.syncInvoke().abort(reason);
         routine.purge();
     }
@@ -786,31 +786,31 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
             logger.dbg("creating new result channel");
             final InvocationLoader<?, OUT> internalLoader = mLoader;
             final ArrayList<IOChannel<OUT, OUT>> channels = mNewChannels;
-            final IOChannel<OUT, OUT> channel = JRoutine.io()
-                                                        .channels()
-                                                        .withChannelMaxSize(Integer.MAX_VALUE)
-                                                        .withChannelTimeout(TimeDuration.ZERO)
-                                                        .withLog(logger.getLog())
-                                                        .withLogLevel(logger.getLogLevel())
-                                                        .set()
-                                                        .buildChannel();
+            final IOChannel<OUT, OUT> channel = JRoutineCompat.io()
+                                                              .channels()
+                                                              .withChannelMaxSize(Integer.MAX_VALUE)
+                                                              .withChannelTimeout(TimeDuration.ZERO)
+                                                              .withLog(logger.getLog())
+                                                              .withLogLevel(logger.getLogLevel())
+                                                              .set()
+                                                              .buildChannel();
             channels.add(channel);
             internalLoader.setInvocationCount(Math.max(channels.size() + mAbortedChannels.size(),
                                                        internalLoader.getInvocationCount()));
 
             if ((looper != null) && (looper != Looper.getMainLooper())) {
 
-                return JRoutine.on(PassingInvocation.<OUT>factoryOf())
-                               .invocations()
-                               .withRunner(Runners.looperRunner(looper))
-                               .withInputMaxSize(Integer.MAX_VALUE)
-                               .withInputTimeout(TimeDuration.ZERO)
-                               .withOutputMaxSize(Integer.MAX_VALUE)
-                               .withOutputTimeout(TimeDuration.ZERO)
-                               .withLog(logger.getLog())
-                               .withLogLevel(logger.getLogLevel())
-                               .set()
-                               .asyncCall(channel);
+                return JRoutineCompat.on(PassingInvocation.<OUT>factoryOf())
+                                     .invocations()
+                                     .withRunner(Runners.looperRunner(looper))
+                                     .withInputMaxSize(Integer.MAX_VALUE)
+                                     .withInputTimeout(TimeDuration.ZERO)
+                                     .withOutputMaxSize(Integer.MAX_VALUE)
+                                     .withOutputTimeout(TimeDuration.ZERO)
+                                     .withLog(logger.getLog())
+                                     .withLogLevel(logger.getLogLevel())
+                                     .set()
+                                     .asyncCall(channel);
             }
 
             return channel;

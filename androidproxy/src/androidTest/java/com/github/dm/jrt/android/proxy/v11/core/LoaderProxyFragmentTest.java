@@ -22,7 +22,7 @@ import com.github.dm.jrt.android.proxy.R;
 import com.github.dm.jrt.android.proxy.annotation.V11Proxy;
 import com.github.dm.jrt.android.proxy.builder.LoaderProxyObjectBuilder;
 import com.github.dm.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
-import com.github.dm.jrt.android.v4.core.JRoutine;
+import com.github.dm.jrt.android.v11.core.JRoutine;
 import com.github.dm.jrt.annotation.Alias;
 import com.github.dm.jrt.annotation.Input;
 import com.github.dm.jrt.annotation.Input.InputMode;

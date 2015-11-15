@@ -69,13 +69,13 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
 
         for (int i = 0; i < size; ++i) {
 
-            final IOChannel<?, ?> ioChannel = JRoutine.io().buildChannel();
+            final IOChannel<?, ?> ioChannel = JRoutineCompat.io().buildChannel();
             ioChannel.passTo(((InputChannel<Object>) channels.valueAt(i)));
             channelMap.put(channels.keyAt(i), ioChannel);
         }
 
         final IOChannel<Selectable<? extends IN>, Selectable<? extends IN>> ioChannel =
-                JRoutine.io().buildChannel();
+                JRoutineCompat.io().buildChannel();
         ioChannel.passTo(new SortingInputMapConsumer(channelMap));
         return ioChannel;
     }
@@ -102,7 +102,7 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
         }
 
         final IOChannel<ParcelableSelectable<OUT>, ParcelableSelectable<OUT>> ioChannel =
-                JRoutine.io().buildChannel();
+                JRoutineCompat.io().buildChannel();
 
         for (int i = 0; i < size; ++i) {
 
@@ -227,7 +227,7 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
 
         for (final Integer index : indexes) {
 
-            final IOChannel<OUT, OUT> ioChannel = JRoutine.io().buildChannel();
+            final IOChannel<OUT, OUT> ioChannel = JRoutineCompat.io().buildChannel();
             inputMap.put(index, ioChannel);
             outputMap.put(index, ioChannel);
         }
@@ -266,7 +266,7 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
         for (int index = startIndex; index < rangeSize; index++) {
 
             final Integer integer = index;
-            final IOChannel<OUT, OUT> ioChannel = JRoutine.io().buildChannel();
+            final IOChannel<OUT, OUT> ioChannel = JRoutineCompat.io().buildChannel();
             inputMap.put(integer, ioChannel);
             outputMap.put(integer, ioChannel);
         }
@@ -297,7 +297,7 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
 
         for (final Integer index : indexes) {
 
-            final IOChannel<OUT, OUT> ioChannel = JRoutine.io().buildChannel();
+            final IOChannel<OUT, OUT> ioChannel = JRoutineCompat.io().buildChannel();
             inputMap.put(index, ioChannel);
             outputMap.put(index, ioChannel);
         }

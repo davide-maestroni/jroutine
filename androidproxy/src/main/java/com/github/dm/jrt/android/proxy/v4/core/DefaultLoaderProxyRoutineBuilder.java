@@ -88,8 +88,8 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
         if (!itf.isAnnotationPresent(LoaderProxyCompat.class)) {
 
             throw new IllegalArgumentException(
-                    "the specified class is not annotated with " + LoaderProxyCompat.class.getName() + ": "
-                            + itf.getName());
+                    "the specified class is not annotated with " + LoaderProxyCompat.class.getName()
+                            + ": " + itf.getName());
         }
 
         final TargetLoaderProxyObjectBuilder<TYPE> builder =
@@ -238,7 +238,8 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
                 final LoaderContextCompat context = mContext;
                 final ContextInvocationTarget<?> target = mTarget;
                 final Class<? super TYPE> interfaceClass = mInterfaceClass;
-                final LoaderProxyCompat annotation = interfaceClass.getAnnotation(LoaderProxyCompat.class);
+                final LoaderProxyCompat annotation =
+                        interfaceClass.getAnnotation(LoaderProxyCompat.class);
                 String packageName = annotation.classPackage();
 
                 if (packageName.equals(Proxy.DEFAULT)) {

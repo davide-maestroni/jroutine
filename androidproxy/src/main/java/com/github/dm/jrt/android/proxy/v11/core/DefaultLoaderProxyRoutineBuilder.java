@@ -88,8 +88,8 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
         if (!itf.isAnnotationPresent(LoaderProxy.class)) {
 
             throw new IllegalArgumentException(
-                    "the specified class is not annotated with " + LoaderProxy.class.getName() + ": "
-                            + itf.getName());
+                    "the specified class is not annotated with " + LoaderProxy.class.getName()
+                            + ": " + itf.getName());
         }
 
         final TargetLoaderProxyObjectBuilder<TYPE> builder =

@@ -15,7 +15,7 @@ package com.github.dm.jrt.android.proxy.v4.core;
 
 import com.github.dm.jrt.android.core.ContextInvocationTarget;
 import com.github.dm.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
-import com.github.dm.jrt.android.v4.core.LoaderContext;
+import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -54,7 +54,7 @@ public class JRoutineProxy extends com.github.dm.jrt.android.proxy.core.JRoutine
      * @return the context builder.
      */
     @NotNull
-    public static ContextBuilder with(@NotNull final LoaderContext context) {
+    public static ContextBuilder with(@NotNull final LoaderContextCompat context) {
 
         return new ContextBuilder(context);
     }
@@ -64,7 +64,7 @@ public class JRoutineProxy extends com.github.dm.jrt.android.proxy.core.JRoutine
      */
     public static class ContextBuilder {
 
-        private final LoaderContext mContext;
+        private final LoaderContextCompat mContext;
 
         /**
          * Constructor.
@@ -72,7 +72,7 @@ public class JRoutineProxy extends com.github.dm.jrt.android.proxy.core.JRoutine
          * @param context the loader context.
          */
         @SuppressWarnings("ConstantConditions")
-        private ContextBuilder(@NotNull final LoaderContext context) {
+        private ContextBuilder(@NotNull final LoaderContextCompat context) {
 
             if (context == null) {
 

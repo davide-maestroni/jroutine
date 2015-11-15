@@ -59,7 +59,7 @@ import java.util.List;
 
 import static com.github.dm.jrt.android.core.ContextInvocationTarget.classOfType;
 import static com.github.dm.jrt.android.core.ContextInvocationTarget.instanceOf;
-import static com.github.dm.jrt.android.v4.core.LoaderContext.contextFrom;
+import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.contextFrom;
 import static com.github.dm.jrt.builder.InvocationConfiguration.builder;
 import static com.github.dm.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;

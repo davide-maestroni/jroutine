@@ -66,7 +66,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         ProxyConfiguration.Configurable<LoaderObjectRoutineBuilder>,
         InvocationConfiguration.Configurable<LoaderObjectRoutineBuilder> {
 
-    private final LoaderContext mContext;
+    private final LoaderContextCompat mContext;
 
     private final ContextInvocationTarget<?> mTarget;
 
@@ -84,7 +84,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      * @param target  the invocation target.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultLoaderObjectRoutineBuilder(@NotNull final LoaderContext context,
+    DefaultLoaderObjectRoutineBuilder(@NotNull final LoaderContextCompat context,
             @NotNull final ContextInvocationTarget<?> target) {
 
         if (context == null) {
@@ -643,7 +643,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      */
     private static class ProxyInvocationHandler implements InvocationHandler {
 
-        private final LoaderContext mContext;
+        private final LoaderContextCompat mContext;
 
         private final InvocationConfiguration mInvocationConfiguration;
 

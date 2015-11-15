@@ -18,7 +18,7 @@ import com.github.dm.jrt.android.core.ContextInvocationTarget;
 import com.github.dm.jrt.android.proxy.annotation.V4Proxy;
 import com.github.dm.jrt.android.proxy.builder.AbstractLoaderProxyObjectBuilder;
 import com.github.dm.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
-import com.github.dm.jrt.android.v4.core.LoaderContext;
+import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.ProxyConfiguration;
 import com.github.dm.jrt.proxy.annotation.Proxy;
@@ -41,7 +41,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
         ProxyConfiguration.Configurable<LoaderProxyRoutineBuilder>,
         LoaderConfiguration.Configurable<LoaderProxyRoutineBuilder> {
 
-    private final LoaderContext mContext;
+    private final LoaderContextCompat mContext;
 
     private final ContextInvocationTarget<?> mTarget;
 
@@ -59,7 +59,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
      * @param target  the invocation target.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultLoaderProxyRoutineBuilder(@NotNull final LoaderContext context,
+    DefaultLoaderProxyRoutineBuilder(@NotNull final LoaderContextCompat context,
             @NotNull final ContextInvocationTarget<?> target) {
 
         if (context == null) {
@@ -183,7 +183,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
     private static class TargetLoaderProxyObjectBuilder<TYPE>
             extends AbstractLoaderProxyObjectBuilder<TYPE> {
 
-        private final LoaderContext mContext;
+        private final LoaderContextCompat mContext;
 
         private final Class<? super TYPE> mInterfaceClass;
 
@@ -196,7 +196,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
          * @param target         the invocation target.
          * @param interfaceClass the proxy interface class.
          */
-        private TargetLoaderProxyObjectBuilder(@NotNull final LoaderContext context,
+        private TargetLoaderProxyObjectBuilder(@NotNull final LoaderContextCompat context,
                 @NotNull final ContextInvocationTarget<?> target,
                 @NotNull final Class<? super TYPE> interfaceClass) {
 
@@ -235,7 +235,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
 
             try {
 
-                final LoaderContext context = mContext;
+                final LoaderContextCompat context = mContext;
                 final ContextInvocationTarget<?> target = mTarget;
                 final Class<? super TYPE> interfaceClass = mInterfaceClass;
                 final V4Proxy annotation = interfaceClass.getAnnotation(V4Proxy.class);

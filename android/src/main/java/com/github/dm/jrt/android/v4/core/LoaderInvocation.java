@@ -75,7 +75,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
 
     private final ClashResolutionType mClashResolutionType;
 
-    private final LoaderContext mContext;
+    private final LoaderContextCompat mContext;
 
     private final FunctionContextInvocationFactory<IN, OUT> mFactory;
 
@@ -101,7 +101,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
      * @param logger        the logger instance.
      */
     @SuppressWarnings("ConstantConditions")
-    LoaderInvocation(@NotNull final LoaderContext context,
+    LoaderInvocation(@NotNull final LoaderContextCompat context,
             @NotNull final FunctionContextInvocationFactory<IN, OUT> factory,
             @NotNull final LoaderConfiguration configuration, @Nullable final OrderType order,
             @NotNull final Logger logger) {
@@ -137,7 +137,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
      * @param context  the context instance.
      * @param loaderId the loader ID.
      */
-    static void purgeLoader(@NotNull final LoaderContext context, final int loaderId) {
+    static void purgeLoader(@NotNull final LoaderContextCompat context, final int loaderId) {
 
         final Object component = context.getComponent();
         final WeakIdentityHashMap<Object,
@@ -197,7 +197,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
      * @param inputs   the invocation inputs.
      */
     @SuppressWarnings("unchecked")
-    static void purgeLoader(@NotNull final LoaderContext context, final int loaderId,
+    static void purgeLoader(@NotNull final LoaderContextCompat context, final int loaderId,
             @NotNull final FunctionContextInvocationFactory<?, ?> factory,
             @NotNull final List<?> inputs) {
 
@@ -266,7 +266,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
      * @param inputs   the invocation inputs.
      */
     @SuppressWarnings("unchecked")
-    static void purgeLoader(@NotNull final LoaderContext context, final int loaderId,
+    static void purgeLoader(@NotNull final LoaderContextCompat context, final int loaderId,
             @NotNull final List<?> inputs) {
 
         final Object component = context.getComponent();
@@ -327,7 +327,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
      * @param loaderId the loader ID.
      * @param factory  the invocation factory.
      */
-    static void purgeLoaders(@NotNull final LoaderContext context, final int loaderId,
+    static void purgeLoaders(@NotNull final LoaderContextCompat context, final int loaderId,
             @NotNull final FunctionContextInvocationFactory<?, ?> factory) {
 
         final Object component = context.getComponent();
@@ -413,7 +413,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
     protected void onCall(@NotNull final List<? extends IN> inputs,
             @NotNull final ResultChannel<OUT> result) {
 
-        final LoaderContext context = mContext;
+        final LoaderContextCompat context = mContext;
         final Object component = context.getComponent();
         final Context loaderContext = context.getLoaderContext();
         final LoaderManager loaderManager = context.getLoaderManager();

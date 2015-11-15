@@ -50,7 +50,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
 
     private final LoaderConfiguration mConfiguration;
 
-    private final LoaderContext mContext;
+    private final LoaderContextCompat mContext;
 
     private final FunctionContextInvocationFactory<IN, OUT> mFactory;
 
@@ -67,7 +67,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
      * @param loaderConfiguration     the loader configuration.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultLoaderRoutine(@NotNull final LoaderContext context,
+    DefaultLoaderRoutine(@NotNull final LoaderContextCompat context,
             @NotNull final FunctionContextInvocationFactory<IN, OUT> factory,
             @NotNull final InvocationConfiguration invocationConfiguration,
             @NotNull final LoaderConfiguration loaderConfiguration) {
@@ -96,7 +96,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
     public void purge() {
 
         super.purge();
-        final LoaderContext context = mContext;
+        final LoaderContextCompat context = mContext;
 
         if (context.getComponent() != null) {
 
@@ -159,7 +159,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
 
     public void purge(@Nullable final IN input) {
 
-        final LoaderContext context = mContext;
+        final LoaderContextCompat context = mContext;
 
         if (context.getComponent() != null) {
 
@@ -172,7 +172,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
 
     public void purge(@Nullable final IN... inputs) {
 
-        final LoaderContext context = mContext;
+        final LoaderContextCompat context = mContext;
 
         if (context.getComponent() != null) {
 
@@ -196,7 +196,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
 
     public void purge(@Nullable final Iterable<? extends IN> inputs) {
 
-        final LoaderContext context = mContext;
+        final LoaderContextCompat context = mContext;
 
         if (context.getComponent() != null) {
 
@@ -227,7 +227,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
      */
     private static class PurgeExecution extends TemplateExecution {
 
-        private final LoaderContext mContext;
+        private final LoaderContextCompat mContext;
 
         private final FunctionContextInvocationFactory<?, ?> mFactory;
 
@@ -240,7 +240,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
          * @param factory  the invocation factory.
          * @param loaderId the loader ID.
          */
-        private PurgeExecution(@NotNull final LoaderContext context,
+        private PurgeExecution(@NotNull final LoaderContextCompat context,
                 @NotNull final FunctionContextInvocationFactory<?, ?> factory, final int loaderId) {
 
             mContext = context;
@@ -261,7 +261,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
      */
     private static class PurgeInputsExecution<IN> extends TemplateExecution {
 
-        private final LoaderContext mContext;
+        private final LoaderContextCompat mContext;
 
         private final FunctionContextInvocationFactory<?, ?> mFactory;
 
@@ -277,7 +277,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
          * @param loaderId the loader ID.
          * @param inputs   the list of inputs.
          */
-        private PurgeInputsExecution(@NotNull final LoaderContext context,
+        private PurgeInputsExecution(@NotNull final LoaderContextCompat context,
                 @NotNull final FunctionContextInvocationFactory<?, ?> factory, final int loaderId,
                 @NotNull final List<IN> inputs) {
 

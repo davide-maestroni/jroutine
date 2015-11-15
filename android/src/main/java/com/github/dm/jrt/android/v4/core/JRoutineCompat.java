@@ -143,7 +143,7 @@ public class JRoutineCompat extends JRoutine {
      * @return the context builder.
      */
     @NotNull
-    public static ContextBuilder with(@NotNull final LoaderContext context) {
+    public static ContextBuilder with(@NotNull final LoaderContextCompat context) {
 
         return new ContextBuilder(context);
     }
@@ -153,7 +153,7 @@ public class JRoutineCompat extends JRoutine {
      */
     public static class ContextBuilder {
 
-        private final LoaderContext mContext;
+        private final LoaderContextCompat mContext;
 
         /**
          * Constructor.
@@ -161,7 +161,7 @@ public class JRoutineCompat extends JRoutine {
          * @param context the loader context.
          */
         @SuppressWarnings("ConstantConditions")
-        private ContextBuilder(@NotNull final LoaderContext context) {
+        private ContextBuilder(@NotNull final LoaderContextCompat context) {
 
             if (context == null) {
 

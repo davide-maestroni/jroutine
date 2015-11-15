@@ -15,11 +15,10 @@ package com.github.dm.jrt.android.proxy.v4.core;
 
 import com.github.dm.jrt.android.core.ContextInvocationTarget;
 import com.github.dm.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
+import com.github.dm.jrt.android.proxy.core.JRoutineProxy;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 
 import org.jetbrains.annotations.NotNull;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Utility class used to create builders of objects wrapping target ones, so to enable asynchronous
@@ -33,12 +32,10 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * Created by davide-maestroni on 05/06/2015.
  *
  * @see com.github.dm.jrt.android.annotation Android Annotations
- * @see com.github.dm.jrt.android.proxy.annotation.V4Proxy V4Proxy
+ * @see com.github.dm.jrt.android.proxy.annotation.LoaderProxyCompat LoaderProxyCompat
  * @see com.github.dm.jrt.annotation Annotations
  */
-@SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS",
-        justification = "utility class extending the functions of another utility class")
-public class JRoutineProxyCompat extends com.github.dm.jrt.android.proxy.core.JRoutineProxy {
+public class JRoutineProxyCompat extends JRoutineProxy {
 
     /**
      * Avoid direct instantiation.

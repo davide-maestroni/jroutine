@@ -51,6 +51,8 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
     private TypeMirror mInputClashAnnotationType;
 
+    private TypeElement mLoaderProxyCompatElement;
+
     private TypeElement mLoaderProxyElement;
 
     private String mMethodHeader;
@@ -65,14 +67,12 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
     private TypeMirror mStaleTimeAnnotationType;
 
-    private TypeElement mV4ProxyElement;
-
     @Override
     public Set<String> getSupportedAnnotationTypes() {
 
         final HashSet<String> types = new HashSet<String>();
         types.add("com.github.dm.jrt.android.proxy.annotation.ServiceProxy");
-        types.add("com.github.dm.jrt.android.proxy.annotation.V4Proxy");
+        types.add("com.github.dm.jrt.android.proxy.annotation.LoaderProxyCompat");
         types.add("com.github.dm.jrt.android.proxy.annotation.LoaderProxy");
         return types;
     }
@@ -93,8 +93,8 @@ public class ContextRoutineProcessor extends RoutineProcessor {
         final Types typeUtils = processingEnv.getTypeUtils();
         mServiceProxyElement = (TypeElement) typeUtils.asElement(
                 getMirrorFromName("com.github.dm.jrt.android.proxy.annotation.ServiceProxy"));
-        mV4ProxyElement = (TypeElement) typeUtils.asElement(
-                getMirrorFromName("com.github.dm.jrt.android.proxy.annotation.V4Proxy"));
+        mLoaderProxyCompatElement = (TypeElement) typeUtils.asElement(
+                getMirrorFromName("com.github.dm.jrt.android.proxy.annotation.LoaderProxyCompat"));
         mLoaderProxyElement = (TypeElement) typeUtils.asElement(
                 getMirrorFromName("com.github.dm.jrt.android.proxy.annotation.LoaderProxy"));
     }
@@ -137,7 +137,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
             IOException {
 
         final TypeElement serviceProxyElement = mServiceProxyElement;
-        final TypeElement v4ProxyElement = mV4ProxyElement;
+        final TypeElement loaderProxyCompatElement = mLoaderProxyCompatElement;
         final TypeElement loaderProxyElement = mLoaderProxyElement;
 
         if (annotationElement == serviceProxyElement) {
@@ -149,7 +149,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
             return mHeaderService;
 
-        } else if (annotationElement == v4ProxyElement) {
+        } else if (annotationElement == loaderProxyCompatElement) {
 
             if (mHeaderV4 == null) {
 

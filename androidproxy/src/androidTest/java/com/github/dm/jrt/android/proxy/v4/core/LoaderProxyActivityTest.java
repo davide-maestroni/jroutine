@@ -17,7 +17,7 @@ import android.annotation.TargetApi;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
-import com.github.dm.jrt.android.proxy.annotation.V4Proxy;
+import com.github.dm.jrt.android.proxy.annotation.LoaderProxyCompat;
 import com.github.dm.jrt.android.proxy.builder.LoaderProxyObjectBuilder;
 import com.github.dm.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
 import com.github.dm.jrt.android.v4.core.JRoutineCompat;
@@ -222,7 +222,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
         final InvocationConfiguration configuration =
                 builder().withRunner(runner).withLogLevel(Level.DEBUG).withLog(log).set();
         final LoaderProxyObjectBuilder<TestProxy> builder =
-                com.github.dm.jrt.android.proxy.V4Proxy_TestActivity.with(
+                com.github.dm.jrt.android.proxy.LoaderProxyCompat_TestActivity.with(
                         contextFrom(getActivity())).on(instanceOf(TestClass.class));
         final TestProxy testProxy = builder.invocations().with(configuration).set().buildProxy();
 
@@ -618,7 +618,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
         }
     }
 
-    @V4Proxy(Impl.class)
+    @LoaderProxyCompat(Impl.class)
     public interface Itf {
 
         @Alias("a")
@@ -1018,7 +1018,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
         Routine<List<Integer>, Void> setL6();
     }
 
-    @V4Proxy(TestClass2.class)
+    @LoaderProxyCompat(TestClass2.class)
     public interface TestClassAsync {
 
         @Output
@@ -1034,7 +1034,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
         int getOne();
     }
 
-    @V4Proxy(TestClassInterface.class)
+    @LoaderProxyCompat(TestClassInterface.class)
     public interface TestInterfaceProxy {
 
         @ReadTimeout(3000)
@@ -1042,7 +1042,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
         OutputChannel<Integer> getOne();
     }
 
-    @V4Proxy(TestList.class)
+    @LoaderProxyCompat(TestList.class)
     public interface TestListItf<TYPE> {
 
         void add(Object t);
@@ -1058,7 +1058,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
         List<TYPE> getList(int i);
     }
 
-    @V4Proxy(value = TestClass.class, className = "TestActivity",
+    @LoaderProxyCompat(value = TestClass.class, className = "TestActivity",
             classPackage = "com.github.dm.jrt.android.proxy")
     public interface TestProxy {
 
@@ -1103,7 +1103,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
         String getString(@Input(int.class) OutputChannel<Integer> i);
     }
 
-    @V4Proxy(TestClass.class)
+    @LoaderProxyCompat(TestClass.class)
     public interface TestStatic {
 
         @ReadTimeout(3000)
@@ -1115,7 +1115,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
         OutputChannel<Integer> getTwo();
     }
 
-    @V4Proxy(TestTimeout.class)
+    @LoaderProxyCompat(TestTimeout.class)
     public interface TestTimeoutItf {
 
         @Output(OutputMode.COLLECTION)

@@ -14,6 +14,7 @@
 package com.github.dm.jrt.android.v11.core;
 
 import android.annotation.TargetApi;
+import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.SparseArray;
@@ -58,6 +59,11 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
     public void testCombine() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final InvocationChannel<String, String> channel1 = JRoutine.with(serviceFrom(getActivity()))
                                                                    .on(factoryOf(
                                                                            PassingString.class))
@@ -99,6 +105,11 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     }
 
     public void testCombineAbort() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         InvocationChannel<String, String> channel1;
         InvocationChannel<Integer, Integer> channel2;
@@ -312,6 +323,11 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
     public void testInputMap() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final ArrayList<ParcelableSelectable<Object>> outputs =
                 new ArrayList<ParcelableSelectable<Object>>();
         outputs.add(new ParcelableSelectable<Object>("test21", Sort.STRING));
@@ -338,6 +354,11 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     }
 
     public void testInputMapAbort() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine =
                 JRoutine.with(serviceFrom(getActivity())).on(factoryOf(Sort.class)).buildRoutine();
@@ -391,6 +412,11 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
     public void testInputMapError() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         try {
 
             Channels.selectParcelable(0, 0, JRoutine.with(serviceFrom(getActivity()))
@@ -405,6 +431,11 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     }
 
     public void testMap() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final IOChannelBuilder builder =
                 JRoutine.io().channels().withChannelOrder(OrderType.BY_CALL).set();
@@ -503,6 +534,11 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     @SuppressWarnings("unchecked")
     public void testOutputMap() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine =
                 JRoutine.with(serviceFrom(getActivity())).on(factoryOf(Sort.class)).buildRoutine();
         SparseArray<OutputChannel<Object>> channelMap;
@@ -526,6 +562,11 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
     @SuppressWarnings("unchecked")
     public void testOutputMapAbort() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine =
                 JRoutine.with(serviceFrom(getActivity())).on(factoryOf(Sort.class)).buildRoutine();
@@ -617,6 +658,11 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     }
 
     public void testOutputMapError() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         try {
 

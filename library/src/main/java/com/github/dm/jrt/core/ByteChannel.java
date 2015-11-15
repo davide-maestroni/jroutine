@@ -44,7 +44,7 @@ public class ByteChannel {
     /**
      * The default buffer size in number of bytes.
      */
-    public static final int DEFAULT_BUFFER_SIZE = 1024 << 4;
+    public static final int DEFAULT_BUFFER_SIZE = 16 << 10;
 
     /**
      * The default core pool size.

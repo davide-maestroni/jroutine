@@ -301,6 +301,16 @@ public class ByteChannelTest {
 
         }
 
+        try {
+
+            inputStream.readAll(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
         assertThat(inputStream.read(new byte[0])).isEqualTo(0);
         assertThat(inputStream.read(b, 8, 0)).isEqualTo(0);
     }
@@ -508,6 +518,25 @@ public class ByteChannelTest {
     }
 
     @Test
+    public void testReadAll() throws IOException {
+
+        final IOChannel<ByteBuffer, ByteBuffer> channel = JRoutine.io().buildChannel();
+        final BufferOutputStream stream = ByteChannel.byteChannel().passTo(channel);
+        stream.write(new byte[]{31, 17, (byte) 155, 13});
+        stream.flush();
+        final BufferInputStream inputStream = ByteChannel.inputStream(channel.next());
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        assertThat(inputStream.readAll(outputStream)).isEqualTo(4);
+        assertThat(outputStream.size()).isEqualTo(4);
+        assertThat(outputStream.toByteArray()).containsExactly((byte) 31, (byte) 17, (byte) 155,
+                                                               (byte) 13);
+        assertThat(inputStream.read(outputStream)).isEqualTo(-1);
+        assertThat(outputStream.size()).isEqualTo(4);
+        assertThat(outputStream.toByteArray()).containsExactly((byte) 31, (byte) 17, (byte) 155,
+                                                               (byte) 13);
+    }
+
+    @Test
     public void testReadByte() throws IOException {
 
         final IOChannel<ByteBuffer, ByteBuffer> channel = JRoutine.io().buildChannel();
@@ -695,6 +724,16 @@ public class ByteChannelTest {
 
         }
 
+        try {
+
+            inputStream.readAll(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
         assertThat(inputStream.read(new byte[0])).isEqualTo(0);
         assertThat(inputStream.read(b, 8, 0)).isEqualTo(0);
     }
@@ -788,6 +827,21 @@ public class ByteChannelTest {
         final ByteChannel byteChannel = ByteChannel.byteChannel();
         final BufferOutputStream stream = byteChannel.passTo(channel.asInput());
         assertThat(byteChannel.passTo(channel.asInput())).isSameAs(stream);
+    }
+
+    @Test
+    public void testWriteAll() throws IOException {
+
+        final IOChannel<ByteBuffer, ByteBuffer> channel = JRoutine.io().buildChannel();
+        final BufferOutputStream stream = ByteChannel.byteChannel(4).passTo(channel);
+        stream.writeAll(new ByteArrayInputStream(new byte[]{77, 33, (byte) 155, 13}));
+        stream.flush();
+        final BufferInputStream inputStream = ByteChannel.inputStream(channel.next());
+        assertThat(inputStream.read()).isEqualTo(77);
+        assertThat(inputStream.read()).isEqualTo(33);
+        assertThat(inputStream.read()).isEqualTo((byte) 155);
+        assertThat(inputStream.read()).isEqualTo(13);
+        assertThat(inputStream.read()).isEqualTo(-1);
     }
 
     @Test
@@ -954,6 +1008,16 @@ public class ByteChannelTest {
         try {
 
             stream.write((InputStream) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            stream.writeAll(null);
 
             fail();
 

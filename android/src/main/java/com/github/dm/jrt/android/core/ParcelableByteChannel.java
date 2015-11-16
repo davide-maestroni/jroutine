@@ -360,7 +360,6 @@ public class ParcelableByteChannel {
             return 0;
         }
 
-        @SuppressWarnings({"ResultOfMethodCallIgnored", "StatementWithEmptyBody"})
         public void writeToParcel(final Parcel dest, final int flags) {
 
             final ByteBuffer buffer = mBuffer;
@@ -373,10 +372,7 @@ public class ParcelableByteChannel {
 
                 try {
 
-                    while (inputStream.read(outputStream) > 0) {
-
-                    }
-
+                    inputStream.readAll(outputStream);
                     outputStream.writeToParcel(dest);
 
                 } catch (final IOException ignored) {
@@ -514,6 +510,12 @@ public class ParcelableByteChannel {
         @Override
         public void reset() {
 
+        }
+
+        @Override
+        public long readAll(@NotNull final OutputStream out) throws IOException {
+
+            return 0;
         }
     }
 

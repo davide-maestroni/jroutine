@@ -296,6 +296,37 @@ public class ByteChannel {
 
         @Override
         public abstract void reset();
+
+        /**
+         * Reads all the bytes returned by the input stream and writes them into the specified
+         * output stream.<br/>
+         * Calling this method has the same effect as calling:
+         * <pre>
+         *     <code>
+         *
+         *         while (inputStream.read(outputStream) > 0) {
+         *
+         *             // Keep looping
+         *         }
+         *     </code>
+         * </pre>
+         *
+         * @param out the output stream.
+         * @return the total number of bytes read.
+         * @throws IOException if an I/O error occurs. In particular, an <code>IOException</code>
+         *                     may be thrown if the output stream has been closed.
+         */
+        public long readAll(@NotNull final OutputStream out) throws IOException {
+
+            long count = 0;
+
+            for (int b; (b = read(out)) > 0; ) {
+
+                count += b;
+            }
+
+            return count;
+        }
     }
 
     /**
@@ -307,13 +338,45 @@ public class ByteChannel {
          * Writes some bytes into the output stream by reading them from the specified input stream.
          *
          * @param in the input stream.
-         * @return the total number of bytes read into the buffer, or <code>-1</code> if there is no
-         * more data because the end of the stream has been reached.
+         * @return the total number of bytes written into the buffer, or <code>-1</code> if there is
+         * no more data because the end of the stream has been reached.
          * @throws IOException If the first byte cannot be read for any reason other than end of
          *                     file, or if the input stream has been closed, or if some other I/O
          *                     error occurs.
          */
         public abstract int write(@NotNull InputStream in) throws IOException;
+
+        /**
+         * Writes all the returned bytes into the output stream by reading them from the specified
+         * input stream.<br/>
+         * Calling this method has the same effect as calling:
+         * <pre>
+         *     <code>
+         *
+         *         while (outputStream.write(inputStream) > 0) {
+         *
+         *             // Keep looping
+         *         }
+         *     </code>
+         * </pre>
+         *
+         * @param in the input stream.
+         * @return the total number of bytes written.
+         * @throws IOException If the first byte cannot be read for any reason other than end of
+         *                     file, or if the input stream has been closed, or if some other I/O
+         *                     error occurs.
+         */
+        public long writeAll(@NotNull final InputStream in) throws IOException {
+
+            long count = 0;
+
+            for (int b; (b = write(in)) > 0; ) {
+
+                count += b;
+            }
+
+            return count;
+        }
 
         @Override
         public abstract void flush();

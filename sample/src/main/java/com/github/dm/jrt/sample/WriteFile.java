@@ -73,7 +73,6 @@ public class WriteFile extends TemplateInvocation<ByteBuffer, Boolean> {
     }
 
     @Override
-    @SuppressWarnings("StatementWithEmptyBody")
     public void onInput(final ByteBuffer buffer, @NotNull final ResultChannel<Boolean> result) {
 
         final BufferInputStream inputStream = ByteChannel.inputStream(buffer);
@@ -81,10 +80,7 @@ public class WriteFile extends TemplateInvocation<ByteBuffer, Boolean> {
 
         try {
 
-            while (inputStream.read(outputStream) > 0) {
-
-                // Keep looping...
-            }
+            inputStream.readAll(outputStream);
 
         } catch (final IOException e) {
 

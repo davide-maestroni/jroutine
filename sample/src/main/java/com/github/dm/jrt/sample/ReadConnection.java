@@ -37,7 +37,6 @@ public class ReadConnection extends FilterInvocation<URI, ByteBuffer> {
 
     private static final int MAX_CHUNK_SIZE = 2048;
 
-    @SuppressWarnings("StatementWithEmptyBody")
     public void onInput(final URI uri, @NotNull final ResultChannel<ByteBuffer> result) {
 
         InputStream inputStream = null;
@@ -64,10 +63,7 @@ public class ReadConnection extends FilterInvocation<URI, ByteBuffer> {
 
             try {
 
-                while (outputStream.write(inputStream) > 0) {
-
-                    // Keep looping...
-                }
+                outputStream.writeAll(inputStream);
 
             } finally {
 

@@ -236,7 +236,7 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
             outputMap.put(integer, ioChannel);
         }
 
-        channel.passTo(new SortingOutputConsumer<OUT>(inputMap));
+        channel.passTo(new SortingOutputMapConsumer<OUT>(inputMap));
         return outputMap;
     }
 
@@ -267,7 +267,7 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
             outputMap.put(index, ioChannel);
         }
 
-        channel.passTo(new SortingOutputConsumer<OUT>(inputMap));
+        channel.passTo(new SortingOutputMapConsumer<OUT>(inputMap));
         return outputMap;
     }
 
@@ -296,7 +296,7 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
             outputMap.put(index, ioChannel);
         }
 
-        channel.passTo(new SortingOutputConsumer<OUT>(inputMap));
+        channel.passTo(new SortingOutputMapConsumer<OUT>(inputMap));
         return outputMap;
     }
 
@@ -357,7 +357,7 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
      *
      * @param <OUT> the output data type.
      */
-    private static class SortingOutputConsumer<OUT>
+    private static class SortingOutputMapConsumer<OUT>
             implements OutputConsumer<ParcelableSelectable<? extends OUT>> {
 
         private final SparseArray<IOChannel<OUT, OUT>> mChannels;
@@ -367,7 +367,7 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
          *
          * @param channels the map of indexes and I/O channels.
          */
-        private SortingOutputConsumer(@NotNull final SparseArray<IOChannel<OUT, OUT>> channels) {
+        private SortingOutputMapConsumer(@NotNull final SparseArray<IOChannel<OUT, OUT>> channels) {
 
             mChannels = channels;
         }

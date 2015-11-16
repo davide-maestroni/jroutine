@@ -652,7 +652,7 @@ public class Channels {
             outputMap.put(integer, ioChannel);
         }
 
-        channel.passTo(new SortingOutputConsumer<OUT>(inputMap));
+        channel.passTo(new SortingOutputMapConsumer<OUT>(inputMap));
         return outputMap;
     }
 
@@ -684,7 +684,7 @@ public class Channels {
             outputMap.put(index, ioChannel);
         }
 
-        channel.passTo(new SortingOutputConsumer<OUT>(inputMap));
+        channel.passTo(new SortingOutputMapConsumer<OUT>(inputMap));
         return outputMap;
     }
 
@@ -715,7 +715,7 @@ public class Channels {
             outputMap.put(index, ioChannel);
         }
 
-        channel.passTo(new SortingOutputConsumer<OUT>(inputMap));
+        channel.passTo(new SortingOutputMapConsumer<OUT>(inputMap));
         return outputMap;
     }
 
@@ -1404,7 +1404,7 @@ public class Channels {
      *
      * @param <OUT> the output data type.
      */
-    private static class SortingOutputConsumer<OUT>
+    private static class SortingOutputMapConsumer<OUT>
             implements OutputConsumer<Selectable<? extends OUT>> {
 
         private final HashMap<Integer, IOChannel<OUT, OUT>> mChannels;
@@ -1414,7 +1414,7 @@ public class Channels {
          *
          * @param channels the map of indexes and I/O channels.
          */
-        private SortingOutputConsumer(
+        private SortingOutputMapConsumer(
                 @NotNull final HashMap<Integer, IOChannel<OUT, OUT>> channels) {
 
             mChannels = channels;

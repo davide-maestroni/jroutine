@@ -20,8 +20,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 /**
  * Class wrapping a bi-consumer instance.
  * <p/>
@@ -66,8 +64,6 @@ public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2> {
      * @return the composed bi-consumer.
      */
     @NotNull
-    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
-            justification = "class comparison with == is done")
     public BiConsumerWrapper<IN1, IN2> andThen(
             @NotNull final BiConsumer<? super IN1, ? super IN2> after) {
 

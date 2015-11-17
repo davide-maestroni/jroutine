@@ -20,8 +20,6 @@ import com.github.dm.jrt.log.Logger;
 
 import org.jetbrains.annotations.NotNull;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 /**
  * Utility class extending the base one in order to support additional routine builders specific to
  * the Android platform.<br/>
@@ -81,8 +79,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * <p/>
  * Created by davide-maestroni on 01/08/2015.
  */
-@SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS",
-        justification = "utility class extending the functions of another utility class")
 public class JRoutine extends com.github.dm.jrt.core.JRoutine {
 
     /**

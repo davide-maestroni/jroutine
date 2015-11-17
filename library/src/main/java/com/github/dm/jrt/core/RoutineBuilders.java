@@ -61,8 +61,6 @@ import java.util.Map.Entry;
 import java.util.TreeSet;
 import java.util.concurrent.locks.ReentrantLock;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import static com.github.dm.jrt.util.Reflection.asArgs;
 
 /**
@@ -998,8 +996,6 @@ public class RoutineBuilders {
     /**
      * Data class storing information about the target method.
      */
-    @SuppressFBWarnings(value = "URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD",
-            justification = "this is an immutable data class")
     public static class MethodInfo {
 
         /**

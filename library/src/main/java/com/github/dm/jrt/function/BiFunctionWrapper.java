@@ -17,8 +17,6 @@ import com.github.dm.jrt.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 /**
  * Class wrapping a bi-function instance.
  * <p/>
@@ -67,8 +65,6 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
      * @return the composed bi-function.
      */
     @NotNull
-    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
-            justification = "class comparison with == is done")
     public <AFTER> BiFunctionWrapper<IN1, IN2, AFTER> andThen(
             @NotNull final Function<? super OUT, AFTER> after) {
 

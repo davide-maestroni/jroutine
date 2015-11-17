@@ -51,8 +51,6 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import static com.github.dm.jrt.android.invocation.ContextInvocations.fromFactory;
 
 /**
@@ -408,8 +406,6 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
 
     @Override
     @SuppressWarnings("unchecked")
-    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST_OF_RETURN_VALUE",
-            justification = "class comparison with == is done")
     protected void onCall(@NotNull final List<? extends IN> inputs,
             @NotNull final ResultChannel<OUT> result) {
 
@@ -554,8 +550,6 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
 
     @NotNull
     @SuppressWarnings("unchecked")
-    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
-            justification = "class comparison with == is done")
     private ClashType getClashType(@Nullable final Loader<InvocationResult<OUT>> loader,
             final int loaderId, @NotNull final List<? extends IN> inputs) {
 

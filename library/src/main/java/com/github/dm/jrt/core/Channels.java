@@ -30,8 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 /**
  * Utility class for handling routine channels.
  * <p/>
@@ -890,8 +888,6 @@ public class Channels {
      *
      * @param <DATA> the data type.
      */
-    @SuppressFBWarnings(value = "URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD",
-            justification = "this is an immutable data class")
     public static class Selectable<DATA> {
 
         /**

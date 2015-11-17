@@ -20,8 +20,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 /**
  * Class wrapping a predicate instance.
  * <p/>
@@ -77,8 +75,6 @@ public class PredicateWrapper<IN> implements Predicate<IN> {
      * @return the composed predicate.
      */
     @NotNull
-    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
-            justification = "class comparison with == is done")
     public PredicateWrapper<IN> and(@NotNull final Predicate<? super IN> other) {
 
         final Class<? extends Predicate> otherClass = other.getClass();
@@ -245,8 +241,6 @@ public class PredicateWrapper<IN> implements Predicate<IN> {
      * @return the composed predicate.
      */
     @NotNull
-    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
-            justification = "class comparison with == is done")
     public PredicateWrapper<IN> or(@NotNull final Predicate<? super IN> other) {
 
         final Class<? extends Predicate> otherClass = other.getClass();

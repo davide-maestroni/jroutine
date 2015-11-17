@@ -17,8 +17,6 @@ import com.github.dm.jrt.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 /**
  * Class wrapping a supplier instance.
  * <p/>
@@ -65,8 +63,6 @@ public class SupplierWrapper<OUT> implements Supplier<OUT> {
      * @return the composed function.
      */
     @NotNull
-    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
-            justification = "class comparison with == is done")
     public <AFTER> SupplierWrapper<AFTER> andThen(
             @NotNull final Function<? super OUT, AFTER> after) {
 

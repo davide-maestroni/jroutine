@@ -63,7 +63,6 @@ findbugs {
 }
 
 tasks.withType(FindBugs) {
-    // Too many false positives...
     excludeFilter = file('findbugs.xml')
 }
 

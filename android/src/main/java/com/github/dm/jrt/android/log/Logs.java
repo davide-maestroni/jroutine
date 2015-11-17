@@ -15,15 +15,11 @@ package com.github.dm.jrt.android.log;
 
 import org.jetbrains.annotations.NotNull;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 /**
  * Utility class for creating and sharing log instances, employing specific Android classes.
  * <p/>
  * Created by davide-maestroni on 12/22/2014.
  */
-@SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS",
-        justification = "utility class extending the functions of another utility class")
 public class Logs extends com.github.dm.jrt.log.Logs {
 
     private static final AndroidLog sAndroidLog = new AndroidLog();

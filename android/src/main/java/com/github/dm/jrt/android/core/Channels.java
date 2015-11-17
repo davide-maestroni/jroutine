@@ -28,15 +28,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 /**
  * Utility class for handling routine channels.
  * <p/>
  * Created by davide-maestroni on 06/18/2015.
  */
-@SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS",
-        justification = "utility class extending the functions of another utility class")
 public class Channels extends com.github.dm.jrt.core.Channels {
 
     /**

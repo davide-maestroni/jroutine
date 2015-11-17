@@ -19,8 +19,6 @@ import com.github.dm.jrt.android.v11.core.LoaderContext;
 
 import org.jetbrains.annotations.NotNull;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 /**
  * Utility class used to create builders of objects wrapping target ones, so to enable asynchronous
  * calls of their methods, bound to a context lifecycle.
@@ -39,8 +37,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * @see com.github.dm.jrt.android.proxy.annotation.LoaderProxy LoaderProxy
  * @see com.github.dm.jrt.annotation Annotations
  */
-@SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS",
-        justification = "utility class extending the functions of another utility class")
 public class JRoutineProxy extends com.github.dm.jrt.android.proxy.core.JRoutineProxy {
 
     /**

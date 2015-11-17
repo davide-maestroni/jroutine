@@ -1064,5 +1064,8 @@ public class ByteChannelTest {
         assertThat(inputStream.read()).isEqualTo(-1);
         assertThat(inputStream.read(b)).isEqualTo(-1);
         assertThat(inputStream.read(b, 3, 3)).isEqualTo(-1);
+        stream.write(new ByteArrayInputStream(new byte[0]));
+        stream.flush();
+        assertThat(channel.eventuallyExit().all()).isEmpty();
     }
 }

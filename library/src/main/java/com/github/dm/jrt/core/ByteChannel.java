@@ -1221,14 +1221,23 @@ public class ByteChannel {
                 final int length = buffer.length;
                 final int offset = mOffset;
                 read = in.read(buffer, offset, length - offset);
-                mOffset += read;
-                size = mOffset;
-                isPass = (size >= length);
 
-                if (isPass) {
+                if (read > 0) {
 
-                    mOffset = 0;
-                    mBuffer = null;
+                    mOffset += Math.max(read, 0);
+                    size = mOffset;
+                    isPass = (size >= length);
+
+                    if (isPass) {
+
+                        mOffset = 0;
+                        mBuffer = null;
+                    }
+
+                } else {
+
+                    size = mOffset;
+                    isPass = false;
                 }
             }
 

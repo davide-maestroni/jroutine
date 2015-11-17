@@ -1201,16 +1201,7 @@ public class ByteChannel {
             return (mBuffer = acquire());
         }
 
-        /**
-         * Writes some bytes into the output stream by reading them from the specified input stream.
-         *
-         * @param in the input stream.
-         * @return the total number of bytes read into the buffer, or <code>-1</code> if there is no
-         * more data because the end of the stream has been reached.
-         * @throws IOException If the first byte cannot be read for any reason other than end of
-         *                     file, or if the input stream has been closed, or if some other I/O
-         *                     error occurs.
-         */
+        @Override
         public int write(@NotNull final InputStream in) throws IOException {
 
             final int read;

@@ -80,8 +80,7 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
     }
 
     /**
-     * Merges the specified channels into a selectable one.
-     * <p/>
+     * Merges the specified channels into a selectable one.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param channelMap the map of indexes and output channels.
@@ -203,7 +202,7 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
 
     /**
      * Returns a map of output channels returning the output data filtered by the specified indexes.
-     * <p/>
+     * <br/>
      * Note that the channel will be bound as a result of the call.
      *
      * @param startIndex the selectable start index.
@@ -242,7 +241,7 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
 
     /**
      * Returns a map of output channels returning the outputs filtered by the specified indexes.
-     * <p/>
+     * <br/>
      * Note that the channel will be bound as a result of the call.
      *
      * @param channel the selectable output channel.
@@ -273,7 +272,7 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
 
     /**
      * Returns a map of output channels returning the output data filtered by the specified indexes.
-     * <p/>
+     * <br/>
      * Note that the channel will be bound as a result of the call.
      *
      * @param channel the selectable output channel.

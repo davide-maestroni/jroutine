@@ -47,8 +47,7 @@ public class Channels extends com.github.dm.jrt.core.Channels {
     }
 
     /**
-     * Merges the specified channels into a selectable one.
-     * <p/>
+     * Merges the specified channels into a selectable one.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param startIndex the selectable start index.
@@ -80,8 +79,7 @@ public class Channels extends com.github.dm.jrt.core.Channels {
     }
 
     /**
-     * Merges the specified channels into a selectable one.
-     * <p/>
+     * Merges the specified channels into a selectable one.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param startIndex the selectable start index.
@@ -111,8 +109,8 @@ public class Channels extends com.github.dm.jrt.core.Channels {
     }
 
     /**
-     * Merges the specified channels into a selectable one.
-     * <p/>
+     * Merges the specified channels into a selectable one. The selectable indexes will be the same
+     * as the list ones.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param channels the channels to merge.
@@ -128,8 +126,8 @@ public class Channels extends com.github.dm.jrt.core.Channels {
     }
 
     /**
-     * Merges the specified channels into a selectable one.
-     * <p/>
+     * Merges the specified channels into a selectable one. The selectable indexes will be the same
+     * as the array ones.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param channels the channels to merge.
@@ -174,8 +172,7 @@ public class Channels extends com.github.dm.jrt.core.Channels {
 
     /**
      * Returns a new channel making the specified one selectable.<br/>
-     * Each output will be passed along unchanged.
-     * <p/>
+     * Each output will be passed along unchanged.<br/>
      * Note that the channel will be bound as a result of the call.
      *
      * @param channel the channel to make selectable.

@@ -65,7 +65,7 @@ public class Channels {
 
     /**
      * Combines the specified channels into a selectable one. The selectable indexes will be the
-     * same as the list ones.<br/>
+     * same as the array ones.<br/>
      * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
      * completion of the invocation lifecycle.
      *
@@ -284,8 +284,7 @@ public class Channels {
 
     /**
      * Returns an output channel joining the data coming from the specified list of channels.<br/>
-     * An output will be generated only when at least one result is available for each channel.
-     * <p/>
+     * An output will be generated only when at least one result is available for each channel.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param channels the list of channels.
@@ -302,8 +301,7 @@ public class Channels {
 
     /**
      * Returns an output channel joining the data coming from the specified list of channels.<br/>
-     * An output will be generated only when at least one result is available for each channel.
-     * <p/>
+     * An output will be generated only when at least one result is available for each channel.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param channels the array of channels.
@@ -321,8 +319,7 @@ public class Channels {
      * An output will be generated only when at least one result is available for each channel.
      * Moreover, when all the output channels complete, the remaining output will be returned by
      * filling the gaps with null instances, so that the generated list of data will always have the
-     * same size of the channel list.
-     * <p/>
+     * same size of the channel list.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param channels the list of channels.
@@ -342,8 +339,7 @@ public class Channels {
      * An output will be generated only when at least one result is available for each channel.
      * Moreover, when all the output channels complete, the remaining output will be returned by
      * filling the gaps with null instances, so that the generated list of data will always have the
-     * same size of the channel array.
-     * <p/>
+     * same size of the channel array.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param channels the array of channels.
@@ -357,8 +353,7 @@ public class Channels {
     }
 
     /**
-     * Merges the specified channels into a selectable one.
-     * <p/>
+     * Merges the specified channels into a selectable one.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param startIndex the selectable start index.
@@ -388,8 +383,7 @@ public class Channels {
     }
 
     /**
-     * Merges the specified channels into a selectable one.
-     * <p/>
+     * Merges the specified channels into a selectable one.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param startIndex the selectable start index.
@@ -418,8 +412,8 @@ public class Channels {
     }
 
     /**
-     * Merges the specified channels into a selectable one.
-     * <p/>
+     * Merges the specified channels into a selectable one. The selectable indexes will be the same
+     * as the list ones.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param channels the channels to merge.
@@ -435,8 +429,7 @@ public class Channels {
     }
 
     /**
-     * Merges the specified channels into a selectable one.
-     * <p/>
+     * Merges the specified channels into a selectable one.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param channelMap the map of indexes and output channels.
@@ -465,8 +458,8 @@ public class Channels {
     }
 
     /**
-     * Merges the specified channels into a selectable one.
-     * <p/>
+     * Merges the specified channels into a selectable one. The selectable indexes will be the same
+     * as the array ones.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param channels the channels to merge.
@@ -619,7 +612,7 @@ public class Channels {
 
     /**
      * Returns a map of output channels returning the output data filtered by the specified indexes.
-     * <p/>
+     * <br/>
      * Note that the channel will be bound as a result of the call.
      *
      * @param startIndex the selectable start index.
@@ -658,7 +651,7 @@ public class Channels {
 
     /**
      * Returns a map of output channels returning the outputs filtered by the specified indexes.
-     * <p/>
+     * <br/>
      * Note that the channel will be bound as a result of the call.
      *
      * @param channel the selectable output channel.
@@ -690,7 +683,7 @@ public class Channels {
 
     /**
      * Returns a map of output channels returning the output data filtered by the specified indexes.
-     * <p/>
+     * <br/>
      * Note that the channel will be bound as a result of the call.
      *
      * @param channel the selectable output channel.
@@ -782,8 +775,7 @@ public class Channels {
 
     /**
      * Returns a new channel making the specified one selectable.<br/>
-     * Each output will be passed along unchanged.
-     * <p/>
+     * Each output will be passed along unchanged.<br/>
      * Note that the channel will be bound as a result of the call.
      *
      * @param channel the channel to make selectable.

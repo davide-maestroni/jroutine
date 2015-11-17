@@ -1031,6 +1031,12 @@ public class ByteChannelTest {
         stream.write(b, 8, 0);
         stream.flush();
         assertThat(channel.eventuallyExit().all()).isEmpty();
+        stream.write(new ByteArrayInputStream(new byte[0]));
+        stream.flush();
+        assertThat(channel.eventuallyExit().all()).isEmpty();
+        stream.writeAll(new ByteArrayInputStream(new byte[0]));
+        stream.flush();
+        assertThat(channel.eventuallyExit().all()).isEmpty();
     }
 
     @Test
@@ -1064,8 +1070,5 @@ public class ByteChannelTest {
         assertThat(inputStream.read()).isEqualTo(-1);
         assertThat(inputStream.read(b)).isEqualTo(-1);
         assertThat(inputStream.read(b, 3, 3)).isEqualTo(-1);
-        stream.write(new ByteArrayInputStream(new byte[0]));
-        stream.flush();
-        assertThat(channel.eventuallyExit().all()).isEmpty();
     }
 }

@@ -1352,7 +1352,7 @@ public class ChannelsTest {
                 Channels.select(channel).index(Sort.STRING).afterMax(seconds(1)).next()).isEqualTo(
                 "test21");
         channel.pass(new Selectable<Object>("test21", Sort.STRING),
-                     new Selectable<Object>(-11, Sort.INTEGER));
+                     new Selectable<Object>(-11, Sort.INTEGER)).close();
         assertThat(
                 Channels.select(channel).index(Sort.INTEGER).afterMax(seconds(1)).next()).isEqualTo(
                 -11);
@@ -1464,6 +1464,22 @@ public class ChannelsTest {
             fail();
 
         } catch (final NullPointerException ignored) {
+
+        }
+
+        final IOChannel<Selectable<Object>, Selectable<Object>> channel =
+                JRoutine.io().buildChannel();
+        Channels.select(channel).index(0);
+        channel.pass(new Selectable<Object>("test", 0));
+        assertThat(Channels.select(channel).index(0).next()).isEqualTo("test");
+
+        try {
+
+            Channels.select(channel).index(1);
+
+            fail();
+
+        } catch (final IllegalStateException ignored) {
 
         }
     }

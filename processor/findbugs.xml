@@ -1,0 +1,7 @@
+<FindBugsFilter>
+    <Match>
+        <Class name="com.github.dm.jrt.processor.RoutineProcessor"/>
+        <Method name="parseTemplate"/>
+        <Bug pattern="UI_INHERITANCE_UNSAFE_GETRESOURCE"/>
+    </Match>
+</FindBugsFilter>

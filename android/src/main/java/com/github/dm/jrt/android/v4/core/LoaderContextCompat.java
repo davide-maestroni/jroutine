@@ -33,12 +33,12 @@ import java.lang.ref.WeakReference;
  * <p/>
  * Created by davide-maestroni on 07/08/2015.
  */
-public abstract class LoaderContext {
+public abstract class LoaderContextCompat {
 
     /**
      * Avoid direct instantiation.
      */
-    private LoaderContext() {
+    private LoaderContextCompat() {
 
     }
 
@@ -49,9 +49,9 @@ public abstract class LoaderContext {
      * @return the loader context.
      */
     @NotNull
-    public static LoaderContext contextFrom(@NotNull final Fragment fragment) {
+    public static LoaderContextCompat contextFrom(@NotNull final Fragment fragment) {
 
-        return new FragmentContext(fragment);
+        return new FragmentContextCompat(fragment);
     }
 
     /**
@@ -64,10 +64,10 @@ public abstract class LoaderContext {
      * @return the loader context.
      */
     @NotNull
-    public static LoaderContext contextFrom(@NotNull final Fragment fragment,
+    public static LoaderContextCompat contextFrom(@NotNull final Fragment fragment,
             @NotNull final Context context) {
 
-        return new WrappedFragmentContext(fragment, context);
+        return new WrappedFragmentContextCompat(fragment, context);
     }
 
     /**
@@ -77,9 +77,9 @@ public abstract class LoaderContext {
      * @return the loader context.
      */
     @NotNull
-    public static LoaderContext contextFrom(@NotNull final FragmentActivity activity) {
+    public static LoaderContextCompat contextFrom(@NotNull final FragmentActivity activity) {
 
-        return new ActivityContext(activity);
+        return new ActivityContextCompat(activity);
     }
 
     /**
@@ -92,10 +92,10 @@ public abstract class LoaderContext {
      * @return the loader context.
      */
     @NotNull
-    public static LoaderContext contextFrom(@NotNull final FragmentActivity activity,
+    public static LoaderContextCompat contextFrom(@NotNull final FragmentActivity activity,
             @NotNull final Context context) {
 
-        return new WrappedActivityContext(activity, context);
+        return new WrappedActivityContextCompat(activity, context);
     }
 
     /**
@@ -125,7 +125,7 @@ public abstract class LoaderContext {
     /**
      * Loader context wrapping an activity.
      */
-    private static class ActivityContext extends LoaderContext {
+    private static class ActivityContextCompat extends LoaderContextCompat {
 
         private final WeakReference<FragmentActivity> mActivity;
 
@@ -135,7 +135,7 @@ public abstract class LoaderContext {
          * @param activity the wrapped activity.
          */
         @SuppressWarnings("ConstantConditions")
-        private ActivityContext(@NotNull final FragmentActivity activity) {
+        private ActivityContextCompat(@NotNull final FragmentActivity activity) {
 
             if (activity == null) {
 
@@ -153,12 +153,12 @@ public abstract class LoaderContext {
                 return true;
             }
 
-            if (!(o instanceof ActivityContext)) {
+            if (!(o instanceof ActivityContextCompat)) {
 
                 return false;
             }
 
-            final ActivityContext that = (ActivityContext) o;
+            final ActivityContextCompat that = (ActivityContextCompat) o;
             final FragmentActivity referent = mActivity.get();
             return (referent != null) && referent.equals(that.mActivity.get());
         }
@@ -196,7 +196,7 @@ public abstract class LoaderContext {
     /**
      * Loader context wrapping a fragment.
      */
-    private static class FragmentContext extends LoaderContext {
+    private static class FragmentContextCompat extends LoaderContextCompat {
 
         private final WeakReference<Fragment> mFragment;
 
@@ -206,7 +206,7 @@ public abstract class LoaderContext {
          * @param fragment the wrapped fragment.
          */
         @SuppressWarnings("ConstantConditions")
-        private FragmentContext(@NotNull final Fragment fragment) {
+        private FragmentContextCompat(@NotNull final Fragment fragment) {
 
             if (fragment == null) {
 
@@ -224,12 +224,12 @@ public abstract class LoaderContext {
                 return true;
             }
 
-            if (!(o instanceof FragmentContext)) {
+            if (!(o instanceof FragmentContextCompat)) {
 
                 return false;
             }
 
-            final FragmentContext that = (FragmentContext) o;
+            final FragmentContextCompat that = (FragmentContextCompat) o;
             final Fragment referent = mFragment.get();
             return (referent != null) && referent.equals(that.mFragment.get());
         }
@@ -268,7 +268,7 @@ public abstract class LoaderContext {
     /**
      * Loader context wrapping an activity and its loader context.
      */
-    private static class WrappedActivityContext extends ActivityContext {
+    private static class WrappedActivityContextCompat extends ActivityContextCompat {
 
         private final WeakReference<Context> mContext;
 
@@ -279,7 +279,7 @@ public abstract class LoaderContext {
          * @param context  the wrapped context.
          */
         @SuppressWarnings("ConstantConditions")
-        private WrappedActivityContext(@NotNull final FragmentActivity activity,
+        private WrappedActivityContextCompat(@NotNull final FragmentActivity activity,
                 @NotNull final Context context) {
 
             super(activity);
@@ -303,7 +303,7 @@ public abstract class LoaderContext {
                 return true;
             }
 
-            if (!(o instanceof WrappedActivityContext)) {
+            if (!(o instanceof WrappedActivityContextCompat)) {
 
                 return false;
             }
@@ -313,7 +313,7 @@ public abstract class LoaderContext {
                 return false;
             }
 
-            final WrappedActivityContext that = (WrappedActivityContext) o;
+            final WrappedActivityContextCompat that = (WrappedActivityContextCompat) o;
             final Context referent = mContext.get();
             return (referent != null) && referent.equals(that.mContext.get());
         }
@@ -338,7 +338,7 @@ public abstract class LoaderContext {
     /**
      * Loader context wrapping a fragment and its loader context.
      */
-    private static class WrappedFragmentContext extends FragmentContext {
+    private static class WrappedFragmentContextCompat extends FragmentContextCompat {
 
         private final WeakReference<Context> mContext;
 
@@ -349,7 +349,7 @@ public abstract class LoaderContext {
          * @param context  the wrapped context.
          */
         @SuppressWarnings("ConstantConditions")
-        private WrappedFragmentContext(@NotNull final Fragment fragment,
+        private WrappedFragmentContextCompat(@NotNull final Fragment fragment,
                 @NotNull final Context context) {
 
             super(fragment);
@@ -373,7 +373,7 @@ public abstract class LoaderContext {
                 return true;
             }
 
-            if (!(o instanceof WrappedFragmentContext)) {
+            if (!(o instanceof WrappedFragmentContextCompat)) {
 
                 return false;
             }
@@ -383,7 +383,7 @@ public abstract class LoaderContext {
                 return false;
             }
 
-            final WrappedFragmentContext that = (WrappedFragmentContext) o;
+            final WrappedFragmentContextCompat that = (WrappedFragmentContextCompat) o;
             final Context referent = mContext.get();
             return (referent != null) && referent.equals(that.mContext.get());
         }

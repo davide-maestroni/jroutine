@@ -26,8 +26,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collections;
 import java.util.List;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 /**
  * Utility class supporting functional programming.
  * <p/>
@@ -497,8 +495,6 @@ public class Functions {
      * @return the wrapped bi-consumer.
      */
     @NotNull
-    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
-            justification = "class comparison with == is done")
     public static <IN1, IN2> BiConsumerWrapper<IN1, IN2> wrapBiConsumer(
             @NotNull final BiConsumer<IN1, IN2> consumer) {
 
@@ -527,8 +523,6 @@ public class Functions {
      * @return the wrapped bi-function.
      */
     @NotNull
-    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
-            justification = "class comparison with == is done")
     public static <IN1, IN2, OUT> BiFunctionWrapper<IN1, IN2, OUT> wrapBiFunction(
             @NotNull final BiFunction<IN1, IN2, OUT> function) {
 
@@ -555,8 +549,6 @@ public class Functions {
      * @return the wrapped consumer.
      */
     @NotNull
-    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
-            justification = "class comparison with == is done")
     public static <IN> ConsumerWrapper<IN> wrapConsumer(@NotNull final Consumer<IN> consumer) {
 
         if (consumer.getClass() == ConsumerWrapper.class) {
@@ -582,8 +574,6 @@ public class Functions {
      * @return the wrapped function.
      */
     @NotNull
-    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
-            justification = "class comparison with == is done")
     public static <IN, OUT> FunctionWrapper<IN, OUT> wrapFunction(
             @NotNull final Function<IN, OUT> function) {
 
@@ -609,8 +599,6 @@ public class Functions {
      * @return the wrapped predicate.
      */
     @NotNull
-    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
-            justification = "class comparison with == is done")
     public static <IN> PredicateWrapper<IN> wrapPredicate(@NotNull final Predicate<IN> predicate) {
 
         if (predicate.getClass() == PredicateWrapper.class) {
@@ -636,8 +624,6 @@ public class Functions {
      * @return the wrapped supplier.
      */
     @NotNull
-    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
-            justification = "class comparison with == is done")
     public static <OUT> SupplierWrapper<OUT> wrapSupplier(@NotNull final Supplier<OUT> supplier) {
 
         if (supplier.getClass() == SupplierWrapper.class) {

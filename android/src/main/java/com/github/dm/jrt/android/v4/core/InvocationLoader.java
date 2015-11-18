@@ -159,14 +159,14 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
                 new InvocationOutputConsumer<OUT>(this, logger);
         final LoaderContextInvocationFactory<IN, OUT> factory =
                 new LoaderContextInvocationFactory<IN, OUT>(mInvocation);
-        JRoutine.on(fromFactory(getContext(), factory))
-                .invocations()
-                .withOutputOrder(mOrderType)
-                .withLog(logger.getLog())
-                .withLogLevel(logger.getLogLevel())
-                .set()
-                .syncCall(mInputs)
-                .passTo(consumer);
+        JRoutineCompat.on(fromFactory(getContext(), factory))
+                      .invocations()
+                      .withOutputOrder(mOrderType)
+                      .withLog(logger.getLog())
+                      .withLogLevel(logger.getLogLevel())
+                      .set()
+                      .syncCall(mInputs)
+                      .passTo(consumer);
         return consumer.createResult();
     }
 

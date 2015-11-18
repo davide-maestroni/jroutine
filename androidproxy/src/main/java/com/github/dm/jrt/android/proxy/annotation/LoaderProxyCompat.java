@@ -21,7 +21,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation is used to indicate interfaces used as templates to generate proxy classes
+ * This annotation is used to indicate interfaces used as templates to generate proxy classes,
  * enabling asynchronous calls to the target instance methods, bound to a context lifecycle.<br/>
  * The target class is specified in the annotation value. A proxy class implementing the annotated
  * interface will be generated according to the specific annotation attributes.
@@ -38,7 +38,7 @@ import java.lang.annotation.Target;
  *
  *         -keepattributes RuntimeVisibleAnnotations
  *         -keepclassmembers class ** {
- *              &#64;com.github.dm.jrt.android.proxy.annotation.V4Proxy *;
+ *              &#64;com.github.dm.jrt.android.proxy.annotation.LoaderProxyCompat *;
  *         }
  *     </code>
  * </pre>
@@ -61,12 +61,12 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface V4Proxy {
+public @interface LoaderProxyCompat {
 
     /**
      * Constant indicating the default generated class name prefix.
      */
-    String DEFAULT_CLASS_PREFIX = "V4Proxy_";
+    String DEFAULT_CLASS_PREFIX = "LoaderProxyCompat_";
 
     /**
      * Constant indicating the default generated class name suffix.

@@ -20,8 +20,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 /**
  * Class wrapping a consumer instance.
  * <p/>
@@ -65,8 +63,6 @@ public class ConsumerWrapper<IN> implements Consumer<IN> {
      * @return the composed consumer.
      */
     @NotNull
-    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
-            justification = "class comparison with == is done")
     public ConsumerWrapper<IN> andThen(@NotNull final Consumer<? super IN> after) {
 
         final Class<? extends Consumer> consumerClass = after.getClass();

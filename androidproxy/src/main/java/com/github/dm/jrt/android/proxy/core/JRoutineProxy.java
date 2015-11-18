@@ -19,8 +19,6 @@ import com.github.dm.jrt.android.proxy.builder.ServiceProxyRoutineBuilder;
 
 import org.jetbrains.annotations.NotNull;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 /**
  * Utility class used to create builders of objects wrapping target ones, so to enable asynchronous
  * calls of their methods in a dedicated service.
@@ -35,8 +33,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * @see com.github.dm.jrt.android.proxy.annotation.ServiceProxy ServiceProxy
  * @see com.github.dm.jrt.annotation Annotations
  */
-@SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS",
-        justification = "utility class extending the functions of another utility class")
 public class JRoutineProxy extends com.github.dm.jrt.proxy.core.JRoutineProxy {
 
     /**

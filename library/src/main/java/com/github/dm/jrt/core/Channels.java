@@ -30,8 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 /**
  * Utility class for handling routine channels.
  * <p/>
@@ -60,14 +58,14 @@ public class Channels {
             @NotNull final Routine<IN, OUT> routine) {
 
         final IOChannel<IN, IN> ioChannel = JRoutine.io().buildChannel();
-        return new DefaultStreamingChannel<IN, OUT>(ioChannel, routine.asyncCall(ioChannel));
+        return stream(ioChannel, routine.asyncCall(ioChannel));
     }
 
     /**
      * Combines the specified channels into a selectable one. The selectable indexes will be the
-     * same as the list ones.<br/>
-     * Note that the returned channel must be closed in order to ensure the completion of the
-     * invocation lifecycle.
+     * same as the array ones.<br/>
+     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
+     * completion of the invocation lifecycle.
      *
      * @param channels the array of input channels.
      * @return the selectable I/O channel.
@@ -82,8 +80,8 @@ public class Channels {
 
     /**
      * Combines the specified channels into a selectable one.<br/>
-     * Note that the returned channel must be closed in order to ensure the completion of the
-     * invocation lifecycle.
+     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
+     * completion of the invocation lifecycle.
      *
      * @param startIndex the selectable start index.
      * @param channels   the array of input channels.
@@ -118,8 +116,8 @@ public class Channels {
 
     /**
      * Combines the specified channels into a selectable one.<br/>
-     * Note that the returned channel must be closed in order to ensure the completion of the
-     * invocation lifecycle.
+     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
+     * completion of the invocation lifecycle.
      *
      * @param startIndex the selectable start index.
      * @param channels   the list of input channels.
@@ -157,8 +155,8 @@ public class Channels {
     /**
      * Combines the specified channels into a selectable one. The selectable indexes will be the
      * same as the list ones.<br/>
-     * Note that the returned channel must be closed in order to ensure the completion of the
-     * invocation lifecycle.
+     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
+     * completion of the invocation lifecycle.
      *
      * @param channels the list of input channels.
      * @param <IN>     the input data type.
@@ -174,8 +172,8 @@ public class Channels {
 
     /**
      * Combines the specified channels into a selectable one.<br/>
-     * Note that the returned channel must be closed in order to ensure the completion of the
-     * invocation lifecycle.
+     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
+     * completion of the invocation lifecycle.
      *
      * @param channels the map of indexes and input channels.
      * @param <IN>     the input data type.
@@ -211,8 +209,8 @@ public class Channels {
     /**
      * Returns a new channel distributing the input data among the specified channels. If the list
      * of data exceeds the number of channels, the invocation will be aborted.<br/>
-     * Note that the returned channel must be closed in order to ensure the completion of the
-     * invocation lifecycle.
+     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
+     * completion of the invocation lifecycle.
      *
      * @param channels the array of channels.
      * @return the I/O channel.
@@ -228,8 +226,8 @@ public class Channels {
     /**
      * Returns a new channel distributing the input data among the specified channels. If the list
      * of data exceeds the number of channels, the invocation will be aborted.<br/>
-     * Note that the returned channel must be closed in order to ensure the completion of the
-     * invocation lifecycle.
+     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
+     * completion of the invocation lifecycle.
      *
      * @param channels the list of channels.
      * @param <IN>     the input data type.
@@ -248,8 +246,8 @@ public class Channels {
      * of data is smaller of the specified number of channels, the remaining ones will be fed with
      * null objects. While, if the list of data exceeds the number of channels, the invocation will
      * be aborted.<br/>
-     * Note that the returned channel must be closed in order to ensure the completion of the
-     * invocation lifecycle.
+     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
+     * completion of the invocation lifecycle.
      *
      * @param channels the array of channels.
      * @return the I/O channel.
@@ -267,8 +265,8 @@ public class Channels {
      * of data is smaller of the specified number of channels, the remaining ones will be fed with
      * null objects. While, if the list of data exceeds the number of channels, the invocation will
      * be aborted.<br/>
-     * Note that the returned channel must be closed in order to ensure the completion of the
-     * invocation lifecycle.
+     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
+     * completion of the invocation lifecycle.
      *
      * @param channels the list of channels.
      * @param <IN>     the input data type.
@@ -284,8 +282,7 @@ public class Channels {
 
     /**
      * Returns an output channel joining the data coming from the specified list of channels.<br/>
-     * An output will be generated only when at least one result is available for each channel.
-     * <p/>
+     * An output will be generated only when at least one result is available for each channel.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param channels the list of channels.
@@ -302,8 +299,7 @@ public class Channels {
 
     /**
      * Returns an output channel joining the data coming from the specified list of channels.<br/>
-     * An output will be generated only when at least one result is available for each channel.
-     * <p/>
+     * An output will be generated only when at least one result is available for each channel.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param channels the array of channels.
@@ -321,8 +317,7 @@ public class Channels {
      * An output will be generated only when at least one result is available for each channel.
      * Moreover, when all the output channels complete, the remaining output will be returned by
      * filling the gaps with null instances, so that the generated list of data will always have the
-     * same size of the channel list.
-     * <p/>
+     * same size of the channel list.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param channels the list of channels.
@@ -342,8 +337,7 @@ public class Channels {
      * An output will be generated only when at least one result is available for each channel.
      * Moreover, when all the output channels complete, the remaining output will be returned by
      * filling the gaps with null instances, so that the generated list of data will always have the
-     * same size of the channel array.
-     * <p/>
+     * same size of the channel array.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param channels the array of channels.
@@ -357,201 +351,7 @@ public class Channels {
     }
 
     /**
-     * Returns a map of input channels accepting the input data identified by the specified indexes.
-     * <br/>
-     * Note that the returned channels must be closed in order to ensure the completion of the
-     * invocation lifecycle.
-     *
-     * @param channel the selectable channel.
-     * @param indexes the iterable returning the channel indexes.
-     * @param <DATA>  the channel data type.
-     * @param <IN>    the input data type.
-     * @return the map of indexes and I/O channels.
-     */
-    @NotNull
-    public static <DATA, IN extends DATA> Map<Integer, IOChannel<IN, IN>> map(
-            @NotNull final InputChannel<? super Selectable<DATA>> channel,
-            @NotNull final Iterable<Integer> indexes) {
-
-        final HashMap<Integer, IOChannel<IN, IN>> channelMap =
-                new HashMap<Integer, IOChannel<IN, IN>>();
-
-        for (final Integer index : indexes) {
-
-            channelMap.put(index, Channels.<DATA, IN>select(channel, index));
-        }
-
-        return channelMap;
-    }
-
-    /**
-     * Returns a map of input channels accepting the input data identified by the specified indexes.
-     * <br/>
-     * Note that the returned channels must be closed in order to ensure the completion of the
-     * invocation lifecycle.
-     *
-     * @param channel the selectable channel.
-     * @param indexes the array of indexes.
-     * @param <DATA>  the channel data type.
-     * @param <IN>    the input data type.
-     * @return the map of indexes and I/O channels.
-     */
-    @NotNull
-    public static <DATA, IN extends DATA> Map<Integer, IOChannel<IN, IN>> map(
-            @NotNull final InputChannel<? super Selectable<DATA>> channel,
-            @NotNull final int... indexes) {
-
-        final int size = indexes.length;
-        final HashMap<Integer, IOChannel<IN, IN>> channelMap =
-                new HashMap<Integer, IOChannel<IN, IN>>(size);
-
-        for (final int index : indexes) {
-
-            channelMap.put(index, Channels.<DATA, IN>select(channel, index));
-        }
-
-        return channelMap;
-    }
-
-    /**
-     * Returns a map of input channels accepting the input data identified by the specified indexes.
-     * <br/>
-     * Note that the returned channels must be closed in order to ensure the completion of the
-     * invocation lifecycle.
-     *
-     * @param startIndex the selectable start index.
-     * @param rangeSize  the size of the range of indexes (must be positive).
-     * @param channel    the selectable channel.
-     * @param <DATA>     the channel data type.
-     * @param <IN>       the input data type.
-     * @return the map of indexes and I/O channels.
-     * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
-     */
-    @NotNull
-    public static <DATA, IN extends DATA> Map<Integer, IOChannel<IN, IN>> map(final int startIndex,
-            final int rangeSize, @NotNull final InputChannel<? super Selectable<DATA>> channel) {
-
-        if (rangeSize <= 0) {
-
-            throw new IllegalArgumentException("invalid range size: " + rangeSize);
-        }
-
-        final HashMap<Integer, IOChannel<IN, IN>> channelMap =
-                new HashMap<Integer, IOChannel<IN, IN>>(rangeSize);
-
-        for (int index = startIndex; index < rangeSize; index++) {
-
-            channelMap.put(index, Channels.<DATA, IN>select(channel, index));
-        }
-
-        return channelMap;
-    }
-
-    /**
-     * Returns a map of output channels returning the output data filtered by the specified indexes.
-     * <p/>
-     * Note that the channel will be bound as a result of the call.
-     *
-     * @param startIndex the selectable start index.
-     * @param rangeSize  the size of the range of indexes (must be positive).
-     * @param channel    the selectable channel.
-     * @param <OUT>      the output data type.
-     * @return the map of indexes and output channels.
-     * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
-     */
-    @NotNull
-    public static <OUT> Map<Integer, OutputChannel<OUT>> map(final int startIndex,
-            final int rangeSize,
-            @NotNull final OutputChannel<? extends Selectable<? extends OUT>> channel) {
-
-        if (rangeSize <= 0) {
-
-            throw new IllegalArgumentException("invalid range size: " + rangeSize);
-        }
-
-        final HashMap<Integer, IOChannel<OUT, OUT>> inputMap =
-                new HashMap<Integer, IOChannel<OUT, OUT>>(rangeSize);
-        final HashMap<Integer, OutputChannel<OUT>> outputMap =
-                new HashMap<Integer, OutputChannel<OUT>>(rangeSize);
-
-        for (int index = startIndex; index < rangeSize; index++) {
-
-            final Integer integer = index;
-            final IOChannel<OUT, OUT> ioChannel = JRoutine.io().buildChannel();
-            inputMap.put(integer, ioChannel);
-            outputMap.put(integer, ioChannel);
-        }
-
-        channel.passTo(new SortingOutputConsumer<OUT>(inputMap));
-        return outputMap;
-    }
-
-    /**
-     * Returns a map of output channels returning the output data filtered by the specified indexes.
-     * <p/>
-     * Note that the channel will be bound as a result of the call.
-     *
-     * @param channel the selectable output channel.
-     * @param indexes the iterable returning the channel indexes.
-     * @param <OUT>   the output data type.
-     * @return the map of indexes and output channels.
-     */
-    @NotNull
-    public static <OUT> Map<Integer, OutputChannel<OUT>> map(
-            @NotNull final OutputChannel<? extends Selectable<? extends OUT>> channel,
-            @NotNull final Iterable<Integer> indexes) {
-
-        final HashMap<Integer, IOChannel<OUT, OUT>> inputMap =
-                new HashMap<Integer, IOChannel<OUT, OUT>>();
-        final HashMap<Integer, OutputChannel<OUT>> outputMap =
-                new HashMap<Integer, OutputChannel<OUT>>();
-
-        for (final Integer index : indexes) {
-
-            final IOChannel<OUT, OUT> ioChannel = JRoutine.io().buildChannel();
-            inputMap.put(index, ioChannel);
-            outputMap.put(index, ioChannel);
-        }
-
-        channel.passTo(new SortingOutputConsumer<OUT>(inputMap));
-        return outputMap;
-    }
-
-    /**
-     * Returns a map of output channels returning the outputs filtered by the specified indexes.
-     * <p/>
-     * Note that the channel will be bound as a result of the call.
-     *
-     * @param channel the selectable output channel.
-     * @param indexes the list of indexes.
-     * @param <OUT>   the output data type.
-     * @return the map of indexes and output channels.
-     */
-    @NotNull
-    public static <OUT> Map<Integer, OutputChannel<OUT>> map(
-            @NotNull final OutputChannel<? extends Selectable<? extends OUT>> channel,
-            @NotNull final int... indexes) {
-
-        final int size = indexes.length;
-        final HashMap<Integer, IOChannel<OUT, OUT>> inputMap =
-                new HashMap<Integer, IOChannel<OUT, OUT>>(size);
-        final HashMap<Integer, OutputChannel<OUT>> outputMap =
-                new HashMap<Integer, OutputChannel<OUT>>(size);
-
-        for (final Integer index : indexes) {
-
-            final IOChannel<OUT, OUT> ioChannel = JRoutine.io().buildChannel();
-            inputMap.put(index, ioChannel);
-            outputMap.put(index, ioChannel);
-        }
-
-        channel.passTo(new SortingOutputConsumer<OUT>(inputMap));
-        return outputMap;
-    }
-
-    /**
-     * Merges the specified channels into a selectable one.
-     * <p/>
+     * Merges the specified channels into a selectable one.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param startIndex the selectable start index.
@@ -581,8 +381,7 @@ public class Channels {
     }
 
     /**
-     * Merges the specified channels into a selectable one.
-     * <p/>
+     * Merges the specified channels into a selectable one.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param startIndex the selectable start index.
@@ -611,8 +410,8 @@ public class Channels {
     }
 
     /**
-     * Merges the specified channels into a selectable one.
-     * <p/>
+     * Merges the specified channels into a selectable one. The selectable indexes will be the same
+     * as the list ones.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param channels the channels to merge.
@@ -628,8 +427,7 @@ public class Channels {
     }
 
     /**
-     * Merges the specified channels into a selectable one.
-     * <p/>
+     * Merges the specified channels into a selectable one.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param channelMap the map of indexes and output channels.
@@ -658,8 +456,8 @@ public class Channels {
     }
 
     /**
-     * Merges the specified channels into a selectable one.
-     * <p/>
+     * Merges the specified channels into a selectable one. The selectable indexes will be the same
+     * as the array ones.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param channels the channels to merge.
@@ -687,13 +485,13 @@ public class Channels {
             @NotNull final Routine<IN, OUT> routine) {
 
         final IOChannel<IN, IN> ioChannel = JRoutine.io().buildChannel();
-        return new DefaultStreamingChannel<IN, OUT>(ioChannel, routine.parallelCall(ioChannel));
+        return stream(ioChannel, routine.parallelCall(ioChannel));
     }
 
     /**
      * Returns a new channel transforming the input data into selectable ones.<br/>
-     * Note that the returned channel must be closed in order to ensure the completion of the
-     * invocation lifecycle.
+     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
+     * completion of the invocation lifecycle.
      *
      * @param channel the selectable channel.
      * @param index   the channel index.
@@ -719,28 +517,214 @@ public class Channels {
     }
 
     /**
-     * Returns a new channel transforming the output data into selectable ones.
-     * <p/>
-     * Note that the channel will be bound as a result of the call.
+     * Returns a map of input channels accepting the input data identified by the specified indexes.
+     * <br/>
+     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
+     * completion of the invocation lifecycle.
      *
      * @param channel the selectable channel.
-     * @param index   the channel index.
-     * @param <OUT>   the output data type.
-     * @return the output channel.
+     * @param indexes the iterable returning the channel indexes.
+     * @param <DATA>  the channel data type.
+     * @param <IN>    the input data type.
+     * @return the map of indexes and I/O channels.
      */
     @NotNull
-    public static <OUT> OutputChannel<OUT> select(
-            @Nullable final OutputChannel<? extends Selectable<? extends OUT>> channel,
-            final int index) {
+    public static <DATA, IN extends DATA> Map<Integer, IOChannel<IN, IN>> select(
+            @NotNull final InputChannel<? super Selectable<DATA>> channel,
+            @NotNull final Iterable<Integer> indexes) {
 
-        final IOChannel<OUT, OUT> ioChannel = JRoutine.io().buildChannel();
+        final HashMap<Integer, IOChannel<IN, IN>> channelMap =
+                new HashMap<Integer, IOChannel<IN, IN>>();
 
-        if (channel != null) {
+        for (final Integer index : indexes) {
 
-            channel.passTo(new FilterOutputConsumer<OUT>(ioChannel, index));
+            channelMap.put(index, Channels.<DATA, IN>select(channel, index));
         }
 
-        return ioChannel;
+        return channelMap;
+    }
+
+    /**
+     * Returns a map of input channels accepting the input data identified by the specified indexes.
+     * <br/>
+     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
+     * completion of the invocation lifecycle.
+     *
+     * @param channel the selectable channel.
+     * @param indexes the array of indexes.
+     * @param <DATA>  the channel data type.
+     * @param <IN>    the input data type.
+     * @return the map of indexes and I/O channels.
+     */
+    @NotNull
+    public static <DATA, IN extends DATA> Map<Integer, IOChannel<IN, IN>> select(
+            @NotNull final InputChannel<? super Selectable<DATA>> channel,
+            @NotNull final int... indexes) {
+
+        final int size = indexes.length;
+        final HashMap<Integer, IOChannel<IN, IN>> channelMap =
+                new HashMap<Integer, IOChannel<IN, IN>>(size);
+
+        for (final int index : indexes) {
+
+            channelMap.put(index, Channels.<DATA, IN>select(channel, index));
+        }
+
+        return channelMap;
+    }
+
+    /**
+     * Returns a map of input channels accepting the input data identified by the specified indexes.
+     * <br/>
+     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
+     * completion of the invocation lifecycle.
+     *
+     * @param startIndex the selectable start index.
+     * @param rangeSize  the size of the range of indexes (must be positive).
+     * @param channel    the selectable channel.
+     * @param <DATA>     the channel data type.
+     * @param <IN>       the input data type.
+     * @return the map of indexes and I/O channels.
+     * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
+     */
+    @NotNull
+    public static <DATA, IN extends DATA> Map<Integer, IOChannel<IN, IN>> select(
+            final int startIndex, final int rangeSize,
+            @NotNull final InputChannel<? super Selectable<DATA>> channel) {
+
+        if (rangeSize <= 0) {
+
+            throw new IllegalArgumentException("invalid range size: " + rangeSize);
+        }
+
+        final HashMap<Integer, IOChannel<IN, IN>> channelMap =
+                new HashMap<Integer, IOChannel<IN, IN>>(rangeSize);
+
+        for (int index = startIndex; index < rangeSize; index++) {
+
+            channelMap.put(index, Channels.<DATA, IN>select(channel, index));
+        }
+
+        return channelMap;
+    }
+
+    /**
+     * Returns a map of output channels returning the output data filtered by the specified indexes.
+     * <br/>
+     * Note that the channel will be bound as a result of the call.
+     *
+     * @param startIndex the selectable start index.
+     * @param rangeSize  the size of the range of indexes (must be positive).
+     * @param channel    the selectable channel.
+     * @param <OUT>      the output data type.
+     * @return the map of indexes and output channels.
+     * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
+     */
+    @NotNull
+    public static <OUT> Map<Integer, OutputChannel<OUT>> select(final int startIndex,
+            final int rangeSize,
+            @NotNull final OutputChannel<? extends Selectable<? extends OUT>> channel) {
+
+        if (rangeSize <= 0) {
+
+            throw new IllegalArgumentException("invalid range size: " + rangeSize);
+        }
+
+        final HashMap<Integer, IOChannel<OUT, OUT>> inputMap =
+                new HashMap<Integer, IOChannel<OUT, OUT>>(rangeSize);
+        final HashMap<Integer, OutputChannel<OUT>> outputMap =
+                new HashMap<Integer, OutputChannel<OUT>>(rangeSize);
+
+        for (int index = startIndex; index < rangeSize; index++) {
+
+            final Integer integer = index;
+            final IOChannel<OUT, OUT> ioChannel = JRoutine.io().buildChannel();
+            inputMap.put(integer, ioChannel);
+            outputMap.put(integer, ioChannel);
+        }
+
+        channel.passTo(new SortingOutputMapConsumer<OUT>(inputMap));
+        return outputMap;
+    }
+
+    /**
+     * Returns a map of output channels returning the outputs filtered by the specified indexes.
+     * <br/>
+     * Note that the channel will be bound as a result of the call.
+     *
+     * @param channel the selectable output channel.
+     * @param indexes the list of indexes.
+     * @param <OUT>   the output data type.
+     * @return the map of indexes and output channels.
+     */
+    @NotNull
+    public static <OUT> Map<Integer, OutputChannel<OUT>> select(
+            @NotNull final OutputChannel<? extends Selectable<? extends OUT>> channel,
+            @NotNull final int... indexes) {
+
+        final int size = indexes.length;
+        final HashMap<Integer, IOChannel<OUT, OUT>> inputMap =
+                new HashMap<Integer, IOChannel<OUT, OUT>>(size);
+        final HashMap<Integer, OutputChannel<OUT>> outputMap =
+                new HashMap<Integer, OutputChannel<OUT>>(size);
+
+        for (final Integer index : indexes) {
+
+            final IOChannel<OUT, OUT> ioChannel = JRoutine.io().buildChannel();
+            inputMap.put(index, ioChannel);
+            outputMap.put(index, ioChannel);
+        }
+
+        channel.passTo(new SortingOutputMapConsumer<OUT>(inputMap));
+        return outputMap;
+    }
+
+    /**
+     * Returns a map of output channels returning the output data filtered by the specified indexes.
+     * <br/>
+     * Note that the channel will be bound as a result of the call.
+     *
+     * @param channel the selectable output channel.
+     * @param indexes the iterable returning the channel indexes.
+     * @param <OUT>   the output data type.
+     * @return the map of indexes and output channels.
+     */
+    @NotNull
+    public static <OUT> Map<Integer, OutputChannel<OUT>> select(
+            @NotNull final OutputChannel<? extends Selectable<? extends OUT>> channel,
+            @NotNull final Iterable<Integer> indexes) {
+
+        final HashMap<Integer, IOChannel<OUT, OUT>> inputMap =
+                new HashMap<Integer, IOChannel<OUT, OUT>>();
+        final HashMap<Integer, OutputChannel<OUT>> outputMap =
+                new HashMap<Integer, OutputChannel<OUT>>();
+
+        for (final Integer index : indexes) {
+
+            final IOChannel<OUT, OUT> ioChannel = JRoutine.io().buildChannel();
+            inputMap.put(index, ioChannel);
+            outputMap.put(index, ioChannel);
+        }
+
+        channel.passTo(new SortingOutputMapConsumer<OUT>(inputMap));
+        return outputMap;
+    }
+
+    /**
+     * Creates and returns a new streaming channel backed by the specified input and output.
+     *
+     * @param inputChannel  the input channel.
+     * @param outputChannel the output channel.
+     * @param <IN>          the input data type.
+     * @param <OUT>         the output data type.
+     * @return the streaming channel.
+     */
+    @NotNull
+    public static <IN, OUT> StreamingChannel<IN, OUT> stream(
+            @NotNull final IOChannel<IN, ?> inputChannel,
+            @NotNull final OutputChannel<OUT> outputChannel) {
+
+        return new DefaultStreamingChannel<IN, OUT>(inputChannel, outputChannel);
     }
 
     /**
@@ -757,14 +741,14 @@ public class Channels {
             @NotNull final Routine<IN, OUT> routine) {
 
         final IOChannel<IN, IN> ioChannel = JRoutine.io().buildChannel();
-        return new DefaultStreamingChannel<IN, OUT>(ioChannel, routine.syncCall(ioChannel));
+        return stream(ioChannel, routine.syncCall(ioChannel));
     }
 
     /**
      * Returns a new selectable channel feeding the specified one.<br/>
      * Each output will be filtered based on the specified index.<br/>
-     * Note that the returned channel must be closed in order to ensure the completion of the
-     * invocation lifecycle.
+     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
+     * completion of the invocation lifecycle.
      *
      * @param channel the channel to make selectable.
      * @param index   the channel index.
@@ -789,8 +773,7 @@ public class Channels {
 
     /**
      * Returns a new channel making the specified one selectable.<br/>
-     * Each output will be passed along unchanged.
-     * <p/>
+     * Each output will be passed along unchanged.<br/>
      * Note that the channel will be bound as a result of the call.
      *
      * @param channel the channel to make selectable.
@@ -905,8 +888,6 @@ public class Channels {
      *
      * @param <DATA> the data type.
      */
-    @SuppressFBWarnings(value = "URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD",
-            justification = "this is an immutable data class")
     public static class Selectable<DATA> {
 
         /**
@@ -1086,49 +1067,6 @@ public class Channels {
         }
 
         public void onOutput(final Selectable<IN> selectable) {
-
-            if (selectable.index == mIndex) {
-
-                mChannel.pass(selectable.data);
-            }
-        }
-    }
-
-    /**
-     * Output consumer filtering selectable output data.
-     *
-     * @param <OUT> the output data type.
-     */
-    private static class FilterOutputConsumer<OUT>
-            implements OutputConsumer<Selectable<? extends OUT>> {
-
-        private final IOChannel<OUT, OUT> mChannel;
-
-        private final int mIndex;
-
-        /**
-         * Constructor.
-         *
-         * @param channel the I/O channel.
-         * @param index   the index to filter.
-         */
-        private FilterOutputConsumer(@NotNull final IOChannel<OUT, OUT> channel, final int index) {
-
-            mChannel = channel;
-            mIndex = index;
-        }
-
-        public void onComplete() {
-
-            mChannel.close();
-        }
-
-        public void onError(@Nullable final RoutineException error) {
-
-            mChannel.abort(error);
-        }
-
-        public void onOutput(final Selectable<? extends OUT> selectable) {
 
             if (selectable.index == mIndex) {
 
@@ -1454,7 +1392,7 @@ public class Channels {
      *
      * @param <OUT> the output data type.
      */
-    private static class SortingOutputConsumer<OUT>
+    private static class SortingOutputMapConsumer<OUT>
             implements OutputConsumer<Selectable<? extends OUT>> {
 
         private final HashMap<Integer, IOChannel<OUT, OUT>> mChannels;
@@ -1464,7 +1402,7 @@ public class Channels {
          *
          * @param channels the map of indexes and I/O channels.
          */
-        private SortingOutputConsumer(
+        private SortingOutputMapConsumer(
                 @NotNull final HashMap<Integer, IOChannel<OUT, OUT>> channels) {
 
             mChannels = channels;

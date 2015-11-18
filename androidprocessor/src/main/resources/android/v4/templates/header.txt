@@ -18,10 +18,10 @@ ${generatedPackage}
 
 public final class ${generatedClassName}${genericTypes} implements ${interfaceFullName} {
 
-    private final com.github.dm.jrt.android.v4.core.LoaderContext mContext;
+    private final com.github.dm.jrt.android.v4.core.LoaderContextCompat mContext;
 
     @SuppressWarnings("ConstantConditions")
-    public ${generatedClassName}(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.v4.core.LoaderContext context,
+    public ${generatedClassName}(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.v4.core.LoaderContextCompat context,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.ContextInvocationTarget<?> target,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.builder.InvocationConfiguration invocationConfiguration,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.builder.ProxyConfiguration proxyConfiguration,
@@ -58,25 +58,25 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
     }
 
     @org.jetbrains.annotations.NotNull
-    public static ContextBuilder with(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.v4.core.LoaderContext context) {
+    public static ContextBuilder with(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.v4.core.LoaderContextCompat context) {
 
         return new ContextBuilder(context);
     }
 
     @org.jetbrains.annotations.NotNull
     private static <OUT> com.github.dm.jrt.android.builder.LoaderRoutineBuilder<Object, OUT> getBuilder(
-            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.v4.core.LoaderContext context,
+            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.v4.core.LoaderContextCompat context,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory<Object, OUT> factory) {
 
-        return com.github.dm.jrt.android.v4.core.JRoutine.with(context).on(factory);
+        return com.github.dm.jrt.android.v4.core.JRoutineCompat.with(context).on(factory);
     }
 
     public static class ContextBuilder {
 
-        private final com.github.dm.jrt.android.v4.core.LoaderContext mContext;
+        private final com.github.dm.jrt.android.v4.core.LoaderContextCompat mContext;
 
         @SuppressWarnings("ConstantConditions")
-        private ContextBuilder(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.v4.core.LoaderContext context) {
+        private ContextBuilder(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.v4.core.LoaderContextCompat context) {
 
             if (context == null) {
 
@@ -101,12 +101,12 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
     private static class LoaderProxyObjectBuilder${genericTypes} extends com.github.dm.jrt.android.proxy.builder.AbstractLoaderProxyObjectBuilder<${interfaceFullName}> {
 
-        private final com.github.dm.jrt.android.v4.core.LoaderContext mContext;
+        private final com.github.dm.jrt.android.v4.core.LoaderContextCompat mContext;
 
         private final com.github.dm.jrt.android.core.ContextInvocationTarget<?> mTarget;
 
         @SuppressWarnings("ConstantConditions")
-        private LoaderProxyObjectBuilder(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.v4.core.LoaderContext context,
+        private LoaderProxyObjectBuilder(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.v4.core.LoaderContextCompat context,
                 @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.ContextInvocationTarget<?> target) {
 
             if (context == null) {

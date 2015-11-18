@@ -17,8 +17,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 /**
  * Utility class for handling a time duration in different time units.
  * <p/>
@@ -516,8 +514,6 @@ public class TimeDuration extends Time {
      * @param target the target object.
      * @throws java.lang.InterruptedException if the current thread is interrupted.
      */
-    @SuppressFBWarnings(value = "WA_NOT_IN_LOOP",
-            justification = "this is just a wrapper on an Object.wait() call")
     public void wait(@NotNull final Object target) throws InterruptedException {
 
         if (isZero()) {
@@ -544,8 +540,6 @@ public class TimeDuration extends Time {
      * @throws java.lang.InterruptedException if the current thread is interrupted.
      * @see java.lang.System#currentTimeMillis()
      */
-    @SuppressFBWarnings(value = "WA_NOT_IN_LOOP",
-            justification = "this is just a wrapper on an Object.wait() call")
     public boolean waitSinceMillis(@NotNull final Object target, final long milliTime) throws
             InterruptedException {
 
@@ -581,8 +575,6 @@ public class TimeDuration extends Time {
      * @throws java.lang.InterruptedException if the current thread is interrupted.
      * @see java.lang.System#nanoTime()
      */
-    @SuppressFBWarnings(value = "WA_NOT_IN_LOOP",
-            justification = "this is just a wrapper on an Object.wait() call")
     public boolean waitSinceNanos(@NotNull final Object target, final long nanoTime) throws
             InterruptedException {
 

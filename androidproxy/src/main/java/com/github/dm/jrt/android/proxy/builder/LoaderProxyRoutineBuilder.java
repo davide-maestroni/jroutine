@@ -39,9 +39,9 @@ public interface LoaderProxyRoutineBuilder
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * The proxy object is created through code generation based on the interfaces annotated with
-     * {@link com.github.dm.jrt.android.proxy.annotation.V4Proxy V4Proxy} or
-     * {@link com.github.dm.jrt.android.proxy.annotation.V11Proxy V11Proxy}. The generated class
-     * name and package will be chosen according to the specific annotation attributes.<br/>
+     * {@link com.github.dm.jrt.android.proxy.annotation.LoaderProxyCompat LoaderProxyCompat} or
+     * {@link com.github.dm.jrt.android.proxy.annotation.LoaderProxy LoaderProxy}. The generated
+     * class name and package will be chosen according to the specific annotation attributes.<br/>
      * It is actually possible to avoid the use of reflection for the proxy object instantiation by
      * explicitly calling the <code>&lt;generated_class_name&gt;.with()</code> method.<br/>
      * Note, however, that, since the class is generated, a generic IDE may highlight an error even
@@ -67,9 +67,9 @@ public interface LoaderProxyRoutineBuilder
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * The proxy object is created through code generation based on the interfaces annotated with
-     * {@link com.github.dm.jrt.android.proxy.annotation.V4Proxy V4Proxy} or
-     * {@link com.github.dm.jrt.android.proxy.annotation.V11Proxy V11Proxy}. The generated class
-     * name and package will be chosen according to the specific annotation attributes.<br/>
+     * {@link com.github.dm.jrt.android.proxy.annotation.LoaderProxyCompat LoaderProxyCompat} or
+     * {@link com.github.dm.jrt.android.proxy.annotation.LoaderProxy LoaderProxy}. The generated
+     * class name and package will be chosen according to the specific annotation attributes.<br/>
      * It is actually possible to avoid the use of reflection for the proxy object instantiation by
      * explicitly calling the <code>&lt;generated_class_name&gt;.with()</code> method.<br/>
      * Note, however, that, since the class is generated, a generic IDE may highlight an error even

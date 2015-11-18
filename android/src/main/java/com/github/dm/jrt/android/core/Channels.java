@@ -28,15 +28,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 /**
  * Utility class for handling routine channels.
  * <p/>
  * Created by davide-maestroni on 06/18/2015.
  */
-@SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS",
-        justification = "utility class extending the functions of another utility class")
 public class Channels extends com.github.dm.jrt.core.Channels {
 
     /**
@@ -47,8 +43,7 @@ public class Channels extends com.github.dm.jrt.core.Channels {
     }
 
     /**
-     * Merges the specified channels into a selectable one.
-     * <p/>
+     * Merges the specified channels into a selectable one.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param startIndex the selectable start index.
@@ -80,8 +75,7 @@ public class Channels extends com.github.dm.jrt.core.Channels {
     }
 
     /**
-     * Merges the specified channels into a selectable one.
-     * <p/>
+     * Merges the specified channels into a selectable one.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param startIndex the selectable start index.
@@ -111,8 +105,8 @@ public class Channels extends com.github.dm.jrt.core.Channels {
     }
 
     /**
-     * Merges the specified channels into a selectable one.
-     * <p/>
+     * Merges the specified channels into a selectable one. The selectable indexes will be the same
+     * as the list ones.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param channels the channels to merge.
@@ -128,8 +122,8 @@ public class Channels extends com.github.dm.jrt.core.Channels {
     }
 
     /**
-     * Merges the specified channels into a selectable one.
-     * <p/>
+     * Merges the specified channels into a selectable one. The selectable indexes will be the same
+     * as the array ones.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param channels the channels to merge.
@@ -145,8 +139,8 @@ public class Channels extends com.github.dm.jrt.core.Channels {
 
     /**
      * Returns a new channel transforming the input data into selectable ones.<br/>
-     * Note that the returned channel must be closed in order to ensure the completion of the
-     * invocation lifecycle.
+     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
+     * completion of the invocation lifecycle.
      *
      * @param channel the selectable channel.
      * @param index   the channel index.
@@ -174,8 +168,7 @@ public class Channels extends com.github.dm.jrt.core.Channels {
 
     /**
      * Returns a new channel making the specified one selectable.<br/>
-     * Each output will be passed along unchanged.
-     * <p/>
+     * Each output will be passed along unchanged.<br/>
      * Note that the channel will be bound as a result of the call.
      *
      * @param channel the channel to make selectable.

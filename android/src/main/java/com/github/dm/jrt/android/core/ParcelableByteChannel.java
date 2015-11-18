@@ -18,6 +18,7 @@ import android.os.Parcelable;
 
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InputChannel;
+import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.channel.TemplateOutputConsumer;
 import com.github.dm.jrt.core.ByteChannel;
@@ -52,8 +53,14 @@ public class ParcelableByteChannel {
 
     private final WeakIdentityHashMap<InputChannel<? super ParcelableByteBuffer>,
             IOChannel<ByteBuffer, ByteBuffer>>
-            mStreams =
+            mChannels =
             new WeakIdentityHashMap<InputChannel<? super ParcelableByteBuffer>,
+                    IOChannel<ByteBuffer, ByteBuffer>>();
+
+    private final WeakIdentityHashMap<IOChannel<? super ParcelableByteBuffer, ?>,
+            IOChannel<ByteBuffer, ByteBuffer>>
+            mIOChannels =
+            new WeakIdentityHashMap<IOChannel<? super ParcelableByteBuffer, ?>,
                     IOChannel<ByteBuffer, ByteBuffer>>();
 
     /**
@@ -217,9 +224,7 @@ public class ParcelableByteChannel {
     }
 
     /**
-     * Returns the output stream used to write bytes into the specified channel.<br/>
-     * Note that, if the method is called more than one time, passing the same input channel, it
-     * will return the same output stream.
+     * Returns the output stream used to write bytes into the specified channel.
      *
      * @param channel the input channel to which to pass the data.
      * @return the output stream.
@@ -230,18 +235,50 @@ public class ParcelableByteChannel {
 
         IOChannel<ByteBuffer, ByteBuffer> ioChannel;
 
-        synchronized (mStreams) {
+        synchronized (mChannels) {
 
             final WeakIdentityHashMap<InputChannel<? super ParcelableByteBuffer>,
                     IOChannel<ByteBuffer, ByteBuffer>>
-                    streams = mStreams;
-            ioChannel = streams.get(channel);
+                    channels = mChannels;
+            ioChannel = channels.get(channel);
 
             if (ioChannel == null) {
 
                 ioChannel = JRoutine.io().buildChannel();
                 ioChannel.passTo(new BufferOutputConsumer(channel));
-                streams.put(channel, ioChannel);
+                channels.put(channel, ioChannel);
+            }
+        }
+
+        return mByteChannel.passTo(ioChannel.asInput());
+    }
+
+    /**
+     * Returns the output stream used to write bytes into the specified channel.<br/>
+     * Note that the channel will be automatically closed as soon as the returned output stream is
+     * closed.
+     *
+     * @param channel the I/O channel to which pass the data.
+     * @return the output stream.
+     */
+    @NotNull
+    public BufferOutputStream passTo(
+            @NotNull final IOChannel<? super ParcelableByteBuffer, ?> channel) {
+
+        IOChannel<ByteBuffer, ByteBuffer> ioChannel;
+
+        synchronized (mIOChannels) {
+
+            final WeakIdentityHashMap<IOChannel<? super ParcelableByteBuffer, ?>,
+                    IOChannel<ByteBuffer, ByteBuffer>>
+                    channels = mIOChannels;
+            ioChannel = channels.get(channel);
+
+            if (ioChannel == null) {
+
+                ioChannel = JRoutine.io().buildChannel();
+                ioChannel.passTo(new IOBufferOutputConsumer(channel));
+                channels.put(channel, ioChannel);
             }
         }
 
@@ -291,7 +328,7 @@ public class ParcelableByteChannel {
 
                             } catch (final IOException ignored) {
 
-                                // It should never happens...
+                                // It should never happen...
                             }
                         }
 
@@ -323,7 +360,6 @@ public class ParcelableByteChannel {
             return 0;
         }
 
-        @SuppressWarnings({"ResultOfMethodCallIgnored", "StatementWithEmptyBody"})
         public void writeToParcel(final Parcel dest, final int flags) {
 
             final ByteBuffer buffer = mBuffer;
@@ -336,15 +372,12 @@ public class ParcelableByteChannel {
 
                 try {
 
-                    while (inputStream.read(outputStream) > 0) {
-
-                    }
-
+                    inputStream.readAll(outputStream);
                     outputStream.writeToParcel(dest);
 
                 } catch (final IOException ignored) {
 
-                    // It should never happens...
+                    // It should never happen...
                     dest.writeByteArray(EMPTY_ARRAY);
                 }
 
@@ -477,6 +510,52 @@ public class ParcelableByteChannel {
         @Override
         public void reset() {
 
+        }
+
+        @Override
+        public long readAll(@NotNull final OutputStream out) throws IOException {
+
+            return 0;
+        }
+    }
+
+    /**
+     * Output consumer transforming byte buffers into parcelable buffers.
+     */
+    private static class IOBufferOutputConsumer implements OutputConsumer<ByteBuffer> {
+
+        private final IOChannel<? super ParcelableByteBuffer, ?> mChannel;
+
+        /**
+         * Constructor.
+         *
+         * @param channel the input channel to which to pass the data.
+         */
+        @SuppressWarnings("ConstantConditions")
+        private IOBufferOutputConsumer(
+                @NotNull final IOChannel<? super ParcelableByteBuffer, ?> channel) {
+
+            if (channel == null) {
+
+                throw new NullPointerException("the I/O channel must not be null");
+            }
+
+            mChannel = channel;
+        }
+
+        public void onComplete() {
+
+            mChannel.close();
+        }
+
+        public void onError(@Nullable final RoutineException error) {
+
+            mChannel.abort(error);
+        }
+
+        public void onOutput(final ByteBuffer output) {
+
+            mChannel.pass(new ParcelableByteBuffer(output));
         }
     }
 

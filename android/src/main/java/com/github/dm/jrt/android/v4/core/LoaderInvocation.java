@@ -51,8 +51,6 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import static com.github.dm.jrt.android.invocation.ContextInvocations.fromFactory;
 
 /**
@@ -75,7 +73,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
 
     private final ClashResolutionType mClashResolutionType;
 
-    private final LoaderContext mContext;
+    private final LoaderContextCompat mContext;
 
     private final FunctionContextInvocationFactory<IN, OUT> mFactory;
 
@@ -101,7 +99,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
      * @param logger        the logger instance.
      */
     @SuppressWarnings("ConstantConditions")
-    LoaderInvocation(@NotNull final LoaderContext context,
+    LoaderInvocation(@NotNull final LoaderContextCompat context,
             @NotNull final FunctionContextInvocationFactory<IN, OUT> factory,
             @NotNull final LoaderConfiguration configuration, @Nullable final OrderType order,
             @NotNull final Logger logger) {
@@ -137,7 +135,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
      * @param context  the context instance.
      * @param loaderId the loader ID.
      */
-    static void purgeLoader(@NotNull final LoaderContext context, final int loaderId) {
+    static void purgeLoader(@NotNull final LoaderContextCompat context, final int loaderId) {
 
         final Object component = context.getComponent();
         final WeakIdentityHashMap<Object,
@@ -197,7 +195,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
      * @param inputs   the invocation inputs.
      */
     @SuppressWarnings("unchecked")
-    static void purgeLoader(@NotNull final LoaderContext context, final int loaderId,
+    static void purgeLoader(@NotNull final LoaderContextCompat context, final int loaderId,
             @NotNull final FunctionContextInvocationFactory<?, ?> factory,
             @NotNull final List<?> inputs) {
 
@@ -266,7 +264,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
      * @param inputs   the invocation inputs.
      */
     @SuppressWarnings("unchecked")
-    static void purgeLoader(@NotNull final LoaderContext context, final int loaderId,
+    static void purgeLoader(@NotNull final LoaderContextCompat context, final int loaderId,
             @NotNull final List<?> inputs) {
 
         final Object component = context.getComponent();
@@ -327,7 +325,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
      * @param loaderId the loader ID.
      * @param factory  the invocation factory.
      */
-    static void purgeLoaders(@NotNull final LoaderContext context, final int loaderId,
+    static void purgeLoaders(@NotNull final LoaderContextCompat context, final int loaderId,
             @NotNull final FunctionContextInvocationFactory<?, ?> factory) {
 
         final Object component = context.getComponent();
@@ -400,20 +398,18 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
         final LoaderContextInvocationFactory<IN, OUT> factory =
                 new LoaderContextInvocationFactory<IN, OUT>(this, mLoaderId);
         final Routine<IN, OUT> routine =
-                JRoutine.on(fromFactory(loaderContext.getApplicationContext(), factory))
-                        .buildRoutine();
+                JRoutineCompat.on(fromFactory(loaderContext.getApplicationContext(), factory))
+                              .buildRoutine();
         routine.syncInvoke().abort(reason);
         routine.purge();
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST_OF_RETURN_VALUE",
-            justification = "class comparison with == is done")
     protected void onCall(@NotNull final List<? extends IN> inputs,
             @NotNull final ResultChannel<OUT> result) {
 
-        final LoaderContext context = mContext;
+        final LoaderContextCompat context = mContext;
         final Object component = context.getComponent();
         final Context loaderContext = context.getLoaderContext();
         final LoaderManager loaderManager = context.getLoaderManager();
@@ -554,8 +550,6 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
 
     @NotNull
     @SuppressWarnings("unchecked")
-    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
-            justification = "class comparison with == is done")
     private ClashType getClashType(@Nullable final Loader<InvocationResult<OUT>> loader,
             final int loaderId, @NotNull final List<? extends IN> inputs) {
 
@@ -786,31 +780,31 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
             logger.dbg("creating new result channel");
             final InvocationLoader<?, OUT> internalLoader = mLoader;
             final ArrayList<IOChannel<OUT, OUT>> channels = mNewChannels;
-            final IOChannel<OUT, OUT> channel = JRoutine.io()
-                                                        .channels()
-                                                        .withChannelMaxSize(Integer.MAX_VALUE)
-                                                        .withChannelTimeout(TimeDuration.ZERO)
-                                                        .withLog(logger.getLog())
-                                                        .withLogLevel(logger.getLogLevel())
-                                                        .set()
-                                                        .buildChannel();
+            final IOChannel<OUT, OUT> channel = JRoutineCompat.io()
+                                                              .channels()
+                                                              .withChannelMaxSize(Integer.MAX_VALUE)
+                                                              .withChannelTimeout(TimeDuration.ZERO)
+                                                              .withLog(logger.getLog())
+                                                              .withLogLevel(logger.getLogLevel())
+                                                              .set()
+                                                              .buildChannel();
             channels.add(channel);
             internalLoader.setInvocationCount(Math.max(channels.size() + mAbortedChannels.size(),
                                                        internalLoader.getInvocationCount()));
 
             if ((looper != null) && (looper != Looper.getMainLooper())) {
 
-                return JRoutine.on(PassingInvocation.<OUT>factoryOf())
-                               .invocations()
-                               .withRunner(Runners.looperRunner(looper))
-                               .withInputMaxSize(Integer.MAX_VALUE)
-                               .withInputTimeout(TimeDuration.ZERO)
-                               .withOutputMaxSize(Integer.MAX_VALUE)
-                               .withOutputTimeout(TimeDuration.ZERO)
-                               .withLog(logger.getLog())
-                               .withLogLevel(logger.getLogLevel())
-                               .set()
-                               .asyncCall(channel);
+                return JRoutineCompat.on(PassingInvocation.<OUT>factoryOf())
+                                     .invocations()
+                                     .withRunner(Runners.looperRunner(looper))
+                                     .withInputMaxSize(Integer.MAX_VALUE)
+                                     .withInputTimeout(TimeDuration.ZERO)
+                                     .withOutputMaxSize(Integer.MAX_VALUE)
+                                     .withOutputTimeout(TimeDuration.ZERO)
+                                     .withLog(logger.getLog())
+                                     .withLogLevel(logger.getLogLevel())
+                                     .set()
+                                     .asyncCall(channel);
             }
 
             return channel;

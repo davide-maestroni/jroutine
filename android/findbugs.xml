@@ -1,5 +1,40 @@
 <FindBugsFilter>
     <Match>
+        <!-- Too many false positives... -->
         <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT"/>
+    </Match>
+    <Match>
+        <Class name="com.github.dm.jrt.android.core.Channels"/>
+        <Bug pattern="NM_SAME_SIMPLE_NAME_AS_SUPERCLASS"/>
+    </Match>
+    <Match>
+        <Class name="com.github.dm.jrt.android.core.JRoutine"/>
+        <Bug pattern="NM_SAME_SIMPLE_NAME_AS_SUPERCLASS"/>
+    </Match>
+    <Match>
+        <Class name="com.github.dm.jrt.android.log.Logs"/>
+        <Bug pattern="NM_SAME_SIMPLE_NAME_AS_SUPERCLASS"/>
+    </Match>
+    <Match>
+        <Class name="com.github.dm.jrt.android.runner.Runners"/>
+        <Bug pattern="NM_SAME_SIMPLE_NAME_AS_SUPERCLASS"/>
+    </Match>
+    <Match>
+        <Class name="com.github.dm.jrt.android.v11.core.Channels"/>
+        <Bug pattern="NM_SAME_SIMPLE_NAME_AS_SUPERCLASS"/>
+    </Match>
+    <Match>
+        <Class name="com.github.dm.jrt.android.v11.core.JRoutine"/>
+        <Bug pattern="NM_SAME_SIMPLE_NAME_AS_SUPERCLASS"/>
+    </Match>
+    <Match>
+        <Class name="com.github.dm.jrt.android.v4.core.LoaderInvocation"/>
+        <Method name="onCall"/>
+        <Bug pattern="BC_UNCONFIRMED_CAST_OF_RETURN_VALUE"/>
+    </Match>
+    <Match>
+        <Class name="com.github.dm.jrt.android.v4.core.LoaderInvocation"/>
+        <Method name="getClashType"/>
+        <Bug pattern="BC_UNCONFIRMED_CAST"/>
     </Match>
 </FindBugsFilter>

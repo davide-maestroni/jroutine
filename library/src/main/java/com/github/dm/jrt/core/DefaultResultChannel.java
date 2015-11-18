@@ -48,8 +48,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import static com.github.dm.jrt.util.Time.current;
 import static com.github.dm.jrt.util.TimeDuration.ZERO;
 import static com.github.dm.jrt.util.TimeDuration.fromUnit;
@@ -972,8 +970,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             return isNextAvailable(mTimeout, mAction);
         }
 
-        @SuppressFBWarnings(value = "IT_NO_SUCH_ELEMENT",
-                justification = "readNext() method actually throws it")
         public OUT next() {
 
             return readNext(mTimeout, mAction);
@@ -1245,8 +1241,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             return isNextAvailable(timeout, timeoutAction);
         }
 
-        @SuppressFBWarnings(value = "IT_NO_SUCH_ELEMENT",
-                justification = "readNext() method actually throws it")
         public OUT next() {
 
             final TimeDuration timeout;

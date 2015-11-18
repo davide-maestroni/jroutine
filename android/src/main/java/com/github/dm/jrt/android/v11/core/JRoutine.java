@@ -21,8 +21,6 @@ import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
 
 import org.jetbrains.annotations.NotNull;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 /**
  * Utility class extending the base one in order to support additional routine builders specific to
  * the Android platform.<br/>
@@ -133,14 +131,11 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  *     </code>
  * </pre>
  * <p/>
- * See {@link com.github.dm.jrt.android.v4.core.JRoutine JRoutine} for support of API levels less
- * than
- * {@value android.os.Build.VERSION_CODES#HONEYCOMB}.
+ * See {@link com.github.dm.jrt.android.v4.core.JRoutineCompat JRoutineCompat} for support of API
+ * levels less than {@value android.os.Build.VERSION_CODES#HONEYCOMB}.
  * <p/>
  * Created by davide-maestroni on 12/08/2014.
  */
-@SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS",
-        justification = "utility class extending the functions of another utility class")
 public class JRoutine extends com.github.dm.jrt.android.core.JRoutine {
 
     /**

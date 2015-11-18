@@ -41,8 +41,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import static com.github.dm.jrt.util.TimeDuration.ZERO;
 import static com.github.dm.jrt.util.TimeDuration.fromUnit;
 
@@ -1301,8 +1299,6 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         }
 
         @Nullable
-        @SuppressFBWarnings(value = "NO_NOTIFY_NOT_NOTIFYALL",
-                justification = "only one input is released")
         public IN nextInput() {
 
             final IN input = mInputQueue.removeFirst();

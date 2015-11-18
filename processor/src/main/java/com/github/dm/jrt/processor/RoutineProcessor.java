@@ -83,8 +83,6 @@ import javax.lang.model.util.Types;
 import javax.tools.Diagnostic.Kind;
 import javax.tools.JavaFileObject;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 /**
  * Annotation processor used to generate proxy classes enabling method asynchronous invocations.
  * <p/>
@@ -1848,8 +1846,6 @@ public class RoutineProcessor extends AbstractProcessor {
      * @throws java.io.IOException if an I/O error occurred.
      */
     @NotNull
-    @SuppressFBWarnings(value = "UI_INHERITANCE_UNSAFE_GETRESOURCE",
-            justification = "inheritance of the processor class must be supported")
     protected String parseTemplate(@NotNull final String path) throws IOException {
 
         final byte[] buffer = mByteBuffer;

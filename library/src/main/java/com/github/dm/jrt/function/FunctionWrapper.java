@@ -20,8 +20,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 /**
  * Class wrapping a function instance.
  * <p/>
@@ -58,8 +56,6 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT> {
      * @return the composed function.
      */
     @NotNull
-    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
-            justification = "class comparison with == is done")
     public <AFTER> FunctionWrapper<IN, AFTER> andThen(
             @NotNull final Function<? super OUT, AFTER> after) {
 
@@ -103,8 +99,6 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT> {
      * @return the composed function.
      */
     @NotNull
-    @SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST",
-            justification = "class comparison with == is done")
     public <BEFORE> FunctionWrapper<BEFORE, OUT> compose(
             @NotNull final Function<BEFORE, ? extends IN> before) {
 
@@ -158,8 +152,6 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT> {
     }
 
     @Override
-    @SuppressFBWarnings(value = "EQ_GETCLASS_AND_CLASS_CONSTANT",
-            justification = "comparing class of the internal list objects")
     public boolean equals(final Object o) {
 
         if (this == o) {

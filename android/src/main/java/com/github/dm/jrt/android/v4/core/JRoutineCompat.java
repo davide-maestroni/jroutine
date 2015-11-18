@@ -17,11 +17,10 @@ import com.github.dm.jrt.android.builder.LoaderChannelBuilder;
 import com.github.dm.jrt.android.builder.LoaderObjectRoutineBuilder;
 import com.github.dm.jrt.android.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.core.ContextInvocationTarget;
+import com.github.dm.jrt.android.core.JRoutine;
 import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
 
 import org.jetbrains.annotations.NotNull;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Utility class extending the base one in order to support additional routine builders specific to
@@ -73,9 +72,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  *             } else {
  *
  *                 final Routine&lt;URI, MyResource&gt; routine =
- *                         JRoutine.with(contextFrom(this))
- *                                 .on(factoryOf(LoadResource.class))
- *                                 .buildRoutine();
+ *                         JRoutineCompat.with(contextFrom(this))
+ *                                       .on(factoryOf(LoadResource.class))
+ *                                       .buildRoutine();
  *                 routine.asyncCall(RESOURCE_URI)
  *                        .passTo(new TemplateOutputConsumer&lt;MyResource&gt;() {
  *
@@ -118,9 +117,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  *             public void onContext(&#64;Nonnull final Context context) {
  *
  *                 super.onContext(context);
- *                 mRoutine = JRoutine.with(serviceFrom(context))
- *                                    .on(factoryOf(LoadResourceUri.class))
- *                                    .buildRoutine();
+ *                 mRoutine = JRoutineCompat.with(serviceFrom(context))
+ *                                          .on(factoryOf(LoadResourceUri.class))
+ *                                          .buildRoutine();
  *             }
  *
  *             &#64;Override
@@ -135,9 +134,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * <p/>
  * Created by davide-maestroni on 12/08/2014.
  */
-@SuppressFBWarnings(value = "NM_SAME_SIMPLE_NAME_AS_SUPERCLASS",
-        justification = "utility class extending the functions of another utility class")
-public class JRoutine extends com.github.dm.jrt.android.core.JRoutine {
+public class JRoutineCompat extends JRoutine {
 
     /**
      * Returns a context based builder of loader routine builders.
@@ -146,7 +143,7 @@ public class JRoutine extends com.github.dm.jrt.android.core.JRoutine {
      * @return the context builder.
      */
     @NotNull
-    public static ContextBuilder with(@NotNull final LoaderContext context) {
+    public static ContextBuilder with(@NotNull final LoaderContextCompat context) {
 
         return new ContextBuilder(context);
     }
@@ -156,7 +153,7 @@ public class JRoutine extends com.github.dm.jrt.android.core.JRoutine {
      */
     public static class ContextBuilder {
 
-        private final LoaderContext mContext;
+        private final LoaderContextCompat mContext;
 
         /**
          * Constructor.
@@ -164,7 +161,7 @@ public class JRoutine extends com.github.dm.jrt.android.core.JRoutine {
          * @param context the loader context.
          */
         @SuppressWarnings("ConstantConditions")
-        private ContextBuilder(@NotNull final LoaderContext context) {
+        private ContextBuilder(@NotNull final LoaderContextCompat context) {
 
             if (context == null) {
 

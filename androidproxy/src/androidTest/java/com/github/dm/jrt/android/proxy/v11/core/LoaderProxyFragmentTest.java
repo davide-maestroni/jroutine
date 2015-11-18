@@ -19,10 +19,10 @@ import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.proxy.R;
-import com.github.dm.jrt.android.proxy.annotation.V11Proxy;
+import com.github.dm.jrt.android.proxy.annotation.LoaderProxy;
 import com.github.dm.jrt.android.proxy.builder.LoaderProxyObjectBuilder;
 import com.github.dm.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
-import com.github.dm.jrt.android.v4.core.JRoutine;
+import com.github.dm.jrt.android.v11.core.JRoutine;
 import com.github.dm.jrt.annotation.Alias;
 import com.github.dm.jrt.annotation.Input;
 import com.github.dm.jrt.annotation.Input.InputMode;
@@ -279,9 +279,9 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         final InvocationConfiguration configuration =
                 builder().withRunner(runner).withLogLevel(Level.DEBUG).withLog(log).set();
         final LoaderProxyObjectBuilder<TestProxy> builder =
-                com.github.dm.jrt.android.proxy.V11Proxy_TestFragment.with(contextFrom(fragment))
-                                                                     .on(instanceOf(
-                                                                             TestClass.class));
+                com.github.dm.jrt.android.proxy.LoaderProxy_TestFragment.with(contextFrom(fragment))
+                                                                        .on(instanceOf(
+                                                                                TestClass.class));
         final TestProxy testProxy = builder.invocations().with(configuration).set().buildProxy();
 
         assertThat(testProxy.getOne().next()).isEqualTo(1);
@@ -703,7 +703,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         }
     }
 
-    @V11Proxy(Impl.class)
+    @LoaderProxy(Impl.class)
     public interface Itf {
 
         @Alias("a")
@@ -1103,7 +1103,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         Routine<List<Integer>, Void> setL6();
     }
 
-    @V11Proxy(TestClass2.class)
+    @LoaderProxy(TestClass2.class)
     public interface TestClassAsync {
 
         @Output
@@ -1119,7 +1119,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         int getOne();
     }
 
-    @V11Proxy(TestClassInterface.class)
+    @LoaderProxy(TestClassInterface.class)
     public interface TestInterfaceProxy {
 
         @ReadTimeout(3000)
@@ -1127,7 +1127,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         OutputChannel<Integer> getOne();
     }
 
-    @V11Proxy(TestList.class)
+    @LoaderProxy(TestList.class)
     public interface TestListItf<TYPE> {
 
         void add(Object t);
@@ -1143,7 +1143,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         List<TYPE> getList(int i);
     }
 
-    @V11Proxy(value = TestClass.class, className = "TestFragment",
+    @LoaderProxy(value = TestClass.class, className = "TestFragment",
             classPackage = "com.github.dm.jrt.android.proxy")
     public interface TestProxy {
 
@@ -1188,7 +1188,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         String getString(@Input(int.class) OutputChannel<Integer> i);
     }
 
-    @V11Proxy(TestClass.class)
+    @LoaderProxy(TestClass.class)
     public interface TestStatic {
 
         @ReadTimeout(3000)
@@ -1200,7 +1200,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         OutputChannel<Integer> getTwo();
     }
 
-    @V11Proxy(TestTimeout.class)
+    @LoaderProxy(TestTimeout.class)
     public interface TestTimeoutItf {
 
         @Output(OutputMode.COLLECTION)

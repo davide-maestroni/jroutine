@@ -38,7 +38,7 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
         implements LoaderRoutineBuilder<IN, OUT>,
         LoaderConfiguration.Configurable<LoaderRoutineBuilder<IN, OUT>> {
 
-    private final LoaderContext mContext;
+    private final LoaderContextCompat mContext;
 
     private final FunctionContextInvocationFactory<IN, OUT> mFactory;
 
@@ -65,7 +65,7 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
      *                                            static.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultLoaderRoutineBuilder(@NotNull final LoaderContext context,
+    DefaultLoaderRoutineBuilder(@NotNull final LoaderContextCompat context,
             @NotNull final FunctionContextInvocationFactory<IN, OUT> factory) {
 
         if (context == null) {

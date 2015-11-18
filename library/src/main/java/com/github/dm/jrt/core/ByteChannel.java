@@ -13,6 +13,7 @@
  */
 package com.github.dm.jrt.core;
 
+import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InputChannel;
 import com.github.dm.jrt.util.WeakIdentityHashMap;
 
@@ -43,7 +44,7 @@ public class ByteChannel {
     /**
      * The default buffer size in number of bytes.
      */
-    public static final int DEFAULT_BUFFER_SIZE = 1024 << 4;
+    public static final int DEFAULT_BUFFER_SIZE = 16 << 10;
 
     /**
      * The default core pool size.
@@ -169,9 +170,7 @@ public class ByteChannel {
     }
 
     /**
-     * Returns the output stream used to write bytes into the specified channel.<br/>
-     * Note that, if the method is called more than one time, passing the same input channel, it
-     * will return the same output stream.
+     * Returns the output stream used to write bytes into the specified channel.
      *
      * @param channel the input channel to which pass the data.
      * @return the output stream.
@@ -195,6 +194,20 @@ public class ByteChannel {
         }
 
         return stream;
+    }
+
+    /**
+     * Returns the output stream used to write bytes into the specified channel.<br/>
+     * Note that the channel will be automatically closed as soon as the returned output stream is
+     * closed.
+     *
+     * @param channel the I/O channel to which pass the data.
+     * @return the output stream.
+     */
+    @NotNull
+    public BufferOutputStream passTo(@NotNull final IOChannel<? super ByteBuffer, ?> channel) {
+
+        return new IOBufferOutputStream(passTo(channel.asInput()), channel);
     }
 
     @NotNull
@@ -283,6 +296,37 @@ public class ByteChannel {
 
         @Override
         public abstract void reset();
+
+        /**
+         * Reads all the bytes returned by the input stream and writes them into the specified
+         * output stream.<br/>
+         * Calling this method has the same effect as calling:
+         * <pre>
+         *     <code>
+         *
+         *         while (inputStream.read(outputStream) > 0) {
+         *
+         *             // Keep looping
+         *         }
+         *     </code>
+         * </pre>
+         *
+         * @param out the output stream.
+         * @return the total number of bytes read.
+         * @throws IOException if an I/O error occurs. In particular, an <code>IOException</code>
+         *                     may be thrown if the output stream has been closed.
+         */
+        public long readAll(@NotNull final OutputStream out) throws IOException {
+
+            long count = 0;
+
+            for (int b; (b = read(out)) > 0; ) {
+
+                count += b;
+            }
+
+            return count;
+        }
     }
 
     /**
@@ -294,19 +338,118 @@ public class ByteChannel {
          * Writes some bytes into the output stream by reading them from the specified input stream.
          *
          * @param in the input stream.
-         * @return the total number of bytes read into the buffer, or <code>-1</code> if there is no
-         * more data because the end of the stream has been reached.
+         * @return the total number of bytes written into the buffer, or <code>-1</code> if there is
+         * no more data because the end of the stream has been reached.
          * @throws IOException If the first byte cannot be read for any reason other than end of
          *                     file, or if the input stream has been closed, or if some other I/O
          *                     error occurs.
          */
         public abstract int write(@NotNull InputStream in) throws IOException;
 
+        /**
+         * Writes all the returned bytes into the output stream by reading them from the specified
+         * input stream.<br/>
+         * Calling this method has the same effect as calling:
+         * <pre>
+         *     <code>
+         *
+         *         while (outputStream.write(inputStream) > 0) {
+         *
+         *             // Keep looping
+         *         }
+         *     </code>
+         * </pre>
+         *
+         * @param in the input stream.
+         * @return the total number of bytes written.
+         * @throws IOException If the first byte cannot be read for any reason other than end of
+         *                     file, or if the input stream has been closed, or if some other I/O
+         *                     error occurs.
+         */
+        public long writeAll(@NotNull final InputStream in) throws IOException {
+
+            long count = 0;
+
+            for (int b; (b = write(in)) > 0; ) {
+
+                count += b;
+            }
+
+            return count;
+        }
+
         @Override
         public abstract void flush();
 
         @Override
         public abstract void close();
+    }
+
+    /**
+     * Implementation of a buffer output stream automatically closing the output I/O channel.
+     */
+    private static class IOBufferOutputStream extends BufferOutputStream {
+
+        private final IOChannel<? super ByteBuffer, ?> mIOChannel;
+
+        private final BufferOutputStream mOutputStream;
+
+        /**
+         * Constructor.
+         *
+         * @param wrapped the wrapped stream.
+         * @param channel the I/O channel.
+         */
+        private IOBufferOutputStream(@NotNull final BufferOutputStream wrapped,
+                @NotNull final IOChannel<? super ByteBuffer, ?> channel) {
+
+            mOutputStream = wrapped;
+            mIOChannel = channel;
+        }
+
+        @Override
+        public int write(@NotNull final InputStream in) throws IOException {
+
+            return mOutputStream.write(in);
+        }
+
+        @Override
+        public void write(final int b) throws IOException {
+
+            mOutputStream.write(b);
+        }
+
+        @Override
+        public void write(@NotNull final byte[] b) throws IOException {
+
+            mOutputStream.write(b);
+        }
+
+        @Override
+        public void write(@NotNull final byte[] b, final int off, final int len) throws
+                IOException {
+
+            mOutputStream.write(b, off, len);
+        }
+
+        @Override
+        public void flush() {
+
+            mOutputStream.flush();
+        }
+
+        @Override
+        public void close() {
+
+            try {
+
+                mOutputStream.close();
+
+            } finally {
+
+                mIOChannel.close();
+            }
+        }
     }
 
     /**
@@ -1045,16 +1188,20 @@ public class ByteChannel {
             mChannel = channel;
         }
 
-        /**
-         * Writes some bytes into the output stream by reading them from the specified input stream.
-         *
-         * @param in the input stream.
-         * @return the total number of bytes read into the buffer, or <code>-1</code> if there is no
-         * more data because the end of the stream has been reached.
-         * @throws IOException If the first byte cannot be read for any reason other than end of
-         *                     file, or if the input stream has been closed, or if some other I/O
-         *                     error occurs.
-         */
+        @NotNull
+        private ByteBuffer getBuffer() {
+
+            final ByteBuffer byteBuffer = mBuffer;
+
+            if (byteBuffer != null) {
+
+                return byteBuffer;
+            }
+
+            return (mBuffer = acquire());
+        }
+
+        @Override
         public int write(@NotNull final InputStream in) throws IOException {
 
             final int read;
@@ -1074,14 +1221,23 @@ public class ByteChannel {
                 final int length = buffer.length;
                 final int offset = mOffset;
                 read = in.read(buffer, offset, length - offset);
-                mOffset += read;
-                size = mOffset;
-                isPass = (size >= length);
 
-                if (isPass) {
+                if (read > 0) {
 
-                    mOffset = 0;
-                    mBuffer = null;
+                    mOffset += Math.max(read, 0);
+                    size = mOffset;
+                    isPass = (size >= length);
+
+                    if (isPass) {
+
+                        mOffset = 0;
+                        mBuffer = null;
+                    }
+
+                } else {
+
+                    size = mOffset;
+                    isPass = false;
                 }
             }
 
@@ -1273,19 +1429,6 @@ public class ByteChannel {
                 }
 
             } while (written < len);
-        }
-
-        @NotNull
-        private ByteBuffer getBuffer() {
-
-            final ByteBuffer byteBuffer = mBuffer;
-
-            if (byteBuffer != null) {
-
-                return byteBuffer;
-            }
-
-            return (mBuffer = acquire());
         }
     }
 }

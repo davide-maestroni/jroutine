@@ -44,7 +44,7 @@ class DefaultLoaderChannelBuilder
         implements LoaderChannelBuilder, LoaderConfiguration.Configurable<LoaderChannelBuilder>,
         ChannelConfiguration.Configurable<LoaderChannelBuilder> {
 
-    private final LoaderContext mContext;
+    private final LoaderContextCompat mContext;
 
     private ChannelConfiguration mChannelConfiguration = ChannelConfiguration.DEFAULT_CONFIGURATION;
 
@@ -56,7 +56,7 @@ class DefaultLoaderChannelBuilder
      * @param context the context instance.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultLoaderChannelBuilder(@NotNull final LoaderContext context) {
+    DefaultLoaderChannelBuilder(@NotNull final LoaderContextCompat context) {
 
         if (context == null) {
 
@@ -77,18 +77,18 @@ class DefaultLoaderChannelBuilder
             throw new IllegalArgumentException("the loader ID must not be generated");
         }
 
-        final LoaderContext context = mContext;
+        final LoaderContextCompat context = mContext;
         final Object component = context.getComponent();
 
         if (component == null) {
 
-            final IOChannel<OUT, OUT> ioChannel = JRoutine.io().buildChannel();
+            final IOChannel<OUT, OUT> ioChannel = JRoutineCompat.io().buildChannel();
             ioChannel.abort(new MissingInvocationException(loaderId));
             return ioChannel.close();
         }
 
         final LoaderRoutineBuilder<Void, OUT> builder =
-                JRoutine.with(context).on(new MissingLoaderInvocationFactory<OUT>(loaderId));
+                JRoutineCompat.with(context).on(new MissingLoaderInvocationFactory<OUT>(loaderId));
         final InvocationConfiguration invocationConfiguration =
                 mChannelConfiguration.toOutputChannelConfiguration();
         final Logger logger = invocationConfiguration.newLogger(this);
@@ -137,7 +137,7 @@ class DefaultLoaderChannelBuilder
 
     public void purge(@Nullable final Iterable<?> inputs) {
 
-        final LoaderContext context = mContext;
+        final LoaderContextCompat context = mContext;
 
         if (context.getComponent() != null) {
 
@@ -165,7 +165,7 @@ class DefaultLoaderChannelBuilder
 
     public void purge() {
 
-        final LoaderContext context = mContext;
+        final LoaderContextCompat context = mContext;
 
         if (context.getComponent() != null) {
 
@@ -177,7 +177,7 @@ class DefaultLoaderChannelBuilder
 
     public void purge(@Nullable final Object input) {
 
-        final LoaderContext context = mContext;
+        final LoaderContextCompat context = mContext;
 
         if (context.getComponent() != null) {
 
@@ -190,7 +190,7 @@ class DefaultLoaderChannelBuilder
 
     public void purge(@Nullable final Object... inputs) {
 
-        final LoaderContext context = mContext;
+        final LoaderContextCompat context = mContext;
 
         if (context.getComponent() != null) {
 
@@ -251,7 +251,7 @@ class DefaultLoaderChannelBuilder
      */
     private static class PurgeExecution extends TemplateExecution {
 
-        private final LoaderContext mContext;
+        private final LoaderContextCompat mContext;
 
         private final int mLoaderId;
 
@@ -261,7 +261,7 @@ class DefaultLoaderChannelBuilder
          * @param context  the context instance.
          * @param loaderId the loader ID.
          */
-        private PurgeExecution(@NotNull final LoaderContext context, final int loaderId) {
+        private PurgeExecution(@NotNull final LoaderContextCompat context, final int loaderId) {
 
             mContext = context;
             mLoaderId = loaderId;
@@ -278,7 +278,7 @@ class DefaultLoaderChannelBuilder
      */
     private static class PurgeInputsExecution extends TemplateExecution {
 
-        private final LoaderContext mContext;
+        private final LoaderContextCompat mContext;
 
         private final List<Object> mInputs;
 
@@ -291,7 +291,7 @@ class DefaultLoaderChannelBuilder
          * @param loaderId the loader ID.
          * @param inputs   the list of inputs.
          */
-        private PurgeInputsExecution(@NotNull final LoaderContext context, final int loaderId,
+        private PurgeInputsExecution(@NotNull final LoaderContextCompat context, final int loaderId,
                 @NotNull final List<Object> inputs) {
 
             mContext = context;

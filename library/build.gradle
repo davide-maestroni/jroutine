@@ -23,7 +23,6 @@ archivesBaseName = project.parent.name
 javaCompatibility = JavaVersion.VERSION_1_5
 
 dependencies {
-    compile 'com.google.code.findbugs:annotations:3.0.0'
     compile 'com.intellij:annotations:12.0'
     testCompile 'junit:junit:4.12'
     testCompile 'org.assertj:assertj-core:1.7.1'
@@ -42,4 +41,8 @@ findbugs {
 
 javadoc {
     options.overview("${project.projectDir}/docs/overview.html")
+}
+
+tasks.withType(FindBugs) {
+    excludeFilter = file('findbugs.xml')
 }

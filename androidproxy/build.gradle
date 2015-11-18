@@ -24,11 +24,11 @@ archivesBaseName = "${project.parent.name}-${project.name}"
 
 android {
     compileSdkVersion 22
-    buildToolsVersion '22.0.1' // Travis does not support an higher version
+    buildToolsVersion '22.0.1'
 
     defaultConfig {
         minSdkVersion 4
-        targetSdkVersion 22 // Travis does not support an higher version
+        targetSdkVersion 22
         versionCode Integer.parseInt(project.getProperty('releaseVersionCode'))
         versionName version
     }
@@ -58,7 +58,6 @@ android {
 dependencies {
     androidTestCompile 'org.assertj:assertj-core:1.7.1'
     apt project(':androidprocessor')
-    // Travis does not support an higher version
     compile 'com.android.support:support-v4:22.2.1'
 }
 conditionalDependencies {
@@ -69,6 +68,10 @@ conditionalDependencies {
 
 findbugs {
     toolVersion '3.0.1'
+}
+
+tasks.withType(FindBugs) {
+    excludeFilter = file('findbugs.xml')
 }
 
 tasks.withType(Javadoc) {

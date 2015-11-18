@@ -147,7 +147,6 @@ Please refer to the dedicated [Wiki page][wiki proguard].
 #### Compilation dependencies
 
 - IntelliJ IDEA Annotations ([Apache License v2.0][apache license])
-- [FindBugs][findbugs] annotations ([Lesser GNU Public License][lgpl license])
 - Android SDK ([Terms and Condition][android sdk])
 - Android Support Library ([Apache License v2.0][apache license])
 
@@ -178,10 +177,8 @@ Unless required by applicable law or agreed to in writing, software distributed 
 [artifacts]:#artifacts
 [apache license]:http://www.apache.org/licenses/LICENSE-2.0
 [eclipse license]:https://www.eclipse.org/legal/epl-v10.html
-[lgpl license]:http://www.gnu.org/licenses/lgpl.html
 [reactive manifesto]:http://www.reactivemanifesto.org/
 [android sdk]:http://developer.android.com/sdk/terms.html
-[findbugs]:http://findbugs.sourceforge.net/
 [assertj]:http://joel-costigliola.github.io/assertj/
 [retrotranslator]:http://retrotranslator.sourceforge.net/
 [github]:https://github.com/

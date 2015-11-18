@@ -1,0 +1,10 @@
+<FindBugsFilter>
+    <Match>
+        <Class name="com.github.dm.jrt.android.proxy.core.JRoutineProxy"/>
+        <Bug pattern="NM_SAME_SIMPLE_NAME_AS_SUPERCLASS"/>
+    </Match>
+    <Match>
+        <Class name="com.github.dm.jrt.android.proxy.v11.core.JRoutineProxy"/>
+        <Bug pattern="NM_SAME_SIMPLE_NAME_AS_SUPERCLASS"/>
+    </Match>
+</FindBugsFilter>

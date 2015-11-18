@@ -66,7 +66,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         ProxyConfiguration.Configurable<LoaderObjectRoutineBuilder>,
         InvocationConfiguration.Configurable<LoaderObjectRoutineBuilder> {
 
-    private final LoaderContext mContext;
+    private final LoaderContextCompat mContext;
 
     private final ContextInvocationTarget<?> mTarget;
 
@@ -84,7 +84,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      * @param target  the invocation target.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultLoaderObjectRoutineBuilder(@NotNull final LoaderContext context,
+    DefaultLoaderObjectRoutineBuilder(@NotNull final LoaderContextCompat context,
             @NotNull final ContextInvocationTarget<?> target) {
 
         if (context == null) {
@@ -169,15 +169,15 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 configurationWithAnnotations(mInvocationConfiguration, targetMethod);
         final LoaderConfiguration loaderConfiguration =
                 loaderConfigurationWithAnnotations(mLoaderConfiguration, targetMethod);
-        return JRoutine.with(mContext)
-                       .on(factory)
-                       .invocations()
-                       .with(invocationConfiguration)
-                       .set()
-                       .loaders()
-                       .with(loaderConfiguration)
-                       .set()
-                       .buildRoutine();
+        return JRoutineCompat.with(mContext)
+                             .on(factory)
+                             .invocations()
+                             .with(invocationConfiguration)
+                             .set()
+                             .loaders()
+                             .with(loaderConfiguration)
+                             .set()
+                             .buildRoutine();
     }
 
     @NotNull
@@ -220,15 +220,15 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 configurationWithAnnotations(mInvocationConfiguration, method);
         final LoaderConfiguration loaderConfiguration =
                 loaderConfigurationWithAnnotations(mLoaderConfiguration, method);
-        return JRoutine.with(mContext)
-                       .on(factory)
-                       .invocations()
-                       .with(invocationConfiguration)
-                       .set()
-                       .loaders()
-                       .with(loaderConfiguration)
-                       .set()
-                       .buildRoutine();
+        return JRoutineCompat.with(mContext)
+                             .on(factory)
+                             .invocations()
+                             .with(invocationConfiguration)
+                             .set()
+                             .loaders()
+                             .with(loaderConfiguration)
+                             .set()
+                             .buildRoutine();
     }
 
     @NotNull
@@ -338,11 +338,11 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
                 final InvocationTarget<?> target = mTarget.getInvocationTarget(context);
                 mInstance = target.getTarget();
-                mRoutine = JRoutine.on(target)
-                                   .proxies()
-                                   .with(mProxyConfiguration)
-                                   .set()
-                                   .aliasMethod(mAliasName);
+                mRoutine = JRoutineCompat.on(target)
+                                         .proxies()
+                                         .with(mProxyConfiguration)
+                                         .set()
+                                         .aliasMethod(mAliasName);
 
             } catch (final Throwable t) {
 
@@ -463,11 +463,11 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
                 final InvocationTarget<?> target = mTarget.getInvocationTarget(context);
                 mInstance = target.getTarget();
-                mRoutine = JRoutine.on(target)
-                                   .proxies()
-                                   .with(mProxyConfiguration)
-                                   .set()
-                                   .method(mMethod);
+                mRoutine = JRoutineCompat.on(target)
+                                         .proxies()
+                                         .with(mProxyConfiguration)
+                                         .set()
+                                         .method(mMethod);
 
             } catch (final Throwable t) {
 
@@ -643,7 +643,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      */
     private static class ProxyInvocationHandler implements InvocationHandler {
 
-        private final LoaderContext mContext;
+        private final LoaderContextCompat mContext;
 
         private final InvocationConfiguration mInvocationConfiguration;
 
@@ -684,15 +684,15 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             final ProxyInvocationFactory factory =
                     new ProxyInvocationFactory(targetMethod, proxyConfiguration, target, inputMode,
                                                outputMode);
-            final LoaderRoutine<Object, Object> routine = JRoutine.with(mContext)
-                                                                  .on(factory)
-                                                                  .invocations()
-                                                                  .with(invocationConfiguration)
-                                                                  .set()
-                                                                  .loaders()
-                                                                  .with(loaderConfiguration)
-                                                                  .set()
-                                                                  .buildRoutine();
+            final LoaderRoutine<Object, Object> routine = JRoutineCompat.with(mContext)
+                                                                        .on(factory)
+                                                                        .invocations()
+                                                                        .with(invocationConfiguration)
+                                                                        .set()
+                                                                        .loaders()
+                                                                        .with(loaderConfiguration)
+                                                                        .set()
+                                                                        .buildRoutine();
             return invokeRoutine(routine, method, asArgs(args), methodInfo.invocationMode,
                                  inputMode, outputMode);
         }

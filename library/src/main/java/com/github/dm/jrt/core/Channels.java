@@ -20,6 +20,7 @@ import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.channel.StreamingChannel;
 import com.github.dm.jrt.routine.Routine;
+import com.github.dm.jrt.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -36,6 +37,10 @@ import java.util.Map.Entry;
  * Created by davide-maestroni on 03/15/2015.
  */
 public class Channels {
+
+    private static final WeakIdentityHashMap<OutputChannel<?>, DefaultSelectableOutput<?>>
+            sSelectableOutputs =
+            new WeakIdentityHashMap<OutputChannel<?>, DefaultSelectableOutput<?>>();
 
     /**
      * Avoid direct instantiation.
@@ -648,6 +653,38 @@ public class Channels {
     }
 
     /**
+     * Returns a selectable output filtering the data coming from the specified channel.<br/>
+     * Note that the channel will be bound as a result of the call, the method, though, can be
+     * safely called more than once for the same selectable channel.
+     *
+     * @param channel the selectable output channel.
+     * @param <OUT>   the output data type.
+     * @return the selectable output.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <OUT> SelectableOutput<OUT> select(
+            @NotNull final OutputChannel<? extends Selectable<? extends OUT>> channel) {
+
+        synchronized (sSelectableOutputs) {
+
+            final WeakIdentityHashMap<OutputChannel<?>, DefaultSelectableOutput<?>>
+                    selectableOutputs = sSelectableOutputs;
+            DefaultSelectableOutput<?> selectableOutput = selectableOutputs.get(channel);
+
+            if (selectableOutput == null) {
+
+                final DefaultSelectableOutput<OUT> output = new DefaultSelectableOutput<OUT>();
+                channel.passTo(output);
+                selectableOutputs.put(channel, output);
+                return output;
+            }
+
+            return (SelectableOutput<OUT>) selectableOutput;
+        }
+    }
+
+    /**
      * Returns a map of output channels returning the outputs filtered by the specified indexes.
      * <br/>
      * Note that the channel will be bound as a result of the call.
@@ -711,7 +748,9 @@ public class Channels {
     }
 
     /**
-     * Creates and returns a new streaming channel backed by the specified input and output.
+     * Creates and returns a new streaming channel backed by the specified input and output.<br/>
+     * Note that it is up to the caller ensure that the specified input and output channels are
+     * actually connected.
      *
      * @param inputChannel  the input channel.
      * @param outputChannel the output channel.
@@ -884,6 +923,28 @@ public class Channels {
     }
 
     /**
+     * Interface defining a selectable output, that is an object filtering data coming from a
+     * selectable channel and dispatching them to a specific output channel based on their index.
+     *
+     * @param <OUT> the output data type.
+     */
+    public interface SelectableOutput<OUT> {
+
+        /**
+         * Returns an output channel returning selectable data matching the specify index.<br/>
+         * New output channels can be bound until data start coming fro the selectable one. After
+         * that, any attempt to bound a channel to a new index will cause an exception to be thrown.
+         *
+         * @param index the channel index.
+         * @return the output channel.
+         * @throws java.lang.IllegalStateException if no more output channels can be bound to the
+         *                                         output.
+         */
+        @NotNull
+        OutputChannel<OUT> index(int index);
+    }
+
+    /**
      * Data class storing information about the origin of the data.
      *
      * @param <DATA> the data type.
@@ -960,6 +1021,93 @@ public class Channels {
                     "data=" + data +
                     ", index=" + index +
                     '}';
+        }
+    }
+
+    /**
+     * Default implementation of a selectable output.
+     *
+     * @param <OUT> the output data type.
+     */
+    private static class DefaultSelectableOutput<OUT>
+            implements SelectableOutput<OUT>, OutputConsumer<Selectable<? extends OUT>> {
+
+        private final HashMap<Integer, IOChannel<OUT, OUT>> mChannels =
+                new HashMap<Integer, IOChannel<OUT, OUT>>();
+
+        private final Object mMutex = new Object();
+
+        private boolean mIsOutput;
+
+        @NotNull
+        public OutputChannel<OUT> index(final int index) {
+
+            IOChannel<OUT, OUT> channel;
+
+            synchronized (mMutex) {
+
+                final HashMap<Integer, IOChannel<OUT, OUT>> channels = mChannels;
+                channel = channels.get(index);
+
+                if (channel == null) {
+
+                    if (mIsOutput) {
+
+                        throw new IllegalStateException();
+                    }
+
+                    channel = JRoutine.io().buildChannel();
+                    channels.put(index, channel);
+                }
+            }
+
+            return channel;
+        }
+
+        public void onComplete() {
+
+            synchronized (mMutex) {
+
+                mIsOutput = true;
+            }
+
+            final HashMap<Integer, IOChannel<OUT, OUT>> channels = mChannels;
+
+            for (final IOChannel<OUT, OUT> channel : channels.values()) {
+
+                channel.close();
+            }
+        }
+
+        public void onOutput(final Selectable<? extends OUT> selectable) {
+
+            synchronized (mMutex) {
+
+                mIsOutput = true;
+            }
+
+            final HashMap<Integer, IOChannel<OUT, OUT>> channels = mChannels;
+            final IOChannel<OUT, OUT> channel = channels.get(selectable.index);
+
+            if (channel != null) {
+
+                channel.pass(selectable.data);
+            }
+        }
+
+        public void onError(@Nullable final RoutineException error) {
+
+            synchronized (mMutex) {
+
+                mIsOutput = true;
+            }
+
+            final HashMap<Integer, IOChannel<OUT, OUT>> channels = mChannels;
+
+            for (final IOChannel<OUT, OUT> channel : channels.values()) {
+
+                channel.abort(error);
+            }
         }
     }
 

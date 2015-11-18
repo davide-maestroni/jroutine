@@ -21,6 +21,7 @@ import com.github.dm.jrt.channel.InputChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.ResultChannel;
+import com.github.dm.jrt.channel.StreamingChannel;
 import com.github.dm.jrt.core.Channels.Selectable;
 import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.invocation.InvocationException;
@@ -1320,6 +1321,149 @@ public class ChannelsTest {
             fail();
 
         } catch (final AbortException ignored) {
+
+        }
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testSelectableOutput() {
+
+        final Routine<Selectable<Object>, Selectable<Object>> routine =
+                JRoutine.on(new Sort()).buildRoutine();
+        final StreamingChannel<Selectable<Object>, Selectable<Object>> channel =
+                Channels.asyncStream(routine);
+        Channels.select(channel).index(Sort.INTEGER);
+        Channels.select(channel).index(Sort.STRING);
+        channel.pass(new Selectable<Object>("test21", Sort.STRING),
+                     new Selectable<Object>(-11, Sort.INTEGER));
+        assertThat(
+                Channels.select(channel).index(Sort.INTEGER).afterMax(seconds(1)).next()).isEqualTo(
+                -11);
+        assertThat(
+                Channels.select(channel).index(Sort.STRING).afterMax(seconds(1)).next()).isEqualTo(
+                "test21");
+        channel.pass(new Selectable<Object>(-11, Sort.INTEGER),
+                     new Selectable<Object>("test21", Sort.STRING));
+        assertThat(
+                Channels.select(channel).index(Sort.INTEGER).afterMax(seconds(1)).next()).isEqualTo(
+                -11);
+        assertThat(
+                Channels.select(channel).index(Sort.STRING).afterMax(seconds(1)).next()).isEqualTo(
+                "test21");
+        channel.pass(new Selectable<Object>("test21", Sort.STRING),
+                     new Selectable<Object>(-11, Sort.INTEGER));
+        assertThat(
+                Channels.select(channel).index(Sort.INTEGER).afterMax(seconds(1)).next()).isEqualTo(
+                -11);
+        assertThat(
+                Channels.select(channel).index(Sort.STRING).afterMax(seconds(1)).next()).isEqualTo(
+                "test21");
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testSelectableOutputAbort() {
+
+        final Routine<Selectable<Object>, Selectable<Object>> routine =
+                JRoutine.on(new Sort()).buildRoutine();
+        StreamingChannel<Selectable<Object>, Selectable<Object>> channel =
+                Channels.asyncStream(routine);
+        Channels.select(channel).index(Sort.INTEGER);
+        Channels.select(channel).index(Sort.STRING);
+        channel.after(millis(100))
+               .pass(new Selectable<Object>("test21", Sort.STRING),
+                     new Selectable<Object>(-11, Sort.INTEGER))
+               .abort();
+
+        try {
+
+            Channels.select(channel).index(Sort.STRING).afterMax(seconds(1)).all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            Channels.select(channel).index(Sort.INTEGER).afterMax(seconds(1)).all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        channel = Channels.asyncStream(routine);
+        Channels.select(channel).index(Sort.INTEGER);
+        Channels.select(channel).index(Sort.STRING);
+        channel.after(millis(100))
+               .pass(new Selectable<Object>(-11, Sort.INTEGER),
+                     new Selectable<Object>("test21", Sort.STRING))
+               .abort();
+
+        try {
+
+            Channels.select(channel).index(Sort.STRING).afterMax(seconds(1)).all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            Channels.select(channel).index(Sort.INTEGER).afterMax(seconds(1)).all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        channel = Channels.asyncStream(routine);
+        Channels.select(channel).index(Sort.INTEGER);
+        Channels.select(channel).index(Sort.STRING);
+        channel.after(millis(100))
+               .pass(new Selectable<Object>("test21", Sort.STRING),
+                     new Selectable<Object>(-11, Sort.INTEGER))
+               .abort();
+
+        try {
+
+            Channels.select(channel).index(Sort.STRING).afterMax(seconds(1)).all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            Channels.select(channel).index(Sort.INTEGER).afterMax(seconds(1)).all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testSelectableOutputError() {
+
+        try {
+
+            Channels.select(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
 
         }
     }

@@ -97,9 +97,9 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
                 .pass(new ParcelableSelectable<String>("test5", 31))
                 .pass(new ParcelableSelectable<Integer>(5, 17))
                 .close();
-        assertThat(channel1.result().afterMax(seconds(1)).all()).containsExactly("test1", "test2",
-                                                                                 "test3", "test4",
-                                                                                 "test5");
+        assertThat(channel1.result().afterMax(seconds(10)).all()).containsExactly("test1", "test2",
+                                                                                  "test3", "test4",
+                                                                                  "test5");
         assertThat(channel2.result().afterMax(seconds(10)).all()).containsExactly(1, 2, 3, 4, 5);
     }
 
@@ -958,7 +958,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         channel3.close();
         channel4.close();
 
-        assertThat(outputChannel.afterMax(seconds(1)).all()).containsExactly("0", "1", "2", "3");
+        assertThat(outputChannel.afterMax(seconds(10)).all()).containsExactly("0", "1", "2", "3");
     }
 
     @SuppressWarnings("unchecked")

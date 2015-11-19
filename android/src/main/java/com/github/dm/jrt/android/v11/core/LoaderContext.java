@@ -67,7 +67,7 @@ public abstract class LoaderContext {
 
     /**
      * Returns a context wrapping the specified activity, with the specified instance as base
-     * context.<br/>
+     * context, that is, the one used by the loader.<br/>
      * In order to prevent undesired leaks, the class of the specified context must be static.
      *
      * @param activity the activity instance.
@@ -103,7 +103,7 @@ public abstract class LoaderContext {
 
     /**
      * Returns a context wrapping the specified fragment, with the specified instance as base
-     * context.<br/>
+     * context, that is, the one used by the loader.<br/>
      * In order to prevent undesired leaks, the class of the specified context must be static.
      *
      * @param fragment the fragment instance.

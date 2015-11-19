@@ -97,9 +97,9 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
                 .pass(new ParcelableSelectable<String>("test5", 31))
                 .pass(new ParcelableSelectable<Integer>(5, 17))
                 .close();
-        assertThat(channel1.result().afterMax(seconds(10)).all()).containsExactly("test1", "test2",
-                                                                                  "test3", "test4",
-                                                                                  "test5");
+        assertThat(channel1.result().afterMax(seconds(1)).all()).containsExactly("test1", "test2",
+                                                                                 "test3", "test4",
+                                                                                 "test5");
         assertThat(channel2.result().afterMax(seconds(10)).all()).containsExactly(1, 2, 3, 4, 5);
     }
 
@@ -1279,27 +1279,30 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         Channels.select(channel).index(Sort.STRING);
         channel.pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
                      new ParcelableSelectable<Object>(-11, Sort.INTEGER));
+        assertThat(Channels.select(channel)
+                           .index(Sort.INTEGER)
+                           .afterMax(seconds(10))
+                           .next()).isEqualTo(-11);
         assertThat(
-                Channels.select(channel).index(Sort.INTEGER).afterMax(seconds(1)).next()).isEqualTo(
-                -11);
-        assertThat(
-                Channels.select(channel).index(Sort.STRING).afterMax(seconds(1)).next()).isEqualTo(
+                Channels.select(channel).index(Sort.STRING).afterMax(seconds(10)).next()).isEqualTo(
                 "test21");
         channel.pass(new ParcelableSelectable<Object>(-11, Sort.INTEGER),
                      new ParcelableSelectable<Object>("test21", Sort.STRING));
+        assertThat(Channels.select(channel)
+                           .index(Sort.INTEGER)
+                           .afterMax(seconds(10))
+                           .next()).isEqualTo(-11);
         assertThat(
-                Channels.select(channel).index(Sort.INTEGER).afterMax(seconds(1)).next()).isEqualTo(
-                -11);
-        assertThat(
-                Channels.select(channel).index(Sort.STRING).afterMax(seconds(1)).next()).isEqualTo(
+                Channels.select(channel).index(Sort.STRING).afterMax(seconds(10)).next()).isEqualTo(
                 "test21");
         channel.pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
                      new ParcelableSelectable<Object>(-11, Sort.INTEGER));
+        assertThat(Channels.select(channel)
+                           .index(Sort.INTEGER)
+                           .afterMax(seconds(10))
+                           .next()).isEqualTo(-11);
         assertThat(
-                Channels.select(channel).index(Sort.INTEGER).afterMax(seconds(1)).next()).isEqualTo(
-                -11);
-        assertThat(
-                Channels.select(channel).index(Sort.STRING).afterMax(seconds(1)).next()).isEqualTo(
+                Channels.select(channel).index(Sort.STRING).afterMax(seconds(10)).next()).isEqualTo(
                 "test21");
     }
 
@@ -1319,7 +1322,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         try {
 
-            Channels.select(channel).index(Sort.STRING).afterMax(seconds(1)).all();
+            Channels.select(channel).index(Sort.STRING).afterMax(seconds(10)).all();
 
             fail();
 
@@ -1329,7 +1332,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         try {
 
-            Channels.select(channel).index(Sort.INTEGER).afterMax(seconds(1)).all();
+            Channels.select(channel).index(Sort.INTEGER).afterMax(seconds(10)).all();
 
             fail();
 
@@ -1347,7 +1350,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         try {
 
-            Channels.select(channel).index(Sort.STRING).afterMax(seconds(1)).all();
+            Channels.select(channel).index(Sort.STRING).afterMax(seconds(10)).all();
 
             fail();
 
@@ -1357,7 +1360,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         try {
 
-            Channels.select(channel).index(Sort.INTEGER).afterMax(seconds(1)).all();
+            Channels.select(channel).index(Sort.INTEGER).afterMax(seconds(10)).all();
 
             fail();
 
@@ -1375,7 +1378,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         try {
 
-            Channels.select(channel).index(Sort.STRING).afterMax(seconds(1)).all();
+            Channels.select(channel).index(Sort.STRING).afterMax(seconds(10)).all();
 
             fail();
 
@@ -1385,7 +1388,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         try {
 
-            Channels.select(channel).index(Sort.INTEGER).afterMax(seconds(1)).all();
+            Channels.select(channel).index(Sort.INTEGER).afterMax(seconds(10)).all();
 
             fail();
 

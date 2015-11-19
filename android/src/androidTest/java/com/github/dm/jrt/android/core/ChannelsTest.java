@@ -28,6 +28,7 @@ import com.github.dm.jrt.channel.InputChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.ResultChannel;
+import com.github.dm.jrt.channel.StreamingChannel;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.invocation.Invocations;
 import com.github.dm.jrt.routine.Routine;
@@ -1263,6 +1264,146 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
             fail();
 
         } catch (final AbortException ignored) {
+
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public void testSelectableOutput() {
+
+        final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine =
+                JRoutine.with(serviceFrom(getActivity())).on(factoryOf(Sort.class)).buildRoutine();
+        final StreamingChannel<ParcelableSelectable<Object>, ParcelableSelectable<Object>> channel =
+                Channels.asyncStream(routine);
+        Channels.select(channel).index(Sort.INTEGER);
+        Channels.select(channel).index(Sort.STRING);
+        channel.pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
+                     new ParcelableSelectable<Object>(-11, Sort.INTEGER));
+        assertThat(
+                Channels.select(channel).index(Sort.INTEGER).afterMax(seconds(1)).next()).isEqualTo(
+                -11);
+        assertThat(
+                Channels.select(channel).index(Sort.STRING).afterMax(seconds(1)).next()).isEqualTo(
+                "test21");
+        channel.pass(new ParcelableSelectable<Object>(-11, Sort.INTEGER),
+                     new ParcelableSelectable<Object>("test21", Sort.STRING));
+        assertThat(
+                Channels.select(channel).index(Sort.INTEGER).afterMax(seconds(1)).next()).isEqualTo(
+                -11);
+        assertThat(
+                Channels.select(channel).index(Sort.STRING).afterMax(seconds(1)).next()).isEqualTo(
+                "test21");
+        channel.pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
+                     new ParcelableSelectable<Object>(-11, Sort.INTEGER));
+        assertThat(
+                Channels.select(channel).index(Sort.INTEGER).afterMax(seconds(1)).next()).isEqualTo(
+                -11);
+        assertThat(
+                Channels.select(channel).index(Sort.STRING).afterMax(seconds(1)).next()).isEqualTo(
+                "test21");
+    }
+
+    @SuppressWarnings("unchecked")
+    public void testSelectableOutputAbort() {
+
+        final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine =
+                JRoutine.with(serviceFrom(getActivity())).on(factoryOf(Sort.class)).buildRoutine();
+        StreamingChannel<ParcelableSelectable<Object>, ParcelableSelectable<Object>> channel =
+                Channels.asyncStream(routine);
+        Channels.select(channel).index(Sort.INTEGER);
+        Channels.select(channel).index(Sort.STRING);
+        channel.after(millis(100))
+               .pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
+                     new ParcelableSelectable<Object>(-11, Sort.INTEGER))
+               .abort();
+
+        try {
+
+            Channels.select(channel).index(Sort.STRING).afterMax(seconds(1)).all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            Channels.select(channel).index(Sort.INTEGER).afterMax(seconds(1)).all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        channel = Channels.asyncStream(routine);
+        Channels.select(channel).index(Sort.INTEGER);
+        Channels.select(channel).index(Sort.STRING);
+        channel.after(millis(100))
+               .pass(new ParcelableSelectable<Object>(-11, Sort.INTEGER),
+                     new ParcelableSelectable<Object>("test21", Sort.STRING))
+               .abort();
+
+        try {
+
+            Channels.select(channel).index(Sort.STRING).afterMax(seconds(1)).all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            Channels.select(channel).index(Sort.INTEGER).afterMax(seconds(1)).all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        channel = Channels.asyncStream(routine);
+        Channels.select(channel).index(Sort.INTEGER);
+        Channels.select(channel).index(Sort.STRING);
+        channel.after(millis(100))
+               .pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
+                     new ParcelableSelectable<Object>(-11, Sort.INTEGER))
+               .abort();
+
+        try {
+
+            Channels.select(channel).index(Sort.STRING).afterMax(seconds(1)).all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            Channels.select(channel).index(Sort.INTEGER).afterMax(seconds(1)).all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public void testSelectableOutputError() {
+
+        try {
+
+            Channels.select(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
 
         }
     }

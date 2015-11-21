@@ -40,7 +40,7 @@ import com.github.dm.jrt.channel.AbortException;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.invocation.DelegatingInvocation.DelegationType;
+import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.log.Log;
 import com.github.dm.jrt.log.Log.Level;

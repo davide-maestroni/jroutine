@@ -14,8 +14,6 @@
 package com.github.dm.jrt.invocation;
 
 import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.core.JRoutine;
-import com.github.dm.jrt.invocation.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.util.ClassToken;
 import com.github.dm.jrt.util.Reflection;
 
@@ -98,32 +96,6 @@ public class InvocationTest {
         try {
 
             factoryOf((Class<TestInvocation>) null, Reflection.NO_ARGS);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-    }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testNullDelegatedRoutine() {
-
-        try {
-
-            new DelegatingInvocation<Object, Object>(null, DelegationType.ASYNC);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new DelegatingInvocation<Object, Object>(JRoutine.on(factoryOf(TestInvocation.class)),
-                                                     null);
 
             fail();
 

@@ -17,8 +17,8 @@ import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.channel.StreamingChannel;
-import com.github.dm.jrt.invocation.DelegatingInvocation;
-import com.github.dm.jrt.invocation.DelegatingInvocation.DelegationType;
+import com.github.dm.jrt.core.DelegatingInvocation;
+import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.routine.Routine;
 

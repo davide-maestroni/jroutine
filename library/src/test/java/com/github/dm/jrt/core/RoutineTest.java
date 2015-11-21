@@ -38,10 +38,9 @@ import com.github.dm.jrt.channel.TimeoutException;
 import com.github.dm.jrt.core.DefaultInvocationChannel.InvocationManager;
 import com.github.dm.jrt.core.DefaultInvocationChannel.InvocationObserver;
 import com.github.dm.jrt.core.DefaultResultChannel.AbortHandler;
+import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.core.InvocationExecution.InputIterator;
 import com.github.dm.jrt.invocation.CommandInvocation;
-import com.github.dm.jrt.invocation.DelegatingInvocation;
-import com.github.dm.jrt.invocation.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.invocation.FunctionInvocation;
 import com.github.dm.jrt.invocation.Invocation;
@@ -1870,6 +1869,32 @@ public class RoutineTest {
             fail();
 
         } catch (final TimeoutException ignored) {
+
+        }
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testNullDelegatedRoutine() {
+
+        try {
+
+            new DelegatingInvocation<Object, Object>(null, DelegationType.ASYNC);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            new DelegatingInvocation<Object, Object>(JRoutine.on(PassingInvocation.factoryOf()),
+                                                     null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
 
         }
     }

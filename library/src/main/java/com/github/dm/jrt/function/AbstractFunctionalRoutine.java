@@ -18,8 +18,8 @@ import com.github.dm.jrt.builder.InvocationConfiguration.Builder;
 import com.github.dm.jrt.builder.InvocationConfiguration.Configurable;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.core.AbstractRoutine;
+import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.core.JRoutine;
-import com.github.dm.jrt.invocation.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.routine.Routine;
 

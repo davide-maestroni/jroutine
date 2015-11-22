@@ -339,19 +339,21 @@ public class Functions {
      * class.<br/>
      * The returned object will support concatenation and comparison.
      *
-     * @param <IN> the input data type.
+     * @param <IN1> the first input data type.
+     * @param <IN2> the second input data type.
      * @return the predicate wrapper.
      */
     @NotNull
     @SuppressWarnings("ConstantConditions")
-    public static <IN> PredicateWrapper<IN> instanceOf(@NotNull final Class<? extends IN> type) {
+    public static <IN1, IN2 extends IN1> PredicateWrapper<IN1> instanceOf(
+            @NotNull final Class<? extends IN2> type) {
 
         if (type == null) {
 
             throw new NullPointerException("the type must not be null");
         }
 
-        return wrapPredicate(new InstanceOfPredicate<IN>(type));
+        return wrapPredicate(new InstanceOfPredicate<IN1>(type));
     }
 
     /**
@@ -495,7 +497,7 @@ public class Functions {
             return isNull();
         }
 
-        return wrapPredicate(new SamAsPredicate<IN1>(other));
+        return wrapPredicate(new SameAsPredicate<IN1>(other));
     }
 
     /**
@@ -721,11 +723,21 @@ public class Functions {
         return new SupplierWrapper<OUT>(supplier, Functions.<OUT>identity());
     }
 
-    // TODO: 21/11/15 javadoc
+    /**
+     * Function implementation casting inputs to the specified class.
+     *
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
+     */
     private static class ClassCastFunction<IN, OUT> implements Function<IN, OUT> {
 
         private final Class<? extends OUT> mType;
 
+        /**
+         * Constructor.
+         *
+         * @param type the output class type.
+         */
         @SuppressWarnings("ConstantConditions")
         private ClassCastFunction(@NotNull final Class<? extends OUT> type) {
 
@@ -761,11 +773,20 @@ public class Functions {
         }
     }
 
-    // TODO: 21/11/15 javadoc
+    /**
+     * Supplier implementation returning always the same object.
+     *
+     * @param <OUT> the output data type.
+     */
     private static class ConstantSupplier<OUT> implements Supplier<OUT> {
 
         private final OUT mResult;
 
+        /**
+         * Constructor.
+         *
+         * @param result the object to return.
+         */
         private ConstantSupplier(final OUT result) {
 
             mResult = result;
@@ -982,11 +1003,20 @@ public class Functions {
         }
     }
 
-    // TODO: 21/11/15 javadoc
+    /**
+     * Predicate implementation testing for equality.
+     *
+     * @param <IN> the input data type.
+     */
     private static class EqualToPredicate<IN> implements Predicate<IN> {
 
         private final IN mOther;
 
+        /**
+         * Constructor.
+         *
+         * @param other the other object to test against.
+         */
         private EqualToPredicate(@NotNull final IN other) {
 
             mOther = other;
@@ -1145,11 +1175,20 @@ public class Functions {
         }
     }
 
-    // TODO: 21/11/15 javadoc
+    /**
+     * Predicate testing whether an object is an instance of a specific class.
+     *
+     * @param <IN> the input data type.
+     */
     private static class InstanceOfPredicate<IN> implements Predicate<IN> {
 
         private final Class<? extends IN> mType;
 
+        /**
+         * Constructor.
+         *
+         * @param type the class type.
+         */
         private InstanceOfPredicate(@NotNull final Class<? extends IN> type) {
 
             mType = type;
@@ -1241,12 +1280,21 @@ public class Functions {
         }
     }
 
-    // TODO: 21/11/15 javadoc
-    private static class SamAsPredicate<IN> implements Predicate<IN> {
+    /**
+     * Predicate implementation testing for identity.
+     *
+     * @param <IN> the input data type.
+     */
+    private static class SameAsPredicate<IN> implements Predicate<IN> {
 
         private final IN mOther;
 
-        private SamAsPredicate(@NotNull final IN other) {
+        /**
+         * Constructor.
+         *
+         * @param other the other object to test against.
+         */
+        private SameAsPredicate(@NotNull final IN other) {
 
             mOther = other;
         }
@@ -1275,8 +1323,8 @@ public class Functions {
                 return false;
             }
 
-            final EqualToPredicate<?> that = (EqualToPredicate<?>) o;
-            return mOther.equals(that.mOther);
+            final SameAsPredicate<?> that = (SameAsPredicate<?>) o;
+            return (mOther == that.mOther);
         }
     }
 

@@ -91,7 +91,7 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
     @Override
     public int hashCode() {
 
-        int result = mBiFunction.getClass().hashCode();
+        int result = mBiFunction.hashCode();
         result = 31 * result + mFunction.hashCode();
         return result;
     }
@@ -110,7 +110,6 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
         }
 
         final BiFunctionWrapper<?, ?, ?> that = (BiFunctionWrapper<?, ?, ?>) o;
-        return (mBiFunction.getClass() == that.mBiFunction.getClass()) && mFunction.equals(
-                that.mFunction);
+        return mBiFunction.equals(that.mBiFunction) && mFunction.equals(that.mFunction);
     }
 }

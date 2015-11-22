@@ -18,6 +18,7 @@ import com.github.dm.jrt.util.Reflection;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -35,9 +36,25 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT> {
     /**
      * Constructor.
      *
+     * @param function the wrapped function.
+     */
+    @SuppressWarnings("ConstantConditions")
+    FunctionWrapper(@NotNull final Function<?, ?> function) {
+
+        this(Collections.<Function<?, ?>>singletonList(function));
+
+        if (function == null) {
+
+            throw new NullPointerException("the function instance must not be null");
+        }
+    }
+
+    /**
+     * Constructor.
+     *
      * @param functions the list of wrapped functions.
      */
-    FunctionWrapper(@NotNull final List<Function<?, ?>> functions) {
+    private FunctionWrapper(@NotNull final List<Function<?, ?>> functions) {
 
         if (functions.isEmpty()) {
 
@@ -141,14 +158,7 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT> {
     @Override
     public int hashCode() {
 
-        int result = 0;
-
-        for (final Function<?, ?> function : mFunctions) {
-
-            result = 31 * result + function.getClass().hashCode();
-        }
-
-        return result;
+        return mFunctions.hashCode();
     }
 
     @Override
@@ -165,23 +175,6 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT> {
         }
 
         final FunctionWrapper<?, ?> that = (FunctionWrapper<?, ?>) o;
-        final List<Function<?, ?>> thisFunctions = mFunctions;
-        final List<Function<?, ?>> thatFunctions = that.mFunctions;
-        final int size = thisFunctions.size();
-
-        if (size != thatFunctions.size()) {
-
-            return false;
-        }
-
-        for (int i = 0; i < size; ++i) {
-
-            if (thisFunctions.get(i).getClass() != thatFunctions.get(i).getClass()) {
-
-                return false;
-            }
-        }
-
-        return true;
+        return mFunctions.equals(that.mFunctions);
     }
 }

@@ -18,6 +18,7 @@ import com.github.dm.jrt.util.Reflection;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -46,11 +47,21 @@ public class PredicateWrapper<IN> implements Predicate<IN> {
     /**
      * Constructor.
      *
+     * @param predicate the core predicate.
+     */
+    PredicateWrapper(@NotNull final Predicate<? super IN> predicate) {
+
+        this(predicate, Collections.<Predicate<?>>singletonList(predicate));
+    }
+
+    /**
+     * Constructor.
+     *
      * @param predicate  the core predicate.
      * @param predicates the list of wrapped predicates.
      */
     @SuppressWarnings("ConstantConditions")
-    PredicateWrapper(@NotNull final Predicate<? super IN> predicate,
+    private PredicateWrapper(@NotNull final Predicate<? super IN> predicate,
             @NotNull final List<Predicate<?>> predicates) {
 
         if (predicate == null) {
@@ -119,14 +130,7 @@ public class PredicateWrapper<IN> implements Predicate<IN> {
     @Override
     public int hashCode() {
 
-        int result = 0;
-
-        for (final Predicate<?> predicate : mPredicates) {
-
-            result = 31 * result + predicate.getClass().hashCode();
-        }
-
-        return result;
+        return mPredicates.hashCode();
     }
 
     @Override
@@ -143,24 +147,7 @@ public class PredicateWrapper<IN> implements Predicate<IN> {
         }
 
         final PredicateWrapper<?> that = (PredicateWrapper<?>) o;
-        final List<Predicate<?>> thisPredicates = mPredicates;
-        final List<Predicate<?>> thatPredicates = that.mPredicates;
-        final int size = thisPredicates.size();
-
-        if (size != thatPredicates.size()) {
-
-            return false;
-        }
-
-        for (int i = 0; i < size; ++i) {
-
-            if (thisPredicates.get(i).getClass() != thatPredicates.get(i).getClass()) {
-
-                return false;
-            }
-        }
-
-        return true;
+        return mPredicates.equals(that.mPredicates);
     }
 
     /**

@@ -59,7 +59,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.android.core.ContextInvocationTarget.classOfType;
 import static com.github.dm.jrt.android.core.ContextInvocationTarget.instanceOf;
-import static com.github.dm.jrt.android.invocation.DelegatingContextInvocation.factoryFrom;
+import static com.github.dm.jrt.android.core.DelegatingContextInvocation.factoryFrom;
 import static com.github.dm.jrt.android.invocation.FunctionContextInvocations.factoryOf;
 import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.contextFrom;
 import static com.github.dm.jrt.builder.InvocationConfiguration.builder;

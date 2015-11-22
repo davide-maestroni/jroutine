@@ -18,6 +18,7 @@ import com.github.dm.jrt.util.Reflection;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -34,9 +35,25 @@ public class ConsumerWrapper<IN> implements Consumer<IN> {
     /**
      * Constructor.
      *
+     * @param consumer the wrapped consumer.
+     */
+    @SuppressWarnings("ConstantConditions")
+    ConsumerWrapper(@NotNull final Consumer<?> consumer) {
+
+        this(Collections.<Consumer<?>>singletonList(consumer));
+
+        if (consumer == null) {
+
+            throw new NullPointerException("the consumer instance must not be null");
+        }
+    }
+
+    /**
+     * Constructor.
+     *
      * @param consumers the list of wrapped consumers.
      */
-    ConsumerWrapper(@NotNull final List<Consumer<?>> consumers) {
+    private ConsumerWrapper(@NotNull final List<Consumer<?>> consumers) {
 
         if (consumers.isEmpty()) {
 
@@ -104,14 +121,7 @@ public class ConsumerWrapper<IN> implements Consumer<IN> {
     @Override
     public int hashCode() {
 
-        int result = 0;
-
-        for (final Consumer<?> consumer : mConsumers) {
-
-            result = 31 * result + consumer.getClass().hashCode();
-        }
-
-        return result;
+        return mConsumers.hashCode();
     }
 
     @Override
@@ -128,23 +138,6 @@ public class ConsumerWrapper<IN> implements Consumer<IN> {
         }
 
         final ConsumerWrapper<?> that = (ConsumerWrapper<?>) o;
-        final List<Consumer<?>> thisConsumers = mConsumers;
-        final List<Consumer<?>> thatConsumers = that.mConsumers;
-        final int size = thisConsumers.size();
-
-        if (size != thatConsumers.size()) {
-
-            return false;
-        }
-
-        for (int i = 0; i < size; ++i) {
-
-            if (thisConsumers.get(i).getClass() != thatConsumers.get(i).getClass()) {
-
-                return false;
-            }
-        }
-
-        return true;
+        return mConsumers.equals(that.mConsumers);
     }
 }

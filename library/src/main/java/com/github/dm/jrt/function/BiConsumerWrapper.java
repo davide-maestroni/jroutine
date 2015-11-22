@@ -18,6 +18,7 @@ import com.github.dm.jrt.util.Reflection;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -35,9 +36,25 @@ public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2> {
     /**
      * Constructor.
      *
+     * @param consumer the wrapped consumer.
+     */
+    @SuppressWarnings("ConstantConditions")
+    BiConsumerWrapper(@NotNull final BiConsumer<?, ?> consumer) {
+
+        this(Collections.<BiConsumer<?, ?>>singletonList(consumer));
+
+        if (consumer == null) {
+
+            throw new NullPointerException("the consumer instance must not be null");
+        }
+    }
+
+    /**
+     * Constructor.
+     *
      * @param consumers the list of wrapped consumers.
      */
-    BiConsumerWrapper(@NotNull final List<BiConsumer<?, ?>> consumers) {
+    private BiConsumerWrapper(@NotNull final List<BiConsumer<?, ?>> consumers) {
 
         if (consumers.isEmpty()) {
 
@@ -106,14 +123,7 @@ public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2> {
     @Override
     public int hashCode() {
 
-        int result = 0;
-
-        for (final BiConsumer<?, ?> consumer : mConsumers) {
-
-            result = 31 * result + consumer.getClass().hashCode();
-        }
-
-        return result;
+        return mConsumers.hashCode();
     }
 
     @Override
@@ -130,23 +140,6 @@ public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2> {
         }
 
         final BiConsumerWrapper<?, ?> that = (BiConsumerWrapper<?, ?>) o;
-        final List<BiConsumer<?, ?>> thisConsumers = mConsumers;
-        final List<BiConsumer<?, ?>> thatConsumers = that.mConsumers;
-        final int size = thisConsumers.size();
-
-        if (size != thatConsumers.size()) {
-
-            return false;
-        }
-
-        for (int i = 0; i < size; ++i) {
-
-            if (thisConsumers.get(i).getClass() != thatConsumers.get(i).getClass()) {
-
-                return false;
-            }
-        }
-
-        return true;
+        return mConsumers.equals(that.mConsumers);
     }
 }

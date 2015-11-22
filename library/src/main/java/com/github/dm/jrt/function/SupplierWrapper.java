@@ -89,8 +89,8 @@ public class SupplierWrapper<OUT> implements Supplier<OUT> {
     @Override
     public int hashCode() {
 
-        int result = mSupplier.getClass().hashCode();
-        result = 31 * result + mFunction.hashCode();
+        int result = mFunction.hashCode();
+        result = 31 * result + mSupplier.hashCode();
         return result;
     }
 
@@ -108,7 +108,6 @@ public class SupplierWrapper<OUT> implements Supplier<OUT> {
         }
 
         final SupplierWrapper<?> that = (SupplierWrapper<?>) o;
-        return (mSupplier.getClass() == that.mSupplier.getClass()) && mFunction.equals(
-                that.mFunction);
+        return mFunction.equals(that.mFunction) && mSupplier.equals(that.mSupplier);
     }
 }

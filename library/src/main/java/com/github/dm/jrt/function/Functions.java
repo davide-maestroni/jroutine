@@ -20,10 +20,11 @@ import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.invocation.FunctionInvocation;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationFactory;
+import com.github.dm.jrt.util.ClassToken;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -114,14 +115,40 @@ public class Functions {
     }
 
     /**
-     * Returns a functional routine builder.
+     * Returns a function wrapper casting the passed inputs to the specified class.<br/>
+     * The returned object will support concatenation and comparison.
      *
-     * @return the routine builder instance.
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
+     * @return the function wrapper.
      */
     @NotNull
-    public static FunctionalRoutineBuilder builder() {
+    @SuppressWarnings("ConstantConditions")
+    public static <IN, OUT> FunctionWrapper<IN, OUT> castTo(
+            @NotNull final Class<? extends OUT> type) {
 
-        return new DefaultFunctionalRoutineBuilder();
+        if (type == null) {
+
+            throw new NullPointerException("the type must not be null");
+        }
+
+        return wrapFunction(new ClassCastFunction<IN, OUT>(type));
+    }
+
+    /**
+     * Returns a function wrapper casting the passed inputs to the specified class token type.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
+     * @return the function wrapper.
+     */
+    @NotNull
+    @SuppressWarnings("ConstantConditions")
+    public static <IN, OUT> FunctionWrapper<IN, OUT> castTo(
+            @NotNull final ClassToken<? extends OUT> token) {
+
+        return wrapFunction(new ClassCastFunction<IN, OUT>(token.getRawClass()));
     }
 
     /**
@@ -135,13 +162,7 @@ public class Functions {
     @NotNull
     public static <OUT> SupplierWrapper<OUT> constant(final OUT result) {
 
-        return wrapSupplier(new Supplier<OUT>() {
-
-            public OUT get() {
-
-                return result;
-            }
-        });
+        return wrapSupplier(new ConstantSupplier<OUT>(result));
     }
 
     /**
@@ -211,6 +232,25 @@ public class Functions {
     }
 
     /**
+     * Returns a predicate wrapper testing for equality to the specified object.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN1> the first input data type.
+     * @param <IN2> the second input data type.
+     * @return the predicate wrapper.
+     */
+    @NotNull
+    public static <IN1, IN2 extends IN1> PredicateWrapper<IN1> equalTo(@Nullable final IN2 other) {
+
+        if (other == null) {
+
+            return isNull();
+        }
+
+        return wrapPredicate(new EqualToPredicate<IN1>(other));
+    }
+
+    /**
      * Returns a bi-function wrapper just returning the first passed argument.<br/>
      * The returned object will support concatenation and comparison.
      *
@@ -270,6 +310,17 @@ public class Functions {
     }
 
     /**
+     * Returns a functional routine builder.
+     *
+     * @return the routine builder instance.
+     */
+    @NotNull
+    public static FunctionalRoutineBuilder functional() {
+
+        return new DefaultFunctionalRoutineBuilder();
+    }
+
+    /**
      * Returns the identity function wrapper.<br/>
      * The returned object will support concatenation and comparison.
      *
@@ -281,6 +332,26 @@ public class Functions {
     public static <IN> FunctionWrapper<IN, IN> identity() {
 
         return (FunctionWrapper<IN, IN>) sIdentity;
+    }
+
+    /**
+     * Returns a predicate wrapper testing whether the passed inputs are instances of the specified
+     * class.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN> the input data type.
+     * @return the predicate wrapper.
+     */
+    @NotNull
+    @SuppressWarnings("ConstantConditions")
+    public static <IN> PredicateWrapper<IN> instanceOf(@NotNull final Class<? extends IN> type) {
+
+        if (type == null) {
+
+            throw new NullPointerException("the type must not be null");
+        }
+
+        return wrapPredicate(new InstanceOfPredicate<IN>(type));
     }
 
     /**
@@ -409,6 +480,25 @@ public class Functions {
     }
 
     /**
+     * Returns a predicate wrapper testing for identity to the specified object.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN1> the first input data type.
+     * @param <IN2> the second input data type.
+     * @return the predicate wrapper.
+     */
+    @NotNull
+    public static <IN1, IN2 extends IN1> PredicateWrapper<IN1> sameAs(@Nullable final IN2 other) {
+
+        if (other == null) {
+
+            return isNull();
+        }
+
+        return wrapPredicate(new SamAsPredicate<IN1>(other));
+    }
+
+    /**
      * Returns a bi-function wrapper just returning the second passed argument.<br/>
      * The returned object will support concatenation and comparison.
      *
@@ -503,8 +593,7 @@ public class Functions {
             return (BiConsumerWrapper<IN1, IN2>) consumer;
         }
 
-        return new BiConsumerWrapper<IN1, IN2>(
-                Collections.<BiConsumer<?, ?>>singletonList(consumer));
+        return new BiConsumerWrapper<IN1, IN2>(consumer);
     }
 
     /**
@@ -531,8 +620,7 @@ public class Functions {
             return (BiFunctionWrapper<IN1, IN2, OUT>) function;
         }
 
-        return new BiFunctionWrapper<IN1, IN2, OUT>(function,
-                                                    wrapFunction(Functions.<OUT>identity()));
+        return new BiFunctionWrapper<IN1, IN2, OUT>(function, Functions.<OUT>identity());
     }
 
     /**
@@ -556,7 +644,7 @@ public class Functions {
             return (ConsumerWrapper<IN>) consumer;
         }
 
-        return new ConsumerWrapper<IN>(Collections.<Consumer<?>>singletonList(consumer));
+        return new ConsumerWrapper<IN>(consumer);
     }
 
     /**
@@ -582,7 +670,7 @@ public class Functions {
             return (FunctionWrapper<IN, OUT>) function;
         }
 
-        return new FunctionWrapper<IN, OUT>(Collections.<Function<?, ?>>singletonList(function));
+        return new FunctionWrapper<IN, OUT>(function);
     }
 
     /**
@@ -606,8 +694,7 @@ public class Functions {
             return (PredicateWrapper<IN>) predicate;
         }
 
-        return new PredicateWrapper<IN>(predicate,
-                                        Collections.<Predicate<?>>singletonList(predicate));
+        return new PredicateWrapper<IN>(predicate);
     }
 
     /**
@@ -632,6 +719,85 @@ public class Functions {
         }
 
         return new SupplierWrapper<OUT>(supplier, Functions.<OUT>identity());
+    }
+
+    // TODO: 21/11/15 javadoc
+    private static class ClassCastFunction<IN, OUT> implements Function<IN, OUT> {
+
+        private final Class<? extends OUT> mType;
+
+        @SuppressWarnings("ConstantConditions")
+        private ClassCastFunction(@NotNull final Class<? extends OUT> type) {
+
+            mType = type;
+        }
+
+        @Override
+        public int hashCode() {
+
+            return mType.hashCode();
+        }
+
+        public OUT apply(final IN in) {
+
+            return mType.cast(in);
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if ((o == null) || (getClass() != o.getClass())) {
+
+                return false;
+            }
+
+            final ClassCastFunction<?, ?> that = (ClassCastFunction<?, ?>) o;
+            return mType.equals(that.mType);
+        }
+    }
+
+    // TODO: 21/11/15 javadoc
+    private static class ConstantSupplier<OUT> implements Supplier<OUT> {
+
+        private final OUT mResult;
+
+        private ConstantSupplier(final OUT result) {
+
+            mResult = result;
+        }
+
+        public OUT get() {
+
+            return mResult;
+        }
+
+        @Override
+        public int hashCode() {
+
+            return mResult != null ? mResult.hashCode() : 0;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if ((o == null) || (getClass() != o.getClass())) {
+
+                return false;
+            }
+
+            final ConstantSupplier<?> that = (ConstantSupplier<?>) o;
+            return (mResult == that.mResult);
+        }
     }
 
     /**
@@ -816,6 +982,45 @@ public class Functions {
         }
     }
 
+    // TODO: 21/11/15 javadoc
+    private static class EqualToPredicate<IN> implements Predicate<IN> {
+
+        private final IN mOther;
+
+        private EqualToPredicate(@NotNull final IN other) {
+
+            mOther = other;
+        }
+
+        @Override
+        public int hashCode() {
+
+            return mOther.hashCode();
+        }
+
+        public boolean test(final IN in) {
+
+            return mOther.equals(in);
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if ((o == null) || (getClass() != o.getClass())) {
+
+                return false;
+            }
+
+            final EqualToPredicate<?> that = (EqualToPredicate<?>) o;
+            return mOther.equals(that.mOther);
+        }
+    }
+
     /**
      * Filter invocation based on a function instance.
      *
@@ -940,6 +1145,45 @@ public class Functions {
         }
     }
 
+    // TODO: 21/11/15 javadoc
+    private static class InstanceOfPredicate<IN> implements Predicate<IN> {
+
+        private final Class<? extends IN> mType;
+
+        private InstanceOfPredicate(@NotNull final Class<? extends IN> type) {
+
+            mType = type;
+        }
+
+        @Override
+        public int hashCode() {
+
+            return mType.hashCode();
+        }
+
+        public boolean test(final IN in) {
+
+            return mType.isInstance(in);
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if ((o == null) || (getClass() != o.getClass())) {
+
+                return false;
+            }
+
+            final InstanceOfPredicate<?> that = (InstanceOfPredicate<?>) o;
+            return mType.equals(that.mType);
+        }
+    }
+
     /**
      * Filter invocation based on a predicate instance.
      *
@@ -994,6 +1238,45 @@ public class Functions {
 
                 result.pass(input);
             }
+        }
+    }
+
+    // TODO: 21/11/15 javadoc
+    private static class SamAsPredicate<IN> implements Predicate<IN> {
+
+        private final IN mOther;
+
+        private SamAsPredicate(@NotNull final IN other) {
+
+            mOther = other;
+        }
+
+        @Override
+        public int hashCode() {
+
+            return mOther.hashCode();
+        }
+
+        public boolean test(final IN in) {
+
+            return (mOther == in);
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if ((o == null) || (getClass() != o.getClass())) {
+
+                return false;
+            }
+
+            final EqualToPredicate<?> that = (EqualToPredicate<?>) o;
+            return mOther.equals(that.mOther);
         }
     }
 

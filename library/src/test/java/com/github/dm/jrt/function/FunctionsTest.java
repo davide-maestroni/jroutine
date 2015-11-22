@@ -26,7 +26,6 @@ import org.assertj.core.api.Assertions;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import java.util.Collections;
 import java.util.List;
 
 import static com.github.dm.jrt.function.Functions.biSink;
@@ -253,16 +252,6 @@ public class FunctionsTest {
 
         try {
 
-            new BiConsumerWrapper<Object, Object>(Collections.<BiConsumer<?, ?>>emptyList());
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
             wrapBiConsumer(new TestBiConsumer()).andThen(null);
 
             fail();
@@ -443,11 +432,10 @@ public class FunctionsTest {
         final InvocationFactory<Void, String> factory = createCommand2();
         final SupplierWrapper<String> constant = constant("test");
         assertThat(factory).isEqualTo(factory);
-        assertThat(factory).isEqualTo(createCommand2());
+        assertThat(factory).isNotEqualTo(createCommand2());
         assertThat(factory).isNotEqualTo(supplierCommand(constant));
         assertThat(factory).isNotEqualTo(createFactory());
         assertThat(factory).isNotEqualTo("");
-        assertThat(factory.hashCode()).isEqualTo(createCommand2().hashCode());
         assertThat(supplierCommand(constant)).isEqualTo(supplierCommand(constant));
         assertThat(supplierCommand(constant).hashCode()).isEqualTo(
                 supplierCommand(constant).hashCode());
@@ -490,11 +478,10 @@ public class FunctionsTest {
         final InvocationFactory<Void, String> factory = createCommand();
         final ConsumerWrapper<ResultChannel<String>> sink = sink();
         assertThat(factory).isEqualTo(factory);
-        assertThat(factory).isEqualTo(createCommand());
+        assertThat(factory).isNotEqualTo(createCommand());
         assertThat(factory).isNotEqualTo(consumerCommand(sink));
         assertThat(factory).isNotEqualTo(createFactory());
         assertThat(factory).isNotEqualTo("");
-        assertThat(factory.hashCode()).isEqualTo(createCommand().hashCode());
         assertThat(consumerCommand(sink)).isEqualTo(consumerCommand(sink));
         assertThat(consumerCommand(sink).hashCode()).isEqualTo(consumerCommand(sink).hashCode());
     }
@@ -626,16 +613,6 @@ public class FunctionsTest {
 
         try {
 
-            new ConsumerWrapper<Object>(Collections.<Consumer<?>>emptyList());
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
             wrapConsumer(new TestConsumer()).andThen(null);
 
             fail();
@@ -660,11 +637,10 @@ public class FunctionsTest {
                 constant(PassingInvocation.factoryOf().newInvocation());
         final InvocationFactory<Object, String> factory = createFactory();
         assertThat(factory).isEqualTo(factory);
-        assertThat(factory).isEqualTo(createFactory());
+        assertThat(factory).isNotEqualTo(createFactory());
         assertThat(factory).isNotEqualTo(supplierFactory(supplier));
         assertThat(factory).isNotEqualTo(createFilter());
         assertThat(factory).isNotEqualTo("");
-        assertThat(factory.hashCode()).isEqualTo(createFactory().hashCode());
         assertThat(supplierFactory(supplier)).isEqualTo(supplierFactory(supplier));
         assertThat(supplierFactory(supplier).hashCode()).isEqualTo(
                 supplierFactory(supplier).hashCode());
@@ -730,11 +706,10 @@ public class FunctionsTest {
         final FunctionWrapper<Object, ? super Object> identity = identity();
         final InvocationFactory<Object, String> factory = createFilter2();
         assertThat(factory).isEqualTo(factory);
-        assertThat(factory).isEqualTo(createFilter2());
+        assertThat(factory).isNotEqualTo(createFilter2());
         assertThat(factory).isNotEqualTo(functionFilter(identity));
         assertThat(factory).isNotEqualTo(createFactory());
         assertThat(factory).isNotEqualTo("");
-        assertThat(factory.hashCode()).isEqualTo(createFilter2().hashCode());
         assertThat(functionFilter(identity)).isEqualTo(functionFilter(identity));
         assertThat(functionFilter(identity).hashCode()).isEqualTo(
                 functionFilter(identity).hashCode());
@@ -784,11 +759,10 @@ public class FunctionsTest {
         final PredicateWrapper<Object> negative = negative();
         final InvocationFactory<String, String> factory = createFilter3();
         assertThat(factory).isEqualTo(factory);
-        assertThat(factory).isEqualTo(createFilter3());
+        assertThat(factory).isNotEqualTo(createFilter3());
         assertThat(factory).isNotEqualTo(predicateFilter(negative));
         assertThat(factory).isNotEqualTo(createFactory());
         assertThat(factory).isNotEqualTo("");
-        assertThat(factory.hashCode()).isEqualTo(createFilter3().hashCode());
         assertThat(predicateFilter(negative)).isEqualTo(predicateFilter(negative));
         assertThat(predicateFilter(negative).hashCode()).isEqualTo(
                 predicateFilter(negative).hashCode());
@@ -831,11 +805,10 @@ public class FunctionsTest {
         final InvocationFactory<Object, String> factory = createFilter();
         final BiConsumerWrapper<Object, ResultChannel<String>> sink = biSink();
         assertThat(factory).isEqualTo(factory);
-        assertThat(factory).isEqualTo(createFilter());
+        assertThat(factory).isNotEqualTo(createFilter());
         assertThat(factory).isNotEqualTo(consumerFilter(sink));
         assertThat(factory).isNotEqualTo(createFactory());
         assertThat(factory).isNotEqualTo("");
-        assertThat(factory.hashCode()).isEqualTo(createFilter().hashCode());
         assertThat(consumerFilter(sink)).isEqualTo(consumerFilter(sink));
         assertThat(consumerFilter(sink).hashCode()).isEqualTo(consumerFilter(sink).hashCode());
     }
@@ -1016,16 +989,6 @@ public class FunctionsTest {
 
         try {
 
-            new FunctionWrapper<Object, Object>(Collections.<Function<?, ?>>emptyList());
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
             wrapFunction(new TestFunction()).andThen(null);
 
             fail();
@@ -1066,11 +1029,10 @@ public class FunctionsTest {
         final InvocationFactory<?, String> factory = createFunction2();
         final FunctionWrapper<List<?>, ? super List<?>> identity = identity();
         assertThat(factory).isEqualTo(factory);
-        assertThat(factory).isEqualTo(createFunction2());
+        assertThat(factory).isNotEqualTo(createFunction2());
         assertThat(factory).isNotEqualTo(functionFactory(identity));
         assertThat(factory).isNotEqualTo(createFactory());
         assertThat(factory).isNotEqualTo("");
-        assertThat(factory.hashCode()).isEqualTo(createFunction2().hashCode());
         assertThat(functionFactory(identity)).isEqualTo(functionFactory(identity));
         assertThat(functionFactory(identity).hashCode()).isEqualTo(
                 functionFactory(identity).hashCode());
@@ -1120,11 +1082,10 @@ public class FunctionsTest {
         final InvocationFactory<?, String> factory = createFunction();
         final BiConsumerWrapper<List<?>, ResultChannel<Object>> sink = biSink();
         assertThat(factory).isEqualTo(factory);
-        assertThat(factory).isEqualTo(createFunction());
+        assertThat(factory).isNotEqualTo(createFunction());
         assertThat(factory).isNotEqualTo(consumerFactory(sink));
         assertThat(factory).isNotEqualTo(createFactory());
         assertThat(factory).isNotEqualTo("");
-        assertThat(factory.hashCode()).isEqualTo(createFunction().hashCode());
         assertThat(consumerFactory(sink)).isEqualTo(consumerFactory(sink));
         assertThat(consumerFactory(sink).hashCode()).isEqualTo(consumerFactory(sink).hashCode());
     }
@@ -1328,33 +1289,11 @@ public class FunctionsTest {
 
         try {
 
-            new PredicateWrapper<Object>(null, Collections.<Predicate<?>>singletonList(
-                    new TestPredicate()));
+            new PredicateWrapper<Object>(null);
 
             fail();
 
         } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new PredicateWrapper<Object>(new TestPredicate(), null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new PredicateWrapper<Object>(new TestPredicate(),
-                                         Collections.<Predicate<?>>emptyList());
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
 
         }
 

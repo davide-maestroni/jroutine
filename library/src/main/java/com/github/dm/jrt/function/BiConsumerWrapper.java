@@ -31,6 +31,12 @@ import java.util.List;
  */
 public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2> {
 
+    private static final BiConsumerWrapper<Object, Object> sBiSink =
+            new BiConsumerWrapper<Object, Object>(new BiConsumer<Object, Object>() {
+
+                public void accept(final Object in1, final Object in2) {}
+            });
+
     private final List<BiConsumer<?, ?>> mConsumers;
 
     /**
@@ -59,13 +65,19 @@ public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2> {
         mConsumers = consumers;
     }
 
+    /**
+     * Returns a bi-consumer wrapper just discarding the passed inputs.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN1> the first input data type.
+     * @param <IN2> the second input data type.
+     * @return the bi-consumer wrapper.
+     */
+    @NotNull
     @SuppressWarnings("unchecked")
-    public void accept(final IN1 in1, final IN2 in2) {
+    public static <IN1, IN2> BiConsumerWrapper<IN1, IN2> biSink() {
 
-        for (final BiConsumer<?, ?> consumer : mConsumers) {
-
-            ((BiConsumer<Object, Object>) consumer).accept(in1, in2);
-        }
+        return (BiConsumerWrapper<IN1, IN2>) sBiSink;
     }
 
     /**
@@ -136,5 +148,14 @@ public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2> {
 
         final BiConsumerWrapper<?, ?> that = (BiConsumerWrapper<?, ?>) o;
         return mConsumers.equals(that.mConsumers);
+    }
+
+    @SuppressWarnings("unchecked")
+    public void accept(final IN1 in1, final IN2 in2) {
+
+        for (final BiConsumer<?, ?> consumer : mConsumers) {
+
+            ((BiConsumer<Object, Object>) consumer).accept(in1, in2);
+        }
     }
 }

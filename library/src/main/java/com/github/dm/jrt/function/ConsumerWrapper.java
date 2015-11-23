@@ -30,6 +30,12 @@ import java.util.List;
  */
 public class ConsumerWrapper<IN> implements Consumer<IN> {
 
+    private static final ConsumerWrapper<Object> sSink =
+            new ConsumerWrapper<Object>(new Consumer<Object>() {
+
+                public void accept(final Object in) {}
+            });
+
     private final List<Consumer<?>> mConsumers;
 
     /**
@@ -58,13 +64,18 @@ public class ConsumerWrapper<IN> implements Consumer<IN> {
         mConsumers = consumers;
     }
 
+    /**
+     * Returns a consumer wrapper just discarding the passed inputs.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN> the input data type.
+     * @return the consumer wrapper.
+     */
+    @NotNull
     @SuppressWarnings("unchecked")
-    public void accept(final IN in) {
+    public static <IN> ConsumerWrapper<IN> sink() {
 
-        for (final Consumer<?> consumer : mConsumers) {
-
-            ((Consumer<Object>) consumer).accept(in);
-        }
+        return (ConsumerWrapper<IN>) sSink;
     }
 
     /**
@@ -134,5 +145,14 @@ public class ConsumerWrapper<IN> implements Consumer<IN> {
 
         final ConsumerWrapper<?> that = (ConsumerWrapper<?>) o;
         return mConsumers.equals(that.mConsumers);
+    }
+
+    @SuppressWarnings("unchecked")
+    public void accept(final IN in) {
+
+        for (final Consumer<?> consumer : mConsumers) {
+
+            ((Consumer<Object>) consumer).accept(in);
+        }
     }
 }

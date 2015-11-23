@@ -35,64 +35,6 @@ import java.util.List;
  */
 public class Functions {
 
-    private static final BiConsumerWrapper<?, ?> sBiSink =
-            wrapBiConsumer(new BiConsumer<Object, Object>() {
-
-                public void accept(final Object in1, final Object in2) {}
-            });
-
-    private static final FunctionWrapper<?, ?> sIdentity =
-            wrapFunction(new Function<Object, Object>() {
-
-                public Object apply(final Object in) {
-
-                    return in;
-                }
-            });
-
-    private static final BiFunctionWrapper<?, ?, ?> sFirst =
-            wrapBiFunction(new BiFunction<Object, Object, Object>() {
-
-                public Object apply(final Object in1, final Object in2) {
-
-                    return in1;
-                }
-            });
-
-    private static final PredicateWrapper<?> sNegative = wrapPredicate(new Predicate<Object>() {
-
-        public boolean test(final Object o) {
-
-            return false;
-        }
-    });
-
-    private static final PredicateWrapper<?> sNotNull = wrapPredicate(new Predicate<Object>() {
-
-        public boolean test(final Object o) {
-
-            return (o != null);
-        }
-    });
-
-    private static final PredicateWrapper<?> sIsNull = sNotNull.negate();
-
-    private static final PredicateWrapper<?> sPositive = sNegative.negate();
-
-    private static final BiFunctionWrapper<?, ?, ?> sSecond =
-            wrapBiFunction(new BiFunction<Object, Object, Object>() {
-
-                public Object apply(final Object in1, final Object in2) {
-
-                    return in2;
-                }
-            });
-
-    private static final ConsumerWrapper<?> sSink = wrapConsumer(new Consumer<Object>() {
-
-        public void accept(final Object in) {}
-    });
-
     /**
      * Avoid direct instantiation.
      */
@@ -109,10 +51,9 @@ public class Functions {
      * @return the bi-consumer wrapper.
      */
     @NotNull
-    @SuppressWarnings("unchecked")
     public static <IN1, IN2> BiConsumerWrapper<IN1, IN2> biSink() {
 
-        return (BiConsumerWrapper<IN1, IN2>) sBiSink;
+        return BiConsumerWrapper.biSink();
     }
 
     /**
@@ -174,6 +115,7 @@ public class Functions {
      * Returns a function wrapper casting the passed inputs to the specified class.<br/>
      * The returned object will support concatenation and comparison.
      *
+     * @param type  the class type.
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      * @return the function wrapper.
@@ -195,6 +137,7 @@ public class Functions {
      * Returns a function wrapper casting the passed inputs to the specified class token type.<br/>
      * The returned object will support concatenation and comparison.
      *
+     * @param token the class token.
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      * @return the function wrapper.
@@ -288,25 +231,6 @@ public class Functions {
     }
 
     /**
-     * Returns a predicate wrapper testing for equality to the specified object.<br/>
-     * The returned object will support concatenation and comparison.
-     *
-     * @param <IN1> the first input data type.
-     * @param <IN2> the second input data type.
-     * @return the predicate wrapper.
-     */
-    @NotNull
-    public static <IN1, IN2 extends IN1> PredicateWrapper<IN1> equalTo(@Nullable final IN2 other) {
-
-        if (other == null) {
-
-            return isNull();
-        }
-
-        return wrapPredicate(new EqualToPredicate<IN1>(other));
-    }
-
-    /**
      * Returns a bi-function wrapper just returning the first passed argument.<br/>
      * The returned object will support concatenation and comparison.
      *
@@ -315,10 +239,9 @@ public class Functions {
      * @return the bi-function wrapper.
      */
     @NotNull
-    @SuppressWarnings("unchecked")
     public static <IN1, IN2> BiFunctionWrapper<IN1, IN2, IN1> first() {
 
-        return (BiFunctionWrapper<IN1, IN2, IN1>) sFirst;
+        return BiFunctionWrapper.first();
     }
 
     /**
@@ -373,32 +296,9 @@ public class Functions {
      * @return the function wrapper.
      */
     @NotNull
-    @SuppressWarnings("unchecked")
     public static <IN> FunctionWrapper<IN, IN> identity() {
 
-        return (FunctionWrapper<IN, IN>) sIdentity;
-    }
-
-    /**
-     * Returns a predicate wrapper testing whether the passed inputs are instances of the specified
-     * class.<br/>
-     * The returned object will support concatenation and comparison.
-     *
-     * @param <IN1> the first input data type.
-     * @param <IN2> the second input data type.
-     * @return the predicate wrapper.
-     */
-    @NotNull
-    @SuppressWarnings("ConstantConditions")
-    public static <IN1, IN2 extends IN1> PredicateWrapper<IN1> instanceOf(
-            @NotNull final Class<? extends IN2> type) {
-
-        if (type == null) {
-
-            throw new NullPointerException("the type must not be null");
-        }
-
-        return wrapPredicate(new InstanceOfPredicate<IN1>(type));
+        return FunctionWrapper.identity();
     }
 
     /**
@@ -414,6 +314,50 @@ public class Functions {
     }
 
     /**
+     * Returns a predicate wrapper testing for equality to the specified object.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param targetRef the target reference.
+     * @param <IN1>     the first input data type.
+     * @param <IN2>     the second input data type.
+     * @return the predicate wrapper.
+     */
+    @NotNull
+    public static <IN1, IN2 extends IN1> PredicateWrapper<IN1> isEqual(
+            @Nullable final IN2 targetRef) {
+
+        if (targetRef == null) {
+
+            return isNull();
+        }
+
+        return wrapPredicate(new EqualToPredicate<IN1>(targetRef));
+    }
+
+    /**
+     * Returns a predicate wrapper testing whether the passed inputs are instances of the specified
+     * class.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param type  the class type.
+     * @param <IN1> the first input data type.
+     * @param <IN2> the second input data type.
+     * @return the predicate wrapper.
+     */
+    @NotNull
+    @SuppressWarnings("ConstantConditions")
+    public static <IN1, IN2 extends IN1> PredicateWrapper<IN1> isInstanceOf(
+            @NotNull final Class<? extends IN2> type) {
+
+        if (type == null) {
+
+            throw new NullPointerException("the type must not be null");
+        }
+
+        return wrapPredicate(new InstanceOfPredicate<IN1>(type));
+    }
+
+    /**
      * Returns a predicate wrapper returning true when the passed argument is null.<br/>
      * The returned object will support concatenation and comparison.
      *
@@ -421,10 +365,9 @@ public class Functions {
      * @return the predicate wrapper.
      */
     @NotNull
-    @SuppressWarnings("unchecked")
     public static <IN> PredicateWrapper<IN> isNull() {
 
-        return (PredicateWrapper<IN>) sIsNull;
+        return PredicateWrapper.isNull();
     }
 
     /**
@@ -435,10 +378,9 @@ public class Functions {
      * @return the predicate wrapper.
      */
     @NotNull
-    @SuppressWarnings("unchecked")
     public static <IN> PredicateWrapper<IN> negative() {
 
-        return (PredicateWrapper<IN>) sNegative;
+        return PredicateWrapper.negative();
     }
 
     /**
@@ -449,10 +391,9 @@ public class Functions {
      * @return the predicate wrapper.
      */
     @NotNull
-    @SuppressWarnings("unchecked")
     public static <IN> PredicateWrapper<IN> notNull() {
 
-        return (PredicateWrapper<IN>) sNotNull;
+        return PredicateWrapper.notNull();
     }
 
     /**
@@ -509,10 +450,9 @@ public class Functions {
      * @return the predicate wrapper.
      */
     @NotNull
-    @SuppressWarnings("unchecked")
     public static <IN> PredicateWrapper<IN> positive() {
 
-        return (PredicateWrapper<IN>) sPositive;
+        return PredicateWrapper.positive();
     }
 
     /**
@@ -566,10 +506,9 @@ public class Functions {
      * @return the bi-function wrapper.
      */
     @NotNull
-    @SuppressWarnings("unchecked")
     public static <IN1, IN2> BiFunctionWrapper<IN1, IN2, IN2> second() {
 
-        return (BiFunctionWrapper<IN1, IN2, IN2>) sSecond;
+        return BiFunctionWrapper.second();
     }
 
     /**
@@ -580,10 +519,9 @@ public class Functions {
      * @return the consumer wrapper.
      */
     @NotNull
-    @SuppressWarnings("unchecked")
     public static <IN> ConsumerWrapper<IN> sink() {
 
-        return (ConsumerWrapper<IN>) sSink;
+        return ConsumerWrapper.sink();
     }
 
     /**
@@ -679,7 +617,7 @@ public class Functions {
             return (BiFunctionWrapper<IN1, IN2, OUT>) function;
         }
 
-        return new BiFunctionWrapper<IN1, IN2, OUT>(function, Functions.<OUT>identity());
+        return new BiFunctionWrapper<IN1, IN2, OUT>(function);
     }
 
     /**
@@ -777,7 +715,7 @@ public class Functions {
             return (SupplierWrapper<OUT>) supplier;
         }
 
-        return new SupplierWrapper<OUT>(supplier, Functions.<OUT>identity());
+        return new SupplierWrapper<OUT>(supplier);
     }
 
     @NotNull
@@ -807,15 +745,15 @@ public class Functions {
             mType = type;
         }
 
+        public OUT apply(final IN in) {
+
+            return mType.cast(in);
+        }
+
         @Override
         public int hashCode() {
 
             return mType.hashCode();
-        }
-
-        public OUT apply(final IN in) {
-
-            return mType.cast(in);
         }
 
         @Override
@@ -1085,16 +1023,17 @@ public class Functions {
             mOther = other;
         }
 
+        public boolean test(final IN in) {
+
+            return mOther.equals(in);
+        }
+
         @Override
         public int hashCode() {
 
             return mOther.hashCode();
         }
 
-        public boolean test(final IN in) {
-
-            return mOther.equals(in);
-        }
 
         @Override
         public boolean equals(final Object o) {

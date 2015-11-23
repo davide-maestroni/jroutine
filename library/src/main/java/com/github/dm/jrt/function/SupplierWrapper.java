@@ -34,21 +34,26 @@ public class SupplierWrapper<OUT> implements Supplier<OUT> {
      * Constructor.
      *
      * @param supplier the initial wrapped supplier.
-     * @param function the concatenated function chain.
      */
     @SuppressWarnings("ConstantConditions")
-    SupplierWrapper(@NotNull final Supplier<?> supplier,
-            @NotNull final FunctionWrapper<?, OUT> function) {
+    SupplierWrapper(@NotNull final Supplier<?> supplier) {
+
+        this(supplier, FunctionWrapper.<OUT>identity());
 
         if (supplier == null) {
 
             throw new NullPointerException("the supplier instance must not be null");
         }
+    }
 
-        if (function == null) {
-
-            throw new NullPointerException("the function chain must not be null");
-        }
+    /**
+     * Constructor.
+     *
+     * @param supplier the initial wrapped supplier.
+     * @param function the concatenated function chain.
+     */
+    private SupplierWrapper(@NotNull final Supplier<?> supplier,
+            @NotNull final FunctionWrapper<?, OUT> function) {
 
         mSupplier = supplier;
         mFunction = function;

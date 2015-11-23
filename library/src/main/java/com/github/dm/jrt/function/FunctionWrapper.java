@@ -31,6 +31,15 @@ import java.util.List;
  */
 public class FunctionWrapper<IN, OUT> implements Function<IN, OUT> {
 
+    private static final FunctionWrapper<Object, Object> sIdentity =
+            new FunctionWrapper<Object, Object>(new Function<Object, Object>() {
+
+                public Object apply(final Object in) {
+
+                    return in;
+                }
+            });
+
     private final List<Function<?, ?>> mFunctions;
 
     /**
@@ -57,6 +66,20 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT> {
     private FunctionWrapper(@NotNull final List<Function<?, ?>> functions) {
 
         mFunctions = functions;
+    }
+
+    /**
+     * Returns the identity function wrapper.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN> the input data type.
+     * @return the function wrapper.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <IN> FunctionWrapper<IN, IN> identity() {
+
+        return (FunctionWrapper<IN, IN>) sIdentity;
     }
 
     /**
@@ -87,19 +110,6 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT> {
         }
 
         return new FunctionWrapper<IN, AFTER>(newFunctions);
-    }
-
-    @SuppressWarnings("unchecked")
-    public OUT apply(final IN in) {
-
-        Object result = in;
-
-        for (final Function<?, ?> function : mFunctions) {
-
-            result = ((Function<Object, Object>) function).apply(result);
-        }
-
-        return (OUT) result;
     }
 
     /**
@@ -171,5 +181,18 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT> {
 
         final FunctionWrapper<?, ?> that = (FunctionWrapper<?, ?>) o;
         return mFunctions.equals(that.mFunctions);
+    }
+
+    @SuppressWarnings("unchecked")
+    public OUT apply(final IN in) {
+
+        Object result = in;
+
+        for (final Function<?, ?> function : mFunctions) {
+
+            result = ((Function<Object, Object>) function).apply(result);
+        }
+
+        return (OUT) result;
     }
 }

@@ -40,18 +40,46 @@ public class PredicateWrapper<IN> implements Predicate<IN> {
 
     private static final LogicalPredicate OR_PREDICATE = new LogicalPredicate();
 
+    private static final PredicateWrapper<Object> sNegative =
+            new PredicateWrapper<Object>(new Predicate<Object>() {
+
+                public boolean test(final Object o) {
+
+                    return false;
+                }
+            });
+
+    private static final PredicateWrapper<Object> sNotNull =
+            new PredicateWrapper<Object>(new Predicate<Object>() {
+
+                public boolean test(final Object o) {
+
+                    return (o != null);
+                }
+            });
+
     private final Predicate<? super IN> mPredicate;
 
     private final List<Predicate<?>> mPredicates;
+
+    private static final PredicateWrapper<Object> sIsNull = sNotNull.negate();
+
+    private static final PredicateWrapper<Object> sPositive = sNegative.negate();
 
     /**
      * Constructor.
      *
      * @param predicate the core predicate.
      */
+    @SuppressWarnings("ConstantConditions")
     PredicateWrapper(@NotNull final Predicate<? super IN> predicate) {
 
         this(predicate, Collections.<Predicate<?>>singletonList(predicate));
+
+        if (predicate == null) {
+
+            throw new NullPointerException("the predicate must not be null");
+        }
     }
 
     /**
@@ -60,17 +88,67 @@ public class PredicateWrapper<IN> implements Predicate<IN> {
      * @param predicate  the core predicate.
      * @param predicates the list of wrapped predicates.
      */
-    @SuppressWarnings("ConstantConditions")
     private PredicateWrapper(@NotNull final Predicate<? super IN> predicate,
             @NotNull final List<Predicate<?>> predicates) {
 
-        if (predicate == null) {
-
-            throw new NullPointerException("the predicate must not be null");
-        }
-
         mPredicate = predicate;
         mPredicates = predicates;
+    }
+
+    /**
+     * Returns a predicate wrapper returning true when the passed argument is null.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN> the input data type.
+     * @return the predicate wrapper.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <IN> PredicateWrapper<IN> isNull() {
+
+        return (PredicateWrapper<IN>) sIsNull;
+    }
+
+    /**
+     * Returns a predicate wrapper always returning the false.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN> the input data type.
+     * @return the predicate wrapper.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <IN> PredicateWrapper<IN> negative() {
+
+        return (PredicateWrapper<IN>) sNegative;
+    }
+
+    /**
+     * Returns a predicate wrapper returning true when the passed argument is not null.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN> the input data type.
+     * @return the predicate wrapper.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <IN> PredicateWrapper<IN> notNull() {
+
+        return (PredicateWrapper<IN>) sNotNull;
+    }
+
+    /**
+     * Returns a predicate wrapper always returning the true.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN> the input data type.
+     * @return the predicate wrapper.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <IN> PredicateWrapper<IN> positive() {
+
+        return (PredicateWrapper<IN>) sPositive;
     }
 
     /**

@@ -57,8 +57,7 @@ public class Functions {
     }
 
     /**
-     * Builds and returns a new functional routine generating outputs from the specified command
-     * invocation.
+     * Short for {@code functional().buildFrom(invocation)}.
      *
      * @param invocation the command invocation instance.
      * @param <OUT>      the output data type.
@@ -68,11 +67,11 @@ public class Functions {
     public static <OUT> FunctionalRoutine<Void, OUT> buildFrom(
             @NotNull final CommandInvocation<OUT> invocation) {
 
-        return builder().buildFrom(invocation);
+        return functional().buildFrom(invocation);
     }
 
     /**
-     * Builds and returns a new functional routine generating outputs from the specified consumer.
+     * Short for {@code functional().buildFrom(consumer)}.
      *
      * @param consumer the consumer instance.
      * @param <OUT>    the output data type.
@@ -82,11 +81,11 @@ public class Functions {
     public static <OUT> FunctionalRoutine<Void, OUT> buildFrom(
             @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
 
-        return builder().buildFrom(consumer);
+        return functional().buildFrom(consumer);
     }
 
     /**
-     * Builds and returns a new functional routine generating outputs from the specified supplier.
+     * Short for {@code functional().buildFrom(supplier)}.
      *
      * @param supplier the supplier instance.
      * @param <OUT>    the output data type.
@@ -96,11 +95,11 @@ public class Functions {
     public static <OUT> FunctionalRoutine<Void, OUT> buildFrom(
             @NotNull final Supplier<OUT> supplier) {
 
-        return builder().buildFrom(supplier);
+        return functional().buildFrom(supplier);
     }
 
     /**
-     * Builds and returns a functional routine.
+     * Short for {@code functional().buildRoutine()}.
      *
      * @param <DATA> the data type.
      * @return the newly created routine instance.
@@ -108,7 +107,7 @@ public class Functions {
     @NotNull
     public static <DATA> FunctionalRoutine<DATA, DATA> buildRoutine() {
 
-        return builder().buildRoutine();
+        return functional().buildRoutine();
     }
 
     /**
@@ -125,12 +124,7 @@ public class Functions {
     public static <IN, OUT> FunctionWrapper<IN, OUT> castTo(
             @NotNull final Class<? extends OUT> type) {
 
-        if (type == null) {
-
-            throw new NullPointerException("the type must not be null");
-        }
-
-        return wrapFunction(new ClassCastFunction<IN, OUT>(type));
+        return FunctionWrapper.castTo(type);
     }
 
     /**
@@ -143,11 +137,10 @@ public class Functions {
      * @return the function wrapper.
      */
     @NotNull
-    @SuppressWarnings("ConstantConditions")
     public static <IN, OUT> FunctionWrapper<IN, OUT> castTo(
             @NotNull final ClassToken<? extends OUT> token) {
 
-        return wrapFunction(new ClassCastFunction<IN, OUT>(token.getRawClass()));
+        return FunctionWrapper.castTo(token);
     }
 
     /**
@@ -161,7 +154,7 @@ public class Functions {
     @NotNull
     public static <OUT> SupplierWrapper<OUT> constant(final OUT result) {
 
-        return wrapSupplier(new ConstantSupplier<OUT>(result));
+        return SupplierWrapper.constant(result);
     }
 
     /**
@@ -289,6 +282,17 @@ public class Functions {
     }
 
     /**
+     * Returns a functional routine builder.
+     *
+     * @return the routine builder instance.
+     */
+    @NotNull
+    public static FunctionalRoutineBuilder functional() {
+
+        return new DefaultFunctionalRoutineBuilder();
+    }
+
+    /**
      * Returns the identity function wrapper.<br/>
      * The returned object will support concatenation and comparison.
      *
@@ -302,15 +306,14 @@ public class Functions {
     }
 
     /**
-     * Returns the invocation configuration builder related to a functional routine builder
-     * instance.
+     * Short for {@code functional().invocations()}.
      *
      * @return the invocation configuration builder.
      */
     @NotNull
     public static Builder<? extends FunctionalRoutineBuilder> invocations() {
 
-        return builder().invocations();
+        return functional().invocations();
     }
 
     /**
@@ -326,12 +329,7 @@ public class Functions {
     public static <IN1, IN2 extends IN1> PredicateWrapper<IN1> isEqual(
             @Nullable final IN2 targetRef) {
 
-        if (targetRef == null) {
-
-            return isNull();
-        }
-
-        return wrapPredicate(new EqualToPredicate<IN1>(targetRef));
+        return PredicateWrapper.isEqual(targetRef);
     }
 
     /**
@@ -349,12 +347,7 @@ public class Functions {
     public static <IN1, IN2 extends IN1> PredicateWrapper<IN1> isInstanceOf(
             @NotNull final Class<? extends IN2> type) {
 
-        if (type == null) {
-
-            throw new NullPointerException("the type must not be null");
-        }
-
-        return wrapPredicate(new InstanceOfPredicate<IN1>(type));
+        return PredicateWrapper.isInstanceOf(type);
     }
 
     /**
@@ -368,6 +361,22 @@ public class Functions {
     public static <IN> PredicateWrapper<IN> isNull() {
 
         return PredicateWrapper.isNull();
+    }
+
+    /**
+     * Returns a predicate wrapper testing for identity to the specified object.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param targetRef the target reference.
+     * @param <IN1>     the first input data type.
+     * @param <IN2>     the second input data type.
+     * @return the predicate wrapper.
+     */
+    @NotNull
+    public static <IN1, IN2 extends IN1> PredicateWrapper<IN1> isSameAs(
+            @Nullable final IN2 targetRef) {
+
+        return PredicateWrapper.isSameAs(targetRef);
     }
 
     /**
@@ -476,25 +485,6 @@ public class Functions {
             @NotNull final Predicate<? super IN> predicate) {
 
         return new PredicateFilterInvocation<IN>(wrapPredicate(predicate));
-    }
-
-    /**
-     * Returns a predicate wrapper testing for identity to the specified object.<br/>
-     * The returned object will support concatenation and comparison.
-     *
-     * @param <IN1> the first input data type.
-     * @param <IN2> the second input data type.
-     * @return the predicate wrapper.
-     */
-    @NotNull
-    public static <IN1, IN2 extends IN1> PredicateWrapper<IN1> sameAs(@Nullable final IN2 other) {
-
-        if (other == null) {
-
-            return isNull();
-        }
-
-        return wrapPredicate(new SameAsPredicate<IN1>(other));
     }
 
     /**
@@ -718,110 +708,6 @@ public class Functions {
         return new SupplierWrapper<OUT>(supplier);
     }
 
-    @NotNull
-    private static DefaultFunctionalRoutineBuilder builder() {
-
-        return new DefaultFunctionalRoutineBuilder();
-    }
-
-    /**
-     * Function implementation casting inputs to the specified class.
-     *
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
-     */
-    private static class ClassCastFunction<IN, OUT> implements Function<IN, OUT> {
-
-        private final Class<? extends OUT> mType;
-
-        /**
-         * Constructor.
-         *
-         * @param type the output class type.
-         */
-        @SuppressWarnings("ConstantConditions")
-        private ClassCastFunction(@NotNull final Class<? extends OUT> type) {
-
-            mType = type;
-        }
-
-        public OUT apply(final IN in) {
-
-            return mType.cast(in);
-        }
-
-        @Override
-        public int hashCode() {
-
-            return mType.hashCode();
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-
-                return true;
-            }
-
-            if ((o == null) || (getClass() != o.getClass())) {
-
-                return false;
-            }
-
-            final ClassCastFunction<?, ?> that = (ClassCastFunction<?, ?>) o;
-            return mType.equals(that.mType);
-        }
-    }
-
-    /**
-     * Supplier implementation returning always the same object.
-     *
-     * @param <OUT> the output data type.
-     */
-    private static class ConstantSupplier<OUT> implements Supplier<OUT> {
-
-        private final OUT mResult;
-
-        /**
-         * Constructor.
-         *
-         * @param result the object to return.
-         */
-        private ConstantSupplier(final OUT result) {
-
-            mResult = result;
-        }
-
-        public OUT get() {
-
-            return mResult;
-        }
-
-        @Override
-        public int hashCode() {
-
-            return mResult != null ? mResult.hashCode() : 0;
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-
-                return true;
-            }
-
-            if ((o == null) || (getClass() != o.getClass())) {
-
-                return false;
-            }
-
-            final ConstantSupplier<?> that = (ConstantSupplier<?>) o;
-            return (mResult == that.mResult);
-        }
-    }
-
     /**
      * Command invocation based on a consumer instance.
      *
@@ -1005,54 +891,6 @@ public class Functions {
     }
 
     /**
-     * Predicate implementation testing for equality.
-     *
-     * @param <IN> the input data type.
-     */
-    private static class EqualToPredicate<IN> implements Predicate<IN> {
-
-        private final IN mOther;
-
-        /**
-         * Constructor.
-         *
-         * @param other the other object to test against.
-         */
-        private EqualToPredicate(@NotNull final IN other) {
-
-            mOther = other;
-        }
-
-        public boolean test(final IN in) {
-
-            return mOther.equals(in);
-        }
-
-        @Override
-        public int hashCode() {
-
-            return mOther.hashCode();
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-
-                return true;
-            }
-
-            if ((o == null) || (getClass() != o.getClass())) {
-
-                return false;
-            }
-
-            final EqualToPredicate<?> that = (EqualToPredicate<?>) o;
-            return mOther.equals(that.mOther);
-        }
-    }
-
-    /**
      * Filter invocation based on a function instance.
      *
      * @param <IN>  the input data type.
@@ -1177,54 +1015,6 @@ public class Functions {
     }
 
     /**
-     * Predicate testing whether an object is an instance of a specific class.
-     *
-     * @param <IN> the input data type.
-     */
-    private static class InstanceOfPredicate<IN> implements Predicate<IN> {
-
-        private final Class<? extends IN> mType;
-
-        /**
-         * Constructor.
-         *
-         * @param type the class type.
-         */
-        private InstanceOfPredicate(@NotNull final Class<? extends IN> type) {
-
-            mType = type;
-        }
-
-        @Override
-        public int hashCode() {
-
-            return mType.hashCode();
-        }
-
-        public boolean test(final IN in) {
-
-            return mType.isInstance(in);
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-
-                return true;
-            }
-
-            if ((o == null) || (getClass() != o.getClass())) {
-
-                return false;
-            }
-
-            final InstanceOfPredicate<?> that = (InstanceOfPredicate<?>) o;
-            return mType.equals(that.mType);
-        }
-    }
-
-    /**
      * Filter invocation based on a predicate instance.
      *
      * @param <IN> the input data type.
@@ -1278,54 +1068,6 @@ public class Functions {
 
                 result.pass(input);
             }
-        }
-    }
-
-    /**
-     * Predicate implementation testing for identity.
-     *
-     * @param <IN> the input data type.
-     */
-    private static class SameAsPredicate<IN> implements Predicate<IN> {
-
-        private final IN mOther;
-
-        /**
-         * Constructor.
-         *
-         * @param other the other object to test against.
-         */
-        private SameAsPredicate(@NotNull final IN other) {
-
-            mOther = other;
-        }
-
-        @Override
-        public int hashCode() {
-
-            return mOther.hashCode();
-        }
-
-        public boolean test(final IN in) {
-
-            return (mOther == in);
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-
-                return true;
-            }
-
-            if ((o == null) || (getClass() != o.getClass())) {
-
-                return false;
-            }
-
-            final SameAsPredicate<?> that = (SameAsPredicate<?>) o;
-            return (mOther == that.mOther);
         }
     }
 

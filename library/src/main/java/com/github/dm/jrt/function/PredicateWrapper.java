@@ -16,6 +16,7 @@ package com.github.dm.jrt.function;
 import com.github.dm.jrt.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -96,6 +97,50 @@ public class PredicateWrapper<IN> implements Predicate<IN> {
     }
 
     /**
+     * Returns a predicate wrapper testing for equality to the specified object.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param targetRef the target reference.
+     * @param <IN1>     the first input data type.
+     * @param <IN2>     the second input data type.
+     * @return the predicate wrapper.
+     */
+    @NotNull
+    public static <IN1, IN2 extends IN1> PredicateWrapper<IN1> isEqual(
+            @Nullable final IN2 targetRef) {
+
+        if (targetRef == null) {
+
+            return isNull();
+        }
+
+        return new PredicateWrapper<IN1>(new EqualToPredicate<IN1>(targetRef));
+    }
+
+    /**
+     * Returns a predicate wrapper testing whether the passed inputs are instances of the specified
+     * class.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param type  the class type.
+     * @param <IN1> the first input data type.
+     * @param <IN2> the second input data type.
+     * @return the predicate wrapper.
+     */
+    @NotNull
+    @SuppressWarnings("ConstantConditions")
+    public static <IN1, IN2 extends IN1> PredicateWrapper<IN1> isInstanceOf(
+            @NotNull final Class<? extends IN2> type) {
+
+        if (type == null) {
+
+            throw new NullPointerException("the type must not be null");
+        }
+
+        return new PredicateWrapper<IN1>(new InstanceOfPredicate<IN1>(type));
+    }
+
+    /**
      * Returns a predicate wrapper returning true when the passed argument is null.<br/>
      * The returned object will support concatenation and comparison.
      *
@@ -107,6 +152,27 @@ public class PredicateWrapper<IN> implements Predicate<IN> {
     public static <IN> PredicateWrapper<IN> isNull() {
 
         return (PredicateWrapper<IN>) sIsNull;
+    }
+
+    /**
+     * Returns a predicate wrapper testing for identity to the specified object.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param targetRef the target reference.
+     * @param <IN1>     the first input data type.
+     * @param <IN2>     the second input data type.
+     * @return the predicate wrapper.
+     */
+    @NotNull
+    public static <IN1, IN2 extends IN1> PredicateWrapper<IN1> isSameAs(
+            @Nullable final IN2 targetRef) {
+
+        if (targetRef == null) {
+
+            return isNull();
+        }
+
+        return new PredicateWrapper<IN1>(new SameAsPredicate<IN1>(targetRef));
     }
 
     /**
@@ -204,23 +270,6 @@ public class PredicateWrapper<IN> implements Predicate<IN> {
     public int hashCode() {
 
         return mPredicates.hashCode();
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-
-        if (this == o) {
-
-            return true;
-        }
-
-        if ((o == null) || (getClass() != o.getClass())) {
-
-            return false;
-        }
-
-        final PredicateWrapper<?> that = (PredicateWrapper<?>) o;
-        return mPredicates.equals(that.mPredicates);
     }
 
     /**
@@ -355,6 +404,102 @@ public class PredicateWrapper<IN> implements Predicate<IN> {
     }
 
     /**
+     * Predicate implementation testing for equality.
+     *
+     * @param <IN> the input data type.
+     */
+    private static class EqualToPredicate<IN> implements Predicate<IN> {
+
+        private final IN mOther;
+
+        /**
+         * Constructor.
+         *
+         * @param other the other object to test against.
+         */
+        private EqualToPredicate(@NotNull final IN other) {
+
+            mOther = other;
+        }
+
+        @Override
+        public int hashCode() {
+
+            return mOther.hashCode();
+        }
+
+        public boolean test(final IN in) {
+
+            return mOther.equals(in);
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if ((o == null) || (getClass() != o.getClass())) {
+
+                return false;
+            }
+
+            final EqualToPredicate<?> that = (EqualToPredicate<?>) o;
+            return mOther.equals(that.mOther);
+        }
+    }
+
+    /**
+     * Predicate testing whether an object is an instance of a specific class.
+     *
+     * @param <IN> the input data type.
+     */
+    private static class InstanceOfPredicate<IN> implements Predicate<IN> {
+
+        private final Class<? extends IN> mType;
+
+        /**
+         * Constructor.
+         *
+         * @param type the class type.
+         */
+        private InstanceOfPredicate(@NotNull final Class<? extends IN> type) {
+
+            mType = type;
+        }
+
+        @Override
+        public int hashCode() {
+
+            return mType.hashCode();
+        }
+
+        public boolean test(final IN in) {
+
+            return mType.isInstance(in);
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if ((o == null) || (getClass() != o.getClass())) {
+
+                return false;
+            }
+
+            final InstanceOfPredicate<?> that = (InstanceOfPredicate<?>) o;
+            return mType.equals(that.mType);
+        }
+    }
+
+    /**
      * Class indicating a logical operation (like AND and OR).
      */
     private static class LogicalPredicate implements Predicate<Object> {
@@ -418,6 +563,71 @@ public class PredicateWrapper<IN> implements Predicate<IN> {
 
             return mPredicate.test(in) || mOther.test(in);
         }
+    }
+
+    /**
+     * Predicate implementation testing for identity.
+     *
+     * @param <IN> the input data type.
+     */
+    private static class SameAsPredicate<IN> implements Predicate<IN> {
+
+        private final IN mOther;
+
+        /**
+         * Constructor.
+         *
+         * @param other the other object to test against.
+         */
+        private SameAsPredicate(@NotNull final IN other) {
+
+            mOther = other;
+        }
+
+        public boolean test(final IN in) {
+
+            return (mOther == in);
+        }
+
+        @Override
+        public int hashCode() {
+
+            return mOther.hashCode();
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if ((o == null) || (getClass() != o.getClass())) {
+
+                return false;
+            }
+
+            final SameAsPredicate<?> that = (SameAsPredicate<?>) o;
+            return (mOther == that.mOther);
+        }
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+
+        if (this == o) {
+
+            return true;
+        }
+
+        if ((o == null) || (getClass() != o.getClass())) {
+
+            return false;
+        }
+
+        final PredicateWrapper<?> that = (PredicateWrapper<?>) o;
+        return mPredicates.equals(that.mPredicates);
     }
 
     public boolean test(final IN in) {

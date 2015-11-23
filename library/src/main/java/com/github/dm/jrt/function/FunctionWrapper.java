@@ -13,6 +13,7 @@
  */
 package com.github.dm.jrt.function;
 
+import com.github.dm.jrt.util.ClassToken;
 import com.github.dm.jrt.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
@@ -66,6 +67,44 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT> {
     private FunctionWrapper(@NotNull final List<Function<?, ?>> functions) {
 
         mFunctions = functions;
+    }
+
+    /**
+     * Returns a function wrapper casting the passed inputs to the specified class.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param type  the class type.
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
+     * @return the function wrapper.
+     */
+    @NotNull
+    @SuppressWarnings("ConstantConditions")
+    public static <IN, OUT> FunctionWrapper<IN, OUT> castTo(
+            @NotNull final Class<? extends OUT> type) {
+
+        if (type == null) {
+
+            throw new NullPointerException("the type must not be null");
+        }
+
+        return new FunctionWrapper<IN, OUT>(new ClassCastFunction<IN, OUT>(type));
+    }
+
+    /**
+     * Returns a function wrapper casting the passed inputs to the specified class token type.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param token the class token.
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
+     * @return the function wrapper.
+     */
+    @NotNull
+    public static <IN, OUT> FunctionWrapper<IN, OUT> castTo(
+            @NotNull final ClassToken<? extends OUT> token) {
+
+        return castTo(token.getRawClass());
     }
 
     /**
@@ -164,6 +203,55 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT> {
     public int hashCode() {
 
         return mFunctions.hashCode();
+    }
+
+    /**
+     * Function implementation casting inputs to the specified class.
+     *
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
+     */
+    private static class ClassCastFunction<IN, OUT> implements Function<IN, OUT> {
+
+        private final Class<? extends OUT> mType;
+
+        /**
+         * Constructor.
+         *
+         * @param type the output class type.
+         */
+        private ClassCastFunction(@NotNull final Class<? extends OUT> type) {
+
+            mType = type;
+        }
+
+        public OUT apply(final IN in) {
+
+            return mType.cast(in);
+        }
+
+        @Override
+        public int hashCode() {
+
+            return mType.hashCode();
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if ((o == null) || (getClass() != o.getClass())) {
+
+                return false;
+            }
+
+            final ClassCastFunction<?, ?> that = (ClassCastFunction<?, ?>) o;
+            return mType.equals(that.mType);
+        }
     }
 
     @Override

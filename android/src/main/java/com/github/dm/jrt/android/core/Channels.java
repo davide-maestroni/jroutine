@@ -160,7 +160,7 @@ public class Channels extends com.github.dm.jrt.core.Channels {
             final IOChannel<ParcelableSelectable<DATA>, ParcelableSelectable<DATA>> ioChannel =
                     JRoutine.io().buildChannel();
             ioChannel.passTo(channel);
-            inputChannel.passTo(new SelectableInputConsumer<DATA, IN>(ioChannel, index));
+            inputChannel.passTo(new SelectableOutputConsumer<DATA, IN>(ioChannel, index));
         }
 
         return inputChannel;
@@ -185,7 +185,7 @@ public class Channels extends com.github.dm.jrt.core.Channels {
 
         if (channel != null) {
 
-            channel.passTo(new SelectableOutputConsumer<OUT>(ioChannel, index));
+            channel.passTo(new SelectableOutputConsumer<OUT, OUT>(ioChannel, index));
         }
 
         return ioChannel;
@@ -251,16 +251,16 @@ public class Channels extends com.github.dm.jrt.core.Channels {
     }
 
     /**
-     * Output consumer transforming input data into selectable ones.
+     * Output consumer transforming data into selectable ones.
      *
-     * @param <DATA> the channel data type.
-     * @param <IN>   the input data type.
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
      */
-    private static class SelectableInputConsumer<DATA, IN extends DATA>
+    private static class SelectableOutputConsumer<OUT, IN extends OUT>
             implements OutputConsumer<IN> {
 
-        private final IOChannel<? super ParcelableSelectable<DATA>, ? super
-                ParcelableSelectable<DATA>> mChannel;
+        private final IOChannel<? super ParcelableSelectable<OUT>, ? super
+                ParcelableSelectable<OUT>> mChannel;
 
         private final int mIndex;
 
@@ -270,9 +270,9 @@ public class Channels extends com.github.dm.jrt.core.Channels {
          * @param channel the selectable channel.
          * @param index   the selectable index.
          */
-        private SelectableInputConsumer(
-                @NotNull final IOChannel<? super ParcelableSelectable<DATA>, ? super
-                        ParcelableSelectable<DATA>> channel, final int index) {
+        private SelectableOutputConsumer(
+                @NotNull final IOChannel<? super ParcelableSelectable<OUT>, ? super
+                        ParcelableSelectable<OUT>> channel, final int index) {
 
             mChannel = channel;
             mIndex = index;
@@ -290,49 +290,7 @@ public class Channels extends com.github.dm.jrt.core.Channels {
 
         public void onOutput(final IN input) {
 
-            mChannel.pass(new ParcelableSelectable<DATA>(input, mIndex));
-        }
-    }
-
-    /**
-     * Output consumer transforming output data into selectable ones.
-     *
-     * @param <OUT> the output data type.
-     */
-    private static class SelectableOutputConsumer<OUT> implements OutputConsumer<OUT> {
-
-        private final IOChannel<ParcelableSelectable<OUT>, ParcelableSelectable<OUT>> mChannel;
-
-        private final int mIndex;
-
-        /**
-         * Constructor.
-         *
-         * @param channel the I/O input channel.
-         * @param index   the selectable index.
-         */
-        private SelectableOutputConsumer(
-                @NotNull final IOChannel<ParcelableSelectable<OUT>, ParcelableSelectable<OUT>>
-                        channel,
-                final int index) {
-
-            mChannel = channel;
-            mIndex = index;
-        }
-
-        public void onComplete() {
-
-            mChannel.close();
-        }
-
-        public void onError(@Nullable final RoutineException error) {
-
-            mChannel.abort(error);
-        }
-
-        public void onOutput(final OUT output) {
-
-            mChannel.pass(new ParcelableSelectable<OUT>(output, mIndex));
+            mChannel.pass(new ParcelableSelectable<OUT>(input, mIndex));
         }
     }
 }

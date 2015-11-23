@@ -38,9 +38,9 @@ import java.util.Map.Entry;
  */
 public class Channels {
 
-    private static final WeakIdentityHashMap<OutputChannel<?>, DefaultSelectableOutput<?>>
-            sSelectableOutputs =
-            new WeakIdentityHashMap<OutputChannel<?>, DefaultSelectableOutput<?>>();
+    private static final WeakIdentityHashMap<OutputChannel<?>, DefaultSelectableOutputChannel<?>>
+            sSelectableChannels =
+            new WeakIdentityHashMap<OutputChannel<?>, DefaultSelectableOutputChannel<?>>();
 
     /**
      * Avoid direct instantiation.
@@ -115,7 +115,7 @@ public class Channels {
         }
 
         final IOChannel<Selectable<?>, Selectable<?>> ioChannel = JRoutine.io().buildChannel();
-        ioChannel.passTo(new SortingInputConsumer(startIndex, channelList));
+        ioChannel.passTo(new SortingArrayOutputConsumer(startIndex, channelList));
         return ioChannel;
     }
 
@@ -153,7 +153,7 @@ public class Channels {
 
         final IOChannel<Selectable<? extends IN>, Selectable<? extends IN>> ioChannel =
                 JRoutine.io().buildChannel();
-        ioChannel.passTo(new SortingInputConsumer(startIndex, channelList));
+        ioChannel.passTo(new SortingArrayOutputConsumer(startIndex, channelList));
         return ioChannel;
     }
 
@@ -207,7 +207,7 @@ public class Channels {
 
         final IOChannel<Selectable<? extends IN>, Selectable<? extends IN>> ioChannel =
                 JRoutine.io().buildChannel();
-        ioChannel.passTo(new SortingInputMapConsumer(channelMap));
+        ioChannel.passTo(new SortingMapOutputConsumer(channelMap));
         return ioChannel;
     }
 
@@ -515,7 +515,7 @@ public class Channels {
             final IOChannel<Selectable<DATA>, Selectable<DATA>> ioChannel =
                     JRoutine.io().buildChannel();
             ioChannel.passTo(channel);
-            inputChannel.passTo(new SelectableInputConsumer<DATA, IN>(ioChannel, index));
+            inputChannel.passTo(new SelectableOutputConsumer<DATA, IN>(ioChannel, index));
         }
 
         return inputChannel;
@@ -648,7 +648,7 @@ public class Channels {
             outputMap.put(integer, ioChannel);
         }
 
-        channel.passTo(new SortingOutputMapConsumer<OUT>(inputMap));
+        channel.passTo(new SortingMapOutputConsumer<OUT>(inputMap));
         return outputMap;
     }
 
@@ -663,24 +663,25 @@ public class Channels {
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <OUT> SelectableOutput<OUT> select(
+    public static <OUT> SelectableOutputChannel<OUT> select(
             @NotNull final OutputChannel<? extends Selectable<? extends OUT>> channel) {
 
-        synchronized (sSelectableOutputs) {
+        synchronized (sSelectableChannels) {
 
-            final WeakIdentityHashMap<OutputChannel<?>, DefaultSelectableOutput<?>>
-                    selectableOutputs = sSelectableOutputs;
-            DefaultSelectableOutput<?> selectableOutput = selectableOutputs.get(channel);
+            final WeakIdentityHashMap<OutputChannel<?>, DefaultSelectableOutputChannel<?>>
+                    selectableOutputs = sSelectableChannels;
+            DefaultSelectableOutputChannel<?> selectableOutput = selectableOutputs.get(channel);
 
             if (selectableOutput == null) {
 
-                final DefaultSelectableOutput<OUT> output = new DefaultSelectableOutput<OUT>();
+                final DefaultSelectableOutputChannel<OUT> output =
+                        new DefaultSelectableOutputChannel<OUT>();
                 channel.passTo(output);
                 selectableOutputs.put(channel, output);
                 return output;
             }
 
-            return (SelectableOutput<OUT>) selectableOutput;
+            return (SelectableOutputChannel<OUT>) selectableOutput;
         }
     }
 
@@ -712,7 +713,7 @@ public class Channels {
             outputMap.put(index, ioChannel);
         }
 
-        channel.passTo(new SortingOutputMapConsumer<OUT>(inputMap));
+        channel.passTo(new SortingMapOutputConsumer<OUT>(inputMap));
         return outputMap;
     }
 
@@ -743,7 +744,7 @@ public class Channels {
             outputMap.put(index, ioChannel);
         }
 
-        channel.passTo(new SortingOutputMapConsumer<OUT>(inputMap));
+        channel.passTo(new SortingMapOutputConsumer<OUT>(inputMap));
         return outputMap;
     }
 
@@ -804,7 +805,7 @@ public class Channels {
 
             final IOChannel<IN, IN> ioChannel = JRoutine.io().buildChannel();
             ioChannel.passTo(channel);
-            inputChannel.passTo(new FilterInputConsumer<IN>(ioChannel, index));
+            inputChannel.passTo(new FilterOutputConsumer<IN>(ioChannel, index));
         }
 
         return inputChannel;
@@ -828,7 +829,7 @@ public class Channels {
 
         if (channel != null) {
 
-            channel.passTo(new SelectableOutputConsumer<OUT>(ioChannel, index));
+            channel.passTo(new SelectableOutputConsumer<OUT, OUT>(ioChannel, index));
         }
 
         return ioChannel;
@@ -856,7 +857,7 @@ public class Channels {
         }
 
         final IOChannel<List<?>, List<?>> ioChannel = JRoutine.io().buildChannel();
-        return ioChannel.passTo(new DistributeInputConsumer(isFlush, channelList));
+        return ioChannel.passTo(new DistributeOutputConsumer(isFlush, channelList));
     }
 
     @NotNull
@@ -882,7 +883,7 @@ public class Channels {
 
         final IOChannel<List<? extends IN>, List<? extends IN>> ioChannel =
                 JRoutine.io().buildChannel();
-        return ioChannel.passTo(new DistributeInputConsumer(isFlush, channelList));
+        return ioChannel.passTo(new DistributeOutputConsumer(isFlush, channelList));
     }
 
     @NotNull
@@ -923,17 +924,17 @@ public class Channels {
     }
 
     /**
-     * Interface defining a selectable output, that is an object filtering data coming from a
-     * selectable channel and dispatching them to a specific output channel based on their index.
+     * Interface defining a selectable output channel, that is a channel filtering selectable data
+     * and dispatching them to a specific output channel based on their index.
      *
      * @param <OUT> the output data type.
      */
-    public interface SelectableOutput<OUT> {
+    public interface SelectableOutputChannel<OUT> {
 
         /**
          * Returns an output channel returning selectable data matching the specify index.<br/>
-         * New output channels can be bound until data start coming fro the selectable one. After
-         * that, any attempt to bound a channel to a new index will cause an exception to be thrown.
+         * New output channels can be bound until data start coming After that, any attempt to bound
+         * a channel to a new index will cause an exception to be thrown.
          *
          * @param index the channel index.
          * @return the output channel.
@@ -1025,12 +1026,12 @@ public class Channels {
     }
 
     /**
-     * Default implementation of a selectable output.
+     * Default implementation of a selectable output channel.
      *
      * @param <OUT> the output data type.
      */
-    private static class DefaultSelectableOutput<OUT>
-            implements SelectableOutput<OUT>, OutputConsumer<Selectable<? extends OUT>> {
+    private static class DefaultSelectableOutputChannel<OUT>
+            implements SelectableOutputChannel<OUT>, OutputConsumer<Selectable<? extends OUT>> {
 
         private final HashMap<Integer, IOChannel<OUT, OUT>> mChannels =
                 new HashMap<Integer, IOChannel<OUT, OUT>>();
@@ -1112,9 +1113,9 @@ public class Channels {
     }
 
     /**
-     * Output consumer distributing list of inputs among a list of input channels.
+     * Output consumer distributing list of data among a list of channels.
      */
-    private static class DistributeInputConsumer implements OutputConsumer<List<?>> {
+    private static class DistributeOutputConsumer implements OutputConsumer<List<?>> {
 
         private final ArrayList<IOChannel<?, ?>> mChannels;
 
@@ -1126,7 +1127,7 @@ public class Channels {
          * @param isFlush  whether the inputs have to be flushed.
          * @param channels the list of channels.
          */
-        private DistributeInputConsumer(final boolean isFlush,
+        private DistributeOutputConsumer(final boolean isFlush,
                 @NotNull final ArrayList<IOChannel<?, ?>> channels) {
 
             mChannels = channels;
@@ -1181,11 +1182,11 @@ public class Channels {
     }
 
     /**
-     * Output consumer filtering selectable input data.
+     * Output consumer filtering selectable data.
      *
      * @param <IN> the input data type.
      */
-    private static class FilterInputConsumer<IN> implements OutputConsumer<Selectable<IN>> {
+    private static class FilterOutputConsumer<IN> implements OutputConsumer<Selectable<IN>> {
 
         private final IOChannel<? super IN, ? super IN> mChannel;
 
@@ -1197,7 +1198,7 @@ public class Channels {
          * @param channel the input channel to feed.
          * @param index   the index to filter.
          */
-        private FilterInputConsumer(@NotNull final IOChannel<? super IN, ? super IN> channel,
+        private FilterOutputConsumer(@NotNull final IOChannel<? super IN, ? super IN> channel,
                 final int index) {
 
             mChannel = channel;
@@ -1260,7 +1261,7 @@ public class Channels {
 
         protected void flush() {
 
-            final IOChannel<List<? extends OUT>, List<? extends OUT>> inputChannel = mChannel;
+            final IOChannel<List<? extends OUT>, List<? extends OUT>> channel = mChannel;
             final SimpleQueue<OUT>[] queues = mQueues;
             final int length = queues.length;
             final ArrayList<OUT> outputs = new ArrayList<OUT>(length);
@@ -1285,7 +1286,7 @@ public class Channels {
 
                 if (!isEmpty) {
 
-                    inputChannel.pass(outputs);
+                    channel.pass(outputs);
                     outputs.clear();
 
                 } else {
@@ -1344,15 +1345,15 @@ public class Channels {
     }
 
     /**
-     * Output consumer transforming input data into selectable ones.
+     * Output consumer transforming data into selectable ones.
      *
-     * @param <DATA> the channel data type.
-     * @param <IN>   the input data type.
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
      */
-    private static class SelectableInputConsumer<DATA, IN extends DATA>
+    private static class SelectableOutputConsumer<OUT, IN extends OUT>
             implements OutputConsumer<IN> {
 
-        private final IOChannel<? super Selectable<DATA>, ? super Selectable<DATA>> mChannel;
+        private final IOChannel<? super Selectable<OUT>, ? super Selectable<OUT>> mChannel;
 
         private final int mIndex;
 
@@ -1362,9 +1363,8 @@ public class Channels {
          * @param channel the selectable channel.
          * @param index   the selectable index.
          */
-        private SelectableInputConsumer(
-                @NotNull final IOChannel<? super Selectable<DATA>, ? super Selectable<DATA>>
-                        channel,
+        private SelectableOutputConsumer(
+                @NotNull final IOChannel<? super Selectable<OUT>, ? super Selectable<OUT>> channel,
                 final int index) {
 
             mChannel = channel;
@@ -1383,55 +1383,14 @@ public class Channels {
 
         public void onOutput(final IN input) {
 
-            mChannel.pass(new Selectable<DATA>(input, mIndex));
-        }
-    }
-
-    /**
-     * Output consumer transforming output data into selectable ones.
-     *
-     * @param <OUT> the output data type.
-     */
-    private static class SelectableOutputConsumer<OUT> implements OutputConsumer<OUT> {
-
-        private final IOChannel<Selectable<OUT>, Selectable<OUT>> mChannel;
-
-        private final int mIndex;
-
-        /**
-         * Constructor.
-         *
-         * @param channel the I/O channel.
-         * @param index   the selectable index.
-         */
-        private SelectableOutputConsumer(
-                @NotNull final IOChannel<Selectable<OUT>, Selectable<OUT>> channel,
-                final int index) {
-
-            mChannel = channel;
-            mIndex = index;
-        }
-
-        public void onComplete() {
-
-            mChannel.close();
-        }
-
-        public void onError(@Nullable final RoutineException error) {
-
-            mChannel.abort(error);
-        }
-
-        public void onOutput(final OUT output) {
-
-            mChannel.pass(new Selectable<OUT>(output, mIndex));
+            mChannel.pass(new Selectable<OUT>(input, mIndex));
         }
     }
 
     /**
      * Output consumer sorting selectable inputs among a list of input channels.
      */
-    private static class SortingInputConsumer implements OutputConsumer<Selectable<?>> {
+    private static class SortingArrayOutputConsumer implements OutputConsumer<Selectable<?>> {
 
         private final ArrayList<IOChannel<?, ?>> mChannelList;
 
@@ -1445,7 +1404,7 @@ public class Channels {
          * @param startIndex the selectable start index.
          * @param channels   the list of channels.
          */
-        private SortingInputConsumer(final int startIndex,
+        private SortingArrayOutputConsumer(final int startIndex,
                 @NotNull final ArrayList<IOChannel<?, ?>> channels) {
 
             mStartIndex = startIndex;
@@ -1455,17 +1414,17 @@ public class Channels {
 
         public void onComplete() {
 
-            for (final IOChannel<?, ?> inputChannel : mChannelList) {
+            for (final IOChannel<?, ?> channel : mChannelList) {
 
-                inputChannel.close();
+                channel.close();
             }
         }
 
         public void onError(@Nullable final RoutineException error) {
 
-            for (final IOChannel<?, ?> inputChannel : mChannelList) {
+            for (final IOChannel<?, ?> channel : mChannelList) {
 
-                inputChannel.abort(error);
+                channel.abort(error);
             }
         }
 
@@ -1479,68 +1438,22 @@ public class Channels {
                 return;
             }
 
-            final IOChannel<Object, Object> inputChannel =
+            final IOChannel<Object, Object> channel =
                     (IOChannel<Object, Object>) mChannelList.get(index);
 
-            if (inputChannel != null) {
+            if (channel != null) {
 
-                inputChannel.pass(selectable.data);
+                channel.pass(selectable.data);
             }
         }
     }
 
     /**
-     * Output consumer sorting selectable inputs among a map of input channels.
-     */
-    private static class SortingInputMapConsumer implements OutputConsumer<Selectable<?>> {
-
-        private final HashMap<Integer, IOChannel<?, ?>> mChannels;
-
-        /**
-         * Constructor.
-         *
-         * @param channels the map of indexes and input channels.
-         */
-        private SortingInputMapConsumer(@NotNull final HashMap<Integer, IOChannel<?, ?>> channels) {
-
-            mChannels = channels;
-        }
-
-        public void onComplete() {
-
-            for (final IOChannel<?, ?> inputChannel : mChannels.values()) {
-
-                inputChannel.close();
-            }
-        }
-
-        public void onError(@Nullable final RoutineException error) {
-
-            for (final IOChannel<?, ?> inputChannel : mChannels.values()) {
-
-                inputChannel.abort(error);
-            }
-        }
-
-        @SuppressWarnings("unchecked")
-        public void onOutput(final Selectable<?> selectable) {
-
-            final IOChannel<Object, Object> inputChannel =
-                    (IOChannel<Object, Object>) mChannels.get(selectable.index);
-
-            if (inputChannel != null) {
-
-                inputChannel.pass(selectable.data);
-            }
-        }
-    }
-
-    /**
-     * Output consumer sorting the output data among a map of output channels.
+     * Output consumer sorting the output data among a map of channels.
      *
      * @param <OUT> the output data type.
      */
-    private static class SortingOutputMapConsumer<OUT>
+    private static class SortingMapOutputConsumer<OUT>
             implements OutputConsumer<Selectable<? extends OUT>> {
 
         private final HashMap<Integer, IOChannel<OUT, OUT>> mChannels;
@@ -1550,7 +1463,7 @@ public class Channels {
          *
          * @param channels the map of indexes and I/O channels.
          */
-        private SortingOutputMapConsumer(
+        private SortingMapOutputConsumer(
                 @NotNull final HashMap<Integer, IOChannel<OUT, OUT>> channels) {
 
             mChannels = channels;

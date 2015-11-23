@@ -1034,7 +1034,6 @@ public class Functions {
             return mOther.hashCode();
         }
 
-
         @Override
         public boolean equals(final Object o) {
 

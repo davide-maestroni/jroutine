@@ -75,6 +75,20 @@ public class FunctionalRoutineTest {
                 return "test";
             }
         }).asyncCall().afterMax(seconds(3)).all()).containsExactly("test");
+        assertThat(Functions.buildFrom(new CommandInvocation<String>() {
+
+            public void onResult(@NotNull final ResultChannel<String> result) {
+
+                result.pass("test1", "test2", "test3");
+            }
+        }).asyncCall().afterMax(seconds(3)).all()).containsOnly("test1", "test2", "test3");
+        assertThat(Functions.buildFrom(new Consumer<ResultChannel<String>>() {
+
+            public void accept(final ResultChannel<String> result) {
+
+                result.pass("test1", "test2", "test3");
+            }
+        }).asyncCall().afterMax(seconds(3)).all()).containsOnly("test1", "test2", "test3");
         assertThat(Functions.invocations()
                             .withOutputOrder(OrderType.BY_CALL)
                             .set()

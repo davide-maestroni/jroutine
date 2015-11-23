@@ -160,7 +160,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     public <IN, OUT> Routine<IN, OUT> aliasMethod(@NotNull final String name) {
 
         final ContextInvocationTarget<?> target = mTarget;
-        final Method targetMethod = getAnnotatedMethod(name, target.getTargetClass());
+        final Method targetMethod = getAnnotatedMethod(target.getTargetClass(), name);
 
         if (targetMethod == null) {
 
@@ -490,7 +490,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                 throw new IllegalStateException("such error should never happen");
             }
 
-            callFromInvocation(mTargetMethod, mMutex, targetInstance, objects, result, mInputMode,
+            callFromInvocation(mMutex, targetInstance, mTargetMethod, objects, result, mInputMode,
                                mOutputMode);
         }
 
@@ -548,7 +548,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                 Throwable {
 
             final ContextInvocationTarget<?> target = mTarget;
-            final MethodInfo methodInfo = getTargetMethodInfo(method, target.getTargetClass());
+            final MethodInfo methodInfo = getTargetMethodInfo(target.getTargetClass(), method);
             final Method targetMethod = methodInfo.method;
             final InputMode inputMode = methodInfo.inputMode;
             final OutputMode outputMode = methodInfo.outputMode;

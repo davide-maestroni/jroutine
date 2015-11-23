@@ -13,6 +13,7 @@
  */
 package com.github.dm.jrt.function;
 
+import com.github.dm.jrt.builder.InvocationConfiguration.Builder;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.invocation.CommandInvocation;
@@ -112,6 +113,61 @@ public class Functions {
     public static <IN1, IN2> BiConsumerWrapper<IN1, IN2> biSink() {
 
         return (BiConsumerWrapper<IN1, IN2>) sBiSink;
+    }
+
+    /**
+     * Builds and returns a new functional routine generating outputs from the specified command
+     * invocation.
+     *
+     * @param invocation the command invocation instance.
+     * @param <OUT>      the output data type.
+     * @return the newly created routine instance.
+     */
+    @NotNull
+    public static <OUT> FunctionalRoutine<Void, OUT> buildFrom(
+            @NotNull final CommandInvocation<OUT> invocation) {
+
+        return builder().buildFrom(invocation);
+    }
+
+    /**
+     * Builds and returns a new functional routine generating outputs from the specified consumer.
+     *
+     * @param consumer the consumer instance.
+     * @param <OUT>    the output data type.
+     * @return the newly created routine instance.
+     */
+    @NotNull
+    public static <OUT> FunctionalRoutine<Void, OUT> buildFrom(
+            @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
+
+        return builder().buildFrom(consumer);
+    }
+
+    /**
+     * Builds and returns a new functional routine generating outputs from the specified supplier.
+     *
+     * @param supplier the supplier instance.
+     * @param <OUT>    the output data type.
+     * @return the newly created routine instance.
+     */
+    @NotNull
+    public static <OUT> FunctionalRoutine<Void, OUT> buildFrom(
+            @NotNull final Supplier<OUT> supplier) {
+
+        return builder().buildFrom(supplier);
+    }
+
+    /**
+     * Builds and returns a functional routine.
+     *
+     * @param <DATA> the data type.
+     * @return the newly created routine instance.
+     */
+    @NotNull
+    public static <DATA> FunctionalRoutine<DATA, DATA> buildRoutine() {
+
+        return builder().buildRoutine();
     }
 
     /**
@@ -310,17 +366,6 @@ public class Functions {
     }
 
     /**
-     * Returns a functional routine builder.
-     *
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public static FunctionalRoutineBuilder functional() {
-
-        return new DefaultFunctionalRoutineBuilder();
-    }
-
-    /**
      * Returns the identity function wrapper.<br/>
      * The returned object will support concatenation and comparison.
      *
@@ -354,6 +399,17 @@ public class Functions {
         }
 
         return wrapPredicate(new InstanceOfPredicate<IN1>(type));
+    }
+
+    /**
+     * Gets the invocation configuration builder related to a functional routine builder instance.
+     *
+     * @return the invocation configuration builder.
+     */
+    @NotNull
+    public static Builder<? extends FunctionalRoutineBuilder> invocations() {
+
+        return builder().invocations();
     }
 
     /**
@@ -721,6 +777,12 @@ public class Functions {
         }
 
         return new SupplierWrapper<OUT>(supplier, Functions.<OUT>identity());
+    }
+
+    @NotNull
+    private static DefaultFunctionalRoutineBuilder builder() {
+
+        return new DefaultFunctionalRoutineBuilder();
     }
 
     /**

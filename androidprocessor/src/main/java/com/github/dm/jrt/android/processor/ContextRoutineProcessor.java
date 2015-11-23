@@ -171,7 +171,6 @@ public class ContextRoutineProcessor extends RoutineProcessor {
         return super.getHeaderTemplate(annotationElement, element, targetElement);
     }
 
-
     @NotNull
     @Override
     protected String getMethodHeaderTemplate(@NotNull final TypeElement annotationElement,

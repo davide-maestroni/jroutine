@@ -56,11 +56,6 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT> {
      */
     private FunctionWrapper(@NotNull final List<Function<?, ?>> functions) {
 
-        if (functions.isEmpty()) {
-
-            throw new IllegalArgumentException("the list of functions must not be empty");
-        }
-
         mFunctions = functions;
     }
 

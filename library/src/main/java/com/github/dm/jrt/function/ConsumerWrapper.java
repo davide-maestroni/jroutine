@@ -55,11 +55,6 @@ public class ConsumerWrapper<IN> implements Consumer<IN> {
      */
     private ConsumerWrapper(@NotNull final List<Consumer<?>> consumers) {
 
-        if (consumers.isEmpty()) {
-
-            throw new IllegalArgumentException("the list of consumers must not be empty");
-        }
-
         mConsumers = consumers;
     }
 

@@ -56,11 +56,6 @@ public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2> {
      */
     private BiConsumerWrapper(@NotNull final List<BiConsumer<?, ?>> consumers) {
 
-        if (consumers.isEmpty()) {
-
-            throw new IllegalArgumentException("the list of consumers must not be empty");
-        }
-
         mConsumers = consumers;
     }
 

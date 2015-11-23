@@ -69,11 +69,6 @@ public class PredicateWrapper<IN> implements Predicate<IN> {
             throw new NullPointerException("the predicate must not be null");
         }
 
-        if (predicates.isEmpty()) {
-
-            throw new IllegalArgumentException("the list of predicates must not be empty");
-        }
-
         mPredicate = predicate;
         mPredicates = predicates;
     }

@@ -402,7 +402,8 @@ public class Functions {
     }
 
     /**
-     * Gets the invocation configuration builder related to a functional routine builder instance.
+     * Returns the invocation configuration builder related to a functional routine builder
+     * instance.
      *
      * @return the invocation configuration builder.
      */

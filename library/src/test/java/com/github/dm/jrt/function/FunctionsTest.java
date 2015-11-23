@@ -370,17 +370,7 @@ public class FunctionsTest {
 
         try {
 
-            new BiFunctionWrapper<Object, Object, Object>(null, wrapFunction(new TestFunction()));
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new BiFunctionWrapper<Object, Object, Object>(new TestBiFunction(), null);
+            new BiFunctionWrapper<Object, Object, Object>(null);
 
             fail();
 
@@ -1636,17 +1626,7 @@ public class FunctionsTest {
 
         try {
 
-            new SupplierWrapper<Object>(null, wrapFunction(new TestFunction()));
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new SupplierWrapper<Object>(new TestSupplier(), null);
+            new SupplierWrapper<Object>(null);
 
             fail();
 

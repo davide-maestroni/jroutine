@@ -186,6 +186,13 @@ class DefaultStreamingChannel<IN, OUT> implements StreamingChannel<IN, OUT> {
     }
 
     @NotNull
+    public StreamingChannel<IN, OUT> eventuallyAbort(@Nullable final Throwable reason) {
+
+        mOutputChannel.eventuallyAbort(reason);
+        return this;
+    }
+
+    @NotNull
     public StreamingChannel<IN, OUT> eventuallyExit() {
 
         mOutputChannel.eventuallyExit();

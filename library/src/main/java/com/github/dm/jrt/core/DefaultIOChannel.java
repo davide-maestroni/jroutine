@@ -186,6 +186,13 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA, DATA> {
     }
 
     @NotNull
+    public IOChannel<DATA, DATA> eventuallyAbort(@Nullable final Throwable reason) {
+
+        mOutputChannel.eventuallyAbort(reason);
+        return this;
+    }
+
+    @NotNull
     public IOChannel<DATA, DATA> eventuallyExit() {
 
         mOutputChannel.eventuallyExit();

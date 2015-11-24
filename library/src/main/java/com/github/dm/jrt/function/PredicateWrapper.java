@@ -101,20 +101,18 @@ public class PredicateWrapper<IN> implements Predicate<IN> {
      * The returned object will support concatenation and comparison.
      *
      * @param targetRef the target reference.
-     * @param <IN1>     the first input data type.
-     * @param <IN2>     the second input data type.
+     * @param <IN>      the input data type.
      * @return the predicate wrapper.
      */
     @NotNull
-    public static <IN1, IN2 extends IN1> PredicateWrapper<IN1> isEqual(
-            @Nullable final IN2 targetRef) {
+    public static <IN> PredicateWrapper<IN> isEqual(@Nullable final Object targetRef) {
 
         if (targetRef == null) {
 
             return isNull();
         }
 
-        return new PredicateWrapper<IN1>(new EqualToPredicate<IN1>(targetRef));
+        return new PredicateWrapper<IN>(new EqualToPredicate<IN>(targetRef));
     }
 
     /**
@@ -122,22 +120,20 @@ public class PredicateWrapper<IN> implements Predicate<IN> {
      * class.<br/>
      * The returned object will support concatenation and comparison.
      *
-     * @param type  the class type.
-     * @param <IN1> the first input data type.
-     * @param <IN2> the second input data type.
+     * @param type the class type.
+     * @param <IN> the input data type.
      * @return the predicate wrapper.
      */
     @NotNull
     @SuppressWarnings("ConstantConditions")
-    public static <IN1, IN2 extends IN1> PredicateWrapper<IN1> isInstanceOf(
-            @NotNull final Class<? extends IN2> type) {
+    public static <IN> PredicateWrapper<IN> isInstanceOf(@NotNull final Class<?> type) {
 
         if (type == null) {
 
             throw new NullPointerException("the type must not be null");
         }
 
-        return new PredicateWrapper<IN1>(new InstanceOfPredicate<IN1>(type));
+        return new PredicateWrapper<IN>(new InstanceOfPredicate<IN>(type));
     }
 
     /**
@@ -159,20 +155,18 @@ public class PredicateWrapper<IN> implements Predicate<IN> {
      * The returned object will support concatenation and comparison.
      *
      * @param targetRef the target reference.
-     * @param <IN1>     the first input data type.
-     * @param <IN2>     the second input data type.
+     * @param <IN>      the input data type.
      * @return the predicate wrapper.
      */
     @NotNull
-    public static <IN1, IN2 extends IN1> PredicateWrapper<IN1> isSameAs(
-            @Nullable final IN2 targetRef) {
+    public static <IN> PredicateWrapper<IN> isSame(@Nullable final Object targetRef) {
 
         if (targetRef == null) {
 
             return isNull();
         }
 
-        return new PredicateWrapper<IN1>(new SameAsPredicate<IN1>(targetRef));
+        return new PredicateWrapper<IN>(new SameAsPredicate<IN>(targetRef));
     }
 
     /**
@@ -410,14 +404,14 @@ public class PredicateWrapper<IN> implements Predicate<IN> {
      */
     private static class EqualToPredicate<IN> implements Predicate<IN> {
 
-        private final IN mOther;
+        private final Object mOther;
 
         /**
          * Constructor.
          *
          * @param other the other object to test against.
          */
-        private EqualToPredicate(@NotNull final IN other) {
+        private EqualToPredicate(@NotNull final Object other) {
 
             mOther = other;
         }
@@ -458,14 +452,14 @@ public class PredicateWrapper<IN> implements Predicate<IN> {
      */
     private static class InstanceOfPredicate<IN> implements Predicate<IN> {
 
-        private final Class<? extends IN> mType;
+        private final Class<?> mType;
 
         /**
          * Constructor.
          *
          * @param type the class type.
          */
-        private InstanceOfPredicate(@NotNull final Class<? extends IN> type) {
+        private InstanceOfPredicate(@NotNull final Class<?> type) {
 
             mType = type;
         }
@@ -572,14 +566,14 @@ public class PredicateWrapper<IN> implements Predicate<IN> {
      */
     private static class SameAsPredicate<IN> implements Predicate<IN> {
 
-        private final IN mOther;
+        private final Object mOther;
 
         /**
          * Constructor.
          *
          * @param other the other object to test against.
          */
-        private SameAsPredicate(@NotNull final IN other) {
+        private SameAsPredicate(@NotNull final Object other) {
 
             mOther = other;
         }

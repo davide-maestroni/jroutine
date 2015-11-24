@@ -13,8 +13,6 @@
  */
 package com.github.dm.jrt.annotation;
 
-import com.github.dm.jrt.builder.InvocationConfiguration;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -49,7 +47,7 @@ import java.lang.annotation.Target;
  * <p/>
  * Created by davide-maestroni on 10/05/2015.
  *
- * @see InvocationConfiguration InvocationConfiguration
+ * @see com.github.dm.jrt.builder.InvocationConfiguration InvocationConfiguration
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

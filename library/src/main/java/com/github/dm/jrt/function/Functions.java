@@ -120,7 +120,6 @@ public class Functions {
      * @return the function wrapper.
      */
     @NotNull
-    @SuppressWarnings("ConstantConditions")
     public static <IN, OUT> FunctionWrapper<IN, OUT> castTo(
             @NotNull final Class<? extends OUT> type) {
 
@@ -321,13 +320,11 @@ public class Functions {
      * The returned object will support concatenation and comparison.
      *
      * @param targetRef the target reference.
-     * @param <IN1>     the first input data type.
-     * @param <IN2>     the second input data type.
+     * @param <IN>      the input data type.
      * @return the predicate wrapper.
      */
     @NotNull
-    public static <IN1, IN2 extends IN1> PredicateWrapper<IN1> isEqual(
-            @Nullable final IN2 targetRef) {
+    public static <IN> PredicateWrapper<IN> isEqual(@Nullable final Object targetRef) {
 
         return PredicateWrapper.isEqual(targetRef);
     }
@@ -337,15 +334,12 @@ public class Functions {
      * class.<br/>
      * The returned object will support concatenation and comparison.
      *
-     * @param type  the class type.
-     * @param <IN1> the first input data type.
-     * @param <IN2> the second input data type.
+     * @param type the class type.
+     * @param <IN> the input data type.
      * @return the predicate wrapper.
      */
     @NotNull
-    @SuppressWarnings("ConstantConditions")
-    public static <IN1, IN2 extends IN1> PredicateWrapper<IN1> isInstanceOf(
-            @NotNull final Class<? extends IN2> type) {
+    public static <IN> PredicateWrapper<IN> isInstanceOf(@NotNull final Class<?> type) {
 
         return PredicateWrapper.isInstanceOf(type);
     }
@@ -368,15 +362,13 @@ public class Functions {
      * The returned object will support concatenation and comparison.
      *
      * @param targetRef the target reference.
-     * @param <IN1>     the first input data type.
-     * @param <IN2>     the second input data type.
+     * @param <IN>      the input data type.
      * @return the predicate wrapper.
      */
     @NotNull
-    public static <IN1, IN2 extends IN1> PredicateWrapper<IN1> isSameAs(
-            @Nullable final IN2 targetRef) {
+    public static <IN> PredicateWrapper<IN> isSame(@Nullable final Object targetRef) {
 
-        return PredicateWrapper.isSameAs(targetRef);
+        return PredicateWrapper.isSame(targetRef);
     }
 
     /**

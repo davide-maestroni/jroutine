@@ -608,7 +608,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     }
 
     private boolean isNextAvailable(@NotNull final TimeDuration timeout,
-            @NotNull final TimeoutActionType timeoutAction) {
+            @NotNull final TimeoutActionType timeoutAction,
+            @Nullable final Throwable timeoutException) {
 
         boolean isAbort = false;
 
@@ -705,8 +706,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             }
         }
 
-        abort();
-        throw new AbortException(null);
+        abort(timeoutException);
+        throw AbortException.wrapIfNeeded(timeoutException);
     }
 
     @Nullable
@@ -735,7 +736,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
     @Nullable
     private OUT readNext(@NotNull final TimeDuration timeout,
-            @NotNull final TimeoutActionType timeoutAction) {
+            @NotNull final TimeoutActionType timeoutAction,
+            @Nullable final Throwable timeoutException) {
 
         boolean isAbort = false;
 
@@ -751,8 +753,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
             if (isAbort) {
 
-                abort();
-                throw new AbortException(null);
+                abort(timeoutException);
+                throw AbortException.wrapIfNeeded(timeoutException);
             }
 
             throw e;
@@ -950,29 +952,33 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         private final TimeoutActionType mAction;
 
+        private final Throwable mException;
+
         private final TimeDuration mTimeout;
 
         /**
          * Constructor.
          *
-         * @param timeout the output timeout.
-         * @param action  the timeout action.
+         * @param timeout   the output timeout.
+         * @param action    the timeout action.
+         * @param exception the timeout exception.
          */
         private DefaultIterator(@NotNull final TimeDuration timeout,
-                @NotNull final TimeoutActionType action) {
+                @NotNull final TimeoutActionType action, @Nullable final Throwable exception) {
 
             mTimeout = timeout;
             mAction = action;
+            mException = exception;
         }
 
         public boolean hasNext() {
 
-            return isNextAvailable(mTimeout, mAction);
+            return isNextAvailable(mTimeout, mAction, mException);
         }
 
         public OUT next() {
 
-            return readNext(mTimeout, mAction);
+            return readNext(mTimeout, mAction, mException);
         }
 
         public void remove() {
@@ -991,6 +997,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         private TimeDuration mExecutionTimeout = ZERO;
 
         private TimeoutActionType mTimeoutActionType = TimeoutActionType.THROW;
+
+        private Throwable mTimeoutException;
 
         @NotNull
         @SuppressWarnings("ConstantConditions")
@@ -1029,6 +1037,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         public OutputChannel<OUT> allInto(@NotNull final Collection<? super OUT> results) {
 
             boolean isAbort = false;
+            final Throwable timeoutException;
 
             synchronized (mMutex) {
 
@@ -1128,12 +1137,14 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                         }
                     }
                 }
+
+                timeoutException = mTimeoutException;
             }
 
             if (isAbort) {
 
-                abort();
-                throw new AbortException(null);
+                abort(timeoutException);
+                throw AbortException.wrapIfNeeded(timeoutException);
             }
 
             return this;
@@ -1200,6 +1211,19 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             synchronized (mMutex) {
 
                 mTimeoutActionType = TimeoutActionType.ABORT;
+                mTimeoutException = null;
+            }
+
+            return this;
+        }
+
+        @NotNull
+        public OutputChannel<OUT> eventuallyAbort(@Nullable final Throwable reason) {
+
+            synchronized (mMutex) {
+
+                mTimeoutActionType = TimeoutActionType.ABORT;
+                mTimeoutException = reason;
             }
 
             return this;
@@ -1211,6 +1235,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             synchronized (mMutex) {
 
                 mTimeoutActionType = TimeoutActionType.EXIT;
+                mTimeoutException = null;
             }
 
             return this;
@@ -1222,6 +1247,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             synchronized (mMutex) {
 
                 mTimeoutActionType = TimeoutActionType.THROW;
+                mTimeoutException = null;
             }
 
             return this;
@@ -1231,28 +1257,32 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
             final TimeDuration timeout;
             final TimeoutActionType timeoutAction;
+            final Throwable timeoutException;
 
             synchronized (mMutex) {
 
                 timeout = mExecutionTimeout;
                 timeoutAction = mTimeoutActionType;
+                timeoutException = mTimeoutException;
             }
 
-            return isNextAvailable(timeout, timeoutAction);
+            return isNextAvailable(timeout, timeoutAction, timeoutException);
         }
 
         public OUT next() {
 
             final TimeDuration timeout;
             final TimeoutActionType timeoutAction;
+            final Throwable timeoutException;
 
             synchronized (mMutex) {
 
                 timeout = mExecutionTimeout;
                 timeoutAction = mTimeoutActionType;
+                timeoutException = mTimeoutException;
             }
 
-            return readNext(timeout, timeoutAction);
+            return readNext(timeout, timeoutAction, timeoutException);
         }
 
         @NotNull
@@ -1279,11 +1309,13 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
             final TimeDuration timeout;
             final TimeoutActionType timeoutAction;
+            final Throwable timeoutException;
 
             synchronized (mMutex) {
 
                 timeout = mExecutionTimeout;
                 timeoutAction = mTimeoutActionType;
+                timeoutException = mTimeoutException;
             }
 
             final ArrayList<OUT> results = new ArrayList<OUT>(count);
@@ -1293,7 +1325,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
                 for (int i = 0; i < count; ++i) {
 
-                    results.add(readNext(timeUntilMillis(endTime), timeoutAction));
+                    results.add(
+                            readNext(timeUntilMillis(endTime), timeoutAction, timeoutException));
                 }
 
             } catch (final NoSuchElementException ignored) {
@@ -1306,8 +1339,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
                 } else if (timeoutAction == TimeoutActionType.ABORT) {
 
-                    abort();
-                    throw new AbortException(null);
+                    abort(timeoutException);
+                    throw AbortException.wrapIfNeeded(timeoutException);
                 }
             }
 
@@ -1353,11 +1386,13 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
                 final TimeDuration timeout;
                 final TimeoutActionType timeoutAction;
+                final Throwable timeoutException;
 
                 synchronized (mMutex) {
 
                     timeout = mExecutionTimeout;
                     timeoutAction = mTimeoutActionType;
+                    timeoutException = mTimeoutException;
                 }
 
                 final long endTime = current().plus(timeout).toMillis();
@@ -1366,7 +1401,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
                     for (int i = 0; i < count; ++i) {
 
-                        readNext(timeUntilMillis(endTime), timeoutAction);
+                        readNext(timeUntilMillis(endTime), timeoutAction, timeoutException);
                     }
 
                 } catch (final NoSuchElementException ignored) {
@@ -1379,8 +1414,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
                     } else if (timeoutAction == TimeoutActionType.ABORT) {
 
-                        abort();
-                        throw new AbortException(null);
+                        abort(timeoutException);
+                        throw AbortException.wrapIfNeeded(timeoutException);
                     }
                 }
             }
@@ -1393,15 +1428,17 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
             final TimeDuration timeout;
             final TimeoutActionType timeoutAction;
+            final Throwable timeoutException;
 
             synchronized (mMutex) {
 
                 verifyBound();
                 timeout = mExecutionTimeout;
                 timeoutAction = mTimeoutActionType;
+                timeoutException = mTimeoutException;
             }
 
-            return new DefaultIterator(timeout, timeoutAction);
+            return new DefaultIterator(timeout, timeoutAction, timeoutException);
         }
 
         public void remove() {

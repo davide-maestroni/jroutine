@@ -268,8 +268,9 @@ public class ByteChannel {
          * @param out the output stream.
          * @return the total number of bytes read into the buffer, or <code>-1</code> if there is no
          * more data because the end of the stream has been reached.
-         * @throws IOException if an I/O error occurs. In particular, an <code>IOException</code>
-         *                     may be thrown if the output stream has been closed.
+         * @throws java.io.IOException if an I/O error occurs. In particular, an
+         *                             <code>IOException</code> may be thrown if the output stream
+         *                             has been closed.
          */
         public abstract int read(@NotNull OutputStream out) throws IOException;
 
@@ -313,8 +314,9 @@ public class ByteChannel {
          *
          * @param out the output stream.
          * @return the total number of bytes read.
-         * @throws IOException if an I/O error occurs. In particular, an <code>IOException</code>
-         *                     may be thrown if the output stream has been closed.
+         * @throws java.io.IOException if an I/O error occurs. In particular, an
+         *                             <code>IOException</code> may be thrown if the output stream
+         *                             has been closed.
          */
         public long readAll(@NotNull final OutputStream out) throws IOException {
 
@@ -340,9 +342,9 @@ public class ByteChannel {
          * @param in the input stream.
          * @return the total number of bytes written into the buffer, or <code>-1</code> if there is
          * no more data because the end of the stream has been reached.
-         * @throws IOException If the first byte cannot be read for any reason other than end of
-         *                     file, or if the input stream has been closed, or if some other I/O
-         *                     error occurs.
+         * @throws java.io.IOException If the first byte cannot be read for any reason other than
+         *                             end of file, or if the input stream has been closed, or if
+         *                             some other I/O error occurs.
          */
         public abstract int write(@NotNull InputStream in) throws IOException;
 
@@ -362,9 +364,9 @@ public class ByteChannel {
          *
          * @param in the input stream.
          * @return the total number of bytes written.
-         * @throws IOException If the first byte cannot be read for any reason other than end of
-         *                     file, or if the input stream has been closed, or if some other I/O
-         *                     error occurs.
+         * @throws java.io.IOException If the first byte cannot be read for any reason other than
+         *                             end of file, or if the input stream has been closed, or if
+         *                             some other I/O error occurs.
          */
         public long writeAll(@NotNull final InputStream in) throws IOException {
 
@@ -503,8 +505,9 @@ public class ByteChannel {
          * @param out the output stream.
          * @return the total number of bytes read into the buffer, or <code>-1</code> if there is no
          * more data because the end of the stream has been reached.
-         * @throws IOException if an I/O error occurs. In particular, an <code>IOException</code>
-         *                     may be thrown if the output stream has been closed.
+         * @throws java.io.IOException if an I/O error occurs. In particular, an
+         *                             <code>IOException</code> may be thrown if the output stream
+         *                             has been closed.
          */
         public int read(@NotNull final OutputStream out) throws IOException {
 

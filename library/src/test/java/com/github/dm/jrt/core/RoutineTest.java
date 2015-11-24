@@ -1862,6 +1862,21 @@ public class RoutineTest {
 
             JRoutine.on(PassingInvocation.factoryOf())
                     .asyncCall("test1")
+                    .eventuallyAbort(new IllegalStateException())
+                    .afterMax(seconds(1))
+                    .next(2);
+
+            fail();
+
+        } catch (final AbortException e) {
+
+            assertThat(e.getCause()).isExactlyInstanceOf(IllegalStateException.class);
+        }
+
+        try {
+
+            JRoutine.on(PassingInvocation.factoryOf())
+                    .asyncCall("test1")
                     .eventuallyThrow()
                     .afterMax(seconds(1))
                     .next(2);
@@ -2533,6 +2548,21 @@ public class RoutineTest {
 
         } catch (final AbortException ignored) {
 
+        }
+
+        try {
+
+            JRoutine.on(PassingInvocation.factoryOf())
+                    .asyncCall("test1")
+                    .eventuallyAbort(new IllegalStateException())
+                    .afterMax(seconds(1))
+                    .skip(2);
+
+            fail();
+
+        } catch (final AbortException e) {
+
+            assertThat(e.getCause()).isExactlyInstanceOf(IllegalStateException.class);
         }
 
         try {

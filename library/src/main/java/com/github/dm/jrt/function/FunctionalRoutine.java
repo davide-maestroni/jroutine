@@ -61,7 +61,7 @@ public interface FunctionalRoutine<IN, OUT>
             @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
 
     /**
-     * Concatenates a functional routine based on the specified predicate to this ones.<br/>
+     * Concatenates a functional routine based on the specified predicate to this one.<br/>
      * The output will be filtered according to the result returned by the predicate.
      * <p/>
      * Note that the created routine will be invoked in an asynchronous mode.
@@ -181,7 +181,7 @@ public interface FunctionalRoutine<IN, OUT>
                     AFTER>> function);
 
     /**
-     * Concatenates a functional routine based on the specified predicate to this ones.<br/>
+     * Concatenates a functional routine based on the specified predicate to this one.<br/>
      * The output will be filtered according to the result returned by the predicate.
      * <p/>
      * Note that the created routine will be invoked in a parallel mode.
@@ -266,7 +266,7 @@ public interface FunctionalRoutine<IN, OUT>
             @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
 
     /**
-     * Concatenates a functional routine based on the specified predicate to this ones.<br/>
+     * Concatenates a functional routine based on the specified predicate to this one.<br/>
      * The output will be filtered according to the result returned by the predicate.
      * <p/>
      * Note that the created routine will be invoked in a synchronous mode.

@@ -44,9 +44,9 @@ public class PassingContextInvocation<DATA> extends FilterContextInvocation<DATA
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <DATA> ContextInvocationFactory<DATA, DATA> factoryOf() {
+    public static <DATA> FilterContextInvocation<DATA, DATA> factoryOf() {
 
-        return (ContextInvocationFactory<DATA, DATA>) sInvocation;
+        return (FilterContextInvocation<DATA, DATA>) sInvocation;
     }
 
     public void onInput(final DATA input, @NotNull final ResultChannel<DATA> result) {

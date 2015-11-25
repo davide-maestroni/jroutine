@@ -43,9 +43,9 @@ public class PassingInvocation<DATA> extends FilterInvocation<DATA, DATA> {
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <DATA> InvocationFactory<DATA, DATA> factoryOf() {
+    public static <DATA> FilterInvocation<DATA, DATA> factoryOf() {
 
-        return (InvocationFactory<DATA, DATA>) sInvocation;
+        return (FilterInvocation<DATA, DATA>) sInvocation;
     }
 
     public void onInput(final DATA input, @NotNull final ResultChannel<DATA> result) {

@@ -321,8 +321,7 @@
             public static void main(final String[] args) {
 
                 final FunctionalRoutine&lt;String, Double&gt; meanRoutine =
-                        Functions.builder()
-                                 .&lt;String&gt;buildRoutine()
+                        Functions.functional()
                                  .thenParallelMap((Function) (s) -&gt; {
 
                                          return Integer.parseInt(s);

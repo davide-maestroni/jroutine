@@ -13,14 +13,19 @@
  */
 package com.github.dm.jrt.function;
 
+import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.Builder;
+import com.github.dm.jrt.builder.InvocationConfiguration.Configurable;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
+import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
+import com.github.dm.jrt.core.JRoutine;
 import com.github.dm.jrt.invocation.CommandInvocation;
 import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.invocation.FunctionInvocation;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationFactory;
+import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.util.ClassToken;
 
 import org.jetbrains.annotations.NotNull;
@@ -54,60 +59,6 @@ public class Functions {
     public static <IN1, IN2> BiConsumerWrapper<IN1, IN2> biSink() {
 
         return BiConsumerWrapper.biSink();
-    }
-
-    /**
-     * Short for {@code functional().buildFrom(invocation)}.
-     *
-     * @param invocation the command invocation instance.
-     * @param <OUT>      the output data type.
-     * @return the newly created routine instance.
-     */
-    @NotNull
-    public static <OUT> FunctionalRoutine<Void, OUT> buildFrom(
-            @NotNull final CommandInvocation<OUT> invocation) {
-
-        return functional().buildFrom(invocation);
-    }
-
-    /**
-     * Short for {@code functional().buildFrom(consumer)}.
-     *
-     * @param consumer the consumer instance.
-     * @param <OUT>    the output data type.
-     * @return the newly created routine instance.
-     */
-    @NotNull
-    public static <OUT> FunctionalRoutine<Void, OUT> buildFrom(
-            @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
-
-        return functional().buildFrom(consumer);
-    }
-
-    /**
-     * Short for {@code functional().buildFrom(supplier)}.
-     *
-     * @param supplier the supplier instance.
-     * @param <OUT>    the output data type.
-     * @return the newly created routine instance.
-     */
-    @NotNull
-    public static <OUT> FunctionalRoutine<Void, OUT> buildFrom(
-            @NotNull final Supplier<OUT> supplier) {
-
-        return functional().buildFrom(supplier);
-    }
-
-    /**
-     * Short for {@code functional().buildRoutine()}.
-     *
-     * @param <DATA> the data type.
-     * @return the newly created routine instance.
-     */
-    @NotNull
-    public static <DATA> FunctionalRoutine<DATA, DATA> buildRoutine() {
-
-        return functional().buildRoutine();
     }
 
     /**
@@ -302,17 +253,6 @@ public class Functions {
     public static <IN> FunctionWrapper<IN, IN> identity() {
 
         return FunctionWrapper.identity();
-    }
-
-    /**
-     * Short for {@code functional().invocations()}.
-     *
-     * @return the invocation configuration builder.
-     */
-    @NotNull
-    public static Builder<? extends FunctionalRoutineBuilder> invocations() {
-
-        return functional().invocations();
     }
 
     /**
@@ -879,6 +819,217 @@ public class Functions {
 
             final ConsumerInvocationFactory<?, ?> that = (ConsumerInvocationFactory<?, ?>) o;
             return mConsumer.equals(that.mConsumer);
+        }
+    }
+
+    /**
+     * Default implementation of a functional routine builder.
+     */
+    private static class DefaultFunctionalRoutineBuilder
+            implements FunctionalRoutineBuilder, Configurable<FunctionalRoutineBuilder> {
+
+        private InvocationConfiguration mConfiguration =
+                InvocationConfiguration.DEFAULT_CONFIGURATION;
+
+        @NotNull
+        public Builder<? extends FunctionalRoutineBuilder> invocations() {
+
+            return new Builder<FunctionalRoutineBuilder>(this, mConfiguration);
+        }
+
+        @NotNull
+        public <OUT> FunctionalRoutine<Void, OUT> routineFrom(
+                @NotNull final CommandInvocation<OUT> invocation) {
+
+            return fromFactory(invocation, DelegationType.SYNC);
+        }
+
+        @NotNull
+        public <OUT> FunctionalRoutine<Void, OUT> routineFrom(
+                @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
+
+            return fromFactory(consumerCommand(consumer), DelegationType.SYNC);
+        }
+
+        @NotNull
+        public <OUT> FunctionalRoutine<Void, OUT> routineFrom(
+                @NotNull final Supplier<OUT> supplier) {
+
+            return fromFactory(supplierCommand(supplier), DelegationType.SYNC);
+        }
+
+        @NotNull
+        public <DATA> FunctionalRoutine<DATA, DATA> thenAsyncAccumulate(
+                @NotNull final BiFunction<? super DATA, ? super DATA, DATA> function) {
+
+            return fromFactory(AccumulateInvocation.functionFactory(function),
+                               DelegationType.ASYNC);
+        }
+
+        @NotNull
+        public <DATA> FunctionalRoutine<DATA, DATA> thenAsyncFilter(
+                @NotNull final Predicate<? super DATA> predicate) {
+
+            return fromFactory(predicateFilter(predicate), DelegationType.ASYNC);
+        }
+
+        @NotNull
+        public <IN, OUT> FunctionalRoutine<IN, OUT> thenAsyncMap(
+                @NotNull final BiConsumer<? super IN, ? super ResultChannel<OUT>> consumer) {
+
+            return fromFactory(consumerFilter(consumer), DelegationType.ASYNC);
+        }
+
+        @NotNull
+        public <IN, OUT> FunctionalRoutine<IN, OUT> thenAsyncMap(
+                @NotNull final FilterInvocation<IN, OUT> invocation) {
+
+            return fromFactory(invocation, DelegationType.ASYNC);
+        }
+
+        @NotNull
+        public <IN, OUT> FunctionalRoutine<IN, OUT> thenAsyncMap(
+                @NotNull final Function<? super IN, OUT> function) {
+
+            return fromFactory(functionFilter(function), DelegationType.ASYNC);
+        }
+
+        @NotNull
+        public <IN, OUT> FunctionalRoutine<IN, OUT> thenAsyncMap(
+                @NotNull final Routine<IN, OUT> routine) {
+
+            return new DefaultFunctionalRoutine<IN, OUT>(routine, DelegationType.ASYNC);
+        }
+
+        @NotNull
+        public <IN, OUT> FunctionalRoutine<IN, OUT> thenAsyncReduce(
+                @NotNull final BiConsumer<? super List<? extends IN>, ? super ResultChannel<OUT>>
+                        consumer) {
+
+            return fromFactory(consumerFactory(consumer), DelegationType.ASYNC);
+        }
+
+        @NotNull
+        public <IN, OUT> FunctionalRoutine<IN, OUT> thenAsyncReduce(
+                @NotNull final Function<? super List<? extends IN>, OUT> function) {
+
+            return fromFactory(functionFactory(function), DelegationType.ASYNC);
+        }
+
+        @NotNull
+        public <DATA> FunctionalRoutine<DATA, DATA> thenParallelFilter(
+                @NotNull final Predicate<? super DATA> predicate) {
+
+            return fromFactory(predicateFilter(predicate), DelegationType.PARALLEL);
+        }
+
+        @NotNull
+        public <IN, OUT> FunctionalRoutine<IN, OUT> thenParallelMap(
+                @NotNull final BiConsumer<? super IN, ? super ResultChannel<OUT>> consumer) {
+
+            return fromFactory(consumerFilter(consumer), DelegationType.PARALLEL);
+        }
+
+        @NotNull
+        public <IN, OUT> FunctionalRoutine<IN, OUT> thenParallelMap(
+                @NotNull final FilterInvocation<IN, OUT> invocation) {
+
+            return fromFactory(invocation, DelegationType.PARALLEL);
+        }
+
+        @NotNull
+        public <IN, OUT> FunctionalRoutine<IN, OUT> thenParallelMap(
+                @NotNull final Function<? super IN, OUT> function) {
+
+            return fromFactory(functionFilter(function), DelegationType.PARALLEL);
+        }
+
+        @NotNull
+        public <IN, OUT> FunctionalRoutine<IN, OUT> thenParallelMap(
+                @NotNull final Routine<IN, OUT> routine) {
+
+            return new DefaultFunctionalRoutine<IN, OUT>(routine, DelegationType.PARALLEL);
+        }
+
+        @NotNull
+        public <DATA> FunctionalRoutine<DATA, DATA> thenSyncAccumulate(
+                @NotNull final BiFunction<? super DATA, ? super DATA, DATA> function) {
+
+            return fromFactory(AccumulateInvocation.functionFactory(function), DelegationType.SYNC);
+        }
+
+        @NotNull
+        public <DATA> FunctionalRoutine<DATA, DATA> thenSyncFilter(
+                @NotNull final Predicate<? super DATA> predicate) {
+
+            return fromFactory(predicateFilter(predicate), DelegationType.SYNC);
+        }
+
+        @NotNull
+        public <IN, OUT> FunctionalRoutine<IN, OUT> thenSyncMap(
+                @NotNull final BiConsumer<? super IN, ? super ResultChannel<OUT>> consumer) {
+
+            return fromFactory(consumerFilter(consumer), DelegationType.SYNC);
+        }
+
+        @NotNull
+        public <IN, OUT> FunctionalRoutine<IN, OUT> thenSyncMap(
+                @NotNull final FilterInvocation<IN, OUT> invocation) {
+
+            return fromFactory(invocation, DelegationType.SYNC);
+        }
+
+        @NotNull
+        public <IN, OUT> FunctionalRoutine<IN, OUT> thenSyncMap(
+                @NotNull final Function<? super IN, OUT> function) {
+
+            return fromFactory(functionFilter(function), DelegationType.SYNC);
+        }
+
+        @NotNull
+        public <IN, OUT> FunctionalRoutine<IN, OUT> thenSyncMap(
+                @NotNull final Routine<IN, OUT> routine) {
+
+            return new DefaultFunctionalRoutine<IN, OUT>(routine, DelegationType.SYNC);
+        }
+
+        @NotNull
+        public <IN, OUT> FunctionalRoutine<IN, OUT> thenSyncReduce(
+                @NotNull final BiConsumer<? super List<? extends IN>, ? super ResultChannel<OUT>>
+                        consumer) {
+
+            return fromFactory(consumerFactory(consumer), DelegationType.SYNC);
+        }
+
+        @NotNull
+        public <IN, OUT> FunctionalRoutine<IN, OUT> thenSyncReduce(
+                @NotNull final Function<? super List<? extends IN>, OUT> function) {
+
+            return fromFactory(functionFactory(function), DelegationType.SYNC);
+        }
+
+        @NotNull
+        @SuppressWarnings("ConstantConditions")
+        public FunctionalRoutineBuilder setConfiguration(
+                @NotNull final InvocationConfiguration configuration) {
+
+            if (configuration == null) {
+
+                throw new NullPointerException("the invocation configuration must not be null");
+            }
+
+            mConfiguration = configuration;
+            return this;
+        }
+
+        @NotNull
+        private <IN, OUT> FunctionalRoutine<IN, OUT> fromFactory(
+                @NotNull final InvocationFactory<IN, OUT> factory,
+                @NotNull final DelegationType delegationType) {
+
+            return new DefaultFunctionalRoutine<IN, OUT>(
+                    JRoutine.on(factory).invocations().with(mConfiguration).set().buildRoutine(),
+                    delegationType);
         }
     }
 

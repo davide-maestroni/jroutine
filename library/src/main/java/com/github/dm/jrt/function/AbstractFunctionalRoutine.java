@@ -21,14 +21,18 @@ import com.github.dm.jrt.core.AbstractRoutine;
 import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.core.JRoutine;
 import com.github.dm.jrt.invocation.FilterInvocation;
+import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+import static com.github.dm.jrt.function.Functions.consumerFactory;
 import static com.github.dm.jrt.function.Functions.consumerFilter;
+import static com.github.dm.jrt.function.Functions.functionFactory;
 import static com.github.dm.jrt.function.Functions.functionFilter;
+import static com.github.dm.jrt.function.Functions.predicateFilter;
 
 /**
  * Abstract implementation of a functional routine.
@@ -75,36 +79,35 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
     public FunctionalRoutine<IN, OUT> thenAsyncAccumulate(
             @NotNull final BiFunction<? super OUT, ? super OUT, ? extends OUT> function) {
 
-        return andThenAccumulate(function, DelegationType.ASYNC);
+        return fromFactory(AccumulateInvocation.functionFactory(function), DelegationType.ASYNC);
     }
 
     @NotNull
     public FunctionalRoutine<IN, OUT> thenAsyncFilter(
             @NotNull final Predicate<? super OUT> predicate) {
 
-        return andThenFilter(predicate, DelegationType.ASYNC);
+        return fromFactory(predicateFilter(predicate), DelegationType.ASYNC);
     }
 
     @NotNull
     public <AFTER> FunctionalRoutine<IN, AFTER> thenAsyncMap(
             @NotNull final BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer) {
 
-        return thenAsyncMap(consumerFilter(consumer));
+        return fromFactory(consumerFilter(consumer), DelegationType.ASYNC);
     }
 
     @NotNull
     public <AFTER> FunctionalRoutine<IN, AFTER> thenAsyncMap(
             @NotNull final FilterInvocation<? super OUT, AFTER> invocation) {
 
-        return thenAsyncMap(
-                JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine());
+        return fromFactory(invocation, DelegationType.ASYNC);
     }
 
     @NotNull
     public <AFTER> FunctionalRoutine<IN, AFTER> thenAsyncMap(
             @NotNull final Function<? super OUT, AFTER> function) {
 
-        return thenAsyncMap(functionFilter(function));
+        return fromFactory(functionFilter(function), DelegationType.ASYNC);
     }
 
     @NotNull
@@ -119,22 +122,14 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
             @NotNull final BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
                     consumer) {
 
-        return thenAsyncMap(JRoutine.on(Functions.consumerFactory(consumer))
-                                    .invocations()
-                                    .with(mConfiguration)
-                                    .set()
-                                    .buildRoutine());
+        return fromFactory(consumerFactory(consumer), DelegationType.ASYNC);
     }
 
     @NotNull
     public <AFTER> FunctionalRoutine<IN, AFTER> thenAsyncReduce(
             @NotNull final Function<? super List<? extends OUT>, AFTER> function) {
 
-        return thenAsyncMap(JRoutine.on(Functions.functionFactory(function))
-                                    .invocations()
-                                    .with(mConfiguration)
-                                    .set()
-                                    .buildRoutine());
+        return fromFactory(functionFactory(function), DelegationType.ASYNC);
     }
 
     @NotNull
@@ -149,29 +144,28 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
     public FunctionalRoutine<IN, OUT> thenParallelFilter(
             @NotNull final Predicate<? super OUT> predicate) {
 
-        return andThenFilter(predicate, DelegationType.PARALLEL);
+        return fromFactory(predicateFilter(predicate), DelegationType.PARALLEL);
     }
 
     @NotNull
     public <AFTER> FunctionalRoutine<IN, AFTER> thenParallelMap(
             @NotNull final BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer) {
 
-        return thenParallelMap(consumerFilter(consumer));
+        return fromFactory(consumerFilter(consumer), DelegationType.PARALLEL);
     }
 
     @NotNull
     public <AFTER> FunctionalRoutine<IN, AFTER> thenParallelMap(
             @NotNull final FilterInvocation<? super OUT, AFTER> invocation) {
 
-        return thenParallelMap(
-                JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine());
+        return fromFactory(invocation, DelegationType.PARALLEL);
     }
 
     @NotNull
     public <AFTER> FunctionalRoutine<IN, AFTER> thenParallelMap(
             @NotNull final Function<? super OUT, AFTER> function) {
 
-        return thenParallelMap(functionFilter(function));
+        return fromFactory(functionFilter(function), DelegationType.PARALLEL);
     }
 
     @NotNull
@@ -186,36 +180,35 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
             @NotNull final BiFunction<? super OUT, ? super OUT, ?
                     extends OUT> function) {
 
-        return andThenAccumulate(function, DelegationType.SYNC);
+        return fromFactory(AccumulateInvocation.functionFactory(function), DelegationType.SYNC);
     }
 
     @NotNull
     public FunctionalRoutine<IN, OUT> thenSyncFilter(
             @NotNull final Predicate<? super OUT> predicate) {
 
-        return andThenFilter(predicate, DelegationType.SYNC);
+        return fromFactory(predicateFilter(predicate), DelegationType.SYNC);
     }
 
     @NotNull
     public <AFTER> FunctionalRoutine<IN, AFTER> thenSyncMap(
             @NotNull final BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer) {
 
-        return thenSyncMap(consumerFilter(consumer));
+        return fromFactory(consumerFilter(consumer), DelegationType.SYNC);
     }
 
     @NotNull
     public <AFTER> FunctionalRoutine<IN, AFTER> thenSyncMap(
             @NotNull final FilterInvocation<? super OUT, AFTER> invocation) {
 
-        return thenSyncMap(
-                JRoutine.on(invocation).invocations().with(mConfiguration).set().buildRoutine());
+        return fromFactory(invocation, DelegationType.SYNC);
     }
 
     @NotNull
     public <AFTER> FunctionalRoutine<IN, AFTER> thenSyncMap(
             @NotNull final Function<? super OUT, AFTER> function) {
 
-        return thenSyncMap(functionFilter(function));
+        return fromFactory(functionFilter(function), DelegationType.SYNC);
     }
 
     @NotNull
@@ -230,22 +223,14 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
             @NotNull final BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
                     consumer) {
 
-        return thenSyncMap(JRoutine.on(Functions.consumerFactory(consumer))
-                                   .invocations()
-                                   .with(mConfiguration)
-                                   .set()
-                                   .buildRoutine());
+        return fromFactory(consumerFactory(consumer), DelegationType.SYNC);
     }
 
     @NotNull
     public <AFTER> FunctionalRoutine<IN, AFTER> thenSyncReduce(
             @NotNull final Function<? super List<? extends OUT>, AFTER> function) {
 
-        return thenSyncMap(JRoutine.on(Functions.functionFactory(function))
-                                   .invocations()
-                                   .with(mConfiguration)
-                                   .set()
-                                   .buildRoutine());
+        return fromFactory(functionFactory(function), DelegationType.SYNC);
     }
 
     /**
@@ -261,26 +246,11 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
             @NotNull Routine<? super OUT, AFTER> routine, @NotNull DelegationType delegationType);
 
     @NotNull
-    private FunctionalRoutine<IN, OUT> andThenAccumulate(
-            @NotNull final BiFunction<? super OUT, ? super OUT, ?
-                    extends OUT> function, @NotNull final DelegationType delegationType) {
-
-        return andThen(JRoutine.on(AccumulateInvocation.functionFactory(function))
-                               .invocations()
-                               .with(mConfiguration)
-                               .set()
-                               .buildRoutine(), delegationType);
-    }
-
-    @NotNull
-    private FunctionalRoutine<IN, OUT> andThenFilter(
-            @NotNull final Predicate<? super OUT> predicate,
+    private <AFTER> FunctionalRoutine<IN, AFTER> fromFactory(
+            @NotNull final InvocationFactory<? super OUT, AFTER> factory,
             @NotNull final DelegationType delegationType) {
 
-        return andThen(JRoutine.on(Functions.predicateFilter(predicate))
-                               .invocations()
-                               .with(mConfiguration)
-                               .set()
-                               .buildRoutine(), delegationType);
+        return andThen(JRoutine.on(factory).invocations().with(mConfiguration).set().buildRoutine(),
+                       delegationType);
     }
 }

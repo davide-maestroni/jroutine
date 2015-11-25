@@ -37,22 +37,32 @@ import static com.github.dm.jrt.core.Channels.syncStream;
  */
 class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine<IN, OUT> {
 
+    private final DelegationType mDelegationType;
+
     private final Routine<IN, OUT> mRoutine;
 
     /**
      * Constructor.
      *
-     * @param routine the backing routine instance.
+     * @param routine        the backing routine instance.
+     * @param delegationType the delegation type.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultFunctionalRoutine(@NotNull final Routine<IN, OUT> routine) {
+    DefaultFunctionalRoutine(@NotNull final Routine<IN, OUT> routine,
+            @NotNull final DelegationType delegationType) {
 
         if (routine == null) {
 
             throw new NullPointerException("the backing routine must not be null");
         }
 
+        if (delegationType == null) {
+
+            throw new NullPointerException("the delegation type must not be null");
+        }
+
         mRoutine = routine;
+        mDelegationType = delegationType;
     }
 
     @NotNull
@@ -60,14 +70,15 @@ class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine<IN, OU
             @NotNull final Function<? super FunctionalRoutine<IN, OUT>, ? extends Routine<BEFORE,
                     AFTER>> function) {
 
-        return new DefaultFunctionalRoutine<BEFORE, AFTER>(function.apply(this));
+        return new DefaultFunctionalRoutine<BEFORE, AFTER>(function.apply(this),
+                                                           DelegationType.SYNC);
     }
 
     @NotNull
     @Override
     protected Invocation<IN, OUT> newInvocation(@NotNull final InvocationType type) {
 
-        return new DelegatingInvocation<IN, OUT>(mRoutine, DelegationType.SYNC);
+        return new DelegatingInvocation<IN, OUT>(mRoutine, mDelegationType);
     }
 
     /**
@@ -127,7 +138,8 @@ class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine<IN, OU
                 @NotNull final Function<? super FunctionalRoutine<IN, AFTER>, ? extends
                         Routine<BEFORE, NEXT>> function) {
 
-            return new DefaultFunctionalRoutine<BEFORE, NEXT>(function.apply(this));
+            return new DefaultFunctionalRoutine<BEFORE, NEXT>(function.apply(this),
+                                                              DelegationType.SYNC);
         }
 
         @NotNull
@@ -188,21 +200,19 @@ class DefaultFunctionalRoutine<IN, OUT> extends AbstractFunctionalRoutine<IN, OU
 
             final StreamingChannel<IN, OUT> streamingChannel = syncStream(mRoutine);
             final DelegationType delegationType = mDelegationType;
+            mInputChannel = streamingChannel;
 
             if (delegationType == DelegationType.ASYNC) {
 
                 mOutputChannel = streamingChannel.passTo(mAfterRoutine.asyncInvoke()).result();
-                mInputChannel = streamingChannel;
 
             } else if (delegationType == DelegationType.PARALLEL) {
 
                 mOutputChannel = streamingChannel.passTo(mAfterRoutine.parallelInvoke()).result();
-                mInputChannel = streamingChannel;
 
             } else {
 
                 mOutputChannel = streamingChannel.passTo(mAfterRoutine.syncInvoke()).result();
-                mInputChannel = streamingChannel;
             }
         }
 

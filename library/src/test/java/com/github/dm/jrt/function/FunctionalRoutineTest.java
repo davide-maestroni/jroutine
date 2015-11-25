@@ -19,6 +19,7 @@ import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.core.JRoutine;
 import com.github.dm.jrt.invocation.CommandInvocation;
 import com.github.dm.jrt.invocation.FilterInvocation;
+import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.invocation.PassingInvocation;
 import com.github.dm.jrt.routine.Routine;
 
@@ -1235,7 +1236,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenAsyncMap((BiConsumer<Object, ResultChannel<Object>>) null);
+            Functions.functional().thenSyncMap((BiConsumer<Object, ResultChannel<Object>>) null);
 
             fail();
 
@@ -1271,7 +1272,129 @@ public class FunctionalRoutineTest {
 
             Functions.functional()
                      .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenAsyncMap((BiConsumer<Object, ResultChannel<Object>>) null);
+                     .thenSyncMap((BiConsumer<Object, ResultChannel<Object>>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testMapFactory() {
+
+        final UpperCase factory = new UpperCase();
+        assertThat(Functions.functional()
+                            .invocations()
+                            .withOutputOrder(OrderType.BY_CALL)
+                            .set()
+                            .thenAsyncMap(factory)
+                            .asyncCall("test1", "test2")
+                            .afterMax(seconds(3))
+                            .all()).containsExactly("TEST1", "TEST2");
+        assertThat(Functions.functional()
+                            .thenParallelMap(factory)
+                            .asyncCall("test1", "test2")
+                            .afterMax(seconds(3))
+                            .all()).containsOnly("TEST1", "TEST2");
+        assertThat(Functions.functional()
+                            .invocations()
+                            .withOutputOrder(OrderType.BY_CALL)
+                            .set()
+                            .thenSyncMap(factory)
+                            .asyncCall("test1", "test2")
+                            .afterMax(seconds(3))
+                            .all()).containsExactly("TEST1", "TEST2");
+        assertThat(Functions.functional()
+                            .thenSyncMap(PassingInvocation.<String>factoryOf())
+                            .invocations()
+                            .withOutputOrder(OrderType.BY_CALL)
+                            .set()
+                            .thenAsyncMap(factory)
+                            .asyncCall("test1", "test2")
+                            .afterMax(seconds(3))
+                            .all()).containsExactly("TEST1", "TEST2");
+        assertThat(Functions.functional()
+                            .thenSyncMap(PassingInvocation.<String>factoryOf())
+                            .thenParallelMap(factory)
+                            .asyncCall("test1", "test2")
+                            .afterMax(seconds(3))
+                            .all()).containsOnly("TEST1", "TEST2");
+        assertThat(Functions.functional()
+                            .thenSyncMap(PassingInvocation.<String>factoryOf())
+                            .invocations()
+                            .withOutputOrder(OrderType.BY_CALL)
+                            .set()
+                            .thenSyncMap(factory)
+                            .asyncCall("test1", "test2")
+                            .afterMax(seconds(3))
+                            .all()).containsExactly("TEST1", "TEST2");
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testMapFactoryNullPointerError() {
+
+        try {
+
+            Functions.functional().thenAsyncMap((InvocationFactory<Object, Object>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Functions.functional().thenParallelMap((InvocationFactory<Object, Object>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Functions.functional().thenSyncMap((InvocationFactory<Object, Object>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Functions.functional()
+                     .thenSyncMap(PassingInvocation.factoryOf())
+                     .thenAsyncMap((InvocationFactory<Object, Object>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Functions.functional()
+                     .thenSyncMap(PassingInvocation.factoryOf())
+                     .thenParallelMap((InvocationFactory<Object, Object>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Functions.functional()
+                     .thenSyncMap(PassingInvocation.factoryOf())
+                     .thenSyncMap((InvocationFactory<Object, Object>) null);
 
             fail();
 
@@ -1418,7 +1541,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenAsyncMap((FilterInvocation<Object, Object>) null);
+            Functions.functional().thenSyncMap((FilterInvocation<Object, Object>) null);
 
             fail();
 
@@ -1454,7 +1577,7 @@ public class FunctionalRoutineTest {
 
             Functions.functional()
                      .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenAsyncMap((FilterInvocation<Object, Object>) null);
+                     .thenSyncMap((FilterInvocation<Object, Object>) null);
 
             fail();
 
@@ -1601,7 +1724,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenAsyncMap((Function<Object, Object>) null);
+            Functions.functional().thenSyncMap((Function<Object, Object>) null);
 
             fail();
 
@@ -1637,7 +1760,7 @@ public class FunctionalRoutineTest {
 
             Functions.functional()
                      .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenAsyncMap((Function<Object, Object>) null);
+                     .thenSyncMap((Function<Object, Object>) null);
 
             fail();
 
@@ -1723,7 +1846,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenAsyncMap((Routine<Object, Object>) null);
+            Functions.functional().thenSyncMap((Routine<Object, Object>) null);
 
             fail();
 
@@ -1759,7 +1882,7 @@ public class FunctionalRoutineTest {
 
             Functions.functional()
                      .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenAsyncMap((Routine<Object, Object>) null);
+                     .thenSyncMap((Routine<Object, Object>) null);
 
             fail();
 

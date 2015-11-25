@@ -16,6 +16,7 @@ package com.github.dm.jrt.function;
 import com.github.dm.jrt.builder.ConfigurableBuilder;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.invocation.FilterInvocation;
+import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
@@ -110,6 +111,19 @@ public interface FunctionalRoutine<IN, OUT>
     @NotNull
     <AFTER> FunctionalRoutine<IN, AFTER> thenAsyncMap(
             @NotNull Function<? super OUT, AFTER> function);
+
+    /**
+     * Concatenates a functional routine based on the specified factory to this one.
+     * <p/>
+     * Note that the created routine will be invoked in an asynchronous mode.
+     *
+     * @param factory the invocation factory.
+     * @param <AFTER> the concatenation output type.
+     * @return the concatenated functional routine.
+     */
+    @NotNull
+    <AFTER> FunctionalRoutine<IN, AFTER> thenAsyncMap(
+            @NotNull InvocationFactory<? super OUT, AFTER> factory);
 
     /**
      * Concatenates a functional routine based on the specified instance to this one.
@@ -232,6 +246,19 @@ public interface FunctionalRoutine<IN, OUT>
             @NotNull Function<? super OUT, AFTER> function);
 
     /**
+     * Concatenates a functional routine based on the specified factory to this one.
+     * <p/>
+     * Note that the created routine will be invoked in a parallel mode.
+     *
+     * @param factory the invocation factory.
+     * @param <AFTER> the concatenation output type.
+     * @return the concatenated functional routine.
+     */
+    @NotNull
+    <AFTER> FunctionalRoutine<IN, AFTER> thenParallelMap(
+            @NotNull InvocationFactory<? super OUT, AFTER> factory);
+
+    /**
      * Concatenates a functional routine based on the specified instance to this one.
      * <p/>
      * Note that the passed routine will be invoked in a parallel mode.
@@ -315,6 +342,19 @@ public interface FunctionalRoutine<IN, OUT>
     @NotNull
     <AFTER> FunctionalRoutine<IN, AFTER> thenSyncMap(
             @NotNull Function<? super OUT, AFTER> function);
+
+    /**
+     * Concatenates a functional routine based on the specified factory to this one.
+     * <p/>
+     * Note that the created routine will be invoked in a synchronous mode.
+     *
+     * @param factory the invocation factory.
+     * @param <AFTER> the concatenation output type.
+     * @return the concatenated functional routine.
+     */
+    @NotNull
+    <AFTER> FunctionalRoutine<IN, AFTER> thenSyncMap(
+            @NotNull InvocationFactory<? super OUT, AFTER> factory);
 
     /**
      * Concatenates a functional routine based on the specified instance to this one.

@@ -17,6 +17,7 @@ import com.github.dm.jrt.builder.ConfigurableBuilder;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.invocation.CommandInvocation;
 import com.github.dm.jrt.invocation.FilterInvocation;
+import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
@@ -140,6 +141,19 @@ public interface FunctionalRoutineBuilder extends ConfigurableBuilder<Functional
     <IN, OUT> FunctionalRoutine<IN, OUT> thenAsyncMap(@NotNull Function<? super IN, OUT> function);
 
     /**
+     * Concatenates a functional routine based on the specified factory.
+     * <p/>
+     * Note that the created routine will be invoked in an asynchronous mode.
+     *
+     * @param factory the invocation factory.
+     * @param <IN>    the input data type.
+     * @param <OUT>   the output data type.
+     * @return the concatenated functional routine.
+     */
+    @NotNull
+    <IN, OUT> FunctionalRoutine<IN, OUT> thenAsyncMap(@NotNull InvocationFactory<IN, OUT> factory);
+
+    /**
      * Concatenates a functional routine based on the specified instance.
      * <p/>
      * Note that the passed routine will be invoked in an asynchronous mode.
@@ -241,6 +255,20 @@ public interface FunctionalRoutineBuilder extends ConfigurableBuilder<Functional
             @NotNull Function<? super IN, OUT> function);
 
     /**
+     * Concatenates a functional routine based on the specified factory.
+     * <p/>
+     * Note that the created routine will be invoked in a parallel mode.
+     *
+     * @param factory the invocation factory.
+     * @param <IN>    the input data type.
+     * @param <OUT>   the output data type.
+     * @return the concatenated functional routine.
+     */
+    @NotNull
+    <IN, OUT> FunctionalRoutine<IN, OUT> thenParallelMap(
+            @NotNull InvocationFactory<IN, OUT> factory);
+
+    /**
      * Concatenates a functional routine based on the specified instance.
      * <p/>
      * Note that the passed routine will be invoked in a parallel mode.
@@ -327,6 +355,19 @@ public interface FunctionalRoutineBuilder extends ConfigurableBuilder<Functional
      */
     @NotNull
     <IN, OUT> FunctionalRoutine<IN, OUT> thenSyncMap(@NotNull Function<? super IN, OUT> function);
+
+    /**
+     * Concatenates a functional routine based on the specified factory.
+     * <p/>
+     * Note that the created routine will be invoked in a synchronous mode.
+     *
+     * @param factory the invocation factory.
+     * @param <IN>    the input data type.
+     * @param <OUT>   the output data type.
+     * @return the concatenated functional routine.
+     */
+    @NotNull
+    <IN, OUT> FunctionalRoutine<IN, OUT> thenSyncMap(@NotNull InvocationFactory<IN, OUT> factory);
 
     /**
      * Concatenates a functional routine based on the specified instance.

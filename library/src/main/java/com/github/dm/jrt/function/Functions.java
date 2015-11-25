@@ -896,6 +896,13 @@ public class Functions {
 
         @NotNull
         public <IN, OUT> FunctionalRoutine<IN, OUT> thenAsyncMap(
+                @NotNull final InvocationFactory<IN, OUT> factory) {
+
+            return fromFactory(factory, DelegationType.ASYNC);
+        }
+
+        @NotNull
+        public <IN, OUT> FunctionalRoutine<IN, OUT> thenAsyncMap(
                 @NotNull final Routine<IN, OUT> routine) {
 
             return new DefaultFunctionalRoutine<IN, OUT>(routine, DelegationType.ASYNC);
@@ -946,6 +953,13 @@ public class Functions {
 
         @NotNull
         public <IN, OUT> FunctionalRoutine<IN, OUT> thenParallelMap(
+                @NotNull final InvocationFactory<IN, OUT> factory) {
+
+            return fromFactory(factory, DelegationType.PARALLEL);
+        }
+
+        @NotNull
+        public <IN, OUT> FunctionalRoutine<IN, OUT> thenParallelMap(
                 @NotNull final Routine<IN, OUT> routine) {
 
             return new DefaultFunctionalRoutine<IN, OUT>(routine, DelegationType.PARALLEL);
@@ -984,6 +998,13 @@ public class Functions {
                 @NotNull final Function<? super IN, OUT> function) {
 
             return fromFactory(functionFilter(function), DelegationType.SYNC);
+        }
+
+        @NotNull
+        public <IN, OUT> FunctionalRoutine<IN, OUT> thenSyncMap(
+                @NotNull final InvocationFactory<IN, OUT> factory) {
+
+            return fromFactory(factory, DelegationType.SYNC);
         }
 
         @NotNull

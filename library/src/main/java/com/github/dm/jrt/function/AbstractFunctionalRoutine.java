@@ -112,6 +112,13 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
 
     @NotNull
     public <AFTER> FunctionalRoutine<IN, AFTER> thenAsyncMap(
+            @NotNull final InvocationFactory<? super OUT, AFTER> factory) {
+
+        return fromFactory(factory, DelegationType.ASYNC);
+    }
+
+    @NotNull
+    public <AFTER> FunctionalRoutine<IN, AFTER> thenAsyncMap(
             @NotNull final Routine<? super OUT, AFTER> routine) {
 
         return andThen(routine, DelegationType.ASYNC);
@@ -170,6 +177,13 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
 
     @NotNull
     public <AFTER> FunctionalRoutine<IN, AFTER> thenParallelMap(
+            @NotNull final InvocationFactory<? super OUT, AFTER> factory) {
+
+        return fromFactory(factory, DelegationType.PARALLEL);
+    }
+
+    @NotNull
+    public <AFTER> FunctionalRoutine<IN, AFTER> thenParallelMap(
             @NotNull final Routine<? super OUT, AFTER> routine) {
 
         return andThen(routine, DelegationType.PARALLEL);
@@ -209,6 +223,13 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
             @NotNull final Function<? super OUT, AFTER> function) {
 
         return fromFactory(functionFilter(function), DelegationType.SYNC);
+    }
+
+    @NotNull
+    public <AFTER> FunctionalRoutine<IN, AFTER> thenSyncMap(
+            @NotNull final InvocationFactory<? super OUT, AFTER> factory) {
+
+        return fromFactory(factory, DelegationType.SYNC);
     }
 
     @NotNull

@@ -20,6 +20,7 @@ import com.github.dm.jrt.core.JRoutine;
 import com.github.dm.jrt.invocation.CommandInvocation;
 import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.invocation.InvocationFactory;
+import com.github.dm.jrt.invocation.Invocations;
 import com.github.dm.jrt.invocation.PassingInvocation;
 import com.github.dm.jrt.routine.Routine;
 
@@ -1284,7 +1285,7 @@ public class FunctionalRoutineTest {
     @Test
     public void testMapFactory() {
 
-        final UpperCase factory = new UpperCase();
+        final InvocationFactory<String, String> factory = Invocations.factoryOf(UpperCase.class);
         assertThat(Functions.functional()
                             .invocations()
                             .withOutputOrder(OrderType.BY_CALL)

@@ -882,13 +882,6 @@ public class Functions {
 
         @NotNull
         public <IN, OUT> FunctionalRoutine<IN, OUT> thenAsyncMap(
-                @NotNull final FilterInvocation<IN, OUT> invocation) {
-
-            return fromFactory(invocation, DelegationType.ASYNC);
-        }
-
-        @NotNull
-        public <IN, OUT> FunctionalRoutine<IN, OUT> thenAsyncMap(
                 @NotNull final Function<? super IN, OUT> function) {
 
             return fromFactory(functionFilter(function), DelegationType.ASYNC);
@@ -939,13 +932,6 @@ public class Functions {
 
         @NotNull
         public <IN, OUT> FunctionalRoutine<IN, OUT> thenParallelMap(
-                @NotNull final FilterInvocation<IN, OUT> invocation) {
-
-            return fromFactory(invocation, DelegationType.PARALLEL);
-        }
-
-        @NotNull
-        public <IN, OUT> FunctionalRoutine<IN, OUT> thenParallelMap(
                 @NotNull final Function<? super IN, OUT> function) {
 
             return fromFactory(functionFilter(function), DelegationType.PARALLEL);
@@ -984,13 +970,6 @@ public class Functions {
                 @NotNull final BiConsumer<? super IN, ? super ResultChannel<OUT>> consumer) {
 
             return fromFactory(consumerFilter(consumer), DelegationType.SYNC);
-        }
-
-        @NotNull
-        public <IN, OUT> FunctionalRoutine<IN, OUT> thenSyncMap(
-                @NotNull final FilterInvocation<IN, OUT> invocation) {
-
-            return fromFactory(invocation, DelegationType.SYNC);
         }
 
         @NotNull

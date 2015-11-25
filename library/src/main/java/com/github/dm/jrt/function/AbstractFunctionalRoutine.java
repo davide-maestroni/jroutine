@@ -20,7 +20,6 @@ import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.core.AbstractRoutine;
 import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.core.JRoutine;
-import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.routine.Routine;
 
@@ -98,13 +97,6 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
 
     @NotNull
     public <AFTER> FunctionalRoutine<IN, AFTER> thenAsyncMap(
-            @NotNull final FilterInvocation<? super OUT, AFTER> invocation) {
-
-        return fromFactory(invocation, DelegationType.ASYNC);
-    }
-
-    @NotNull
-    public <AFTER> FunctionalRoutine<IN, AFTER> thenAsyncMap(
             @NotNull final Function<? super OUT, AFTER> function) {
 
         return fromFactory(functionFilter(function), DelegationType.ASYNC);
@@ -163,13 +155,6 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
 
     @NotNull
     public <AFTER> FunctionalRoutine<IN, AFTER> thenParallelMap(
-            @NotNull final FilterInvocation<? super OUT, AFTER> invocation) {
-
-        return fromFactory(invocation, DelegationType.PARALLEL);
-    }
-
-    @NotNull
-    public <AFTER> FunctionalRoutine<IN, AFTER> thenParallelMap(
             @NotNull final Function<? super OUT, AFTER> function) {
 
         return fromFactory(functionFilter(function), DelegationType.PARALLEL);
@@ -209,13 +194,6 @@ abstract class AbstractFunctionalRoutine<IN, OUT> extends AbstractRoutine<IN, OU
             @NotNull final BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer) {
 
         return fromFactory(consumerFilter(consumer), DelegationType.SYNC);
-    }
-
-    @NotNull
-    public <AFTER> FunctionalRoutine<IN, AFTER> thenSyncMap(
-            @NotNull final FilterInvocation<? super OUT, AFTER> invocation) {
-
-        return fromFactory(invocation, DelegationType.SYNC);
     }
 
     @NotNull

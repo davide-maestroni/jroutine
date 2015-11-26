@@ -1082,7 +1082,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
     @LoaderProxy(TestClassInterface.class)
     public interface TestInterfaceProxy {
 
-        @ReadTimeout(3000)
+        @ReadTimeout(10000)
         @Output
         OutputChannel<Integer> getOne();
     }
@@ -1107,55 +1107,55 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
             classPackage = "com.github.dm.jrt.android.proxy")
     public interface TestProxy {
 
-        @ReadTimeout(3000)
+        @ReadTimeout(10000)
         @Invoke(InvocationMode.PARALLEL)
         @Output
         Iterable<Iterable> getList(@Input(value = List.class,
                 mode = InputMode.ELEMENT) List<? extends List<String>> i);
 
-        @ReadTimeout(3000)
+        @ReadTimeout(10000)
         @Output
         OutputChannel<Integer> getOne();
 
-        @ReadTimeout(3000)
+        @ReadTimeout(10000)
         @Invoke(InvocationMode.PARALLEL)
         String getString(@Input(value = int.class, mode = InputMode.ELEMENT) int... i);
 
-        @ReadTimeout(3000)
+        @ReadTimeout(10000)
         @Invoke(InvocationMode.PARALLEL)
         @Output
         OutputChannel<String> getString(
                 @Input(value = int.class, mode = InputMode.ELEMENT) HashSet<Integer> i);
 
-        @ReadTimeout(3000)
+        @ReadTimeout(10000)
         @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.COLLECTION)
         List<String> getString(@Input(value = int.class, mode = InputMode.ELEMENT) List<Integer> i);
 
-        @ReadTimeout(3000)
+        @ReadTimeout(10000)
         @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.COLLECTION)
         Iterable<String> getString(
                 @Input(value = int.class, mode = InputMode.ELEMENT) Iterable<Integer> i);
 
-        @ReadTimeout(3000)
+        @ReadTimeout(10000)
         @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.COLLECTION)
         String[] getString(
                 @Input(value = int.class, mode = InputMode.ELEMENT) Collection<Integer> i);
 
-        @ReadTimeout(3000)
+        @ReadTimeout(10000)
         String getString(@Input(int.class) OutputChannel<Integer> i);
     }
 
     @LoaderProxy(TestClass.class)
     public interface TestStatic {
 
-        @ReadTimeout(3000)
+        @ReadTimeout(10000)
         @Output
         OutputChannel<Integer> getOne();
 
-        @ReadTimeout(3000)
+        @ReadTimeout(10000)
         @Output
         OutputChannel<Integer> getTwo();
     }

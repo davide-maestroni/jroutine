@@ -27,6 +27,7 @@ dependencies {
 }
 conditionalDependencies {
     compile name: 'processor', artifact: { "${it.parent.name}-${it.name}" }
+    compile name: 'library', artifact: { it.parent.name }
 }
 
 jacocoTestReport {

@@ -24,7 +24,6 @@ import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.core.DefaultResultChannel.AbortHandler;
 import com.github.dm.jrt.core.InvocationExecution.InputIterator;
-import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.runner.Execution;
@@ -382,59 +381,6 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
             mInputCount -= count;
             throw new InvocationInterruptedException(e);
         }
-    }
-
-    /**
-     * Interface defining an object managing the creation and the recycling of invocation instances.
-     *
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
-     */
-    interface InvocationManager<IN, OUT> {
-
-        /**
-         * Creates a new invocation instance.
-         *
-         * @param observer the invocation observer.
-         */
-        void create(@NotNull InvocationObserver<IN, OUT> observer);
-
-        /**
-         * Discards the specified invocation.
-         *
-         * @param invocation the invocation instance.
-         */
-        void discard(@NotNull Invocation<IN, OUT> invocation);
-
-        /**
-         * Recycles the specified invocation.
-         *
-         * @param invocation the invocation instance.
-         */
-        void recycle(@NotNull Invocation<IN, OUT> invocation);
-    }
-
-    /**
-     * Interface defining an observer of invocation instances.
-     *
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
-     */
-    interface InvocationObserver<IN, OUT> {
-
-        /**
-         * Called when a new invocation instances is available.
-         *
-         * @param invocation the invocation.
-         */
-        void onCreate(@NotNull Invocation<IN, OUT> invocation);
-
-        /**
-         * Called when an error occurs during the invocation instantiation.
-         *
-         * @param error the error.
-         */
-        void onError(@NotNull Throwable error);
     }
 
     /**

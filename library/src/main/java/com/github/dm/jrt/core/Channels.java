@@ -1259,7 +1259,7 @@ public class Channels {
             }
         }
 
-        protected void flush() {
+        private void flush() {
 
             final IOChannel<List<? extends OUT>, List<? extends OUT>> channel = mChannel;
             final SimpleQueue<OUT>[] queues = mQueues;

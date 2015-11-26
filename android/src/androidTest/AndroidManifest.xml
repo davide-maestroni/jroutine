@@ -3,7 +3,7 @@
 
     <application
         android:name=".app.TestApp"
-        android:label="@string/lib_name">
+        android:label="jroutine-android">
         <activity
             android:name="com.github.dm.jrt.android.core.TestActivity"
             android:label="test">

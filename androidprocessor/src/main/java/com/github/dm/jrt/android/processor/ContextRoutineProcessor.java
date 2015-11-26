@@ -228,8 +228,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
     @NotNull
     @SuppressWarnings("unchecked")
-    private String buildInvocationOptions(@NotNull final ExecutableElement methodElement) throws
-            IOException {
+    private String buildInvocationOptions(@NotNull final ExecutableElement methodElement) {
 
         // We need to avoid explicit dependency on the android module...
         final StringBuilder builder = new StringBuilder();

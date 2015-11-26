@@ -18,6 +18,7 @@ import com.github.dm.jrt.util.Reflection;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -30,30 +31,53 @@ import java.util.List;
  */
 public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2> {
 
+    private static final BiConsumerWrapper<Object, Object> sBiSink =
+            new BiConsumerWrapper<Object, Object>(new BiConsumer<Object, Object>() {
+
+                public void accept(final Object in1, final Object in2) {}
+            });
+
     private final List<BiConsumer<?, ?>> mConsumers;
+
+    /**
+     * Constructor.
+     *
+     * @param consumer the wrapped consumer.
+     */
+    @SuppressWarnings("ConstantConditions")
+    BiConsumerWrapper(@NotNull final BiConsumer<?, ?> consumer) {
+
+        this(Collections.<BiConsumer<?, ?>>singletonList(consumer));
+
+        if (consumer == null) {
+
+            throw new NullPointerException("the consumer instance must not be null");
+        }
+    }
 
     /**
      * Constructor.
      *
      * @param consumers the list of wrapped consumers.
      */
-    BiConsumerWrapper(@NotNull final List<BiConsumer<?, ?>> consumers) {
-
-        if (consumers.isEmpty()) {
-
-            throw new IllegalArgumentException("the list of consumers must not be empty");
-        }
+    private BiConsumerWrapper(@NotNull final List<BiConsumer<?, ?>> consumers) {
 
         mConsumers = consumers;
     }
 
+    /**
+     * Returns a bi-consumer wrapper just discarding the passed inputs.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN1> the first input data type.
+     * @param <IN2> the second input data type.
+     * @return the bi-consumer wrapper.
+     */
+    @NotNull
     @SuppressWarnings("unchecked")
-    public void accept(final IN1 in1, final IN2 in2) {
+    public static <IN1, IN2> BiConsumerWrapper<IN1, IN2> biSink() {
 
-        for (final BiConsumer<?, ?> consumer : mConsumers) {
-
-            ((BiConsumer<Object, Object>) consumer).accept(in1, in2);
-        }
+        return (BiConsumerWrapper<IN1, IN2>) sBiSink;
     }
 
     /**
@@ -106,14 +130,7 @@ public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2> {
     @Override
     public int hashCode() {
 
-        int result = 0;
-
-        for (final BiConsumer<?, ?> consumer : mConsumers) {
-
-            result = 31 * result + consumer.getClass().hashCode();
-        }
-
-        return result;
+        return mConsumers.hashCode();
     }
 
     @Override
@@ -130,23 +147,15 @@ public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2> {
         }
 
         final BiConsumerWrapper<?, ?> that = (BiConsumerWrapper<?, ?>) o;
-        final List<BiConsumer<?, ?>> thisConsumers = mConsumers;
-        final List<BiConsumer<?, ?>> thatConsumers = that.mConsumers;
-        final int size = thisConsumers.size();
+        return mConsumers.equals(that.mConsumers);
+    }
 
-        if (size != thatConsumers.size()) {
+    @SuppressWarnings("unchecked")
+    public void accept(final IN1 in1, final IN2 in2) {
 
-            return false;
+        for (final BiConsumer<?, ?> consumer : mConsumers) {
+
+            ((BiConsumer<Object, Object>) consumer).accept(in1, in2);
         }
-
-        for (int i = 0; i < size; ++i) {
-
-            if (thisConsumers.get(i).getClass() != thatConsumers.get(i).getClass()) {
-
-                return false;
-            }
-        }
-
-        return true;
     }
 }

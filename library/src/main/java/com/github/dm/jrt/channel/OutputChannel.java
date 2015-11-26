@@ -16,6 +16,7 @@ package com.github.dm.jrt.channel;
 import com.github.dm.jrt.util.TimeDuration;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -76,6 +77,7 @@ public interface OutputChannel<OUT> extends Channel, Iterator<OUT>, Iterable<OUT
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      * @see #immediately()
      * @see #eventuallyAbort()
+     * @see #eventuallyAbort(Throwable)
      * @see #eventuallyExit()
      * @see #eventuallyThrow()
      */
@@ -99,6 +101,7 @@ public interface OutputChannel<OUT> extends Channel, Iterator<OUT>, Iterable<OUT
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      * @see #immediately()
      * @see #eventuallyAbort()
+     * @see #eventuallyAbort(Throwable)
      * @see #eventuallyExit()
      * @see #eventuallyThrow()
      */
@@ -126,11 +129,31 @@ public interface OutputChannel<OUT> extends Channel, Iterator<OUT>, Iterable<OUT
      * @see #afterMax(TimeDuration)
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      * @see #immediately()
+     * @see #eventuallyAbort(Throwable)
      * @see #eventuallyExit()
      * @see #eventuallyThrow()
      */
     @NotNull
     OutputChannel<OUT> eventuallyAbort();
+
+    /**
+     * Tells the channel to abort the invocation execution in case no result is available before
+     * the timeout has elapsed.
+     * <p/>
+     * By default an {@link com.github.dm.jrt.channel.ExecutionTimeoutException
+     * ExecutionTimeoutException} exception will be thrown.
+     *
+     * @param reason the throwable object identifying the reason of the invocation abortion.
+     * @return this channel.
+     * @see #afterMax(TimeDuration)
+     * @see #afterMax(long, java.util.concurrent.TimeUnit)
+     * @see #immediately()
+     * @see #eventuallyAbort()
+     * @see #eventuallyExit()
+     * @see #eventuallyThrow()
+     */
+    @NotNull
+    OutputChannel<OUT> eventuallyAbort(@Nullable Throwable reason);
 
     /**
      * Tells the channel to break execution in case no result is available before the timeout has
@@ -144,6 +167,7 @@ public interface OutputChannel<OUT> extends Channel, Iterator<OUT>, Iterable<OUT
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      * @see #immediately()
      * @see #eventuallyAbort()
+     * @see #eventuallyAbort(Throwable)
      * @see #eventuallyThrow()
      */
     @NotNull
@@ -160,6 +184,7 @@ public interface OutputChannel<OUT> extends Channel, Iterator<OUT>, Iterable<OUT
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      * @see #immediately()
      * @see #eventuallyAbort()
+     * @see #eventuallyAbort(Throwable)
      * @see #eventuallyExit()
      */
     @NotNull
@@ -180,6 +205,7 @@ public interface OutputChannel<OUT> extends Channel, Iterator<OUT>, Iterable<OUT
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      * @see #immediately()
      * @see #eventuallyAbort()
+     * @see #eventuallyAbort(Throwable)
      * @see #eventuallyExit()
      * @see #eventuallyThrow()
      */
@@ -205,6 +231,7 @@ public interface OutputChannel<OUT> extends Channel, Iterator<OUT>, Iterable<OUT
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      * @see #immediately()
      * @see #eventuallyAbort()
+     * @see #eventuallyAbort(Throwable)
      * @see #eventuallyExit()
      * @see #eventuallyThrow()
      */
@@ -245,6 +272,7 @@ public interface OutputChannel<OUT> extends Channel, Iterator<OUT>, Iterable<OUT
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      * @see #immediately()
      * @see #eventuallyAbort()
+     * @see #eventuallyAbort(Throwable)
      * @see #eventuallyExit()
      * @see #eventuallyThrow()
      */
@@ -293,6 +321,7 @@ public interface OutputChannel<OUT> extends Channel, Iterator<OUT>, Iterable<OUT
      * @see #afterMax(long, java.util.concurrent.TimeUnit)
      * @see #immediately()
      * @see #eventuallyAbort()
+     * @see #eventuallyAbort(Throwable)
      * @see #eventuallyExit()
      * @see #eventuallyThrow()
      */

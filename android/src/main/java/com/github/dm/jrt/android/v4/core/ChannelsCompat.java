@@ -73,7 +73,7 @@ public class ChannelsCompat extends Channels {
 
         final IOChannel<Selectable<? extends IN>, Selectable<? extends IN>> ioChannel =
                 JRoutineCompat.io().buildChannel();
-        ioChannel.passTo(new SortingInputMapConsumer(channelMap));
+        ioChannel.passTo(new SortingMapOutputConsumer(channelMap));
         return ioChannel;
     }
 
@@ -228,7 +228,7 @@ public class ChannelsCompat extends Channels {
             outputMap.put(index, ioChannel);
         }
 
-        channel.passTo(new SortingOutputMapConsumer<OUT>(inputMap));
+        channel.passTo(new SortingMapOutputConsumer<OUT>(inputMap));
         return outputMap;
     }
 
@@ -267,7 +267,7 @@ public class ChannelsCompat extends Channels {
             outputMap.put(integer, ioChannel);
         }
 
-        channel.passTo(new SortingOutputMapConsumer<OUT>(inputMap));
+        channel.passTo(new SortingMapOutputConsumer<OUT>(inputMap));
         return outputMap;
     }
 
@@ -298,69 +298,16 @@ public class ChannelsCompat extends Channels {
             outputMap.put(index, ioChannel);
         }
 
-        channel.passTo(new SortingOutputMapConsumer<OUT>(inputMap));
+        channel.passTo(new SortingMapOutputConsumer<OUT>(inputMap));
         return outputMap;
     }
 
     /**
-     * Output consumer sorting selectable inputs among a map of input channels.
-     */
-    private static class SortingInputMapConsumer implements OutputConsumer<Selectable<?>> {
-
-        private final SparseArrayCompat<IOChannel<?, ?>> mChannels;
-
-        /**
-         * Constructor.
-         *
-         * @param channels the map of indexes and input channels.
-         */
-        private SortingInputMapConsumer(
-                @NotNull final SparseArrayCompat<IOChannel<?, ?>> channels) {
-
-            mChannels = channels;
-        }
-
-        public void onComplete() {
-
-            final SparseArrayCompat<IOChannel<?, ?>> channels = mChannels;
-            final int size = channels.size();
-
-            for (int i = 0; i < size; ++i) {
-
-                channels.valueAt(i).close();
-            }
-        }
-
-        public void onError(@Nullable final RoutineException error) {
-
-            final SparseArrayCompat<IOChannel<?, ?>> channels = mChannels;
-            final int size = channels.size();
-
-            for (int i = 0; i < size; ++i) {
-
-                channels.valueAt(i).abort(error);
-            }
-        }
-
-        @SuppressWarnings("unchecked")
-        public void onOutput(final Selectable<?> selectable) {
-
-            final IOChannel<Object, Object> inputChannel =
-                    (IOChannel<Object, Object>) mChannels.get(selectable.index);
-
-            if (inputChannel != null) {
-
-                inputChannel.pass(selectable.data);
-            }
-        }
-    }
-
-    /**
-     * Output consumer sorting the output data among a map of output channels.
+     * Output consumer sorting the output data among a map of channels.
      *
      * @param <OUT> the output data type.
      */
-    private static class SortingOutputMapConsumer<OUT>
+    private static class SortingMapOutputConsumer<OUT>
             implements OutputConsumer<ParcelableSelectable<? extends OUT>> {
 
         private final SparseArrayCompat<IOChannel<OUT, OUT>> mChannels;
@@ -370,7 +317,7 @@ public class ChannelsCompat extends Channels {
          *
          * @param channels the map of indexes and I/O channels.
          */
-        private SortingOutputMapConsumer(
+        private SortingMapOutputConsumer(
                 @NotNull final SparseArrayCompat<IOChannel<OUT, OUT>> channels) {
 
             mChannels = channels;

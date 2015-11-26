@@ -28,6 +28,24 @@ import org.jetbrains.annotations.NotNull;
  */
 public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OUT> {
 
+    private static final BiFunctionWrapper<Object, Object, Object> sFirst =
+            new BiFunctionWrapper<Object, Object, Object>(new BiFunction<Object, Object, Object>() {
+
+                public Object apply(final Object in1, final Object in2) {
+
+                    return in1;
+                }
+            });
+
+    private static final BiFunctionWrapper<Object, Object, Object> sSecond =
+            new BiFunctionWrapper<Object, Object, Object>(new BiFunction<Object, Object, Object>() {
+
+                public Object apply(final Object in1, final Object in2) {
+
+                    return in2;
+                }
+            });
+
     private final BiFunction<IN1, IN2, ?> mBiFunction;
 
     private final FunctionWrapper<?, OUT> mFunction;
@@ -35,25 +53,60 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
     /**
      * Constructor.
      *
-     * @param biFunction the initial wrapped supplier.
-     * @param function   the concatenated function chain.
+     * @param biFunction the wrapped supplier.
      */
     @SuppressWarnings("ConstantConditions")
-    BiFunctionWrapper(@NotNull final BiFunction<IN1, IN2, ?> biFunction,
-            @NotNull final FunctionWrapper<?, OUT> function) {
+    BiFunctionWrapper(@NotNull final BiFunction<IN1, IN2, ?> biFunction) {
+
+        this(biFunction, FunctionWrapper.<OUT>identity());
 
         if (biFunction == null) {
 
             throw new NullPointerException("the bi-function instance must not be null");
         }
+    }
 
-        if (function == null) {
-
-            throw new NullPointerException("the function wrapper must not be null");
-        }
+    /**
+     * Constructor.
+     *
+     * @param biFunction the initial wrapped supplier.
+     * @param function   the concatenated function chain.
+     */
+    private BiFunctionWrapper(@NotNull final BiFunction<IN1, IN2, ?> biFunction,
+            @NotNull final FunctionWrapper<?, OUT> function) {
 
         mBiFunction = biFunction;
         mFunction = function;
+    }
+
+    /**
+     * Returns a bi-function wrapper just returning the first passed argument.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN1> the first input data type.
+     * @param <IN2> the second input data type.
+     * @return the bi-function wrapper.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <IN1, IN2> BiFunctionWrapper<IN1, IN2, IN1> first() {
+
+        return (BiFunctionWrapper<IN1, IN2, IN1>) sFirst;
+    }
+
+    /**
+     * Returns a bi-function wrapper just returning the second passed argument.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN1> the first input data type.
+     * @param <IN2> the second input data type.
+     * @return the bi-function wrapper.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <IN1, IN2> BiFunctionWrapper<IN1, IN2, IN2> second() {
+
+        return (BiFunctionWrapper<IN1, IN2, IN2>) sSecond;
     }
 
     /**
@@ -71,12 +124,6 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
         return new BiFunctionWrapper<IN1, IN2, AFTER>(mBiFunction, mFunction.andThen(after));
     }
 
-    @SuppressWarnings("unchecked")
-    public OUT apply(final IN1 in1, final IN2 in2) {
-
-        return ((FunctionWrapper<Object, OUT>) mFunction).apply(mBiFunction.apply(in1, in2));
-    }
-
     /**
      * Checks if the functions wrapped by this instance have a static context.
      *
@@ -91,7 +138,7 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
     @Override
     public int hashCode() {
 
-        int result = mBiFunction.getClass().hashCode();
+        int result = mBiFunction.hashCode();
         result = 31 * result + mFunction.hashCode();
         return result;
     }
@@ -110,7 +157,12 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
         }
 
         final BiFunctionWrapper<?, ?, ?> that = (BiFunctionWrapper<?, ?, ?>) o;
-        return (mBiFunction.getClass() == that.mBiFunction.getClass()) && mFunction.equals(
-                that.mFunction);
+        return mBiFunction.equals(that.mBiFunction) && mFunction.equals(that.mFunction);
+    }
+
+    @SuppressWarnings("unchecked")
+    public OUT apply(final IN1 in1, final IN2 in2) {
+
+        return ((FunctionWrapper<Object, OUT>) mFunction).apply(mBiFunction.apply(in1, in2));
     }
 }

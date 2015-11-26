@@ -11,15 +11,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.dm.jrt.invocation;
+package com.github.dm.jrt.core;
 
-import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
+import com.github.dm.jrt.channel.StreamingChannel;
+import com.github.dm.jrt.invocation.Invocation;
+import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import static com.github.dm.jrt.core.Channels.asyncStream;
+import static com.github.dm.jrt.core.Channels.parallelStream;
+import static com.github.dm.jrt.core.Channels.syncStream;
 
 /**
  * Invocation implementation delegating the execution to another routine.
@@ -35,7 +41,7 @@ public class DelegatingInvocation<IN, OUT> implements Invocation<IN, OUT> {
 
     private final Routine<IN, OUT> mRoutine;
 
-    private InvocationChannel<IN, OUT> mChannel;
+    private StreamingChannel<IN, OUT> mChannel;
 
     /**
      * Constructor.
@@ -92,19 +98,33 @@ public class DelegatingInvocation<IN, OUT> implements Invocation<IN, OUT> {
     public void onInitialize() {
 
         final DelegationType delegationType = mDelegationType;
-        mChannel = (delegationType == DelegationType.SYNC) ? mRoutine.syncInvoke()
-                : (delegationType == DelegationType.ASYNC) ? mRoutine.asyncInvoke()
-                        : mRoutine.parallelInvoke();
+        mChannel = (delegationType == DelegationType.ASYNC) ? asyncStream(mRoutine)
+                : (delegationType == DelegationType.PARALLEL) ? parallelStream(mRoutine)
+                        : syncStream(mRoutine);
     }
 
     public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
 
-        mChannel.pass(input);
+        final StreamingChannel<IN, OUT> channel = mChannel;
+
+        if (!channel.isBound()) {
+
+            channel.passTo(result);
+        }
+
+        channel.pass(input);
     }
 
     public void onResult(@NotNull final ResultChannel<OUT> result) {
 
-        result.pass(mChannel.result());
+        final StreamingChannel<IN, OUT> channel = mChannel;
+
+        if (!channel.isBound()) {
+
+            channel.passTo(result);
+        }
+
+        channel.close();
     }
 
     public void onTerminate() {

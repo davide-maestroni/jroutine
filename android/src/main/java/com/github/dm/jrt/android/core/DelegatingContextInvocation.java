@@ -11,13 +11,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.dm.jrt.android.invocation;
+package com.github.dm.jrt.android.core;
 
 import android.content.Context;
 
+import com.github.dm.jrt.android.invocation.FunctionContextInvocation;
+import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
 import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.invocation.DelegatingInvocation.DelegationType;
+import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
@@ -96,9 +98,9 @@ public class DelegatingContextInvocation<IN, OUT> extends FunctionContextInvocat
 
         final DelegationType delegationType = mDelegationType;
         final OutputChannel<OUT> channel =
-                (delegationType == DelegationType.SYNC) ? mRoutine.syncCall(inputs)
-                        : (delegationType == DelegationType.ASYNC) ? mRoutine.asyncCall(inputs)
-                                : mRoutine.parallelCall(inputs);
+                (delegationType == DelegationType.ASYNC) ? mRoutine.asyncCall(inputs)
+                        : (delegationType == DelegationType.PARALLEL) ? mRoutine.parallelCall(
+                                inputs) : mRoutine.syncCall(inputs);
         result.pass(channel);
     }
 

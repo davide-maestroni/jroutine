@@ -39,13 +39,13 @@ import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.RoutineException;
-import com.github.dm.jrt.core.TemplateRoutine;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.log.Log;
 import com.github.dm.jrt.log.Log.Level;
 import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.routine.Routine;
+import com.github.dm.jrt.routine.TemplateRoutine;
 import com.github.dm.jrt.runner.TemplateExecution;
 import com.github.dm.jrt.util.TimeDuration;
 
@@ -570,20 +570,22 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
                 mOutMessenger = new Messenger(service);
                 final ServiceConfiguration serviceConfiguration = mServiceConfiguration;
                 final Message message = Message.obtain(null, InvocationService.MSG_INIT);
+                final TargetInvocationFactory<IN, OUT> targetFactory = mTargetFactory;
 
                 if (mIsParallel) {
 
                     logger.dbg("sending parallel invocation message");
-                    putParallelInvocation(message.getData(), mUUID, mTargetFactory,
-                                          mInvocationConfiguration,
+                    putParallelInvocation(message.getData(), mUUID,
+                                          targetFactory.getInvocationClass(),
+                                          targetFactory.getFactoryArgs(), mInvocationConfiguration,
                                           serviceConfiguration.getRunnerClassOr(null),
                                           serviceConfiguration.getLogClassOr(null));
 
                 } else {
 
                     logger.dbg("sending async invocation message");
-                    putAsyncInvocation(message.getData(), mUUID, mTargetFactory,
-                                       mInvocationConfiguration,
+                    putAsyncInvocation(message.getData(), mUUID, targetFactory.getInvocationClass(),
+                                       targetFactory.getFactoryArgs(), mInvocationConfiguration,
                                        serviceConfiguration.getRunnerClassOr(null),
                                        serviceConfiguration.getLogClassOr(null));
                 }

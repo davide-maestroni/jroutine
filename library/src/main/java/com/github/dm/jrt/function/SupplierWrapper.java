@@ -34,24 +34,43 @@ public class SupplierWrapper<OUT> implements Supplier<OUT> {
      * Constructor.
      *
      * @param supplier the initial wrapped supplier.
-     * @param function the concatenated function chain.
      */
     @SuppressWarnings("ConstantConditions")
-    SupplierWrapper(@NotNull final Supplier<?> supplier,
-            @NotNull final FunctionWrapper<?, OUT> function) {
+    SupplierWrapper(@NotNull final Supplier<?> supplier) {
+
+        this(supplier, FunctionWrapper.<OUT>identity());
 
         if (supplier == null) {
 
             throw new NullPointerException("the supplier instance must not be null");
         }
+    }
 
-        if (function == null) {
-
-            throw new NullPointerException("the function chain must not be null");
-        }
+    /**
+     * Constructor.
+     *
+     * @param supplier the initial wrapped supplier.
+     * @param function the concatenated function chain.
+     */
+    private SupplierWrapper(@NotNull final Supplier<?> supplier,
+            @NotNull final FunctionWrapper<?, OUT> function) {
 
         mSupplier = supplier;
         mFunction = function;
+    }
+
+    /**
+     * Returns a supplier wrapper always returning the same result.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param result the result.
+     * @param <OUT>  the output data type.
+     * @return the supplier wrapper.
+     */
+    @NotNull
+    public static <OUT> SupplierWrapper<OUT> constant(final OUT result) {
+
+        return new SupplierWrapper<OUT>(new ConstantSupplier<OUT>(result));
     }
 
     /**
@@ -89,9 +108,57 @@ public class SupplierWrapper<OUT> implements Supplier<OUT> {
     @Override
     public int hashCode() {
 
-        int result = mSupplier.getClass().hashCode();
-        result = 31 * result + mFunction.hashCode();
+        int result = mFunction.hashCode();
+        result = 31 * result + mSupplier.hashCode();
         return result;
+    }
+
+    /**
+     * Supplier implementation returning always the same object.
+     *
+     * @param <OUT> the output data type.
+     */
+    private static class ConstantSupplier<OUT> implements Supplier<OUT> {
+
+        private final OUT mResult;
+
+        /**
+         * Constructor.
+         *
+         * @param result the object to return.
+         */
+        private ConstantSupplier(final OUT result) {
+
+            mResult = result;
+        }
+
+        public OUT get() {
+
+            return mResult;
+        }
+
+        @Override
+        public int hashCode() {
+
+            return mResult != null ? mResult.hashCode() : 0;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if ((o == null) || (getClass() != o.getClass())) {
+
+                return false;
+            }
+
+            final ConstantSupplier<?> that = (ConstantSupplier<?>) o;
+            return (mResult == that.mResult);
+        }
     }
 
     @Override
@@ -108,7 +175,6 @@ public class SupplierWrapper<OUT> implements Supplier<OUT> {
         }
 
         final SupplierWrapper<?> that = (SupplierWrapper<?>) o;
-        return (mSupplier.getClass() == that.mSupplier.getClass()) && mFunction.equals(
-                that.mFunction);
+        return mFunction.equals(that.mFunction) && mSupplier.equals(that.mSupplier);
     }
 }

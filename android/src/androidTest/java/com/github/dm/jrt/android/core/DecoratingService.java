@@ -20,6 +20,7 @@ import com.github.dm.jrt.android.invocation.DecoratingContextInvocationFactory;
 import com.github.dm.jrt.android.service.InvocationService;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Invocation service decorating the invocation factory.
@@ -32,11 +33,13 @@ public class DecoratingService extends InvocationService {
     @Override
     @SuppressWarnings("unchecked")
     public ContextInvocationFactory<?, ?> getInvocationFactory(
-            @NotNull final TargetInvocationFactory<?, ?> target) {
+            @NotNull final Class<? extends ContextInvocation<?, ?>> targetClass,
+            @Nullable final Object... args) {
 
-        final ContextInvocationFactory<?, ?> factory = super.getInvocationFactory(target);
+        final ContextInvocationFactory<?, ?> factory =
+                super.getInvocationFactory(targetClass, args);
 
-        if (StringInvocation.class.isAssignableFrom(target.getInvocationClass())) {
+        if (StringInvocation.class.isAssignableFrom(targetClass)) {
 
             return new TestInvocationFactory((ContextInvocationFactory<String, String>) factory);
         }

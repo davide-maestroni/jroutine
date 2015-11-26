@@ -21,15 +21,19 @@ import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.invocation.PassingInvocation;
 import com.github.dm.jrt.routine.Routine;
+import com.github.dm.jrt.util.ClassToken;
 
 import org.assertj.core.api.Assertions;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.github.dm.jrt.function.Functions.biSink;
+import static com.github.dm.jrt.function.Functions.castTo;
 import static com.github.dm.jrt.function.Functions.constant;
 import static com.github.dm.jrt.function.Functions.consumerCommand;
 import static com.github.dm.jrt.function.Functions.consumerFactory;
@@ -37,7 +41,10 @@ import static com.github.dm.jrt.function.Functions.consumerFilter;
 import static com.github.dm.jrt.function.Functions.functionFactory;
 import static com.github.dm.jrt.function.Functions.functionFilter;
 import static com.github.dm.jrt.function.Functions.identity;
+import static com.github.dm.jrt.function.Functions.isEqual;
+import static com.github.dm.jrt.function.Functions.isInstanceOf;
 import static com.github.dm.jrt.function.Functions.isNull;
+import static com.github.dm.jrt.function.Functions.isSame;
 import static com.github.dm.jrt.function.Functions.negative;
 import static com.github.dm.jrt.function.Functions.notNull;
 import static com.github.dm.jrt.function.Functions.positive;
@@ -253,16 +260,6 @@ public class FunctionsTest {
 
         try {
 
-            new BiConsumerWrapper<Object, Object>(Collections.<BiConsumer<?, ?>>emptyList());
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
             wrapBiConsumer(new TestBiConsumer()).andThen(null);
 
             fail();
@@ -373,17 +370,7 @@ public class FunctionsTest {
 
         try {
 
-            new BiFunctionWrapper<Object, Object, Object>(null, wrapFunction(new TestFunction()));
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new BiFunctionWrapper<Object, Object, Object>(new TestBiFunction(), null);
+            new BiFunctionWrapper<Object, Object, Object>(null);
 
             fail();
 
@@ -424,6 +411,94 @@ public class FunctionsTest {
     }
 
     @Test
+    public void testCastPredicate() {
+
+        final FunctionWrapper<Object, Number> function = castTo(Number.class);
+        function.apply(1);
+        function.apply(3.5);
+
+        try {
+
+            function.apply("test");
+
+            fail();
+
+        } catch (final ClassCastException ignored) {
+
+        }
+
+        assertThat(function.hasStaticContext()).isTrue();
+        final FunctionWrapper<Object, List<String>> function1 =
+                castTo(new ClassToken<List<String>>() {});
+        function1.apply(new ArrayList<String>());
+        function1.apply(new CopyOnWriteArrayList<String>());
+
+        try {
+
+            fail(function1.apply(Arrays.asList(1, 2)).get(0));
+
+        } catch (final ClassCastException ignored) {
+
+        }
+
+        try {
+
+            function1.apply("test");
+
+            fail();
+
+        } catch (final ClassCastException ignored) {
+
+        }
+
+        assertThat(function1.hasStaticContext()).isTrue();
+    }
+
+    @Test
+    public void testCastPredicateEquals() {
+
+        final FunctionWrapper<Object, Number> function = castTo(Number.class);
+        assertThat(function).isEqualTo(function);
+        assertThat(function).isEqualTo(castTo(Number.class));
+        assertThat(function).isNotEqualTo(castTo(String.class));
+        assertThat(function).isNotEqualTo("");
+        assertThat(function.hashCode()).isEqualTo(castTo(Number.class).hashCode());
+        final FunctionWrapper<Object, List<String>> function1 =
+                castTo(new ClassToken<List<String>>() {});
+        assertThat(function1).isEqualTo(function1);
+        assertThat(function1).isEqualTo(castTo(new ClassToken<List<String>>() {}));
+        assertThat(function1).isNotEqualTo(castTo(new ClassToken<String>() {}));
+        assertThat(function1).isNotEqualTo("");
+        assertThat(function1.hashCode()).isEqualTo(
+                castTo(new ClassToken<List<String>>() {}).hashCode());
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testCastPredicateError() {
+
+        try {
+
+            castTo((Class<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            castTo((ClassToken<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
     public void testCommand() {
 
         final Routine<Void, String> routine = JRoutine.on(createCommand()).buildRoutine();
@@ -443,11 +518,10 @@ public class FunctionsTest {
         final InvocationFactory<Void, String> factory = createCommand2();
         final SupplierWrapper<String> constant = constant("test");
         assertThat(factory).isEqualTo(factory);
-        assertThat(factory).isEqualTo(createCommand2());
+        assertThat(factory).isNotEqualTo(createCommand2());
         assertThat(factory).isNotEqualTo(supplierCommand(constant));
         assertThat(factory).isNotEqualTo(createFactory());
         assertThat(factory).isNotEqualTo("");
-        assertThat(factory.hashCode()).isEqualTo(createCommand2().hashCode());
         assertThat(supplierCommand(constant)).isEqualTo(supplierCommand(constant));
         assertThat(supplierCommand(constant).hashCode()).isEqualTo(
                 supplierCommand(constant).hashCode());
@@ -490,11 +564,10 @@ public class FunctionsTest {
         final InvocationFactory<Void, String> factory = createCommand();
         final ConsumerWrapper<ResultChannel<String>> sink = sink();
         assertThat(factory).isEqualTo(factory);
-        assertThat(factory).isEqualTo(createCommand());
+        assertThat(factory).isNotEqualTo(createCommand());
         assertThat(factory).isNotEqualTo(consumerCommand(sink));
         assertThat(factory).isNotEqualTo(createFactory());
         assertThat(factory).isNotEqualTo("");
-        assertThat(factory.hashCode()).isEqualTo(createCommand().hashCode());
         assertThat(consumerCommand(sink)).isEqualTo(consumerCommand(sink));
         assertThat(consumerCommand(sink).hashCode()).isEqualTo(consumerCommand(sink).hashCode());
     }
@@ -531,13 +604,24 @@ public class FunctionsTest {
     }
 
     @Test
-    public void testConstant() {
+    public void testConstantSupplier() {
 
         final TestFunction function = new TestFunction();
         final SupplierWrapper<Object> supplier = constant("test").andThen(function);
         assertThat(supplier.get()).isEqualTo("test");
         assertThat(function.isCalled()).isTrue();
         assertThat(supplier.hasStaticContext()).isTrue();
+    }
+
+    @Test
+    public void testConstantSupplierEquals() {
+
+        final SupplierWrapper<String> supplier = constant("test");
+        assertThat(supplier).isEqualTo(supplier);
+        assertThat(supplier).isEqualTo(constant("test"));
+        assertThat(supplier).isNotEqualTo(constant(1));
+        assertThat(supplier).isNotEqualTo("");
+        assertThat(supplier.hashCode()).isEqualTo(constant("test").hashCode());
     }
 
     @Test
@@ -626,16 +710,6 @@ public class FunctionsTest {
 
         try {
 
-            new ConsumerWrapper<Object>(Collections.<Consumer<?>>emptyList());
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
             wrapConsumer(new TestConsumer()).andThen(null);
 
             fail();
@@ -643,6 +717,31 @@ public class FunctionsTest {
         } catch (final NullPointerException ignored) {
 
         }
+    }
+
+    @Test
+    public void testEqualToPredicate() {
+
+        final PredicateWrapper<Object> predicate = isEqual("test");
+        assertThat(predicate.test("test")).isTrue();
+        assertThat(predicate.test(1)).isFalse();
+        assertThat(predicate.test(null)).isFalse();
+        final PredicateWrapper<Object> predicate1 = isEqual(null);
+        assertThat(predicate1.test("test")).isFalse();
+        assertThat(predicate1.test(1)).isFalse();
+        assertThat(predicate1.test(null)).isTrue();
+    }
+
+    @Test
+    public void testEqualToPredicateEquals() {
+
+        final PredicateWrapper<Object> predicate = isEqual("test");
+        assertThat(predicate).isEqualTo(predicate);
+        assertThat(predicate).isEqualTo(isEqual("test"));
+        assertThat(predicate).isNotEqualTo(isEqual(1.1));
+        assertThat(predicate).isNotEqualTo("");
+        assertThat(predicate.hashCode()).isEqualTo(isEqual("test").hashCode());
+        assertThat(isEqual(null)).isEqualTo(isNull());
     }
 
     @Test
@@ -660,11 +759,10 @@ public class FunctionsTest {
                 constant(PassingInvocation.factoryOf().newInvocation());
         final InvocationFactory<Object, String> factory = createFactory();
         assertThat(factory).isEqualTo(factory);
-        assertThat(factory).isEqualTo(createFactory());
+        assertThat(factory).isNotEqualTo(createFactory());
         assertThat(factory).isNotEqualTo(supplierFactory(supplier));
         assertThat(factory).isNotEqualTo(createFilter());
         assertThat(factory).isNotEqualTo("");
-        assertThat(factory.hashCode()).isEqualTo(createFactory().hashCode());
         assertThat(supplierFactory(supplier)).isEqualTo(supplierFactory(supplier));
         assertThat(supplierFactory(supplier).hashCode()).isEqualTo(
                 supplierFactory(supplier).hashCode());
@@ -730,11 +828,10 @@ public class FunctionsTest {
         final FunctionWrapper<Object, ? super Object> identity = identity();
         final InvocationFactory<Object, String> factory = createFilter2();
         assertThat(factory).isEqualTo(factory);
-        assertThat(factory).isEqualTo(createFilter2());
+        assertThat(factory).isNotEqualTo(createFilter2());
         assertThat(factory).isNotEqualTo(functionFilter(identity));
         assertThat(factory).isNotEqualTo(createFactory());
         assertThat(factory).isNotEqualTo("");
-        assertThat(factory.hashCode()).isEqualTo(createFilter2().hashCode());
         assertThat(functionFilter(identity)).isEqualTo(functionFilter(identity));
         assertThat(functionFilter(identity).hashCode()).isEqualTo(
                 functionFilter(identity).hashCode());
@@ -784,11 +881,10 @@ public class FunctionsTest {
         final PredicateWrapper<Object> negative = negative();
         final InvocationFactory<String, String> factory = createFilter3();
         assertThat(factory).isEqualTo(factory);
-        assertThat(factory).isEqualTo(createFilter3());
+        assertThat(factory).isNotEqualTo(createFilter3());
         assertThat(factory).isNotEqualTo(predicateFilter(negative));
         assertThat(factory).isNotEqualTo(createFactory());
         assertThat(factory).isNotEqualTo("");
-        assertThat(factory.hashCode()).isEqualTo(createFilter3().hashCode());
         assertThat(predicateFilter(negative)).isEqualTo(predicateFilter(negative));
         assertThat(predicateFilter(negative).hashCode()).isEqualTo(
                 predicateFilter(negative).hashCode());
@@ -831,11 +927,10 @@ public class FunctionsTest {
         final InvocationFactory<Object, String> factory = createFilter();
         final BiConsumerWrapper<Object, ResultChannel<String>> sink = biSink();
         assertThat(factory).isEqualTo(factory);
-        assertThat(factory).isEqualTo(createFilter());
+        assertThat(factory).isNotEqualTo(createFilter());
         assertThat(factory).isNotEqualTo(consumerFilter(sink));
         assertThat(factory).isNotEqualTo(createFactory());
         assertThat(factory).isNotEqualTo("");
-        assertThat(factory.hashCode()).isEqualTo(createFilter().hashCode());
         assertThat(consumerFilter(sink)).isEqualTo(consumerFilter(sink));
         assertThat(consumerFilter(sink).hashCode()).isEqualTo(consumerFilter(sink).hashCode());
     }
@@ -1016,16 +1111,6 @@ public class FunctionsTest {
 
         try {
 
-            new FunctionWrapper<Object, Object>(Collections.<Function<?, ?>>emptyList());
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
             wrapFunction(new TestFunction()).andThen(null);
 
             fail();
@@ -1066,11 +1151,10 @@ public class FunctionsTest {
         final InvocationFactory<?, String> factory = createFunction2();
         final FunctionWrapper<List<?>, ? super List<?>> identity = identity();
         assertThat(factory).isEqualTo(factory);
-        assertThat(factory).isEqualTo(createFunction2());
+        assertThat(factory).isNotEqualTo(createFunction2());
         assertThat(factory).isNotEqualTo(functionFactory(identity));
         assertThat(factory).isNotEqualTo(createFactory());
         assertThat(factory).isNotEqualTo("");
-        assertThat(factory.hashCode()).isEqualTo(createFunction2().hashCode());
         assertThat(functionFactory(identity)).isEqualTo(functionFactory(identity));
         assertThat(functionFactory(identity).hashCode()).isEqualTo(
                 functionFactory(identity).hashCode());
@@ -1120,11 +1204,10 @@ public class FunctionsTest {
         final InvocationFactory<?, String> factory = createFunction();
         final BiConsumerWrapper<List<?>, ResultChannel<Object>> sink = biSink();
         assertThat(factory).isEqualTo(factory);
-        assertThat(factory).isEqualTo(createFunction());
+        assertThat(factory).isNotEqualTo(createFunction());
         assertThat(factory).isNotEqualTo(consumerFactory(sink));
         assertThat(factory).isNotEqualTo(createFactory());
         assertThat(factory).isNotEqualTo("");
-        assertThat(factory.hashCode()).isEqualTo(createFunction().hashCode());
         assertThat(consumerFactory(sink)).isEqualTo(consumerFactory(sink));
         assertThat(consumerFactory(sink).hashCode()).isEqualTo(consumerFactory(sink).hashCode());
     }
@@ -1172,6 +1255,41 @@ public class FunctionsTest {
         assertThat(function1.isCalled()).isTrue();
         assertThat(function2.hasStaticContext()).isTrue();
         assertThat(identity()).isSameAs(identity());
+    }
+
+    @Test
+    public void testInstanceOfPredicate() {
+
+        final PredicateWrapper<Object> predicate = isInstanceOf(String.class);
+        assertThat(predicate.test("test")).isTrue();
+        assertThat(predicate.test(1)).isFalse();
+        assertThat(predicate.test(null)).isFalse();
+    }
+
+    @Test
+    public void testInstanceOfPredicateEquals() {
+
+        final PredicateWrapper<Object> predicate = isInstanceOf(String.class);
+        assertThat(predicate).isEqualTo(predicate);
+        assertThat(predicate).isEqualTo(isInstanceOf(String.class));
+        assertThat(predicate).isNotEqualTo(isInstanceOf(Integer.class));
+        assertThat(predicate).isNotEqualTo("");
+        assertThat(predicate.hashCode()).isEqualTo(isInstanceOf(String.class).hashCode());
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testInstanceOfPredicateError() {
+
+        try {
+
+            isInstanceOf(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
     }
 
     @Test
@@ -1328,33 +1446,11 @@ public class FunctionsTest {
 
         try {
 
-            new PredicateWrapper<Object>(null, Collections.<Predicate<?>>singletonList(
-                    new TestPredicate()));
+            new PredicateWrapper<Object>(null);
 
             fail();
 
         } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new PredicateWrapper<Object>(new TestPredicate(), null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new PredicateWrapper<Object>(new TestPredicate(),
-                                         Collections.<Predicate<?>>emptyList());
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
 
         }
 
@@ -1397,6 +1493,35 @@ public class FunctionsTest {
         } catch (final NullPointerException ignored) {
 
         }
+    }
+
+    @Test
+    public void testSameAsPredicate() {
+
+        final Identity instance = new Identity();
+        final PredicateWrapper<Object> predicate = isSame(instance);
+        assertThat(predicate.test(instance)).isTrue();
+        assertThat(predicate.test(new Identity())).isFalse();
+        assertThat(predicate.test(1)).isFalse();
+        assertThat(predicate.test(null)).isFalse();
+        final PredicateWrapper<Object> predicate1 = isSame(null);
+        assertThat(predicate1.test(instance)).isFalse();
+        assertThat(predicate1.test(1)).isFalse();
+        assertThat(predicate1.test(null)).isTrue();
+    }
+
+    @Test
+    public void testSameAsPredicateEquals() {
+
+        final Identity instance = new Identity();
+        final PredicateWrapper<Object> predicate = isSame(instance);
+        assertThat(predicate).isEqualTo(predicate);
+        assertThat(predicate).isEqualTo(isSame(instance));
+        assertThat(predicate).isNotEqualTo(isSame(new Identity()));
+        assertThat(predicate).isNotEqualTo(isSame(1.1));
+        assertThat(predicate).isNotEqualTo("");
+        assertThat(predicate.hashCode()).isEqualTo(isSame(instance).hashCode());
+        assertThat(isSame(null)).isEqualTo(isNull());
     }
 
     @Test
@@ -1501,17 +1626,7 @@ public class FunctionsTest {
 
         try {
 
-            new SupplierWrapper<Object>(null, wrapFunction(new TestFunction()));
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new SupplierWrapper<Object>(new TestSupplier(), null);
+            new SupplierWrapper<Object>(null);
 
             fail();
 
@@ -1527,6 +1642,15 @@ public class FunctionsTest {
 
         } catch (final NullPointerException ignored) {
 
+        }
+    }
+
+    private static class Identity {
+
+        @Override
+        public boolean equals(final Object obj) {
+
+            return (obj != null) && (obj.getClass() == Identity.class);
         }
     }
 

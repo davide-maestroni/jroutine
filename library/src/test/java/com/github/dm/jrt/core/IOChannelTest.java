@@ -372,6 +372,23 @@ public class IOChannelTest {
                     .buildChannel()
                     .pass("test1")
                     .close()
+                    .eventuallyAbort(new IllegalStateException())
+                    .afterMax(seconds(1))
+                    .next(2);
+
+            fail();
+
+        } catch (final AbortException e) {
+
+            assertThat(e.getCause()).isExactlyInstanceOf(IllegalStateException.class);
+        }
+
+        try {
+
+            JRoutine.io()
+                    .buildChannel()
+                    .pass("test1")
+                    .close()
                     .eventuallyThrow()
                     .afterMax(seconds(1))
                     .next(2);
@@ -673,6 +690,23 @@ public class IOChannelTest {
 
         } catch (final AbortException ignored) {
 
+        }
+
+        try {
+
+            JRoutine.io()
+                    .buildChannel()
+                    .pass("test1")
+                    .close()
+                    .eventuallyAbort(new IllegalStateException())
+                    .afterMax(seconds(1))
+                    .skip(2);
+
+            fail();
+
+        } catch (final AbortException e) {
+
+            assertThat(e.getCause()).isExactlyInstanceOf(IllegalStateException.class);
         }
 
         try {

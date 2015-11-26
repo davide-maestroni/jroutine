@@ -1,6 +1,5 @@
 package com.github.dm.jrt.annotation;
 
-import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.log.Log.Level;
 
 import java.lang.annotation.ElementType;
@@ -36,7 +35,7 @@ import java.lang.annotation.Target;
  * <p/>
  * Created by davide-maestroni on 11/03/2015.
  *
- * @see InvocationConfiguration InvocationConfiguration
+ * @see com.github.dm.jrt.builder.InvocationConfiguration InvocationConfiguration
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

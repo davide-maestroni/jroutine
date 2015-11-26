@@ -18,6 +18,7 @@ import com.github.dm.jrt.util.Reflection;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -29,30 +30,52 @@ import java.util.List;
  */
 public class ConsumerWrapper<IN> implements Consumer<IN> {
 
+    private static final ConsumerWrapper<Object> sSink =
+            new ConsumerWrapper<Object>(new Consumer<Object>() {
+
+                public void accept(final Object in) {}
+            });
+
     private final List<Consumer<?>> mConsumers;
+
+    /**
+     * Constructor.
+     *
+     * @param consumer the wrapped consumer.
+     */
+    @SuppressWarnings("ConstantConditions")
+    ConsumerWrapper(@NotNull final Consumer<?> consumer) {
+
+        this(Collections.<Consumer<?>>singletonList(consumer));
+
+        if (consumer == null) {
+
+            throw new NullPointerException("the consumer instance must not be null");
+        }
+    }
 
     /**
      * Constructor.
      *
      * @param consumers the list of wrapped consumers.
      */
-    ConsumerWrapper(@NotNull final List<Consumer<?>> consumers) {
-
-        if (consumers.isEmpty()) {
-
-            throw new IllegalArgumentException("the list of consumers must not be empty");
-        }
+    private ConsumerWrapper(@NotNull final List<Consumer<?>> consumers) {
 
         mConsumers = consumers;
     }
 
+    /**
+     * Returns a consumer wrapper just discarding the passed inputs.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN> the input data type.
+     * @return the consumer wrapper.
+     */
+    @NotNull
     @SuppressWarnings("unchecked")
-    public void accept(final IN in) {
+    public static <IN> ConsumerWrapper<IN> sink() {
 
-        for (final Consumer<?> consumer : mConsumers) {
-
-            ((Consumer<Object>) consumer).accept(in);
-        }
+        return (ConsumerWrapper<IN>) sSink;
     }
 
     /**
@@ -104,14 +127,7 @@ public class ConsumerWrapper<IN> implements Consumer<IN> {
     @Override
     public int hashCode() {
 
-        int result = 0;
-
-        for (final Consumer<?> consumer : mConsumers) {
-
-            result = 31 * result + consumer.getClass().hashCode();
-        }
-
-        return result;
+        return mConsumers.hashCode();
     }
 
     @Override
@@ -128,23 +144,15 @@ public class ConsumerWrapper<IN> implements Consumer<IN> {
         }
 
         final ConsumerWrapper<?> that = (ConsumerWrapper<?>) o;
-        final List<Consumer<?>> thisConsumers = mConsumers;
-        final List<Consumer<?>> thatConsumers = that.mConsumers;
-        final int size = thisConsumers.size();
+        return mConsumers.equals(that.mConsumers);
+    }
 
-        if (size != thatConsumers.size()) {
+    @SuppressWarnings("unchecked")
+    public void accept(final IN in) {
 
-            return false;
+        for (final Consumer<?> consumer : mConsumers) {
+
+            ((Consumer<Object>) consumer).accept(in);
         }
-
-        for (int i = 0; i < size; ++i) {
-
-            if (thisConsumers.get(i).getClass() != thatConsumers.get(i).getClass()) {
-
-                return false;
-            }
-        }
-
-        return true;
     }
 }

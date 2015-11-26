@@ -24,6 +24,7 @@ import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.StreamingChannel;
 import com.github.dm.jrt.channel.TimeoutException;
 import com.github.dm.jrt.invocation.FilterInvocation;
+import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.invocation.PassingInvocation;
 import com.github.dm.jrt.log.Log;
 import com.github.dm.jrt.log.Log.Level;
@@ -356,27 +357,25 @@ public class StreamingChannelTest {
     @Test
     public void testNext() {
 
-        assertThat(asyncStream(JRoutine.on(PassingInvocation.factoryOf())).pass("test1", "test2",
-                                                                                "test3", "test4")
-                                                                          .close()
-                                                                          .afterMax(seconds(3))
-                                                                          .next(2)).containsExactly(
-                "test1", "test2");
+        final InvocationFactory<String, String> factory = PassingInvocation.factoryOf();
+        assertThat(asyncStream(JRoutine.on(factory)).pass("test1", "test2", "test3", "test4")
+                                                    .close()
+                                                    .afterMax(seconds(3))
+                                                    .next(2)).containsExactly("test1", "test2");
 
-        assertThat(asyncStream(JRoutine.on(PassingInvocation.factoryOf())).pass("test1")
-                                                                          .close()
-                                                                          .afterMax(seconds(3))
-                                                                          .eventuallyExit()
-                                                                          .next(2)).containsExactly(
-                "test1");
+        assertThat(asyncStream(JRoutine.on(factory)).pass("test1")
+                                                    .close()
+                                                    .afterMax(seconds(3))
+                                                    .eventuallyExit()
+                                                    .next(2)).containsExactly("test1");
 
         try {
 
-            asyncStream(JRoutine.on(PassingInvocation.factoryOf())).pass("test1")
-                                                                   .close()
-                                                                   .afterMax(seconds(3))
-                                                                   .eventuallyAbort()
-                                                                   .next(2);
+            asyncStream(JRoutine.on(factory)).pass("test1")
+                                             .close()
+                                             .afterMax(seconds(3))
+                                             .eventuallyAbort()
+                                             .next(2);
 
             fail();
 
@@ -386,11 +385,26 @@ public class StreamingChannelTest {
 
         try {
 
-            asyncStream(JRoutine.on(PassingInvocation.factoryOf())).pass("test1")
-                                                                   .close()
-                                                                   .afterMax(seconds(3))
-                                                                   .eventuallyThrow()
-                                                                   .next(2);
+            asyncStream(JRoutine.on(factory)).pass("test1")
+                                             .close()
+                                             .afterMax(seconds(3))
+                                             .eventuallyAbort(new IllegalStateException())
+                                             .next(2);
+
+            fail();
+
+        } catch (final AbortException e) {
+
+            assertThat(e.getCause()).isExactlyInstanceOf(IllegalStateException.class);
+        }
+
+        try {
+
+            asyncStream(JRoutine.on(factory)).pass("test1")
+                                             .close()
+                                             .afterMax(seconds(3))
+                                             .eventuallyThrow()
+                                             .next(2);
 
             fail();
 
@@ -705,28 +719,27 @@ public class StreamingChannelTest {
     @Test
     public void testSkip() {
 
-        assertThat(asyncStream(JRoutine.on(PassingInvocation.factoryOf())).pass("test1", "test2",
-                                                                                "test3", "test4")
-                                                                          .close()
-                                                                          .afterMax(seconds(3))
-                                                                          .skip(2)
-                                                                          .all()).containsExactly(
-                "test3", "test4");
+        final InvocationFactory<String, String> factory = PassingInvocation.factoryOf();
+        assertThat(asyncStream(JRoutine.on(factory)).pass("test1", "test2", "test3", "test4")
+                                                    .close()
+                                                    .afterMax(seconds(3))
+                                                    .skip(2)
+                                                    .all()).containsExactly("test3", "test4");
 
-        assertThat(asyncStream(JRoutine.on(PassingInvocation.factoryOf())).pass("test1")
-                                                                          .close()
-                                                                          .afterMax(seconds(3))
-                                                                          .eventuallyExit()
-                                                                          .skip(2)
-                                                                          .all()).isEmpty();
+        assertThat(asyncStream(JRoutine.on(factory)).pass("test1")
+                                                    .close()
+                                                    .afterMax(seconds(3))
+                                                    .eventuallyExit()
+                                                    .skip(2)
+                                                    .all()).isEmpty();
 
         try {
 
-            asyncStream(JRoutine.on(PassingInvocation.factoryOf())).pass("test1")
-                                                                   .close()
-                                                                   .afterMax(seconds(3))
-                                                                   .eventuallyAbort()
-                                                                   .skip(2);
+            asyncStream(JRoutine.on(factory)).pass("test1")
+                                             .close()
+                                             .afterMax(seconds(3))
+                                             .eventuallyAbort()
+                                             .skip(2);
 
             fail();
 
@@ -736,11 +749,26 @@ public class StreamingChannelTest {
 
         try {
 
-            asyncStream(JRoutine.on(PassingInvocation.factoryOf())).pass("test1")
-                                                                   .close()
-                                                                   .afterMax(seconds(3))
-                                                                   .eventuallyThrow()
-                                                                   .skip(2);
+            asyncStream(JRoutine.on(factory)).pass("test1")
+                                             .close()
+                                             .afterMax(seconds(3))
+                                             .eventuallyAbort(new IllegalStateException())
+                                             .skip(2);
+
+            fail();
+
+        } catch (final AbortException e) {
+
+            assertThat(e.getCause()).isExactlyInstanceOf(IllegalStateException.class);
+        }
+
+        try {
+
+            asyncStream(JRoutine.on(factory)).pass("test1")
+                                             .close()
+                                             .afterMax(seconds(3))
+                                             .eventuallyThrow()
+                                             .skip(2);
 
             fail();
 

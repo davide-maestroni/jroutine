@@ -15,7 +15,7 @@ package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.builder.ConfigurableBuilder;
 import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.invocation.FilterInvocation;
+import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
@@ -61,7 +61,7 @@ public interface FunctionalRoutine<IN, OUT>
             @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
 
     /**
-     * Concatenates a functional routine based on the specified predicate to this ones.<br/>
+     * Concatenates a functional routine based on the specified predicate to this one.<br/>
      * The output will be filtered according to the result returned by the predicate.
      * <p/>
      * Note that the created routine will be invoked in an asynchronous mode.
@@ -86,19 +86,6 @@ public interface FunctionalRoutine<IN, OUT>
             @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
 
     /**
-     * Concatenates a functional routine based on the specified invocation to this one.
-     * <p/>
-     * Note that the created routine will be invoked in an asynchronous mode.
-     *
-     * @param invocation the filter invocation instance.
-     * @param <AFTER>    the concatenation output type.
-     * @return the concatenated functional routine.
-     */
-    @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> thenAsyncMap(
-            @NotNull FilterInvocation<? super OUT, AFTER> invocation);
-
-    /**
      * Concatenates a functional routine based on the specified function to this one.
      * <p/>
      * Note that the created routine will be invoked in an asynchronous mode.
@@ -110,6 +97,19 @@ public interface FunctionalRoutine<IN, OUT>
     @NotNull
     <AFTER> FunctionalRoutine<IN, AFTER> thenAsyncMap(
             @NotNull Function<? super OUT, AFTER> function);
+
+    /**
+     * Concatenates a functional routine based on the specified factory to this one.
+     * <p/>
+     * Note that the created routine will be invoked in an asynchronous mode.
+     *
+     * @param factory the invocation factory.
+     * @param <AFTER> the concatenation output type.
+     * @return the concatenated functional routine.
+     */
+    @NotNull
+    <AFTER> FunctionalRoutine<IN, AFTER> thenAsyncMap(
+            @NotNull InvocationFactory<? super OUT, AFTER> factory);
 
     /**
      * Concatenates a functional routine based on the specified instance to this one.
@@ -181,7 +181,7 @@ public interface FunctionalRoutine<IN, OUT>
                     AFTER>> function);
 
     /**
-     * Concatenates a functional routine based on the specified predicate to this ones.<br/>
+     * Concatenates a functional routine based on the specified predicate to this one.<br/>
      * The output will be filtered according to the result returned by the predicate.
      * <p/>
      * Note that the created routine will be invoked in a parallel mode.
@@ -206,19 +206,6 @@ public interface FunctionalRoutine<IN, OUT>
             @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
 
     /**
-     * Concatenates a functional routine based on the specified invocation to this one.
-     * <p/>
-     * Note that the created routine will be invoked in a parallel mode.
-     *
-     * @param invocation the filter invocation instance.
-     * @param <AFTER>    the concatenation output type.
-     * @return the concatenated functional routine.
-     */
-    @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> thenParallelMap(
-            @NotNull FilterInvocation<? super OUT, AFTER> invocation);
-
-    /**
      * Concatenates a functional routine based on the specified function to this one.
      * <p/>
      * Note that the created routine will be invoked in a parallel mode.
@@ -230,6 +217,19 @@ public interface FunctionalRoutine<IN, OUT>
     @NotNull
     <AFTER> FunctionalRoutine<IN, AFTER> thenParallelMap(
             @NotNull Function<? super OUT, AFTER> function);
+
+    /**
+     * Concatenates a functional routine based on the specified factory to this one.
+     * <p/>
+     * Note that the created routine will be invoked in a parallel mode.
+     *
+     * @param factory the invocation factory.
+     * @param <AFTER> the concatenation output type.
+     * @return the concatenated functional routine.
+     */
+    @NotNull
+    <AFTER> FunctionalRoutine<IN, AFTER> thenParallelMap(
+            @NotNull InvocationFactory<? super OUT, AFTER> factory);
 
     /**
      * Concatenates a functional routine based on the specified instance to this one.
@@ -266,7 +266,7 @@ public interface FunctionalRoutine<IN, OUT>
             @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
 
     /**
-     * Concatenates a functional routine based on the specified predicate to this ones.<br/>
+     * Concatenates a functional routine based on the specified predicate to this one.<br/>
      * The output will be filtered according to the result returned by the predicate.
      * <p/>
      * Note that the created routine will be invoked in a synchronous mode.
@@ -291,19 +291,6 @@ public interface FunctionalRoutine<IN, OUT>
             @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
 
     /**
-     * Concatenates a functional routine based on the specified invocation to this one.
-     * <p/>
-     * Note that the created routine will be invoked in a synchronous mode.
-     *
-     * @param invocation the filter invocation instance.
-     * @param <AFTER>    the concatenation output type.
-     * @return the concatenated functional routine.
-     */
-    @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> thenSyncMap(
-            @NotNull FilterInvocation<? super OUT, AFTER> invocation);
-
-    /**
      * Concatenates a functional routine based on the specified function to this one.
      * <p/>
      * Note that the created routine will be invoked in a synchronous mode.
@@ -315,6 +302,19 @@ public interface FunctionalRoutine<IN, OUT>
     @NotNull
     <AFTER> FunctionalRoutine<IN, AFTER> thenSyncMap(
             @NotNull Function<? super OUT, AFTER> function);
+
+    /**
+     * Concatenates a functional routine based on the specified factory to this one.
+     * <p/>
+     * Note that the created routine will be invoked in a synchronous mode.
+     *
+     * @param factory the invocation factory.
+     * @param <AFTER> the concatenation output type.
+     * @return the concatenated functional routine.
+     */
+    @NotNull
+    <AFTER> FunctionalRoutine<IN, AFTER> thenSyncMap(
+            @NotNull InvocationFactory<? super OUT, AFTER> factory);
 
     /**
      * Concatenates a functional routine based on the specified instance to this one.

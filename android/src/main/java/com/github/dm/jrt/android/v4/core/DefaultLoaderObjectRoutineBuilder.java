@@ -152,7 +152,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     public <IN, OUT> LoaderRoutine<IN, OUT> aliasMethod(@NotNull final String name) {
 
         final ContextInvocationTarget<?> target = mTarget;
-        final Method targetMethod = getAnnotatedMethod(name, target.getTargetClass());
+        final Method targetMethod = getAnnotatedMethod(target.getTargetClass(), name);
 
         if (targetMethod == null) {
 
@@ -567,7 +567,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 throw new IllegalStateException("the target object has been destroyed");
             }
 
-            callFromInvocation(mTargetMethod, mMutex, targetInstance, objects, result, mInputMode,
+            callFromInvocation(mMutex, targetInstance, mTargetMethod, objects, result, mInputMode,
                                mOutputMode);
         }
 
@@ -671,7 +671,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 Throwable {
 
             final ContextInvocationTarget<?> target = mTarget;
-            final MethodInfo methodInfo = getTargetMethodInfo(method, target.getTargetClass());
+            final MethodInfo methodInfo = getTargetMethodInfo(target.getTargetClass(), method);
             final Method targetMethod = methodInfo.method;
             final InputMode inputMode = methodInfo.inputMode;
             final OutputMode outputMode = methodInfo.outputMode;

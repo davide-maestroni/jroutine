@@ -92,20 +92,19 @@ public class RoutineBuilders {
     /**
      * Calls the specified target method from inside a routine invocation.
      *
-     * @param targetMethod the target method.
      * @param mutex        the method mutex.
      * @param target       the target instance.
+     * @param targetMethod the target method.
      * @param objects      the input objects.
      * @param result       the invocation result channel.
      * @param inputMode    the input transfer mode.
      * @param outputMode   the output transfer mode.
      * @throws com.github.dm.jrt.channel.RoutineException in case of errors.
      */
-    @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
-    public static void callFromInvocation(@NotNull final Method targetMethod,
-            @NotNull final Mutex mutex, @NotNull final Object target,
-            @NotNull final List<?> objects, @NotNull final ResultChannel<Object> result,
-            @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
+    public static void callFromInvocation(@NotNull final Mutex mutex, @NotNull final Object target,
+            @NotNull final Method targetMethod, @NotNull final List<?> objects,
+            @NotNull final ResultChannel<Object> result, @Nullable final InputMode inputMode,
+            @Nullable final OutputMode outputMode) {
 
         Reflection.makeAccessible(targetMethod);
 
@@ -337,15 +336,15 @@ public class RoutineBuilders {
     /**
      * Gets the method annotated with the specified alias name.
      *
-     * @param name        the alias name.
      * @param targetClass the target class.
+     * @param name        the alias name.
      * @return the method.
      * @throws java.lang.IllegalArgumentException if no method with the specified alias name was
      *                                            found.
      */
     @Nullable
-    public static Method getAnnotatedMethod(@NotNull final String name,
-            @NotNull final Class<?> targetClass) {
+    public static Method getAnnotatedMethod(@NotNull final Class<?> targetClass,
+            @NotNull final String name) {
 
         synchronized (sAliasMethods) {
 
@@ -670,14 +669,14 @@ public class RoutineBuilders {
     /**
      * Gets info about the method targeted by the specified proxy one.
      *
-     * @param proxyMethod the proxy method.
      * @param targetClass the target class.
+     * @param proxyMethod the proxy method.
      * @return the method info.
      * @throws java.lang.IllegalArgumentException if no target method was found.
      */
     @NotNull
-    public static MethodInfo getTargetMethodInfo(@NotNull final Method proxyMethod,
-            @NotNull final Class<?> targetClass) {
+    public static MethodInfo getTargetMethodInfo(@NotNull final Class<?> targetClass,
+            @NotNull final Method proxyMethod) {
 
         MethodInfo methodInfo;
 
@@ -972,7 +971,7 @@ public class RoutineBuilders {
         if (annotation != null) {
 
             name = annotation.value();
-            targetMethod = getAnnotatedMethod(name, targetClass);
+            targetMethod = getAnnotatedMethod(targetClass, name);
         }
 
         if (targetMethod == null) {

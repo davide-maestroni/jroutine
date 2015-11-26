@@ -15,7 +15,6 @@ package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.core.JRoutine;
 import com.github.dm.jrt.invocation.CommandInvocation;
 import com.github.dm.jrt.invocation.FilterInvocation;
@@ -42,19 +41,8 @@ public class FunctionalRoutineTest {
 
     public static void internalTestAccumulate() {
 
-        assertThat(Functions.functional()
-                            .thenAsyncAccumulate(new BiFunction<String, String, String>() {
-
-                                public String apply(final String s, final String s2) {
-
-                                    return s + s2;
-                                }
-                            })
-                            .asyncCall("test1", "test2", "test3")
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("test1test2test3");
         assertThat(
-                Functions.functional().thenSyncAccumulate(new BiFunction<String, String, String>() {
+                JFunctional.routine().thenAsyncAccumulate(new BiFunction<String, String, String>() {
 
                     public String apply(final String s, final String s2) {
 
@@ -62,586 +50,604 @@ public class FunctionalRoutineTest {
                     }
                 }).asyncCall("test1", "test2", "test3").afterMax(seconds(3)).all()).containsExactly(
                 "test1test2test3");
-        assertThat(Functions.functional()
-                            .thenSyncMap(PassingInvocation.<String>factoryOf())
-                            .thenAsyncAccumulate(new BiFunction<String, String, String>() {
+        assertThat(
+                JFunctional.routine().thenSyncAccumulate(new BiFunction<String, String, String>() {
 
-                                public String apply(final String s, final String s2) {
+                    public String apply(final String s, final String s2) {
 
-                                    return s + s2;
-                                }
-                            })
-                            .asyncCall("test1", "test2", "test3")
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("test1test2test3");
-        assertThat(Functions.functional()
-                            .thenSyncMap(PassingInvocation.<String>factoryOf())
-                            .thenSyncAccumulate(new BiFunction<String, String, String>() {
+                        return s + s2;
+                    }
+                }).asyncCall("test1", "test2", "test3").afterMax(seconds(3)).all()).containsExactly(
+                "test1test2test3");
+        assertThat(JFunctional.routine()
+                              .thenSyncMap(PassingInvocation.<String>factoryOf())
+                              .thenAsyncAccumulate(new BiFunction<String, String, String>() {
 
-                                public String apply(final String s, final String s2) {
+                                  public String apply(final String s, final String s2) {
 
-                                    return s + s2;
-                                }
-                            })
-                            .asyncCall("test1", "test2", "test3")
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("test1test2test3");
+                                      return s + s2;
+                                  }
+                              })
+                              .asyncCall("test1", "test2", "test3")
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("test1test2test3");
+        assertThat(JFunctional.routine()
+                              .thenSyncMap(PassingInvocation.<String>factoryOf())
+                              .thenSyncAccumulate(new BiFunction<String, String, String>() {
+
+                                  public String apply(final String s, final String s2) {
+
+                                      return s + s2;
+                                  }
+                              })
+                              .asyncCall("test1", "test2", "test3")
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("test1test2test3");
     }
 
     private static void internalTestBuilder() {
 
-        assertThat(Functions.functional()
-                            .thenSyncMap(PassingInvocation.factoryOf())
-                            .asyncCall("test")
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("test");
-        assertThat(Functions.functional().routineFrom(new Supplier<String>() {
+        assertThat(JFunctional.routine()
+                              .thenSyncMap(PassingInvocation.factoryOf())
+                              .asyncCall("test")
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("test");
+        assertThat(JFunctional.routine().from(new Supplier<String>() {
 
             public String get() {
 
                 return "test";
             }
         }).asyncCall().afterMax(seconds(3)).all()).containsExactly("test");
-        assertThat(Functions.functional().routineFrom(new CommandInvocation<String>() {
+        assertThat(JFunctional.routine().from(new CommandInvocation<String>() {
 
             public void onResult(@NotNull final ResultChannel<String> result) {
 
                 result.pass("test1", "test2", "test3");
             }
         }).asyncCall().afterMax(seconds(3)).all()).containsOnly("test1", "test2", "test3");
-        assertThat(Functions.functional().routineFrom(new Consumer<ResultChannel<String>>() {
+        assertThat(JFunctional.routine().from(new Consumer<ResultChannel<String>>() {
 
             public void accept(final ResultChannel<String> result) {
 
                 result.pass("test1", "test2", "test3");
             }
         }).asyncCall().afterMax(seconds(3)).all()).containsOnly("test1", "test2", "test3");
-        assertThat(Functions.functional()
-                            .invocations()
-                            .withOutputOrder(OrderType.BY_CALL)
-                            .set()
-                            .routineFrom(new CommandInvocation<String>() {
+        assertThat(JFunctional.routine()
+                              .invocations()
+                              .withOutputOrder(OrderType.BY_CALL)
+                              .set()
+                              .from(new CommandInvocation<String>() {
 
-                                public void onResult(@NotNull final ResultChannel<String> result) {
+                                  public void onResult(
+                                          @NotNull final ResultChannel<String> result) {
 
-                                    result.pass("test1", "test2", "test3");
-                                }
-                            })
-                            .asyncCall()
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("test1", "test2", "test3");
-        assertThat(Functions.functional()
-                            .invocations()
-                            .withOutputOrder(OrderType.BY_CALL)
-                            .set()
-                            .routineFrom(new Consumer<ResultChannel<String>>() {
+                                      result.pass("test1", "test2", "test3");
+                                  }
+                              })
+                              .asyncCall()
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("test1", "test2", "test3");
+        assertThat(JFunctional.routine()
+                              .invocations()
+                              .withOutputOrder(OrderType.BY_CALL)
+                              .set()
+                              .from(new Consumer<ResultChannel<String>>() {
 
-                                public void accept(final ResultChannel<String> result) {
+                                  public void accept(final ResultChannel<String> result) {
 
-                                    result.pass("test1", "test2", "test3");
-                                }
-                            })
-                            .asyncCall()
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("test1", "test2", "test3");
+                                      result.pass("test1", "test2", "test3");
+                                  }
+                              })
+                              .asyncCall()
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("test1", "test2", "test3");
     }
 
     private static void internalTestLift() {
 
-        assertThat(Functions.functional()
-                            .thenSyncMap(PassingInvocation.<String>factoryOf())
-                            .thenLift(
-                                    new Function<FunctionalRoutine<String, String>,
-                                            FunctionalRoutine<String, String>>() {
+        assertThat(JFunctional.routine()
+                              .thenSyncMap(PassingInvocation.<String>factoryOf())
+                              .thenLift(
+                                      new Function<FunctionalRoutine<String, String>,
+                                              FunctionalRoutine<String, String>>() {
 
-                                        public FunctionalRoutine<String, String> apply(
-                                                final FunctionalRoutine<String, String> routine) {
+                                          public FunctionalRoutine<String, String> apply(
+                                                  final FunctionalRoutine<String, String> routine) {
 
-                                            return Functions.functional()
-                                                            .thenSyncFilter(
-                                                                    Functions.<String>notNull())
-                                                            .thenAsyncMap(routine);
-                                        }
-                                    })
-                            .asyncCall("test1", null, "test2", null)
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("test1", "test2");
-        assertThat(Functions.functional()
-                            .thenAsyncMap(new FilterInvocation<String, String>() {
+                                              return JFunctional.routine()
+                                                                .thenSyncFilter(
+                                                                        Functions.<String>notNull())
+                                                                .thenAsyncMap(routine);
+                                          }
+                                      })
+                              .asyncCall("test1", null, "test2", null)
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("test1", "test2");
+        assertThat(JFunctional.routine()
+                              .thenAsyncMap(new FilterInvocation<String, String>() {
 
-                                public void onInput(final String input,
-                                        @NotNull final ResultChannel<String> result) {
+                                  public void onInput(final String input,
+                                          @NotNull final ResultChannel<String> result) {
 
-                                    result.pass(input.toUpperCase());
-                                }
-                            })
-                            .thenFlatLift(
-                                    new Function<FunctionalRoutine<String, String>,
-                                            FunctionalRoutine<String, String>>() {
+                                      result.pass(input.toUpperCase());
+                                  }
+                              })
+                              .thenFlatLift(
+                                      new Function<FunctionalRoutine<String, String>,
+                                              FunctionalRoutine<String, String>>() {
 
-                                        public FunctionalRoutine<String, String> apply(
-                                                final FunctionalRoutine<String, String> routine) {
+                                          public FunctionalRoutine<String, String> apply(
+                                                  final FunctionalRoutine<String, String> routine) {
 
-                                            return Functions.functional()
-                                                            .thenSyncFilter(
-                                                                    Functions.<String>notNull())
-                                                            .thenAsyncMap(routine);
-                                        }
-                                    })
-                            .asyncCall("test1", null, "test2", null)
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("TEST1", "TEST2");
-        assertThat(Functions.functional()
-                            .thenAsyncMap(new FilterInvocation<String, String>() {
+                                              return JFunctional.routine()
+                                                                .thenSyncFilter(
+                                                                        Functions.<String>notNull())
+                                                                .thenAsyncMap(routine);
+                                          }
+                                      })
+                              .asyncCall("test1", null, "test2", null)
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("TEST1", "TEST2");
+        assertThat(JFunctional.routine()
+                              .thenAsyncMap(new FilterInvocation<String, String>() {
 
-                                public void onInput(final String input,
-                                        @NotNull final ResultChannel<String> result) {
+                                  public void onInput(final String input,
+                                          @NotNull final ResultChannel<String> result) {
 
-                                    result.pass(input.toUpperCase());
-                                }
-                            })
-                            .thenLift(
-                                    new Function<FunctionalRoutine<String, String>,
-                                            Routine<String, String>>() {
+                                      result.pass(input.toUpperCase());
+                                  }
+                              })
+                              .thenLift(
+                                      new Function<FunctionalRoutine<String, String>,
+                                              Routine<String, String>>() {
 
-                                        public FunctionalRoutine<String, String> apply(
-                                                final FunctionalRoutine<String, String> routine) {
+                                          public FunctionalRoutine<String, String> apply(
+                                                  final FunctionalRoutine<String, String> routine) {
 
-                                            return Functions.functional()
-                                                            .thenSyncFilter(
-                                                                    Functions.<String>notNull())
-                                                            .thenAsyncMap(routine);
-                                        }
-                                    })
-                            .asyncCall("test1", null, "test2", null)
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("TEST1", "TEST2");
+                                              return JFunctional.routine()
+                                                                .thenSyncFilter(
+                                                                        Functions.<String>notNull())
+                                                                .thenAsyncMap(routine);
+                                          }
+                                      })
+                              .asyncCall("test1", null, "test2", null)
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("TEST1", "TEST2");
     }
 
     private static void internalTestMapConsumer() {
 
-        assertThat(Functions.functional()
-                            .invocations()
-                            .withOutputOrder(OrderType.BY_CALL)
-                            .set()
-                            .thenAsyncMap(new BiConsumer<String, ResultChannel<String>>() {
+        assertThat(JFunctional.routine()
+                              .invocations()
+                              .withOutputOrder(OrderType.BY_CALL)
+                              .set()
+                              .thenAsyncMap(new BiConsumer<String, ResultChannel<String>>() {
 
-                                public void accept(final String s,
-                                        final ResultChannel<String> result) {
+                                  public void accept(final String s,
+                                          final ResultChannel<String> result) {
 
-                                    result.pass(s.toUpperCase());
-                                }
-                            })
-                            .asyncCall("test1", "test2")
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("TEST1", "TEST2");
-        assertThat(Functions.functional()
-                            .thenParallelMap(new BiConsumer<String, ResultChannel<String>>() {
+                                      result.pass(s.toUpperCase());
+                                  }
+                              })
+                              .asyncCall("test1", "test2")
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("TEST1", "TEST2");
+        assertThat(JFunctional.routine()
+                              .thenParallelMap(new BiConsumer<String, ResultChannel<String>>() {
 
-                                public void accept(final String s,
-                                        final ResultChannel<String> result) {
+                                                   public void accept(final String s,
+                                                           final ResultChannel<String> result) {
 
-                                    result.pass(s.toUpperCase());
-                                }
-                            })
-                            .asyncCall("test1", "test2")
-                            .afterMax(seconds(3))
-                            .all()).containsOnly("TEST1", "TEST2");
-        assertThat(Functions.functional()
-                            .invocations()
-                            .withOutputOrder(OrderType.BY_CALL)
-                            .set()
-                            .thenSyncMap(new BiConsumer<String, ResultChannel<String>>() {
+                                                       result.pass(s.toUpperCase());
+                                                   }
+                                               })
+                              .asyncCall("test1", "test2")
+                              .afterMax(seconds(3))
+                              .all()).containsOnly("TEST1", "TEST2");
+        assertThat(JFunctional.routine()
+                              .invocations()
+                              .withOutputOrder(OrderType.BY_CALL)
+                              .set()
+                              .thenSyncMap(new BiConsumer<String, ResultChannel<String>>() {
 
-                                public void accept(final String s,
-                                        final ResultChannel<String> result) {
+                                  public void accept(final String s,
+                                          final ResultChannel<String> result) {
 
-                                    result.pass(s.toUpperCase());
-                                }
-                            })
-                            .asyncCall("test1", "test2")
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("TEST1", "TEST2");
-        assertThat(Functions.functional()
-                            .thenSyncMap(PassingInvocation.<String>factoryOf())
-                            .invocations()
-                            .withOutputOrder(OrderType.BY_CALL)
-                            .set()
-                            .thenAsyncMap(new BiConsumer<String, ResultChannel<String>>() {
+                                      result.pass(s.toUpperCase());
+                                  }
+                              })
+                              .asyncCall("test1", "test2")
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("TEST1", "TEST2");
+        assertThat(JFunctional.routine()
+                              .thenSyncMap(PassingInvocation.<String>factoryOf())
+                              .invocations()
+                              .withOutputOrder(OrderType.BY_CALL)
+                              .set()
+                              .thenAsyncMap(new BiConsumer<String, ResultChannel<String>>() {
 
-                                public void accept(final String s,
-                                        final ResultChannel<String> result) {
+                                  public void accept(final String s,
+                                          final ResultChannel<String> result) {
 
-                                    result.pass(s.toUpperCase());
-                                }
-                            })
-                            .asyncCall("test1", "test2")
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("TEST1", "TEST2");
-        assertThat(Functions.functional()
-                            .thenSyncMap(PassingInvocation.<String>factoryOf())
-                            .thenParallelMap(new BiConsumer<String, ResultChannel<String>>() {
+                                      result.pass(s.toUpperCase());
+                                  }
+                              })
+                              .asyncCall("test1", "test2")
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("TEST1", "TEST2");
+        assertThat(JFunctional.routine()
+                              .thenSyncMap(PassingInvocation.<String>factoryOf())
+                              .thenParallelMap(new BiConsumer<String, ResultChannel<String>>() {
 
-                                public void accept(final String s,
-                                        final ResultChannel<String> result) {
+                                                   public void accept(final String s,
+                                                           final ResultChannel<String> result) {
 
-                                    result.pass(s.toUpperCase());
-                                }
-                            })
-                            .asyncCall("test1", "test2")
-                            .afterMax(seconds(3))
-                            .all()).containsOnly("TEST1", "TEST2");
-        assertThat(Functions.functional()
-                            .thenSyncMap(PassingInvocation.<String>factoryOf())
-                            .invocations()
-                            .withOutputOrder(OrderType.BY_CALL)
-                            .set()
-                            .thenSyncMap(new BiConsumer<String, ResultChannel<String>>() {
+                                                       result.pass(s.toUpperCase());
+                                                   }
+                                               })
+                              .asyncCall("test1", "test2")
+                              .afterMax(seconds(3))
+                              .all()).containsOnly("TEST1", "TEST2");
+        assertThat(JFunctional.routine()
+                              .thenSyncMap(PassingInvocation.<String>factoryOf())
+                              .invocations()
+                              .withOutputOrder(OrderType.BY_CALL)
+                              .set()
+                              .thenSyncMap(new BiConsumer<String, ResultChannel<String>>() {
 
-                                public void accept(final String s,
-                                        final ResultChannel<String> result) {
+                                  public void accept(final String s,
+                                          final ResultChannel<String> result) {
 
-                                    result.pass(s.toUpperCase());
-                                }
-                            })
-                            .asyncCall("test1", "test2")
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("TEST1", "TEST2");
+                                      result.pass(s.toUpperCase());
+                                  }
+                              })
+                              .asyncCall("test1", "test2")
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("TEST1", "TEST2");
     }
 
     private static void internalTestMapFilter() {
 
-        assertThat(Functions.functional()
-                            .invocations()
-                            .withOutputOrder(OrderType.BY_CALL)
-                            .set()
-                            .thenAsyncMap(new FilterInvocation<String, String>() {
+        assertThat(JFunctional.routine()
+                              .invocations()
+                              .withOutputOrder(OrderType.BY_CALL)
+                              .set()
+                              .thenAsyncMap(new FilterInvocation<String, String>() {
 
-                                public void onInput(final String input,
-                                        @NotNull final ResultChannel<String> result) {
+                                  public void onInput(final String input,
+                                          @NotNull final ResultChannel<String> result) {
 
-                                    result.pass(input.toUpperCase());
-                                }
-                            })
-                            .asyncCall("test1", "test2")
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("TEST1", "TEST2");
-        assertThat(Functions.functional().thenParallelMap(new FilterInvocation<String, String>() {
+                                      result.pass(input.toUpperCase());
+                                  }
+                              })
+                              .asyncCall("test1", "test2")
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("TEST1", "TEST2");
+        assertThat(JFunctional.routine().thenParallelMap(new FilterInvocation<String, String>() {
 
             public void onInput(final String input, @NotNull final ResultChannel<String> result) {
 
                 result.pass(input.toUpperCase());
             }
         }).asyncCall("test1", "test2").afterMax(seconds(3)).all()).containsOnly("TEST1", "TEST2");
-        assertThat(Functions.functional()
-                            .invocations()
-                            .withOutputOrder(OrderType.BY_CALL)
-                            .set()
-                            .thenSyncMap(new FilterInvocation<String, String>() {
+        assertThat(JFunctional.routine()
+                              .invocations()
+                              .withOutputOrder(OrderType.BY_CALL)
+                              .set()
+                              .thenSyncMap(new FilterInvocation<String, String>() {
 
-                                public void onInput(final String input,
-                                        @NotNull final ResultChannel<String> result) {
+                                  public void onInput(final String input,
+                                          @NotNull final ResultChannel<String> result) {
 
-                                    result.pass(input.toUpperCase());
-                                }
-                            })
-                            .asyncCall("test1", "test2")
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("TEST1", "TEST2");
-        assertThat(Functions.functional()
-                            .thenSyncMap(PassingInvocation.<String>factoryOf())
-                            .invocations()
-                            .withOutputOrder(OrderType.BY_CALL)
-                            .set()
-                            .thenAsyncMap(new FilterInvocation<String, String>() {
+                                      result.pass(input.toUpperCase());
+                                  }
+                              })
+                              .asyncCall("test1", "test2")
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("TEST1", "TEST2");
+        assertThat(JFunctional.routine()
+                              .thenSyncMap(PassingInvocation.<String>factoryOf())
+                              .invocations()
+                              .withOutputOrder(OrderType.BY_CALL)
+                              .set()
+                              .thenAsyncMap(new FilterInvocation<String, String>() {
 
-                                public void onInput(final String input,
-                                        @NotNull final ResultChannel<String> result) {
+                                  public void onInput(final String input,
+                                          @NotNull final ResultChannel<String> result) {
 
-                                    result.pass(input.toUpperCase());
-                                }
-                            })
-                            .asyncCall("test1", "test2")
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("TEST1", "TEST2");
-        assertThat(Functions.functional()
-                            .thenSyncMap(PassingInvocation.<String>factoryOf())
-                            .thenParallelMap(new FilterInvocation<String, String>() {
+                                      result.pass(input.toUpperCase());
+                                  }
+                              })
+                              .asyncCall("test1", "test2")
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("TEST1", "TEST2");
+        assertThat(JFunctional.routine()
+                              .thenSyncMap(PassingInvocation.<String>factoryOf())
+                              .thenParallelMap(new FilterInvocation<String, String>() {
 
-                                public void onInput(final String input,
-                                        @NotNull final ResultChannel<String> result) {
+                                  public void onInput(final String input,
+                                          @NotNull final ResultChannel<String> result) {
 
-                                    result.pass(input.toUpperCase());
-                                }
-                            })
-                            .asyncCall("test1", "test2")
-                            .afterMax(seconds(3))
-                            .all()).containsOnly("TEST1", "TEST2");
-        assertThat(Functions.functional()
-                            .thenSyncMap(PassingInvocation.<String>factoryOf())
-                            .invocations()
-                            .withOutputOrder(OrderType.BY_CALL)
-                            .set()
-                            .thenSyncMap(new FilterInvocation<String, String>() {
+                                      result.pass(input.toUpperCase());
+                                  }
+                              })
+                              .asyncCall("test1", "test2")
+                              .afterMax(seconds(3))
+                              .all()).containsOnly("TEST1", "TEST2");
+        assertThat(JFunctional.routine()
+                              .thenSyncMap(PassingInvocation.<String>factoryOf())
+                              .invocations()
+                              .withOutputOrder(OrderType.BY_CALL)
+                              .set()
+                              .thenSyncMap(new FilterInvocation<String, String>() {
 
-                                public void onInput(final String input,
-                                        @NotNull final ResultChannel<String> result) {
+                                  public void onInput(final String input,
+                                          @NotNull final ResultChannel<String> result) {
 
-                                    result.pass(input.toUpperCase());
-                                }
-                            })
-                            .asyncCall("test1", "test2")
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("TEST1", "TEST2");
+                                      result.pass(input.toUpperCase());
+                                  }
+                              })
+                              .asyncCall("test1", "test2")
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("TEST1", "TEST2");
     }
 
     private static void internalTestMapFunction() {
 
-        assertThat(Functions.functional()
-                            .invocations()
-                            .withOutputOrder(OrderType.BY_CALL)
-                            .set()
-                            .thenAsyncMap(new Function<String, String>() {
+        assertThat(JFunctional.routine()
+                              .invocations()
+                              .withOutputOrder(OrderType.BY_CALL)
+                              .set()
+                              .thenAsyncMap(new Function<String, String>() {
 
-                                public String apply(final String s) {
+                                  public String apply(final String s) {
 
-                                    return s.toUpperCase();
-                                }
-                            })
-                            .asyncCall("test1", "test2")
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("TEST1", "TEST2");
-        assertThat(Functions.functional().thenParallelMap(new Function<String, String>() {
+                                      return s.toUpperCase();
+                                  }
+                              })
+                              .asyncCall("test1", "test2")
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("TEST1", "TEST2");
+        assertThat(JFunctional.routine().thenParallelMap(new Function<String, String>() {
 
             public String apply(final String s) {
 
                 return s.toUpperCase();
             }
         }).asyncCall("test1", "test2").afterMax(seconds(3)).all()).containsOnly("TEST1", "TEST2");
-        assertThat(Functions.functional()
-                            .invocations()
-                            .withOutputOrder(OrderType.BY_CALL)
-                            .set()
-                            .thenSyncMap(new Function<String, String>() {
+        assertThat(JFunctional.routine()
+                              .invocations()
+                              .withOutputOrder(OrderType.BY_CALL)
+                              .set()
+                              .thenSyncMap(new Function<String, String>() {
 
-                                public String apply(final String s) {
+                                  public String apply(final String s) {
 
-                                    return s.toUpperCase();
-                                }
-                            })
-                            .asyncCall("test1", "test2")
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("TEST1", "TEST2");
-        assertThat(Functions.functional()
-                            .thenSyncMap(PassingInvocation.<String>factoryOf())
-                            .invocations()
-                            .withOutputOrder(OrderType.BY_CALL)
-                            .set()
-                            .thenAsyncMap(new Function<String, String>() {
+                                      return s.toUpperCase();
+                                  }
+                              })
+                              .asyncCall("test1", "test2")
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("TEST1", "TEST2");
+        assertThat(JFunctional.routine()
+                              .thenSyncMap(PassingInvocation.<String>factoryOf())
+                              .invocations()
+                              .withOutputOrder(OrderType.BY_CALL)
+                              .set()
+                              .thenAsyncMap(new Function<String, String>() {
 
-                                public String apply(final String s) {
+                                  public String apply(final String s) {
 
-                                    return s.toUpperCase();
-                                }
-                            })
-                            .asyncCall("test1", "test2")
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("TEST1", "TEST2");
-        assertThat(Functions.functional()
-                            .thenSyncMap(PassingInvocation.<String>factoryOf())
-                            .thenParallelMap(new Function<String, String>() {
+                                      return s.toUpperCase();
+                                  }
+                              })
+                              .asyncCall("test1", "test2")
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("TEST1", "TEST2");
+        assertThat(JFunctional.routine()
+                              .thenSyncMap(PassingInvocation.<String>factoryOf())
+                              .thenParallelMap(new Function<String, String>() {
 
-                                public String apply(final String s) {
+                                  public String apply(final String s) {
 
-                                    return s.toUpperCase();
-                                }
-                            })
-                            .asyncCall("test1", "test2")
-                            .afterMax(seconds(3))
-                            .all()).containsOnly("TEST1", "TEST2");
-        assertThat(Functions.functional()
-                            .thenSyncMap(PassingInvocation.<String>factoryOf())
-                            .invocations()
-                            .withOutputOrder(OrderType.BY_CALL)
-                            .set()
-                            .thenSyncMap(new Function<String, String>() {
+                                      return s.toUpperCase();
+                                  }
+                              })
+                              .asyncCall("test1", "test2")
+                              .afterMax(seconds(3))
+                              .all()).containsOnly("TEST1", "TEST2");
+        assertThat(JFunctional.routine()
+                              .thenSyncMap(PassingInvocation.<String>factoryOf())
+                              .invocations()
+                              .withOutputOrder(OrderType.BY_CALL)
+                              .set()
+                              .thenSyncMap(new Function<String, String>() {
 
-                                public String apply(final String s) {
+                                  public String apply(final String s) {
 
-                                    return s.toUpperCase();
-                                }
-                            })
-                            .asyncCall("test1", "test2")
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("TEST1", "TEST2");
+                                      return s.toUpperCase();
+                                  }
+                              })
+                              .asyncCall("test1", "test2")
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("TEST1", "TEST2");
     }
 
     private static void internalTestReduceConsumer() {
 
-        assertThat(Functions.functional()
-                            .thenAsyncReduce(
-                                    new BiConsumer<List<? extends String>, ResultChannel<String>>
-                                            () {
+        assertThat(JFunctional.routine()
+                              .thenAsyncReduce(
+                                      new BiConsumer<List<? extends String>,
+                                              ResultChannel<String>>() {
 
-                                        public void accept(final List<? extends String> strings,
-                                                final ResultChannel<String> result) {
+                                          public void accept(final List<? extends String> strings,
+                                                  final ResultChannel<String> result) {
 
-                                            final StringBuilder builder = new StringBuilder();
+                                              final StringBuilder builder = new StringBuilder();
 
-                                            for (final String string : strings) {
+                                              for (final String string : strings) {
 
-                                                builder.append(string);
-                                            }
+                                                  builder.append(string);
+                                              }
 
-                                            result.pass(builder.toString());
-                                        }
-                                    })
-                            .asyncCall("test1", "test2", "test3")
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("test1test2test3");
-        assertThat(Functions.functional()
-                            .thenSyncReduce(
-                                    new BiConsumer<List<? extends String>, ResultChannel<String>>
-                                            () {
+                                              result.pass(builder.toString());
+                                          }
+                                      })
+                              .asyncCall("test1", "test2", "test3")
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("test1test2test3");
+        assertThat(JFunctional.routine()
+                              .thenSyncReduce(
+                                      new BiConsumer<List<? extends String>,
+                                              ResultChannel<String>>() {
 
-                                        public void accept(final List<? extends String> strings,
-                                                final ResultChannel<String> result) {
+                                          public void accept(final List<? extends String> strings,
+                                                  final ResultChannel<String> result) {
 
-                                            final StringBuilder builder = new StringBuilder();
+                                              final StringBuilder builder = new StringBuilder();
 
-                                            for (final String string : strings) {
+                                              for (final String string : strings) {
 
-                                                builder.append(string);
-                                            }
+                                                  builder.append(string);
+                                              }
 
-                                            result.pass(builder.toString());
-                                        }
-                                    })
-                            .asyncCall("test1", "test2", "test3")
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("test1test2test3");
-        assertThat(Functions.functional()
-                            .thenSyncMap(PassingInvocation.<String>factoryOf())
-                            .thenAsyncReduce(
-                                    new BiConsumer<List<? extends String>, ResultChannel<String>>
-                                            () {
+                                              result.pass(builder.toString());
+                                          }
+                                      })
+                              .asyncCall("test1", "test2", "test3")
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("test1test2test3");
+        assertThat(JFunctional.routine()
+                              .thenSyncMap(PassingInvocation.<String>factoryOf())
+                              .thenAsyncReduce(
+                                      new BiConsumer<List<? extends String>,
+                                              ResultChannel<String>>() {
 
-                                        public void accept(final List<? extends String> strings,
-                                                final ResultChannel<String> result) {
+                                          public void accept(final List<? extends String> strings,
+                                                  final ResultChannel<String> result) {
 
-                                            final StringBuilder builder = new StringBuilder();
+                                              final StringBuilder builder = new StringBuilder();
 
-                                            for (final String string : strings) {
+                                              for (final String string : strings) {
 
-                                                builder.append(string);
-                                            }
+                                                  builder.append(string);
+                                              }
 
-                                            result.pass(builder.toString());
-                                        }
-                                    })
-                            .asyncCall("test1", "test2", "test3")
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("test1test2test3");
-        assertThat(Functions.functional()
-                            .thenSyncMap(PassingInvocation.<String>factoryOf())
-                            .thenSyncReduce(
-                                    new BiConsumer<List<? extends String>, ResultChannel<String>>
-                                            () {
+                                              result.pass(builder.toString());
+                                          }
+                                      })
+                              .asyncCall("test1", "test2", "test3")
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("test1test2test3");
+        assertThat(JFunctional.routine()
+                              .thenSyncMap(PassingInvocation.<String>factoryOf())
+                              .thenSyncReduce(
+                                      new BiConsumer<List<? extends String>,
+                                              ResultChannel<String>>() {
 
-                                        public void accept(final List<? extends String> strings,
-                                                final ResultChannel<String> result) {
+                                          public void accept(final List<? extends String> strings,
+                                                  final ResultChannel<String> result) {
 
-                                            final StringBuilder builder = new StringBuilder();
+                                              final StringBuilder builder = new StringBuilder();
 
-                                            for (final String string : strings) {
+                                              for (final String string : strings) {
 
-                                                builder.append(string);
-                                            }
+                                                  builder.append(string);
+                                              }
 
-                                            result.pass(builder.toString());
-                                        }
-                                    })
-                            .asyncCall("test1", "test2", "test3")
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("test1test2test3");
+                                              result.pass(builder.toString());
+                                          }
+                                      })
+                              .asyncCall("test1", "test2", "test3")
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("test1test2test3");
     }
 
     private static void internalTestReduceFunction() {
 
-        assertThat(Functions.functional()
-                            .thenAsyncReduce(new Function<List<? extends String>, String>() {
+        assertThat(JFunctional.routine()
+                              .thenAsyncReduce(new Function<List<? extends String>, String>() {
 
-                                public String apply(final List<? extends String> strings) {
+                                                   public String apply(
+                                                           final List<? extends String> strings) {
 
-                                    final StringBuilder builder = new StringBuilder();
+                                                       final StringBuilder builder =
+                                                               new StringBuilder();
 
-                                    for (final String string : strings) {
+                                                       for (final String string : strings) {
 
-                                        builder.append(string);
-                                    }
+                                                           builder.append(string);
+                                                       }
 
-                                    return builder.toString();
-                                }
-                            })
-                            .asyncCall("test1", "test2", "test3")
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("test1test2test3");
-        assertThat(Functions.functional()
-                            .thenSyncReduce(new Function<List<? extends String>, String>() {
+                                                       return builder.toString();
+                                                   }
+                                               })
+                              .asyncCall("test1", "test2", "test3")
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("test1test2test3");
+        assertThat(JFunctional.routine()
+                              .thenSyncReduce(new Function<List<? extends String>, String>() {
 
-                                public String apply(final List<? extends String> strings) {
+                                                  public String apply(
+                                                          final List<? extends String> strings) {
 
-                                    final StringBuilder builder = new StringBuilder();
+                                                      final StringBuilder builder =
+                                                              new StringBuilder();
 
-                                    for (final String string : strings) {
+                                                      for (final String string : strings) {
 
-                                        builder.append(string);
-                                    }
+                                                          builder.append(string);
+                                                      }
 
-                                    return builder.toString();
-                                }
-                            })
-                            .asyncCall("test1", "test2", "test3")
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("test1test2test3");
-        assertThat(Functions.functional()
-                            .thenSyncMap(PassingInvocation.<String>factoryOf())
-                            .thenAsyncReduce(new Function<List<? extends String>, String>() {
+                                                      return builder.toString();
+                                                  }
+                                              })
+                              .asyncCall("test1", "test2", "test3")
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("test1test2test3");
+        assertThat(JFunctional.routine()
+                              .thenSyncMap(PassingInvocation.<String>factoryOf())
+                              .thenAsyncReduce(new Function<List<? extends String>, String>() {
 
-                                public String apply(final List<? extends String> strings) {
+                                                   public String apply(
+                                                           final List<? extends String> strings) {
 
-                                    final StringBuilder builder = new StringBuilder();
+                                                       final StringBuilder builder =
+                                                               new StringBuilder();
 
-                                    for (final String string : strings) {
+                                                       for (final String string : strings) {
 
-                                        builder.append(string);
-                                    }
+                                                           builder.append(string);
+                                                       }
 
-                                    return builder.toString();
-                                }
-                            })
-                            .asyncCall("test1", "test2", "test3")
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("test1test2test3");
-        assertThat(Functions.functional()
-                            .thenSyncMap(PassingInvocation.<String>factoryOf())
-                            .thenSyncReduce(new Function<List<? extends String>, String>() {
+                                                       return builder.toString();
+                                                   }
+                                               })
+                              .asyncCall("test1", "test2", "test3")
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("test1test2test3");
+        assertThat(JFunctional.routine()
+                              .thenSyncMap(PassingInvocation.<String>factoryOf())
+                              .thenSyncReduce(new Function<List<? extends String>, String>() {
 
-                                public String apply(final List<? extends String> strings) {
+                                                  public String apply(
+                                                          final List<? extends String> strings) {
 
-                                    final StringBuilder builder = new StringBuilder();
+                                                      final StringBuilder builder =
+                                                              new StringBuilder();
 
-                                    for (final String string : strings) {
+                                                      for (final String string : strings) {
 
-                                        builder.append(string);
-                                    }
+                                                          builder.append(string);
+                                                      }
 
-                                    return builder.toString();
-                                }
-                            })
-                            .asyncCall("test1", "test2", "test3")
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("test1test2test3");
+                                                      return builder.toString();
+                                                  }
+                                              })
+                              .asyncCall("test1", "test2", "test3")
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("test1test2test3");
     }
 
     @Test
@@ -655,7 +661,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenAsyncAccumulate(new BiFunction<Object, Object, Object>() {
+            JFunctional.routine().thenAsyncAccumulate(new BiFunction<Object, Object, Object>() {
 
                 public Object apply(final Object o, final Object o2) {
 
@@ -671,7 +677,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenSyncAccumulate(new BiFunction<Object, Object, Object>() {
+            JFunctional.routine().thenSyncAccumulate(new BiFunction<Object, Object, Object>() {
 
                 public Object apply(final Object o, final Object o2) {
 
@@ -687,15 +693,15 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenAsyncAccumulate(new BiFunction<Object, Object, Object>() {
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenAsyncAccumulate(new BiFunction<Object, Object, Object>() {
 
-                         public Object apply(final Object o, final Object o2) {
+                           public Object apply(final Object o, final Object o2) {
 
-                             return null;
-                         }
-                     });
+                               return null;
+                           }
+                       });
 
             fail();
 
@@ -705,15 +711,15 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenSyncAccumulate(new BiFunction<Object, Object, Object>() {
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenSyncAccumulate(new BiFunction<Object, Object, Object>() {
 
-                         public Object apply(final Object o, final Object o2) {
+                           public Object apply(final Object o, final Object o2) {
 
-                             return null;
-                         }
-                     });
+                               return null;
+                           }
+                       });
 
             fail();
 
@@ -728,7 +734,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenAsyncAccumulate(null);
+            JFunctional.routine().thenAsyncAccumulate(null);
 
             fail();
 
@@ -738,7 +744,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenSyncAccumulate(null);
+            JFunctional.routine().thenSyncAccumulate(null);
 
             fail();
 
@@ -748,9 +754,9 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenAsyncAccumulate(null);
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenAsyncAccumulate(null);
 
             fail();
 
@@ -760,9 +766,9 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenSyncAccumulate(null);
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenSyncAccumulate(null);
 
             fail();
 
@@ -782,7 +788,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().routineFrom(new Consumer<ResultChannel<String>>() {
+            JFunctional.routine().from(new Consumer<ResultChannel<String>>() {
 
                 public void accept(final ResultChannel<String> stringResultChannel) {
 
@@ -797,7 +803,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().routineFrom(new CommandInvocation<String>() {
+            JFunctional.routine().from(new CommandInvocation<String>() {
 
                 public void onResult(@NotNull final ResultChannel<String> result) {
 
@@ -812,7 +818,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().routineFrom(new Supplier<String>() {
+            JFunctional.routine().from(new Supplier<String>() {
 
                 public String get() {
 
@@ -833,7 +839,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().routineFrom((Consumer<ResultChannel<String>>) null);
+            JFunctional.routine().from((Consumer<ResultChannel<String>>) null);
 
             fail();
 
@@ -843,7 +849,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().routineFrom((CommandInvocation<String>) null);
+            JFunctional.routine().from((CommandInvocation<String>) null);
 
             fail();
 
@@ -853,7 +859,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().routineFrom((Supplier<String>) null);
+            JFunctional.routine().from((Supplier<String>) null);
 
             fail();
 
@@ -865,39 +871,39 @@ public class FunctionalRoutineTest {
     @Test
     public void testFilter() {
 
-        assertThat(Functions.functional()
-                            .thenAsyncFilter(Functions.notNull())
-                            .asyncCall(null, "test")
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("test");
-        assertThat(Functions.functional()
-                            .thenParallelFilter(Functions.notNull())
-                            .asyncCall(null, "test")
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("test");
-        assertThat(Functions.functional()
-                            .thenSyncFilter(Functions.notNull())
-                            .asyncCall(null, "test")
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("test");
-        assertThat(Functions.functional()
-                            .thenSyncMap(PassingInvocation.factoryOf())
-                            .thenAsyncFilter(Functions.notNull())
-                            .asyncCall(null, "test")
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("test");
-        assertThat(Functions.functional()
-                            .thenSyncMap(PassingInvocation.factoryOf())
-                            .thenParallelFilter(Functions.notNull())
-                            .asyncCall(null, "test")
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("test");
-        assertThat(Functions.functional()
-                            .thenSyncMap(PassingInvocation.factoryOf())
-                            .thenSyncFilter(Functions.notNull())
-                            .asyncCall(null, "test")
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("test");
+        assertThat(JFunctional.routine()
+                              .thenAsyncFilter(Functions.notNull())
+                              .asyncCall(null, "test")
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("test");
+        assertThat(JFunctional.routine()
+                              .thenParallelFilter(Functions.notNull())
+                              .asyncCall(null, "test")
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("test");
+        assertThat(JFunctional.routine()
+                              .thenSyncFilter(Functions.notNull())
+                              .asyncCall(null, "test")
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("test");
+        assertThat(JFunctional.routine()
+                              .thenSyncMap(PassingInvocation.factoryOf())
+                              .thenAsyncFilter(Functions.notNull())
+                              .asyncCall(null, "test")
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("test");
+        assertThat(JFunctional.routine()
+                              .thenSyncMap(PassingInvocation.factoryOf())
+                              .thenParallelFilter(Functions.notNull())
+                              .asyncCall(null, "test")
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("test");
+        assertThat(JFunctional.routine()
+                              .thenSyncMap(PassingInvocation.factoryOf())
+                              .thenSyncFilter(Functions.notNull())
+                              .asyncCall(null, "test")
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("test");
     }
 
     @Test
@@ -905,7 +911,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenAsyncFilter(new Predicate<Object>() {
+            JFunctional.routine().thenAsyncFilter(new Predicate<Object>() {
 
                 public boolean test(final Object o) {
 
@@ -921,7 +927,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenParallelFilter(new Predicate<Object>() {
+            JFunctional.routine().thenParallelFilter(new Predicate<Object>() {
 
                 public boolean test(final Object o) {
 
@@ -937,7 +943,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenSyncFilter(new Predicate<Object>() {
+            JFunctional.routine().thenSyncFilter(new Predicate<Object>() {
 
                 public boolean test(final Object o) {
 
@@ -953,33 +959,15 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenAsyncFilter(new Predicate<Object>() {
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenAsyncFilter(new Predicate<Object>() {
 
-                         public boolean test(final Object o) {
+                           public boolean test(final Object o) {
 
-                             return false;
-                         }
-                     });
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenParallelFilter(new Predicate<Object>() {
-
-                         public boolean test(final Object o) {
-
-                             return false;
-                         }
-                     });
+                               return false;
+                           }
+                       });
 
             fail();
 
@@ -989,15 +977,33 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenSyncFilter(new Predicate<Object>() {
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenParallelFilter(new Predicate<Object>() {
 
-                         public boolean test(final Object o) {
+                           public boolean test(final Object o) {
 
-                             return false;
-                         }
-                     });
+                               return false;
+                           }
+                       });
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenSyncFilter(new Predicate<Object>() {
+
+                           public boolean test(final Object o) {
+
+                               return false;
+                           }
+                       });
 
             fail();
 
@@ -1012,7 +1018,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenAsyncFilter(null);
+            JFunctional.routine().thenAsyncFilter(null);
 
             fail();
 
@@ -1022,7 +1028,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenParallelFilter(null);
+            JFunctional.routine().thenParallelFilter(null);
 
             fail();
 
@@ -1032,7 +1038,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenSyncFilter(null);
+            JFunctional.routine().thenSyncFilter(null);
 
             fail();
 
@@ -1042,7 +1048,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenSyncMap(PassingInvocation.factoryOf()).thenAsyncFilter(null);
+            JFunctional.routine().thenSyncMap(PassingInvocation.factoryOf()).thenAsyncFilter(null);
 
             fail();
 
@@ -1052,9 +1058,9 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenParallelFilter(null);
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenParallelFilter(null);
 
             fail();
 
@@ -1064,7 +1070,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenSyncMap(PassingInvocation.factoryOf()).thenSyncFilter(null);
+            JFunctional.routine().thenSyncMap(PassingInvocation.factoryOf()).thenSyncFilter(null);
 
             fail();
 
@@ -1085,7 +1091,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenSyncMap(PassingInvocation.factoryOf()).thenFlatLift(null);
+            JFunctional.routine().thenSyncMap(PassingInvocation.factoryOf()).thenFlatLift(null);
 
             fail();
 
@@ -1095,7 +1101,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenSyncMap(PassingInvocation.factoryOf()).thenLift(null);
+            JFunctional.routine().thenSyncMap(PassingInvocation.factoryOf()).thenLift(null);
 
             fail();
 
@@ -1115,7 +1121,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenAsyncMap(new BiConsumer<Object, ResultChannel<Object>>() {
+            JFunctional.routine().thenAsyncMap(new BiConsumer<Object, ResultChannel<Object>>() {
 
                 public void accept(final Object o, final ResultChannel<Object> result) {
 
@@ -1130,7 +1136,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenParallelMap(new BiConsumer<Object, ResultChannel<Object>>() {
+            JFunctional.routine().thenParallelMap(new BiConsumer<Object, ResultChannel<Object>>() {
 
                 public void accept(final Object o, final ResultChannel<Object> result) {
 
@@ -1145,7 +1151,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenSyncMap(new BiConsumer<Object, ResultChannel<Object>>() {
+            JFunctional.routine().thenSyncMap(new BiConsumer<Object, ResultChannel<Object>>() {
 
                 public void accept(final Object o, final ResultChannel<Object> result) {
 
@@ -1160,31 +1166,14 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenAsyncMap(new BiConsumer<Object, ResultChannel<Object>>() {
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenAsyncMap(new BiConsumer<Object, ResultChannel<Object>>() {
 
-                         public void accept(final Object o, final ResultChannel<Object> result) {
+                           public void accept(final Object o, final ResultChannel<Object> result) {
 
-                         }
-                     });
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenParallelMap(new BiConsumer<Object, ResultChannel<Object>>() {
-
-                         public void accept(final Object o, final ResultChannel<Object> result) {
-
-                         }
-                     });
+                           }
+                       });
 
             fail();
 
@@ -1194,14 +1183,31 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenSyncMap(new BiConsumer<Object, ResultChannel<Object>>() {
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenParallelMap(new BiConsumer<Object, ResultChannel<Object>>() {
 
-                         public void accept(final Object o, final ResultChannel<Object> result) {
+                           public void accept(final Object o, final ResultChannel<Object> result) {
 
-                         }
-                     });
+                           }
+                       });
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenSyncMap(new BiConsumer<Object, ResultChannel<Object>>() {
+
+                           public void accept(final Object o, final ResultChannel<Object> result) {
+
+                           }
+                       });
 
             fail();
 
@@ -1216,7 +1222,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenAsyncMap((BiConsumer<Object, ResultChannel<Object>>) null);
+            JFunctional.routine().thenAsyncMap((BiConsumer<Object, ResultChannel<Object>>) null);
 
             fail();
 
@@ -1226,8 +1232,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenParallelMap((BiConsumer<Object, ResultChannel<Object>>) null);
+            JFunctional.routine().thenParallelMap((BiConsumer<Object, ResultChannel<Object>>) null);
 
             fail();
 
@@ -1237,7 +1242,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenSyncMap((BiConsumer<Object, ResultChannel<Object>>) null);
+            JFunctional.routine().thenSyncMap((BiConsumer<Object, ResultChannel<Object>>) null);
 
             fail();
 
@@ -1247,9 +1252,9 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenAsyncMap((BiConsumer<Object, ResultChannel<Object>>) null);
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenAsyncMap((BiConsumer<Object, ResultChannel<Object>>) null);
 
             fail();
 
@@ -1259,9 +1264,9 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenParallelMap((BiConsumer<Object, ResultChannel<Object>>) null);
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenParallelMap((BiConsumer<Object, ResultChannel<Object>>) null);
 
             fail();
 
@@ -1271,9 +1276,9 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenSyncMap((BiConsumer<Object, ResultChannel<Object>>) null);
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenSyncMap((BiConsumer<Object, ResultChannel<Object>>) null);
 
             fail();
 
@@ -1286,51 +1291,51 @@ public class FunctionalRoutineTest {
     public void testMapFactory() {
 
         final InvocationFactory<String, String> factory = Invocations.factoryOf(UpperCase.class);
-        assertThat(Functions.functional()
-                            .invocations()
-                            .withOutputOrder(OrderType.BY_CALL)
-                            .set()
-                            .thenAsyncMap(factory)
-                            .asyncCall("test1", "test2")
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("TEST1", "TEST2");
-        assertThat(Functions.functional()
-                            .thenParallelMap(factory)
-                            .asyncCall("test1", "test2")
-                            .afterMax(seconds(3))
-                            .all()).containsOnly("TEST1", "TEST2");
-        assertThat(Functions.functional()
-                            .invocations()
-                            .withOutputOrder(OrderType.BY_CALL)
-                            .set()
-                            .thenSyncMap(factory)
-                            .asyncCall("test1", "test2")
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("TEST1", "TEST2");
-        assertThat(Functions.functional()
-                            .thenSyncMap(PassingInvocation.<String>factoryOf())
-                            .invocations()
-                            .withOutputOrder(OrderType.BY_CALL)
-                            .set()
-                            .thenAsyncMap(factory)
-                            .asyncCall("test1", "test2")
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("TEST1", "TEST2");
-        assertThat(Functions.functional()
-                            .thenSyncMap(PassingInvocation.<String>factoryOf())
-                            .thenParallelMap(factory)
-                            .asyncCall("test1", "test2")
-                            .afterMax(seconds(3))
-                            .all()).containsOnly("TEST1", "TEST2");
-        assertThat(Functions.functional()
-                            .thenSyncMap(PassingInvocation.<String>factoryOf())
-                            .invocations()
-                            .withOutputOrder(OrderType.BY_CALL)
-                            .set()
-                            .thenSyncMap(factory)
-                            .asyncCall("test1", "test2")
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("TEST1", "TEST2");
+        assertThat(JFunctional.routine()
+                              .invocations()
+                              .withOutputOrder(OrderType.BY_CALL)
+                              .set()
+                              .thenAsyncMap(factory)
+                              .asyncCall("test1", "test2")
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("TEST1", "TEST2");
+        assertThat(JFunctional.routine()
+                              .thenParallelMap(factory)
+                              .asyncCall("test1", "test2")
+                              .afterMax(seconds(3))
+                              .all()).containsOnly("TEST1", "TEST2");
+        assertThat(JFunctional.routine()
+                              .invocations()
+                              .withOutputOrder(OrderType.BY_CALL)
+                              .set()
+                              .thenSyncMap(factory)
+                              .asyncCall("test1", "test2")
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("TEST1", "TEST2");
+        assertThat(JFunctional.routine()
+                              .thenSyncMap(PassingInvocation.<String>factoryOf())
+                              .invocations()
+                              .withOutputOrder(OrderType.BY_CALL)
+                              .set()
+                              .thenAsyncMap(factory)
+                              .asyncCall("test1", "test2")
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("TEST1", "TEST2");
+        assertThat(JFunctional.routine()
+                              .thenSyncMap(PassingInvocation.<String>factoryOf())
+                              .thenParallelMap(factory)
+                              .asyncCall("test1", "test2")
+                              .afterMax(seconds(3))
+                              .all()).containsOnly("TEST1", "TEST2");
+        assertThat(JFunctional.routine()
+                              .thenSyncMap(PassingInvocation.<String>factoryOf())
+                              .invocations()
+                              .withOutputOrder(OrderType.BY_CALL)
+                              .set()
+                              .thenSyncMap(factory)
+                              .asyncCall("test1", "test2")
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("TEST1", "TEST2");
     }
 
     @Test
@@ -1339,7 +1344,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenAsyncMap((InvocationFactory<Object, Object>) null);
+            JFunctional.routine().thenAsyncMap((InvocationFactory<Object, Object>) null);
 
             fail();
 
@@ -1349,7 +1354,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenParallelMap((InvocationFactory<Object, Object>) null);
+            JFunctional.routine().thenParallelMap((InvocationFactory<Object, Object>) null);
 
             fail();
 
@@ -1359,7 +1364,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenSyncMap((InvocationFactory<Object, Object>) null);
+            JFunctional.routine().thenSyncMap((InvocationFactory<Object, Object>) null);
 
             fail();
 
@@ -1369,9 +1374,9 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenAsyncMap((InvocationFactory<Object, Object>) null);
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenAsyncMap((InvocationFactory<Object, Object>) null);
 
             fail();
 
@@ -1381,9 +1386,9 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenParallelMap((InvocationFactory<Object, Object>) null);
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenParallelMap((InvocationFactory<Object, Object>) null);
 
             fail();
 
@@ -1393,9 +1398,9 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenSyncMap((InvocationFactory<Object, Object>) null);
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenSyncMap((InvocationFactory<Object, Object>) null);
 
             fail();
 
@@ -1415,7 +1420,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenAsyncMap(new FilterInvocation<Object, Object>() {
+            JFunctional.routine().thenAsyncMap(new FilterInvocation<Object, Object>() {
 
                 public void onInput(final Object input,
                         @NotNull final ResultChannel<Object> result) {
@@ -1431,7 +1436,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenParallelMap(new FilterInvocation<Object, Object>() {
+            JFunctional.routine().thenParallelMap(new FilterInvocation<Object, Object>() {
 
                 public void onInput(final Object input,
                         @NotNull final ResultChannel<Object> result) {
@@ -1447,7 +1452,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenSyncMap(new FilterInvocation<Object, Object>() {
+            JFunctional.routine().thenSyncMap(new FilterInvocation<Object, Object>() {
 
                 public void onInput(final Object input,
                         @NotNull final ResultChannel<Object> result) {
@@ -1463,33 +1468,15 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenAsyncMap(new FilterInvocation<Object, Object>() {
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenAsyncMap(new FilterInvocation<Object, Object>() {
 
-                         public void onInput(final Object input,
-                                 @NotNull final ResultChannel<Object> result) {
+                           public void onInput(final Object input,
+                                   @NotNull final ResultChannel<Object> result) {
 
-                         }
-                     });
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenParallelMap(new FilterInvocation<Object, Object>() {
-
-                         public void onInput(final Object input,
-                                 @NotNull final ResultChannel<Object> result) {
-
-                         }
-                     });
+                           }
+                       });
 
             fail();
 
@@ -1499,15 +1486,33 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenSyncMap(new FilterInvocation<Object, Object>() {
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenParallelMap(new FilterInvocation<Object, Object>() {
 
-                         public void onInput(final Object input,
-                                 @NotNull final ResultChannel<Object> result) {
+                           public void onInput(final Object input,
+                                   @NotNull final ResultChannel<Object> result) {
 
-                         }
-                     });
+                           }
+                       });
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenSyncMap(new FilterInvocation<Object, Object>() {
+
+                           public void onInput(final Object input,
+                                   @NotNull final ResultChannel<Object> result) {
+
+                           }
+                       });
 
             fail();
 
@@ -1522,7 +1527,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenAsyncMap((FilterInvocation<Object, Object>) null);
+            JFunctional.routine().thenAsyncMap((FilterInvocation<Object, Object>) null);
 
             fail();
 
@@ -1532,7 +1537,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenParallelMap((FilterInvocation<Object, Object>) null);
+            JFunctional.routine().thenParallelMap((FilterInvocation<Object, Object>) null);
 
             fail();
 
@@ -1542,7 +1547,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenSyncMap((FilterInvocation<Object, Object>) null);
+            JFunctional.routine().thenSyncMap((FilterInvocation<Object, Object>) null);
 
             fail();
 
@@ -1552,9 +1557,9 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenAsyncMap((FilterInvocation<Object, Object>) null);
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenAsyncMap((FilterInvocation<Object, Object>) null);
 
             fail();
 
@@ -1564,9 +1569,9 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenParallelMap((FilterInvocation<Object, Object>) null);
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenParallelMap((FilterInvocation<Object, Object>) null);
 
             fail();
 
@@ -1576,9 +1581,9 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenSyncMap((FilterInvocation<Object, Object>) null);
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenSyncMap((FilterInvocation<Object, Object>) null);
 
             fail();
 
@@ -1598,7 +1603,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenAsyncMap(new Function<Object, Object>() {
+            JFunctional.routine().thenAsyncMap(new Function<Object, Object>() {
 
                 public Object apply(final Object o) {
 
@@ -1614,7 +1619,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenParallelMap(new Function<Object, Object>() {
+            JFunctional.routine().thenParallelMap(new Function<Object, Object>() {
 
                 public Object apply(final Object o) {
 
@@ -1630,7 +1635,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenSyncMap(new Function<Object, Object>() {
+            JFunctional.routine().thenSyncMap(new Function<Object, Object>() {
 
                 public Object apply(final Object o) {
 
@@ -1646,33 +1651,15 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenAsyncMap(new Function<Object, Object>() {
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenAsyncMap(new Function<Object, Object>() {
 
-                         public Object apply(final Object o) {
+                           public Object apply(final Object o) {
 
-                             return null;
-                         }
-                     });
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenParallelMap(new Function<Object, Object>() {
-
-                         public Object apply(final Object o) {
-
-                             return null;
-                         }
-                     });
+                               return null;
+                           }
+                       });
 
             fail();
 
@@ -1682,15 +1669,33 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenSyncMap(new Function<Object, Object>() {
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenParallelMap(new Function<Object, Object>() {
 
-                         public Object apply(final Object o) {
+                           public Object apply(final Object o) {
 
-                             return null;
-                         }
-                     });
+                               return null;
+                           }
+                       });
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenSyncMap(new Function<Object, Object>() {
+
+                           public Object apply(final Object o) {
+
+                               return null;
+                           }
+                       });
 
             fail();
 
@@ -1705,7 +1710,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenAsyncMap((Function<Object, Object>) null);
+            JFunctional.routine().thenAsyncMap((Function<Object, Object>) null);
 
             fail();
 
@@ -1715,7 +1720,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenParallelMap((Function<Object, Object>) null);
+            JFunctional.routine().thenParallelMap((Function<Object, Object>) null);
 
             fail();
 
@@ -1725,7 +1730,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenSyncMap((Function<Object, Object>) null);
+            JFunctional.routine().thenSyncMap((Function<Object, Object>) null);
 
             fail();
 
@@ -1735,9 +1740,9 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenAsyncMap((Function<Object, Object>) null);
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenAsyncMap((Function<Object, Object>) null);
 
             fail();
 
@@ -1747,9 +1752,9 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenParallelMap((Function<Object, Object>) null);
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenParallelMap((Function<Object, Object>) null);
 
             fail();
 
@@ -1759,9 +1764,9 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenSyncMap((Function<Object, Object>) null);
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenSyncMap((Function<Object, Object>) null);
 
             fail();
 
@@ -1774,51 +1779,51 @@ public class FunctionalRoutineTest {
     public void testMapRoutine() {
 
         final Routine<String, String> routine = JRoutine.on(new UpperCase()).buildRoutine();
-        assertThat(Functions.functional()
-                            .invocations()
-                            .withOutputOrder(OrderType.BY_CALL)
-                            .set()
-                            .thenAsyncMap(routine)
-                            .asyncCall("test1", "test2")
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("TEST1", "TEST2");
-        assertThat(Functions.functional()
-                            .thenParallelMap(routine)
-                            .asyncCall("test1", "test2")
-                            .afterMax(seconds(3))
-                            .all()).containsOnly("TEST1", "TEST2");
-        assertThat(Functions.functional()
-                            .invocations()
-                            .withOutputOrder(OrderType.BY_CALL)
-                            .set()
-                            .thenSyncMap(routine)
-                            .asyncCall("test1", "test2")
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("TEST1", "TEST2");
-        assertThat(Functions.functional()
-                            .thenSyncMap(PassingInvocation.<String>factoryOf())
-                            .invocations()
-                            .withOutputOrder(OrderType.BY_CALL)
-                            .set()
-                            .thenAsyncMap(routine)
-                            .asyncCall("test1", "test2")
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("TEST1", "TEST2");
-        assertThat(Functions.functional()
-                            .thenSyncMap(PassingInvocation.<String>factoryOf())
-                            .thenParallelMap(routine)
-                            .asyncCall("test1", "test2")
-                            .afterMax(seconds(3))
-                            .all()).containsOnly("TEST1", "TEST2");
-        assertThat(Functions.functional()
-                            .thenSyncMap(PassingInvocation.<String>factoryOf())
-                            .invocations()
-                            .withOutputOrder(OrderType.BY_CALL)
-                            .set()
-                            .thenSyncMap(routine)
-                            .asyncCall("test1", "test2")
-                            .afterMax(seconds(3))
-                            .all()).containsExactly("TEST1", "TEST2");
+        assertThat(JFunctional.routine()
+                              .invocations()
+                              .withOutputOrder(OrderType.BY_CALL)
+                              .set()
+                              .thenAsyncMap(routine)
+                              .asyncCall("test1", "test2")
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("TEST1", "TEST2");
+        assertThat(JFunctional.routine()
+                              .thenParallelMap(routine)
+                              .asyncCall("test1", "test2")
+                              .afterMax(seconds(3))
+                              .all()).containsOnly("TEST1", "TEST2");
+        assertThat(JFunctional.routine()
+                              .invocations()
+                              .withOutputOrder(OrderType.BY_CALL)
+                              .set()
+                              .thenSyncMap(routine)
+                              .asyncCall("test1", "test2")
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("TEST1", "TEST2");
+        assertThat(JFunctional.routine()
+                              .thenSyncMap(PassingInvocation.<String>factoryOf())
+                              .invocations()
+                              .withOutputOrder(OrderType.BY_CALL)
+                              .set()
+                              .thenAsyncMap(routine)
+                              .asyncCall("test1", "test2")
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("TEST1", "TEST2");
+        assertThat(JFunctional.routine()
+                              .thenSyncMap(PassingInvocation.<String>factoryOf())
+                              .thenParallelMap(routine)
+                              .asyncCall("test1", "test2")
+                              .afterMax(seconds(3))
+                              .all()).containsOnly("TEST1", "TEST2");
+        assertThat(JFunctional.routine()
+                              .thenSyncMap(PassingInvocation.<String>factoryOf())
+                              .invocations()
+                              .withOutputOrder(OrderType.BY_CALL)
+                              .set()
+                              .thenSyncMap(routine)
+                              .asyncCall("test1", "test2")
+                              .afterMax(seconds(3))
+                              .all()).containsExactly("TEST1", "TEST2");
     }
 
     @Test
@@ -1827,7 +1832,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenAsyncMap((Routine<Object, Object>) null);
+            JFunctional.routine().thenAsyncMap((Routine<Object, Object>) null);
 
             fail();
 
@@ -1837,7 +1842,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenParallelMap((Routine<Object, Object>) null);
+            JFunctional.routine().thenParallelMap((Routine<Object, Object>) null);
 
             fail();
 
@@ -1847,7 +1852,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenSyncMap((Routine<Object, Object>) null);
+            JFunctional.routine().thenSyncMap((Routine<Object, Object>) null);
 
             fail();
 
@@ -1857,9 +1862,9 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenAsyncMap((Routine<Object, Object>) null);
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenAsyncMap((Routine<Object, Object>) null);
 
             fail();
 
@@ -1869,9 +1874,9 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenParallelMap((Routine<Object, Object>) null);
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenParallelMap((Routine<Object, Object>) null);
 
             fail();
 
@@ -1881,35 +1886,9 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenSyncMap((Routine<Object, Object>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-    }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testNullPointer() {
-
-        try {
-
-            new DefaultFunctionalRoutine<Object, Object>(null, DelegationType.ASYNC);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            new DefaultFunctionalRoutine<Object, Object>(JRoutine.on(PassingInvocation.factoryOf()),
-                                                         null);
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenSyncMap((Routine<Object, Object>) null);
 
             fail();
 
@@ -1929,24 +1908,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenAsyncReduce(new BiConsumer<List<?>, ResultChannel<Object>>() {
-
-                         public void accept(final List<?> objects,
-                                 final ResultChannel<Object> result) {
-
-                         }
-                     });
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            Functions.functional().thenSyncReduce(new BiConsumer<List<?>, ResultChannel<Object>>() {
+            JFunctional.routine().thenAsyncReduce(new BiConsumer<List<?>, ResultChannel<Object>>() {
 
                 public void accept(final List<?> objects, final ResultChannel<Object> result) {
 
@@ -1961,15 +1923,12 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenAsyncReduce(new BiConsumer<List<?>, ResultChannel<Object>>() {
+            JFunctional.routine().thenSyncReduce(new BiConsumer<List<?>, ResultChannel<Object>>() {
 
-                         public void accept(final List<?> objects,
-                                 final ResultChannel<Object> result) {
+                public void accept(final List<?> objects, final ResultChannel<Object> result) {
 
-                         }
-                     });
+                }
+            });
 
             fail();
 
@@ -1979,15 +1938,33 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenSyncReduce(new BiConsumer<List<?>, ResultChannel<Object>>() {
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenAsyncReduce(new BiConsumer<List<?>, ResultChannel<Object>>() {
 
-                         public void accept(final List<?> objects,
-                                 final ResultChannel<Object> result) {
+                           public void accept(final List<?> objects,
+                                   final ResultChannel<Object> result) {
 
-                         }
-                     });
+                           }
+                       });
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenSyncReduce(new BiConsumer<List<?>, ResultChannel<Object>>() {
+
+                           public void accept(final List<?> objects,
+                                   final ResultChannel<Object> result) {
+
+                           }
+                       });
 
             fail();
 
@@ -2002,8 +1979,8 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenAsyncReduce((BiConsumer<List<?>, ResultChannel<Object>>) null);
+            JFunctional.routine()
+                       .thenAsyncReduce((BiConsumer<List<?>, ResultChannel<Object>>) null);
 
             fail();
 
@@ -2013,8 +1990,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenSyncReduce((BiConsumer<List<?>, ResultChannel<Object>>) null);
+            JFunctional.routine().thenSyncReduce((BiConsumer<List<?>, ResultChannel<Object>>) null);
 
             fail();
 
@@ -2024,9 +2000,9 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenAsyncReduce((BiConsumer<List<?>, ResultChannel<Object>>) null);
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenAsyncReduce((BiConsumer<List<?>, ResultChannel<Object>>) null);
 
             fail();
 
@@ -2036,9 +2012,9 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenSyncReduce((BiConsumer<List<?>, ResultChannel<Object>>) null);
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenSyncReduce((BiConsumer<List<?>, ResultChannel<Object>>) null);
 
             fail();
 
@@ -2058,7 +2034,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenAsyncReduce(new Function<List<?>, Object>() {
+            JFunctional.routine().thenAsyncReduce(new Function<List<?>, Object>() {
 
                 public Object apply(final List<?> objects) {
 
@@ -2074,7 +2050,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenSyncReduce(new Function<List<?>, Object>() {
+            JFunctional.routine().thenSyncReduce(new Function<List<?>, Object>() {
 
                 public Object apply(final List<?> objects) {
 
@@ -2090,15 +2066,15 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenAsyncReduce(new Function<List<?>, Object>() {
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenAsyncReduce(new Function<List<?>, Object>() {
 
-                         public Object apply(final List<?> objects) {
+                           public Object apply(final List<?> objects) {
 
-                             return null;
-                         }
-                     });
+                               return null;
+                           }
+                       });
 
             fail();
 
@@ -2108,15 +2084,15 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenSyncReduce(new Function<List<?>, Object>() {
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenSyncReduce(new Function<List<?>, Object>() {
 
-                         public Object apply(final List<?> objects) {
+                           public Object apply(final List<?> objects) {
 
-                             return null;
-                         }
-                     });
+                               return null;
+                           }
+                       });
 
             fail();
 
@@ -2131,7 +2107,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenAsyncReduce((Function<List<?>, Object>) null);
+            JFunctional.routine().thenAsyncReduce((Function<List<?>, Object>) null);
 
             fail();
 
@@ -2141,7 +2117,7 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional().thenSyncReduce((Function<List<?>, Object>) null);
+            JFunctional.routine().thenSyncReduce((Function<List<?>, Object>) null);
 
             fail();
 
@@ -2151,9 +2127,9 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenAsyncReduce((Function<List<?>, Object>) null);
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenAsyncReduce((Function<List<?>, Object>) null);
 
             fail();
 
@@ -2163,9 +2139,9 @@ public class FunctionalRoutineTest {
 
         try {
 
-            Functions.functional()
-                     .thenSyncMap(PassingInvocation.factoryOf())
-                     .thenSyncReduce((Function<List<?>, Object>) null);
+            JFunctional.routine()
+                       .thenSyncMap(PassingInvocation.factoryOf())
+                       .thenSyncReduce((Function<List<?>, Object>) null);
 
             fail();
 

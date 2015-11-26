@@ -39,7 +39,7 @@ public interface FunctionalRoutineBuilder extends ConfigurableBuilder<Functional
      * @return the newly created routine instance.
      */
     @NotNull
-    <OUT> FunctionalRoutine<Void, OUT> routineFrom(@NotNull CommandInvocation<OUT> invocation);
+    <OUT> FunctionalRoutine<Void, OUT> from(@NotNull CommandInvocation<OUT> invocation);
 
     /**
      * Builds and returns a new functional routine generating outputs from the specified consumer.
@@ -49,8 +49,7 @@ public interface FunctionalRoutineBuilder extends ConfigurableBuilder<Functional
      * @return the newly created routine instance.
      */
     @NotNull
-    <OUT> FunctionalRoutine<Void, OUT> routineFrom(
-            @NotNull Consumer<? super ResultChannel<OUT>> consumer);
+    <OUT> FunctionalRoutine<Void, OUT> from(@NotNull Consumer<? super ResultChannel<OUT>> consumer);
 
     /**
      * Builds and returns a new functional routine generating outputs from the specified supplier.
@@ -60,7 +59,7 @@ public interface FunctionalRoutineBuilder extends ConfigurableBuilder<Functional
      * @return the newly created routine instance.
      */
     @NotNull
-    <OUT> FunctionalRoutine<Void, OUT> routineFrom(@NotNull Supplier<OUT> supplier);
+    <OUT> FunctionalRoutine<Void, OUT> from(@NotNull Supplier<OUT> supplier);
 
     /**
      * Concatenates a functional routine based on the specified accumulate function.

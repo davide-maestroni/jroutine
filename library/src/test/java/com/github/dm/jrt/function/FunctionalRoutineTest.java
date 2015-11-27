@@ -44,12 +44,11 @@ public class FunctionalRoutineTest {
         assertThat(JFunctional.startRoutine()
                               .thenAsyncAccumulate(new BiFunction<String, String, String>() {
 
-                                                       public String apply(final String s,
-                                                               final String s2) {
+                                  public String apply(final String s, final String s2) {
 
-                                                           return s + s2;
-                                                       }
-                                                   })
+                                      return s + s2;
+                                  }
+                              })
                               .asyncCall("test1", "test2", "test3")
                               .afterMax(seconds(3))
                               .all()).containsExactly("test1test2test3");

@@ -19,7 +19,6 @@ import com.github.dm.jrt.channel.AbortException;
 import com.github.dm.jrt.channel.InputDeadlockException;
 import com.github.dm.jrt.channel.InputTimeoutException;
 import com.github.dm.jrt.channel.InvocationChannel;
-import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.core.DefaultResultChannel.AbortHandler;

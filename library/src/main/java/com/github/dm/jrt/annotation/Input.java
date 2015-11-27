@@ -96,8 +96,8 @@ public @interface Input {
          * Channel mode.<br/>
          * The variable is just read from an output channel.
          * <p/>
-         * The annotated parameters must extend an {@link com.github.dm.jrt.channel.OutputChannel
-         * OutputChannel}.
+         * The annotated parameters must extend an
+         * {@link com.github.dm.jrt.channel.Channel.OutputChannel OutputChannel}.
          */
         CHANNEL,
         /**
@@ -113,8 +113,9 @@ public @interface Input {
          * The inputs are collected from the channel and passed as an array or collection to the
          * wrapped method.
          * <p/>
-         * The annotated parameter must extend an {@link com.github.dm.jrt.channel.OutputChannel
-         * OutputChannel} and must be the only parameter accepted by the method.
+         * The annotated parameter must extend an
+         * {@link com.github.dm.jrt.channel.Channel.OutputChannel OutputChannel} and must be the
+         * only parameter accepted by the method.
          */
         COLLECTION
     }

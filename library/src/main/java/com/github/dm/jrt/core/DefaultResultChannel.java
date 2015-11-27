@@ -19,8 +19,6 @@ import com.github.dm.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.channel.AbortException;
 import com.github.dm.jrt.channel.ExecutionDeadlockException;
 import com.github.dm.jrt.channel.ExecutionTimeoutException;
-import com.github.dm.jrt.channel.InputChannel;
-import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.OutputDeadlockException;
 import com.github.dm.jrt.channel.OutputTimeoutException;

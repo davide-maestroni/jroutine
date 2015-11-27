@@ -176,7 +176,6 @@ public interface Channel {
          * @return this channel.
          * @throws com.github.dm.jrt.channel.RoutineException if the execution has been aborted.
          * @throws java.lang.IllegalStateException            if this channel is already closed.
-         * @see OutputChannel#passTo(InputChannel)
          */
         @NotNull
         InputChannel<IN> pass(@Nullable OutputChannel<? extends IN> channel);
@@ -441,8 +440,6 @@ public interface Channel {
          * Checks if this channel is bound to a consumer or another channel.
          *
          * @return whether the channel is bound.
-         * @see #passTo(InputChannel)
-         * @see #passTo(OutputConsumer)
          */
         boolean isBound();
 

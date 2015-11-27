@@ -13,6 +13,8 @@
  */
 package com.github.dm.jrt.android.v4.core;
 
+import android.support.v4.content.Loader;
+
 import com.github.dm.jrt.android.runner.Runners;
 import com.github.dm.jrt.channel.AbortException;
 import com.github.dm.jrt.channel.IOChannel;
@@ -64,7 +66,7 @@ class InvocationOutputConsumer<OUT> extends TemplateOutputConsumer<OUT> {
      * @param logger the logger instance.
      */
     @SuppressWarnings("ConstantConditions")
-    InvocationOutputConsumer(@NotNull final InvocationLoader<?, OUT> loader,
+    InvocationOutputConsumer(@NotNull final Loader<InvocationResult<OUT>> loader,
             @NotNull final Logger logger) {
 
         if (loader == null) {

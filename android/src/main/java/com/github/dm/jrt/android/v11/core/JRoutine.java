@@ -71,7 +71,7 @@ import org.jetbrains.annotations.NotNull;
  *             } else {
  *
  *                 final Routine&lt;URI, MyResource&gt; routine =
- *                         JRoutine.with(contextFrom(this))
+ *                         JRoutine.with(loaderFrom(this))
  *                                 .on(factoryOf(LoadResource.class))
  *                                 .buildRoutine();
  *                 routine.asyncCall(RESOURCE_URI)

@@ -261,7 +261,8 @@ public interface Channel {
          * @throws com.github.dm.jrt.channel.RoutineException          if the execution has been
          *                                                             aborted.
          * @throws java.lang.IllegalStateException                     if this channel is already
-         *                                                             bound to a consumer.
+         *                                                             bound to a consumer or
+         *                                                             another channel.
          * @see #afterMax(TimeDuration)
          * @see #afterMax(long, TimeUnit)
          * @see #immediately()
@@ -285,7 +286,8 @@ public interface Channel {
          * @throws com.github.dm.jrt.channel.RoutineException          if the execution has been
          *                                                             aborted.
          * @throws java.lang.IllegalStateException                     if this channel is already
-         *                                                             bound to a consumer.
+         *                                                             bound to a consumer or
+         *                                                             another channel.
          * @see #afterMax(TimeDuration)
          * @see #afterMax(long, TimeUnit)
          * @see #immediately()
@@ -389,7 +391,8 @@ public interface Channel {
          * @throws com.github.dm.jrt.channel.RoutineException          if the execution has been
          *                                                             aborted.
          * @throws java.lang.IllegalStateException                     if this channel is already
-         *                                                             bound to a consumer.
+         *                                                             bound to a consumer or
+         *                                                             another channel.
          * @see #afterMax(TimeDuration)
          * @see #afterMax(long, TimeUnit)
          * @see #immediately()
@@ -410,7 +413,8 @@ public interface Channel {
          * @throws com.github.dm.jrt.channel.RoutineException          if the execution has been
          *                                                             aborted.
          * @throws java.lang.IllegalStateException                     if this channel is already
-         *                                                             bound to a consumer.
+         *                                                             bound to a consumer or
+         *                                                             another channel.
          * @throws java.util.NoSuchElementException                    if no output is available (it
          *                                                             might be thrown also in the
          *                                                             case the read timeout elapses
@@ -440,6 +444,8 @@ public interface Channel {
          * Checks if this channel is bound to a consumer or another channel.
          *
          * @return whether the channel is bound.
+         * @see #passTo passTo(InputChannel)
+         * @see #passTo(OutputConsumer)
          */
         boolean isBound();
 
@@ -454,7 +460,8 @@ public interface Channel {
          * @throws com.github.dm.jrt.channel.RoutineException          if the execution has been
          *                                                             aborted.
          * @throws java.lang.IllegalStateException                     if this channel is already
-         *                                                             bound to a consumer.
+         *                                                             bound to a consumer or
+         *                                                             another channel.
          * @see #afterMax(TimeDuration)
          * @see #afterMax(long, TimeUnit)
          * @see #immediately()
@@ -503,7 +510,8 @@ public interface Channel {
          * @throws com.github.dm.jrt.channel.RoutineException          if the execution has been
          *                                                             aborted.
          * @throws java.lang.IllegalStateException                     if this channel is already
-         *                                                             bound to a consumer.
+         *                                                             bound to a consumer or
+         *                                                             another channel.
          * @see #afterMax(TimeDuration)
          * @see #afterMax(long, TimeUnit)
          * @see #immediately()

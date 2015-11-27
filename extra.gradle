@@ -22,7 +22,7 @@ apply plugin: 'signing'
 Project.metaClass.toVersionRange = { String version ->
 
     def versions = version.split('\\.')
-    "[" + versions[0] + "." + versions[1] + "," + versions[0] + "." + ++versions[1] + ")"
+    "[" + versions[0] + "." + versions[1] + "," + versions[0] + "." + ++Integer.parseInt(versions[1]) + ")"
 }
 Project.metaClass.getWorkingBranch = {
 

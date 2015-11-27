@@ -32,7 +32,7 @@ before_script:
 script: ./gradlew -i build connectedCheck
 
 # Print reports
-after_failure: cat file:///home/travis/build/davide-maestroni/jroutine/android/build/outputs/lint-results.xml
+after_failure: cat /home/travis/build/davide-maestroni/jroutine/android/build/outputs/lint-results.xml
 
 # Code coverage
 after_success: ./gradlew jacocoTestReport coveralls

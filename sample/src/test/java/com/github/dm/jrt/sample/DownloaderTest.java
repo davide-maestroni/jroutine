@@ -319,5 +319,10 @@ public class DownloaderTest {
         }
 
         mDownloader.waitDone(uri, TimeDuration.millis(timeout));
+
+        if ((startTime + timeoutMs - System.currentTimeMillis()) < 0) {
+
+            throw new IOException();
+        }
     }
 }

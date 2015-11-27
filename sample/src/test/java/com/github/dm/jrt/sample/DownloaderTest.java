@@ -247,7 +247,7 @@ public class DownloaderTest {
         waitFor(uri, startTime, 20000);
 
         assertThat(downloader.isDownloaded(uri)).isFalse();
-        checkNotExists(outFile);//XXX
+        checkNotExists(outFile);
     }
 
     @Test

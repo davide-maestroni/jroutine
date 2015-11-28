@@ -30,7 +30,7 @@
                 try {
 
                     final ImageView imageView = (ImageView) findViewById(R.id.image);
-                    JRoutine.with(contextFrom(this))
+                    JRoutine.with(loaderFrom(this))
                             .on(factoryOf(LoadBitmap.class))
                             .loaders()
                             .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
@@ -113,7 +113,7 @@
                 try {
 
                     final ImageView imageView = (ImageView) findViewById(R.id.image);
-                    JRoutine.with(contextFrom(this))
+                    JRoutine.with(loaderFrom(this))
                             .on(factoryOf(LoadBitmapFromService.class))
                             .loaders()
                             .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)

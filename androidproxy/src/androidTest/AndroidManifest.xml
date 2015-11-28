@@ -1,9 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.github.dm.jrt.android.proxy">
 
     <application
         android:name=".app.TestApp"
-        android:label="@string/lib_name">
+        android:label="jroutine-androidproxy">
         <activity
             android:name="com.github.dm.jrt.android.proxy.core.TestActivity"
             android:label="test">

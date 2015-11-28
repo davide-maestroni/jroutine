@@ -16,8 +16,6 @@ package com.github.dm.jrt.core;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.core.DefaultInvocationChannel.InvocationManager;
-import com.github.dm.jrt.core.DefaultInvocationChannel.InvocationObserver;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationDeadlockException;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;

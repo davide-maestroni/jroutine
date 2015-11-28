@@ -22,21 +22,19 @@ import com.github.dm.jrt.builder.InvocationConfiguration.AgingPriority;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.channel.AbortException;
+import com.github.dm.jrt.channel.Channel.InputChannel;
+import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.DeadlockException;
 import com.github.dm.jrt.channel.ExecutionTimeoutException;
 import com.github.dm.jrt.channel.IOChannel;
-import com.github.dm.jrt.channel.InputChannel;
 import com.github.dm.jrt.channel.InputTimeoutException;
 import com.github.dm.jrt.channel.InvocationChannel;
-import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.OutputTimeoutException;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.channel.TemplateOutputConsumer;
 import com.github.dm.jrt.channel.TimeoutException;
-import com.github.dm.jrt.core.DefaultInvocationChannel.InvocationManager;
-import com.github.dm.jrt.core.DefaultInvocationChannel.InvocationObserver;
 import com.github.dm.jrt.core.DefaultResultChannel.AbortHandler;
 import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.core.InvocationExecution.InputIterator;
@@ -1894,7 +1892,7 @@ public class RoutineTest {
 
         try {
 
-            new DelegatingInvocation<Object, Object>(null, DelegationType.ASYNC);
+            DelegatingInvocation.factoryFrom(null, DelegationType.ASYNC);
 
             fail();
 
@@ -1904,8 +1902,7 @@ public class RoutineTest {
 
         try {
 
-            new DelegatingInvocation<Object, Object>(JRoutine.on(PassingInvocation.factoryOf()),
-                                                     null);
+            DelegatingInvocation.factoryFrom(JRoutine.on(PassingInvocation.factoryOf()), null);
 
             fail();
 

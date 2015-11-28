@@ -16,12 +16,11 @@ package com.github.dm.jrt.function;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.Builder;
 import com.github.dm.jrt.builder.InvocationConfiguration.Configurable;
-import com.github.dm.jrt.channel.OutputChannel;
+import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.channel.StreamingChannel;
 import com.github.dm.jrt.core.AbstractRoutine;
-import com.github.dm.jrt.core.DelegatingInvocation;
 import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.core.JRoutine;
 import com.github.dm.jrt.invocation.CommandInvocation;
@@ -35,6 +34,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 import static com.github.dm.jrt.core.Channels.syncStream;
+import static com.github.dm.jrt.core.DelegatingInvocation.factoryFrom;
 import static com.github.dm.jrt.function.Functions.consumerCommand;
 import static com.github.dm.jrt.function.Functions.consumerFactory;
 import static com.github.dm.jrt.function.Functions.consumerFilter;
@@ -63,7 +63,7 @@ public class JFunctional {
      * @return the routine builder instance.
      */
     @NotNull
-    public static FunctionalRoutineBuilder routine() {
+    public static FunctionalRoutineBuilder startRoutine() {
 
         return new DefaultFunctionalRoutineBuilder();
     }
@@ -304,9 +304,8 @@ public class JFunctional {
     private static class DefaultFunctionalRoutine<IN, OUT>
             extends AbstractFunctionalRoutine<IN, OUT> {
 
-        private final DelegationType mDelegationType;
 
-        private final Routine<IN, OUT> mRoutine;
+        private final InvocationFactory<IN, OUT> mFactory;
 
         /**
          * Constructor.
@@ -318,13 +317,7 @@ public class JFunctional {
         private DefaultFunctionalRoutine(@NotNull final Routine<IN, OUT> routine,
                 @NotNull final DelegationType delegationType) {
 
-            if (routine == null) {
-
-                throw new NullPointerException("the backing routine must not be null");
-            }
-
-            mRoutine = routine;
-            mDelegationType = delegationType;
+            mFactory = factoryFrom(routine, delegationType);
         }
 
         @NotNull
@@ -340,7 +333,7 @@ public class JFunctional {
         @Override
         protected Invocation<IN, OUT> newInvocation(@NotNull final InvocationType type) {
 
-            return new DelegatingInvocation<IN, OUT>(mRoutine, mDelegationType);
+            return mFactory.newInvocation();
         }
 
         /**

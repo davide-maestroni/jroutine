@@ -13,8 +13,8 @@
  */
 package com.github.dm.jrt.core;
 
+import com.github.dm.jrt.channel.Channel.InputChannel;
 import com.github.dm.jrt.channel.IOChannel;
-import com.github.dm.jrt.channel.InputChannel;
 import com.github.dm.jrt.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;

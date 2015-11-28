@@ -16,8 +16,6 @@ package com.github.dm.jrt.core;
 import com.github.dm.jrt.builder.ChannelConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.channel.IOChannel;
-import com.github.dm.jrt.channel.InputChannel;
-import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.core.DefaultResultChannel.AbortHandler;

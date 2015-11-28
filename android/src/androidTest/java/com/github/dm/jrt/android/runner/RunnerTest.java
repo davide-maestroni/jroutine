@@ -18,7 +18,7 @@ import android.os.Looper;
 import android.test.AndroidTestCase;
 
 import com.github.dm.jrt.android.v11.core.JRoutine;
-import com.github.dm.jrt.channel.OutputChannel;
+import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.invocation.FunctionInvocation;
 import com.github.dm.jrt.invocation.Invocation;

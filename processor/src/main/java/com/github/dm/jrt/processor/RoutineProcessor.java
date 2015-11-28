@@ -36,8 +36,8 @@ import com.github.dm.jrt.annotation.ReadTimeoutAction;
 import com.github.dm.jrt.annotation.SharedFields;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.builder.InvocationConfiguration.TimeoutActionType;
+import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
-import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.log.Log.Level;
 import com.github.dm.jrt.routine.Routine;
 

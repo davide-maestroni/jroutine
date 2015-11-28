@@ -16,13 +16,13 @@ package com.github.dm.jrt.android.v11.core;
 import com.github.dm.jrt.android.builder.LoaderChannelBuilder;
 import com.github.dm.jrt.android.builder.LoaderConfiguration;
 import com.github.dm.jrt.android.builder.LoaderConfiguration.ClashResolutionType;
-import com.github.dm.jrt.android.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.invocation.MissingInvocationException;
 import com.github.dm.jrt.android.runner.Runners;
 import com.github.dm.jrt.builder.ChannelConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration;
+import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
-import com.github.dm.jrt.channel.OutputChannel;
+import com.github.dm.jrt.core.JRoutine;
 import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.runner.TemplateExecution;
 import com.github.dm.jrt.util.TimeDuration;
@@ -87,8 +87,10 @@ class DefaultLoaderChannelBuilder
             return ioChannel.close();
         }
 
-        final LoaderRoutineBuilder<Void, OUT> builder =
-                JRoutine.with(context).on(new MissingLoaderInvocationFactory<OUT>(loaderId));
+        final MissingLoaderInvocationFactory<OUT> factory =
+                new MissingLoaderInvocationFactory<OUT>(loaderId);
+        final DefaultLoaderRoutineBuilder<Void, OUT> builder =
+                new DefaultLoaderRoutineBuilder<Void, OUT>(context, factory);
         final InvocationConfiguration invocationConfiguration =
                 mChannelConfiguration.toOutputChannelConfiguration();
         final Logger logger = invocationConfiguration.newLogger(this);

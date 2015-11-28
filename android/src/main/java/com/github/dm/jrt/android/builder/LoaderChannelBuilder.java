@@ -15,7 +15,7 @@ package com.github.dm.jrt.android.builder;
 
 import com.github.dm.jrt.android.builder.LoaderConfiguration.Builder;
 import com.github.dm.jrt.builder.ConfigurableChannelBuilder;
-import com.github.dm.jrt.channel.OutputChannel;
+import com.github.dm.jrt.channel.Channel.OutputChannel;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

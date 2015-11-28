@@ -52,7 +52,7 @@ public abstract class LoaderContext {
      * @return the loader context.
      */
     @NotNull
-    public static LoaderContext contextFrom(@NotNull final Activity activity) {
+    public static LoaderContext loaderFrom(@NotNull final Activity activity) {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
 
@@ -75,7 +75,7 @@ public abstract class LoaderContext {
      * @return the loader context.
      */
     @NotNull
-    public static LoaderContext contextFrom(@NotNull final Activity activity,
+    public static LoaderContext loaderFrom(@NotNull final Activity activity,
             @NotNull final Context context) {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
@@ -96,7 +96,7 @@ public abstract class LoaderContext {
      * @return the loader context.
      */
     @NotNull
-    public static LoaderContext contextFrom(@NotNull final Fragment fragment) {
+    public static LoaderContext loaderFrom(@NotNull final Fragment fragment) {
 
         return new FragmentContext(fragment);
     }
@@ -111,7 +111,7 @@ public abstract class LoaderContext {
      * @return the loader context.
      */
     @NotNull
-    public static LoaderContext contextFrom(@NotNull final Fragment fragment,
+    public static LoaderContext loaderFrom(@NotNull final Fragment fragment,
             @NotNull final Context context) {
 
         return new WrappedFragmentContext(fragment, context);

@@ -16,9 +16,9 @@ package com.github.dm.jrt.android.v4.core;
 import android.support.v4.util.SparseArrayCompat;
 
 import com.github.dm.jrt.android.core.Channels;
+import com.github.dm.jrt.channel.Channel.InputChannel;
+import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
-import com.github.dm.jrt.channel.InputChannel;
-import com.github.dm.jrt.channel.OutputChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.RoutineException;
 

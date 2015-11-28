@@ -25,6 +25,7 @@ import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.ProxyConfiguration;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.core.InvocationTarget;
+import com.github.dm.jrt.core.JRoutine;
 import com.github.dm.jrt.core.RoutineBuilders.MethodInfo;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.routine.Routine;
@@ -171,16 +172,18 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         final List<String> sharedFields =
                 fieldsWithShareAnnotation(mProxyConfiguration, targetMethod);
         final Object[] args = asArgs(sharedFields, target, name);
-        return (Routine<IN, OUT>) JRoutine.with(mContext)
-                                          .on(factoryOf(MethodAliasInvocation.class, args))
-                                          .invocations()
-                                          .with(configurationWithAnnotations(
-                                                  mInvocationConfiguration, targetMethod))
-                                          .set()
-                                          .service()
-                                          .with(mServiceConfiguration)
-                                          .set()
-                                          .buildRoutine();
+        final TargetInvocationFactory<Object, Object> factory =
+                factoryOf(MethodAliasInvocation.class, args);
+        final DefaultServiceRoutineBuilder<Object, Object> builder =
+                new DefaultServiceRoutineBuilder<Object, Object>(mContext, factory);
+        return (Routine<IN, OUT>) builder.invocations()
+                                         .with(configurationWithAnnotations(
+                                                 mInvocationConfiguration, targetMethod))
+                                         .set()
+                                         .service()
+                                         .with(mServiceConfiguration)
+                                         .set()
+                                         .buildRoutine();
     }
 
     @NotNull
@@ -213,16 +216,18 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         final List<String> sharedFields =
                 fieldsWithShareAnnotation(mProxyConfiguration, targetMethod);
         final Object[] args = asArgs(sharedFields, target, name, toNames(parameterTypes));
-        return (Routine<IN, OUT>) JRoutine.with(mContext)
-                                          .on(factoryOf(MethodSignatureInvocation.class, args))
-                                          .invocations()
-                                          .with(configurationWithAnnotations(
-                                                  mInvocationConfiguration, targetMethod))
-                                          .set()
-                                          .service()
-                                          .with(mServiceConfiguration)
-                                          .set()
-                                          .buildRoutine();
+        final TargetInvocationFactory<Object, Object> factory =
+                factoryOf(MethodSignatureInvocation.class, args);
+        final DefaultServiceRoutineBuilder<Object, Object> builder =
+                new DefaultServiceRoutineBuilder<Object, Object>(mContext, factory);
+        return (Routine<IN, OUT>) builder.invocations()
+                                         .with(configurationWithAnnotations(
+                                                 mInvocationConfiguration, targetMethod))
+                                         .set()
+                                         .service()
+                                         .with(mServiceConfiguration)
+                                         .set()
+                                         .buildRoutine();
     }
 
     @NotNull
@@ -562,15 +567,15 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                     factoryOf(ProxyInvocation.class, factoryArgs);
             final InvocationConfiguration invocationConfiguration =
                     configurationWithAnnotations(mInvocationConfiguration, method);
-            final Routine<Object, Object> routine = JRoutine.with(mContext)
-                                                            .on(targetFactory)
-                                                            .invocations()
-                                                            .with(invocationConfiguration)
-                                                            .set()
-                                                            .service()
-                                                            .with(mServiceConfiguration)
-                                                            .set()
-                                                            .buildRoutine();
+            final DefaultServiceRoutineBuilder<Object, Object> builder =
+                    new DefaultServiceRoutineBuilder<Object, Object>(mContext, targetFactory);
+            final Routine<Object, Object> routine = builder.invocations()
+                                                           .with(invocationConfiguration)
+                                                           .set()
+                                                           .service()
+                                                           .with(mServiceConfiguration)
+                                                           .set()
+                                                           .buildRoutine();
             return invokeRoutine(routine, method, asArgs(args), methodInfo.invocationMode,
                                  inputMode, outputMode);
         }

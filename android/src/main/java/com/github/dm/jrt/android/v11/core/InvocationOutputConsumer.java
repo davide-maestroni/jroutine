@@ -13,6 +13,10 @@
  */
 package com.github.dm.jrt.android.v11.core;
 
+import android.annotation.TargetApi;
+import android.content.Loader;
+import android.os.Build.VERSION_CODES;
+
 import com.github.dm.jrt.android.runner.Runners;
 import com.github.dm.jrt.channel.AbortException;
 import com.github.dm.jrt.channel.IOChannel;
@@ -37,6 +41,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @param <OUT> the output data type.
  */
+@TargetApi(VERSION_CODES.HONEYCOMB)
 class InvocationOutputConsumer<OUT> extends TemplateOutputConsumer<OUT> {
 
     private static final Runner sMainRunner = Runners.mainRunner();
@@ -64,7 +69,7 @@ class InvocationOutputConsumer<OUT> extends TemplateOutputConsumer<OUT> {
      * @param logger the logger instance.
      */
     @SuppressWarnings("ConstantConditions")
-    InvocationOutputConsumer(@NotNull final InvocationLoader<?, OUT> loader,
+    InvocationOutputConsumer(@NotNull final Loader<InvocationResult<OUT>> loader,
             @NotNull final Logger logger) {
 
         if (loader == null) {

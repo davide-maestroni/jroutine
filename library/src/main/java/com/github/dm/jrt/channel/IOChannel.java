@@ -13,6 +13,8 @@
  */
 package com.github.dm.jrt.channel;
 
+import com.github.dm.jrt.channel.Channel.InputChannel;
+import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.util.TimeDuration;
 
 import org.jetbrains.annotations.NotNull;

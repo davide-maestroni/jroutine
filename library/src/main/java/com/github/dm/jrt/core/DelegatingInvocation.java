@@ -49,19 +49,8 @@ public class DelegatingInvocation<IN, OUT> implements Invocation<IN, OUT> {
      * @param routine    the routine used to execute this invocation.
      * @param delegation the type of routine invocation.
      */
-    @SuppressWarnings("ConstantConditions")
-    public DelegatingInvocation(@NotNull final Routine<IN, OUT> routine,
+    private DelegatingInvocation(@NotNull final Routine<IN, OUT> routine,
             @NotNull final DelegationType delegation) {
-
-        if (routine == null) {
-
-            throw new NullPointerException("the routine must not be null");
-        }
-
-        if (delegation == null) {
-
-            throw new NullPointerException("the delegation type must not be null");
-        }
 
         mRoutine = routine;
         mDelegationType = delegation;
@@ -78,7 +67,6 @@ public class DelegatingInvocation<IN, OUT> implements Invocation<IN, OUT> {
      * @return the factory.
      */
     @NotNull
-    @SuppressWarnings("ConstantConditions")
     public static <IN, OUT> InvocationFactory<IN, OUT> factoryFrom(
             @NotNull final Routine<IN, OUT> routine, @NotNull final DelegationType delegation) {
 

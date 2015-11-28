@@ -22,7 +22,7 @@ apply plugin: 'signing'
 Project.metaClass.toVersionRange = { String version ->
 
     def versions = version.split('\\.')
-    "[" + versions[0] + "." + versions[1] + "," + versions[0] + "." + ++versions[1] + ")"
+    "[" + versions[0] + "." + versions[1] + "," + versions[0] + "." + ++Integer.parseInt(versions[1]) + ")"
 }
 Project.metaClass.getWorkingBranch = {
 
@@ -41,7 +41,14 @@ Project.metaClass.setJavaCompatibility = { JavaVersion javaVersion ->
     tasks.withType(JavaCompile) {
         def javaHome = System.getenv("JAVA${javaVersion.ordinal() + 1}_HOME")
         if ((javaHome != null) && (javaHome.length() > 0)) {
-            options.bootClasspath = "${javaHome}/jre/lib/rt.jar"
+            def jarPath = "${javaHome}/jre/lib/rt.jar"
+            if (!file(jarPath).exists()) {
+                // Mac OS workaround
+                jarPath = "${javaHome}/../Classes/classes.jar"
+            }
+            if (file(jarPath).exists()) {
+                options.bootClasspath = jarPath
+            }
         }
         sourceCompatibility = javaVersion
         targetCompatibility = javaVersion

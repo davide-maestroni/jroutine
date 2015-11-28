@@ -44,6 +44,7 @@ public class ReadConnection extends FilterInvocation<URI, ByteBuffer> {
         try {
 
             final URLConnection connection = uri.toURL().openConnection();
+            connection.setConnectTimeout(3000);
 
             if (connection instanceof HttpURLConnection) {
 

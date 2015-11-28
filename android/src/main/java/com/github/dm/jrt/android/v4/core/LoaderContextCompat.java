@@ -49,7 +49,7 @@ public abstract class LoaderContextCompat {
      * @return the loader context.
      */
     @NotNull
-    public static LoaderContextCompat contextFrom(@NotNull final Fragment fragment) {
+    public static LoaderContextCompat loaderFrom(@NotNull final Fragment fragment) {
 
         return new FragmentContextCompat(fragment);
     }
@@ -64,7 +64,7 @@ public abstract class LoaderContextCompat {
      * @return the loader context.
      */
     @NotNull
-    public static LoaderContextCompat contextFrom(@NotNull final Fragment fragment,
+    public static LoaderContextCompat loaderFrom(@NotNull final Fragment fragment,
             @NotNull final Context context) {
 
         return new WrappedFragmentContextCompat(fragment, context);
@@ -77,7 +77,7 @@ public abstract class LoaderContextCompat {
      * @return the loader context.
      */
     @NotNull
-    public static LoaderContextCompat contextFrom(@NotNull final FragmentActivity activity) {
+    public static LoaderContextCompat loaderFrom(@NotNull final FragmentActivity activity) {
 
         return new ActivityContextCompat(activity);
     }
@@ -92,7 +92,7 @@ public abstract class LoaderContextCompat {
      * @return the loader context.
      */
     @NotNull
-    public static LoaderContextCompat contextFrom(@NotNull final FragmentActivity activity,
+    public static LoaderContextCompat loaderFrom(@NotNull final FragmentActivity activity,
             @NotNull final Context context) {
 
         return new WrappedActivityContextCompat(activity, context);

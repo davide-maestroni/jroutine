@@ -13,7 +13,7 @@
  */
 package com.github.dm.jrt.routine;
 
-import com.github.dm.jrt.channel.OutputChannel;
+import com.github.dm.jrt.channel.Channel.OutputChannel;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

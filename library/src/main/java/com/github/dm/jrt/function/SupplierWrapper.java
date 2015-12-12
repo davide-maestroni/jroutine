@@ -13,8 +13,6 @@
  */
 package com.github.dm.jrt.function;
 
-import com.github.dm.jrt.util.Reflection;
-
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -92,17 +90,6 @@ public class SupplierWrapper<OUT> implements Supplier<OUT> {
     public OUT get() {
 
         return ((Function<Object, OUT>) mFunction).apply(mSupplier.get());
-    }
-
-    /**
-     * Checks if the supplier and functions wrapped by this instance have a static context.
-     *
-     * @return whether the supplier and functions have a static context.
-     */
-    public boolean hasStaticContext() {
-
-        final Supplier<?> supplier = mSupplier;
-        return Reflection.hasStaticContext(supplier.getClass()) && mFunction.hasStaticContext();
     }
 
     @Override

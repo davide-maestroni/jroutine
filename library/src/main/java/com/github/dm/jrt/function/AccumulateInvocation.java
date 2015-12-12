@@ -112,12 +112,6 @@ class AccumulateInvocation<IN> extends TemplateInvocation<IN, IN> {
         private AccumulateInvocationFactory(
                 @NotNull final BiFunctionWrapper<? super IN, ? super IN, ? extends IN> function) {
 
-            if (!function.hasStaticContext()) {
-
-                throw new IllegalArgumentException(
-                        "the bi-function class must have a static context: " + function.getClass());
-            }
-
             mFunction = function;
         }
 

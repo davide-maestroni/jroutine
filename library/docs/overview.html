@@ -321,25 +321,25 @@
             public static void main(final String[] args) {
 
                 final FunctionalRoutine&lt;String, Double&gt; meanRoutine =
-                        JFunctional.startRoutine()
-                                   .thenParallelMap((Function) (s) -&gt; {
+                        JFunctional.routine()
+                                   .parallelMap((Function) (s) -&gt; {
 
                                            return Integer.parseInt(s);
                                    })
-                                   .thenParallelMap((Function) (integer) -&gt; {
+                                   .parallelMap((Function) (integer) -&gt; {
 
                                            return integer * integer;
                                    })
-                                   .thenSyncMap((Function) (integer) -&gt; {
+                                   .syncMap((Function) (integer) -&gt; {
 
                                            return new SumData(integer, 1);
                                    })
-                                   .thenAsyncAccumulate((BiFunction) (data1, data2) -&gt; {
+                                   .asyncAccumulate((BiFunction) (data1, data2) -&gt; {
 
                                            return new SumData(data1.sum + data2.sum,
                                                               data1.count + data2.count);
                                    })
-                                   .thenSyncMap((Function) (sumData) -&gt; {
+                                   .syncMap((Function) (sumData) -&gt; {
 
                                            return Math.sqrt((double) sumData.sum / sumData.count);
                                    });

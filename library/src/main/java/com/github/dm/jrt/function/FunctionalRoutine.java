@@ -15,6 +15,7 @@ package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.builder.ConfigurableBuilder;
 import com.github.dm.jrt.channel.ResultChannel;
+import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.routine.Routine;
 
@@ -51,91 +52,123 @@ public interface FunctionalRoutine<IN, OUT>
      * </pre>
      * The accumulated value will be passed as result only when the routine invocation completes.
      * <p/>
-     * Note that the created routine will be invoked in an asynchronous mode.
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in an asynchronous mode.
      *
      * @param function the bi-function instance.
      * @return the concatenated functional routine.
      */
     @NotNull
-    FunctionalRoutine<IN, OUT> thenAsyncAccumulate(
+    FunctionalRoutine<IN, OUT> asyncAccumulate(
             @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
+
+    /**
+     * Concatenates a functional routine based on the specified consumer to this one.<br/>
+     * The routine outputs will be not further propagated.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in an asynchronous mode.
+     *
+     * @param consumer the consumer instance.
+     * @return the concatenated functional routine.
+     */
+    @NotNull
+    FunctionalRoutine<IN, Void> asyncConsume(@NotNull Consumer<? super OUT> consumer);
+
+    /**
+     * Concatenates a functional routine based on the specified consumer to this one.<br/>
+     * The routine exception will be further propagated.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in an asynchronous mode.
+     *
+     * @param consumer the consumer instance.
+     * @return the concatenated functional routine.
+     */
+    @NotNull
+    FunctionalRoutine<IN, OUT> asyncError(@NotNull Consumer<? super RoutineException> consumer);
 
     /**
      * Concatenates a functional routine based on the specified predicate to this one.<br/>
      * The output will be filtered according to the result returned by the predicate.
      * <p/>
-     * Note that the created routine will be invoked in an asynchronous mode.
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in an asynchronous mode.
      *
      * @param predicate the predicate instance.
      * @return the concatenated functional routine.
      */
     @NotNull
-    FunctionalRoutine<IN, OUT> thenAsyncFilter(@NotNull Predicate<? super OUT> predicate);
+    FunctionalRoutine<IN, OUT> asyncFilter(@NotNull Predicate<? super OUT> predicate);
 
     /**
      * Concatenates a functional routine based on the specified consumer to this one.
      * <p/>
-     * Note that the created routine will be invoked in an asynchronous mode.
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in an asynchronous mode.
      *
      * @param consumer the bi-consumer instance.
      * @param <AFTER>  the concatenation output type.
      * @return the concatenated functional routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> thenAsyncMap(
+    <AFTER> FunctionalRoutine<IN, AFTER> asyncMap(
             @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
 
     /**
      * Concatenates a functional routine based on the specified function to this one.
      * <p/>
-     * Note that the created routine will be invoked in an asynchronous mode.
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in an asynchronous mode.
      *
      * @param function the function instance.
      * @param <AFTER>  the concatenation output type.
      * @return the concatenated functional routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> thenAsyncMap(
-            @NotNull Function<? super OUT, AFTER> function);
+    <AFTER> FunctionalRoutine<IN, AFTER> asyncMap(@NotNull Function<? super OUT, AFTER> function);
 
     /**
      * Concatenates a functional routine based on the specified factory to this one.
      * <p/>
-     * Note that the created routine will be invoked in an asynchronous mode.
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in an asynchronous mode.
      *
      * @param factory the invocation factory.
      * @param <AFTER> the concatenation output type.
      * @return the concatenated functional routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> thenAsyncMap(
+    <AFTER> FunctionalRoutine<IN, AFTER> asyncMap(
             @NotNull InvocationFactory<? super OUT, AFTER> factory);
 
     /**
      * Concatenates a functional routine based on the specified instance to this one.
      * <p/>
-     * Note that the passed routine will be invoked in an asynchronous mode.
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in an asynchronous mode.
      *
      * @param routine the routine instance.
      * @param <AFTER> the concatenation output type.
      * @return the concatenated functional routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> thenAsyncMap(@NotNull Routine<? super OUT, AFTER> routine);
+    <AFTER> FunctionalRoutine<IN, AFTER> asyncMap(@NotNull Routine<? super OUT, AFTER> routine);
 
     /**
      * Concatenates a functional routine based on the specified reducing consumer to this one.<br/>
      * The outputs will be reduced by applying the function, only when the routine invocation
      * completes.
      * <p/>
-     * Note that the created routine will be invoked in an asynchronous mode.
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in an asynchronous mode.
      *
      * @param consumer the bi-consumer instance.
      * @param <AFTER>  the concatenation output type.
      * @return the concatenated functional routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> thenAsyncReduce(
+    <AFTER> FunctionalRoutine<IN, AFTER> asyncReduce(
             @NotNull BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
                     consumer);
 
@@ -144,15 +177,45 @@ public interface FunctionalRoutine<IN, OUT>
      * The outputs will be reduced by applying the function, only when the routine invocation
      * completes.
      * <p/>
-     * Note that the created routine will be invoked in an asynchronous mode.
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in an asynchronous mode.
      *
      * @param function the function instance.
      * @param <AFTER>  the concatenation output type.
      * @return the concatenated functional routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> thenAsyncReduce(
+    <AFTER> FunctionalRoutine<IN, AFTER> asyncReduce(
             @NotNull Function<? super List<? extends OUT>, AFTER> function);
+
+    /**
+     * Concatenates a functional routine based on the specified consumer to this one.<br/>
+     * The consumer will be called only when the invocation completes.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in an asynchronous mode.
+     *
+     * @param consumer the consumer instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated functional routine.
+     */
+    @NotNull
+    <AFTER> FunctionalRoutine<IN, AFTER> asyncThen(
+            @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
+
+    /**
+     * Concatenates a functional routine based on the specified supplier to this one.<br/>
+     * The supplier will be called only when the invocation completes.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in an asynchronous mode.
+     *
+     * @param supplier the supplier instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated functional routine.
+     */
+    @NotNull
+    <AFTER> FunctionalRoutine<IN, AFTER> asyncThen(@NotNull Supplier<AFTER> supplier);
 
     /**
      * Lifts this functional routine by applying the specified function.
@@ -163,7 +226,7 @@ public interface FunctionalRoutine<IN, OUT>
      * @return the lifted functional routine.
      */
     @NotNull
-    <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> thenFlatLift(
+    <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> flatLift(
             @NotNull Function<? super FunctionalRoutine<IN, OUT>, ? extends
                     FunctionalRoutine<BEFORE, AFTER>> function);
 
@@ -176,7 +239,7 @@ public interface FunctionalRoutine<IN, OUT>
      * @return the lifted functional routine.
      */
     @NotNull
-    <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> thenLift(
+    <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> lift(
             @NotNull Function<? super FunctionalRoutine<IN, OUT>, ? extends Routine<BEFORE,
                     AFTER>> function);
 
@@ -184,65 +247,69 @@ public interface FunctionalRoutine<IN, OUT>
      * Concatenates a functional routine based on the specified predicate to this one.<br/>
      * The output will be filtered according to the result returned by the predicate.
      * <p/>
-     * Note that the created routine will be invoked in a parallel mode.
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a parallel mode.
      *
      * @param predicate the predicate instance.
      * @return the concatenated functional routine.
      */
     @NotNull
-    FunctionalRoutine<IN, OUT> thenParallelFilter(@NotNull Predicate<? super OUT> predicate);
+    FunctionalRoutine<IN, OUT> parallelFilter(@NotNull Predicate<? super OUT> predicate);
 
     /**
      * Concatenates a functional routine based on the specified consumer to this one.
      * <p/>
-     * Note that the created routine will be invoked in a parallel mode.
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a parallel mode.
      *
      * @param consumer the bi-consumer instance.
      * @param <AFTER>  the concatenation output type.
      * @return the concatenated functional routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> thenParallelMap(
+    <AFTER> FunctionalRoutine<IN, AFTER> parallelMap(
             @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
 
     /**
      * Concatenates a functional routine based on the specified function to this one.
      * <p/>
-     * Note that the created routine will be invoked in a parallel mode.
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a parallel mode.
      *
      * @param function the function instance.
      * @param <AFTER>  the concatenation output type.
      * @return the concatenated functional routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> thenParallelMap(
+    <AFTER> FunctionalRoutine<IN, AFTER> parallelMap(
             @NotNull Function<? super OUT, AFTER> function);
 
     /**
      * Concatenates a functional routine based on the specified factory to this one.
      * <p/>
-     * Note that the created routine will be invoked in a parallel mode.
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a parallel mode.
      *
      * @param factory the invocation factory.
      * @param <AFTER> the concatenation output type.
      * @return the concatenated functional routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> thenParallelMap(
+    <AFTER> FunctionalRoutine<IN, AFTER> parallelMap(
             @NotNull InvocationFactory<? super OUT, AFTER> factory);
 
     /**
      * Concatenates a functional routine based on the specified instance to this one.
      * <p/>
-     * Note that the passed routine will be invoked in a parallel mode.
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a parallel mode.
      *
      * @param routine the routine instance.
      * @param <AFTER> the concatenation output type.
      * @return the concatenated functional routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> thenParallelMap(
-            @NotNull Routine<? super OUT, AFTER> routine);
+    <AFTER> FunctionalRoutine<IN, AFTER> parallelMap(@NotNull Routine<? super OUT, AFTER> routine);
 
     /**
      * Concatenates a functional routine based on the specified accumulate function to this one.
@@ -256,91 +323,123 @@ public interface FunctionalRoutine<IN, OUT>
      * </pre>
      * The accumulated value will be passed as result only when the routine invocation completes.
      * <p/>
-     * Note that the created routine will be invoked in a synchronous mode.
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a synchronous mode.
      *
      * @param function the bi-function instance.
      * @return the concatenated functional routine.
      */
     @NotNull
-    FunctionalRoutine<IN, OUT> thenSyncAccumulate(
+    FunctionalRoutine<IN, OUT> syncAccumulate(
             @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
+
+    /**
+     * Concatenates a functional routine based on the specified consumer to this one.<br/>
+     * The routine outputs will be not further propagated.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a synchronous mode.
+     *
+     * @param consumer the consumer instance.
+     * @return the concatenated functional routine.
+     */
+    @NotNull
+    FunctionalRoutine<IN, Void> syncConsume(@NotNull Consumer<? super OUT> consumer);
+
+    /**
+     * Concatenates a functional routine based on the specified consumer to this one.<br/>
+     * The routine exception will be further propagated.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a synchronous mode.
+     *
+     * @param consumer the consumer instance.
+     * @return the concatenated functional routine.
+     */
+    @NotNull
+    FunctionalRoutine<IN, OUT> syncError(@NotNull Consumer<? super RoutineException> consumer);
 
     /**
      * Concatenates a functional routine based on the specified predicate to this one.<br/>
      * The output will be filtered according to the result returned by the predicate.
      * <p/>
-     * Note that the created routine will be invoked in a synchronous mode.
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a synchronous mode.
      *
      * @param predicate the predicate instance.
      * @return the concatenated functional routine.
      */
     @NotNull
-    FunctionalRoutine<IN, OUT> thenSyncFilter(@NotNull Predicate<? super OUT> predicate);
+    FunctionalRoutine<IN, OUT> syncFilter(@NotNull Predicate<? super OUT> predicate);
 
     /**
      * Concatenates a functional routine based on the specified consumer to this one.
      * <p/>
-     * Note that the created routine will be invoked in a synchronous mode.
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a synchronous mode.
      *
      * @param consumer the bi-consumer instance.
      * @param <AFTER>  the concatenation output type.
      * @return the concatenated functional routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> thenSyncMap(
+    <AFTER> FunctionalRoutine<IN, AFTER> syncMap(
             @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
 
     /**
      * Concatenates a functional routine based on the specified function to this one.
      * <p/>
-     * Note that the created routine will be invoked in a synchronous mode.
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a synchronous mode.
      *
      * @param function the function instance.
      * @param <AFTER>  the concatenation output type.
      * @return the concatenated functional routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> thenSyncMap(
-            @NotNull Function<? super OUT, AFTER> function);
+    <AFTER> FunctionalRoutine<IN, AFTER> syncMap(@NotNull Function<? super OUT, AFTER> function);
 
     /**
      * Concatenates a functional routine based on the specified factory to this one.
      * <p/>
-     * Note that the created routine will be invoked in a synchronous mode.
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a synchronous mode.
      *
      * @param factory the invocation factory.
      * @param <AFTER> the concatenation output type.
      * @return the concatenated functional routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> thenSyncMap(
+    <AFTER> FunctionalRoutine<IN, AFTER> syncMap(
             @NotNull InvocationFactory<? super OUT, AFTER> factory);
 
     /**
      * Concatenates a functional routine based on the specified instance to this one.
      * <p/>
-     * Note that the passed routine will be invoked in a synchronous mode.
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a synchronous mode.
      *
      * @param routine the routine instance.
      * @param <AFTER> the concatenation output type.
      * @return the concatenated functional routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> thenSyncMap(@NotNull Routine<? super OUT, AFTER> routine);
+    <AFTER> FunctionalRoutine<IN, AFTER> syncMap(@NotNull Routine<? super OUT, AFTER> routine);
 
     /**
      * Concatenates a functional routine based on the specified reducing consumer to this one.<br/>
      * The outputs will be reduced by applying the function, only when the routine invocation
      * completes.
      * <p/>
-     * Note that the created routine will be invoked in a synchronous mode.
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a synchronous mode.
      *
      * @param consumer the bi-consumer instance.
      * @param <AFTER>  the concatenation output type.
      * @return the concatenated functional routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> thenSyncReduce(
+    <AFTER> FunctionalRoutine<IN, AFTER> syncReduce(
             @NotNull BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
                     consumer);
 
@@ -349,13 +448,43 @@ public interface FunctionalRoutine<IN, OUT>
      * The outputs will be reduced by applying the function, only when the routine invocation
      * completes.
      * <p/>
-     * Note that the created routine will be invoked in a synchronous mode.
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a synchronous mode.
      *
      * @param function the function instance.
      * @param <AFTER>  the concatenation output type.
      * @return the concatenated functional routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> thenSyncReduce(
+    <AFTER> FunctionalRoutine<IN, AFTER> syncReduce(
             @NotNull Function<? super List<? extends OUT>, AFTER> function);
+
+    /**
+     * Concatenates a functional routine based on the specified consumer to this one.<br/>
+     * The consumer will be called only when the invocation completes.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in an asynchronous mode.
+     *
+     * @param consumer the consumer instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated functional routine.
+     */
+    @NotNull
+    <AFTER> FunctionalRoutine<IN, AFTER> syncThen(
+            @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
+
+    /**
+     * Concatenates a functional routine based on the specified supplier to this one.<br/>
+     * The supplier will be called only when the invocation completes.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a synchronous mode.
+     *
+     * @param supplier the supplier instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated functional routine.
+     */
+    @NotNull
+    <AFTER> FunctionalRoutine<IN, AFTER> syncThen(@NotNull Supplier<AFTER> supplier);
 }

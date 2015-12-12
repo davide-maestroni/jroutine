@@ -103,8 +103,7 @@ public class Functions {
 
     /**
      * Builds and returns a new command invocation based on the specified consumer instance.<br/>
-     * In order to prevent undesired leaks, the class of the specified consumer must have a static
-     * context.
+     * It's up to the caller to prevent undesired leaks.
      * <p/>
      * Note that the passed object is expected to behave like a function, that is, it must not
      * retain a mutable internal state.<br/>
@@ -124,8 +123,7 @@ public class Functions {
 
     /**
      * Builds and returns a new invocation factory based on the specified bi-consumer instance.<br/>
-     * In order to prevent undesired leaks, the class of the specified bi-consumer must have a
-     * static context.
+     * It's up to the caller to prevent undesired leaks.
      * <p/>
      * Note that the passed object is expected to behave like a function, that is, it must not
      * retain a mutable internal state.<br/>
@@ -147,8 +145,7 @@ public class Functions {
 
     /**
      * Builds and returns a new filter invocation based on the specified bi-consumer instance.<br/>
-     * In order to prevent undesired leaks, the class of the specified bi-consumer must have a
-     * static context.
+     * It's up to the caller to prevent undesired leaks.
      * <p/>
      * Note that the passed object is expected to behave like a function, that is, it must not
      * retain a mutable internal state.<br/>
@@ -183,8 +180,7 @@ public class Functions {
 
     /**
      * Builds and returns a new invocation factory based on the specified function instance.<br/>
-     * In order to prevent undesired leaks, the class of the specified function must have a static
-     * context.
+     * It's up to the caller to prevent undesired leaks.
      * <p/>
      * Note that the passed object is expected to behave like a function, that is, it must not
      * retain a mutable internal state.<br/>
@@ -205,8 +201,7 @@ public class Functions {
 
     /**
      * Builds and returns a new filter invocation based on the specified function instance.<br/>
-     * In order to prevent undesired leaks, the class of the specified function must have a static
-     * context.
+     * It's up to the caller to prevent undesired leaks.
      * <p/>
      * Note that the passed object is expected to behave like a function, that is, it must not
      * retain a mutable internal state.<br/>
@@ -383,8 +378,7 @@ public class Functions {
      * Builds and returns a new filter invocation based on the specified predicate instance.<br/>
      * Only the inputs which satisfies the predicate will be passed on, while the others will be
      * filtered out.<br/>
-     * In order to prevent undesired leaks, the class of the specified predicate must have a static
-     * context.
+     * It's up to the caller to prevent undesired leaks.
      * <p/>
      * Note that the passed object is expected to behave like a function, that is, it must not
      * retain a mutable internal state.<br/>
@@ -431,8 +425,7 @@ public class Functions {
 
     /**
      * Builds and returns a new command invocation based on the specified supplier instance.<br/>
-     * In order to prevent undesired leaks, the class of the specified supplier must have a static
-     * context.
+     * It's up to the caller to prevent undesired leaks.
      * <p/>
      * Note that the passed object is expected to behave like a function, that is, it must not
      * retain a mutable internal state.<br/>
@@ -452,8 +445,7 @@ public class Functions {
 
     /**
      * Builds and returns a new invocation factory based on the specified supplier instance.<br/>
-     * In order to prevent undesired leaks, the class of the specified supplier must have a static
-     * context.
+     * It's up to the caller to prevent undesired leaks.
      * <p/>
      * Note that the passed object is expected to behave like a function, that is, it must not
      * retain a mutable internal state.<br/>
@@ -640,12 +632,6 @@ public class Functions {
         public ConsumerCommandInvocation(
                 @NotNull final ConsumerWrapper<? super ResultChannel<OUT>> consumer) {
 
-            if (!consumer.hasStaticContext()) {
-
-                throw new IllegalArgumentException(
-                        "the consumer class must have a static context: " + consumer.getClass());
-            }
-
             mConsumer = consumer;
         }
 
@@ -695,12 +681,6 @@ public class Functions {
          */
         private ConsumerFilterInvocation(
                 @NotNull final BiConsumerWrapper<? super IN, ? super ResultChannel<OUT>> consumer) {
-
-            if (!consumer.hasStaticContext()) {
-
-                throw new IllegalArgumentException(
-                        "the bi-consumer class must have a static context: " + consumer.getClass());
-            }
 
             mConsumer = consumer;
         }
@@ -755,12 +735,6 @@ public class Functions {
         private ConsumerInvocationFactory(
                 @NotNull final BiConsumerWrapper<? super List<? extends IN>, ? super
                         ResultChannel<OUT>> consumer) {
-
-            if (!consumer.hasStaticContext()) {
-
-                throw new IllegalArgumentException(
-                        "the bi-consumer class must have a static context: " + consumer.getClass());
-            }
 
             mConsumer = consumer;
             mInvocation = new FunctionInvocation<IN, OUT>() {
@@ -822,12 +796,6 @@ public class Functions {
          */
         private FunctionFilterInvocation(@NotNull final FunctionWrapper<? super IN, OUT> function) {
 
-            if (!function.hasStaticContext()) {
-
-                throw new IllegalArgumentException(
-                        "the function class must have a static context: " + function.getClass());
-            }
-
             mFunction = function;
         }
 
@@ -879,12 +847,6 @@ public class Functions {
          */
         private FunctionInvocationFactory(
                 @NotNull final FunctionWrapper<? super List<? extends IN>, OUT> function) {
-
-            if (!function.hasStaticContext()) {
-
-                throw new IllegalArgumentException(
-                        "the function class must have a static context: " + function.getClass());
-            }
 
             mFunction = function;
             mInvocation = new FunctionInvocation<IN, OUT>() {
@@ -945,12 +907,6 @@ public class Functions {
          */
         private PredicateFilterInvocation(@NotNull final PredicateWrapper<? super IN> predicate) {
 
-            if (!predicate.hasStaticContext()) {
-
-                throw new IllegalArgumentException(
-                        "the predicate class must have a static context: " + predicate.getClass());
-            }
-
             mPredicate = predicate;
         }
 
@@ -1002,12 +958,6 @@ public class Functions {
          */
         public SupplierCommandInvocation(@NotNull final SupplierWrapper<OUT> supplier) {
 
-            if (!supplier.hasStaticContext()) {
-
-                throw new IllegalArgumentException(
-                        "the supplier class must have a static context: " + supplier.getClass());
-            }
-
             mSupplier = supplier;
         }
 
@@ -1057,12 +1007,6 @@ public class Functions {
          */
         private SupplierInvocationFactory(
                 @NotNull final SupplierWrapper<? extends Invocation<IN, OUT>> supplier) {
-
-            if (!supplier.hasStaticContext()) {
-
-                throw new IllegalArgumentException(
-                        "the supplier class must have a static context: " + supplier.getClass());
-            }
 
             mSupplier = supplier;
         }

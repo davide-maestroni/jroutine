@@ -13,8 +13,6 @@
  */
 package com.github.dm.jrt.function;
 
-import com.github.dm.jrt.util.Reflection;
-
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -104,24 +102,6 @@ public class ConsumerWrapper<IN> implements Consumer<IN> {
         }
 
         return new ConsumerWrapper<IN>(newConsumers);
-    }
-
-    /**
-     * Checks if the consumers wrapped by this instance have a static context.
-     *
-     * @return whether the consumers have a static context.
-     */
-    public boolean hasStaticContext() {
-
-        for (final Consumer<?> consumer : mConsumers) {
-
-            if (!Reflection.hasStaticContext(consumer.getClass())) {
-
-                return false;
-            }
-        }
-
-        return true;
     }
 
     @Override

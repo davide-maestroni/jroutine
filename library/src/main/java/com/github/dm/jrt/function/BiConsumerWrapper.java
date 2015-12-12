@@ -13,8 +13,6 @@
  */
 package com.github.dm.jrt.function;
 
-import com.github.dm.jrt.util.Reflection;
-
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -107,24 +105,6 @@ public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2> {
         }
 
         return new BiConsumerWrapper<IN1, IN2>(newConsumers);
-    }
-
-    /**
-     * Checks if the bi-consumers wrapped by this instance have a static context.
-     *
-     * @return whether the bi-consumers have a static context.
-     */
-    public boolean hasStaticContext() {
-
-        for (final BiConsumer<?, ?> consumer : mConsumers) {
-
-            if (!Reflection.hasStaticContext(consumer.getClass())) {
-
-                return false;
-            }
-        }
-
-        return true;
     }
 
     @Override

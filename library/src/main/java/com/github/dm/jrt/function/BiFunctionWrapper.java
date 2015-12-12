@@ -13,9 +13,11 @@
  */
 package com.github.dm.jrt.function;
 
-import com.github.dm.jrt.util.Reflection;
+import com.github.dm.jrt.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Comparator;
 
 /**
  * Class wrapping a bi-function instance.
@@ -27,6 +29,12 @@ import org.jetbrains.annotations.NotNull;
  * @param <OUT> the output data type.
  */
 public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OUT> {
+
+    private static final WeakIdentityHashMap<Comparator<?>, BiFunctionWrapper<?, ?, ?>>
+            mMaxFunctions = new WeakIdentityHashMap<Comparator<?>, BiFunctionWrapper<?, ?, ?>>();
+
+    private static final WeakIdentityHashMap<Comparator<?>, BiFunctionWrapper<?, ?, ?>>
+            mMinFunctions = new WeakIdentityHashMap<Comparator<?>, BiFunctionWrapper<?, ?, ?>>();
 
     private static final BiFunctionWrapper<Object, Object, Object> sFirst =
             new BiFunctionWrapper<Object, Object, Object>(new BiFunction<Object, Object, Object>() {
@@ -95,6 +103,90 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
     }
 
     /**
+     * Returns a bi-function wrapper returning the greater of the two inputs as indicated by the
+     * specified comparator.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param comparator the comparator instance.
+     * @param <IN>       the input data type.
+     * @return the bi-function wrapper.
+     */
+    @SuppressWarnings({"unchecked", "ConstantConditions"})
+    public static <IN> BiFunctionWrapper<IN, IN, IN> maxBy(
+            @NotNull final Comparator<IN> comparator) {
+
+        if (comparator == null) {
+
+            throw new NullPointerException("the comparator must not be null");
+        }
+
+        synchronized (mMaxFunctions) {
+
+            final WeakIdentityHashMap<Comparator<?>, BiFunctionWrapper<?, ?, ?>> functions =
+                    mMaxFunctions;
+            BiFunctionWrapper<IN, IN, IN> function =
+                    (BiFunctionWrapper<IN, IN, IN>) functions.get(comparator);
+
+            if (function == null) {
+
+                function = new BiFunctionWrapper<IN, IN, IN>(new BiFunction<IN, IN, IN>() {
+
+                    public IN apply(final IN in1, final IN in2) {
+
+                        return (comparator.compare(in1, in2) > 0) ? in1 : in2;
+                    }
+                });
+
+                functions.put(comparator, function);
+            }
+
+            return function;
+        }
+    }
+
+    /**
+     * Returns a bi-function wrapper returning the smaller of the two inputs as indicated by the
+     * specified comparator.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param comparator the comparator instance.
+     * @param <IN>       the input data type.
+     * @return the bi-function wrapper.
+     */
+    @SuppressWarnings({"unchecked", "ConstantConditions"})
+    public static <IN> BiFunctionWrapper<IN, IN, IN> minBy(
+            @NotNull final Comparator<IN> comparator) {
+
+        if (comparator == null) {
+
+            throw new NullPointerException("the comparator must not be null");
+        }
+
+        synchronized (mMinFunctions) {
+
+            final WeakIdentityHashMap<Comparator<?>, BiFunctionWrapper<?, ?, ?>> functions =
+                    mMinFunctions;
+            BiFunctionWrapper<IN, IN, IN> function =
+                    (BiFunctionWrapper<IN, IN, IN>) functions.get(comparator);
+
+            if (function == null) {
+
+                function = new BiFunctionWrapper<IN, IN, IN>(new BiFunction<IN, IN, IN>() {
+
+                    public IN apply(final IN in1, final IN in2) {
+
+                        return (comparator.compare(in1, in2) < 0) ? in1 : in2;
+                    }
+                });
+
+                functions.put(comparator, function);
+            }
+
+            return function;
+        }
+    }
+
+    /**
      * Returns a bi-function wrapper just returning the second passed argument.<br/>
      * The returned object will support concatenation and comparison.
      *
@@ -122,17 +214,6 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
             @NotNull final Function<? super OUT, AFTER> after) {
 
         return new BiFunctionWrapper<IN1, IN2, AFTER>(mBiFunction, mFunction.andThen(after));
-    }
-
-    /**
-     * Checks if the functions wrapped by this instance have a static context.
-     *
-     * @return whether the functions have a static context.
-     */
-    public boolean hasStaticContext() {
-
-        final BiFunction<IN1, IN2, ?> biFunction = mBiFunction;
-        return Reflection.hasStaticContext(biFunction.getClass()) && mFunction.hasStaticContext();
     }
 
     @Override

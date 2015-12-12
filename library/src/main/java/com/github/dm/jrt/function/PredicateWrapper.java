@@ -13,8 +13,6 @@
  */
 package com.github.dm.jrt.function;
 
-import com.github.dm.jrt.util.Reflection;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -240,24 +238,6 @@ public class PredicateWrapper<IN> implements Predicate<IN> {
 
         newPredicates.add(CLOSE_PREDICATE);
         return new PredicateWrapper<IN>(new AndPredicate<IN>(mPredicate, other), newPredicates);
-    }
-
-    /**
-     * Checks if the predicates wrapped by this instance have a static context.
-     *
-     * @return whether the predicates have a static context.
-     */
-    public boolean hasStaticContext() {
-
-        for (final Predicate<?> predicate : mPredicates) {
-
-            if (!Reflection.hasStaticContext(predicate.getClass())) {
-
-                return false;
-            }
-        }
-
-        return true;
     }
 
     @Override

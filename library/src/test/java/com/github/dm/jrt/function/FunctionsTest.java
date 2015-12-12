@@ -191,21 +191,6 @@ public class FunctionsTest {
     }
 
     @Test
-    public void testBiConsumerContext() {
-
-        final BiConsumerWrapper<Object, Object> consumer1 =
-                wrapBiConsumer(new TestBiConsumer()).andThen(new TestBiConsumer());
-        assertThat(consumer1.hasStaticContext()).isTrue();
-        assertThat(consumer1.andThen(new BiConsumer<Object, Object>() {
-
-            public void accept(final Object o, final Object o2) {
-
-            }
-        }).hasStaticContext()).isFalse();
-        assertThat(consumer1.andThen(consumer1).hasStaticContext()).isTrue();
-    }
-
-    @Test
     public void testBiConsumerEquals() {
 
         final TestBiConsumer consumer1 = new TestBiConsumer();
@@ -308,22 +293,6 @@ public class FunctionsTest {
     }
 
     @Test
-    public void testBiFunctionContext() {
-
-        final BiFunctionWrapper<Object, Object, Object> function1 =
-                wrapBiFunction(new TestBiFunction()).andThen(new TestFunction());
-        assertThat(function1.hasStaticContext()).isTrue();
-        assertThat(function1.andThen(new Function<Object, Object>() {
-
-            public Object apply(final Object o) {
-
-                return null;
-            }
-        }).hasStaticContext()).isFalse();
-        assertThat(function1.andThen(identity()).hasStaticContext()).isTrue();
-    }
-
-    @Test
     public void testBiFunctionEquals() {
 
         final TestBiFunction function1 = new TestBiFunction();
@@ -406,7 +375,6 @@ public class FunctionsTest {
         final BiConsumerWrapper<Object, Object> consumer2 = biSink().andThen(consumer1);
         consumer2.accept("test", "test");
         assertThat(consumer1.isCalled()).isTrue();
-        assertThat(consumer2.hasStaticContext()).isTrue();
         assertThat(biSink()).isSameAs(biSink());
     }
 
@@ -427,7 +395,6 @@ public class FunctionsTest {
 
         }
 
-        assertThat(function.hasStaticContext()).isTrue();
         final FunctionWrapper<Object, List<String>> function1 =
                 castTo(new ClassToken<List<String>>() {});
         function1.apply(new ArrayList<String>());
@@ -450,8 +417,6 @@ public class FunctionsTest {
         } catch (final ClassCastException ignored) {
 
         }
-
-        assertThat(function1.hasStaticContext()).isTrue();
     }
 
     @Test
@@ -540,22 +505,6 @@ public class FunctionsTest {
         } catch (final NullPointerException ignored) {
 
         }
-
-        try {
-
-            JRoutine.on(supplierCommand(new Supplier<Object>() {
-
-                public Object get() {
-
-                    return "test";
-                }
-            })).buildRoutine();
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
     }
 
     @Test
@@ -585,22 +534,6 @@ public class FunctionsTest {
         } catch (final NullPointerException ignored) {
 
         }
-
-        try {
-
-            JRoutine.on(consumerCommand(new Consumer<ResultChannel<String>>() {
-
-                public void accept(final ResultChannel<String> result) {
-
-                    result.pass("test");
-                }
-            })).buildRoutine();
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
     }
 
     @Test
@@ -610,7 +543,6 @@ public class FunctionsTest {
         final SupplierWrapper<Object> supplier = constant("test").andThen(function);
         assertThat(supplier.get()).isEqualTo("test");
         assertThat(function.isCalled()).isTrue();
-        assertThat(supplier.hasStaticContext()).isTrue();
     }
 
     @Test
@@ -638,21 +570,6 @@ public class FunctionsTest {
         consumer4.accept("test");
         assertThat(consumer1.isCalled()).isTrue();
         assertThat(consumer3.isCalled()).isTrue();
-    }
-
-    @Test
-    public void testConsumerContext() {
-
-        final ConsumerWrapper<Object> consumer1 =
-                wrapConsumer(new TestConsumer()).andThen(new TestConsumer());
-        assertThat(consumer1.hasStaticContext()).isTrue();
-        assertThat(consumer1.andThen(new Consumer<Object>() {
-
-            public void accept(final Object o) {
-
-            }
-        }).hasStaticContext()).isFalse();
-        assertThat(consumer1.andThen(consumer1).hasStaticContext()).isTrue();
     }
 
     @Test
@@ -781,29 +698,6 @@ public class FunctionsTest {
         } catch (final NullPointerException ignored) {
 
         }
-
-        try {
-
-            JRoutine.on(supplierFactory(new Supplier<Invocation<Object, String>>() {
-
-                public Invocation<Object, String> get() {
-
-                    return new FilterInvocation<Object, String>() {
-
-                        public void onInput(final Object input,
-                                @NotNull final ResultChannel<String> result) {
-
-                            result.pass(input.toString());
-                        }
-                    };
-                }
-            })).buildRoutine();
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
     }
 
     @Test
@@ -850,22 +744,6 @@ public class FunctionsTest {
         } catch (final NullPointerException ignored) {
 
         }
-
-        try {
-
-            JRoutine.on(functionFilter(new Function<Object, Object>() {
-
-                public Object apply(final Object o) {
-
-                    return o.toString();
-                }
-            })).buildRoutine();
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
     }
 
     @Test
@@ -903,22 +781,6 @@ public class FunctionsTest {
         } catch (final NullPointerException ignored) {
 
         }
-
-        try {
-
-            JRoutine.on(predicateFilter(new Predicate<Object>() {
-
-                public boolean test(final Object o) {
-
-                    return o != null;
-                }
-            })).buildRoutine();
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
     }
 
     @Test
@@ -946,22 +808,6 @@ public class FunctionsTest {
             fail();
 
         } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            JRoutine.on(consumerFilter(new BiConsumer<Object, ResultChannel<String>>() {
-
-                public void accept(final Object o, final ResultChannel<String> result) {
-
-                    result.pass(o.toString());
-                }
-            })).buildRoutine();
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
 
         }
     }
@@ -1002,30 +848,6 @@ public class FunctionsTest {
                 return s + s;
             }
         }).apply("test")).isEqualTo(24);
-    }
-
-    @Test
-    public void testFunctionContext() {
-
-        final FunctionWrapper<Object, Object> function1 =
-                wrapFunction(new TestFunction()).andThen(new TestFunction());
-        assertThat(function1.hasStaticContext()).isTrue();
-        assertThat(function1.andThen(new Function<Object, Object>() {
-
-            public Object apply(final Object o) {
-
-                return null;
-            }
-        }).hasStaticContext()).isFalse();
-        assertThat(function1.andThen(function1).hasStaticContext()).isTrue();
-        assertThat(function1.compose(new Function<Object, Object>() {
-
-            public Object apply(final Object o) {
-
-                return null;
-            }
-        }).hasStaticContext()).isFalse();
-        assertThat(function1.compose(function1).hasStaticContext()).isTrue();
     }
 
     @Test
@@ -1173,29 +995,6 @@ public class FunctionsTest {
         } catch (final NullPointerException ignored) {
 
         }
-
-        try {
-
-            JRoutine.on(functionFactory(new Function<List<?>, String>() {
-
-                public String apply(final List<?> objects) {
-
-                    final StringBuilder builder = new StringBuilder();
-
-                    for (final Object object : objects) {
-
-                        builder.append(object.toString());
-                    }
-
-                    return builder.toString();
-                }
-            })).buildRoutine();
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
     }
 
     @Test
@@ -1225,25 +1024,6 @@ public class FunctionsTest {
         } catch (final NullPointerException ignored) {
 
         }
-
-        try {
-
-            JRoutine.on(consumerFactory(new BiConsumer<List<?>, ResultChannel<String>>() {
-
-                public void accept(final List<?> objects, final ResultChannel<String> result) {
-
-                    for (final Object object : objects) {
-
-                        result.pass(object.toString());
-                    }
-                }
-            })).buildRoutine();
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
     }
 
     @Test
@@ -1253,7 +1033,6 @@ public class FunctionsTest {
         final FunctionWrapper<Object, Object> function2 = identity().andThen(function1);
         assertThat(function2.apply("test")).isEqualTo("test");
         assertThat(function1.isCalled()).isTrue();
-        assertThat(function2.hasStaticContext()).isTrue();
         assertThat(identity()).isSameAs(identity());
     }
 
@@ -1350,23 +1129,6 @@ public class FunctionsTest {
         assertThat(negative().and(positive()).test("test")).isFalse();
         assertThat(notNull().or(isNull()).test(null)).isTrue();
         assertThat(notNull().and(isNull()).test("test")).isFalse();
-    }
-
-    @Test
-    public void testPredicateContext() {
-
-        final PredicateWrapper<Object> predicate1 =
-                wrapPredicate(new TestPredicate()).and(new TestPredicate());
-        assertThat(predicate1.hasStaticContext()).isTrue();
-        assertThat(predicate1.or(new Predicate<Object>() {
-
-            public boolean test(final Object o) {
-
-                return false;
-            }
-        }).hasStaticContext()).isFalse();
-        assertThat(predicate1.or(negative()).hasStaticContext()).isTrue();
-        assertThat(predicate1.or(isNull()).hasStaticContext()).isTrue();
     }
 
     @Test
@@ -1531,7 +1293,6 @@ public class FunctionsTest {
         final ConsumerWrapper<Object> consumer2 = sink().andThen(consumer1);
         consumer2.accept("test");
         assertThat(consumer1.isCalled()).isTrue();
-        assertThat(consumer2.hasStaticContext()).isTrue();
         assertThat(sink()).isSameAs(sink());
     }
 
@@ -1562,22 +1323,6 @@ public class FunctionsTest {
                 return integer * 3;
             }
         }).get()).isEqualTo(12);
-    }
-
-    @Test
-    public void testSupplierContext() {
-
-        final SupplierWrapper<Object> supplier1 =
-                wrapSupplier(new TestSupplier()).andThen(new TestFunction());
-        assertThat(supplier1.hasStaticContext()).isTrue();
-        assertThat(supplier1.andThen(new Function<Object, Object>() {
-
-            public Object apply(final Object o) {
-
-                return null;
-            }
-        }).hasStaticContext()).isFalse();
-        assertThat(supplier1.andThen(identity()).hasStaticContext()).isTrue();
     }
 
     @Test

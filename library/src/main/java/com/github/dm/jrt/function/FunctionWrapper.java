@@ -14,7 +14,6 @@
 package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.util.ClassToken;
-import com.github.dm.jrt.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -179,24 +178,6 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT> {
 
         newFunctions.addAll(functions);
         return new FunctionWrapper<BEFORE, OUT>(newFunctions);
-    }
-
-    /**
-     * Checks if the functions wrapped by this instance have a static context.
-     *
-     * @return whether the functions have a static context.
-     */
-    public boolean hasStaticContext() {
-
-        for (final Function<?, ?> function : mFunctions) {
-
-            if (!Reflection.hasStaticContext(function.getClass())) {
-
-                return false;
-            }
-        }
-
-        return true;
     }
 
     @Override

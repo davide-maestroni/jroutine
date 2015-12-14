@@ -29,9 +29,12 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static com.github.dm.jrt.function.BiFunctionWrapper.maxBy;
+import static com.github.dm.jrt.function.BiFunctionWrapper.minBy;
 import static com.github.dm.jrt.function.Functions.biSink;
 import static com.github.dm.jrt.function.Functions.castTo;
 import static com.github.dm.jrt.function.Functions.constant;
@@ -1063,6 +1066,104 @@ public class FunctionsTest {
         try {
 
             isInstanceOf(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testMaxByBiFunction() {
+
+        final BiFunctionWrapper<String, String, String> function =
+                maxBy(String.CASE_INSENSITIVE_ORDER);
+        assertThat(function.apply("TEST", "a test")).isEqualTo("TEST");
+        assertThat(function.andThen(new Function<String, String>() {
+
+            public String apply(final String s) {
+
+                return s.toLowerCase();
+            }
+        }).apply("TEST", "a test")).isEqualTo("test");
+        assertThat(function.apply("2", "1")).isEqualTo("2");
+    }
+
+    @Test
+    public void testMaxByBiFunctionEquals() {
+
+        final BiFunctionWrapper<String, String, String> function =
+                maxBy(String.CASE_INSENSITIVE_ORDER);
+        assertThat(function).isEqualTo(function);
+        assertThat(function).isEqualTo(maxBy(String.CASE_INSENSITIVE_ORDER));
+        assertThat(function).isNotEqualTo(maxBy(new Comparator<String>() {
+
+            public int compare(final String o1, final String o2) {
+
+                return o2.compareTo(o1);
+            }
+        }));
+        assertThat(function).isNotEqualTo("");
+        assertThat(function.hashCode()).isEqualTo(maxBy(String.CASE_INSENSITIVE_ORDER).hashCode());
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testMaxByBiFunctionError() {
+
+        try {
+
+            maxBy(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testMinByBiFunction() {
+
+        final BiFunctionWrapper<String, String, String> function =
+                minBy(String.CASE_INSENSITIVE_ORDER);
+        assertThat(function.apply("TEST", "a test")).isEqualTo("a test");
+        assertThat(function.andThen(new Function<String, String>() {
+
+            public String apply(final String s) {
+
+                return s.toUpperCase();
+            }
+        }).apply("TEST", "a test")).isEqualTo("A TEST");
+        assertThat(function.apply("2", "1")).isEqualTo("1");
+    }
+
+    @Test
+    public void testMinByBiFunctionEquals() {
+
+        final BiFunctionWrapper<String, String, String> function =
+                minBy(String.CASE_INSENSITIVE_ORDER);
+        assertThat(function).isEqualTo(function);
+        assertThat(function).isEqualTo(minBy(String.CASE_INSENSITIVE_ORDER));
+        assertThat(function).isNotEqualTo(minBy(new Comparator<String>() {
+
+            public int compare(final String o1, final String o2) {
+
+                return o1.compareTo(o2);
+            }
+        }));
+        assertThat(function).isNotEqualTo("");
+        assertThat(function.hashCode()).isEqualTo(minBy(String.CASE_INSENSITIVE_ORDER).hashCode());
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testMinByBiFunctionError() {
+
+        try {
+
+            minBy(null);
 
             fail();
 

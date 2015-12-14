@@ -15,7 +15,7 @@ package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
-import com.github.dm.jrt.channel.StreamingChannel;
+import com.github.dm.jrt.channel.StreamingIOChannel;
 import com.github.dm.jrt.util.TimeDuration;
 
 import org.jetbrains.annotations.NotNull;
@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class DefaultStreamingChannel<IN, OUT> implements StreamingChannel<IN, OUT> {
+class DefaultStreamingIOChannel<IN, OUT> implements StreamingIOChannel<IN, OUT> {
 
     private final IOChannel<IN, ?> mInputChannel;
 
@@ -47,7 +47,7 @@ class DefaultStreamingChannel<IN, OUT> implements StreamingChannel<IN, OUT> {
      * @param outputChannel the output channel.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultStreamingChannel(@NotNull final IOChannel<IN, ?> inputChannel,
+    DefaultStreamingIOChannel(@NotNull final IOChannel<IN, ?> inputChannel,
             @NotNull final OutputChannel<OUT> outputChannel) {
 
         if (inputChannel == null) {
@@ -85,84 +85,84 @@ class DefaultStreamingChannel<IN, OUT> implements StreamingChannel<IN, OUT> {
     }
 
     @NotNull
-    public StreamingChannel<IN, OUT> after(@NotNull final TimeDuration delay) {
+    public StreamingIOChannel<IN, OUT> after(@NotNull final TimeDuration delay) {
 
         mInputChannel.after(delay);
         return this;
     }
 
     @NotNull
-    public StreamingChannel<IN, OUT> after(final long delay, @NotNull final TimeUnit timeUnit) {
+    public StreamingIOChannel<IN, OUT> after(final long delay, @NotNull final TimeUnit timeUnit) {
 
         mInputChannel.after(delay, timeUnit);
         return this;
     }
 
     @NotNull
-    public StreamingChannel<IN, OUT> now() {
+    public StreamingIOChannel<IN, OUT> now() {
 
         mInputChannel.now();
         return this;
     }
 
     @NotNull
-    public StreamingChannel<IN, OUT> orderByCall() {
+    public StreamingIOChannel<IN, OUT> orderByCall() {
 
         mInputChannel.orderByCall();
         return this;
     }
 
     @NotNull
-    public StreamingChannel<IN, OUT> orderByChance() {
+    public StreamingIOChannel<IN, OUT> orderByChance() {
 
         mInputChannel.orderByChance();
         return this;
     }
 
     @NotNull
-    public StreamingChannel<IN, OUT> orderByDelay() {
+    public StreamingIOChannel<IN, OUT> orderByDelay() {
 
         mInputChannel.orderByDelay();
         return this;
     }
 
     @NotNull
-    public StreamingChannel<IN, OUT> pass(@Nullable final OutputChannel<? extends IN> channel) {
+    public StreamingIOChannel<IN, OUT> pass(@Nullable final OutputChannel<? extends IN> channel) {
 
         mInputChannel.pass(channel);
         return this;
     }
 
     @NotNull
-    public StreamingChannel<IN, OUT> pass(@Nullable final Iterable<? extends IN> inputs) {
+    public StreamingIOChannel<IN, OUT> pass(@Nullable final Iterable<? extends IN> inputs) {
 
         mInputChannel.pass(inputs);
         return this;
     }
 
     @NotNull
-    public StreamingChannel<IN, OUT> pass(@Nullable final IN input) {
+    public StreamingIOChannel<IN, OUT> pass(@Nullable final IN input) {
 
         mInputChannel.pass(input);
         return this;
     }
 
     @NotNull
-    public StreamingChannel<IN, OUT> pass(@Nullable final IN... inputs) {
+    public StreamingIOChannel<IN, OUT> pass(@Nullable final IN... inputs) {
 
         mInputChannel.pass(inputs);
         return this;
     }
 
     @NotNull
-    public StreamingChannel<IN, OUT> afterMax(@NotNull final TimeDuration timeout) {
+    public StreamingIOChannel<IN, OUT> afterMax(@NotNull final TimeDuration timeout) {
 
         mOutputChannel.afterMax(timeout);
         return this;
     }
 
     @NotNull
-    public StreamingChannel<IN, OUT> afterMax(final long timeout,
+    public StreamingIOChannel<IN, OUT> afterMax(final long timeout,
             @NotNull final TimeUnit timeUnit) {
 
         mOutputChannel.afterMax(timeout, timeUnit);
@@ -170,82 +170,82 @@ class DefaultStreamingChannel<IN, OUT> implements StreamingChannel<IN, OUT> {
     }
 
     @NotNull
-    public StreamingChannel<IN, OUT> allInto(@NotNull final Collection<? super OUT> results) {
+    public StreamingIOChannel<IN, OUT> allInto(@NotNull final Collection<? super OUT> results) {
 
         mOutputChannel.allInto(results);
         return this;
     }
 
     @NotNull
-    public StreamingChannel<IN, OUT> eventuallyAbort() {
+    public StreamingIOChannel<IN, OUT> eventuallyAbort() {
 
         mOutputChannel.eventuallyAbort();
         return this;
     }
 
     @NotNull
-    public StreamingChannel<IN, OUT> eventuallyAbort(@Nullable final Throwable reason) {
+    public StreamingIOChannel<IN, OUT> eventuallyAbort(@Nullable final Throwable reason) {
 
         mOutputChannel.eventuallyAbort(reason);
         return this;
     }
 
     @NotNull
-    public StreamingChannel<IN, OUT> eventuallyExit() {
+    public StreamingIOChannel<IN, OUT> eventuallyExit() {
 
         mOutputChannel.eventuallyExit();
         return this;
     }
 
     @NotNull
-    public StreamingChannel<IN, OUT> eventuallyThrow() {
+    public StreamingIOChannel<IN, OUT> eventuallyThrow() {
 
         mOutputChannel.eventuallyThrow();
         return this;
     }
 
     @NotNull
-    public StreamingChannel<IN, OUT> immediately() {
+    public StreamingIOChannel<IN, OUT> immediately() {
 
         mOutputChannel.immediately();
         return this;
     }
 
     @NotNull
-    public StreamingChannel<IN, OUT> passTo(@NotNull final OutputConsumer<? super OUT> consumer) {
+    public StreamingIOChannel<IN, OUT> passTo(@NotNull final OutputConsumer<? super OUT> consumer) {
 
         mOutputChannel.passTo(consumer);
         return this;
     }
 
     @NotNull
-    public StreamingChannel<IN, OUT> skip(final int count) {
+    public StreamingIOChannel<IN, OUT> skip(final int count) {
 
         mOutputChannel.skip(count);
         return this;
     }
 
     @NotNull
-    public StreamingChannel<IN, OUT> close() {
+    public StreamingIOChannel<IN, OUT> close() {
 
         mInputChannel.close();
         return this;
     }
 
     @NotNull
-    public <BEFORE> StreamingChannel<BEFORE, OUT> combine(
+    public <BEFORE> StreamingIOChannel<BEFORE, OUT> combine(
             @NotNull final IOChannel<BEFORE, ? extends IN> channel) {
 
         mInputChannel.pass(channel).close();
-        return new DefaultStreamingChannel<BEFORE, OUT>(channel, mOutputChannel);
+        return new DefaultStreamingIOChannel<BEFORE, OUT>(channel, mOutputChannel);
     }
 
     @NotNull
-    public <AFTER> StreamingChannel<IN, AFTER> concat(
+    public <AFTER> StreamingIOChannel<IN, AFTER> concat(
             @NotNull final IOChannel<? super OUT, AFTER> channel) {
 
         mOutputChannel.passTo(channel);
-        return new DefaultStreamingChannel<IN, AFTER>(mInputChannel, channel.close());
+        return new DefaultStreamingIOChannel<IN, AFTER>(mInputChannel, channel.close());
     }
 
     @NotNull

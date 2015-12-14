@@ -14,6 +14,7 @@
 package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.builder.ConfigurableBuilder;
+import com.github.dm.jrt.channel.Channel.InputChannel;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.invocation.InvocationFactory;
@@ -24,8 +25,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 /**
- * Interface defining a functional routine, that is, a routine concatenating map and reduce
- * functions.<br/>
+ * Interface defining a stream routine, that is, a routine concatenating map and reduce functions.
+ * <br/>
  * Each function in the channel is backed by a sub-routine instance, that can have its own specific
  * configuration and invocation mode.
  * <p/>
@@ -37,11 +38,11 @@ import java.util.List;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public interface FunctionalRoutine<IN, OUT>
-        extends Routine<IN, OUT>, ConfigurableBuilder<FunctionalRoutine<IN, OUT>> {
+public interface StreamRoutine<IN, OUT>
+        extends Routine<IN, OUT>, ConfigurableBuilder<StreamRoutine<IN, OUT>> {
 
     /**
-     * Concatenates a functional routine based on the specified accumulate function to this one.
+     * Concatenates a stream routine based on the specified accumulate function to this one.
      * <br/>
      * The output will be accumulated as follows:
      * <pre>
@@ -56,107 +57,123 @@ public interface FunctionalRoutine<IN, OUT>
      * invoked in an asynchronous mode.
      *
      * @param function the bi-function instance.
-     * @return the concatenated functional routine.
+     * @return the concatenated stream routine.
      */
     @NotNull
-    FunctionalRoutine<IN, OUT> asyncAccumulate(
+    StreamRoutine<IN, OUT> asyncAccumulate(
             @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
 
     /**
-     * Concatenates a functional routine based on the specified consumer to this one.<br/>
+     * Concatenates a stream routine based on the specified consumer to this one.<br/>
      * The routine outputs will be not further propagated.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
      * invoked in an asynchronous mode.
      *
      * @param consumer the consumer instance.
-     * @return the concatenated functional routine.
+     * @return the concatenated stream routine.
      */
     @NotNull
-    FunctionalRoutine<IN, Void> asyncConsume(@NotNull Consumer<? super OUT> consumer);
+    StreamRoutine<IN, Void> asyncConsume(@NotNull Consumer<? super OUT> consumer);
 
     /**
-     * Concatenates a functional routine based on the specified consumer to this one.<br/>
+     * Concatenates a stream routine based on the specified consumer to this one.<br/>
      * The routine exception will be further propagated.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
      * invoked in an asynchronous mode.
      *
      * @param consumer the consumer instance.
-     * @return the concatenated functional routine.
+     * @return the concatenated stream routine.
      */
     @NotNull
-    FunctionalRoutine<IN, OUT> asyncError(@NotNull Consumer<? super RoutineException> consumer);
+    StreamRoutine<IN, OUT> asyncError(@NotNull Consumer<? super RoutineException> consumer);
 
     /**
-     * Concatenates a functional routine based on the specified predicate to this one.<br/>
+     * Concatenates a stream routine based on the specified predicate to this one.<br/>
      * The output will be filtered according to the result returned by the predicate.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
      * invoked in an asynchronous mode.
      *
      * @param predicate the predicate instance.
-     * @return the concatenated functional routine.
+     * @return the concatenated stream routine.
      */
     @NotNull
-    FunctionalRoutine<IN, OUT> asyncFilter(@NotNull Predicate<? super OUT> predicate);
+    StreamRoutine<IN, OUT> asyncFilter(@NotNull Predicate<? super OUT> predicate);
 
     /**
-     * Concatenates a functional routine based on the specified consumer to this one.
+     * Lifts this stream routine by applying the specified function.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in an asynchronous mode.
+     *
+     * @param function the function instance.
+     * @param <BEFORE> the lifting input type.
+     * @param <AFTER>  the lifting output type.
+     * @return the lifted stream routine.
+     */
+    @NotNull
+    <BEFORE, AFTER> StreamRoutine<BEFORE, AFTER> asyncLift(
+            @NotNull Function<? super StreamRoutine<IN, OUT>, ? extends Routine<BEFORE, AFTER>>
+                    function);
+
+    /**
+     * Concatenates a stream routine based on the specified consumer to this one.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
      * invoked in an asynchronous mode.
      *
      * @param consumer the bi-consumer instance.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated functional routine.
+     * @return the concatenated stream routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> asyncMap(
+    <AFTER> StreamRoutine<IN, AFTER> asyncMap(
             @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
 
     /**
-     * Concatenates a functional routine based on the specified function to this one.
+     * Concatenates a stream routine based on the specified function to this one.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
      * invoked in an asynchronous mode.
      *
      * @param function the function instance.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated functional routine.
+     * @return the concatenated stream routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> asyncMap(@NotNull Function<? super OUT, AFTER> function);
+    <AFTER> StreamRoutine<IN, AFTER> asyncMap(@NotNull Function<? super OUT, AFTER> function);
 
     /**
-     * Concatenates a functional routine based on the specified factory to this one.
+     * Concatenates a stream routine based on the specified factory to this one.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
      * invoked in an asynchronous mode.
      *
      * @param factory the invocation factory.
      * @param <AFTER> the concatenation output type.
-     * @return the concatenated functional routine.
+     * @return the concatenated stream routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> asyncMap(
+    <AFTER> StreamRoutine<IN, AFTER> asyncMap(
             @NotNull InvocationFactory<? super OUT, AFTER> factory);
 
     /**
-     * Concatenates a functional routine based on the specified instance to this one.
+     * Concatenates a stream routine based on the specified instance to this one.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
      * invoked in an asynchronous mode.
      *
      * @param routine the routine instance.
      * @param <AFTER> the concatenation output type.
-     * @return the concatenated functional routine.
+     * @return the concatenated stream routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> asyncMap(@NotNull Routine<? super OUT, AFTER> routine);
+    <AFTER> StreamRoutine<IN, AFTER> asyncMap(@NotNull Routine<? super OUT, AFTER> routine);
 
     /**
-     * Concatenates a functional routine based on the specified reducing consumer to this one.<br/>
+     * Concatenates a stream routine based on the specified reducing consumer to this one.<br/>
      * The outputs will be reduced by applying the function, only when the routine invocation
      * completes.
      * <p/>
@@ -165,15 +182,15 @@ public interface FunctionalRoutine<IN, OUT>
      *
      * @param consumer the bi-consumer instance.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated functional routine.
+     * @return the concatenated stream routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> asyncReduce(
+    <AFTER> StreamRoutine<IN, AFTER> asyncReduce(
             @NotNull BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
                     consumer);
 
     /**
-     * Concatenates a functional routine based on the specified reducing function to this one.<br/>
+     * Concatenates a stream routine based on the specified reducing function to this one.<br/>
      * The outputs will be reduced by applying the function, only when the routine invocation
      * completes.
      * <p/>
@@ -182,14 +199,14 @@ public interface FunctionalRoutine<IN, OUT>
      *
      * @param function the function instance.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated functional routine.
+     * @return the concatenated stream routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> asyncReduce(
+    <AFTER> StreamRoutine<IN, AFTER> asyncReduce(
             @NotNull Function<? super List<? extends OUT>, AFTER> function);
 
     /**
-     * Concatenates a functional routine based on the specified consumer to this one.<br/>
+     * Concatenates a stream routine based on the specified consumer to this one.<br/>
      * The consumer will be called only when the invocation completes.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
@@ -197,14 +214,14 @@ public interface FunctionalRoutine<IN, OUT>
      *
      * @param consumer the consumer instance.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated functional routine.
+     * @return the concatenated stream routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> asyncThen(
+    <AFTER> StreamRoutine<IN, AFTER> asyncThen(
             @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
 
     /**
-     * Concatenates a functional routine based on the specified supplier to this one.<br/>
+     * Concatenates a stream routine based on the specified supplier to this one.<br/>
      * The supplier will be called only when the invocation completes.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
@@ -212,107 +229,137 @@ public interface FunctionalRoutine<IN, OUT>
      *
      * @param supplier the supplier instance.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated functional routine.
+     * @return the concatenated stream routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> asyncThen(@NotNull Supplier<AFTER> supplier);
+    <AFTER> StreamRoutine<IN, AFTER> asyncThen(@NotNull Supplier<AFTER> supplier);
+
+    // TODO: 12/13/15 javadoc
+    @NotNull
+    StreamRoutine<IN, OUT> asyncTryCatch(
+            @NotNull BiConsumer<? super RoutineException, ? super InputChannel<OUT>> consumer);
+
+    // TODO: 12/13/15 javadoc
+    @NotNull
+    StreamRoutine<IN, OUT> asyncTryCatch(@NotNull Consumer<? super RoutineException> consumer);
+
+    // TODO: 12/13/15 javadoc
+    @NotNull
+    StreamRoutine<IN, OUT> asyncTryCatch(
+            @NotNull Function<? super RoutineException, ? extends OUT> function);
 
     /**
-     * Lifts this functional routine by applying the specified function.
+     * Lifts this stream routine by applying the specified function.
      *
      * @param function the function instance.
      * @param <BEFORE> the lifting input type.
      * @param <AFTER>  the lifting output type.
-     * @return the lifted functional routine.
+     * @return the lifted stream routine.
      */
     @NotNull
-    <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> flatLift(
-            @NotNull Function<? super FunctionalRoutine<IN, OUT>, ? extends
-                    FunctionalRoutine<BEFORE, AFTER>> function);
+    <BEFORE, AFTER> StreamRoutine<BEFORE, AFTER> flatLift(
+            @NotNull Function<? super StreamRoutine<IN, OUT>, ? extends
+                    StreamRoutine<BEFORE, AFTER>> function);
 
     /**
-     * Lifts this functional routine by applying the specified function.
-     *
-     * @param function the function instance.
-     * @param <BEFORE> the lifting input type.
-     * @param <AFTER>  the lifting output type.
-     * @return the lifted functional routine.
-     */
-    @NotNull
-    <BEFORE, AFTER> FunctionalRoutine<BEFORE, AFTER> lift(
-            @NotNull Function<? super FunctionalRoutine<IN, OUT>, ? extends Routine<BEFORE,
-                    AFTER>> function);
-
-    /**
-     * Concatenates a functional routine based on the specified predicate to this one.<br/>
+     * Concatenates a stream routine based on the specified predicate to this one.<br/>
      * The output will be filtered according to the result returned by the predicate.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
      * invoked in a parallel mode.
      *
      * @param predicate the predicate instance.
-     * @return the concatenated functional routine.
+     * @return the concatenated stream routine.
      */
     @NotNull
-    FunctionalRoutine<IN, OUT> parallelFilter(@NotNull Predicate<? super OUT> predicate);
+    StreamRoutine<IN, OUT> parallelFilter(@NotNull Predicate<? super OUT> predicate);
 
     /**
-     * Concatenates a functional routine based on the specified consumer to this one.
+     * Lifts this stream routine by applying the specified function.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a parallel mode.
+     *
+     * @param function the function instance.
+     * @param <BEFORE> the lifting input type.
+     * @param <AFTER>  the lifting output type.
+     * @return the lifted stream routine.
+     */
+    @NotNull
+    <BEFORE, AFTER> StreamRoutine<BEFORE, AFTER> parallelLift(
+            @NotNull Function<? super StreamRoutine<IN, OUT>, ? extends Routine<BEFORE, AFTER>>
+                    function);
+
+    /**
+     * Concatenates a stream routine based on the specified consumer to this one.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
      * invoked in a parallel mode.
      *
      * @param consumer the bi-consumer instance.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated functional routine.
+     * @return the concatenated stream routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> parallelMap(
+    <AFTER> StreamRoutine<IN, AFTER> parallelMap(
             @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
 
     /**
-     * Concatenates a functional routine based on the specified function to this one.
+     * Concatenates a stream routine based on the specified function to this one.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
      * invoked in a parallel mode.
      *
      * @param function the function instance.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated functional routine.
+     * @return the concatenated stream routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> parallelMap(
-            @NotNull Function<? super OUT, AFTER> function);
+    <AFTER> StreamRoutine<IN, AFTER> parallelMap(@NotNull Function<? super OUT, AFTER> function);
 
     /**
-     * Concatenates a functional routine based on the specified factory to this one.
+     * Concatenates a stream routine based on the specified factory to this one.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
      * invoked in a parallel mode.
      *
      * @param factory the invocation factory.
      * @param <AFTER> the concatenation output type.
-     * @return the concatenated functional routine.
+     * @return the concatenated stream routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> parallelMap(
+    <AFTER> StreamRoutine<IN, AFTER> parallelMap(
             @NotNull InvocationFactory<? super OUT, AFTER> factory);
 
     /**
-     * Concatenates a functional routine based on the specified instance to this one.
+     * Concatenates a stream routine based on the specified instance to this one.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
      * invoked in a parallel mode.
      *
      * @param routine the routine instance.
      * @param <AFTER> the concatenation output type.
-     * @return the concatenated functional routine.
+     * @return the concatenated stream routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> parallelMap(@NotNull Routine<? super OUT, AFTER> routine);
+    <AFTER> StreamRoutine<IN, AFTER> parallelMap(@NotNull Routine<? super OUT, AFTER> routine);
+
+    // TODO: 12/13/15 javadoc
+    @NotNull
+    StreamRoutine<IN, OUT> parallelTryCatch(
+            @NotNull BiConsumer<? super RoutineException, ? super InputChannel<OUT>> consumer);
+
+    // TODO: 12/13/15 javadoc
+    @NotNull
+    StreamRoutine<IN, OUT> parallelTryCatch(@NotNull Consumer<? super RoutineException> consumer);
+
+    // TODO: 12/13/15 javadoc
+    @NotNull
+    StreamRoutine<IN, OUT> parallelTryCatch(
+            @NotNull Function<? super RoutineException, ? extends OUT> function);
 
     /**
-     * Concatenates a functional routine based on the specified accumulate function to this one.
+     * Concatenates a stream routine based on the specified accumulate function to this one.
      * <br/>
      * The output will be accumulated as follows:
      * <pre>
@@ -327,107 +374,123 @@ public interface FunctionalRoutine<IN, OUT>
      * invoked in a synchronous mode.
      *
      * @param function the bi-function instance.
-     * @return the concatenated functional routine.
+     * @return the concatenated stream routine.
      */
     @NotNull
-    FunctionalRoutine<IN, OUT> syncAccumulate(
+    StreamRoutine<IN, OUT> syncAccumulate(
             @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
 
     /**
-     * Concatenates a functional routine based on the specified consumer to this one.<br/>
+     * Concatenates a stream routine based on the specified consumer to this one.<br/>
      * The routine outputs will be not further propagated.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
      * invoked in a synchronous mode.
      *
      * @param consumer the consumer instance.
-     * @return the concatenated functional routine.
+     * @return the concatenated stream routine.
      */
     @NotNull
-    FunctionalRoutine<IN, Void> syncConsume(@NotNull Consumer<? super OUT> consumer);
+    StreamRoutine<IN, Void> syncConsume(@NotNull Consumer<? super OUT> consumer);
 
     /**
-     * Concatenates a functional routine based on the specified consumer to this one.<br/>
+     * Concatenates a stream routine based on the specified consumer to this one.<br/>
      * The routine exception will be further propagated.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
      * invoked in a synchronous mode.
      *
      * @param consumer the consumer instance.
-     * @return the concatenated functional routine.
+     * @return the concatenated stream routine.
      */
     @NotNull
-    FunctionalRoutine<IN, OUT> syncError(@NotNull Consumer<? super RoutineException> consumer);
+    StreamRoutine<IN, OUT> syncError(@NotNull Consumer<? super RoutineException> consumer);
 
     /**
-     * Concatenates a functional routine based on the specified predicate to this one.<br/>
+     * Concatenates a stream routine based on the specified predicate to this one.<br/>
      * The output will be filtered according to the result returned by the predicate.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
      * invoked in a synchronous mode.
      *
      * @param predicate the predicate instance.
-     * @return the concatenated functional routine.
+     * @return the concatenated stream routine.
      */
     @NotNull
-    FunctionalRoutine<IN, OUT> syncFilter(@NotNull Predicate<? super OUT> predicate);
+    StreamRoutine<IN, OUT> syncFilter(@NotNull Predicate<? super OUT> predicate);
 
     /**
-     * Concatenates a functional routine based on the specified consumer to this one.
+     * Lifts this stream routine by applying the specified function.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a synchronous mode.
+     *
+     * @param function the function instance.
+     * @param <BEFORE> the lifting input type.
+     * @param <AFTER>  the lifting output type.
+     * @return the lifted stream routine.
+     */
+    @NotNull
+    <BEFORE, AFTER> StreamRoutine<BEFORE, AFTER> syncLift(
+            @NotNull Function<? super StreamRoutine<IN, OUT>, ? extends Routine<BEFORE, AFTER>>
+                    function);
+
+    /**
+     * Concatenates a stream routine based on the specified consumer to this one.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
      * invoked in a synchronous mode.
      *
      * @param consumer the bi-consumer instance.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated functional routine.
+     * @return the concatenated stream routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> syncMap(
+    <AFTER> StreamRoutine<IN, AFTER> syncMap(
             @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
 
     /**
-     * Concatenates a functional routine based on the specified function to this one.
+     * Concatenates a stream routine based on the specified function to this one.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
      * invoked in a synchronous mode.
      *
      * @param function the function instance.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated functional routine.
+     * @return the concatenated stream routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> syncMap(@NotNull Function<? super OUT, AFTER> function);
+    <AFTER> StreamRoutine<IN, AFTER> syncMap(@NotNull Function<? super OUT, AFTER> function);
 
     /**
-     * Concatenates a functional routine based on the specified factory to this one.
+     * Concatenates a stream routine based on the specified factory to this one.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
      * invoked in a synchronous mode.
      *
      * @param factory the invocation factory.
      * @param <AFTER> the concatenation output type.
-     * @return the concatenated functional routine.
+     * @return the concatenated stream routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> syncMap(
+    <AFTER> StreamRoutine<IN, AFTER> syncMap(
             @NotNull InvocationFactory<? super OUT, AFTER> factory);
 
     /**
-     * Concatenates a functional routine based on the specified instance to this one.
+     * Concatenates a stream routine based on the specified instance to this one.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
      * invoked in a synchronous mode.
      *
      * @param routine the routine instance.
      * @param <AFTER> the concatenation output type.
-     * @return the concatenated functional routine.
+     * @return the concatenated stream routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> syncMap(@NotNull Routine<? super OUT, AFTER> routine);
+    <AFTER> StreamRoutine<IN, AFTER> syncMap(@NotNull Routine<? super OUT, AFTER> routine);
 
     /**
-     * Concatenates a functional routine based on the specified reducing consumer to this one.<br/>
+     * Concatenates a stream routine based on the specified reducing consumer to this one.<br/>
      * The outputs will be reduced by applying the function, only when the routine invocation
      * completes.
      * <p/>
@@ -436,15 +499,15 @@ public interface FunctionalRoutine<IN, OUT>
      *
      * @param consumer the bi-consumer instance.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated functional routine.
+     * @return the concatenated stream routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> syncReduce(
+    <AFTER> StreamRoutine<IN, AFTER> syncReduce(
             @NotNull BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
                     consumer);
 
     /**
-     * Concatenates a functional routine based on the specified reducing function to this one.<br/>
+     * Concatenates a stream routine based on the specified reducing function to this one.<br/>
      * The outputs will be reduced by applying the function, only when the routine invocation
      * completes.
      * <p/>
@@ -453,14 +516,14 @@ public interface FunctionalRoutine<IN, OUT>
      *
      * @param function the function instance.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated functional routine.
+     * @return the concatenated stream routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> syncReduce(
+    <AFTER> StreamRoutine<IN, AFTER> syncReduce(
             @NotNull Function<? super List<? extends OUT>, AFTER> function);
 
     /**
-     * Concatenates a functional routine based on the specified consumer to this one.<br/>
+     * Concatenates a stream routine based on the specified consumer to this one.<br/>
      * The consumer will be called only when the invocation completes.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
@@ -468,14 +531,14 @@ public interface FunctionalRoutine<IN, OUT>
      *
      * @param consumer the consumer instance.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated functional routine.
+     * @return the concatenated stream routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> syncThen(
+    <AFTER> StreamRoutine<IN, AFTER> syncThen(
             @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
 
     /**
-     * Concatenates a functional routine based on the specified supplier to this one.<br/>
+     * Concatenates a stream routine based on the specified supplier to this one.<br/>
      * The supplier will be called only when the invocation completes.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
@@ -483,8 +546,22 @@ public interface FunctionalRoutine<IN, OUT>
      *
      * @param supplier the supplier instance.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated functional routine.
+     * @return the concatenated stream routine.
      */
     @NotNull
-    <AFTER> FunctionalRoutine<IN, AFTER> syncThen(@NotNull Supplier<AFTER> supplier);
+    <AFTER> StreamRoutine<IN, AFTER> syncThen(@NotNull Supplier<AFTER> supplier);
+
+    // TODO: 12/13/15 javadoc
+    @NotNull
+    StreamRoutine<IN, OUT> syncTryCatch(
+            @NotNull BiConsumer<? super RoutineException, ? super InputChannel<OUT>> consumer);
+
+    // TODO: 12/13/15 javadoc
+    @NotNull
+    StreamRoutine<IN, OUT> syncTryCatch(@NotNull Consumer<? super RoutineException> consumer);
+
+    // TODO: 12/13/15 javadoc
+    @NotNull
+    StreamRoutine<IN, OUT> syncTryCatch(
+            @NotNull Function<? super RoutineException, ? extends OUT> function);
 }

@@ -21,7 +21,7 @@ import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.channel.StreamingChannel;
+import com.github.dm.jrt.channel.StreamingIOChannel;
 import com.github.dm.jrt.core.Channels.Selectable;
 import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.invocation.InvocationException;
@@ -1331,8 +1331,8 @@ public class ChannelsTest {
 
         final Routine<Selectable<Object>, Selectable<Object>> routine =
                 JRoutine.on(new Sort()).buildRoutine();
-        final StreamingChannel<Selectable<Object>, Selectable<Object>> channel =
-                Channels.asyncStream(routine);
+        final StreamingIOChannel<Selectable<Object>, Selectable<Object>> channel =
+                Channels.asyncIo(routine);
         Channels.select(channel).index(Sort.INTEGER);
         Channels.select(channel).index(Sort.STRING);
         channel.pass(new Selectable<Object>("test21", Sort.STRING),
@@ -1367,8 +1367,8 @@ public class ChannelsTest {
 
         final Routine<Selectable<Object>, Selectable<Object>> routine =
                 JRoutine.on(new Sort()).buildRoutine();
-        StreamingChannel<Selectable<Object>, Selectable<Object>> channel =
-                Channels.asyncStream(routine);
+        StreamingIOChannel<Selectable<Object>, Selectable<Object>> channel =
+                Channels.asyncIo(routine);
         Channels.select(channel).index(Sort.INTEGER);
         Channels.select(channel).index(Sort.STRING);
         channel.after(millis(100))
@@ -1396,7 +1396,7 @@ public class ChannelsTest {
 
         }
 
-        channel = Channels.asyncStream(routine);
+        channel = Channels.asyncIo(routine);
         Channels.select(channel).index(Sort.INTEGER);
         Channels.select(channel).index(Sort.STRING);
         channel.after(millis(100))
@@ -1424,7 +1424,7 @@ public class ChannelsTest {
 
         }
 
-        channel = Channels.asyncStream(routine);
+        channel = Channels.asyncIo(routine);
         Channels.select(channel).index(Sort.INTEGER);
         Channels.select(channel).index(Sort.STRING);
         channel.after(millis(100))

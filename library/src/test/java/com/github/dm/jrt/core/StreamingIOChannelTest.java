@@ -21,7 +21,7 @@ import com.github.dm.jrt.channel.ExecutionTimeoutException;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.channel.StreamingChannel;
+import com.github.dm.jrt.channel.StreamingIOChannel;
 import com.github.dm.jrt.channel.TimeoutException;
 import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.invocation.InvocationFactory;
@@ -42,9 +42,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.dm.jrt.core.Channels.asyncStream;
-import static com.github.dm.jrt.core.Channels.parallelStream;
-import static com.github.dm.jrt.core.Channels.syncStream;
+import static com.github.dm.jrt.core.Channels.asyncIo;
+import static com.github.dm.jrt.core.Channels.parallelIo;
+import static com.github.dm.jrt.core.Channels.syncIo;
 import static com.github.dm.jrt.util.TimeDuration.millis;
 import static com.github.dm.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -55,14 +55,14 @@ import static org.junit.Assert.fail;
  * <p/>
  * Created by davide-maestroni on 09/25/2015.
  */
-public class StreamingChannelTest {
+public class StreamingIOChannelTest {
 
     @Test
     public void testAbort() {
 
         final TimeDuration timeout = seconds(1);
-        final StreamingChannel<String, String> streamingChannel =
-                asyncStream(JRoutine.on(PassingInvocation.<String>factoryOf()));
+        final StreamingIOChannel<String, String> streamingChannel =
+                asyncIo(JRoutine.on(PassingInvocation.<String>factoryOf()));
         final InvocationChannel<String, String> invocationChannel =
                 JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke();
         final OutputChannel<String> outputChannel =
@@ -85,8 +85,8 @@ public class StreamingChannelTest {
     @Test
     public void testAbortDelay() {
 
-        final StreamingChannel<String, String> streamingChannel =
-                asyncStream(JRoutine.on(PassingInvocation.<String>factoryOf()));
+        final StreamingIOChannel<String, String> streamingChannel =
+                asyncIo(JRoutine.on(PassingInvocation.<String>factoryOf()));
         streamingChannel.after(TimeDuration.days(1)).pass("test");
 
         assertThat(streamingChannel.immediately().eventuallyExit().all()).isEmpty();
@@ -113,8 +113,8 @@ public class StreamingChannelTest {
     @Test
     public void testAllIntoTimeout() {
 
-        final StreamingChannel<String, String> streamingChannel =
-                asyncStream(JRoutine.on(PassingInvocation.<String>factoryOf()));
+        final StreamingIOChannel<String, String> streamingChannel =
+                asyncIo(JRoutine.on(PassingInvocation.<String>factoryOf()));
         streamingChannel.after(TimeDuration.seconds(3)).pass("test").close();
 
         assertThat(streamingChannel.immediately().eventuallyExit().all()).isEmpty();
@@ -137,8 +137,8 @@ public class StreamingChannelTest {
     @Test
     public void testAllIntoTimeout2() {
 
-        final StreamingChannel<String, String> streamingChannel =
-                asyncStream(JRoutine.on(PassingInvocation.<String>factoryOf()));
+        final StreamingIOChannel<String, String> streamingChannel =
+                asyncIo(JRoutine.on(PassingInvocation.<String>factoryOf()));
         streamingChannel.after(TimeDuration.seconds(3)).pass("test").close();
 
         assertThat(streamingChannel.immediately().eventuallyExit().all()).isEmpty();
@@ -161,8 +161,8 @@ public class StreamingChannelTest {
     @Test
     public void testAllTimeout() {
 
-        final StreamingChannel<String, String> streamingChannel =
-                asyncStream(JRoutine.on(PassingInvocation.<String>factoryOf()));
+        final StreamingIOChannel<String, String> streamingChannel =
+                asyncIo(JRoutine.on(PassingInvocation.<String>factoryOf()));
         streamingChannel.after(TimeDuration.seconds(3)).pass("test").close();
 
         assertThat(streamingChannel.immediately().eventuallyExit().all()).isEmpty();
@@ -185,8 +185,8 @@ public class StreamingChannelTest {
     @Test
     public void testAllTimeout2() {
 
-        final StreamingChannel<String, String> streamingChannel =
-                asyncStream(JRoutine.on(PassingInvocation.<String>factoryOf()));
+        final StreamingIOChannel<String, String> streamingChannel =
+                asyncIo(JRoutine.on(PassingInvocation.<String>factoryOf()));
         streamingChannel.after(TimeDuration.seconds(3)).pass("test").close();
 
         assertThat(streamingChannel.immediately().eventuallyExit().all()).isEmpty();
@@ -210,13 +210,13 @@ public class StreamingChannelTest {
     public void testAppend() {
 
         final Routine<String, String> doubleString = JRoutine.on(new DoubleString()).buildRoutine();
-        assertThat(asyncStream(doubleString).pass("test").afterMax(seconds(10)).next()).isEqualTo(
+        assertThat(asyncIo(doubleString).pass("test").afterMax(seconds(10)).next()).isEqualTo(
                 "testtest");
         final Routine<String, Integer> stringLength =
                 JRoutine.on(new StringLength()).buildRoutine();
-        assertThat(asyncStream(stringLength).pass("test").afterMax(seconds(10)).next()).isEqualTo(
+        assertThat(asyncIo(stringLength).pass("test").afterMax(seconds(10)).next()).isEqualTo(
                 4);
-        assertThat(asyncStream(doubleString).concat(asyncStream(stringLength))
+        assertThat(asyncIo(doubleString).concat(asyncIo(stringLength))
                                             .pass("test")
                                             .afterMax(seconds(10))
                                             .next()).isEqualTo(8);
@@ -226,8 +226,8 @@ public class StreamingChannelTest {
     public void testAsynchronousInput() {
 
         final TimeDuration timeout = seconds(1);
-        final StreamingChannel<String, String> streamingChannel =
-                asyncStream(JRoutine.on(PassingInvocation.<String>factoryOf()));
+        final StreamingIOChannel<String, String> streamingChannel =
+                asyncIo(JRoutine.on(PassingInvocation.<String>factoryOf()));
 
         new Thread() {
 
@@ -257,7 +257,7 @@ public class StreamingChannelTest {
     public void testAsynchronousInput2() {
 
         final TimeDuration timeout = seconds(1);
-        final StreamingChannel<String, String> streamingChannel = asyncStream(
+        final StreamingIOChannel<String, String> streamingChannel = asyncIo(
                 JRoutine.on(PassingInvocation.<String>factoryOf())
                         .invocations()
                         .withInputOrder(OrderType.BY_CALL)
@@ -286,8 +286,8 @@ public class StreamingChannelTest {
     @Test
     public void testEmpty() {
 
-        final StreamingChannel<String, String> streamingChannel =
-                syncStream(JRoutine.on(PassingInvocation.<String>factoryOf()));
+        final StreamingIOChannel<String, String> streamingChannel =
+                syncIo(JRoutine.on(PassingInvocation.<String>factoryOf()));
         assertThat(streamingChannel.isEmpty()).isTrue();
         assertThat(streamingChannel.pass("test").isEmpty()).isFalse();
         streamingChannel.next();
@@ -298,8 +298,8 @@ public class StreamingChannelTest {
     @Test
     public void testEmptyAbort() {
 
-        final StreamingChannel<String, String> streamingChannel =
-                syncStream(JRoutine.on(PassingInvocation.<String>factoryOf()));
+        final StreamingIOChannel<String, String> streamingChannel =
+                syncIo(JRoutine.on(PassingInvocation.<String>factoryOf()));
         assertThat(streamingChannel.isEmpty()).isTrue();
         assertThat(streamingChannel.pass("test").isEmpty()).isFalse();
         assertThat(streamingChannel.abort()).isTrue();
@@ -309,8 +309,8 @@ public class StreamingChannelTest {
     @Test
     public void testHasNextIteratorTimeout() {
 
-        final StreamingChannel<String, String> streamingChannel =
-                parallelStream(JRoutine.on(PassingInvocation.<String>factoryOf()));
+        final StreamingIOChannel<String, String> streamingChannel =
+                parallelIo(JRoutine.on(PassingInvocation.<String>factoryOf()));
         streamingChannel.after(TimeDuration.seconds(3)).pass("test").close();
 
         assertThat(streamingChannel.immediately().eventuallyExit().all()).isEmpty();
@@ -333,8 +333,8 @@ public class StreamingChannelTest {
     @Test
     public void testHasNextIteratorTimeout2() {
 
-        final StreamingChannel<String, String> streamingChannel =
-                asyncStream(JRoutine.on(PassingInvocation.<String>factoryOf()));
+        final StreamingIOChannel<String, String> streamingChannel =
+                asyncIo(JRoutine.on(PassingInvocation.<String>factoryOf()));
         streamingChannel.after(TimeDuration.seconds(3)).pass("test").close();
 
         assertThat(streamingChannel.immediately().eventuallyExit().all()).isEmpty();
@@ -358,12 +358,12 @@ public class StreamingChannelTest {
     public void testNext() {
 
         final InvocationFactory<String, String> factory = PassingInvocation.factoryOf();
-        assertThat(asyncStream(JRoutine.on(factory)).pass("test1", "test2", "test3", "test4")
+        assertThat(asyncIo(JRoutine.on(factory)).pass("test1", "test2", "test3", "test4")
                                                     .close()
                                                     .afterMax(seconds(3))
                                                     .next(2)).containsExactly("test1", "test2");
 
-        assertThat(asyncStream(JRoutine.on(factory)).pass("test1")
+        assertThat(asyncIo(JRoutine.on(factory)).pass("test1")
                                                     .close()
                                                     .afterMax(seconds(3))
                                                     .eventuallyExit()
@@ -371,7 +371,7 @@ public class StreamingChannelTest {
 
         try {
 
-            asyncStream(JRoutine.on(factory)).pass("test1")
+            asyncIo(JRoutine.on(factory)).pass("test1")
                                              .close()
                                              .afterMax(seconds(3))
                                              .eventuallyAbort()
@@ -385,7 +385,7 @@ public class StreamingChannelTest {
 
         try {
 
-            asyncStream(JRoutine.on(factory)).pass("test1")
+            asyncIo(JRoutine.on(factory)).pass("test1")
                                              .close()
                                              .afterMax(seconds(3))
                                              .eventuallyAbort(new IllegalStateException())
@@ -400,7 +400,7 @@ public class StreamingChannelTest {
 
         try {
 
-            asyncStream(JRoutine.on(factory)).pass("test1")
+            asyncIo(JRoutine.on(factory)).pass("test1")
                                              .close()
                                              .afterMax(seconds(3))
                                              .eventuallyThrow()
@@ -416,8 +416,8 @@ public class StreamingChannelTest {
     @Test
     public void testNextIteratorTimeout() {
 
-        final StreamingChannel<String, String> streamingChannel =
-                asyncStream(JRoutine.on(PassingInvocation.<String>factoryOf()));
+        final StreamingIOChannel<String, String> streamingChannel =
+                asyncIo(JRoutine.on(PassingInvocation.<String>factoryOf()));
         streamingChannel.after(TimeDuration.seconds(3)).pass("test").close();
 
         assertThat(streamingChannel.immediately().eventuallyExit().all()).isEmpty();
@@ -440,8 +440,8 @@ public class StreamingChannelTest {
     @Test
     public void testNextIteratorTimeout2() {
 
-        final StreamingChannel<String, String> streamingChannel =
-                asyncStream(JRoutine.on(PassingInvocation.<String>factoryOf()));
+        final StreamingIOChannel<String, String> streamingChannel =
+                asyncIo(JRoutine.on(PassingInvocation.<String>factoryOf()));
         streamingChannel.after(TimeDuration.seconds(3)).pass("test").close();
 
         assertThat(streamingChannel.immediately().eventuallyExit().all()).isEmpty();
@@ -464,8 +464,8 @@ public class StreamingChannelTest {
     @Test
     public void testNextTimeout() {
 
-        final StreamingChannel<String, String> streamingChannel =
-                asyncStream(JRoutine.on(PassingInvocation.<String>factoryOf()));
+        final StreamingIOChannel<String, String> streamingChannel =
+                asyncIo(JRoutine.on(PassingInvocation.<String>factoryOf()));
         streamingChannel.after(TimeDuration.seconds(3)).pass("test").close();
 
         assertThat(streamingChannel.immediately().eventuallyExit().all()).isEmpty();
@@ -488,8 +488,8 @@ public class StreamingChannelTest {
     @Test
     public void testNextTimeout2() {
 
-        final StreamingChannel<String, String> streamingChannel =
-                asyncStream(JRoutine.on(PassingInvocation.<String>factoryOf()));
+        final StreamingIOChannel<String, String> streamingChannel =
+                asyncIo(JRoutine.on(PassingInvocation.<String>factoryOf()));
         streamingChannel.after(TimeDuration.seconds(3)).pass("test").close();
 
         assertThat(streamingChannel.immediately().eventuallyExit().all()).isEmpty();
@@ -515,7 +515,7 @@ public class StreamingChannelTest {
 
         try {
 
-            new DefaultStreamingChannel<Object, Object>(null, JRoutine.io().buildChannel());
+            new DefaultStreamingIOChannel<Object, Object>(null, JRoutine.io().buildChannel());
 
             fail();
 
@@ -525,7 +525,7 @@ public class StreamingChannelTest {
 
         try {
 
-            new DefaultStreamingChannel<Object, Object>(JRoutine.io().buildChannel(), null);
+            new DefaultStreamingIOChannel<Object, Object>(JRoutine.io().buildChannel(), null);
 
             fail();
 
@@ -538,7 +538,7 @@ public class StreamingChannelTest {
     public void testOrderType() {
 
         final TimeDuration timeout = seconds(1);
-        final StreamingChannel<Object, Object> channel = asyncStream(
+        final StreamingIOChannel<Object, Object> channel = asyncIo(
                 JRoutine.on(PassingInvocation.factoryOf())
                         .invocations()
                         .withInputOrder(OrderType.BY_CALL)
@@ -551,13 +551,13 @@ public class StreamingChannelTest {
         channel.pass(-77L);
         assertThat(channel.afterMax(timeout).next()).isEqualTo(-77L);
 
-        final StreamingChannel<Object, Object> channel1 =
-                asyncStream(JRoutine.on(PassingInvocation.factoryOf()));
+        final StreamingIOChannel<Object, Object> channel1 =
+                asyncIo(JRoutine.on(PassingInvocation.factoryOf()));
         channel1.after(TimeDuration.millis(200)).pass(23).now().pass(-77L).close();
         assertThat(channel1.afterMax(timeout).all()).containsOnly(23, -77L);
 
-        final StreamingChannel<Object, Object> channel2 =
-                asyncStream(JRoutine.on(PassingInvocation.factoryOf()));
+        final StreamingIOChannel<Object, Object> channel2 =
+                asyncIo(JRoutine.on(PassingInvocation.factoryOf()));
         channel2.orderByChance().orderByDelay().orderByCall();
         channel2.after(TimeDuration.millis(200)).pass(23).now().pass(-77L).close();
         assertThat(channel2.afterMax(timeout).all()).containsExactly(23, -77L);
@@ -566,8 +566,8 @@ public class StreamingChannelTest {
     @Test
     public void testPartialOut() {
 
-        final StreamingChannel<String, String> streamingChannel =
-                asyncStream(JRoutine.on(PassingInvocation.<String>factoryOf()));
+        final StreamingIOChannel<String, String> streamingChannel =
+                asyncIo(JRoutine.on(PassingInvocation.<String>factoryOf()));
 
         new Thread() {
 
@@ -597,7 +597,7 @@ public class StreamingChannelTest {
     @Test
     public void testPassTimeout() {
 
-        final StreamingChannel<Object, Object> streamingChannel = asyncStream(
+        final StreamingIOChannel<Object, Object> streamingChannel = asyncIo(
                 JRoutine.on(PassingInvocation.factoryOf())
                         .invocations()
                         .withReadTimeout(millis(10))
@@ -610,7 +610,7 @@ public class StreamingChannelTest {
     @Test
     public void testPassTimeout2() {
 
-        final StreamingChannel<Object, Object> streamingChannel = asyncStream(
+        final StreamingIOChannel<Object, Object> streamingChannel = asyncIo(
                 JRoutine.on(PassingInvocation.factoryOf())
                         .invocations()
                         .withReadTimeout(millis(10))
@@ -631,7 +631,7 @@ public class StreamingChannelTest {
     @Test
     public void testPassTimeout3() {
 
-        final StreamingChannel<Object, Object> streamingChannel = asyncStream(
+        final StreamingIOChannel<Object, Object> streamingChannel = asyncIo(
                 JRoutine.on(PassingInvocation.factoryOf())
                         .invocations()
                         .withReadTimeout(millis(10))
@@ -652,8 +652,8 @@ public class StreamingChannelTest {
     @Test
     public void testPendingInputs() throws InterruptedException {
 
-        final StreamingChannel<String, String> channel =
-                asyncStream(JRoutine.on(PassingInvocation.<String>factoryOf()));
+        final StreamingIOChannel<String, String> channel =
+                asyncIo(JRoutine.on(PassingInvocation.<String>factoryOf()));
         assertThat(channel.isOpen()).isTrue();
         channel.pass("test");
         assertThat(channel.isOpen()).isTrue();
@@ -672,8 +672,8 @@ public class StreamingChannelTest {
     @Test
     public void testPendingInputsAbort() throws InterruptedException {
 
-        final StreamingChannel<String, String> channel =
-                asyncStream(JRoutine.on(PassingInvocation.<String>factoryOf()));
+        final StreamingIOChannel<String, String> channel =
+                asyncIo(JRoutine.on(PassingInvocation.<String>factoryOf()));
         assertThat(channel.isOpen()).isTrue();
         channel.pass("test");
         assertThat(channel.isOpen()).isTrue();
@@ -690,13 +690,13 @@ public class StreamingChannelTest {
     public void testPrepend() {
 
         final Routine<String, String> doubleString = JRoutine.on(new DoubleString()).buildRoutine();
-        assertThat(asyncStream(doubleString).pass("test").afterMax(seconds(10)).next()).isEqualTo(
+        assertThat(asyncIo(doubleString).pass("test").afterMax(seconds(10)).next()).isEqualTo(
                 "testtest");
         final Routine<String, Integer> stringLength =
                 JRoutine.on(new StringLength()).buildRoutine();
-        assertThat(asyncStream(stringLength).pass("test").afterMax(seconds(10)).next()).isEqualTo(
+        assertThat(asyncIo(stringLength).pass("test").afterMax(seconds(10)).next()).isEqualTo(
                 4);
-        assertThat(asyncStream(stringLength).combine(asyncStream(doubleString))
+        assertThat(asyncIo(stringLength).combine(asyncIo(doubleString))
                                             .pass("test")
                                             .afterMax(seconds(10))
                                             .next()).isEqualTo(8);
@@ -706,8 +706,8 @@ public class StreamingChannelTest {
     public void testReadFirst() throws InterruptedException {
 
         final TimeDuration timeout = seconds(1);
-        final StreamingChannel<String, String> streamingChannel =
-                asyncStream(JRoutine.on(PassingInvocation.<String>factoryOf()));
+        final StreamingIOChannel<String, String> streamingChannel =
+                asyncIo(JRoutine.on(PassingInvocation.<String>factoryOf()));
 
         new WeakThread(streamingChannel).start();
 
@@ -720,13 +720,13 @@ public class StreamingChannelTest {
     public void testSkip() {
 
         final InvocationFactory<String, String> factory = PassingInvocation.factoryOf();
-        assertThat(asyncStream(JRoutine.on(factory)).pass("test1", "test2", "test3", "test4")
+        assertThat(asyncIo(JRoutine.on(factory)).pass("test1", "test2", "test3", "test4")
                                                     .close()
                                                     .afterMax(seconds(3))
                                                     .skip(2)
                                                     .all()).containsExactly("test3", "test4");
 
-        assertThat(asyncStream(JRoutine.on(factory)).pass("test1")
+        assertThat(asyncIo(JRoutine.on(factory)).pass("test1")
                                                     .close()
                                                     .afterMax(seconds(3))
                                                     .eventuallyExit()
@@ -735,7 +735,7 @@ public class StreamingChannelTest {
 
         try {
 
-            asyncStream(JRoutine.on(factory)).pass("test1")
+            asyncIo(JRoutine.on(factory)).pass("test1")
                                              .close()
                                              .afterMax(seconds(3))
                                              .eventuallyAbort()
@@ -749,7 +749,7 @@ public class StreamingChannelTest {
 
         try {
 
-            asyncStream(JRoutine.on(factory)).pass("test1")
+            asyncIo(JRoutine.on(factory)).pass("test1")
                                              .close()
                                              .afterMax(seconds(3))
                                              .eventuallyAbort(new IllegalStateException())
@@ -764,7 +764,7 @@ public class StreamingChannelTest {
 
         try {
 
-            asyncStream(JRoutine.on(factory)).pass("test1")
+            asyncIo(JRoutine.on(factory)).pass("test1")
                                              .close()
                                              .afterMax(seconds(3))
                                              .eventuallyThrow()
@@ -838,11 +838,11 @@ public class StreamingChannelTest {
 
     private static class WeakThread extends Thread {
 
-        private final WeakReference<StreamingChannel<String, String>> mChannelRef;
+        private final WeakReference<StreamingIOChannel<String, String>> mChannelRef;
 
-        public WeakThread(final StreamingChannel<String, String> ioChannel) {
+        public WeakThread(final StreamingIOChannel<String, String> ioChannel) {
 
-            mChannelRef = new WeakReference<StreamingChannel<String, String>>(ioChannel);
+            mChannelRef = new WeakReference<StreamingIOChannel<String, String>>(ioChannel);
         }
 
         @Override
@@ -856,7 +856,7 @@ public class StreamingChannelTest {
 
             } finally {
 
-                final StreamingChannel<String, String> streamingChannel = mChannelRef.get();
+                final StreamingIOChannel<String, String> streamingChannel = mChannelRef.get();
 
                 if (streamingChannel != null) {
 

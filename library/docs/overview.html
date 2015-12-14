@@ -320,29 +320,29 @@
 
             public static void main(final String[] args) {
 
-                final FunctionalRoutine&lt;String, Double&gt; meanRoutine =
-                        JFunctional.routine()
-                                   .parallelMap((Function) (s) -&gt; {
+                final StreamRoutine&lt;String, Double&gt; meanRoutine =
+                        Streams.routine()
+                               .parallelMap((Function) (s) -&gt; {
 
-                                           return Integer.parseInt(s);
-                                   })
-                                   .parallelMap((Function) (integer) -&gt; {
+                                       return Integer.parseInt(s);
+                               })
+                               .parallelMap((Function) (integer) -&gt; {
 
-                                           return integer * integer;
-                                   })
-                                   .syncMap((Function) (integer) -&gt; {
+                                       return integer * integer;
+                               })
+                               .syncMap((Function) (integer) -&gt; {
 
-                                           return new SumData(integer, 1);
-                                   })
-                                   .asyncAccumulate((BiFunction) (data1, data2) -&gt; {
+                                       return new SumData(integer, 1);
+                               })
+                               .asyncAccumulate((BiFunction) (data1, data2) -&gt; {
 
-                                           return new SumData(data1.sum + data2.sum,
-                                                              data1.count + data2.count);
-                                   })
-                                   .syncMap((Function) (sumData) -&gt; {
+                                       return new SumData(data1.sum + data2.sum,
+                                                          data1.count + data2.count);
+                               })
+                               .syncMap((Function) (sumData) -&gt; {
 
-                                           return Math.sqrt((double) sumData.sum / sumData.count);
-                                   });
+                                       return Math.sqrt((double) sumData.sum / sumData.count);
+                               });
 
                 final Double rms = meanRoutine.asyncCall(args).afterMax(seconds(1)).next();
                 System.out.println(rms);

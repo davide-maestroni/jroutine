@@ -28,7 +28,7 @@ import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.channel.StreamingChannel;
+import com.github.dm.jrt.channel.StreamingIOChannel;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.invocation.Invocations;
 import com.github.dm.jrt.routine.Routine;
@@ -1273,8 +1273,8 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine =
                 JRoutine.with(serviceFrom(getActivity())).on(factoryOf(Sort.class)).buildRoutine();
-        final StreamingChannel<ParcelableSelectable<Object>, ParcelableSelectable<Object>> channel =
-                Channels.asyncStream(routine);
+        final StreamingIOChannel<ParcelableSelectable<Object>, ParcelableSelectable<Object>> channel =
+                Channels.asyncIo(routine);
         Channels.select(channel).index(Sort.INTEGER);
         Channels.select(channel).index(Sort.STRING);
         channel.pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
@@ -1311,8 +1311,8 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine =
                 JRoutine.with(serviceFrom(getActivity())).on(factoryOf(Sort.class)).buildRoutine();
-        StreamingChannel<ParcelableSelectable<Object>, ParcelableSelectable<Object>> channel =
-                Channels.asyncStream(routine);
+        StreamingIOChannel<ParcelableSelectable<Object>, ParcelableSelectable<Object>> channel =
+                Channels.asyncIo(routine);
         Channels.select(channel).index(Sort.INTEGER);
         Channels.select(channel).index(Sort.STRING);
         channel.after(millis(100))
@@ -1340,7 +1340,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         }
 
-        channel = Channels.asyncStream(routine);
+        channel = Channels.asyncIo(routine);
         Channels.select(channel).index(Sort.INTEGER);
         Channels.select(channel).index(Sort.STRING);
         channel.after(millis(100))
@@ -1368,7 +1368,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         }
 
-        channel = Channels.asyncStream(routine);
+        channel = Channels.asyncIo(routine);
         Channels.select(channel).index(Sort.INTEGER);
         Channels.select(channel).index(Sort.STRING);
         channel.after(millis(100))

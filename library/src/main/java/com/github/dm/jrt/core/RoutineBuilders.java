@@ -833,6 +833,7 @@ public class RoutineBuilders {
                         : (invocationMode == InvocationMode.PARALLEL) ? routine.parallelInvoke()
                                 : routine.asyncInvoke();
 
+        // TODO: 12/14/15 remove InputMode.ELEMENT and OutputMode.COLLECTION
         if (inputMode == InputMode.ELEMENT) {
 
             final Class<?> parameterType = method.getParameterTypes()[0];
@@ -891,14 +892,12 @@ public class RoutineBuilders {
 
         } else if (inputMode == InputMode.COLLECTION) {
 
-            outputChannel = routine.asyncInvoke()
-                                   .orderByCall()
-                                   .pass((OutputChannel<Object>) args[0])
-                                   .result();
+            outputChannel =
+                    invocationChannel.orderByCall().pass((OutputChannel<Object>) args[0]).result();
 
         } else {
 
-            outputChannel = routine.asyncCall(args);
+            outputChannel = invocationChannel.pass(args).result();
         }
 
         if (!Void.class.equals(Reflection.boxingClass(returnType))) {

@@ -18,7 +18,7 @@ import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.RoutineException;
-import com.github.dm.jrt.channel.StreamingChannel;
+import com.github.dm.jrt.channel.StreamingIOChannel;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.util.WeakIdentityHashMap;
 
@@ -50,8 +50,8 @@ public class Channels {
     }
 
     /**
-     * Creates and returns a new streaming channel by invoking the specified routine in asynchronous
-     * mode.
+     * Creates and returns a new streaming I/O channel by invoking the specified routine in
+     * asynchronous mode.
      *
      * @param routine the routine to be invoked.
      * @param <IN>    the input data type.
@@ -59,11 +59,11 @@ public class Channels {
      * @return the streaming channel.
      */
     @NotNull
-    public static <IN, OUT> StreamingChannel<IN, OUT> asyncStream(
+    public static <IN, OUT> StreamingIOChannel<IN, OUT> asyncIo(
             @NotNull final Routine<IN, OUT> routine) {
 
         final IOChannel<IN, IN> ioChannel = JRoutine.io().buildChannel();
-        return stream(ioChannel, routine.asyncCall(ioChannel));
+        return io(ioChannel, routine.asyncCall(ioChannel));
     }
 
     /**
@@ -286,6 +286,26 @@ public class Channels {
     }
 
     /**
+     * Creates and returns a new streaming I/O channel backed by the specified input and output.
+     * <br/>
+     * Note that it is up to the caller ensure that the specified input and output channels are
+     * actually connected.
+     *
+     * @param inputChannel  the input channel.
+     * @param outputChannel the output channel.
+     * @param <IN>          the input data type.
+     * @param <OUT>         the output data type.
+     * @return the streaming channel.
+     */
+    @NotNull
+    public static <IN, OUT> StreamingIOChannel<IN, OUT> io(
+            @NotNull final IOChannel<IN, ?> inputChannel,
+            @NotNull final OutputChannel<OUT> outputChannel) {
+
+        return new DefaultStreamingIOChannel<IN, OUT>(inputChannel, outputChannel);
+    }
+
+    /**
      * Returns an output channel joining the data coming from the specified list of channels.<br/>
      * An output will be generated only when at least one result is available for each channel.<br/>
      * Note that the channels will be bound as a result of the call.
@@ -477,7 +497,7 @@ public class Channels {
     }
 
     /**
-     * Creates and returns a new streaming channel by invoking the specified routine in parallel
+     * Creates and returns a new streaming I/O channel by invoking the specified routine in parallel
      * mode.
      *
      * @param routine the routine to be invoked.
@@ -486,11 +506,11 @@ public class Channels {
      * @return the streaming channel.
      */
     @NotNull
-    public static <IN, OUT> StreamingChannel<IN, OUT> parallelStream(
+    public static <IN, OUT> StreamingIOChannel<IN, OUT> parallelIo(
             @NotNull final Routine<IN, OUT> routine) {
 
         final IOChannel<IN, IN> ioChannel = JRoutine.io().buildChannel();
-        return stream(ioChannel, routine.parallelCall(ioChannel));
+        return io(ioChannel, routine.parallelCall(ioChannel));
     }
 
     /**
@@ -749,27 +769,8 @@ public class Channels {
     }
 
     /**
-     * Creates and returns a new streaming channel backed by the specified input and output.<br/>
-     * Note that it is up to the caller ensure that the specified input and output channels are
-     * actually connected.
-     *
-     * @param inputChannel  the input channel.
-     * @param outputChannel the output channel.
-     * @param <IN>          the input data type.
-     * @param <OUT>         the output data type.
-     * @return the streaming channel.
-     */
-    @NotNull
-    public static <IN, OUT> StreamingChannel<IN, OUT> stream(
-            @NotNull final IOChannel<IN, ?> inputChannel,
-            @NotNull final OutputChannel<OUT> outputChannel) {
-
-        return new DefaultStreamingChannel<IN, OUT>(inputChannel, outputChannel);
-    }
-
-    /**
-     * Creates and returns a new streaming channel by invoking the specified routine in synchronous
-     * mode.
+     * Creates and returns a new streaming I/O channel by invoking the specified routine in
+     * synchronous mode.
      *
      * @param routine the routine to be invoked.
      * @param <IN>    the input data type.
@@ -777,11 +778,11 @@ public class Channels {
      * @return the streaming channel.
      */
     @NotNull
-    public static <IN, OUT> StreamingChannel<IN, OUT> syncStream(
+    public static <IN, OUT> StreamingIOChannel<IN, OUT> syncIo(
             @NotNull final Routine<IN, OUT> routine) {
 
         final IOChannel<IN, IN> ioChannel = JRoutine.io().buildChannel();
-        return stream(ioChannel, routine.syncCall(ioChannel));
+        return io(ioChannel, routine.syncCall(ioChannel));
     }
 
     /**

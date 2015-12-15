@@ -1719,6 +1719,112 @@ public class StreamRoutineTest {
         }
     }
 
+    @Test
+    public void testThen() {
+
+        assertThat(Streams.streamRoutine()
+                          .syncMap(PassingInvocation.<String>factoryOf())
+                          .syncThen(new Consumer<ResultChannel<String>>() {
+
+                              public void accept(final ResultChannel<String> resultChannel) {
+
+                                  resultChannel.pass("TEST2");
+                              }
+                          })
+                          .asyncCall("test1")
+                          .afterMax(seconds(3))
+                          .all()).containsOnly("TEST2");
+        assertThat(Streams.streamRoutine()
+                          .syncMap(PassingInvocation.<String>factoryOf())
+                          .syncThen(new Supplier<String>() {
+
+                              public String get() {
+
+                                  return "TEST2";
+                              }
+                          })
+                          .asyncCall("test1")
+                          .afterMax(seconds(3))
+                          .all()).containsOnly("TEST2");
+        assertThat(Streams.streamRoutine()
+                          .syncMap(PassingInvocation.<String>factoryOf())
+                          .asyncThen(new Consumer<ResultChannel<String>>() {
+
+                              public void accept(final ResultChannel<String> resultChannel) {
+
+                                  resultChannel.pass("TEST2");
+                              }
+                          })
+                          .asyncCall("test1")
+                          .afterMax(seconds(3))
+                          .all()).containsOnly("TEST2");
+        assertThat(Streams.streamRoutine()
+                          .syncMap(PassingInvocation.<String>factoryOf())
+                          .asyncThen(new Supplier<String>() {
+
+                              public String get() {
+
+                                  return "TEST2";
+                              }
+                          })
+                          .asyncCall("test1")
+                          .afterMax(seconds(3))
+                          .all()).containsOnly("TEST2");
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testThenNullPointerError() {
+
+        try {
+
+            Streams.streamRoutine()
+                   .syncMap(PassingInvocation.factoryOf())
+                   .syncThen((Consumer<ResultChannel<?>>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamRoutine()
+                   .syncMap(PassingInvocation.factoryOf())
+                   .syncThen((Supplier<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamRoutine()
+                   .syncMap(PassingInvocation.factoryOf())
+                   .asyncThen((Consumer<ResultChannel<?>>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamRoutine()
+                   .syncMap(PassingInvocation.factoryOf())
+                   .asyncThen((Supplier<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
     private static class Strings extends CommandInvocation<String> {
 
         private final String[] mStrings;

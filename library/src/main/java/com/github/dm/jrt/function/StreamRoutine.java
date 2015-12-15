@@ -65,19 +65,6 @@ public interface StreamRoutine<IN, OUT>
 
     /**
      * Concatenates a stream routine based on the specified consumer to this one.<br/>
-     * The routine outputs will be not further propagated.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in an asynchronous mode.
-     *
-     * @param consumer the consumer instance.
-     * @return the concatenated stream routine.
-     */
-    @NotNull
-    StreamRoutine<IN, Void> asyncConsume(@NotNull Consumer<? super OUT> consumer);
-
-    /**
-     * Concatenates a stream routine based on the specified consumer to this one.<br/>
      * The routine exception will be further propagated.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
@@ -101,6 +88,19 @@ public interface StreamRoutine<IN, OUT>
      */
     @NotNull
     StreamRoutine<IN, OUT> asyncFilter(@NotNull Predicate<? super OUT> predicate);
+
+    /**
+     * Concatenates a stream routine based on the specified consumer to this one.<br/>
+     * The routine outputs will not be further propagated.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in an asynchronous mode.
+     *
+     * @param consumer the consumer instance.
+     * @return the concatenated stream routine.
+     */
+    @NotNull
+    StreamRoutine<IN, Void> asyncForEach(@NotNull Consumer<? super OUT> consumer);
 
     /**
      * Lifts this stream routine by applying the specified function.
@@ -234,20 +234,6 @@ public interface StreamRoutine<IN, OUT>
     @NotNull
     <AFTER> StreamRoutine<IN, AFTER> asyncThen(@NotNull Supplier<AFTER> supplier);
 
-    // TODO: 12/13/15 javadoc
-    @NotNull
-    StreamRoutine<IN, OUT> asyncTryCatch(
-            @NotNull BiConsumer<? super RoutineException, ? super InputChannel<OUT>> consumer);
-
-    // TODO: 12/13/15 javadoc
-    @NotNull
-    StreamRoutine<IN, OUT> asyncTryCatch(@NotNull Consumer<? super RoutineException> consumer);
-
-    // TODO: 12/13/15 javadoc
-    @NotNull
-    StreamRoutine<IN, OUT> asyncTryCatch(
-            @NotNull Function<? super RoutineException, ? extends OUT> function);
-
     /**
      * Lifts this stream routine by applying the specified function.
      *
@@ -344,20 +330,6 @@ public interface StreamRoutine<IN, OUT>
     @NotNull
     <AFTER> StreamRoutine<IN, AFTER> parallelMap(@NotNull Routine<? super OUT, AFTER> routine);
 
-    // TODO: 12/13/15 javadoc
-    @NotNull
-    StreamRoutine<IN, OUT> parallelTryCatch(
-            @NotNull BiConsumer<? super RoutineException, ? super InputChannel<OUT>> consumer);
-
-    // TODO: 12/13/15 javadoc
-    @NotNull
-    StreamRoutine<IN, OUT> parallelTryCatch(@NotNull Consumer<? super RoutineException> consumer);
-
-    // TODO: 12/13/15 javadoc
-    @NotNull
-    StreamRoutine<IN, OUT> parallelTryCatch(
-            @NotNull Function<? super RoutineException, ? extends OUT> function);
-
     /**
      * Concatenates a stream routine based on the specified accumulate function to this one.
      * <br/>
@@ -379,19 +351,6 @@ public interface StreamRoutine<IN, OUT>
     @NotNull
     StreamRoutine<IN, OUT> syncAccumulate(
             @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
-
-    /**
-     * Concatenates a stream routine based on the specified consumer to this one.<br/>
-     * The routine outputs will be not further propagated.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in a synchronous mode.
-     *
-     * @param consumer the consumer instance.
-     * @return the concatenated stream routine.
-     */
-    @NotNull
-    StreamRoutine<IN, Void> syncConsume(@NotNull Consumer<? super OUT> consumer);
 
     /**
      * Concatenates a stream routine based on the specified consumer to this one.<br/>
@@ -418,6 +377,19 @@ public interface StreamRoutine<IN, OUT>
      */
     @NotNull
     StreamRoutine<IN, OUT> syncFilter(@NotNull Predicate<? super OUT> predicate);
+
+    /**
+     * Concatenates a stream routine based on the specified consumer to this one.<br/>
+     * The routine outputs will not be further propagated.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a synchronous mode.
+     *
+     * @param consumer the consumer instance.
+     * @return the concatenated stream routine.
+     */
+    @NotNull
+    StreamRoutine<IN, Void> syncForEach(@NotNull Consumer<? super OUT> consumer);
 
     /**
      * Lifts this stream routine by applying the specified function.
@@ -551,17 +523,44 @@ public interface StreamRoutine<IN, OUT>
     @NotNull
     <AFTER> StreamRoutine<IN, AFTER> syncThen(@NotNull Supplier<AFTER> supplier);
 
-    // TODO: 12/13/15 javadoc
+    /**
+     * Concatenates a consumer handling a routine exception.<br/>
+     * The error will not be automatically further propagated.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a synchronous mode.
+     *
+     * @param consumer the bi-consumer instance.
+     * @return the concatenated stream routine.
+     */
     @NotNull
-    StreamRoutine<IN, OUT> syncTryCatch(
+    StreamRoutine<IN, OUT> tryCatch(
             @NotNull BiConsumer<? super RoutineException, ? super InputChannel<OUT>> consumer);
 
-    // TODO: 12/13/15 javadoc
+    /**
+     * Concatenates a consumer handling a routine exception.<br/>
+     * The error will not be automatically further propagated.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a synchronous mode.
+     *
+     * @param consumer the consumer instance.
+     * @return the concatenated stream routine.
+     */
     @NotNull
-    StreamRoutine<IN, OUT> syncTryCatch(@NotNull Consumer<? super RoutineException> consumer);
+    StreamRoutine<IN, OUT> tryCatch(@NotNull Consumer<? super RoutineException> consumer);
 
-    // TODO: 12/13/15 javadoc
+    /**
+     * Concatenates a function handling a routine exception.<br/>
+     * The error will not be automatically further propagated.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a synchronous mode.
+     *
+     * @param function the function instance.
+     * @return the concatenated stream routine.
+     */
     @NotNull
-    StreamRoutine<IN, OUT> syncTryCatch(
+    StreamRoutine<IN, OUT> tryCatch(
             @NotNull Function<? super RoutineException, ? extends OUT> function);
 }

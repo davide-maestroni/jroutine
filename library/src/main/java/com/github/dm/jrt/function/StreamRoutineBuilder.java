@@ -57,20 +57,6 @@ public interface StreamRoutineBuilder extends ConfigurableBuilder<StreamRoutineB
 
     /**
      * Concatenates a stream routine based on the specified consumer to this one.<br/>
-     * The routine outputs will be not further propagated.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in an asynchronous mode.
-     *
-     * @param consumer the consumer instance.
-     * @param <DATA>   the data type.
-     * @return the concatenated stream routine.
-     */
-    @NotNull
-    <DATA> StreamRoutine<DATA, Void> asyncConsume(@NotNull Consumer<? super DATA> consumer);
-
-    /**
-     * Concatenates a stream routine based on the specified consumer to this one.<br/>
      * The routine exception will be further propagated.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
@@ -97,6 +83,20 @@ public interface StreamRoutineBuilder extends ConfigurableBuilder<StreamRoutineB
      */
     @NotNull
     <DATA> StreamRoutine<DATA, DATA> asyncFilter(@NotNull Predicate<? super DATA> predicate);
+
+    /**
+     * Concatenates a stream routine based on the specified consumer to this one.<br/>
+     * The routine outputs will be not further propagated.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in an asynchronous mode.
+     *
+     * @param consumer the consumer instance.
+     * @param <DATA>   the data type.
+     * @return the concatenated stream routine.
+     */
+    @NotNull
+    <DATA> StreamRoutine<DATA, Void> asyncForEach(@NotNull Consumer<? super DATA> consumer);
 
     /**
      * Builds and returns a new stream routine generating outputs from the specified command
@@ -365,20 +365,6 @@ public interface StreamRoutineBuilder extends ConfigurableBuilder<StreamRoutineB
 
     /**
      * Concatenates a stream routine based on the specified consumer to this one.<br/>
-     * The routine outputs will be not further propagated.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in a synchronous mode.
-     *
-     * @param consumer the consumer instance.
-     * @param <DATA>   the data type.
-     * @return the concatenated stream routine.
-     */
-    @NotNull
-    <DATA> StreamRoutine<DATA, Void> syncConsume(@NotNull Consumer<? super DATA> consumer);
-
-    /**
-     * Concatenates a stream routine based on the specified consumer to this one.<br/>
      * The routine exception will be further propagated.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
@@ -405,6 +391,20 @@ public interface StreamRoutineBuilder extends ConfigurableBuilder<StreamRoutineB
      */
     @NotNull
     <DATA> StreamRoutine<DATA, DATA> syncFilter(@NotNull Predicate<? super DATA> predicate);
+
+    /**
+     * Concatenates a stream routine based on the specified consumer to this one.<br/>
+     * The routine outputs will be not further propagated.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a synchronous mode.
+     *
+     * @param consumer the consumer instance.
+     * @param <DATA>   the data type.
+     * @return the concatenated stream routine.
+     */
+    @NotNull
+    <DATA> StreamRoutine<DATA, Void> syncForEach(@NotNull Consumer<? super DATA> consumer);
 
     /**
      * Builds and returns a new stream routine generating outputs from the specified command

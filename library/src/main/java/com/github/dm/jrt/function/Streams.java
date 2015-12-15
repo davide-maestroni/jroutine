@@ -39,8 +39,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static com.github.dm.jrt.core.Channels.asyncIo;
-import static com.github.dm.jrt.core.Channels.parallelIo;
 import static com.github.dm.jrt.core.Channels.syncIo;
 import static com.github.dm.jrt.core.DelegatingInvocation.factoryFrom;
 import static com.github.dm.jrt.function.Functions.consumerCommand;
@@ -71,9 +69,9 @@ public class Streams {
      * @return the routine builder instance.
      */
     @NotNull
-    public static StreamRoutineBuilder routine() {
+    public static StreamRoutineBuilder streamRoutine() {
 
-        return routine(InvocationConfiguration.DEFAULT_CONFIGURATION);
+        return streamRoutine(InvocationConfiguration.DEFAULT_CONFIGURATION);
     }
 
     /**
@@ -83,7 +81,7 @@ public class Streams {
      * @return the routine builder instance.
      */
     @NotNull
-    public static StreamRoutineBuilder routine(
+    public static StreamRoutineBuilder streamRoutine(
             @NotNull final InvocationConfiguration configuration) {
 
         return new DefaultStreamRoutineBuilder(configuration);
@@ -122,12 +120,6 @@ public class Streams {
         }
 
         @NotNull
-        public StreamRoutine<IN, Void> asyncConsume(@NotNull final Consumer<? super OUT> consumer) {
-
-            return fromFactory(new ConsumerInvocation<OUT>(consumer), DelegationType.ASYNC);
-        }
-
-        @NotNull
         public StreamRoutine<IN, OUT> asyncError(
                 @NotNull final Consumer<? super RoutineException> consumer) {
 
@@ -138,6 +130,12 @@ public class Streams {
         public StreamRoutine<IN, OUT> asyncFilter(@NotNull final Predicate<? super OUT> predicate) {
 
             return fromFactory(predicateFilter(predicate), DelegationType.ASYNC);
+        }
+
+        @NotNull
+        public StreamRoutine<IN, Void> asyncForEach(@NotNull final Consumer<? super OUT> consumer) {
+
+            return fromFactory(new ConsumerInvocation<OUT>(consumer), DelegationType.ASYNC);
         }
 
         @NotNull
@@ -207,46 +205,6 @@ public class Streams {
         }
 
         @NotNull
-        @SuppressWarnings("ConstantConditions")
-        public StreamRoutine<IN, OUT> asyncTryCatch(
-                @NotNull final BiConsumer<? super RoutineException, ? super InputChannel<OUT>>
-                        consumer) {
-
-            if (consumer == null) {
-
-                throw new NullPointerException("the bi-consumer instance must not be null");
-            }
-
-            return tryCatch(consumer, DelegationType.ASYNC);
-        }
-
-        @NotNull
-        @SuppressWarnings("ConstantConditions")
-        public StreamRoutine<IN, OUT> asyncTryCatch(
-                @NotNull final Consumer<? super RoutineException> consumer) {
-
-            if (consumer == null) {
-
-                throw new NullPointerException("the consumer instance must not be null");
-            }
-
-            return tryCatch(new TryCatchBiConsumerConsumer<OUT>(consumer), DelegationType.ASYNC);
-        }
-
-        @NotNull
-        @SuppressWarnings("ConstantConditions")
-        public StreamRoutine<IN, OUT> asyncTryCatch(
-                @NotNull final Function<? super RoutineException, ? extends OUT> function) {
-
-            if (function == null) {
-
-                throw new NullPointerException("the function instance must not be null");
-            }
-
-            return tryCatch(new TryCatchBiConsumerFunction<OUT>(function), DelegationType.ASYNC);
-        }
-
-        @NotNull
         public <BEFORE, AFTER> StreamRoutine<BEFORE, AFTER> flatLift(
                 @NotNull final Function<? super StreamRoutine<IN, OUT>, ? extends
                         StreamRoutine<BEFORE, AFTER>> function) {
@@ -298,57 +256,11 @@ public class Streams {
         }
 
         @NotNull
-        @SuppressWarnings("ConstantConditions")
-        public StreamRoutine<IN, OUT> parallelTryCatch(
-                @NotNull final BiConsumer<? super RoutineException, ? super InputChannel<OUT>>
-                        consumer) {
-
-            if (consumer == null) {
-
-                throw new NullPointerException("the bi-consumer instance must not be null");
-            }
-
-            return tryCatch(consumer, DelegationType.PARALLEL);
-        }
-
-        @NotNull
-        @SuppressWarnings("ConstantConditions")
-        public StreamRoutine<IN, OUT> parallelTryCatch(
-                @NotNull final Consumer<? super RoutineException> consumer) {
-
-            if (consumer == null) {
-
-                throw new NullPointerException("the consumer instance must not be null");
-            }
-
-            return tryCatch(new TryCatchBiConsumerConsumer<OUT>(consumer), DelegationType.PARALLEL);
-        }
-
-        @NotNull
-        @SuppressWarnings("ConstantConditions")
-        public StreamRoutine<IN, OUT> parallelTryCatch(
-                @NotNull final Function<? super RoutineException, ? extends OUT> function) {
-
-            if (function == null) {
-
-                throw new NullPointerException("the function instance must not be null");
-            }
-
-            return tryCatch(new TryCatchBiConsumerFunction<OUT>(function), DelegationType.PARALLEL);
-        }
-
-        @NotNull
         public StreamRoutine<IN, OUT> syncAccumulate(
                 @NotNull final BiFunction<? super OUT, ? super OUT, ?
                         extends OUT> function) {
 
             return fromFactory(AccumulateInvocation.functionFactory(function), DelegationType.SYNC);
-        }
-
-        @NotNull
-        public StreamRoutine<IN, Void> syncConsume(@NotNull final Consumer<? super OUT> consumer) {
-
-            return fromFactory(new ConsumerInvocation<OUT>(consumer), DelegationType.SYNC);
         }
 
         @NotNull
@@ -362,6 +274,12 @@ public class Streams {
         public StreamRoutine<IN, OUT> syncFilter(@NotNull final Predicate<? super OUT> predicate) {
 
             return fromFactory(predicateFilter(predicate), DelegationType.SYNC);
+        }
+
+        @NotNull
+        public StreamRoutine<IN, Void> syncForEach(@NotNull final Consumer<? super OUT> consumer) {
+
+            return fromFactory(new ConsumerInvocation<OUT>(consumer), DelegationType.SYNC);
         }
 
         @NotNull
@@ -431,46 +349,6 @@ public class Streams {
         }
 
         @NotNull
-        @SuppressWarnings("ConstantConditions")
-        public StreamRoutine<IN, OUT> syncTryCatch(
-                @NotNull final BiConsumer<? super RoutineException, ? super InputChannel<OUT>>
-                        consumer) {
-
-            if (consumer == null) {
-
-                throw new NullPointerException("the bi-consumer instance must not be null");
-            }
-
-            return tryCatch(consumer, DelegationType.SYNC);
-        }
-
-        @NotNull
-        @SuppressWarnings("ConstantConditions")
-        public StreamRoutine<IN, OUT> syncTryCatch(
-                @NotNull final Consumer<? super RoutineException> consumer) {
-
-            if (consumer == null) {
-
-                throw new NullPointerException("the consumer instance must not be null");
-            }
-
-            return tryCatch(new TryCatchBiConsumerConsumer<OUT>(consumer), DelegationType.SYNC);
-        }
-
-        @NotNull
-        @SuppressWarnings("ConstantConditions")
-        public StreamRoutine<IN, OUT> syncTryCatch(
-                @NotNull final Function<? super RoutineException, ? extends OUT> function) {
-
-            if (function == null) {
-
-                throw new NullPointerException("the function instance must not be null");
-            }
-
-            return tryCatch(new TryCatchBiConsumerFunction<OUT>(function), DelegationType.SYNC);
-        }
-
-        @NotNull
         public Builder<? extends StreamRoutine<IN, OUT>> invocations() {
 
             return new Builder<StreamRoutine<IN, OUT>>(this, mConcatConfiguration);
@@ -516,11 +394,6 @@ public class Streams {
                 @NotNull DelegationType delegationType);
 
         @NotNull
-        protected abstract StreamRoutine<IN, OUT> tryCatch(
-                @NotNull BiConsumer<? super RoutineException, ? super InputChannel<OUT>> consumer,
-                @NotNull DelegationType delegationType);
-
-        @NotNull
         private <AFTER> StreamRoutine<IN, AFTER> fromFactory(
                 @NotNull final InvocationFactory<? super OUT, AFTER> factory,
                 @NotNull final DelegationType delegationType) {
@@ -530,6 +403,32 @@ public class Streams {
                                   .with(mConcatConfiguration)
                                   .set()
                                   .buildRoutine(), delegationType);
+        }
+
+        @NotNull
+        @SuppressWarnings("ConstantConditions")
+        public StreamRoutine<IN, OUT> tryCatch(
+                @NotNull final Consumer<? super RoutineException> consumer) {
+
+            if (consumer == null) {
+
+                throw new NullPointerException("the consumer instance must not be null");
+            }
+
+            return tryCatch(new TryCatchBiConsumerConsumer<OUT>(consumer));
+        }
+
+        @NotNull
+        @SuppressWarnings("ConstantConditions")
+        public StreamRoutine<IN, OUT> tryCatch(
+                @NotNull final Function<? super RoutineException, ? extends OUT> function) {
+
+            if (function == null) {
+
+                throw new NullPointerException("the function instance must not be null");
+            }
+
+            return tryCatch(new TryCatchBiConsumerFunction<OUT>(function));
         }
     }
 
@@ -693,6 +592,15 @@ public class Streams {
         }
 
         @NotNull
+        public StreamRoutine<IN, AFTER> tryCatch(
+                @NotNull final BiConsumer<? super RoutineException, ? super InputChannel<AFTER>>
+                        consumer) {
+
+            return new TryCatchStreamRoutine<IN, AFTER>(getConfiguration(),
+                                                        getConcatConfiguration(), this, consumer);
+        }
+
+        @NotNull
         protected <BEFORE, NEXT> StreamRoutine<BEFORE, NEXT> lift(
                 @NotNull final Function<? super StreamRoutine<IN, AFTER>, ? extends
                         Routine<BEFORE, NEXT>> function,
@@ -701,17 +609,6 @@ public class Streams {
             return new DefaultStreamRoutine<BEFORE, NEXT>(getConfiguration(),
                                                           getConcatConfiguration(),
                                                           function.apply(this), delegationType);
-        }
-
-        @NotNull
-        protected StreamRoutine<IN, AFTER> tryCatch(
-                @NotNull final BiConsumer<? super RoutineException, ? super InputChannel<AFTER>>
-                        consumer,
-                @NotNull final DelegationType delegationType) {
-
-            return new TryCatchStreamRoutine<IN, AFTER>(getConfiguration(),
-                                                        getConcatConfiguration(), this, consumer,
-                                                        delegationType);
         }
     }
 
@@ -746,11 +643,20 @@ public class Streams {
         }
     }
 
-    // TODO: 12/13/15 javadoc
+    /**
+     * Consumer implementation passing an output to the result channel.
+     *
+     * @param <OUT> the output data type.
+     */
     private static class ConsumerOutput<OUT> implements Consumer<ResultChannel<OUT>> {
 
         private final OUT mOutput;
 
+        /**
+         * Constructor.
+         *
+         * @param output the output.
+         */
         private ConsumerOutput(@Nullable final OUT output) {
 
             mOutput = output;
@@ -762,11 +668,20 @@ public class Streams {
         }
     }
 
-    // TODO: 12/13/15 javadoc
+    /**
+     * Consumer implementation passing a list of outputs to the result channel.
+     *
+     * @param <OUT> the output data type.
+     */
     private static class ConsumerOutputs<OUT> implements Consumer<ResultChannel<OUT>> {
 
         private final ArrayList<OUT> mOutputs;
 
+        /**
+         * Constructor.
+         *
+         * @param outputs the list of outputs.
+         */
         private ConsumerOutputs(@Nullable final ArrayList<OUT> outputs) {
 
             mOutputs = outputs;
@@ -789,6 +704,11 @@ public class Streams {
 
         private final Consumer<? super ResultChannel<OUT>> mConsumer;
 
+        /**
+         * Constructor.
+         *
+         * @param consumer the consumer instance.
+         */
         @SuppressWarnings("ConstantConditions")
         private ConsumerThenInvocation(
                 @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
@@ -863,6 +783,15 @@ public class Streams {
         }
 
         @NotNull
+        public StreamRoutine<IN, OUT> tryCatch(
+                @NotNull final BiConsumer<? super RoutineException, ? super InputChannel<OUT>>
+                        consumer) {
+
+            return new TryCatchStreamRoutine<IN, OUT>(getConfiguration(), getConcatConfiguration(),
+                                                      this, consumer);
+        }
+
+        @NotNull
         @Override
         protected <AFTER> StreamRoutine<IN, AFTER> concat(
                 @NotNull final Routine<? super OUT, AFTER> routine,
@@ -890,16 +819,6 @@ public class Streams {
                                                            getConcatConfiguration(),
                                                            function.apply(this), delegationType);
         }
-
-        @NotNull
-        protected StreamRoutine<IN, OUT> tryCatch(
-                @NotNull final BiConsumer<? super RoutineException, ? super InputChannel<OUT>>
-                        consumer,
-                @NotNull final DelegationType delegationType) {
-
-            return new TryCatchStreamRoutine<IN, OUT>(getConfiguration(), getConcatConfiguration(),
-                                                      this, consumer, delegationType);
-        }
     }
 
     /**
@@ -913,6 +832,11 @@ public class Streams {
         private InvocationConfiguration mConfiguration =
                 InvocationConfiguration.DEFAULT_CONFIGURATION;
 
+        /**
+         * Constructor.
+         *
+         * @param configuration the initial configuration.
+         */
         @SuppressWarnings("ConstantConditions")
         private DefaultStreamRoutineBuilder(@NotNull final InvocationConfiguration configuration) {
 
@@ -933,13 +857,6 @@ public class Streams {
         }
 
         @NotNull
-        public <DATA> StreamRoutine<DATA, Void> asyncConsume(
-                @NotNull final Consumer<? super DATA> consumer) {
-
-            return fromFactory(new ConsumerInvocation<DATA>(consumer), DelegationType.ASYNC);
-        }
-
-        @NotNull
         public <DATA> StreamRoutine<DATA, DATA> asyncError(
                 @NotNull final Consumer<? super RoutineException> consumer) {
 
@@ -951,6 +868,13 @@ public class Streams {
                 @NotNull final Predicate<? super DATA> predicate) {
 
             return fromFactory(predicateFilter(predicate), DelegationType.ASYNC);
+        }
+
+        @NotNull
+        public <DATA> StreamRoutine<DATA, Void> asyncForEach(
+                @NotNull final Consumer<? super DATA> consumer) {
+
+            return fromFactory(new ConsumerInvocation<DATA>(consumer), DelegationType.ASYNC);
         }
 
         @NotNull
@@ -1097,13 +1021,6 @@ public class Streams {
         }
 
         @NotNull
-        public <DATA> StreamRoutine<DATA, Void> syncConsume(
-                @NotNull final Consumer<? super DATA> consumer) {
-
-            return fromFactory(new ConsumerInvocation<DATA>(consumer), DelegationType.SYNC);
-        }
-
-        @NotNull
         public <DATA> StreamRoutine<DATA, DATA> syncError(
                 @NotNull final Consumer<? super RoutineException> consumer) {
 
@@ -1115,6 +1032,13 @@ public class Streams {
                 @NotNull final Predicate<? super DATA> predicate) {
 
             return fromFactory(predicateFilter(predicate), DelegationType.SYNC);
+        }
+
+        @NotNull
+        public <DATA> StreamRoutine<DATA, Void> syncForEach(
+                @NotNull final Consumer<? super DATA> consumer) {
+
+            return fromFactory(new ConsumerInvocation<DATA>(consumer), DelegationType.SYNC);
         }
 
         @NotNull
@@ -1320,6 +1244,11 @@ public class Streams {
 
         private final Supplier<OUT> mSupplier;
 
+        /**
+         * Constructor.
+         *
+         * @param supplier the supplier instance.
+         */
         @SuppressWarnings("ConstantConditions")
         private SupplierThenInvocation(@NotNull final Supplier<OUT> supplier) {
 
@@ -1364,12 +1293,21 @@ public class Streams {
         }
     }
 
-    // TODO: 12/13/15 javadoc
+    /**
+     * Bi-consumer implementation wrapping a try/catch consumer.
+     *
+     * @param <OUT> the output data type.
+     */
     private static class TryCatchBiConsumerConsumer<OUT>
             implements BiConsumer<RoutineException, InputChannel<OUT>> {
 
         private final Consumer<? super RoutineException> mConsumer;
 
+        /**
+         * Constructor.
+         *
+         * @param consumer the consumer instance.
+         */
         private TryCatchBiConsumerConsumer(
                 @NotNull final Consumer<? super RoutineException> consumer) {
 
@@ -1382,12 +1320,21 @@ public class Streams {
         }
     }
 
-    // TODO: 12/13/15 javadoc
+    /**
+     * Bi-consumer implementation wrapping a try/catch function.
+     *
+     * @param <OUT> the output data type.
+     */
     private static class TryCatchBiConsumerFunction<OUT>
             implements BiConsumer<RoutineException, InputChannel<OUT>> {
 
         private final Function<? super RoutineException, ? extends OUT> mFunction;
 
+        /**
+         * Constructor.
+         *
+         * @param function the function instance.
+         */
         private TryCatchBiConsumerFunction(
                 @NotNull final Function<? super RoutineException, ? extends OUT> function) {
 
@@ -1400,13 +1347,16 @@ public class Streams {
         }
     }
 
-    // TODO: 12/13/15 javadoc
+    /**
+     * Invocation implementation binding a try/catch output consumer.
+     *
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
+     */
     private static class TryCatchInvocation<IN, OUT>
             implements Invocation<IN, OUT>, OutputConsumer<OUT> {
 
         private final BiConsumer<? super RoutineException, ? super InputChannel<OUT>> mConsumer;
-
-        private final DelegationType mDelegationType;
 
         private final Routine<IN, OUT> mRoutine;
 
@@ -1414,14 +1364,18 @@ public class Streams {
 
         private IOChannel<OUT, OUT> mOutputChannel;
 
+        /**
+         * Constructor.
+         *
+         * @param routine  the routine instance.
+         * @param consumer the consumer instance.
+         */
         private TryCatchInvocation(@NotNull final Routine<IN, OUT> routine,
                 @NotNull final BiConsumer<? super RoutineException, ? super InputChannel<OUT>>
-                        consumer,
-                @NotNull final DelegationType delegationType) {
+                        consumer) {
 
             mRoutine = routine;
             mConsumer = consumer;
-            mDelegationType = delegationType;
         }
 
         public void onComplete() {
@@ -1462,22 +1416,7 @@ public class Streams {
 
         public void onInitialize() {
 
-            final DelegationType delegationType = mDelegationType;
-            final StreamingIOChannel<IN, OUT> streamingChannel;
-
-            if (delegationType == DelegationType.ASYNC) {
-
-                streamingChannel = asyncIo(mRoutine);
-
-            } else if (delegationType == DelegationType.PARALLEL) {
-
-                streamingChannel = parallelIo(mRoutine);
-
-            } else {
-
-                streamingChannel = syncIo(mRoutine);
-            }
-
+            final StreamingIOChannel<IN, OUT> streamingChannel = syncIo(mRoutine);
             streamingChannel.passTo(this);
             mInputChannel = streamingChannel;
             mOutputChannel = JRoutine.io().buildChannel();
@@ -1514,26 +1453,51 @@ public class Streams {
         }
     }
 
-    // TODO: 12/13/15 javadoc
+    /**
+     * Stream routine implementation binding a try/catch output consumer.
+     *
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
+     */
     private static class TryCatchStreamRoutine<IN, OUT> extends AbstractStreamRoutine<IN, OUT> {
 
         private final BiConsumer<? super RoutineException, ? super InputChannel<OUT>> mConsumer;
 
-        private final DelegationType mDelegationType;
-
         private final Routine<IN, OUT> mRoutine;
 
+        /**
+         * Constructor.
+         *
+         * @param initialConfiguration the initial configuration.
+         * @param configuration        the routine configuration.
+         * @param routine              the backing routine instance.
+         * @param consumer             the consumer instance.
+         */
+        @SuppressWarnings("ConstantConditions")
         private TryCatchStreamRoutine(@NotNull final InvocationConfiguration initialConfiguration,
                 @NotNull final InvocationConfiguration configuration,
                 @NotNull final Routine<IN, OUT> routine,
                 @NotNull final BiConsumer<? super RoutineException, ? super InputChannel<OUT>>
-                        consumer,
-                @NotNull final DelegationType delegationType) {
+                        consumer) {
 
             super(initialConfiguration, configuration);
+
+            if (consumer == null) {
+
+                throw new NullPointerException("the consumer instance must not be null");
+            }
+
             mRoutine = routine;
             mConsumer = consumer;
-            mDelegationType = delegationType;
+        }
+
+        @NotNull
+        public StreamRoutine<IN, OUT> tryCatch(
+                @NotNull final BiConsumer<? super RoutineException, ? super InputChannel<OUT>>
+                        consumer) {
+
+            return new TryCatchStreamRoutine<IN, OUT>(getConfiguration(), getConcatConfiguration(),
+                                                      this, consumer);
         }
 
         @NotNull
@@ -1551,7 +1515,7 @@ public class Streams {
         @Override
         protected Invocation<IN, OUT> newInvocation(@NotNull final InvocationType type) {
 
-            return new TryCatchInvocation<IN, OUT>(mRoutine, mConsumer, mDelegationType);
+            return new TryCatchInvocation<IN, OUT>(mRoutine, mConsumer);
         }
 
         @NotNull
@@ -1563,16 +1527,6 @@ public class Streams {
             return new DefaultStreamRoutine<BEFORE, AFTER>(getConfiguration(),
                                                            getConcatConfiguration(),
                                                            function.apply(this), delegationType);
-        }
-
-        @NotNull
-        protected StreamRoutine<IN, OUT> tryCatch(
-                @NotNull final BiConsumer<? super RoutineException, ? super InputChannel<OUT>>
-                        consumer,
-                @NotNull final DelegationType delegationType) {
-
-            return new TryCatchStreamRoutine<IN, OUT>(getConfiguration(), getConcatConfiguration(),
-                                                      this, consumer, delegationType);
         }
     }
 }

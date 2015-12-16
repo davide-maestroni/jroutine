@@ -1353,8 +1353,7 @@ public class Streams {
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class TryCatchInvocation<IN, OUT>
-            implements Invocation<IN, OUT>, OutputConsumer<OUT> {
+    private static class TryCatchInvocation<IN, OUT> implements Invocation<IN, OUT> {
 
         private final BiConsumer<? super RoutineException, ? super InputChannel<OUT>> mConsumer;
 
@@ -1378,31 +1377,6 @@ public class Streams {
             mConsumer = consumer;
         }
 
-        public void onComplete() {
-
-            mOutputChannel.close();
-        }
-
-        public void onError(@Nullable final RoutineException error) {
-
-            final IOChannel<OUT, OUT> channel = mOutputChannel;
-
-            try {
-
-                mConsumer.accept(error, channel);
-                channel.close();
-
-            } catch (final Throwable t) {
-
-                channel.abort(t);
-            }
-        }
-
-        public void onOutput(final OUT output) {
-
-            mOutputChannel.pass(output);
-        }
-
         public void onAbort(@Nullable final RoutineException reason) {
 
             mInputChannel.abort(reason);
@@ -1417,9 +1391,9 @@ public class Streams {
         public void onInitialize() {
 
             final StreamingIOChannel<IN, OUT> streamingChannel = syncIo(mRoutine);
-            streamingChannel.passTo(this);
             mInputChannel = streamingChannel;
             mOutputChannel = JRoutine.io().buildChannel();
+            streamingChannel.passTo(new TryCatchOutputConsumer<OUT>(mConsumer, mOutputChannel));
         }
 
         public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
@@ -1450,6 +1424,58 @@ public class Streams {
 
             mInputChannel = null;
             mOutputChannel = null;
+        }
+    }
+
+    /**
+     * Try/catch output consumer implementation.
+     *
+     * @param <OUT> the output data type.
+     */
+    private static class TryCatchOutputConsumer<OUT> implements OutputConsumer<OUT> {
+
+        private final BiConsumer<? super RoutineException, ? super InputChannel<OUT>> mConsumer;
+
+        private final IOChannel<OUT, OUT> mOutputChannel;
+
+        /**
+         * Constructor.
+         *
+         * @param consumer      the consumer instance.
+         * @param outputChannel the output channel.
+         */
+        private TryCatchOutputConsumer(
+                @NotNull final BiConsumer<? super RoutineException, ? super InputChannel<OUT>>
+                        consumer,
+                @NotNull final IOChannel<OUT, OUT> outputChannel) {
+
+            mConsumer = consumer;
+            mOutputChannel = outputChannel;
+        }
+
+        public void onComplete() {
+
+            mOutputChannel.close();
+        }
+
+        public void onError(@Nullable final RoutineException error) {
+
+            final IOChannel<OUT, OUT> channel = mOutputChannel;
+
+            try {
+
+                mConsumer.accept(error, channel);
+                channel.close();
+
+            } catch (final Throwable t) {
+
+                channel.abort(t);
+            }
+        }
+
+        public void onOutput(final OUT output) {
+
+            mOutputChannel.pass(output);
         }
     }
 

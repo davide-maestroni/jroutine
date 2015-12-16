@@ -152,6 +152,16 @@ public class StreamRoutineTest {
                           .afterMax(seconds(3))
                           .all()).isEmpty();
         assertThat(Streams.streamRoutine()
+                          .syncOf((List<?>) null)
+                          .asyncCall()
+                          .afterMax(seconds(3))
+                          .all()).isEmpty();
+        assertThat(Streams.streamRoutine()
+                          .syncOf(Collections.emptyList())
+                          .asyncCall()
+                          .afterMax(seconds(3))
+                          .all()).isEmpty();
+        assertThat(Streams.streamRoutine()
                           .syncOf("test")
                           .asyncCall()
                           .afterMax(seconds(3))
@@ -211,6 +221,16 @@ public class StreamRoutineTest {
                 Streams.streamRoutine().asyncOf().asyncCall().afterMax(seconds(3)).all()).isEmpty();
         assertThat(Streams.streamRoutine()
                           .asyncOf((Object[]) null)
+                          .asyncCall()
+                          .afterMax(seconds(3))
+                          .all()).isEmpty();
+        assertThat(Streams.streamRoutine()
+                          .asyncOf((List<?>) null)
+                          .asyncCall()
+                          .afterMax(seconds(3))
+                          .all()).isEmpty();
+        assertThat(Streams.streamRoutine()
+                          .asyncOf(Collections.emptyList())
                           .asyncCall()
                           .afterMax(seconds(3))
                           .all()).isEmpty();

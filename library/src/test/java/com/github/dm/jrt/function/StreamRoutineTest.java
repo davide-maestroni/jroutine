@@ -14,11 +14,10 @@
 package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
-import com.github.dm.jrt.channel.Channel.OutputChannel;
+import com.github.dm.jrt.channel.Channel.InputChannel;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.core.JRoutine;
-import com.github.dm.jrt.invocation.CommandInvocation;
 import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.invocation.Invocations;
@@ -32,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static com.github.dm.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,7 +47,7 @@ public class StreamRoutineTest {
     public void testAccumulate() {
 
         assertThat(
-                Streams.streamRoutine().asyncAccumulate(new BiFunction<String, String, String>() {
+                Streams.<String>routine().asyncAccumulate(new BiFunction<String, String, String>() {
 
                     public String apply(final String s, final String s2) {
 
@@ -57,15 +55,16 @@ public class StreamRoutineTest {
                     }
                 }).asyncCall("test1", "test2", "test3").afterMax(seconds(3)).all()).containsExactly(
                 "test1test2test3");
-        assertThat(Streams.streamRoutine().syncAccumulate(new BiFunction<String, String, String>() {
+        assertThat(
+                Streams.<String>routine().syncAccumulate(new BiFunction<String, String, String>() {
 
-            public String apply(final String s, final String s2) {
+                    public String apply(final String s, final String s2) {
 
-                return s + s2;
-            }
-        }).asyncCall("test1", "test2", "test3").afterMax(seconds(3)).all()).containsExactly(
+                        return s + s2;
+                    }
+                }).asyncCall("test1", "test2", "test3").afterMax(seconds(3)).all()).containsExactly(
                 "test1test2test3");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .syncMap(PassingInvocation.<String>factoryOf())
                           .asyncAccumulate(new BiFunction<String, String, String>() {
 
@@ -77,8 +76,32 @@ public class StreamRoutineTest {
                           .asyncCall("test1", "test2", "test3")
                           .afterMax(seconds(3))
                           .all()).containsExactly("test1test2test3");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .syncMap(PassingInvocation.<String>factoryOf())
+                          .syncAccumulate(new BiFunction<String, String, String>() {
+
+                              public String apply(final String s, final String s2) {
+
+                                  return s + s2;
+                              }
+                          })
+                          .asyncCall("test1", "test2", "test3")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1test2test3");
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
+                          .asyncAccumulate(new BiFunction<String, String, String>() {
+
+                              public String apply(final String s, final String s2) {
+
+                                  return s + s2;
+                              }
+                          })
+                          .asyncCall("test1", "test2", "test3")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1test2test3");
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
                           .syncAccumulate(new BiFunction<String, String, String>() {
 
                               public String apply(final String s, final String s2) {
@@ -97,7 +120,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine().asyncAccumulate(null);
+            Streams.routine().asyncAccumulate(null);
 
             fail();
 
@@ -107,7 +130,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine().syncAccumulate(null);
+            Streams.routine().syncAccumulate(null);
 
             fail();
 
@@ -117,7 +140,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine().syncMap(PassingInvocation.factoryOf()).asyncAccumulate(null);
+            Streams.routine().syncMap(PassingInvocation.factoryOf()).asyncAccumulate(null);
 
             fail();
 
@@ -127,7 +150,27 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine().syncMap(PassingInvocation.factoryOf()).syncAccumulate(null);
+            Streams.routine().syncMap(PassingInvocation.factoryOf()).syncAccumulate(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine().tryCatch(ConsumerWrapper.sink()).asyncAccumulate(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine().tryCatch(ConsumerWrapper.sink()).syncAccumulate(null);
 
             fail();
 
@@ -139,329 +182,77 @@ public class StreamRoutineTest {
     @Test
     public void testBuilder() {
 
-        assertThat(Streams.streamRoutine()
-                          .syncMap(PassingInvocation.factoryOf())
-                          .asyncCall("test")
-                          .afterMax(seconds(3))
-                          .all()).containsExactly("test");
-        assertThat(
-                Streams.streamRoutine().syncOf().asyncCall().afterMax(seconds(3)).all()).isEmpty();
-        assertThat(Streams.streamRoutine()
-                          .syncOf((Object[]) null)
+        assertThat(Streams.routine().asyncCall("test").afterMax(seconds(3)).all()).containsExactly(
+                "test");
+        assertThat(Streams.of().asyncCall().afterMax(seconds(3)).all()).isEmpty();
+        assertThat(Streams.of((Object[]) null).asyncCall().afterMax(seconds(3)).all()).isEmpty();
+        assertThat(Streams.of((List<?>) null).asyncCall().afterMax(seconds(3)).all()).isEmpty();
+        assertThat(Streams.of(Collections.emptyList())
                           .asyncCall()
                           .afterMax(seconds(3))
                           .all()).isEmpty();
-        assertThat(Streams.streamRoutine()
-                          .syncOf((List<?>) null)
-                          .asyncCall()
-                          .afterMax(seconds(3))
-                          .all()).isEmpty();
-        assertThat(Streams.streamRoutine()
-                          .syncOf(Collections.emptyList())
-                          .asyncCall()
-                          .afterMax(seconds(3))
-                          .all()).isEmpty();
-        assertThat(Streams.streamRoutine()
-                          .syncOf("test")
-                          .asyncCall()
-                          .afterMax(seconds(3))
-                          .all()).containsExactly("test");
-        assertThat(Streams.streamRoutine()
-                          .syncOf("test1", "test2", "test3")
+        assertThat(Streams.of("test").asyncCall().afterMax(seconds(3)).all()).containsExactly(
+                "test");
+        assertThat(Streams.of("test1", "test2", "test3")
                           .asyncCall()
                           .afterMax(seconds(3))
                           .all()).containsOnly("test1", "test2", "test3");
-        assertThat(Streams.streamRoutine()
-                          .syncOf(Arrays.asList("test1", "test2", "test3"))
+        assertThat(Streams.of(Arrays.asList("test1", "test2", "test3"))
                           .asyncCall()
                           .afterMax(seconds(3))
                           .all()).containsOnly("test1", "test2", "test3");
-        assertThat(Streams.streamRoutine().syncFrom(new Supplier<String>() {
-
-            public String get() {
-
-                return "test";
-            }
-        }).asyncCall().afterMax(seconds(3)).all()).containsExactly("test");
-        assertThat(Streams.streamRoutine()
-                          .syncFrom(new Strings("test1", "test2", "test3"))
-                          .asyncCall()
-                          .afterMax(seconds(3))
-                          .all()).containsOnly("test1", "test2", "test3");
-        assertThat(Streams.streamRoutine().syncFrom(new Consumer<ResultChannel<String>>() {
-
-            public void accept(final ResultChannel<String> result) {
-
-                result.pass("test1", "test2", "test3");
-            }
-        }).asyncCall().afterMax(seconds(3)).all()).containsOnly("test1", "test2", "test3");
-        assertThat(Streams.streamRoutine()
-                          .invocations()
-                          .withOutputOrder(OrderType.BY_CALL)
-                          .set()
-                          .syncFrom(new Strings("test1", "test2", "test3"))
-                          .asyncCall()
-                          .afterMax(seconds(3))
-                          .all()).containsExactly("test1", "test2", "test3");
-        assertThat(Streams.streamRoutine()
-                          .invocations()
-                          .withOutputOrder(OrderType.BY_CALL)
-                          .set()
-                          .syncFrom(new Consumer<ResultChannel<String>>() {
-
-                              public void accept(final ResultChannel<String> result) {
-
-                                  result.pass("test1", "test2", "test3");
-                              }
-                          })
-                          .asyncCall()
-                          .afterMax(seconds(3))
-                          .all()).containsExactly("test1", "test2", "test3");
-        assertThat(
-                Streams.streamRoutine().asyncOf().asyncCall().afterMax(seconds(3)).all()).isEmpty();
-        assertThat(Streams.streamRoutine()
-                          .asyncOf((Object[]) null)
-                          .asyncCall()
-                          .afterMax(seconds(3))
-                          .all()).isEmpty();
-        assertThat(Streams.streamRoutine()
-                          .asyncOf((List<?>) null)
-                          .asyncCall()
-                          .afterMax(seconds(3))
-                          .all()).isEmpty();
-        assertThat(Streams.streamRoutine()
-                          .asyncOf(Collections.emptyList())
-                          .asyncCall()
-                          .afterMax(seconds(3))
-                          .all()).isEmpty();
-        assertThat(Streams.streamRoutine()
-                          .asyncOf("test")
-                          .asyncCall()
-                          .afterMax(seconds(3))
-                          .all()).containsExactly("test");
-        assertThat(Streams.streamRoutine()
-                          .asyncOf("test1", "test2", "test3")
-                          .asyncCall()
-                          .afterMax(seconds(3))
-                          .all()).containsOnly("test1", "test2", "test3");
-        assertThat(Streams.streamRoutine()
-                          .asyncOf(Arrays.asList("test1", "test2", "test3"))
-                          .asyncCall()
-                          .afterMax(seconds(3))
-                          .all()).containsOnly("test1", "test2", "test3");
-        assertThat(Streams.streamRoutine().asyncFrom(new Supplier<String>() {
-
-            public String get() {
-
-                return "test";
-            }
-        }).asyncCall().afterMax(seconds(3)).all()).containsExactly("test");
-        assertThat(Streams.streamRoutine()
-                          .asyncFrom(new Strings("test1", "test2", "test3"))
-                          .asyncCall()
-                          .afterMax(seconds(3))
-                          .all()).containsOnly("test1", "test2", "test3");
-        assertThat(Streams.streamRoutine().asyncFrom(new Consumer<ResultChannel<String>>() {
-
-            public void accept(final ResultChannel<String> result) {
-
-                result.pass("test1", "test2", "test3");
-            }
-        }).asyncCall().afterMax(seconds(3)).all()).containsOnly("test1", "test2", "test3");
-        assertThat(Streams.streamRoutine()
-                          .invocations()
-                          .withOutputOrder(OrderType.BY_CALL)
-                          .set()
-                          .asyncFrom(new Strings("test1", "test2", "test3"))
-                          .asyncCall()
-                          .afterMax(seconds(3))
-                          .all()).containsExactly("test1", "test2", "test3");
-        assertThat(Streams.streamRoutine()
-                          .invocations()
-                          .withOutputOrder(OrderType.BY_CALL)
-                          .set()
-                          .asyncFrom(new Consumer<ResultChannel<String>>() {
-
-                              public void accept(final ResultChannel<String> result) {
-
-                                  result.pass("test1", "test2", "test3");
-                              }
-                          })
-                          .asyncCall()
-                          .afterMax(seconds(3))
-                          .all()).containsExactly("test1", "test2", "test3");
-    }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testBuilderNullPointerError() {
-
-        try {
-
-            Streams.streamRoutine().syncFrom((Consumer<ResultChannel<String>>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.streamRoutine().syncFrom((CommandInvocation<String>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.streamRoutine().syncFrom((Supplier<String>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-    }
-
-    @Test
-    @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
-    public void testError() {
-
-        final AtomicReference<RoutineException> ex = new AtomicReference<RoutineException>();
-        OutputChannel<Object> channel =
-                Streams.streamRoutine().syncError(new Consumer<RoutineException>() {
-
-                    public void accept(final RoutineException e) {
-
-                        ex.set(e);
-                    }
-                }).asyncInvoke().after(seconds(3)).result();
-        channel.abort(new NumberFormatException());
-        channel.afterMax(seconds(3)).checkComplete();
-        assertThat(ex.get().getCause()).isExactlyInstanceOf(NumberFormatException.class);
-        channel = Streams.streamRoutine().asyncError(new Consumer<RoutineException>() {
-
-            public void accept(final RoutineException e) {
-
-                ex.set(e);
-            }
-        }).asyncInvoke().after(seconds(3)).result();
-        channel.abort(new NumberFormatException());
-        channel.afterMax(seconds(3)).checkComplete();
-        assertThat(ex.get().getCause()).isExactlyInstanceOf(NumberFormatException.class);
-        channel = Streams.streamRoutine()
-                         .syncMap(PassingInvocation.factoryOf())
-                         .syncError(new Consumer<RoutineException>() {
-
-                             public void accept(final RoutineException e) {
-
-                                 ex.set(e);
-                             }
-                         })
-                         .asyncInvoke()
-                         .after(seconds(3))
-                         .result();
-        channel.abort(new NumberFormatException());
-        channel.afterMax(seconds(3)).checkComplete();
-        assertThat(ex.get().getCause()).isExactlyInstanceOf(NumberFormatException.class);
-        channel = Streams.streamRoutine()
-                         .syncMap(PassingInvocation.factoryOf())
-                         .asyncError(new Consumer<RoutineException>() {
-
-                             public void accept(final RoutineException e) {
-
-                                 ex.set(e);
-                             }
-                         })
-                         .asyncInvoke()
-                         .after(seconds(3))
-                         .result();
-        channel.abort(new NumberFormatException());
-        channel.afterMax(seconds(3)).checkComplete();
-        assertThat(ex.get().getCause()).isExactlyInstanceOf(NumberFormatException.class);
-    }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testErrorNullPointerError() {
-
-        try {
-
-            Streams.streamRoutine().syncError(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.streamRoutine().asyncError(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.streamRoutine().syncMap(PassingInvocation.factoryOf()).syncError(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.streamRoutine().syncMap(PassingInvocation.factoryOf()).asyncError(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
     }
 
     @Test
     public void testFilter() {
 
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.routine()
                           .asyncFilter(Functions.notNull())
                           .asyncCall(null, "test")
                           .afterMax(seconds(3))
                           .all()).containsExactly("test");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.routine()
                           .parallelFilter(Functions.notNull())
                           .asyncCall(null, "test")
                           .afterMax(seconds(3))
                           .all()).containsExactly("test");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.routine()
                           .syncFilter(Functions.notNull())
                           .asyncCall(null, "test")
                           .afterMax(seconds(3))
                           .all()).containsExactly("test");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.routine()
                           .syncMap(PassingInvocation.factoryOf())
                           .asyncFilter(Functions.notNull())
                           .asyncCall(null, "test")
                           .afterMax(seconds(3))
                           .all()).containsExactly("test");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.routine()
                           .syncMap(PassingInvocation.factoryOf())
                           .parallelFilter(Functions.notNull())
                           .asyncCall(null, "test")
                           .afterMax(seconds(3))
                           .all()).containsExactly("test");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.routine()
                           .syncMap(PassingInvocation.factoryOf())
+                          .syncFilter(Functions.notNull())
+                          .asyncCall(null, "test")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test");
+        assertThat(Streams.routine()
+                          .tryCatch(ConsumerWrapper.sink())
+                          .asyncFilter(Functions.notNull())
+                          .asyncCall(null, "test")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test");
+        assertThat(Streams.routine()
+                          .tryCatch(ConsumerWrapper.sink())
+                          .parallelFilter(Functions.notNull())
+                          .asyncCall(null, "test")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test");
+        assertThat(Streams.routine()
+                          .tryCatch(ConsumerWrapper.sink())
                           .syncFilter(Functions.notNull())
                           .asyncCall(null, "test")
                           .afterMax(seconds(3))
@@ -474,7 +265,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine().asyncFilter(null);
+            Streams.routine().asyncFilter(null);
 
             fail();
 
@@ -484,7 +275,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine().parallelFilter(null);
+            Streams.routine().parallelFilter(null);
 
             fail();
 
@@ -494,7 +285,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine().syncFilter(null);
+            Streams.routine().syncFilter(null);
 
             fail();
 
@@ -504,7 +295,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine().syncMap(PassingInvocation.factoryOf()).asyncFilter(null);
+            Streams.routine().syncMap(PassingInvocation.factoryOf()).asyncFilter(null);
 
             fail();
 
@@ -514,7 +305,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine().syncMap(PassingInvocation.factoryOf()).parallelFilter(null);
+            Streams.routine().syncMap(PassingInvocation.factoryOf()).parallelFilter(null);
 
             fail();
 
@@ -524,7 +315,37 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine().syncMap(PassingInvocation.factoryOf()).syncFilter(null);
+            Streams.routine().syncMap(PassingInvocation.factoryOf()).syncFilter(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine().tryCatch(ConsumerWrapper.sink()).asyncFilter(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine().tryCatch(ConsumerWrapper.sink()).parallelFilter(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine().tryCatch(ConsumerWrapper.sink()).syncFilter(null);
 
             fail();
 
@@ -537,7 +358,7 @@ public class StreamRoutineTest {
     public void testForEach() {
 
         final List<String> list = Collections.synchronizedList(new ArrayList<String>());
-        assertThat(Streams.streamRoutine().syncForEach(new Consumer<String>() {
+        assertThat(Streams.<String>routine().syncForEach(new Consumer<String>() {
 
             public void accept(final String s) {
 
@@ -546,7 +367,7 @@ public class StreamRoutineTest {
         }).asyncCall("test1", "test2", "test3").afterMax(seconds(3)).all()).isEmpty();
         assertThat(list).containsOnly("test1", "test2", "test3");
         list.clear();
-        assertThat(Streams.streamRoutine().asyncForEach(new Consumer<String>() {
+        assertThat(Streams.<String>routine().asyncForEach(new Consumer<String>() {
 
             public void accept(final String s) {
 
@@ -555,7 +376,7 @@ public class StreamRoutineTest {
         }).asyncCall("test1", "test2", "test3").afterMax(seconds(3)).all()).isEmpty();
         assertThat(list).containsOnly("test1", "test2", "test3");
         list.clear();
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .syncMap(PassingInvocation.<String>factoryOf())
                           .syncForEach(new Consumer<String>() {
 
@@ -569,8 +390,36 @@ public class StreamRoutineTest {
                           .all()).isEmpty();
         assertThat(list).containsOnly("test1", "test2", "test3");
         list.clear();
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .syncMap(PassingInvocation.<String>factoryOf())
+                          .asyncForEach(new Consumer<String>() {
+
+                              public void accept(final String s) {
+
+                                  list.add(s);
+                              }
+                          })
+                          .asyncCall("test1", "test2", "test3")
+                          .afterMax(seconds(3))
+                          .all()).isEmpty();
+        assertThat(list).containsOnly("test1", "test2", "test3");
+        list.clear();
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
+                          .syncForEach(new Consumer<String>() {
+
+                              public void accept(final String s) {
+
+                                  list.add(s);
+                              }
+                          })
+                          .asyncCall("test1", "test2", "test3")
+                          .afterMax(seconds(3))
+                          .all()).isEmpty();
+        assertThat(list).containsOnly("test1", "test2", "test3");
+        list.clear();
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
                           .asyncForEach(new Consumer<String>() {
 
                               public void accept(final String s) {
@@ -590,7 +439,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine().syncForEach(null);
+            Streams.routine().syncForEach(null);
 
             fail();
 
@@ -600,7 +449,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine().asyncForEach(null);
+            Streams.routine().asyncForEach(null);
 
             fail();
 
@@ -610,7 +459,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine().syncMap(PassingInvocation.factoryOf()).syncForEach(null);
+            Streams.routine().syncMap(PassingInvocation.factoryOf()).syncForEach(null);
 
             fail();
 
@@ -620,7 +469,27 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine().syncMap(PassingInvocation.factoryOf()).asyncForEach(null);
+            Streams.routine().syncMap(PassingInvocation.factoryOf()).asyncForEach(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine().tryCatch(ConsumerWrapper.sink()).syncForEach(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine().tryCatch(ConsumerWrapper.sink()).asyncForEach(null);
 
             fail();
 
@@ -632,7 +501,23 @@ public class StreamRoutineTest {
     @Test
     public void testLift() {
 
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
+                          .flatLift(
+                                  new Function<StreamRoutine<String, String>,
+                                          StreamRoutine<String, String>>() {
+
+                                      public StreamRoutine<String, String> apply(
+                                              final StreamRoutine<String, String> routine) {
+
+                                          return Streams.<String>routine()
+                                                        .syncFilter(Functions.<String>notNull())
+                                                        .asyncMap(routine);
+                                      }
+                                  })
+                          .asyncCall("test1", null, "test2", null)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1", "test2");
+        assertThat(Streams.<String>routine()
                           .asyncMap(new UpperCase())
                           .flatLift(
                                   new Function<StreamRoutine<String, String>,
@@ -641,7 +526,7 @@ public class StreamRoutineTest {
                                       public StreamRoutine<String, String> apply(
                                               final StreamRoutine<String, String> routine) {
 
-                                          return Streams.streamRoutine()
+                                          return Streams.<String>routine()
                                                         .syncFilter(Functions.<String>notNull())
                                                         .asyncMap(routine);
                                       }
@@ -649,16 +534,16 @@ public class StreamRoutineTest {
                           .asyncCall("test1", null, "test2", null)
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
-        assertThat(Streams.streamRoutine()
-                          .syncMap(PassingInvocation.<String>factoryOf())
-                          .syncLift(
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
+                          .flatLift(
                                   new Function<StreamRoutine<String, String>,
                                           StreamRoutine<String, String>>() {
 
                                       public StreamRoutine<String, String> apply(
                                               final StreamRoutine<String, String> routine) {
 
-                                          return Streams.streamRoutine()
+                                          return Streams.<String>routine()
                                                         .syncFilter(Functions.<String>notNull())
                                                         .asyncMap(routine);
                                       }
@@ -666,7 +551,23 @@ public class StreamRoutineTest {
                           .asyncCall("test1", null, "test2", null)
                           .afterMax(seconds(3))
                           .all()).containsExactly("test1", "test2");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
+                          .syncLift(
+                                  new Function<StreamRoutine<String, String>,
+                                          StreamRoutine<String, String>>() {
+
+                                      public StreamRoutine<String, String> apply(
+                                              final StreamRoutine<String, String> routine) {
+
+                                          return Streams.<String>routine()
+                                                        .syncFilter(Functions.<String>notNull())
+                                                        .asyncMap(routine);
+                                      }
+                                  })
+                          .asyncCall("test1", null, "test2", null)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1", "test2");
+        assertThat(Streams.<String>routine()
                           .asyncMap(new UpperCase())
                           .syncLift(
                                   new Function<StreamRoutine<String, String>, Routine<String,
@@ -675,7 +576,7 @@ public class StreamRoutineTest {
                                       public StreamRoutine<String, String> apply(
                                               final StreamRoutine<String, String> routine) {
 
-                                          return Streams.streamRoutine()
+                                          return Streams.<String>routine()
                                                         .syncFilter(Functions.<String>notNull())
                                                         .asyncMap(routine);
                                       }
@@ -683,16 +584,16 @@ public class StreamRoutineTest {
                           .asyncCall("test1", null, "test2", null)
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
-        assertThat(Streams.streamRoutine()
-                          .syncMap(PassingInvocation.<String>factoryOf())
-                          .asyncLift(
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
+                          .syncLift(
                                   new Function<StreamRoutine<String, String>,
                                           StreamRoutine<String, String>>() {
 
                                       public StreamRoutine<String, String> apply(
                                               final StreamRoutine<String, String> routine) {
 
-                                          return Streams.streamRoutine()
+                                          return Streams.<String>routine()
                                                         .syncFilter(Functions.<String>notNull())
                                                         .asyncMap(routine);
                                       }
@@ -700,7 +601,23 @@ public class StreamRoutineTest {
                           .asyncCall("test1", null, "test2", null)
                           .afterMax(seconds(3))
                           .all()).containsExactly("test1", "test2");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
+                          .asyncLift(
+                                  new Function<StreamRoutine<String, String>,
+                                          StreamRoutine<String, String>>() {
+
+                                      public StreamRoutine<String, String> apply(
+                                              final StreamRoutine<String, String> routine) {
+
+                                          return Streams.<String>routine()
+                                                        .syncFilter(Functions.<String>notNull())
+                                                        .asyncMap(routine);
+                                      }
+                                  })
+                          .asyncCall("test1", null, "test2", null)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1", "test2");
+        assertThat(Streams.<String>routine()
                           .asyncMap(new UpperCase())
                           .asyncLift(
                                   new Function<StreamRoutine<String, String>, Routine<String,
@@ -709,7 +626,7 @@ public class StreamRoutineTest {
                                       public StreamRoutine<String, String> apply(
                                               final StreamRoutine<String, String> routine) {
 
-                                          return Streams.streamRoutine()
+                                          return Streams.<String>routine()
                                                         .syncFilter(Functions.<String>notNull())
                                                         .asyncMap(routine);
                                       }
@@ -717,8 +634,24 @@ public class StreamRoutineTest {
                           .asyncCall("test1", null, "test2", null)
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
-        assertThat(Streams.streamRoutine()
-                          .syncMap(PassingInvocation.<String>factoryOf())
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
+                          .asyncLift(
+                                  new Function<StreamRoutine<String, String>,
+                                          StreamRoutine<String, String>>() {
+
+                                      public StreamRoutine<String, String> apply(
+                                              final StreamRoutine<String, String> routine) {
+
+                                          return Streams.<String>routine()
+                                                        .syncFilter(Functions.<String>notNull())
+                                                        .asyncMap(routine);
+                                      }
+                                  })
+                          .asyncCall("test1", null, "test2", null)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1", "test2");
+        assertThat(Streams.<String>routine()
                           .parallelLift(
                                   new Function<StreamRoutine<String, String>,
                                           StreamRoutine<String, String>>() {
@@ -726,7 +659,7 @@ public class StreamRoutineTest {
                                       public StreamRoutine<String, String> apply(
                                               final StreamRoutine<String, String> routine) {
 
-                                          return Streams.streamRoutine()
+                                          return Streams.<String>routine()
                                                         .syncFilter(Functions.<String>notNull())
                                                         .asyncMap(routine);
                                       }
@@ -734,7 +667,7 @@ public class StreamRoutineTest {
                           .asyncCall("test1", null, "test2", null)
                           .afterMax(seconds(3))
                           .all()).containsOnly("test1", "test2");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .asyncMap(new UpperCase())
                           .parallelLift(
                                   new Function<StreamRoutine<String, String>, Routine<String,
@@ -743,7 +676,7 @@ public class StreamRoutineTest {
                                       public StreamRoutine<String, String> apply(
                                               final StreamRoutine<String, String> routine) {
 
-                                          return Streams.streamRoutine()
+                                          return Streams.<String>routine()
                                                         .syncFilter(Functions.<String>notNull())
                                                         .asyncMap(routine);
                                       }
@@ -751,6 +684,23 @@ public class StreamRoutineTest {
                           .asyncCall("test1", null, "test2", null)
                           .afterMax(seconds(3))
                           .all()).containsOnly("TEST1", "TEST2");
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
+                          .parallelLift(
+                                  new Function<StreamRoutine<String, String>,
+                                          StreamRoutine<String, String>>() {
+
+                                      public StreamRoutine<String, String> apply(
+                                              final StreamRoutine<String, String> routine) {
+
+                                          return Streams.<String>routine()
+                                                        .syncFilter(Functions.<String>notNull())
+                                                        .asyncMap(routine);
+                                      }
+                                  })
+                          .asyncCall("test1", null, "test2", null)
+                          .afterMax(seconds(3))
+                          .all()).containsOnly("test1", "test2");
     }
 
     @Test
@@ -759,7 +709,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine().syncMap(PassingInvocation.factoryOf()).flatLift(null);
+            Streams.routine().flatLift(null);
 
             fail();
 
@@ -769,7 +719,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine().syncMap(PassingInvocation.factoryOf()).syncLift(null);
+            Streams.routine().syncLift(null);
 
             fail();
 
@@ -779,7 +729,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine().syncMap(PassingInvocation.factoryOf()).asyncLift(null);
+            Streams.routine().asyncLift(null);
 
             fail();
 
@@ -789,7 +739,87 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine().syncMap(PassingInvocation.factoryOf()).parallelLift(null);
+            Streams.routine().parallelLift(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine().syncMap(PassingInvocation.factoryOf()).flatLift(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine().syncMap(PassingInvocation.factoryOf()).syncLift(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine().syncMap(PassingInvocation.factoryOf()).asyncLift(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine().syncMap(PassingInvocation.factoryOf()).parallelLift(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine().tryCatch(ConsumerWrapper.sink()).flatLift(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine().tryCatch(ConsumerWrapper.sink()).syncLift(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine().tryCatch(ConsumerWrapper.sink()).asyncLift(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine().tryCatch(ConsumerWrapper.sink()).parallelLift(null);
 
             fail();
 
@@ -801,7 +831,7 @@ public class StreamRoutineTest {
     @Test
     public void testMapConsumer() {
 
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .invocations()
                           .withOutputOrder(OrderType.BY_CALL)
                           .set()
@@ -816,7 +846,7 @@ public class StreamRoutineTest {
                           .asyncCall("test1", "test2")
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .parallelMap(new BiConsumer<String, ResultChannel<String>>() {
 
                               public void accept(final String s,
@@ -828,7 +858,7 @@ public class StreamRoutineTest {
                           .asyncCall("test1", "test2")
                           .afterMax(seconds(3))
                           .all()).containsOnly("TEST1", "TEST2");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .invocations()
                           .withOutputOrder(OrderType.BY_CALL)
                           .set()
@@ -843,7 +873,7 @@ public class StreamRoutineTest {
                           .asyncCall("test1", "test2")
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .syncMap(PassingInvocation.<String>factoryOf())
                           .invocations()
                           .withOutputOrder(OrderType.BY_CALL)
@@ -859,7 +889,7 @@ public class StreamRoutineTest {
                           .asyncCall("test1", "test2")
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .syncMap(PassingInvocation.<String>factoryOf())
                           .parallelMap(new BiConsumer<String, ResultChannel<String>>() {
 
@@ -872,8 +902,53 @@ public class StreamRoutineTest {
                           .asyncCall("test1", "test2")
                           .afterMax(seconds(3))
                           .all()).containsOnly("TEST1", "TEST2");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .syncMap(PassingInvocation.<String>factoryOf())
+                          .invocations()
+                          .withOutputOrder(OrderType.BY_CALL)
+                          .set()
+                          .syncMap(new BiConsumer<String, ResultChannel<String>>() {
+
+                              public void accept(final String s,
+                                      final ResultChannel<String> result) {
+
+                                  result.pass(s.toUpperCase());
+                              }
+                          })
+                          .asyncCall("test1", "test2")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("TEST1", "TEST2");
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
+                          .invocations()
+                          .withOutputOrder(OrderType.BY_CALL)
+                          .set()
+                          .asyncMap(new BiConsumer<String, ResultChannel<String>>() {
+
+                              public void accept(final String s,
+                                      final ResultChannel<String> result) {
+
+                                  result.pass(s.toUpperCase());
+                              }
+                          })
+                          .asyncCall("test1", "test2")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("TEST1", "TEST2");
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
+                          .parallelMap(new BiConsumer<String, ResultChannel<String>>() {
+
+                              public void accept(final String s,
+                                      final ResultChannel<String> result) {
+
+                                  result.pass(s.toUpperCase());
+                              }
+                          })
+                          .asyncCall("test1", "test2")
+                          .afterMax(seconds(3))
+                          .all()).containsOnly("TEST1", "TEST2");
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
                           .invocations()
                           .withOutputOrder(OrderType.BY_CALL)
                           .set()
@@ -896,7 +971,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine().asyncMap((BiConsumer<Object, ResultChannel<Object>>) null);
+            Streams.routine().asyncMap((BiConsumer<Object, ResultChannel<Object>>) null);
 
             fail();
 
@@ -906,7 +981,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine().parallelMap((BiConsumer<Object, ResultChannel<Object>>) null);
+            Streams.routine().parallelMap((BiConsumer<Object, ResultChannel<Object>>) null);
 
             fail();
 
@@ -916,7 +991,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine().syncMap((BiConsumer<Object, ResultChannel<Object>>) null);
+            Streams.routine().syncMap((BiConsumer<Object, ResultChannel<Object>>) null);
 
             fail();
 
@@ -926,7 +1001,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine()
+            Streams.routine()
                    .syncMap(PassingInvocation.factoryOf())
                    .asyncMap((BiConsumer<Object, ResultChannel<Object>>) null);
 
@@ -938,7 +1013,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine()
+            Streams.routine()
                    .syncMap(PassingInvocation.factoryOf())
                    .parallelMap((BiConsumer<Object, ResultChannel<Object>>) null);
 
@@ -950,8 +1025,44 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine()
+            Streams.routine()
                    .syncMap(PassingInvocation.factoryOf())
+                   .syncMap((BiConsumer<Object, ResultChannel<Object>>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .tryCatch(ConsumerWrapper.sink())
+                   .asyncMap((BiConsumer<Object, ResultChannel<Object>>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .tryCatch(ConsumerWrapper.sink())
+                   .parallelMap((BiConsumer<Object, ResultChannel<Object>>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .tryCatch(ConsumerWrapper.sink())
                    .syncMap((BiConsumer<Object, ResultChannel<Object>>) null);
 
             fail();
@@ -965,7 +1076,7 @@ public class StreamRoutineTest {
     public void testMapFactory() {
 
         final InvocationFactory<String, String> factory = Invocations.factoryOf(UpperCase.class);
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .invocations()
                           .withOutputOrder(OrderType.BY_CALL)
                           .set()
@@ -973,12 +1084,12 @@ public class StreamRoutineTest {
                           .asyncCall("test1", "test2")
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .parallelMap(factory)
                           .asyncCall("test1", "test2")
                           .afterMax(seconds(3))
                           .all()).containsOnly("TEST1", "TEST2");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .invocations()
                           .withOutputOrder(OrderType.BY_CALL)
                           .set()
@@ -986,7 +1097,7 @@ public class StreamRoutineTest {
                           .asyncCall("test1", "test2")
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .syncMap(PassingInvocation.<String>factoryOf())
                           .invocations()
                           .withOutputOrder(OrderType.BY_CALL)
@@ -995,14 +1106,38 @@ public class StreamRoutineTest {
                           .asyncCall("test1", "test2")
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .syncMap(PassingInvocation.<String>factoryOf())
                           .parallelMap(factory)
                           .asyncCall("test1", "test2")
                           .afterMax(seconds(3))
                           .all()).containsOnly("TEST1", "TEST2");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .syncMap(PassingInvocation.<String>factoryOf())
+                          .invocations()
+                          .withOutputOrder(OrderType.BY_CALL)
+                          .set()
+                          .syncMap(factory)
+                          .asyncCall("test1", "test2")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("TEST1", "TEST2");
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
+                          .invocations()
+                          .withOutputOrder(OrderType.BY_CALL)
+                          .set()
+                          .asyncMap(factory)
+                          .asyncCall("test1", "test2")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("TEST1", "TEST2");
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
+                          .parallelMap(factory)
+                          .asyncCall("test1", "test2")
+                          .afterMax(seconds(3))
+                          .all()).containsOnly("TEST1", "TEST2");
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
                           .invocations()
                           .withOutputOrder(OrderType.BY_CALL)
                           .set()
@@ -1018,7 +1153,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine().asyncMap((InvocationFactory<Object, Object>) null);
+            Streams.routine().asyncMap((InvocationFactory<Object, Object>) null);
 
             fail();
 
@@ -1028,7 +1163,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine().parallelMap((InvocationFactory<Object, Object>) null);
+            Streams.routine().parallelMap((InvocationFactory<Object, Object>) null);
 
             fail();
 
@@ -1038,7 +1173,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine().syncMap((InvocationFactory<Object, Object>) null);
+            Streams.routine().syncMap((InvocationFactory<Object, Object>) null);
 
             fail();
 
@@ -1048,7 +1183,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine()
+            Streams.routine()
                    .syncMap(PassingInvocation.factoryOf())
                    .asyncMap((InvocationFactory<Object, Object>) null);
 
@@ -1060,7 +1195,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine()
+            Streams.routine()
                    .syncMap(PassingInvocation.factoryOf())
                    .parallelMap((InvocationFactory<Object, Object>) null);
 
@@ -1072,8 +1207,44 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine()
+            Streams.routine()
                    .syncMap(PassingInvocation.factoryOf())
+                   .syncMap((InvocationFactory<Object, Object>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .tryCatch(ConsumerWrapper.sink())
+                   .asyncMap((InvocationFactory<Object, Object>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .tryCatch(ConsumerWrapper.sink())
+                   .parallelMap((InvocationFactory<Object, Object>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .tryCatch(ConsumerWrapper.sink())
                    .syncMap((InvocationFactory<Object, Object>) null);
 
             fail();
@@ -1086,7 +1257,7 @@ public class StreamRoutineTest {
     @Test
     public void testMapFilter() {
 
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .invocations()
                           .withOutputOrder(OrderType.BY_CALL)
                           .set()
@@ -1094,12 +1265,12 @@ public class StreamRoutineTest {
                           .asyncCall("test1", "test2")
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .parallelMap(new UpperCase())
                           .asyncCall("test1", "test2")
                           .afterMax(seconds(3))
                           .all()).containsOnly("TEST1", "TEST2");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .invocations()
                           .withOutputOrder(OrderType.BY_CALL)
                           .set()
@@ -1107,7 +1278,7 @@ public class StreamRoutineTest {
                           .asyncCall("test1", "test2")
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .syncMap(PassingInvocation.<String>factoryOf())
                           .invocations()
                           .withOutputOrder(OrderType.BY_CALL)
@@ -1116,14 +1287,38 @@ public class StreamRoutineTest {
                           .asyncCall("test1", "test2")
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .syncMap(PassingInvocation.<String>factoryOf())
                           .parallelMap(new UpperCase())
                           .asyncCall("test1", "test2")
                           .afterMax(seconds(3))
                           .all()).containsOnly("TEST1", "TEST2");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .syncMap(PassingInvocation.<String>factoryOf())
+                          .invocations()
+                          .withOutputOrder(OrderType.BY_CALL)
+                          .set()
+                          .syncMap(new UpperCase())
+                          .asyncCall("test1", "test2")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("TEST1", "TEST2");
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
+                          .invocations()
+                          .withOutputOrder(OrderType.BY_CALL)
+                          .set()
+                          .asyncMap(new UpperCase())
+                          .asyncCall("test1", "test2")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("TEST1", "TEST2");
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
+                          .parallelMap(new UpperCase())
+                          .asyncCall("test1", "test2")
+                          .afterMax(seconds(3))
+                          .all()).containsOnly("TEST1", "TEST2");
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
                           .invocations()
                           .withOutputOrder(OrderType.BY_CALL)
                           .set()
@@ -1139,7 +1334,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine().asyncMap((FilterInvocation<Object, Object>) null);
+            Streams.routine().asyncMap((FilterInvocation<Object, Object>) null);
 
             fail();
 
@@ -1149,7 +1344,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine().parallelMap((FilterInvocation<Object, Object>) null);
+            Streams.routine().parallelMap((FilterInvocation<Object, Object>) null);
 
             fail();
 
@@ -1159,7 +1354,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine().syncMap((FilterInvocation<Object, Object>) null);
+            Streams.routine().syncMap((FilterInvocation<Object, Object>) null);
 
             fail();
 
@@ -1169,7 +1364,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine()
+            Streams.routine()
                    .syncMap(PassingInvocation.factoryOf())
                    .asyncMap((FilterInvocation<Object, Object>) null);
 
@@ -1181,7 +1376,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine()
+            Streams.routine()
                    .syncMap(PassingInvocation.factoryOf())
                    .parallelMap((FilterInvocation<Object, Object>) null);
 
@@ -1193,8 +1388,44 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine()
+            Streams.routine()
                    .syncMap(PassingInvocation.factoryOf())
+                   .syncMap((FilterInvocation<Object, Object>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .tryCatch(ConsumerWrapper.sink())
+                   .asyncMap((FilterInvocation<Object, Object>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .tryCatch(ConsumerWrapper.sink())
+                   .parallelMap((FilterInvocation<Object, Object>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .tryCatch(ConsumerWrapper.sink())
                    .syncMap((FilterInvocation<Object, Object>) null);
 
             fail();
@@ -1207,7 +1438,7 @@ public class StreamRoutineTest {
     @Test
     public void testMapFunction() {
 
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .invocations()
                           .withOutputOrder(OrderType.BY_CALL)
                           .set()
@@ -1221,14 +1452,14 @@ public class StreamRoutineTest {
                           .asyncCall("test1", "test2")
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
-        assertThat(Streams.streamRoutine().parallelMap(new Function<String, String>() {
+        assertThat(Streams.<String>routine().parallelMap(new Function<String, String>() {
 
             public String apply(final String s) {
 
                 return s.toUpperCase();
             }
         }).asyncCall("test1", "test2").afterMax(seconds(3)).all()).containsOnly("TEST1", "TEST2");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .invocations()
                           .withOutputOrder(OrderType.BY_CALL)
                           .set()
@@ -1242,7 +1473,7 @@ public class StreamRoutineTest {
                           .asyncCall("test1", "test2")
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .syncMap(PassingInvocation.<String>factoryOf())
                           .invocations()
                           .withOutputOrder(OrderType.BY_CALL)
@@ -1257,7 +1488,7 @@ public class StreamRoutineTest {
                           .asyncCall("test1", "test2")
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .syncMap(PassingInvocation.<String>factoryOf())
                           .parallelMap(new Function<String, String>() {
 
@@ -1269,8 +1500,50 @@ public class StreamRoutineTest {
                           .asyncCall("test1", "test2")
                           .afterMax(seconds(3))
                           .all()).containsOnly("TEST1", "TEST2");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .syncMap(PassingInvocation.<String>factoryOf())
+                          .invocations()
+                          .withOutputOrder(OrderType.BY_CALL)
+                          .set()
+                          .syncMap(new Function<String, String>() {
+
+                              public String apply(final String s) {
+
+                                  return s.toUpperCase();
+                              }
+                          })
+                          .asyncCall("test1", "test2")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("TEST1", "TEST2");
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
+                          .invocations()
+                          .withOutputOrder(OrderType.BY_CALL)
+                          .set()
+                          .asyncMap(new Function<String, String>() {
+
+                              public String apply(final String s) {
+
+                                  return s.toUpperCase();
+                              }
+                          })
+                          .asyncCall("test1", "test2")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("TEST1", "TEST2");
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
+                          .parallelMap(new Function<String, String>() {
+
+                              public String apply(final String s) {
+
+                                  return s.toUpperCase();
+                              }
+                          })
+                          .asyncCall("test1", "test2")
+                          .afterMax(seconds(3))
+                          .all()).containsOnly("TEST1", "TEST2");
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
                           .invocations()
                           .withOutputOrder(OrderType.BY_CALL)
                           .set()
@@ -1292,7 +1565,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine().asyncMap((Function<Object, Object>) null);
+            Streams.routine().asyncMap((Function<Object, Object>) null);
 
             fail();
 
@@ -1302,7 +1575,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine().parallelMap((Function<Object, Object>) null);
+            Streams.routine().parallelMap((Function<Object, Object>) null);
 
             fail();
 
@@ -1312,7 +1585,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine().syncMap((Function<Object, Object>) null);
+            Streams.routine().syncMap((Function<Object, Object>) null);
 
             fail();
 
@@ -1322,7 +1595,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine()
+            Streams.routine()
                    .syncMap(PassingInvocation.factoryOf())
                    .asyncMap((Function<Object, Object>) null);
 
@@ -1334,7 +1607,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine()
+            Streams.routine()
                    .syncMap(PassingInvocation.factoryOf())
                    .parallelMap((Function<Object, Object>) null);
 
@@ -1346,8 +1619,44 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine()
+            Streams.routine()
                    .syncMap(PassingInvocation.factoryOf())
+                   .syncMap((Function<Object, Object>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .tryCatch(ConsumerWrapper.sink())
+                   .asyncMap((Function<Object, Object>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .tryCatch(ConsumerWrapper.sink())
+                   .parallelMap((Function<Object, Object>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .tryCatch(ConsumerWrapper.sink())
                    .syncMap((Function<Object, Object>) null);
 
             fail();
@@ -1361,7 +1670,7 @@ public class StreamRoutineTest {
     public void testMapRoutine() {
 
         final Routine<String, String> routine = JRoutine.on(new UpperCase()).buildRoutine();
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .invocations()
                           .withOutputOrder(OrderType.BY_CALL)
                           .set()
@@ -1369,12 +1678,12 @@ public class StreamRoutineTest {
                           .asyncCall("test1", "test2")
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .parallelMap(routine)
                           .asyncCall("test1", "test2")
                           .afterMax(seconds(3))
                           .all()).containsOnly("TEST1", "TEST2");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .invocations()
                           .withOutputOrder(OrderType.BY_CALL)
                           .set()
@@ -1382,7 +1691,7 @@ public class StreamRoutineTest {
                           .asyncCall("test1", "test2")
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .syncMap(PassingInvocation.<String>factoryOf())
                           .invocations()
                           .withOutputOrder(OrderType.BY_CALL)
@@ -1391,14 +1700,38 @@ public class StreamRoutineTest {
                           .asyncCall("test1", "test2")
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .syncMap(PassingInvocation.<String>factoryOf())
                           .parallelMap(routine)
                           .asyncCall("test1", "test2")
                           .afterMax(seconds(3))
                           .all()).containsOnly("TEST1", "TEST2");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .syncMap(PassingInvocation.<String>factoryOf())
+                          .invocations()
+                          .withOutputOrder(OrderType.BY_CALL)
+                          .set()
+                          .syncMap(routine)
+                          .asyncCall("test1", "test2")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("TEST1", "TEST2");
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
+                          .invocations()
+                          .withOutputOrder(OrderType.BY_CALL)
+                          .set()
+                          .asyncMap(routine)
+                          .asyncCall("test1", "test2")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("TEST1", "TEST2");
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
+                          .parallelMap(routine)
+                          .asyncCall("test1", "test2")
+                          .afterMax(seconds(3))
+                          .all()).containsOnly("TEST1", "TEST2");
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
                           .invocations()
                           .withOutputOrder(OrderType.BY_CALL)
                           .set()
@@ -1414,7 +1747,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine().asyncMap((Routine<Object, Object>) null);
+            Streams.routine().asyncMap((Routine<Object, Object>) null);
 
             fail();
 
@@ -1424,7 +1757,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine().parallelMap((Routine<Object, Object>) null);
+            Streams.routine().parallelMap((Routine<Object, Object>) null);
 
             fail();
 
@@ -1434,7 +1767,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine().syncMap((Routine<Object, Object>) null);
+            Streams.routine().syncMap((Routine<Object, Object>) null);
 
             fail();
 
@@ -1444,7 +1777,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine()
+            Streams.routine()
                    .syncMap(PassingInvocation.factoryOf())
                    .asyncMap((Routine<Object, Object>) null);
 
@@ -1456,7 +1789,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine()
+            Streams.routine()
                    .syncMap(PassingInvocation.factoryOf())
                    .parallelMap((Routine<Object, Object>) null);
 
@@ -1468,8 +1801,44 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine()
+            Streams.routine()
                    .syncMap(PassingInvocation.factoryOf())
+                   .syncMap((Routine<Object, Object>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .tryCatch(ConsumerWrapper.sink())
+                   .asyncMap((Routine<Object, Object>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .tryCatch(ConsumerWrapper.sink())
+                   .parallelMap((Routine<Object, Object>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .tryCatch(ConsumerWrapper.sink())
                    .syncMap((Routine<Object, Object>) null);
 
             fail();
@@ -1482,7 +1851,7 @@ public class StreamRoutineTest {
     @Test
     public void testReduceConsumer() {
 
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .asyncReduce(
                                   new BiConsumer<List<? extends String>, ResultChannel<String>>() {
 
@@ -1502,7 +1871,7 @@ public class StreamRoutineTest {
                           .asyncCall("test1", "test2", "test3")
                           .afterMax(seconds(3))
                           .all()).containsExactly("test1test2test3");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .syncReduce(
                                   new BiConsumer<List<? extends String>, ResultChannel<String>>() {
 
@@ -1522,7 +1891,7 @@ public class StreamRoutineTest {
                           .asyncCall("test1", "test2", "test3")
                           .afterMax(seconds(3))
                           .all()).containsExactly("test1test2test3");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .syncMap(PassingInvocation.<String>factoryOf())
                           .asyncReduce(
                                   new BiConsumer<List<? extends String>, ResultChannel<String>>() {
@@ -1543,8 +1912,50 @@ public class StreamRoutineTest {
                           .asyncCall("test1", "test2", "test3")
                           .afterMax(seconds(3))
                           .all()).containsExactly("test1test2test3");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .syncMap(PassingInvocation.<String>factoryOf())
+                          .syncReduce(
+                                  new BiConsumer<List<? extends String>, ResultChannel<String>>() {
+
+                                      public void accept(final List<? extends String> strings,
+                                              final ResultChannel<String> result) {
+
+                                          final StringBuilder builder = new StringBuilder();
+
+                                          for (final String string : strings) {
+
+                                              builder.append(string);
+                                          }
+
+                                          result.pass(builder.toString());
+                                      }
+                                  })
+                          .asyncCall("test1", "test2", "test3")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1test2test3");
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
+                          .asyncReduce(
+                                  new BiConsumer<List<? extends String>, ResultChannel<String>>() {
+
+                                      public void accept(final List<? extends String> strings,
+                                              final ResultChannel<String> result) {
+
+                                          final StringBuilder builder = new StringBuilder();
+
+                                          for (final String string : strings) {
+
+                                              builder.append(string);
+                                          }
+
+                                          result.pass(builder.toString());
+                                      }
+                                  })
+                          .asyncCall("test1", "test2", "test3")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1test2test3");
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
                           .syncReduce(
                                   new BiConsumer<List<? extends String>, ResultChannel<String>>() {
 
@@ -1572,7 +1983,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine().asyncReduce((BiConsumer<List<?>, ResultChannel<Object>>) null);
+            Streams.routine().asyncReduce((BiConsumer<List<?>, ResultChannel<Object>>) null);
 
             fail();
 
@@ -1582,7 +1993,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine().syncReduce((BiConsumer<List<?>, ResultChannel<Object>>) null);
+            Streams.routine().syncReduce((BiConsumer<List<?>, ResultChannel<Object>>) null);
 
             fail();
 
@@ -1592,7 +2003,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine()
+            Streams.routine()
                    .syncMap(PassingInvocation.factoryOf())
                    .asyncReduce((BiConsumer<List<?>, ResultChannel<Object>>) null);
 
@@ -1604,8 +2015,32 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine()
+            Streams.routine()
                    .syncMap(PassingInvocation.factoryOf())
+                   .syncReduce((BiConsumer<List<?>, ResultChannel<Object>>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .tryCatch(ConsumerWrapper.sink())
+                   .asyncReduce((BiConsumer<List<?>, ResultChannel<Object>>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .tryCatch(ConsumerWrapper.sink())
                    .syncReduce((BiConsumer<List<?>, ResultChannel<Object>>) null);
 
             fail();
@@ -1618,39 +2053,43 @@ public class StreamRoutineTest {
     @Test
     public void testReduceFunction() {
 
-        assertThat(
-                Streams.streamRoutine().asyncReduce(new Function<List<? extends String>, String>() {
+        assertThat(Streams.<String>routine()
+                          .asyncReduce(new Function<List<? extends String>, String>() {
 
-                    public String apply(final List<? extends String> strings) {
+                              public String apply(final List<? extends String> strings) {
 
-                        final StringBuilder builder = new StringBuilder();
+                                  final StringBuilder builder = new StringBuilder();
 
-                        for (final String string : strings) {
+                                  for (final String string : strings) {
 
-                            builder.append(string);
-                        }
+                                      builder.append(string);
+                                  }
 
-                        return builder.toString();
-                    }
-                }).asyncCall("test1", "test2", "test3").afterMax(seconds(3)).all()).containsExactly(
-                "test1test2test3");
-        assertThat(
-                Streams.streamRoutine().syncReduce(new Function<List<? extends String>, String>() {
+                                  return builder.toString();
+                              }
+                          })
+                          .asyncCall("test1", "test2", "test3")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1test2test3");
+        assertThat(Streams.<String>routine()
+                          .syncReduce(new Function<List<? extends String>, String>() {
 
-                    public String apply(final List<? extends String> strings) {
+                              public String apply(final List<? extends String> strings) {
 
-                        final StringBuilder builder = new StringBuilder();
+                                  final StringBuilder builder = new StringBuilder();
 
-                        for (final String string : strings) {
+                                  for (final String string : strings) {
 
-                            builder.append(string);
-                        }
+                                      builder.append(string);
+                                  }
 
-                        return builder.toString();
-                    }
-                }).asyncCall("test1", "test2", "test3").afterMax(seconds(3)).all()).containsExactly(
-                "test1test2test3");
-        assertThat(Streams.streamRoutine()
+                                  return builder.toString();
+                              }
+                          })
+                          .asyncCall("test1", "test2", "test3")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1test2test3");
+        assertThat(Streams.<String>routine()
                           .syncMap(PassingInvocation.<String>factoryOf())
                           .asyncReduce(new Function<List<? extends String>, String>() {
 
@@ -1669,8 +2108,46 @@ public class StreamRoutineTest {
                           .asyncCall("test1", "test2", "test3")
                           .afterMax(seconds(3))
                           .all()).containsExactly("test1test2test3");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .syncMap(PassingInvocation.<String>factoryOf())
+                          .syncReduce(new Function<List<? extends String>, String>() {
+
+                              public String apply(final List<? extends String> strings) {
+
+                                  final StringBuilder builder = new StringBuilder();
+
+                                  for (final String string : strings) {
+
+                                      builder.append(string);
+                                  }
+
+                                  return builder.toString();
+                              }
+                          })
+                          .asyncCall("test1", "test2", "test3")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1test2test3");
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
+                          .asyncReduce(new Function<List<? extends String>, String>() {
+
+                              public String apply(final List<? extends String> strings) {
+
+                                  final StringBuilder builder = new StringBuilder();
+
+                                  for (final String string : strings) {
+
+                                      builder.append(string);
+                                  }
+
+                                  return builder.toString();
+                              }
+                          })
+                          .asyncCall("test1", "test2", "test3")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1test2test3");
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
                           .syncReduce(new Function<List<? extends String>, String>() {
 
                               public String apply(final List<? extends String> strings) {
@@ -1696,7 +2173,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine().asyncReduce((Function<List<?>, Object>) null);
+            Streams.routine().asyncReduce((Function<List<?>, Object>) null);
 
             fail();
 
@@ -1706,7 +2183,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine().syncReduce((Function<List<?>, Object>) null);
+            Streams.routine().syncReduce((Function<List<?>, Object>) null);
 
             fail();
 
@@ -1716,7 +2193,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine()
+            Streams.routine()
                    .syncMap(PassingInvocation.factoryOf())
                    .asyncReduce((Function<List<?>, Object>) null);
 
@@ -1728,8 +2205,32 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine()
+            Streams.routine()
                    .syncMap(PassingInvocation.factoryOf())
+                   .syncReduce((Function<List<?>, Object>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .tryCatch(ConsumerWrapper.sink())
+                   .asyncReduce((Function<List<?>, Object>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .tryCatch(ConsumerWrapper.sink())
                    .syncReduce((Function<List<?>, Object>) null);
 
             fail();
@@ -1742,7 +2243,7 @@ public class StreamRoutineTest {
     @Test
     public void testThen() {
 
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .syncMap(PassingInvocation.<String>factoryOf())
                           .syncThen(new Consumer<ResultChannel<String>>() {
 
@@ -1754,7 +2255,7 @@ public class StreamRoutineTest {
                           .asyncCall("test1")
                           .afterMax(seconds(3))
                           .all()).containsOnly("TEST2");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .syncMap(PassingInvocation.<String>factoryOf())
                           .syncThen(new Supplier<String>() {
 
@@ -1766,7 +2267,7 @@ public class StreamRoutineTest {
                           .asyncCall("test1")
                           .afterMax(seconds(3))
                           .all()).containsOnly("TEST2");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .syncMap(PassingInvocation.<String>factoryOf())
                           .asyncThen(new Consumer<ResultChannel<String>>() {
 
@@ -1778,8 +2279,32 @@ public class StreamRoutineTest {
                           .asyncCall("test1")
                           .afterMax(seconds(3))
                           .all()).containsOnly("TEST2");
-        assertThat(Streams.streamRoutine()
+        assertThat(Streams.<String>routine()
                           .syncMap(PassingInvocation.<String>factoryOf())
+                          .asyncThen(new Supplier<String>() {
+
+                              public String get() {
+
+                                  return "TEST2";
+                              }
+                          })
+                          .asyncCall("test1")
+                          .afterMax(seconds(3))
+                          .all()).containsOnly("TEST2");
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
+                          .asyncThen(new Consumer<ResultChannel<String>>() {
+
+                              public void accept(final ResultChannel<String> resultChannel) {
+
+                                  resultChannel.pass("TEST2");
+                              }
+                          })
+                          .asyncCall("test1")
+                          .afterMax(seconds(3))
+                          .all()).containsOnly("TEST2");
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
                           .asyncThen(new Supplier<String>() {
 
                               public String get() {
@@ -1798,9 +2323,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine()
-                   .syncMap(PassingInvocation.factoryOf())
-                   .syncThen((Consumer<ResultChannel<?>>) null);
+            Streams.routine().syncThen((Consumer<ResultChannel<?>>) null);
 
             fail();
 
@@ -1810,9 +2333,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine()
-                   .syncMap(PassingInvocation.factoryOf())
-                   .syncThen((Supplier<?>) null);
+            Streams.routine().syncThen((Supplier<?>) null);
 
             fail();
 
@@ -1822,7 +2343,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine()
+            Streams.routine()
                    .syncMap(PassingInvocation.factoryOf())
                    .asyncThen((Consumer<ResultChannel<?>>) null);
 
@@ -1834,9 +2355,29 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.streamRoutine()
-                   .syncMap(PassingInvocation.factoryOf())
-                   .asyncThen((Supplier<?>) null);
+            Streams.routine().syncMap(PassingInvocation.factoryOf()).asyncThen((Supplier<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .tryCatch(ConsumerWrapper.sink())
+                   .asyncThen((Consumer<ResultChannel<?>>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine().tryCatch(ConsumerWrapper.sink()).asyncThen((Supplier<?>) null);
 
             fail();
 
@@ -1845,18 +2386,110 @@ public class StreamRoutineTest {
         }
     }
 
-    private static class Strings extends CommandInvocation<String> {
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testTryCatchNullPointerError() {
 
-        private final String[] mStrings;
+        try {
 
-        private Strings(final String... strings) {
+            Streams.routine().tryCatch((BiConsumer<RoutineException, InputChannel<?>>) null);
 
-            mStrings = (strings != null) ? strings.clone() : null;
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
         }
 
-        public void onResult(@NotNull final ResultChannel<String> result) {
+        try {
 
-            result.pass(mStrings);
+            Streams.routine().tryCatch((Consumer<RoutineException>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine().tryCatch((Function<RoutineException, ?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .syncMap(PassingInvocation.factoryOf())
+                   .tryCatch((BiConsumer<RoutineException, InputChannel<?>>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .syncMap(PassingInvocation.factoryOf())
+                   .tryCatch((Consumer<RoutineException>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .syncMap(PassingInvocation.factoryOf())
+                   .tryCatch((Function<RoutineException, ?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .tryCatch(ConsumerWrapper.sink())
+                   .tryCatch((BiConsumer<RoutineException, InputChannel<?>>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .tryCatch(ConsumerWrapper.sink())
+                   .tryCatch((Consumer<RoutineException>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .tryCatch(ConsumerWrapper.sink())
+                   .tryCatch((Function<RoutineException, ?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
         }
     }
 

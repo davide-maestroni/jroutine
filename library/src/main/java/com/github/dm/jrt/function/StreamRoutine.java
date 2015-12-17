@@ -64,19 +64,6 @@ public interface StreamRoutine<IN, OUT>
             @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
 
     /**
-     * Concatenates a stream routine based on the specified consumer to this one.<br/>
-     * The routine exception will be further propagated.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in an asynchronous mode.
-     *
-     * @param consumer the consumer instance.
-     * @return the concatenated stream routine.
-     */
-    @NotNull
-    StreamRoutine<IN, OUT> asyncError(@NotNull Consumer<? super RoutineException> consumer);
-
-    /**
      * Concatenates a stream routine based on the specified predicate to this one.<br/>
      * The output will be filtered according to the result returned by the predicate.
      * <p/>
@@ -351,19 +338,6 @@ public interface StreamRoutine<IN, OUT>
     @NotNull
     StreamRoutine<IN, OUT> syncAccumulate(
             @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
-
-    /**
-     * Concatenates a stream routine based on the specified consumer to this one.<br/>
-     * The routine exception will be further propagated.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in a synchronous mode.
-     *
-     * @param consumer the consumer instance.
-     * @return the concatenated stream routine.
-     */
-    @NotNull
-    StreamRoutine<IN, OUT> syncError(@NotNull Consumer<? super RoutineException> consumer);
 
     /**
      * Concatenates a stream routine based on the specified predicate to this one.<br/>

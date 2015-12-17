@@ -113,7 +113,7 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
      */
     @SuppressWarnings({"unchecked", "ConstantConditions"})
     public static <IN> BiFunctionWrapper<IN, IN, IN> maxBy(
-            @NotNull final Comparator<IN> comparator) {
+            @NotNull final Comparator<? super IN> comparator) {
 
         if (comparator == null) {
 
@@ -155,7 +155,7 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
      */
     @SuppressWarnings({"unchecked", "ConstantConditions"})
     public static <IN> BiFunctionWrapper<IN, IN, IN> minBy(
-            @NotNull final Comparator<IN> comparator) {
+            @NotNull final Comparator<? super IN> comparator) {
 
         if (comparator == null) {
 

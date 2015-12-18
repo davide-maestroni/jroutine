@@ -240,19 +240,37 @@ public class StreamRoutineTest {
                           .afterMax(seconds(3))
                           .all()).containsExactly("test");
         assertThat(Streams.routine()
-                          .tryCatch(ConsumerWrapper.sink())
+                          .tryCatch(new Function<RoutineException, Object>() {
+
+                              public Object apply(final RoutineException e) {
+
+                                  return e.getMessage();
+                              }
+                          })
                           .asyncFilter(Functions.notNull())
                           .asyncCall(null, "test")
                           .afterMax(seconds(3))
                           .all()).containsExactly("test");
         assertThat(Streams.routine()
-                          .tryCatch(ConsumerWrapper.sink())
+                          .tryCatch(new Function<RoutineException, Object>() {
+
+                              public Object apply(final RoutineException e) {
+
+                                  return e.getMessage();
+                              }
+                          })
                           .parallelFilter(Functions.notNull())
                           .asyncCall(null, "test")
                           .afterMax(seconds(3))
                           .all()).containsExactly("test");
         assertThat(Streams.routine()
-                          .tryCatch(ConsumerWrapper.sink())
+                          .tryCatch(new Function<RoutineException, Object>() {
+
+                              public Object apply(final RoutineException e) {
+
+                                  return e.getMessage();
+                              }
+                          })
                           .syncFilter(Functions.notNull())
                           .asyncCall(null, "test")
                           .afterMax(seconds(3))
@@ -2444,6 +2462,61 @@ public class StreamRoutineTest {
         } catch (final NullPointerException ignored) {
 
         }
+    }
+
+    @Test
+    public void testTryCatch() {
+
+        assertThat(Streams.routine().syncMap(new Function<Object, Object>() {
+
+            public Object apply(final Object o) {
+
+                throw new NullPointerException();
+            }
+        }).tryCatch(new BiConsumer<RoutineException, InputChannel<Object>>() {
+
+            public void accept(final RoutineException e, final InputChannel<Object> channel) {
+
+                channel.pass("exception");
+            }
+        }).asyncCall("test").afterMax(seconds(3)).next()).isEqualTo("exception");
+
+        try {
+
+            Streams.routine().syncMap(new Function<Object, Object>() {
+
+                public Object apply(final Object o) {
+
+                    throw new NullPointerException();
+                }
+            }).tryCatch(new Consumer<RoutineException>() {
+
+                public void accept(final RoutineException e) {
+
+                    throw new IllegalArgumentException();
+                }
+            }).asyncCall("test").afterMax(seconds(3)).next();
+
+            fail();
+
+        } catch (final RoutineException e) {
+
+            assertThat(e.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
+        }
+
+        assertThat(Streams.routine().syncMap(new Function<Object, Object>() {
+
+            public Object apply(final Object o) {
+
+                throw new NullPointerException();
+            }
+        }).tryCatch(new Function<RoutineException, Object>() {
+
+            public Object apply(final RoutineException e) {
+
+                return "exception";
+            }
+        }).asyncCall("test").afterMax(seconds(3)).next()).isEqualTo("exception");
     }
 
     @Test

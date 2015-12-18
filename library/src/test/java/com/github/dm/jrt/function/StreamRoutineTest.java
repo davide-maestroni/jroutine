@@ -2241,6 +2241,66 @@ public class StreamRoutineTest {
     }
 
     @Test
+    public void testRetry() {
+
+        final Function<StreamRoutine<Object, String>, StreamRoutine<Object, String>> retryFunction =
+                new Function<StreamRoutine<Object, String>, StreamRoutine<Object, String>>() {
+
+                    public StreamRoutine<Object, String> apply(
+                            final StreamRoutine<Object, String> routine) {
+
+                        return Streams.routine()
+                                      .syncReduce(new BiConsumer<List<?>, ResultChannel<String>>() {
+
+                                          public void accept(final List<?> inputs,
+                                                  final ResultChannel<String> result) {
+
+                                              final int[] count = {0};
+                                              routine.tryCatch(
+                                                      new BiConsumer<RoutineException,
+                                                              InputChannel<String>>() {
+
+                                                          public void accept(
+                                                                  final RoutineException e,
+                                                                  final InputChannel<String>
+                                                                          channel) {
+
+                                                              if (++count[0] < 3) {
+
+                                                                  routine.tryCatch(this)
+                                                                         .syncCall(inputs)
+                                                                         .passTo(channel);
+
+                                                              } else {
+
+                                                                  throw e;
+                                                              }
+                                                          }
+                                                      }).syncCall(inputs).passTo(result);
+                                          }
+                                      });
+                    }
+                };
+
+        try {
+
+            Streams.routine().syncMap(new Function<Object, String>() {
+
+                public String apply(final Object o) {
+
+                    return o.toString();
+                }
+            }).flatLift(retryFunction).asyncCall((Object) null).afterMax(seconds(3)).all();
+
+            fail();
+
+        } catch (final RoutineException e) {
+
+            assertThat(e.getCause()).isExactlyInstanceOf(NullPointerException.class);
+        }
+    }
+
+    @Test
     public void testThen() {
 
         assertThat(Streams.<String>routine()

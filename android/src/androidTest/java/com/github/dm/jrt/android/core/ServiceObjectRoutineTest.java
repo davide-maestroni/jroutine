@@ -111,7 +111,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                                         .invocations()
                                         .withReadTimeout(timeout)
                                         .set()
-                                        .buildProxy(SumItf.class);
+                                        .buildProxy(ClassToken.tokenOf(SumItf.class));
         final IOChannel<Integer, Integer> channel3 = JRoutine.io().buildChannel();
         channel3.pass(7).close();
         assertThat(sumAsync.compute(3, channel3)).isEqualTo(10);

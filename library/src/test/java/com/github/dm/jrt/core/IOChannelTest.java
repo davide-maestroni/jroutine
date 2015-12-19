@@ -34,6 +34,7 @@ import org.junit.Test;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -490,6 +491,16 @@ public class IOChannelTest {
         }
 
         assertThat(ioChannel.checkComplete()).isFalse();
+    }
+
+    @Test
+    public void testOf() {
+
+        final IOChannel<Integer, Integer> channel = JRoutine.io().of(2);
+        assertThat(channel.isOpen()).isFalse();
+        assertThat(channel.all()).containsExactly(2);
+        assertThat(JRoutine.io().of(-11, 73).all()).containsExactly(-11, 73);
+        assertThat(JRoutine.io().of(Arrays.asList(3, 12, -7)).all()).containsExactly(3, 12, -7);
     }
 
     @Test

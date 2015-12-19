@@ -520,7 +520,7 @@ public class RoutineBuilders {
                                 + " must be a superclass of " + channelClassName);
             }
 
-        } else if (outputMode == OutputMode.ELEMENT) {
+        } else { // OutputMode.ELEMENT
 
             if (!returnType.isAssignableFrom(OutputChannel.class)) {
 
@@ -536,26 +536,6 @@ public class RoutineBuilders {
                         "[" + method + "] an async output with mode " + OutputMode.ELEMENT
                                 + " must be bound to an array or a type implementing an "
                                 + Iterable.class.getCanonicalName());
-            }
-
-        } else { // OutputMode.COLLECTION
-
-            if (!returnType.isArray() && !returnType.isAssignableFrom(List.class)) {
-
-                throw new IllegalArgumentException(
-                        "[" + method + "] an async output with mode " + OutputMode.COLLECTION
-                                + " must be an array or a superclass of "
-                                + List.class.getCanonicalName());
-            }
-
-            if (returnType.isArray() && !Reflection.boxingClass(returnType.getComponentType())
-                                                   .isAssignableFrom(Reflection.boxingClass(
-                                                           targetReturnType))) {
-
-                throw new IllegalArgumentException(
-                        "[" + method + "] the async output array with mode " + OutputMode.COLLECTION
-                                + " does not match the bound type: "
-                                + targetReturnType.getCanonicalName());
             }
         }
 
@@ -728,25 +708,13 @@ public class RoutineBuilders {
                 final Class<?> returnType = proxyMethod.getReturnType();
                 final Class<?> targetReturnType = targetMethod.getReturnType();
                 final Output outputAnnotation = proxyMethod.getAnnotation(Output.class);
-                boolean isError = false;
 
                 if (outputAnnotation != null) {
 
                     outputMode = getOutputMode(proxyMethod, targetReturnType);
 
-                    if ((outputMode == OutputMode.COLLECTION) && returnType.isArray()) {
-
-                        isError = !Reflection.boxingClass(returnType.getComponentType())
-                                             .isAssignableFrom(
-                                                     Reflection.boxingClass(targetReturnType));
-                    }
-
-                } else if (inputsAnnotation == null) {
-
-                    isError = !returnType.isAssignableFrom(targetReturnType);
-                }
-
-                if (isError) {
+                } else if ((inputsAnnotation == null) && !returnType.isAssignableFrom(
+                        targetReturnType)) {
 
                     throw new IllegalArgumentException(
                             "the proxy method has incompatible return type: " + proxyMethod);
@@ -799,7 +767,7 @@ public class RoutineBuilders {
                         : (invocationMode == InvocationMode.PARALLEL) ? routine.parallelInvoke()
                                 : routine.asyncInvoke();
 
-        // TODO: 12/14/15 remove InputMode.ELEMENT and OutputMode.COLLECTION
+        // TODO: 12/14/15 support InputMode.COLLECTION and OutputMode.ELEMENT
         if (inputMode == InputMode.CHANNEL) {
 
             invocationChannel.orderByCall();

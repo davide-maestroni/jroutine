@@ -114,8 +114,6 @@ public class RoutineProcessor extends AbstractProcessor {
 
     private String mHeader;
 
-    private String mMethodArray;
-
     private String mMethodArrayInvocation;
 
     private String mMethodArrayInvocationCollection;
@@ -139,8 +137,6 @@ public class RoutineProcessor extends AbstractProcessor {
     private String mMethodInvocationHeader;
 
     private String mMethodInvocationVoid;
-
-    private String mMethodList;
 
     private String mMethodResult;
 
@@ -1151,31 +1147,6 @@ public class RoutineProcessor extends AbstractProcessor {
      */
     @NotNull
     @SuppressWarnings("UnusedParameters")
-    protected String getMethodArrayTemplate(@NotNull final TypeElement annotationElement,
-            @NotNull final TypeElement element, @NotNull final Element targetElement,
-            @NotNull final ExecutableElement methodElement, final int count) throws IOException {
-
-        if (mMethodArray == null) {
-
-            mMethodArray = parseTemplate("/templates/method_array.txt");
-        }
-
-        return mMethodArray;
-    }
-
-    /**
-     * Returns the specified template as a string.
-     *
-     * @param annotationElement the annotation element.
-     * @param element           the annotated element.
-     * @param targetElement     the target element.
-     * @param methodElement     the method element.
-     * @param count             the method count.
-     * @return the template.
-     * @throws java.io.IOException if an I/O error occurred.
-     */
-    @NotNull
-    @SuppressWarnings("UnusedParameters")
     protected String getMethodAsyncTemplate(@NotNull final TypeElement annotationElement,
             @NotNull final TypeElement element, @NotNull final Element targetElement,
             @NotNull final ExecutableElement methodElement, final int count) throws IOException {
@@ -1403,31 +1374,6 @@ public class RoutineProcessor extends AbstractProcessor {
      */
     @NotNull
     @SuppressWarnings("UnusedParameters")
-    protected String getMethodListTemplate(@NotNull final TypeElement annotationElement,
-            @NotNull final TypeElement element, @NotNull final Element targetElement,
-            @NotNull final ExecutableElement methodElement, final int count) throws IOException {
-
-        if (mMethodList == null) {
-
-            mMethodList = parseTemplate("/templates/method_list.txt");
-        }
-
-        return mMethodList;
-    }
-
-    /**
-     * Returns the specified template as a string.
-     *
-     * @param annotationElement the annotation element.
-     * @param element           the annotated element.
-     * @param targetElement     the target element.
-     * @param methodElement     the method element.
-     * @param count             the method count.
-     * @return the template.
-     * @throws java.io.IOException if an I/O error occurred.
-     */
-    @NotNull
-    @SuppressWarnings("UnusedParameters")
     protected String getMethodResultTemplate(@NotNull final TypeElement annotationElement,
             @NotNull final TypeElement element, @NotNull final Element targetElement,
             @NotNull final ExecutableElement methodElement, final int count) throws IOException {
@@ -1513,7 +1459,7 @@ public class RoutineProcessor extends AbstractProcessor {
                                 + " must be a superclass of " + outputChannelType);
             }
 
-        } else if (outputMode == OutputMode.ELEMENT) {
+        } else { // OutputMode.ELEMENT
 
             if (!typeUtils.isAssignable(outputChannelType, erasure)) {
 
@@ -1531,27 +1477,6 @@ public class RoutineProcessor extends AbstractProcessor {
                                 + "] an async output with mode " + OutputMode.ELEMENT
                                 + " must be bound to an array or a type implementing an "
                                 + iterableType);
-            }
-
-        } else { // OutputMode.COLLECTION
-
-            if ((returnType.getKind() != TypeKind.ARRAY) && !typeUtils.isAssignable(listType,
-                                                                                    erasure)) {
-
-                throw new IllegalArgumentException(
-                        "[" + methodElement.getEnclosingElement() + "." + methodElement
-                                + "] an async output with mode " + OutputMode.COLLECTION
-                                + " must be an array or a superclass of " + listType);
-            }
-
-            if ((returnType.getKind() == TypeKind.ARRAY) && !typeUtils.isAssignable(
-                    getBoxedType(targetMirror),
-                    getBoxedType(((ArrayType) returnType).getComponentType()))) {
-
-                throw new IllegalArgumentException(
-                        "[" + methodElement.getEnclosingElement() + "." + methodElement
-                                + "] the async output array with mode " + OutputMode.COLLECTION
-                                + " does not match the bound type: " + targetMirror);
             }
         }
 
@@ -2063,7 +1988,6 @@ public class RoutineProcessor extends AbstractProcessor {
 
         final Types typeUtils = processingEnv.getTypeUtils();
         final TypeMirror outputChannelType = this.outputChannelType;
-        final TypeMirror listType = this.listType;
         final TypeMirror objectType = this.objectType;
         final ExecutableElement targetMethod = findMatchingMethod(methodElement, targetElement);
         TypeMirror targetReturnType = targetMethod.getReturnType();
@@ -2137,30 +2061,7 @@ public class RoutineProcessor extends AbstractProcessor {
             final TypeMirror returnType = methodElement.getReturnType();
             final TypeMirror returnTypeErasure = typeUtils.erasure(returnType);
 
-            if (returnType.getKind() == TypeKind.ARRAY) {
-
-                targetReturnType = ((ArrayType) returnType).getComponentType();
-                method = getMethodArrayTemplate(annotationElement, element, targetElement,
-                                                methodElement, count);
-
-            } else if (typeUtils.isAssignable(listType, returnTypeErasure)) {
-
-                final List<? extends TypeMirror> typeArguments =
-                        ((DeclaredType) returnType).getTypeArguments();
-
-                if (typeArguments.isEmpty()) {
-
-                    targetReturnType = objectType;
-
-                } else {
-
-                    targetReturnType = typeArguments.get(0);
-                }
-
-                method = getMethodListTemplate(annotationElement, element, targetElement,
-                                               methodElement, count);
-
-            } else if (typeUtils.isAssignable(outputChannelType, returnTypeErasure)) {
+            if (typeUtils.isAssignable(outputChannelType, returnTypeErasure)) {
 
                 final List<? extends TypeMirror> typeArguments =
                         ((DeclaredType) returnType).getTypeArguments();

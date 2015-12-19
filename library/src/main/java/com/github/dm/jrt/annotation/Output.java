@@ -55,16 +55,6 @@ import java.lang.annotation.Target;
  *     </code>
  * </pre>
  * <p/>
- * The interface can also return an array or list of outputs:
- * <p/>
- * <pre>
- *     <code>
- *
- *         &#64;Output(OutputMode.COLLECTION)
- *         public List&lt;Integer&gt; sum(int i1, int i2);
- *     </code>
- * </pre>
- * <p/>
  * Note that the transfer mode is specifically chosen through the annotation {@code mode} attribute
  * (it's {@link Output.OutputMode#CHANNEL CHANNEL} by default).
  * <p/>
@@ -114,13 +104,6 @@ public @interface Output {
          * The annotated method must return a superclass of
          * {@link com.github.dm.jrt.channel.Channel.OutputChannel OutputChannel}.
          */
-        ELEMENT,
-        /**
-         * Collection mode.<br/>
-         * The results are collected before being returned by the annotated method.
-         * <p/>
-         * The annotated method must return an array or a superclass of {@link java.util.List}.
-         */
-        COLLECTION
+        ELEMENT
     }
 }

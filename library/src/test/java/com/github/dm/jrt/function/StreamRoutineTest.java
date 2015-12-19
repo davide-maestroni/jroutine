@@ -1002,7 +1002,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.routine().syncGenerate(3, SupplierWrapper.constant(null));
+            Streams.routine().syncGenerate(-1, SupplierWrapper.constant(null));
 
             fail();
 
@@ -1012,7 +1012,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.routine().asyncGenerate(3, SupplierWrapper.constant(null));
+            Streams.routine().asyncGenerate(0, SupplierWrapper.constant(null));
 
             fail();
 
@@ -1022,19 +1022,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.routine().parallelGenerate(3, SupplierWrapper.constant(null));
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            Streams.routine()
-                   .syncMap(PassingInvocation.factoryOf())
-                   .syncGenerate(3, SupplierWrapper.constant(null));
+            Streams.routine().parallelGenerate(-1, SupplierWrapper.constant(null));
 
             fail();
 
@@ -1046,7 +1034,7 @@ public class StreamRoutineTest {
 
             Streams.routine()
                    .syncMap(PassingInvocation.factoryOf())
-                   .asyncGenerate(3, SupplierWrapper.constant(null));
+                   .syncGenerate(0, SupplierWrapper.constant(null));
 
             fail();
 
@@ -1058,7 +1046,19 @@ public class StreamRoutineTest {
 
             Streams.routine()
                    .syncMap(PassingInvocation.factoryOf())
-                   .parallelGenerate(3, SupplierWrapper.constant(null));
+                   .asyncGenerate(-1, SupplierWrapper.constant(null));
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .syncMap(PassingInvocation.factoryOf())
+                   .parallelGenerate(0, SupplierWrapper.constant(null));
 
             fail();
 
@@ -1070,7 +1070,7 @@ public class StreamRoutineTest {
 
             Streams.routine()
                    .tryCatch(ConsumerWrapper.sink())
-                   .syncGenerate(3, SupplierWrapper.constant(null));
+                   .syncGenerate(-1, SupplierWrapper.constant(null));
 
             fail();
 
@@ -1082,7 +1082,7 @@ public class StreamRoutineTest {
 
             Streams.routine()
                    .tryCatch(ConsumerWrapper.sink())
-                   .asyncGenerate(3, SupplierWrapper.constant(null));
+                   .asyncGenerate(0, SupplierWrapper.constant(null));
 
             fail();
 
@@ -1094,7 +1094,7 @@ public class StreamRoutineTest {
 
             Streams.routine()
                    .tryCatch(ConsumerWrapper.sink())
-                   .parallelGenerate(3, SupplierWrapper.constant(null));
+                   .parallelGenerate(-1, SupplierWrapper.constant(null));
 
             fail();
 

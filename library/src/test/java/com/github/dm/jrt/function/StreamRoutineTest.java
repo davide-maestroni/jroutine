@@ -44,142 +44,6 @@ import static org.junit.Assert.fail;
 public class StreamRoutineTest {
 
     @Test
-    public void testAccumulate() {
-
-        assertThat(
-                Streams.<String>routine().asyncAccumulate(new BiFunction<String, String, String>() {
-
-                    public String apply(final String s, final String s2) {
-
-                        return s + s2;
-                    }
-                }).asyncCall("test1", "test2", "test3").afterMax(seconds(3)).all()).containsExactly(
-                "test1test2test3");
-        assertThat(
-                Streams.<String>routine().syncAccumulate(new BiFunction<String, String, String>() {
-
-                    public String apply(final String s, final String s2) {
-
-                        return s + s2;
-                    }
-                }).asyncCall("test1", "test2", "test3").afterMax(seconds(3)).all()).containsExactly(
-                "test1test2test3");
-        assertThat(Streams.<String>routine()
-                          .syncMap(PassingInvocation.<String>factoryOf())
-                          .asyncAccumulate(new BiFunction<String, String, String>() {
-
-                              public String apply(final String s, final String s2) {
-
-                                  return s + s2;
-                              }
-                          })
-                          .asyncCall("test1", "test2", "test3")
-                          .afterMax(seconds(3))
-                          .all()).containsExactly("test1test2test3");
-        assertThat(Streams.<String>routine()
-                          .syncMap(PassingInvocation.<String>factoryOf())
-                          .syncAccumulate(new BiFunction<String, String, String>() {
-
-                              public String apply(final String s, final String s2) {
-
-                                  return s + s2;
-                              }
-                          })
-                          .asyncCall("test1", "test2", "test3")
-                          .afterMax(seconds(3))
-                          .all()).containsExactly("test1test2test3");
-        assertThat(Streams.<String>routine()
-                          .tryCatch(ConsumerWrapper.sink())
-                          .asyncAccumulate(new BiFunction<String, String, String>() {
-
-                              public String apply(final String s, final String s2) {
-
-                                  return s + s2;
-                              }
-                          })
-                          .asyncCall("test1", "test2", "test3")
-                          .afterMax(seconds(3))
-                          .all()).containsExactly("test1test2test3");
-        assertThat(Streams.<String>routine()
-                          .tryCatch(ConsumerWrapper.sink())
-                          .syncAccumulate(new BiFunction<String, String, String>() {
-
-                              public String apply(final String s, final String s2) {
-
-                                  return s + s2;
-                              }
-                          })
-                          .asyncCall("test1", "test2", "test3")
-                          .afterMax(seconds(3))
-                          .all()).containsExactly("test1test2test3");
-    }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testAccumulateNullPointerError() {
-
-        try {
-
-            Streams.routine().asyncAccumulate(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.routine().syncAccumulate(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.routine().syncMap(PassingInvocation.factoryOf()).asyncAccumulate(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.routine().syncMap(PassingInvocation.factoryOf()).syncAccumulate(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.routine().tryCatch(ConsumerWrapper.sink()).asyncAccumulate(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.routine().tryCatch(ConsumerWrapper.sink()).syncAccumulate(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-    }
-
-    @Test
     public void testBuilder() {
 
         assertThat(Streams.routine().asyncCall("test").afterMax(seconds(3)).all()).containsExactly(
@@ -201,6 +65,398 @@ public class StreamRoutineTest {
                           .asyncCall()
                           .afterMax(seconds(3))
                           .all()).containsOnly("test1", "test2", "test3");
+    }
+
+    @Test
+    public void testCollectConsumer() {
+
+        assertThat(Streams.<String>routine()
+                          .asyncCollect(
+                                  new BiConsumer<List<? extends String>, ResultChannel<String>>() {
+
+                                      public void accept(final List<? extends String> strings,
+                                              final ResultChannel<String> result) {
+
+                                          final StringBuilder builder = new StringBuilder();
+
+                                          for (final String string : strings) {
+
+                                              builder.append(string);
+                                          }
+
+                                          result.pass(builder.toString());
+                                      }
+                                  })
+                          .asyncCall("test1", "test2", "test3")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1test2test3");
+        assertThat(Streams.<String>routine()
+                          .syncCollect(
+                                  new BiConsumer<List<? extends String>, ResultChannel<String>>() {
+
+                                      public void accept(final List<? extends String> strings,
+                                              final ResultChannel<String> result) {
+
+                                          final StringBuilder builder = new StringBuilder();
+
+                                          for (final String string : strings) {
+
+                                              builder.append(string);
+                                          }
+
+                                          result.pass(builder.toString());
+                                      }
+                                  })
+                          .asyncCall("test1", "test2", "test3")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1test2test3");
+        assertThat(Streams.<String>routine()
+                          .syncMap(PassingInvocation.<String>factoryOf())
+                          .asyncCollect(
+                                  new BiConsumer<List<? extends String>, ResultChannel<String>>() {
+
+                                      public void accept(final List<? extends String> strings,
+                                              final ResultChannel<String> result) {
+
+                                          final StringBuilder builder = new StringBuilder();
+
+                                          for (final String string : strings) {
+
+                                              builder.append(string);
+                                          }
+
+                                          result.pass(builder.toString());
+                                      }
+                                  })
+                          .asyncCall("test1", "test2", "test3")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1test2test3");
+        assertThat(Streams.<String>routine()
+                          .syncMap(PassingInvocation.<String>factoryOf())
+                          .syncCollect(
+                                  new BiConsumer<List<? extends String>, ResultChannel<String>>() {
+
+                                      public void accept(final List<? extends String> strings,
+                                              final ResultChannel<String> result) {
+
+                                          final StringBuilder builder = new StringBuilder();
+
+                                          for (final String string : strings) {
+
+                                              builder.append(string);
+                                          }
+
+                                          result.pass(builder.toString());
+                                      }
+                                  })
+                          .asyncCall("test1", "test2", "test3")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1test2test3");
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
+                          .asyncCollect(
+                                  new BiConsumer<List<? extends String>, ResultChannel<String>>() {
+
+                                      public void accept(final List<? extends String> strings,
+                                              final ResultChannel<String> result) {
+
+                                          final StringBuilder builder = new StringBuilder();
+
+                                          for (final String string : strings) {
+
+                                              builder.append(string);
+                                          }
+
+                                          result.pass(builder.toString());
+                                      }
+                                  })
+                          .asyncCall("test1", "test2", "test3")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1test2test3");
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
+                          .syncCollect(
+                                  new BiConsumer<List<? extends String>, ResultChannel<String>>() {
+
+                                      public void accept(final List<? extends String> strings,
+                                              final ResultChannel<String> result) {
+
+                                          final StringBuilder builder = new StringBuilder();
+
+                                          for (final String string : strings) {
+
+                                              builder.append(string);
+                                          }
+
+                                          result.pass(builder.toString());
+                                      }
+                                  })
+                          .asyncCall("test1", "test2", "test3")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1test2test3");
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testCollectConsumerNullPointerError() {
+
+        try {
+
+            Streams.routine().asyncCollect((BiConsumer<List<?>, ResultChannel<Object>>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine().syncCollect((BiConsumer<List<?>, ResultChannel<Object>>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .syncMap(PassingInvocation.factoryOf())
+                   .asyncCollect((BiConsumer<List<?>, ResultChannel<Object>>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .syncMap(PassingInvocation.factoryOf())
+                   .syncCollect((BiConsumer<List<?>, ResultChannel<Object>>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .tryCatch(ConsumerWrapper.sink())
+                   .asyncCollect((BiConsumer<List<?>, ResultChannel<Object>>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .tryCatch(ConsumerWrapper.sink())
+                   .syncCollect((BiConsumer<List<?>, ResultChannel<Object>>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testCollectFunction() {
+
+        assertThat(Streams.<String>routine()
+                          .asyncCollect(new Function<List<? extends String>, String>() {
+
+                              public String apply(final List<? extends String> strings) {
+
+                                  final StringBuilder builder = new StringBuilder();
+
+                                  for (final String string : strings) {
+
+                                      builder.append(string);
+                                  }
+
+                                  return builder.toString();
+                              }
+                          })
+                          .asyncCall("test1", "test2", "test3")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1test2test3");
+        assertThat(Streams.<String>routine()
+                          .syncCollect(new Function<List<? extends String>, String>() {
+
+                              public String apply(final List<? extends String> strings) {
+
+                                  final StringBuilder builder = new StringBuilder();
+
+                                  for (final String string : strings) {
+
+                                      builder.append(string);
+                                  }
+
+                                  return builder.toString();
+                              }
+                          })
+                          .asyncCall("test1", "test2", "test3")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1test2test3");
+        assertThat(Streams.<String>routine()
+                          .syncMap(PassingInvocation.<String>factoryOf())
+                          .asyncCollect(new Function<List<? extends String>, String>() {
+
+                              public String apply(final List<? extends String> strings) {
+
+                                  final StringBuilder builder = new StringBuilder();
+
+                                  for (final String string : strings) {
+
+                                      builder.append(string);
+                                  }
+
+                                  return builder.toString();
+                              }
+                          })
+                          .asyncCall("test1", "test2", "test3")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1test2test3");
+        assertThat(Streams.<String>routine()
+                          .syncMap(PassingInvocation.<String>factoryOf())
+                          .syncCollect(new Function<List<? extends String>, String>() {
+
+                              public String apply(final List<? extends String> strings) {
+
+                                  final StringBuilder builder = new StringBuilder();
+
+                                  for (final String string : strings) {
+
+                                      builder.append(string);
+                                  }
+
+                                  return builder.toString();
+                              }
+                          })
+                          .asyncCall("test1", "test2", "test3")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1test2test3");
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
+                          .asyncCollect(new Function<List<? extends String>, String>() {
+
+                              public String apply(final List<? extends String> strings) {
+
+                                  final StringBuilder builder = new StringBuilder();
+
+                                  for (final String string : strings) {
+
+                                      builder.append(string);
+                                  }
+
+                                  return builder.toString();
+                              }
+                          })
+                          .asyncCall("test1", "test2", "test3")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1test2test3");
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
+                          .syncCollect(new Function<List<? extends String>, String>() {
+
+                              public String apply(final List<? extends String> strings) {
+
+                                  final StringBuilder builder = new StringBuilder();
+
+                                  for (final String string : strings) {
+
+                                      builder.append(string);
+                                  }
+
+                                  return builder.toString();
+                              }
+                          })
+                          .asyncCall("test1", "test2", "test3")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1test2test3");
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testCollectFunctionNullPointerError() {
+
+        try {
+
+            Streams.routine().asyncCollect((Function<List<?>, Object>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine().syncCollect((Function<List<?>, Object>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .syncMap(PassingInvocation.factoryOf())
+                   .asyncCollect((Function<List<?>, Object>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .syncMap(PassingInvocation.factoryOf())
+                   .syncCollect((Function<List<?>, Object>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .tryCatch(ConsumerWrapper.sink())
+                   .asyncCollect((Function<List<?>, Object>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .tryCatch(ConsumerWrapper.sink())
+                   .syncCollect((Function<List<?>, Object>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
     }
 
     @Test
@@ -508,6 +764,572 @@ public class StreamRoutineTest {
         try {
 
             Streams.routine().tryCatch(ConsumerWrapper.sink()).asyncForEach(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testGenerate() {
+
+        assertThat(Streams.<String>routine().syncGenerate(new Consumer<ResultChannel<String>>() {
+
+            public void accept(final ResultChannel<String> resultChannel) {
+
+                resultChannel.pass("TEST2");
+            }
+        }).asyncCall("test1").afterMax(seconds(3)).all()).containsOnly("TEST2");
+        assertThat(Streams.<String>routine().syncGenerate(new Supplier<String>() {
+
+            public String get() {
+
+                return "TEST2";
+            }
+        }).asyncCall("test1").afterMax(seconds(3)).all()).containsOnly("TEST2");
+        assertThat(Streams.<String>routine().asyncGenerate(3, new Supplier<String>() {
+
+            public String get() {
+
+                return "TEST2";
+            }
+        }).asyncCall("test1").afterMax(seconds(3)).all()).containsExactly("TEST2", "TEST2",
+                                                                          "TEST2");
+        assertThat(Streams.<String>routine().asyncGenerate(new Consumer<ResultChannel<String>>() {
+
+            public void accept(final ResultChannel<String> resultChannel) {
+
+                resultChannel.pass("TEST2");
+            }
+        }).asyncCall("test1").afterMax(seconds(3)).all()).containsOnly("TEST2");
+        assertThat(Streams.<String>routine().asyncGenerate(new Supplier<String>() {
+
+            public String get() {
+
+                return "TEST2";
+            }
+        }).asyncCall("test1").afterMax(seconds(3)).all()).containsOnly("TEST2");
+        assertThat(Streams.<String>routine().asyncGenerate(3, new Supplier<String>() {
+
+            public String get() {
+
+                return "TEST2";
+            }
+        }).asyncCall("test1").afterMax(seconds(3)).all()).containsExactly("TEST2", "TEST2",
+                                                                          "TEST2");
+        assertThat(Streams.<String>routine().parallelGenerate(3, new Supplier<String>() {
+
+            public String get() {
+
+                return "TEST2";
+            }
+        }).asyncCall("test1").afterMax(seconds(3)).all()).containsExactly("TEST2", "TEST2",
+                                                                          "TEST2");
+        assertThat(Streams.<String>routine()
+                          .syncMap(PassingInvocation.<String>factoryOf())
+                          .syncGenerate(new Consumer<ResultChannel<String>>() {
+
+                              public void accept(final ResultChannel<String> resultChannel) {
+
+                                  resultChannel.pass("TEST2");
+                              }
+                          })
+                          .asyncCall("test1")
+                          .afterMax(seconds(3))
+                          .all()).containsOnly("TEST2");
+        assertThat(Streams.<String>routine()
+                          .syncMap(PassingInvocation.<String>factoryOf())
+                          .syncGenerate(new Supplier<String>() {
+
+                              public String get() {
+
+                                  return "TEST2";
+                              }
+                          })
+                          .asyncCall("test1")
+                          .afterMax(seconds(3))
+                          .all()).containsOnly("TEST2");
+        assertThat(Streams.<String>routine()
+                          .syncMap(PassingInvocation.<String>factoryOf())
+                          .syncGenerate(3, new Supplier<String>() {
+
+                              public String get() {
+
+                                  return "TEST2";
+                              }
+                          })
+                          .asyncCall("test1")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("TEST2", "TEST2", "TEST2");
+        assertThat(Streams.<String>routine()
+                          .syncMap(PassingInvocation.<String>factoryOf())
+                          .asyncGenerate(new Consumer<ResultChannel<String>>() {
+
+                              public void accept(final ResultChannel<String> resultChannel) {
+
+                                  resultChannel.pass("TEST2");
+                              }
+                          })
+                          .asyncCall("test1")
+                          .afterMax(seconds(3))
+                          .all()).containsOnly("TEST2");
+        assertThat(Streams.<String>routine()
+                          .syncMap(PassingInvocation.<String>factoryOf())
+                          .asyncGenerate(new Supplier<String>() {
+
+                              public String get() {
+
+                                  return "TEST2";
+                              }
+                          })
+                          .asyncCall("test1")
+                          .afterMax(seconds(3))
+                          .all()).containsOnly("TEST2");
+        assertThat(Streams.<String>routine()
+                          .syncMap(PassingInvocation.<String>factoryOf())
+                          .asyncGenerate(3, new Supplier<String>() {
+
+                              public String get() {
+
+                                  return "TEST2";
+                              }
+                          })
+                          .asyncCall("test1")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("TEST2", "TEST2", "TEST2");
+        assertThat(Streams.<String>routine()
+                          .syncMap(PassingInvocation.<String>factoryOf())
+                          .parallelGenerate(3, new Supplier<String>() {
+
+                              public String get() {
+
+                                  return "TEST2";
+                              }
+                          })
+                          .asyncCall("test1")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("TEST2", "TEST2", "TEST2");
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
+                          .syncGenerate(new Consumer<ResultChannel<String>>() {
+
+                              public void accept(final ResultChannel<String> resultChannel) {
+
+                                  resultChannel.pass("TEST2");
+                              }
+                          })
+                          .asyncCall("test1")
+                          .afterMax(seconds(3))
+                          .all()).containsOnly("TEST2");
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
+                          .syncGenerate(new Supplier<String>() {
+
+                              public String get() {
+
+                                  return "TEST2";
+                              }
+                          })
+                          .asyncCall("test1")
+                          .afterMax(seconds(3))
+                          .all()).containsOnly("TEST2");
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
+                          .syncGenerate(3, new Supplier<String>() {
+
+                              public String get() {
+
+                                  return "TEST2";
+                              }
+                          })
+                          .asyncCall("test1")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("TEST2", "TEST2", "TEST2");
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
+                          .asyncGenerate(new Consumer<ResultChannel<String>>() {
+
+                              public void accept(final ResultChannel<String> resultChannel) {
+
+                                  resultChannel.pass("TEST2");
+                              }
+                          })
+                          .asyncCall("test1")
+                          .afterMax(seconds(3))
+                          .all()).containsOnly("TEST2");
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
+                          .asyncGenerate(new Supplier<String>() {
+
+                              public String get() {
+
+                                  return "TEST2";
+                              }
+                          })
+                          .asyncCall("test1")
+                          .afterMax(seconds(3))
+                          .all()).containsOnly("TEST2");
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
+                          .asyncGenerate(3, new Supplier<String>() {
+
+                              public String get() {
+
+                                  return "TEST2";
+                              }
+                          })
+                          .asyncCall("test1")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("TEST2", "TEST2", "TEST2");
+        assertThat(Streams.<String>routine()
+                          .tryCatch(ConsumerWrapper.sink())
+                          .parallelGenerate(3, new Supplier<String>() {
+
+                              public String get() {
+
+                                  return "TEST2";
+                              }
+                          })
+                          .asyncCall("test1")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("TEST2", "TEST2", "TEST2");
+    }
+
+    @Test
+    public void testGenerateNegativeCount() {
+
+        try {
+
+            Streams.routine().syncGenerate(3, SupplierWrapper.constant(null));
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine().asyncGenerate(3, SupplierWrapper.constant(null));
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine().parallelGenerate(3, SupplierWrapper.constant(null));
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .syncMap(PassingInvocation.factoryOf())
+                   .syncGenerate(3, SupplierWrapper.constant(null));
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .syncMap(PassingInvocation.factoryOf())
+                   .asyncGenerate(3, SupplierWrapper.constant(null));
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .syncMap(PassingInvocation.factoryOf())
+                   .parallelGenerate(3, SupplierWrapper.constant(null));
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .tryCatch(ConsumerWrapper.sink())
+                   .syncGenerate(3, SupplierWrapper.constant(null));
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .tryCatch(ConsumerWrapper.sink())
+                   .asyncGenerate(3, SupplierWrapper.constant(null));
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .tryCatch(ConsumerWrapper.sink())
+                   .parallelGenerate(3, SupplierWrapper.constant(null));
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testGenerateNullPointerError() {
+
+        try {
+
+            Streams.routine().syncGenerate((Consumer<ResultChannel<?>>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine().syncGenerate((Supplier<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine().syncGenerate(3, (Supplier<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine().asyncGenerate((Consumer<ResultChannel<?>>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine().asyncGenerate((Supplier<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine().asyncGenerate(3, (Supplier<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine().parallelGenerate(3, (Supplier<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .syncMap(PassingInvocation.factoryOf())
+                   .syncGenerate((Consumer<ResultChannel<?>>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .syncMap(PassingInvocation.factoryOf())
+                   .syncGenerate((Supplier<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .syncMap(PassingInvocation.factoryOf())
+                   .syncGenerate(3, (Supplier<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .syncMap(PassingInvocation.factoryOf())
+                   .asyncGenerate((Consumer<ResultChannel<?>>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .syncMap(PassingInvocation.factoryOf())
+                   .asyncGenerate((Supplier<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .syncMap(PassingInvocation.factoryOf())
+                   .asyncGenerate(3, (Supplier<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .syncMap(PassingInvocation.factoryOf())
+                   .parallelGenerate(3, (Supplier<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .tryCatch(ConsumerWrapper.sink())
+                   .syncGenerate((Consumer<ResultChannel<?>>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine().tryCatch(ConsumerWrapper.sink()).syncGenerate((Supplier<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine().tryCatch(ConsumerWrapper.sink()).syncGenerate(3, (Supplier<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .tryCatch(ConsumerWrapper.sink())
+                   .asyncGenerate((Consumer<ResultChannel<?>>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine().tryCatch(ConsumerWrapper.sink()).asyncGenerate((Supplier<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine().tryCatch(ConsumerWrapper.sink()).asyncGenerate(3, (Supplier<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.routine()
+                   .tryCatch(ConsumerWrapper.sink())
+                   .parallelGenerate(3, (Supplier<?>) null);
 
             fail();
 
@@ -1867,241 +2689,31 @@ public class StreamRoutineTest {
     }
 
     @Test
-    public void testReduceConsumer() {
+    public void testReduce() {
 
-        assertThat(Streams.<String>routine()
-                          .asyncReduce(
-                                  new BiConsumer<List<? extends String>, ResultChannel<String>>() {
+        assertThat(Streams.<String>routine().asyncReduce(new BiFunction<String, String, String>() {
 
-                                      public void accept(final List<? extends String> strings,
-                                              final ResultChannel<String> result) {
+            public String apply(final String s, final String s2) {
 
-                                          final StringBuilder builder = new StringBuilder();
+                return s + s2;
+            }
+        }).asyncCall("test1", "test2", "test3").afterMax(seconds(3)).all()).containsExactly(
+                "test1test2test3");
+        assertThat(Streams.<String>routine().syncReduce(new BiFunction<String, String, String>() {
 
-                                          for (final String string : strings) {
+            public String apply(final String s, final String s2) {
 
-                                              builder.append(string);
-                                          }
-
-                                          result.pass(builder.toString());
-                                      }
-                                  })
-                          .asyncCall("test1", "test2", "test3")
-                          .afterMax(seconds(3))
-                          .all()).containsExactly("test1test2test3");
-        assertThat(Streams.<String>routine()
-                          .syncReduce(
-                                  new BiConsumer<List<? extends String>, ResultChannel<String>>() {
-
-                                      public void accept(final List<? extends String> strings,
-                                              final ResultChannel<String> result) {
-
-                                          final StringBuilder builder = new StringBuilder();
-
-                                          for (final String string : strings) {
-
-                                              builder.append(string);
-                                          }
-
-                                          result.pass(builder.toString());
-                                      }
-                                  })
-                          .asyncCall("test1", "test2", "test3")
-                          .afterMax(seconds(3))
-                          .all()).containsExactly("test1test2test3");
+                return s + s2;
+            }
+        }).asyncCall("test1", "test2", "test3").afterMax(seconds(3)).all()).containsExactly(
+                "test1test2test3");
         assertThat(Streams.<String>routine()
                           .syncMap(PassingInvocation.<String>factoryOf())
-                          .asyncReduce(
-                                  new BiConsumer<List<? extends String>, ResultChannel<String>>() {
+                          .asyncReduce(new BiFunction<String, String, String>() {
 
-                                      public void accept(final List<? extends String> strings,
-                                              final ResultChannel<String> result) {
+                              public String apply(final String s, final String s2) {
 
-                                          final StringBuilder builder = new StringBuilder();
-
-                                          for (final String string : strings) {
-
-                                              builder.append(string);
-                                          }
-
-                                          result.pass(builder.toString());
-                                      }
-                                  })
-                          .asyncCall("test1", "test2", "test3")
-                          .afterMax(seconds(3))
-                          .all()).containsExactly("test1test2test3");
-        assertThat(Streams.<String>routine()
-                          .syncMap(PassingInvocation.<String>factoryOf())
-                          .syncReduce(
-                                  new BiConsumer<List<? extends String>, ResultChannel<String>>() {
-
-                                      public void accept(final List<? extends String> strings,
-                                              final ResultChannel<String> result) {
-
-                                          final StringBuilder builder = new StringBuilder();
-
-                                          for (final String string : strings) {
-
-                                              builder.append(string);
-                                          }
-
-                                          result.pass(builder.toString());
-                                      }
-                                  })
-                          .asyncCall("test1", "test2", "test3")
-                          .afterMax(seconds(3))
-                          .all()).containsExactly("test1test2test3");
-        assertThat(Streams.<String>routine()
-                          .tryCatch(ConsumerWrapper.sink())
-                          .asyncReduce(
-                                  new BiConsumer<List<? extends String>, ResultChannel<String>>() {
-
-                                      public void accept(final List<? extends String> strings,
-                                              final ResultChannel<String> result) {
-
-                                          final StringBuilder builder = new StringBuilder();
-
-                                          for (final String string : strings) {
-
-                                              builder.append(string);
-                                          }
-
-                                          result.pass(builder.toString());
-                                      }
-                                  })
-                          .asyncCall("test1", "test2", "test3")
-                          .afterMax(seconds(3))
-                          .all()).containsExactly("test1test2test3");
-        assertThat(Streams.<String>routine()
-                          .tryCatch(ConsumerWrapper.sink())
-                          .syncReduce(
-                                  new BiConsumer<List<? extends String>, ResultChannel<String>>() {
-
-                                      public void accept(final List<? extends String> strings,
-                                              final ResultChannel<String> result) {
-
-                                          final StringBuilder builder = new StringBuilder();
-
-                                          for (final String string : strings) {
-
-                                              builder.append(string);
-                                          }
-
-                                          result.pass(builder.toString());
-                                      }
-                                  })
-                          .asyncCall("test1", "test2", "test3")
-                          .afterMax(seconds(3))
-                          .all()).containsExactly("test1test2test3");
-    }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testReduceConsumerNullPointerError() {
-
-        try {
-
-            Streams.routine().asyncReduce((BiConsumer<List<?>, ResultChannel<Object>>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.routine().syncReduce((BiConsumer<List<?>, ResultChannel<Object>>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.routine()
-                   .syncMap(PassingInvocation.factoryOf())
-                   .asyncReduce((BiConsumer<List<?>, ResultChannel<Object>>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.routine()
-                   .syncMap(PassingInvocation.factoryOf())
-                   .syncReduce((BiConsumer<List<?>, ResultChannel<Object>>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.routine()
-                   .tryCatch(ConsumerWrapper.sink())
-                   .asyncReduce((BiConsumer<List<?>, ResultChannel<Object>>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.routine()
-                   .tryCatch(ConsumerWrapper.sink())
-                   .syncReduce((BiConsumer<List<?>, ResultChannel<Object>>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-    }
-
-    @Test
-    public void testReduceFunction() {
-
-        assertThat(Streams.<String>routine()
-                          .asyncReduce(new Function<List<? extends String>, String>() {
-
-                              public String apply(final List<? extends String> strings) {
-
-                                  final StringBuilder builder = new StringBuilder();
-
-                                  for (final String string : strings) {
-
-                                      builder.append(string);
-                                  }
-
-                                  return builder.toString();
-                              }
-                          })
-                          .asyncCall("test1", "test2", "test3")
-                          .afterMax(seconds(3))
-                          .all()).containsExactly("test1test2test3");
-        assertThat(Streams.<String>routine()
-                          .syncReduce(new Function<List<? extends String>, String>() {
-
-                              public String apply(final List<? extends String> strings) {
-
-                                  final StringBuilder builder = new StringBuilder();
-
-                                  for (final String string : strings) {
-
-                                      builder.append(string);
-                                  }
-
-                                  return builder.toString();
+                                  return s + s2;
                               }
                           })
                           .asyncCall("test1", "test2", "test3")
@@ -2109,37 +2721,11 @@ public class StreamRoutineTest {
                           .all()).containsExactly("test1test2test3");
         assertThat(Streams.<String>routine()
                           .syncMap(PassingInvocation.<String>factoryOf())
-                          .asyncReduce(new Function<List<? extends String>, String>() {
+                          .syncReduce(new BiFunction<String, String, String>() {
 
-                              public String apply(final List<? extends String> strings) {
+                              public String apply(final String s, final String s2) {
 
-                                  final StringBuilder builder = new StringBuilder();
-
-                                  for (final String string : strings) {
-
-                                      builder.append(string);
-                                  }
-
-                                  return builder.toString();
-                              }
-                          })
-                          .asyncCall("test1", "test2", "test3")
-                          .afterMax(seconds(3))
-                          .all()).containsExactly("test1test2test3");
-        assertThat(Streams.<String>routine()
-                          .syncMap(PassingInvocation.<String>factoryOf())
-                          .syncReduce(new Function<List<? extends String>, String>() {
-
-                              public String apply(final List<? extends String> strings) {
-
-                                  final StringBuilder builder = new StringBuilder();
-
-                                  for (final String string : strings) {
-
-                                      builder.append(string);
-                                  }
-
-                                  return builder.toString();
+                                  return s + s2;
                               }
                           })
                           .asyncCall("test1", "test2", "test3")
@@ -2147,18 +2733,11 @@ public class StreamRoutineTest {
                           .all()).containsExactly("test1test2test3");
         assertThat(Streams.<String>routine()
                           .tryCatch(ConsumerWrapper.sink())
-                          .asyncReduce(new Function<List<? extends String>, String>() {
+                          .asyncReduce(new BiFunction<String, String, String>() {
 
-                              public String apply(final List<? extends String> strings) {
+                              public String apply(final String s, final String s2) {
 
-                                  final StringBuilder builder = new StringBuilder();
-
-                                  for (final String string : strings) {
-
-                                      builder.append(string);
-                                  }
-
-                                  return builder.toString();
+                                  return s + s2;
                               }
                           })
                           .asyncCall("test1", "test2", "test3")
@@ -2166,18 +2745,11 @@ public class StreamRoutineTest {
                           .all()).containsExactly("test1test2test3");
         assertThat(Streams.<String>routine()
                           .tryCatch(ConsumerWrapper.sink())
-                          .syncReduce(new Function<List<? extends String>, String>() {
+                          .syncReduce(new BiFunction<String, String, String>() {
 
-                              public String apply(final List<? extends String> strings) {
+                              public String apply(final String s, final String s2) {
 
-                                  final StringBuilder builder = new StringBuilder();
-
-                                  for (final String string : strings) {
-
-                                      builder.append(string);
-                                  }
-
-                                  return builder.toString();
+                                  return s + s2;
                               }
                           })
                           .asyncCall("test1", "test2", "test3")
@@ -2187,11 +2759,11 @@ public class StreamRoutineTest {
 
     @Test
     @SuppressWarnings("ConstantConditions")
-    public void testReduceFunctionNullPointerError() {
+    public void testReduceNullPointerError() {
 
         try {
 
-            Streams.routine().asyncReduce((Function<List<?>, Object>) null);
+            Streams.routine().asyncReduce(null);
 
             fail();
 
@@ -2201,7 +2773,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.routine().syncReduce((Function<List<?>, Object>) null);
+            Streams.routine().syncReduce(null);
 
             fail();
 
@@ -2211,9 +2783,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.routine()
-                   .syncMap(PassingInvocation.factoryOf())
-                   .asyncReduce((Function<List<?>, Object>) null);
+            Streams.routine().syncMap(PassingInvocation.factoryOf()).asyncReduce(null);
 
             fail();
 
@@ -2223,9 +2793,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.routine()
-                   .syncMap(PassingInvocation.factoryOf())
-                   .syncReduce((Function<List<?>, Object>) null);
+            Streams.routine().syncMap(PassingInvocation.factoryOf()).syncReduce(null);
 
             fail();
 
@@ -2235,9 +2803,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.routine()
-                   .tryCatch(ConsumerWrapper.sink())
-                   .asyncReduce((Function<List<?>, Object>) null);
+            Streams.routine().tryCatch(ConsumerWrapper.sink()).asyncReduce(null);
 
             fail();
 
@@ -2247,9 +2813,7 @@ public class StreamRoutineTest {
 
         try {
 
-            Streams.routine()
-                   .tryCatch(ConsumerWrapper.sink())
-                   .syncReduce((Function<List<?>, Object>) null);
+            Streams.routine().tryCatch(ConsumerWrapper.sink()).syncReduce(null);
 
             fail();
 
@@ -2268,35 +2832,37 @@ public class StreamRoutineTest {
                             final StreamRoutine<Object, String> routine) {
 
                         return Streams.routine()
-                                      .syncReduce(new BiConsumer<List<?>, ResultChannel<String>>() {
+                                      .syncCollect(
+                                              new BiConsumer<List<?>, ResultChannel<String>>() {
 
-                                          public void accept(final List<?> inputs,
-                                                  final ResultChannel<String> result) {
+                                                  public void accept(final List<?> inputs,
+                                                          final ResultChannel<String> result) {
 
-                                              final int[] count = {0};
-                                              routine.tryCatch(
-                                                      new BiConsumer<RoutineException,
-                                                              InputChannel<String>>() {
+                                                      final int[] count = {0};
+                                                      routine.tryCatch(
+                                                              new BiConsumer<RoutineException,
+                                                                      InputChannel<String>>() {
 
-                                                          public void accept(
-                                                                  final RoutineException e,
-                                                                  final InputChannel<String>
-                                                                          channel) {
+                                                                  public void accept(
+                                                                          final RoutineException e,
+                                                                          final
+                                                                          InputChannel<String>
+                                                                                  channel) {
 
-                                                              if (++count[0] < 3) {
+                                                                      if (++count[0] < 3) {
 
-                                                                  routine.tryCatch(this)
-                                                                         .syncCall(inputs)
-                                                                         .passTo(channel);
+                                                                          routine.tryCatch(this)
+                                                                                 .syncCall(inputs)
+                                                                                 .passTo(channel);
 
-                                                              } else {
+                                                                      } else {
 
-                                                                  throw e;
-                                                              }
-                                                          }
-                                                      }).syncCall(inputs).passTo(result);
-                                          }
-                                      });
+                                                                          throw e;
+                                                                      }
+                                                                  }
+                                                              }).syncCall(inputs).passTo(result);
+                                                  }
+                                              });
                     }
                 };
 
@@ -2315,152 +2881,6 @@ public class StreamRoutineTest {
         } catch (final RoutineException e) {
 
             assertThat(e.getCause()).isExactlyInstanceOf(NullPointerException.class);
-        }
-    }
-
-    @Test
-    public void testThen() {
-
-        assertThat(Streams.<String>routine()
-                          .syncMap(PassingInvocation.<String>factoryOf())
-                          .syncThen(new Consumer<ResultChannel<String>>() {
-
-                              public void accept(final ResultChannel<String> resultChannel) {
-
-                                  resultChannel.pass("TEST2");
-                              }
-                          })
-                          .asyncCall("test1")
-                          .afterMax(seconds(3))
-                          .all()).containsOnly("TEST2");
-        assertThat(Streams.<String>routine()
-                          .syncMap(PassingInvocation.<String>factoryOf())
-                          .syncThen(new Supplier<String>() {
-
-                              public String get() {
-
-                                  return "TEST2";
-                              }
-                          })
-                          .asyncCall("test1")
-                          .afterMax(seconds(3))
-                          .all()).containsOnly("TEST2");
-        assertThat(Streams.<String>routine()
-                          .syncMap(PassingInvocation.<String>factoryOf())
-                          .asyncThen(new Consumer<ResultChannel<String>>() {
-
-                              public void accept(final ResultChannel<String> resultChannel) {
-
-                                  resultChannel.pass("TEST2");
-                              }
-                          })
-                          .asyncCall("test1")
-                          .afterMax(seconds(3))
-                          .all()).containsOnly("TEST2");
-        assertThat(Streams.<String>routine()
-                          .syncMap(PassingInvocation.<String>factoryOf())
-                          .asyncThen(new Supplier<String>() {
-
-                              public String get() {
-
-                                  return "TEST2";
-                              }
-                          })
-                          .asyncCall("test1")
-                          .afterMax(seconds(3))
-                          .all()).containsOnly("TEST2");
-        assertThat(Streams.<String>routine()
-                          .tryCatch(ConsumerWrapper.sink())
-                          .asyncThen(new Consumer<ResultChannel<String>>() {
-
-                              public void accept(final ResultChannel<String> resultChannel) {
-
-                                  resultChannel.pass("TEST2");
-                              }
-                          })
-                          .asyncCall("test1")
-                          .afterMax(seconds(3))
-                          .all()).containsOnly("TEST2");
-        assertThat(Streams.<String>routine()
-                          .tryCatch(ConsumerWrapper.sink())
-                          .asyncThen(new Supplier<String>() {
-
-                              public String get() {
-
-                                  return "TEST2";
-                              }
-                          })
-                          .asyncCall("test1")
-                          .afterMax(seconds(3))
-                          .all()).containsOnly("TEST2");
-    }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testThenNullPointerError() {
-
-        try {
-
-            Streams.routine().syncThen((Consumer<ResultChannel<?>>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.routine().syncThen((Supplier<?>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.routine()
-                   .syncMap(PassingInvocation.factoryOf())
-                   .asyncThen((Consumer<ResultChannel<?>>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.routine().syncMap(PassingInvocation.factoryOf()).asyncThen((Supplier<?>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.routine()
-                   .tryCatch(ConsumerWrapper.sink())
-                   .asyncThen((Consumer<ResultChannel<?>>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.routine().tryCatch(ConsumerWrapper.sink()).asyncThen((Supplier<?>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
         }
     }
 

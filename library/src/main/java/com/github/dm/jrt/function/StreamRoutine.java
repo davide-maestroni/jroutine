@@ -42,26 +42,37 @@ public interface StreamRoutine<IN, OUT>
         extends Routine<IN, OUT>, ConfigurableBuilder<StreamRoutine<IN, OUT>> {
 
     /**
-     * Concatenates a stream routine based on the specified accumulate function to this one.
-     * <br/>
-     * The output will be accumulated as follows:
-     * <pre>
-     *     <code>
-     *
-     *         acc = function.apply(acc, input);
-     *     </code>
-     * </pre>
-     * The accumulated value will be passed as result only when the routine invocation completes.
+     * Concatenates a stream routine based on the specified collecting consumer to this one.<br/>
+     * The outputs will be collected by applying the function, only when the routine invocation
+     * completes.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
      * invoked in an asynchronous mode.
      *
-     * @param function the bi-function instance.
+     * @param consumer the bi-consumer instance.
+     * @param <AFTER>  the concatenation output type.
      * @return the concatenated stream routine.
      */
     @NotNull
-    StreamRoutine<IN, OUT> asyncAccumulate(
-            @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
+    <AFTER> StreamRoutine<IN, AFTER> asyncCollect(
+            @NotNull BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
+                    consumer);
+
+    /**
+     * Concatenates a stream routine based on the specified collecting function to this one.<br/>
+     * The outputs will be collected by applying the function, only when the routine invocation
+     * completes.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in an asynchronous mode.
+     *
+     * @param function the function instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream routine.
+     */
+    @NotNull
+    <AFTER> StreamRoutine<IN, AFTER> asyncCollect(
+            @NotNull Function<? super List<? extends OUT>, AFTER> function);
 
     /**
      * Concatenates a stream routine based on the specified predicate to this one.<br/>
@@ -88,6 +99,52 @@ public interface StreamRoutine<IN, OUT>
      */
     @NotNull
     StreamRoutine<IN, Void> asyncForEach(@NotNull Consumer<? super OUT> consumer);
+
+    /**
+     * Concatenates a stream routine based on the specified consumer to this one.<br/>
+     * The consumer will be called only when the invocation completes.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in an asynchronous mode.
+     *
+     * @param consumer the consumer instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream routine.
+     */
+    @NotNull
+    <AFTER> StreamRoutine<IN, AFTER> asyncGenerate(
+            @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
+
+    /**
+     * Concatenates a stream routine based on the specified supplier to this one.<br/>
+     * The supplier will be called {@code count} number of times only when the invocation completes.
+     * The count number must be positived.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in an asynchronous mode.
+     *
+     * @param count    the number of generated outputs.
+     * @param supplier the supplier instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream routine
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative..
+     */
+    @NotNull
+    <AFTER> StreamRoutine<IN, AFTER> asyncGenerate(long count, @NotNull Supplier<AFTER> supplier);
+
+    /**
+     * Concatenates a stream routine based on the specified supplier to this one.<br/>
+     * The supplier will be called only when the invocation completes.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in an asynchronous mode.
+     *
+     * @param supplier the supplier instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream routine.
+     */
+    @NotNull
+    <AFTER> StreamRoutine<IN, AFTER> asyncGenerate(@NotNull Supplier<AFTER> supplier);
 
     /**
      * Lifts this stream routine by applying the specified function.
@@ -160,66 +217,26 @@ public interface StreamRoutine<IN, OUT>
     <AFTER> StreamRoutine<IN, AFTER> asyncMap(@NotNull Routine<? super OUT, AFTER> routine);
 
     /**
-     * Concatenates a stream routine based on the specified reducing consumer to this one.<br/>
-     * The outputs will be reduced by applying the function, only when the routine invocation
-     * completes.
+     * Concatenates a stream routine based on the specified accumulating function to this one.
+     * <br/>
+     * The output will be computed as follows:
+     * <pre>
+     *     <code>
+     *
+     *         acc = function.apply(acc, input);
+     *     </code>
+     * </pre>
+     * The accumulated value will be passed as result only when the routine invocation completes.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
      * invoked in an asynchronous mode.
      *
-     * @param consumer the bi-consumer instance.
-     * @param <AFTER>  the concatenation output type.
+     * @param function the bi-function instance.
      * @return the concatenated stream routine.
      */
     @NotNull
-    <AFTER> StreamRoutine<IN, AFTER> asyncReduce(
-            @NotNull BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
-                    consumer);
-
-    /**
-     * Concatenates a stream routine based on the specified reducing function to this one.<br/>
-     * The outputs will be reduced by applying the function, only when the routine invocation
-     * completes.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in an asynchronous mode.
-     *
-     * @param function the function instance.
-     * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream routine.
-     */
-    @NotNull
-    <AFTER> StreamRoutine<IN, AFTER> asyncReduce(
-            @NotNull Function<? super List<? extends OUT>, AFTER> function);
-
-    /**
-     * Concatenates a stream routine based on the specified consumer to this one.<br/>
-     * The consumer will be called only when the invocation completes.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in an asynchronous mode.
-     *
-     * @param consumer the consumer instance.
-     * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream routine.
-     */
-    @NotNull
-    <AFTER> StreamRoutine<IN, AFTER> asyncThen(
-            @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
-
-    /**
-     * Concatenates a stream routine based on the specified supplier to this one.<br/>
-     * The supplier will be called only when the invocation completes.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in an asynchronous mode.
-     *
-     * @param supplier the supplier instance.
-     * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream routine.
-     */
-    @NotNull
-    <AFTER> StreamRoutine<IN, AFTER> asyncThen(@NotNull Supplier<AFTER> supplier);
+    StreamRoutine<IN, OUT> asyncReduce(
+            @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
 
     /**
      * Lifts this stream routine by applying the specified function.
@@ -246,6 +263,24 @@ public interface StreamRoutine<IN, OUT>
      */
     @NotNull
     StreamRoutine<IN, OUT> parallelFilter(@NotNull Predicate<? super OUT> predicate);
+
+    /**
+     * Concatenates a stream routine based on the specified supplier to this one.<br/>
+     * The supplier will be called {@code count} number of times only when the invocation completes.
+     * If count number must be positive.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a parallel mode.
+     *
+     * @param count    the number of generated outputs.
+     * @param supplier the supplier instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream routine.
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+     */
+    @NotNull
+    <AFTER> StreamRoutine<IN, AFTER> parallelGenerate(long count,
+            @NotNull Supplier<AFTER> supplier);
 
     /**
      * Lifts this stream routine by applying the specified function.
@@ -318,26 +353,37 @@ public interface StreamRoutine<IN, OUT>
     <AFTER> StreamRoutine<IN, AFTER> parallelMap(@NotNull Routine<? super OUT, AFTER> routine);
 
     /**
-     * Concatenates a stream routine based on the specified accumulate function to this one.
-     * <br/>
-     * The output will be accumulated as follows:
-     * <pre>
-     *     <code>
-     *
-     *         acc = function.apply(acc, input);
-     *     </code>
-     * </pre>
-     * The accumulated value will be passed as result only when the routine invocation completes.
+     * Concatenates a stream routine based on the specified collecting consumer to this one.<br/>
+     * The outputs will be collected by applying the function, only when the routine invocation
+     * completes.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
      * invoked in a synchronous mode.
      *
-     * @param function the bi-function instance.
+     * @param consumer the bi-consumer instance.
+     * @param <AFTER>  the concatenation output type.
      * @return the concatenated stream routine.
      */
     @NotNull
-    StreamRoutine<IN, OUT> syncAccumulate(
-            @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
+    <AFTER> StreamRoutine<IN, AFTER> syncCollect(
+            @NotNull BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
+                    consumer);
+
+    /**
+     * Concatenates a stream routine based on the specified collecting function to this one.<br/>
+     * The outputs will be collected by applying the function, only when the routine invocation
+     * completes.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a synchronous mode.
+     *
+     * @param function the function instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream routine.
+     */
+    @NotNull
+    <AFTER> StreamRoutine<IN, AFTER> syncCollect(
+            @NotNull Function<? super List<? extends OUT>, AFTER> function);
 
     /**
      * Concatenates a stream routine based on the specified predicate to this one.<br/>
@@ -364,6 +410,52 @@ public interface StreamRoutine<IN, OUT>
      */
     @NotNull
     StreamRoutine<IN, Void> syncForEach(@NotNull Consumer<? super OUT> consumer);
+
+    /**
+     * Concatenates a stream routine based on the specified consumer to this one.<br/>
+     * The consumer will be called only when the invocation completes.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in an asynchronous mode.
+     *
+     * @param consumer the consumer instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream routine.
+     */
+    @NotNull
+    <AFTER> StreamRoutine<IN, AFTER> syncGenerate(
+            @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
+
+    /**
+     * Concatenates a stream routine based on the specified supplier to this one.<br/>
+     * The supplier will be called {@code count} number of times only when the invocation completes.
+     * If count number must be positive.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a synchronous mode.
+     *
+     * @param count    the number of generated outputs.
+     * @param supplier the supplier instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream routine.
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+     */
+    @NotNull
+    <AFTER> StreamRoutine<IN, AFTER> syncGenerate(long count, @NotNull Supplier<AFTER> supplier);
+
+    /**
+     * Concatenates a stream routine based on the specified supplier to this one.<br/>
+     * The supplier will be called only when the invocation completes.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a synchronous mode.
+     *
+     * @param supplier the supplier instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream routine.
+     */
+    @NotNull
+    <AFTER> StreamRoutine<IN, AFTER> syncGenerate(@NotNull Supplier<AFTER> supplier);
 
     /**
      * Lifts this stream routine by applying the specified function.
@@ -436,66 +528,26 @@ public interface StreamRoutine<IN, OUT>
     <AFTER> StreamRoutine<IN, AFTER> syncMap(@NotNull Routine<? super OUT, AFTER> routine);
 
     /**
-     * Concatenates a stream routine based on the specified reducing consumer to this one.<br/>
-     * The outputs will be reduced by applying the function, only when the routine invocation
-     * completes.
+     * Concatenates a stream routine based on the specified accumulating function to this one.
+     * <br/>
+     * The output will be computed as follows:
+     * <pre>
+     *     <code>
+     *
+     *         acc = function.apply(acc, input);
+     *     </code>
+     * </pre>
+     * The accumulated value will be passed as result only when the routine invocation completes.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
      * invoked in a synchronous mode.
      *
-     * @param consumer the bi-consumer instance.
-     * @param <AFTER>  the concatenation output type.
+     * @param function the bi-function instance.
      * @return the concatenated stream routine.
      */
     @NotNull
-    <AFTER> StreamRoutine<IN, AFTER> syncReduce(
-            @NotNull BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
-                    consumer);
-
-    /**
-     * Concatenates a stream routine based on the specified reducing function to this one.<br/>
-     * The outputs will be reduced by applying the function, only when the routine invocation
-     * completes.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in a synchronous mode.
-     *
-     * @param function the function instance.
-     * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream routine.
-     */
-    @NotNull
-    <AFTER> StreamRoutine<IN, AFTER> syncReduce(
-            @NotNull Function<? super List<? extends OUT>, AFTER> function);
-
-    /**
-     * Concatenates a stream routine based on the specified consumer to this one.<br/>
-     * The consumer will be called only when the invocation completes.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in an asynchronous mode.
-     *
-     * @param consumer the consumer instance.
-     * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream routine.
-     */
-    @NotNull
-    <AFTER> StreamRoutine<IN, AFTER> syncThen(
-            @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
-
-    /**
-     * Concatenates a stream routine based on the specified supplier to this one.<br/>
-     * The supplier will be called only when the invocation completes.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in a synchronous mode.
-     *
-     * @param supplier the supplier instance.
-     * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream routine.
-     */
-    @NotNull
-    <AFTER> StreamRoutine<IN, AFTER> syncThen(@NotNull Supplier<AFTER> supplier);
+    StreamRoutine<IN, OUT> syncReduce(
+            @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
 
     /**
      * Concatenates a consumer handling a routine exception.<br/>

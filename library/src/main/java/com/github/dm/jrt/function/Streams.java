@@ -55,6 +55,8 @@ import static com.github.dm.jrt.function.Functions.predicateFilter;
  */
 public class Streams {
 
+    private static final Supplier<Void> NULL_SUPPLIER = SupplierWrapper.constant(null);
+
     /**
      * Avoid direct instantiation.
      */
@@ -176,11 +178,18 @@ public class Streams {
         }
 
         @NotNull
-        public StreamRoutine<IN, OUT> asyncAccumulate(
-                @NotNull final BiFunction<? super OUT, ? super OUT, ? extends OUT> function) {
+        public <AFTER> StreamRoutine<IN, AFTER> asyncCollect(
+                @NotNull final BiConsumer<? super List<? extends OUT>, ? super
+                        ResultChannel<AFTER>> consumer) {
 
-            return fromFactory(AccumulateInvocation.functionFactory(function),
-                               DelegationType.ASYNC);
+            return fromFactory(consumerFactory(consumer), DelegationType.ASYNC);
+        }
+
+        @NotNull
+        public <AFTER> StreamRoutine<IN, AFTER> asyncCollect(
+                @NotNull final Function<? super List<? extends OUT>, AFTER> function) {
+
+            return fromFactory(functionFactory(function), DelegationType.ASYNC);
         }
 
         @NotNull
@@ -193,6 +202,29 @@ public class Streams {
         public StreamRoutine<IN, Void> asyncForEach(@NotNull final Consumer<? super OUT> consumer) {
 
             return fromFactory(new ConsumerInvocation<OUT>(consumer), DelegationType.ASYNC);
+        }
+
+        @NotNull
+        public <AFTER> StreamRoutine<IN, AFTER> asyncGenerate(
+                @NotNull final Consumer<? super ResultChannel<AFTER>> consumer) {
+
+            return fromFactory(new GenerateConsumerInvocation<OUT, AFTER>(consumer),
+                               DelegationType.ASYNC);
+        }
+
+        @NotNull
+        public <AFTER> StreamRoutine<IN, AFTER> asyncGenerate(final long count,
+                @NotNull final Supplier<AFTER> supplier) {
+
+            return fromFactory(new GenerateSupplierInvocation<OUT, AFTER>(count, supplier),
+                               DelegationType.ASYNC);
+        }
+
+        @NotNull
+        public <AFTER> StreamRoutine<IN, AFTER> asyncGenerate(
+                @NotNull final Supplier<AFTER> supplier) {
+
+            return asyncGenerate(1, supplier);
         }
 
         @NotNull
@@ -232,32 +264,10 @@ public class Streams {
         }
 
         @NotNull
-        public <AFTER> StreamRoutine<IN, AFTER> asyncReduce(
-                @NotNull final BiConsumer<? super List<? extends OUT>, ? super
-                        ResultChannel<AFTER>> consumer) {
+        public StreamRoutine<IN, OUT> asyncReduce(
+                @NotNull final BiFunction<? super OUT, ? super OUT, ? extends OUT> function) {
 
-            return fromFactory(consumerFactory(consumer), DelegationType.ASYNC);
-        }
-
-        @NotNull
-        public <AFTER> StreamRoutine<IN, AFTER> asyncReduce(
-                @NotNull final Function<? super List<? extends OUT>, AFTER> function) {
-
-            return fromFactory(functionFactory(function), DelegationType.ASYNC);
-        }
-
-        @NotNull
-        public <AFTER> StreamRoutine<IN, AFTER> asyncThen(
-                @NotNull final Consumer<? super ResultChannel<AFTER>> consumer) {
-
-            return fromFactory(new ConsumerThenInvocation<OUT, AFTER>(consumer),
-                               DelegationType.ASYNC);
-        }
-
-        @NotNull
-        public <AFTER> StreamRoutine<IN, AFTER> asyncThen(@NotNull final Supplier<AFTER> supplier) {
-
-            return fromFactory(new SupplierThenInvocation<OUT, AFTER>(supplier),
+            return fromFactory(AccumulateInvocation.functionFactory(function),
                                DelegationType.ASYNC);
         }
 
@@ -274,6 +284,25 @@ public class Streams {
                 @NotNull final Predicate<? super OUT> predicate) {
 
             return fromFactory(predicateFilter(predicate), DelegationType.PARALLEL);
+        }
+
+        @NotNull
+        @SuppressWarnings("ConstantConditions")
+        public <AFTER> StreamRoutine<IN, AFTER> parallelGenerate(final long count,
+                @NotNull final Supplier<AFTER> supplier) {
+
+            if (supplier == null) {
+
+                throw new NullPointerException("the supplier instance must not be null");
+            }
+
+            return syncGenerate(count, NULL_SUPPLIER).parallelMap(new Function<Object, AFTER>() {
+
+                public AFTER apply(final Object o) {
+
+                    return supplier.get();
+                }
+            });
         }
 
         @NotNull
@@ -313,11 +342,18 @@ public class Streams {
         }
 
         @NotNull
-        public StreamRoutine<IN, OUT> syncAccumulate(
-                @NotNull final BiFunction<? super OUT, ? super OUT, ?
-                        extends OUT> function) {
+        public <AFTER> StreamRoutine<IN, AFTER> syncCollect(
+                @NotNull final BiConsumer<? super List<? extends OUT>, ? super
+                        ResultChannel<AFTER>> consumer) {
 
-            return fromFactory(AccumulateInvocation.functionFactory(function), DelegationType.SYNC);
+            return fromFactory(consumerFactory(consumer), DelegationType.SYNC);
+        }
+
+        @NotNull
+        public <AFTER> StreamRoutine<IN, AFTER> syncCollect(
+                @NotNull final Function<? super List<? extends OUT>, AFTER> function) {
+
+            return fromFactory(functionFactory(function), DelegationType.SYNC);
         }
 
         @NotNull
@@ -330,6 +366,29 @@ public class Streams {
         public StreamRoutine<IN, Void> syncForEach(@NotNull final Consumer<? super OUT> consumer) {
 
             return fromFactory(new ConsumerInvocation<OUT>(consumer), DelegationType.SYNC);
+        }
+
+        @NotNull
+        public <AFTER> StreamRoutine<IN, AFTER> syncGenerate(
+                @NotNull final Consumer<? super ResultChannel<AFTER>> consumer) {
+
+            return fromFactory(new GenerateConsumerInvocation<OUT, AFTER>(consumer),
+                               DelegationType.SYNC);
+        }
+
+        @NotNull
+        public <AFTER> StreamRoutine<IN, AFTER> syncGenerate(final long count,
+                @NotNull final Supplier<AFTER> supplier) {
+
+            return fromFactory(new GenerateSupplierInvocation<OUT, AFTER>(count, supplier),
+                               DelegationType.SYNC);
+        }
+
+        @NotNull
+        public <AFTER> StreamRoutine<IN, AFTER> syncGenerate(
+                @NotNull final Supplier<AFTER> supplier) {
+
+            return syncGenerate(1, supplier);
         }
 
         @NotNull
@@ -369,33 +428,11 @@ public class Streams {
         }
 
         @NotNull
-        public <AFTER> StreamRoutine<IN, AFTER> syncReduce(
-                @NotNull final BiConsumer<? super List<? extends OUT>, ? super
-                        ResultChannel<AFTER>> consumer) {
+        public StreamRoutine<IN, OUT> syncReduce(
+                @NotNull final BiFunction<? super OUT, ? super OUT, ?
+                        extends OUT> function) {
 
-            return fromFactory(consumerFactory(consumer), DelegationType.SYNC);
-        }
-
-        @NotNull
-        public <AFTER> StreamRoutine<IN, AFTER> syncReduce(
-                @NotNull final Function<? super List<? extends OUT>, AFTER> function) {
-
-            return fromFactory(functionFactory(function), DelegationType.SYNC);
-        }
-
-        @NotNull
-        public <AFTER> StreamRoutine<IN, AFTER> syncThen(
-                @NotNull final Consumer<? super ResultChannel<AFTER>> consumer) {
-
-            return fromFactory(new ConsumerThenInvocation<OUT, AFTER>(consumer),
-                               DelegationType.SYNC);
-        }
-
-        @NotNull
-        public <AFTER> StreamRoutine<IN, AFTER> syncThen(@NotNull final Supplier<AFTER> supplier) {
-
-            return fromFactory(new SupplierThenInvocation<OUT, AFTER>(supplier),
-                               DelegationType.SYNC);
+            return fromFactory(AccumulateInvocation.functionFactory(function), DelegationType.SYNC);
         }
 
         @NotNull
@@ -689,67 +726,6 @@ public class Streams {
     }
 
     /**
-     * Invocation implementation wrapping a consumer instance.
-     *
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
-     */
-    private static class ConsumerThenInvocation<IN, OUT> extends InvocationFactory<IN, OUT>
-            implements Invocation<IN, OUT> {
-
-        private final Consumer<? super ResultChannel<OUT>> mConsumer;
-
-        /**
-         * Constructor.
-         *
-         * @param consumer the consumer instance.
-         */
-        @SuppressWarnings("ConstantConditions")
-        private ConsumerThenInvocation(
-                @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
-
-            if (consumer == null) {
-
-                throw new NullPointerException("the consumer instance must not be null");
-            }
-
-            mConsumer = consumer;
-        }
-
-        @NotNull
-        @Override
-        public Invocation<IN, OUT> newInvocation() {
-
-            return this;
-        }
-
-        public void onAbort(@Nullable final RoutineException reason) {
-
-        }
-
-        public void onDestroy() {
-
-        }
-
-        public void onInitialize() {
-
-        }
-
-        public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
-
-        }
-
-        public void onResult(@NotNull final ResultChannel<OUT> result) {
-
-            mConsumer.accept(result);
-        }
-
-        public void onTerminate() {
-
-        }
-    }
-
-    /**
      * Default implementation of a stream routine.
      *
      * @param <IN>  the input data type.
@@ -812,6 +788,142 @@ public class Streams {
     }
 
     /**
+     * Invocation implementation wrapping a consumer instance.
+     *
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
+     */
+    private static class GenerateConsumerInvocation<IN, OUT> extends InvocationFactory<IN, OUT>
+            implements Invocation<IN, OUT> {
+
+        private final Consumer<? super ResultChannel<OUT>> mConsumer;
+
+        /**
+         * Constructor.
+         *
+         * @param consumer the consumer instance.
+         */
+        @SuppressWarnings("ConstantConditions")
+        private GenerateConsumerInvocation(
+                @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
+
+            if (consumer == null) {
+
+                throw new NullPointerException("the consumer instance must not be null");
+            }
+
+            mConsumer = consumer;
+        }
+
+        @NotNull
+        @Override
+        public Invocation<IN, OUT> newInvocation() {
+
+            return this;
+        }
+
+        public void onAbort(@Nullable final RoutineException reason) {
+
+        }
+
+        public void onDestroy() {
+
+        }
+
+        public void onInitialize() {
+
+        }
+
+        public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
+
+        }
+
+        public void onResult(@NotNull final ResultChannel<OUT> result) {
+
+            mConsumer.accept(result);
+        }
+
+        public void onTerminate() {
+
+        }
+    }
+
+    /**
+     * Invocation implementation wrapping a supplier instance.
+     *
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
+     */
+    private static class GenerateSupplierInvocation<IN, OUT> extends InvocationFactory<IN, OUT>
+            implements Invocation<IN, OUT> {
+
+        private final long mCount;
+
+        private final Supplier<OUT> mSupplier;
+
+        /**
+         * Constructor.
+         *
+         * @param count    the number of generated outputs.
+         * @param supplier the supplier instance.
+         * @throws java.lang.IllegalArgumentException if the specified count number is 0 or
+         *                                            negative.
+         */
+        @SuppressWarnings("ConstantConditions")
+        private GenerateSupplierInvocation(final long count,
+                @NotNull final Supplier<OUT> supplier) {
+
+            if (count <= 0) {
+
+                throw new IllegalArgumentException("the count number must be positive: " + count);
+            }
+
+            if (supplier == null) {
+
+                throw new NullPointerException("the supplier instance must not be null");
+            }
+
+            mCount = count;
+            mSupplier = supplier;
+        }
+
+        @NotNull
+        @Override
+        public Invocation<IN, OUT> newInvocation() {
+
+            return this;
+        }
+
+        public void onAbort(@Nullable final RoutineException reason) {
+
+        }
+
+        public void onDestroy() {
+
+        }
+
+        public void onInitialize() {
+
+        }
+
+        public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
+
+        }
+
+        public void onResult(@NotNull final ResultChannel<OUT> result) {
+
+            for (int i = 0; i < mCount; ++i) {
+
+                result.pass(mSupplier.get());
+            }
+        }
+
+        public void onTerminate() {
+
+        }
+    }
+
+    /**
      * Command invocation producing an output.
      *
      * @param <OUT> the output data type.
@@ -858,66 +970,6 @@ public class Streams {
         public void onResult(@NotNull final ResultChannel<OUT> result) {
 
             result.pass(mOutputs);
-        }
-    }
-
-    /**
-     * Invocation implementation wrapping a supplier instance.
-     *
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
-     */
-    private static class SupplierThenInvocation<IN, OUT> extends InvocationFactory<IN, OUT>
-            implements Invocation<IN, OUT> {
-
-        private final Supplier<OUT> mSupplier;
-
-        /**
-         * Constructor.
-         *
-         * @param supplier the supplier instance.
-         */
-        @SuppressWarnings("ConstantConditions")
-        private SupplierThenInvocation(@NotNull final Supplier<OUT> supplier) {
-
-            if (supplier == null) {
-
-                throw new NullPointerException("the supplier instance must not be null");
-            }
-
-            mSupplier = supplier;
-        }
-
-        @NotNull
-        @Override
-        public Invocation<IN, OUT> newInvocation() {
-
-            return this;
-        }
-
-        public void onAbort(@Nullable final RoutineException reason) {
-
-        }
-
-        public void onDestroy() {
-
-        }
-
-        public void onInitialize() {
-
-        }
-
-        public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
-
-        }
-
-        public void onResult(@NotNull final ResultChannel<OUT> result) {
-
-            result.pass(mSupplier.get());
-        }
-
-        public void onTerminate() {
-
         }
     }
 

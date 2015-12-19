@@ -16,6 +16,7 @@ package com.github.dm.jrt.builder;
 import com.github.dm.jrt.channel.IOChannel;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Interface defining a builder of I/O channel objects.
@@ -32,4 +33,37 @@ public interface IOChannelBuilder extends ConfigurableChannelBuilder<IOChannelBu
      */
     @NotNull
     <DATA> IOChannel<DATA, DATA> buildChannel();
+
+    /**
+     * Builds and returns the I/O channel instance returning the specified input.<br/>
+     * Note that the returned channel will be already closed.
+     *
+     * @param input  the input.
+     * @param <DATA> the data type.
+     * @return the newly created channel.
+     */
+    @NotNull
+    <DATA> IOChannel<DATA, DATA> of(@Nullable DATA input);
+
+    /**
+     * Builds and returns the I/O channel instance returning the specified inputs.<br/>
+     * Note that the returned channel will be already closed.
+     *
+     * @param inputs the input data.
+     * @param <DATA> the data type.
+     * @return the newly created channel.
+     */
+    @NotNull
+    <DATA> IOChannel<DATA, DATA> of(@Nullable DATA... inputs);
+
+    /**
+     * Builds and returns the I/O channel instance returning the specified inputs.<br/>
+     * Note that the returned channel will be already closed.
+     *
+     * @param inputs the iterable returning the input data.
+     * @param <DATA> the data type.
+     * @return the newly created channel.
+     */
+    @NotNull
+    <DATA> IOChannel<DATA, DATA> of(@Nullable Iterable<DATA> inputs);
 }

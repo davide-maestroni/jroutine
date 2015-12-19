@@ -52,7 +52,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -198,21 +197,24 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
                                                                ClassToken.tokenOf(TestProxy.class));
 
         assertThat(testProxy.getOne().next()).isEqualTo(1);
-        assertThat(testProxy.getString(1, 2, 3)).isIn("1", "2", "3");
-        assertThat(testProxy.getString(new HashSet<Integer>(Arrays.asList(1, 2, 3)))
+        assertThat(testProxy.getStringParallel1(JRoutineCompat.io().of(1, 2, 3))).isIn("1", "2",
+                                                                                       "3");
+        assertThat(testProxy.getStringParallel2(
+                JRoutineCompat.io().of(new HashSet<Integer>(Arrays.asList(1, 2, 3))))
                             .all()).containsOnly("1", "2", "3");
-        assertThat(testProxy.getString(Arrays.asList(1, 2, 3))).containsOnly("1", "2", "3");
-        assertThat(testProxy.getString((Iterable<Integer>) Arrays.asList(1, 2, 3))).containsOnly(
-                "1", "2", "3");
-        assertThat(testProxy.getString((Collection<Integer>) Arrays.asList(1, 2, 3))).containsOnly(
-                "1", "2", "3");
+        assertThat(testProxy.getStringParallel3(
+                JRoutineCompat.io().of(Arrays.asList(1, 2, 3)))).containsOnly("1", "2", "3");
+        assertThat(testProxy.getStringParallel4(
+                JRoutineCompat.io().of(Arrays.asList(1, 2, 3)))).containsOnly("1", "2", "3");
+        assertThat(testProxy.getStringParallel5(
+                JRoutineCompat.io().of(Arrays.asList(1, 2, 3)))).containsOnly("1", "2", "3");
 
         final ArrayList<String> list = new ArrayList<String>();
-        assertThat(testProxy.getList(Collections.singletonList(list))).containsExactly(list);
+        assertThat(testProxy.getList(JRoutineCompat.io()
+                                                   .of(Collections.<List<String>>singletonList(
+                                                           list)))).containsExactly(list);
 
-        final IOChannel<Integer, Integer> ioChannel = JRoutineCompat.io().buildChannel();
-        ioChannel.pass(3).close();
-        assertThat(testProxy.getString(ioChannel)).isEqualTo("3");
+        assertThat(testProxy.getString(JRoutineCompat.io().of(3))).isEqualTo("3");
     }
 
     public void testProxyBuilder() {
@@ -227,21 +229,24 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
         final TestProxy testProxy = builder.invocations().with(configuration).set().buildProxy();
 
         assertThat(testProxy.getOne().next()).isEqualTo(1);
-        assertThat(testProxy.getString(1, 2, 3)).isIn("1", "2", "3");
-        assertThat(testProxy.getString(new HashSet<Integer>(Arrays.asList(1, 2, 3)))
+        assertThat(testProxy.getStringParallel1(JRoutineCompat.io().of(1, 2, 3))).isIn("1", "2",
+                                                                                       "3");
+        assertThat(testProxy.getStringParallel2(
+                JRoutineCompat.io().of(new HashSet<Integer>(Arrays.asList(1, 2, 3))))
                             .all()).containsOnly("1", "2", "3");
-        assertThat(testProxy.getString(Arrays.asList(1, 2, 3))).containsOnly("1", "2", "3");
-        assertThat(testProxy.getString((Iterable<Integer>) Arrays.asList(1, 2, 3))).containsOnly(
-                "1", "2", "3");
-        assertThat(testProxy.getString((Collection<Integer>) Arrays.asList(1, 2, 3))).containsOnly(
-                "1", "2", "3");
+        assertThat(testProxy.getStringParallel3(
+                JRoutineCompat.io().of(Arrays.asList(1, 2, 3)))).containsOnly("1", "2", "3");
+        assertThat(testProxy.getStringParallel4(
+                JRoutineCompat.io().of(Arrays.asList(1, 2, 3)))).containsOnly("1", "2", "3");
+        assertThat(testProxy.getStringParallel5(
+                JRoutineCompat.io().of(Arrays.asList(1, 2, 3)))).containsOnly("1", "2", "3");
 
         final ArrayList<String> list = new ArrayList<String>();
-        assertThat(testProxy.getList(Collections.singletonList(list))).containsExactly(list);
+        assertThat(testProxy.getList(JRoutineCompat.io()
+                                                   .of(Collections.<List<String>>singletonList(
+                                                           list)))).containsExactly(list);
 
-        final IOChannel<Integer, Integer> ioChannel = JRoutineCompat.io().buildChannel();
-        ioChannel.pass(3).close();
-        assertThat(testProxy.getString(ioChannel)).isEqualTo("3");
+        assertThat(testProxy.getString(JRoutineCompat.io().of(3))).isEqualTo("3");
 
         assertThat(JRoutineProxyCompat.with(loaderFrom(getActivity()))
                                       .on(instanceOf(TestClass.class))
@@ -638,7 +643,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
 
         @Alias("a")
         @Invoke(InvocationMode.PARALLEL)
-        int add2(@Input(value = char.class, mode = InputMode.ELEMENT) OutputChannel<Character> c);
+        int add2(@Input(value = char.class, mode = InputMode.CHANNEL) OutputChannel<Character> c);
 
         @Alias("a")
         @Output(OutputMode.CHANNEL)
@@ -653,7 +658,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
         @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.CHANNEL)
         OutputChannel<Integer> add5(
-                @Input(value = char.class, mode = InputMode.ELEMENT) OutputChannel<Character> c);
+                @Input(value = char.class, mode = InputMode.CHANNEL) OutputChannel<Character> c);
 
         @Alias("a")
         @Inputs(char.class)
@@ -678,7 +683,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
         @Alias("aa")
         @Invoke(InvocationMode.PARALLEL)
         int[] addA03(@Input(value = char[].class,
-                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
+                mode = InputMode.CHANNEL) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Output(OutputMode.CHANNEL)
@@ -698,7 +703,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
         @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.CHANNEL)
         OutputChannel<int[]> addA07(@Input(value = char[].class,
-                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
+                mode = InputMode.CHANNEL) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Output(OutputMode.ELEMENT)
@@ -718,7 +723,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
         @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.ELEMENT)
         OutputChannel<Integer> addA11(@Input(value = char[].class,
-                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
+                mode = InputMode.CHANNEL) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Output(OutputMode.COLLECTION)
@@ -738,7 +743,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
         @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.COLLECTION)
         List<int[]> addA15(@Input(value = char[].class,
-                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
+                mode = InputMode.CHANNEL) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Output(OutputMode.COLLECTION)
@@ -758,7 +763,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
         @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.COLLECTION)
         int[][] addA19(@Input(value = char[].class,
-                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
+                mode = InputMode.CHANNEL) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Inputs(char[].class)
@@ -792,7 +797,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
         @Alias("al")
         @Invoke(InvocationMode.PARALLEL)
         List<Integer> addL03(@Input(value = List.class,
-                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
+                mode = InputMode.CHANNEL) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Output(OutputMode.CHANNEL)
@@ -812,7 +817,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
         @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.CHANNEL)
         OutputChannel<List<Integer>> addL07(@Input(value = List.class,
-                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
+                mode = InputMode.CHANNEL) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Output(OutputMode.ELEMENT)
@@ -832,7 +837,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
         @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.ELEMENT)
         OutputChannel<Integer> addL11(@Input(value = List.class,
-                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
+                mode = InputMode.CHANNEL) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Output(OutputMode.COLLECTION)
@@ -852,7 +857,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
         @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.COLLECTION)
         List<List<Integer>> addL15(@Input(value = List.class,
-                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
+                mode = InputMode.CHANNEL) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Output(OutputMode.COLLECTION)
@@ -872,7 +877,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
         @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.COLLECTION)
         List[] addL19(@Input(value = List.class,
-                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
+                mode = InputMode.CHANNEL) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Inputs(List.class)
@@ -911,7 +916,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
 
         @Alias("s")
         @Invoke(InvocationMode.PARALLEL)
-        void set2(@Input(value = int.class, mode = InputMode.ELEMENT) OutputChannel<Integer> i);
+        void set2(@Input(value = int.class, mode = InputMode.CHANNEL) OutputChannel<Integer> i);
 
         @Alias("g")
         @Inputs({})
@@ -944,7 +949,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
 
         @Alias("sa")
         @Invoke(InvocationMode.PARALLEL)
-        void setA3(@Input(value = int[].class, mode = InputMode.ELEMENT) OutputChannel<int[]> i);
+        void setA3(@Input(value = int[].class, mode = InputMode.CHANNEL) OutputChannel<int[]> i);
 
         @Alias("ga")
         @Inputs({})
@@ -983,7 +988,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
         @Alias("sl")
         @Invoke(InvocationMode.PARALLEL)
         void setL3(@Input(value = List.class,
-                mode = InputMode.ELEMENT) OutputChannel<List<Integer>> i);
+                mode = InputMode.CHANNEL) OutputChannel<List<Integer>> i);
 
         @Alias("gl")
         @Inputs({})
@@ -1065,42 +1070,43 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
         @ReadTimeout(10000)
         @Invoke(InvocationMode.PARALLEL)
         @Output
-        Iterable<Iterable> getList(@Input(value = List.class,
-                mode = InputMode.ELEMENT) List<? extends List<String>> i);
+        Iterable<Iterable> getList(@Input(List.class) OutputChannel<List<String>> i);
 
         @ReadTimeout(10000)
         @Output
         OutputChannel<Integer> getOne();
 
         @ReadTimeout(10000)
-        @Invoke(InvocationMode.PARALLEL)
-        String getString(@Input(value = int.class, mode = InputMode.ELEMENT) int... i);
+        String getString(@Input(int.class) OutputChannel<Integer> i);
 
+        @Alias("getString")
+        @ReadTimeout(10000)
+        @Invoke(InvocationMode.PARALLEL)
+        String getStringParallel1(@Input(int.class) OutputChannel<Integer> i);
+
+        @Alias("getString")
         @ReadTimeout(10000)
         @Invoke(InvocationMode.PARALLEL)
         @Output
-        OutputChannel<String> getString(
-                @Input(value = int.class, mode = InputMode.ELEMENT) HashSet<Integer> i);
+        OutputChannel<String> getStringParallel2(@Input(int.class) OutputChannel<Integer> i);
 
+        @Alias("getString")
         @ReadTimeout(10000)
         @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.COLLECTION)
-        List<String> getString(@Input(value = int.class, mode = InputMode.ELEMENT) List<Integer> i);
+        List<String> getStringParallel3(@Input(int.class) OutputChannel<Integer> i);
 
+        @Alias("getString")
         @ReadTimeout(10000)
         @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.COLLECTION)
-        Iterable<String> getString(
-                @Input(value = int.class, mode = InputMode.ELEMENT) Iterable<Integer> i);
+        Iterable<String> getStringParallel4(@Input(int.class) OutputChannel<Integer> i);
 
+        @Alias("getString")
         @ReadTimeout(10000)
         @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.COLLECTION)
-        String[] getString(
-                @Input(value = int.class, mode = InputMode.ELEMENT) Collection<Integer> i);
-
-        @ReadTimeout(10000)
-        String getString(@Input(int.class) OutputChannel<Integer> i);
+        String[] getStringParallel5(@Input(int.class) OutputChannel<Integer> i);
     }
 
     @LoaderProxyCompat(TestClass.class)

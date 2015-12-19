@@ -20,6 +20,7 @@ import com.github.dm.jrt.builder.IOChannelBuilder;
 import com.github.dm.jrt.channel.IOChannel;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Class implementing a builder of I/O channel objects.
@@ -41,6 +42,27 @@ class DefaultIOChannelBuilder implements IOChannelBuilder, Configurable<IOChanne
     public <DATA> IOChannel<DATA, DATA> buildChannel() {
 
         return new DefaultIOChannel<DATA>(mConfiguration);
+    }
+
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public <DATA> IOChannel<DATA, DATA> of(@Nullable final DATA input) {
+
+        return (IOChannel<DATA, DATA>) buildChannel().pass(input).close();
+    }
+
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public <DATA> IOChannel<DATA, DATA> of(@Nullable final DATA... inputs) {
+
+        return (IOChannel<DATA, DATA>) buildChannel().pass(inputs).close();
+    }
+
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public <DATA> IOChannel<DATA, DATA> of(@Nullable final Iterable<DATA> inputs) {
+
+        return (IOChannel<DATA, DATA>) buildChannel().pass(inputs).close();
     }
 
     @NotNull

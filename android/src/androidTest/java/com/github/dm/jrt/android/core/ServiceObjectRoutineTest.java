@@ -338,33 +338,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
             JRoutine.with(serviceFrom(getActivity()))
                     .on(instanceOf(Sum.class))
                     .buildProxy(SumError.class)
-                    .compute(new Object());
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            JRoutine.with(serviceFrom(getActivity()))
-                    .on(instanceOf(Sum.class))
-                    .buildProxy(SumError.class)
-                    .compute(new Object[0]);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            JRoutine.with(serviceFrom(getActivity()))
-                    .on(instanceOf(Sum.class))
-                    .buildProxy(SumError.class)
-                    .compute("test", new int[0]);
+                    .compute("test", channel);
 
             fail();
 
@@ -869,13 +843,6 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         assertThat(squareAsync.compute(3)).isEqualTo(9);
         assertThat(squareAsync.compute1(3)).containsExactly(9);
         assertThat(squareAsync.compute2(3)).containsExactly(9);
-        assertThat(squareAsync.computeParallel1(1, 2, 3).afterMax(timeout).all()).containsOnly(1, 4,
-                                                                                               9);
-        assertThat(squareAsync.computeParallel2(1, 2, 3).afterMax(timeout).all()).containsOnly(1, 4,
-                                                                                               9);
-        assertThat(squareAsync.computeParallel3(Arrays.asList(1, 2, 3))
-                              .afterMax(timeout)
-                              .all()).containsOnly(1, 4, 9);
 
         final IOChannel<Integer, Integer> channel1 = JRoutine.io().buildChannel();
         channel1.pass(4).close();
@@ -883,15 +850,8 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
         final IOChannel<Integer, Integer> channel2 = JRoutine.io().buildChannel();
         channel2.pass(1, 2, 3).close();
-        assertThat(squareAsync.computeParallel4(channel2).afterMax(timeout).all()).containsOnly(1,
-                                                                                                4,
-                                                                                                9);
-
-        final IncItf incItf = JRoutine.with(serviceFrom(getActivity()))
-                                      .on(instanceOf(Inc.class))
-                                      .buildProxy(ClassToken.tokenOf(IncItf.class));
-        assertThat(incItf.inc(1, 2, 3, 4)).containsOnly(2, 3, 4, 5);
-        assertThat(incItf.incIterable(1, 2, 3, 4)).containsOnly(2, 3, 4, 5);
+        assertThat(squareAsync.computeParallel(channel2).afterMax(timeout).all()).containsOnly(1, 4,
+                                                                                               9);
     }
 
     public void testSharedFields() throws NoSuchMethodException {
@@ -1048,7 +1008,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
         @Alias("a")
         @Invoke(InvocationMode.PARALLEL)
-        int add2(@Input(value = char.class, mode = InputMode.ELEMENT) OutputChannel<Character> c);
+        int add2(@Input(value = char.class, mode = InputMode.CHANNEL) OutputChannel<Character> c);
 
         @Alias("a")
         @Output(OutputMode.CHANNEL)
@@ -1063,7 +1023,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.CHANNEL)
         OutputChannel<Integer> add5(
-                @Input(value = char.class, mode = InputMode.ELEMENT) OutputChannel<Character> c);
+                @Input(value = char.class, mode = InputMode.CHANNEL) OutputChannel<Character> c);
 
         @Alias("a")
         @Inputs(char.class)
@@ -1088,7 +1048,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         @Alias("aa")
         @Invoke(InvocationMode.PARALLEL)
         int[] addA03(@Input(value = char[].class,
-                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
+                mode = InputMode.CHANNEL) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Output(OutputMode.CHANNEL)
@@ -1108,7 +1068,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.CHANNEL)
         OutputChannel<int[]> addA07(@Input(value = char[].class,
-                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
+                mode = InputMode.CHANNEL) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Output(OutputMode.ELEMENT)
@@ -1128,7 +1088,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.ELEMENT)
         OutputChannel<Integer> addA11(@Input(value = char[].class,
-                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
+                mode = InputMode.CHANNEL) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Output(OutputMode.COLLECTION)
@@ -1148,7 +1108,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.COLLECTION)
         List<int[]> addA15(@Input(value = char[].class,
-                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
+                mode = InputMode.CHANNEL) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Output(OutputMode.COLLECTION)
@@ -1168,7 +1128,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.COLLECTION)
         int[][] addA19(@Input(value = char[].class,
-                mode = InputMode.ELEMENT) OutputChannel<char[]> c);
+                mode = InputMode.CHANNEL) OutputChannel<char[]> c);
 
         @Alias("aa")
         @Inputs(char[].class)
@@ -1202,7 +1162,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         @Alias("al")
         @Invoke(InvocationMode.PARALLEL)
         List<Integer> addL03(@Input(value = List.class,
-                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
+                mode = InputMode.CHANNEL) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Output(OutputMode.CHANNEL)
@@ -1222,7 +1182,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.CHANNEL)
         OutputChannel<List<Integer>> addL07(@Input(value = List.class,
-                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
+                mode = InputMode.CHANNEL) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Output(OutputMode.ELEMENT)
@@ -1242,7 +1202,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.ELEMENT)
         OutputChannel<Integer> addL11(@Input(value = List.class,
-                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
+                mode = InputMode.CHANNEL) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Output(OutputMode.COLLECTION)
@@ -1262,7 +1222,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.COLLECTION)
         List<List<Integer>> addL15(@Input(value = List.class,
-                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
+                mode = InputMode.CHANNEL) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Output(OutputMode.COLLECTION)
@@ -1282,7 +1242,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         @Invoke(InvocationMode.PARALLEL)
         @Output(OutputMode.COLLECTION)
         List[] addL19(@Input(value = List.class,
-                mode = InputMode.ELEMENT) OutputChannel<List<Character>> c);
+                mode = InputMode.CHANNEL) OutputChannel<List<Character>> c);
 
         @Alias("al")
         @Inputs(List.class)
@@ -1321,7 +1281,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
         @Alias("s")
         @Invoke(InvocationMode.PARALLEL)
-        void set2(@Input(value = int.class, mode = InputMode.ELEMENT) OutputChannel<Integer> i);
+        void set2(@Input(value = int.class, mode = InputMode.CHANNEL) OutputChannel<Integer> i);
 
         @Alias("g")
         @Inputs({})
@@ -1354,7 +1314,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
         @Alias("sa")
         @Invoke(InvocationMode.PARALLEL)
-        void setA3(@Input(value = int[].class, mode = InputMode.ELEMENT) OutputChannel<int[]> i);
+        void setA3(@Input(value = int[].class, mode = InputMode.CHANNEL) OutputChannel<int[]> i);
 
         @Alias("ga")
         @Inputs({})
@@ -1393,7 +1353,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         @Alias("sl")
         @Invoke(InvocationMode.PARALLEL)
         void setL3(@Input(value = List.class,
-                mode = InputMode.ELEMENT) OutputChannel<List<Integer>> i);
+                mode = InputMode.CHANNEL) OutputChannel<List<Integer>> i);
 
         @Alias("gl")
         @Inputs({})
@@ -1474,20 +1434,6 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         OutputChannel<Integer> countList1(int length);
     }
 
-    private interface IncItf {
-
-        @ReadTimeout(10000)
-        @Invoke(InvocationMode.PARALLEL)
-        @Output(OutputMode.COLLECTION)
-        int[] inc(@Input(value = int.class, mode = InputMode.ELEMENT) int... i);
-
-        @ReadTimeout(10000)
-        @Alias("inc")
-        @Invoke(InvocationMode.PARALLEL)
-        @Output
-        Iterable<Integer> incIterable(@Input(value = int.class, mode = InputMode.ELEMENT) int... i);
-    }
-
     private interface SquareItf {
 
         @ReadTimeout(value = 10, unit = TimeUnit.SECONDS)
@@ -1511,28 +1457,8 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         @Alias("compute")
         @Invoke(InvocationMode.PARALLEL)
         @Output
-        OutputChannel<Integer> computeParallel1(
-                @Input(value = int.class, mode = InputMode.ELEMENT) int... i);
-
-        @Alias("compute")
-        @Invoke(InvocationMode.PARALLEL)
-        @Output
-        OutputChannel<Integer> computeParallel2(
-                @Input(value = int.class, mode = InputMode.ELEMENT) Integer... i);
-
-        @SharedFields({})
-        @Alias("compute")
-        @Invoke(InvocationMode.PARALLEL)
-        @Output
-        OutputChannel<Integer> computeParallel3(
-                @Input(value = int.class, mode = InputMode.ELEMENT) List<Integer> i);
-
-        @SharedFields({})
-        @Alias("compute")
-        @Invoke(InvocationMode.PARALLEL)
-        @Output
-        OutputChannel<Integer> computeParallel4(
-                @Input(value = int.class, mode = InputMode.ELEMENT) OutputChannel<Integer> i);
+        OutputChannel<Integer> computeParallel(
+                @Input(value = int.class, mode = InputMode.CHANNEL) OutputChannel<Integer> i);
     }
 
     private interface SumError {
@@ -1552,13 +1478,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                 @Input(value = int[].class, mode = InputMode.COLLECTION) OutputChannel<Integer> b);
 
         @Invoke(InvocationMode.PARALLEL)
-        int compute(@Input(value = int.class, mode = InputMode.ELEMENT) Object ints);
-
-        @Invoke(InvocationMode.PARALLEL)
-        int compute(@Input(value = int.class, mode = InputMode.ELEMENT) Object[] ints);
-
-        @Invoke(InvocationMode.PARALLEL)
-        int compute(String text, @Input(value = int.class, mode = InputMode.ELEMENT) int[] ints);
+        int compute(String text, @Input(int.class) OutputChannel<Integer> ints);
     }
 
     private interface SumItf {

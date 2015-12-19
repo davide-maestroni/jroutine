@@ -419,7 +419,7 @@ public class RoutineBuilders {
                                 + " must extends an " + OutputChannel.class.getCanonicalName());
             }
 
-        } else if (inputMode == InputMode.COLLECTION) {
+        } else { // InputMode.COLLECTION
 
             if (!OutputChannel.class.isAssignableFrom(parameterType)) {
 
@@ -445,40 +445,6 @@ public class RoutineBuilders {
                 throw new IllegalArgumentException(
                         "[" + method + "] an async input with mode " + InputMode.COLLECTION +
                                 " cannot be applied to a method taking " + length
-                                + " input parameters");
-            }
-
-        } else { // InputMode.ELEMENT
-
-            final boolean isArray = parameterType.isArray();
-
-            if (!isArray && !Iterable.class.isAssignableFrom(parameterType)) {
-
-                throw new IllegalArgumentException(
-                        "[" + method + "] an async input with mode " + InputMode.ELEMENT
-                                + " must be an array or implement an "
-                                + Iterable.class.getCanonicalName());
-            }
-
-            final Class<?> paramClass = inputAnnotation.value();
-
-            if (isArray && !Reflection.boxingClass(paramClass)
-                                      .isAssignableFrom(Reflection.boxingClass(
-                                              parameterType.getComponentType()))) {
-
-                throw new IllegalArgumentException(
-                        "[" + method + "] the async input array with mode " + InputMode.ELEMENT
-                                + " does not match the bound type: "
-                                + paramClass.getCanonicalName());
-            }
-
-            final int length = parameterTypes.length;
-
-            if (length > 1) {
-
-                throw new IllegalArgumentException(
-                        "[" + method + "] an async input with mode " + InputMode.ELEMENT
-                                + " cannot be applied to a method taking " + length
                                 + " input parameters");
             }
         }
@@ -834,41 +800,7 @@ public class RoutineBuilders {
                                 : routine.asyncInvoke();
 
         // TODO: 12/14/15 remove InputMode.ELEMENT and OutputMode.COLLECTION
-        if (inputMode == InputMode.ELEMENT) {
-
-            final Class<?> parameterType = method.getParameterTypes()[0];
-            final Object arg = args[0];
-
-            if (arg == null) {
-
-                invocationChannel.pass((Iterable<Object>) null);
-
-            } else if (OutputChannel.class.isAssignableFrom(parameterType)) {
-
-                invocationChannel.pass((OutputChannel<Object>) arg);
-
-            } else if (parameterType.isArray()) {
-
-                final int length = Array.getLength(arg);
-
-                for (int i = 0; i < length; ++i) {
-
-                    invocationChannel.pass(Array.get(arg, i));
-                }
-
-            } else {
-
-                final Iterable<?> iterable = (Iterable<?>) arg;
-
-                for (final Object input : iterable) {
-
-                    invocationChannel.pass(input);
-                }
-            }
-
-            outputChannel = invocationChannel.result();
-
-        } else if (inputMode == InputMode.CHANNEL) {
+        if (inputMode == InputMode.CHANNEL) {
 
             invocationChannel.orderByCall();
             final Class<?>[] parameterTypes = method.getParameterTypes();

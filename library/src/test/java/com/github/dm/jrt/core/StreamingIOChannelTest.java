@@ -214,12 +214,11 @@ public class StreamingIOChannelTest {
                 "testtest");
         final Routine<String, Integer> stringLength =
                 JRoutine.on(new StringLength()).buildRoutine();
-        assertThat(asyncIo(stringLength).pass("test").afterMax(seconds(10)).next()).isEqualTo(
-                4);
+        assertThat(asyncIo(stringLength).pass("test").afterMax(seconds(10)).next()).isEqualTo(4);
         assertThat(asyncIo(doubleString).concat(asyncIo(stringLength))
-                                            .pass("test")
-                                            .afterMax(seconds(10))
-                                            .next()).isEqualTo(8);
+                                        .pass("test")
+                                        .afterMax(seconds(10))
+                                        .next()).isEqualTo(8);
     }
 
     @Test
@@ -257,11 +256,11 @@ public class StreamingIOChannelTest {
     public void testAsynchronousInput2() {
 
         final TimeDuration timeout = seconds(1);
-        final StreamingIOChannel<String, String> streamingChannel = asyncIo(
-                JRoutine.on(PassingInvocation.<String>factoryOf())
-                        .invocations()
-                        .withInputOrder(OrderType.BY_CALL)
-                        .set());
+        final StreamingIOChannel<String, String> streamingChannel =
+                asyncIo(JRoutine.on(PassingInvocation.<String>factoryOf())
+                                .invocations()
+                                .withInputOrder(OrderType.BY_CALL)
+                                .set());
 
         new Thread() {
 
@@ -359,23 +358,23 @@ public class StreamingIOChannelTest {
 
         final InvocationFactory<String, String> factory = PassingInvocation.factoryOf();
         assertThat(asyncIo(JRoutine.on(factory)).pass("test1", "test2", "test3", "test4")
-                                                    .close()
-                                                    .afterMax(seconds(3))
-                                                    .next(2)).containsExactly("test1", "test2");
+                                                .close()
+                                                .afterMax(seconds(3))
+                                                .next(2)).containsExactly("test1", "test2");
 
         assertThat(asyncIo(JRoutine.on(factory)).pass("test1")
-                                                    .close()
-                                                    .afterMax(seconds(3))
-                                                    .eventuallyExit()
-                                                    .next(2)).containsExactly("test1");
+                                                .close()
+                                                .afterMax(seconds(3))
+                                                .eventuallyExit()
+                                                .next(2)).containsExactly("test1");
 
         try {
 
             asyncIo(JRoutine.on(factory)).pass("test1")
-                                             .close()
-                                             .afterMax(seconds(3))
-                                             .eventuallyAbort()
-                                             .next(2);
+                                         .close()
+                                         .afterMax(seconds(3))
+                                         .eventuallyAbort()
+                                         .next(2);
 
             fail();
 
@@ -386,10 +385,10 @@ public class StreamingIOChannelTest {
         try {
 
             asyncIo(JRoutine.on(factory)).pass("test1")
-                                             .close()
-                                             .afterMax(seconds(3))
-                                             .eventuallyAbort(new IllegalStateException())
-                                             .next(2);
+                                         .close()
+                                         .afterMax(seconds(3))
+                                         .eventuallyAbort(new IllegalStateException())
+                                         .next(2);
 
             fail();
 
@@ -401,10 +400,10 @@ public class StreamingIOChannelTest {
         try {
 
             asyncIo(JRoutine.on(factory)).pass("test1")
-                                             .close()
-                                             .afterMax(seconds(3))
-                                             .eventuallyThrow()
-                                             .next(2);
+                                         .close()
+                                         .afterMax(seconds(3))
+                                         .eventuallyThrow()
+                                         .next(2);
 
             fail();
 
@@ -538,16 +537,16 @@ public class StreamingIOChannelTest {
     public void testOrderType() {
 
         final TimeDuration timeout = seconds(1);
-        final StreamingIOChannel<Object, Object> channel = asyncIo(
-                JRoutine.on(PassingInvocation.factoryOf())
-                        .invocations()
-                        .withInputOrder(OrderType.BY_CALL)
-                        .withInputMaxSize(1)
-                        .withInputTimeout(1, TimeUnit.MILLISECONDS)
-                        .withInputTimeout(seconds(1))
-                        .withLogLevel(Level.DEBUG)
-                        .withLog(new NullLog())
-                        .set());
+        final StreamingIOChannel<Object, Object> channel =
+                asyncIo(JRoutine.on(PassingInvocation.factoryOf())
+                                .invocations()
+                                .withInputOrder(OrderType.BY_CALL)
+                                .withInputMaxSize(1)
+                                .withInputTimeout(1, TimeUnit.MILLISECONDS)
+                                .withInputTimeout(seconds(1))
+                                .withLogLevel(Level.DEBUG)
+                                .withLog(new NullLog())
+                                .set());
         channel.pass(-77L);
         assertThat(channel.afterMax(timeout).next()).isEqualTo(-77L);
 
@@ -597,12 +596,12 @@ public class StreamingIOChannelTest {
     @Test
     public void testPassTimeout() {
 
-        final StreamingIOChannel<Object, Object> streamingChannel = asyncIo(
-                JRoutine.on(PassingInvocation.factoryOf())
-                        .invocations()
-                        .withReadTimeout(millis(10))
-                        .withReadTimeoutAction(TimeoutActionType.EXIT)
-                        .set());
+        final StreamingIOChannel<Object, Object> streamingChannel =
+                asyncIo(JRoutine.on(PassingInvocation.factoryOf())
+                                .invocations()
+                                .withReadTimeout(millis(10))
+                                .withReadTimeoutAction(TimeoutActionType.EXIT)
+                                .set());
 
         assertThat(streamingChannel.all()).isEmpty();
     }
@@ -610,12 +609,12 @@ public class StreamingIOChannelTest {
     @Test
     public void testPassTimeout2() {
 
-        final StreamingIOChannel<Object, Object> streamingChannel = asyncIo(
-                JRoutine.on(PassingInvocation.factoryOf())
-                        .invocations()
-                        .withReadTimeout(millis(10))
-                        .withReadTimeoutAction(TimeoutActionType.ABORT)
-                        .set());
+        final StreamingIOChannel<Object, Object> streamingChannel =
+                asyncIo(JRoutine.on(PassingInvocation.factoryOf())
+                                .invocations()
+                                .withReadTimeout(millis(10))
+                                .withReadTimeoutAction(TimeoutActionType.ABORT)
+                                .set());
 
         try {
 
@@ -631,12 +630,12 @@ public class StreamingIOChannelTest {
     @Test
     public void testPassTimeout3() {
 
-        final StreamingIOChannel<Object, Object> streamingChannel = asyncIo(
-                JRoutine.on(PassingInvocation.factoryOf())
-                        .invocations()
-                        .withReadTimeout(millis(10))
-                        .withReadTimeoutAction(TimeoutActionType.THROW)
-                        .set());
+        final StreamingIOChannel<Object, Object> streamingChannel =
+                asyncIo(JRoutine.on(PassingInvocation.factoryOf())
+                                .invocations()
+                                .withReadTimeout(millis(10))
+                                .withReadTimeoutAction(TimeoutActionType.THROW)
+                                .set());
 
         try {
 
@@ -694,12 +693,11 @@ public class StreamingIOChannelTest {
                 "testtest");
         final Routine<String, Integer> stringLength =
                 JRoutine.on(new StringLength()).buildRoutine();
-        assertThat(asyncIo(stringLength).pass("test").afterMax(seconds(10)).next()).isEqualTo(
-                4);
+        assertThat(asyncIo(stringLength).pass("test").afterMax(seconds(10)).next()).isEqualTo(4);
         assertThat(asyncIo(stringLength).combine(asyncIo(doubleString))
-                                            .pass("test")
-                                            .afterMax(seconds(10))
-                                            .next()).isEqualTo(8);
+                                        .pass("test")
+                                        .afterMax(seconds(10))
+                                        .next()).isEqualTo(8);
     }
 
     @Test
@@ -721,25 +719,25 @@ public class StreamingIOChannelTest {
 
         final InvocationFactory<String, String> factory = PassingInvocation.factoryOf();
         assertThat(asyncIo(JRoutine.on(factory)).pass("test1", "test2", "test3", "test4")
-                                                    .close()
-                                                    .afterMax(seconds(3))
-                                                    .skip(2)
-                                                    .all()).containsExactly("test3", "test4");
+                                                .close()
+                                                .afterMax(seconds(3))
+                                                .skip(2)
+                                                .all()).containsExactly("test3", "test4");
 
         assertThat(asyncIo(JRoutine.on(factory)).pass("test1")
-                                                    .close()
-                                                    .afterMax(seconds(3))
-                                                    .eventuallyExit()
-                                                    .skip(2)
-                                                    .all()).isEmpty();
+                                                .close()
+                                                .afterMax(seconds(3))
+                                                .eventuallyExit()
+                                                .skip(2)
+                                                .all()).isEmpty();
 
         try {
 
             asyncIo(JRoutine.on(factory)).pass("test1")
-                                             .close()
-                                             .afterMax(seconds(3))
-                                             .eventuallyAbort()
-                                             .skip(2);
+                                         .close()
+                                         .afterMax(seconds(3))
+                                         .eventuallyAbort()
+                                         .skip(2);
 
             fail();
 
@@ -750,10 +748,10 @@ public class StreamingIOChannelTest {
         try {
 
             asyncIo(JRoutine.on(factory)).pass("test1")
-                                             .close()
-                                             .afterMax(seconds(3))
-                                             .eventuallyAbort(new IllegalStateException())
-                                             .skip(2);
+                                         .close()
+                                         .afterMax(seconds(3))
+                                         .eventuallyAbort(new IllegalStateException())
+                                         .skip(2);
 
             fail();
 
@@ -765,10 +763,10 @@ public class StreamingIOChannelTest {
         try {
 
             asyncIo(JRoutine.on(factory)).pass("test1")
-                                             .close()
-                                             .afterMax(seconds(3))
-                                             .eventuallyThrow()
-                                             .skip(2);
+                                         .close()
+                                         .afterMax(seconds(3))
+                                         .eventuallyThrow()
+                                         .skip(2);
 
             fail();
 

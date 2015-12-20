@@ -354,20 +354,23 @@ public class ChannelsTest {
                 JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         final InvocationChannel<String, String> channel2 =
                 JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
-        Channels.distributeAndFlush(channel1, channel2)
+        Channels.distributeAndFlush(null, channel1, channel2)
                 .pass(Arrays.asList("test1-1", "test1-2"))
                 .close();
-        Channels.distributeAndFlush(Arrays.<InputChannel<?>>asList(channel1, channel2))
+        final String placeholder = "placeholder";
+        Channels.distributeAndFlush((Object) placeholder,
+                                    Arrays.<InputChannel<?>>asList(channel1, channel2))
                 .pass(Arrays.asList("test2-1", "test2-2"))
                 .close();
-        Channels.distributeAndFlush(channel1, channel2)
+        Channels.distributeAndFlush(placeholder, channel1, channel2)
                 .pass(Collections.singletonList("test3-1"))
                 .close();
         assertThat(channel1.result().afterMax(seconds(1)).all()).containsExactly("test1-1",
                                                                                  "test2-1",
                                                                                  "test3-1");
         assertThat(channel2.result().afterMax(seconds(1)).all()).containsExactly("test1-2",
-                                                                                 "test2-2", null);
+                                                                                 "test2-2",
+                                                                                 placeholder);
     }
 
     @Test
@@ -377,7 +380,7 @@ public class ChannelsTest {
         InvocationChannel<String, String> channel2;
         channel1 = JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         channel2 = JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
-        Channels.distributeAndFlush(channel1, channel2).abort();
+        Channels.distributeAndFlush(null, channel1, channel2).abort();
 
         try {
 
@@ -401,7 +404,8 @@ public class ChannelsTest {
 
         channel1 = JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         channel2 = JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
-        Channels.distributeAndFlush(Arrays.<InputChannel<?>>asList(channel1, channel2)).abort();
+        Channels.distributeAndFlush(null, Arrays.<InputChannel<?>>asList(channel1, channel2))
+                .abort();
 
         try {
 
@@ -429,7 +433,9 @@ public class ChannelsTest {
 
         final InvocationChannel<String, String> channel1 =
                 JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
-        Channels.distributeAndFlush(channel1).pass(Arrays.asList("test1-1", "test1-2")).close();
+        Channels.distributeAndFlush(null, channel1)
+                .pass(Arrays.asList("test1-1", "test1-2"))
+                .close();
 
         try {
 
@@ -443,7 +449,7 @@ public class ChannelsTest {
 
         try {
 
-            Channels.distributeAndFlush();
+            Channels.distributeAndFlush(new Object());
 
             fail();
 
@@ -453,7 +459,7 @@ public class ChannelsTest {
 
         try {
 
-            Channels.distributeAndFlush(Collections.<InputChannel<?>>emptyList());
+            Channels.distributeAndFlush(null, Collections.<InputChannel<?>>emptyList());
 
             fail();
 
@@ -740,15 +746,16 @@ public class ChannelsTest {
         channel2 = builder.buildChannel();
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
         channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
-        assertThat(routine.asyncCall(Channels.<Object>joinAndFlush(channel1, channel2))
-                          .afterMax(seconds(10))
-                          .all()).containsExactly('s', '2');
+        assertThat(
+                routine.asyncCall(Channels.<Object>joinAndFlush(new Object(), channel1, channel2))
+                       .afterMax(seconds(10))
+                       .all()).containsExactly('s', '2');
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
         channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
         assertThat(routine.asyncCall(
-                Channels.joinAndFlush(Arrays.<OutputChannel<?>>asList(channel1, channel2)))
+                Channels.joinAndFlush(null, Arrays.<OutputChannel<?>>asList(channel1, channel2)))
                           .afterMax(seconds(10))
                           .all()).containsExactly('s', '2');
         channel1 = builder.buildChannel();
@@ -763,7 +770,7 @@ public class ChannelsTest {
 
         try {
 
-            routine.asyncCall(Channels.<Object>joinAndFlush(channel1, channel2))
+            routine.asyncCall(Channels.<Object>joinAndFlush(new Object(), channel1, channel2))
                    .afterMax(seconds(10))
                    .all();
 
@@ -788,7 +795,7 @@ public class ChannelsTest {
 
         try {
 
-            routine.asyncCall(Channels.<Object>joinAndFlush(channel1, channel2))
+            routine.asyncCall(Channels.<Object>joinAndFlush(null, channel1, channel2))
                    .afterMax(seconds(1))
                    .all();
 
@@ -805,8 +812,9 @@ public class ChannelsTest {
 
         try {
 
-            routine.asyncCall(
-                    Channels.joinAndFlush(Arrays.<OutputChannel<?>>asList(channel1, channel2)))
+            routine.asyncCall(Channels.joinAndFlush(new Object(),
+                                                    Arrays.<OutputChannel<?>>asList(channel1,
+                                                                                    channel2)))
                    .afterMax(seconds(1))
                    .all();
 
@@ -822,7 +830,7 @@ public class ChannelsTest {
 
         try {
 
-            Channels.joinAndFlush();
+            Channels.joinAndFlush(new Object());
 
             fail();
 
@@ -832,7 +840,7 @@ public class ChannelsTest {
 
         try {
 
-            Channels.joinAndFlush(Collections.<OutputChannel<?>>emptyList());
+            Channels.joinAndFlush(null, Collections.<OutputChannel<?>>emptyList());
 
             fail();
 

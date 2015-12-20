@@ -13,6 +13,8 @@
  */
 package com.github.dm.jrt.annotation;
 
+import com.github.dm.jrt.annotation.Output.OutputMode;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -80,6 +82,14 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Inputs {
+
+    // TODO: 21/12/15 rename
+    /**
+     * The output transfer mode.
+     *
+     * @return the mode.
+     */
+    OutputMode mode() default OutputMode.VALUE;
 
     /**
      * The array of parameter types.

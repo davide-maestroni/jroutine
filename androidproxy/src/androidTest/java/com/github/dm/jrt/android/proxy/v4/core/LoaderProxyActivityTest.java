@@ -408,6 +408,20 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
                                     new char[]{'f', 'z'})
                       .all()).containsOnly(new int[]{'d', 'z'}, new int[]{'e', 'z'},
                                            new int[]{'f', 'z'});
+        assertThat(itf.addA16().pass(new char[]{'c', 'z'}).result().all()).containsExactly(
+                (int) 'c', (int) 'z');
+        assertThat(itf.addA17()
+                      .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
+                      .result()
+                      .all()).containsOnly((int) 'd', (int) 'z', (int) 'e', (int) 'z', (int) 'f',
+                                           (int) 'z');
+        assertThat(itf.addA18().asyncCall(new char[]{'c', 'z'}).all()).containsExactly((int) 'c',
+                                                                                       (int) 'z');
+        assertThat(itf.addA19()
+                      .parallelCall(new char[]{'d', 'z'}, new char[]{'e', 'z'},
+                                    new char[]{'f', 'z'})
+                      .all()).containsOnly((int) 'd', (int) 'z', (int) 'e', (int) 'z', (int) 'f',
+                                           (int) 'z');
         assertThat(itf.addL00(Arrays.asList('c', 'z'))).isEqualTo(
                 Arrays.asList((int) 'c', (int) 'z'));
         final IOChannel<List<Character>, List<Character>> channel20 =
@@ -473,6 +487,21 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
                       .all()).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
                                            Arrays.asList((int) 'e', (int) 'z'),
                                            Arrays.asList((int) 'f', (int) 'z'));
+        assertThat(itf.addL16().pass(Arrays.asList('c', 'z')).result().all()).containsExactly(
+                (int) 'c', (int) 'z');
+        assertThat(itf.addL17()
+                      .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'),
+                            Arrays.asList('f', 'z'))
+                      .result()
+                      .all()).containsOnly((int) 'd', (int) 'z', (int) 'e', (int) 'z', (int) 'f',
+                                           (int) 'z');
+        assertThat(itf.addL18().asyncCall(Arrays.asList('c', 'z')).all()).containsExactly((int) 'c',
+                                                                                          (int) 'z');
+        assertThat(itf.addL19()
+                      .parallelCall(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'),
+                                    Arrays.asList('f', 'z'))
+                      .all()).containsOnly((int) 'd', (int) 'z', (int) 'e', (int) 'z', (int) 'f',
+                                           (int) 'z');
         assertThat(itf.get0()).isEqualTo(31);
         assertThat(itf.get1().all()).containsExactly(31);
         assertThat(itf.get2().result().all()).containsExactly(31);
@@ -481,10 +510,14 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
         assertThat(itf.getA1().all()).containsExactly(1, 2, 3);
         assertThat(itf.getA2().result().all()).containsExactly(new int[]{1, 2, 3});
         assertThat(itf.getA3().asyncCall().all()).containsExactly(new int[]{1, 2, 3});
+        assertThat(itf.getA4().result().all()).containsExactly(1, 2, 3);
+        assertThat(itf.getA5().asyncCall().all()).containsExactly(1, 2, 3);
         assertThat(itf.getL0()).isEqualTo(Arrays.asList(1, 2, 3));
         assertThat(itf.getL1().all()).containsExactly(1, 2, 3);
         assertThat(itf.getL2().result().all()).containsExactly(Arrays.asList(1, 2, 3));
         assertThat(itf.getL3().asyncCall().all()).containsExactly(Arrays.asList(1, 2, 3));
+        assertThat(itf.getL4().result().all()).containsExactly(1, 2, 3);
+        assertThat(itf.getL5().asyncCall().all()).containsExactly(1, 2, 3);
         itf.set0(-17);
         final IOChannel<Integer, Integer> channel35 = JRoutineCompat.io().buildChannel();
         channel35.pass(-17).close();
@@ -572,17 +605,17 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
         int add2(@Input(value = char.class, mode = InputMode.CHANNEL) OutputChannel<Character> c);
 
         @Alias("a")
-        @Output(OutputMode.CHANNEL)
+        @Output(OutputMode.VALUE)
         OutputChannel<Integer> add3(char c);
 
         @Alias("a")
-        @Output(OutputMode.CHANNEL)
+        @Output(OutputMode.VALUE)
         OutputChannel<Integer> add4(
                 @Input(value = char.class, mode = InputMode.CHANNEL) OutputChannel<Character> c);
 
         @Alias("a")
         @Invoke(InvocationMode.PARALLEL)
-        @Output(OutputMode.CHANNEL)
+        @Output(OutputMode.VALUE)
         OutputChannel<Integer> add5(
                 @Input(value = char.class, mode = InputMode.CHANNEL) OutputChannel<Character> c);
 
@@ -612,22 +645,22 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
                 mode = InputMode.CHANNEL) OutputChannel<char[]> c);
 
         @Alias("aa")
-        @Output(OutputMode.CHANNEL)
+        @Output(OutputMode.VALUE)
         OutputChannel<int[]> addA04(char[] c);
 
         @Alias("aa")
-        @Output(OutputMode.CHANNEL)
+        @Output(OutputMode.VALUE)
         OutputChannel<int[]> addA05(
                 @Input(value = char[].class, mode = InputMode.CHANNEL) OutputChannel<char[]> c);
 
         @Alias("aa")
-        @Output(OutputMode.CHANNEL)
+        @Output(OutputMode.VALUE)
         OutputChannel<int[]> addA06(@Input(value = char[].class,
                 mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("aa")
         @Invoke(InvocationMode.PARALLEL)
-        @Output(OutputMode.CHANNEL)
+        @Output(OutputMode.VALUE)
         OutputChannel<int[]> addA07(@Input(value = char[].class,
                 mode = InputMode.CHANNEL) OutputChannel<char[]> c);
 
@@ -669,6 +702,24 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
         @Inputs(char[].class)
         Routine<char[], int[]> addA15();
 
+        @Alias("aa")
+        @Inputs(value = char[].class, mode = OutputMode.ELEMENT)
+        InvocationChannel<char[], Integer> addA16();
+
+        @Alias("aa")
+        @Invoke(InvocationMode.PARALLEL)
+        @Inputs(value = char[].class, mode = OutputMode.ELEMENT)
+        InvocationChannel<char[], Integer> addA17();
+
+        @Alias("aa")
+        @Inputs(value = char[].class, mode = OutputMode.ELEMENT)
+        Routine<char[], Integer> addA18();
+
+        @Alias("aa")
+        @Invoke(InvocationMode.PARALLEL)
+        @Inputs(value = char[].class, mode = OutputMode.ELEMENT)
+        Routine<char[], Integer> addA19();
+
         @Alias("al")
         List<Integer> addL00(List<Character> c);
 
@@ -686,22 +737,22 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
                 mode = InputMode.CHANNEL) OutputChannel<List<Character>> c);
 
         @Alias("al")
-        @Output(OutputMode.CHANNEL)
+        @Output(OutputMode.VALUE)
         OutputChannel<List<Integer>> addL04(List<Character> c);
 
         @Alias("al")
-        @Output(OutputMode.CHANNEL)
+        @Output(OutputMode.VALUE)
         OutputChannel<List<Integer>> addL05(@Input(value = List.class,
                 mode = InputMode.CHANNEL) OutputChannel<List<Character>> c);
 
         @Alias("al")
-        @Output(OutputMode.CHANNEL)
+        @Output(OutputMode.VALUE)
         OutputChannel<List<Integer>> addL06(@Input(value = List.class,
                 mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("al")
         @Invoke(InvocationMode.PARALLEL)
-        @Output(OutputMode.CHANNEL)
+        @Output(OutputMode.VALUE)
         OutputChannel<List<Integer>> addL07(@Input(value = List.class,
                 mode = InputMode.CHANNEL) OutputChannel<List<Character>> c);
 
@@ -743,6 +794,24 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
         @Inputs(List.class)
         Routine<List<Character>, List<Integer>> addL15();
 
+        @Alias("al")
+        @Inputs(value = List.class, mode = OutputMode.ELEMENT)
+        InvocationChannel<List<Character>, Integer> addL16();
+
+        @Alias("al")
+        @Invoke(InvocationMode.PARALLEL)
+        @Inputs(value = List.class, mode = OutputMode.ELEMENT)
+        InvocationChannel<List<Character>, Integer> addL17();
+
+        @Alias("al")
+        @Inputs(value = List.class, mode = OutputMode.ELEMENT)
+        Routine<List<Character>, Integer> addL18();
+
+        @Alias("al")
+        @Invoke(InvocationMode.PARALLEL)
+        @Inputs(value = List.class, mode = OutputMode.ELEMENT)
+        Routine<List<Character>, Integer> addL19();
+
         @Alias("g")
         int get0();
 
@@ -750,7 +819,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
         void set0(int i);
 
         @Alias("g")
-        @Output(OutputMode.CHANNEL)
+        @Output(OutputMode.VALUE)
         OutputChannel<Integer> get1();
 
         @Alias("s")
@@ -797,6 +866,14 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
         @Invoke(InvocationMode.PARALLEL)
         void setA3(@Input(value = int[].class, mode = InputMode.CHANNEL) OutputChannel<int[]> i);
 
+        @Alias("ga")
+        @Inputs(value = {}, mode = OutputMode.ELEMENT)
+        InvocationChannel<Void, Integer> getA4();
+
+        @Alias("ga")
+        @Inputs(value = {}, mode = OutputMode.ELEMENT)
+        Routine<Void, Integer> getA5();
+
         @Alias("gl")
         List<Integer> getL0();
 
@@ -827,6 +904,14 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
         @Invoke(InvocationMode.PARALLEL)
         void setL3(@Input(value = List.class,
                 mode = InputMode.CHANNEL) OutputChannel<List<Integer>> i);
+
+        @Alias("gl")
+        @Inputs(value = {}, mode = OutputMode.ELEMENT)
+        InvocationChannel<Void, Integer> getL4();
+
+        @Alias("gl")
+        @Inputs(value = {}, mode = OutputMode.ELEMENT)
+        Routine<Void, Integer> getL5();
 
         @Alias("s")
         @Inputs(int.class)

@@ -225,7 +225,7 @@ public class Channels {
     public static IOChannel<List<?>, List<?>> distribute(
             @NotNull final InputChannel<?>... channels) {
 
-        return distribute(false, channels);
+        return distribute(false, null, channels);
     }
 
     /**
@@ -243,46 +243,49 @@ public class Channels {
     public static <IN> IOChannel<List<? extends IN>, List<? extends IN>> distribute(
             @NotNull final List<? extends InputChannel<? extends IN>> channels) {
 
-        return distribute(false, channels);
+        return distribute(false, null, channels);
     }
 
     /**
      * Returns a new channel distributing the input data among the specified channels. If the list
      * of data is smaller of the specified number of channels, the remaining ones will be fed with
-     * null objects. While, if the list of data exceeds the number of channels, the invocation will
-     * be aborted.<br/>
+     * the specified placeholder instance. While, if the list of data exceeds the number of
+     * channels, the invocation will be aborted.<br/>
      * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
      * completion of the invocation lifecycle.
      *
-     * @param channels the array of channels.
+     * @param placeholder the placeholder instance.
+     * @param channels    the array of channels.
      * @return the I/O channel.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static IOChannel<List<?>, List<?>> distributeAndFlush(
+    public static IOChannel<List<?>, List<?>> distributeAndFlush(@Nullable final Object placeholder,
             @NotNull final InputChannel<?>... channels) {
 
-        return distribute(true, channels);
+        return distribute(true, placeholder, channels);
     }
 
     /**
      * Returns a new channel distributing the input data among the specified channels. If the list
      * of data is smaller of the specified number of channels, the remaining ones will be fed with
-     * null objects. While, if the list of data exceeds the number of channels, the invocation will
-     * be aborted.<br/>
+     * the specified placeholder instance. While, if the list of data exceeds the number of
+     * channels, the invocation will be aborted.<br/>
      * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
      * completion of the invocation lifecycle.
      *
-     * @param channels the list of channels.
-     * @param <IN>     the input data type.
+     * @param placeholder the placeholder instance.
+     * @param channels    the list of channels.
+     * @param <IN>        the input data type.
      * @return the I/O channel.
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @NotNull
     public static <IN> IOChannel<List<? extends IN>, List<? extends IN>> distributeAndFlush(
+            @Nullable final IN placeholder,
             @NotNull final List<? extends InputChannel<? extends IN>> channels) {
 
-        return distribute(true, channels);
+        return distribute(true, placeholder, channels);
     }
 
     /**
@@ -319,7 +322,7 @@ public class Channels {
     public static <OUT> OutputChannel<List<? extends OUT>> join(
             @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
 
-        return join(false, channels);
+        return join(false, null, channels);
     }
 
     /**
@@ -334,45 +337,49 @@ public class Channels {
     @NotNull
     public static OutputChannel<List<?>> join(@NotNull final OutputChannel<?>... channels) {
 
-        return join(false, channels);
+        return join(false, null, channels);
     }
 
     /**
      * Returns an output channel joining the data coming from the specified list of channels.<br/>
      * An output will be generated only when at least one result is available for each channel.
-     * Moreover, when all the output channels complete, the remaining output will be returned by
-     * filling the gaps with null instances, so that the generated list of data will always have the
-     * same size of the channel list.<br/>
+     * Moreover, when all the output channels complete, the remaining outputs will be returned by
+     * filling the gaps with the specified placeholder instance, so that the generated list of data
+     * will always have the same size of the channel list.<br/>
      * Note that the channels will be bound as a result of the call.
      *
-     * @param channels the list of channels.
-     * @param <OUT>    the output data type.
+     * @param placeholder the placeholder instance.
+     * @param channels    the list of channels.
+     * @param <OUT>       the output data type.
      * @return the output channel.
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @NotNull
     public static <OUT> OutputChannel<List<? extends OUT>> joinAndFlush(
+            @Nullable final OUT placeholder,
             @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
 
-        return join(true, channels);
+        return join(true, placeholder, channels);
     }
 
     /**
      * Returns an output channel joining the data coming from the specified list of channels.<br/>
      * An output will be generated only when at least one result is available for each channel.
-     * Moreover, when all the output channels complete, the remaining output will be returned by
-     * filling the gaps with null instances, so that the generated list of data will always have the
-     * same size of the channel array.<br/>
+     * Moreover, when all the output channels complete, the remaining outputs will be returned by
+     * filling the gaps with the specified placeholder instance, so that the generated list of data
+     * will always have the same size of the channel list.<br/>
      * Note that the channels will be bound as a result of the call.
      *
-     * @param channels the array of channels.
+     * @param placeholder the placeholder instance.
+     * @param channels    the array of channels.
      * @return the output channel.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static OutputChannel<List<?>> joinAndFlush(@NotNull final OutputChannel<?>... channels) {
+    public static OutputChannel<List<?>> joinAndFlush(@Nullable final Object placeholder,
+            @NotNull final OutputChannel<?>... channels) {
 
-        return join(true, channels);
+        return join(true, placeholder, channels);
     }
 
     /**
@@ -526,19 +533,13 @@ public class Channels {
      */
     @NotNull
     public static <DATA, IN extends DATA> IOChannel<IN, IN> select(
-            @Nullable final InputChannel<? super Selectable<DATA>> channel, final int index) {
+            @NotNull final InputChannel<? super Selectable<DATA>> channel, final int index) {
 
         final IOChannel<IN, IN> inputChannel = JRoutine.io().buildChannel();
-
-        if (channel != null) {
-
-            final IOChannel<Selectable<DATA>, Selectable<DATA>> ioChannel =
-                    JRoutine.io().buildChannel();
-            ioChannel.passTo(channel);
-            inputChannel.passTo(new SelectableOutputConsumer<DATA, IN>(ioChannel, index));
-        }
-
-        return inputChannel;
+        final IOChannel<Selectable<DATA>, Selectable<DATA>> ioChannel =
+                JRoutine.io().buildChannel();
+        ioChannel.passTo(channel);
+        return inputChannel.passTo(new SelectableOutputConsumer<DATA, IN>(ioChannel, index));
     }
 
     /**
@@ -798,18 +799,12 @@ public class Channels {
      */
     @NotNull
     public static <IN> IOChannel<Selectable<IN>, Selectable<IN>> toSelectable(
-            @Nullable final InputChannel<? super IN> channel, final int index) {
+            @NotNull final InputChannel<? super IN> channel, final int index) {
 
         final IOChannel<Selectable<IN>, Selectable<IN>> inputChannel = JRoutine.io().buildChannel();
-
-        if (channel != null) {
-
-            final IOChannel<IN, IN> ioChannel = JRoutine.io().buildChannel();
-            ioChannel.passTo(channel);
-            inputChannel.passTo(new FilterOutputConsumer<IN>(ioChannel, index));
-        }
-
-        return inputChannel;
+        final IOChannel<IN, IN> ioChannel = JRoutine.io().buildChannel();
+        ioChannel.passTo(channel);
+        return inputChannel.passTo(new FilterOutputConsumer<IN>(ioChannel, index));
     }
 
     /**
@@ -824,22 +819,17 @@ public class Channels {
      */
     @NotNull
     public static <OUT> OutputChannel<? extends Selectable<OUT>> toSelectable(
-            @Nullable final OutputChannel<? extends OUT> channel, final int index) {
+            @NotNull final OutputChannel<? extends OUT> channel, final int index) {
 
         final IOChannel<Selectable<OUT>, Selectable<OUT>> ioChannel = JRoutine.io().buildChannel();
-
-        if (channel != null) {
-
-            channel.passTo(new SelectableOutputConsumer<OUT, OUT>(ioChannel, index));
-        }
-
+        channel.passTo(new SelectableOutputConsumer<OUT, OUT>(ioChannel, index));
         return ioChannel;
     }
 
     @NotNull
     @SuppressWarnings("unchecked")
     private static IOChannel<List<?>, List<?>> distribute(final boolean isFlush,
-            @NotNull final InputChannel<?>... channels) {
+            @Nullable final Object placeholder, @NotNull final InputChannel<?>... channels) {
 
         final int length = channels.length;
 
@@ -858,13 +848,13 @@ public class Channels {
         }
 
         final IOChannel<List<?>, List<?>> ioChannel = JRoutine.io().buildChannel();
-        return ioChannel.passTo(new DistributeOutputConsumer(isFlush, channelList));
+        return ioChannel.passTo(new DistributeOutputConsumer(isFlush, placeholder, channelList));
     }
 
     @NotNull
     @SuppressWarnings("unchecked")
     private static <IN> IOChannel<List<? extends IN>, List<? extends IN>> distribute(
-            final boolean isFlush,
+            final boolean isFlush, @Nullable final IN placeholder,
             @NotNull final List<? extends InputChannel<? extends IN>> channels) {
 
         if (channels.isEmpty()) {
@@ -884,11 +874,12 @@ public class Channels {
 
         final IOChannel<List<? extends IN>, List<? extends IN>> ioChannel =
                 JRoutine.io().buildChannel();
-        return ioChannel.passTo(new DistributeOutputConsumer(isFlush, channelList));
+        return ioChannel.passTo(new DistributeOutputConsumer(isFlush, placeholder, channelList));
     }
 
     @NotNull
     private static <OUT> OutputChannel<List<? extends OUT>> join(final boolean isFlush,
+            @Nullable final OUT placeholder,
             @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
 
         final int size = channels.size();
@@ -901,7 +892,7 @@ public class Channels {
         final IOChannel<List<? extends OUT>, List<? extends OUT>> ioChannel =
                 JRoutine.io().buildChannel();
         final JoinOutputConsumer<OUT> consumer =
-                new JoinOutputConsumer<OUT>(ioChannel, size, isFlush);
+                new JoinOutputConsumer<OUT>(isFlush, size, placeholder, ioChannel);
         merge(channels).passTo(consumer);
         return ioChannel;
     }
@@ -909,7 +900,7 @@ public class Channels {
     @NotNull
     @SuppressWarnings("unchecked")
     private static OutputChannel<List<?>> join(final boolean isFlush,
-            @NotNull final OutputChannel<?>... channels) {
+            @Nullable final Object placeholder, @NotNull final OutputChannel<?>... channels) {
 
         final int length = channels.length;
 
@@ -919,7 +910,8 @@ public class Channels {
         }
 
         final IOChannel<List<?>, List<?>> ioChannel = JRoutine.io().buildChannel();
-        final JoinOutputConsumer consumer = new JoinOutputConsumer(ioChannel, length, isFlush);
+        final JoinOutputConsumer consumer =
+                new JoinOutputConsumer(isFlush, length, placeholder, ioChannel);
         merge(channels).passTo(consumer);
         return ioChannel;
     }
@@ -1122,17 +1114,21 @@ public class Channels {
 
         private final boolean mIsFlush;
 
+        private final Object mPlaceholder;
+
         /**
          * Constructor.
          *
-         * @param isFlush  whether the inputs have to be flushed.
-         * @param channels the list of channels.
+         * @param isFlush     whether the inputs have to be flushed.
+         * @param placeholder the placeholder instance.
+         * @param channels    the list of channels.
          */
-        private DistributeOutputConsumer(final boolean isFlush,
+        private DistributeOutputConsumer(final boolean isFlush, @Nullable final Object placeholder,
                 @NotNull final ArrayList<IOChannel<?, ?>> channels) {
 
-            mChannels = channels;
             mIsFlush = isFlush;
+            mChannels = channels;
+            mPlaceholder = placeholder;
         }
 
         public void onComplete() {
@@ -1163,6 +1159,7 @@ public class Channels {
                 throw new IllegalArgumentException();
             }
 
+            final Object placeholder = mPlaceholder;
             final boolean isFlush = mIsFlush;
 
             for (int i = 0; i < size; ++i) {
@@ -1176,7 +1173,7 @@ public class Channels {
 
                 } else if (isFlush) {
 
-                    channel.pass((Object) null);
+                    channel.pass(placeholder);
                 }
             }
         }
@@ -1236,23 +1233,27 @@ public class Channels {
 
         private final boolean mIsFlush;
 
+        private final OUT mPlaceholder;
+
         private final SimpleQueue<OUT>[] mQueues;
 
         /**
          * Constructor.
          *
-         * @param channel the I/O channel.
-         * @param size    the number of channels to join.
-         * @param isFlush whether the inputs have to be flushed.
+         * @param isFlush     whether the inputs have to be flushed.
+         * @param size        the number of channels to join.
+         * @param placeholder the placeholder instance.
+         * @param channel     the I/O channel.
          */
         @SuppressWarnings("unchecked")
-        private JoinOutputConsumer(
-                @NotNull final IOChannel<List<? extends OUT>, List<? extends OUT>> channel,
-                final int size, final boolean isFlush) {
+        private JoinOutputConsumer(final boolean isFlush, final int size,
+                @Nullable final OUT placeholder,
+                @NotNull final IOChannel<List<? extends OUT>, List<? extends OUT>> channel) {
 
             final SimpleQueue<OUT>[] queues = (mQueues = new SimpleQueue[size]);
-            mChannel = channel;
             mIsFlush = isFlush;
+            mChannel = channel;
+            mPlaceholder = placeholder;
 
             for (int i = 0; i < size; ++i) {
 
@@ -1265,6 +1266,7 @@ public class Channels {
             final IOChannel<List<? extends OUT>, List<? extends OUT>> channel = mChannel;
             final SimpleQueue<OUT>[] queues = mQueues;
             final int length = queues.length;
+            final OUT placeholder = mPlaceholder;
             final ArrayList<OUT> outputs = new ArrayList<OUT>(length);
             boolean isEmpty;
 
@@ -1281,7 +1283,7 @@ public class Channels {
 
                     } else {
 
-                        outputs.add(null);
+                        outputs.add(placeholder);
                     }
                 }
 

@@ -164,17 +164,17 @@ public class Streams {
     private static abstract class AbstractStreamRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
             implements StreamRoutine<IN, OUT>, Configurable<StreamRoutine<IN, OUT>> {
 
-        private InvocationConfiguration mConcatConfiguration;
+        private InvocationConfiguration mConfiguration;
 
         /**
          * Constructor.
          *
-         * @param concatConfiguration the concatenated routine configuration.
+         * @param initialConfiguration the initial routine configuration.
          */
-        private AbstractStreamRoutine(@NotNull final InvocationConfiguration concatConfiguration) {
+        private AbstractStreamRoutine(@NotNull final InvocationConfiguration initialConfiguration) {
 
             super(InvocationConfiguration.DEFAULT_CONFIGURATION);
-            mConcatConfiguration = concatConfiguration;
+            mConfiguration = initialConfiguration;
         }
 
         @NotNull
@@ -438,7 +438,7 @@ public class Streams {
         @NotNull
         public Builder<? extends StreamRoutine<IN, OUT>> invocations() {
 
-            return new Builder<StreamRoutine<IN, OUT>>(this, mConcatConfiguration);
+            return new Builder<StreamRoutine<IN, OUT>>(this, mConfiguration);
         }
 
         @NotNull
@@ -451,7 +451,7 @@ public class Streams {
                 throw new NullPointerException("the invocation configuration must not be null");
             }
 
-            mConcatConfiguration = configuration;
+            mConfiguration = configuration;
             return this;
         }
 
@@ -469,9 +469,9 @@ public class Streams {
                 @NotNull DelegationType delegationType);
 
         @NotNull
-        protected InvocationConfiguration getConcatConfiguration() {
+        protected InvocationConfiguration getCurrentConfiguration() {
 
-            return mConcatConfiguration;
+            return mConfiguration;
         }
 
         @NotNull
@@ -485,11 +485,9 @@ public class Streams {
                 @NotNull final InvocationFactory<? super OUT, AFTER> factory,
                 @NotNull final DelegationType delegationType) {
 
-            return concat(JRoutine.on(factory)
-                                  .invocations()
-                                  .with(mConcatConfiguration)
-                                  .set()
-                                  .buildRoutine(), delegationType);
+            return concat(
+                    JRoutine.on(factory).invocations().with(mConfiguration).set().buildRoutine(),
+                    delegationType);
         }
 
         @NotNull
@@ -635,18 +633,18 @@ public class Streams {
         /**
          * Constructor.
          *
-         * @param configuration  the routine configuration.
-         * @param routine        the backing routine instance.
-         * @param afterRoutine   the concatenated routine instance.
-         * @param delegationType the concatenated delegation type.
+         * @param initialConfiguration the initial routine configuration.
+         * @param routine              the backing routine instance.
+         * @param afterRoutine         the concatenated routine instance.
+         * @param delegationType       the concatenated delegation type.
          */
         @SuppressWarnings("ConstantConditions")
-        private AfterStreamRoutine(@NotNull final InvocationConfiguration configuration,
+        private AfterStreamRoutine(@NotNull final InvocationConfiguration initialConfiguration,
                 @NotNull final StreamRoutine<IN, OUT> routine,
                 @NotNull final Routine<? super OUT, AFTER> afterRoutine,
                 @NotNull final DelegationType delegationType) {
 
-            super(configuration);
+            super(initialConfiguration);
 
             if (afterRoutine == null) {
 
@@ -664,7 +662,7 @@ public class Streams {
                 @NotNull final Routine<? super AFTER, NEXT> routine,
                 @NotNull final DelegationType delegationType) {
 
-            return new AfterStreamRoutine<IN, AFTER, NEXT>(getConcatConfiguration(), this, routine,
+            return new AfterStreamRoutine<IN, AFTER, NEXT>(getCurrentConfiguration(), this, routine,
                                                            delegationType);
         }
 
@@ -680,7 +678,7 @@ public class Streams {
                 @NotNull final BiConsumer<? super RoutineException, ? super InputChannel<AFTER>>
                         consumer) {
 
-            return new TryCatchStreamRoutine<IN, AFTER>(getConcatConfiguration(), this, consumer);
+            return new TryCatchStreamRoutine<IN, AFTER>(getCurrentConfiguration(), this, consumer);
         }
 
         @NotNull
@@ -689,7 +687,7 @@ public class Streams {
                         Routine<BEFORE, NEXT>> function,
                 @NotNull final DelegationType delegationType) {
 
-            return new DefaultStreamRoutine<BEFORE, NEXT>(getConcatConfiguration(),
+            return new DefaultStreamRoutine<BEFORE, NEXT>(getCurrentConfiguration(),
                                                           function.apply(this), delegationType);
         }
     }
@@ -738,16 +736,16 @@ public class Streams {
         /**
          * Constructor.
          *
-         * @param configuration  the routine configuration.
-         * @param routine        the backing routine instance.
-         * @param delegationType the delegation type.
+         * @param initialConfiguration the initial routine configuration.
+         * @param routine              the backing routine instance.
+         * @param delegationType       the delegation type.
          */
         @SuppressWarnings("ConstantConditions")
-        private DefaultStreamRoutine(@NotNull final InvocationConfiguration configuration,
+        private DefaultStreamRoutine(@NotNull final InvocationConfiguration initialConfiguration,
                 @NotNull final Routine<IN, OUT> routine,
                 @NotNull final DelegationType delegationType) {
 
-            super(configuration);
+            super(initialConfiguration);
             mFactory = factoryFrom(routine, delegationType);
         }
 
@@ -756,7 +754,7 @@ public class Streams {
                 @NotNull final BiConsumer<? super RoutineException, ? super InputChannel<OUT>>
                         consumer) {
 
-            return new TryCatchStreamRoutine<IN, OUT>(getConcatConfiguration(), this, consumer);
+            return new TryCatchStreamRoutine<IN, OUT>(getCurrentConfiguration(), this, consumer);
         }
 
         @NotNull
@@ -765,7 +763,7 @@ public class Streams {
                 @NotNull final Routine<? super OUT, AFTER> routine,
                 @NotNull final DelegationType delegationType) {
 
-            return new AfterStreamRoutine<IN, OUT, AFTER>(getConcatConfiguration(), this, routine,
+            return new AfterStreamRoutine<IN, OUT, AFTER>(getCurrentConfiguration(), this, routine,
                                                           delegationType);
         }
 
@@ -782,7 +780,7 @@ public class Streams {
                         Routine<BEFORE, AFTER>> function,
                 @NotNull final DelegationType delegationType) {
 
-            return new DefaultStreamRoutine<BEFORE, AFTER>(getConcatConfiguration(),
+            return new DefaultStreamRoutine<BEFORE, AFTER>(getCurrentConfiguration(),
                                                            function.apply(this), delegationType);
         }
     }
@@ -1174,17 +1172,17 @@ public class Streams {
         /**
          * Constructor.
          *
-         * @param configuration the routine configuration.
-         * @param routine       the backing routine instance.
-         * @param consumer      the consumer instance.
+         * @param initialConfiguration the initial routine configuration.
+         * @param routine              the backing routine instance.
+         * @param consumer             the consumer instance.
          */
         @SuppressWarnings("ConstantConditions")
-        private TryCatchStreamRoutine(@NotNull final InvocationConfiguration configuration,
+        private TryCatchStreamRoutine(@NotNull final InvocationConfiguration initialConfiguration,
                 @NotNull final Routine<IN, OUT> routine,
                 @NotNull final BiConsumer<? super RoutineException, ? super InputChannel<OUT>>
                         consumer) {
 
-            super(configuration);
+            super(initialConfiguration);
 
             if (consumer == null) {
 
@@ -1200,7 +1198,7 @@ public class Streams {
                 @NotNull final BiConsumer<? super RoutineException, ? super InputChannel<OUT>>
                         consumer) {
 
-            return new TryCatchStreamRoutine<IN, OUT>(getConcatConfiguration(), this, consumer);
+            return new TryCatchStreamRoutine<IN, OUT>(getCurrentConfiguration(), this, consumer);
         }
 
         @NotNull
@@ -1209,7 +1207,7 @@ public class Streams {
                 @NotNull final Routine<? super OUT, AFTER> routine,
                 @NotNull final DelegationType delegationType) {
 
-            return new AfterStreamRoutine<IN, OUT, AFTER>(getConcatConfiguration(), this, routine,
+            return new AfterStreamRoutine<IN, OUT, AFTER>(getCurrentConfiguration(), this, routine,
                                                           delegationType);
         }
 
@@ -1226,7 +1224,7 @@ public class Streams {
                         Routine<BEFORE, AFTER>> function,
                 @NotNull final DelegationType delegationType) {
 
-            return new DefaultStreamRoutine<BEFORE, AFTER>(getConcatConfiguration(),
+            return new DefaultStreamRoutine<BEFORE, AFTER>(getCurrentConfiguration(),
                                                            function.apply(this), delegationType);
         }
     }

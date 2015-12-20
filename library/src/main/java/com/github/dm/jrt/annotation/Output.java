@@ -56,7 +56,7 @@ import java.lang.annotation.Target;
  * </pre>
  * <p/>
  * Note that the transfer mode is specifically chosen through the annotation {@code mode} attribute
- * (it's {@link Output.OutputMode#CHANNEL CHANNEL} by default).
+ * (it's {@link Output.OutputMode#VALUE VALUE} by default).
  * <p/>
  * Remember also that, in order for the annotation to properly work at run time, you will need to
  * add the following rules to your Proguard file (if employing it for shrinking or obfuscation):
@@ -81,7 +81,7 @@ public @interface Output {
      *
      * @return the mode.
      */
-    OutputMode value() default OutputMode.CHANNEL;
+    OutputMode value() default OutputMode.VALUE;
 
     /**
      * Output transfer mode type.<br/>
@@ -90,13 +90,13 @@ public @interface Output {
     enum OutputMode {
 
         /**
-         * Channel mode.<br/>
-         * The variable is just passed to an output channel.
+         * Value mode.<br/>
+         * The variable is just passed to the output channel.
          * <p/>
          * The annotated method must return a superclass of
          * {@link com.github.dm.jrt.channel.Channel.OutputChannel OutputChannel}.
          */
-        CHANNEL,
+        VALUE,
         /**
          * Element mode.<br/>
          * The elements of the result array or iterable are passed one by one to the output channel.

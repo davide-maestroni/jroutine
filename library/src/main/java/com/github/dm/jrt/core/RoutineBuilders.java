@@ -508,35 +508,23 @@ public class RoutineBuilders {
         }
 
         final Class<?> returnType = method.getReturnType();
+
+        if (!returnType.isAssignableFrom(OutputChannel.class)) {
+
+            final String channelClassName = OutputChannel.class.getCanonicalName();
+            throw new IllegalArgumentException(
+                    "[" + method + "] an async output must be a superclass of " + channelClassName);
+        }
+
         OutputMode outputMode = outputAnnotation.value();
 
-        if (outputMode == OutputMode.CHANNEL) {
+        if ((outputMode == OutputMode.ELEMENT) && !targetReturnType.isArray()
+                && !Iterable.class.isAssignableFrom(targetReturnType)) {
 
-            if (!returnType.isAssignableFrom(OutputChannel.class)) {
-
-                final String channelClassName = OutputChannel.class.getCanonicalName();
-                throw new IllegalArgumentException(
-                        "[" + method + "] an async output with mode " + OutputMode.CHANNEL
-                                + " must be a superclass of " + channelClassName);
-            }
-
-        } else { // OutputMode.ELEMENT
-
-            if (!returnType.isAssignableFrom(OutputChannel.class)) {
-
-                final String channelClassName = OutputChannel.class.getCanonicalName();
-                throw new IllegalArgumentException(
-                        "[" + method + "] an async output with mode " + OutputMode.CHANNEL
-                                + " must be a superclass of " + channelClassName);
-            }
-
-            if (!targetReturnType.isArray() && !Iterable.class.isAssignableFrom(targetReturnType)) {
-
-                throw new IllegalArgumentException(
-                        "[" + method + "] an async output with mode " + OutputMode.ELEMENT
-                                + " must be bound to an array or a type implementing an "
-                                + Iterable.class.getCanonicalName());
-            }
+            throw new IllegalArgumentException(
+                    "[" + method + "] an async output with mode " + OutputMode.ELEMENT
+                            + " must be bound to an array or a type implementing an "
+                            + Iterable.class.getCanonicalName());
         }
 
         return outputMode;
@@ -642,10 +630,10 @@ public class RoutineBuilders {
             if (methodInfo == null) {
 
                 final InvocationMode invocationMode = getInvocationMode(proxyMethod);
-                InputMode inputMode = null;
-                OutputMode outputMode = null;
                 final Class<?>[] targetParameterTypes;
                 final Inputs inputsAnnotation = proxyMethod.getAnnotation(Inputs.class);
+                InputMode inputMode = null;
+                OutputMode outputMode = null;
 
                 if (inputsAnnotation != null) {
 
@@ -667,7 +655,7 @@ public class RoutineBuilders {
 
                     targetParameterTypes = inputsAnnotation.value();
                     inputMode = InputMode.CHANNEL;
-                    outputMode = OutputMode.CHANNEL;
+                    outputMode = inputsAnnotation.mode();
 
                 } else {
 
@@ -767,7 +755,6 @@ public class RoutineBuilders {
                         : (invocationMode == InvocationMode.PARALLEL) ? routine.parallelInvoke()
                                 : routine.asyncInvoke();
 
-        // TODO: 12/14/15 support InputMode.COLLECTION and OutputMode.ELEMENT
         if (inputMode == InputMode.CHANNEL) {
 
             invocationChannel.orderByCall();

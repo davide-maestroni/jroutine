@@ -1447,37 +1447,24 @@ public class RoutineProcessor extends AbstractProcessor {
         final TypeMirror returnType = methodElement.getReturnType();
         final TypeMirror erasure = typeUtils.erasure(returnType);
         final TypeMirror targetMirror = typeUtils.erasure(targetMethodElement.getReturnType());
+
+        if (!typeUtils.isAssignable(outputChannelType, erasure)) {
+
+            throw new IllegalArgumentException(
+                    "[" + methodElement.getEnclosingElement() + "." + methodElement
+                            + "] an async output must be a superclass of " + outputChannelType);
+        }
+
         OutputMode outputMode = methodElement.getAnnotation(Output.class).value();
 
-        if (outputMode == OutputMode.CHANNEL) {
+        if ((outputMode == OutputMode.ELEMENT) && (targetMirror != null) && (targetMirror.getKind()
+                != TypeKind.ARRAY) && !typeUtils.isAssignable(targetMirror, iterableType)) {
 
-            if (!typeUtils.isAssignable(outputChannelType, erasure)) {
-
-                throw new IllegalArgumentException(
-                        "[" + methodElement.getEnclosingElement() + "." + methodElement
-                                + "] an async output with mode " + OutputMode.CHANNEL
-                                + " must be a superclass of " + outputChannelType);
-            }
-
-        } else { // OutputMode.ELEMENT
-
-            if (!typeUtils.isAssignable(outputChannelType, erasure)) {
-
-                throw new IllegalArgumentException(
-                        "[" + methodElement.getEnclosingElement() + "." + methodElement
-                                + "] an async output with mode " + OutputMode.CHANNEL
-                                + " must be a superclass of " + outputChannelType);
-            }
-
-            if ((targetMirror != null) && (targetMirror.getKind() != TypeKind.ARRAY)
-                    && !typeUtils.isAssignable(targetMirror, iterableType)) {
-
-                throw new IllegalArgumentException(
-                        "[" + methodElement.getEnclosingElement() + "." + methodElement
-                                + "] an async output with mode " + OutputMode.ELEMENT
-                                + " must be bound to an array or a type implementing an "
-                                + iterableType);
-            }
+            throw new IllegalArgumentException(
+                    "[" + methodElement.getEnclosingElement() + "." + methodElement
+                            + "] an async output with mode " + OutputMode.ELEMENT
+                            + " must be bound to an array or a type implementing an "
+                            + iterableType);
         }
 
         return outputMode;
@@ -1987,8 +1974,6 @@ public class RoutineProcessor extends AbstractProcessor {
             final int count) throws IOException {
 
         final Types typeUtils = processingEnv.getTypeUtils();
-        final TypeMirror outputChannelType = this.outputChannelType;
-        final TypeMirror objectType = this.objectType;
         final ExecutableElement targetMethod = findMatchingMethod(methodElement, targetElement);
         TypeMirror targetReturnType = targetMethod.getReturnType();
         final boolean isVoid = (targetReturnType.getKind() == TypeKind.VOID);
@@ -1999,7 +1984,6 @@ public class RoutineProcessor extends AbstractProcessor {
                 (invocationAnnotation != null) ? getInvocationMode(methodElement,
                                                                    invocationAnnotation) : null;
         InputMode inputMode = null;
-        OutputMode outputMode = null;
 
         final List<? extends VariableElement> parameters = methodElement.getParameters();
 
@@ -2015,14 +1999,10 @@ public class RoutineProcessor extends AbstractProcessor {
             inputMode = getInputMode(methodElement, annotation, parameter, parameters.size());
         }
 
+        OutputMode outputMode = null;
         String method;
 
         if (inputsAnnotation != null) {
-
-            if (outputAnnotation != null) {
-
-                getOutputMode(methodElement, targetMethod);
-            }
 
             if (!methodElement.getParameters().isEmpty()) {
 
@@ -2041,8 +2021,20 @@ public class RoutineProcessor extends AbstractProcessor {
                         "the proxy method has incompatible return type: " + methodElement);
             }
 
+            final List<? extends TypeMirror> typeArguments =
+                    ((DeclaredType) returnType).getTypeArguments();
+
+            if (typeArguments.isEmpty()) {
+
+                targetReturnType = objectType;
+
+            } else {
+
+                targetReturnType = typeArguments.get(1);
+            }
+
             inputMode = InputMode.CHANNEL;
-            outputMode = OutputMode.CHANNEL;
+            outputMode = inputsAnnotation.mode();
 
             if (typeUtils.isAssignable(invocationChannelType, returnErasure)) {
 
@@ -2057,31 +2049,30 @@ public class RoutineProcessor extends AbstractProcessor {
 
         } else if (outputAnnotation != null) {
 
-            outputMode = getOutputMode(methodElement, targetMethod);
             final TypeMirror returnType = methodElement.getReturnType();
             final TypeMirror returnTypeErasure = typeUtils.erasure(returnType);
 
-            if (typeUtils.isAssignable(outputChannelType, returnTypeErasure)) {
+            if (!typeUtils.isAssignable(outputChannelType, returnTypeErasure)) {
 
-                final List<? extends TypeMirror> typeArguments =
-                        ((DeclaredType) returnType).getTypeArguments();
+                throw new IllegalArgumentException(
+                        "the proxy method has incompatible return type: " + methodElement);
+            }
 
-                if (typeArguments.isEmpty()) {
+            final List<? extends TypeMirror> typeArguments =
+                    ((DeclaredType) returnType).getTypeArguments();
 
-                    targetReturnType = objectType;
+            if (typeArguments.isEmpty()) {
 
-                } else {
-
-                    targetReturnType = typeArguments.get(0);
-                }
-
-                method = getMethodAsyncTemplate(annotationElement, element, targetElement,
-                                                methodElement, count);
+                targetReturnType = objectType;
 
             } else {
 
-                throw new IllegalArgumentException("[" + methodElement + "] invalid return type");
+                targetReturnType = typeArguments.get(0);
             }
+
+            method =
+                    getMethodAsyncTemplate(annotationElement, element, targetElement, methodElement,
+                                           count);
 
         } else if (isVoid) {
 
@@ -2093,6 +2084,11 @@ public class RoutineProcessor extends AbstractProcessor {
             targetReturnType = methodElement.getReturnType();
             method = getMethodResultTemplate(annotationElement, element, targetElement,
                                              methodElement, count);
+        }
+
+        if (outputAnnotation != null) {
+
+            outputMode = getOutputMode(methodElement, targetMethod);
         }
 
         if ((invocationMode == InvocationMode.PARALLEL) && (targetMethod.getParameters().size()

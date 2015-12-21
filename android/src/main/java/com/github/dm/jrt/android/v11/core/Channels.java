@@ -50,7 +50,7 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <IN> IOChannel<Selectable<? extends IN>, Selectable<? extends IN>> combine(
+    public static <IN> IOChannel<Selectable<? extends IN>> combine(
             @NotNull final SparseArray<? extends InputChannel<? extends IN>> channels) {
 
         final int size = channels.size();
@@ -60,17 +60,16 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
             throw new IllegalArgumentException("the map of channels must not be empty");
         }
 
-        final SparseArray<IOChannel<?, ?>> channelMap = new SparseArray<IOChannel<?, ?>>(size);
+        final SparseArray<IOChannel<?>> channelMap = new SparseArray<IOChannel<?>>(size);
 
         for (int i = 0; i < size; ++i) {
 
-            final IOChannel<?, ?> ioChannel = JRoutine.io().buildChannel();
+            final IOChannel<?> ioChannel = JRoutine.io().buildChannel();
             ioChannel.passTo(((InputChannel<Object>) channels.valueAt(i)));
             channelMap.put(channels.keyAt(i), ioChannel);
         }
 
-        final IOChannel<Selectable<? extends IN>, Selectable<? extends IN>> ioChannel =
-                JRoutine.io().buildChannel();
+        final IOChannel<Selectable<? extends IN>> ioChannel = JRoutine.io().buildChannel();
         ioChannel.passTo(new SortingMapOutputConsumer(channelMap));
         return ioChannel;
     }
@@ -95,8 +94,7 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
             throw new IllegalArgumentException("the map of channels must not be empty");
         }
 
-        final IOChannel<ParcelableSelectable<OUT>, ParcelableSelectable<OUT>> ioChannel =
-                JRoutine.io().buildChannel();
+        final IOChannel<ParcelableSelectable<OUT>> ioChannel = JRoutine.io().buildChannel();
 
         for (int i = 0; i < size; ++i) {
 
@@ -119,12 +117,12 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
      * @return the map of indexes and I/O channels.
      */
     @NotNull
-    public static <DATA, IN extends DATA> SparseArray<IOChannel<IN, IN>> selectParcelable(
+    public static <DATA, IN extends DATA> SparseArray<IOChannel<IN>> selectParcelable(
             @NotNull final InputChannel<? super ParcelableSelectable<DATA>> channel,
             @NotNull final int... indexes) {
 
         final int size = indexes.length;
-        final SparseArray<IOChannel<IN, IN>> channelMap = new SparseArray<IOChannel<IN, IN>>(size);
+        final SparseArray<IOChannel<IN>> channelMap = new SparseArray<IOChannel<IN>>(size);
 
         for (final int index : indexes) {
 
@@ -147,11 +145,11 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
      * @return the map of indexes and I/O channels.
      */
     @NotNull
-    public static <DATA, IN extends DATA> SparseArray<IOChannel<IN, IN>> selectParcelable(
+    public static <DATA, IN extends DATA> SparseArray<IOChannel<IN>> selectParcelable(
             @NotNull final InputChannel<? super ParcelableSelectable<DATA>> channel,
             @NotNull final Iterable<Integer> indexes) {
 
-        final SparseArray<IOChannel<IN, IN>> channelMap = new SparseArray<IOChannel<IN, IN>>();
+        final SparseArray<IOChannel<IN>> channelMap = new SparseArray<IOChannel<IN>>();
 
         for (final Integer index : indexes) {
 
@@ -176,7 +174,7 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
      * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
      */
     @NotNull
-    public static <DATA, IN extends DATA> SparseArray<IOChannel<IN, IN>> selectParcelable(
+    public static <DATA, IN extends DATA> SparseArray<IOChannel<IN>> selectParcelable(
             final int startIndex, final int rangeSize,
             @NotNull final InputChannel<? super ParcelableSelectable<DATA>> channel) {
 
@@ -185,8 +183,7 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
             throw new IllegalArgumentException("invalid range size: " + rangeSize);
         }
 
-        final SparseArray<IOChannel<IN, IN>> channelMap =
-                new SparseArray<IOChannel<IN, IN>>(rangeSize);
+        final SparseArray<IOChannel<IN>> channelMap = new SparseArray<IOChannel<IN>>(rangeSize);
 
         for (int index = startIndex; index < rangeSize; index++) {
 
@@ -218,15 +215,14 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
             throw new IllegalArgumentException("invalid range size: " + rangeSize);
         }
 
-        final SparseArray<IOChannel<OUT, OUT>> inputMap =
-                new SparseArray<IOChannel<OUT, OUT>>(rangeSize);
+        final SparseArray<IOChannel<OUT>> inputMap = new SparseArray<IOChannel<OUT>>(rangeSize);
         final SparseArray<OutputChannel<OUT>> outputMap =
                 new SparseArray<OutputChannel<OUT>>(rangeSize);
 
         for (int index = startIndex; index < rangeSize; index++) {
 
             final Integer integer = index;
-            final IOChannel<OUT, OUT> ioChannel = JRoutine.io().buildChannel();
+            final IOChannel<OUT> ioChannel = JRoutine.io().buildChannel();
             inputMap.put(integer, ioChannel);
             outputMap.put(integer, ioChannel);
         }
@@ -251,13 +247,12 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
             @NotNull final int... indexes) {
 
         final int size = indexes.length;
-        final SparseArray<IOChannel<OUT, OUT>> inputMap =
-                new SparseArray<IOChannel<OUT, OUT>>(size);
+        final SparseArray<IOChannel<OUT>> inputMap = new SparseArray<IOChannel<OUT>>(size);
         final SparseArray<OutputChannel<OUT>> outputMap = new SparseArray<OutputChannel<OUT>>(size);
 
         for (final Integer index : indexes) {
 
-            final IOChannel<OUT, OUT> ioChannel = JRoutine.io().buildChannel();
+            final IOChannel<OUT> ioChannel = JRoutine.io().buildChannel();
             inputMap.put(index, ioChannel);
             outputMap.put(index, ioChannel);
         }
@@ -281,12 +276,12 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
             @NotNull final OutputChannel<? extends ParcelableSelectable<? extends OUT>> channel,
             @NotNull final Iterable<Integer> indexes) {
 
-        final SparseArray<IOChannel<OUT, OUT>> inputMap = new SparseArray<IOChannel<OUT, OUT>>();
+        final SparseArray<IOChannel<OUT>> inputMap = new SparseArray<IOChannel<OUT>>();
         final SparseArray<OutputChannel<OUT>> outputMap = new SparseArray<OutputChannel<OUT>>();
 
         for (final Integer index : indexes) {
 
-            final IOChannel<OUT, OUT> ioChannel = JRoutine.io().buildChannel();
+            final IOChannel<OUT> ioChannel = JRoutine.io().buildChannel();
             inputMap.put(index, ioChannel);
             outputMap.put(index, ioChannel);
         }
@@ -303,21 +298,21 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
     private static class SortingMapOutputConsumer<OUT>
             implements OutputConsumer<ParcelableSelectable<? extends OUT>> {
 
-        private final SparseArray<IOChannel<OUT, OUT>> mChannels;
+        private final SparseArray<IOChannel<OUT>> mChannels;
 
         /**
          * Constructor.
          *
          * @param channels the map of indexes and I/O channels.
          */
-        private SortingMapOutputConsumer(@NotNull final SparseArray<IOChannel<OUT, OUT>> channels) {
+        private SortingMapOutputConsumer(@NotNull final SparseArray<IOChannel<OUT>> channels) {
 
             mChannels = channels;
         }
 
         public void onComplete() {
 
-            final SparseArray<IOChannel<OUT, OUT>> channels = mChannels;
+            final SparseArray<IOChannel<OUT>> channels = mChannels;
             final int size = channels.size();
 
             for (int i = 0; i < size; ++i) {
@@ -328,7 +323,7 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
 
         public void onError(@Nullable final RoutineException error) {
 
-            final SparseArray<IOChannel<OUT, OUT>> channels = mChannels;
+            final SparseArray<IOChannel<OUT>> channels = mChannels;
             final int size = channels.size();
 
             for (int i = 0; i < size; ++i) {
@@ -339,7 +334,7 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
 
         public void onOutput(final ParcelableSelectable<? extends OUT> selectable) {
 
-            final IOChannel<OUT, OUT> channel = mChannels.get(selectable.index);
+            final IOChannel<OUT> channel = mChannels.get(selectable.index);
 
             if (channel != null) {
 

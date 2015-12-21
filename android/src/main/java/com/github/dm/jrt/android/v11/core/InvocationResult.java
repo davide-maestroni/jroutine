@@ -67,7 +67,7 @@ interface InvocationResult<OUT> {
      *                        aborted while passing the results.
      * @return whether the invocation is complete.
      */
-    boolean passTo(@NotNull Collection<IOChannel<OUT, OUT>> newChannels,
-            @NotNull Collection<IOChannel<OUT, OUT>> oldChannels,
-            @NotNull Collection<IOChannel<OUT, OUT>> abortedChannels);
+    boolean passTo(@NotNull Collection<IOChannel<OUT>> newChannels,
+            @NotNull Collection<IOChannel<OUT>> oldChannels,
+            @NotNull Collection<IOChannel<OUT>> abortedChannels);
 }

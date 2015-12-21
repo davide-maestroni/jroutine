@@ -52,16 +52,16 @@ public class ParcelableByteChannel {
     private final ByteChannel mByteChannel;
 
     private final WeakIdentityHashMap<InputChannel<? super ParcelableByteBuffer>,
-            IOChannel<ByteBuffer, ByteBuffer>>
+            IOChannel<ByteBuffer>>
             mChannels =
             new WeakIdentityHashMap<InputChannel<? super ParcelableByteBuffer>,
-                    IOChannel<ByteBuffer, ByteBuffer>>();
+                    IOChannel<ByteBuffer>>();
 
-    private final WeakIdentityHashMap<IOChannel<? super ParcelableByteBuffer, ?>,
-            IOChannel<ByteBuffer, ByteBuffer>>
+    private final WeakIdentityHashMap<IOChannel<? super ParcelableByteBuffer>,
+            IOChannel<ByteBuffer>>
             mIOChannels =
-            new WeakIdentityHashMap<IOChannel<? super ParcelableByteBuffer, ?>,
-                    IOChannel<ByteBuffer, ByteBuffer>>();
+            new WeakIdentityHashMap<IOChannel<? super ParcelableByteBuffer>,
+                    IOChannel<ByteBuffer>>();
 
     /**
      * Constructor.
@@ -233,12 +233,12 @@ public class ParcelableByteChannel {
     public BufferOutputStream passTo(
             @NotNull final InputChannel<? super ParcelableByteBuffer> channel) {
 
-        IOChannel<ByteBuffer, ByteBuffer> ioChannel;
+        IOChannel<ByteBuffer> ioChannel;
 
         synchronized (mChannels) {
 
             final WeakIdentityHashMap<InputChannel<? super ParcelableByteBuffer>,
-                    IOChannel<ByteBuffer, ByteBuffer>>
+                    IOChannel<ByteBuffer>>
                     channels = mChannels;
             ioChannel = channels.get(channel);
 
@@ -263,14 +263,14 @@ public class ParcelableByteChannel {
      */
     @NotNull
     public BufferOutputStream passTo(
-            @NotNull final IOChannel<? super ParcelableByteBuffer, ?> channel) {
+            @NotNull final IOChannel<? super ParcelableByteBuffer> channel) {
 
-        IOChannel<ByteBuffer, ByteBuffer> ioChannel;
+        IOChannel<ByteBuffer> ioChannel;
 
         synchronized (mIOChannels) {
 
-            final WeakIdentityHashMap<IOChannel<? super ParcelableByteBuffer, ?>,
-                    IOChannel<ByteBuffer, ByteBuffer>>
+            final WeakIdentityHashMap<IOChannel<? super ParcelableByteBuffer>,
+                    IOChannel<ByteBuffer>>
                     channels = mIOChannels;
             ioChannel = channels.get(channel);
 
@@ -315,8 +315,7 @@ public class ParcelableByteChannel {
 
                         if (data.length > 0) {
 
-                            final IOChannel<ByteBuffer, ByteBuffer> ioChannel =
-                                    JRoutine.io().buildChannel();
+                            final IOChannel<ByteBuffer> ioChannel = JRoutine.io().buildChannel();
                             final BufferOutputStream outputStream =
                                     ByteChannel.byteChannel(data.length).passTo(ioChannel);
 
@@ -524,7 +523,7 @@ public class ParcelableByteChannel {
      */
     private static class IOBufferOutputConsumer implements OutputConsumer<ByteBuffer> {
 
-        private final IOChannel<? super ParcelableByteBuffer, ?> mChannel;
+        private final IOChannel<? super ParcelableByteBuffer> mChannel;
 
         /**
          * Constructor.
@@ -533,7 +532,7 @@ public class ParcelableByteChannel {
          */
         @SuppressWarnings("ConstantConditions")
         private IOBufferOutputConsumer(
-                @NotNull final IOChannel<? super ParcelableByteBuffer, ?> channel) {
+                @NotNull final IOChannel<? super ParcelableByteBuffer> channel) {
 
             if (channel == null) {
 

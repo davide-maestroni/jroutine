@@ -51,7 +51,7 @@ public class ChannelsCompat extends Channels {
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <IN> IOChannel<Selectable<? extends IN>, Selectable<? extends IN>> combine(
+    public static <IN> IOChannel<Selectable<? extends IN>> combine(
             @NotNull final SparseArrayCompat<? extends InputChannel<? extends IN>> channels) {
 
         final int size = channels.size();
@@ -61,18 +61,17 @@ public class ChannelsCompat extends Channels {
             throw new IllegalArgumentException("the map of channels must not be empty");
         }
 
-        final SparseArrayCompat<IOChannel<?, ?>> channelMap =
-                new SparseArrayCompat<IOChannel<?, ?>>(size);
+        final SparseArrayCompat<IOChannel<?>> channelMap =
+                new SparseArrayCompat<IOChannel<?>>(size);
 
         for (int i = 0; i < size; ++i) {
 
-            final IOChannel<?, ?> ioChannel = JRoutineCompat.io().buildChannel();
+            final IOChannel<?> ioChannel = JRoutineCompat.io().buildChannel();
             ioChannel.passTo(((InputChannel<Object>) channels.valueAt(i)));
             channelMap.put(channels.keyAt(i), ioChannel);
         }
 
-        final IOChannel<Selectable<? extends IN>, Selectable<? extends IN>> ioChannel =
-                JRoutineCompat.io().buildChannel();
+        final IOChannel<Selectable<? extends IN>> ioChannel = JRoutineCompat.io().buildChannel();
         ioChannel.passTo(new SortingMapOutputConsumer(channelMap));
         return ioChannel;
     }
@@ -97,8 +96,7 @@ public class ChannelsCompat extends Channels {
             throw new IllegalArgumentException("the map of channels must not be empty");
         }
 
-        final IOChannel<ParcelableSelectable<OUT>, ParcelableSelectable<OUT>> ioChannel =
-                JRoutineCompat.io().buildChannel();
+        final IOChannel<ParcelableSelectable<OUT>> ioChannel = JRoutineCompat.io().buildChannel();
 
         for (int i = 0; i < size; ++i) {
 
@@ -121,13 +119,13 @@ public class ChannelsCompat extends Channels {
      * @return the map of indexes and I/O channels.
      */
     @NotNull
-    public static <DATA, IN extends DATA> SparseArrayCompat<IOChannel<IN, IN>> selectParcelable(
+    public static <DATA, IN extends DATA> SparseArrayCompat<IOChannel<IN>> selectParcelable(
             @NotNull final InputChannel<? super ParcelableSelectable<DATA>> channel,
             @NotNull final int... indexes) {
 
         final int size = indexes.length;
-        final SparseArrayCompat<IOChannel<IN, IN>> channelMap =
-                new SparseArrayCompat<IOChannel<IN, IN>>(size);
+        final SparseArrayCompat<IOChannel<IN>> channelMap =
+                new SparseArrayCompat<IOChannel<IN>>(size);
 
         for (final int index : indexes) {
 
@@ -150,12 +148,11 @@ public class ChannelsCompat extends Channels {
      * @return the map of indexes and I/O channels.
      */
     @NotNull
-    public static <DATA, IN extends DATA> SparseArrayCompat<IOChannel<IN, IN>> selectParcelable(
+    public static <DATA, IN extends DATA> SparseArrayCompat<IOChannel<IN>> selectParcelable(
             @NotNull final InputChannel<? super ParcelableSelectable<DATA>> channel,
             @NotNull final Iterable<Integer> indexes) {
 
-        final SparseArrayCompat<IOChannel<IN, IN>> channelMap =
-                new SparseArrayCompat<IOChannel<IN, IN>>();
+        final SparseArrayCompat<IOChannel<IN>> channelMap = new SparseArrayCompat<IOChannel<IN>>();
 
         for (final Integer index : indexes) {
 
@@ -180,7 +177,7 @@ public class ChannelsCompat extends Channels {
      * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
      */
     @NotNull
-    public static <DATA, IN extends DATA> SparseArrayCompat<IOChannel<IN, IN>> selectParcelable(
+    public static <DATA, IN extends DATA> SparseArrayCompat<IOChannel<IN>> selectParcelable(
             final int startIndex, final int rangeSize,
             @NotNull final InputChannel<? super ParcelableSelectable<DATA>> channel) {
 
@@ -189,8 +186,8 @@ public class ChannelsCompat extends Channels {
             throw new IllegalArgumentException("invalid range size: " + rangeSize);
         }
 
-        final SparseArrayCompat<IOChannel<IN, IN>> channelMap =
-                new SparseArrayCompat<IOChannel<IN, IN>>(rangeSize);
+        final SparseArrayCompat<IOChannel<IN>> channelMap =
+                new SparseArrayCompat<IOChannel<IN>>(rangeSize);
 
         for (int index = startIndex; index < rangeSize; index++) {
 
@@ -216,14 +213,14 @@ public class ChannelsCompat extends Channels {
             @NotNull final int... indexes) {
 
         final int size = indexes.length;
-        final SparseArrayCompat<IOChannel<OUT, OUT>> inputMap =
-                new SparseArrayCompat<IOChannel<OUT, OUT>>(size);
+        final SparseArrayCompat<IOChannel<OUT>> inputMap =
+                new SparseArrayCompat<IOChannel<OUT>>(size);
         final SparseArrayCompat<OutputChannel<OUT>> outputMap =
                 new SparseArrayCompat<OutputChannel<OUT>>(size);
 
         for (final Integer index : indexes) {
 
-            final IOChannel<OUT, OUT> ioChannel = JRoutineCompat.io().buildChannel();
+            final IOChannel<OUT> ioChannel = JRoutineCompat.io().buildChannel();
             inputMap.put(index, ioChannel);
             outputMap.put(index, ioChannel);
         }
@@ -254,15 +251,15 @@ public class ChannelsCompat extends Channels {
             throw new IllegalArgumentException("invalid range size: " + rangeSize);
         }
 
-        final SparseArrayCompat<IOChannel<OUT, OUT>> inputMap =
-                new SparseArrayCompat<IOChannel<OUT, OUT>>(rangeSize);
+        final SparseArrayCompat<IOChannel<OUT>> inputMap =
+                new SparseArrayCompat<IOChannel<OUT>>(rangeSize);
         final SparseArrayCompat<OutputChannel<OUT>> outputMap =
                 new SparseArrayCompat<OutputChannel<OUT>>(rangeSize);
 
         for (int index = startIndex; index < rangeSize; index++) {
 
             final Integer integer = index;
-            final IOChannel<OUT, OUT> ioChannel = JRoutineCompat.io().buildChannel();
+            final IOChannel<OUT> ioChannel = JRoutineCompat.io().buildChannel();
             inputMap.put(integer, ioChannel);
             outputMap.put(integer, ioChannel);
         }
@@ -286,14 +283,13 @@ public class ChannelsCompat extends Channels {
             @NotNull final OutputChannel<? extends ParcelableSelectable<? extends OUT>> channel,
             @NotNull final Iterable<Integer> indexes) {
 
-        final SparseArrayCompat<IOChannel<OUT, OUT>> inputMap =
-                new SparseArrayCompat<IOChannel<OUT, OUT>>();
+        final SparseArrayCompat<IOChannel<OUT>> inputMap = new SparseArrayCompat<IOChannel<OUT>>();
         final SparseArrayCompat<OutputChannel<OUT>> outputMap =
                 new SparseArrayCompat<OutputChannel<OUT>>();
 
         for (final Integer index : indexes) {
 
-            final IOChannel<OUT, OUT> ioChannel = JRoutineCompat.io().buildChannel();
+            final IOChannel<OUT> ioChannel = JRoutineCompat.io().buildChannel();
             inputMap.put(index, ioChannel);
             outputMap.put(index, ioChannel);
         }
@@ -310,7 +306,7 @@ public class ChannelsCompat extends Channels {
     private static class SortingMapOutputConsumer<OUT>
             implements OutputConsumer<ParcelableSelectable<? extends OUT>> {
 
-        private final SparseArrayCompat<IOChannel<OUT, OUT>> mChannels;
+        private final SparseArrayCompat<IOChannel<OUT>> mChannels;
 
         /**
          * Constructor.
@@ -318,14 +314,14 @@ public class ChannelsCompat extends Channels {
          * @param channels the map of indexes and I/O channels.
          */
         private SortingMapOutputConsumer(
-                @NotNull final SparseArrayCompat<IOChannel<OUT, OUT>> channels) {
+                @NotNull final SparseArrayCompat<IOChannel<OUT>> channels) {
 
             mChannels = channels;
         }
 
         public void onComplete() {
 
-            final SparseArrayCompat<IOChannel<OUT, OUT>> channels = mChannels;
+            final SparseArrayCompat<IOChannel<OUT>> channels = mChannels;
             final int size = channels.size();
 
             for (int i = 0; i < size; ++i) {
@@ -336,7 +332,7 @@ public class ChannelsCompat extends Channels {
 
         public void onError(@Nullable final RoutineException error) {
 
-            final SparseArrayCompat<IOChannel<OUT, OUT>> channels = mChannels;
+            final SparseArrayCompat<IOChannel<OUT>> channels = mChannels;
             final int size = channels.size();
 
             for (int i = 0; i < size; ++i) {
@@ -347,7 +343,7 @@ public class ChannelsCompat extends Channels {
 
         public void onOutput(final ParcelableSelectable<? extends OUT> selectable) {
 
-            final IOChannel<OUT, OUT> channel = mChannels.get(selectable.index);
+            final IOChannel<OUT> channel = mChannels.get(selectable.index);
 
             if (channel != null) {
 

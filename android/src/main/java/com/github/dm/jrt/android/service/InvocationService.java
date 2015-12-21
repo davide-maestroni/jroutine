@@ -880,7 +880,7 @@ public class InvocationService extends Service {
 
         private final String mId;
 
-        private final IOChannel<Object, Object> mIoChannel;
+        private final IOChannel<Object> mIoChannel;
 
         private final RoutineInfo mRoutineInfo;
 
@@ -902,7 +902,7 @@ public class InvocationService extends Service {
             mChannel = channel;
             mRoutineInfo = info;
             mRoutineState = state;
-            final IOChannel<Object, Object> ioChannel = (mIoChannel = JRoutine.io().buildChannel());
+            final IOChannel<Object> ioChannel = (mIoChannel = JRoutine.io().buildChannel());
             channel.pass(ioChannel);
         }
 

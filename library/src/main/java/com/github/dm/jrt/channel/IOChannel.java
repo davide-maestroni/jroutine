@@ -33,130 +33,129 @@ import java.util.concurrent.TimeUnit;
  * <p/>
  * Created by davide-maestroni on 09/24/2015.
  *
- * @param <IN>  the input data type.
- * @param <OUT> the output data type.
+ * @param <DATA> the data type.
  */
-public interface IOChannel<IN, OUT> extends InputChannel<IN>, OutputChannel<OUT> {
+public interface IOChannel<DATA> extends InputChannel<DATA>, OutputChannel<DATA> {
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    IOChannel<IN, OUT> after(@NotNull TimeDuration delay);
+    IOChannel<DATA> after(@NotNull TimeDuration delay);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    IOChannel<IN, OUT> after(long delay, @NotNull TimeUnit timeUnit);
+    IOChannel<DATA> after(long delay, @NotNull TimeUnit timeUnit);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    IOChannel<IN, OUT> now();
+    IOChannel<DATA> now();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    IOChannel<IN, OUT> orderByCall();
+    IOChannel<DATA> orderByCall();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    IOChannel<IN, OUT> orderByChance();
+    IOChannel<DATA> orderByChance();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    IOChannel<IN, OUT> orderByDelay();
+    IOChannel<DATA> orderByDelay();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    IOChannel<IN, OUT> pass(@Nullable OutputChannel<? extends IN> channel);
+    IOChannel<DATA> pass(@Nullable OutputChannel<? extends DATA> channel);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    IOChannel<IN, OUT> pass(@Nullable Iterable<? extends IN> inputs);
+    IOChannel<DATA> pass(@Nullable Iterable<? extends DATA> inputs);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    IOChannel<IN, OUT> pass(@Nullable IN input);
+    IOChannel<DATA> pass(@Nullable DATA input);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    IOChannel<IN, OUT> pass(@Nullable IN... inputs);
+    IOChannel<DATA> pass(@Nullable DATA... inputs);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    IOChannel<IN, OUT> afterMax(@NotNull TimeDuration timeout);
+    IOChannel<DATA> afterMax(@NotNull TimeDuration timeout);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    IOChannel<IN, OUT> afterMax(long timeout, @NotNull TimeUnit timeUnit);
+    IOChannel<DATA> afterMax(long timeout, @NotNull TimeUnit timeUnit);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    IOChannel<IN, OUT> allInto(@NotNull Collection<? super OUT> results);
+    IOChannel<DATA> allInto(@NotNull Collection<? super DATA> results);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    IOChannel<IN, OUT> eventuallyAbort();
+    IOChannel<DATA> eventuallyAbort();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    IOChannel<IN, OUT> eventuallyAbort(@Nullable Throwable reason);
+    IOChannel<DATA> eventuallyAbort(@Nullable Throwable reason);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    IOChannel<IN, OUT> eventuallyExit();
+    IOChannel<DATA> eventuallyExit();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    IOChannel<IN, OUT> eventuallyThrow();
+    IOChannel<DATA> eventuallyThrow();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    IOChannel<IN, OUT> immediately();
+    IOChannel<DATA> immediately();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    IOChannel<IN, OUT> passTo(@NotNull OutputConsumer<? super OUT> consumer);
+    IOChannel<DATA> passTo(@NotNull OutputConsumer<? super DATA> consumer);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    IOChannel<IN, OUT> skip(int count);
+    IOChannel<DATA> skip(int count);
 
     /**
      * Returns this channel as an input one.
@@ -164,7 +163,7 @@ public interface IOChannel<IN, OUT> extends InputChannel<IN>, OutputChannel<OUT>
      * @return this channel.
      */
     @NotNull
-    InputChannel<IN> asInput();
+    InputChannel<DATA> asInput();
 
     /**
      * Returns this channel as an output one.
@@ -172,7 +171,7 @@ public interface IOChannel<IN, OUT> extends InputChannel<IN>, OutputChannel<OUT>
      * @return this channel.
      */
     @NotNull
-    OutputChannel<OUT> asOutput();
+    OutputChannel<DATA> asOutput();
 
     /**
      * Closes the channel input.<br/>
@@ -183,5 +182,5 @@ public interface IOChannel<IN, OUT> extends InputChannel<IN>, OutputChannel<OUT>
      * @return this channel.
      */
     @NotNull
-    IOChannel<IN, OUT> close();
+    IOChannel<DATA> close();
 }

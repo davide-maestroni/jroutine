@@ -659,11 +659,9 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
     private static class RoutineLoaderCallbacks<OUT>
             implements LoaderCallbacks<InvocationResult<OUT>> {
 
-        private final ArrayList<IOChannel<OUT, OUT>> mAbortedChannels =
-                new ArrayList<IOChannel<OUT, OUT>>();
+        private final ArrayList<IOChannel<OUT>> mAbortedChannels = new ArrayList<IOChannel<OUT>>();
 
-        private final ArrayList<IOChannel<OUT, OUT>> mChannels =
-                new ArrayList<IOChannel<OUT, OUT>>();
+        private final ArrayList<IOChannel<OUT>> mChannels = new ArrayList<IOChannel<OUT>>();
 
         private final InvocationLoader<?, OUT> mLoader;
 
@@ -671,8 +669,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
 
         private final Logger mLogger;
 
-        private final ArrayList<IOChannel<OUT, OUT>> mNewChannels =
-                new ArrayList<IOChannel<OUT, OUT>>();
+        private final ArrayList<IOChannel<OUT>> mNewChannels = new ArrayList<IOChannel<OUT>>();
 
         private CacheStrategyType mCacheStrategyType;
 
@@ -704,15 +701,15 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
 
             final Logger logger = mLogger;
             final InvocationLoader<?, OUT> internalLoader = mLoader;
-            final ArrayList<IOChannel<OUT, OUT>> channels = mChannels;
-            final ArrayList<IOChannel<OUT, OUT>> newChannels = mNewChannels;
-            final ArrayList<IOChannel<OUT, OUT>> abortedChannels = mAbortedChannels;
+            final ArrayList<IOChannel<OUT>> channels = mChannels;
+            final ArrayList<IOChannel<OUT>> newChannels = mNewChannels;
+            final ArrayList<IOChannel<OUT>> abortedChannels = mAbortedChannels;
             logger.dbg("dispatching invocation result: %s", data);
 
             if (data.passTo(newChannels, channels, abortedChannels)) {
 
-                final ArrayList<IOChannel<OUT, OUT>> channelsToClose =
-                        new ArrayList<IOChannel<OUT, OUT>>(channels);
+                final ArrayList<IOChannel<OUT>> channelsToClose =
+                        new ArrayList<IOChannel<OUT>>(channels);
                 channelsToClose.addAll(newChannels);
                 mResultCount += channels.size() + newChannels.size();
                 channels.clear();
@@ -739,14 +736,14 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
 
                     final RoutineException exception = data.getAbortException();
 
-                    for (final IOChannel<OUT, OUT> channel : channelsToClose) {
+                    for (final IOChannel<OUT> channel : channelsToClose) {
 
                         channel.abort(exception);
                     }
 
                 } else {
 
-                    for (final IOChannel<OUT, OUT> channel : channelsToClose) {
+                    for (final IOChannel<OUT> channel : channelsToClose) {
 
                         channel.close();
                     }
@@ -778,15 +775,15 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
             final Logger logger = mLogger;
             logger.dbg("creating new result channel");
             final InvocationLoader<?, OUT> internalLoader = mLoader;
-            final ArrayList<IOChannel<OUT, OUT>> channels = mNewChannels;
-            final IOChannel<OUT, OUT> channel = JRoutine.io()
-                                                        .channels()
-                                                        .withChannelMaxSize(Integer.MAX_VALUE)
-                                                        .withChannelTimeout(TimeDuration.ZERO)
-                                                        .withLog(logger.getLog())
-                                                        .withLogLevel(logger.getLogLevel())
-                                                        .set()
-                                                        .buildChannel();
+            final ArrayList<IOChannel<OUT>> channels = mNewChannels;
+            final IOChannel<OUT> channel = JRoutine.io()
+                                                   .channels()
+                                                   .withChannelMaxSize(Integer.MAX_VALUE)
+                                                   .withChannelTimeout(TimeDuration.ZERO)
+                                                   .withLog(logger.getLog())
+                                                   .withLogLevel(logger.getLogLevel())
+                                                   .set()
+                                                   .buildChannel();
             channels.add(channel);
             internalLoader.setInvocationCount(Math.max(channels.size() + mAbortedChannels.size(),
                                                        internalLoader.getInvocationCount()));
@@ -813,17 +810,17 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
 
             mLogger.dbg("aborting result channels");
             mResultCount = 0;
-            final ArrayList<IOChannel<OUT, OUT>> channels = mChannels;
-            final ArrayList<IOChannel<OUT, OUT>> newChannels = mNewChannels;
+            final ArrayList<IOChannel<OUT>> channels = mChannels;
+            final ArrayList<IOChannel<OUT>> newChannels = mNewChannels;
 
-            for (final IOChannel<OUT, OUT> channel : channels) {
+            for (final IOChannel<OUT> channel : channels) {
 
                 channel.abort(reason);
             }
 
             channels.clear();
 
-            for (final IOChannel<OUT, OUT> newChannel : newChannels) {
+            for (final IOChannel<OUT> newChannel : newChannels) {
 
                 newChannel.abort(reason);
             }

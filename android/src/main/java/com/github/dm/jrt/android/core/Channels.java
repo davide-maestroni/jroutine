@@ -62,8 +62,7 @@ public class Channels extends com.github.dm.jrt.core.Channels {
             throw new IllegalArgumentException("the list of channels must not be empty");
         }
 
-        final IOChannel<ParcelableSelectable<OUT>, ParcelableSelectable<OUT>> ioChannel =
-                JRoutine.io().buildChannel();
+        final IOChannel<ParcelableSelectable<OUT>> ioChannel = JRoutine.io().buildChannel();
         int i = startIndex;
 
         for (final OutputChannel<? extends OUT> channel : channels) {
@@ -92,8 +91,7 @@ public class Channels extends com.github.dm.jrt.core.Channels {
             throw new IllegalArgumentException("the array of channels must not be empty");
         }
 
-        final IOChannel<ParcelableSelectable<?>, ParcelableSelectable<?>> ioChannel =
-                JRoutine.io().buildChannel();
+        final IOChannel<ParcelableSelectable<?>> ioChannel = JRoutine.io().buildChannel();
         int i = startIndex;
 
         for (final OutputChannel<?> channel : channels) {
@@ -149,13 +147,12 @@ public class Channels extends com.github.dm.jrt.core.Channels {
      * @return the I/O channel.
      */
     @NotNull
-    public static <DATA, IN extends DATA> IOChannel<IN, IN> selectParcelable(
+    public static <DATA, IN extends DATA> IOChannel<IN> selectParcelable(
             @NotNull final InputChannel<? super ParcelableSelectable<DATA>> channel,
             final int index) {
 
-        final IOChannel<IN, IN> inputChannel = JRoutine.io().buildChannel();
-        final IOChannel<ParcelableSelectable<DATA>, ParcelableSelectable<DATA>> ioChannel =
-                JRoutine.io().buildChannel();
+        final IOChannel<IN> inputChannel = JRoutine.io().buildChannel();
+        final IOChannel<ParcelableSelectable<DATA>> ioChannel = JRoutine.io().buildChannel();
         ioChannel.passTo(channel);
         return inputChannel.passTo(new SelectableOutputConsumer<DATA, IN>(ioChannel, index));
     }
@@ -174,8 +171,7 @@ public class Channels extends com.github.dm.jrt.core.Channels {
     public static <OUT> OutputChannel<? extends ParcelableSelectable<OUT>> toSelectable(
             @NotNull final OutputChannel<? extends OUT> channel, final int index) {
 
-        final IOChannel<ParcelableSelectable<OUT>, ParcelableSelectable<OUT>> ioChannel =
-                JRoutine.io().buildChannel();
+        final IOChannel<ParcelableSelectable<OUT>> ioChannel = JRoutine.io().buildChannel();
         channel.passTo(new SelectableOutputConsumer<OUT, OUT>(ioChannel, index));
         return ioChannel;
     }
@@ -248,7 +244,7 @@ public class Channels extends com.github.dm.jrt.core.Channels {
     private static class SelectableOutputConsumer<OUT, IN extends OUT>
             implements OutputConsumer<IN> {
 
-        private final IOChannel<? super ParcelableSelectable<OUT>, ? super
+        private final IOChannel<? super
                 ParcelableSelectable<OUT>> mChannel;
 
         private final int mIndex;
@@ -259,9 +255,8 @@ public class Channels extends com.github.dm.jrt.core.Channels {
          * @param channel the selectable channel.
          * @param index   the selectable index.
          */
-        private SelectableOutputConsumer(
-                @NotNull final IOChannel<? super ParcelableSelectable<OUT>, ? super
-                        ParcelableSelectable<OUT>> channel, final int index) {
+        private SelectableOutputConsumer(@NotNull final IOChannel<? super
+                ParcelableSelectable<OUT>> channel, final int index) {
 
             mChannel = channel;
             mIndex = index;

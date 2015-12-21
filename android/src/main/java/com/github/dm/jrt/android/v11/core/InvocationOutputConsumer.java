@@ -213,9 +213,9 @@ class InvocationOutputConsumer<OUT> extends TemplateOutputConsumer<OUT> {
             }
         }
 
-        public boolean passTo(@NotNull final Collection<IOChannel<OUT, OUT>> newChannels,
-                @NotNull final Collection<IOChannel<OUT, OUT>> oldChannels,
-                @NotNull final Collection<IOChannel<OUT, OUT>> abortedChannels) {
+        public boolean passTo(@NotNull final Collection<IOChannel<OUT>> newChannels,
+                @NotNull final Collection<IOChannel<OUT>> oldChannels,
+                @NotNull final Collection<IOChannel<OUT>> abortedChannels) {
 
             synchronized (mMutex) {
 
@@ -234,7 +234,7 @@ class InvocationOutputConsumer<OUT> extends TemplateOutputConsumer<OUT> {
 
                     logger.dbg("passing result: %s + %s", cachedResults, lastResults);
 
-                    for (final IOChannel<OUT, OUT> newChannel : newChannels) {
+                    for (final IOChannel<OUT> newChannel : newChannels) {
 
                         try {
 
@@ -250,7 +250,7 @@ class InvocationOutputConsumer<OUT> extends TemplateOutputConsumer<OUT> {
                         }
                     }
 
-                    for (final IOChannel<OUT, OUT> channel : oldChannels) {
+                    for (final IOChannel<OUT> channel : oldChannels) {
 
                         try {
 

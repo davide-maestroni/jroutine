@@ -32,7 +32,7 @@ public interface IOChannelBuilder extends ConfigurableChannelBuilder<IOChannelBu
      * @return the newly created channel.
      */
     @NotNull
-    <DATA> IOChannel<DATA, DATA> buildChannel();
+    <DATA> IOChannel<DATA> buildChannel();
 
     /**
      * Builds and returns the I/O channel instance returning the specified input.<br/>
@@ -43,7 +43,7 @@ public interface IOChannelBuilder extends ConfigurableChannelBuilder<IOChannelBu
      * @return the newly created channel.
      */
     @NotNull
-    <DATA> IOChannel<DATA, DATA> of(@Nullable DATA input);
+    <DATA> IOChannel<DATA> of(@Nullable DATA input);
 
     /**
      * Builds and returns the I/O channel instance returning the specified inputs.<br/>
@@ -54,7 +54,7 @@ public interface IOChannelBuilder extends ConfigurableChannelBuilder<IOChannelBu
      * @return the newly created channel.
      */
     @NotNull
-    <DATA> IOChannel<DATA, DATA> of(@Nullable DATA... inputs);
+    <DATA> IOChannel<DATA> of(@Nullable DATA... inputs);
 
     /**
      * Builds and returns the I/O channel instance returning the specified inputs.<br/>
@@ -65,5 +65,5 @@ public interface IOChannelBuilder extends ConfigurableChannelBuilder<IOChannelBu
      * @return the newly created channel.
      */
     @NotNull
-    <DATA> IOChannel<DATA, DATA> of(@Nullable Iterable<DATA> inputs);
+    <DATA> IOChannel<DATA> of(@Nullable Iterable<DATA> inputs);
 }

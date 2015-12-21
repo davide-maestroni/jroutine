@@ -22,7 +22,6 @@ import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
-import com.github.dm.jrt.channel.StreamingIOChannel;
 import com.github.dm.jrt.core.AbstractRoutine;
 import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.core.JRoutine;
@@ -40,7 +39,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static com.github.dm.jrt.core.Channels.syncIo;
 import static com.github.dm.jrt.core.DelegatingInvocation.factoryFrom;
 import static com.github.dm.jrt.function.Functions.consumerFactory;
 import static com.github.dm.jrt.function.Functions.consumerFilter;
@@ -532,7 +530,7 @@ public class Streams {
 
         private final StreamRoutine<IN, OUT> mRoutine;
 
-        private StreamingIOChannel<IN, OUT> mInputChannel;
+        private IOChannel<IN> mInputChannel;
 
         private OutputChannel<AFTER> mOutputChannel;
 
@@ -565,21 +563,22 @@ public class Streams {
 
         public void onInitialize() {
 
-            final StreamingIOChannel<IN, OUT> streamingChannel = syncIo(mRoutine);
+            final IOChannel<IN> inputChannel = JRoutine.io().buildChannel();
+            final OutputChannel<OUT> outputChannel = mRoutine.syncCall(inputChannel);
             final DelegationType delegationType = mDelegationType;
-            mInputChannel = streamingChannel;
+            mInputChannel = inputChannel;
 
             if (delegationType == DelegationType.ASYNC) {
 
-                mOutputChannel = streamingChannel.passTo(mAfterRoutine.asyncInvoke()).result();
+                mOutputChannel = outputChannel.passTo(mAfterRoutine.asyncInvoke()).result();
 
             } else if (delegationType == DelegationType.PARALLEL) {
 
-                mOutputChannel = streamingChannel.passTo(mAfterRoutine.parallelInvoke()).result();
+                mOutputChannel = outputChannel.passTo(mAfterRoutine.parallelInvoke()).result();
 
             } else {
 
-                mOutputChannel = streamingChannel.passTo(mAfterRoutine.syncInvoke()).result();
+                mOutputChannel = outputChannel.passTo(mAfterRoutine.syncInvoke()).result();
             }
         }
 
@@ -1037,9 +1036,9 @@ public class Streams {
 
         private final Routine<IN, OUT> mRoutine;
 
-        private StreamingIOChannel<IN, OUT> mInputChannel;
+        private IOChannel<IN> mInputChannel;
 
-        private IOChannel<OUT, OUT> mOutputChannel;
+        private IOChannel<OUT> mOutputChannel;
 
         /**
          * Constructor.
@@ -1068,15 +1067,16 @@ public class Streams {
 
         public void onInitialize() {
 
-            final StreamingIOChannel<IN, OUT> streamingChannel = syncIo(mRoutine);
-            mInputChannel = streamingChannel;
+            final IOChannel<IN> inputChannel = JRoutine.io().buildChannel();
+            final OutputChannel<OUT> outputChannel = mRoutine.syncCall(inputChannel);
+            mInputChannel = inputChannel;
             mOutputChannel = JRoutine.io().buildChannel();
-            streamingChannel.passTo(new TryCatchOutputConsumer<OUT>(mConsumer, mOutputChannel));
+            outputChannel.passTo(new TryCatchOutputConsumer<OUT>(mConsumer, mOutputChannel));
         }
 
         public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
 
-            final IOChannel<OUT, OUT> channel = mOutputChannel;
+            final IOChannel<OUT> channel = mOutputChannel;
 
             if (!channel.isBound()) {
 
@@ -1088,7 +1088,7 @@ public class Streams {
 
         public void onResult(@NotNull final ResultChannel<OUT> result) {
 
-            final IOChannel<OUT, OUT> channel = mOutputChannel;
+            final IOChannel<OUT> channel = mOutputChannel;
 
             if (!channel.isBound()) {
 
@@ -1114,7 +1114,7 @@ public class Streams {
 
         private final BiConsumer<? super RoutineException, ? super InputChannel<OUT>> mConsumer;
 
-        private final IOChannel<OUT, OUT> mOutputChannel;
+        private final IOChannel<OUT> mOutputChannel;
 
         /**
          * Constructor.
@@ -1125,7 +1125,7 @@ public class Streams {
         private TryCatchOutputConsumer(
                 @NotNull final BiConsumer<? super RoutineException, ? super InputChannel<OUT>>
                         consumer,
-                @NotNull final IOChannel<OUT, OUT> outputChannel) {
+                @NotNull final IOChannel<OUT> outputChannel) {
 
             mConsumer = consumer;
             mOutputChannel = outputChannel;
@@ -1138,7 +1138,7 @@ public class Streams {
 
         public void onError(@Nullable final RoutineException error) {
 
-            final IOChannel<OUT, OUT> channel = mOutputChannel;
+            final IOChannel<OUT> channel = mOutputChannel;
 
             try {
 

@@ -28,7 +28,6 @@ import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.channel.StreamingIOChannel;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.invocation.Invocations;
 import com.github.dm.jrt.routine.Routine;
@@ -586,8 +585,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     @SuppressWarnings("unchecked")
     public void testInputSelect() {
 
-        final IOChannel<ParcelableSelectable<String>, ParcelableSelectable<String>> channel =
-                JRoutine.io().buildChannel();
+        final IOChannel<ParcelableSelectable<String>> channel = JRoutine.io().buildChannel();
         Channels.selectParcelable(channel, 33).pass("test1", "test2", "test3").close();
         channel.close();
         assertThat(channel.all()).containsExactly(new ParcelableSelectable<String>("test1", 33),
@@ -597,8 +595,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
     public void testInputSelectAbort() {
 
-        final IOChannel<ParcelableSelectable<String>, ParcelableSelectable<String>> channel =
-                JRoutine.io().buildChannel();
+        final IOChannel<ParcelableSelectable<String>> channel = JRoutine.io().buildChannel();
         Channels.selectParcelable(channel, 33).pass("test1", "test2", "test3").abort();
         channel.close();
 
@@ -616,7 +613,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     @SuppressWarnings("unchecked")
     public void testInputToSelectable() {
 
-        final IOChannel<String, String> channel = JRoutine.io().buildChannel();
+        final IOChannel<String> channel = JRoutine.io().buildChannel();
         Channels.toSelectable(channel.asInput(), 33)
                 .pass(new ParcelableSelectable<String>("test1", 33),
                       new ParcelableSelectable<String>("test2", -33),
@@ -629,7 +626,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
     public void testInputToSelectableAbort() {
 
-        final IOChannel<String, String> channel = JRoutine.io().buildChannel();
+        final IOChannel<String> channel = JRoutine.io().buildChannel();
         Channels.toSelectable(channel.asInput(), 33).abort();
         channel.close();
 
@@ -650,8 +647,8 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         final Routine<List<?>, Character> routine = JRoutine.with(serviceFrom(getActivity()))
                                                             .on(factoryOf(CharAt.class))
                                                             .buildRoutine();
-        IOChannel<String, String> channel1;
-        IOChannel<Integer, Integer> channel2;
+        IOChannel<String> channel1;
+        IOChannel<Integer> channel2;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
@@ -685,8 +682,8 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         final Routine<List<?>, Character> routine = JRoutine.with(serviceFrom(getActivity()))
                                                             .on(factoryOf(CharAt.class))
                                                             .buildRoutine();
-        IOChannel<String, String> channel1;
-        IOChannel<Integer, Integer> channel2;
+        IOChannel<String> channel1;
+        IOChannel<Integer> channel2;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
@@ -726,8 +723,8 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         final Routine<List<?>, Character> routine = JRoutine.with(serviceFrom(getActivity()))
                                                             .on(factoryOf(CharAt.class))
                                                             .buildRoutine();
-        IOChannel<String, String> channel1;
-        IOChannel<Integer, Integer> channel2;
+        IOChannel<String> channel1;
+        IOChannel<Integer> channel2;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
@@ -772,8 +769,8 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         final Routine<List<?>, Character> routine = JRoutine.with(serviceFrom(getActivity()))
                                                             .on(factoryOf(CharAt.class))
                                                             .buildRoutine();
-        IOChannel<String, String> channel1;
-        IOChannel<Integer, Integer> channel2;
+        IOChannel<String> channel1;
+        IOChannel<Integer> channel2;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
@@ -861,11 +858,11 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         final IOChannelBuilder builder =
                 JRoutine.io().channels().withChannelOrder(OrderType.BY_CALL).set();
-        final IOChannel<String, String> channel1 = builder.buildChannel();
-        final IOChannel<Integer, Integer> channel2 = builder.buildChannel();
+        final IOChannel<String> channel1 = builder.buildChannel();
+        final IOChannel<Integer> channel2 = builder.buildChannel();
 
         final OutputChannel<? extends ParcelableSelectable<Object>> channel =
-                Channels.merge(Arrays.<IOChannel<?, ?>>asList(channel1, channel2));
+                Channels.merge(Arrays.<IOChannel<?>>asList(channel1, channel2));
         final OutputChannel<ParcelableSelectable<Object>> output =
                 JRoutine.with(serviceFrom(getActivity()))
                         .on(factoryOf(Sort.class))
@@ -899,8 +896,8 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         final IOChannelBuilder builder =
                 JRoutine.io().channels().withChannelOrder(OrderType.BY_CALL).set();
-        IOChannel<String, String> channel1;
-        IOChannel<Integer, Integer> channel2;
+        IOChannel<String> channel1;
+        IOChannel<Integer> channel2;
         OutputChannel<? extends ParcelableSelectable<?>> outputChannel;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
@@ -941,10 +938,10 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         final IOChannelBuilder builder =
                 JRoutine.io().channels().withChannelOrder(OrderType.BY_CALL).set();
-        final IOChannel<String, String> channel1 = builder.buildChannel();
-        final IOChannel<String, String> channel2 = builder.buildChannel();
-        final IOChannel<String, String> channel3 = builder.buildChannel();
-        final IOChannel<String, String> channel4 = builder.buildChannel();
+        final IOChannel<String> channel1 = builder.buildChannel();
+        final IOChannel<String> channel2 = builder.buildChannel();
+        final IOChannel<String> channel3 = builder.buildChannel();
+        final IOChannel<String> channel4 = builder.buildChannel();
 
         final Routine<ParcelableSelectable<String>, String> routine =
                 JRoutine.on(Invocations.factoryOf(new ClassToken<Amb<String>>() {})).buildRoutine();
@@ -973,8 +970,8 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         final IOChannelBuilder builder =
                 JRoutine.io().channels().withChannelOrder(OrderType.BY_CALL).set();
-        IOChannel<String, String> channel1;
-        IOChannel<Integer, Integer> channel2;
+        IOChannel<String> channel1;
+        IOChannel<Integer> channel2;
         OutputChannel<? extends ParcelableSelectable<?>> outputChannel;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
@@ -1218,8 +1215,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     @SuppressWarnings("unchecked")
     public void testOutputSelect() {
 
-        final IOChannel<ParcelableSelectable<String>, ParcelableSelectable<String>> channel =
-                JRoutine.io().buildChannel();
+        final IOChannel<ParcelableSelectable<String>> channel = JRoutine.io().buildChannel();
         final OutputChannel<String> outputChannel = Channels.select(channel, 33).get(33);
         channel.pass(new ParcelableSelectable<String>("test1", 33),
                      new ParcelableSelectable<String>("test2", -33),
@@ -1231,8 +1227,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
     public void testOutputSelectAbort() {
 
-        final IOChannel<ParcelableSelectable<String>, ParcelableSelectable<String>> channel =
-                JRoutine.io().buildChannel();
+        final IOChannel<ParcelableSelectable<String>> channel = JRoutine.io().buildChannel();
         final OutputChannel<String> outputChannel = Channels.select(channel, 33).get(33);
         channel.abort();
 
@@ -1250,7 +1245,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     @SuppressWarnings("unchecked")
     public void testOutputToSelectable() {
 
-        final IOChannel<String, String> channel = JRoutine.io().buildChannel();
+        final IOChannel<String> channel = JRoutine.io().buildChannel();
         channel.pass("test1", "test2", "test3").close();
         assertThat(Channels.toSelectable(channel.asOutput(), 33)
                            .afterMax(seconds(10))
@@ -1261,7 +1256,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
     public void testOutputToSelectableAbort() {
 
-        final IOChannel<String, String> channel = JRoutine.io().buildChannel();
+        final IOChannel<String> channel = JRoutine.io().buildChannel();
         channel.pass("test1", "test2", "test3").abort();
 
         try {
@@ -1280,37 +1275,41 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine =
                 JRoutine.with(serviceFrom(getActivity())).on(factoryOf(Sort.class)).buildRoutine();
-        final StreamingIOChannel<ParcelableSelectable<Object>, ParcelableSelectable<Object>>
-                channel = Channels.asyncIo(routine);
-        Channels.select(channel).index(Sort.INTEGER);
-        Channels.select(channel).index(Sort.STRING);
-        channel.pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
-                     new ParcelableSelectable<Object>(-11, Sort.INTEGER));
-        assertThat(Channels.select(channel)
+        final IOChannel<ParcelableSelectable<Object>> inputChannel = JRoutine.io().buildChannel();
+        final OutputChannel<ParcelableSelectable<Object>> outputChannel =
+                routine.asyncCall(inputChannel);
+        Channels.select(outputChannel).index(Sort.INTEGER);
+        Channels.select(outputChannel).index(Sort.STRING);
+        inputChannel.pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
+                          new ParcelableSelectable<Object>(-11, Sort.INTEGER));
+        assertThat(Channels.select(outputChannel)
                            .index(Sort.INTEGER)
                            .afterMax(seconds(10))
                            .next()).isEqualTo(-11);
-        assertThat(
-                Channels.select(channel).index(Sort.STRING).afterMax(seconds(10)).next()).isEqualTo(
-                "test21");
-        channel.pass(new ParcelableSelectable<Object>(-11, Sort.INTEGER),
-                     new ParcelableSelectable<Object>("test21", Sort.STRING));
-        assertThat(Channels.select(channel)
+        assertThat(Channels.select(outputChannel)
+                           .index(Sort.STRING)
+                           .afterMax(seconds(10))
+                           .next()).isEqualTo("test21");
+        inputChannel.pass(new ParcelableSelectable<Object>(-11, Sort.INTEGER),
+                          new ParcelableSelectable<Object>("test21", Sort.STRING));
+        assertThat(Channels.select(outputChannel)
                            .index(Sort.INTEGER)
                            .afterMax(seconds(10))
                            .next()).isEqualTo(-11);
-        assertThat(
-                Channels.select(channel).index(Sort.STRING).afterMax(seconds(10)).next()).isEqualTo(
-                "test21");
-        channel.pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
-                     new ParcelableSelectable<Object>(-11, Sort.INTEGER));
-        assertThat(Channels.select(channel)
+        assertThat(Channels.select(outputChannel)
+                           .index(Sort.STRING)
+                           .afterMax(seconds(10))
+                           .next()).isEqualTo("test21");
+        inputChannel.pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
+                          new ParcelableSelectable<Object>(-11, Sort.INTEGER));
+        assertThat(Channels.select(outputChannel)
                            .index(Sort.INTEGER)
                            .afterMax(seconds(10))
                            .next()).isEqualTo(-11);
-        assertThat(
-                Channels.select(channel).index(Sort.STRING).afterMax(seconds(10)).next()).isEqualTo(
-                "test21");
+        assertThat(Channels.select(outputChannel)
+                           .index(Sort.STRING)
+                           .afterMax(seconds(10))
+                           .next()).isEqualTo("test21");
     }
 
     @SuppressWarnings("unchecked")
@@ -1318,18 +1317,18 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine =
                 JRoutine.with(serviceFrom(getActivity())).on(factoryOf(Sort.class)).buildRoutine();
-        StreamingIOChannel<ParcelableSelectable<Object>, ParcelableSelectable<Object>> channel =
-                Channels.asyncIo(routine);
-        Channels.select(channel).index(Sort.INTEGER);
-        Channels.select(channel).index(Sort.STRING);
-        channel.after(millis(100))
-               .pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
-                     new ParcelableSelectable<Object>(-11, Sort.INTEGER))
-               .abort();
+        IOChannel<ParcelableSelectable<Object>> inputChannel = JRoutine.io().buildChannel();
+        OutputChannel<ParcelableSelectable<Object>> outputChannel = routine.asyncCall(inputChannel);
+        Channels.select(outputChannel).index(Sort.INTEGER);
+        Channels.select(outputChannel).index(Sort.STRING);
+        inputChannel.after(millis(100))
+                    .pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
+                          new ParcelableSelectable<Object>(-11, Sort.INTEGER))
+                    .abort();
 
         try {
 
-            Channels.select(channel).index(Sort.STRING).afterMax(seconds(10)).all();
+            Channels.select(outputChannel).index(Sort.STRING).afterMax(seconds(10)).all();
 
             fail();
 
@@ -1339,7 +1338,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         try {
 
-            Channels.select(channel).index(Sort.INTEGER).afterMax(seconds(10)).all();
+            Channels.select(outputChannel).index(Sort.INTEGER).afterMax(seconds(10)).all();
 
             fail();
 
@@ -1347,45 +1346,18 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         }
 
-        channel = Channels.asyncIo(routine);
-        Channels.select(channel).index(Sort.INTEGER);
-        Channels.select(channel).index(Sort.STRING);
-        channel.after(millis(100))
-               .pass(new ParcelableSelectable<Object>(-11, Sort.INTEGER),
-                     new ParcelableSelectable<Object>("test21", Sort.STRING))
-               .abort();
+        inputChannel = JRoutine.io().buildChannel();
+        outputChannel = routine.asyncCall(inputChannel);
+        Channels.select(outputChannel).index(Sort.INTEGER);
+        Channels.select(outputChannel).index(Sort.STRING);
+        inputChannel.after(millis(100))
+                    .pass(new ParcelableSelectable<Object>(-11, Sort.INTEGER),
+                          new ParcelableSelectable<Object>("test21", Sort.STRING))
+                    .abort();
 
         try {
 
-            Channels.select(channel).index(Sort.STRING).afterMax(seconds(10)).all();
-
-            fail();
-
-        } catch (final AbortException ignored) {
-
-        }
-
-        try {
-
-            Channels.select(channel).index(Sort.INTEGER).afterMax(seconds(10)).all();
-
-            fail();
-
-        } catch (final AbortException ignored) {
-
-        }
-
-        channel = Channels.asyncIo(routine);
-        Channels.select(channel).index(Sort.INTEGER);
-        Channels.select(channel).index(Sort.STRING);
-        channel.after(millis(100))
-               .pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
-                     new ParcelableSelectable<Object>(-11, Sort.INTEGER))
-               .abort();
-
-        try {
-
-            Channels.select(channel).index(Sort.STRING).afterMax(seconds(10)).all();
+            Channels.select(outputChannel).index(Sort.STRING).afterMax(seconds(10)).all();
 
             fail();
 
@@ -1395,7 +1367,36 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         try {
 
-            Channels.select(channel).index(Sort.INTEGER).afterMax(seconds(10)).all();
+            Channels.select(outputChannel).index(Sort.INTEGER).afterMax(seconds(10)).all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        inputChannel = JRoutine.io().buildChannel();
+        outputChannel = routine.asyncCall(inputChannel);
+        Channels.select(outputChannel).index(Sort.INTEGER);
+        Channels.select(outputChannel).index(Sort.STRING);
+        inputChannel.after(millis(100))
+                    .pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
+                          new ParcelableSelectable<Object>(-11, Sort.INTEGER))
+                    .abort();
+
+        try {
+
+            Channels.select(outputChannel).index(Sort.STRING).afterMax(seconds(10)).all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            Channels.select(outputChannel).index(Sort.INTEGER).afterMax(seconds(10)).all();
 
             fail();
 

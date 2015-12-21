@@ -166,7 +166,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
 
         private final Messenger mInMessenger;
 
-        private final IOChannel<IN, IN> mInput;
+        private final IOChannel<IN> mInput;
 
         private final InvocationConfiguration mInvocationConfiguration;
 
@@ -176,7 +176,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
 
         private final Object mMutex = new Object();
 
-        private final IOChannel<OUT, OUT> mOutput;
+        private final IOChannel<OUT> mOutput;
 
         private final ServiceConfiguration mServiceConfiguration;
 

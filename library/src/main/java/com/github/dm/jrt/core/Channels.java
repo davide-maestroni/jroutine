@@ -18,8 +18,6 @@ import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.RoutineException;
-import com.github.dm.jrt.channel.StreamingIOChannel;
-import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
@@ -50,23 +48,6 @@ public class Channels {
     }
 
     /**
-     * Creates and returns a new streaming I/O channel by invoking the specified routine in
-     * asynchronous mode.
-     *
-     * @param routine the routine to be invoked.
-     * @param <IN>    the input data type.
-     * @param <OUT>   the output data type.
-     * @return the streaming channel.
-     */
-    @NotNull
-    public static <IN, OUT> StreamingIOChannel<IN, OUT> asyncIo(
-            @NotNull final Routine<IN, OUT> routine) {
-
-        final IOChannel<IN, IN> ioChannel = JRoutine.io().buildChannel();
-        return io(ioChannel, routine.asyncCall(ioChannel));
-    }
-
-    /**
      * Combines the specified channels into a selectable one. The selectable indexes will be the
      * same as the array ones.<br/>
      * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
@@ -77,8 +58,7 @@ public class Channels {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static IOChannel<Selectable<?>, Selectable<?>> combine(
-            @NotNull final InputChannel<?>... channels) {
+    public static IOChannel<Selectable<?>> combine(@NotNull final InputChannel<?>... channels) {
 
         return combine(0, channels);
     }
@@ -95,7 +75,7 @@ public class Channels {
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static IOChannel<Selectable<?>, Selectable<?>> combine(final int startIndex,
+    public static IOChannel<Selectable<?>> combine(final int startIndex,
             @NotNull final InputChannel<?>... channels) {
 
         final int length = channels.length;
@@ -105,16 +85,16 @@ public class Channels {
             throw new IllegalArgumentException("the array of channels must not be empty");
         }
 
-        final ArrayList<IOChannel<?, ?>> channelList = new ArrayList<IOChannel<?, ?>>(length);
+        final ArrayList<IOChannel<?>> channelList = new ArrayList<IOChannel<?>>(length);
 
         for (final InputChannel<?> channel : channels) {
 
-            final IOChannel<?, ?> ioChannel = JRoutine.io().buildChannel();
+            final IOChannel<?> ioChannel = JRoutine.io().buildChannel();
             ioChannel.passTo((InputChannel<Object>) channel);
             channelList.add(ioChannel);
         }
 
-        final IOChannel<Selectable<?>, Selectable<?>> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<Selectable<?>> ioChannel = JRoutine.io().buildChannel();
         ioChannel.passTo(new SortingArrayOutputConsumer(startIndex, channelList));
         return ioChannel;
     }
@@ -132,8 +112,7 @@ public class Channels {
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <IN> IOChannel<Selectable<? extends IN>, Selectable<? extends IN>> combine(
-            final int startIndex,
+    public static <IN> IOChannel<Selectable<? extends IN>> combine(final int startIndex,
             @NotNull final List<? extends InputChannel<? extends IN>> channels) {
 
         if (channels.isEmpty()) {
@@ -141,18 +120,16 @@ public class Channels {
             throw new IllegalArgumentException("the list of channels must not be empty");
         }
 
-        final ArrayList<IOChannel<?, ?>> channelList =
-                new ArrayList<IOChannel<?, ?>>(channels.size());
+        final ArrayList<IOChannel<?>> channelList = new ArrayList<IOChannel<?>>(channels.size());
 
         for (final InputChannel<?> channel : channels) {
 
-            final IOChannel<?, ?> ioChannel = JRoutine.io().buildChannel();
+            final IOChannel<?> ioChannel = JRoutine.io().buildChannel();
             ioChannel.passTo(((InputChannel<Object>) channel));
             channelList.add(ioChannel);
         }
 
-        final IOChannel<Selectable<? extends IN>, Selectable<? extends IN>> ioChannel =
-                JRoutine.io().buildChannel();
+        final IOChannel<Selectable<? extends IN>> ioChannel = JRoutine.io().buildChannel();
         ioChannel.passTo(new SortingArrayOutputConsumer(startIndex, channelList));
         return ioChannel;
     }
@@ -169,7 +146,7 @@ public class Channels {
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @NotNull
-    public static <IN> IOChannel<Selectable<? extends IN>, Selectable<? extends IN>> combine(
+    public static <IN> IOChannel<Selectable<? extends IN>> combine(
             @NotNull final List<? extends InputChannel<? extends IN>> channels) {
 
         return combine(0, channels);
@@ -187,7 +164,7 @@ public class Channels {
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <IN> IOChannel<Selectable<? extends IN>, Selectable<? extends IN>> combine(
+    public static <IN> IOChannel<Selectable<? extends IN>> combine(
             @NotNull final Map<Integer, ? extends InputChannel<? extends IN>> channels) {
 
         if (channels.isEmpty()) {
@@ -195,18 +172,17 @@ public class Channels {
             throw new IllegalArgumentException("the map of channels must not be empty");
         }
 
-        final HashMap<Integer, IOChannel<?, ?>> channelMap =
-                new HashMap<Integer, IOChannel<?, ?>>(channels.size());
+        final HashMap<Integer, IOChannel<?>> channelMap =
+                new HashMap<Integer, IOChannel<?>>(channels.size());
 
         for (final Entry<Integer, ? extends InputChannel<?>> entry : channels.entrySet()) {
 
-            final IOChannel<?, ?> ioChannel = JRoutine.io().buildChannel();
+            final IOChannel<?> ioChannel = JRoutine.io().buildChannel();
             ioChannel.passTo(((InputChannel<Object>) entry.getValue()));
             channelMap.put(entry.getKey(), ioChannel);
         }
 
-        final IOChannel<Selectable<? extends IN>, Selectable<? extends IN>> ioChannel =
-                JRoutine.io().buildChannel();
+        final IOChannel<Selectable<? extends IN>> ioChannel = JRoutine.io().buildChannel();
         ioChannel.passTo(new SortingMapOutputConsumer(channelMap));
         return ioChannel;
     }
@@ -222,8 +198,7 @@ public class Channels {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static IOChannel<List<?>, List<?>> distribute(
-            @NotNull final InputChannel<?>... channels) {
+    public static IOChannel<List<?>> distribute(@NotNull final InputChannel<?>... channels) {
 
         return distribute(false, null, channels);
     }
@@ -240,7 +215,7 @@ public class Channels {
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @NotNull
-    public static <IN> IOChannel<List<? extends IN>, List<? extends IN>> distribute(
+    public static <IN> IOChannel<List<? extends IN>> distribute(
             @NotNull final List<? extends InputChannel<? extends IN>> channels) {
 
         return distribute(false, null, channels);
@@ -260,7 +235,7 @@ public class Channels {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static IOChannel<List<?>, List<?>> distributeAndFlush(@Nullable final Object placeholder,
+    public static IOChannel<List<?>> distributeAndFlush(@Nullable final Object placeholder,
             @NotNull final InputChannel<?>... channels) {
 
         return distribute(true, placeholder, channels);
@@ -281,31 +256,11 @@ public class Channels {
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @NotNull
-    public static <IN> IOChannel<List<? extends IN>, List<? extends IN>> distributeAndFlush(
+    public static <IN> IOChannel<List<? extends IN>> distributeAndFlush(
             @Nullable final IN placeholder,
             @NotNull final List<? extends InputChannel<? extends IN>> channels) {
 
         return distribute(true, placeholder, channels);
-    }
-
-    /**
-     * Creates and returns a new streaming I/O channel backed by the specified input and output.
-     * <br/>
-     * Note that it is up to the caller ensure that the specified input and output channels are
-     * actually connected.
-     *
-     * @param inputChannel  the input channel.
-     * @param outputChannel the output channel.
-     * @param <IN>          the input data type.
-     * @param <OUT>         the output data type.
-     * @return the streaming channel.
-     */
-    @NotNull
-    public static <IN, OUT> StreamingIOChannel<IN, OUT> io(
-            @NotNull final IOChannel<IN, ?> inputChannel,
-            @NotNull final OutputChannel<OUT> outputChannel) {
-
-        return new DefaultStreamingIOChannel<IN, OUT>(inputChannel, outputChannel);
     }
 
     /**
@@ -401,7 +356,7 @@ public class Channels {
             throw new IllegalArgumentException("the list of channels must not be empty");
         }
 
-        final IOChannel<Selectable<OUT>, Selectable<OUT>> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<Selectable<OUT>> ioChannel = JRoutine.io().buildChannel();
         int i = startIndex;
 
         for (final OutputChannel<? extends OUT> channel : channels) {
@@ -430,7 +385,7 @@ public class Channels {
             throw new IllegalArgumentException("the array of channels must not be empty");
         }
 
-        final IOChannel<Selectable<?>, Selectable<?>> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<Selectable<?>> ioChannel = JRoutine.io().buildChannel();
         int i = startIndex;
 
         for (final OutputChannel<?> channel : channels) {
@@ -476,7 +431,7 @@ public class Channels {
             throw new IllegalArgumentException("the map of channels must not be empty");
         }
 
-        final IOChannel<Selectable<OUT>, Selectable<OUT>> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<Selectable<OUT>> ioChannel = JRoutine.io().buildChannel();
 
         for (final Entry<Integer, ? extends OutputChannel<? extends OUT>> entry : channelMap
                 .entrySet()) {
@@ -504,23 +459,6 @@ public class Channels {
     }
 
     /**
-     * Creates and returns a new streaming I/O channel by invoking the specified routine in parallel
-     * mode.
-     *
-     * @param routine the routine to be invoked.
-     * @param <IN>    the input data type.
-     * @param <OUT>   the output data type.
-     * @return the streaming channel.
-     */
-    @NotNull
-    public static <IN, OUT> StreamingIOChannel<IN, OUT> parallelIo(
-            @NotNull final Routine<IN, OUT> routine) {
-
-        final IOChannel<IN, IN> ioChannel = JRoutine.io().buildChannel();
-        return io(ioChannel, routine.parallelCall(ioChannel));
-    }
-
-    /**
      * Returns a new channel transforming the input data into selectable ones.<br/>
      * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
      * completion of the invocation lifecycle.
@@ -532,12 +470,11 @@ public class Channels {
      * @return the I/O channel.
      */
     @NotNull
-    public static <DATA, IN extends DATA> IOChannel<IN, IN> select(
+    public static <DATA, IN extends DATA> IOChannel<IN> select(
             @NotNull final InputChannel<? super Selectable<DATA>> channel, final int index) {
 
-        final IOChannel<IN, IN> inputChannel = JRoutine.io().buildChannel();
-        final IOChannel<Selectable<DATA>, Selectable<DATA>> ioChannel =
-                JRoutine.io().buildChannel();
+        final IOChannel<IN> inputChannel = JRoutine.io().buildChannel();
+        final IOChannel<Selectable<DATA>> ioChannel = JRoutine.io().buildChannel();
         ioChannel.passTo(channel);
         return inputChannel.passTo(new SelectableOutputConsumer<DATA, IN>(ioChannel, index));
     }
@@ -555,12 +492,11 @@ public class Channels {
      * @return the map of indexes and I/O channels.
      */
     @NotNull
-    public static <DATA, IN extends DATA> Map<Integer, IOChannel<IN, IN>> select(
+    public static <DATA, IN extends DATA> Map<Integer, IOChannel<IN>> select(
             @NotNull final InputChannel<? super Selectable<DATA>> channel,
             @NotNull final Iterable<Integer> indexes) {
 
-        final HashMap<Integer, IOChannel<IN, IN>> channelMap =
-                new HashMap<Integer, IOChannel<IN, IN>>();
+        final HashMap<Integer, IOChannel<IN>> channelMap = new HashMap<Integer, IOChannel<IN>>();
 
         for (final Integer index : indexes) {
 
@@ -583,13 +519,13 @@ public class Channels {
      * @return the map of indexes and I/O channels.
      */
     @NotNull
-    public static <DATA, IN extends DATA> Map<Integer, IOChannel<IN, IN>> select(
+    public static <DATA, IN extends DATA> Map<Integer, IOChannel<IN>> select(
             @NotNull final InputChannel<? super Selectable<DATA>> channel,
             @NotNull final int... indexes) {
 
         final int size = indexes.length;
-        final HashMap<Integer, IOChannel<IN, IN>> channelMap =
-                new HashMap<Integer, IOChannel<IN, IN>>(size);
+        final HashMap<Integer, IOChannel<IN>> channelMap =
+                new HashMap<Integer, IOChannel<IN>>(size);
 
         for (final int index : indexes) {
 
@@ -614,17 +550,16 @@ public class Channels {
      * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
      */
     @NotNull
-    public static <DATA, IN extends DATA> Map<Integer, IOChannel<IN, IN>> select(
-            final int startIndex, final int rangeSize,
-            @NotNull final InputChannel<? super Selectable<DATA>> channel) {
+    public static <DATA, IN extends DATA> Map<Integer, IOChannel<IN>> select(final int startIndex,
+            final int rangeSize, @NotNull final InputChannel<? super Selectable<DATA>> channel) {
 
         if (rangeSize <= 0) {
 
             throw new IllegalArgumentException("invalid range size: " + rangeSize);
         }
 
-        final HashMap<Integer, IOChannel<IN, IN>> channelMap =
-                new HashMap<Integer, IOChannel<IN, IN>>(rangeSize);
+        final HashMap<Integer, IOChannel<IN>> channelMap =
+                new HashMap<Integer, IOChannel<IN>>(rangeSize);
 
         for (int index = startIndex; index < rangeSize; index++) {
 
@@ -656,15 +591,15 @@ public class Channels {
             throw new IllegalArgumentException("invalid range size: " + rangeSize);
         }
 
-        final HashMap<Integer, IOChannel<OUT, OUT>> inputMap =
-                new HashMap<Integer, IOChannel<OUT, OUT>>(rangeSize);
+        final HashMap<Integer, IOChannel<OUT>> inputMap =
+                new HashMap<Integer, IOChannel<OUT>>(rangeSize);
         final HashMap<Integer, OutputChannel<OUT>> outputMap =
                 new HashMap<Integer, OutputChannel<OUT>>(rangeSize);
 
         for (int index = startIndex; index < rangeSize; index++) {
 
             final Integer integer = index;
-            final IOChannel<OUT, OUT> ioChannel = JRoutine.io().buildChannel();
+            final IOChannel<OUT> ioChannel = JRoutine.io().buildChannel();
             inputMap.put(integer, ioChannel);
             outputMap.put(integer, ioChannel);
         }
@@ -722,14 +657,14 @@ public class Channels {
             @NotNull final int... indexes) {
 
         final int size = indexes.length;
-        final HashMap<Integer, IOChannel<OUT, OUT>> inputMap =
-                new HashMap<Integer, IOChannel<OUT, OUT>>(size);
+        final HashMap<Integer, IOChannel<OUT>> inputMap =
+                new HashMap<Integer, IOChannel<OUT>>(size);
         final HashMap<Integer, OutputChannel<OUT>> outputMap =
                 new HashMap<Integer, OutputChannel<OUT>>(size);
 
         for (final Integer index : indexes) {
 
-            final IOChannel<OUT, OUT> ioChannel = JRoutine.io().buildChannel();
+            final IOChannel<OUT> ioChannel = JRoutine.io().buildChannel();
             inputMap.put(index, ioChannel);
             outputMap.put(index, ioChannel);
         }
@@ -753,37 +688,19 @@ public class Channels {
             @NotNull final OutputChannel<? extends Selectable<? extends OUT>> channel,
             @NotNull final Iterable<Integer> indexes) {
 
-        final HashMap<Integer, IOChannel<OUT, OUT>> inputMap =
-                new HashMap<Integer, IOChannel<OUT, OUT>>();
+        final HashMap<Integer, IOChannel<OUT>> inputMap = new HashMap<Integer, IOChannel<OUT>>();
         final HashMap<Integer, OutputChannel<OUT>> outputMap =
                 new HashMap<Integer, OutputChannel<OUT>>();
 
         for (final Integer index : indexes) {
 
-            final IOChannel<OUT, OUT> ioChannel = JRoutine.io().buildChannel();
+            final IOChannel<OUT> ioChannel = JRoutine.io().buildChannel();
             inputMap.put(index, ioChannel);
             outputMap.put(index, ioChannel);
         }
 
         channel.passTo(new SortingMapOutputConsumer<OUT>(inputMap));
         return outputMap;
-    }
-
-    /**
-     * Creates and returns a new streaming I/O channel by invoking the specified routine in
-     * synchronous mode.
-     *
-     * @param routine the routine to be invoked.
-     * @param <IN>    the input data type.
-     * @param <OUT>   the output data type.
-     * @return the streaming channel.
-     */
-    @NotNull
-    public static <IN, OUT> StreamingIOChannel<IN, OUT> syncIo(
-            @NotNull final Routine<IN, OUT> routine) {
-
-        final IOChannel<IN, IN> ioChannel = JRoutine.io().buildChannel();
-        return io(ioChannel, routine.syncCall(ioChannel));
     }
 
     /**
@@ -798,11 +715,11 @@ public class Channels {
      * @return the selectable I/O channel.
      */
     @NotNull
-    public static <IN> IOChannel<Selectable<IN>, Selectable<IN>> toSelectable(
+    public static <IN> IOChannel<Selectable<IN>> toSelectable(
             @NotNull final InputChannel<? super IN> channel, final int index) {
 
-        final IOChannel<Selectable<IN>, Selectable<IN>> inputChannel = JRoutine.io().buildChannel();
-        final IOChannel<IN, IN> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<Selectable<IN>> inputChannel = JRoutine.io().buildChannel();
+        final IOChannel<IN> ioChannel = JRoutine.io().buildChannel();
         ioChannel.passTo(channel);
         return inputChannel.passTo(new FilterOutputConsumer<IN>(ioChannel, index));
     }
@@ -821,14 +738,14 @@ public class Channels {
     public static <OUT> OutputChannel<? extends Selectable<OUT>> toSelectable(
             @NotNull final OutputChannel<? extends OUT> channel, final int index) {
 
-        final IOChannel<Selectable<OUT>, Selectable<OUT>> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<Selectable<OUT>> ioChannel = JRoutine.io().buildChannel();
         channel.passTo(new SelectableOutputConsumer<OUT, OUT>(ioChannel, index));
         return ioChannel;
     }
 
     @NotNull
     @SuppressWarnings("unchecked")
-    private static IOChannel<List<?>, List<?>> distribute(final boolean isFlush,
+    private static IOChannel<List<?>> distribute(final boolean isFlush,
             @Nullable final Object placeholder, @NotNull final InputChannel<?>... channels) {
 
         final int length = channels.length;
@@ -838,23 +755,23 @@ public class Channels {
             throw new IllegalArgumentException("the array of channels must not be empty");
         }
 
-        final ArrayList<IOChannel<?, ?>> channelList = new ArrayList<IOChannel<?, ?>>(length);
+        final ArrayList<IOChannel<?>> channelList = new ArrayList<IOChannel<?>>(length);
 
         for (final InputChannel<?> channel : channels) {
 
-            final IOChannel<?, ?> ioChannel = JRoutine.io().buildChannel();
+            final IOChannel<?> ioChannel = JRoutine.io().buildChannel();
             ioChannel.passTo(((InputChannel<Object>) channel));
             channelList.add(ioChannel);
         }
 
-        final IOChannel<List<?>, List<?>> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<List<?>> ioChannel = JRoutine.io().buildChannel();
         return ioChannel.passTo(new DistributeOutputConsumer(isFlush, placeholder, channelList));
     }
 
     @NotNull
     @SuppressWarnings("unchecked")
-    private static <IN> IOChannel<List<? extends IN>, List<? extends IN>> distribute(
-            final boolean isFlush, @Nullable final IN placeholder,
+    private static <IN> IOChannel<List<? extends IN>> distribute(final boolean isFlush,
+            @Nullable final IN placeholder,
             @NotNull final List<? extends InputChannel<? extends IN>> channels) {
 
         if (channels.isEmpty()) {
@@ -862,18 +779,16 @@ public class Channels {
             throw new IllegalArgumentException("the list of channels must not be empty");
         }
 
-        final ArrayList<IOChannel<?, ?>> channelList =
-                new ArrayList<IOChannel<?, ?>>(channels.size());
+        final ArrayList<IOChannel<?>> channelList = new ArrayList<IOChannel<?>>(channels.size());
 
         for (final InputChannel<?> channel : channels) {
 
-            final IOChannel<?, ?> ioChannel = JRoutine.io().buildChannel();
+            final IOChannel<?> ioChannel = JRoutine.io().buildChannel();
             ioChannel.passTo(((InputChannel<Object>) channel));
             channelList.add(ioChannel);
         }
 
-        final IOChannel<List<? extends IN>, List<? extends IN>> ioChannel =
-                JRoutine.io().buildChannel();
+        final IOChannel<List<? extends IN>> ioChannel = JRoutine.io().buildChannel();
         return ioChannel.passTo(new DistributeOutputConsumer(isFlush, placeholder, channelList));
     }
 
@@ -889,8 +804,7 @@ public class Channels {
             throw new IllegalArgumentException("the list of channels must not be empty");
         }
 
-        final IOChannel<List<? extends OUT>, List<? extends OUT>> ioChannel =
-                JRoutine.io().buildChannel();
+        final IOChannel<List<? extends OUT>> ioChannel = JRoutine.io().buildChannel();
         final JoinOutputConsumer<OUT> consumer =
                 new JoinOutputConsumer<OUT>(isFlush, size, placeholder, ioChannel);
         merge(channels).passTo(consumer);
@@ -909,7 +823,7 @@ public class Channels {
             throw new IllegalArgumentException("the array of channels must not be empty");
         }
 
-        final IOChannel<List<?>, List<?>> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<List<?>> ioChannel = JRoutine.io().buildChannel();
         final JoinOutputConsumer consumer =
                 new JoinOutputConsumer(isFlush, length, placeholder, ioChannel);
         merge(channels).passTo(consumer);
@@ -1026,8 +940,8 @@ public class Channels {
     private static class DefaultSelectableOutputChannel<OUT>
             implements SelectableOutputChannel<OUT>, OutputConsumer<Selectable<? extends OUT>> {
 
-        private final HashMap<Integer, IOChannel<OUT, OUT>> mChannels =
-                new HashMap<Integer, IOChannel<OUT, OUT>>();
+        private final HashMap<Integer, IOChannel<OUT>> mChannels =
+                new HashMap<Integer, IOChannel<OUT>>();
 
         private final Object mMutex = new Object();
 
@@ -1036,11 +950,11 @@ public class Channels {
         @NotNull
         public OutputChannel<OUT> index(final int index) {
 
-            IOChannel<OUT, OUT> channel;
+            IOChannel<OUT> channel;
 
             synchronized (mMutex) {
 
-                final HashMap<Integer, IOChannel<OUT, OUT>> channels = mChannels;
+                final HashMap<Integer, IOChannel<OUT>> channels = mChannels;
                 channel = channels.get(index);
 
                 if (channel == null) {
@@ -1065,9 +979,9 @@ public class Channels {
                 mIsOutput = true;
             }
 
-            final HashMap<Integer, IOChannel<OUT, OUT>> channels = mChannels;
+            final HashMap<Integer, IOChannel<OUT>> channels = mChannels;
 
-            for (final IOChannel<OUT, OUT> channel : channels.values()) {
+            for (final IOChannel<OUT> channel : channels.values()) {
 
                 channel.close();
             }
@@ -1080,8 +994,8 @@ public class Channels {
                 mIsOutput = true;
             }
 
-            final HashMap<Integer, IOChannel<OUT, OUT>> channels = mChannels;
-            final IOChannel<OUT, OUT> channel = channels.get(selectable.index);
+            final HashMap<Integer, IOChannel<OUT>> channels = mChannels;
+            final IOChannel<OUT> channel = channels.get(selectable.index);
 
             if (channel != null) {
 
@@ -1096,9 +1010,9 @@ public class Channels {
                 mIsOutput = true;
             }
 
-            final HashMap<Integer, IOChannel<OUT, OUT>> channels = mChannels;
+            final HashMap<Integer, IOChannel<OUT>> channels = mChannels;
 
-            for (final IOChannel<OUT, OUT> channel : channels.values()) {
+            for (final IOChannel<OUT> channel : channels.values()) {
 
                 channel.abort(error);
             }
@@ -1110,7 +1024,7 @@ public class Channels {
      */
     private static class DistributeOutputConsumer implements OutputConsumer<List<?>> {
 
-        private final ArrayList<IOChannel<?, ?>> mChannels;
+        private final ArrayList<IOChannel<?>> mChannels;
 
         private final boolean mIsFlush;
 
@@ -1124,7 +1038,7 @@ public class Channels {
          * @param channels    the list of channels.
          */
         private DistributeOutputConsumer(final boolean isFlush, @Nullable final Object placeholder,
-                @NotNull final ArrayList<IOChannel<?, ?>> channels) {
+                @NotNull final ArrayList<IOChannel<?>> channels) {
 
             mIsFlush = isFlush;
             mChannels = channels;
@@ -1133,7 +1047,7 @@ public class Channels {
 
         public void onComplete() {
 
-            for (final IOChannel<?, ?> channel : mChannels) {
+            for (final IOChannel<?> channel : mChannels) {
 
                 channel.close();
             }
@@ -1141,7 +1055,7 @@ public class Channels {
 
         public void onError(@Nullable final RoutineException error) {
 
-            for (final IOChannel<?, ?> channel : mChannels) {
+            for (final IOChannel<?> channel : mChannels) {
 
                 channel.abort(error);
             }
@@ -1151,7 +1065,7 @@ public class Channels {
         public void onOutput(final List<?> inputs) {
 
             final int inputSize = inputs.size();
-            final ArrayList<IOChannel<?, ?>> channels = mChannels;
+            final ArrayList<IOChannel<?>> channels = mChannels;
             final int size = channels.size();
 
             if (inputSize > size) {
@@ -1164,8 +1078,7 @@ public class Channels {
 
             for (int i = 0; i < size; ++i) {
 
-                final IOChannel<Object, Object> channel =
-                        (IOChannel<Object, Object>) channels.get(i);
+                final IOChannel<Object> channel = (IOChannel<Object>) channels.get(i);
 
                 if (i < inputSize) {
 
@@ -1186,7 +1099,7 @@ public class Channels {
      */
     private static class FilterOutputConsumer<IN> implements OutputConsumer<Selectable<IN>> {
 
-        private final IOChannel<? super IN, ? super IN> mChannel;
+        private final IOChannel<? super IN> mChannel;
 
         private final int mIndex;
 
@@ -1196,7 +1109,7 @@ public class Channels {
          * @param channel the input channel to feed.
          * @param index   the index to filter.
          */
-        private FilterOutputConsumer(@NotNull final IOChannel<? super IN, ? super IN> channel,
+        private FilterOutputConsumer(@NotNull final IOChannel<? super IN> channel,
                 final int index) {
 
             mChannel = channel;
@@ -1229,7 +1142,7 @@ public class Channels {
      */
     private static class JoinOutputConsumer<OUT> implements OutputConsumer<Selectable<OUT>> {
 
-        private final IOChannel<List<? extends OUT>, List<? extends OUT>> mChannel;
+        private final IOChannel<List<? extends OUT>> mChannel;
 
         private final boolean mIsFlush;
 
@@ -1248,7 +1161,7 @@ public class Channels {
         @SuppressWarnings("unchecked")
         private JoinOutputConsumer(final boolean isFlush, final int size,
                 @Nullable final OUT placeholder,
-                @NotNull final IOChannel<List<? extends OUT>, List<? extends OUT>> channel) {
+                @NotNull final IOChannel<List<? extends OUT>> channel) {
 
             final SimpleQueue<OUT>[] queues = (mQueues = new SimpleQueue[size]);
             mIsFlush = isFlush;
@@ -1263,7 +1176,7 @@ public class Channels {
 
         private void flush() {
 
-            final IOChannel<List<? extends OUT>, List<? extends OUT>> channel = mChannel;
+            final IOChannel<List<? extends OUT>> channel = mChannel;
             final SimpleQueue<OUT>[] queues = mQueues;
             final int length = queues.length;
             final OUT placeholder = mPlaceholder;
@@ -1356,7 +1269,7 @@ public class Channels {
     private static class SelectableOutputConsumer<OUT, IN extends OUT>
             implements OutputConsumer<IN> {
 
-        private final IOChannel<? super Selectable<OUT>, ? super Selectable<OUT>> mChannel;
+        private final IOChannel<? super Selectable<OUT>> mChannel;
 
         private final int mIndex;
 
@@ -1366,8 +1279,7 @@ public class Channels {
          * @param channel the selectable channel.
          * @param index   the selectable index.
          */
-        private SelectableOutputConsumer(
-                @NotNull final IOChannel<? super Selectable<OUT>, ? super Selectable<OUT>> channel,
+        private SelectableOutputConsumer(@NotNull final IOChannel<? super Selectable<OUT>> channel,
                 final int index) {
 
             mChannel = channel;
@@ -1395,7 +1307,7 @@ public class Channels {
      */
     private static class SortingArrayOutputConsumer implements OutputConsumer<Selectable<?>> {
 
-        private final ArrayList<IOChannel<?, ?>> mChannelList;
+        private final ArrayList<IOChannel<?>> mChannelList;
 
         private final int mSize;
 
@@ -1408,7 +1320,7 @@ public class Channels {
          * @param channels   the list of channels.
          */
         private SortingArrayOutputConsumer(final int startIndex,
-                @NotNull final ArrayList<IOChannel<?, ?>> channels) {
+                @NotNull final ArrayList<IOChannel<?>> channels) {
 
             mStartIndex = startIndex;
             mChannelList = channels;
@@ -1417,7 +1329,7 @@ public class Channels {
 
         public void onComplete() {
 
-            for (final IOChannel<?, ?> channel : mChannelList) {
+            for (final IOChannel<?> channel : mChannelList) {
 
                 channel.close();
             }
@@ -1425,7 +1337,7 @@ public class Channels {
 
         public void onError(@Nullable final RoutineException error) {
 
-            for (final IOChannel<?, ?> channel : mChannelList) {
+            for (final IOChannel<?> channel : mChannelList) {
 
                 channel.abort(error);
             }
@@ -1441,8 +1353,7 @@ public class Channels {
                 return;
             }
 
-            final IOChannel<Object, Object> channel =
-                    (IOChannel<Object, Object>) mChannelList.get(index);
+            final IOChannel<Object> channel = (IOChannel<Object>) mChannelList.get(index);
 
             if (channel != null) {
 
@@ -1459,22 +1370,21 @@ public class Channels {
     private static class SortingMapOutputConsumer<OUT>
             implements OutputConsumer<Selectable<? extends OUT>> {
 
-        private final HashMap<Integer, IOChannel<OUT, OUT>> mChannels;
+        private final HashMap<Integer, IOChannel<OUT>> mChannels;
 
         /**
          * Constructor.
          *
          * @param channels the map of indexes and I/O channels.
          */
-        private SortingMapOutputConsumer(
-                @NotNull final HashMap<Integer, IOChannel<OUT, OUT>> channels) {
+        private SortingMapOutputConsumer(@NotNull final HashMap<Integer, IOChannel<OUT>> channels) {
 
             mChannels = channels;
         }
 
         public void onComplete() {
 
-            for (final IOChannel<OUT, OUT> channel : mChannels.values()) {
+            for (final IOChannel<OUT> channel : mChannels.values()) {
 
                 channel.close();
             }
@@ -1482,7 +1392,7 @@ public class Channels {
 
         public void onError(@Nullable final RoutineException error) {
 
-            for (final IOChannel<OUT, OUT> channel : mChannels.values()) {
+            for (final IOChannel<OUT> channel : mChannels.values()) {
 
                 channel.abort(error);
             }
@@ -1490,7 +1400,7 @@ public class Channels {
 
         public void onOutput(final Selectable<? extends OUT> selectable) {
 
-            final IOChannel<OUT, OUT> channel = mChannels.get(selectable.index);
+            final IOChannel<OUT> channel = mChannels.get(selectable.index);
 
             if (channel != null) {
 

@@ -21,7 +21,6 @@ import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.channel.StreamingIOChannel;
 import com.github.dm.jrt.core.Channels.Selectable;
 import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.invocation.InvocationException;
@@ -514,7 +513,7 @@ public class ChannelsTest {
         outputs.add(new Selectable<Object>(-11, Sort.INTEGER));
         final Routine<Selectable<Object>, Selectable<Object>> routine =
                 JRoutine.on(new Sort()).buildRoutine();
-        Map<Integer, IOChannel<Object, Object>> channelMap;
+        Map<Integer, IOChannel<Object>> channelMap;
         InvocationChannel<Selectable<Object>, Selectable<Object>> channel;
         channel = routine.asyncInvoke();
         channelMap = Channels.select(channel, Arrays.asList(Sort.INTEGER, Sort.STRING));
@@ -538,7 +537,7 @@ public class ChannelsTest {
 
         final Routine<Selectable<Object>, Selectable<Object>> routine =
                 JRoutine.on(new Sort()).buildRoutine();
-        Map<Integer, IOChannel<Object, Object>> channelMap;
+        Map<Integer, IOChannel<Object>> channelMap;
         InvocationChannel<Selectable<Object>, Selectable<Object>> channel;
         channel = routine.asyncInvoke();
         channelMap = Channels.select(channel, Arrays.asList(Sort.INTEGER, Sort.STRING));
@@ -604,8 +603,7 @@ public class ChannelsTest {
     @SuppressWarnings("unchecked")
     public void testInputSelect() {
 
-        final IOChannel<Selectable<String>, Selectable<String>> channel =
-                JRoutine.io().buildChannel();
+        final IOChannel<Selectable<String>> channel = JRoutine.io().buildChannel();
         Channels.select(channel.asInput(), 33).pass("test1", "test2", "test3").close();
         assertThat(channel.close().all()).containsExactly(new Selectable<String>("test1", 33),
                                                           new Selectable<String>("test2", 33),
@@ -615,8 +613,7 @@ public class ChannelsTest {
     @Test
     public void testInputSelectAbort() {
 
-        final IOChannel<Selectable<String>, Selectable<String>> channel =
-                JRoutine.io().buildChannel();
+        final IOChannel<Selectable<String>> channel = JRoutine.io().buildChannel();
         Channels.select(channel.asInput(), 33).pass("test1", "test2", "test3").abort();
 
         try {
@@ -634,7 +631,7 @@ public class ChannelsTest {
     @SuppressWarnings("unchecked")
     public void testInputToSelectable() {
 
-        final IOChannel<String, String> channel = JRoutine.io().buildChannel();
+        final IOChannel<String> channel = JRoutine.io().buildChannel();
         Channels.toSelectable(channel.asInput(), 33)
                 .pass(new Selectable<String>("test1", 33), new Selectable<String>("test2", -33),
                       new Selectable<String>("test3", 33), new Selectable<String>("test4", 333))
@@ -645,7 +642,7 @@ public class ChannelsTest {
     @Test
     public void testInputToSelectableAbort() {
 
-        final IOChannel<String, String> channel = JRoutine.io().buildChannel();
+        final IOChannel<String> channel = JRoutine.io().buildChannel();
         Channels.toSelectable(channel.asInput(), 33).abort();
 
         try {
@@ -664,8 +661,8 @@ public class ChannelsTest {
 
         final IOChannelBuilder builder = JRoutine.io();
         final Routine<List<?>, Character> routine = JRoutine.on(new CharAt()).buildRoutine();
-        IOChannel<String, String> channel1;
-        IOChannel<Integer, Integer> channel2;
+        IOChannel<String> channel1;
+        IOChannel<Integer> channel2;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
@@ -700,8 +697,8 @@ public class ChannelsTest {
 
         final IOChannelBuilder builder = JRoutine.io();
         final Routine<List<?>, Character> routine = JRoutine.on(new CharAt()).buildRoutine();
-        IOChannel<String, String> channel1;
-        IOChannel<Integer, Integer> channel2;
+        IOChannel<String> channel1;
+        IOChannel<Integer> channel2;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
@@ -740,8 +737,8 @@ public class ChannelsTest {
 
         final IOChannelBuilder builder = JRoutine.io();
         final Routine<List<?>, Character> routine = JRoutine.on(new CharAt()).buildRoutine();
-        IOChannel<String, String> channel1;
-        IOChannel<Integer, Integer> channel2;
+        IOChannel<String> channel1;
+        IOChannel<Integer> channel2;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
@@ -786,8 +783,8 @@ public class ChannelsTest {
 
         final IOChannelBuilder builder = JRoutine.io();
         final Routine<List<?>, Character> routine = JRoutine.on(new CharAt()).buildRoutine();
-        IOChannel<String, String> channel1;
-        IOChannel<Integer, Integer> channel2;
+        IOChannel<String> channel1;
+        IOChannel<Integer> channel2;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
@@ -878,8 +875,8 @@ public class ChannelsTest {
 
         final IOChannelBuilder builder =
                 JRoutine.io().channels().withChannelOrder(OrderType.BY_CALL).set();
-        final IOChannel<String, String> channel1 = builder.buildChannel();
-        final IOChannel<Integer, Integer> channel2 = builder.buildChannel();
+        final IOChannel<String> channel1 = builder.buildChannel();
+        final IOChannel<Integer> channel2 = builder.buildChannel();
 
         final OutputChannel<? extends Selectable<Object>> channel =
                 Channels.merge(Arrays.<OutputChannel<?>>asList(channel1, channel2));
@@ -913,8 +910,8 @@ public class ChannelsTest {
 
         final IOChannelBuilder builder =
                 JRoutine.io().channels().withChannelOrder(OrderType.BY_CALL).set();
-        IOChannel<String, String> channel1;
-        IOChannel<Integer, Integer> channel2;
+        IOChannel<String> channel1;
+        IOChannel<Integer> channel2;
         OutputChannel<? extends Selectable<?>> outputChannel;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
@@ -964,10 +961,10 @@ public class ChannelsTest {
 
         final IOChannelBuilder builder =
                 JRoutine.io().channels().withChannelOrder(OrderType.BY_CALL).set();
-        final IOChannel<String, String> channel1 = builder.buildChannel();
-        final IOChannel<String, String> channel2 = builder.buildChannel();
-        final IOChannel<String, String> channel3 = builder.buildChannel();
-        final IOChannel<String, String> channel4 = builder.buildChannel();
+        final IOChannel<String> channel1 = builder.buildChannel();
+        final IOChannel<String> channel2 = builder.buildChannel();
+        final IOChannel<String> channel3 = builder.buildChannel();
+        final IOChannel<String> channel4 = builder.buildChannel();
 
         final Routine<Selectable<String>, String> routine =
                 JRoutine.on(factoryOf(new ClassToken<Amb<String>>() {})).buildRoutine();
@@ -996,8 +993,8 @@ public class ChannelsTest {
 
         final IOChannelBuilder builder =
                 JRoutine.io().channels().withChannelOrder(OrderType.BY_CALL).set();
-        IOChannel<String, String> channel1;
-        IOChannel<Integer, Integer> channel2;
+        IOChannel<String> channel1;
+        IOChannel<Integer> channel2;
         OutputChannel<? extends Selectable<?>> outputChannel;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
@@ -1275,8 +1272,7 @@ public class ChannelsTest {
     @SuppressWarnings("unchecked")
     public void testOutputSelect() {
 
-        final IOChannel<Selectable<String>, Selectable<String>> channel =
-                JRoutine.io().buildChannel();
+        final IOChannel<Selectable<String>> channel = JRoutine.io().buildChannel();
         final OutputChannel<String> outputChannel = Channels.select(channel.asOutput(), 33).get(33);
         channel.pass(new Selectable<String>("test1", 33), new Selectable<String>("test2", -33),
                      new Selectable<String>("test3", 33), new Selectable<String>("test4", 333));
@@ -1287,8 +1283,7 @@ public class ChannelsTest {
     @Test
     public void testOutputSelectAbort() {
 
-        final IOChannel<Selectable<String>, Selectable<String>> channel =
-                JRoutine.io().buildChannel();
+        final IOChannel<Selectable<String>> channel = JRoutine.io().buildChannel();
         final OutputChannel<String> outputChannel = Channels.select(channel.asOutput(), 33).get(33);
         channel.abort();
 
@@ -1307,7 +1302,7 @@ public class ChannelsTest {
     @SuppressWarnings("unchecked")
     public void testOutputToSelectable() {
 
-        final IOChannel<String, String> channel = JRoutine.io().buildChannel();
+        final IOChannel<String> channel = JRoutine.io().buildChannel();
         channel.pass("test1", "test2", "test3").close();
         assertThat(Channels.toSelectable(channel.asOutput(), 33)
                            .afterMax(seconds(1))
@@ -1319,7 +1314,7 @@ public class ChannelsTest {
     @Test
     public void testOutputToSelectableAbort() {
 
-        final IOChannel<String, String> channel = JRoutine.io().buildChannel();
+        final IOChannel<String> channel = JRoutine.io().buildChannel();
         channel.pass("test1", "test2", "test3").abort();
 
         try {
@@ -1339,34 +1334,40 @@ public class ChannelsTest {
 
         final Routine<Selectable<Object>, Selectable<Object>> routine =
                 JRoutine.on(new Sort()).buildRoutine();
-        final StreamingIOChannel<Selectable<Object>, Selectable<Object>> channel =
-                Channels.asyncIo(routine);
-        Channels.select(channel).index(Sort.INTEGER);
-        Channels.select(channel).index(Sort.STRING);
-        channel.pass(new Selectable<Object>("test21", Sort.STRING),
-                     new Selectable<Object>(-11, Sort.INTEGER));
-        assertThat(
-                Channels.select(channel).index(Sort.INTEGER).afterMax(seconds(1)).next()).isEqualTo(
-                -11);
-        assertThat(
-                Channels.select(channel).index(Sort.STRING).afterMax(seconds(1)).next()).isEqualTo(
-                "test21");
-        channel.pass(new Selectable<Object>(-11, Sort.INTEGER),
-                     new Selectable<Object>("test21", Sort.STRING));
-        assertThat(
-                Channels.select(channel).index(Sort.INTEGER).afterMax(seconds(1)).next()).isEqualTo(
-                -11);
-        assertThat(
-                Channels.select(channel).index(Sort.STRING).afterMax(seconds(1)).next()).isEqualTo(
-                "test21");
-        channel.pass(new Selectable<Object>("test21", Sort.STRING),
-                     new Selectable<Object>(-11, Sort.INTEGER)).close();
-        assertThat(
-                Channels.select(channel).index(Sort.INTEGER).afterMax(seconds(1)).next()).isEqualTo(
-                -11);
-        assertThat(
-                Channels.select(channel).index(Sort.STRING).afterMax(seconds(1)).next()).isEqualTo(
-                "test21");
+        final IOChannel<Selectable<Object>> inputChannel = JRoutine.io().buildChannel();
+        final OutputChannel<Selectable<Object>> outputChannel = routine.asyncCall(inputChannel);
+        Channels.select(outputChannel).index(Sort.INTEGER);
+        Channels.select(outputChannel).index(Sort.STRING);
+        inputChannel.pass(new Selectable<Object>("test21", Sort.STRING),
+                          new Selectable<Object>(-11, Sort.INTEGER));
+        assertThat(Channels.select(outputChannel)
+                           .index(Sort.INTEGER)
+                           .afterMax(seconds(10))
+                           .next()).isEqualTo(-11);
+        assertThat(Channels.select(outputChannel)
+                           .index(Sort.STRING)
+                           .afterMax(seconds(10))
+                           .next()).isEqualTo("test21");
+        inputChannel.pass(new Selectable<Object>(-11, Sort.INTEGER),
+                          new Selectable<Object>("test21", Sort.STRING));
+        assertThat(Channels.select(outputChannel)
+                           .index(Sort.INTEGER)
+                           .afterMax(seconds(10))
+                           .next()).isEqualTo(-11);
+        assertThat(Channels.select(outputChannel)
+                           .index(Sort.STRING)
+                           .afterMax(seconds(10))
+                           .next()).isEqualTo("test21");
+        inputChannel.pass(new Selectable<Object>("test21", Sort.STRING),
+                          new Selectable<Object>(-11, Sort.INTEGER));
+        assertThat(Channels.select(outputChannel)
+                           .index(Sort.INTEGER)
+                           .afterMax(seconds(10))
+                           .next()).isEqualTo(-11);
+        assertThat(Channels.select(outputChannel)
+                           .index(Sort.STRING)
+                           .afterMax(seconds(10))
+                           .next()).isEqualTo("test21");
     }
 
     @Test
@@ -1375,18 +1376,18 @@ public class ChannelsTest {
 
         final Routine<Selectable<Object>, Selectable<Object>> routine =
                 JRoutine.on(new Sort()).buildRoutine();
-        StreamingIOChannel<Selectable<Object>, Selectable<Object>> channel =
-                Channels.asyncIo(routine);
-        Channels.select(channel).index(Sort.INTEGER);
-        Channels.select(channel).index(Sort.STRING);
-        channel.after(millis(100))
-               .pass(new Selectable<Object>("test21", Sort.STRING),
-                     new Selectable<Object>(-11, Sort.INTEGER))
-               .abort();
+        IOChannel<Selectable<Object>> inputChannel = JRoutine.io().buildChannel();
+        OutputChannel<Selectable<Object>> outputChannel = routine.asyncCall(inputChannel);
+        Channels.select(outputChannel).index(Sort.INTEGER);
+        Channels.select(outputChannel).index(Sort.STRING);
+        inputChannel.after(millis(100))
+                    .pass(new Selectable<Object>("test21", Sort.STRING),
+                          new Selectable<Object>(-11, Sort.INTEGER))
+                    .abort();
 
         try {
 
-            Channels.select(channel).index(Sort.STRING).afterMax(seconds(1)).all();
+            Channels.select(outputChannel).index(Sort.STRING).afterMax(seconds(1)).all();
 
             fail();
 
@@ -1396,7 +1397,7 @@ public class ChannelsTest {
 
         try {
 
-            Channels.select(channel).index(Sort.INTEGER).afterMax(seconds(1)).all();
+            Channels.select(outputChannel).index(Sort.INTEGER).afterMax(seconds(1)).all();
 
             fail();
 
@@ -1404,45 +1405,18 @@ public class ChannelsTest {
 
         }
 
-        channel = Channels.asyncIo(routine);
-        Channels.select(channel).index(Sort.INTEGER);
-        Channels.select(channel).index(Sort.STRING);
-        channel.after(millis(100))
-               .pass(new Selectable<Object>(-11, Sort.INTEGER),
-                     new Selectable<Object>("test21", Sort.STRING))
-               .abort();
+        inputChannel = JRoutine.io().buildChannel();
+        outputChannel = routine.asyncCall(inputChannel);
+        Channels.select(outputChannel).index(Sort.INTEGER);
+        Channels.select(outputChannel).index(Sort.STRING);
+        inputChannel.after(millis(100))
+                    .pass(new Selectable<Object>(-11, Sort.INTEGER),
+                          new Selectable<Object>("test21", Sort.STRING))
+                    .abort();
 
         try {
 
-            Channels.select(channel).index(Sort.STRING).afterMax(seconds(1)).all();
-
-            fail();
-
-        } catch (final AbortException ignored) {
-
-        }
-
-        try {
-
-            Channels.select(channel).index(Sort.INTEGER).afterMax(seconds(1)).all();
-
-            fail();
-
-        } catch (final AbortException ignored) {
-
-        }
-
-        channel = Channels.asyncIo(routine);
-        Channels.select(channel).index(Sort.INTEGER);
-        Channels.select(channel).index(Sort.STRING);
-        channel.after(millis(100))
-               .pass(new Selectable<Object>("test21", Sort.STRING),
-                     new Selectable<Object>(-11, Sort.INTEGER))
-               .abort();
-
-        try {
-
-            Channels.select(channel).index(Sort.STRING).afterMax(seconds(1)).all();
+            Channels.select(outputChannel).index(Sort.STRING).afterMax(seconds(1)).all();
 
             fail();
 
@@ -1452,7 +1426,36 @@ public class ChannelsTest {
 
         try {
 
-            Channels.select(channel).index(Sort.INTEGER).afterMax(seconds(1)).all();
+            Channels.select(outputChannel).index(Sort.INTEGER).afterMax(seconds(1)).all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        inputChannel = JRoutine.io().buildChannel();
+        outputChannel = routine.asyncCall(inputChannel);
+        Channels.select(outputChannel).index(Sort.INTEGER);
+        Channels.select(outputChannel).index(Sort.STRING);
+        inputChannel.after(millis(100))
+                    .pass(new Selectable<Object>("test21", Sort.STRING),
+                          new Selectable<Object>(-11, Sort.INTEGER))
+                    .abort();
+
+        try {
+
+            Channels.select(outputChannel).index(Sort.STRING).afterMax(seconds(1)).all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            Channels.select(outputChannel).index(Sort.INTEGER).afterMax(seconds(1)).all();
 
             fail();
 
@@ -1475,8 +1478,7 @@ public class ChannelsTest {
 
         }
 
-        final IOChannel<Selectable<Object>, Selectable<Object>> channel =
-                JRoutine.io().buildChannel();
+        final IOChannel<Selectable<Object>> channel = JRoutine.io().buildChannel();
         Channels.select(channel).index(0);
         channel.pass(new Selectable<Object>("test", 0));
         assertThat(Channels.select(channel).index(0).next()).isEqualTo("test");

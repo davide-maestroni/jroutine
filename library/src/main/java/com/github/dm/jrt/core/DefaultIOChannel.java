@@ -38,7 +38,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @param <DATA> the data type.
  */
-class DefaultIOChannel<DATA> implements IOChannel<DATA, DATA> {
+class DefaultIOChannel<DATA> implements IOChannel<DATA> {
 
     private final DefaultResultChannel<DATA> mInputChannel;
 
@@ -86,140 +86,140 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA, DATA> {
     }
 
     @NotNull
-    public IOChannel<DATA, DATA> after(@NotNull final TimeDuration delay) {
+    public IOChannel<DATA> after(@NotNull final TimeDuration delay) {
 
         mInputChannel.after(delay);
         return this;
     }
 
     @NotNull
-    public IOChannel<DATA, DATA> after(final long delay, @NotNull final TimeUnit timeUnit) {
+    public IOChannel<DATA> after(final long delay, @NotNull final TimeUnit timeUnit) {
 
         mInputChannel.after(delay, timeUnit);
         return this;
     }
 
     @NotNull
-    public IOChannel<DATA, DATA> now() {
+    public IOChannel<DATA> now() {
 
         mInputChannel.now();
         return this;
     }
 
     @NotNull
-    public IOChannel<DATA, DATA> orderByCall() {
+    public IOChannel<DATA> orderByCall() {
 
         mInputChannel.orderByCall();
         return this;
     }
 
     @NotNull
-    public IOChannel<DATA, DATA> orderByChance() {
+    public IOChannel<DATA> orderByChance() {
 
         mInputChannel.orderByChance();
         return this;
     }
 
     @NotNull
-    public IOChannel<DATA, DATA> orderByDelay() {
+    public IOChannel<DATA> orderByDelay() {
 
         mInputChannel.orderByDelay();
         return this;
     }
 
     @NotNull
-    public IOChannel<DATA, DATA> pass(@Nullable final OutputChannel<? extends DATA> channel) {
+    public IOChannel<DATA> pass(@Nullable final OutputChannel<? extends DATA> channel) {
 
         mInputChannel.pass(channel);
         return this;
     }
 
     @NotNull
-    public IOChannel<DATA, DATA> pass(@Nullable final Iterable<? extends DATA> inputs) {
+    public IOChannel<DATA> pass(@Nullable final Iterable<? extends DATA> inputs) {
 
         mInputChannel.pass(inputs);
         return this;
     }
 
     @NotNull
-    public IOChannel<DATA, DATA> pass(@Nullable final DATA input) {
+    public IOChannel<DATA> pass(@Nullable final DATA input) {
 
         mInputChannel.pass(input);
         return this;
     }
 
     @NotNull
-    public IOChannel<DATA, DATA> pass(@Nullable final DATA... inputs) {
+    public IOChannel<DATA> pass(@Nullable final DATA... inputs) {
 
         mInputChannel.pass(inputs);
         return this;
     }
 
     @NotNull
-    public IOChannel<DATA, DATA> afterMax(@NotNull final TimeDuration timeout) {
+    public IOChannel<DATA> afterMax(@NotNull final TimeDuration timeout) {
 
         mOutputChannel.afterMax(timeout);
         return this;
     }
 
     @NotNull
-    public IOChannel<DATA, DATA> afterMax(final long timeout, @NotNull final TimeUnit timeUnit) {
+    public IOChannel<DATA> afterMax(final long timeout, @NotNull final TimeUnit timeUnit) {
 
         mOutputChannel.afterMax(timeout, timeUnit);
         return this;
     }
 
     @NotNull
-    public IOChannel<DATA, DATA> allInto(@NotNull final Collection<? super DATA> results) {
+    public IOChannel<DATA> allInto(@NotNull final Collection<? super DATA> results) {
 
         mOutputChannel.allInto(results);
         return this;
     }
 
     @NotNull
-    public IOChannel<DATA, DATA> eventuallyAbort() {
+    public IOChannel<DATA> eventuallyAbort() {
 
         mOutputChannel.eventuallyAbort();
         return this;
     }
 
     @NotNull
-    public IOChannel<DATA, DATA> eventuallyAbort(@Nullable final Throwable reason) {
+    public IOChannel<DATA> eventuallyAbort(@Nullable final Throwable reason) {
 
         mOutputChannel.eventuallyAbort(reason);
         return this;
     }
 
     @NotNull
-    public IOChannel<DATA, DATA> eventuallyExit() {
+    public IOChannel<DATA> eventuallyExit() {
 
         mOutputChannel.eventuallyExit();
         return this;
     }
 
     @NotNull
-    public IOChannel<DATA, DATA> eventuallyThrow() {
+    public IOChannel<DATA> eventuallyThrow() {
 
         mOutputChannel.eventuallyThrow();
         return this;
     }
 
     @NotNull
-    public IOChannel<DATA, DATA> immediately() {
+    public IOChannel<DATA> immediately() {
 
         mOutputChannel.immediately();
         return this;
     }
 
     @NotNull
-    public IOChannel<DATA, DATA> passTo(@NotNull final OutputConsumer<? super DATA> consumer) {
+    public IOChannel<DATA> passTo(@NotNull final OutputConsumer<? super DATA> consumer) {
 
         mOutputChannel.passTo(consumer);
         return this;
     }
 
     @NotNull
-    public IOChannel<DATA, DATA> skip(final int count) {
+    public IOChannel<DATA> skip(final int count) {
 
         mOutputChannel.skip(count);
         return this;
@@ -238,7 +238,7 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA, DATA> {
     }
 
     @NotNull
-    public IOChannel<DATA, DATA> close() {
+    public IOChannel<DATA> close() {
 
         mInputChannel.close();
         return this;

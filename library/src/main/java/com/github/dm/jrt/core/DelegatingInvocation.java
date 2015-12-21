@@ -13,19 +13,16 @@
  */
 package com.github.dm.jrt.core;
 
+import com.github.dm.jrt.channel.Channel.OutputChannel;
+import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
-import com.github.dm.jrt.channel.StreamingIOChannel;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import static com.github.dm.jrt.core.Channels.asyncIo;
-import static com.github.dm.jrt.core.Channels.parallelIo;
-import static com.github.dm.jrt.core.Channels.syncIo;
 
 /**
  * Invocation implementation delegating the execution to another routine.
@@ -41,7 +38,9 @@ public class DelegatingInvocation<IN, OUT> implements Invocation<IN, OUT> {
 
     private final Routine<IN, OUT> mRoutine;
 
-    private StreamingIOChannel<IN, OUT> mChannel;
+    private IOChannel<IN> mInputChannel;
+
+    private OutputChannel<OUT> mOutputChannel;
 
     /**
      * Constructor.
@@ -54,7 +53,8 @@ public class DelegatingInvocation<IN, OUT> implements Invocation<IN, OUT> {
 
         mRoutine = routine;
         mDelegationType = delegation;
-        mChannel = null;
+        mInputChannel = null;
+        mOutputChannel = null;
     }
 
     /**
@@ -75,7 +75,7 @@ public class DelegatingInvocation<IN, OUT> implements Invocation<IN, OUT> {
 
     public void onAbort(@Nullable final RoutineException reason) {
 
-        mChannel.abort(reason);
+        mInputChannel.abort(reason);
     }
 
     public void onDestroy() {
@@ -86,38 +86,41 @@ public class DelegatingInvocation<IN, OUT> implements Invocation<IN, OUT> {
     public void onInitialize() {
 
         final DelegationType delegationType = mDelegationType;
-        mChannel = (delegationType == DelegationType.ASYNC) ? asyncIo(mRoutine)
-                : (delegationType == DelegationType.PARALLEL) ? parallelIo(mRoutine)
-                        : syncIo(mRoutine);
+        final IOChannel<IN> inputChannel = JRoutine.io().buildChannel();
+        mInputChannel = inputChannel;
+        mOutputChannel = (delegationType == DelegationType.ASYNC) ? mRoutine.asyncCall(inputChannel)
+                : (delegationType == DelegationType.PARALLEL) ? mRoutine.parallelCall(inputChannel)
+                        : mRoutine.syncCall(inputChannel);
     }
 
     public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
 
-        final StreamingIOChannel<IN, OUT> channel = mChannel;
+        final OutputChannel<OUT> outputChannel = mOutputChannel;
 
-        if (!channel.isBound()) {
+        if (!outputChannel.isBound()) {
 
-            channel.passTo(result);
+            outputChannel.passTo(result);
         }
 
-        channel.pass(input);
+        mInputChannel.pass(input);
     }
 
     public void onResult(@NotNull final ResultChannel<OUT> result) {
 
-        final StreamingIOChannel<IN, OUT> channel = mChannel;
+        final OutputChannel<OUT> outputChannel = mOutputChannel;
 
-        if (!channel.isBound()) {
+        if (!outputChannel.isBound()) {
 
-            channel.passTo(result);
+            outputChannel.passTo(result);
         }
 
-        channel.close();
+        mInputChannel.close();
     }
 
     public void onTerminate() {
 
-        mChannel = null;
+        mInputChannel = null;
+        mOutputChannel = null;
     }
 
     /**

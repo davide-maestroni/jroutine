@@ -205,7 +205,7 @@ public class ByteChannel {
      * @return the output stream.
      */
     @NotNull
-    public BufferOutputStream passTo(@NotNull final IOChannel<? super ByteBuffer, ?> channel) {
+    public BufferOutputStream passTo(@NotNull final IOChannel<? super ByteBuffer> channel) {
 
         return new IOBufferOutputStream(passTo(channel.asInput()), channel);
     }
@@ -392,7 +392,7 @@ public class ByteChannel {
      */
     private static class IOBufferOutputStream extends BufferOutputStream {
 
-        private final IOChannel<? super ByteBuffer, ?> mIOChannel;
+        private final IOChannel<? super ByteBuffer> mIOChannel;
 
         private final BufferOutputStream mOutputStream;
 
@@ -403,7 +403,7 @@ public class ByteChannel {
          * @param channel the I/O channel.
          */
         private IOBufferOutputStream(@NotNull final BufferOutputStream wrapped,
-                @NotNull final IOChannel<? super ByteBuffer, ?> channel) {
+                @NotNull final IOChannel<? super ByteBuffer> channel) {
 
             mOutputStream = wrapped;
             mIOChannel = channel;

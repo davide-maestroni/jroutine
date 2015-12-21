@@ -82,7 +82,7 @@ class DefaultLoaderChannelBuilder
 
         if (component == null) {
 
-            final IOChannel<OUT, OUT> ioChannel = JRoutine.io().buildChannel();
+            final IOChannel<OUT> ioChannel = JRoutine.io().buildChannel();
             ioChannel.abort(new MissingInvocationException(loaderId));
             return ioChannel.close();
         }

@@ -39,30 +39,30 @@ class DefaultIOChannelBuilder implements IOChannelBuilder, Configurable<IOChanne
     }
 
     @NotNull
-    public <DATA> IOChannel<DATA, DATA> buildChannel() {
+    public <DATA> IOChannel<DATA> buildChannel() {
 
         return new DefaultIOChannel<DATA>(mConfiguration);
     }
 
     @NotNull
     @SuppressWarnings("unchecked")
-    public <DATA> IOChannel<DATA, DATA> of(@Nullable final DATA input) {
+    public <DATA> IOChannel<DATA> of(@Nullable final DATA input) {
 
-        return (IOChannel<DATA, DATA>) buildChannel().pass(input).close();
+        return (IOChannel<DATA>) buildChannel().pass(input).close();
     }
 
     @NotNull
     @SuppressWarnings("unchecked")
-    public <DATA> IOChannel<DATA, DATA> of(@Nullable final DATA... inputs) {
+    public <DATA> IOChannel<DATA> of(@Nullable final DATA... inputs) {
 
-        return (IOChannel<DATA, DATA>) buildChannel().pass(inputs).close();
+        return (IOChannel<DATA>) buildChannel().pass(inputs).close();
     }
 
     @NotNull
     @SuppressWarnings("unchecked")
-    public <DATA> IOChannel<DATA, DATA> of(@Nullable final Iterable<DATA> inputs) {
+    public <DATA> IOChannel<DATA> of(@Nullable final Iterable<DATA> inputs) {
 
-        return (IOChannel<DATA, DATA>) buildChannel().pass(inputs).close();
+        return (IOChannel<DATA>) buildChannel().pass(inputs).close();
     }
 
     @NotNull

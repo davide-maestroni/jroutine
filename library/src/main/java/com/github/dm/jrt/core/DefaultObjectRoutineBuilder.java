@@ -13,8 +13,8 @@
  */
 package com.github.dm.jrt.core;
 
-import com.github.dm.jrt.annotation.Input.InputMode;
-import com.github.dm.jrt.annotation.Output.OutputMode;
+import com.github.dm.jrt.annotation.AsyncIn.InputMode;
+import com.github.dm.jrt.annotation.AsyncOut.OutputMode;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.Configurable;
 import com.github.dm.jrt.builder.ObjectRoutineBuilder;

@@ -68,15 +68,15 @@
             public interface AsyncMain {
 
                 &commat;Invoke(InvocationMode.PARALLEL)
-                &commat;Output
-                OutputChannel&lt;Integer&gt; parseArg(&commat;Input(String.class) OutputChannel&lt;String&gt; args);
+                &commat;AsyncOut
+                OutputChannel&lt;Integer&gt; parseArg(&commat;AsyncIn(String.class) OutputChannel&lt;String&gt; args);
 
                 &commat;Invoke(InvocationMode.PARALLEL)
-                &commat;Output
-                OutputChannel&lt;Integer&gt; square(&commat;Input(int.class) OutputChannel&lt;Integer&gt; value);
+                &commat;AsyncOut
+                OutputChannel&lt;Integer&gt; square(&commat;AsyncIn(int.class) OutputChannel&lt;Integer&gt; value);
 
                 double squareRootMean(
-                        &commat;Input(value = List.class, mode = InputMode.COLLECTION) OutputChannel&lt;Integer&gt; values);
+                        &commat;AsyncIn(value = List.class, mode = InputMode.COLLECTION) OutputChannel&lt;Integer&gt; values);
             }
         }
     </code>
@@ -137,15 +137,15 @@
             public interface AsyncMain {
 
                 &commat;Invoke(InvocationMode.PARALLEL)
-                &commat;Output
-                OutputChannel&lt;Integer&gt; parseArg(&commat;Input(String.class) OutputChannel&lt;String&gt; args);
+                &commat;AsyncOut
+                OutputChannel&lt;Integer&gt; parseArg(&commat;AsyncIn(String.class) OutputChannel&lt;String&gt; args);
 
                 &commat;Invoke(InvocationMode.PARALLEL)
-                &commat;Output
-                OutputChannel&lt;Integer&gt; square(&commat;Input(int.class) OutputChannel&lt;Integer&gt; value);
+                &commat;AsyncOut
+                OutputChannel&lt;Integer&gt; square(&commat;AsyncIn(int.class) OutputChannel&lt;Integer&gt; value);
 
                 double squareRootMean(
-                        &commat;Input(value = List.class, mode = InputMode.COLLECTION) OutputChannel&lt;Integer&gt; values);
+                        &commat;AsyncIn(value = List.class, mode = InputMode.COLLECTION) OutputChannel&lt;Integer&gt; values);
             }
         }
     </code>

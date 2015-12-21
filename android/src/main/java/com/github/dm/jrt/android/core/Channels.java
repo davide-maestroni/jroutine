@@ -150,20 +150,14 @@ public class Channels extends com.github.dm.jrt.core.Channels {
      */
     @NotNull
     public static <DATA, IN extends DATA> IOChannel<IN, IN> selectParcelable(
-            @Nullable final InputChannel<? super ParcelableSelectable<DATA>> channel,
+            @NotNull final InputChannel<? super ParcelableSelectable<DATA>> channel,
             final int index) {
 
         final IOChannel<IN, IN> inputChannel = JRoutine.io().buildChannel();
-
-        if (channel != null) {
-
-            final IOChannel<ParcelableSelectable<DATA>, ParcelableSelectable<DATA>> ioChannel =
-                    JRoutine.io().buildChannel();
-            ioChannel.passTo(channel);
-            inputChannel.passTo(new SelectableOutputConsumer<DATA, IN>(ioChannel, index));
-        }
-
-        return inputChannel;
+        final IOChannel<ParcelableSelectable<DATA>, ParcelableSelectable<DATA>> ioChannel =
+                JRoutine.io().buildChannel();
+        ioChannel.passTo(channel);
+        return inputChannel.passTo(new SelectableOutputConsumer<DATA, IN>(ioChannel, index));
     }
 
     /**
@@ -178,16 +172,11 @@ public class Channels extends com.github.dm.jrt.core.Channels {
      */
     @NotNull
     public static <OUT> OutputChannel<? extends ParcelableSelectable<OUT>> toSelectable(
-            @Nullable final OutputChannel<? extends OUT> channel, final int index) {
+            @NotNull final OutputChannel<? extends OUT> channel, final int index) {
 
         final IOChannel<ParcelableSelectable<OUT>, ParcelableSelectable<OUT>> ioChannel =
                 JRoutine.io().buildChannel();
-
-        if (channel != null) {
-
-            channel.passTo(new SelectableOutputConsumer<OUT, OUT>(ioChannel, index));
-        }
-
+        channel.passTo(new SelectableOutputConsumer<OUT, OUT>(ioChannel, index));
         return ioChannel;
     }
 

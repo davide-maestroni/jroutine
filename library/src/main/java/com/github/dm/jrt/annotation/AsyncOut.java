@@ -50,13 +50,13 @@ import java.lang.annotation.Target;
  * <pre>
  *     <code>
  *
- *         &#64;Output
+ *         &#64;AsyncOut
  *         public OutputChannel&lt;Integer&gt; sum(int i1, int i2);
  *     </code>
  * </pre>
  * <p/>
  * Note that the transfer mode is specifically chosen through the annotation {@code mode} attribute
- * (it's {@link Output.OutputMode#VALUE VALUE} by default).
+ * (it's {@link AsyncOut.OutputMode#VALUE VALUE} by default).
  * <p/>
  * Remember also that, in order for the annotation to properly work at run time, you will need to
  * add the following rules to your Proguard file (if employing it for shrinking or obfuscation):
@@ -65,7 +65,7 @@ import java.lang.annotation.Target;
  *
  *         -keepattributes RuntimeVisibleAnnotations
  *         -keepclassmembers class ** {
- *              &#64;com.github.dm.jrt.annotation.Output *;
+ *              &#64;com.github.dm.jrt.annotation.AsyncOut *;
  *         }
  *     </code>
  * </pre>
@@ -74,7 +74,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Output {
+public @interface AsyncOut {
 
     /**
      * The output transfer mode.

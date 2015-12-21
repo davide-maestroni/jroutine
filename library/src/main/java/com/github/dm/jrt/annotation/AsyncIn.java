@@ -13,21 +13,19 @@
  */
 package com.github.dm.jrt.annotation;
 
-import com.github.dm.jrt.annotation.Output.OutputMode;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Through this annotation it is possible to indicate the original parameter types of the target
+ * Through this annotation it is possible to indicate the original parameter type of the target
  * object method.
  * <p/>
  * The only use case in which this annotation is useful, is when an interface is used as a proxy
- * of another class methods. The interface can take all its input parameters in an asynchronous way.
- * In such case, the values specified in the annotation will indicate the type of the parameters
- * expected by the target method.
+ * of another class methods. The interface can take some input parameters in an asynchronous way. In
+ * such case, the value specified in the annotation will indicate the type of the parameter expected
+ * by the target method.
  * <p/>
  * For example, a method taking two integers:
  * <p/>
@@ -42,21 +40,12 @@ import java.lang.annotation.Target;
  * <pre>
  *     <code>
  *
- *         &#64;Inputs({int.class, int.class})
- *         public InvocationChannel&lt;Integer, Integer&gt; sum();
- *     </code>
- * </pre>
- * The proxying method can also return the routine wrapping the target one, as:
- * <p/>
- * <pre>
- *     <code>
- *
- *         &#64;Inputs({int.class, int.class})
- *         public Routine&lt;Integer, Integer&gt; sum();
+ *         public int sum(&#64;AsyncIn(int.class) OutputChannel&lt;Integer&gt; i1, int i2);
  *     </code>
  * </pre>
  * <p/>
- * In such case, it is up to the caller to invoke it in the proper mode.
+ * Note that the transfer mode is specifically chosen through the annotation {@code mode} attribute
+ * (it's {@link AsyncIn.InputMode#VALUE VALUE} by default).
  * <p/>
  * This annotation is used to decorate methods that are to be invoked in an asynchronous way.<br/>
  * Note that the piece of code inside such methods will be automatically protected so to avoid
@@ -72,29 +61,54 @@ import java.lang.annotation.Target;
  *
  *         -keepattributes RuntimeVisibleAnnotations
  *         -keepclassmembers class ** {
- *              &#64;com.github.dm.jrt.annotation.Inputs *;
+ *              &#64;com.github.dm.jrt.annotation.AsyncIn *;
  *         }
  *     </code>
  * </pre>
  * <p/>
- * Created by davide-maestroni on 05/22/2015.
+ * Created by davide-maestroni on 05/23/2015.
  */
-@Target(ElementType.METHOD)
+@Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Inputs {
+public @interface AsyncIn {
 
-    // TODO: 21/12/15 rename
     /**
-     * The output transfer mode.
+     * The input transfer mode.
      *
      * @return the mode.
      */
-    OutputMode mode() default OutputMode.VALUE;
+    InputMode mode() default InputMode.VALUE;
 
     /**
-     * The array of parameter types.
+     * The parameter class.
      *
-     * @return the parameter types.
+     * @return the class.
      */
-    Class<?>[] value();
+    Class<?> value();
+
+    /**
+     * Input transfer mode type.<br/>
+     * The mode indicates in which way a parameter is passed to the wrapped method.
+     */
+    enum InputMode {
+
+        /**
+         * Value mode.<br/>
+         * The variable is just read from an output channel.
+         * <p/>
+         * The annotated parameters must extend an
+         * {@link com.github.dm.jrt.channel.Channel.OutputChannel OutputChannel}.
+         */
+        VALUE,
+        /**
+         * Collection mode.<br/>
+         * The inputs are collected from the channel and passed as an array or collection to the
+         * wrapped method.
+         * <p/>
+         * The annotated parameter must extend an
+         * {@link com.github.dm.jrt.channel.Channel.OutputChannel OutputChannel} and must be the
+         * only parameter accepted by the method.
+         */
+        COLLECTION
+    }
 }

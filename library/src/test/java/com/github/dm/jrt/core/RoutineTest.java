@@ -14,8 +14,8 @@
 package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.annotation.Alias;
-import com.github.dm.jrt.annotation.Input;
-import com.github.dm.jrt.annotation.Output;
+import com.github.dm.jrt.annotation.AsyncIn;
+import com.github.dm.jrt.annotation.AsyncOut;
 import com.github.dm.jrt.annotation.ReadTimeout;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.AgingPriority;
@@ -3362,9 +3362,9 @@ public class RoutineTest {
 
     private interface TestInterfaceAsync {
 
-        int getInt(@Input(int.class) OutputChannel<Integer> i);
+        int getInt(@AsyncIn(int.class) OutputChannel<Integer> i);
 
-        @Output
+        @AsyncOut
         OutputChannel<Integer> getOne();
 
         @Alias(value = "getInt")

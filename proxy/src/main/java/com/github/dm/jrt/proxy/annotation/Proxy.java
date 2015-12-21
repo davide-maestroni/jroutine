@@ -65,7 +65,7 @@ import java.lang.annotation.Target;
  *                 TYPE get(int i);
  *
  *                 &#64;Alias("get")
- *                 &#64;Output
+ *                 &#64;AsyncOut
  *                 OutputChannel&lt;TYPE&gt; getAsync(int i);
  *             }
  *     </code>

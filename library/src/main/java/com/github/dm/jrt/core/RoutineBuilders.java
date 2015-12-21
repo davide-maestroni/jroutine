@@ -14,19 +14,19 @@
 package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.annotation.Alias;
+import com.github.dm.jrt.annotation.AsyncIn;
+import com.github.dm.jrt.annotation.AsyncIn.InputMode;
+import com.github.dm.jrt.annotation.AsyncMethod;
+import com.github.dm.jrt.annotation.AsyncOut;
+import com.github.dm.jrt.annotation.AsyncOut.OutputMode;
 import com.github.dm.jrt.annotation.CoreInstances;
-import com.github.dm.jrt.annotation.Input;
-import com.github.dm.jrt.annotation.Input.InputMode;
 import com.github.dm.jrt.annotation.InputMaxSize;
 import com.github.dm.jrt.annotation.InputOrder;
 import com.github.dm.jrt.annotation.InputTimeout;
-import com.github.dm.jrt.annotation.Inputs;
 import com.github.dm.jrt.annotation.Invoke;
 import com.github.dm.jrt.annotation.Invoke.InvocationMode;
 import com.github.dm.jrt.annotation.LogLevel;
 import com.github.dm.jrt.annotation.MaxInstances;
-import com.github.dm.jrt.annotation.Output;
-import com.github.dm.jrt.annotation.Output.OutputMode;
 import com.github.dm.jrt.annotation.OutputMaxSize;
 import com.github.dm.jrt.annotation.OutputOrder;
 import com.github.dm.jrt.annotation.OutputTimeout;
@@ -377,45 +377,46 @@ public class RoutineBuilders {
 
     /**
      * Gets the input transfer mode associated to the specified method parameter, while also
-     * validating the use of the {@link com.github.dm.jrt.annotation.Input Input} annotation.<br/>
+     * validating the use of the {@link com.github.dm.jrt.annotation.AsyncIn AsyncIn} annotation.
+     * <br/>
      * In case no annotation is present, the function will return with null.
      *
      * @param method the proxy method.
      * @param index  the index of the parameter.
      * @return the input mode.
      * @throws java.lang.IllegalArgumentException if the method has been incorrectly annotated.
-     * @see com.github.dm.jrt.annotation.Input Input
+     * @see com.github.dm.jrt.annotation.AsyncIn AsyncIn
      */
     @Nullable
     public static InputMode getInputMode(@NotNull final Method method, final int index) {
 
-        Input inputAnnotation = null;
+        AsyncIn asyncInputAnnotation = null;
         final Annotation[][] annotations = method.getParameterAnnotations();
 
         for (final Annotation annotation : annotations[index]) {
 
-            if (annotation.annotationType() == Input.class) {
+            if (annotation.annotationType() == AsyncIn.class) {
 
-                inputAnnotation = (Input) annotation;
+                asyncInputAnnotation = (AsyncIn) annotation;
                 break;
             }
         }
 
-        if (inputAnnotation == null) {
+        if (asyncInputAnnotation == null) {
 
             return null;
         }
 
-        InputMode inputMode = inputAnnotation.mode();
+        InputMode inputMode = asyncInputAnnotation.mode();
         final Class<?>[] parameterTypes = method.getParameterTypes();
         final Class<?> parameterType = parameterTypes[index];
 
-        if (inputMode == InputMode.CHANNEL) {
+        if (inputMode == InputMode.VALUE) {
 
             if (!OutputChannel.class.isAssignableFrom(parameterType)) {
 
                 throw new IllegalArgumentException(
-                        "[" + method + "] an async input with mode " + InputMode.CHANNEL
+                        "[" + method + "] an async input with mode " + InputMode.VALUE
                                 + " must extends an " + OutputChannel.class.getCanonicalName());
             }
 
@@ -428,7 +429,7 @@ public class RoutineBuilders {
                                 + " must extends an " + OutputChannel.class.getCanonicalName());
             }
 
-            final Class<?> paramClass = inputAnnotation.value();
+            final Class<?> paramClass = asyncInputAnnotation.value();
 
             if (!paramClass.isArray() && !paramClass.isAssignableFrom(List.class)) {
 
@@ -465,14 +466,14 @@ public class RoutineBuilders {
     @Nullable
     public static InvocationMode getInvocationMode(@NotNull final Method method) {
 
-        final Invoke methodAnnotation = method.getAnnotation(Invoke.class);
+        final Invoke invokeAnnotation = method.getAnnotation(Invoke.class);
 
-        if (methodAnnotation == null) {
+        if (invokeAnnotation == null) {
 
             return null;
         }
 
-        final InvocationMode invocationMode = methodAnnotation.value();
+        final InvocationMode invocationMode = invokeAnnotation.value();
 
         if ((invocationMode == InvocationMode.PARALLEL) && (method.getParameterTypes().length
                 > 1)) {
@@ -487,22 +488,23 @@ public class RoutineBuilders {
 
     /**
      * Gets the output transfer mode of the return type of the specified method, while also
-     * validating the use of the {@link com.github.dm.jrt.annotation.Output Output} annotation.<br/>
+     * validating the use of the {@link com.github.dm.jrt.annotation.AsyncOut AsyncOut} annotation.
+     * <br/>
      * In case no annotation is present, the function will return with null.
      *
      * @param method           the proxy method.
      * @param targetReturnType the target return type.
      * @return the output mode.
      * @throws java.lang.IllegalArgumentException if the method has been incorrectly annotated.
-     * @see com.github.dm.jrt.annotation.Output Output
+     * @see com.github.dm.jrt.annotation.AsyncOut AsyncOut
      */
     @Nullable
     public static OutputMode getOutputMode(@NotNull final Method method,
             @NotNull final Class<?> targetReturnType) {
 
-        final Output outputAnnotation = method.getAnnotation(Output.class);
+        final AsyncOut asyncOutputAnnotation = method.getAnnotation(AsyncOut.class);
 
-        if (outputAnnotation == null) {
+        if (asyncOutputAnnotation == null) {
 
             return null;
         }
@@ -516,7 +518,7 @@ public class RoutineBuilders {
                     "[" + method + "] an async output must be a superclass of " + channelClassName);
         }
 
-        OutputMode outputMode = outputAnnotation.value();
+        OutputMode outputMode = asyncOutputAnnotation.value();
 
         if ((outputMode == OutputMode.ELEMENT) && !targetReturnType.isArray()
                 && !Iterable.class.isAssignableFrom(targetReturnType)) {
@@ -631,16 +633,17 @@ public class RoutineBuilders {
 
                 final InvocationMode invocationMode = getInvocationMode(proxyMethod);
                 final Class<?>[] targetParameterTypes;
-                final Inputs inputsAnnotation = proxyMethod.getAnnotation(Inputs.class);
+                final AsyncMethod asyncMethodAnnotation =
+                        proxyMethod.getAnnotation(AsyncMethod.class);
                 InputMode inputMode = null;
                 OutputMode outputMode = null;
 
-                if (inputsAnnotation != null) {
+                if (asyncMethodAnnotation != null) {
 
                     if (proxyMethod.getParameterTypes().length > 0) {
 
                         throw new IllegalArgumentException(
-                                "methods annotated with " + Inputs.class.getSimpleName()
+                                "methods annotated with " + AsyncMethod.class.getSimpleName()
                                         + " must have no input parameters: " + proxyMethod);
                     }
 
@@ -653,9 +656,9 @@ public class RoutineBuilders {
                                 "the proxy method has incompatible return type: " + proxyMethod);
                     }
 
-                    targetParameterTypes = inputsAnnotation.value();
-                    inputMode = InputMode.CHANNEL;
-                    outputMode = inputsAnnotation.mode();
+                    targetParameterTypes = asyncMethodAnnotation.value();
+                    inputMode = InputMode.VALUE;
+                    outputMode = asyncMethodAnnotation.mode();
 
                 } else {
 
@@ -673,9 +676,9 @@ public class RoutineBuilders {
 
                             for (final Annotation paramAnnotation : annotations[i]) {
 
-                                if (paramAnnotation.annotationType() == Input.class) {
+                                if (paramAnnotation.annotationType() == AsyncIn.class) {
 
-                                    targetParameterTypes[i] = ((Input) paramAnnotation).value();
+                                    targetParameterTypes[i] = ((AsyncIn) paramAnnotation).value();
                                     break;
                                 }
                             }
@@ -695,13 +698,13 @@ public class RoutineBuilders {
                         getTargetMethod(proxyMethod, targetClass, targetParameterTypes);
                 final Class<?> returnType = proxyMethod.getReturnType();
                 final Class<?> targetReturnType = targetMethod.getReturnType();
-                final Output outputAnnotation = proxyMethod.getAnnotation(Output.class);
+                final AsyncOut asyncOutAnnotation = proxyMethod.getAnnotation(AsyncOut.class);
 
-                if (outputAnnotation != null) {
+                if (asyncOutAnnotation != null) {
 
                     outputMode = getOutputMode(proxyMethod, targetReturnType);
 
-                } else if ((inputsAnnotation == null) && !returnType.isAssignableFrom(
+                } else if ((asyncMethodAnnotation == null) && !returnType.isAssignableFrom(
                         targetReturnType)) {
 
                     throw new IllegalArgumentException(
@@ -737,7 +740,7 @@ public class RoutineBuilders {
 
         final Class<?> returnType = method.getReturnType();
 
-        if (method.isAnnotationPresent(Inputs.class)) {
+        if (method.isAnnotationPresent(AsyncMethod.class)) {
 
             if (returnType.isAssignableFrom(InvocationChannel.class)) {
 
@@ -755,7 +758,7 @@ public class RoutineBuilders {
                         : (invocationMode == InvocationMode.PARALLEL) ? routine.parallelInvoke()
                                 : routine.asyncInvoke();
 
-        if (inputMode == InputMode.CHANNEL) {
+        if (inputMode == InputMode.VALUE) {
 
             invocationChannel.orderByCall();
             final Class<?>[] parameterTypes = method.getParameterTypes();

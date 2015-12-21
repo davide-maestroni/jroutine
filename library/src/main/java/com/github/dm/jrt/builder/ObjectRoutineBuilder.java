@@ -59,10 +59,10 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
      * value will be used to bind the interface method with the instance ones. If no annotation is
      * present, the method name will be used instead.<br/>
      * The interface will be interpreted as a proxy of the target object methods, and the optional
-     * {@link com.github.dm.jrt.annotation.Input Input},
-     * {@link com.github.dm.jrt.annotation.Inputs Inputs},
-     * {@link com.github.dm.jrt.annotation.Invoke Invoke} and
-     * {@link com.github.dm.jrt.annotation.Output Output} annotations will be honored.
+     * {@link com.github.dm.jrt.annotation.AsyncIn AsyncIn},
+     * {@link com.github.dm.jrt.annotation.AsyncMethod AsyncMethod},
+     * {@link com.github.dm.jrt.annotation.AsyncOut AsyncOut} and
+     * {@link com.github.dm.jrt.annotation.Invoke Invoke} annotations will be honored.
      *
      * @param itf    the token of the interface implemented by the returned object.
      * @param <TYPE> the interface type.
@@ -85,10 +85,10 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
      * value will be used to bind the interface method with the instance ones. If no annotation is
      * present, the method name will be used instead.<br/>
      * The interface will be interpreted as a proxy of the target object methods, and the optional
-     * {@link com.github.dm.jrt.annotation.Input Input},
-     * {@link com.github.dm.jrt.annotation.Inputs Inputs},
-     * {@link com.github.dm.jrt.annotation.Invoke Invoke} and
-     * {@link com.github.dm.jrt.annotation.Output Output} annotations will be honored.
+     * {@link com.github.dm.jrt.annotation.AsyncIn AsyncIn},
+     * {@link com.github.dm.jrt.annotation.AsyncMethod AsyncMethod},
+     * {@link com.github.dm.jrt.annotation.AsyncOut AsyncOut} and
+     * {@link com.github.dm.jrt.annotation.Invoke Invoke} annotations will be honored.
      *
      * @param itf    the interface implemented by the returned object.
      * @param <TYPE> the interface type.

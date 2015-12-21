@@ -13,19 +13,21 @@
  */
 package com.github.dm.jrt.annotation;
 
+import com.github.dm.jrt.annotation.AsyncOut.OutputMode;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Through this annotation it is possible to indicate the original parameter type of the target
- * object method.
+ * Through this annotation it is possible to indicate the original parameter types of the target
+ * object method, and the wrapping routine output mode.
  * <p/>
  * The only use case in which this annotation is useful, is when an interface is used as a proxy
- * of another class methods. The interface can take some input parameters in an asynchronous way. In
- * such case, the value specified in the annotation will indicate the type of the parameter expected
- * by the target method.
+ * of another class methods. The interface can take all its input parameters in an asynchronous way.
+ * In such case, the values specified in the annotation will indicate the type of the parameters
+ * expected by the target method.
  * <p/>
  * For example, a method taking two integers:
  * <p/>
@@ -40,12 +42,21 @@ import java.lang.annotation.Target;
  * <pre>
  *     <code>
  *
- *         public int sum(&#64;Input(int.class) OutputChannel&lt;Integer&gt; i1, int i2);
+ *         &#64;AsyncMethod({int.class, int.class})
+ *         public InvocationChannel&lt;Integer, Integer&gt; sum();
+ *     </code>
+ * </pre>
+ * The proxying method can also return the routine wrapping the target one, as:
+ * <p/>
+ * <pre>
+ *     <code>
+ *
+ *         &#64;AsyncMethod({int.class, int.class})
+ *         public Routine&lt;Integer, Integer&gt; sum();
  *     </code>
  * </pre>
  * <p/>
- * Note that the transfer mode is specifically chosen through the annotation {@code mode} attribute
- * (it's {@link Input.InputMode#CHANNEL CHANNEL} by default).
+ * In such case, it is up to the caller to invoke it in the proper mode.
  * <p/>
  * This annotation is used to decorate methods that are to be invoked in an asynchronous way.<br/>
  * Note that the piece of code inside such methods will be automatically protected so to avoid
@@ -61,54 +72,28 @@ import java.lang.annotation.Target;
  *
  *         -keepattributes RuntimeVisibleAnnotations
  *         -keepclassmembers class ** {
- *              &#64;com.github.dm.jrt.annotation.Input *;
+ *              &#64;com.github.dm.jrt.annotation.AsyncMethod *;
  *         }
  *     </code>
  * </pre>
  * <p/>
- * Created by davide-maestroni on 05/23/2015.
+ * Created by davide-maestroni on 05/22/2015.
  */
-@Target(ElementType.PARAMETER)
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Input {
+public @interface AsyncMethod {
 
     /**
-     * The input transfer mode.
+     * The output transfer mode.
      *
      * @return the mode.
      */
-    InputMode mode() default InputMode.CHANNEL;
+    OutputMode mode() default OutputMode.VALUE;
 
     /**
-     * The parameter class.
+     * The array of parameter types.
      *
-     * @return the class.
+     * @return the parameter types.
      */
-    Class<?> value();
-
-    /**
-     * Input transfer mode type.<br/>
-     * The mode indicates in which way a parameter is passed to the wrapped method.
-     */
-    enum InputMode {
-
-        /**
-         * Channel mode.<br/>
-         * The variable is just read from an output channel.
-         * <p/>
-         * The annotated parameters must extend an
-         * {@link com.github.dm.jrt.channel.Channel.OutputChannel OutputChannel}.
-         */
-        CHANNEL,
-        /**
-         * Collection mode.<br/>
-         * The inputs are collected from the channel and passed as an array or collection to the
-         * wrapped method.
-         * <p/>
-         * The annotated parameter must extend an
-         * {@link com.github.dm.jrt.channel.Channel.OutputChannel OutputChannel} and must be the
-         * only parameter accepted by the method.
-         */
-        COLLECTION
-    }
+    Class<?>[] value();
 }

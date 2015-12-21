@@ -20,13 +20,13 @@ import android.test.ActivityInstrumentationTestCase2;
 import com.github.dm.jrt.android.builder.ServiceConfiguration;
 import com.github.dm.jrt.android.builder.ServiceObjectRoutineBuilder;
 import com.github.dm.jrt.annotation.Alias;
-import com.github.dm.jrt.annotation.Input;
-import com.github.dm.jrt.annotation.Input.InputMode;
-import com.github.dm.jrt.annotation.Inputs;
+import com.github.dm.jrt.annotation.AsyncIn;
+import com.github.dm.jrt.annotation.AsyncIn.InputMode;
+import com.github.dm.jrt.annotation.AsyncMethod;
+import com.github.dm.jrt.annotation.AsyncOut;
+import com.github.dm.jrt.annotation.AsyncOut.OutputMode;
 import com.github.dm.jrt.annotation.Invoke;
 import com.github.dm.jrt.annotation.Invoke.InvocationMode;
-import com.github.dm.jrt.annotation.Output;
-import com.github.dm.jrt.annotation.Output.OutputMode;
 import com.github.dm.jrt.annotation.ReadTimeout;
 import com.github.dm.jrt.annotation.ReadTimeoutAction;
 import com.github.dm.jrt.annotation.SharedFields;
@@ -944,227 +944,227 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         int add0(char c);
 
         @Alias("a")
-        int add1(@Input(value = char.class, mode = InputMode.CHANNEL) OutputChannel<Character> c);
+        int add1(@AsyncIn(value = char.class, mode = InputMode.VALUE) OutputChannel<Character> c);
 
         @Alias("a")
-        @Inputs(char.class)
+        @AsyncMethod(char.class)
         Routine<Character, Integer> add10();
 
         @Alias("a")
         @Invoke(InvocationMode.PARALLEL)
-        @Inputs(char.class)
+        @AsyncMethod(char.class)
         Routine<Character, Integer> add11();
 
         @Alias("a")
         @Invoke(InvocationMode.PARALLEL)
-        int add2(@Input(value = char.class, mode = InputMode.CHANNEL) OutputChannel<Character> c);
+        int add2(@AsyncIn(value = char.class, mode = InputMode.VALUE) OutputChannel<Character> c);
 
         @Alias("a")
-        @Output(OutputMode.VALUE)
+        @AsyncOut(OutputMode.VALUE)
         OutputChannel<Integer> add3(char c);
 
         @Alias("a")
-        @Output(OutputMode.VALUE)
+        @AsyncOut(OutputMode.VALUE)
         OutputChannel<Integer> add4(
-                @Input(value = char.class, mode = InputMode.CHANNEL) OutputChannel<Character> c);
+                @AsyncIn(value = char.class, mode = InputMode.VALUE) OutputChannel<Character> c);
 
         @Alias("a")
         @Invoke(InvocationMode.PARALLEL)
-        @Output(OutputMode.VALUE)
+        @AsyncOut(OutputMode.VALUE)
         OutputChannel<Integer> add5(
-                @Input(value = char.class, mode = InputMode.CHANNEL) OutputChannel<Character> c);
+                @AsyncIn(value = char.class, mode = InputMode.VALUE) OutputChannel<Character> c);
 
         @Alias("a")
-        @Inputs(char.class)
+        @AsyncMethod(char.class)
         InvocationChannel<Character, Integer> add6();
 
         @Alias("a")
         @Invoke(InvocationMode.PARALLEL)
-        @Inputs(char.class)
+        @AsyncMethod(char.class)
         InvocationChannel<Character, Integer> add7();
 
         @Alias("aa")
         int[] addA00(char[] c);
 
         @Alias("aa")
-        int[] addA01(@Input(value = char[].class,
-                mode = InputMode.CHANNEL) OutputChannel<char[]> c);
+        int[] addA01(@AsyncIn(value = char[].class,
+                mode = InputMode.VALUE) OutputChannel<char[]> c);
 
         @Alias("aa")
-        int[] addA02(@Input(value = char[].class,
+        int[] addA02(@AsyncIn(value = char[].class,
                 mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("aa")
         @Invoke(InvocationMode.PARALLEL)
-        int[] addA03(@Input(value = char[].class,
-                mode = InputMode.CHANNEL) OutputChannel<char[]> c);
+        int[] addA03(@AsyncIn(value = char[].class,
+                mode = InputMode.VALUE) OutputChannel<char[]> c);
 
         @Alias("aa")
-        @Output(OutputMode.VALUE)
+        @AsyncOut(OutputMode.VALUE)
         OutputChannel<int[]> addA04(char[] c);
 
         @Alias("aa")
-        @Output(OutputMode.VALUE)
+        @AsyncOut(OutputMode.VALUE)
         OutputChannel<int[]> addA05(
-                @Input(value = char[].class, mode = InputMode.CHANNEL) OutputChannel<char[]> c);
+                @AsyncIn(value = char[].class, mode = InputMode.VALUE) OutputChannel<char[]> c);
 
         @Alias("aa")
-        @Output(OutputMode.VALUE)
-        OutputChannel<int[]> addA06(@Input(value = char[].class,
+        @AsyncOut(OutputMode.VALUE)
+        OutputChannel<int[]> addA06(@AsyncIn(value = char[].class,
                 mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("aa")
         @Invoke(InvocationMode.PARALLEL)
-        @Output(OutputMode.VALUE)
-        OutputChannel<int[]> addA07(@Input(value = char[].class,
-                mode = InputMode.CHANNEL) OutputChannel<char[]> c);
+        @AsyncOut(OutputMode.VALUE)
+        OutputChannel<int[]> addA07(@AsyncIn(value = char[].class,
+                mode = InputMode.VALUE) OutputChannel<char[]> c);
 
         @Alias("aa")
-        @Output(OutputMode.ELEMENT)
+        @AsyncOut(OutputMode.ELEMENT)
         OutputChannel<Integer> addA08(char[] c);
 
         @Alias("aa")
-        @Output(OutputMode.ELEMENT)
+        @AsyncOut(OutputMode.ELEMENT)
         OutputChannel<Integer> addA09(
-                @Input(value = char[].class, mode = InputMode.CHANNEL) OutputChannel<char[]> c);
+                @AsyncIn(value = char[].class, mode = InputMode.VALUE) OutputChannel<char[]> c);
 
         @Alias("aa")
-        @Output(OutputMode.ELEMENT)
-        OutputChannel<Integer> addA10(@Input(value = char[].class,
+        @AsyncOut(OutputMode.ELEMENT)
+        OutputChannel<Integer> addA10(@AsyncIn(value = char[].class,
                 mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("aa")
         @Invoke(InvocationMode.PARALLEL)
-        @Output(OutputMode.ELEMENT)
-        OutputChannel<Integer> addA11(@Input(value = char[].class,
-                mode = InputMode.CHANNEL) OutputChannel<char[]> c);
+        @AsyncOut(OutputMode.ELEMENT)
+        OutputChannel<Integer> addA11(@AsyncIn(value = char[].class,
+                mode = InputMode.VALUE) OutputChannel<char[]> c);
 
         @Alias("aa")
-        @Inputs(char[].class)
+        @AsyncMethod(char[].class)
         InvocationChannel<char[], int[]> addA12();
 
         @Alias("aa")
         @Invoke(InvocationMode.PARALLEL)
-        @Inputs(char[].class)
+        @AsyncMethod(char[].class)
         InvocationChannel<char[], int[]> addA13();
 
         @Alias("aa")
-        @Inputs(char[].class)
+        @AsyncMethod(char[].class)
         Routine<char[], int[]> addA14();
 
         @Alias("aa")
         @Invoke(InvocationMode.PARALLEL)
-        @Inputs(char[].class)
+        @AsyncMethod(char[].class)
         Routine<char[], int[]> addA15();
 
         @Alias("aa")
-        @Inputs(value = char[].class, mode = OutputMode.ELEMENT)
+        @AsyncMethod(value = char[].class, mode = OutputMode.ELEMENT)
         InvocationChannel<char[], Integer> addA16();
 
         @Alias("aa")
         @Invoke(InvocationMode.PARALLEL)
-        @Inputs(value = char[].class, mode = OutputMode.ELEMENT)
+        @AsyncMethod(value = char[].class, mode = OutputMode.ELEMENT)
         InvocationChannel<char[], Integer> addA17();
 
         @Alias("aa")
-        @Inputs(value = char[].class, mode = OutputMode.ELEMENT)
+        @AsyncMethod(value = char[].class, mode = OutputMode.ELEMENT)
         Routine<char[], Integer> addA18();
 
         @Alias("aa")
         @Invoke(InvocationMode.PARALLEL)
-        @Inputs(value = char[].class, mode = OutputMode.ELEMENT)
+        @AsyncMethod(value = char[].class, mode = OutputMode.ELEMENT)
         Routine<char[], Integer> addA19();
 
         @Alias("al")
         List<Integer> addL00(List<Character> c);
 
         @Alias("al")
-        List<Integer> addL01(@Input(value = List.class,
-                mode = InputMode.CHANNEL) OutputChannel<List<Character>> c);
+        List<Integer> addL01(@AsyncIn(value = List.class,
+                mode = InputMode.VALUE) OutputChannel<List<Character>> c);
 
         @Alias("al")
-        List<Integer> addL02(@Input(value = List.class,
+        List<Integer> addL02(@AsyncIn(value = List.class,
                 mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("al")
         @Invoke(InvocationMode.PARALLEL)
-        List<Integer> addL03(@Input(value = List.class,
-                mode = InputMode.CHANNEL) OutputChannel<List<Character>> c);
+        List<Integer> addL03(@AsyncIn(value = List.class,
+                mode = InputMode.VALUE) OutputChannel<List<Character>> c);
 
         @Alias("al")
-        @Output(OutputMode.VALUE)
+        @AsyncOut(OutputMode.VALUE)
         OutputChannel<List<Integer>> addL04(List<Character> c);
 
         @Alias("al")
-        @Output(OutputMode.VALUE)
-        OutputChannel<List<Integer>> addL05(@Input(value = List.class,
-                mode = InputMode.CHANNEL) OutputChannel<List<Character>> c);
+        @AsyncOut(OutputMode.VALUE)
+        OutputChannel<List<Integer>> addL05(@AsyncIn(value = List.class,
+                mode = InputMode.VALUE) OutputChannel<List<Character>> c);
 
         @Alias("al")
-        @Output(OutputMode.VALUE)
-        OutputChannel<List<Integer>> addL06(@Input(value = List.class,
+        @AsyncOut(OutputMode.VALUE)
+        OutputChannel<List<Integer>> addL06(@AsyncIn(value = List.class,
                 mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("al")
         @Invoke(InvocationMode.PARALLEL)
-        @Output(OutputMode.VALUE)
-        OutputChannel<List<Integer>> addL07(@Input(value = List.class,
-                mode = InputMode.CHANNEL) OutputChannel<List<Character>> c);
+        @AsyncOut(OutputMode.VALUE)
+        OutputChannel<List<Integer>> addL07(@AsyncIn(value = List.class,
+                mode = InputMode.VALUE) OutputChannel<List<Character>> c);
 
         @Alias("al")
-        @Output(OutputMode.ELEMENT)
+        @AsyncOut(OutputMode.ELEMENT)
         OutputChannel<Integer> addL08(List<Character> c);
 
         @Alias("al")
-        @Output(OutputMode.ELEMENT)
-        OutputChannel<Integer> addL09(@Input(value = List.class,
-                mode = InputMode.CHANNEL) OutputChannel<List<Character>> c);
+        @AsyncOut(OutputMode.ELEMENT)
+        OutputChannel<Integer> addL09(@AsyncIn(value = List.class,
+                mode = InputMode.VALUE) OutputChannel<List<Character>> c);
 
         @Alias("al")
-        @Output(OutputMode.ELEMENT)
-        OutputChannel<Integer> addL10(@Input(value = List.class,
+        @AsyncOut(OutputMode.ELEMENT)
+        OutputChannel<Integer> addL10(@AsyncIn(value = List.class,
                 mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("al")
         @Invoke(InvocationMode.PARALLEL)
-        @Output(OutputMode.ELEMENT)
-        OutputChannel<Integer> addL11(@Input(value = List.class,
-                mode = InputMode.CHANNEL) OutputChannel<List<Character>> c);
+        @AsyncOut(OutputMode.ELEMENT)
+        OutputChannel<Integer> addL11(@AsyncIn(value = List.class,
+                mode = InputMode.VALUE) OutputChannel<List<Character>> c);
 
         @Alias("al")
-        @Inputs(List.class)
+        @AsyncMethod(List.class)
         InvocationChannel<List<Character>, List<Integer>> addL12();
 
         @Alias("al")
         @Invoke(InvocationMode.PARALLEL)
-        @Inputs(List.class)
+        @AsyncMethod(List.class)
         InvocationChannel<List<Character>, List<Integer>> addL13();
 
         @Alias("al")
-        @Inputs(List.class)
+        @AsyncMethod(List.class)
         Routine<List<Character>, List<Integer>> addL14();
 
         @Alias("al")
         @Invoke(InvocationMode.PARALLEL)
-        @Inputs(List.class)
+        @AsyncMethod(List.class)
         Routine<List<Character>, List<Integer>> addL15();
 
         @Alias("al")
-        @Inputs(value = List.class, mode = OutputMode.ELEMENT)
+        @AsyncMethod(value = List.class, mode = OutputMode.ELEMENT)
         InvocationChannel<List<Character>, Integer> addL16();
 
         @Alias("al")
         @Invoke(InvocationMode.PARALLEL)
-        @Inputs(value = List.class, mode = OutputMode.ELEMENT)
+        @AsyncMethod(value = List.class, mode = OutputMode.ELEMENT)
         InvocationChannel<List<Character>, Integer> addL17();
 
         @Alias("al")
-        @Inputs(value = List.class, mode = OutputMode.ELEMENT)
+        @AsyncMethod(value = List.class, mode = OutputMode.ELEMENT)
         Routine<List<Character>, Integer> addL18();
 
         @Alias("al")
         @Invoke(InvocationMode.PARALLEL)
-        @Inputs(value = List.class, mode = OutputMode.ELEMENT)
+        @AsyncMethod(value = List.class, mode = OutputMode.ELEMENT)
         Routine<List<Character>, Integer> addL19();
 
         @Alias("g")
@@ -1174,22 +1174,22 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         void set0(int i);
 
         @Alias("g")
-        @Output(OutputMode.VALUE)
+        @AsyncOut(OutputMode.VALUE)
         OutputChannel<Integer> get1();
 
         @Alias("s")
-        void set1(@Input(value = int.class, mode = InputMode.CHANNEL) OutputChannel<Integer> i);
+        void set1(@AsyncIn(value = int.class, mode = InputMode.VALUE) OutputChannel<Integer> i);
 
         @Alias("g")
-        @Inputs({})
+        @AsyncMethod({})
         InvocationChannel<Void, Integer> get2();
 
         @Alias("s")
         @Invoke(InvocationMode.PARALLEL)
-        void set2(@Input(value = int.class, mode = InputMode.CHANNEL) OutputChannel<Integer> i);
+        void set2(@AsyncIn(value = int.class, mode = InputMode.VALUE) OutputChannel<Integer> i);
 
         @Alias("g")
-        @Inputs({})
+        @AsyncMethod({})
         Routine<Void, Integer> get4();
 
         @Alias("ga")
@@ -1199,34 +1199,34 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         void setA0(int[] i);
 
         @Alias("ga")
-        @Output(OutputMode.ELEMENT)
+        @AsyncOut(OutputMode.ELEMENT)
         OutputChannel<Integer> getA1();
 
         @Alias("sa")
-        void setA1(@Input(value = int[].class, mode = InputMode.CHANNEL) OutputChannel<int[]> i);
+        void setA1(@AsyncIn(value = int[].class, mode = InputMode.VALUE) OutputChannel<int[]> i);
 
         @Alias("ga")
-        @Inputs({})
+        @AsyncMethod({})
         InvocationChannel<Void, int[]> getA2();
 
         @Alias("sa")
-        void setA2(
-                @Input(value = int[].class, mode = InputMode.COLLECTION) OutputChannel<Integer> i);
+        void setA2(@AsyncIn(value = int[].class,
+                mode = InputMode.COLLECTION) OutputChannel<Integer> i);
 
         @Alias("ga")
-        @Inputs({})
+        @AsyncMethod({})
         Routine<Void, int[]> getA3();
 
         @Alias("sa")
         @Invoke(InvocationMode.PARALLEL)
-        void setA3(@Input(value = int[].class, mode = InputMode.CHANNEL) OutputChannel<int[]> i);
+        void setA3(@AsyncIn(value = int[].class, mode = InputMode.VALUE) OutputChannel<int[]> i);
 
         @Alias("ga")
-        @Inputs(value = {}, mode = OutputMode.ELEMENT)
+        @AsyncMethod(value = {}, mode = OutputMode.ELEMENT)
         InvocationChannel<Void, Integer> getA4();
 
         @Alias("ga")
-        @Inputs(value = {}, mode = OutputMode.ELEMENT)
+        @AsyncMethod(value = {}, mode = OutputMode.ELEMENT)
         Routine<Void, Integer> getA5();
 
         @Alias("gl")
@@ -1236,98 +1236,98 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         void setL0(List<Integer> i);
 
         @Alias("gl")
-        @Output(OutputMode.ELEMENT)
+        @AsyncOut(OutputMode.ELEMENT)
         OutputChannel<Integer> getL1();
 
         @Alias("sl")
-        void setL1(@Input(value = List.class,
-                mode = InputMode.CHANNEL) OutputChannel<List<Integer>> i);
+        void setL1(@AsyncIn(value = List.class,
+                mode = InputMode.VALUE) OutputChannel<List<Integer>> i);
 
         @Alias("gl")
-        @Inputs({})
+        @AsyncMethod({})
         InvocationChannel<Void, List<Integer>> getL2();
 
         @Alias("sl")
         void setL2(
-                @Input(value = List.class, mode = InputMode.COLLECTION) OutputChannel<Integer> i);
+                @AsyncIn(value = List.class, mode = InputMode.COLLECTION) OutputChannel<Integer> i);
 
         @Alias("gl")
-        @Inputs({})
+        @AsyncMethod({})
         Routine<Void, List<Integer>> getL3();
 
         @Alias("sl")
         @Invoke(InvocationMode.PARALLEL)
-        void setL3(@Input(value = List.class,
-                mode = InputMode.CHANNEL) OutputChannel<List<Integer>> i);
+        void setL3(@AsyncIn(value = List.class,
+                mode = InputMode.VALUE) OutputChannel<List<Integer>> i);
 
         @Alias("gl")
-        @Inputs(value = {}, mode = OutputMode.ELEMENT)
+        @AsyncMethod(value = {}, mode = OutputMode.ELEMENT)
         InvocationChannel<Void, Integer> getL4();
 
         @Alias("gl")
-        @Inputs(value = {}, mode = OutputMode.ELEMENT)
+        @AsyncMethod(value = {}, mode = OutputMode.ELEMENT)
         Routine<Void, Integer> getL5();
 
         @Alias("s")
-        @Inputs(int.class)
+        @AsyncMethod(int.class)
         InvocationChannel<Integer, Void> set3();
 
         @Alias("s")
-        @Inputs(int.class)
+        @AsyncMethod(int.class)
         Routine<Integer, Void> set5();
 
         @Alias("sa")
-        @Inputs(int[].class)
+        @AsyncMethod(int[].class)
         InvocationChannel<int[], Void> setA4();
 
         @Alias("sa")
-        @Inputs(int[].class)
+        @AsyncMethod(int[].class)
         Routine<int[], Void> setA6();
 
         @Alias("sl")
-        @Inputs(List.class)
+        @AsyncMethod(List.class)
         InvocationChannel<List<Integer>, Void> setL4();
 
         @Alias("sl")
-        @Inputs(List.class)
+        @AsyncMethod(List.class)
         Routine<List<Integer>, Void> setL6();
     }
 
     private interface CountError {
 
-        @Output
+        @AsyncOut
         String[] count(int length);
 
         @Alias("count")
-        @Output(OutputMode.ELEMENT)
+        @AsyncOut(OutputMode.ELEMENT)
         String[] count1(int length);
 
-        @Output(OutputMode.VALUE)
+        @AsyncOut(OutputMode.VALUE)
         List<Integer> countList(int length);
 
         @Alias("countList")
-        @Output(OutputMode.ELEMENT)
+        @AsyncOut(OutputMode.ELEMENT)
         List<Integer> countList1(int length);
     }
 
     private interface CountItf {
 
-        @Output(OutputMode.ELEMENT)
+        @AsyncOut(OutputMode.ELEMENT)
         OutputChannel<Integer> count(int length);
 
         @Alias("count")
-        @Output(OutputMode.VALUE)
+        @AsyncOut(OutputMode.VALUE)
         OutputChannel<int[]> count1(int length);
 
         @Alias("count")
-        @Output(OutputMode.ELEMENT)
+        @AsyncOut(OutputMode.ELEMENT)
         OutputChannel<Integer> count2(int length);
 
-        @Output(OutputMode.ELEMENT)
+        @AsyncOut(OutputMode.ELEMENT)
         OutputChannel<Integer> countList(int length);
 
         @Alias("countList")
-        @Output(OutputMode.ELEMENT)
+        @AsyncOut(OutputMode.ELEMENT)
         OutputChannel<Integer> countList1(int length);
     }
 
@@ -1338,62 +1338,63 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
         @Alias("compute")
         @ReadTimeout(10000)
-        int computeAsync(@Input(int.class) OutputChannel<Integer> i);
+        int computeAsync(@AsyncIn(int.class) OutputChannel<Integer> i);
 
         @SharedFields({})
         @Alias("compute")
         @Invoke(InvocationMode.PARALLEL)
-        @Output
+        @AsyncOut
         OutputChannel<Integer> computeParallel(
-                @Input(value = int.class, mode = InputMode.CHANNEL) OutputChannel<Integer> i);
+                @AsyncIn(value = int.class, mode = InputMode.VALUE) OutputChannel<Integer> i);
     }
 
     private interface SumError {
 
-        int compute(int a, @Input(int.class) int[] b);
+        int compute(int a, @AsyncIn(int.class) int[] b);
 
-        int compute(@Input(int.class) String[] ints);
+        int compute(@AsyncIn(int.class) String[] ints);
 
-        int compute(@Input(value = int.class, mode = InputMode.CHANNEL) int[] ints);
+        int compute(@AsyncIn(value = int.class, mode = InputMode.VALUE) int[] ints);
 
-        int compute(@Input(value = int.class, mode = InputMode.COLLECTION) Iterable<Integer> ints);
+        int compute(
+                @AsyncIn(value = int.class, mode = InputMode.COLLECTION) Iterable<Integer> ints);
 
-        int compute(@Input(value = int.class,
+        int compute(@AsyncIn(value = int.class,
                 mode = InputMode.COLLECTION) OutputChannel<Integer> ints);
 
-        int compute(int a,
-                @Input(value = int[].class, mode = InputMode.COLLECTION) OutputChannel<Integer> b);
+        int compute(int a, @AsyncIn(value = int[].class,
+                mode = InputMode.COLLECTION) OutputChannel<Integer> b);
 
         @Invoke(InvocationMode.PARALLEL)
-        int compute(String text, @Input(int.class) OutputChannel<Integer> ints);
+        int compute(String text, @AsyncIn(int.class) OutputChannel<Integer> ints);
     }
 
     private interface SumItf {
 
-        int compute(int a, @Input(int.class) OutputChannel<Integer> b);
+        int compute(int a, @AsyncIn(int.class) OutputChannel<Integer> b);
 
-        int compute(@Input(value = int[].class,
+        int compute(@AsyncIn(value = int[].class,
                 mode = InputMode.COLLECTION) OutputChannel<Integer> ints);
 
         @Alias("compute")
-        int compute1(@Input(int[].class) OutputChannel<int[]> ints);
+        int compute1(@AsyncIn(int[].class) OutputChannel<int[]> ints);
 
         @Alias("compute")
-        int computeList(@Input(value = List.class,
+        int computeList(@AsyncIn(value = List.class,
                 mode = InputMode.COLLECTION) OutputChannel<Integer> ints);
 
         @Alias("compute")
-        int computeList1(@Input(value = List.class,
+        int computeList1(@AsyncIn(value = List.class,
                 mode = InputMode.COLLECTION) OutputChannel<Integer> ints);
     }
 
     @SuppressWarnings("unused")
     private interface TestItf {
 
-        void throwException(@Input(int.class) RuntimeException ex);
+        void throwException(@AsyncIn(int.class) RuntimeException ex);
 
         @Alias(TestClass.THROW)
-        @Output
+        @AsyncOut
         void throwException1(RuntimeException ex);
 
         @Alias(TestClass.THROW)

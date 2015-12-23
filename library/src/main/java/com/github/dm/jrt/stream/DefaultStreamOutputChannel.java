@@ -49,7 +49,11 @@ import static com.github.dm.jrt.function.Functions.functionFilter;
 import static com.github.dm.jrt.function.Functions.predicateFilter;
 
 /**
+ * Default implementation of a stream output channel.
+ * <p/>
  * Created by davide-maestroni on 12/23/2015.
+ *
+ * @param <OUT> the output data type.
  */
 class DefaultStreamOutputChannel<OUT>
         implements StreamOutputChannel<OUT>, Configurable<StreamOutputChannel<OUT>> {
@@ -58,11 +62,28 @@ class DefaultStreamOutputChannel<OUT>
 
     private InvocationConfiguration mConfiguration = InvocationConfiguration.DEFAULT_CONFIGURATION;
 
+    /**
+     * Constructor.
+     *
+     * @param channel the wrapped output channel.
+     */
+    @SuppressWarnings("ConstantConditions")
     DefaultStreamOutputChannel(@NotNull final OutputChannel<OUT> channel) {
+
+        if (channel == null) {
+
+            throw new NullPointerException("the output channel instance must not be null");
+        }
 
         mChannel = channel;
     }
 
+    /**
+     * Constructor.
+     *
+     * @param configuration the initial invocation configuration.
+     * @param channel       the wrapped output channel.
+     */
     private DefaultStreamOutputChannel(@NotNull final InvocationConfiguration configuration,
             @NotNull final OutputChannel<OUT> channel) {
 
@@ -241,7 +262,7 @@ class DefaultStreamOutputChannel<OUT>
     public <AFTER> StreamOutputChannel<AFTER> asyncLift(
             @NotNull final Function<? super OUT, ? extends OutputChannel<AFTER>> function) {
 
-        return asyncMap(new LiftConsumer<OUT, AFTER>(function));
+        return asyncMap(new LiftInvocation<OUT, AFTER>(function));
     }
 
     @NotNull
@@ -298,7 +319,7 @@ class DefaultStreamOutputChannel<OUT>
     public <AFTER> StreamOutputChannel<AFTER> parallelLift(
             @NotNull final Function<? super OUT, ? extends OutputChannel<AFTER>> function) {
 
-        return parallelMap(new LiftConsumer<OUT, AFTER>(function));
+        return parallelMap(new LiftInvocation<OUT, AFTER>(function));
     }
 
     @NotNull
@@ -382,7 +403,7 @@ class DefaultStreamOutputChannel<OUT>
     public <AFTER> StreamOutputChannel<AFTER> syncLift(
             @NotNull final Function<? super OUT, ? extends OutputChannel<AFTER>> function) {
 
-        return syncMap(new LiftConsumer<OUT, AFTER>(function));
+        return syncMap(new LiftInvocation<OUT, AFTER>(function));
     }
 
     @NotNull
@@ -668,14 +689,24 @@ class DefaultStreamOutputChannel<OUT>
         }
     }
 
-    // TODO: 12/23/15 javadoc
-    private static class LiftConsumer<OUT, AFTER> implements BiConsumer<OUT, ResultChannel<AFTER>> {
+    /**
+     * Filter invocation implementation wrapping a lifting function.
+     *
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
+     */
+    private static class LiftInvocation<IN, OUT> extends FilterInvocation<IN, OUT> {
 
-        private final Function<? super OUT, ? extends OutputChannel<AFTER>> mFunction;
+        private final Function<? super IN, ? extends OutputChannel<OUT>> mFunction;
 
+        /**
+         * Constructor.
+         *
+         * @param function the lifting function.
+         */
         @SuppressWarnings("ConstantConditions")
-        private LiftConsumer(
-                @NotNull final Function<? super OUT, ? extends OutputChannel<AFTER>> function) {
+        private LiftInvocation(
+                @NotNull final Function<? super IN, ? extends OutputChannel<OUT>> function) {
 
             if (function == null) {
 
@@ -685,9 +716,9 @@ class DefaultStreamOutputChannel<OUT>
             mFunction = function;
         }
 
-        public void accept(final OUT out, final ResultChannel<AFTER> result) {
+        public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
 
-            final OutputChannel<AFTER> channel = mFunction.apply(out);
+            final OutputChannel<OUT> channel = mFunction.apply(input);
 
             if (channel != null) {
 

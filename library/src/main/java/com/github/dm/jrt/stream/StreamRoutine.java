@@ -11,12 +11,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.dm.jrt.function;
+package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.builder.ConfigurableBuilder;
 import com.github.dm.jrt.channel.Channel.InputChannel;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
+import com.github.dm.jrt.function.BiConsumer;
+import com.github.dm.jrt.function.BiFunction;
+import com.github.dm.jrt.function.Consumer;
+import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.function.Predicate;
+import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.routine.Routine;
 
@@ -118,7 +124,7 @@ public interface StreamRoutine<IN, OUT>
     /**
      * Concatenates a stream routine based on the specified supplier to this one.<br/>
      * The supplier will be called {@code count} number of times only when the invocation completes.
-     * The count number must be positived.
+     * The count number must be positive.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
      * invoked in an asynchronous mode.

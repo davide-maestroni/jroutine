@@ -11,15 +11,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.dm.jrt.function;
+package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.JRoutine;
+import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.invocation.InvocationFactory;
 
 import org.junit.Test;
 
-import static com.github.dm.jrt.function.AccumulateInvocation.functionFactory;
 import static com.github.dm.jrt.function.Functions.first;
+import static com.github.dm.jrt.stream.AccumulateInvocation.functionFactory;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

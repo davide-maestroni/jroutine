@@ -93,7 +93,7 @@ public interface StreamOutputChannel<OUT>
 
     /**
      * Concatenates a stream channel based on the specified consumer to this one.<br/>
-     * The routine outputs will not be further propagated.
+     * The channel outputs will not be further propagated.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
      * invoked in an asynchronous mode.
@@ -240,85 +240,326 @@ public interface StreamOutputChannel<OUT>
     StreamOutputChannel<OUT> asyncReduce(
             @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
 
+    /**
+     * Concatenates a stream channel based on the specified predicate to this one.<br/>
+     * The output will be filtered according to the result returned by the predicate.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a parallel mode.
+     *
+     * @param predicate the predicate instance.
+     * @return the concatenated stream channel.
+     */
     @NotNull
     StreamOutputChannel<OUT> parallelFilter(@NotNull Predicate<? super OUT> predicate);
 
+    /**
+     * Concatenates a stream channel based on the specified supplier to this one.<br/>
+     * The supplier will be called {@code count} number of times only when the outputs complete.
+     * The count number must be positive.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a parallel mode.
+     *
+     * @param count    the number of generated outputs.
+     * @param supplier the supplier instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream channel
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative..
+     */
     @NotNull
     <AFTER> StreamOutputChannel<AFTER> parallelGenerate(long count,
             @NotNull Supplier<AFTER> supplier);
 
+    /**
+     * Lifts this stream outputs by applying the specified function.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a parallel mode.
+     *
+     * @param function the function instance.
+     * @param <AFTER>  the lifting output type.
+     * @return the lifted stream channel.
+     */
     @NotNull
     <AFTER> StreamOutputChannel<AFTER> parallelLift(
             @NotNull Function<? super OUT, ? extends OutputChannel<AFTER>> function);
 
+    /**
+     * Concatenates a stream channel based on the specified consumer to this one.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a parallel mode.
+     *
+     * @param consumer the bi-consumer instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream channel.
+     */
     @NotNull
     <AFTER> StreamOutputChannel<AFTER> parallelMap(
             @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
 
+    /**
+     * Concatenates a stream channel based on the specified function to this one.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a parallel mode.
+     *
+     * @param function the function instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream channel.
+     */
     @NotNull
     <AFTER> StreamOutputChannel<AFTER> parallelMap(@NotNull Function<? super OUT, AFTER> function);
 
+    /**
+     * Concatenates a stream channel based on the specified factory to this one.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a parallel mode.
+     *
+     * @param factory the invocation factory.
+     * @param <AFTER> the concatenation output type.
+     * @return the concatenated stream channel.
+     */
     @NotNull
     <AFTER> StreamOutputChannel<AFTER> parallelMap(
             @NotNull InvocationFactory<? super OUT, AFTER> factory);
 
+    /**
+     * Concatenates a stream channel based on the specified instance to this one.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a parallel mode.
+     *
+     * @param routine the routine instance.
+     * @param <AFTER> the concatenation output type.
+     * @return the concatenated stream channel.
+     */
     @NotNull
     <AFTER> StreamOutputChannel<AFTER> parallelMap(@NotNull Routine<? super OUT, AFTER> routine);
 
+    /**
+     * Concatenates a stream channel based on the specified collecting consumer to this one.<br/>
+     * The outputs will be collected by applying the function, only when the outputs complete.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a synchronous mode.
+     *
+     * @param consumer the bi-consumer instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream channel.
+     */
     @NotNull
     <AFTER> StreamOutputChannel<AFTER> syncCollect(
             @NotNull BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
                     consumer);
 
+    /**
+     * Concatenates a stream channel based on the specified collecting function to this one.<br/>
+     * The outputs will be collected by applying the function, only when the outputs complete.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a synchronous mode.
+     *
+     * @param function the function instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream channel.
+     */
     @NotNull
     <AFTER> StreamOutputChannel<AFTER> syncCollect(
             @NotNull Function<? super List<? extends OUT>, AFTER> function);
 
+    /**
+     * Concatenates a stream channel based on the specified predicate to this one.<br/>
+     * The output will be filtered according to the result returned by the predicate.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a synchronous mode.
+     *
+     * @param predicate the predicate instance.
+     * @return the concatenated stream channel.
+     */
     @NotNull
     StreamOutputChannel<OUT> syncFilter(@NotNull Predicate<? super OUT> predicate);
 
+    /**
+     * Concatenates a stream channel based on the specified consumer to this one.<br/>
+     * The channel outputs will not be further propagated.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a synchronous mode.
+     *
+     * @param consumer the consumer instance.
+     * @return the concatenated stream channel.
+     */
     @NotNull
     StreamOutputChannel<Void> syncForEach(@NotNull Consumer<? super OUT> consumer);
 
+    /**
+     * Concatenates a stream channel based on the specified consumer to this one.<br/>
+     * The consumer will be called only when the invocation completes.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a synchronous mode.
+     *
+     * @param consumer the consumer instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream channel.
+     */
     @NotNull
     <AFTER> StreamOutputChannel<AFTER> syncGenerate(
             @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
 
+    /**
+     * Concatenates a stream channel based on the specified supplier to this one.<br/>
+     * The supplier will be called {@code count} number of times only when the outputs complete.
+     * The count number must be positive.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a synchronous mode.
+     *
+     * @param count    the number of generated outputs.
+     * @param supplier the supplier instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream channel
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative..
+     */
     @NotNull
     <AFTER> StreamOutputChannel<AFTER> syncGenerate(long count, @NotNull Supplier<AFTER> supplier);
 
+    /**
+     * Concatenates a stream channel based on the specified supplier to this one.<br/>
+     * The supplier will be called only when the outputs complete.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a synchronous mode.
+     *
+     * @param supplier the supplier instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream channel.
+     */
     @NotNull
     <AFTER> StreamOutputChannel<AFTER> syncGenerate(@NotNull Supplier<AFTER> supplier);
 
+    /**
+     * Lifts this stream outputs by applying the specified function.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a synchronous mode.
+     *
+     * @param function the function instance.
+     * @param <AFTER>  the lifting output type.
+     * @return the lifted stream channel.
+     */
     @NotNull
     <AFTER> StreamOutputChannel<AFTER> syncLift(
             @NotNull Function<? super OUT, ? extends OutputChannel<AFTER>> function);
 
+    /**
+     * Concatenates a stream channel based on the specified consumer to this one.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a synchronous mode.
+     *
+     * @param consumer the bi-consumer instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream channel.
+     */
     @NotNull
     <AFTER> StreamOutputChannel<AFTER> syncMap(
             @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
 
+    /**
+     * Concatenates a stream channel based on the specified function to this one.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a synchronous mode.
+     *
+     * @param function the function instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream channel.
+     */
     @NotNull
     <AFTER> StreamOutputChannel<AFTER> syncMap(@NotNull Function<? super OUT, AFTER> function);
 
+    /**
+     * Concatenates a stream channel based on the specified factory to this one.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a synchronous mode.
+     *
+     * @param factory the invocation factory.
+     * @param <AFTER> the concatenation output type.
+     * @return the concatenated stream channel.
+     */
     @NotNull
     <AFTER> StreamOutputChannel<AFTER> syncMap(
             @NotNull InvocationFactory<? super OUT, AFTER> factory);
 
+    /**
+     * Concatenates a stream channel based on the specified instance to this one.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a synchronous mode.
+     *
+     * @param routine the routine instance.
+     * @param <AFTER> the concatenation output type.
+     * @return the concatenated stream channel.
+     */
     @NotNull
     <AFTER> StreamOutputChannel<AFTER> syncMap(@NotNull Routine<? super OUT, AFTER> routine);
 
+    /**
+     * Concatenates a stream channel based on the specified accumulating function to this one.
+     * <br/>
+     * The output will be computed as follows:
+     * <pre>
+     *     <code>
+     *
+     *         acc = function.apply(acc, input);
+     *     </code>
+     * </pre>
+     * The accumulated value will be passed as result only when the outputs complete.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in a synchronous mode.
+     *
+     * @param function the bi-function instance.
+     * @return the concatenated stream channel.
+     */
     @NotNull
     StreamOutputChannel<OUT> syncReduce(
             @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
 
+    /**
+     * Concatenates a consumer handling the invocation exceptions.<br/>
+     * The errors will not be automatically further propagated.
+     *
+     * @param consumer the bi-consumer instance.
+     * @return the concatenated stream channel.
+     */
     @NotNull
     StreamOutputChannel<OUT> tryCatch(
             @NotNull BiConsumer<? super RoutineException, ? super InputChannel<OUT>> consumer);
 
+    /**
+     * Concatenates a consumer handling a invocation exceptions.<br/>
+     * The errors will not be automatically further propagated.
+     *
+     * @param consumer the consumer instance.
+     * @return the concatenated stream channel.
+     */
     @NotNull
     StreamOutputChannel<OUT> tryCatch(@NotNull Consumer<? super RoutineException> consumer);
 
+    /**
+     * Concatenates a function handling a invocation exceptions.<br/>
+     * The errors will not be automatically further propagated.
+     *
+     * @param function the function instance.
+     * @return the concatenated stream channel.
+     */
     @NotNull
     StreamOutputChannel<OUT> tryCatch(
             @NotNull Function<? super RoutineException, ? extends OUT> function);

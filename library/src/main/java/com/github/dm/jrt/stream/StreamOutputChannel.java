@@ -65,8 +65,7 @@ public interface StreamOutputChannel<OUT>
 
     /**
      * Concatenates a stream channel based on the specified collecting function to this one.<br/>
-     * The outputs will be collected by applying the function, only when the routine invocation
-     * completes.
+     * The outputs will be collected by applying the function, only when the outputs complete.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
      * invoked in an asynchronous mode.
@@ -92,37 +91,151 @@ public interface StreamOutputChannel<OUT>
     @NotNull
     StreamOutputChannel<OUT> asyncFilter(@NotNull Predicate<? super OUT> predicate);
 
+    /**
+     * Concatenates a stream channel based on the specified consumer to this one.<br/>
+     * The routine outputs will not be further propagated.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in an asynchronous mode.
+     *
+     * @param consumer the consumer instance.
+     * @return the concatenated stream channel.
+     */
     @NotNull
     StreamOutputChannel<Void> asyncForEach(@NotNull Consumer<? super OUT> consumer);
 
+    /**
+     * Concatenates a stream channel based on the specified consumer to this one.<br/>
+     * The consumer will be called only when the invocation completes.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in an asynchronous mode.
+     *
+     * @param consumer the consumer instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream channel.
+     */
     @NotNull
     <AFTER> StreamOutputChannel<AFTER> asyncGenerate(
             @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
 
+    /**
+     * Concatenates a stream channel based on the specified supplier to this one.<br/>
+     * The supplier will be called {@code count} number of times only when the outputs complete.
+     * The count number must be positive.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in an asynchronous mode.
+     *
+     * @param count    the number of generated outputs.
+     * @param supplier the supplier instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream channel
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative..
+     */
     @NotNull
     <AFTER> StreamOutputChannel<AFTER> asyncGenerate(long count, @NotNull Supplier<AFTER> supplier);
 
+    /**
+     * Concatenates a stream channel based on the specified supplier to this one.<br/>
+     * The supplier will be called only when the outputs complete.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in an asynchronous mode.
+     *
+     * @param supplier the supplier instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream channel.
+     */
     @NotNull
     <AFTER> StreamOutputChannel<AFTER> asyncGenerate(@NotNull Supplier<AFTER> supplier);
 
+    /**
+     * Lifts this stream outputs by applying the specified function.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in an asynchronous mode.
+     *
+     * @param function the function instance.
+     * @param <AFTER>  the lifting output type.
+     * @return the lifted stream channel.
+     */
     @NotNull
     <AFTER> StreamOutputChannel<AFTER> asyncLift(
             @NotNull Function<? super OUT, ? extends OutputChannel<AFTER>> function);
 
+    /**
+     * Concatenates a stream channel based on the specified consumer to this one.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in an asynchronous mode.
+     *
+     * @param consumer the bi-consumer instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream channel.
+     */
     @NotNull
     <AFTER> StreamOutputChannel<AFTER> asyncMap(
             @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
 
+    /**
+     * Concatenates a stream channel based on the specified function to this one.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in an asynchronous mode.
+     *
+     * @param function the function instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream channel.
+     */
     @NotNull
     <AFTER> StreamOutputChannel<AFTER> asyncMap(@NotNull Function<? super OUT, AFTER> function);
 
+    /**
+     * Concatenates a stream channel based on the specified factory to this one.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in an asynchronous mode.
+     *
+     * @param factory the invocation factory.
+     * @param <AFTER> the concatenation output type.
+     * @return the concatenated stream channel.
+     */
     @NotNull
     <AFTER> StreamOutputChannel<AFTER> asyncMap(
             @NotNull InvocationFactory<? super OUT, AFTER> factory);
 
+    /**
+     * Concatenates a stream channel based on the specified instance to this one.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in an asynchronous mode.
+     *
+     * @param routine the routine instance.
+     * @param <AFTER> the concatenation output type.
+     * @return the concatenated stream channel.
+     */
     @NotNull
     <AFTER> StreamOutputChannel<AFTER> asyncMap(@NotNull Routine<? super OUT, AFTER> routine);
 
+    /**
+     * Concatenates a stream channel based on the specified accumulating function to this one.
+     * <br/>
+     * The output will be computed as follows:
+     * <pre>
+     *     <code>
+     *
+     *         acc = function.apply(acc, input);
+     *     </code>
+     * </pre>
+     * The accumulated value will be passed as result only when the outputs complete.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration and will be
+     * invoked in an asynchronous mode.
+     *
+     * @param function the bi-function instance.
+     * @return the concatenated stream channel.
+     */
     @NotNull
     StreamOutputChannel<OUT> asyncReduce(
             @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);

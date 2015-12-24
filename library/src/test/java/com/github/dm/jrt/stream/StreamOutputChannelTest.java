@@ -100,7 +100,6 @@ public class StreamOutputChannelTest {
         assertThat(channel.afterMax(1, TimeUnit.SECONDS).hasNext()).isTrue();
         channel.immediately().allInto(results);
         assertThat(results).containsExactly("test");
-        // TODO: 24/12/15 eventually*
         channel = Streams.streamOf("test1", "test2", "test3");
 
         try {

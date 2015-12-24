@@ -79,24 +79,26 @@ public class Channels extends com.github.dm.jrt.core.Channels {
      *
      * @param startIndex the selectable start index.
      * @param channels   the array of channels.
+     * @param <OUT>      the output data type.
      * @return the selectable output channel.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static OutputChannel<? extends ParcelableSelectable<?>> merge(final int startIndex,
-            @NotNull final OutputChannel<?>... channels) {
+    @SuppressWarnings("unchecked")
+    public static <OUT> OutputChannel<? extends ParcelableSelectable<OUT>> merge(
+            final int startIndex, @NotNull final OutputChannel<?>... channels) {
 
         if (channels.length == 0) {
 
             throw new IllegalArgumentException("the array of channels must not be empty");
         }
 
-        final IOChannel<ParcelableSelectable<?>> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<ParcelableSelectable<OUT>> ioChannel = JRoutine.io().buildChannel();
         int i = startIndex;
 
         for (final OutputChannel<?> channel : channels) {
 
-            ioChannel.pass(toSelectable(channel, i++));
+            ioChannel.pass(toSelectable((OutputChannel<? extends OUT>) channel, i++));
         }
 
         return ioChannel.close();
@@ -125,11 +127,12 @@ public class Channels extends com.github.dm.jrt.core.Channels {
      * Note that the channels will be bound as a result of the call.
      *
      * @param channels the channels to merge.
+     * @param <OUT>    the output data type.
      * @return the selectable output channel.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static OutputChannel<? extends ParcelableSelectable<?>> merge(
+    public static <OUT> OutputChannel<? extends ParcelableSelectable<OUT>> merge(
             @NotNull final OutputChannel<?>... channels) {
 
         return merge(0, channels);

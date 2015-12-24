@@ -14,10 +14,13 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
+import com.github.dm.jrt.channel.AbortException;
 import com.github.dm.jrt.channel.Channel.InputChannel;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
+import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
+import com.github.dm.jrt.channel.TimeoutException;
 import com.github.dm.jrt.core.JRoutine;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
@@ -37,7 +40,10 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.function.Functions.functionFilter;
 import static com.github.dm.jrt.util.TimeDuration.seconds;
@@ -77,6 +83,100 @@ public class StreamOutputChannelTest {
 
         } catch (final NullPointerException ignored) {
 
+        }
+    }
+
+    @Test
+    public void testChannel() {
+
+        StreamOutputChannel<String> channel = Streams.streamOf("test");
+        assertThat(channel.abort()).isFalse();
+        assertThat(channel.abort(null)).isFalse();
+        assertThat(channel.isOpen()).isFalse();
+        assertThat(channel.isEmpty()).isFalse();
+        assertThat(channel.checkComplete()).isTrue();
+        assertThat(channel.isBound()).isFalse();
+        final ArrayList<String> results = new ArrayList<String>();
+        assertThat(channel.afterMax(1, TimeUnit.SECONDS).hasNext()).isTrue();
+        channel.immediately().allInto(results);
+        assertThat(results).containsExactly("test");
+        // TODO: 24/12/15 eventually*
+        channel = Streams.streamOf("test1", "test2", "test3");
+
+        try {
+
+            channel.remove();
+
+            fail();
+
+        } catch (final UnsupportedOperationException ignored) {
+
+
+        }
+
+        assertThat(channel.skip(1).next(1)).containsExactly("test2");
+        assertThat(channel.eventuallyExit().next(4)).containsExactly("test3");
+
+        final Iterator<String> iterator = Streams.streamOf("test1", "test2", "test3").iterator();
+        assertThat(iterator.hasNext()).isTrue();
+        assertThat(iterator.next()).isEqualTo("test1");
+
+        try {
+
+            iterator.remove();
+
+            fail();
+
+        } catch (final UnsupportedOperationException ignored) {
+
+
+        }
+
+        final IOChannel<String> ioChannel = JRoutine.io().buildChannel();
+        channel = Streams.streamOf(ioChannel.after(1, TimeUnit.DAYS).pass("test"));
+
+        try {
+
+            channel.eventuallyThrow().next();
+
+            fail();
+
+        } catch (final TimeoutException ignored) {
+
+
+        }
+
+        try {
+
+            channel.eventuallyExit().next();
+
+            fail();
+
+        } catch (final NoSuchElementException ignored) {
+
+
+        }
+
+        try {
+
+            channel.eventuallyAbort().next();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+
+        }
+
+        try {
+
+            channel.eventuallyAbort(new IllegalArgumentException()).next();
+
+            fail();
+
+        } catch (final AbortException e) {
+
+            assertThat(e.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
         }
     }
 

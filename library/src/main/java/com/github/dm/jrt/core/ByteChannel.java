@@ -227,7 +227,7 @@ public class ByteChannel {
 
         if (buffer != null) {
 
-            return buffer.unlock();
+            return buffer;
         }
 
         return new ByteBuffer(mDataBufferSize);
@@ -807,7 +807,17 @@ public class ByteChannel {
          */
         private ByteBuffer(final int bufferSize) {
 
-            mBuffer = new byte[bufferSize];
+            this(new byte[bufferSize]);
+        }
+
+        /**
+         * Constructor.
+         *
+         * @param buffer the internal buffer.
+         */
+        private ByteBuffer(final byte[] buffer) {
+
+            mBuffer = buffer;
             mStream = new DefaultBufferInputStream(this);
         }
 
@@ -935,19 +945,7 @@ public class ByteChannel {
                 mSize = 0;
             }
 
-            release(this);
-        }
-
-        @NotNull
-        private ByteBuffer unlock() {
-
-            synchronized (mMutex) {
-
-                changeState(BufferState.RECYCLED, BufferState.WRITE,
-                            "attempting to reuse instance while in illegal state");
-            }
-
-            return this;
+            release(new ByteBuffer(mBuffer));
         }
 
         @NotNull

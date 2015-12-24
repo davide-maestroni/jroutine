@@ -48,7 +48,14 @@ public class Channels {
 
     }
 
-    // TODO: 23/12/15 javadoc
+    /**
+     * Returns an output channel blending the outputs coming from the specified ones.<br/>
+     * Note that the channels will be bound as a result of the call.
+     *
+     * @param channels the list of channels.
+     * @param <OUT>    the output data type.
+     * @return the output channel.
+     */
     @NotNull
     public static <OUT> OutputChannel<OUT> blend(
             @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
@@ -68,7 +75,14 @@ public class Channels {
         return ioChannel.close();
     }
 
-    // TODO: 23/12/15 javadoc
+    /**
+     * Returns an output channel blending the outputs coming from the specified ones.<br/>
+     * Note that the channels will be bound as a result of the call.
+     *
+     * @param channels the array of channels.
+     * @param <OUT>    the output data type.
+     * @return the output channel.
+     */
     @NotNull
     @SuppressWarnings("unchecked")
     public static <OUT> OutputChannel<OUT> blend(@NotNull final OutputChannel<?>... channels) {
@@ -230,7 +244,16 @@ public class Channels {
         return ioChannel;
     }
 
-    // TODO: 23/12/15 javadoc
+    /**
+     * Returns an output channel concatenating the outputs coming from the specified ones, so that,
+     * all the outputs of the first channel will come before all the outputs of the second one, and
+     * so on.<br/>
+     * Note that the channels will be bound as a result of the call.
+     *
+     * @param channels the list of channels.
+     * @param <OUT>    the output data type.
+     * @return the output channel.
+     */
     @NotNull
     public static <OUT> OutputChannel<OUT> concat(
             @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
@@ -251,7 +274,16 @@ public class Channels {
         return ioChannel.close();
     }
 
-    // TODO: 23/12/15 javadoc
+    /**
+     * Returns an output channel concatenating the outputs coming from the specified ones, so that,
+     * all the outputs of the first channel will come before all the outputs of the second one, and
+     * so on.<br/>
+     * Note that the channels will be bound as a result of the call.
+     *
+     * @param channels the array of channels.
+     * @param <OUT>    the output data type.
+     * @return the output channel.
+     */
     @NotNull
     @SuppressWarnings("unchecked")
     public static <OUT> OutputChannel<OUT> concat(@NotNull final OutputChannel<?>... channels) {
@@ -373,11 +405,13 @@ public class Channels {
      * Note that the channels will be bound as a result of the call.
      *
      * @param channels the array of channels.
+     * @param <OUT>    the output data type.
      * @return the output channel.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static OutputChannel<List<?>> join(@NotNull final OutputChannel<?>... channels) {
+    public static <OUT> OutputChannel<List<? extends OUT>> join(
+            @NotNull final OutputChannel<?>... channels) {
 
         return join(false, null, channels);
     }
@@ -414,12 +448,13 @@ public class Channels {
      *
      * @param placeholder the placeholder instance.
      * @param channels    the array of channels.
+     * @param <OUT>       the output data type.
      * @return the output channel.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static OutputChannel<List<?>> joinAndFlush(@Nullable final Object placeholder,
-            @NotNull final OutputChannel<?>... channels) {
+    public static <OUT> OutputChannel<List<? extends OUT>> joinAndFlush(
+            @Nullable final Object placeholder, @NotNull final OutputChannel<?>... channels) {
 
         return join(true, placeholder, channels);
     }
@@ -460,11 +495,13 @@ public class Channels {
      *
      * @param startIndex the selectable start index.
      * @param channels   the array of channels.
+     * @param <OUT>      the output data type.
      * @return the selectable output channel.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static OutputChannel<? extends Selectable<?>> merge(final int startIndex,
+    @SuppressWarnings("unchecked")
+    public static <OUT> OutputChannel<? extends Selectable<OUT>> merge(final int startIndex,
             @NotNull final OutputChannel<?>... channels) {
 
         if (channels.length == 0) {
@@ -472,12 +509,12 @@ public class Channels {
             throw new IllegalArgumentException("the array of channels must not be empty");
         }
 
-        final IOChannel<Selectable<?>> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<Selectable<OUT>> ioChannel = JRoutine.io().buildChannel();
         int i = startIndex;
 
         for (final OutputChannel<?> channel : channels) {
 
-            ioChannel.pass(toSelectable(channel, i++));
+            ioChannel.pass(toSelectable((OutputChannel<? extends OUT>) channel, i++));
         }
 
         return ioChannel.close();
@@ -535,11 +572,12 @@ public class Channels {
      * Note that the channels will be bound as a result of the call.
      *
      * @param channels the channels to merge.
+     * @param <OUT>    the output data type.
      * @return the selectable output channel.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static OutputChannel<? extends Selectable<?>> merge(
+    public static <OUT> OutputChannel<? extends Selectable<OUT>> merge(
             @NotNull final OutputChannel<?>... channels) {
 
         return merge(0, channels);
@@ -900,7 +938,7 @@ public class Channels {
 
     @NotNull
     @SuppressWarnings("unchecked")
-    private static OutputChannel<List<?>> join(final boolean isFlush,
+    private static <OUT> OutputChannel<List<? extends OUT>> join(final boolean isFlush,
             @Nullable final Object placeholder, @NotNull final OutputChannel<?>... channels) {
 
         final int length = channels.length;
@@ -910,7 +948,7 @@ public class Channels {
             throw new IllegalArgumentException("the array of channels must not be empty");
         }
 
-        final IOChannel<List<?>> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<List<? extends OUT>> ioChannel = JRoutine.io().buildChannel();
         final JoinOutputConsumer consumer =
                 new JoinOutputConsumer(isFlush, length, placeholder, ioChannel);
         merge(channels).passTo(consumer);

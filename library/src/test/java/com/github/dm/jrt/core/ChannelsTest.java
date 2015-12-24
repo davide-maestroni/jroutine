@@ -990,7 +990,7 @@ public class ChannelsTest {
         channel2 = builder.buildChannel();
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
         channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
-        assertThat(routine.asyncCall(Channels.<Object>join(channel1, channel2))
+        assertThat(routine.asyncCall(Channels.join(channel1, channel2))
                           .afterMax(seconds(10))
                           .all()).containsExactly('s', '2');
         channel1 = builder.buildChannel();
@@ -1010,7 +1010,7 @@ public class ChannelsTest {
                 .pass("test3")
                 .close();
         channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
-        assertThat(routine.asyncCall(Channels.<Object>join(channel1, channel2))
+        assertThat(routine.asyncCall(Channels.join(channel1, channel2))
                           .afterMax(seconds(10))
                           .all()).containsExactly('s', '2');
     }
@@ -1029,7 +1029,7 @@ public class ChannelsTest {
 
         try {
 
-            routine.asyncCall(Channels.<Object>join(channel1, channel2)).afterMax(seconds(1)).all();
+            routine.asyncCall(Channels.join(channel1, channel2)).afterMax(seconds(1)).all();
 
             fail();
 
@@ -1067,7 +1067,7 @@ public class ChannelsTest {
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
         channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
         assertThat(
-                routine.asyncCall(Channels.<Object>joinAndFlush(new Object(), channel1, channel2))
+                routine.asyncCall(Channels.joinAndFlush(new Object(), channel1, channel2))
                        .afterMax(seconds(10))
                        .all()).containsExactly('s', '2');
         channel1 = builder.buildChannel();
@@ -1090,7 +1090,7 @@ public class ChannelsTest {
 
         try {
 
-            routine.asyncCall(Channels.<Object>joinAndFlush(new Object(), channel1, channel2))
+            routine.asyncCall(Channels.joinAndFlush(new Object(), channel1, channel2))
                    .afterMax(seconds(10))
                    .all();
 
@@ -1115,7 +1115,7 @@ public class ChannelsTest {
 
         try {
 
-            routine.asyncCall(Channels.<Object>joinAndFlush(null, channel1, channel2))
+            routine.asyncCall(Channels.joinAndFlush(null, channel1, channel2))
                    .afterMax(seconds(1))
                    .all();
 

@@ -71,7 +71,6 @@ public class ByteChannelTest {
         stream.write(13);
         stream.flush();
         final ByteBuffer buffer2 = channel.next();
-        assertThat(buffer1).isNotSameAs(buffer2);
         assertThat(buffer1.hashCode()).isEqualTo(buffer2.hashCode());
         assertThat(buffer1).isEqualTo(buffer2);
         assertThat(buffer2).isEqualTo(buffer1);
@@ -79,8 +78,6 @@ public class ByteChannelTest {
         stream.write(new byte[]{31, 17, (byte) 155});
         stream.flush();
         final ByteBuffer buffer3 = channel.next();
-        assertThat(buffer2).isSameAs(buffer3);
-        assertThat(buffer1).isNotSameAs(buffer3);
         assertThat(buffer1.hashCode()).isNotEqualTo(buffer3.hashCode());
         assertThat(buffer1).isNotEqualTo(buffer3);
         assertThat(buffer3).isNotEqualTo(buffer1);
@@ -364,21 +361,6 @@ public class ByteChannelTest {
         assertThat(inputStream.skip(4)).isEqualTo(0);
         assertThat(inputStream.read()).isEqualTo(-1);
         assertThat(inputStream.available()).isEqualTo(0);
-    }
-
-    @Test
-    public void testDataPool() throws IOException {
-
-        final IOChannel<ByteBuffer> channel = JRoutine.io().buildChannel();
-        final BufferOutputStream stream = ByteChannel.byteChannel().passTo(channel);
-        stream.write(31);
-        stream.flush();
-        final ByteBuffer buffer = channel.next();
-        final BufferInputStream inputStream = ByteChannel.inputStream(buffer);
-        inputStream.close();
-        stream.write(77);
-        stream.flush();
-        assertThat(channel.next()).isSameAs(buffer);
     }
 
     @Test

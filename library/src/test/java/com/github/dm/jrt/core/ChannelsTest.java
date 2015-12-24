@@ -53,6 +53,127 @@ import static org.junit.Assert.fail;
 public class ChannelsTest {
 
     @Test
+    public void testBlend() {
+
+        IOChannel<String> ioChannel1 = JRoutine.io().of("test1", "test2", "test3");
+        IOChannel<String> ioChannel2 = JRoutine.io().of("test4", "test5", "test6");
+        assertThat(Channels.blend(ioChannel2, ioChannel1).all()).containsOnly("test1", "test2",
+                                                                              "test3", "test4",
+                                                                              "test5", "test6");
+        ioChannel1 = JRoutine.io().of("test1", "test2", "test3");
+        ioChannel2 = JRoutine.io().of("test4", "test5", "test6");
+        assertThat(Channels.blend(Arrays.<OutputChannel<?>>asList(ioChannel1, ioChannel2))
+                           .all()).containsOnly("test1", "test2", "test3", "test4", "test5",
+                                                "test6");
+    }
+
+    @Test
+    public void testBlendAbort() {
+
+        final IOChannelBuilder builder = JRoutine.io();
+        final Routine<Object, Object> routine =
+                JRoutine.on(PassingInvocation.factoryOf()).buildRoutine();
+        IOChannel<String> channel1;
+        IOChannel<Integer> channel2;
+        channel1 = builder.buildChannel();
+        channel2 = builder.buildChannel();
+        channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
+        channel2.orderByCall().abort();
+
+        try {
+
+            routine.asyncCall(Channels.blend(channel1, channel2)).afterMax(seconds(1)).all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        channel1 = builder.buildChannel();
+        channel2 = builder.buildChannel();
+        channel1.orderByCall().abort();
+        channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
+
+        try {
+
+            routine.asyncCall(Channels.blend(Arrays.<OutputChannel<?>>asList(channel1, channel2)))
+                   .afterMax(seconds(1))
+                   .all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testBlendError() {
+
+        try {
+
+            Channels.blend();
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Channels.blend((OutputChannel<?>[]) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Channels.blend(new OutputChannel[]{null});
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Channels.blend(Collections.<OutputChannel<?>>emptyList());
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Channels.blend((List<OutputChannel<?>>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Channels.blend(Collections.<OutputChannel<?>>singletonList(null));
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
     public void testCombine() {
 
         final InvocationChannel<String, String> channel1 =
@@ -271,6 +392,167 @@ public class ChannelsTest {
         } catch (final IllegalArgumentException ignored) {
 
         }
+
+        try {
+
+            Channels.combine(new InvocationChannel[]{null});
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Channels.combine(0, new InvocationChannel[]{null});
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Channels.combine(Collections.<InvocationChannel<?, ?>>singletonList(null));
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Channels.combine(0, Collections.<InvocationChannel<?, ?>>singletonList(null));
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testConcat() {
+
+        IOChannel<String> ioChannel1 = JRoutine.io().of("test1", "test2", "test3");
+        IOChannel<String> ioChannel2 = JRoutine.io().of("test4", "test5", "test6");
+        assertThat(Channels.concat(ioChannel2, ioChannel1).all()).containsExactly("test4", "test5",
+                                                                                  "test6", "test1",
+                                                                                  "test2", "test3");
+        ioChannel1 = JRoutine.io().of("test1", "test2", "test3");
+        ioChannel2 = JRoutine.io().of("test4", "test5", "test6");
+        assertThat(Channels.concat(Arrays.<OutputChannel<?>>asList(ioChannel1, ioChannel2))
+                           .all()).containsExactly("test1", "test2", "test3", "test4", "test5",
+                                                   "test6");
+    }
+
+    @Test
+    public void testConcatAbort() {
+
+        final IOChannelBuilder builder = JRoutine.io();
+        final Routine<Object, Object> routine =
+                JRoutine.on(PassingInvocation.factoryOf()).buildRoutine();
+        IOChannel<String> channel1;
+        IOChannel<Integer> channel2;
+        channel1 = builder.buildChannel();
+        channel2 = builder.buildChannel();
+        channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
+        channel2.orderByCall().abort();
+
+        try {
+
+            routine.asyncCall(Channels.concat(channel1, channel2)).afterMax(seconds(1)).all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        channel1 = builder.buildChannel();
+        channel2 = builder.buildChannel();
+        channel1.orderByCall().abort();
+        channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
+
+        try {
+
+            routine.asyncCall(Channels.concat(Arrays.<OutputChannel<?>>asList(channel1, channel2)))
+                   .afterMax(seconds(1))
+                   .all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testConcatError() {
+
+        try {
+
+            Channels.concat();
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Channels.concat((OutputChannel<?>[]) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Channels.concat(new OutputChannel[]{null});
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Channels.concat(Collections.<OutputChannel<?>>emptyList());
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Channels.concat((List<OutputChannel<?>>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Channels.concat(Collections.<OutputChannel<?>>singletonList(null));
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
     }
 
     @Test
@@ -465,6 +747,27 @@ public class ChannelsTest {
         } catch (final IllegalArgumentException ignored) {
 
         }
+
+        try {
+
+            Channels.distributeAndFlush(new Object(), new InputChannel[]{null});
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Channels.distributeAndFlush(new Object(),
+                                        Collections.<InputChannel<?>>singletonList(null));
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
     }
 
     @Test
@@ -501,6 +804,26 @@ public class ChannelsTest {
             fail();
 
         } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Channels.distribute(new InputChannel[]{null});
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Channels.distribute(Collections.<InputChannel<?>>singletonList(null));
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
 
         }
     }
@@ -844,6 +1167,26 @@ public class ChannelsTest {
         } catch (final IllegalArgumentException ignored) {
 
         }
+
+        try {
+
+            Channels.joinAndFlush(new Object(), new OutputChannel[]{null});
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Channels.joinAndFlush(new Object(), Collections.<OutputChannel<?>>singletonList(null));
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
     }
 
     @Test
@@ -866,6 +1209,26 @@ public class ChannelsTest {
             fail();
 
         } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Channels.join(new OutputChannel[]{null});
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Channels.join(Collections.<OutputChannel<?>>singletonList(null));
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
 
         }
     }
@@ -1132,6 +1495,56 @@ public class ChannelsTest {
             fail();
 
         } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Channels.merge(new OutputChannel[]{null});
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Channels.merge(Collections.<OutputChannel<?>>singletonList(null));
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Channels.merge(0, new OutputChannel[]{null});
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Channels.merge(0, Collections.<OutputChannel<?>>singletonList(null));
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Channels.merge(Collections.<Integer, OutputChannel<?>>singletonMap(1, null));
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
 
         }
     }

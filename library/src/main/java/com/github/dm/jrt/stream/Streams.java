@@ -14,6 +14,7 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.Channels;
 import com.github.dm.jrt.core.JRoutine;
 
 import org.jetbrains.annotations.NotNull;
@@ -24,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
  * <p/>
  * Created by davide-maestroni on 11/26/2015.
  */
-public class Streams {
+public class Streams extends Channels {
 
     /**
      * Avoid direct instantiation.

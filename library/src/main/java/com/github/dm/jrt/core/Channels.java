@@ -13,6 +13,7 @@
  */
 package com.github.dm.jrt.core;
 
+import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.channel.Channel.InputChannel;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
@@ -45,6 +46,48 @@ public class Channels {
      */
     protected Channels() {
 
+    }
+
+    // TODO: 23/12/15 javadoc
+    @NotNull
+    public static <OUT> OutputChannel<OUT> blend(
+            @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
+
+        if (channels.isEmpty()) {
+
+            throw new IllegalArgumentException("the list of channels must not be empty");
+        }
+
+        final IOChannel<OUT> ioChannel = JRoutine.io().buildChannel();
+
+        for (final OutputChannel<? extends OUT> channel : channels) {
+
+            channel.passTo(ioChannel);
+        }
+
+        return ioChannel.close();
+    }
+
+    // TODO: 23/12/15 javadoc
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <OUT> OutputChannel<OUT> blend(@NotNull final OutputChannel<?>... channels) {
+
+        final int length = channels.length;
+
+        if (length == 0) {
+
+            throw new IllegalArgumentException("the array of channels must not be empty");
+        }
+
+        final IOChannel<Object> ioChannel = JRoutine.io().buildChannel();
+
+        for (final OutputChannel<?> channel : channels) {
+
+            channel.passTo(ioChannel);
+        }
+
+        return (OutputChannel<OUT>) ioChannel.close();
     }
 
     /**
@@ -185,6 +228,50 @@ public class Channels {
         final IOChannel<Selectable<? extends IN>> ioChannel = JRoutine.io().buildChannel();
         ioChannel.passTo(new SortingMapOutputConsumer(channelMap));
         return ioChannel;
+    }
+
+    // TODO: 23/12/15 javadoc
+    @NotNull
+    public static <OUT> OutputChannel<OUT> concat(
+            @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
+
+        if (channels.isEmpty()) {
+
+            throw new IllegalArgumentException("the list of channels must not be empty");
+        }
+
+        final IOChannel<OUT> ioChannel =
+                JRoutine.io().channels().withChannelOrder(OrderType.BY_CALL).set().buildChannel();
+
+        for (final OutputChannel<? extends OUT> channel : channels) {
+
+            channel.passTo(ioChannel);
+        }
+
+        return ioChannel.close();
+    }
+
+    // TODO: 23/12/15 javadoc
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <OUT> OutputChannel<OUT> concat(@NotNull final OutputChannel<?>... channels) {
+
+        final int length = channels.length;
+
+        if (length == 0) {
+
+            throw new IllegalArgumentException("the array of channels must not be empty");
+        }
+
+        final IOChannel<Object> ioChannel =
+                JRoutine.io().channels().withChannelOrder(OrderType.BY_CALL).set().buildChannel();
+
+        for (final OutputChannel<?> channel : channels) {
+
+            channel.passTo(ioChannel);
+        }
+
+        return (OutputChannel<OUT>) ioChannel.close();
     }
 
     /**

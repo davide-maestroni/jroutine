@@ -27,6 +27,14 @@ public class LoaderInvocationException extends RoutineException {
 
     /**
      * Constructor.
+     */
+    public LoaderInvocationException() {
+
+        this(-1);
+    }
+
+    /**
+     * Constructor.
      *
      * @param id the loader ID.
      */

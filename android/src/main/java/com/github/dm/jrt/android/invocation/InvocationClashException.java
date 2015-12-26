@@ -22,6 +22,13 @@ public class InvocationClashException extends LoaderInvocationException {
 
     /**
      * Constructor.
+     */
+    public InvocationClashException() {
+
+    }
+
+    /**
+     * Constructor.
      *
      * @param id the loader ID.
      */

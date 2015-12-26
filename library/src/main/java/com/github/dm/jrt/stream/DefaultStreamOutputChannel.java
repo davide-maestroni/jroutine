@@ -112,102 +112,73 @@ class DefaultStreamOutputChannel<OUT>
     }
 
     @NotNull
-    public OutputChannel<OUT> afterMax(@NotNull final TimeDuration timeout) {
+    public StreamOutputChannel<OUT> afterMax(@NotNull final TimeDuration timeout) {
 
-        return mChannel.afterMax(timeout);
+        mChannel.afterMax(timeout);
+        return this;
     }
 
     @NotNull
-    public OutputChannel<OUT> afterMax(final long timeout, @NotNull final TimeUnit timeUnit) {
+    public StreamOutputChannel<OUT> afterMax(final long timeout, @NotNull final TimeUnit timeUnit) {
 
-        return mChannel.afterMax(timeout, timeUnit);
+        mChannel.afterMax(timeout, timeUnit);
+        return this;
     }
 
     @NotNull
-    public List<OUT> all() {
+    public StreamOutputChannel<OUT> allInto(@NotNull final Collection<? super OUT> results) {
 
-        return mChannel.all();
+        mChannel.allInto(results);
+        return this;
     }
 
     @NotNull
-    public OutputChannel<OUT> allInto(@NotNull final Collection<? super OUT> results) {
+    public StreamOutputChannel<OUT> eventuallyAbort() {
 
-        return mChannel.allInto(results);
-    }
-
-    public boolean checkComplete() {
-
-        return mChannel.checkComplete();
+        mChannel.eventuallyAbort();
+        return this;
     }
 
     @NotNull
-    public OutputChannel<OUT> eventuallyAbort() {
+    public StreamOutputChannel<OUT> eventuallyAbort(@Nullable final Throwable reason) {
 
-        return mChannel.eventuallyAbort();
+        mChannel.eventuallyAbort(reason);
+        return this;
     }
 
     @NotNull
-    public OutputChannel<OUT> eventuallyAbort(@Nullable final Throwable reason) {
+    public StreamOutputChannel<OUT> eventuallyExit() {
 
-        return mChannel.eventuallyAbort(reason);
+        mChannel.eventuallyExit();
+        return this;
     }
 
     @NotNull
-    public OutputChannel<OUT> eventuallyExit() {
+    public StreamOutputChannel<OUT> eventuallyThrow() {
 
-        return mChannel.eventuallyExit();
+        mChannel.eventuallyThrow();
+        return this;
     }
 
     @NotNull
-    public OutputChannel<OUT> eventuallyThrow() {
+    public StreamOutputChannel<OUT> immediately() {
 
-        return mChannel.eventuallyThrow();
-    }
-
-    public boolean hasNext() {
-
-        return mChannel.hasNext();
-    }
-
-    public OUT next() {
-
-        return mChannel.next();
+        mChannel.immediately();
+        return this;
     }
 
     @NotNull
-    public OutputChannel<OUT> immediately() {
+    public StreamOutputChannel<OUT> passTo(@NotNull final OutputConsumer<? super OUT> consumer) {
 
-        return mChannel.immediately();
-    }
-
-    public boolean isBound() {
-
-        return mChannel.isBound();
+        mChannel.passTo(consumer);
+        return this;
     }
 
     @NotNull
-    public List<OUT> next(final int count) {
+    public StreamOutputChannel<OUT> skip(final int count) {
 
-        return mChannel.next(count);
-    }
-
-    @NotNull
-    public <CHANNEL extends InputChannel<? super OUT>> CHANNEL passTo(
-            @NotNull final CHANNEL channel) {
-
-        return mChannel.passTo(channel);
-    }
-
-    @NotNull
-    public OutputChannel<OUT> passTo(@NotNull final OutputConsumer<? super OUT> consumer) {
-
-        return mChannel.passTo(consumer);
-    }
-
-    @NotNull
-    public OutputChannel<OUT> skip(final int count) {
-
-        return mChannel.skip(count);
+        mChannel.skip(count);
+        return this;
     }
 
     @NotNull
@@ -482,6 +453,45 @@ class DefaultStreamOutputChannel<OUT>
         }
 
         return tryCatch(new TryCatchBiConsumerFunction<OUT>(function));
+    }
+
+    @NotNull
+    public List<OUT> all() {
+
+        return mChannel.all();
+    }
+
+    public boolean checkComplete() {
+
+        return mChannel.checkComplete();
+    }
+
+    public boolean hasNext() {
+
+        return mChannel.hasNext();
+    }
+
+    public OUT next() {
+
+        return mChannel.next();
+    }
+
+    public boolean isBound() {
+
+        return mChannel.isBound();
+    }
+
+    @NotNull
+    public List<OUT> next(final int count) {
+
+        return mChannel.next(count);
+    }
+
+    @NotNull
+    public <CHANNEL extends InputChannel<? super OUT>> CHANNEL passTo(
+            @NotNull final CHANNEL channel) {
+
+        return mChannel.passTo(channel);
     }
 
     @NotNull

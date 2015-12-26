@@ -22,6 +22,13 @@ public class MissingInvocationException extends LoaderInvocationException {
 
     /**
      * Constructor.
+     */
+    public MissingInvocationException() {
+
+    }
+
+    /**
+     * Constructor.
      *
      * @param id the loader ID.
      */

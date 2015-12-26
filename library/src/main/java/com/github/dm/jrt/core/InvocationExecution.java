@@ -50,6 +50,8 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
 
     private Invocation<IN, OUT> mInvocation;
 
+    private boolean mIsInitialized;
+
     private boolean mIsWaitingAbortInvocation;
 
     private boolean mIsWaitingInvocation;
@@ -141,6 +143,7 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
                                 mInvocation = invocation;
                                 mLogger.dbg("initializing invocation: %s", invocation);
                                 invocation.onInitialize();
+                                mIsInitialized = true;
                             }
 
                             while (inputIterator.hasInput()) {
@@ -329,11 +332,21 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
                                 mInvocation = invocation;
                                 mLogger.dbg("initializing invocation: %s", invocation);
                                 invocation.onInitialize();
+                                mIsInitialized = true;
                             }
 
-                            invocation.onAbort(exception);
-                            invocation.onTerminate();
-                            manager.recycle(invocation);
+                            if (mIsInitialized) {
+
+                                invocation.onAbort(exception);
+                                invocation.onTerminate();
+                                manager.recycle(invocation);
+
+                            } else {
+
+                                // Initialization failed, so just discard the invocation
+                                manager.discard(invocation);
+                            }
+
                             resultChannel.close(exception);
 
                         } catch (final Throwable t) {

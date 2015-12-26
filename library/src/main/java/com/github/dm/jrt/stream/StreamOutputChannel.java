@@ -15,6 +15,7 @@ package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.builder.ConfigurableBuilder;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
+import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.function.BiConsumer;
@@ -25,10 +26,14 @@ import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.routine.Routine;
+import com.github.dm.jrt.util.TimeDuration;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Interface defining a stream output channel, that is, a channel concatenating map and reduce
@@ -46,6 +51,66 @@ import java.util.List;
  */
 public interface StreamOutputChannel<OUT>
         extends OutputChannel<OUT>, ConfigurableBuilder<StreamOutputChannel<OUT>> {
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    StreamOutputChannel<OUT> afterMax(@NotNull TimeDuration timeout);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    StreamOutputChannel<OUT> afterMax(long timeout, @NotNull TimeUnit timeUnit);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    StreamOutputChannel<OUT> allInto(@NotNull Collection<? super OUT> results);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    StreamOutputChannel<OUT> eventuallyAbort();
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    StreamOutputChannel<OUT> eventuallyAbort(@Nullable Throwable reason);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    StreamOutputChannel<OUT> eventuallyExit();
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    StreamOutputChannel<OUT> eventuallyThrow();
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    StreamOutputChannel<OUT> immediately();
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    StreamOutputChannel<OUT> passTo(@NotNull OutputConsumer<? super OUT> consumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    StreamOutputChannel<OUT> skip(int count);
 
     /**
      * Concatenates a stream channel based on the specified collecting consumer to this one.<br/>

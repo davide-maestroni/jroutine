@@ -22,6 +22,13 @@ public class InvocationTypeException extends LoaderInvocationException {
 
     /**
      * Constructor.
+     */
+    public InvocationTypeException() {
+
+    }
+
+    /**
+     * Constructor.
      *
      * @param id the loader ID.
      */

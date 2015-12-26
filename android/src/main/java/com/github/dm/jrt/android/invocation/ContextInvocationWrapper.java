@@ -15,12 +15,10 @@ package com.github.dm.jrt.android.invocation;
 
 import android.content.Context;
 
-import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.invocation.Invocation;
+import com.github.dm.jrt.invocation.InvocationDecorator;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Implementation of a platform specific Android invocation wrapping a base invocation instance.
@@ -30,54 +28,17 @@ import org.jetbrains.annotations.Nullable;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public class ContextInvocationWrapper<IN, OUT> implements ContextInvocation<IN, OUT> {
-
-    private final Invocation<IN, OUT> mInvocation;
+public class ContextInvocationWrapper<IN, OUT> extends InvocationDecorator<IN, OUT>
+        implements ContextInvocation<IN, OUT> {
 
     /**
      * Constructor.
      *
      * @param invocation the wrapped invocation.
      */
-    @SuppressWarnings("ConstantConditions")
     public ContextInvocationWrapper(@NotNull final Invocation<IN, OUT> invocation) {
 
-        if (invocation == null) {
-
-            throw new NullPointerException("the invocation must not be null");
-        }
-
-        mInvocation = invocation;
-    }
-
-    public void onAbort(@Nullable final RoutineException reason) {
-
-        mInvocation.onAbort(reason);
-    }
-
-    public void onDestroy() {
-
-        mInvocation.onDestroy();
-    }
-
-    public void onInitialize() {
-
-        mInvocation.onInitialize();
-    }
-
-    public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
-
-        mInvocation.onInput(input, result);
-    }
-
-    public void onResult(@NotNull final ResultChannel<OUT> result) {
-
-        mInvocation.onResult(result);
-    }
-
-    public void onTerminate() {
-
-        mInvocation.onTerminate();
+        super(invocation);
     }
 
     public void onContext(@NotNull final Context context) {

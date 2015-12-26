@@ -26,7 +26,17 @@ import org.jetbrains.annotations.Nullable;
  */
 public class ServiceDisconnectedException extends RoutineException {
 
-    private final ComponentName mName;
+    private final String mClassName;
+
+    private final String mPackageName;
+
+    /**
+     * Constructor.
+     */
+    public ServiceDisconnectedException() {
+
+        this(null);
+    }
 
     /**
      * Constructor.
@@ -35,7 +45,16 @@ public class ServiceDisconnectedException extends RoutineException {
      */
     public ServiceDisconnectedException(@Nullable final ComponentName name) {
 
-        mName = name;
+        if (name != null) {
+
+            mPackageName = name.getPackageName();
+            mClassName = name.getClassName();
+
+        } else {
+
+            mPackageName = null;
+            mClassName = null;
+        }
     }
 
     /**
@@ -44,8 +63,13 @@ public class ServiceDisconnectedException extends RoutineException {
      * @return the component name.
      */
     @Nullable
-    public ComponentName getName() {
+    public ComponentName getComponentName() {
 
-        return mName;
+        if ((mPackageName != null) && (mClassName != null)) {
+
+            return new ComponentName(mPackageName, mClassName);
+        }
+
+        return null;
     }
 }

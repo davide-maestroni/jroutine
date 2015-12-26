@@ -31,14 +31,14 @@ import static com.github.dm.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Context invocation factories unit test.
+ * Target invocation factories unit test.
  * <p/>
  * Created by davide-maestroni on 10/06/2015.
  */
 @TargetApi(VERSION_CODES.FROYO)
-public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCase2<TestActivity> {
+public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase2<TestActivity> {
 
-    public ContextInvocationFactoryTest() {
+    public TargetInvocationFactoryTest() {
 
         super(TestActivity.class);
     }

@@ -22,8 +22,10 @@ import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.core.Channels;
 import com.github.dm.jrt.core.Channels.Selectable;
 import com.github.dm.jrt.core.JRoutine;
+import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.invocation.InvocationException;
+import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.invocation.PassingInvocation;
 import com.github.dm.jrt.invocation.TemplateInvocation;
 import com.github.dm.jrt.routine.Routine;
@@ -284,6 +286,45 @@ public class StreamsTest {
         try {
 
             Streams.concat(Collections.<OutputChannel<?>>singletonList(null));
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testFactory() {
+
+        final InvocationFactory<String, String> factory = Streams.factory(
+                new Function<StreamOutputChannel<? extends String>, StreamOutputChannel<String>>() {
+
+                    public StreamOutputChannel<String> apply(
+                            final StreamOutputChannel<? extends String> channel) {
+
+                        return channel.syncMap(new Function<String, String>() {
+
+                            public String apply(final String s) {
+
+                                return s.toUpperCase();
+                            }
+                        });
+                    }
+                });
+        assertThat(JRoutine.on(factory)
+                           .asyncCall("test1", "test2", "test3")
+                           .afterMax(seconds(3))
+                           .all()).containsExactly("TEST1", "TEST2", "TEST3");
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testFactoryError() {
+
+        try {
+
+            Streams.factory(null);
 
             fail();
 

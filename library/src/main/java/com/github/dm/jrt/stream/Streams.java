@@ -14,8 +14,14 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.channel.Channel.OutputChannel;
+import com.github.dm.jrt.channel.IOChannel;
+import com.github.dm.jrt.channel.ResultChannel;
+import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.core.Channels;
 import com.github.dm.jrt.core.JRoutine;
+import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.invocation.Invocation;
+import com.github.dm.jrt.invocation.InvocationFactory;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -99,6 +105,25 @@ public class Streams extends Channels {
             @NotNull final OutputChannel<?>... channels) {
 
         return streamOf(Channels.<OUT>concat(channels));
+    }
+
+    /**
+     * Returns an invocation factory, whose invocation instances employ the stream output channels
+     * provided by the specified function to process input data.<br/>
+     * The function should return a new instance each time it is called, starting from the passed
+     * one.
+     *
+     * @param function the function providing the stream output channels.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the invocation factory.
+     */
+    @NotNull
+    public static <IN, OUT> InvocationFactory<IN, OUT> factory(
+            @NotNull final Function<? super StreamOutputChannel<? extends IN>, ? extends
+                    StreamOutputChannel<? extends OUT>> function) {
+
+        return new StreamInvocationFactory<IN, OUT>(function);
     }
 
     /**
@@ -330,5 +355,116 @@ public class Streams extends Channels {
             @NotNull final OutputChannel<OUT> output) {
 
         return new DefaultStreamOutputChannel<OUT>(output);
+    }
+
+    /**
+     * Implementation of an invocation wrapping a stream output channel.
+     *
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
+     */
+    private static class StreamInvocation<IN, OUT> implements Invocation<IN, OUT> {
+
+        private final Function<? super StreamOutputChannel<? extends IN>, ? extends
+                StreamOutputChannel<? extends OUT>> mFunction;
+
+        private IOChannel<IN> mInputChannel;
+
+        private StreamOutputChannel<? extends OUT> mOutputChannel;
+
+        /**
+         * Constructor.
+         *
+         * @param function the function used to instantiate the stream output channel.
+         */
+        private StreamInvocation(final Function<? super StreamOutputChannel<? extends IN>, ? extends
+                StreamOutputChannel<? extends OUT>> function) {
+
+            mFunction = function;
+        }
+
+        public void onAbort(@Nullable final RoutineException reason) {
+
+            mInputChannel.abort(reason);
+        }
+
+        public void onDestroy() {
+
+            mInputChannel = null;
+            mOutputChannel = null;
+        }
+
+        public void onInitialize() {
+
+            final IOChannel<IN> ioChannel = JRoutine.io().buildChannel();
+            mOutputChannel = mFunction.apply(streamOf(ioChannel));
+            mInputChannel = ioChannel;
+        }
+
+        public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
+
+            final StreamOutputChannel<? extends OUT> outputChannel = mOutputChannel;
+
+            if (!outputChannel.isBound()) {
+
+                outputChannel.passTo(result);
+            }
+
+            mInputChannel.pass(input);
+        }
+
+        public void onResult(@NotNull final ResultChannel<OUT> result) {
+
+            final StreamOutputChannel<? extends OUT> outputChannel = mOutputChannel;
+
+            if (!outputChannel.isBound()) {
+
+                outputChannel.passTo(result);
+            }
+
+            mInputChannel.close();
+        }
+
+        public void onTerminate() {
+
+            mInputChannel = null;
+            mOutputChannel = null;
+        }
+    }
+
+    /**
+     * Implementation of a factory creating invocations wrapping a stream output channel.
+     *
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
+     */
+    private static class StreamInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
+
+        private final Function<? super StreamOutputChannel<? extends IN>, ? extends
+                StreamOutputChannel<? extends OUT>> mFunction;
+
+        /**
+         * Constructor.
+         *
+         * @param function the function used to instantiate the stream output channel.
+         */
+        private StreamInvocationFactory(
+                final Function<? super StreamOutputChannel<? extends IN>, ? extends
+                        StreamOutputChannel<? extends OUT>> function) {
+
+            if (function == null) {
+
+                throw new NullPointerException("the function instance must not be null");
+            }
+
+            mFunction = function;
+        }
+
+        @NotNull
+        @Override
+        public Invocation<IN, OUT> newInvocation() {
+
+            return new StreamInvocation<IN, OUT>(mFunction);
+        }
     }
 }

@@ -254,7 +254,7 @@ public interface Channel {
          * Consumes all the results by waiting for the routine to complete at the maximum for the
          * set timeout.
          *
-         * @return this channel.
+         * @return the list of results.
          * @throws com.github.dm.jrt.channel.ExecutionTimeoutException if the channel is set to
          *                                                             throw an exception when the
          *                                                             timeout elapses.
@@ -453,7 +453,7 @@ public interface Channel {
          * Consumes the first {@code count} available results by waiting at the maximum for the set
          * timeout.
          *
-         * @return the first available results.
+         * @return the first {@code count} available results.
          * @throws com.github.dm.jrt.channel.ExecutionTimeoutException if the channel is set to
          *                                                             throw an exception when the
          *                                                             timeout elapses.
@@ -480,7 +480,7 @@ public interface Channel {
          *
          * @param channel   the input channel
          * @param <CHANNEL> the input channel type.
-         * @return this channel.
+         * @return the passed channel.
          * @throws java.lang.IllegalStateException if this channel is already bound.
          */
         @NotNull
@@ -503,7 +503,7 @@ public interface Channel {
          * Skips the first {@code count} available results by waiting at the maximum for the set
          * timeout.
          *
-         * @return the first available results.
+         * @return this channel.
          * @throws com.github.dm.jrt.channel.ExecutionTimeoutException if the channel is set to
          *                                                             throw an exception when the
          *                                                             timeout elapses.

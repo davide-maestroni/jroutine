@@ -645,9 +645,6 @@ public class StreamOutputChannelTest {
     public void testMapConsumer() {
 
         assertThat(Streams.streamOf("test1", "test2")
-                          .invocations()
-                          .withOutputOrder(OrderType.BY_CALL)
-                          .set()
                           .asyncMap(new BiConsumer<String, ResultChannel<String>>() {
 
                               public void accept(final String s,
@@ -659,6 +656,9 @@ public class StreamOutputChannelTest {
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
         assertThat(Streams.streamOf("test1", "test2")
+                          .invocations()
+                          .withOutputOrder(OrderType.BY_CALL)
+                          .set()
                           .parallelMap(new BiConsumer<String, ResultChannel<String>>() {
 
                               public void accept(final String s,
@@ -668,11 +668,8 @@ public class StreamOutputChannelTest {
                               }
                           })
                           .afterMax(seconds(3))
-                          .all()).containsOnly("TEST1", "TEST2");
+                          .all()).containsExactly("TEST1", "TEST2");
         assertThat(Streams.streamOf("test1", "test2")
-                          .invocations()
-                          .withOutputOrder(OrderType.BY_CALL)
-                          .set()
                           .syncMap(new BiConsumer<String, ResultChannel<String>>() {
 
                               public void accept(final String s,
@@ -724,22 +721,18 @@ public class StreamOutputChannelTest {
 
         final InvocationFactory<String, String> factory = Invocations.factoryOf(UpperCase.class);
         assertThat(Streams.streamOf("test1", "test2")
-                          .invocations()
-                          .withOutputOrder(OrderType.BY_CALL)
-                          .set()
                           .asyncMap(factory)
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
         assertThat(Streams.streamOf("test1", "test2")
-                          .parallelMap(factory)
-                          .afterMax(seconds(3))
-                          .all()).containsOnly("TEST1", "TEST2");
-        assertThat(Streams.streamOf("test1", "test2")
                           .invocations()
                           .withOutputOrder(OrderType.BY_CALL)
                           .set()
-                          .syncMap(factory)
+                          .parallelMap(factory)
+                          .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
+        assertThat(Streams.streamOf("test1", "test2").syncMap(factory).all()).containsExactly(
+                "TEST1", "TEST2");
     }
 
     @Test
@@ -781,22 +774,19 @@ public class StreamOutputChannelTest {
     public void testMapFilter() {
 
         assertThat(Streams.streamOf("test1", "test2")
-                          .invocations()
-                          .withOutputOrder(OrderType.BY_CALL)
-                          .set()
                           .asyncMap(new UpperCase())
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
         assertThat(Streams.streamOf("test1", "test2")
-                          .parallelMap(new UpperCase())
-                          .afterMax(seconds(3))
-                          .all()).containsOnly("TEST1", "TEST2");
-        assertThat(Streams.streamOf("test1", "test2")
                           .invocations()
                           .withOutputOrder(OrderType.BY_CALL)
                           .set()
-                          .syncMap(new UpperCase())
+                          .parallelMap(new UpperCase())
+                          .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
+        assertThat(
+                Streams.streamOf("test1", "test2").syncMap(new UpperCase()).all()).containsExactly(
+                "TEST1", "TEST2");
     }
 
     @Test
@@ -837,11 +827,18 @@ public class StreamOutputChannelTest {
     @Test
     public void testMapFunction() {
 
+        assertThat(Streams.streamOf("test1", "test2").asyncMap(new Function<String, String>() {
+
+            public String apply(final String s) {
+
+                return s.toUpperCase();
+            }
+        }).afterMax(seconds(3)).all()).containsExactly("TEST1", "TEST2");
         assertThat(Streams.streamOf("test1", "test2")
                           .invocations()
                           .withOutputOrder(OrderType.BY_CALL)
                           .set()
-                          .asyncMap(new Function<String, String>() {
+                          .parallelMap(new Function<String, String>() {
 
                               public String apply(final String s) {
 
@@ -850,25 +847,13 @@ public class StreamOutputChannelTest {
                           })
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
-        assertThat(Streams.streamOf("test1", "test2").parallelMap(new Function<String, String>() {
+        assertThat(Streams.streamOf("test1", "test2").syncMap(new Function<String, String>() {
 
             public String apply(final String s) {
 
                 return s.toUpperCase();
             }
-        }).afterMax(seconds(3)).all()).containsOnly("TEST1", "TEST2");
-        assertThat(Streams.streamOf("test1", "test2")
-                          .invocations()
-                          .withOutputOrder(OrderType.BY_CALL)
-                          .set()
-                          .syncMap(new Function<String, String>() {
-
-                              public String apply(final String s) {
-
-                                  return s.toUpperCase();
-                              }
-                          })
-                          .all()).containsExactly("TEST1", "TEST2");
+        }).all()).containsExactly("TEST1", "TEST2");
     }
 
     @Test
@@ -911,22 +896,18 @@ public class StreamOutputChannelTest {
 
         final Routine<String, String> routine = JRoutine.on(new UpperCase()).buildRoutine();
         assertThat(Streams.streamOf("test1", "test2")
-                          .invocations()
-                          .withOutputOrder(OrderType.BY_CALL)
-                          .set()
                           .asyncMap(routine)
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
         assertThat(Streams.streamOf("test1", "test2")
-                          .parallelMap(routine)
-                          .afterMax(seconds(3))
-                          .all()).containsOnly("TEST1", "TEST2");
-        assertThat(Streams.streamOf("test1", "test2")
                           .invocations()
                           .withOutputOrder(OrderType.BY_CALL)
                           .set()
-                          .syncMap(routine)
+                          .parallelMap(routine)
+                          .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
+        assertThat(Streams.streamOf("test1", "test2").syncMap(routine).all()).containsExactly(
+                "TEST1", "TEST2");
     }
 
     @Test
@@ -1085,6 +1066,20 @@ public class StreamOutputChannelTest {
             }
         }).next()).isEqualTo("exception");
 
+        assertThat(Streams.streamOf("test").syncMap(new Function<Object, Object>() {
+
+            public Object apply(final Object o) {
+
+                return o;
+            }
+        }).tryCatch(new BiConsumer<RoutineException, InputChannel<Object>>() {
+
+            public void accept(final RoutineException e, final InputChannel<Object> channel) {
+
+                channel.pass("exception");
+            }
+        }).next()).isEqualTo("test");
+
         try {
 
             Streams.streamOf("test").syncMap(new Function<Object, Object>() {
@@ -1107,6 +1102,19 @@ public class StreamOutputChannelTest {
 
             assertThat(e.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
         }
+
+        assertThat(Streams.streamOf("test").syncMap(new Function<Object, Object>() {
+
+            public Object apply(final Object o) {
+
+                throw new NullPointerException();
+            }
+        }).tryCatch(new Consumer<RoutineException>() {
+
+            public void accept(final RoutineException e) {
+
+            }
+        }).all()).isEmpty();
 
         assertThat(Streams.streamOf("test").syncMap(new Function<Object, Object>() {
 

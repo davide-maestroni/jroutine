@@ -22,6 +22,7 @@ import org.junit.Test;
 import static com.github.dm.jrt.util.TimeDuration.millis;
 import static com.github.dm.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  * Invocation factories unit test.
@@ -38,6 +39,21 @@ public class InvocationFactoryTest {
         final TestInvocationFactory decoratedFactory = new TestInvocationFactory(factory);
         assertThat(decoratedFactory.newInvocation()).isExactlyInstanceOf(
                 TestInvocationDecorator.class);
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testDecoratingInvocationFactoryError() {
+
+        try {
+
+            new TestInvocationFactory(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
     }
 
     @Test

@@ -56,7 +56,7 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
 
     private final BiFunction<IN1, IN2, ?> mBiFunction;
 
-    private final FunctionWrapper<?, OUT> mFunction;
+    private final FunctionWrapper<?, ? extends OUT> mFunction;
 
     /**
      * Constructor.
@@ -81,7 +81,7 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
      * @param function   the concatenated function chain.
      */
     private BiFunctionWrapper(@NotNull final BiFunction<IN1, IN2, ?> biFunction,
-            @NotNull final FunctionWrapper<?, OUT> function) {
+            @NotNull final FunctionWrapper<?, ? extends OUT> function) {
 
         mBiFunction = biFunction;
         mFunction = function;
@@ -211,7 +211,7 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
      */
     @NotNull
     public <AFTER> BiFunctionWrapper<IN1, IN2, AFTER> andThen(
-            @NotNull final Function<? super OUT, AFTER> after) {
+            @NotNull final Function<? super OUT, ? extends AFTER> after) {
 
         return new BiFunctionWrapper<IN1, IN2, AFTER>(mBiFunction, mFunction.andThen(after));
     }

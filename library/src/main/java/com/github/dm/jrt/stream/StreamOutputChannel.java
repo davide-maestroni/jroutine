@@ -141,7 +141,7 @@ public interface StreamOutputChannel<OUT>
      */
     @NotNull
     <AFTER> StreamOutputChannel<AFTER> asyncCollect(
-            @NotNull Function<? super List<? extends OUT>, AFTER> function);
+            @NotNull Function<? super List<? extends OUT>, ? extends AFTER> function);
 
     /**
      * Concatenates a stream channel based on the specified predicate to this one.<br/>
@@ -199,7 +199,8 @@ public interface StreamOutputChannel<OUT>
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative..
      */
     @NotNull
-    <AFTER> StreamOutputChannel<AFTER> asyncGenerate(long count, @NotNull Supplier<AFTER> supplier);
+    <AFTER> StreamOutputChannel<AFTER> asyncGenerate(long count,
+            @NotNull Supplier<? extends AFTER> supplier);
 
     /**
      * Concatenates a stream channel based on the specified supplier to this one.<br/>
@@ -213,7 +214,7 @@ public interface StreamOutputChannel<OUT>
      * @return the concatenated stream channel.
      */
     @NotNull
-    <AFTER> StreamOutputChannel<AFTER> asyncGenerate(@NotNull Supplier<AFTER> supplier);
+    <AFTER> StreamOutputChannel<AFTER> asyncGenerate(@NotNull Supplier<? extends AFTER> supplier);
 
     /**
      * Lifts this stream outputs by applying the specified function.
@@ -227,7 +228,7 @@ public interface StreamOutputChannel<OUT>
      */
     @NotNull
     <AFTER> StreamOutputChannel<AFTER> asyncLift(
-            @NotNull Function<? super OUT, ? extends OutputChannel<AFTER>> function);
+            @NotNull Function<? super OUT, ? extends OutputChannel<? extends AFTER>> function);
 
     /**
      * Concatenates a stream channel based on the specified consumer to this one.
@@ -254,7 +255,8 @@ public interface StreamOutputChannel<OUT>
      * @return the concatenated stream channel.
      */
     @NotNull
-    <AFTER> StreamOutputChannel<AFTER> asyncMap(@NotNull Function<? super OUT, AFTER> function);
+    <AFTER> StreamOutputChannel<AFTER> asyncMap(
+            @NotNull Function<? super OUT, ? extends AFTER> function);
 
     /**
      * Concatenates a stream channel based on the specified factory to this one.
@@ -268,7 +270,7 @@ public interface StreamOutputChannel<OUT>
      */
     @NotNull
     <AFTER> StreamOutputChannel<AFTER> asyncMap(
-            @NotNull InvocationFactory<? super OUT, AFTER> factory);
+            @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
 
     /**
      * Concatenates a stream channel based on the specified instance to this one.
@@ -281,7 +283,8 @@ public interface StreamOutputChannel<OUT>
      * @return the concatenated stream channel.
      */
     @NotNull
-    <AFTER> StreamOutputChannel<AFTER> asyncMap(@NotNull Routine<? super OUT, AFTER> routine);
+    <AFTER> StreamOutputChannel<AFTER> asyncMap(
+            @NotNull Routine<? super OUT, ? extends AFTER> routine);
 
     /**
      * Concatenates a stream channel based on the specified accumulating function to this one.
@@ -304,6 +307,12 @@ public interface StreamOutputChannel<OUT>
     @NotNull
     StreamOutputChannel<OUT> asyncReduce(
             @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
+
+    // TODO: 28/12/15 javadoc
+    @NotNull
+    <AFTER> StreamOutputChannel<AFTER> flatMap(
+            @NotNull Function<? super StreamOutputChannel<? extends OUT>, ? extends
+                    StreamOutputChannel<? extends AFTER>> function);
 
     /**
      * Concatenates a stream channel based on the specified predicate to this one.<br/>
@@ -334,7 +343,7 @@ public interface StreamOutputChannel<OUT>
      */
     @NotNull
     <AFTER> StreamOutputChannel<AFTER> parallelGenerate(long count,
-            @NotNull Supplier<AFTER> supplier);
+            @NotNull Supplier<? extends AFTER> supplier);
 
     /**
      * Lifts this stream outputs by applying the specified function.
@@ -348,7 +357,7 @@ public interface StreamOutputChannel<OUT>
      */
     @NotNull
     <AFTER> StreamOutputChannel<AFTER> parallelLift(
-            @NotNull Function<? super OUT, ? extends OutputChannel<AFTER>> function);
+            @NotNull Function<? super OUT, ? extends OutputChannel<? extends AFTER>> function);
 
     /**
      * Concatenates a stream channel based on the specified consumer to this one.
@@ -375,7 +384,8 @@ public interface StreamOutputChannel<OUT>
      * @return the concatenated stream channel.
      */
     @NotNull
-    <AFTER> StreamOutputChannel<AFTER> parallelMap(@NotNull Function<? super OUT, AFTER> function);
+    <AFTER> StreamOutputChannel<AFTER> parallelMap(
+            @NotNull Function<? super OUT, ? extends AFTER> function);
 
     /**
      * Concatenates a stream channel based on the specified factory to this one.
@@ -389,7 +399,7 @@ public interface StreamOutputChannel<OUT>
      */
     @NotNull
     <AFTER> StreamOutputChannel<AFTER> parallelMap(
-            @NotNull InvocationFactory<? super OUT, AFTER> factory);
+            @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
 
     /**
      * Concatenates a stream channel based on the specified instance to this one.
@@ -401,8 +411,10 @@ public interface StreamOutputChannel<OUT>
      * @param <AFTER> the concatenation output type.
      * @return the concatenated stream channel.
      */
+    // TODO: 28/12/15 explain configuration
     @NotNull
-    <AFTER> StreamOutputChannel<AFTER> parallelMap(@NotNull Routine<? super OUT, AFTER> routine);
+    <AFTER> StreamOutputChannel<AFTER> parallelMap(
+            @NotNull Routine<? super OUT, ? extends AFTER> routine);
 
     /**
      * Concatenates a stream channel based on the specified collecting consumer to this one.<br/>
@@ -433,7 +445,7 @@ public interface StreamOutputChannel<OUT>
      */
     @NotNull
     <AFTER> StreamOutputChannel<AFTER> syncCollect(
-            @NotNull Function<? super List<? extends OUT>, AFTER> function);
+            @NotNull Function<? super List<? extends OUT>, ? extends AFTER> function);
 
     /**
      * Concatenates a stream channel based on the specified predicate to this one.<br/>
@@ -491,7 +503,8 @@ public interface StreamOutputChannel<OUT>
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative..
      */
     @NotNull
-    <AFTER> StreamOutputChannel<AFTER> syncGenerate(long count, @NotNull Supplier<AFTER> supplier);
+    <AFTER> StreamOutputChannel<AFTER> syncGenerate(long count,
+            @NotNull Supplier<? extends AFTER> supplier);
 
     /**
      * Concatenates a stream channel based on the specified supplier to this one.<br/>
@@ -505,7 +518,7 @@ public interface StreamOutputChannel<OUT>
      * @return the concatenated stream channel.
      */
     @NotNull
-    <AFTER> StreamOutputChannel<AFTER> syncGenerate(@NotNull Supplier<AFTER> supplier);
+    <AFTER> StreamOutputChannel<AFTER> syncGenerate(@NotNull Supplier<? extends AFTER> supplier);
 
     /**
      * Lifts this stream outputs by applying the specified function.
@@ -519,7 +532,7 @@ public interface StreamOutputChannel<OUT>
      */
     @NotNull
     <AFTER> StreamOutputChannel<AFTER> syncLift(
-            @NotNull Function<? super OUT, ? extends OutputChannel<AFTER>> function);
+            @NotNull Function<? super OUT, ? extends OutputChannel<? extends AFTER>> function);
 
     /**
      * Concatenates a stream channel based on the specified consumer to this one.
@@ -546,7 +559,8 @@ public interface StreamOutputChannel<OUT>
      * @return the concatenated stream channel.
      */
     @NotNull
-    <AFTER> StreamOutputChannel<AFTER> syncMap(@NotNull Function<? super OUT, AFTER> function);
+    <AFTER> StreamOutputChannel<AFTER> syncMap(
+            @NotNull Function<? super OUT, ? extends AFTER> function);
 
     /**
      * Concatenates a stream channel based on the specified factory to this one.
@@ -560,7 +574,7 @@ public interface StreamOutputChannel<OUT>
      */
     @NotNull
     <AFTER> StreamOutputChannel<AFTER> syncMap(
-            @NotNull InvocationFactory<? super OUT, AFTER> factory);
+            @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
 
     /**
      * Concatenates a stream channel based on the specified instance to this one.
@@ -573,7 +587,8 @@ public interface StreamOutputChannel<OUT>
      * @return the concatenated stream channel.
      */
     @NotNull
-    <AFTER> StreamOutputChannel<AFTER> syncMap(@NotNull Routine<? super OUT, AFTER> routine);
+    <AFTER> StreamOutputChannel<AFTER> syncMap(
+            @NotNull Routine<? super OUT, ? extends AFTER> routine);
 
     /**
      * Concatenates a stream channel based on the specified accumulating function to this one.

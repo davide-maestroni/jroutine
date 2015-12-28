@@ -60,6 +60,8 @@ import org.jetbrains.annotations.Nullable;
  *            -----------------
  *     </code>
  * </pre>
+ * The routine invocation interface is designed so to allow recycling of instantiated objects.
+ * <p/>
  * Note that the {@code onInput()} method will be called for each input passed to the routine, so,
  * in case no input is expected, the {@code onResult()} method will be called soon after the
  * initialization.

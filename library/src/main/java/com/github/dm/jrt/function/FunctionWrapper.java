@@ -130,7 +130,7 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT> {
      */
     @NotNull
     public <AFTER> FunctionWrapper<IN, AFTER> andThen(
-            @NotNull final Function<? super OUT, AFTER> after) {
+            @NotNull final Function<? super OUT, ? extends AFTER> after) {
 
         final Class<? extends Function> functionClass = after.getClass();
         final List<Function<?, ?>> functions = mFunctions;
@@ -160,7 +160,7 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT> {
      */
     @NotNull
     public <BEFORE> FunctionWrapper<BEFORE, OUT> compose(
-            @NotNull final Function<BEFORE, ? extends IN> before) {
+            @NotNull final Function<? super BEFORE, ? extends IN> before) {
 
         final Class<? extends Function> functionClass = before.getClass();
         final List<Function<?, ?>> functions = mFunctions;

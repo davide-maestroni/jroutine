@@ -194,7 +194,7 @@ public class Functions {
      */
     @NotNull
     public static <IN, OUT> InvocationFactory<IN, OUT> functionFactory(
-            @NotNull final Function<? super List<? extends IN>, OUT> function) {
+            @NotNull final Function<? super List<? extends IN>, ? extends OUT> function) {
 
         return new FunctionInvocationFactory<IN, OUT>(wrapFunction(function));
     }
@@ -215,7 +215,7 @@ public class Functions {
      */
     @NotNull
     public static <IN, OUT> FilterInvocation<IN, OUT> functionFilter(
-            @NotNull final Function<? super IN, OUT> function) {
+            @NotNull final Function<? super IN, ? extends OUT> function) {
 
         return new FunctionFilterInvocation<IN, OUT>(wrapFunction(function));
     }
@@ -438,7 +438,7 @@ public class Functions {
      */
     @NotNull
     public static <OUT> CommandInvocation<OUT> supplierCommand(
-            @NotNull final Supplier<OUT> supplier) {
+            @NotNull final Supplier<? extends OUT> supplier) {
 
         return new SupplierCommandInvocation<OUT>(wrapSupplier(supplier));
     }
@@ -459,7 +459,7 @@ public class Functions {
      */
     @NotNull
     public static <IN, OUT> InvocationFactory<IN, OUT> supplierFactory(
-            @NotNull final Supplier<? extends Invocation<IN, OUT>> supplier) {
+            @NotNull final Supplier<? extends Invocation<? super IN, ? extends OUT>> supplier) {
 
         return new SupplierInvocationFactory<IN, OUT>(wrapSupplier(supplier));
     }
@@ -787,14 +787,15 @@ public class Functions {
      */
     private static class FunctionFilterInvocation<IN, OUT> extends FilterInvocation<IN, OUT> {
 
-        private final FunctionWrapper<? super IN, OUT> mFunction;
+        private final FunctionWrapper<? super IN, ? extends OUT> mFunction;
 
         /**
          * Constructor.
          *
          * @param function the function instance.
          */
-        private FunctionFilterInvocation(@NotNull final FunctionWrapper<? super IN, OUT> function) {
+        private FunctionFilterInvocation(
+                @NotNull final FunctionWrapper<? super IN, ? extends OUT> function) {
 
             mFunction = function;
         }
@@ -836,7 +837,7 @@ public class Functions {
      */
     private static class FunctionInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
-        private final FunctionWrapper<? super List<? extends IN>, OUT> mFunction;
+        private final FunctionWrapper<? super List<? extends IN>, ? extends OUT> mFunction;
 
         private final FunctionInvocation<IN, OUT> mInvocation;
 
@@ -846,7 +847,8 @@ public class Functions {
          * @param function the function instance.
          */
         private FunctionInvocationFactory(
-                @NotNull final FunctionWrapper<? super List<? extends IN>, OUT> function) {
+                @NotNull final FunctionWrapper<? super List<? extends IN>, ? extends OUT>
+                        function) {
 
             mFunction = function;
             mInvocation = new FunctionInvocation<IN, OUT>() {
@@ -949,14 +951,14 @@ public class Functions {
      */
     private static class SupplierCommandInvocation<OUT> extends CommandInvocation<OUT> {
 
-        private final SupplierWrapper<OUT> mSupplier;
+        private final SupplierWrapper<? extends OUT> mSupplier;
 
         /**
          * Constructor.
          *
          * @param supplier the supplier instance.
          */
-        public SupplierCommandInvocation(@NotNull final SupplierWrapper<OUT> supplier) {
+        public SupplierCommandInvocation(@NotNull final SupplierWrapper<? extends OUT> supplier) {
 
             mSupplier = supplier;
         }
@@ -998,7 +1000,7 @@ public class Functions {
      */
     private static class SupplierInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
-        private final SupplierWrapper<? extends Invocation<IN, OUT>> mSupplier;
+        private final SupplierWrapper<? extends Invocation<? super IN, ? extends OUT>> mSupplier;
 
         /**
          * Constructor.
@@ -1006,16 +1008,18 @@ public class Functions {
          * @param supplier the supplier function.
          */
         private SupplierInvocationFactory(
-                @NotNull final SupplierWrapper<? extends Invocation<IN, OUT>> supplier) {
+                @NotNull final SupplierWrapper<? extends Invocation<? super IN, ? extends OUT>>
+                        supplier) {
 
             mSupplier = supplier;
         }
 
         @NotNull
         @Override
+        @SuppressWarnings("unchecked")
         public Invocation<IN, OUT> newInvocation() {
 
-            return mSupplier.get();
+            return (Invocation<IN, OUT>) mSupplier.get();
         }
 
         @Override

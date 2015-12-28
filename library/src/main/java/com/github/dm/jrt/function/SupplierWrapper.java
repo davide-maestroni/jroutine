@@ -81,7 +81,7 @@ public class SupplierWrapper<OUT> implements Supplier<OUT> {
      */
     @NotNull
     public <AFTER> SupplierWrapper<AFTER> andThen(
-            @NotNull final Function<? super OUT, AFTER> after) {
+            @NotNull final Function<? super OUT, ? extends AFTER> after) {
 
         return new SupplierWrapper<AFTER>(mSupplier, mFunction.andThen(after));
     }

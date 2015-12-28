@@ -191,7 +191,7 @@ class DefaultStreamOutputChannel<OUT>
 
     @NotNull
     public <AFTER> StreamOutputChannel<AFTER> asyncCollect(
-            @NotNull final Function<? super List<? extends OUT>, AFTER> function) {
+            @NotNull final Function<? super List<? extends OUT>, ? extends AFTER> function) {
 
         return asyncMap(functionFactory(function));
     }
@@ -217,21 +217,22 @@ class DefaultStreamOutputChannel<OUT>
 
     @NotNull
     public <AFTER> StreamOutputChannel<AFTER> asyncGenerate(final long count,
-            @NotNull final Supplier<AFTER> supplier) {
+            @NotNull final Supplier<? extends AFTER> supplier) {
 
         return asyncMap(new GenerateSupplierInvocation<OUT, AFTER>(count, supplier));
     }
 
     @NotNull
     public <AFTER> StreamOutputChannel<AFTER> asyncGenerate(
-            @NotNull final Supplier<AFTER> supplier) {
+            @NotNull final Supplier<? extends AFTER> supplier) {
 
         return asyncGenerate(1, supplier);
     }
 
     @NotNull
     public <AFTER> StreamOutputChannel<AFTER> asyncLift(
-            @NotNull final Function<? super OUT, ? extends OutputChannel<AFTER>> function) {
+            @NotNull final Function<? super OUT, ? extends OutputChannel<? extends AFTER>>
+                    function) {
 
         return asyncMap(new LiftInvocation<OUT, AFTER>(function));
     }
@@ -245,14 +246,14 @@ class DefaultStreamOutputChannel<OUT>
 
     @NotNull
     public <AFTER> StreamOutputChannel<AFTER> asyncMap(
-            @NotNull final Function<? super OUT, AFTER> function) {
+            @NotNull final Function<? super OUT, ? extends AFTER> function) {
 
         return asyncMap(functionFilter(function));
     }
 
     @NotNull
     public <AFTER> StreamOutputChannel<AFTER> asyncMap(
-            @NotNull final InvocationFactory<? super OUT, AFTER> factory) {
+            @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
 
         return asyncMap(
                 JRoutine.on(factory).invocations().with(mConfiguration).set().buildRoutine());
@@ -260,7 +261,7 @@ class DefaultStreamOutputChannel<OUT>
 
     @NotNull
     public <AFTER> StreamOutputChannel<AFTER> asyncMap(
-            @NotNull final Routine<? super OUT, AFTER> routine) {
+            @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
 
         return concat(routine.asyncInvoke());
     }
@@ -272,6 +273,16 @@ class DefaultStreamOutputChannel<OUT>
         return asyncMap(AccumulateInvocation.functionFactory(function));
     }
 
+    // TODO: 28/12/15 unit test
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public <AFTER> StreamOutputChannel<AFTER> flatMap(
+            @NotNull final Function<? super StreamOutputChannel<? extends OUT>, ? extends
+                    StreamOutputChannel<? extends AFTER>> function) {
+
+        return (StreamOutputChannel<AFTER>) function.apply(this);
+    }
+
     @NotNull
     public StreamOutputChannel<OUT> parallelFilter(
             @NotNull final Predicate<? super OUT> predicate) {
@@ -281,14 +292,15 @@ class DefaultStreamOutputChannel<OUT>
 
     @NotNull
     public <AFTER> StreamOutputChannel<AFTER> parallelGenerate(final long count,
-            @NotNull final Supplier<AFTER> supplier) {
+            @NotNull final Supplier<? extends AFTER> supplier) {
 
         return parallelMap(new GenerateSupplierInvocation<OUT, AFTER>(count, supplier));
     }
 
     @NotNull
     public <AFTER> StreamOutputChannel<AFTER> parallelLift(
-            @NotNull final Function<? super OUT, ? extends OutputChannel<AFTER>> function) {
+            @NotNull final Function<? super OUT, ? extends OutputChannel<? extends AFTER>>
+                    function) {
 
         return parallelMap(new LiftInvocation<OUT, AFTER>(function));
     }
@@ -302,14 +314,14 @@ class DefaultStreamOutputChannel<OUT>
 
     @NotNull
     public <AFTER> StreamOutputChannel<AFTER> parallelMap(
-            @NotNull final Function<? super OUT, AFTER> function) {
+            @NotNull final Function<? super OUT, ? extends AFTER> function) {
 
         return parallelMap(functionFilter(function));
     }
 
     @NotNull
     public <AFTER> StreamOutputChannel<AFTER> parallelMap(
-            @NotNull final InvocationFactory<? super OUT, AFTER> factory) {
+            @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
 
         return parallelMap(
                 JRoutine.on(factory).invocations().with(mConfiguration).set().buildRoutine());
@@ -317,7 +329,7 @@ class DefaultStreamOutputChannel<OUT>
 
     @NotNull
     public <AFTER> StreamOutputChannel<AFTER> parallelMap(
-            @NotNull final Routine<? super OUT, AFTER> routine) {
+            @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
 
         return concat(routine.parallelInvoke());
     }
@@ -332,7 +344,7 @@ class DefaultStreamOutputChannel<OUT>
 
     @NotNull
     public <AFTER> StreamOutputChannel<AFTER> syncCollect(
-            @NotNull final Function<? super List<? extends OUT>, AFTER> function) {
+            @NotNull final Function<? super List<? extends OUT>, ? extends AFTER> function) {
 
         return syncMap(functionFactory(function));
     }
@@ -358,21 +370,22 @@ class DefaultStreamOutputChannel<OUT>
 
     @NotNull
     public <AFTER> StreamOutputChannel<AFTER> syncGenerate(final long count,
-            @NotNull final Supplier<AFTER> supplier) {
+            @NotNull final Supplier<? extends AFTER> supplier) {
 
         return syncMap(new GenerateSupplierInvocation<OUT, AFTER>(count, supplier));
     }
 
     @NotNull
     public <AFTER> StreamOutputChannel<AFTER> syncGenerate(
-            @NotNull final Supplier<AFTER> supplier) {
+            @NotNull final Supplier<? extends AFTER> supplier) {
 
         return syncGenerate(1, supplier);
     }
 
     @NotNull
     public <AFTER> StreamOutputChannel<AFTER> syncLift(
-            @NotNull final Function<? super OUT, ? extends OutputChannel<AFTER>> function) {
+            @NotNull final Function<? super OUT, ? extends OutputChannel<? extends AFTER>>
+                    function) {
 
         return syncMap(new LiftInvocation<OUT, AFTER>(function));
     }
@@ -386,14 +399,14 @@ class DefaultStreamOutputChannel<OUT>
 
     @NotNull
     public <AFTER> StreamOutputChannel<AFTER> syncMap(
-            @NotNull final Function<? super OUT, AFTER> function) {
+            @NotNull final Function<? super OUT, ? extends AFTER> function) {
 
         return syncMap(functionFilter(function));
     }
 
     @NotNull
     public <AFTER> StreamOutputChannel<AFTER> syncMap(
-            @NotNull final InvocationFactory<? super OUT, AFTER> factory) {
+            @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
 
         return syncMap(
                 JRoutine.on(factory).invocations().with(mConfiguration).set().buildRoutine());
@@ -401,7 +414,7 @@ class DefaultStreamOutputChannel<OUT>
 
     @NotNull
     public <AFTER> StreamOutputChannel<AFTER> syncMap(
-            @NotNull final Routine<? super OUT, AFTER> routine) {
+            @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
 
         return concat(routine.syncInvoke());
     }
@@ -525,11 +538,13 @@ class DefaultStreamOutputChannel<OUT>
     }
 
     @NotNull
+    @SuppressWarnings("unchecked")
     private <AFTER> StreamOutputChannel<AFTER> concat(
-            @NotNull final InvocationChannel<? super OUT, AFTER> channel) {
+            @NotNull final InvocationChannel<? super OUT, ? extends AFTER> channel) {
 
-        return new DefaultStreamOutputChannel<AFTER>(mConfiguration,
-                                                     mChannel.passTo(channel).result());
+        return new DefaultStreamOutputChannel<AFTER>(mConfiguration, (OutputChannel<AFTER>) mChannel
+                .passTo(channel)
+                .result());
     }
 
     /**
@@ -635,7 +650,7 @@ class DefaultStreamOutputChannel<OUT>
 
         private final long mCount;
 
-        private final Supplier<OUT> mSupplier;
+        private final Supplier<? extends OUT> mSupplier;
 
         /**
          * Constructor.
@@ -647,7 +662,7 @@ class DefaultStreamOutputChannel<OUT>
          */
         @SuppressWarnings("ConstantConditions")
         private GenerateSupplierInvocation(final long count,
-                @NotNull final Supplier<OUT> supplier) {
+                @NotNull final Supplier<? extends OUT> supplier) {
 
             if (count <= 0) {
 
@@ -707,7 +722,7 @@ class DefaultStreamOutputChannel<OUT>
      */
     private static class LiftInvocation<IN, OUT> extends FilterInvocation<IN, OUT> {
 
-        private final Function<? super IN, ? extends OutputChannel<OUT>> mFunction;
+        private final Function<? super IN, ? extends OutputChannel<? extends OUT>> mFunction;
 
         /**
          * Constructor.
@@ -716,7 +731,8 @@ class DefaultStreamOutputChannel<OUT>
          */
         @SuppressWarnings("ConstantConditions")
         private LiftInvocation(
-                @NotNull final Function<? super IN, ? extends OutputChannel<OUT>> function) {
+                @NotNull final Function<? super IN, ? extends OutputChannel<? extends OUT>>
+                        function) {
 
             if (function == null) {
 
@@ -728,7 +744,7 @@ class DefaultStreamOutputChannel<OUT>
 
         public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
 
-            final OutputChannel<OUT> channel = mFunction.apply(input);
+            final OutputChannel<? extends OUT> channel = mFunction.apply(input);
 
             if (channel != null) {
 

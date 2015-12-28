@@ -520,7 +520,7 @@ public class StreamOutputChannelTest {
 
         try {
 
-            Streams.streamOf().syncGenerate(3, (Supplier<?>) null);
+            Streams.streamOf().syncGenerate(3, null);
 
             fail();
 
@@ -550,7 +550,7 @@ public class StreamOutputChannelTest {
 
         try {
 
-            Streams.streamOf().asyncGenerate(3, (Supplier<?>) null);
+            Streams.streamOf().asyncGenerate(3, null);
 
             fail();
 
@@ -560,7 +560,7 @@ public class StreamOutputChannelTest {
 
         try {
 
-            Streams.streamOf().parallelGenerate(3, (Supplier<?>) null);
+            Streams.streamOf().parallelGenerate(3, null);
 
             fail();
 
@@ -894,15 +894,16 @@ public class StreamOutputChannelTest {
     @Test
     public void testMapRoutine() {
 
-        final Routine<String, String> routine = JRoutine.on(new UpperCase()).buildRoutine();
+        final Routine<String, String> routine = JRoutine.on(new UpperCase())
+                                                        .invocations()
+                                                        .withOutputOrder(OrderType.BY_CALL)
+                                                        .set()
+                                                        .buildRoutine();
         assertThat(Streams.streamOf("test1", "test2")
                           .asyncMap(routine)
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
         assertThat(Streams.streamOf("test1", "test2")
-                          .invocations()
-                          .withOutputOrder(OrderType.BY_CALL)
-                          .set()
                           .parallelMap(routine)
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");

@@ -19,13 +19,16 @@ import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.core.Channels;
 import com.github.dm.jrt.core.JRoutine;
+import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationFactory;
+import com.github.dm.jrt.invocation.TemplateInvocation;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -124,6 +127,34 @@ public class Streams extends Channels {
                     StreamOutputChannel<? extends OUT>> function) {
 
         return new StreamInvocationFactory<IN, OUT>(function);
+    }
+
+    /**
+     * Returns an factory of invocations passing at max the specified number of input data and
+     * discarding the following ones.
+     *
+     * @param count  the maximum number of data to pass.
+     * @param <DATA> the data type.
+     * @return the invocation factory.
+     */
+    @NotNull
+    public static <DATA> InvocationFactory<DATA, DATA> first(final int count) {
+
+        return new FirstInvocationFactory<DATA>(count);
+    }
+
+    /**
+     * Returns a factory of invocations grouping the input data in collections of the specified
+     * size.
+     *
+     * @param size   the group size.
+     * @param <DATA> the data type.
+     * @return the invocation factory.
+     */
+    @NotNull
+    public static <DATA> InvocationFactory<DATA, List<DATA>> groupBy(final int size) {
+
+        return new GroupByInvocationFactory<DATA>(size);
     }
 
     /**
@@ -293,6 +324,227 @@ public class Streams extends Channels {
     }
 
     /**
+     * Returns a consumer instance generating a range of numbers up to and including the {@code end}
+     * element, by applying a default increment of {@code +1} or {@code -1} depending on the
+     * comparison between the first and the last element. That is, if the first element is less than
+     * the last, the increment will be {@code +1}. On the contrary, if the former is greater than
+     * the latter, the increment will be {@code -1}.
+     *
+     * @param start the first element of the range.
+     * @param end   the last element of the range.
+     * @return the consumer instance.
+     */
+    @NotNull
+    public static Consumer<? super ResultChannel<Number>> range(@NotNull final Number start,
+            @NotNull final Number end) {
+
+        if ((start instanceof Double) || (end instanceof Double)) {
+
+            final double startValue = start.doubleValue();
+            final double endValue = end.doubleValue();
+            return range(start, end, (startValue <= endValue) ? 1 : -1);
+
+        } else if ((start instanceof Float) || (end instanceof Float)) {
+
+            final float startValue = start.floatValue();
+            final float endValue = end.floatValue();
+            return range(start, end, (startValue <= endValue) ? 1 : -1);
+
+        } else if ((start instanceof Long) || (end instanceof Long)) {
+
+            final long startValue = start.longValue();
+            final long endValue = end.longValue();
+            return range(start, end, (startValue <= endValue) ? 1L : -1L);
+
+        } else if ((start instanceof Integer) || (end instanceof Integer)) {
+
+            final int startValue = start.intValue();
+            final int endValue = end.intValue();
+            return range(start, end, (startValue <= endValue) ? 1 : -1);
+
+        } else if ((start instanceof Short) || (end instanceof Short)) {
+
+            final short startValue = start.shortValue();
+            final short endValue = end.shortValue();
+            return range(start, end, (short) ((startValue <= endValue) ? 1 : -1));
+
+        } else if ((start instanceof Byte) || (end instanceof Byte)) {
+
+            final byte startValue = start.byteValue();
+            final byte endValue = end.byteValue();
+            return range(start, end, (byte) ((startValue <= endValue) ? 1 : -1));
+        }
+
+        throw new IllegalArgumentException(
+                "unsupported Number class: [" + start.getClass().getCanonicalName() + ", "
+                        + end.getClass().getCanonicalName() + "]");
+    }
+
+    /**
+     * Returns a consumer instance generating a range of numbers by applying the specified increment
+     * up to and including the {@code end} element.<br/>
+     * Note that the increment can be negative.
+     *
+     * @param start     the first element of the range.
+     * @param end       the last element of the range.
+     * @param increment the increment to apply to the current element.
+     * @return the consumer instance.
+     */
+    @NotNull
+    public static Consumer<? super ResultChannel<Number>> range(@NotNull final Number start,
+            @NotNull final Number end, @NotNull final Number increment) {
+
+        if ((start instanceof Double) || (end instanceof Double) || (increment instanceof Double)) {
+
+            final double startValue = start.doubleValue();
+            final double endValue = end.doubleValue();
+            final double incValue = increment.doubleValue();
+            final Function<Double, Double> function = new Function<Double, Double>() {
+
+                public Double apply(final Double aDouble) {
+
+                    return aDouble + incValue;
+                }
+            };
+
+            return genericRange(startValue, endValue, function);
+
+        } else if ((start instanceof Float) || (end instanceof Float)
+                || (increment instanceof Float)) {
+
+            final float startValue = start.floatValue();
+            final float endValue = end.floatValue();
+            final float incValue = increment.floatValue();
+            final Function<Float, Float> function = new Function<Float, Float>() {
+
+                public Float apply(final Float aFloat) {
+
+                    return aFloat + incValue;
+                }
+            };
+
+            return genericRange(startValue, endValue, function);
+
+        } else if ((start instanceof Long) || (end instanceof Long)
+                || (increment instanceof Long)) {
+
+            final long startValue = start.longValue();
+            final long endValue = end.longValue();
+            final long incValue = increment.longValue();
+            final Function<Long, Long> function = new Function<Long, Long>() {
+
+                public Long apply(final Long aLong) {
+
+                    return aLong + incValue;
+                }
+            };
+
+            return genericRange(startValue, endValue, function);
+
+        } else if ((start instanceof Integer) || (end instanceof Integer)
+                || (increment instanceof Integer)) {
+
+            final int startValue = start.intValue();
+            final int endValue = end.intValue();
+            final int incValue = increment.intValue();
+            final Function<Integer, Integer> function = new Function<Integer, Integer>() {
+
+                public Integer apply(final Integer anInteger) {
+
+                    return anInteger + incValue;
+                }
+            };
+
+            return genericRange(startValue, endValue, function);
+
+        } else if ((start instanceof Short) || (end instanceof Short)
+                || (increment instanceof Short)) {
+
+            final short startValue = start.shortValue();
+            final short endValue = end.shortValue();
+            final short incValue = increment.shortValue();
+            final Function<Short, Short> function = new Function<Short, Short>() {
+
+                public Short apply(final Short aShort) {
+
+                    return (short) (aShort + incValue);
+                }
+            };
+
+            return genericRange(startValue, endValue, function);
+
+        } else if ((start instanceof Byte) || (end instanceof Byte)
+                || (increment instanceof Byte)) {
+
+            final byte startValue = start.byteValue();
+            final byte endValue = end.byteValue();
+            final byte incValue = increment.byteValue();
+            final Function<Byte, Byte> function = new Function<Byte, Byte>() {
+
+                public Byte apply(final Byte aByte) {
+
+                    return (byte) (aByte + incValue);
+                }
+            };
+
+            return genericRange(startValue, endValue, function);
+        }
+
+        throw new IllegalArgumentException(
+                "unsupported Number class: [" + start.getClass().getCanonicalName() + ", "
+                        + end.getClass().getCanonicalName() + ", " + increment.getClass()
+                                                                              .getCanonicalName()
+                        + "]");
+    }
+
+    /**
+     * Returns a consumer instance generating a range of data starting from the specified first one
+     * and up to and including the specified last one.
+     *
+     * @param start     the first element of the range.
+     * @param end       the last element of the range.
+     * @param increment the function incrementing the current element.
+     * @param <DATA>    the data type.
+     * @return the consumer instance.
+     */
+    @NotNull
+    @SuppressWarnings("ConstantConditions")
+    public static <DATA extends Comparable<DATA>> Consumer<? super ResultChannel<DATA>> range(
+            @NotNull final DATA start, @NotNull final DATA end,
+            @NotNull final Function<DATA, DATA> increment) {
+
+        if (start == null) {
+
+            throw new NullPointerException("the start element must not be null");
+        }
+
+        if (end == null) {
+
+            throw new NullPointerException("the end element must not be null");
+        }
+
+        if (increment == null) {
+
+            throw new NullPointerException("the incrementing function must not be null");
+        }
+
+        return genericRange(start, end, increment);
+    }
+
+    /**
+     * Returns an factory of invocations skipping the specified number of input data.
+     *
+     * @param count  the number of data to skip.
+     * @param <DATA> the data type.
+     * @return the invocation factory.
+     */
+    @NotNull
+    public static <DATA> InvocationFactory<DATA, DATA> skip(final int count) {
+
+        return new SkipInvocationFactory<DATA>(count);
+    }
+
+    /**
      * Builds and returns a new stream output channel.
      *
      * @param <OUT> the output data type.
@@ -357,6 +609,256 @@ public class Streams extends Channels {
         return new DefaultStreamOutputChannel<OUT>(output);
     }
 
+    @NotNull
+    private static <DATA extends Comparable<DATA>> Consumer<? super ResultChannel<? super DATA>>
+    genericRange(
+            @NotNull final DATA start, @NotNull final DATA end,
+            @NotNull final Function<DATA, DATA> increment) {
+
+        return new Consumer<ResultChannel<? super DATA>>() {
+
+            public void accept(final ResultChannel<? super DATA> result) {
+
+                DATA current = start;
+
+                if (start.compareTo(end) <= 0) {
+
+                    while (current.compareTo(end) <= 0) {
+
+                        result.pass(current);
+                        current = increment.apply(current);
+                    }
+
+                } else {
+
+                    while (current.compareTo(end) >= 0) {
+
+                        result.pass(current);
+                        current = increment.apply(current);
+                    }
+                }
+            }
+        };
+    }
+
+    /**
+     * Routine invocation passing only the first input data.
+     *
+     * @param <DATA> the data type.
+     */
+    private static class FirstInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
+
+        private final int mCount;
+
+        private int mCurrent;
+
+        /**
+         * Constructor.
+         *
+         * @param count the number of data to pass.
+         */
+        private FirstInvocation(final int count) {
+
+            mCount = count;
+        }
+
+        @Override
+        public void onInitialize() {
+
+            mCurrent = 0;
+        }
+
+        @Override
+        public void onInput(final DATA input, @NotNull final ResultChannel<DATA> result) {
+
+            if (mCurrent < mCount) {
+
+                ++mCurrent;
+                result.pass(input);
+            }
+        }
+    }
+
+    /**
+     * Factory of first data invocations.
+     *
+     * @param <DATA> the data type.
+     */
+    private static class FirstInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
+
+        private final int mCount;
+
+        /**
+         * Constructor.
+         *
+         * @param count the number of data to pass.
+         */
+        private FirstInvocationFactory(final int count) {
+
+            mCount = count;
+        }
+
+        @NotNull
+        @Override
+        public Invocation<DATA, DATA> newInvocation() {
+
+            return new FirstInvocation<DATA>(mCount);
+        }
+    }
+
+    /**
+     * Routine invocation grouping data into collections of the same size.
+     *
+     * @param <DATA> the data type.
+     */
+    private static class GroupByInvocation<DATA> extends TemplateInvocation<DATA, List<DATA>> {
+
+        private final ArrayList<DATA> mInputs = new ArrayList<DATA>();
+
+        private final int mSize;
+
+        /**
+         * Constructor.
+         *
+         * @param size the group size.
+         */
+        private GroupByInvocation(final int size) {
+
+            mSize = size;
+        }
+
+        @Override
+        public void onInput(final DATA input, @NotNull final ResultChannel<List<DATA>> result) {
+
+            final ArrayList<DATA> inputs = mInputs;
+            final int size = mSize;
+
+            if (inputs.size() < size) {
+
+                inputs.add(input);
+
+                if (inputs.size() == size) {
+
+                    result.pass(new ArrayList<DATA>(inputs));
+                    inputs.clear();
+                }
+            }
+        }
+
+        @Override
+        public void onResult(@NotNull final ResultChannel<List<DATA>> result) {
+
+            final ArrayList<DATA> inputs = mInputs;
+
+            if (!inputs.isEmpty()) {
+
+                result.pass(new ArrayList<DATA>(inputs));
+            }
+        }
+
+        @Override
+        public void onTerminate() {
+
+            mInputs.clear();
+        }
+    }
+
+    /**
+     * Factory of grouping invocation.
+     *
+     * @param <DATA> the data type.
+     */
+    private static class GroupByInvocationFactory<DATA>
+            extends InvocationFactory<DATA, List<DATA>> {
+
+        private final int mSize;
+
+        /**
+         * Constructor.
+         *
+         * @param size the group size.
+         */
+        private GroupByInvocationFactory(final int size) {
+
+            mSize = size;
+        }
+
+        @NotNull
+        @Override
+        public Invocation<DATA, List<DATA>> newInvocation() {
+
+            return new GroupByInvocation<DATA>(mSize);
+        }
+    }
+
+    /**
+     * Routine invocation skipping input data.
+     *
+     * @param <DATA> the data type.
+     */
+    private static class SkipInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
+
+        private final int mCount;
+
+        private int mCurrent;
+
+        /**
+         * Constructor.
+         *
+         * @param count the number of data to skip.
+         */
+        private SkipInvocation(final int count) {
+
+            mCount = count;
+        }
+
+        @Override
+        public void onInitialize() {
+
+            mCurrent = 0;
+        }
+
+        @Override
+        public void onInput(final DATA input, @NotNull final ResultChannel<DATA> result) {
+
+            if (mCurrent < mCount) {
+
+                ++mCurrent;
+
+            } else {
+
+                result.pass(input);
+            }
+        }
+    }
+
+    /**
+     * Factory of skip invocations.
+     *
+     * @param <DATA> the data type.
+     */
+    private static class SkipInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
+
+        private final int mCount;
+
+        /**
+         * Constructor.
+         *
+         * @param count the number of data to skip.
+         */
+        private SkipInvocationFactory(final int count) {
+
+            mCount = count;
+        }
+
+        @NotNull
+        @Override
+        public Invocation<DATA, DATA> newInvocation() {
+
+            return new SkipInvocation<DATA>(mCount);
+        }
+    }
+
     /**
      * Implementation of an invocation wrapping a stream output channel.
      *
@@ -377,8 +879,9 @@ public class Streams extends Channels {
          *
          * @param function the function used to instantiate the stream output channel.
          */
-        private StreamInvocation(final Function<? super StreamOutputChannel<? extends IN>, ? extends
-                StreamOutputChannel<? extends OUT>> function) {
+        private StreamInvocation(
+                @NotNull final Function<? super StreamOutputChannel<? extends IN>, ? extends
+                        StreamOutputChannel<? extends OUT>> function) {
 
             mFunction = function;
         }
@@ -390,8 +893,6 @@ public class Streams extends Channels {
 
         public void onDestroy() {
 
-            mInputChannel = null;
-            mOutputChannel = null;
         }
 
         public void onInitialize() {
@@ -448,8 +949,9 @@ public class Streams extends Channels {
          *
          * @param function the function used to instantiate the stream output channel.
          */
+        @SuppressWarnings("ConstantConditions")
         private StreamInvocationFactory(
-                final Function<? super StreamOutputChannel<? extends IN>, ? extends
+                @NotNull final Function<? super StreamOutputChannel<? extends IN>, ? extends
                         StreamOutputChannel<? extends OUT>> function) {
 
             if (function == null) {

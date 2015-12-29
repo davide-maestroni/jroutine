@@ -26,6 +26,7 @@ import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.invocation.FilterInvocation;
@@ -89,6 +90,159 @@ class DefaultStreamOutputChannel<OUT>
 
         this(channel);
         mConfiguration = configuration;
+    }
+
+    @NotNull
+    private static <IN> RangeInvocation<IN, ? extends Number> range(@NotNull final Number start,
+            @NotNull final Number end) {
+
+        if ((start instanceof Double) || (end instanceof Double)) {
+
+            final double startValue = start.doubleValue();
+            final double endValue = end.doubleValue();
+            return range(start, end, (startValue <= endValue) ? 1 : -1);
+
+        } else if ((start instanceof Float) || (end instanceof Float)) {
+
+            final float startValue = start.floatValue();
+            final float endValue = end.floatValue();
+            return range(start, end, (startValue <= endValue) ? 1 : -1);
+
+        } else if ((start instanceof Long) || (end instanceof Long)) {
+
+            final long startValue = start.longValue();
+            final long endValue = end.longValue();
+            return range(start, end, (startValue <= endValue) ? 1 : -1);
+
+        } else if ((start instanceof Integer) || (end instanceof Integer)) {
+
+            final int startValue = start.intValue();
+            final int endValue = end.intValue();
+            return range(start, end, (startValue <= endValue) ? 1 : -1);
+
+        } else if ((start instanceof Short) || (end instanceof Short)) {
+
+            final short startValue = start.shortValue();
+            final short endValue = end.shortValue();
+            return range(start, end, (short) ((startValue <= endValue) ? 1 : -1));
+
+        } else if ((start instanceof Byte) || (end instanceof Byte)) {
+
+            final byte startValue = start.byteValue();
+            final byte endValue = end.byteValue();
+            return range(start, end, (byte) ((startValue <= endValue) ? 1 : -1));
+        }
+
+        throw new IllegalArgumentException(
+                "unsupported Number class: [" + start.getClass().getCanonicalName() + ", "
+                        + end.getClass().getCanonicalName() + "]");
+    }
+
+    @NotNull
+    private static <IN> RangeInvocation<IN, ? extends Number> range(@NotNull final Number start,
+            @NotNull final Number end, @NotNull final Number increment) {
+
+        if ((start instanceof Double) || (end instanceof Double) || (increment instanceof Double)) {
+
+            final double startValue = start.doubleValue();
+            final double endValue = end.doubleValue();
+            final double incValue = increment.doubleValue();
+            final Function<Double, Double> function = new Function<Double, Double>() {
+
+                public Double apply(final Double aDouble) {
+
+                    return aDouble + incValue;
+                }
+            };
+
+            return new RangeInvocation<IN, Double>(startValue, endValue, function);
+
+        } else if ((start instanceof Float) || (end instanceof Float)
+                || (increment instanceof Float)) {
+
+            final float startValue = start.floatValue();
+            final float endValue = end.floatValue();
+            final float incValue = increment.floatValue();
+            final Function<Float, Float> function = new Function<Float, Float>() {
+
+                public Float apply(final Float aFloat) {
+
+                    return aFloat + incValue;
+                }
+            };
+
+            return new RangeInvocation<IN, Float>(startValue, endValue, function);
+
+        } else if ((start instanceof Long) || (end instanceof Long)
+                || (increment instanceof Long)) {
+
+            final long startValue = start.longValue();
+            final long endValue = end.longValue();
+            final long incValue = increment.longValue();
+            final Function<Long, Long> function = new Function<Long, Long>() {
+
+                public Long apply(final Long aLong) {
+
+                    return aLong + incValue;
+                }
+            };
+
+            return new RangeInvocation<IN, Long>(startValue, endValue, function);
+
+        } else if ((start instanceof Integer) || (end instanceof Integer)
+                || (increment instanceof Integer)) {
+
+            final int startValue = start.intValue();
+            final int endValue = end.intValue();
+            final int incValue = increment.intValue();
+            final Function<Integer, Integer> function = new Function<Integer, Integer>() {
+
+                public Integer apply(final Integer anInteger) {
+
+                    return anInteger + incValue;
+                }
+            };
+
+            return new RangeInvocation<IN, Integer>(startValue, endValue, function);
+
+        } else if ((start instanceof Short) || (end instanceof Short)
+                || (increment instanceof Short)) {
+
+            final short startValue = start.shortValue();
+            final short endValue = end.shortValue();
+            final short incValue = increment.shortValue();
+            final Function<Short, Short> function = new Function<Short, Short>() {
+
+                public Short apply(final Short aShort) {
+
+                    return (short) (aShort + incValue);
+                }
+            };
+
+            return new RangeInvocation<IN, Short>(startValue, endValue, function);
+
+        } else if ((start instanceof Byte) || (end instanceof Byte)
+                || (increment instanceof Byte)) {
+
+            final byte startValue = start.byteValue();
+            final byte endValue = end.byteValue();
+            final byte incValue = increment.byteValue();
+            final Function<Byte, Byte> function = new Function<Byte, Byte>() {
+
+                public Byte apply(final Byte aByte) {
+
+                    return (byte) (aByte + incValue);
+                }
+            };
+
+            return new RangeInvocation<IN, Byte>(startValue, endValue, function);
+        }
+
+        throw new IllegalArgumentException(
+                "unsupported Number class: [" + start.getClass().getCanonicalName() + ", "
+                        + end.getClass().getCanonicalName() + ", " + increment.getClass()
+                                                                              .getCanonicalName()
+                        + "]");
     }
 
     public boolean abort() {
@@ -267,20 +421,32 @@ class DefaultStreamOutputChannel<OUT>
     }
 
     @NotNull
+    public <AFTER extends Comparable<AFTER>> StreamOutputChannel<AFTER> asyncRange(
+            @NotNull final AFTER start, @NotNull final AFTER end,
+            @NotNull final Function<AFTER, AFTER> increment) {
+
+        return asyncMap(new RangeInvocation<OUT, AFTER>(start, end, increment));
+    }
+
+    @NotNull
+    public StreamOutputChannel<Number> asyncRange(@NotNull final Number start,
+            @NotNull final Number end) {
+
+        return this.<Number>asyncMap(range(start, end));
+    }
+
+    @NotNull
+    public StreamOutputChannel<Number> asyncRange(@NotNull final Number start,
+            @NotNull final Number end, @NotNull final Number increment) {
+
+        return this.<Number>asyncMap(range(start, end, increment));
+    }
+
+    @NotNull
     public StreamOutputChannel<OUT> asyncReduce(
             @NotNull final BiFunction<? super OUT, ? super OUT, ? extends OUT> function) {
 
         return asyncMap(AccumulateInvocation.functionFactory(function));
-    }
-
-    // TODO: 28/12/15 unit test
-    @NotNull
-    @SuppressWarnings("unchecked")
-    public <AFTER> StreamOutputChannel<AFTER> flatMap(
-            @NotNull final Function<? super StreamOutputChannel<? extends OUT>, ? extends
-                    StreamOutputChannel<? extends AFTER>> function) {
-
-        return (StreamOutputChannel<AFTER>) function.apply(this);
     }
 
     @NotNull
@@ -292,9 +458,28 @@ class DefaultStreamOutputChannel<OUT>
 
     @NotNull
     public <AFTER> StreamOutputChannel<AFTER> parallelGenerate(final long count,
+            @NotNull final Consumer<? super ResultChannel<AFTER>> consumer) {
+
+        if (count <= 0) {
+
+            throw new IllegalArgumentException("the count number must be positive: " + count);
+        }
+
+        return asyncRange(1, count).parallelMap(
+                new GenerateConsumerInvocation<Number, AFTER>(consumer));
+    }
+
+    @NotNull
+    public <AFTER> StreamOutputChannel<AFTER> parallelGenerate(final long count,
             @NotNull final Supplier<? extends AFTER> supplier) {
 
-        return parallelMap(new GenerateSupplierInvocation<OUT, AFTER>(count, supplier));
+        if (count <= 0) {
+
+            throw new IllegalArgumentException("the count number must be positive: " + count);
+        }
+
+        return asyncRange(1, count).parallelMap(
+                new GenerateSupplierInvocation<Number, AFTER>(1, supplier));
     }
 
     @NotNull
@@ -332,6 +517,28 @@ class DefaultStreamOutputChannel<OUT>
             @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
 
         return concat(routine.parallelInvoke());
+    }
+
+    @NotNull
+    public <AFTER extends Comparable<AFTER>> StreamOutputChannel<AFTER> parallelRange(
+            @NotNull final AFTER start, @NotNull final AFTER end,
+            @NotNull final Function<AFTER, AFTER> increment) {
+
+        return asyncRange(start, end, increment).parallelMap(Functions.<AFTER>identity());
+    }
+
+    @NotNull
+    public StreamOutputChannel<Number> parallelRange(@NotNull final Number start,
+            @NotNull final Number end) {
+
+        return asyncRange(start, end).parallelMap(Functions.<Number>identity());
+    }
+
+    @NotNull
+    public StreamOutputChannel<Number> parallelRange(@NotNull final Number start,
+            @NotNull final Number end, @NotNull final Number increment) {
+
+        return asyncRange(start, end, increment).parallelMap(Functions.<Number>identity());
     }
 
     @NotNull
@@ -417,6 +624,28 @@ class DefaultStreamOutputChannel<OUT>
             @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
 
         return concat(routine.syncInvoke());
+    }
+
+    @NotNull
+    public <AFTER extends Comparable<AFTER>> StreamOutputChannel<AFTER> syncRange(
+            @NotNull final AFTER start, @NotNull final AFTER end,
+            @NotNull final Function<AFTER, AFTER> increment) {
+
+        return syncMap(new RangeInvocation<OUT, AFTER>(start, end, increment));
+    }
+
+    @NotNull
+    public StreamOutputChannel<Number> syncRange(@NotNull final Number start,
+            @NotNull final Number end) {
+
+        return this.<Number>syncMap(range(start, end));
+    }
+
+    @NotNull
+    public StreamOutputChannel<Number> syncRange(@NotNull final Number start,
+            @NotNull final Number end, @NotNull final Number increment) {
+
+        return this.<Number>syncMap(range(start, end, increment));
     }
 
     @NotNull
@@ -750,6 +979,105 @@ class DefaultStreamOutputChannel<OUT>
 
                 channel.passTo(result);
             }
+        }
+    }
+
+    /**
+     * Invocation implementation generating a range of data.
+     *
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
+     */
+    private static class RangeInvocation<IN, OUT extends Comparable<OUT>>
+            extends InvocationFactory<IN, OUT> implements Invocation<IN, OUT> {
+
+        private final OUT mEnd;
+
+        private final Function<OUT, OUT> mIncrement;
+
+        private final OUT mStart;
+
+        /**
+         * Constructor.
+         *
+         * @param start     the first element of the range.
+         * @param end       the last element of the range.
+         * @param increment the function incrementing the current element.
+         */
+        @SuppressWarnings("ConstantConditions")
+        private RangeInvocation(@NotNull final OUT start, @NotNull final OUT end,
+                @NotNull final Function<OUT, OUT> increment) {
+
+            if (start == null) {
+
+                throw new NullPointerException("the start element must not be null");
+            }
+
+            if (end == null) {
+
+                throw new NullPointerException("the end element must not be null");
+            }
+
+            if (increment == null) {
+
+                throw new NullPointerException("the incrementing function must not be null");
+            }
+
+            mStart = start;
+            mEnd = end;
+            mIncrement = increment;
+        }
+
+        @NotNull
+        @Override
+        public Invocation<IN, OUT> newInvocation() {
+
+            return this;
+        }
+
+        public void onAbort(@Nullable final RoutineException reason) {
+
+        }
+
+        public void onDestroy() {
+
+        }
+
+        public void onInitialize() {
+
+        }
+
+        public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
+
+        }
+
+        public void onResult(@NotNull final ResultChannel<OUT> result) {
+
+            final OUT start = mStart;
+            final OUT end = mEnd;
+            final Function<OUT, OUT> increment = mIncrement;
+            OUT current = start;
+
+            if (start.compareTo(end) <= 0) {
+
+                while (current.compareTo(end) <= 0) {
+
+                    result.pass(current);
+                    current = increment.apply(current);
+                }
+
+            } else {
+
+                while (current.compareTo(end) >= 0) {
+
+                    result.pass(current);
+                    current = increment.apply(current);
+                }
+            }
+        }
+
+        public void onTerminate() {
+
         }
     }
 

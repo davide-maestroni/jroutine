@@ -350,18 +350,18 @@ public class StreamsTest {
     public void testFirst() {
 
         assertThat(Streams.streamOf()
-                          .asyncGenerate(Streams.range(1, 10))
-                          .asyncMap(Streams.first(5))
+                          .syncRange(1, 10)
+                          .asyncMap(Streams.limit(5))
                           .afterMax(seconds(3))
                           .all()).containsExactly(1, 2, 3, 4, 5);
         assertThat(Streams.streamOf()
-                          .asyncGenerate(Streams.range(1, 10))
-                          .asyncMap(Streams.first(0))
+                          .syncRange(1, 10)
+                          .asyncMap(Streams.limit(0))
                           .afterMax(seconds(3))
                           .all()).isEmpty();
         assertThat(Streams.streamOf()
-                          .asyncGenerate(Streams.range(1, 10))
-                          .asyncMap(Streams.first(15))
+                          .syncRange(1, 10)
+                          .asyncMap(Streams.limit(15))
                           .afterMax(seconds(3))
                           .all()).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
     }
@@ -371,7 +371,7 @@ public class StreamsTest {
     public void testGroupBy() {
 
         assertThat(Streams.streamOf()
-                          .asyncGenerate(Streams.range(1, 10))
+                          .syncRange(1, 10)
                           .asyncMap(Streams.<Number>groupBy(3))
                           .afterMax(seconds(3))
                           .all()).containsExactly(Arrays.<Number>asList(1, 2, 3),
@@ -379,12 +379,12 @@ public class StreamsTest {
                                                   Arrays.<Number>asList(7, 8, 9),
                                                   Collections.<Number>singletonList(10));
         assertThat(Streams.streamOf()
-                          .asyncGenerate(Streams.range(1, 10))
+                          .syncRange(1, 10)
                           .asyncMap(Streams.<Number>groupBy(0))
                           .afterMax(seconds(3))
                           .all()).isEmpty();
         assertThat(Streams.streamOf()
-                          .asyncGenerate(Streams.range(1, 10))
+                          .syncRange(1, 10)
                           .asyncMap(Streams.<Number>groupBy(13))
                           .afterMax(seconds(3))
                           .all()).containsExactly(
@@ -961,219 +961,20 @@ public class StreamsTest {
     }
 
     @Test
-    public void testRange() {
-
-        assertThat(Streams.streamOf()
-                          .asyncGenerate(
-                                  Streams.range('a', 'e', new Function<Character, Character>() {
-
-                                      public Character apply(final Character character) {
-
-                                          return (char) (character + 1);
-                                      }
-                                  }))
-                          .afterMax(seconds(3))
-                          .all()).containsExactly('a', 'b', 'c', 'd', 'e');
-        assertThat(Streams.streamOf()
-                          .asyncGenerate(Streams.range(0, -10, -2))
-                          .afterMax(seconds(3))
-                          .all()).containsExactly(0, -2, -4, -6, -8, -10);
-        assertThat(Streams.streamOf()
-                          .asyncGenerate(Streams.range(0, 2, 0.7))
-                          .afterMax(seconds(3))
-                          .all()).containsExactly(0d, 0.7d, 1.4d);
-        assertThat(Streams.streamOf()
-                          .asyncGenerate(Streams.range(0, 2, 0.7f))
-                          .afterMax(seconds(3))
-                          .all()).containsExactly(0f, 0.7f, 1.4f);
-        assertThat(Streams.streamOf()
-                          .asyncGenerate(Streams.range(0L, -9, -2))
-                          .afterMax(seconds(3))
-                          .all()).containsExactly(0L, -2L, -4L, -6L, -8L);
-        assertThat(Streams.streamOf()
-                          .asyncGenerate(Streams.range(0, (short) 9, 2))
-                          .afterMax(seconds(3))
-                          .all()).containsExactly(0, 2, 4, 6, 8);
-        assertThat(Streams.streamOf()
-                          .asyncGenerate(Streams.range((byte) 0, (short) 9, (byte) 2))
-                          .afterMax(seconds(3))
-                          .all()).containsExactly((short) 0, (short) 2, (short) 4, (short) 6,
-                                                  (short) 8);
-        assertThat(Streams.streamOf()
-                          .asyncGenerate(Streams.range((byte) 0, (byte) 10, (byte) 2))
-                          .afterMax(seconds(3))
-                          .all()).containsExactly((byte) 0, (byte) 2, (byte) 4, (byte) 6, (byte) 8,
-                                                  (byte) 10);
-        assertThat(Streams.streamOf()
-                          .asyncGenerate(Streams.range(0, -5))
-                          .afterMax(seconds(3))
-                          .all()).containsExactly(0, -1, -2, -3, -4, -5);
-        assertThat(Streams.streamOf()
-                          .asyncGenerate(Streams.range(0, 2.1))
-                          .afterMax(seconds(3))
-                          .all()).containsExactly(0d, 1d, 2d);
-        assertThat(
-                Streams.streamOf().asyncGenerate(Streams.range(0, 1.9f)).afterMax(seconds(3)).all())
-                .containsExactly(0f, 1f);
-        assertThat(Streams.streamOf()
-                          .asyncGenerate(Streams.range(0L, -4))
-                          .afterMax(seconds(3))
-                          .all()).containsExactly(0L, -1L, -2L, -3L, -4L);
-        assertThat(Streams.streamOf()
-                          .asyncGenerate(Streams.range(0, (short) 4))
-                          .afterMax(seconds(3))
-                          .all()).containsExactly(0, 1, 2, 3, 4);
-        assertThat(Streams.streamOf()
-                          .asyncGenerate(Streams.range((byte) 0, (short) 4))
-                          .afterMax(seconds(3))
-                          .all()).containsExactly((short) 0, (short) 1, (short) 2, (short) 3,
-                                                  (short) 4);
-        assertThat(Streams.streamOf()
-                          .asyncGenerate(Streams.range((byte) 0, (byte) 5))
-                          .afterMax(seconds(3))
-                          .all()).containsExactly((byte) 0, (byte) 1, (byte) 2, (byte) 3, (byte) 4,
-                                                  (byte) 5);
-    }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testRangeError() {
-
-        try {
-
-            Streams.range(null, 'f', new Function<Character, Character>() {
-
-                public Character apply(final Character character) {
-
-                    return (char) (character + 1);
-                }
-            });
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.range('a', null, new Function<Character, Character>() {
-
-                public Character apply(final Character character) {
-
-                    return (char) (character + 1);
-                }
-            });
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.range('a', 'f', null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.range(null, 1, 1);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.range(1, null, 1);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.range(1, 1, (Number) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        final Number number = new Number() {
-
-            @Override
-            public int intValue() {
-
-                return 0;
-            }
-
-            @Override
-            public long longValue() {
-
-                return 0;
-            }
-
-            @Override
-            public float floatValue() {
-
-                return 0;
-            }
-
-            @Override
-            public double doubleValue() {
-
-                return 0;
-            }
-        };
-
-        try {
-
-            Streams.range(number, number, number);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            Streams.range(number, number);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-    }
-
-    @Test
     public void testSkip() {
 
         assertThat(Streams.streamOf()
-                          .asyncGenerate(Streams.range(1, 10))
+                          .syncRange(1, 10)
                           .asyncMap(Streams.skip(5))
                           .afterMax(seconds(3))
                           .all()).containsExactly(6, 7, 8, 9, 10);
         assertThat(Streams.streamOf()
-                          .asyncGenerate(Streams.range(1, 10))
+                          .syncRange(1, 10)
                           .asyncMap(Streams.skip(15))
                           .afterMax(seconds(3))
                           .all()).isEmpty();
         assertThat(Streams.streamOf()
-                          .asyncGenerate(Streams.range(1, 10))
+                          .syncRange(1, 10)
                           .asyncMap(Streams.skip(0))
                           .afterMax(seconds(3))
                           .all()).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);

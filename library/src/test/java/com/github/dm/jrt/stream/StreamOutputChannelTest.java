@@ -28,7 +28,6 @@ import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.function.Supplier;
-import com.github.dm.jrt.function.SupplierWrapper;
 import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.invocation.Invocations;
@@ -423,7 +422,7 @@ public class StreamOutputChannelTest {
                 return "TEST2";
             }
         }).all()).containsOnly("TEST2");
-        assertThat(Streams.streamOf("test1").asyncGenerate(3, new Supplier<String>() {
+        assertThat(Streams.streamOf("test1").syncGenerate(3, new Supplier<String>() {
 
             public String get() {
 
@@ -451,6 +450,16 @@ public class StreamOutputChannelTest {
                 return "TEST2";
             }
         }).afterMax(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
+        assertThat(Streams.streamOf("test1")
+                          .parallelGenerate(3, new Consumer<ResultChannel<String>>() {
+
+                              public void accept(final ResultChannel<String> resultChannel) {
+
+                                  resultChannel.pass("TEST2");
+                              }
+                          })
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("TEST2", "TEST2", "TEST2");
         assertThat(Streams.streamOf("test1").parallelGenerate(3, new Supplier<String>() {
 
             public String get() {
@@ -465,7 +474,7 @@ public class StreamOutputChannelTest {
 
         try {
 
-            Streams.streamOf().syncGenerate(-1, SupplierWrapper.constant(null));
+            Streams.streamOf().syncGenerate(-1, Functions.constant(null));
 
             fail();
 
@@ -475,7 +484,7 @@ public class StreamOutputChannelTest {
 
         try {
 
-            Streams.streamOf().asyncGenerate(0, SupplierWrapper.constant(null));
+            Streams.streamOf().asyncGenerate(0, Functions.constant(null));
 
             fail();
 
@@ -485,7 +494,27 @@ public class StreamOutputChannelTest {
 
         try {
 
-            Streams.streamOf().parallelGenerate(-1, SupplierWrapper.constant(null));
+            Streams.streamOf().parallelGenerate(-1, Functions.constant(null));
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().parallelGenerate(-1, Functions.constant(null));
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().parallelGenerate(-1, Functions.sink());
 
             fail();
 
@@ -560,7 +589,17 @@ public class StreamOutputChannelTest {
 
         try {
 
-            Streams.streamOf().parallelGenerate(3, null);
+            Streams.streamOf().parallelGenerate(3, (Supplier<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().parallelGenerate(3, (Consumer<ResultChannel<?>>) null);
 
             fail();
 
@@ -942,6 +981,555 @@ public class StreamOutputChannelTest {
             fail();
 
         } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testRange() {
+
+        assertThat(Streams.streamOf().asyncRange('a', 'e', new Function<Character, Character>() {
+
+            public Character apply(final Character character) {
+
+                return (char) (character + 1);
+            }
+        }).afterMax(seconds(3)).all()).containsExactly('a', 'b', 'c', 'd', 'e');
+        assertThat(Streams.streamOf()
+                          .asyncRange(0, -10, -2)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly(0, -2, -4, -6, -8, -10);
+        assertThat(Streams.streamOf()
+                          .asyncRange(0, 2, 0.7)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly(0d, 0.7d, 1.4d);
+        assertThat(Streams.streamOf()
+                          .asyncRange(0, 2, 0.7f)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly(0f, 0.7f, 1.4f);
+        assertThat(Streams.streamOf()
+                          .asyncRange(0L, -9, -2)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly(0L, -2L, -4L, -6L, -8L);
+        assertThat(Streams.streamOf()
+                          .asyncRange(0, (short) 9, 2)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly(0, 2, 4, 6, 8);
+        assertThat(Streams.streamOf()
+                          .asyncRange((byte) 0, (short) 9, (byte) 2)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly((short) 0, (short) 2, (short) 4, (short) 6,
+                                                  (short) 8);
+        assertThat(Streams.streamOf()
+                          .asyncRange((byte) 0, (byte) 10, (byte) 2)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly((byte) 0, (byte) 2, (byte) 4, (byte) 6, (byte) 8,
+                                                  (byte) 10);
+        assertThat(Streams.streamOf().asyncRange(0, -5).afterMax(seconds(3)).all()).containsExactly(
+                0, -1, -2, -3, -4, -5);
+        assertThat(
+                Streams.streamOf().asyncRange(0, 2.1).afterMax(seconds(3)).all()).containsExactly(
+                0d, 1d, 2d);
+        assertThat(
+                Streams.streamOf().asyncRange(0, 1.9f).afterMax(seconds(3)).all()).containsExactly(
+                0f, 1f);
+        assertThat(
+                Streams.streamOf().asyncRange(0L, -4).afterMax(seconds(3)).all()).containsExactly(
+                0L, -1L, -2L, -3L, -4L);
+        assertThat(Streams.streamOf()
+                          .asyncRange(0, (short) 4)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly(0, 1, 2, 3, 4);
+        assertThat(Streams.streamOf()
+                          .asyncRange((byte) 0, (short) 4)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly((short) 0, (short) 1, (short) 2, (short) 3,
+                                                  (short) 4);
+        assertThat(Streams.streamOf()
+                          .asyncRange((byte) 0, (byte) 5)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly((byte) 0, (byte) 1, (byte) 2, (byte) 3, (byte) 4,
+                                                  (byte) 5);
+        assertThat(Streams.streamOf()
+                          .invocations()
+                          .withOutputOrder(OrderType.BY_CALL)
+                          .set()
+                          .parallelRange('a', 'e', new Function<Character, Character>() {
+
+                              public Character apply(final Character character) {
+
+                                  return (char) (character + 1);
+                              }
+                          })
+                          .afterMax(seconds(3))
+                          .all()).containsExactly('a', 'b', 'c', 'd', 'e');
+        assertThat(Streams.streamOf()
+                          .invocations()
+                          .withOutputOrder(OrderType.BY_CALL)
+                          .set()
+                          .parallelRange(0, -10, -2)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly(0, -2, -4, -6, -8, -10);
+        assertThat(Streams.streamOf()
+                          .invocations()
+                          .withOutputOrder(OrderType.BY_CALL)
+                          .set()
+                          .parallelRange(0, 2, 0.7)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly(0d, 0.7d, 1.4d);
+        assertThat(Streams.streamOf()
+                          .invocations()
+                          .withOutputOrder(OrderType.BY_CALL)
+                          .set()
+                          .parallelRange(0, 2, 0.7f)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly(0f, 0.7f, 1.4f);
+        assertThat(Streams.streamOf()
+                          .invocations()
+                          .withOutputOrder(OrderType.BY_CALL)
+                          .set()
+                          .parallelRange(0L, -9, -2)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly(0L, -2L, -4L, -6L, -8L);
+        assertThat(Streams.streamOf()
+                          .invocations()
+                          .withOutputOrder(OrderType.BY_CALL)
+                          .set()
+                          .parallelRange(0, (short) 9, 2)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly(0, 2, 4, 6, 8);
+        assertThat(Streams.streamOf()
+                          .invocations()
+                          .withOutputOrder(OrderType.BY_CALL)
+                          .set()
+                          .parallelRange((byte) 0, (short) 9, (byte) 2)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly((short) 0, (short) 2, (short) 4, (short) 6,
+                                                  (short) 8);
+        assertThat(Streams.streamOf()
+                          .invocations()
+                          .withOutputOrder(OrderType.BY_CALL)
+                          .set()
+                          .parallelRange((byte) 0, (byte) 10, (byte) 2)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly((byte) 0, (byte) 2, (byte) 4, (byte) 6, (byte) 8,
+                                                  (byte) 10);
+        assertThat(Streams.streamOf()
+                          .invocations()
+                          .withOutputOrder(OrderType.BY_CALL)
+                          .set()
+                          .parallelRange(0, -5)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly(0, -1, -2, -3, -4, -5);
+        assertThat(Streams.streamOf()
+                          .invocations()
+                          .withOutputOrder(OrderType.BY_CALL)
+                          .set()
+                          .parallelRange(0, 2.1)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly(0d, 1d, 2d);
+        assertThat(Streams.streamOf()
+                          .invocations()
+                          .withOutputOrder(OrderType.BY_CALL)
+                          .set()
+                          .parallelRange(0, 1.9f)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly(0f, 1f);
+        assertThat(Streams.streamOf()
+                          .invocations()
+                          .withOutputOrder(OrderType.BY_CALL)
+                          .set()
+                          .parallelRange(0L, -4)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly(0L, -1L, -2L, -3L, -4L);
+        assertThat(Streams.streamOf()
+                          .invocations()
+                          .withOutputOrder(OrderType.BY_CALL)
+                          .set()
+                          .parallelRange(0, (short) 4)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly(0, 1, 2, 3, 4);
+        assertThat(Streams.streamOf()
+                          .invocations()
+                          .withOutputOrder(OrderType.BY_CALL)
+                          .set()
+                          .parallelRange((byte) 0, (short) 4)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly((short) 0, (short) 1, (short) 2, (short) 3,
+                                                  (short) 4);
+        assertThat(Streams.streamOf()
+                          .invocations()
+                          .withOutputOrder(OrderType.BY_CALL)
+                          .set()
+                          .parallelRange((byte) 0, (byte) 5)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly((byte) 0, (byte) 1, (byte) 2, (byte) 3, (byte) 4,
+                                                  (byte) 5);
+        assertThat(Streams.streamOf().syncRange('a', 'e', new Function<Character, Character>() {
+
+            public Character apply(final Character character) {
+
+                return (char) (character + 1);
+            }
+        }).afterMax(seconds(3)).all()).containsExactly('a', 'b', 'c', 'd', 'e');
+        assertThat(Streams.streamOf()
+                          .syncRange(0, -10, -2)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly(0, -2, -4, -6, -8, -10);
+        assertThat(
+                Streams.streamOf().syncRange(0, 2, 0.7).afterMax(seconds(3)).all()).containsExactly(
+                0d, 0.7d, 1.4d);
+        assertThat(Streams.streamOf()
+                          .syncRange(0, 2, 0.7f)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly(0f, 0.7f, 1.4f);
+        assertThat(Streams.streamOf()
+                          .syncRange(0L, -9, -2)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly(0L, -2L, -4L, -6L, -8L);
+        assertThat(Streams.streamOf()
+                          .syncRange(0, (short) 9, 2)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly(0, 2, 4, 6, 8);
+        assertThat(Streams.streamOf()
+                          .syncRange((byte) 0, (short) 9, (byte) 2)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly((short) 0, (short) 2, (short) 4, (short) 6,
+                                                  (short) 8);
+        assertThat(Streams.streamOf()
+                          .syncRange((byte) 0, (byte) 10, (byte) 2)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly((byte) 0, (byte) 2, (byte) 4, (byte) 6, (byte) 8,
+                                                  (byte) 10);
+        assertThat(Streams.streamOf().syncRange(0, -5).afterMax(seconds(3)).all()).containsExactly(
+                0, -1, -2, -3, -4, -5);
+        assertThat(Streams.streamOf().syncRange(0, 2.1).afterMax(seconds(3)).all()).containsExactly(
+                0d, 1d, 2d);
+        assertThat(
+                Streams.streamOf().syncRange(0, 1.9f).afterMax(seconds(3)).all()).containsExactly(
+                0f, 1f);
+        assertThat(Streams.streamOf().syncRange(0L, -4).afterMax(seconds(3)).all()).containsExactly(
+                0L, -1L, -2L, -3L, -4L);
+        assertThat(Streams.streamOf()
+                          .syncRange(0, (short) 4)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly(0, 1, 2, 3, 4);
+        assertThat(Streams.streamOf()
+                          .syncRange((byte) 0, (short) 4)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly((short) 0, (short) 1, (short) 2, (short) 3,
+                                                  (short) 4);
+        assertThat(Streams.streamOf()
+                          .syncRange((byte) 0, (byte) 5)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly((byte) 0, (byte) 1, (byte) 2, (byte) 3, (byte) 4,
+                                                  (byte) 5);
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testRangeError() {
+
+        try {
+
+            Streams.streamOf().asyncRange(null, 'f', new Function<Character, Character>() {
+
+                public Character apply(final Character character) {
+
+                    return (char) (character + 1);
+                }
+            });
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().asyncRange('a', null, new Function<Character, Character>() {
+
+                public Character apply(final Character character) {
+
+                    return (char) (character + 1);
+                }
+            });
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().asyncRange('a', 'f', null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().asyncRange(null, 1, 1);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().asyncRange(1, null, 1);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().asyncRange(1, 1, (Number) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().parallelRange(null, 'f', new Function<Character, Character>() {
+
+                public Character apply(final Character character) {
+
+                    return (char) (character + 1);
+                }
+            });
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().parallelRange('a', null, new Function<Character, Character>() {
+
+                public Character apply(final Character character) {
+
+                    return (char) (character + 1);
+                }
+            });
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().parallelRange('a', 'f', null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().parallelRange(null, 1, 1);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().parallelRange(1, null, 1);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().parallelRange(1, 1, (Number) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().syncRange(null, 'f', new Function<Character, Character>() {
+
+                public Character apply(final Character character) {
+
+                    return (char) (character + 1);
+                }
+            });
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().syncRange('a', null, new Function<Character, Character>() {
+
+                public Character apply(final Character character) {
+
+                    return (char) (character + 1);
+                }
+            });
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().syncRange('a', 'f', null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().syncRange(null, 1, 1);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().syncRange(1, null, 1);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().syncRange(1, 1, (Number) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        final Number number = new Number() {
+
+            @Override
+            public int intValue() {
+
+                return 0;
+            }
+
+            @Override
+            public long longValue() {
+
+                return 0;
+            }
+
+            @Override
+            public float floatValue() {
+
+                return 0;
+            }
+
+            @Override
+            public double doubleValue() {
+
+                return 0;
+            }
+        };
+
+        try {
+
+            Streams.streamOf().asyncRange(number, number, number);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().asyncRange(number, number);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().parallelRange(number, number, number);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().parallelRange(number, number);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().syncRange(number, number, number);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().syncRange(number, number);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
 
         }
     }

@@ -26,6 +26,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
  */
 public class LogSet extends CopyOnWriteArraySet<Log> implements Log {
 
+    private static final long serialVersionUID = -1;
+
     public void dbg(@NotNull final List<Object> contexts, @Nullable final String message,
             @Nullable final Throwable throwable) {
 

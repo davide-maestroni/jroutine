@@ -5,7 +5,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:1.5.0'
-        classpath 'com.uphyca.gradle:gradle-android-apt-plugin:0.9.4'
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
         classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.4.0'
     }
 }

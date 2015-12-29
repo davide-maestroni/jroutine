@@ -839,7 +839,7 @@ public class InvocationService extends Service {
             }
         }
 
-        public void onError(@Nullable final RoutineException error) {
+        public void onError(@NotNull final RoutineException error) {
 
             mInvocation.recycle();
             final Message message = Message.obtain(null, MSG_ABORT);

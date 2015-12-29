@@ -1128,7 +1128,7 @@ public class Channels {
             }
         }
 
-        public void onError(@Nullable final RoutineException error) {
+        public void onError(@NotNull final RoutineException error) {
 
             synchronized (mMutex) {
 
@@ -1178,7 +1178,7 @@ public class Channels {
             }
         }
 
-        public void onError(@Nullable final RoutineException error) {
+        public void onError(@NotNull final RoutineException error) {
 
             for (final IOChannel<?> channel : mChannels) {
 
@@ -1246,7 +1246,7 @@ public class Channels {
             mChannel.close();
         }
 
-        public void onError(@Nullable final RoutineException error) {
+        public void onError(@NotNull final RoutineException error) {
 
             mChannel.abort(error);
         }
@@ -1348,7 +1348,7 @@ public class Channels {
             mChannel.close();
         }
 
-        public void onError(@Nullable final RoutineException error) {
+        public void onError(@NotNull final RoutineException error) {
 
             mChannel.abort(error);
         }
@@ -1416,7 +1416,7 @@ public class Channels {
             mChannel.close();
         }
 
-        public void onError(@Nullable final RoutineException error) {
+        public void onError(@NotNull final RoutineException error) {
 
             mChannel.abort(error);
         }
@@ -1460,7 +1460,7 @@ public class Channels {
             }
         }
 
-        public void onError(@Nullable final RoutineException error) {
+        public void onError(@NotNull final RoutineException error) {
 
             for (final IOChannel<?> channel : mChannelList) {
 
@@ -1515,7 +1515,7 @@ public class Channels {
             }
         }
 
-        public void onError(@Nullable final RoutineException error) {
+        public void onError(@NotNull final RoutineException error) {
 
             for (final IOChannel<OUT> channel : mChannels.values()) {
 

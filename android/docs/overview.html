@@ -39,7 +39,7 @@
                             .passTo(new TemplateOutputConsumer&lt;Bitmap&gt;() {
 
                                 &commat;Override
-                                public void onError(&commat;Nullable final RoutineException error) {
+                                public void onError(&commat;NotNull final RoutineException error) {
 
                                     Toast.makeText(MainTestActivity.this, (error != null) ? error.getMessage()
                                             : "Cannot load image", Toast.LENGTH_LONG).show();
@@ -122,7 +122,7 @@
                             .passTo(new TemplateOutputConsumer&lt;Bitmap&gt;() {
 
                                 &commat;Override
-                                public void onError(&commat;Nullable final RoutineException error) {
+                                public void onError(&commat;NotNull final RoutineException error) {
 
                                     Toast.makeText(MainTestActivity.this, (error != null) ? error.getMessage()
                                             : "Cannot load image", Toast.LENGTH_LONG).show();

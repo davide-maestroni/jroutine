@@ -23,7 +23,6 @@ import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.RoutineException;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Utility class for handling routine channels.
@@ -330,7 +329,7 @@ public class ChannelsCompat extends Channels {
             }
         }
 
-        public void onError(@Nullable final RoutineException error) {
+        public void onError(@NotNull final RoutineException error) {
 
             final SparseArrayCompat<IOChannel<OUT>> channels = mChannels;
             final int size = channels.size();

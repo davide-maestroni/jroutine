@@ -1530,7 +1530,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             }
         }
 
-        public void onError(@Nullable final RoutineException error) {
+        public void onError(@NotNull final RoutineException error) {
 
             final boolean needsAbort;
 

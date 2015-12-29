@@ -13,7 +13,7 @@
  */
 package com.github.dm.jrt.channel;
 
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Empty abstract implementation of an output consumer.
@@ -30,7 +30,7 @@ public abstract class TemplateOutputConsumer<OUT> implements OutputConsumer<OUT>
 
     }
 
-    public void onError(@Nullable final RoutineException error) {
+    public void onError(@NotNull final RoutineException error) {
 
     }
 

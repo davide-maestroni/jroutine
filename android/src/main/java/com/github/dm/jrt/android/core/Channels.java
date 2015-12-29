@@ -24,7 +24,6 @@ import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.core.JRoutine;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -270,7 +269,7 @@ public class Channels extends com.github.dm.jrt.core.Channels {
             mChannel.close();
         }
 
-        public void onError(@Nullable final RoutineException error) {
+        public void onError(@NotNull final RoutineException error) {
 
             mChannel.abort(error);
         }

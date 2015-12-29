@@ -446,7 +446,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
                 }
             }
 
-            public void onError(@Nullable final RoutineException error) {
+            public void onError(@NotNull final RoutineException error) {
 
                 final Message message = Message.obtain(null, InvocationService.MSG_ABORT);
                 putError(message.getData(), mUUID, error);

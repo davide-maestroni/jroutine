@@ -443,7 +443,7 @@ public class ParcelableByteChannel {
         }
 
         @Override
-        public void onError(@Nullable final RoutineException error) {
+        public void onError(@NotNull final RoutineException error) {
 
             mChannel.abort(error);
         }
@@ -547,7 +547,7 @@ public class ParcelableByteChannel {
             mChannel.close();
         }
 
-        public void onError(@Nullable final RoutineException error) {
+        public void onError(@NotNull final RoutineException error) {
 
             mChannel.abort(error);
         }

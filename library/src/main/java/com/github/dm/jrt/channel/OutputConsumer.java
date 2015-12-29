@@ -13,7 +13,7 @@
  */
 package com.github.dm.jrt.channel;
 
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Interface defining an output consumer that can be bound to an output channel.<br/>
@@ -56,7 +56,7 @@ public interface OutputConsumer<OUT> {
      *
      * @param error the reason of the abortion.
      */
-    void onError(@Nullable RoutineException error);
+    void onError(@NotNull RoutineException error);
 
     /**
      * Called when an output is passed to the channel.

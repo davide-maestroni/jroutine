@@ -17,7 +17,6 @@ import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.RoutineException;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Utility class used to build output consumer based on consumer functions.
@@ -71,7 +70,7 @@ public class OutputConsumerBuilder<OUT> implements OutputConsumer<OUT> {
         mOnComplete.accept(null);
     }
 
-    public void onError(@Nullable final RoutineException error) {
+    public void onError(@NotNull final RoutineException error) {
 
         mOnError.accept(error);
     }

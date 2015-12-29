@@ -1166,7 +1166,7 @@ class DefaultStreamOutputChannel<OUT>
             mOutputChannel.close();
         }
 
-        public void onError(@Nullable final RoutineException error) {
+        public void onError(@NotNull final RoutineException error) {
 
             final IOChannel<OUT> channel = mOutputChannel;
 

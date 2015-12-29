@@ -109,7 +109,6 @@ public class StreamOutputChannelTest {
 
         } catch (final UnsupportedOperationException ignored) {
 
-
         }
 
         assertThat(channel.skip(1).next(1)).containsExactly("test2");
@@ -127,7 +126,6 @@ public class StreamOutputChannelTest {
 
         } catch (final UnsupportedOperationException ignored) {
 
-
         }
 
         final IOChannel<String> ioChannel = JRoutine.io().buildChannel();
@@ -141,7 +139,6 @@ public class StreamOutputChannelTest {
 
         } catch (final TimeoutException ignored) {
 
-
         }
 
         try {
@@ -152,7 +149,6 @@ public class StreamOutputChannelTest {
 
         } catch (final NoSuchElementException ignored) {
 
-
         }
 
         try {
@@ -162,7 +158,6 @@ public class StreamOutputChannelTest {
             fail();
 
         } catch (final AbortException ignored) {
-
 
         }
 

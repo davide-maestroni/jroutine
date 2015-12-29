@@ -253,7 +253,7 @@ public interface Channel {
         /**
          * Consumes all the results by waiting for the routine to complete at the maximum for the
          * set timeout.<br/>
-         * Note that this method invocation will block the calling thread.
+         * Note that this method invocation will likely block the calling thread.
          *
          * @return the list of results.
          * @throws com.github.dm.jrt.channel.ExecutionTimeoutException if the channel is set to
@@ -278,7 +278,7 @@ public interface Channel {
         /**
          * Consumes all the results by waiting for the routine to complete at the maximum for the
          * set timeout, and put them into the specified collection.<br/>
-         * Note that this method invocation will block the calling thread.
+         * Note that this method invocation will likely block the calling thread.
          *
          * @param results the collection to fill.
          * @return this channel.
@@ -303,7 +303,7 @@ public interface Channel {
 
         /**
          * Checks if the routine is complete, waiting at the maximum for the set timeout.<br/>
-         * Note that this method invocation will block the calling thread.
+         * Note that this method invocation will likely block the calling thread.
          *
          * @return whether the routine execution has complete.
          * @see #afterMax(TimeDuration)
@@ -386,7 +386,7 @@ public interface Channel {
 
         /**
          * Checks if more results are available by waiting at the maximum for the set timeout.<br/>
-         * Note that this method invocation will block the calling thread.
+         * Note that this method invocation will likely block the calling thread.
          *
          * @return whether at least one result is available.
          * @throws com.github.dm.jrt.channel.ExecutionTimeoutException if the channel is set to
@@ -409,7 +409,7 @@ public interface Channel {
 
         /**
          * Consumes the first available result by waiting at the maximum for the set timeout.<br/>
-         * Note that this method invocation will block the calling thread.
+         * Note that this method invocation will likely block the calling thread.
          *
          * @return the first available result.
          * @throws com.github.dm.jrt.channel.ExecutionTimeoutException if the channel is set to
@@ -457,7 +457,7 @@ public interface Channel {
         /**
          * Consumes the first {@code count} available results by waiting at the maximum for the set
          * timeout.<br/>
-         * Note that this method invocation will block the calling thread.
+         * Note that this method invocation will likely block the calling thread.
          *
          * @return the first {@code count} available results.
          * @throws com.github.dm.jrt.channel.ExecutionTimeoutException if the channel is set to
@@ -508,7 +508,7 @@ public interface Channel {
         /**
          * Skips the first {@code count} available results by waiting at the maximum for the set
          * timeout.<br/>
-         * Note that this method invocation will block the calling thread.
+         * Note that this method invocation will likely block the calling thread.
          *
          * @return this channel.
          * @throws com.github.dm.jrt.channel.ExecutionTimeoutException if the channel is set to

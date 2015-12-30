@@ -59,7 +59,7 @@ public class LoaderRoutineRotationTest
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine = JRoutineCompat.with(loaderFrom(getActivity()))
                                                               .on(factoryOf(ToUpperCase.class))
-                                                              .loaders()
+                                                              .withLoaders()
                                                               .withId(0)
                                                               .withClashResolution(
                                                                       ClashResolutionType.JOIN)
@@ -84,10 +84,10 @@ public class LoaderRoutineRotationTest
         final TimeDuration timeout = TimeDuration.seconds(10);
         JRoutineCompat.with(loaderFrom(getActivity()))
                       .on(factoryOf(ToUpperCase.class))
-                      .invocations()
+                      .withInvocations()
                       .withOutputOrder(OrderType.BY_CALL)
                       .set()
-                      .loaders()
+                      .withLoaders()
                       .withId(0)
                       .set()
                       .asyncCall("test1", "test2");
@@ -163,7 +163,7 @@ public class LoaderRoutineRotationTest
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine = JRoutineCompat.with(loaderFrom(getActivity()))
                                                               .on(factoryOf(ToUpperCase.class))
-                                                              .loaders()
+                                                              .withLoaders()
                                                               .withId(0)
                                                               .withClashResolution(
                                                                       ClashResolutionType.JOIN)

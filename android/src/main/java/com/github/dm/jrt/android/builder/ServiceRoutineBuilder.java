@@ -41,5 +41,5 @@ public interface ServiceRoutineBuilder<IN, OUT> extends RoutineBuilder<IN, OUT>,
      * {@inheritDoc}
      */
     @NotNull
-    Builder<? extends ServiceRoutineBuilder<IN, OUT>> invocations();
+    Builder<? extends ServiceRoutineBuilder<IN, OUT>> withInvocations();
 }

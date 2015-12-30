@@ -92,7 +92,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final TimeDuration timeout = seconds(10);
         final Routine<String, String> routine = JRoutine.with(loaderFrom(getActivity()))
                                                         .on(factoryOf(ToUpperCase.class))
-                                                        .loaders()
+                                                        .withLoaders()
                                                         .withId(0)
                                                         .withInputClashResolution(
                                                                 ClashResolutionType.ABORT_THIS)
@@ -124,7 +124,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final TimeDuration timeout = seconds(10);
         final Routine<String, String> routine = JRoutine.with(loaderFrom(getActivity()))
                                                         .on(factoryOf(ToUpperCase.class))
-                                                        .loaders()
+                                                        .withLoaders()
                                                         .withId(0)
                                                         .withClashResolution(
                                                                 ClashResolutionType.ABORT_THIS)
@@ -160,11 +160,11 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final LoaderRoutine<String, String> routine = JRoutine.with(loaderFrom(getActivity()))
                                                               .on(factoryOf(
                                                                       PurgeContextInvocation.class))
-                                                              .invocations()
+                                                              .withInvocations()
                                                               .with(invocationConfiguration)
                                                               .withReadTimeout(seconds(10))
                                                               .set()
-                                                              .loaders()
+                                                              .withLoaders()
                                                               .withId(0)
                                                               .withCacheStrategy(
                                                                       CacheStrategyType.CACHE)
@@ -191,11 +191,11 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final LoaderRoutine<String, String> routine = JRoutine.with(loaderFrom(getActivity()))
                                                               .on(factoryOf(
                                                                       PurgeContextInvocation.class))
-                                                              .invocations()
+                                                              .withInvocations()
                                                               .with(invocationConfiguration)
                                                               .withReadTimeout(seconds(10))
                                                               .set()
-                                                              .loaders()
+                                                              .withLoaders()
                                                               .withId(0)
                                                               .withCacheStrategy(
                                                                       CacheStrategyType.CACHE)
@@ -233,7 +233,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final Data data1 = new Data();
         final OutputChannel<Data> result1 = JRoutine.with(loaderFrom(getActivity()))
                                                     .on(factoryOf(Abort.class))
-                                                    .loaders()
+                                                    .withLoaders()
                                                     .withId(0)
                                                     .withCacheStrategy(
                                                             CacheStrategyType.CACHE_IF_SUCCESS)
@@ -255,7 +255,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         final OutputChannel<Data> result2 = JRoutine.with(loaderFrom(getActivity()))
                                                     .on(factoryOf(Delay.class))
-                                                    .loaders()
+                                                    .withLoaders()
                                                     .withId(0)
                                                     .withCacheStrategy(
                                                             CacheStrategyType.CACHE_IF_SUCCESS)
@@ -268,7 +268,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         final OutputChannel<Data> result3 = JRoutine.with(loaderFrom(getActivity()))
                                                     .on(factoryOf(Delay.class))
-                                                    .loaders()
+                                                    .withLoaders()
                                                     .withId(0)
                                                     .set()
                                                     .asyncCall(data1)
@@ -289,7 +289,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final Data data1 = new Data();
         final OutputChannel<Data> result1 = JRoutine.with(loaderFrom(getActivity()))
                                                     .on(factoryOf(Delay.class))
-                                                    .loaders()
+                                                    .withLoaders()
                                                     .withId(0)
                                                     .withCacheStrategy(
                                                             CacheStrategyType.CACHE_IF_ERROR)
@@ -303,7 +303,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         AbortException error = null;
         final OutputChannel<Data> result2 = JRoutine.with(loaderFrom(getActivity()))
                                                     .on(factoryOf(Abort.class))
-                                                    .loaders()
+                                                    .withLoaders()
                                                     .withId(0)
                                                     .withCacheStrategy(
                                                             CacheStrategyType.CACHE_IF_ERROR)
@@ -326,7 +326,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         final OutputChannel<Data> result3 = JRoutine.with(loaderFrom(getActivity()))
                                                     .on(factoryOf(Abort.class))
-                                                    .loaders()
+                                                    .withLoaders()
                                                     .withId(0)
                                                     .set()
                                                     .asyncCall(data1)
@@ -458,7 +458,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final TimeDuration timeout = seconds(10);
         final Routine<String, String> routine = JRoutine.with(loaderFrom(getActivity()))
                                                         .on(factoryOf(ToUpperCase.class))
-                                                        .loaders()
+                                                        .withLoaders()
                                                         .withId(0)
                                                         .withClashResolution(
                                                                 ClashResolutionType.JOIN)
@@ -584,7 +584,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final TimeDuration timeout = seconds(10);
         final Routine<String, String> routine = JRoutine.with(loaderFrom(getActivity()))
                                                         .on(factoryOf(ToUpperCase.class))
-                                                        .loaders()
+                                                        .withLoaders()
                                                         .withId(0)
                                                         .withInputClashResolution(
                                                                 ClashResolutionType.ABORT_THAT)
@@ -616,7 +616,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final TimeDuration timeout = seconds(10);
         final Routine<String, String> routine = JRoutine.with(loaderFrom(getActivity()))
                                                         .on(factoryOf(ToUpperCase.class))
-                                                        .loaders()
+                                                        .withLoaders()
                                                         .withId(0)
                                                         .withClashResolution(
                                                                 ClashResolutionType.ABORT_THAT)
@@ -649,7 +649,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final Data data1 = new Data();
         final OutputChannel<Data> result1 = JRoutine.with(loaderFrom(getActivity()))
                                                     .on(factoryOf(Delay.class))
-                                                    .loaders()
+                                                    .withLoaders()
                                                     .withId(0)
                                                     .withCacheStrategy(CacheStrategyType.CACHE)
                                                     .set()
@@ -661,7 +661,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         final OutputChannel<Data> result2 = JRoutine.with(loaderFrom(getActivity()))
                                                     .on(factoryOf(Delay.class))
-                                                    .loaders()
+                                                    .withLoaders()
                                                     .withId(0)
                                                     .set()
                                                     .asyncCall(data1)
@@ -673,7 +673,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         AbortException error = null;
         final OutputChannel<Data> result3 = JRoutine.with(loaderFrom(getActivity()))
                                                     .on(factoryOf(Abort.class))
-                                                    .loaders()
+                                                    .withLoaders()
                                                     .withId(0)
                                                     .withCacheStrategy(CacheStrategyType.CACHE)
                                                     .set()
@@ -695,7 +695,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         final OutputChannel<Data> result4 = JRoutine.with(loaderFrom(getActivity()))
                                                     .on(factoryOf(Abort.class))
-                                                    .loaders()
+                                                    .withLoaders()
                                                     .withId(0)
                                                     .set()
                                                     .asyncCall(data1)
@@ -729,11 +729,11 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final LoaderRoutine<String, String> routine = JRoutine.with(loaderFrom(getActivity()))
                                                               .on(factoryOf(
                                                                       PurgeContextInvocation.class))
-                                                              .invocations()
+                                                              .withInvocations()
                                                               .with(invocationConfiguration)
                                                               .withReadTimeout(seconds(10))
                                                               .set()
-                                                              .loaders()
+                                                              .withLoaders()
                                                               .withId(0)
                                                               .withCacheStrategy(
                                                                       CacheStrategyType.CACHE)
@@ -756,12 +756,12 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final LoaderRoutine<String, String> routine = JRoutine.with(loaderFrom(getActivity()))
                                                               .on(factoryOf(
                                                                       PurgeContextInvocation.class))
-                                                              .invocations()
+                                                              .withInvocations()
                                                               .withInputOrder(OrderType.BY_CALL)
                                                               .withOutputOrder(OrderType.BY_CALL)
                                                               .withReadTimeout(seconds(10))
                                                               .set()
-                                                              .loaders()
+                                                              .withLoaders()
                                                               .withId(0)
                                                               .withCacheStrategy(
                                                                       CacheStrategyType.CACHE)
@@ -821,7 +821,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                           .set();
         JRoutine.with(loaderFrom(getActivity()))
                 .onId(0)
-                .channels()
+                .withChannels()
                 .with(configuration)
                 .set()
                 .buildChannel();
@@ -832,7 +832,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                           R.id.test_fragment);
         JRoutine.with(loaderFrom(fragment))
                 .onId(0)
-                .channels()
+                .withChannels()
                 .with(configuration)
                 .set()
                 .buildChannel();
@@ -850,7 +850,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final Data data1 = new Data();
         final OutputChannel<Data> result1 = JRoutine.with(loaderFrom(getActivity()))
                                                     .on(factoryOf(Delay.class))
-                                                    .loaders()
+                                                    .withLoaders()
                                                     .withId(0)
                                                     .withCacheStrategy(CacheStrategyType.CACHE)
                                                     .set()
@@ -862,7 +862,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         final OutputChannel<Data> result2 = JRoutine.with(loaderFrom(getActivity()))
                                                     .on(factoryOf(Abort.class))
-                                                    .loaders()
+                                                    .withLoaders()
                                                     .withId(0)
                                                     .set()
                                                     .asyncCall(data1)
@@ -930,7 +930,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                           R.id.test_fragment);
         final Routine<String, String> routine = JRoutine.with(loaderFrom(fragment))
                                                         .on(factoryOf(ToUpperCase.class))
-                                                        .loaders()
+                                                        .withLoaders()
                                                         .withId(0)
                                                         .withClashResolution(
                                                                 ClashResolutionType.ABORT_THIS)
@@ -965,12 +965,12 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final LoaderRoutine<String, String> routine = JRoutine.with(loaderFrom(fragment))
                                                               .on(factoryOf(
                                                                       PurgeContextInvocation.class))
-                                                              .invocations()
+                                                              .withInvocations()
                                                               .withInputOrder(OrderType.BY_CALL)
                                                               .withOutputOrder(OrderType.BY_CALL)
                                                               .withReadTimeout(seconds(10))
                                                               .set()
-                                                              .loaders()
+                                                              .withLoaders()
                                                               .withId(0)
                                                               .withCacheStrategy(
                                                                       CacheStrategyType.CACHE)
@@ -996,12 +996,12 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final LoaderRoutine<String, String> routine = JRoutine.with(loaderFrom(fragment))
                                                               .on(factoryOf(
                                                                       PurgeContextInvocation.class))
-                                                              .invocations()
+                                                              .withInvocations()
                                                               .withInputOrder(OrderType.BY_CALL)
                                                               .withOutputOrder(OrderType.BY_CALL)
                                                               .withReadTimeout(seconds(10))
                                                               .set()
-                                                              .loaders()
+                                                              .withLoaders()
                                                               .withId(0)
                                                               .withCacheStrategy(
                                                                       CacheStrategyType.CACHE)
@@ -1039,10 +1039,10 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                           R.id.test_fragment);
         final Routine<String, String> routine = JRoutine.with(loaderFrom(fragment))
                                                         .on(factoryOf(ToUpperCase.class))
-                                                        .loaders()
+                                                        .withLoaders()
                                                         .withId(0)
                                                         .set()
-                                                        .invocations()
+                                                        .withInvocations()
                                                         .withOutputOrder(OrderType.BY_CALL)
                                                         .set()
                                                         .buildRoutine();
@@ -1162,7 +1162,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                           R.id.test_fragment);
         final Routine<String, String> routine = JRoutine.with(loaderFrom(fragment))
                                                         .on(factoryOf(ToUpperCase.class))
-                                                        .loaders()
+                                                        .withLoaders()
                                                         .withId(0)
                                                         .withClashResolution(
                                                                 ClashResolutionType.JOIN)
@@ -1297,7 +1297,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                           R.id.test_fragment);
         final Routine<String, String> routine = JRoutine.with(loaderFrom(fragment))
                                                         .on(factoryOf(ToUpperCase.class))
-                                                        .loaders()
+                                                        .withLoaders()
                                                         .withId(0)
                                                         .withInputClashResolution(
                                                                 ClashResolutionType.ABORT_THAT)
@@ -1332,7 +1332,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                           R.id.test_fragment);
         final Routine<String, String> routine = JRoutine.with(loaderFrom(fragment))
                                                         .on(factoryOf(ToUpperCase.class))
-                                                        .loaders()
+                                                        .withLoaders()
                                                         .withId(0)
                                                         .withClashResolution(
                                                                 ClashResolutionType.ABORT_THAT)
@@ -1367,12 +1367,12 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final LoaderRoutine<String, String> routine = JRoutine.with(loaderFrom(fragment))
                                                               .on(factoryOf(
                                                                       PurgeContextInvocation.class))
-                                                              .invocations()
+                                                              .withInvocations()
                                                               .withInputOrder(OrderType.BY_CALL)
                                                               .withOutputOrder(OrderType.BY_CALL)
                                                               .withReadTimeout(seconds(10))
                                                               .set()
-                                                              .loaders()
+                                                              .withLoaders()
                                                               .withId(0)
                                                               .withCacheStrategy(
                                                                       CacheStrategyType.CACHE)
@@ -1398,12 +1398,12 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final LoaderRoutine<String, String> routine = JRoutine.with(loaderFrom(fragment))
                                                               .on(factoryOf(
                                                                       PurgeContextInvocation.class))
-                                                              .invocations()
+                                                              .withInvocations()
                                                               .withInputOrder(OrderType.BY_CALL)
                                                               .withOutputOrder(OrderType.BY_CALL)
                                                               .withReadTimeout(seconds(10))
                                                               .set()
-                                                              .loaders()
+                                                              .withLoaders()
                                                               .withId(0)
                                                               .withCacheStrategy(
                                                                       CacheStrategyType.CACHE)
@@ -1460,7 +1460,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final Routine<String, String> routine1 = JRoutine.with(loaderFrom(getActivity()))
                                                          .on(PassingFunctionContextInvocation
                                                                      .<String>factoryOf())
-                                                         .invocations()
+                                                         .withInvocations()
                                                          .withLog(Logs.androidLog())
                                                          .withLogLevel(Level.WARNING)
                                                          .set()
@@ -1478,7 +1478,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                 ClassToken.tokenOf(StringFunctionInvocation.class);
         final Routine<String, String> routine2 = JRoutine.with(loaderFrom(getActivity()))
                                                          .on(factoryOf(token2))
-                                                         .invocations()
+                                                         .withInvocations()
                                                          .withLog(Logs.androidLog())
                                                          .withLogLevel(Level.WARNING)
                                                          .set()
@@ -1567,10 +1567,10 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                .set();
         JRoutine.with(loaderFrom(getActivity()))
                 .on(factoryOf(ToUpperCase.class))
-                .invocations()
+                .withInvocations()
                 .with(configuration)
                 .set()
-                .loaders()
+                .withLoaders()
                 .withId(0)
                 .withInputClashResolution(ClashResolutionType.JOIN)
                 .set()
@@ -1582,10 +1582,10 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                           R.id.test_fragment);
         JRoutine.with(loaderFrom(fragment))
                 .on(factoryOf(ToUpperCase.class))
-                .invocations()
+                .withInvocations()
                 .with(configuration)
                 .set()
-                .loaders()
+                .withLoaders()
                 .withId(0)
                 .withInputClashResolution(ClashResolutionType.JOIN)
                 .set()

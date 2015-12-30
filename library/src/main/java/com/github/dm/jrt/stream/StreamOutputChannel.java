@@ -14,6 +14,7 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.builder.ConfigurableBuilder;
+import com.github.dm.jrt.builder.InvocationConfiguration.Builder;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.ResultChannel;
@@ -26,6 +27,7 @@ import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.routine.Routine;
+import com.github.dm.jrt.runner.Runner;
 import com.github.dm.jrt.util.TimeDuration;
 
 import org.jetbrains.annotations.NotNull;
@@ -117,7 +119,8 @@ public interface StreamOutputChannel<OUT>
      * The outputs will be collected by applying the function, only when the outputs complete.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in an asynchronous mode.
+     * invoked in an asynchronous mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param consumer the bi-consumer instance.
      * @param <AFTER>  the concatenation output type.
@@ -133,7 +136,8 @@ public interface StreamOutputChannel<OUT>
      * The outputs will be collected by applying the function, only when the outputs complete.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in an asynchronous mode.
+     * invoked in an asynchronous mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param function the function instance.
      * @param <AFTER>  the concatenation output type.
@@ -148,7 +152,8 @@ public interface StreamOutputChannel<OUT>
      * The output will be filtered according to the result returned by the predicate.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in an asynchronous mode.
+     * invoked in an asynchronous mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param predicate the predicate instance.
      * @return the concatenated stream channel.
@@ -161,7 +166,8 @@ public interface StreamOutputChannel<OUT>
      * The channel outputs will not be further propagated.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in an asynchronous mode.
+     * invoked in an asynchronous mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param consumer the consumer instance.
      * @return the concatenated stream channel.
@@ -174,7 +180,8 @@ public interface StreamOutputChannel<OUT>
      * The consumer will be called only when the invocation completes.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in an asynchronous mode.
+     * invoked in an asynchronous mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param consumer the consumer instance.
      * @param <AFTER>  the concatenation output type.
@@ -190,7 +197,8 @@ public interface StreamOutputChannel<OUT>
      * The count number must be positive.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in an asynchronous mode.
+     * invoked in an asynchronous mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param count    the number of generated outputs.
      * @param supplier the supplier instance.
@@ -207,7 +215,8 @@ public interface StreamOutputChannel<OUT>
      * The supplier will be called only when the outputs complete.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in an asynchronous mode.
+     * invoked in an asynchronous mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param supplier the supplier instance.
      * @param <AFTER>  the concatenation output type.
@@ -220,7 +229,8 @@ public interface StreamOutputChannel<OUT>
      * Lifts this stream outputs by applying the specified function.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in an asynchronous mode.
+     * invoked in an asynchronous mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param function the function instance.
      * @param <AFTER>  the lifting output type.
@@ -234,7 +244,8 @@ public interface StreamOutputChannel<OUT>
      * Concatenates a stream channel based on the specified consumer to this one.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in an asynchronous mode.
+     * invoked in an asynchronous mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param consumer the bi-consumer instance.
      * @param <AFTER>  the concatenation output type.
@@ -248,7 +259,8 @@ public interface StreamOutputChannel<OUT>
      * Concatenates a stream channel based on the specified function to this one.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in an asynchronous mode.
+     * invoked in an asynchronous mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param function the function instance.
      * @param <AFTER>  the concatenation output type.
@@ -262,7 +274,8 @@ public interface StreamOutputChannel<OUT>
      * Concatenates a stream channel based on the specified factory to this one.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in an asynchronous mode.
+     * invoked in an asynchronous mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param factory the invocation factory.
      * @param <AFTER> the concatenation output type.
@@ -276,7 +289,8 @@ public interface StreamOutputChannel<OUT>
      * Concatenates a stream channel based on the specified instance to this one.
      * <p/>
      * Note that the created routine will ignore the current configuration, even if it will be
-     * employed in further concatenations, and will be invoked in an asynchronous mode.
+     * employed in further concatenations, and will be invoked in an asynchronous mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param routine the routine instance.
      * @param <AFTER> the concatenation output type.
@@ -292,7 +306,8 @@ public interface StreamOutputChannel<OUT>
      * last one, by computing each next element through the specified function.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in an asynchronous mode.
+     * invoked in an asynchronous mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param start     the first element of the range.
      * @param end       the last element of the range.
@@ -314,7 +329,8 @@ public interface StreamOutputChannel<OUT>
      * increment will be {@code -1}.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in an asynchronous mode.
+     * invoked in an asynchronous mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param start the first element of the range.
      * @param end   the last element of the range.
@@ -329,7 +345,8 @@ public interface StreamOutputChannel<OUT>
      * including the {@code end} element.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in an asynchronous mode.
+     * invoked in an asynchronous mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param start     the first element of the range.
      * @param end       the last element of the range.
@@ -353,7 +370,8 @@ public interface StreamOutputChannel<OUT>
      * The accumulated value will be passed as result only when the outputs complete.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in an asynchronous mode.
+     * invoked in an asynchronous mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param function the bi-function instance.
      * @return the concatenated stream channel.
@@ -362,12 +380,31 @@ public interface StreamOutputChannel<OUT>
     StreamOutputChannel<OUT> asyncReduce(
             @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
 
+    // TODO: 30/12/15 unordered, backPressure, runOn
+    @NotNull
+    StreamOutputChannel<OUT> backPressureOn(@Nullable Runner runner, int maxOutputs, long maxTime,
+            TimeUnit timeUnit);
+
+    // TODO: 30/12/15 unordered, backPressure, runOn
+    @NotNull
+    StreamOutputChannel<OUT> backPressureOn(@Nullable Runner runner, int maxOutputs,
+            TimeDuration maxTime);
+
+    // TODO: 30/12/15 unordered, backPressure, runOn
+    @NotNull
+    StreamOutputChannel<OUT> maxParallelInvocations(int maxInvocations);
+
+    // TODO: 30/12/15 unordered, backPressure, runOn
+    @NotNull
+    StreamOutputChannel<OUT> ordered();
+
     /**
      * Concatenates a stream channel based on the specified predicate to this one.<br/>
      * The output will be filtered according to the result returned by the predicate.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in a parallel mode.
+     * invoked in a parallel mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param predicate the predicate instance.
      * @return the concatenated stream channel.
@@ -381,7 +418,8 @@ public interface StreamOutputChannel<OUT>
      * The count number must be positive.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in a parallel mode.
+     * invoked in a parallel mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param count    the number of generated outputs.
      * @param consumer the consumer instance.
@@ -399,7 +437,8 @@ public interface StreamOutputChannel<OUT>
      * The count number must be positive.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in a parallel mode.
+     * invoked in a parallel mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param count    the number of generated outputs.
      * @param supplier the supplier instance.
@@ -415,7 +454,8 @@ public interface StreamOutputChannel<OUT>
      * Lifts this stream outputs by applying the specified function.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in a parallel mode.
+     * invoked in a parallel mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param function the function instance.
      * @param <AFTER>  the lifting output type.
@@ -429,7 +469,8 @@ public interface StreamOutputChannel<OUT>
      * Concatenates a stream channel based on the specified consumer to this one.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in a parallel mode.
+     * invoked in a parallel mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param consumer the bi-consumer instance.
      * @param <AFTER>  the concatenation output type.
@@ -443,7 +484,8 @@ public interface StreamOutputChannel<OUT>
      * Concatenates a stream channel based on the specified function to this one.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in a parallel mode.
+     * invoked in a parallel mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param function the function instance.
      * @param <AFTER>  the concatenation output type.
@@ -457,7 +499,8 @@ public interface StreamOutputChannel<OUT>
      * Concatenates a stream channel based on the specified factory to this one.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in a parallel mode.
+     * invoked in a parallel mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param factory the invocation factory.
      * @param <AFTER> the concatenation output type.
@@ -471,7 +514,8 @@ public interface StreamOutputChannel<OUT>
      * Concatenates a stream channel based on the specified instance to this one.
      * <p/>
      * Note that the created routine will ignore the current configuration, even if it will be
-     * employed in further concatenations, and will be invoked in a parallel mode.
+     * employed in further concatenations, and will be invoked in a parallel mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param routine the routine instance.
      * @param <AFTER> the concatenation output type.
@@ -487,7 +531,8 @@ public interface StreamOutputChannel<OUT>
      * last one, by computing each next element through the specified function.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in a parallel mode.
+     * invoked in a parallel mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param start     the first element of the range.
      * @param end       the last element of the range.
@@ -509,7 +554,8 @@ public interface StreamOutputChannel<OUT>
      * increment will be {@code -1}.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in a parallel mode.
+     * invoked in a parallel mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param start the first element of the range.
      * @param end   the last element of the range.
@@ -525,7 +571,8 @@ public interface StreamOutputChannel<OUT>
      * including the {@code end} element.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in a parallel mode.
+     * invoked in a parallel mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param start     the first element of the range.
      * @param end       the last element of the range.
@@ -536,12 +583,21 @@ public interface StreamOutputChannel<OUT>
     StreamOutputChannel<Number> parallelRange(@NotNull final Number start,
             @NotNull final Number end, @NotNull final Number increment);
 
+    // TODO: 30/12/15 unordered, backPressure, runOn
+    @NotNull
+    StreamOutputChannel<OUT> runOn(@Nullable Runner runner);
+
+    // TODO: 30/12/15 unordered, backPressure, runOn
+    @NotNull
+    StreamOutputChannel<OUT> runOnShared();
+
     /**
      * Concatenates a stream channel based on the specified collecting consumer to this one.<br/>
      * The outputs will be collected by applying the function, only when the outputs complete.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in a synchronous mode.
+     * invoked in a synchronous mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param consumer the bi-consumer instance.
      * @param <AFTER>  the concatenation output type.
@@ -557,7 +613,8 @@ public interface StreamOutputChannel<OUT>
      * The outputs will be collected by applying the function, only when the outputs complete.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in a synchronous mode.
+     * invoked in a synchronous mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param function the function instance.
      * @param <AFTER>  the concatenation output type.
@@ -572,7 +629,8 @@ public interface StreamOutputChannel<OUT>
      * The output will be filtered according to the result returned by the predicate.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in a synchronous mode.
+     * invoked in a synchronous mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param predicate the predicate instance.
      * @return the concatenated stream channel.
@@ -585,7 +643,8 @@ public interface StreamOutputChannel<OUT>
      * The channel outputs will not be further propagated.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in a synchronous mode.
+     * invoked in a synchronous mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param consumer the consumer instance.
      * @return the concatenated stream channel.
@@ -598,7 +657,8 @@ public interface StreamOutputChannel<OUT>
      * The consumer will be called only when the invocation completes.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in a synchronous mode.
+     * invoked in a synchronous mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param consumer the consumer instance.
      * @param <AFTER>  the concatenation output type.
@@ -614,7 +674,8 @@ public interface StreamOutputChannel<OUT>
      * The count number must be positive.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in a synchronous mode.
+     * invoked in a synchronous mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param count    the number of generated outputs.
      * @param supplier the supplier instance.
@@ -631,7 +692,8 @@ public interface StreamOutputChannel<OUT>
      * The supplier will be called only when the outputs complete.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in a synchronous mode.
+     * invoked in a synchronous mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param supplier the supplier instance.
      * @param <AFTER>  the concatenation output type.
@@ -644,7 +706,8 @@ public interface StreamOutputChannel<OUT>
      * Lifts this stream outputs by applying the specified function.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in a synchronous mode.
+     * invoked in a synchronous mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param function the function instance.
      * @param <AFTER>  the lifting output type.
@@ -658,7 +721,8 @@ public interface StreamOutputChannel<OUT>
      * Concatenates a stream channel based on the specified consumer to this one.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in a synchronous mode.
+     * invoked in a synchronous mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param consumer the bi-consumer instance.
      * @param <AFTER>  the concatenation output type.
@@ -672,7 +736,8 @@ public interface StreamOutputChannel<OUT>
      * Concatenates a stream channel based on the specified function to this one.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in a synchronous mode.
+     * invoked in a synchronous mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param function the function instance.
      * @param <AFTER>  the concatenation output type.
@@ -686,7 +751,8 @@ public interface StreamOutputChannel<OUT>
      * Concatenates a stream channel based on the specified factory to this one.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in a synchronous mode.
+     * invoked in a synchronous mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param factory the invocation factory.
      * @param <AFTER> the concatenation output type.
@@ -700,7 +766,8 @@ public interface StreamOutputChannel<OUT>
      * Concatenates a stream channel based on the specified instance to this one.
      * <p/>
      * Note that the created routine will ignore the current configuration, even if it will be
-     * employed in further concatenations, and will be invoked in a synchronous mode.
+     * employed in further concatenations, and will be invoked in a synchronous mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param routine the routine instance.
      * @param <AFTER> the concatenation output type.
@@ -716,7 +783,8 @@ public interface StreamOutputChannel<OUT>
      * last one, by computing each next element through the specified function.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in a synchronous mode.
+     * invoked in a synchronous mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param start     the first element of the range.
      * @param end       the last element of the range.
@@ -738,7 +806,8 @@ public interface StreamOutputChannel<OUT>
      * increment will be {@code -1}.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in a synchronous mode.
+     * invoked in a synchronous mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param start the first element of the range.
      * @param end   the last element of the range.
@@ -753,7 +822,8 @@ public interface StreamOutputChannel<OUT>
      * including the {@code end} element.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in a synchronous mode.
+     * invoked in a synchronous mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param start     the first element of the range.
      * @param end       the last element of the range.
@@ -777,7 +847,8 @@ public interface StreamOutputChannel<OUT>
      * The accumulated value will be passed as result only when the outputs complete.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
-     * invoked in a synchronous mode.
+     * invoked in a synchronous mode.<br/>
+     * Note also that the output channel will be bound as a result of the call.
      *
      * @param function the bi-function instance.
      * @return the concatenated stream channel.
@@ -789,6 +860,8 @@ public interface StreamOutputChannel<OUT>
     /**
      * Concatenates a consumer handling the invocation exceptions.<br/>
      * The errors will not be automatically further propagated.
+     * <p/>
+     * Note that the output channel will be bound as a result of the call.
      *
      * @param consumer the bi-consumer instance.
      * @return the concatenated stream channel.
@@ -800,6 +873,8 @@ public interface StreamOutputChannel<OUT>
     /**
      * Concatenates a consumer handling a invocation exceptions.<br/>
      * The errors will not be automatically further propagated.
+     * <p/>
+     * Note that the output channel will be bound as a result of the call.
      *
      * @param consumer the consumer instance.
      * @return the concatenated stream channel.
@@ -810,6 +885,8 @@ public interface StreamOutputChannel<OUT>
     /**
      * Concatenates a function handling a invocation exceptions.<br/>
      * The errors will not be automatically further propagated.
+     * <p/>
+     * Note that the output channel will be bound as a result of the call.
      *
      * @param function the function instance.
      * @return the concatenated stream channel.
@@ -817,4 +894,16 @@ public interface StreamOutputChannel<OUT>
     @NotNull
     StreamOutputChannel<OUT> tryCatch(
             @NotNull Function<? super RoutineException, ? extends OUT> function);
+
+    /**
+     * Gets the invocation configuration builder related only to the next concatenated routine
+     * instance. Any further addition to the chain will retain only the base configuration.
+     * <p/>
+     * Note that the configuration builder will be initialized with the current configuration for
+     * the next routine.
+     *
+     * @return the invocation configuration builder.
+     */
+    @NotNull
+    Builder<? extends StreamOutputChannel<OUT>> withNextInvocations();
 }

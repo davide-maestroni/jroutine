@@ -28,11 +28,11 @@
         final com.github.dm.jrt.android.core.TargetInvocationFactory<Object, ${resultClassName}> targetFactory = com.github.dm.jrt.android.core.TargetInvocationFactory.factoryOf(
                 // We need to work around Proguard stripping away generics information, so the use of a ClassToken is not an option
                 (Class<? extends com.github.dm.jrt.android.invocation.ContextInvocation<Object, ${resultClassName}>>) new ContextInvocation${methodCount}${genericTypes}(sharedFields, target).getClass(), sharedFields, target);
-        return getBuilder(mContext, targetFactory).invocations()
+        return getBuilder(mContext, targetFactory).withInvocations()
                                                   .with(invocationConfiguration)
                                                   ${routineBuilderOptions}
                                                   .set()
-                                                  .service()
+                                                  .withService()
                                                   .with(serviceConfiguration)
                                                   .set()
                                                   .buildRoutine();

@@ -32,7 +32,9 @@ import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.invocation.Invocations;
 import com.github.dm.jrt.routine.Routine;
+import com.github.dm.jrt.runner.Runners;
 
+import org.assertj.core.data.Offset;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
@@ -299,6 +301,96 @@ public class StreamOutputChannelTest {
         } catch (final NullPointerException ignored) {
 
         }
+    }
+
+    @Test
+    public void testConfiguration() {
+
+        assertThat(Streams.streamOf("test1", "test2")
+                          .maxParallelInvocations(1)
+                          .parallelMap(new Function<String, String>() {
+
+                              public String apply(final String s) {
+
+                                  return s.toUpperCase();
+                              }
+                          })
+                          .afterMax(seconds(3))
+                          .all()).containsOnly("TEST1", "TEST2");
+        assertThat(Streams.streamOf("test1", "test2")
+                          .ordered()
+                          .maxParallelInvocations(1)
+                          .parallelMap(new Function<String, String>() {
+
+                              public String apply(final String s) {
+
+                                  return s.toUpperCase();
+                              }
+                          })
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("TEST1", "TEST2");
+        assertThat(Streams.streamOf("test1", "test2")
+                          .ordered()
+                          .maxParallelInvocations(1)
+                          .parallelMap(new Function<String, String>() {
+
+                              public String apply(final String s) {
+
+                                  return s.toUpperCase();
+                              }
+                          })
+                          .parallelMap(new Function<String, String>() {
+
+                              public String apply(final String s) {
+
+                                  return s.toLowerCase();
+                              }
+                          })
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1", "test2");
+        assertThat(Streams.streamOf().asyncRange(1, 1000)
+                .backPressureOn(Runners.poolRunner(1), 2, 10, TimeUnit.SECONDS)
+//                           .withInvocations()
+//                           .withRunner(Runners.poolRunner(1))
+//                           .withInputMaxSize(2)
+//                           .withInputTimeout(days(10))
+//                           .withOutputMaxSize(2)
+//                           .withOutputTimeout(days(10))
+//                           .set()
+                           .asyncMap(Functions.<Number>identity())
+                           .asyncMap(new Function<Number, Double>() {
+
+                               public Double apply(final Number number) {
+
+                                   final double value = number.doubleValue();
+                                   return Math.sqrt(value);
+                               }
+                           })
+                           .syncMap(new Function<Double, SumData>() {
+
+                               public SumData apply(final Double aDouble) {
+
+                                   return new SumData(aDouble, 1);
+                               }
+                           })
+                           .syncReduce(new BiFunction<SumData, SumData, SumData>() {
+
+                               public SumData apply(final SumData data1, final SumData data2) {
+
+                                   return new SumData(data1.sum + data2.sum,
+                                                      data1.count + data2.count);
+                               }
+                           })
+                           .syncMap(new Function<SumData, Double>() {
+
+                               public Double apply(final SumData data) {
+
+                                   return data.sum / data.count;
+                               }
+                           })
+                           .runOnShared()
+                           .afterMax(seconds(3))
+                           .next()).isCloseTo(21, Offset.offset(0.1));
     }
 
     @Test
@@ -690,9 +782,7 @@ public class StreamOutputChannelTest {
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
         assertThat(Streams.streamOf("test1", "test2")
-                          .invocations()
-                          .withOutputOrder(OrderType.BY_CALL)
-                          .set()
+                          .ordered()
                           .parallelMap(new BiConsumer<String, ResultChannel<String>>() {
 
                               public void accept(final String s,
@@ -759,9 +849,7 @@ public class StreamOutputChannelTest {
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
         assertThat(Streams.streamOf("test1", "test2")
-                          .invocations()
-                          .withOutputOrder(OrderType.BY_CALL)
-                          .set()
+                          .ordered()
                           .parallelMap(factory)
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
@@ -812,9 +900,7 @@ public class StreamOutputChannelTest {
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
         assertThat(Streams.streamOf("test1", "test2")
-                          .invocations()
-                          .withOutputOrder(OrderType.BY_CALL)
-                          .set()
+                          .ordered()
                           .parallelMap(new UpperCase())
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
@@ -869,9 +955,7 @@ public class StreamOutputChannelTest {
             }
         }).afterMax(seconds(3)).all()).containsExactly("TEST1", "TEST2");
         assertThat(Streams.streamOf("test1", "test2")
-                          .invocations()
-                          .withOutputOrder(OrderType.BY_CALL)
-                          .set()
+                          .ordered()
                           .parallelMap(new Function<String, String>() {
 
                               public String apply(final String s) {
@@ -929,7 +1013,7 @@ public class StreamOutputChannelTest {
     public void testMapRoutine() {
 
         final Routine<String, String> routine = JRoutine.on(new UpperCase())
-                                                        .invocations()
+                                                        .withInvocations()
                                                         .withOutputOrder(OrderType.BY_CALL)
                                                         .set()
                                                         .buildRoutine();
@@ -1046,9 +1130,7 @@ public class StreamOutputChannelTest {
                           .all()).containsExactly((byte) 0, (byte) 1, (byte) 2, (byte) 3, (byte) 4,
                                                   (byte) 5);
         assertThat(Streams.streamOf()
-                          .invocations()
-                          .withOutputOrder(OrderType.BY_CALL)
-                          .set()
+                          .ordered()
                           .parallelRange('a', 'e', new Function<Character, Character>() {
 
                               public Character apply(final Character character) {
@@ -1059,103 +1141,70 @@ public class StreamOutputChannelTest {
                           .afterMax(seconds(3))
                           .all()).containsExactly('a', 'b', 'c', 'd', 'e');
         assertThat(Streams.streamOf()
-                          .invocations()
-                          .withOutputOrder(OrderType.BY_CALL)
-                          .set()
+                          .ordered()
                           .parallelRange(0, -10, -2)
                           .afterMax(seconds(3))
                           .all()).containsExactly(0, -2, -4, -6, -8, -10);
+        assertThat(Streams.streamOf().ordered().parallelRange(0, 2, 0.7).afterMax(seconds(3)).all())
+                .containsExactly(0d, 0.7d, 1.4d);
         assertThat(Streams.streamOf()
-                          .invocations()
-                          .withOutputOrder(OrderType.BY_CALL)
-                          .set()
-                          .parallelRange(0, 2, 0.7)
-                          .afterMax(seconds(3))
-                          .all()).containsExactly(0d, 0.7d, 1.4d);
-        assertThat(Streams.streamOf()
-                          .invocations()
-                          .withOutputOrder(OrderType.BY_CALL)
-                          .set()
+                          .ordered()
                           .parallelRange(0, 2, 0.7f)
                           .afterMax(seconds(3))
                           .all()).containsExactly(0f, 0.7f, 1.4f);
         assertThat(Streams.streamOf()
-                          .invocations()
-                          .withOutputOrder(OrderType.BY_CALL)
-                          .set()
+                          .ordered()
                           .parallelRange(0L, -9, -2)
                           .afterMax(seconds(3))
                           .all()).containsExactly(0L, -2L, -4L, -6L, -8L);
         assertThat(Streams.streamOf()
-                          .invocations()
-                          .withOutputOrder(OrderType.BY_CALL)
-                          .set()
+                          .ordered()
                           .parallelRange(0, (short) 9, 2)
                           .afterMax(seconds(3))
                           .all()).containsExactly(0, 2, 4, 6, 8);
         assertThat(Streams.streamOf()
-                          .invocations()
-                          .withOutputOrder(OrderType.BY_CALL)
-                          .set()
+                          .ordered()
                           .parallelRange((byte) 0, (short) 9, (byte) 2)
                           .afterMax(seconds(3))
                           .all()).containsExactly((short) 0, (short) 2, (short) 4, (short) 6,
                                                   (short) 8);
         assertThat(Streams.streamOf()
-                          .invocations()
-                          .withOutputOrder(OrderType.BY_CALL)
-                          .set()
+                          .ordered()
                           .parallelRange((byte) 0, (byte) 10, (byte) 2)
                           .afterMax(seconds(3))
                           .all()).containsExactly((byte) 0, (byte) 2, (byte) 4, (byte) 6, (byte) 8,
                                                   (byte) 10);
         assertThat(Streams.streamOf()
-                          .invocations()
-                          .withOutputOrder(OrderType.BY_CALL)
-                          .set()
+                          .ordered()
                           .parallelRange(0, -5)
                           .afterMax(seconds(3))
                           .all()).containsExactly(0, -1, -2, -3, -4, -5);
         assertThat(Streams.streamOf()
-                          .invocations()
-                          .withOutputOrder(OrderType.BY_CALL)
-                          .set()
+                          .ordered()
                           .parallelRange(0, 2.1)
                           .afterMax(seconds(3))
                           .all()).containsExactly(0d, 1d, 2d);
         assertThat(Streams.streamOf()
-                          .invocations()
-                          .withOutputOrder(OrderType.BY_CALL)
-                          .set()
+                          .ordered()
                           .parallelRange(0, 1.9f)
                           .afterMax(seconds(3))
                           .all()).containsExactly(0f, 1f);
         assertThat(Streams.streamOf()
-                          .invocations()
-                          .withOutputOrder(OrderType.BY_CALL)
-                          .set()
+                          .ordered()
                           .parallelRange(0L, -4)
                           .afterMax(seconds(3))
                           .all()).containsExactly(0L, -1L, -2L, -3L, -4L);
+        assertThat(
+                Streams.streamOf().ordered().parallelRange(0, (short) 4).afterMax(seconds(3)).all())
+                .containsExactly(0, 1, 2, 3, 4);
         assertThat(Streams.streamOf()
-                          .invocations()
-                          .withOutputOrder(OrderType.BY_CALL)
-                          .set()
-                          .parallelRange(0, (short) 4)
-                          .afterMax(seconds(3))
-                          .all()).containsExactly(0, 1, 2, 3, 4);
-        assertThat(Streams.streamOf()
-                          .invocations()
-                          .withOutputOrder(OrderType.BY_CALL)
-                          .set()
+                          .ordered()
                           .parallelRange((byte) 0, (short) 4)
                           .afterMax(seconds(3))
                           .all()).containsExactly((short) 0, (short) 1, (short) 2, (short) 3,
                                                   (short) 4);
         assertThat(Streams.streamOf()
-                          .invocations()
-                          .withOutputOrder(OrderType.BY_CALL)
-                          .set()
+                          .ordered()
                           .parallelRange((byte) 0, (byte) 5)
                           .afterMax(seconds(3))
                           .all()).containsExactly((byte) 0, (byte) 1, (byte) 2, (byte) 3, (byte) 4,
@@ -1747,6 +1796,19 @@ public class StreamOutputChannelTest {
 
         } catch (final NullPointerException ignored) {
 
+        }
+    }
+
+    private static class SumData {
+
+        private final int count;
+
+        private final double sum;
+
+        private SumData(final double sum, final int count) {
+
+            this.sum = sum;
+            this.count = count;
         }
     }
 

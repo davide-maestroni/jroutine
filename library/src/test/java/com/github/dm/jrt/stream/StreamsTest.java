@@ -648,14 +648,14 @@ public class StreamsTest {
     public void testMap() {
 
         final IOChannelBuilder builder =
-                JRoutine.io().channels().withChannelOrder(OrderType.BY_CALL).set();
+                JRoutine.io().withChannels().withChannelOrder(OrderType.BY_CALL).set();
         final IOChannel<String> channel1 = builder.buildChannel();
         final IOChannel<Integer> channel2 = builder.buildChannel();
 
         final OutputChannel<? extends Selectable<Object>> channel =
                 Streams.merge(Arrays.<OutputChannel<?>>asList(channel1, channel2));
         final OutputChannel<Selectable<Object>> output = JRoutine.on(new Sort())
-                                                                 .invocations()
+                                                                 .withInvocations()
                                                                  .withInputOrder(OrderType.BY_CALL)
                                                                  .set()
                                                                  .asyncCall(channel);
@@ -683,7 +683,7 @@ public class StreamsTest {
     public void testMerge() {
 
         final IOChannelBuilder builder =
-                JRoutine.io().channels().withChannelOrder(OrderType.BY_CALL).set();
+                JRoutine.io().withChannels().withChannelOrder(OrderType.BY_CALL).set();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
         OutputChannel<? extends Selectable<?>> outputChannel;
@@ -734,7 +734,7 @@ public class StreamsTest {
     public void testMerge4() {
 
         final IOChannelBuilder builder =
-                JRoutine.io().channels().withChannelOrder(OrderType.BY_CALL).set();
+                JRoutine.io().withChannels().withChannelOrder(OrderType.BY_CALL).set();
         final IOChannel<String> channel1 = builder.buildChannel();
         final IOChannel<String> channel2 = builder.buildChannel();
         final IOChannel<String> channel3 = builder.buildChannel();
@@ -766,7 +766,7 @@ public class StreamsTest {
     public void testMergeAbort() {
 
         final IOChannelBuilder builder =
-                JRoutine.io().channels().withChannelOrder(OrderType.BY_CALL).set();
+                JRoutine.io().withChannels().withChannelOrder(OrderType.BY_CALL).set();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
         OutputChannel<? extends Selectable<?>> outputChannel;

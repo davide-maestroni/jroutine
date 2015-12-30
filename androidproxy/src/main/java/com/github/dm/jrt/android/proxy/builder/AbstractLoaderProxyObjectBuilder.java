@@ -118,24 +118,18 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
     }
 
     @NotNull
-    public InvocationConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>> invocations() {
+    public InvocationConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>>
+    withInvocations() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<LoaderProxyObjectBuilder<TYPE>>(this, config);
     }
 
     @NotNull
-    public ProxyConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>> proxies() {
+    public ProxyConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>> withProxies() {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<LoaderProxyObjectBuilder<TYPE>>(this, config);
-    }
-
-    @NotNull
-    public LoaderConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>> loaders() {
-
-        final LoaderConfiguration config = mLoaderConfiguration;
-        return new LoaderConfiguration.Builder<LoaderProxyObjectBuilder<TYPE>>(this, config);
     }
 
     @NotNull
@@ -178,6 +172,13 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
 
         mProxyConfiguration = configuration;
         return this;
+    }
+
+    @NotNull
+    public LoaderConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>> withLoaders() {
+
+        final LoaderConfiguration config = mLoaderConfiguration;
+        return new LoaderConfiguration.Builder<LoaderProxyObjectBuilder<TYPE>>(this, config);
     }
 
     /**

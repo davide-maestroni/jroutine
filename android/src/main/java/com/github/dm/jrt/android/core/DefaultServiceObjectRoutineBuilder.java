@@ -176,11 +176,11 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                 factoryOf(MethodAliasInvocation.class, args);
         final DefaultServiceRoutineBuilder<Object, Object> builder =
                 new DefaultServiceRoutineBuilder<Object, Object>(mContext, factory);
-        return (Routine<IN, OUT>) builder.invocations()
+        return (Routine<IN, OUT>) builder.withInvocations()
                                          .with(configurationWithAnnotations(
                                                  mInvocationConfiguration, targetMethod))
                                          .set()
-                                         .service()
+                                         .withService()
                                          .with(mServiceConfiguration)
                                          .set()
                                          .buildRoutine();
@@ -220,11 +220,11 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                 factoryOf(MethodSignatureInvocation.class, args);
         final DefaultServiceRoutineBuilder<Object, Object> builder =
                 new DefaultServiceRoutineBuilder<Object, Object>(mContext, factory);
-        return (Routine<IN, OUT>) builder.invocations()
+        return (Routine<IN, OUT>) builder.withInvocations()
                                          .with(configurationWithAnnotations(
                                                  mInvocationConfiguration, targetMethod))
                                          .set()
-                                         .service()
+                                         .withService()
                                          .with(mServiceConfiguration)
                                          .set()
                                          .buildRoutine();
@@ -234,27 +234,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     public <IN, OUT> Routine<IN, OUT> method(@NotNull final Method method) {
 
         return method(method.getName(), method.getParameterTypes());
-    }
-
-    @NotNull
-    public InvocationConfiguration.Builder<? extends ServiceObjectRoutineBuilder> invocations() {
-
-        final InvocationConfiguration config = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<ServiceObjectRoutineBuilder>(this, config);
-    }
-
-    @NotNull
-    public ProxyConfiguration.Builder<? extends ServiceObjectRoutineBuilder> proxies() {
-
-        final ProxyConfiguration config = mProxyConfiguration;
-        return new ProxyConfiguration.Builder<ServiceObjectRoutineBuilder>(this, config);
-    }
-
-    @NotNull
-    public ServiceConfiguration.Builder<? extends ServiceObjectRoutineBuilder> service() {
-
-        final ServiceConfiguration config = mServiceConfiguration;
-        return new ServiceConfiguration.Builder<ServiceObjectRoutineBuilder>(this, config);
     }
 
     @NotNull
@@ -299,6 +278,28 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         return this;
     }
 
+    @NotNull
+    public InvocationConfiguration.Builder<? extends ServiceObjectRoutineBuilder> withInvocations
+            () {
+
+        final InvocationConfiguration config = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<ServiceObjectRoutineBuilder>(this, config);
+    }
+
+    @NotNull
+    public ProxyConfiguration.Builder<? extends ServiceObjectRoutineBuilder> withProxies() {
+
+        final ProxyConfiguration config = mProxyConfiguration;
+        return new ProxyConfiguration.Builder<ServiceObjectRoutineBuilder>(this, config);
+    }
+
+    @NotNull
+    public ServiceConfiguration.Builder<? extends ServiceObjectRoutineBuilder> withService() {
+
+        final ServiceConfiguration config = mServiceConfiguration;
+        return new ServiceConfiguration.Builder<ServiceObjectRoutineBuilder>(this, config);
+    }
+
     /**
      * Alias method invocation.
      */
@@ -339,7 +340,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                 final InvocationTarget target = mTarget.getInvocationTarget(context);
                 mInstance = target.getTarget();
                 mRoutine = JRoutine.on(target)
-                                   .proxies()
+                                   .withProxies()
                                    .withSharedFields(mSharedFields)
                                    .set()
                                    .aliasMethod(mAliasName);
@@ -426,7 +427,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                 final InvocationTarget target = mTarget.getInvocationTarget(context);
                 mInstance = target.getTarget();
                 mRoutine = JRoutine.on(target)
-                                   .proxies()
+                                   .withProxies()
                                    .withSharedFields(mSharedFields)
                                    .set()
                                    .method(mMethodName, mParameterTypes);
@@ -569,10 +570,10 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                     configurationWithAnnotations(mInvocationConfiguration, method);
             final DefaultServiceRoutineBuilder<Object, Object> builder =
                     new DefaultServiceRoutineBuilder<Object, Object>(mContext, targetFactory);
-            final Routine<Object, Object> routine = builder.invocations()
+            final Routine<Object, Object> routine = builder.withInvocations()
                                                            .with(invocationConfiguration)
                                                            .set()
-                                                           .service()
+                                                           .withService()
                                                            .with(mServiceConfiguration)
                                                            .set()
                                                            .buildRoutine();

@@ -32,7 +32,7 @@
                     final ImageView imageView = (ImageView) findViewById(R.id.image);
                     JRoutine.with(loaderFrom(this))
                             .on(factoryOf(LoadBitmap.class))
-                            .loaders()
+                            .withLoaders()
                             .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
                             .set()
                             .asyncCall(new URI(IMAGE_URI))
@@ -115,7 +115,7 @@
                     final ImageView imageView = (ImageView) findViewById(R.id.image);
                     JRoutine.with(loaderFrom(this))
                             .on(factoryOf(LoadBitmapFromService.class))
-                            .loaders()
+                            .withLoaders()
                             .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
                             .set()
                             .asyncCall(new URI(IMAGE_URI))

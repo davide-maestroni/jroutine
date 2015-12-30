@@ -78,10 +78,10 @@ class DefaultProxyRoutineBuilder
 
         final TargetProxyObjectBuilder<TYPE> builder =
                 new TargetProxyObjectBuilder<TYPE>(mTarget, itf);
-        return builder.invocations()
+        return builder.withInvocations()
                       .with(mInvocationConfiguration)
                       .set()
-                      .proxies()
+                      .withProxies()
                       .with(mProxyConfiguration)
                       .set()
                       .buildProxy();
@@ -91,20 +91,6 @@ class DefaultProxyRoutineBuilder
     public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
 
         return buildProxy(itf.getRawClass());
-    }
-
-    @NotNull
-    public InvocationConfiguration.Builder<? extends ProxyRoutineBuilder> invocations() {
-
-        final InvocationConfiguration configuration = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<ProxyRoutineBuilder>(this, configuration);
-    }
-
-    @NotNull
-    public ProxyConfiguration.Builder<? extends ProxyRoutineBuilder> proxies() {
-
-        final ProxyConfiguration configuration = mProxyConfiguration;
-        return new ProxyConfiguration.Builder<ProxyRoutineBuilder>(this, configuration);
     }
 
     @NotNull
@@ -132,6 +118,20 @@ class DefaultProxyRoutineBuilder
 
         mInvocationConfiguration = configuration;
         return this;
+    }
+
+    @NotNull
+    public InvocationConfiguration.Builder<? extends ProxyRoutineBuilder> withInvocations() {
+
+        final InvocationConfiguration configuration = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<ProxyRoutineBuilder>(this, configuration);
+    }
+
+    @NotNull
+    public ProxyConfiguration.Builder<? extends ProxyRoutineBuilder> withProxies() {
+
+        final ProxyConfiguration configuration = mProxyConfiguration;
+        return new ProxyConfiguration.Builder<ProxyRoutineBuilder>(this, configuration);
     }
 
     /**

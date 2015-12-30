@@ -111,25 +111,18 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
     }
 
     @NotNull
-    public InvocationConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>> invocations
-            () {
+    public InvocationConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
+    withInvocations() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ServiceProxyObjectBuilder<TYPE>>(this, config);
     }
 
     @NotNull
-    public ProxyConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>> proxies() {
+    public ProxyConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>> withProxies() {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<ServiceProxyObjectBuilder<TYPE>>(this, config);
-    }
-
-    @NotNull
-    public ServiceConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>> service() {
-
-        final ServiceConfiguration config = mServiceConfiguration;
-        return new ServiceConfiguration.Builder<ServiceProxyObjectBuilder<TYPE>>(this, config);
     }
 
     @NotNull
@@ -172,6 +165,13 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
 
         mProxyConfiguration = configuration;
         return this;
+    }
+
+    @NotNull
+    public ServiceConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>> withService() {
+
+        final ServiceConfiguration config = mServiceConfiguration;
+        return new ServiceConfiguration.Builder<ServiceProxyObjectBuilder<TYPE>>(this, config);
     }
 
     /**

@@ -16,6 +16,7 @@ package com.github.dm.jrt.stream;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.Builder;
 import com.github.dm.jrt.builder.InvocationConfiguration.Configurable;
+import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
@@ -33,6 +34,7 @@ import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.routine.Routine;
+import com.github.dm.jrt.runner.Runner;
 import com.github.dm.jrt.util.TimeDuration;
 
 import org.jetbrains.annotations.NotNull;
@@ -62,6 +64,21 @@ class DefaultStreamOutputChannel<OUT>
     private final OutputChannel<OUT> mChannel;
 
     private InvocationConfiguration mConfiguration = InvocationConfiguration.DEFAULT_CONFIGURATION;
+
+    private InvocationConfiguration mNextConfiguration =
+            InvocationConfiguration.DEFAULT_CONFIGURATION;
+
+    private final Configurable<StreamOutputChannel<OUT>> mNextConfigurable =
+            new Configurable<StreamOutputChannel<OUT>>() {
+
+                @NotNull
+                public StreamOutputChannel<OUT> setConfiguration(
+                        @NotNull final InvocationConfiguration configuration) {
+
+                    mNextConfiguration = configuration;
+                    return DefaultStreamOutputChannel.this;
+                }
+            };
 
     /**
      * Constructor.
@@ -409,8 +426,11 @@ class DefaultStreamOutputChannel<OUT>
     public <AFTER> StreamOutputChannel<AFTER> asyncMap(
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
 
-        return asyncMap(
-                JRoutine.on(factory).invocations().with(mConfiguration).set().buildRoutine());
+        return asyncMap(JRoutine.on(factory)
+                                .withInvocations()
+                                .with(mConfiguration.builderFrom().with(mNextConfiguration).set())
+                                .set()
+                                .buildRoutine());
     }
 
     @NotNull
@@ -447,6 +467,35 @@ class DefaultStreamOutputChannel<OUT>
             @NotNull final BiFunction<? super OUT, ? super OUT, ? extends OUT> function) {
 
         return asyncMap(AccumulateInvocation.functionFactory(function));
+    }
+
+    @NotNull
+    public StreamOutputChannel<OUT> backPressureOn(@Nullable final Runner runner,
+            final int maxOutputs, final long maxTime, final TimeUnit timeUnit) {
+
+        return backPressureOn(runner, maxOutputs, TimeDuration.fromUnit(maxTime, timeUnit));
+    }
+
+    @NotNull
+    public StreamOutputChannel<OUT> backPressureOn(@Nullable final Runner runner,
+            final int maxOutputs, final TimeDuration maxTime) {
+
+        return withNextInvocations().withRunner(runner)
+                                    .withInputMaxSize(maxOutputs)
+                                    .withInputTimeout(maxTime)
+                                    .set();
+    }
+
+    @NotNull
+    public StreamOutputChannel<OUT> maxParallelInvocations(final int maxInvocations) {
+
+        return withNextInvocations().withMaxInstances(maxInvocations).set();
+    }
+
+    @NotNull
+    public StreamOutputChannel<OUT> ordered() {
+
+        return withInvocations().withOutputOrder(OrderType.BY_CALL).set();
     }
 
     @NotNull
@@ -508,8 +557,13 @@ class DefaultStreamOutputChannel<OUT>
     public <AFTER> StreamOutputChannel<AFTER> parallelMap(
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
 
-        return parallelMap(
-                JRoutine.on(factory).invocations().with(mConfiguration).set().buildRoutine());
+        return parallelMap(JRoutine.on(factory)
+                                   .withInvocations()
+                                   .with(mConfiguration.builderFrom()
+                                                       .with(mNextConfiguration)
+                                                       .set())
+                                   .set()
+                                   .buildRoutine());
     }
 
     @NotNull
@@ -539,6 +593,18 @@ class DefaultStreamOutputChannel<OUT>
             @NotNull final Number end, @NotNull final Number increment) {
 
         return asyncRange(start, end, increment).parallelMap(Functions.<Number>identity());
+    }
+
+    @NotNull
+    public StreamOutputChannel<OUT> runOn(@Nullable final Runner runner) {
+
+        return withNextInvocations().withRunner(runner).set().asyncMap(Functions.<OUT>identity());
+    }
+
+    @NotNull
+    public StreamOutputChannel<OUT> runOnShared() {
+
+        return runOn(null);
     }
 
     @NotNull
@@ -615,8 +681,11 @@ class DefaultStreamOutputChannel<OUT>
     public <AFTER> StreamOutputChannel<AFTER> syncMap(
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
 
-        return syncMap(
-                JRoutine.on(factory).invocations().with(mConfiguration).set().buildRoutine());
+        return syncMap(JRoutine.on(factory)
+                               .withInvocations()
+                               .with(mConfiguration.builderFrom().with(mNextConfiguration).set())
+                               .set()
+                               .buildRoutine());
     }
 
     @NotNull
@@ -698,6 +767,13 @@ class DefaultStreamOutputChannel<OUT>
     }
 
     @NotNull
+    public Builder<? extends StreamOutputChannel<OUT>> withNextInvocations() {
+
+        // TODO: 31/12/15  withStreamInvocations: invert with mConfiguration
+        return new Builder<StreamOutputChannel<OUT>>(mNextConfigurable, mNextConfiguration);
+    }
+
+    @NotNull
     public List<OUT> all() {
 
         return mChannel.all();
@@ -736,12 +812,6 @@ class DefaultStreamOutputChannel<OUT>
         return mChannel.passTo(channel);
     }
 
-    @NotNull
-    public Builder<? extends StreamOutputChannel<OUT>> invocations() {
-
-        return new Builder<StreamOutputChannel<OUT>>(this, mConfiguration);
-    }
-
     public Iterator<OUT> iterator() {
 
         return mChannel.iterator();
@@ -753,17 +823,9 @@ class DefaultStreamOutputChannel<OUT>
     }
 
     @NotNull
-    @SuppressWarnings("ConstantConditions")
-    public StreamOutputChannel<OUT> setConfiguration(
-            @NotNull final InvocationConfiguration configuration) {
+    public Builder<? extends StreamOutputChannel<OUT>> withInvocations() {
 
-        if (configuration == null) {
-
-            throw new NullPointerException("the invocation configuration must not be null");
-        }
-
-        mConfiguration = configuration;
-        return this;
+        return new Builder<StreamOutputChannel<OUT>>(this, mConfiguration);
     }
 
     @NotNull
@@ -1185,5 +1247,19 @@ class DefaultStreamOutputChannel<OUT>
 
             mOutputChannel.pass(output);
         }
+    }
+
+    @NotNull
+    @SuppressWarnings("ConstantConditions")
+    public StreamOutputChannel<OUT> setConfiguration(
+            @NotNull final InvocationConfiguration configuration) {
+
+        if (configuration == null) {
+
+            throw new NullPointerException("the invocation configuration must not be null");
+        }
+
+        mConfiguration = configuration;
+        return this;
     }
 }

@@ -36,7 +36,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.util.TimeDuration.ZERO;
@@ -242,6 +244,8 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         return this;
     }
 
+    private final Set<Thread> mBindingThreads = Collections.synchronizedSet(new HashSet<Thread>());
+
     @NotNull
     public InvocationChannel<IN, OUT> pass(@Nullable final OutputChannel<? extends IN> channel) {
 
@@ -254,7 +258,15 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
         if ((consumer != null) && (channel != null)) {
 
-            channel.passTo(consumer);
+            try {
+
+                mBindingThreads.add(Thread.currentThread());
+                channel.passTo(consumer);
+
+            } finally {
+
+                mBindingThreads.remove(Thread.currentThread());
+            }
         }
 
         return this;
@@ -961,7 +973,9 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
             mSubLogger.dbg("consumer input [#%d+1]: %s [%s]", mInputCount, input, delay);
             ++mInputCount;
 
-            if (!mHasInputs.isTrue()) {
+            // Cannot wait on consumer...
+            // TODO: 31/12/15 fix this
+            if (!mBindingThreads.contains(Thread.currentThread()) && !mHasInputs.isTrue()) {
 
                 waitInputs(1);
 

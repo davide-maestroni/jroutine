@@ -66,12 +66,6 @@ class DefaultIOChannelBuilder implements IOChannelBuilder, Configurable<IOChanne
     }
 
     @NotNull
-    public Builder<? extends IOChannelBuilder> channels() {
-
-        return new Builder<IOChannelBuilder>(this, mConfiguration);
-    }
-
-    @NotNull
     @SuppressWarnings("ConstantConditions")
     public IOChannelBuilder setConfiguration(@NotNull final ChannelConfiguration configuration) {
 
@@ -82,5 +76,11 @@ class DefaultIOChannelBuilder implements IOChannelBuilder, Configurable<IOChanne
 
         mConfiguration = configuration;
         return this;
+    }
+
+    @NotNull
+    public Builder<? extends IOChannelBuilder> withChannels() {
+
+        return new Builder<IOChannelBuilder>(this, mConfiguration);
     }
 }

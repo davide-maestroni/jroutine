@@ -36,5 +36,5 @@ public interface ConfigurableBuilder<TYPE> {
      * @return the invocation configuration builder.
      */
     @NotNull
-    Builder<? extends TYPE> invocations();
+    Builder<? extends TYPE> withInvocations();
 }

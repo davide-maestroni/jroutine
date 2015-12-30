@@ -190,10 +190,11 @@
 
             public static void main(final String[] args) {
 
-                final ObjectRoutineBuilder builder = JRoutine.on(classOfType(Main.class)).proxies()
+                final ObjectRoutineBuilder builder = JRoutine.on(classOfType(Main.class))
+                                                             .withProxies()
                                                              .withSharedFields()
                                                              .set()
-                                                             .invocations()
+                                                             .withInvocations()
                                                              .withReadTimeout(seconds(3))
                                                              .set();
                 final Routine&lt;String, Integer&gt; parseRoutine = builder.aliasMethod(PARSE);
@@ -250,10 +251,10 @@
 
                 final Main main = new Main();
                 final AsyncMain proxy = JRoutine.on(instance(main))
-                                                .proxies()
+                                                .withProxies()
                                                 .withSharedFields()
                                                 .set()
-                                                .invocations()
+                                                .withInvocations()
                                                 .withReadTimeout(seconds(3))
                                                 .set()
                                                 .buildProxy(AsyncMain.class);

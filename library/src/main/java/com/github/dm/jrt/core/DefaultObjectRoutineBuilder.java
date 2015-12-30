@@ -137,20 +137,6 @@ class DefaultObjectRoutineBuilder
     }
 
     @NotNull
-    public InvocationConfiguration.Builder<? extends ObjectRoutineBuilder> invocations() {
-
-        final InvocationConfiguration configuration = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<ObjectRoutineBuilder>(this, configuration);
-    }
-
-    @NotNull
-    public ProxyConfiguration.Builder<? extends ObjectRoutineBuilder> proxies() {
-
-        final ProxyConfiguration configuration = mProxyConfiguration;
-        return new ProxyConfiguration.Builder<ObjectRoutineBuilder>(this, configuration);
-    }
-
-    @NotNull
     @SuppressWarnings("ConstantConditions")
     public ObjectRoutineBuilder setConfiguration(@NotNull final ProxyConfiguration configuration) {
 
@@ -175,6 +161,20 @@ class DefaultObjectRoutineBuilder
 
         mInvocationConfiguration = configuration;
         return this;
+    }
+
+    @NotNull
+    public InvocationConfiguration.Builder<? extends ObjectRoutineBuilder> withInvocations() {
+
+        final InvocationConfiguration configuration = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<ObjectRoutineBuilder>(this, configuration);
+    }
+
+    @NotNull
+    public ProxyConfiguration.Builder<? extends ObjectRoutineBuilder> withProxies() {
+
+        final ProxyConfiguration configuration = mProxyConfiguration;
+        return new ProxyConfiguration.Builder<ObjectRoutineBuilder>(this, configuration);
     }
 
     @NotNull

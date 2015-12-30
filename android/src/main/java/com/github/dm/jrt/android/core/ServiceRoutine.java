@@ -118,7 +118,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
         final ContextInvocationFactory<IN, OUT> factory =
                 factoryOf(invocationClass, target.getFactoryArgs());
         mRoutine = JRoutine.on(fromFactory(serviceContext.getApplicationContext(), factory))
-                           .invocations()
+                           .withInvocations()
                            .with(invocationConfiguration)
                            .set()
                            .buildRoutine();
@@ -224,7 +224,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
                     invocationConfiguration.getInputMaxSizeOr(ChannelConfiguration.DEFAULT);
             final TimeDuration inputTimeout = invocationConfiguration.getInputTimeoutOr(null);
             mInput = JRoutine.io()
-                             .channels()
+                             .withChannels()
                              .withChannelOrder(inputOrderType)
                              .withChannelMaxSize(inputMaxSize)
                              .withChannelTimeout(inputTimeout)
@@ -239,7 +239,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
             final TimeoutActionType timeoutActionType =
                     invocationConfiguration.getReadTimeoutActionOr(null);
             mOutput = JRoutine.io()
-                              .channels()
+                              .withChannels()
                               .withChannelMaxSize(outputMaxSize)
                               .withChannelTimeout(outputTimeout)
                               .withReadTimeout(executionTimeout)

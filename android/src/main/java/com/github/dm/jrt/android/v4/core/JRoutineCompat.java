@@ -229,7 +229,7 @@ public class JRoutineCompat extends JRoutine {
         @NotNull
         public LoaderChannelBuilder onId(final int loaderId) {
 
-            return new DefaultLoaderChannelBuilder(mContext).loaders().withId(loaderId).set();
+            return new DefaultLoaderChannelBuilder(mContext).withLoaders().withId(loaderId).set();
         }
     }
 }

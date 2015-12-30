@@ -79,7 +79,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
 
         final TestStatic testStatic = JRoutineProxyCompat.with(loaderFrom(getActivity()))
                                                          .on(classOfType(TestClass.class))
-                                                         .invocations()
+                                                         .withInvocations()
                                                          .withRunner(Runners.poolRunner())
                                                          .withLogLevel(Level.DEBUG)
                                                          .withLog(new NullLog())
@@ -104,7 +104,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
         final LoaderProxyRoutineBuilder builder =
                 JRoutineProxyCompat.with(loaderFrom(getActivity()))
                                    .on(instanceOf(TestList.class))
-                                   .invocations()
+                                   .withInvocations()
                                    .withReadTimeout(seconds(10))
                                    .set();
 
@@ -169,7 +169,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
 
         final TestStatic testStatic = JRoutineProxyCompat.with(loaderFrom(getActivity()))
                                                          .on(instanceOf(TestClass.class))
-                                                         .invocations()
+                                                         .withInvocations()
                                                          .withRunner(Runners.poolRunner())
                                                          .withLogLevel(Level.DEBUG)
                                                          .withLog(new NullLog())
@@ -186,7 +186,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
         final Runner runner = Runners.poolRunner();
         final TestProxy testProxy = JRoutineProxyCompat.with(loaderFrom(getActivity()))
                                                        .on(instanceOf(TestClass.class))
-                                                       .invocations()
+                                                       .withInvocations()
                                                        .withRunner(runner)
                                                        .withLogLevel(Level.DEBUG)
                                                        .withLog(log)
@@ -218,7 +218,8 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
         final LoaderProxyObjectBuilder<TestProxy> builder =
                 com.github.dm.jrt.android.proxy.LoaderProxyCompat_TestActivity.with(
                         loaderFrom(getActivity())).on(instanceOf(TestClass.class));
-        final TestProxy testProxy = builder.invocations().with(configuration).set().buildProxy();
+        final TestProxy testProxy =
+                builder.withInvocations().with(configuration).set().buildProxy();
 
         assertThat(testProxy.getOne().next()).isEqualTo(1);
         assertThat(testProxy.getStringParallel1(JRoutineCompat.io().of(1, 2, 3))).isIn("1", "2",
@@ -236,7 +237,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
 
         assertThat(JRoutineProxyCompat.with(loaderFrom(getActivity()))
                                       .on(instanceOf(TestClass.class))
-                                      .invocations()
+                                      .withInvocations()
                                       .with(configuration)
                                       .set()
                                       .buildProxy(ClassToken.tokenOf(TestProxy.class))).isSameAs(
@@ -251,7 +252,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
                 builder().withRunner(runner).withLogLevel(Level.DEBUG).withLog(log).set();
         final TestProxy testProxy = JRoutineProxyCompat.with(loaderFrom(getActivity()))
                                                        .on(instanceOf(TestClass.class))
-                                                       .invocations()
+                                                       .withInvocations()
                                                        .with(configuration)
                                                        .set()
                                                        .buildProxy(
@@ -259,7 +260,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
 
         assertThat(JRoutineProxyCompat.with(loaderFrom(getActivity()))
                                       .on(instanceOf(TestClass.class))
-                                      .invocations()
+                                      .withInvocations()
                                       .with(configuration)
                                       .set()
                                       .buildProxy(ClassToken.tokenOf(TestProxy.class))).isSameAs(
@@ -298,18 +299,18 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
         final LoaderProxyRoutineBuilder builder =
                 JRoutineProxyCompat.with(loaderFrom(getActivity()))
                                    .on(instanceOf(TestClass2.class))
-                                   .invocations()
+                                   .withInvocations()
                                    .withReadTimeout(seconds(10))
                                    .set();
 
         long startTime = System.currentTimeMillis();
 
-        OutputChannel<Integer> getOne = builder.proxies()
+        OutputChannel<Integer> getOne = builder.withProxies()
                                                .withSharedFields("1")
                                                .set()
                                                .buildProxy(TestClassAsync.class)
                                                .getOne();
-        OutputChannel<Integer> getTwo = builder.proxies()
+        OutputChannel<Integer> getTwo = builder.withProxies()
                                                .withSharedFields("2")
                                                .set()
                                                .buildProxy(TestClassAsync.class)
@@ -335,7 +336,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
 
         final Itf itf = JRoutineProxyCompat.with(loaderFrom(getActivity()))
                                            .on(instanceOf(Impl.class))
-                                           .invocations()
+                                           .withInvocations()
                                            .withReadTimeout(seconds(10))
                                            .set()
                                            .buildProxy(Itf.class);
@@ -551,7 +552,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
 
         assertThat(JRoutineProxyCompat.with(loaderFrom(getActivity()))
                                       .on(instanceOf(TestTimeout.class))
-                                      .invocations()
+                                      .withInvocations()
                                       .withReadTimeout(seconds(10))
                                       .set()
                                       .buildProxy(TestTimeoutItf.class)
@@ -561,7 +562,7 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
 
             JRoutineProxyCompat.with(loaderFrom(getActivity()))
                                .on(instanceOf(TestTimeout.class))
-                               .invocations()
+                               .withInvocations()
                                .withReadTimeoutAction(TimeoutActionType.THROW)
                                .set()
                                .buildProxy(TestTimeoutItf.class)

@@ -516,7 +516,9 @@ public final class InvocationConfiguration {
         /**
          * Order by delay.<br/>
          * Data are passed to the invocation or the output consumer in the same order as they are
-         * delivered based on their delay.
+         * passed to the channel based on their delay.<br/>
+         * Note that, if an output channel is passed to the channel with a 0 delay, all its outputs
+         * will be delivered before any other.
          */
         BY_DELAY,
         /**
@@ -725,8 +727,8 @@ public final class InvocationConfiguration {
 
         /**
          * Applies the specified configuration to this builder. A null value means that all the
-         * configuration options need to be set to their default value, otherwise only the set
-         * options will be applied.
+         * configuration options will be reset to their default, otherwise only the set options will
+         * be applied.
          *
          * @param configuration the invocation configuration.
          * @return this builder.

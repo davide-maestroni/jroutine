@@ -777,7 +777,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
             final InvocationLoader<?, OUT> internalLoader = mLoader;
             final ArrayList<IOChannel<OUT>> channels = mNewChannels;
             final IOChannel<OUT> channel = JRoutine.io()
-                                                   .channels()
+                                                   .withChannels()
                                                    .withChannelMaxSize(Integer.MAX_VALUE)
                                                    .withChannelTimeout(TimeDuration.ZERO)
                                                    .withLog(logger.getLog())
@@ -791,7 +791,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
             if ((looper != null) && (looper != Looper.getMainLooper())) {
 
                 return JRoutine.on(PassingInvocation.<OUT>factoryOf())
-                               .invocations()
+                               .withInvocations()
                                .withRunner(Runners.looperRunner(looper))
                                .withInputMaxSize(Integer.MAX_VALUE)
                                .withInputTimeout(TimeDuration.ZERO)

@@ -55,12 +55,6 @@ public abstract class TemplateRoutineBuilder<IN, OUT> extends TemplateRoutine<IN
     }
 
     @NotNull
-    public Builder<? extends RoutineBuilder<IN, OUT>> invocations() {
-
-        return new Builder<RoutineBuilder<IN, OUT>>(this, mConfiguration);
-    }
-
-    @NotNull
     @SuppressWarnings("ConstantConditions")
     public RoutineBuilder<IN, OUT> setConfiguration(
             @NotNull final InvocationConfiguration configuration) {
@@ -72,6 +66,12 @@ public abstract class TemplateRoutineBuilder<IN, OUT> extends TemplateRoutine<IN
 
         mConfiguration = configuration;
         return this;
+    }
+
+    @NotNull
+    public Builder<? extends RoutineBuilder<IN, OUT>> withInvocations() {
+
+        return new Builder<RoutineBuilder<IN, OUT>>(this, mConfiguration);
     }
 
     /**

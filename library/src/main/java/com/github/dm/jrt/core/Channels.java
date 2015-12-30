@@ -263,8 +263,11 @@ public class Channels {
             throw new IllegalArgumentException("the list of channels must not be empty");
         }
 
-        final IOChannel<OUT> ioChannel =
-                JRoutine.io().channels().withChannelOrder(OrderType.BY_CALL).set().buildChannel();
+        final IOChannel<OUT> ioChannel = JRoutine.io()
+                                                 .withChannels()
+                                                 .withChannelOrder(OrderType.BY_CALL)
+                                                 .set()
+                                                 .buildChannel();
 
         for (final OutputChannel<? extends OUT> channel : channels) {
 
@@ -295,8 +298,11 @@ public class Channels {
             throw new IllegalArgumentException("the array of channels must not be empty");
         }
 
-        final IOChannel<Object> ioChannel =
-                JRoutine.io().channels().withChannelOrder(OrderType.BY_CALL).set().buildChannel();
+        final IOChannel<Object> ioChannel = JRoutine.io()
+                                                    .withChannels()
+                                                    .withChannelOrder(OrderType.BY_CALL)
+                                                    .set()
+                                                    .buildChannel();
 
         for (final OutputChannel<?> channel : channels) {
 

@@ -857,7 +857,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     public void testMap() {
 
         final IOChannelBuilder builder =
-                JRoutine.io().channels().withChannelOrder(OrderType.BY_CALL).set();
+                JRoutine.io().withChannels().withChannelOrder(OrderType.BY_CALL).set();
         final IOChannel<String> channel1 = builder.buildChannel();
         final IOChannel<Integer> channel2 = builder.buildChannel();
 
@@ -866,7 +866,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         final OutputChannel<ParcelableSelectable<Object>> output =
                 JRoutine.with(serviceFrom(getActivity()))
                         .on(factoryOf(Sort.class))
-                        .invocations()
+                        .withInvocations()
                         .withInputOrder(OrderType.BY_CALL)
                         .set()
                         .asyncCall(channel);
@@ -895,7 +895,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     public void testMerge() {
 
         final IOChannelBuilder builder =
-                JRoutine.io().channels().withChannelOrder(OrderType.BY_CALL).set();
+                JRoutine.io().withChannels().withChannelOrder(OrderType.BY_CALL).set();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
         OutputChannel<? extends ParcelableSelectable<?>> outputChannel;
@@ -937,7 +937,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     public void testMerge4() {
 
         final IOChannelBuilder builder =
-                JRoutine.io().channels().withChannelOrder(OrderType.BY_CALL).set();
+                JRoutine.io().withChannels().withChannelOrder(OrderType.BY_CALL).set();
         final IOChannel<String> channel1 = builder.buildChannel();
         final IOChannel<String> channel2 = builder.buildChannel();
         final IOChannel<String> channel3 = builder.buildChannel();
@@ -969,7 +969,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     public void testMergeAbort() {
 
         final IOChannelBuilder builder =
-                JRoutine.io().channels().withChannelOrder(OrderType.BY_CALL).set();
+                JRoutine.io().withChannels().withChannelOrder(OrderType.BY_CALL).set();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
         OutputChannel<? extends ParcelableSelectable<?>> outputChannel;

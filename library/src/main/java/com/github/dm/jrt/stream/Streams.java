@@ -388,6 +388,8 @@ public class Streams extends Channels {
 
     /**
      * Builds and returns a new stream output channel generating the specified outputs.
+     * <p/>
+     * Note that the output channel will be bound as a result of the call.
      *
      * @param output the output channel returning the output data.
      * @param <OUT>  the output data type.

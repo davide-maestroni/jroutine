@@ -118,23 +118,16 @@ class DefaultLoaderChannelBuilder
             logger.wrn("the specified results stale time will be ignored: %s", resultStaleTime);
         }
 
-        return builder.invocations()
+        return builder.withInvocations()
                       .with(invocationConfiguration)
                       .set()
-                      .loaders()
+                      .withLoaders()
                       .with(loaderConfiguration)
                       .withClashResolution(ClashResolutionType.JOIN)
                       .withInputClashResolution(ClashResolutionType.JOIN)
                       .withResultStaleTime(TimeDuration.INFINITY)
                       .set()
                       .asyncCall();
-    }
-
-    @NotNull
-    public LoaderConfiguration.Builder<? extends LoaderChannelBuilder> loaders() {
-
-        final LoaderConfiguration config = mLoaderConfiguration;
-        return new LoaderConfiguration.Builder<LoaderChannelBuilder>(this, config);
     }
 
     public void purge(@Nullable final Iterable<?> inputs) {
@@ -215,10 +208,10 @@ class DefaultLoaderChannelBuilder
     }
 
     @NotNull
-    public ChannelConfiguration.Builder<? extends LoaderChannelBuilder> channels() {
+    public LoaderConfiguration.Builder<? extends LoaderChannelBuilder> withLoaders() {
 
-        final ChannelConfiguration config = mChannelConfiguration;
-        return new ChannelConfiguration.Builder<LoaderChannelBuilder>(this, config);
+        final LoaderConfiguration config = mLoaderConfiguration;
+        return new LoaderConfiguration.Builder<LoaderChannelBuilder>(this, config);
     }
 
     @NotNull
@@ -246,6 +239,13 @@ class DefaultLoaderChannelBuilder
 
         mChannelConfiguration = configuration;
         return this;
+    }
+
+    @NotNull
+    public ChannelConfiguration.Builder<? extends LoaderChannelBuilder> withChannels() {
+
+        final ChannelConfiguration config = mChannelConfiguration;
+        return new ChannelConfiguration.Builder<LoaderChannelBuilder>(this, config);
     }
 
     /**

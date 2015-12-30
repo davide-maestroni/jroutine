@@ -96,13 +96,13 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
 
         final TargetServiceProxyObjectBuilder<TYPE> builder =
                 new TargetServiceProxyObjectBuilder<TYPE>(mContext, mTarget, itf);
-        return builder.invocations()
+        return builder.withInvocations()
                       .with(mInvocationConfiguration)
                       .set()
-                      .proxies()
+                      .withProxies()
                       .with(mProxyConfiguration)
                       .set()
-                      .service()
+                      .withService()
                       .with(mServiceConfiguration)
                       .set()
                       .buildProxy();
@@ -115,24 +115,17 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
     }
 
     @NotNull
-    public InvocationConfiguration.Builder<? extends ServiceProxyRoutineBuilder> invocations() {
+    public InvocationConfiguration.Builder<? extends ServiceProxyRoutineBuilder> withInvocations() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ServiceProxyRoutineBuilder>(this, config);
     }
 
     @NotNull
-    public ProxyConfiguration.Builder<? extends ServiceProxyRoutineBuilder> proxies() {
+    public ProxyConfiguration.Builder<? extends ServiceProxyRoutineBuilder> withProxies() {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<ServiceProxyRoutineBuilder>(this, config);
-    }
-
-    @NotNull
-    public ServiceConfiguration.Builder<? extends ServiceProxyRoutineBuilder> service() {
-
-        final ServiceConfiguration config = mServiceConfiguration;
-        return new ServiceConfiguration.Builder<ServiceProxyRoutineBuilder>(this, config);
     }
 
     @NotNull
@@ -175,6 +168,13 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
 
         mServiceConfiguration = configuration;
         return this;
+    }
+
+    @NotNull
+    public ServiceConfiguration.Builder<? extends ServiceProxyRoutineBuilder> withService() {
+
+        final ServiceConfiguration config = mServiceConfiguration;
+        return new ServiceConfiguration.Builder<ServiceProxyRoutineBuilder>(this, config);
     }
 
     /**

@@ -36,5 +36,5 @@ public interface ServiceConfigurableBuilder<TYPE> {
      * @return the service configuration builder.
      */
     @NotNull
-    Builder<? extends TYPE> service();
+    Builder<? extends TYPE> withService();
 }

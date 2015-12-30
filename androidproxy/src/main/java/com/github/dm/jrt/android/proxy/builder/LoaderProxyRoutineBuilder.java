@@ -92,11 +92,11 @@ public interface LoaderProxyRoutineBuilder
      * @return the invocation configuration builder.
      */
     @NotNull
-    InvocationConfiguration.Builder<? extends LoaderProxyRoutineBuilder> invocations();
+    InvocationConfiguration.Builder<? extends LoaderProxyRoutineBuilder> withInvocations();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    ProxyConfiguration.Builder<? extends LoaderProxyRoutineBuilder> proxies();
+    ProxyConfiguration.Builder<? extends LoaderProxyRoutineBuilder> withProxies();
 }

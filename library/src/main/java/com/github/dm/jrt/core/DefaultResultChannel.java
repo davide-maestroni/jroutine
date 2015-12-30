@@ -865,6 +865,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         try {
 
+            // TODO: 31/12/15 add !isBound condition
             if (!mOutputTimeout.waitTrue(mMutex, mHasOutputs)) {
 
                 mOutputCount -= count;

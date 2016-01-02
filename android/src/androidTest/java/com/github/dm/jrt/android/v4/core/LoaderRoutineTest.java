@@ -721,7 +721,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         final CountLog countLog = new CountLog();
         final Builder<ChannelConfiguration> builder = ChannelConfiguration.builder();
-        final ChannelConfiguration configuration = builder.withAsyncRunner(Runners.taskRunner())
+        final ChannelConfiguration configuration = builder.withRunner(Runners.taskRunner())
                                                           .withChannelMaxSize(3)
                                                           .withChannelTimeout(seconds(10))
                                                           .withLogLevel(Level.DEBUG)

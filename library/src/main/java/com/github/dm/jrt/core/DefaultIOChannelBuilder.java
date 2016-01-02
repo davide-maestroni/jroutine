@@ -18,6 +18,7 @@ import com.github.dm.jrt.builder.ChannelConfiguration.Builder;
 import com.github.dm.jrt.builder.ChannelConfiguration.Configurable;
 import com.github.dm.jrt.builder.IOChannelBuilder;
 import com.github.dm.jrt.channel.IOChannel;
+import com.github.dm.jrt.runner.Runners;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,24 +46,28 @@ class DefaultIOChannelBuilder implements IOChannelBuilder, Configurable<IOChanne
     }
 
     @NotNull
-    @SuppressWarnings("unchecked")
     public <DATA> IOChannel<DATA> of(@Nullable final DATA input) {
 
-        return (IOChannel<DATA>) buildChannel().pass(input).close();
+        return this.<DATA>syncChannel().pass(input).close();
     }
 
     @NotNull
-    @SuppressWarnings("unchecked")
     public <DATA> IOChannel<DATA> of(@Nullable final DATA... inputs) {
 
-        return (IOChannel<DATA>) buildChannel().pass(inputs).close();
+        return this.<DATA>syncChannel().pass(inputs).close();
     }
 
     @NotNull
-    @SuppressWarnings("unchecked")
     public <DATA> IOChannel<DATA> of(@Nullable final Iterable<DATA> inputs) {
 
-        return (IOChannel<DATA>) buildChannel().pass(inputs).close();
+        return this.<DATA>syncChannel().pass(inputs).close();
+    }
+
+    @NotNull
+    public <DATA> DefaultIOChannel<DATA> syncChannel() {
+
+        return new DefaultIOChannel<DATA>(
+                mConfiguration.builderFrom().withRunner(Runners.syncRunner()).set());
     }
 
     @NotNull

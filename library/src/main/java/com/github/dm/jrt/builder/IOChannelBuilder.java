@@ -19,7 +19,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Interface defining a builder of I/O channel objects.
+ * Interface defining a builder of I/O channel objects.<br/>
+ * Note that the passed inputs might be delivered though the configured runner.
  * <p/>
  * Created by davide-maestroni on 03/07/2015.
  */
@@ -35,7 +36,7 @@ public interface IOChannelBuilder extends ConfigurableChannelBuilder<IOChannelBu
     <DATA> IOChannel<DATA> buildChannel();
 
     /**
-     * Builds and returns the I/O channel instance returning the specified input.<br/>
+     * Builds and returns a synchronous I/O channel returning the specified input.<br/>
      * Note that the returned channel will be already closed.
      *
      * @param input  the input.
@@ -46,7 +47,7 @@ public interface IOChannelBuilder extends ConfigurableChannelBuilder<IOChannelBu
     <DATA> IOChannel<DATA> of(@Nullable DATA input);
 
     /**
-     * Builds and returns the I/O channel instance returning the specified inputs.<br/>
+     * Builds and returns a synchronous I/O channel returning the specified inputs.<br/>
      * Note that the returned channel will be already closed.
      *
      * @param inputs the input data.
@@ -57,7 +58,7 @@ public interface IOChannelBuilder extends ConfigurableChannelBuilder<IOChannelBu
     <DATA> IOChannel<DATA> of(@Nullable DATA... inputs);
 
     /**
-     * Builds and returns the I/O channel instance returning the specified inputs.<br/>
+     * Builds and returns a synchronous I/O channel returning the specified inputs.<br/>
      * Note that the returned channel will be already closed.
      *
      * @param inputs the iterable returning the input data.
@@ -66,4 +67,14 @@ public interface IOChannelBuilder extends ConfigurableChannelBuilder<IOChannelBu
      */
     @NotNull
     <DATA> IOChannel<DATA> of(@Nullable Iterable<DATA> inputs);
+
+    /**
+     * Builds and returns an I/O channel instance employing a synchronous runner by ignoring the
+     * configured instance.
+     *
+     * @param <DATA> the data type.
+     * @return the newly created channel.
+     */
+    @NotNull
+    <DATA> IOChannel<DATA> syncChannel();
 }

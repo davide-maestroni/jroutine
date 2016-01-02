@@ -2300,7 +2300,7 @@ public class ObjectRoutineTest {
 
         public boolean isExecutionThread() {
 
-            return false;
+            return true;
         }
 
         public void run(@NotNull final Execution execution, final long delay,

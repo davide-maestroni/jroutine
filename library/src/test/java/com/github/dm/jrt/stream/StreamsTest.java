@@ -59,11 +59,12 @@ public class StreamsTest {
 
         StreamOutputChannel<String> channel1 = Streams.streamOf("test1", "test2", "test3");
         StreamOutputChannel<String> channel2 = Streams.streamOf("test4", "test5", "test6");
-        assertThat(Streams.blend(channel2, channel1).all()).containsOnly("test1", "test2", "test3",
-                                                                         "test4", "test5", "test6");
+        assertThat(Streams.blend(channel2, channel1).afterMax(seconds(1)).all()).containsOnly(
+                "test1", "test2", "test3", "test4", "test5", "test6");
         channel1 = Streams.streamOf("test1", "test2", "test3");
         channel2 = Streams.streamOf("test4", "test5", "test6");
         assertThat(Streams.blend(Arrays.<StreamOutputChannel<?>>asList(channel1, channel2))
+                          .afterMax(seconds(1))
                           .all()).containsOnly("test1", "test2", "test3", "test4", "test5",
                                                "test6");
     }
@@ -179,12 +180,12 @@ public class StreamsTest {
 
         StreamOutputChannel<String> channel1 = Streams.streamOf("test1", "test2", "test3");
         StreamOutputChannel<String> channel2 = Streams.streamOf("test4", "test5", "test6");
-        assertThat(Streams.concat(channel2, channel1).all()).containsExactly("test4", "test5",
-                                                                             "test6", "test1",
-                                                                             "test2", "test3");
+        assertThat(Streams.concat(channel2, channel1).afterMax(seconds(1)).all()).containsExactly(
+                "test4", "test5", "test6", "test1", "test2", "test3");
         channel1 = Streams.streamOf("test1", "test2", "test3");
         channel2 = Streams.streamOf("test4", "test5", "test6");
         assertThat(Streams.concat(Arrays.<StreamOutputChannel<?>>asList(channel1, channel2))
+                          .afterMax(seconds(1))
                           .all()).containsExactly("test1", "test2", "test3", "test4", "test5",
                                                   "test6");
     }

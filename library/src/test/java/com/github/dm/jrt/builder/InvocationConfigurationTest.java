@@ -39,20 +39,6 @@ import static org.junit.Assert.fail;
 public class InvocationConfigurationTest {
 
     @Test
-    public void testAsyncRunnerEquals() {
-
-        final InvocationConfiguration configuration = builder().withPriority(11)
-                                                               .withInputOrder(OrderType.BY_CALL)
-                                                               .withRunner(Runners.syncRunner())
-                                                               .withLog(new NullLog())
-                                                               .withOutputMaxSize(100)
-                                                               .set();
-        assertThat(configuration).isNotEqualTo(builder().withRunner(Runners.sharedRunner()).set());
-        assertThat(configuration.builderFrom().withRunner(Runners.syncRunner()).set()).isNotEqualTo(
-                builder().withRunner(Runners.syncRunner()).set());
-    }
-
-    @Test
     public void testBuildFrom() {
 
         final InvocationConfiguration configuration = builder().withPriority(11)
@@ -408,5 +394,19 @@ public class InvocationConfigurationTest {
         assertThat(configuration).isNotEqualTo(builder().withPriority(3).set());
         assertThat(configuration.builderFrom().withPriority(17).set()).isNotEqualTo(
                 builder().withPriority(17).set());
+    }
+
+    @Test
+    public void testRunnerEquals() {
+
+        final InvocationConfiguration configuration = builder().withPriority(11)
+                                                               .withInputOrder(OrderType.BY_CALL)
+                                                               .withRunner(Runners.syncRunner())
+                                                               .withLog(new NullLog())
+                                                               .withOutputMaxSize(100)
+                                                               .set();
+        assertThat(configuration).isNotEqualTo(builder().withRunner(Runners.sharedRunner()).set());
+        assertThat(configuration.builderFrom().withRunner(Runners.syncRunner()).set()).isNotEqualTo(
+                builder().withRunner(Runners.syncRunner()).set());
     }
 }

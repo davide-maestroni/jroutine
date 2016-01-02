@@ -36,9 +36,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.util.TimeDuration.ZERO;
@@ -244,8 +242,6 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         return this;
     }
 
-    private final Set<Thread> mBindingThreads = Collections.synchronizedSet(new HashSet<Thread>());
-
     @NotNull
     public InvocationChannel<IN, OUT> pass(@Nullable final OutputChannel<? extends IN> channel) {
 
@@ -258,15 +254,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
         if ((consumer != null) && (channel != null)) {
 
-            try {
-
-                mBindingThreads.add(Thread.currentThread());
-                channel.passTo(consumer);
-
-            } finally {
-
-                mBindingThreads.remove(Thread.currentThread());
-            }
+            channel.passTo(consumer);
         }
 
         return this;
@@ -364,10 +352,13 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
     private void waitInputs(final int count) {
 
-        if (mInputTimeout.isZero()) {
+        final TimeDuration timeout = mInputTimeout;
+
+        if (timeout.isZero()) {
 
             mInputCount -= count;
-            throw new InputTimeoutException("timeout while waiting for room in the input channel");
+            throw new InputTimeoutException(
+                    "timeout while waiting for room in the input channel [" + timeout + "]");
         }
 
         if (mRunner.isExecutionThread()) {
@@ -380,11 +371,11 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
         try {
 
-            if (!mInputTimeout.waitTrue(mMutex, mHasInputs)) {
+            if (!timeout.waitTrue(mMutex, mHasInputs)) {
 
                 mInputCount -= count;
                 throw new InputTimeoutException(
-                        "timeout while waiting for room in the input channel");
+                        "timeout while waiting for room in the input channel [" + timeout + "]");
             }
 
         } catch (final InterruptedException e) {
@@ -973,9 +964,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
             mSubLogger.dbg("consumer input [#%d+1]: %s [%s]", mInputCount, input, delay);
             ++mInputCount;
 
-            // Cannot wait on consumer...
-            // TODO: 31/12/15 fix this
-            if (!mBindingThreads.contains(Thread.currentThread()) && !mHasInputs.isTrue()) {
+            if (!mHasInputs.isTrue()) {
 
                 waitInputs(1);
 
@@ -1094,13 +1083,6 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
             }
 
             final int size = list.size();
-
-            if (size > mMaxInput) {
-
-                throw new InputTimeoutException(
-                        "inputs exceed maximum channel size [" + size + "/" + mMaxInput + "]");
-            }
-
             final TimeDuration delay = mInputDelay;
             mSubLogger.dbg("passing iterable [#%d+%d]: %s [%s]", mInputCount, size, inputs, delay);
             mInputCount += size;
@@ -1196,13 +1178,6 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
             }
 
             final int size = inputs.length;
-
-            if (size > mMaxInput) {
-
-                throw new InputTimeoutException(
-                        "inputs exceed maximum channel size [" + size + "/" + mMaxInput + "]");
-            }
-
             final TimeDuration delay = mInputDelay;
             mSubLogger.dbg("passing array [#%d+%d]: %s [%s]", mInputCount, size, inputs, delay);
             mInputCount += size;

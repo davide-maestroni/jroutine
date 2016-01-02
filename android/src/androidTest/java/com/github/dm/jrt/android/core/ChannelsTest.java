@@ -588,9 +588,10 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         final IOChannel<ParcelableSelectable<String>> channel = JRoutine.io().buildChannel();
         Channels.selectParcelable(channel, 33).pass("test1", "test2", "test3").close();
         channel.close();
-        assertThat(channel.all()).containsExactly(new ParcelableSelectable<String>("test1", 33),
-                                                  new ParcelableSelectable<String>("test2", 33),
-                                                  new ParcelableSelectable<String>("test3", 33));
+        assertThat(channel.afterMax(seconds(10)).all()).containsExactly(
+                new ParcelableSelectable<String>("test1", 33),
+                new ParcelableSelectable<String>("test2", 33),
+                new ParcelableSelectable<String>("test3", 33));
     }
 
     public void testInputSelectAbort() {
@@ -1222,7 +1223,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
                      new ParcelableSelectable<String>("test3", 33),
                      new ParcelableSelectable<String>("test4", 333));
         channel.close();
-        assertThat(outputChannel.all()).containsExactly("test1", "test3");
+        assertThat(outputChannel.afterMax(seconds(10)).all()).containsExactly("test1", "test3");
     }
 
     public void testOutputSelectAbort() {

@@ -688,7 +688,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
                      new ParcelableSelectable<String>("test3", 33),
                      new ParcelableSelectable<String>("test4", 333));
         channel.close();
-        assertThat(outputChannel.all()).containsExactly("test1", "test3");
+        assertThat(outputChannel.afterMax(seconds(10)).all()).containsExactly("test1", "test3");
     }
 
     public void testOutputSelectAbort() {

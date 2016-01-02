@@ -27,6 +27,7 @@ import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.DeadlockException;
 import com.github.dm.jrt.channel.ExecutionTimeoutException;
 import com.github.dm.jrt.channel.IOChannel;
+import com.github.dm.jrt.channel.InputDeadlockException;
 import com.github.dm.jrt.channel.InputTimeoutException;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
@@ -1575,7 +1576,7 @@ public class RoutineTest {
                            .afterMax(seconds(1))
                            .all()).containsExactly("test1", "test2");
 
-        final IOChannel<Object> channel = JRoutine.io().buildChannel();
+        final IOChannel<Object> channel = JRoutine.io().syncChannel();
         channel.pass("test2").close();
         assertThat(JRoutine.on(PassingInvocation.factoryOf())
                            .withInvocations()
@@ -1592,6 +1593,36 @@ public class RoutineTest {
                            .result()
                            .afterMax(seconds(1))
                            .all()).containsExactly("test1", "test2");
+    }
+
+    @Test
+    public void testInputTimeoutIssue() {
+
+        try {
+
+            final IOChannel<Object> channel = JRoutine.io().buildChannel();
+            channel.pass("test2").close();
+            JRoutine.on(PassingInvocation.factoryOf())
+                    .withInvocations()
+                    .withInputOrder(OrderType.BY_CALL)
+                    .withInputMaxSize(1)
+                    .withInputTimeout(millis(1000))
+                    .set()
+                    .asyncInvoke()
+                    .orderByCall()
+                    .after(millis(100))
+                    .pass("test1")
+                    .now()
+                    .pass(channel)
+                    .result()
+                    .afterMax(seconds(10))
+                    .all();
+
+            fail();
+
+        } catch (final InputDeadlockException ignored) {
+
+        }
     }
 
     @Test
@@ -4107,7 +4138,7 @@ public class RoutineTest {
 
         public boolean isExecutionThread() {
 
-            return false;
+            return true;
         }
 
         public void run(@NotNull final Execution execution, final long delay,

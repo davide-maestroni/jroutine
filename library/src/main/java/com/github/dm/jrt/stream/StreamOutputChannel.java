@@ -897,7 +897,9 @@ public interface StreamOutputChannel<OUT>
 
     /**
      * Gets the invocation configuration builder related only to the next concatenated routine
-     * instance. Any further addition to the chain will retain only the base configuration.
+     * instance. Any further addition to the chain will retain only the stream configuration.<br/>
+     * Only the options set in this configuration (that is, the ones with a value different from the
+     * default) will override the stream one.
      * <p/>
      * Note that the configuration builder will be initialized with the current configuration for
      * the next routine.
@@ -905,5 +907,18 @@ public interface StreamOutputChannel<OUT>
      * @return the invocation configuration builder.
      */
     @NotNull
-    Builder<? extends StreamOutputChannel<OUT>> withNextInvocations();
+    Builder<? extends StreamOutputChannel<OUT>> withInvocations();
+
+    /**
+     * Gets the invocation configuration builder related to the whole stream.<br/>
+     * The configuration options will be applied to all the next concatenated routine unless
+     * overwritten by specific ones.
+     * <p/>
+     * Note that the configuration builder will be initialized with the current stream
+     * configuration.
+     *
+     * @return the invocation configuration builder.
+     */
+    @NotNull
+    Builder<? extends StreamOutputChannel<OUT>> withStreamInvocations();
 }

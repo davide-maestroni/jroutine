@@ -344,7 +344,7 @@ public class Streams extends Channels {
     @NotNull
     public static <OUT> StreamOutputChannel<OUT> streamOf() {
 
-        return streamOf(JRoutine.io().<OUT>buildChannel().close());
+        return streamOf(JRoutine.io().<OUT>syncChannel().close());
     }
 
     /**

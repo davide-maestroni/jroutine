@@ -105,7 +105,7 @@ public class IOChannelTest {
     public void testAllIntoTimeout() {
 
         final IOChannel<String> ioChannel = JRoutine.io().buildChannel();
-        ioChannel.after(TimeDuration.seconds(3)).pass("test").close();
+        ioChannel.after(seconds(3)).pass("test").close();
 
         assertThat(ioChannel.immediately().eventuallyExit().all()).isEmpty();
 
@@ -128,11 +128,11 @@ public class IOChannelTest {
     public void testAllIntoTimeout2() {
 
         final IOChannel<String> ioChannel = JRoutine.io().buildChannel();
-        ioChannel.after(TimeDuration.seconds(3)).pass("test").close();
+        ioChannel.after(seconds(3)).pass("test").close();
 
         assertThat(ioChannel.immediately().eventuallyExit().all()).isEmpty();
 
-        ioChannel.eventuallyThrow().afterMax(TimeDuration.millis(10));
+        ioChannel.eventuallyThrow().afterMax(millis(10));
 
         try {
 
@@ -151,7 +151,7 @@ public class IOChannelTest {
     public void testAllTimeout() {
 
         final IOChannel<String> ioChannel = JRoutine.io().buildChannel();
-        ioChannel.after(TimeDuration.seconds(3)).pass("test").close();
+        ioChannel.after(seconds(3)).pass("test").close();
 
         assertThat(ioChannel.immediately().eventuallyExit().all()).isEmpty();
 
@@ -174,11 +174,11 @@ public class IOChannelTest {
     public void testAllTimeout2() {
 
         final IOChannel<String> ioChannel = JRoutine.io().buildChannel();
-        ioChannel.after(TimeDuration.seconds(3)).pass("test").close();
+        ioChannel.after(seconds(3)).pass("test").close();
 
         assertThat(ioChannel.immediately().eventuallyExit().all()).isEmpty();
 
-        ioChannel.eventuallyThrow().afterMax(TimeDuration.millis(10));
+        ioChannel.eventuallyThrow().afterMax(millis(10));
 
         try {
 
@@ -239,7 +239,7 @@ public class IOChannelTest {
             public void run() {
 
                 ioChannel1.after(1, TimeUnit.MILLISECONDS)
-                          .after(TimeDuration.millis(200))
+                          .after(millis(200))
                           .pass("test1", "test2")
                           .pass(Collections.singleton("test3"))
                           .close();
@@ -273,7 +273,7 @@ public class IOChannelTest {
         final IOChannel<Object> ioChannel = JRoutine.io().buildChannel();
         assertThat(ioChannel.isEmpty()).isTrue();
         assertThat(ioChannel.pass("test").isEmpty()).isFalse();
-        ioChannel.next();
+        ioChannel.afterMax(seconds(1)).next();
         assertThat(ioChannel.isEmpty()).isTrue();
         assertThat(ioChannel.after(millis(100)).pass("test").isEmpty()).isTrue();
         assertThat(ioChannel.close().afterMax(seconds(10)).checkComplete()).isTrue();
@@ -294,7 +294,7 @@ public class IOChannelTest {
     public void testHasNextIteratorTimeout() {
 
         final IOChannel<String> ioChannel = JRoutine.io().buildChannel();
-        ioChannel.after(TimeDuration.seconds(3)).pass("test").close();
+        ioChannel.after(seconds(3)).pass("test").close();
 
         assertThat(ioChannel.immediately().eventuallyExit().all()).isEmpty();
 
@@ -317,11 +317,11 @@ public class IOChannelTest {
     public void testHasNextIteratorTimeout2() {
 
         final IOChannel<String> ioChannel = JRoutine.io().buildChannel();
-        ioChannel.after(TimeDuration.seconds(3)).pass("test").close();
+        ioChannel.after(seconds(3)).pass("test").close();
 
         assertThat(ioChannel.immediately().eventuallyExit().all()).isEmpty();
 
-        ioChannel.eventuallyThrow().afterMax(TimeDuration.millis(10));
+        ioChannel.eventuallyThrow().afterMax(millis(10));
 
         try {
 
@@ -408,7 +408,7 @@ public class IOChannelTest {
     public void testNextIteratorTimeout() {
 
         final IOChannel<String> ioChannel = JRoutine.io().buildChannel();
-        ioChannel.after(TimeDuration.seconds(3)).pass("test").close();
+        ioChannel.after(seconds(3)).pass("test").close();
 
         assertThat(ioChannel.immediately().eventuallyExit().all()).isEmpty();
 
@@ -431,11 +431,11 @@ public class IOChannelTest {
     public void testNextIteratorTimeout2() {
 
         final IOChannel<String> ioChannel = JRoutine.io().buildChannel();
-        ioChannel.after(TimeDuration.seconds(3)).pass("test").close();
+        ioChannel.after(seconds(3)).pass("test").close();
 
         assertThat(ioChannel.immediately().eventuallyExit().all()).isEmpty();
 
-        ioChannel.eventuallyThrow().afterMax(TimeDuration.millis(10));
+        ioChannel.eventuallyThrow().afterMax(millis(10));
 
         try {
 
@@ -454,7 +454,7 @@ public class IOChannelTest {
     public void testNextTimeout() {
 
         final IOChannel<String> ioChannel = JRoutine.io().buildChannel();
-        ioChannel.after(TimeDuration.seconds(3)).pass("test").close();
+        ioChannel.after(seconds(3)).pass("test").close();
 
         assertThat(ioChannel.immediately().eventuallyExit().all()).isEmpty();
 
@@ -477,11 +477,11 @@ public class IOChannelTest {
     public void testNextTimeout2() {
 
         final IOChannel<String> ioChannel = JRoutine.io().buildChannel();
-        ioChannel.after(TimeDuration.seconds(3)).pass("test").close();
+        ioChannel.after(seconds(3)).pass("test").close();
 
         assertThat(ioChannel.immediately().eventuallyExit().all()).isEmpty();
 
-        ioChannel.eventuallyThrow().afterMax(TimeDuration.millis(10));
+        ioChannel.eventuallyThrow().afterMax(millis(10));
 
         try {
 
@@ -501,9 +501,12 @@ public class IOChannelTest {
 
         final IOChannel<Integer> channel = JRoutine.io().of(2);
         assertThat(channel.isOpen()).isFalse();
-        assertThat(channel.all()).containsExactly(2);
-        assertThat(JRoutine.io().of(-11, 73).all()).containsExactly(-11, 73);
-        assertThat(JRoutine.io().of(Arrays.asList(3, 12, -7)).all()).containsExactly(3, 12, -7);
+        assertThat(channel.afterMax(seconds(1)).all()).containsExactly(2);
+        assertThat(JRoutine.io().of(-11, 73).afterMax(seconds(1)).all()).containsExactly(-11, 73);
+        assertThat(JRoutine.io()
+                           .of(Arrays.asList(3, 12, -7))
+                           .afterMax(seconds(1))
+                           .all()).containsExactly(3, 12, -7);
     }
 
     @Test
@@ -513,7 +516,7 @@ public class IOChannelTest {
         final IOChannel<Object> channel = JRoutine.io()
                                                   .withChannels()
                                                   .withChannelOrder(OrderType.BY_CALL)
-                                                  .withAsyncRunner(Runners.sharedRunner())
+                                                  .withRunner(Runners.sharedRunner())
                                                   .withChannelMaxSize(1)
                                                   .withChannelTimeout(1, TimeUnit.MILLISECONDS)
                                                   .withChannelTimeout(seconds(1))
@@ -525,12 +528,12 @@ public class IOChannelTest {
         assertThat(channel.afterMax(timeout).next()).isEqualTo(-77L);
 
         final IOChannel<Object> ioChannel1 = JRoutine.io().buildChannel();
-        ioChannel1.after(TimeDuration.millis(200)).pass(23).now().pass(-77L).close();
+        ioChannel1.after(millis(200)).pass(23).now().pass(-77L).close();
         assertThat(ioChannel1.afterMax(timeout).all()).containsOnly(23, -77L);
 
         final IOChannel<Object> ioChannel2 = JRoutine.io().buildChannel();
         ioChannel2.orderByChance().orderByDelay().orderByCall();
-        ioChannel2.after(TimeDuration.millis(200)).pass(23).now().pass(-77L).close();
+        ioChannel2.after(millis(200)).pass(23).now().pass(-77L).close();
         assertThat(ioChannel2.afterMax(timeout).all()).containsExactly(23, -77L);
     }
 
@@ -554,14 +557,14 @@ public class IOChannelTest {
                 JRoutine.on(PassingInvocation.<String>factoryOf())
                         .asyncCall(ioChannel)
                         .eventuallyExit();
-        assertThat(outputChannel.afterMax(TimeDuration.millis(500)).all()).containsExactly("test");
+        assertThat(outputChannel.afterMax(millis(500)).all()).containsExactly("test");
 
         assertThat(System.currentTimeMillis() - startTime).isLessThan(2000);
 
         assertThat(outputChannel.immediately().checkComplete()).isFalse();
         ioChannel.close();
         assertThat(ioChannel.isOpen()).isFalse();
-        assertThat(outputChannel.afterMax(TimeDuration.millis(500)).checkComplete()).isTrue();
+        assertThat(outputChannel.afterMax(millis(500)).checkComplete()).isTrue();
     }
 
     @Test

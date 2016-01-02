@@ -780,6 +780,7 @@ public final class InvocationConfiguration {
          * @return this builder.
          * @throws java.lang.IllegalArgumentException if the number is less than 1.
          */
+        // TODO: 31/12/15 explain use: back pressure
         @NotNull
         public Builder<TYPE> withInputMaxSize(final int inputMaxSize) {
 
@@ -817,6 +818,7 @@ public final class InvocationConfiguration {
          * @return this builder.
          * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
          */
+        // TODO: 31/12/15 used in conjunction with max size
         @NotNull
         public Builder<TYPE> withInputTimeout(final long timeout,
                 @NotNull final TimeUnit timeUnit) {
@@ -898,6 +900,7 @@ public final class InvocationConfiguration {
          * @return this builder.
          * @throws java.lang.IllegalArgumentException if the number is less than 1.
          */
+        // TODO: 31/12/15 explain use: consumer
         @NotNull
         public Builder<TYPE> withOutputMaxSize(final int outputMaxSize) {
 
@@ -935,6 +938,7 @@ public final class InvocationConfiguration {
          * @return this builder.
          * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
          */
+        // TODO: 31/12/15 used in conjunction with max size
         @NotNull
         public Builder<TYPE> withOutputTimeout(final long timeout,
                 @NotNull final TimeUnit timeUnit) {

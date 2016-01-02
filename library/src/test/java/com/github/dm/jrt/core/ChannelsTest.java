@@ -57,12 +57,12 @@ public class ChannelsTest {
 
         IOChannel<String> ioChannel1 = JRoutine.io().of("test1", "test2", "test3");
         IOChannel<String> ioChannel2 = JRoutine.io().of("test4", "test5", "test6");
-        assertThat(Channels.blend(ioChannel2, ioChannel1).all()).containsOnly("test1", "test2",
-                                                                              "test3", "test4",
-                                                                              "test5", "test6");
+        assertThat(Channels.blend(ioChannel2, ioChannel1).afterMax(seconds(1)).all()).containsOnly(
+                "test1", "test2", "test3", "test4", "test5", "test6");
         ioChannel1 = JRoutine.io().of("test1", "test2", "test3");
         ioChannel2 = JRoutine.io().of("test4", "test5", "test6");
         assertThat(Channels.blend(Arrays.<OutputChannel<?>>asList(ioChannel1, ioChannel2))
+                           .afterMax(seconds(1))
                            .all()).containsOnly("test1", "test2", "test3", "test4", "test5",
                                                 "test6");
     }
@@ -439,12 +439,13 @@ public class ChannelsTest {
 
         IOChannel<String> ioChannel1 = JRoutine.io().of("test1", "test2", "test3");
         IOChannel<String> ioChannel2 = JRoutine.io().of("test4", "test5", "test6");
-        assertThat(Channels.concat(ioChannel2, ioChannel1).all()).containsExactly("test4", "test5",
-                                                                                  "test6", "test1",
-                                                                                  "test2", "test3");
+        assertThat(
+                Channels.concat(ioChannel2, ioChannel1).afterMax(seconds(1)).all()).containsExactly(
+                "test4", "test5", "test6", "test1", "test2", "test3");
         ioChannel1 = JRoutine.io().of("test1", "test2", "test3");
         ioChannel2 = JRoutine.io().of("test4", "test5", "test6");
         assertThat(Channels.concat(Arrays.<OutputChannel<?>>asList(ioChannel1, ioChannel2))
+                           .afterMax(seconds(1))
                            .all()).containsExactly("test1", "test2", "test3", "test4", "test5",
                                                    "test6");
     }
@@ -928,9 +929,9 @@ public class ChannelsTest {
 
         final IOChannel<Selectable<String>> channel = JRoutine.io().buildChannel();
         Channels.select(channel.asInput(), 33).pass("test1", "test2", "test3").close();
-        assertThat(channel.close().all()).containsExactly(new Selectable<String>("test1", 33),
-                                                          new Selectable<String>("test2", 33),
-                                                          new Selectable<String>("test3", 33));
+        assertThat(channel.close().afterMax(seconds(1)).all()).containsExactly(
+                new Selectable<String>("test1", 33), new Selectable<String>("test2", 33),
+                new Selectable<String>("test3", 33));
     }
 
     @Test
@@ -1687,7 +1688,7 @@ public class ChannelsTest {
         channel.pass(new Selectable<String>("test1", 33), new Selectable<String>("test2", -33),
                      new Selectable<String>("test3", 33), new Selectable<String>("test4", 333));
         channel.close();
-        assertThat(outputChannel.all()).containsExactly("test1", "test3");
+        assertThat(outputChannel.afterMax(seconds(1)).all()).containsExactly("test1", "test3");
     }
 
     @Test
@@ -1891,7 +1892,7 @@ public class ChannelsTest {
         final IOChannel<Selectable<Object>> channel = JRoutine.io().buildChannel();
         Channels.select(channel).index(0);
         channel.pass(new Selectable<Object>("test", 0));
-        assertThat(Channels.select(channel).index(0).next()).isEqualTo("test");
+        assertThat(Channels.select(channel).index(0).afterMax(seconds(1)).next()).isEqualTo("test");
 
         try {
 

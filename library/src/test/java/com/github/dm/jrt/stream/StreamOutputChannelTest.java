@@ -17,6 +17,7 @@ import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.channel.AbortException;
 import com.github.dm.jrt.channel.Channel.InputChannel;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
+import com.github.dm.jrt.channel.DeadlockException;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
@@ -61,14 +62,15 @@ public class StreamOutputChannelTest {
     @Test
     public void testBuilder() {
 
-        assertThat(Streams.streamOf("test").all()).containsExactly("test");
-        assertThat(Streams.streamOf("test1", "test2", "test3").all()).containsExactly("test1",
-                                                                                      "test2",
-                                                                                      "test3");
-        assertThat(
-                Streams.streamOf(Arrays.asList("test1", "test2", "test3")).all()).containsExactly(
-                "test1", "test2", "test3");
+        assertThat(Streams.streamOf("test").afterMax(seconds(1)).all()).containsExactly("test");
+        assertThat(Streams.streamOf("test1", "test2", "test3")
+                          .afterMax(seconds(1))
+                          .all()).containsExactly("test1", "test2", "test3");
+        assertThat(Streams.streamOf(Arrays.asList("test1", "test2", "test3"))
+                          .afterMax(seconds(1))
+                          .all()).containsExactly("test1", "test2", "test3");
         assertThat(Streams.streamOf(JRoutine.io().of("test1", "test2", "test3"))
+                          .afterMax(seconds(1))
                           .all()).containsExactly("test1", "test2", "test3");
     }
 
@@ -348,49 +350,43 @@ public class StreamOutputChannelTest {
                           })
                           .afterMax(seconds(3))
                           .all()).containsExactly("test1", "test2");
-        assertThat(Streams.streamOf().asyncRange(1, 1000)
-                .backPressureOn(Runners.poolRunner(1), 2, 10, TimeUnit.SECONDS)
-//                           .withInvocations()
-//                           .withRunner(Runners.poolRunner(1))
-//                           .withInputMaxSize(2)
-//                           .withInputTimeout(days(10))
-//                           .withOutputMaxSize(2)
-//                           .withOutputTimeout(days(10))
-//                           .set()
-                           .asyncMap(Functions.<Number>identity())
-                           .asyncMap(new Function<Number, Double>() {
+        assertThat(Streams.streamOf()
+                          .asyncRange(1, 1000)
+                          .backPressureOn(Runners.poolRunner(1), 2, 10, TimeUnit.SECONDS)
+                          .asyncMap(Functions.<Number>identity())
+                          .asyncMap(new Function<Number, Double>() {
 
-                               public Double apply(final Number number) {
+                              public Double apply(final Number number) {
 
-                                   final double value = number.doubleValue();
-                                   return Math.sqrt(value);
-                               }
-                           })
-                           .syncMap(new Function<Double, SumData>() {
+                                  final double value = number.doubleValue();
+                                  return Math.sqrt(value);
+                              }
+                          })
+                          .syncMap(new Function<Double, SumData>() {
 
-                               public SumData apply(final Double aDouble) {
+                              public SumData apply(final Double aDouble) {
 
-                                   return new SumData(aDouble, 1);
-                               }
-                           })
-                           .syncReduce(new BiFunction<SumData, SumData, SumData>() {
+                                  return new SumData(aDouble, 1);
+                              }
+                          })
+                          .syncReduce(new BiFunction<SumData, SumData, SumData>() {
 
-                               public SumData apply(final SumData data1, final SumData data2) {
+                              public SumData apply(final SumData data1, final SumData data2) {
 
-                                   return new SumData(data1.sum + data2.sum,
-                                                      data1.count + data2.count);
-                               }
-                           })
-                           .syncMap(new Function<SumData, Double>() {
+                                  return new SumData(data1.sum + data2.sum,
+                                                     data1.count + data2.count);
+                              }
+                          })
+                          .syncMap(new Function<SumData, Double>() {
 
-                               public Double apply(final SumData data) {
+                              public Double apply(final SumData data) {
 
-                                   return data.sum / data.count;
-                               }
-                           })
-                           .runOnShared()
-                           .afterMax(seconds(3))
-                           .next()).isCloseTo(21, Offset.offset(0.1));
+                                  return data.sum / data.count;
+                              }
+                          })
+                          .runOnShared()
+                          .afterMax(seconds(3))
+                          .next()).isCloseTo(21, Offset.offset(0.1));
     }
 
     @Test
@@ -1065,6 +1061,103 @@ public class StreamOutputChannelTest {
     }
 
     @Test
+    public void testMaxSizeDeadlock() {
+
+        try {
+
+            Streams.streamOf()
+                   .asyncRange(1, 1000)
+                   .withStreamInvocations()
+                   .withRunner(Runners.poolRunner(1))
+                   .withInputMaxSize(2)
+                   .withInputTimeout(seconds(10))
+                   .withOutputMaxSize(2)
+                   .withOutputTimeout(seconds(10))
+                   .set()
+                   .asyncMap(Functions.<Number>identity())
+                   .asyncMap(new Function<Number, Double>() {
+
+                       public Double apply(final Number number) {
+
+                           final double value = number.doubleValue();
+                           return Math.sqrt(value);
+                       }
+                   })
+                   .syncMap(new Function<Double, SumData>() {
+
+                       public SumData apply(final Double aDouble) {
+
+                           return new SumData(aDouble, 1);
+                       }
+                   })
+                   .syncReduce(new BiFunction<SumData, SumData, SumData>() {
+
+                       public SumData apply(final SumData data1, final SumData data2) {
+
+                           return new SumData(data1.sum + data2.sum, data1.count + data2.count);
+                       }
+                   })
+                   .syncMap(new Function<SumData, Double>() {
+
+                       public Double apply(final SumData data) {
+
+                           return data.sum / data.count;
+                       }
+                   })
+                   .runOnShared()
+                   .afterMax(seconds(3))
+                   .next();
+
+            fail();
+
+        } catch (final DeadlockException ignored) {
+
+        }
+
+        assertThat(Streams.streamOf()
+                          .asyncRange(1, 1000)
+                          .withStreamInvocations()
+                          .withRunner(Runners.poolRunner(1))
+                          .withOutputMaxSize(2)
+                          .withOutputTimeout(seconds(10))
+                          .set()
+                          .asyncMap(Functions.<Number>identity())
+                          .asyncMap(new Function<Number, Double>() {
+
+                              public Double apply(final Number number) {
+
+                                  final double value = number.doubleValue();
+                                  return Math.sqrt(value);
+                              }
+                          })
+                          .syncMap(new Function<Double, SumData>() {
+
+                              public SumData apply(final Double aDouble) {
+
+                                  return new SumData(aDouble, 1);
+                              }
+                          })
+                          .syncReduce(new BiFunction<SumData, SumData, SumData>() {
+
+                              public SumData apply(final SumData data1, final SumData data2) {
+
+                                  return new SumData(data1.sum + data2.sum,
+                                                     data1.count + data2.count);
+                              }
+                          })
+                          .syncMap(new Function<SumData, Double>() {
+
+                              public Double apply(final SumData data) {
+
+                                  return data.sum / data.count;
+                              }
+                          })
+                          .runOnShared()
+                          .afterMax(seconds(3))
+                          .next()).isCloseTo(21, Offset.offset(0.1));
+    }
+
+    @Test
     public void testRange() {
 
         assertThat(Streams.streamOf().asyncRange('a', 'e', new Function<Character, Character>() {
@@ -1215,59 +1308,36 @@ public class StreamOutputChannelTest {
 
                 return (char) (character + 1);
             }
-        }).afterMax(seconds(3)).all()).containsExactly('a', 'b', 'c', 'd', 'e');
-        assertThat(Streams.streamOf()
-                          .syncRange(0, -10, -2)
-                          .afterMax(seconds(3))
-                          .all()).containsExactly(0, -2, -4, -6, -8, -10);
+        }).all()).containsExactly('a', 'b', 'c', 'd', 'e');
+        assertThat(Streams.streamOf().syncRange(0, -10, -2).all()).containsExactly(0, -2, -4, -6,
+                                                                                   -8, -10);
+        assertThat(Streams.streamOf().syncRange(0, 2, 0.7).all()).containsExactly(0d, 0.7d, 1.4d);
+        assertThat(Streams.streamOf().syncRange(0, 2, 0.7f).all()).containsExactly(0f, 0.7f, 1.4f);
+        assertThat(Streams.streamOf().syncRange(0L, -9, -2).all()).containsExactly(0L, -2L, -4L,
+                                                                                   -6L, -8L);
+        assertThat(Streams.streamOf().syncRange(0, (short) 9, 2).all()).containsExactly(0, 2, 4, 6,
+                                                                                        8);
         assertThat(
-                Streams.streamOf().syncRange(0, 2, 0.7).afterMax(seconds(3)).all()).containsExactly(
-                0d, 0.7d, 1.4d);
-        assertThat(Streams.streamOf()
-                          .syncRange(0, 2, 0.7f)
-                          .afterMax(seconds(3))
-                          .all()).containsExactly(0f, 0.7f, 1.4f);
-        assertThat(Streams.streamOf()
-                          .syncRange(0L, -9, -2)
-                          .afterMax(seconds(3))
-                          .all()).containsExactly(0L, -2L, -4L, -6L, -8L);
-        assertThat(Streams.streamOf()
-                          .syncRange(0, (short) 9, 2)
-                          .afterMax(seconds(3))
-                          .all()).containsExactly(0, 2, 4, 6, 8);
-        assertThat(Streams.streamOf()
-                          .syncRange((byte) 0, (short) 9, (byte) 2)
-                          .afterMax(seconds(3))
-                          .all()).containsExactly((short) 0, (short) 2, (short) 4, (short) 6,
-                                                  (short) 8);
-        assertThat(Streams.streamOf()
-                          .syncRange((byte) 0, (byte) 10, (byte) 2)
-                          .afterMax(seconds(3))
-                          .all()).containsExactly((byte) 0, (byte) 2, (byte) 4, (byte) 6, (byte) 8,
-                                                  (byte) 10);
-        assertThat(Streams.streamOf().syncRange(0, -5).afterMax(seconds(3)).all()).containsExactly(
-                0, -1, -2, -3, -4, -5);
-        assertThat(Streams.streamOf().syncRange(0, 2.1).afterMax(seconds(3)).all()).containsExactly(
-                0d, 1d, 2d);
+                Streams.streamOf().syncRange((byte) 0, (short) 9, (byte) 2).all()).containsExactly(
+                (short) 0, (short) 2, (short) 4, (short) 6, (short) 8);
         assertThat(
-                Streams.streamOf().syncRange(0, 1.9f).afterMax(seconds(3)).all()).containsExactly(
-                0f, 1f);
-        assertThat(Streams.streamOf().syncRange(0L, -4).afterMax(seconds(3)).all()).containsExactly(
-                0L, -1L, -2L, -3L, -4L);
-        assertThat(Streams.streamOf()
-                          .syncRange(0, (short) 4)
-                          .afterMax(seconds(3))
-                          .all()).containsExactly(0, 1, 2, 3, 4);
-        assertThat(Streams.streamOf()
-                          .syncRange((byte) 0, (short) 4)
-                          .afterMax(seconds(3))
-                          .all()).containsExactly((short) 0, (short) 1, (short) 2, (short) 3,
-                                                  (short) 4);
-        assertThat(Streams.streamOf()
-                          .syncRange((byte) 0, (byte) 5)
-                          .afterMax(seconds(3))
-                          .all()).containsExactly((byte) 0, (byte) 1, (byte) 2, (byte) 3, (byte) 4,
-                                                  (byte) 5);
+                Streams.streamOf().syncRange((byte) 0, (byte) 10, (byte) 2).all()).containsExactly(
+                (byte) 0, (byte) 2, (byte) 4, (byte) 6, (byte) 8, (byte) 10);
+        assertThat(Streams.streamOf().syncRange(0, -5).all()).containsExactly(0, -1, -2, -3, -4,
+                                                                              -5);
+        assertThat(Streams.streamOf().syncRange(0, 2.1).all()).containsExactly(0d, 1d, 2d);
+        assertThat(Streams.streamOf().syncRange(0, 1.9f).all()).containsExactly(0f, 1f);
+        assertThat(Streams.streamOf().syncRange(0L, -4).all()).containsExactly(0L, -1L, -2L, -3L,
+                                                                               -4L);
+        assertThat(Streams.streamOf().syncRange(0, (short) 4).all()).containsExactly(0, 1, 2, 3, 4);
+        assertThat(Streams.streamOf().syncRange((byte) 0, (short) 4).all()).containsExactly(
+                (short) 0, (short) 1, (short) 2, (short) 3, (short) 4);
+        assertThat(Streams.streamOf().syncRange((byte) 0, (byte) 5).all()).containsExactly((byte) 0,
+                                                                                           (byte) 1,
+                                                                                           (byte) 2,
+                                                                                           (byte) 3,
+                                                                                           (byte) 4,
+                                                                                           (byte) 5);
     }
 
     @Test

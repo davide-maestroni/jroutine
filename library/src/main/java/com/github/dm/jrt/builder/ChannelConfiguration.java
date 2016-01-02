@@ -59,8 +59,6 @@ public final class ChannelConfiguration {
      */
     public static final ChannelConfiguration DEFAULT_CONFIGURATION = builder().buildConfiguration();
 
-    private final Runner mAsyncRunner;
-
     private final int mChannelMaxSize;
 
     private final OrderType mChannelOrderType;
@@ -73,12 +71,14 @@ public final class ChannelConfiguration {
 
     private final TimeDuration mReadTimeout;
 
+    private final Runner mRunner;
+
     private final TimeoutActionType mTimeoutActionType;
 
     /**
      * Constructor.
      *
-     * @param asyncRunner      the runner used for asynchronous inputs.
+     * @param runner           the runner used for asynchronous inputs.
      * @param readTimeout      the timeout for the channel to produce an output.
      * @param actionType       the action to be taken if the timeout elapses before a readable
      *                         output is available.
@@ -89,13 +89,13 @@ public final class ChannelConfiguration {
      * @param log              the log instance.
      * @param logLevel         the log level.
      */
-    private ChannelConfiguration(@Nullable final Runner asyncRunner,
+    private ChannelConfiguration(@Nullable final Runner runner,
             @Nullable final TimeDuration readTimeout, @Nullable final TimeoutActionType actionType,
             @Nullable final OrderType channelOrderType, final int channelMaxSize,
             @Nullable final TimeDuration channelTimeout, @Nullable final Log log,
             @Nullable final Level logLevel) {
 
-        mAsyncRunner = asyncRunner;
+        mRunner = runner;
         mReadTimeout = readTimeout;
         mTimeoutActionType = actionType;
         mChannelOrderType = channelOrderType;
@@ -139,18 +139,6 @@ public final class ChannelConfiguration {
     public Builder<ChannelConfiguration> builderFrom() {
 
         return builderFrom(this);
-    }
-
-    /**
-     * Returns the runner used for asynchronous inputs (null by default).
-     *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the runner instance.
-     */
-    public Runner getAsyncRunnerOr(@Nullable final Runner valueIfNotSet) {
-
-        final Runner runner = mAsyncRunner;
-        return (runner != null) ? runner : valueIfNotSet;
     }
 
     /**
@@ -240,17 +228,29 @@ public final class ChannelConfiguration {
         return (readTimeout != null) ? readTimeout : valueIfNotSet;
     }
 
+    /**
+     * Returns the runner used for asynchronous inputs (null by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the runner instance.
+     */
+    public Runner getRunnerOr(@Nullable final Runner valueIfNotSet) {
+
+        final Runner runner = mRunner;
+        return (runner != null) ? runner : valueIfNotSet;
+    }
+
     @Override
     public int hashCode() {
 
         // AUTO-GENERATED CODE
-        int result = mAsyncRunner != null ? mAsyncRunner.hashCode() : 0;
-        result = 31 * result + mChannelMaxSize;
+        int result = mChannelMaxSize;
         result = 31 * result + (mChannelOrderType != null ? mChannelOrderType.hashCode() : 0);
         result = 31 * result + (mChannelTimeout != null ? mChannelTimeout.hashCode() : 0);
         result = 31 * result + (mLog != null ? mLog.hashCode() : 0);
         result = 31 * result + (mLogLevel != null ? mLogLevel.hashCode() : 0);
         result = 31 * result + (mReadTimeout != null ? mReadTimeout.hashCode() : 0);
+        result = 31 * result + (mRunner != null ? mRunner.hashCode() : 0);
         result = 31 * result + (mTimeoutActionType != null ? mTimeoutActionType.hashCode() : 0);
         return result;
     }
@@ -273,12 +273,6 @@ public final class ChannelConfiguration {
         final ChannelConfiguration that = (ChannelConfiguration) o;
 
         if (mChannelMaxSize != that.mChannelMaxSize) {
-
-            return false;
-        }
-
-        if (mAsyncRunner != null ? !mAsyncRunner.equals(that.mAsyncRunner)
-                : that.mAsyncRunner != null) {
 
             return false;
         }
@@ -310,6 +304,11 @@ public final class ChannelConfiguration {
             return false;
         }
 
+        if (mRunner != null ? !mRunner.equals(that.mRunner) : that.mRunner != null) {
+
+            return false;
+        }
+
         return mTimeoutActionType == that.mTimeoutActionType;
     }
 
@@ -318,13 +317,13 @@ public final class ChannelConfiguration {
 
         // AUTO-GENERATED CODE
         return "ChannelConfiguration{" +
-                "mAsyncRunner=" + mAsyncRunner +
-                ", mChannelMaxSize=" + mChannelMaxSize +
+                "mChannelMaxSize=" + mChannelMaxSize +
                 ", mChannelOrderType=" + mChannelOrderType +
                 ", mChannelTimeout=" + mChannelTimeout +
                 ", mLog=" + mLog +
                 ", mLogLevel=" + mLogLevel +
                 ", mReadTimeout=" + mReadTimeout +
+                ", mRunner=" + mRunner +
                 ", mTimeoutActionType=" + mTimeoutActionType +
                 '}';
     }
@@ -355,7 +354,7 @@ public final class ChannelConfiguration {
     public InvocationConfiguration toInvocationConfiguration() {
 
         return InvocationConfiguration.builder()
-                                      .withRunner(getAsyncRunnerOr(null))
+                                      .withRunner(getRunnerOr(null))
                                       .withReadTimeout(getReadTimeoutOr(null))
                                       .withReadTimeoutAction(getReadTimeoutActionOr(null))
                                       .withLog(getLogOr(null))
@@ -406,8 +405,6 @@ public final class ChannelConfiguration {
 
         private final Configurable<? extends TYPE> mConfigurable;
 
-        private Runner mAsyncRunner;
-
         private int mChannelMaxSize;
 
         private OrderType mChannelOrderType;
@@ -419,6 +416,8 @@ public final class ChannelConfiguration {
         private Level mLogLevel;
 
         private TimeDuration mReadTimeout;
+
+        private Runner mRunner;
 
         private TimeoutActionType mTimeoutActionType;
 
@@ -486,11 +485,11 @@ public final class ChannelConfiguration {
                 return this;
             }
 
-            final Runner asyncRunner = configuration.mAsyncRunner;
+            final Runner runner = configuration.mRunner;
 
-            if (asyncRunner != null) {
+            if (runner != null) {
 
-                withAsyncRunner(asyncRunner);
+                withRunner(runner);
             }
 
             final TimeDuration readTimeout = configuration.mReadTimeout;
@@ -542,20 +541,6 @@ public final class ChannelConfiguration {
                 withLogLevel(logLevel);
             }
 
-            return this;
-        }
-
-        /**
-         * Sets the asynchronous runner instance. A null value means that it is up to the specific
-         * implementation to choose a default one.
-         *
-         * @param runner the runner instance.
-         * @return this builder.
-         */
-        @NotNull
-        public Builder<TYPE> withAsyncRunner(@Nullable final Runner runner) {
-
-            mAsyncRunner = runner;
             return this;
         }
 
@@ -703,17 +688,31 @@ public final class ChannelConfiguration {
             return this;
         }
 
+        /**
+         * Sets the asynchronous runner instance. A null value means that it is up to the specific
+         * implementation to choose a default one.
+         *
+         * @param runner the runner instance.
+         * @return this builder.
+         */
+        @NotNull
+        public Builder<TYPE> withRunner(@Nullable final Runner runner) {
+
+            mRunner = runner;
+            return this;
+        }
+
         @NotNull
         private ChannelConfiguration buildConfiguration() {
 
-            return new ChannelConfiguration(mAsyncRunner, mReadTimeout, mTimeoutActionType,
+            return new ChannelConfiguration(mRunner, mReadTimeout, mTimeoutActionType,
                                             mChannelOrderType, mChannelMaxSize, mChannelTimeout,
                                             mLog, mLogLevel);
         }
 
         private void setConfiguration(@NotNull final ChannelConfiguration configuration) {
 
-            mAsyncRunner = configuration.mAsyncRunner;
+            mRunner = configuration.mRunner;
             mReadTimeout = configuration.mReadTimeout;
             mTimeoutActionType = configuration.mTimeoutActionType;
             mChannelOrderType = configuration.mChannelOrderType;

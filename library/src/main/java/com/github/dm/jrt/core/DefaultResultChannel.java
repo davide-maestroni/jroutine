@@ -162,7 +162,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
             public boolean isTrue() {
 
-                return (mOutputCount <= maxOutputSize) || mIsWaitingInvocation;
+                return (mOutputCount <= maxOutputSize) || mIsWaitingInvocation || (mOutputConsumer
+                        != null);
             }
         };
         mState = new OutputChannelState();
@@ -292,7 +293,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         if (delay.isZero()) {
 
-            flushOutput(false);
+            executeFlush(false);
 
         } else if (execution != null) {
 
@@ -316,7 +317,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         if (delay.isZero()) {
 
-            flushOutput(false);
+            executeFlush(false);
 
         } else if (execution != null) {
 
@@ -340,7 +341,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         if (delay.isZero()) {
 
-            flushOutput(false);
+            executeFlush(false);
 
         } else if (execution != null) {
 
@@ -403,7 +404,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             channel.abort(abortException);
         }
 
-        flushOutput(false);
+        executeFlush(false);
     }
 
     /**
@@ -420,7 +421,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         if (needsFlush) {
 
-            flushOutput(false);
+            executeFlush(false);
         }
     }
 
@@ -485,6 +486,22 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                 mState = currentState.toDoneState();
                 mMutex.notifyAll();
             }
+        }
+    }
+
+    private void executeFlush(final boolean forceClose) {
+
+        // We need to make sure to pass the outputs to the consumer in the runner thread, so to
+        // avoid deadlock issues
+        final Runner runner = mRunner;
+
+        if (runner.isExecutionThread()) {
+
+            flushOutput(forceClose);
+
+        } else {
+
+            runner.run(new FlushExecution(forceClose), 0, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -570,27 +587,10 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
                 } catch (final Throwable t) {
 
-                    final OutputChannelState finalState;
-                    boolean isClose = false;
-
                     synchronized (mMutex) {
 
-                        finalState = mState;
                         logger.wrn(t, "consumer exception (%s)", consumer);
-
-                        if (forceClose || finalState.isReadyToComplete()) {
-
-                            isClose = true;
-
-                        } else {
-
-                            abortException = finalState.abortConsumer(t);
-                        }
-                    }
-
-                    if (isClose) {
-
-                        closeConsumer(finalState, consumer);
+                        abortException = mState.abortConsumer(t);
                     }
                 }
             }
@@ -632,7 +632,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                     if (timeoutAction == TimeoutActionType.THROW) {
 
                         throw new ExecutionTimeoutException(
-                                "timeout while waiting to know if more outputs are coming");
+                                "timeout while waiting to know if more outputs are coming ["
+                                        + timeout + "]");
 
                     } else {
 
@@ -692,7 +693,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                     if (timeoutAction == TimeoutActionType.THROW) {
 
                         throw new ExecutionTimeoutException(
-                                "timeout while waiting to know if more outputs are coming");
+                                "timeout while waiting to know if more outputs are coming ["
+                                        + timeout + "]");
 
                     } else {
 
@@ -780,7 +782,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
                 if (action == TimeoutActionType.THROW) {
 
-                    throw new ExecutionTimeoutException("timeout while waiting for outputs");
+                    throw new ExecutionTimeoutException(
+                            "timeout while waiting for outputs [" + timeout + "]");
                 }
             }
 
@@ -830,7 +833,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
             if (action == TimeoutActionType.THROW) {
 
-                throw new ExecutionTimeoutException("timeout while waiting for outputs");
+                throw new ExecutionTimeoutException(
+                        "timeout while waiting for outputs [" + timeout + "]");
             }
         }
 
@@ -848,11 +852,13 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
     private void waitOutputs(final int count, @NotNull final TimeDuration delay) {
 
-        if (mOutputTimeout.isZero()) {
+        final TimeDuration timeout = mOutputTimeout;
+
+        if (timeout.isZero()) {
 
             mOutputCount -= count;
             throw new OutputTimeoutException(
-                    "timeout while waiting for room in the output channel");
+                    "timeout while waiting for room in the output channel [" + timeout + "]");
         }
 
         if (!delay.isZero() && mRunner.isExecutionThread()) {
@@ -865,12 +871,11 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         try {
 
-            // TODO: 31/12/15 add !isBound condition
-            if (!mOutputTimeout.waitTrue(mMutex, mHasOutputs)) {
+            if (!timeout.waitTrue(mMutex, mHasOutputs)) {
 
                 mOutputCount -= count;
                 throw new OutputTimeoutException(
-                        "timeout while waiting for room in the output channel");
+                        "timeout while waiting for room in the output channel [" + timeout + "]");
             }
 
         } catch (final InterruptedException e) {
@@ -1075,7 +1080,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                         if (timeoutAction == TimeoutActionType.THROW) {
 
                             throw new ExecutionTimeoutException(
-                                    "timeout while waiting to collect all outputs");
+                                    "timeout while waiting to collect all outputs ["
+                                            + executionTimeout + "]");
 
                         } else {
 
@@ -1133,7 +1139,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                         if (action == TimeoutActionType.THROW) {
 
                             throw new ExecutionTimeoutException(
-                                    "timeout while waiting to collect all outputs");
+                                    "timeout while waiting to collect all outputs ["
+                                            + executionTimeout + "]");
 
                         } else {
 
@@ -1339,7 +1346,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
                 if (timeoutAction == TimeoutActionType.THROW) {
 
-                    throw new ExecutionTimeoutException("timeout while waiting for outputs");
+                    throw new ExecutionTimeoutException(
+                            "timeout while waiting for outputs [" + timeout + "]");
 
                 } else if (timeoutAction == TimeoutActionType.ABORT) {
 
@@ -1377,9 +1385,10 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                 forceClose = mState.isDone();
                 mOutputConsumer = consumer;
                 mConsumerMutex = getMutex(consumer);
+                mMutex.notifyAll();
             }
 
-            flushOutput(forceClose);
+            executeFlush(forceClose);
             return this;
         }
 
@@ -1414,7 +1423,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
                     if (timeoutAction == TimeoutActionType.THROW) {
 
-                        throw new ExecutionTimeoutException("timeout while waiting for outputs");
+                        throw new ExecutionTimeoutException(
+                                "timeout while waiting for outputs [" + timeout + "]");
 
                     } else if (timeoutAction == TimeoutActionType.ABORT) {
 
@@ -1527,7 +1537,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
             if (needsFlush) {
 
-                flushOutput(false);
+                executeFlush(false);
             }
         }
 
@@ -1559,7 +1569,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
             if (delay.isZero()) {
 
-                flushOutput(false);
+                executeFlush(false);
 
             } else if (execution != null) {
 
@@ -1891,6 +1901,29 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     }
 
     /**
+     * Execution flushing the output to the bound consumer.
+     */
+    private class FlushExecution extends TemplateExecution {
+
+        private final boolean mForceClose;
+
+        /**
+         * Constructor.
+         *
+         * @param forceClose whether to forcedly close the consumer.
+         */
+        private FlushExecution(final boolean forceClose) {
+
+            mForceClose = forceClose;
+        }
+
+        public void run() {
+
+            flushOutput(mForceClose);
+        }
+    }
+
+    /**
      * Result channel internal state (using "state" design pattern).
      */
     private class OutputChannelState {
@@ -2209,13 +2242,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             }
 
             final int size = list.size();
-
-            if (size > mMaxOutput) {
-
-                throw new OutputTimeoutException(
-                        "outputs exceed maximum channel size [" + size + "/" + mMaxOutput + "]");
-            }
-
             final TimeDuration delay = mResultDelay;
             mSubLogger.dbg("passing iterable [#%d+%d]: %s [%s]", mOutputCount, size, outputs,
                            delay);
@@ -2296,13 +2322,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             }
 
             final int size = outputs.length;
-
-            if (size > mMaxOutput) {
-
-                throw new OutputTimeoutException(
-                        "outputs exceed maximum channel size [" + size + "/" + mMaxOutput + "]");
-            }
-
             final TimeDuration delay = mResultDelay;
             mSubLogger.dbg("passing array [#%d+%d]: %s [%s]", mOutputCount, size, outputs, delay);
             mOutputCount += size;

@@ -244,7 +244,7 @@ public class ParcelableByteChannel {
 
             if (ioChannel == null) {
 
-                ioChannel = JRoutine.io().buildChannel();
+                ioChannel = JRoutine.io().syncChannel();
                 ioChannel.passTo(new BufferOutputConsumer(channel));
                 channels.put(channel, ioChannel);
             }
@@ -276,7 +276,7 @@ public class ParcelableByteChannel {
 
             if (ioChannel == null) {
 
-                ioChannel = JRoutine.io().buildChannel();
+                ioChannel = JRoutine.io().syncChannel();
                 ioChannel.passTo(new IOBufferOutputConsumer(channel));
                 channels.put(channel, ioChannel);
             }

@@ -1288,7 +1288,7 @@ public class ProxyRoutineTest {
         @Override
         public boolean isExecutionThread() {
 
-            return false;
+            return true;
         }
 
         @Override

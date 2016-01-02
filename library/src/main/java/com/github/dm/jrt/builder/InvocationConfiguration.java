@@ -775,12 +775,16 @@ public final class InvocationConfiguration {
          * Sets the maximum number of data that the input channel can retain before they are
          * consumed. A {@link InvocationConfiguration#DEFAULT DEFAULT} value means that it is up
          * to the specific implementation to choose a default one.
+         * <p/>
+         * This configuration option is used to slow down the process feeding the routine invocation
+         * when its execution time increases. Note, however, that it is not allowed to block the
+         * invocation execution thread, so make sure that the feeding routine and this one does not
+         * share the same runner.
          *
          * @param inputMaxSize the maximum size.
          * @return this builder.
          * @throws java.lang.IllegalArgumentException if the number is less than 1.
          */
-        // TODO: 31/12/15 explain use: back pressure
         @NotNull
         public Builder<TYPE> withInputMaxSize(final int inputMaxSize) {
 
@@ -812,13 +816,16 @@ public final class InvocationConfiguration {
 
         /**
          * Sets the timeout for an input channel to have room for additional data.
+         * <p/>
+         * This configuration option should be used on conjunction with the input max size, or it
+         * might have no effect on the invocation execution.
          *
          * @param timeout  the timeout.
          * @param timeUnit the timeout time unit.
          * @return this builder.
          * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
+         * @see #withInputMaxSize(int)
          */
-        // TODO: 31/12/15 used in conjunction with max size
         @NotNull
         public Builder<TYPE> withInputTimeout(final long timeout,
                 @NotNull final TimeUnit timeUnit) {
@@ -829,9 +836,13 @@ public final class InvocationConfiguration {
         /**
          * Sets the timeout for an input channel to have room for additional data. A null value
          * means that it is up to the specific implementation to choose a default one.
+         * <p/>
+         * This configuration option should be used on conjunction with the input max size, or it
+         * might have no effect on the invocation execution.
          *
          * @param timeout the timeout.
          * @return this builder.
+         * @see #withInputMaxSize(int)
          */
         @NotNull
         public Builder<TYPE> withInputTimeout(@Nullable final TimeDuration timeout) {
@@ -895,12 +906,16 @@ public final class InvocationConfiguration {
          * Sets the maximum number of data that the result channel can retain before they are
          * consumed. A {@link InvocationConfiguration#DEFAULT DEFAULT} value means that it is up
          * to the specific implementation to choose a default one.
+         * <p/>
+         * This configuration option is useful when the results coming from the invocation execution
+         * are meant to be explicitly read through its output channel. The execution will slow down
+         * until enough data are consumed. Note, however, that binding the channel to an output
+         * consumer will make the option ineffective.
          *
          * @param outputMaxSize the maximum size.
          * @return this builder.
          * @throws java.lang.IllegalArgumentException if the number is less than 1.
          */
-        // TODO: 31/12/15 explain use: consumer
         @NotNull
         public Builder<TYPE> withOutputMaxSize(final int outputMaxSize) {
 
@@ -932,13 +947,16 @@ public final class InvocationConfiguration {
 
         /**
          * Sets the timeout for a result channel to have room for additional data.
+         * <p/>
+         * This configuration option should be used on conjunction with the output max size, or it
+         * might have no effect on the invocation execution.
          *
          * @param timeout  the timeout.
          * @param timeUnit the timeout time unit.
          * @return this builder.
          * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
+         * @see #withOutputMaxSize(int)
          */
-        // TODO: 31/12/15 used in conjunction with max size
         @NotNull
         public Builder<TYPE> withOutputTimeout(final long timeout,
                 @NotNull final TimeUnit timeUnit) {
@@ -949,9 +967,13 @@ public final class InvocationConfiguration {
         /**
          * Sets the timeout for a result channel to have room for additional data. A null value
          * means that it is up to the specific implementation to choose a default one.
+         * <p/>
+         * This configuration option should be used on conjunction with the output max size, or it
+         * might have no effect on the invocation execution.
          *
          * @param timeout the timeout.
          * @return this builder.
+         * @see #withOutputMaxSize(int)
          */
         @NotNull
         public Builder<TYPE> withOutputTimeout(@Nullable final TimeDuration timeout) {

@@ -50,7 +50,8 @@ public class Channels {
 
     /**
      * Returns an output channel blending the outputs coming from the specified ones.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that
+     * the passed ones will be bound as a result of the call.
      *
      * @param channels the list of channels.
      * @param <OUT>    the output data type.
@@ -77,7 +78,8 @@ public class Channels {
 
     /**
      * Returns an output channel blending the outputs coming from the specified ones.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that
+     * the passed ones will be bound as a result of the call.
      *
      * @param channels the array of channels.
      * @param <OUT>    the output data type.
@@ -107,8 +109,9 @@ public class Channels {
     /**
      * Combines the specified channels into a selectable one. The selectable indexes will be the
      * same as the array ones.<br/>
-     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
-     * completion of the invocation lifecycle.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that it
+     * <b>must be explicitly closed</b> in order to ensure the completion of the invocation
+     * lifecycle.
      *
      * @param channels the array of input channels.
      * @return the selectable I/O channel.
@@ -122,8 +125,9 @@ public class Channels {
 
     /**
      * Combines the specified channels into a selectable one.<br/>
-     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
-     * completion of the invocation lifecycle.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that it
+     * <b>must be explicitly closed</b> in order to ensure the completion of the invocation
+     * lifecycle.
      *
      * @param startIndex the selectable start index.
      * @param channels   the array of input channels.
@@ -158,8 +162,9 @@ public class Channels {
 
     /**
      * Combines the specified channels into a selectable one.<br/>
-     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
-     * completion of the invocation lifecycle.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that it
+     * <b>must be explicitly closed</b> in order to ensure the completion of the invocation
+     * lifecycle.
      *
      * @param startIndex the selectable start index.
      * @param channels   the list of input channels.
@@ -194,8 +199,9 @@ public class Channels {
     /**
      * Combines the specified channels into a selectable one. The selectable indexes will be the
      * same as the list ones.<br/>
-     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
-     * completion of the invocation lifecycle.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that it
+     * <b>must be explicitly closed</b> in order to ensure the completion of the invocation
+     * lifecycle.
      *
      * @param channels the list of input channels.
      * @param <IN>     the input data type.
@@ -211,8 +217,9 @@ public class Channels {
 
     /**
      * Combines the specified channels into a selectable one.<br/>
-     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
-     * completion of the invocation lifecycle.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that it
+     * <b>must be explicitly closed</b> in order to ensure the completion of the invocation
+     * lifecycle.
      *
      * @param channels the map of indexes and input channels.
      * @param <IN>     the input data type.
@@ -248,7 +255,8 @@ public class Channels {
      * Returns an output channel concatenating the outputs coming from the specified ones, so that,
      * all the outputs of the first channel will come before all the outputs of the second one, and
      * so on.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that
+     * the passed ones will be bound as a result of the call.
      *
      * @param channels the list of channels.
      * @param <OUT>    the output data type.
@@ -281,7 +289,8 @@ public class Channels {
      * Returns an output channel concatenating the outputs coming from the specified ones, so that,
      * all the outputs of the first channel will come before all the outputs of the second one, and
      * so on.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that
+     * the passed ones will be bound as a result of the call.
      *
      * @param channels the array of channels.
      * @param <OUT>    the output data type.
@@ -315,8 +324,9 @@ public class Channels {
     /**
      * Returns a new channel distributing the input data among the specified channels. If the list
      * of data exceeds the number of channels, the invocation will be aborted.<br/>
-     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
-     * completion of the invocation lifecycle.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that it
+     * <b>must be explicitly closed</b> in order to ensure the completion of the invocation
+     * lifecycle.
      *
      * @param channels the array of channels.
      * @return the I/O channel.
@@ -331,8 +341,9 @@ public class Channels {
     /**
      * Returns a new channel distributing the input data among the specified channels. If the list
      * of data exceeds the number of channels, the invocation will be aborted.<br/>
-     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
-     * completion of the invocation lifecycle.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that it
+     * <b>must be explicitly closed</b> in order to ensure the completion of the invocation
+     * lifecycle.
      *
      * @param channels the list of channels.
      * @param <IN>     the input data type.
@@ -351,8 +362,9 @@ public class Channels {
      * of data is smaller of the specified number of channels, the remaining ones will be fed with
      * the specified placeholder instance. While, if the list of data exceeds the number of
      * channels, the invocation will be aborted.<br/>
-     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
-     * completion of the invocation lifecycle.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that it
+     * <b>must be explicitly closed</b> in order to ensure the completion of the invocation
+     * lifecycle.
      *
      * @param placeholder the placeholder instance.
      * @param channels    the array of channels.
@@ -371,8 +383,9 @@ public class Channels {
      * of data is smaller of the specified number of channels, the remaining ones will be fed with
      * the specified placeholder instance. While, if the list of data exceeds the number of
      * channels, the invocation will be aborted.<br/>
-     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
-     * completion of the invocation lifecycle.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that it
+     * <b>must be explicitly closed</b> in order to ensure the completion of the invocation
+     * lifecycle.
      *
      * @param placeholder the placeholder instance.
      * @param channels    the list of channels.
@@ -391,7 +404,8 @@ public class Channels {
     /**
      * Returns an output channel joining the data coming from the specified list of channels.<br/>
      * An output will be generated only when at least one result is available for each channel.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that
+     * the passed ones will be bound as a result of the call.
      *
      * @param channels the list of channels.
      * @param <OUT>    the output data type.
@@ -408,7 +422,8 @@ public class Channels {
     /**
      * Returns an output channel joining the data coming from the specified list of channels.<br/>
      * An output will be generated only when at least one result is available for each channel.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that
+     * the passed ones will be bound as a result of the call.
      *
      * @param channels the array of channels.
      * @param <OUT>    the output data type.
@@ -428,7 +443,8 @@ public class Channels {
      * Moreover, when all the output channels complete, the remaining outputs will be returned by
      * filling the gaps with the specified placeholder instance, so that the generated list of data
      * will always have the same size of the channel list.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that
+     * the passed ones will be bound as a result of the call.
      *
      * @param placeholder the placeholder instance.
      * @param channels    the list of channels.
@@ -450,7 +466,8 @@ public class Channels {
      * Moreover, when all the output channels complete, the remaining outputs will be returned by
      * filling the gaps with the specified placeholder instance, so that the generated list of data
      * will always have the same size of the channel list.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that
+     * the passed ones will be bound as a result of the call.
      *
      * @param placeholder the placeholder instance.
      * @param channels    the array of channels.
@@ -467,7 +484,8 @@ public class Channels {
 
     /**
      * Merges the specified channels into a selectable one.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that
+     * the passed ones will be bound as a result of the call.
      *
      * @param startIndex the selectable start index.
      * @param channels   the list of channels.
@@ -497,7 +515,8 @@ public class Channels {
 
     /**
      * Merges the specified channels into a selectable one.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that
+     * the passed ones will be bound as a result of the call.
      *
      * @param startIndex the selectable start index.
      * @param channels   the array of channels.
@@ -529,7 +548,8 @@ public class Channels {
     /**
      * Merges the specified channels into a selectable one. The selectable indexes will be the same
      * as the list ones.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that
+     * the passed ones will be bound as a result of the call.
      *
      * @param channels the channels to merge.
      * @param <OUT>    the output data type.
@@ -545,7 +565,8 @@ public class Channels {
 
     /**
      * Merges the specified channels into a selectable one.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that
+     * the passed ones will be bound as a result of the call.
      *
      * @param channelMap the map of indexes and output channels.
      * @param <OUT>      the output data type.
@@ -575,7 +596,8 @@ public class Channels {
     /**
      * Merges the specified channels into a selectable one. The selectable indexes will be the same
      * as the array ones.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that
+     * the passed ones will be bound as a result of the call.
      *
      * @param channels the channels to merge.
      * @param <OUT>    the output data type.
@@ -591,8 +613,9 @@ public class Channels {
 
     /**
      * Returns a new channel transforming the input data into selectable ones.<br/>
-     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
-     * completion of the invocation lifecycle.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that it
+     * <b>must be explicitly closed</b> in order to ensure the completion of the invocation
+     * lifecycle.
      *
      * @param channel the selectable channel.
      * @param index   the channel index.
@@ -613,8 +636,9 @@ public class Channels {
     /**
      * Returns a map of input channels accepting the input data identified by the specified indexes.
      * <br/>
-     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
-     * completion of the invocation lifecycle.
+     * Note that the returned channels will employ a synchronous runner to transfer data, and that
+     * they <b>must be explicitly closed</b> in order to ensure the completion of the invocation
+     * lifecycle.
      *
      * @param channel the selectable channel.
      * @param indexes the iterable returning the channel indexes.
@@ -640,8 +664,9 @@ public class Channels {
     /**
      * Returns a map of input channels accepting the input data identified by the specified indexes.
      * <br/>
-     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
-     * completion of the invocation lifecycle.
+     * Note that the returned channels will employ a synchronous runner to transfer data, and that
+     * they <b>must be explicitly closed</b> in order to ensure the completion of the invocation
+     * lifecycle.
      *
      * @param channel the selectable channel.
      * @param indexes the array of indexes.
@@ -669,8 +694,9 @@ public class Channels {
     /**
      * Returns a map of input channels accepting the input data identified by the specified indexes.
      * <br/>
-     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
-     * completion of the invocation lifecycle.
+     * Note that the returned channels will employ a synchronous runner to transfer data, and that
+     * they <b>must be explicitly closed</b> in order to ensure the completion of the invocation
+     * lifecycle.
      *
      * @param startIndex the selectable start index.
      * @param rangeSize  the size of the range of indexes (must be positive).
@@ -703,7 +729,8 @@ public class Channels {
     /**
      * Returns a map of output channels returning the output data filtered by the specified indexes.
      * <br/>
-     * Note that the channel will be bound as a result of the call.
+     * Note that the returned channels will employ a synchronous runner to transfer data, and that
+     * the passed one will be bound as a result of the call.
      *
      * @param startIndex the selectable start index.
      * @param rangeSize  the size of the range of indexes (must be positive).
@@ -775,7 +802,8 @@ public class Channels {
     /**
      * Returns a map of output channels returning the outputs filtered by the specified indexes.
      * <br/>
-     * Note that the channel will be bound as a result of the call.
+     * Note that the returned channels will employ a synchronous runner to transfer data, and that
+     * the passed one will be bound as a result of the call.
      *
      * @param channel the selectable output channel.
      * @param indexes the list of indexes.
@@ -807,7 +835,8 @@ public class Channels {
     /**
      * Returns a map of output channels returning the output data filtered by the specified indexes.
      * <br/>
-     * Note that the channel will be bound as a result of the call.
+     * Note that the returned channels will employ a synchronous runner to transfer data, and that
+     * the passed one will be bound as a result of the call.
      *
      * @param channel the selectable output channel.
      * @param indexes the iterable returning the channel indexes.
@@ -837,8 +866,9 @@ public class Channels {
     /**
      * Returns a new selectable channel feeding the specified one.<br/>
      * Each output will be filtered based on the specified index.<br/>
-     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
-     * completion of the invocation lifecycle.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that it
+     * <b>must be explicitly closed</b> in order to ensure the completion of the invocation
+     * lifecycle.
      *
      * @param channel the channel to make selectable.
      * @param index   the channel index.
@@ -858,7 +888,8 @@ public class Channels {
     /**
      * Returns a new channel making the specified one selectable.<br/>
      * Each output will be passed along unchanged.<br/>
-     * Note that the channel will be bound as a result of the call.
+     * Note that the returned channels will employ a synchronous runner to transfer data, and that
+     * the passed one will be bound as a result of the call.
      *
      * @param channel the channel to make selectable.
      * @param index   the channel index.
@@ -972,7 +1003,8 @@ public class Channels {
         /**
          * Returns an output channel returning selectable data matching the specify index.<br/>
          * New output channels can be bound until data start coming After that, any attempt to bound
-         * a channel to a new index will cause an exception to be thrown.
+         * a channel to a new index will cause an exception to be thrown.<br/>
+         * Note that the returned channel will employ a synchronous runner to transfer data.
          *
          * @param index the channel index.
          * @return the output channel.

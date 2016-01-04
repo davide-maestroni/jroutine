@@ -142,7 +142,10 @@ public class JRoutine {
     }
 
     /**
-     * Returns an I/O channel builder.
+     * Returns an I/O channel builder.<br/>
+     * The channels created through the returned builder will employ, by default, a synchronous
+     * runner to transfer the passed data. So, in case inputs need to be delivered asynchronously,
+     * the proper asynchronous runner must be explicitly configured.
      *
      * @return the channel builder instance.
      */

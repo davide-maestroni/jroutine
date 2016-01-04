@@ -27,6 +27,8 @@ import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.invocation.PassingInvocation;
 import com.github.dm.jrt.invocation.TemplateInvocation;
 import com.github.dm.jrt.routine.Routine;
+import com.github.dm.jrt.stream.StreamOutputChannel;
+import com.github.dm.jrt.stream.Streams;
 import com.github.dm.jrt.util.ClassToken;
 
 import org.jetbrains.annotations.NotNull;
@@ -1259,11 +1261,14 @@ public class ChannelsTest {
         channel1.close();
         channel2.close();
 
-        assertThat(channelMap.get(Sort.STRING).afterMax(seconds(1)).all()).containsExactly("0", "1",
-                                                                                           "2",
-                                                                                           "3");
-        assertThat(channelMap.get(Sort.INTEGER).afterMax(seconds(1)).all()).containsExactly(0, 1, 2,
-                                                                                            3);
+        assertThat(Streams.streamOf(channelMap.get(Sort.STRING))
+                          .runOnShared()
+                          .afterMax(seconds(1))
+                          .all()).containsExactly("0", "1", "2", "3");
+        assertThat(Streams.streamOf(channelMap.get(Sort.INTEGER))
+                          .runOnShared()
+                          .afterMax(seconds(1))
+                          .all()).containsExactly(0, 1, 2, 3);
     }
 
     @Test
@@ -1558,18 +1563,36 @@ public class ChannelsTest {
         channel = routine.asyncCall(new Selectable<Object>("test21", Sort.STRING),
                                     new Selectable<Object>(-11, Sort.INTEGER));
         channelMap = Channels.select(channel, Arrays.asList(Sort.INTEGER, Sort.STRING));
-        assertThat(channelMap.get(Sort.INTEGER).afterMax(seconds(1)).all()).containsOnly(-11);
-        assertThat(channelMap.get(Sort.STRING).afterMax(seconds(1)).all()).containsOnly("test21");
+        assertThat(Streams.streamOf(channelMap.get(Sort.INTEGER))
+                          .runOnShared()
+                          .afterMax(seconds(1))
+                          .all()).containsOnly(-11);
+        assertThat(Streams.streamOf(channelMap.get(Sort.STRING))
+                          .runOnShared()
+                          .afterMax(seconds(1))
+                          .all()).containsOnly("test21");
         channel = routine.asyncCall(new Selectable<Object>(-11, Sort.INTEGER),
                                     new Selectable<Object>("test21", Sort.STRING));
         channelMap = Channels.select(channel, Sort.INTEGER, Sort.STRING);
-        assertThat(channelMap.get(Sort.INTEGER).afterMax(seconds(1)).all()).containsOnly(-11);
-        assertThat(channelMap.get(Sort.STRING).afterMax(seconds(1)).all()).containsOnly("test21");
+        assertThat(Streams.streamOf(channelMap.get(Sort.INTEGER))
+                          .runOnShared()
+                          .afterMax(seconds(1))
+                          .all()).containsOnly(-11);
+        assertThat(Streams.streamOf(channelMap.get(Sort.STRING))
+                          .runOnShared()
+                          .afterMax(seconds(1))
+                          .all()).containsOnly("test21");
         channel = routine.asyncCall(new Selectable<Object>("test21", Sort.STRING),
                                     new Selectable<Object>(-11, Sort.INTEGER));
         channelMap = Channels.select(Math.min(Sort.INTEGER, Sort.STRING), 2, channel);
-        assertThat(channelMap.get(Sort.INTEGER).afterMax(seconds(1)).all()).containsOnly(-11);
-        assertThat(channelMap.get(Sort.STRING).afterMax(seconds(1)).all()).containsOnly("test21");
+        assertThat(Streams.streamOf(channelMap.get(Sort.INTEGER))
+                          .runOnShared()
+                          .afterMax(seconds(1))
+                          .all()).containsOnly(-11);
+        assertThat(Streams.streamOf(channelMap.get(Sort.STRING))
+                          .runOnShared()
+                          .afterMax(seconds(1))
+                          .all()).containsOnly("test21");
     }
 
     @Test
@@ -1590,7 +1613,7 @@ public class ChannelsTest {
 
         try {
 
-            channelMap.get(Sort.STRING).afterMax(seconds(1)).all();
+            Streams.streamOf(channelMap.get(Sort.STRING)).runOnShared().afterMax(seconds(1)).all();
 
             fail();
 
@@ -1600,7 +1623,7 @@ public class ChannelsTest {
 
         try {
 
-            channelMap.get(Sort.INTEGER).afterMax(seconds(1)).all();
+            Streams.streamOf(channelMap.get(Sort.INTEGER)).runOnShared().afterMax(seconds(1)).all();
 
             fail();
 
@@ -1618,7 +1641,7 @@ public class ChannelsTest {
 
         try {
 
-            channelMap.get(Sort.STRING).afterMax(seconds(1)).all();
+            Streams.streamOf(channelMap.get(Sort.STRING)).runOnShared().afterMax(seconds(1)).all();
 
             fail();
 
@@ -1628,7 +1651,7 @@ public class ChannelsTest {
 
         try {
 
-            channelMap.get(Sort.INTEGER).afterMax(seconds(1)).all();
+            Streams.streamOf(channelMap.get(Sort.INTEGER)).runOnShared().afterMax(seconds(1)).all();
 
             fail();
 
@@ -1646,7 +1669,7 @@ public class ChannelsTest {
 
         try {
 
-            channelMap.get(Sort.STRING).afterMax(seconds(1)).all();
+            Streams.streamOf(channelMap.get(Sort.STRING)).runOnShared().afterMax(seconds(1)).all();
 
             fail();
 
@@ -1656,7 +1679,7 @@ public class ChannelsTest {
 
         try {
 
-            channelMap.get(Sort.INTEGER).afterMax(seconds(1)).all();
+            Streams.streamOf(channelMap.get(Sort.INTEGER)).runOnShared().afterMax(seconds(1)).all();
 
             fail();
 
@@ -1747,38 +1770,22 @@ public class ChannelsTest {
                 JRoutine.on(new Sort()).buildRoutine();
         final IOChannel<Selectable<Object>> inputChannel = JRoutine.io().buildChannel();
         final OutputChannel<Selectable<Object>> outputChannel = routine.asyncCall(inputChannel);
-        Channels.select(outputChannel).index(Sort.INTEGER);
-        Channels.select(outputChannel).index(Sort.STRING);
+        final StreamOutputChannel<Object> intChannel =
+                Streams.streamOf(Channels.select(outputChannel).index(Sort.INTEGER)).runOnShared();
+        final StreamOutputChannel<Object> strChannel =
+                Streams.streamOf(Channels.select(outputChannel).index(Sort.STRING)).runOnShared();
         inputChannel.pass(new Selectable<Object>("test21", Sort.STRING),
                           new Selectable<Object>(-11, Sort.INTEGER));
-        assertThat(Channels.select(outputChannel)
-                           .index(Sort.INTEGER)
-                           .afterMax(seconds(10))
-                           .next()).isEqualTo(-11);
-        assertThat(Channels.select(outputChannel)
-                           .index(Sort.STRING)
-                           .afterMax(seconds(10))
-                           .next()).isEqualTo("test21");
+        assertThat(intChannel.afterMax(seconds(10)).next()).isEqualTo(-11);
+        assertThat(strChannel.afterMax(seconds(10)).next()).isEqualTo("test21");
         inputChannel.pass(new Selectable<Object>(-11, Sort.INTEGER),
                           new Selectable<Object>("test21", Sort.STRING));
-        assertThat(Channels.select(outputChannel)
-                           .index(Sort.INTEGER)
-                           .afterMax(seconds(10))
-                           .next()).isEqualTo(-11);
-        assertThat(Channels.select(outputChannel)
-                           .index(Sort.STRING)
-                           .afterMax(seconds(10))
-                           .next()).isEqualTo("test21");
+        assertThat(intChannel.afterMax(seconds(10)).next()).isEqualTo(-11);
+        assertThat(strChannel.afterMax(seconds(10)).next()).isEqualTo("test21");
         inputChannel.pass(new Selectable<Object>("test21", Sort.STRING),
                           new Selectable<Object>(-11, Sort.INTEGER));
-        assertThat(Channels.select(outputChannel)
-                           .index(Sort.INTEGER)
-                           .afterMax(seconds(10))
-                           .next()).isEqualTo(-11);
-        assertThat(Channels.select(outputChannel)
-                           .index(Sort.STRING)
-                           .afterMax(seconds(10))
-                           .next()).isEqualTo("test21");
+        assertThat(intChannel.afterMax(seconds(10)).next()).isEqualTo(-11);
+        assertThat(strChannel.afterMax(seconds(10)).next()).isEqualTo("test21");
     }
 
     @Test
@@ -1798,7 +1805,10 @@ public class ChannelsTest {
 
         try {
 
-            Channels.select(outputChannel).index(Sort.STRING).afterMax(seconds(1)).all();
+            Streams.streamOf(Channels.select(outputChannel).index(Sort.STRING))
+                   .runOnShared()
+                   .afterMax(seconds(1))
+                   .all();
 
             fail();
 
@@ -1808,7 +1818,10 @@ public class ChannelsTest {
 
         try {
 
-            Channels.select(outputChannel).index(Sort.INTEGER).afterMax(seconds(1)).all();
+            Streams.streamOf(Channels.select(outputChannel).index(Sort.INTEGER))
+                   .runOnShared()
+                   .afterMax(seconds(1))
+                   .all();
 
             fail();
 
@@ -1827,7 +1840,10 @@ public class ChannelsTest {
 
         try {
 
-            Channels.select(outputChannel).index(Sort.STRING).afterMax(seconds(1)).all();
+            Streams.streamOf(Channels.select(outputChannel).index(Sort.STRING))
+                   .runOnShared()
+                   .afterMax(seconds(1))
+                   .all();
 
             fail();
 
@@ -1837,7 +1853,10 @@ public class ChannelsTest {
 
         try {
 
-            Channels.select(outputChannel).index(Sort.INTEGER).afterMax(seconds(1)).all();
+            Streams.streamOf(Channels.select(outputChannel).index(Sort.INTEGER))
+                   .runOnShared()
+                   .afterMax(seconds(1))
+                   .all();
 
             fail();
 
@@ -1856,7 +1875,10 @@ public class ChannelsTest {
 
         try {
 
-            Channels.select(outputChannel).index(Sort.STRING).afterMax(seconds(1)).all();
+            Streams.streamOf(Channels.select(outputChannel).index(Sort.STRING))
+                   .runOnShared()
+                   .afterMax(seconds(1))
+                   .all();
 
             fail();
 
@@ -1866,7 +1888,10 @@ public class ChannelsTest {
 
         try {
 
-            Channels.select(outputChannel).index(Sort.INTEGER).afterMax(seconds(1)).all();
+            Streams.streamOf(Channels.select(outputChannel).index(Sort.INTEGER))
+                   .runOnShared()
+                   .afterMax(seconds(1))
+                   .all();
 
             fail();
 

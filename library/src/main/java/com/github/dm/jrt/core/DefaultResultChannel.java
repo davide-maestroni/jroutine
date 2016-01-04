@@ -300,6 +300,14 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             mRunner.run(execution, delay.time, delay.unit);
         }
 
+        synchronized (mMutex) {
+
+            if (!mHasOutputs.isTrue()) {
+
+                waitOutputs();
+            }
+        }
+
         return this;
     }
 
@@ -324,6 +332,14 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             mRunner.run(execution, delay.time, delay.unit);
         }
 
+        synchronized (mMutex) {
+
+            if (!mHasOutputs.isTrue()) {
+
+                waitOutputs();
+            }
+        }
+
         return this;
     }
 
@@ -346,6 +362,14 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         } else if (execution != null) {
 
             mRunner.run(execution, delay.time, delay.unit);
+        }
+
+        synchronized (mMutex) {
+
+            if (!mHasOutputs.isTrue()) {
+
+                waitOutputs();
+            }
         }
 
         return this;
@@ -850,20 +874,18 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
     }
 
-    private void waitOutputs(final int count, @NotNull final TimeDuration delay) {
+    private void waitOutputs() {
 
         final TimeDuration timeout = mOutputTimeout;
 
         if (timeout.isZero()) {
 
-            mOutputCount -= count;
             throw new OutputTimeoutException(
                     "timeout while waiting for room in the output channel [" + timeout + "]");
         }
 
-        if (!delay.isZero() && mRunner.isExecutionThread()) {
+        if (mRunner.isExecutionThread()) {
 
-            mOutputCount -= count;
             throw new OutputDeadlockException(
                     "cannot wait on the invocation runner thread: " + Thread.currentThread()
                             + "\nTry increasing the timeout or the max number of outputs");
@@ -873,14 +895,12 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
             if (!timeout.waitTrue(mMutex, mHasOutputs)) {
 
-                mOutputCount -= count;
                 throw new OutputTimeoutException(
                         "timeout while waiting for room in the output channel [" + timeout + "]");
             }
 
         } catch (final InterruptedException e) {
 
-            mOutputCount -= count;
             throw new InvocationInterruptedException(e);
         }
     }
@@ -1575,6 +1595,14 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
                 mRunner.run(execution, delay.time, delay.unit);
             }
+
+            synchronized (mMutex) {
+
+                if (!mHasOutputs.isTrue()) {
+
+                    waitOutputs();
+                }
+            }
         }
     }
 
@@ -2166,17 +2194,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             mSubLogger.dbg("consumer output [#%d+1]: %s [%s]", mOutputCount, output, delay);
             ++mOutputCount;
 
-            if (!mHasOutputs.isTrue()) {
-
-                waitOutputs(1, delay);
-
-                if (mState != this) {
-
-                    --mOutputCount;
-                    return mState.onConsumerOutput(queue, output, delay, orderType);
-                }
-            }
-
             if (delay.isZero()) {
 
                 queue.add(output);
@@ -2247,17 +2264,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                            delay);
             mOutputCount += size;
 
-            if (!mHasOutputs.isTrue()) {
-
-                waitOutputs(size, delay);
-
-                if (mState != this) {
-
-                    mOutputCount -= size;
-                    return mState.pass(outputs);
-                }
-            }
-
             if (delay.isZero()) {
 
                 mOutputQueue.addAll(list);
@@ -2282,17 +2288,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             final TimeDuration delay = mResultDelay;
             mSubLogger.dbg("passing output [#%d+1]: %s [%s]", mOutputCount, output, delay);
             ++mOutputCount;
-
-            if (!mHasOutputs.isTrue()) {
-
-                waitOutputs(1, delay);
-
-                if (mState != this) {
-
-                    --mOutputCount;
-                    return mState.pass(output);
-                }
-            }
 
             if (delay.isZero()) {
 
@@ -2325,18 +2320,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             final TimeDuration delay = mResultDelay;
             mSubLogger.dbg("passing array [#%d+%d]: %s [%s]", mOutputCount, size, outputs, delay);
             mOutputCount += size;
-
-            if (!mHasOutputs.isTrue()) {
-
-                waitOutputs(size, delay);
-
-                if (mState != this) {
-
-                    mOutputCount -= size;
-                    return mState.pass(outputs);
-                }
-            }
-
             final ArrayList<OUT> list = new ArrayList<OUT>(size);
             Collections.addAll(list, outputs);
 

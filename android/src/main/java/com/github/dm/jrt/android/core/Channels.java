@@ -43,7 +43,8 @@ public class Channels extends com.github.dm.jrt.core.Channels {
 
     /**
      * Merges the specified channels into a selectable one.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that
+     * the passed ones will be bound as a result of the call.
      *
      * @param startIndex the selectable start index.
      * @param channels   the list of channels.
@@ -74,7 +75,8 @@ public class Channels extends com.github.dm.jrt.core.Channels {
 
     /**
      * Merges the specified channels into a selectable one.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that
+     * the passed ones will be bound as a result of the call.
      *
      * @param startIndex the selectable start index.
      * @param channels   the array of channels.
@@ -106,7 +108,8 @@ public class Channels extends com.github.dm.jrt.core.Channels {
     /**
      * Merges the specified channels into a selectable one. The selectable indexes will be the same
      * as the list ones.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that
+     * the passed ones will be bound as a result of the call.
      *
      * @param channels the channels to merge.
      * @param <OUT>    the output data type.
@@ -123,7 +126,8 @@ public class Channels extends com.github.dm.jrt.core.Channels {
     /**
      * Merges the specified channels into a selectable one. The selectable indexes will be the same
      * as the array ones.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that
+     * the passed ones will be bound as a result of the call.
      *
      * @param channels the channels to merge.
      * @param <OUT>    the output data type.
@@ -139,8 +143,9 @@ public class Channels extends com.github.dm.jrt.core.Channels {
 
     /**
      * Returns a new channel transforming the input data into selectable ones.<br/>
-     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
-     * completion of the invocation lifecycle.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that it
+     * <b>must be explicitly closed</b> in order to ensure the completion of the invocation
+     * lifecycle.
      *
      * @param channel the selectable channel.
      * @param index   the channel index.
@@ -162,7 +167,8 @@ public class Channels extends com.github.dm.jrt.core.Channels {
     /**
      * Returns a new channel making the specified one selectable.<br/>
      * Each output will be passed along unchanged.<br/>
-     * Note that the channel will be bound as a result of the call.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that
+     * the passed ones will be bound as a result of the call.
      *
      * @param channel the channel to make selectable.
      * @param index   the channel index.

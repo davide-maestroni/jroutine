@@ -17,8 +17,9 @@ import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.channel.AbortException;
 import com.github.dm.jrt.channel.Channel.InputChannel;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
-import com.github.dm.jrt.channel.DeadlockException;
 import com.github.dm.jrt.channel.IOChannel;
+import com.github.dm.jrt.channel.InputDeadlockException;
+import com.github.dm.jrt.channel.OutputDeadlockException;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.channel.TimeoutException;
@@ -33,6 +34,7 @@ import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.invocation.Invocations;
 import com.github.dm.jrt.routine.Routine;
+import com.github.dm.jrt.runner.Runner;
 import com.github.dm.jrt.runner.Runners;
 
 import org.assertj.core.data.Offset;
@@ -58,6 +60,8 @@ import static org.junit.Assert.fail;
  * Created by davide-maestroni on 10/22/2015.
  */
 public class StreamOutputChannelTest {
+
+    private final Runner mSingleThreadRunner = Runners.poolRunner(1);
 
     @Test
     public void testBuilder() {
@@ -132,7 +136,11 @@ public class StreamOutputChannelTest {
 
         }
 
-        final IOChannel<String> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<String> ioChannel = JRoutine.io()
+                                                    .withChannels()
+                                                    .withRunner(Runners.sharedRunner())
+                                                    .set()
+                                                    .buildChannel();
         channel = Streams.streamOf(ioChannel.after(1, TimeUnit.DAYS).pass("test"));
 
         try {
@@ -352,7 +360,7 @@ public class StreamOutputChannelTest {
                           .all()).containsExactly("test1", "test2");
         assertThat(Streams.streamOf()
                           .asyncRange(1, 1000)
-                          .backPressureOn(Runners.poolRunner(1), 2, 10, TimeUnit.SECONDS)
+                          .backPressureOn(mSingleThreadRunner, 2, 10, TimeUnit.SECONDS)
                           .asyncMap(Functions.<Number>identity())
                           .asyncMap(new Function<Number, Double>() {
 
@@ -1068,7 +1076,7 @@ public class StreamOutputChannelTest {
             Streams.streamOf()
                    .asyncRange(1, 1000)
                    .withStreamInvocations()
-                   .withRunner(Runners.poolRunner(1))
+                   .withRunner(mSingleThreadRunner)
                    .withInputMaxSize(2)
                    .withInputTimeout(seconds(10))
                    .withOutputMaxSize(2)
@@ -1110,51 +1118,58 @@ public class StreamOutputChannelTest {
 
             fail();
 
-        } catch (final DeadlockException ignored) {
+        } catch (final OutputDeadlockException ignored) {
 
         }
 
-        assertThat(Streams.streamOf()
-                          .asyncRange(1, 1000)
-                          .withStreamInvocations()
-                          .withRunner(Runners.poolRunner(1))
-                          .withOutputMaxSize(2)
-                          .withOutputTimeout(seconds(10))
-                          .set()
-                          .asyncMap(Functions.<Number>identity())
-                          .asyncMap(new Function<Number, Double>() {
+        try {
 
-                              public Double apply(final Number number) {
+            Streams.streamOf()
+                   .asyncRange(1, 1000)
+                   .withStreamInvocations()
+                   .withRunner(mSingleThreadRunner)
+                   .withInputMaxSize(2)
+                   .withInputTimeout(seconds(10))
+                   .set()
+                   .asyncMap(Functions.<Number>identity())
+                   .asyncMap(new Function<Number, Double>() {
 
-                                  final double value = number.doubleValue();
-                                  return Math.sqrt(value);
-                              }
-                          })
-                          .syncMap(new Function<Double, SumData>() {
+                       public Double apply(final Number number) {
 
-                              public SumData apply(final Double aDouble) {
+                           final double value = number.doubleValue();
+                           return Math.sqrt(value);
+                       }
+                   })
+                   .syncMap(new Function<Double, SumData>() {
 
-                                  return new SumData(aDouble, 1);
-                              }
-                          })
-                          .syncReduce(new BiFunction<SumData, SumData, SumData>() {
+                       public SumData apply(final Double aDouble) {
 
-                              public SumData apply(final SumData data1, final SumData data2) {
+                           return new SumData(aDouble, 1);
+                       }
+                   })
+                   .syncReduce(new BiFunction<SumData, SumData, SumData>() {
 
-                                  return new SumData(data1.sum + data2.sum,
-                                                     data1.count + data2.count);
-                              }
-                          })
-                          .syncMap(new Function<SumData, Double>() {
+                       public SumData apply(final SumData data1, final SumData data2) {
 
-                              public Double apply(final SumData data) {
+                           return new SumData(data1.sum + data2.sum, data1.count + data2.count);
+                       }
+                   })
+                   .syncMap(new Function<SumData, Double>() {
 
-                                  return data.sum / data.count;
-                              }
-                          })
-                          .runOnShared()
-                          .afterMax(seconds(3))
-                          .next()).isCloseTo(21, Offset.offset(0.1));
+                       public Double apply(final SumData data) {
+
+                           return data.sum / data.count;
+                       }
+                   })
+                   .runOnShared()
+                   .afterMax(seconds(3))
+                   .next();
+
+            fail();
+
+        } catch (final InputDeadlockException ignored) {
+
+        }
     }
 
     @Test

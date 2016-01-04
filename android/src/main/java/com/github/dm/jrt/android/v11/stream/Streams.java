@@ -11,31 +11,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.dm.jrt.stream;
+package com.github.dm.jrt.android.v11.stream;
 
-import com.github.dm.jrt.builder.RoutineBuilder;
+import android.util.SparseArray;
+
+import com.github.dm.jrt.android.builder.LoaderRoutineBuilder;
+import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
+import com.github.dm.jrt.android.v11.core.Channels;
+import com.github.dm.jrt.android.v11.core.JRoutine;
+import com.github.dm.jrt.android.v11.core.JRoutine.ContextBuilder;
+import com.github.dm.jrt.android.v11.core.LoaderContext;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
-import com.github.dm.jrt.channel.IOChannel;
-import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.channel.RoutineException;
-import com.github.dm.jrt.core.Channels;
-import com.github.dm.jrt.core.JRoutine;
+import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.function.Function;
-import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationFactory;
-import com.github.dm.jrt.invocation.TemplateInvocation;
+import com.github.dm.jrt.stream.StreamOutputChannel;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+
+import static com.github.dm.jrt.android.core.DelegatingContextInvocation.factoryFrom;
+import static com.github.dm.jrt.function.Functions.wrapFunction;
 
 /**
  * Utility class acting as a factory of stream output channels.
  * <p/>
- * Created by davide-maestroni on 11/26/2015.
+ * Created by davide-maestroni on 01/02/2016.
  */
 public class Streams extends Channels {
 
@@ -48,7 +51,8 @@ public class Streams extends Channels {
 
     /**
      * Returns a stream output channel blending the outputs coming from the specified ones.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that
+     * the passed ones will be bound as a result of the call.
      *
      * @param channels the list of channels.
      * @param <OUT>    the output data type.
@@ -63,7 +67,8 @@ public class Streams extends Channels {
 
     /**
      * Returns a stream output channel blending the outputs coming from the specified ones.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that
+     * the passed ones will be bound as a result of the call.
      *
      * @param channels the array of channels.
      * @param <OUT>    the output data type.
@@ -80,7 +85,8 @@ public class Streams extends Channels {
      * Returns a stream output channel concatenating the outputs coming from the specified ones, so
      * that, all the outputs of the first channel will come before all the outputs of the second
      * one, and so on.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that
+     * the passed ones will be bound as a result of the call.
      *
      * @param channels the list of channels.
      * @param <OUT>    the output data type.
@@ -97,7 +103,8 @@ public class Streams extends Channels {
      * Returns a stream output channel concatenating the outputs coming from the specified ones, so
      * that, all the outputs of the first channel will come before all the outputs of the second
      * one, and so on.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that
+     * the passed ones will be bound as a result of the call.
      *
      * @param channels the array of channels.
      * @param <OUT>    the output data type.
@@ -122,11 +129,12 @@ public class Streams extends Channels {
      * @return the invocation factory.
      */
     @NotNull
-    public static <IN, OUT> InvocationFactory<IN, OUT> factory(
+    public static <IN, OUT> FunctionContextInvocationFactory<IN, OUT> factory(
             @NotNull final Function<? super StreamOutputChannel<? extends IN>, ? extends
                     StreamOutputChannel<? extends OUT>> function) {
 
-        return new StreamInvocationFactory<IN, OUT>(function);
+        return factoryFrom(com.github.dm.jrt.stream.Streams.on(function),
+                           wrapFunction(function).hashCode(), DelegationType.SYNC);
     }
 
     /**
@@ -140,14 +148,15 @@ public class Streams extends Channels {
     @NotNull
     public static <DATA> InvocationFactory<DATA, List<DATA>> groupBy(final int size) {
 
-        return new GroupByInvocationFactory<DATA>(size);
+        return com.github.dm.jrt.stream.Streams.groupBy(size);
     }
 
     /**
      * Returns a stream output channel joining the data coming from the specified list of channels.
      * <br/>
      * An output will be generated only when at least one result is available for each channel.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that
+     * the passed ones will be bound as a result of the call.
      *
      * @param channels the list of channels.
      * @param <OUT>    the output data type.
@@ -165,7 +174,8 @@ public class Streams extends Channels {
      * Returns a stream output channel joining the data coming from the specified list of channels.
      * <br/>
      * An output will be generated only when at least one result is available for each channel.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that
+     * the passed ones will be bound as a result of the call.
      *
      * @param channels the array of channels.
      * @param <OUT>    the output data type.
@@ -186,7 +196,8 @@ public class Streams extends Channels {
      * Moreover, when all the output channels complete, the remaining outputs will be returned by
      * filling the gaps with the specified placeholder instance, so that the generated list of data
      * will always have the same size of the channel list.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that
+     * the passed ones will be bound as a result of the call.
      *
      * @param placeholder the placeholder instance.
      * @param channels    the list of channels.
@@ -209,7 +220,8 @@ public class Streams extends Channels {
      * Moreover, when all the output channels complete, the remaining outputs will be returned by
      * filling the gaps with the specified placeholder instance, so that the generated list of data
      * will always have the same size of the channel list.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that
+     * the passed ones will be bound as a result of the call.
      *
      * @param placeholder the placeholder instance.
      * @param channels    the array of channels.
@@ -235,12 +247,13 @@ public class Streams extends Channels {
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> limit(final int count) {
 
-        return new LimitInvocationFactory<DATA>(count);
+        return com.github.dm.jrt.stream.Streams.limit(count);
     }
 
     /**
      * Merges the specified channels into a selectable one.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that
+     * the passed ones will be bound as a result of the call.
      *
      * @param startIndex the selectable start index.
      * @param channels   the list of channels.
@@ -249,7 +262,8 @@ public class Streams extends Channels {
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @NotNull
-    public static <OUT> StreamOutputChannel<? extends Selectable<OUT>> merge(final int startIndex,
+    public static <OUT> StreamOutputChannel<? extends ParcelableSelectable<OUT>> merge(
+            final int startIndex,
             @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
 
         return streamOf(Channels.merge(startIndex, channels));
@@ -257,7 +271,8 @@ public class Streams extends Channels {
 
     /**
      * Merges the specified channels into a selectable one.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that
+     * the passed ones will be bound as a result of the call.
      *
      * @param startIndex the selectable start index.
      * @param channels   the array of channels.
@@ -266,8 +281,8 @@ public class Streams extends Channels {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static <OUT> StreamOutputChannel<? extends Selectable<OUT>> merge(final int startIndex,
-            @NotNull final OutputChannel<?>... channels) {
+    public static <OUT> StreamOutputChannel<? extends ParcelableSelectable<OUT>> merge(
+            final int startIndex, @NotNull final OutputChannel<?>... channels) {
 
         return streamOf(Channels.<OUT>merge(startIndex, channels));
     }
@@ -275,7 +290,8 @@ public class Streams extends Channels {
     /**
      * Merges the specified channels into a selectable one. The selectable indexes will be the same
      * as the list ones.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that
+     * the passed ones will be bound as a result of the call.
      *
      * @param channels the channels to merge.
      * @param <OUT>    the output data type.
@@ -283,32 +299,17 @@ public class Streams extends Channels {
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @NotNull
-    public static <OUT> StreamOutputChannel<? extends Selectable<OUT>> merge(
+    public static <OUT> StreamOutputChannel<? extends ParcelableSelectable<OUT>> merge(
             @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
 
         return streamOf(Channels.merge(channels));
     }
 
     /**
-     * Merges the specified channels into a selectable one.<br/>
-     * Note that the channels will be bound as a result of the call.
-     *
-     * @param channelMap the map of indexes and output channels.
-     * @param <OUT>      the output data type.
-     * @return the selectable stream channel.
-     * @throws java.lang.IllegalArgumentException if the specified map is empty.
-     */
-    @NotNull
-    public static <OUT> StreamOutputChannel<? extends Selectable<OUT>> merge(
-            @NotNull final Map<Integer, ? extends OutputChannel<? extends OUT>> channelMap) {
-
-        return streamOf(Channels.merge(channelMap));
-    }
-
-    /**
      * Merges the specified channels into a selectable one. The selectable indexes will be the same
      * as the array ones.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that
+     * the passed ones will be bound as a result of the call.
      *
      * @param channels the channels to merge.
      * @param <OUT>    the output data type.
@@ -316,29 +317,27 @@ public class Streams extends Channels {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static <OUT> StreamOutputChannel<? extends Selectable<OUT>> merge(
+    public static <OUT> StreamOutputChannel<? extends ParcelableSelectable<OUT>> merge(
             @NotNull final OutputChannel<?>... channels) {
 
         return streamOf(Channels.<OUT>merge(channels));
     }
 
     /**
-     * Returns an routine builder, whose invocation instances employ the stream output channels,
-     * provided by the specified function, to process input data.<br/>
-     * The function should return a new instance each time it is called, starting from the passed
-     * one.
+     * Merges the specified channels into a selectable one.<br/>
+     * Note that the returned channel will employ a synchronous runner to transfer data, and that
+     * the passed ones will be bound as a result of the call.
      *
-     * @param function the function providing the stream output channels.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the routine builder.
+     * @param channelMap the map of indexes and output channels.
+     * @param <OUT>      the output data type.
+     * @return the selectable output channel.
+     * @throws java.lang.IllegalArgumentException if the specified map is empty.
      */
     @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> on(
-            @NotNull final Function<? super StreamOutputChannel<? extends IN>, ? extends
-                    StreamOutputChannel<? extends OUT>> function) {
+    public static <OUT> StreamOutputChannel<? extends ParcelableSelectable<OUT>> merge(
+            @NotNull final SparseArray<? extends OutputChannel<? extends OUT>> channelMap) {
 
-        return JRoutine.on(factory(function));
+        return streamOf(Channels.merge(channelMap));
     }
 
     /**
@@ -351,7 +350,7 @@ public class Streams extends Channels {
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> skip(final int count) {
 
-        return new SkipInvocationFactory<DATA>(count);
+        return com.github.dm.jrt.stream.Streams.skip(count);
     }
 
     /**
@@ -363,7 +362,7 @@ public class Streams extends Channels {
     @NotNull
     public static <OUT> StreamOutputChannel<OUT> streamOf() {
 
-        return streamOf(JRoutine.io().<OUT>buildChannel().close());
+        return com.github.dm.jrt.stream.Streams.streamOf();
     }
 
     /**
@@ -376,7 +375,7 @@ public class Streams extends Channels {
     @NotNull
     public static <OUT> StreamOutputChannel<OUT> streamOf(@Nullable final Iterable<OUT> outputs) {
 
-        return streamOf(JRoutine.io().of(outputs));
+        return com.github.dm.jrt.stream.Streams.streamOf(outputs);
     }
 
     /**
@@ -389,7 +388,7 @@ public class Streams extends Channels {
     @NotNull
     public static <OUT> StreamOutputChannel<OUT> streamOf(@Nullable final OUT output) {
 
-        return streamOf(JRoutine.io().of(output));
+        return com.github.dm.jrt.stream.Streams.streamOf(output);
     }
 
     /**
@@ -402,7 +401,7 @@ public class Streams extends Channels {
     @NotNull
     public static <OUT> StreamOutputChannel<OUT> streamOf(@Nullable final OUT... outputs) {
 
-        return streamOf(JRoutine.io().of(outputs));
+        return com.github.dm.jrt.stream.Streams.streamOf(outputs);
     }
 
     /**
@@ -418,335 +417,55 @@ public class Streams extends Channels {
     public static <OUT> StreamOutputChannel<OUT> streamOf(
             @NotNull final OutputChannel<OUT> output) {
 
-        return new DefaultStreamOutputChannel<OUT>(output);
+        return com.github.dm.jrt.stream.Streams.streamOf(output);
     }
 
     /**
-     * Routine invocation grouping data into collections of the same size.
+     * Returns a context based builder of loader routine builders.
      *
-     * @param <DATA> the data type.
+     * @param context the loader context.
+     * @return the context builder.
      */
-    private static class GroupByInvocation<DATA> extends TemplateInvocation<DATA, List<DATA>> {
+    @NotNull
+    public static StreamContextBuilder with(@NotNull final LoaderContext context) {
 
-        private final ArrayList<DATA> mInputs = new ArrayList<DATA>();
+        return new StreamContextBuilder(JRoutine.with(context));
+    }
 
-        private final int mSize;
+    /**
+     * Context based builder of loader routine builders.
+     */
+    public static class StreamContextBuilder {
+
+        private final ContextBuilder mContextBuilder;
 
         /**
          * Constructor.
          *
-         * @param size the group size.
+         * @param builder the context builder.
          */
-        private GroupByInvocation(final int size) {
+        private StreamContextBuilder(@NotNull final ContextBuilder builder) {
 
-            mSize = size;
+            mContextBuilder = builder;
         }
-
-        @Override
-        public void onInput(final DATA input, @NotNull final ResultChannel<List<DATA>> result) {
-
-            final ArrayList<DATA> inputs = mInputs;
-            final int size = mSize;
-
-            if (inputs.size() < size) {
-
-                inputs.add(input);
-
-                if (inputs.size() == size) {
-
-                    result.pass(new ArrayList<DATA>(inputs));
-                    inputs.clear();
-                }
-            }
-        }
-
-        @Override
-        public void onResult(@NotNull final ResultChannel<List<DATA>> result) {
-
-            final ArrayList<DATA> inputs = mInputs;
-
-            if (!inputs.isEmpty()) {
-
-                result.pass(new ArrayList<DATA>(inputs));
-            }
-        }
-
-        @Override
-        public void onTerminate() {
-
-            mInputs.clear();
-        }
-    }
-
-    /**
-     * Factory of grouping invocation.
-     *
-     * @param <DATA> the data type.
-     */
-    private static class GroupByInvocationFactory<DATA>
-            extends InvocationFactory<DATA, List<DATA>> {
-
-        private final int mSize;
 
         /**
-         * Constructor.
+         * Returns a loader routine builder, whose invocation instances employ the stream output
+         * channels, provided by the specified function, to process input data.<br/>
+         * The function should return a new instance each time it is called, starting from the
+         * passed one.
          *
-         * @param size the group size.
+         * @param function the function providing the stream output channels.
+         * @param <IN>     the input data type.
+         * @param <OUT>    the output data type.
+         * @return the loader routine builder.
          */
-        private GroupByInvocationFactory(final int size) {
-
-            mSize = size;
-        }
-
         @NotNull
-        @Override
-        public Invocation<DATA, List<DATA>> newInvocation() {
-
-            return new GroupByInvocation<DATA>(mSize);
-        }
-    }
-
-    /**
-     * Routine invocation passing only the first {@code count} input data.
-     *
-     * @param <DATA> the data type.
-     */
-    private static class LimitInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
-
-        private final int mCount;
-
-        private int mCurrent;
-
-        /**
-         * Constructor.
-         *
-         * @param count the number of data to pass.
-         */
-        private LimitInvocation(final int count) {
-
-            mCount = count;
-        }
-
-        @Override
-        public void onInitialize() {
-
-            mCurrent = 0;
-        }
-
-        @Override
-        public void onInput(final DATA input, @NotNull final ResultChannel<DATA> result) {
-
-            if (mCurrent < mCount) {
-
-                ++mCurrent;
-                result.pass(input);
-            }
-        }
-    }
-
-    /**
-     * Factory of limiting data invocations.
-     *
-     * @param <DATA> the data type.
-     */
-    private static class LimitInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
-
-        private final int mCount;
-
-        /**
-         * Constructor.
-         *
-         * @param count the number of data to pass.
-         */
-        private LimitInvocationFactory(final int count) {
-
-            mCount = count;
-        }
-
-        @NotNull
-        @Override
-        public Invocation<DATA, DATA> newInvocation() {
-
-            return new LimitInvocation<DATA>(mCount);
-        }
-    }
-
-    /**
-     * Routine invocation skipping input data.
-     *
-     * @param <DATA> the data type.
-     */
-    private static class SkipInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
-
-        private final int mCount;
-
-        private int mCurrent;
-
-        /**
-         * Constructor.
-         *
-         * @param count the number of data to skip.
-         */
-        private SkipInvocation(final int count) {
-
-            mCount = count;
-        }
-
-        @Override
-        public void onInitialize() {
-
-            mCurrent = 0;
-        }
-
-        @Override
-        public void onInput(final DATA input, @NotNull final ResultChannel<DATA> result) {
-
-            if (mCurrent < mCount) {
-
-                ++mCurrent;
-
-            } else {
-
-                result.pass(input);
-            }
-        }
-    }
-
-    /**
-     * Factory of skip invocations.
-     *
-     * @param <DATA> the data type.
-     */
-    private static class SkipInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
-
-        private final int mCount;
-
-        /**
-         * Constructor.
-         *
-         * @param count the number of data to skip.
-         */
-        private SkipInvocationFactory(final int count) {
-
-            mCount = count;
-        }
-
-        @NotNull
-        @Override
-        public Invocation<DATA, DATA> newInvocation() {
-
-            return new SkipInvocation<DATA>(mCount);
-        }
-    }
-
-    /**
-     * Implementation of an invocation wrapping a stream output channel.
-     *
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
-     */
-    private static class StreamInvocation<IN, OUT> implements Invocation<IN, OUT> {
-
-        private final Function<? super StreamOutputChannel<? extends IN>, ? extends
-                StreamOutputChannel<? extends OUT>> mFunction;
-
-        private IOChannel<IN> mInputChannel;
-
-        private StreamOutputChannel<? extends OUT> mOutputChannel;
-
-        /**
-         * Constructor.
-         *
-         * @param function the function used to instantiate the stream output channel.
-         */
-        private StreamInvocation(
+        public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
                 @NotNull final Function<? super StreamOutputChannel<? extends IN>, ? extends
                         StreamOutputChannel<? extends OUT>> function) {
 
-            mFunction = function;
-        }
-
-        public void onAbort(@Nullable final RoutineException reason) {
-
-            mInputChannel.abort(reason);
-        }
-
-        public void onDestroy() {
-
-        }
-
-        public void onInitialize() {
-
-            final IOChannel<IN> ioChannel = JRoutine.io().buildChannel();
-            mOutputChannel = mFunction.apply(streamOf(ioChannel));
-            mInputChannel = ioChannel;
-        }
-
-        public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
-
-            final StreamOutputChannel<? extends OUT> outputChannel = mOutputChannel;
-
-            if (!outputChannel.isBound()) {
-
-                outputChannel.passTo(result);
-            }
-
-            mInputChannel.pass(input);
-        }
-
-        public void onResult(@NotNull final ResultChannel<OUT> result) {
-
-            final StreamOutputChannel<? extends OUT> outputChannel = mOutputChannel;
-
-            if (!outputChannel.isBound()) {
-
-                outputChannel.passTo(result);
-            }
-
-            mInputChannel.close();
-        }
-
-        public void onTerminate() {
-
-            mInputChannel = null;
-            mOutputChannel = null;
-        }
-    }
-
-    /**
-     * Implementation of a factory creating invocations wrapping a stream output channel.
-     *
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
-     */
-    private static class StreamInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
-
-        private final Function<? super StreamOutputChannel<? extends IN>, ? extends
-                StreamOutputChannel<? extends OUT>> mFunction;
-
-        /**
-         * Constructor.
-         *
-         * @param function the function used to instantiate the stream output channel.
-         */
-        @SuppressWarnings("ConstantConditions")
-        private StreamInvocationFactory(
-                @NotNull final Function<? super StreamOutputChannel<? extends IN>, ? extends
-                        StreamOutputChannel<? extends OUT>> function) {
-
-            if (function == null) {
-
-                throw new NullPointerException("the function instance must not be null");
-            }
-
-            mFunction = function;
-        }
-
-        @NotNull
-        @Override
-        public Invocation<IN, OUT> newInvocation() {
-
-            return new StreamInvocation<IN, OUT>(mFunction);
+            return mContextBuilder.on(factory(function));
         }
     }
 }

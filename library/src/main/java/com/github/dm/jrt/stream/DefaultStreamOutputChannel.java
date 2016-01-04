@@ -735,7 +735,7 @@ class DefaultStreamOutputChannel<OUT>
             throw new NullPointerException("the consumer instance must not be null");
         }
 
-        final IOChannel<OUT> ioChannel = JRoutine.io().syncChannel();
+        final IOChannel<OUT> ioChannel = JRoutine.io().buildChannel();
         mChannel.passTo(new TryCatchOutputConsumer<OUT>(consumer, ioChannel));
         return new DefaultStreamOutputChannel<OUT>(mStreamConfiguration, ioChannel);
     }

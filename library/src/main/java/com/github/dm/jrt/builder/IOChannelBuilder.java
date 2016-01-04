@@ -67,14 +67,4 @@ public interface IOChannelBuilder extends ConfigurableChannelBuilder<IOChannelBu
      */
     @NotNull
     <DATA> IOChannel<DATA> of(@Nullable Iterable<DATA> inputs);
-
-    /**
-     * Builds and returns an I/O channel instance employing a synchronous and ignoring the
-     * configured one.
-     *
-     * @param <DATA> the data type.
-     * @return the newly created channel.
-     */
-    @NotNull
-    <DATA> IOChannel<DATA> syncChannel();
 }

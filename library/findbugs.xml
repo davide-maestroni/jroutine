@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FindBugsFilter>
     <Match>
-        <Class name="com.github.dm.jrt.core.DefaultInvocationChannel$InputChannelState"/>
-        <Method name="nextInput"/>
-        <Bug pattern="NO_NOTIFY_NOT_NOTIFYALL"/>
-    </Match>
-    <Match>
         <Class name="com.github.dm.jrt.core.DefaultResultChannel$DefaultIterator"/>
         <Method name="next"/>
         <Bug pattern="IT_NO_SUCH_ELEMENT"/>

@@ -86,7 +86,7 @@ public class DelegatingInvocation<IN, OUT> implements Invocation<IN, OUT> {
     public void onInitialize() {
 
         final DelegationType delegationType = mDelegationType;
-        final IOChannel<IN> inputChannel = JRoutine.io().syncChannel();
+        final IOChannel<IN> inputChannel = JRoutine.io().buildChannel();
         mInputChannel = inputChannel;
         mOutputChannel = (delegationType == DelegationType.ASYNC) ? mRoutine.asyncCall(inputChannel)
                 : (delegationType == DelegationType.PARALLEL) ? mRoutine.parallelCall(inputChannel)

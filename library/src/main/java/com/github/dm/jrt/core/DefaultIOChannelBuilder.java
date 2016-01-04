@@ -30,6 +30,11 @@ import org.jetbrains.annotations.Nullable;
  */
 class DefaultIOChannelBuilder implements IOChannelBuilder, Configurable<IOChannelBuilder> {
 
+    private static final ChannelConfiguration DEFAULT_CONFIGURATION =
+            ChannelConfiguration.DEFAULT_CONFIGURATION.builderFrom()
+                                                      .withRunner(Runners.syncRunner())
+                                                      .set();
+
     private ChannelConfiguration mConfiguration = ChannelConfiguration.DEFAULT_CONFIGURATION;
 
     /**
@@ -42,32 +47,26 @@ class DefaultIOChannelBuilder implements IOChannelBuilder, Configurable<IOChanne
     @NotNull
     public <DATA> IOChannel<DATA> buildChannel() {
 
-        return new DefaultIOChannel<DATA>(mConfiguration);
+        return new DefaultIOChannel<DATA>(
+                DEFAULT_CONFIGURATION.builderFrom().with(mConfiguration).set());
     }
 
     @NotNull
     public <DATA> IOChannel<DATA> of(@Nullable final DATA input) {
 
-        return this.<DATA>syncChannel().pass(input).close();
+        return this.<DATA>buildChannel().pass(input).close();
     }
 
     @NotNull
     public <DATA> IOChannel<DATA> of(@Nullable final DATA... inputs) {
 
-        return this.<DATA>syncChannel().pass(inputs).close();
+        return this.<DATA>buildChannel().pass(inputs).close();
     }
 
     @NotNull
     public <DATA> IOChannel<DATA> of(@Nullable final Iterable<DATA> inputs) {
 
-        return this.<DATA>syncChannel().pass(inputs).close();
-    }
-
-    @NotNull
-    public <DATA> DefaultIOChannel<DATA> syncChannel() {
-
-        return new DefaultIOChannel<DATA>(
-                mConfiguration.builderFrom().withRunner(Runners.syncRunner()).set());
+        return this.<DATA>buildChannel().pass(inputs).close();
     }
 
     @NotNull

@@ -277,6 +277,14 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
             mRunner.run(execution, delay.time, delay.unit);
         }
 
+        synchronized (mMutex) {
+
+            if (!mHasInputs.isTrue()) {
+
+                waitInputs();
+            }
+        }
+
         return this;
     }
 
@@ -297,6 +305,14 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
             mRunner.run(execution, delay.time, delay.unit);
         }
 
+        synchronized (mMutex) {
+
+            if (!mHasInputs.isTrue()) {
+
+                waitInputs();
+            }
+        }
+
         return this;
     }
 
@@ -315,6 +331,14 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         if (execution != null) {
 
             mRunner.run(execution, delay.time, delay.unit);
+        }
+
+        synchronized (mMutex) {
+
+            if (!mHasInputs.isTrue()) {
+
+                waitInputs();
+            }
         }
 
         return this;
@@ -350,20 +374,18 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         mRunner.cancel(mExecution);
     }
 
-    private void waitInputs(final int count) {
+    private void waitInputs() {
 
         final TimeDuration timeout = mInputTimeout;
 
         if (timeout.isZero()) {
 
-            mInputCount -= count;
             throw new InputTimeoutException(
                     "timeout while waiting for room in the input channel [" + timeout + "]");
         }
 
         if (mRunner.isExecutionThread()) {
 
-            mInputCount -= count;
             throw new InputDeadlockException(
                     "cannot wait on the invocation runner thread: " + Thread.currentThread()
                             + "\nTry increasing the timeout or the max number of inputs");
@@ -373,14 +395,12 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
             if (!timeout.waitTrue(mMutex, mHasInputs)) {
 
-                mInputCount -= count;
                 throw new InputTimeoutException(
                         "timeout while waiting for room in the input channel [" + timeout + "]");
             }
 
         } catch (final InterruptedException e) {
 
-            mInputCount -= count;
             throw new InvocationInterruptedException(e);
         }
     }
@@ -571,6 +591,14 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
             if (execution != null) {
 
                 mRunner.run(execution, delay.time, delay.unit);
+            }
+
+            synchronized (mMutex) {
+
+                if (!mHasInputs.isTrue()) {
+
+                    waitInputs();
+                }
             }
         }
     }
@@ -964,17 +992,6 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
             mSubLogger.dbg("consumer input [#%d+1]: %s [%s]", mInputCount, input, delay);
             ++mInputCount;
 
-            if (!mHasInputs.isTrue()) {
-
-                waitInputs(1);
-
-                if (mState != this) {
-
-                    --mInputCount;
-                    return mState.onConsumerOutput(input, queue, delay, orderType);
-                }
-            }
-
             if (delay.isZero()) {
 
                 queue.add(input);
@@ -1087,17 +1104,6 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
             mSubLogger.dbg("passing iterable [#%d+%d]: %s [%s]", mInputCount, size, inputs, delay);
             mInputCount += size;
 
-            if (!mHasInputs.isTrue()) {
-
-                waitInputs(size);
-
-                if (mState != this) {
-
-                    mInputCount -= size;
-                    return mState.pass(inputs);
-                }
-            }
-
             if (delay.isZero()) {
 
                 mInputQueue.addAll(list);
@@ -1130,17 +1136,6 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
             final TimeDuration delay = mInputDelay;
             mSubLogger.dbg("passing input [#%d+1]: %s [%s]", mInputCount, input, delay);
             ++mInputCount;
-
-            if (!mHasInputs.isTrue()) {
-
-                waitInputs(1);
-
-                if (mState != this) {
-
-                    --mInputCount;
-                    return mState.pass(input);
-                }
-            }
 
             if (delay.isZero()) {
 
@@ -1181,18 +1176,6 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
             final TimeDuration delay = mInputDelay;
             mSubLogger.dbg("passing array [#%d+%d]: %s [%s]", mInputCount, size, inputs, delay);
             mInputCount += size;
-
-            if (!mHasInputs.isTrue()) {
-
-                waitInputs(size);
-
-                if (mState != this) {
-
-                    mInputCount -= size;
-                    return mState.pass(inputs);
-                }
-            }
-
             final ArrayList<IN> list = new ArrayList<IN>(size);
             Collections.addAll(list, inputs);
 
@@ -1242,7 +1225,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
             if ((--mInputCount <= maxInput) && (prevInputCount > maxInput)) {
 
-                mMutex.notify();
+                mMutex.notifyAll();
             }
 
             return input;

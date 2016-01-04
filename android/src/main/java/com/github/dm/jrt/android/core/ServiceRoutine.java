@@ -46,6 +46,7 @@ import com.github.dm.jrt.log.Log.Level;
 import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.routine.TemplateRoutine;
+import com.github.dm.jrt.runner.Runner;
 import com.github.dm.jrt.runner.TemplateExecution;
 import com.github.dm.jrt.util.TimeDuration;
 
@@ -211,20 +212,22 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
             mUUID = randomUUID().toString();
             mIsParallel = isParallel;
             mContext = context;
-            mInMessenger = new Messenger(new IncomingHandler(
-                    serviceConfiguration.getResultLooperOr(Looper.getMainLooper())));
+            final Looper looper = serviceConfiguration.getResultLooperOr(Looper.getMainLooper());
+            mInMessenger = new Messenger(new IncomingHandler(looper));
             mTargetFactory = target;
             mInvocationConfiguration = invocationConfiguration;
             mServiceConfiguration = serviceConfiguration;
             mLogger = logger;
             final Log log = logger.getLog();
             final Level logLevel = logger.getLogLevel();
+            final Runner runner = invocationConfiguration.getRunnerOr(Runners.sharedRunner());
             final OrderType inputOrderType = invocationConfiguration.getInputOrderTypeOr(null);
             final int inputMaxSize =
                     invocationConfiguration.getInputMaxSizeOr(ChannelConfiguration.DEFAULT);
             final TimeDuration inputTimeout = invocationConfiguration.getInputTimeoutOr(null);
             mInput = JRoutine.io()
                              .withChannels()
+                             .withRunner(runner)
                              .withChannelOrder(inputOrderType)
                              .withChannelMaxSize(inputMaxSize)
                              .withChannelTimeout(inputTimeout)
@@ -240,6 +243,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
                     invocationConfiguration.getReadTimeoutActionOr(null);
             mOutput = JRoutine.io()
                               .withChannels()
+                              .withRunner(Runners.looperRunner(looper))
                               .withChannelMaxSize(outputMaxSize)
                               .withChannelTimeout(outputTimeout)
                               .withReadTimeout(executionTimeout)

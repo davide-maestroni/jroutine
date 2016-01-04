@@ -11,8 +11,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.dm.jrt.stream;
+package com.github.dm.jrt.android.v11.stream;
 
+import android.annotation.TargetApi;
+import android.os.Build.VERSION;
+import android.os.Build.VERSION_CODES;
+import android.test.ActivityInstrumentationTestCase2;
+import android.util.SparseArray;
+
+import com.github.dm.jrt.android.core.Channels.ParcelableSelectable;
+import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
+import com.github.dm.jrt.android.invocation.PassingFunctionContextInvocation;
+import com.github.dm.jrt.android.v11.core.Channels;
+import com.github.dm.jrt.android.v11.core.JRoutine;
+import com.github.dm.jrt.android.v11.core.TestActivity;
 import com.github.dm.jrt.builder.IOChannelBuilder;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.channel.AbortException;
@@ -20,42 +32,47 @@ import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.core.Channels;
-import com.github.dm.jrt.core.Channels.Selectable;
-import com.github.dm.jrt.core.JRoutine;
+import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.invocation.InvocationException;
-import com.github.dm.jrt.invocation.InvocationFactory;
-import com.github.dm.jrt.invocation.PassingInvocation;
 import com.github.dm.jrt.invocation.TemplateInvocation;
 import com.github.dm.jrt.routine.Routine;
+import com.github.dm.jrt.stream.StreamOutputChannel;
 import com.github.dm.jrt.util.ClassToken;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import static com.github.dm.jrt.android.core.DelegatingContextInvocation.factoryFrom;
+import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
 import static com.github.dm.jrt.invocation.Invocations.factoryOf;
 import static com.github.dm.jrt.util.TimeDuration.millis;
 import static com.github.dm.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
 
 /**
  * Streams unit tests.
  * <p/>
- * Created by davide-maestroni on 12/24/2015.
+ * Created by davide-maestroni on 01/04/2016.
  */
-public class StreamsTest {
+@TargetApi(VERSION_CODES.FROYO)
+public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> {
 
-    @Test
+    public StreamsTest() {
+
+        super(TestActivity.class);
+    }
+
     public void testBlend() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         StreamOutputChannel<String> channel1 = Streams.streamOf("test1", "test2", "test3");
         StreamOutputChannel<String> channel2 = Streams.streamOf("test4", "test5", "test6");
@@ -69,12 +86,18 @@ public class StreamsTest {
                                                "test6");
     }
 
-    @Test
     public void testBlendAbort() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final IOChannelBuilder builder = JRoutine.io();
-        final Routine<Object, Object> routine =
-                JRoutine.on(PassingInvocation.factoryOf()).buildRoutine();
+        final Routine<Object, Object> routine = JRoutine.with(loaderFrom(getActivity()))
+                                                        .on(PassingFunctionContextInvocation
+                                                                    .factoryOf())
+                                                        .buildRoutine();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
         channel1 = builder.buildChannel();
@@ -110,9 +133,13 @@ public class StreamsTest {
         }
     }
 
-    @Test
     @SuppressWarnings("ConstantConditions")
     public void testBlendError() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         try {
 
@@ -175,8 +202,50 @@ public class StreamsTest {
         }
     }
 
-    @Test
+    public void testBuilder() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        assertThat(Streams.streamOf("test").afterMax(seconds(1)).all()).containsExactly("test");
+        assertThat(Streams.streamOf("test1", "test2", "test3")
+                          .afterMax(seconds(1))
+                          .all()).containsExactly("test1", "test2", "test3");
+        assertThat(Streams.streamOf(Arrays.asList("test1", "test2", "test3"))
+                          .afterMax(seconds(1))
+                          .all()).containsExactly("test1", "test2", "test3");
+        assertThat(Streams.streamOf(JRoutine.io().of("test1", "test2", "test3"))
+                          .afterMax(seconds(1))
+                          .all()).containsExactly("test1", "test2", "test3");
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public void testBuilderNullPointerError() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        try {
+
+            Streams.streamOf((OutputChannel<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
     public void testConcat() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         StreamOutputChannel<String> channel1 = Streams.streamOf("test1", "test2", "test3");
         StreamOutputChannel<String> channel2 = Streams.streamOf("test4", "test5", "test6");
@@ -190,12 +259,18 @@ public class StreamsTest {
                                                   "test6");
     }
 
-    @Test
     public void testConcatAbort() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final IOChannelBuilder builder = JRoutine.io();
-        final Routine<Object, Object> routine =
-                JRoutine.on(PassingInvocation.factoryOf()).buildRoutine();
+        final Routine<Object, Object> routine = JRoutine.with(loaderFrom(getActivity()))
+                                                        .on(PassingFunctionContextInvocation
+                                                                    .factoryOf())
+                                                        .buildRoutine();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
         channel1 = builder.buildChannel();
@@ -231,9 +306,13 @@ public class StreamsTest {
         }
     }
 
-    @Test
     @SuppressWarnings("ConstantConditions")
     public void testConcatError() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         try {
 
@@ -296,10 +375,14 @@ public class StreamsTest {
         }
     }
 
-    @Test
     public void testFactory() {
 
-        final InvocationFactory<String, String> factory = Streams.factory(
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final FunctionContextInvocationFactory<String, String> factory = Streams.factory(
                 new Function<StreamOutputChannel<? extends String>, StreamOutputChannel<String>>() {
 
                     public StreamOutputChannel<String> apply(
@@ -314,14 +397,16 @@ public class StreamsTest {
                         });
                     }
                 });
-        assertThat(JRoutine.on(factory)
+        assertThat(JRoutine.with(loaderFrom(getActivity()))
+                           .on(factory)
                            .asyncCall("test1", "test2", "test3")
                            .afterMax(seconds(3))
                            .all()).containsExactly("TEST1", "TEST2", "TEST3");
 
         try {
 
-            final InvocationChannel<String, String> channel = JRoutine.on(factory).asyncInvoke();
+            final InvocationChannel<String, String> channel =
+                    JRoutine.with(loaderFrom(getActivity())).on(factory).asyncInvoke();
             channel.after(millis(100)).abort(new IllegalArgumentException());
             channel.result().afterMax(seconds(1)).next();
 
@@ -331,41 +416,46 @@ public class StreamsTest {
 
         }
 
-        assertThat(Streams.on(
-                new Function<StreamOutputChannel<? extends String>, StreamOutputChannel<String>>() {
+        assertThat(Streams.with(loaderFrom(getActivity()))
+                          .on(new Function<StreamOutputChannel<? extends String>,
+                                  StreamOutputChannel<String>>() {
 
-                    public StreamOutputChannel<String> apply(
-                            final StreamOutputChannel<? extends String> channel) {
+                              public StreamOutputChannel<String> apply(
+                                      final StreamOutputChannel<? extends String> channel) {
 
-                        return channel.syncMap(new Function<String, String>() {
+                                  return channel.syncMap(new Function<String, String>() {
 
-                            public String apply(final String s) {
+                                      public String apply(final String s) {
 
-                                return s.toUpperCase();
-                            }
-                        });
-                    }
-                }).asyncCall("test1", "test2", "test3").afterMax(seconds(3)).all()).containsExactly(
-                "TEST1", "TEST2", "TEST3");
+                                          return s.toUpperCase();
+                                      }
+                                  });
+                              }
+                          })
+                          .asyncCall("test1", "test2", "test3")
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("TEST1", "TEST2", "TEST3");
 
         try {
 
-            final InvocationChannel<String, String> channel = Streams.on(
-                    new Function<StreamOutputChannel<? extends String>,
-                            StreamOutputChannel<String>>() {
+            final InvocationChannel<String, String> channel =
+                    Streams.with(loaderFrom(getActivity()))
+                           .on(new Function<StreamOutputChannel<? extends String>,
+                                   StreamOutputChannel<String>>() {
 
-                        public StreamOutputChannel<String> apply(
-                                final StreamOutputChannel<? extends String> channel) {
+                               public StreamOutputChannel<String> apply(
+                                       final StreamOutputChannel<? extends String> channel) {
 
-                            return channel.syncMap(new Function<String, String>() {
+                                   return channel.syncMap(new Function<String, String>() {
 
-                                public String apply(final String s) {
+                                       public String apply(final String s) {
 
-                                    return s.toUpperCase();
-                                }
-                            });
-                        }
-                    }).asyncInvoke();
+                                           return s.toUpperCase();
+                                       }
+                                   });
+                               }
+                           })
+                           .asyncInvoke();
             channel.after(millis(100)).abort(new IllegalArgumentException());
             channel.result().afterMax(seconds(1)).next();
 
@@ -376,9 +466,13 @@ public class StreamsTest {
         }
     }
 
-    @Test
     @SuppressWarnings("ConstantConditions")
     public void testFactoryError() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         try {
 
@@ -392,7 +486,17 @@ public class StreamsTest {
 
         try {
 
-            Streams.on(null);
+            Streams.with(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.with(loaderFrom(getActivity())).on(null);
 
             fail();
 
@@ -401,8 +505,12 @@ public class StreamsTest {
         }
     }
 
-    @Test
     public void testFirst() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         assertThat(Streams.streamOf()
                           .syncRange(1, 10)
@@ -421,9 +529,13 @@ public class StreamsTest {
                           .all()).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
     }
 
-    @Test
     @SuppressWarnings("unchecked")
     public void testGroupBy() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         assertThat(Streams.streamOf()
                           .syncRange(1, 10)
@@ -446,11 +558,20 @@ public class StreamsTest {
                 Arrays.<Number>asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
     }
 
-    @Test
     public void testJoin() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final IOChannelBuilder builder = JRoutine.io();
-        final Routine<List<?>, Character> routine = JRoutine.on(new CharAt()).buildRoutine();
+        final Routine<List<?>, Character> routine = JRoutine.with(loaderFrom(getActivity()))
+                                                            .on(factoryFrom(
+                                                                    JRoutine.on(new CharAt())
+                                                                            .buildRoutine(), 1,
+                                                                    DelegationType.SYNC))
+                                                            .buildRoutine();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
         channel1 = builder.buildChannel();
@@ -482,11 +603,20 @@ public class StreamsTest {
                           .all()).containsExactly('s', '2');
     }
 
-    @Test
     public void testJoinAbort() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final IOChannelBuilder builder = JRoutine.io();
-        final Routine<List<?>, Character> routine = JRoutine.on(new CharAt()).buildRoutine();
+        final Routine<List<?>, Character> routine = JRoutine.with(loaderFrom(getActivity()))
+                                                            .on(factoryFrom(
+                                                                    JRoutine.on(new CharAt())
+                                                                            .buildRoutine(), 1,
+                                                                    DelegationType.SYNC))
+                                                            .buildRoutine();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
         channel1 = builder.buildChannel();
@@ -522,11 +652,20 @@ public class StreamsTest {
         }
     }
 
-    @Test
     public void testJoinAndFlush() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final IOChannelBuilder builder = JRoutine.io();
-        final Routine<List<?>, Character> routine = JRoutine.on(new CharAt()).buildRoutine();
+        final Routine<List<?>, Character> routine = JRoutine.with(loaderFrom(getActivity()))
+                                                            .on(factoryFrom(
+                                                                    JRoutine.on(new CharAt())
+                                                                            .buildRoutine(), 1,
+                                                                    DelegationType.SYNC))
+                                                            .buildRoutine();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
         channel1 = builder.buildChannel();
@@ -567,11 +706,20 @@ public class StreamsTest {
         }
     }
 
-    @Test
     public void testJoinAndFlushAbort() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final IOChannelBuilder builder = JRoutine.io();
-        final Routine<List<?>, Character> routine = JRoutine.on(new CharAt()).buildRoutine();
+        final Routine<List<?>, Character> routine = JRoutine.with(loaderFrom(getActivity()))
+                                                            .on(factoryFrom(
+                                                                    JRoutine.on(new CharAt())
+                                                                            .buildRoutine(), 1,
+                                                                    DelegationType.SYNC))
+                                                            .buildRoutine();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
         channel1 = builder.buildChannel();
@@ -611,8 +759,12 @@ public class StreamsTest {
         }
     }
 
-    @Test
     public void testJoinAndFlushError() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         try {
 
@@ -655,8 +807,12 @@ public class StreamsTest {
         }
     }
 
-    @Test
     public void testJoinError() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         try {
 
@@ -699,23 +855,30 @@ public class StreamsTest {
         }
     }
 
-    @Test
     public void testMap() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final IOChannelBuilder builder =
                 JRoutine.io().withChannels().withChannelOrder(OrderType.BY_CALL).set();
         final IOChannel<String> channel1 = builder.buildChannel();
         final IOChannel<Integer> channel2 = builder.buildChannel();
 
-        final OutputChannel<? extends Selectable<Object>> channel =
+        final OutputChannel<? extends ParcelableSelectable<Object>> channel =
                 Streams.merge(Arrays.<OutputChannel<?>>asList(channel1, channel2));
-        final OutputChannel<Selectable<Object>> output = JRoutine.on(new Sort())
-                                                                 .withInvocations()
-                                                                 .withInputOrder(OrderType.BY_CALL)
-                                                                 .set()
-                                                                 .asyncCall(channel);
-        final Map<Integer, OutputChannel<Object>> channelMap =
-                Streams.select(output, Sort.INTEGER, Sort.STRING);
+        final OutputChannel<ParcelableSelectable<Object>> output =
+                JRoutine.with(loaderFrom(getActivity()))
+                        .on(factoryFrom(JRoutine.on(new Sort()).buildRoutine(), 1,
+                                        DelegationType.SYNC))
+                        .withInvocations()
+                        .withInputOrder(OrderType.BY_CALL)
+                        .set()
+                        .asyncCall(channel);
+        final SparseArray<OutputChannel<Object>> channelMap =
+                Streams.selectParcelable(output, Sort.INTEGER, Sort.STRING);
 
         for (int i = 0; i < 4; i++) {
 
@@ -737,21 +900,26 @@ public class StreamsTest {
                           .all()).containsExactly(0, 1, 2, 3);
     }
 
-    @Test
     public void testMerge() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final IOChannelBuilder builder =
                 JRoutine.io().withChannels().withChannelOrder(OrderType.BY_CALL).set();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
-        OutputChannel<? extends Selectable<?>> outputChannel;
+        OutputChannel<? extends ParcelableSelectable<?>> outputChannel;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         outputChannel = Streams.<Object>merge(-7, channel1, channel2);
         channel1.pass("test1").close();
         channel2.pass(13).close();
         assertThat(outputChannel.afterMax(seconds(1)).all()).containsOnly(
-                new Selectable<String>("test1", -7), new Selectable<Integer>(13, -6));
+                new ParcelableSelectable<String>("test1", -7),
+                new ParcelableSelectable<Integer>(13, -6));
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         outputChannel =
@@ -759,37 +927,44 @@ public class StreamsTest {
         channel2.pass(13).close();
         channel1.pass("test1").close();
         assertThat(outputChannel.afterMax(seconds(1)).all()).containsOnly(
-                new Selectable<String>("test1", 11), new Selectable<Integer>(13, 12));
+                new ParcelableSelectable<String>("test1", 11),
+                new ParcelableSelectable<Integer>(13, 12));
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         outputChannel = Streams.<Object>merge(channel1, channel2);
         channel1.pass("test2").close();
         channel2.pass(-17).close();
         assertThat(outputChannel.afterMax(seconds(1)).all()).containsOnly(
-                new Selectable<String>("test2", 0), new Selectable<Integer>(-17, 1));
+                new ParcelableSelectable<String>("test2", 0),
+                new ParcelableSelectable<Integer>(-17, 1));
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         outputChannel = Streams.<Object>merge(Arrays.<OutputChannel<?>>asList(channel1, channel2));
         channel1.pass("test2").close();
         channel2.pass(-17).close();
         assertThat(outputChannel.afterMax(seconds(1)).all()).containsOnly(
-                new Selectable<String>("test2", 0), new Selectable<Integer>(-17, 1));
+                new ParcelableSelectable<String>("test2", 0),
+                new ParcelableSelectable<Integer>(-17, 1));
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        final HashMap<Integer, OutputChannel<?>> channelMap =
-                new HashMap<Integer, OutputChannel<?>>(2);
+        final SparseArray<OutputChannel<?>> channelMap = new SparseArray<OutputChannel<?>>(2);
         channelMap.put(7, channel1);
         channelMap.put(-3, channel2);
         outputChannel = Streams.<Object>merge(channelMap);
         channel1.pass("test3").close();
         channel2.pass(111).close();
         assertThat(outputChannel.afterMax(seconds(1)).all()).containsOnly(
-                new Selectable<String>("test3", 7), new Selectable<Integer>(111, -3));
+                new ParcelableSelectable<String>("test3", 7),
+                new ParcelableSelectable<Integer>(111, -3));
     }
 
-    @Test
     @SuppressWarnings("unchecked")
     public void testMerge4() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final IOChannelBuilder builder =
                 JRoutine.io().withChannels().withChannelOrder(OrderType.BY_CALL).set();
@@ -798,8 +973,11 @@ public class StreamsTest {
         final IOChannel<String> channel3 = builder.buildChannel();
         final IOChannel<String> channel4 = builder.buildChannel();
 
-        final Routine<Selectable<String>, String> routine =
-                JRoutine.on(factoryOf(new ClassToken<Amb<String>>() {})).buildRoutine();
+        final Routine<ParcelableSelectable<String>, String> routine =
+                JRoutine.with(loaderFrom(getActivity()))
+                        .on(factoryFrom(JRoutine.on(factoryOf(new ClassToken<Amb<String>>() {}))
+                                                .buildRoutine(), 1, DelegationType.SYNC))
+                        .buildRoutine();
         final OutputChannel<String> outputChannel = routine.asyncCall(
                 Streams.merge(Arrays.asList(channel1, channel2, channel3, channel4)));
 
@@ -820,14 +998,18 @@ public class StreamsTest {
         assertThat(outputChannel.afterMax(seconds(10)).all()).containsExactly("0", "1", "2", "3");
     }
 
-    @Test
     public void testMergeAbort() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final IOChannelBuilder builder =
                 JRoutine.io().withChannels().withChannelOrder(OrderType.BY_CALL).set();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
-        OutputChannel<? extends Selectable<?>> outputChannel;
+        OutputChannel<? extends ParcelableSelectable<?>> outputChannel;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         outputChannel = Streams.<Object>merge(-7, channel1, channel2);
@@ -895,10 +1077,9 @@ public class StreamsTest {
 
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        final HashMap<Integer, OutputChannel<?>> channelMap =
-                new HashMap<Integer, OutputChannel<?>>(2);
-        channelMap.put(7, channel1);
-        channelMap.put(-3, channel2);
+        final SparseArray<OutputChannel<?>> channelMap = new SparseArray<OutputChannel<?>>(2);
+        channelMap.append(7, channel1);
+        channelMap.append(-3, channel2);
         outputChannel = Streams.<Object>merge(channelMap);
         channel1.abort();
         channel2.pass(111).close();
@@ -914,8 +1095,12 @@ public class StreamsTest {
         }
     }
 
-    @Test
     public void testMergeError() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         try {
 
@@ -1018,8 +1203,12 @@ public class StreamsTest {
         }
     }
 
-    @Test
     public void testSkip() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         assertThat(Streams.streamOf()
                           .syncRange(1, 10)
@@ -1038,7 +1227,7 @@ public class StreamsTest {
                           .all()).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
     }
 
-    private static class Amb<DATA> extends TemplateInvocation<Selectable<DATA>, DATA> {
+    private static class Amb<DATA> extends TemplateInvocation<ParcelableSelectable<DATA>, DATA> {
 
         private static final int NO_INDEX = Integer.MIN_VALUE;
 
@@ -1051,7 +1240,7 @@ public class StreamsTest {
         }
 
         @Override
-        public void onInput(final Selectable<DATA> input,
+        public void onInput(final ParcelableSelectable<DATA> input,
                 @NotNull final ResultChannel<DATA> result) {
 
             if (mFirstIndex == NO_INDEX) {
@@ -1076,25 +1265,26 @@ public class StreamsTest {
         }
     }
 
-    private static class Sort extends FilterInvocation<Selectable<Object>, Selectable<Object>> {
+    private static class Sort
+            extends FilterInvocation<ParcelableSelectable<Object>, ParcelableSelectable<Object>> {
 
         private static final int INTEGER = 1;
 
         private static final int STRING = 0;
 
-        public void onInput(final Selectable<Object> selectable,
-                @NotNull final ResultChannel<Selectable<Object>> result) {
+        public void onInput(final ParcelableSelectable<Object> selectable,
+                @NotNull final ResultChannel<ParcelableSelectable<Object>> result) {
 
             switch (selectable.index) {
 
                 case INTEGER:
-                    Channels.<Object, Integer>select(result, INTEGER)
+                    Channels.<Object, Integer>selectParcelable(result, INTEGER)
                             .pass(selectable.<Integer>data())
                             .close();
                     break;
 
                 case STRING:
-                    Channels.<Object, String>select(result, STRING)
+                    Channels.<Object, String>selectParcelable(result, STRING)
                             .pass(selectable.<String>data())
                             .close();
                     break;

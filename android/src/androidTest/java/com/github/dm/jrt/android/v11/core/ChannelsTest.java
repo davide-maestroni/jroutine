@@ -31,6 +31,7 @@ import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.routine.Routine;
+import com.github.dm.jrt.stream.Streams;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -465,12 +466,14 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         channel1.close();
         channel2.close();
 
-        assertThat(channelMap.get(Sort.STRING).afterMax(seconds(10)).all()).containsExactly("0",
-                                                                                            "1",
-                                                                                            "2",
-                                                                                            "3");
-        assertThat(channelMap.get(Sort.INTEGER).afterMax(seconds(10)).all()).containsExactly(0, 1,
-                                                                                             2, 3);
+        assertThat(Streams.streamOf(channelMap.get(Sort.STRING))
+                          .runOnShared()
+                          .afterMax(seconds(10))
+                          .all()).containsExactly("0", "1", "2", "3");
+        assertThat(Streams.streamOf(channelMap.get(Sort.INTEGER))
+                          .runOnShared()
+                          .afterMax(seconds(10))
+                          .all()).containsExactly(0, 1, 2, 3);
     }
 
     @SuppressWarnings("unchecked")
@@ -546,18 +549,36 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         channel = routine.asyncCall(new ParcelableSelectable<Object>("test21", Sort.STRING),
                                     new ParcelableSelectable<Object>(-11, Sort.INTEGER));
         channelMap = Channels.selectParcelable(channel, Arrays.asList(Sort.INTEGER, Sort.STRING));
-        assertThat(channelMap.get(Sort.INTEGER).afterMax(seconds(10)).all()).containsOnly(-11);
-        assertThat(channelMap.get(Sort.STRING).afterMax(seconds(10)).all()).containsOnly("test21");
+        assertThat(Streams.streamOf(channelMap.get(Sort.INTEGER))
+                          .runOnShared()
+                          .afterMax(seconds(10))
+                          .all()).containsOnly(-11);
+        assertThat(Streams.streamOf(channelMap.get(Sort.STRING))
+                          .runOnShared()
+                          .afterMax(seconds(10))
+                          .all()).containsOnly("test21");
         channel = routine.asyncCall(new ParcelableSelectable<Object>(-11, Sort.INTEGER),
                                     new ParcelableSelectable<Object>("test21", Sort.STRING));
         channelMap = Channels.selectParcelable(channel, Sort.INTEGER, Sort.STRING);
-        assertThat(channelMap.get(Sort.INTEGER).afterMax(seconds(10)).all()).containsOnly(-11);
-        assertThat(channelMap.get(Sort.STRING).afterMax(seconds(10)).all()).containsOnly("test21");
+        assertThat(Streams.streamOf(channelMap.get(Sort.INTEGER))
+                          .runOnShared()
+                          .afterMax(seconds(10))
+                          .all()).containsOnly(-11);
+        assertThat(Streams.streamOf(channelMap.get(Sort.STRING))
+                          .runOnShared()
+                          .afterMax(seconds(10))
+                          .all()).containsOnly("test21");
         channel = routine.asyncCall(new ParcelableSelectable<Object>("test21", Sort.STRING),
                                     new ParcelableSelectable<Object>(-11, Sort.INTEGER));
         channelMap = Channels.selectParcelable(Math.min(Sort.INTEGER, Sort.STRING), 2, channel);
-        assertThat(channelMap.get(Sort.INTEGER).afterMax(seconds(10)).all()).containsOnly(-11);
-        assertThat(channelMap.get(Sort.STRING).afterMax(seconds(10)).all()).containsOnly("test21");
+        assertThat(Streams.streamOf(channelMap.get(Sort.INTEGER))
+                          .runOnShared()
+                          .afterMax(seconds(10))
+                          .all()).containsOnly(-11);
+        assertThat(Streams.streamOf(channelMap.get(Sort.STRING))
+                          .runOnShared()
+                          .afterMax(seconds(10))
+                          .all()).containsOnly("test21");
     }
 
     @SuppressWarnings("unchecked")
@@ -582,7 +603,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         try {
 
-            channelMap.get(Sort.STRING).afterMax(seconds(10)).all();
+            Streams.streamOf(channelMap.get(Sort.STRING)).runOnShared().afterMax(seconds(10)).all();
 
             fail();
 
@@ -592,7 +613,10 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         try {
 
-            channelMap.get(Sort.INTEGER).afterMax(seconds(10)).all();
+            Streams.streamOf(channelMap.get(Sort.INTEGER))
+                   .runOnShared()
+                   .afterMax(seconds(10))
+                   .all();
 
             fail();
 
@@ -610,7 +634,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         try {
 
-            channelMap.get(Sort.STRING).afterMax(seconds(10)).all();
+            Streams.streamOf(channelMap.get(Sort.STRING)).runOnShared().afterMax(seconds(10)).all();
 
             fail();
 
@@ -620,7 +644,10 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         try {
 
-            channelMap.get(Sort.INTEGER).afterMax(seconds(10)).all();
+            Streams.streamOf(channelMap.get(Sort.INTEGER))
+                   .runOnShared()
+                   .afterMax(seconds(10))
+                   .all();
 
             fail();
 
@@ -638,7 +665,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         try {
 
-            channelMap.get(Sort.STRING).afterMax(seconds(10)).all();
+            Streams.streamOf(channelMap.get(Sort.STRING)).runOnShared().afterMax(seconds(10)).all();
 
             fail();
 
@@ -648,7 +675,10 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
         try {
 
-            channelMap.get(Sort.INTEGER).afterMax(seconds(10)).all();
+            Streams.streamOf(channelMap.get(Sort.INTEGER))
+                   .runOnShared()
+                   .afterMax(seconds(10))
+                   .all();
 
             fail();
 

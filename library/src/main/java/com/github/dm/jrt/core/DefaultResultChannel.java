@@ -163,7 +163,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             public boolean isTrue() {
 
                 return (mOutputCount <= maxOutputSize) || mIsWaitingInvocation || (mOutputConsumer
-                        != null);
+                        != null) || (mAbortException != null);
             }
         };
         mState = new OutputChannelState();
@@ -626,12 +626,13 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
     }
 
-    private void internalAbort(@Nullable final RoutineException abortException) {
+    private void internalAbort(@NotNull final RoutineException abortException) {
 
         mOutputQueue.clear();
         mPendingOutputCount = 0;
         mAbortException = abortException;
         mState = new ExceptionChannelState();
+        mMutex.notifyAll();
     }
 
     private boolean isNextAvailable(@NotNull final TimeDuration timeout,
@@ -917,7 +918,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
          * @param delay    the abortion delay.
          * @param timeUnit the delay time unit.
          */
-        void onAbort(@Nullable RoutineException reason, long delay, @NotNull TimeUnit timeUnit);
+        void onAbort(@NotNull RoutineException reason, long delay, @NotNull TimeUnit timeUnit);
     }
 
     /**
@@ -1618,7 +1619,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
          *
          * @param reason the reason of the abortion.
          */
-        private DelayedAbortExecution(@Nullable final RoutineException reason) {
+        private DelayedAbortExecution(@NotNull final RoutineException reason) {
 
             mAbortException = reason;
         }
@@ -1724,7 +1725,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         @Nullable
         @Override
-        RoutineException delayedAbortInvocation(@Nullable final RoutineException reason) {
+        RoutineException delayedAbortInvocation(@NotNull final RoutineException reason) {
 
             if (mOutputQueue.isEmpty()) {
 
@@ -1805,7 +1806,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         @Nullable
         @Override
-        RoutineException delayedAbortInvocation(@Nullable final RoutineException reason) {
+        RoutineException delayedAbortInvocation(@NotNull final RoutineException reason) {
 
             mSubLogger.dbg(reason, "avoiding aborting since channel is closed");
             return null;
@@ -1907,7 +1908,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
 
         @Override
-        boolean onConsumerError(@Nullable final RoutineException error) {
+        boolean onConsumerError(@NotNull final RoutineException error) {
 
             mSubLogger.dbg("avoiding aborting output since result channel is closed");
             return false;
@@ -2081,7 +2082,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
          * @return the abort exception or null.
          */
         @Nullable
-        RoutineException delayedAbortInvocation(@Nullable final RoutineException reason) {
+        RoutineException delayedAbortInvocation(@NotNull final RoutineException reason) {
 
             mSubLogger.dbg(reason, "aborting channel");
             internalAbort(reason);
@@ -2171,7 +2172,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
          * @param error the error.
          * @return whether the queue content has changed.
          */
-        boolean onConsumerError(@Nullable final RoutineException error) {
+        boolean onConsumerError(@NotNull final RoutineException error) {
 
             mSubLogger.dbg(error, "aborting output");
             internalAbort(error);

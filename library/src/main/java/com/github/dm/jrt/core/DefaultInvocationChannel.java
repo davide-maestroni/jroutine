@@ -118,12 +118,12 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
             public boolean isTrue() {
 
-                return (mInputCount <= maxInputSize);
+                return (mInputCount <= maxInputSize) || (mAbortException != null);
             }
         };
         mResultChanel = new DefaultResultChannel<OUT>(configuration, new AbortHandler() {
 
-            public void onAbort(@Nullable final RoutineException reason, final long delay,
+            public void onAbort(@NotNull final RoutineException reason, final long delay,
                     @NotNull final TimeUnit timeUnit) {
 
                 final Execution execution;
@@ -367,7 +367,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         return result;
     }
 
-    private void internalAbort(@Nullable final RoutineException abortException) {
+    private void internalAbort(@NotNull final RoutineException abortException) {
 
         mInputQueue.clear();
         mAbortException = abortException;
@@ -417,7 +417,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
          *
          * @param reason the reason of the abortion.
          */
-        private AbortResultExecution(@Nullable final Throwable reason) {
+        private AbortResultExecution(@NotNull final Throwable reason) {
 
             mAbortException = reason;
         }
@@ -615,7 +615,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
          *
          * @param reason the reason of the abortion.
          */
-        private DelayedAbortExecution(@Nullable final RoutineException reason) {
+        private DelayedAbortExecution(@NotNull final RoutineException reason) {
 
             mAbortException = reason;
         }
@@ -735,7 +735,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
         @Nullable
         @Override
-        Execution onHandlerAbort(@Nullable final RoutineException reason) {
+        Execution onHandlerAbort(@NotNull final RoutineException reason) {
 
             mSubLogger.wrn("avoiding aborting result channel since invocation is aborted");
             return null;
@@ -843,6 +843,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
                 mSubLogger.dbg(reason, "aborting channel");
                 internalAbort(abortException);
                 mState = new AbortedChannelState();
+                mMutex.notifyAll();
                 return mExecution.abort();
             }
 
@@ -873,11 +874,12 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
          * @return the execution to run or null.
          */
         @Nullable
-        Execution delayedAbortInvocation(@Nullable final RoutineException reason) {
+        Execution delayedAbortInvocation(@NotNull final RoutineException reason) {
 
             mSubLogger.dbg(reason, "aborting channel");
             internalAbort(reason);
             mState = new AbortedChannelState();
+            mMutex.notifyAll();
             return mExecution.abort();
         }
 
@@ -967,7 +969,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
          * @return the execution to run or null.
          */
         @Nullable
-        Execution onConsumerError(@Nullable final RoutineException error) {
+        Execution onConsumerError(@NotNull final RoutineException error) {
 
             mSubLogger.dbg("aborting consumer");
             mAbortException = error;
@@ -1018,11 +1020,12 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
          * @return the execution to run or null.
          */
         @Nullable
-        Execution onHandlerAbort(@Nullable final RoutineException reason) {
+        Execution onHandlerAbort(@NotNull final RoutineException reason) {
 
             mSubLogger.dbg("aborting result channel");
             internalAbort(reason);
             mState = new ExceptionChannelState();
+            mMutex.notifyAll();
             return mExecution.abort();
         }
 
@@ -1278,7 +1281,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
         @Nullable
         @Override
-        Execution delayedAbortInvocation(@Nullable final RoutineException reason) {
+        Execution delayedAbortInvocation(@NotNull final RoutineException reason) {
 
             if ((mPendingExecutionCount <= 0) && !mIsConsuming) {
 
@@ -1382,7 +1385,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
         @Nullable
         @Override
-        Execution delayedAbortInvocation(@Nullable final RoutineException reason) {
+        Execution delayedAbortInvocation(@NotNull final RoutineException reason) {
 
             mSubLogger.dbg(reason, "avoiding aborting since channel is closed");
             return null;
@@ -1426,7 +1429,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
         @Nullable
         @Override
-        Execution onHandlerAbort(@Nullable final RoutineException reason) {
+        Execution onHandlerAbort(@NotNull final RoutineException reason) {
 
             mSubLogger.dbg("avoiding aborting result channel since invocation is complete");
             return new AbortResultExecution(reason);
@@ -1441,7 +1444,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
         @Nullable
         @Override
-        Execution onConsumerError(@Nullable final RoutineException error) {
+        Execution onConsumerError(@NotNull final RoutineException error) {
 
             mSubLogger.wrn("avoiding aborting consumer since channel is closed");
             return null;

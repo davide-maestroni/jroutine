@@ -3912,7 +3912,7 @@ public class RoutineTest {
 
     private static class TestAbortHandler implements AbortHandler {
 
-        public void onAbort(@Nullable final RoutineException reason, final long delay,
+        public void onAbort(@NotNull final RoutineException reason, final long delay,
                 @NotNull final TimeUnit timeUnit) {
 
         }

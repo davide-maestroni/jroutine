@@ -17,6 +17,7 @@ import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.channel.AbortException;
 import com.github.dm.jrt.channel.Channel.InputChannel;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
+import com.github.dm.jrt.channel.DeadlockException;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InputDeadlockException;
 import com.github.dm.jrt.channel.OutputDeadlockException;
@@ -50,6 +51,7 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.function.Functions.functionFilter;
+import static com.github.dm.jrt.util.TimeDuration.days;
 import static com.github.dm.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -1113,10 +1115,58 @@ public class StreamOutputChannelTest {
                        }
                    })
                    .runOnShared()
-                   .afterMax(seconds(3))
+                   .afterMax(days(3))
                    .next();
 
             fail();
+
+        } catch (final DeadlockException ignored) {
+
+        }
+
+        try {
+
+            assertThat(Streams.streamOf()
+                              .asyncRange(1, 1000)
+                              .withStreamInvocations()
+                              .withRunner(mSingleThreadRunner)
+                              .withOutputMaxSize(2)
+                              .withOutputTimeout(seconds(10))
+                              .set()
+                              .asyncMap(Functions.<Number>identity())
+                              .asyncMap(new Function<Number, Double>() {
+
+                                  public Double apply(final Number number) {
+
+                                      final double value = number.doubleValue();
+                                      return Math.sqrt(value);
+                                  }
+                              })
+                              .syncMap(new Function<Double, SumData>() {
+
+                                  public SumData apply(final Double aDouble) {
+
+                                      return new SumData(aDouble, 1);
+                                  }
+                              })
+                              .syncReduce(new BiFunction<SumData, SumData, SumData>() {
+
+                                  public SumData apply(final SumData data1, final SumData data2) {
+
+                                      return new SumData(data1.sum + data2.sum,
+                                                         data1.count + data2.count);
+                                  }
+                              })
+                              .syncMap(new Function<SumData, Double>() {
+
+                                  public Double apply(final SumData data) {
+
+                                      return data.sum / data.count;
+                                  }
+                              })
+                              .runOnShared()
+                              .afterMax(days(3))
+                              .next()).isCloseTo(21, Offset.offset(0.1));
 
         } catch (final OutputDeadlockException ignored) {
 
@@ -1162,7 +1212,7 @@ public class StreamOutputChannelTest {
                        }
                    })
                    .runOnShared()
-                   .afterMax(seconds(3))
+                   .afterMax(days(3))
                    .next();
 
             fail();

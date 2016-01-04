@@ -1419,12 +1419,12 @@ public class RoutineTest {
 
         try {
 
-            JRoutine.on(PassingInvocation.<String>factoryOf())
+            JRoutine.on(new SleepInvocation(millis(100)))
                     .withInvocations()
                     .withInputMaxSize(1)
                     .withInputTimeout(TimeDuration.ZERO)
                     .set()
-                    .asyncCall("test1", "test2")
+                    .asyncCall("test", "test")
                     .all();
 
             fail();
@@ -1435,12 +1435,12 @@ public class RoutineTest {
 
         try {
 
-            JRoutine.on(PassingInvocation.<String>factoryOf())
+            JRoutine.on(new SleepInvocation(millis(100)))
                     .withInvocations()
                     .withInputMaxSize(1)
                     .withInputTimeout(TimeDuration.ZERO)
                     .set()
-                    .asyncCall(Arrays.asList("test1", "test2"))
+                    .asyncCall(Arrays.asList("test", "test"))
                     .all();
 
             fail();

@@ -32,7 +32,7 @@ import com.github.dm.jrt.runner.Execution;
 import com.github.dm.jrt.runner.Runner;
 import com.github.dm.jrt.runner.TemplateExecution;
 import com.github.dm.jrt.util.TimeDuration;
-import com.github.dm.jrt.util.TimeDuration.Check;
+import com.github.dm.jrt.util.TimeDuration.Condition;
 import com.github.dm.jrt.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
@@ -72,6 +72,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     private static final WeakIdentityHashMap<OutputConsumer<?>, Object> sConsumerMutexes =
             new WeakIdentityHashMap<OutputConsumer<?>, Object>();
 
+    private static final LocalMutableBoolean sInsideInvocation = new LocalMutableBoolean();
+
     private final ArrayList<OutputChannel<?>> mBoundChannels = new ArrayList<OutputChannel<?>>();
 
     private final TimeDuration mExecutionTimeout;
@@ -80,7 +82,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
     private final AbortHandler mHandler;
 
-    private final Check mHasOutputs;
+    private final Condition mHasOutputs;
 
     private final Logger mLogger;
 
@@ -106,9 +108,9 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
     private int mOutputCount;
 
-    private Check mOutputHasNext;
+    private Condition mOutputHasNext;
 
-    private Check mOutputNotEmpty;
+    private Condition mOutputNotEmpty;
 
     private int mPendingOutputCount;
 
@@ -158,7 +160,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             }
         };
         final int maxOutputSize = mMaxOutput;
-        mHasOutputs = new Check() {
+        mHasOutputs = new Condition() {
 
             public boolean isTrue() {
 
@@ -167,19 +169,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             }
         };
         mState = new OutputChannelState();
-    }
-
-    @NotNull
-    private static String getExecutionDeadlockMessage() {
-
-        return "cannot wait on the invocation runner thread: " + Thread.currentThread()
-                + "\nTry binding the output channel or employing a different runner";
-    }
-
-    @NotNull
-    private static String getInvocationDeadlockMessage() {
-
-        return INVOCATION_DEADLOCK_MESSAGE;
     }
 
     @NotNull
@@ -449,6 +438,18 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
     }
 
+    // TODO: 1/5/16 javadoc
+    void enterInvocation() {
+
+        sInsideInvocation.get().mIsTrue = true;
+    }
+
+    // TODO: 1/5/16 javadoc
+    void exitInvocation() {
+
+        sInsideInvocation.get().mIsTrue = false;
+    }
+
     /**
      * Returns the output channel reading the data pushed into this channel.
      *
@@ -493,6 +494,28 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         synchronized (mMutex) {
 
             mIsWaitingInvocation = false;
+        }
+    }
+
+    private void checkCanWait() {
+
+        if (sInsideInvocation.get().mIsTrue) {
+
+            throw new ExecutionDeadlockException(
+                    "cannot wait inside an invocation: " + Thread.currentThread()
+                            + "\nTry binding the output channel");
+        }
+
+        if (mRunner.isExecutionThread()) {
+
+            throw new ExecutionDeadlockException(
+                    "cannot wait on the channel runner thread: " + Thread.currentThread()
+                            + "\nTry binding the output channel or employing a different runner");
+        }
+
+        if (mIsWaitingInvocation) {
+
+            throw new InvocationDeadlockException(INVOCATION_DEADLOCK_MESSAGE);
         }
     }
 
@@ -673,19 +696,11 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
             } else {
 
-                if (mRunner.isExecutionThread()) {
-
-                    throw new ExecutionDeadlockException(getExecutionDeadlockMessage());
-                }
-
-                if (mIsWaitingInvocation) {
-
-                    throw new InvocationDeadlockException(getInvocationDeadlockMessage());
-                }
+                checkCanWait();
 
                 if (mOutputHasNext == null) {
 
-                    mOutputHasNext = new Check() {
+                    mOutputHasNext = new Condition() {
 
                         public boolean isTrue() {
 
@@ -708,7 +723,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
                 if (mIsWaitingInvocation) {
 
-                    throw new InvocationDeadlockException(getInvocationDeadlockMessage());
+                    throw new InvocationDeadlockException(INVOCATION_DEADLOCK_MESSAGE);
                 }
 
                 if (isTimeout) {
@@ -815,19 +830,11 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             return nextOutput(timeout);
         }
 
-        if (mRunner.isExecutionThread()) {
-
-            throw new ExecutionDeadlockException(getExecutionDeadlockMessage());
-        }
-
-        if (mIsWaitingInvocation) {
-
-            throw new InvocationDeadlockException(getInvocationDeadlockMessage());
-        }
+        checkCanWait();
 
         if (mOutputNotEmpty == null) {
 
-            mOutputNotEmpty = new Check() {
+            mOutputNotEmpty = new Condition() {
 
                 public boolean isTrue() {
 
@@ -849,7 +856,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         if (mIsWaitingInvocation) {
 
-            throw new InvocationDeadlockException(getInvocationDeadlockMessage());
+            throw new InvocationDeadlockException(INVOCATION_DEADLOCK_MESSAGE);
         }
 
         if (isTimeout) {
@@ -888,7 +895,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         if (mRunner.isExecutionThread()) {
 
             throw new OutputDeadlockException(
-                    "cannot wait on the invocation runner thread: " + Thread.currentThread()
+                    "cannot wait on the channel runner thread: " + Thread.currentThread()
                             + "\nTry increasing the timeout or the max number of outputs");
         }
 
@@ -919,6 +926,22 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
          * @param timeUnit the delay time unit.
          */
         void onAbort(@NotNull RoutineException reason, long delay, @NotNull TimeUnit timeUnit);
+    }
+
+    // TODO: 1/5/16 javadoc
+    private static class LocalMutableBoolean extends ThreadLocal<MutableBoolean> {
+
+        @Override
+        protected MutableBoolean initialValue() {
+
+            return new MutableBoolean();
+        }
+    }
+
+    // TODO: 1/5/16 javadoc
+    private static class MutableBoolean {
+
+        private boolean mIsTrue;
     }
 
     /**
@@ -1132,16 +1155,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                                 break;
                             }
 
-                            if (mRunner.isExecutionThread()) {
-
-                                throw new ExecutionDeadlockException(getExecutionDeadlockMessage());
-                            }
-
-                            if (mIsWaitingInvocation) {
-
-                                throw new InvocationDeadlockException(
-                                        getInvocationDeadlockMessage());
-                            }
+                            checkCanWait();
 
                         } while (executionTimeout.waitSinceMillis(mMutex, startTime));
 
@@ -1195,22 +1209,14 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
                 if (!executionTimeout.isZero()) {
 
-                    if (mRunner.isExecutionThread()) {
-
-                        throw new ExecutionDeadlockException(getExecutionDeadlockMessage());
-                    }
-
-                    if (mIsWaitingInvocation) {
-
-                        throw new InvocationDeadlockException(getInvocationDeadlockMessage());
-                    }
+                    checkCanWait();
                 }
 
                 final boolean isDone;
 
                 try {
 
-                    isDone = executionTimeout.waitTrue(mMutex, new Check() {
+                    isDone = executionTimeout.waitTrue(mMutex, new Condition() {
 
                         public boolean isTrue() {
 
@@ -1225,7 +1231,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
                 if (mIsWaitingInvocation) {
 
-                    throw new InvocationDeadlockException(getInvocationDeadlockMessage());
+                    throw new InvocationDeadlockException(INVOCATION_DEADLOCK_MESSAGE);
                 }
 
                 if (!isDone) {

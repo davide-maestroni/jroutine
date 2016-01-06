@@ -29,7 +29,7 @@ import com.github.dm.jrt.runner.Execution;
 import com.github.dm.jrt.runner.Runner;
 import com.github.dm.jrt.runner.TemplateExecution;
 import com.github.dm.jrt.util.TimeDuration;
-import com.github.dm.jrt.util.TimeDuration.Check;
+import com.github.dm.jrt.util.TimeDuration.Condition;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -56,7 +56,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
     private final InvocationExecution<IN, OUT> mExecution;
 
-    private final Check mHasInputs;
+    private final Condition mHasInputs;
 
     private final NestedQueue<IN> mInputQueue;
 
@@ -114,7 +114,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
             }
         };
         final int maxInputSize = mMaxInput;
-        mHasInputs = new Check() {
+        mHasInputs = new Condition() {
 
             public boolean isTrue() {
 

@@ -14,7 +14,7 @@
 package com.github.dm.jrt.util;
 
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
-import com.github.dm.jrt.util.TimeDuration.Check;
+import com.github.dm.jrt.util.TimeDuration.Condition;
 
 import org.junit.Test;
 
@@ -72,7 +72,7 @@ public class TimeDurationTest {
 
         try {
 
-            TimeDuration.seconds(1).waitTrue(null, new Check() {
+            TimeDuration.seconds(1).waitTrue(null, new Condition() {
 
                 public boolean isTrue() {
 
@@ -888,14 +888,14 @@ public class TimeDurationTest {
     @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
     public void testWaitTrueMilli() throws InterruptedException {
 
-        final Check alwaysFalse = new Check() {
+        final Condition alwaysFalse = new Condition() {
 
             public boolean isTrue() {
 
                 return false;
             }
         };
-        final Check alwaysTrue = new Check() {
+        final Condition alwaysTrue = new Condition() {
 
             public boolean isTrue() {
 
@@ -944,7 +944,7 @@ public class TimeDurationTest {
 
         synchronized (thread) {
 
-            assertThat(TimeDuration.INFINITY.waitTrue(thread, new Check() {
+            assertThat(TimeDuration.INFINITY.waitTrue(thread, new Condition() {
 
                 private boolean mToggle = true;
 
@@ -960,14 +960,14 @@ public class TimeDurationTest {
     @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
     public void testWaitTrueNano() throws InterruptedException {
 
-        final Check alwaysFalse = new Check() {
+        final Condition alwaysFalse = new Condition() {
 
             public boolean isTrue() {
 
                 return false;
             }
         };
-        final Check alwaysTrue = new Check() {
+        final Condition alwaysTrue = new Condition() {
 
             public boolean isTrue() {
 
@@ -996,14 +996,14 @@ public class TimeDurationTest {
     @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
     public void testWaitTrueZero() throws InterruptedException {
 
-        final Check alwaysFalse = new Check() {
+        final Condition alwaysFalse = new Condition() {
 
             public boolean isTrue() {
 
                 return false;
             }
         };
-        final Check alwaysTrue = new Check() {
+        final Condition alwaysTrue = new Condition() {
 
             public boolean isTrue() {
 

@@ -128,6 +128,8 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
 
             try {
 
+                resultChannel.enterInvocation();
+
                 for (int i = 0; i < count; ++i) {
 
                     try {
@@ -184,6 +186,7 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
 
             } finally {
 
+                resultChannel.exitInvocation();
                 final AbortExecution abortExecution = mAbortExecution;
 
                 if (mIsWaitingAbortInvocation && (abortExecution != null)) {
@@ -314,6 +317,8 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
 
                 try {
 
+                    resultChannel.enterInvocation();
+
                     for (int i = 0; i < count; ++i) {
 
                         if (!inputIterator.isAborting()) {
@@ -358,6 +363,7 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
 
                 } finally {
 
+                    resultChannel.exitInvocation();
                     inputIterator.onAbortComplete();
 
                     if (mIsWaitingInvocation) {

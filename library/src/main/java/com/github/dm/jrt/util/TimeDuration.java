@@ -601,25 +601,25 @@ public class TimeDuration extends Time {
     }
 
     /**
-     * Waits for the specified check to be true by performing an {@link java.lang.Object#wait()} and
-     * using this duration as timeout.
+     * Waits for the specified condition to be true by performing an {@link java.lang.Object#wait()}
+     * and using this duration as timeout.
      *
-     * @param target the target object.
-     * @param check  the check to verify.
+     * @param target    the target object.
+     * @param condition the condition to verify.
      * @return whether the check became true before the timeout elapsed.
      * @throws java.lang.InterruptedException if the current thread is interrupted.
      */
-    public boolean waitTrue(@NotNull final Object target, @NotNull final Check check) throws
+    public boolean waitTrue(@NotNull final Object target, @NotNull final Condition condition) throws
             InterruptedException {
 
         if (isZero()) {
 
-            return check.isTrue();
+            return condition.isTrue();
         }
 
         if (isInfinity()) {
 
-            while (!check.isTrue()) {
+            while (!condition.isTrue()) {
 
                 target.wait();
             }
@@ -631,7 +631,7 @@ public class TimeDuration extends Time {
 
             final long startMillis = System.currentTimeMillis();
 
-            while (!check.isTrue()) {
+            while (!condition.isTrue()) {
 
                 if (!waitSinceMillis(target, startMillis)) {
 
@@ -643,7 +643,7 @@ public class TimeDuration extends Time {
 
             final long startNanos = System.nanoTime();
 
-            while (!check.isTrue()) {
+            while (!condition.isTrue()) {
 
                 if (!waitSinceNanos(target, startNanos)) {
 
@@ -656,14 +656,14 @@ public class TimeDuration extends Time {
     }
 
     /**
-     * Interface defining a check to be performed.
+     * Interface defining a condition to check.
      */
-    public interface Check {
+    public interface Condition {
 
         /**
          * Checks if true.
          *
-         * @return whether the check is verified.
+         * @return whether the condition is verified.
          */
         boolean isTrue();
     }

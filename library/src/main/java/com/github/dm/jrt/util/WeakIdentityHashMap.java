@@ -108,7 +108,6 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
 
     public boolean containsKey(final Object o) {
 
-        cleanUp();
         return mMap.containsKey(new IdentityWeakReference(o));
     }
 
@@ -120,7 +119,6 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
 
     public V get(final Object o) {
 
-        cleanUp();
         return mMap.get(new IdentityWeakReference(o));
     }
 
@@ -132,7 +130,6 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
 
     public V remove(final Object o) {
 
-        cleanUp();
         return mMap.remove(new IdentityWeakReference(o));
     }
 

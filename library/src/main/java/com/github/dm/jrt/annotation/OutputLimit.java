@@ -17,11 +17,10 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.concurrent.TimeUnit;
 
 /**
- * Through this annotation it is possible to indicate the timeout for an input channel to have room
- * for additional data.
+ * Through this annotation it is possible to indicate the maximum number of data buffered inside
+ * the output channel before starting to slow down the feeding thread.
  * <p/>
  * This annotation is used to decorate methods that are to be invoked in an asynchronous way.<br/>
  * Note that the piece of code inside such methods will be automatically protected so to avoid
@@ -31,7 +30,7 @@ import java.util.concurrent.TimeUnit;
  * routines as well.
  * <p/>
  * Finally, be aware that a method might need to be made accessible in order to be called. That
- * means that, in case a {@link java.lang.SecurityManager} is installed, a security exception might
+ * means that, in case a {@link SecurityManager} is installed, a security exception might
  * be raised based on the specific policy implemented.
  * <p/>
  * Remember also that, in order for the annotation to properly work at run time, you will need to
@@ -41,30 +40,24 @@ import java.util.concurrent.TimeUnit;
  *
  *         -keepattributes RuntimeVisibleAnnotations
  *         -keepclassmembers class ** {
- *              &#64;com.github.dm.jrt.annotation.InputTimeout *;
+ *              &#64;com.github.dm.jrt.annotation.InputLimit *;
  *         }
  *     </code>
  * </pre>
  * <p/>
- * Created by davide-maestroni on 10/05/2015.
+ * Created by davide-maestroni on 01/08/2016.
  *
  * @see com.github.dm.jrt.builder.InvocationConfiguration InvocationConfiguration
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface InputTimeout {
+public @interface OutputLimit {
 
     /**
-     * The time unit of the timeout for an input channel to have room for additional data.
+     * The maximum number of data that the output channel can retain before slowing down the feeding
+     * thread.
      *
-     * @return the time unit.
+     * @return the maximum number of buffered output data.
      */
-    TimeUnit unit() default TimeUnit.MILLISECONDS;
-
-    /**
-     * The timeout for an input channel to have room for additional data.
-     *
-     * @return the timeout.
-     */
-    long value();
+    int value();
 }

@@ -200,7 +200,6 @@ class NestedQueue<E> {
      * @return the element.
      * @throws java.util.NoSuchElementException if the queue is empty.
      */
-    @Nullable
     @SuppressWarnings("unchecked")
     public E removeFirst() {
 

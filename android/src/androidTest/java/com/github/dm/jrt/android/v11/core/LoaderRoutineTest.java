@@ -815,7 +815,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final Builder<ChannelConfiguration> builder = ChannelConfiguration.builder();
         final ChannelConfiguration configuration = builder.withRunner(Runners.taskRunner())
                                                           .withChannelMaxSize(3)
-                                                          .withChannelTimeout(seconds(10))
+                                                          .withChannelMaxDelay(seconds(10))
                                                           .withLogLevel(Level.DEBUG)
                                                           .withLog(countLog)
                                                           .set();
@@ -1558,10 +1558,12 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         final CountLog countLog = new CountLog();
         final InvocationConfiguration configuration = builder().withRunner(Runners.taskRunner())
-                                                               .withInputMaxSize(3)
-                                                               .withInputTimeout(seconds(10))
-                                                               .withOutputMaxSize(3)
-                                                               .withOutputTimeout(seconds(10))
+                                                               .withInputLimit(3)
+                                                               .withInputMaxDelay(seconds(10))
+                                                               .withInputMaxSize(33)
+                                                               .withOutputLimit(3)
+                                                               .withOutputMaxDelay(seconds(10))
+                                                               .withOutputMaxSize(33)
                                                                .withLogLevel(Level.DEBUG)
                                                                .withLog(countLog)
                                                                .set();

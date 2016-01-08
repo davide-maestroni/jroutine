@@ -481,8 +481,8 @@ class DefaultStreamOutputChannel<OUT>
             final int maxOutputs, final TimeDuration maxTime) {
 
         return withInvocations().withRunner(runner)
-                                .withInputMaxSize(maxOutputs)
-                                .withInputTimeout(maxTime)
+                                .withInputLimit(maxOutputs)
+                                .withInputMaxDelay(maxTime)
                                 .set();
     }
 

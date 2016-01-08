@@ -782,8 +782,6 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
             final IOChannel<OUT> channel = JRoutine.io()
                                                    .withChannels()
                                                    .withRunner(runner)
-                                                   .withChannelMaxSize(Integer.MAX_VALUE)
-                                                   .withChannelTimeout(TimeDuration.ZERO)
                                                    .withLog(logger.getLog())
                                                    .withLogLevel(logger.getLogLevel())
                                                    .set()

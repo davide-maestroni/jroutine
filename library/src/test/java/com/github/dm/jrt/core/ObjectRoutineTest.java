@@ -20,16 +20,18 @@ import com.github.dm.jrt.annotation.AsyncMethod;
 import com.github.dm.jrt.annotation.AsyncOut;
 import com.github.dm.jrt.annotation.AsyncOut.OutputMode;
 import com.github.dm.jrt.annotation.CoreInstances;
+import com.github.dm.jrt.annotation.InputLimit;
+import com.github.dm.jrt.annotation.InputMaxDelay;
 import com.github.dm.jrt.annotation.InputMaxSize;
 import com.github.dm.jrt.annotation.InputOrder;
-import com.github.dm.jrt.annotation.InputTimeout;
 import com.github.dm.jrt.annotation.Invoke;
 import com.github.dm.jrt.annotation.Invoke.InvocationMode;
 import com.github.dm.jrt.annotation.LogLevel;
 import com.github.dm.jrt.annotation.MaxInstances;
+import com.github.dm.jrt.annotation.OutputLimit;
+import com.github.dm.jrt.annotation.OutputMaxDelay;
 import com.github.dm.jrt.annotation.OutputMaxSize;
 import com.github.dm.jrt.annotation.OutputOrder;
-import com.github.dm.jrt.annotation.OutputTimeout;
 import com.github.dm.jrt.annotation.Priority;
 import com.github.dm.jrt.annotation.ReadTimeout;
 import com.github.dm.jrt.annotation.ReadTimeoutAction;
@@ -231,14 +233,16 @@ public class ObjectRoutineTest {
                                                 AnnotationItf.class.getMethod(
                                                         "toString"))).isEqualTo(
                 builder().withCoreInstances(3)
-                         .withInputMaxSize(33)
                          .withInputOrder(OrderType.BY_DELAY)
-                         .withInputTimeout(7777, TimeUnit.MICROSECONDS)
+                         .withInputLimit(71)
+                         .withInputMaxDelay(7777, TimeUnit.MICROSECONDS)
+                         .withInputMaxSize(33)
                          .withLogLevel(Level.WARNING)
                          .withMaxInstances(17)
-                         .withOutputMaxSize(77)
                          .withOutputOrder(OrderType.BY_CALL)
-                         .withOutputTimeout(3333, TimeUnit.NANOSECONDS)
+                         .withOutputLimit(31)
+                         .withOutputMaxDelay(3333, TimeUnit.NANOSECONDS)
+                         .withOutputMaxSize(77)
                          .withPriority(41)
                          .withReadTimeout(1111, TimeUnit.MICROSECONDS)
                          .withReadTimeoutAction(TimeoutActionType.ABORT)
@@ -1447,14 +1451,16 @@ public class ObjectRoutineTest {
     public interface AnnotationItf {
 
         @CoreInstances(3)
+        @InputLimit(71)
+        @InputMaxDelay(value = 7777, unit = TimeUnit.MICROSECONDS)
         @InputMaxSize(33)
         @InputOrder(OrderType.BY_DELAY)
-        @InputTimeout(value = 7777, unit = TimeUnit.MICROSECONDS)
         @LogLevel(Level.WARNING)
         @MaxInstances(17)
+        @OutputLimit(31)
+        @OutputMaxDelay(value = 3333, unit = TimeUnit.NANOSECONDS)
         @OutputMaxSize(77)
         @OutputOrder(OrderType.BY_CALL)
-        @OutputTimeout(value = 3333, unit = TimeUnit.NANOSECONDS)
         @Priority(41)
         @ReadTimeout(value = 1111, unit = TimeUnit.MICROSECONDS)
         @ReadTimeoutAction(TimeoutActionType.ABORT)

@@ -73,21 +73,9 @@ public class ExceptionTest {
     }
 
     @Test
-    public void testInputTimeoutException() {
-
-        assertThat(new InputTimeoutException("")).hasNoCause();
-    }
-
-    @Test
     public void testOutputDeadlockException() {
 
         assertThat(new OutputDeadlockException("")).hasNoCause();
-    }
-
-    @Test
-    public void testOutputTimeoutException() {
-
-        assertThat(new OutputTimeoutException("")).hasNoCause();
     }
 
     @Test

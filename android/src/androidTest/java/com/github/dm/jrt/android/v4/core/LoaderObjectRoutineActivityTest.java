@@ -201,11 +201,13 @@ public class LoaderObjectRoutineActivityTest
         final CountLog countLog = new CountLog();
         final InvocationConfiguration configuration = builder().withRunner(Runners.poolRunner())
                                                                .withInputOrder(OrderType.BY_CHANCE)
-                                                               .withInputMaxSize(3)
-                                                               .withInputTimeout(seconds(10))
+                                                               .withInputLimit(3)
+                                                               .withInputMaxDelay(seconds(10))
+                                                               .withInputMaxSize(33)
                                                                .withOutputOrder(OrderType.BY_CHANCE)
-                                                               .withOutputMaxSize(3)
-                                                               .withOutputTimeout(seconds(10))
+                                                               .withOutputLimit(3)
+                                                               .withOutputMaxDelay(seconds(10))
+                                                               .withOutputMaxSize(33)
                                                                .withLogLevel(Level.DEBUG)
                                                                .withLog(countLog)
                                                                .set();

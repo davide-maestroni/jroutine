@@ -21,7 +21,6 @@ import com.github.dm.jrt.channel.ExecutionDeadlockException;
 import com.github.dm.jrt.channel.ExecutionTimeoutException;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.OutputDeadlockException;
-import com.github.dm.jrt.channel.OutputTimeoutException;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.invocation.InvocationDeadlockException;
@@ -90,9 +89,11 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
     private final Object mMutex = new Object();
 
-    private final NestedQueue<Object> mOutputQueue;
+    private final int mOutputLimit;
 
-    private final TimeDuration mOutputTimeout;
+    private final TimeDuration mOutputMaxDelay;
+
+    private final NestedQueue<Object> mOutputQueue;
 
     private final Runner mRunner;
 
@@ -149,8 +150,9 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         mResultOrder = configuration.getOutputOrderTypeOr(OrderType.BY_CHANCE);
         mExecutionTimeout = configuration.getReadTimeoutOr(ZERO);
         mTimeoutActionType = configuration.getReadTimeoutActionOr(TimeoutActionType.THROW);
+        mOutputLimit = configuration.getOutputLimitOr(Integer.MAX_VALUE);
+        mOutputMaxDelay = configuration.getOutputMaxDelayOr(ZERO);
         mMaxOutput = configuration.getOutputMaxSizeOr(Integer.MAX_VALUE);
-        mOutputTimeout = configuration.getOutputTimeoutOr(ZERO);
         mOutputQueue = new NestedQueue<Object>() {
 
             @Override
@@ -159,13 +161,13 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                 // Preventing closing
             }
         };
-        final int maxOutputSize = mMaxOutput;
+        final int outputLimit = mOutputLimit;
         mHasOutputs = new Condition() {
 
             public boolean isTrue() {
 
-                return (mOutputCount <= maxOutputSize) || mIsWaitingInvocation || (mOutputConsumer
-                        != null) || (mAbortException != null);
+                return (mOutputCount <= outputLimit) || mIsWaitingInvocation || (mAbortException
+                        != null);
             }
         };
         mState = new OutputChannelState();
@@ -438,13 +440,17 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
     }
 
-    // TODO: 1/5/16 javadoc
+    /**
+     * Notifies to this channel that the invocation execution is entering.
+     */
     void enterInvocation() {
 
         sInsideInvocation.get().mIsTrue = true;
     }
 
-    // TODO: 1/5/16 javadoc
+    /**
+     * Notifies to this channel that the invocation execution is exiting.
+     */
     void exitInvocation() {
 
         sInsideInvocation.get().mIsTrue = false;
@@ -502,7 +508,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         if (sInsideInvocation.get().mIsTrue) {
 
             throw new ExecutionDeadlockException(
-                    "cannot wait inside an invocation: " + Thread.currentThread()
+                    "cannot wait inside an invocation execution: " + Thread.currentThread()
                             + "\nTry binding the output channel");
         }
 
@@ -516,6 +522,15 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         if (mIsWaitingInvocation) {
 
             throw new InvocationDeadlockException(INVOCATION_DEADLOCK_MESSAGE);
+        }
+    }
+
+    private void checkMaxSize() {
+
+        if (mOutputCount > mMaxOutput) {
+
+            throw new OutputDeadlockException(
+                    "maximum output channel size has been reached: " + mMaxOutput);
         }
     }
 
@@ -768,10 +783,10 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             throw ((RoutineExceptionWrapper) result).raise();
         }
 
-        final int maxOutput = mMaxOutput;
+        final int outputLimit = mOutputLimit;
         final int prevOutputCount = mOutputCount;
 
-        if ((--mOutputCount <= maxOutput) && (prevOutputCount > maxOutput)) {
+        if ((--mOutputCount <= outputLimit) && (prevOutputCount > outputLimit)) {
 
             mMutex.notifyAll();
         }
@@ -884,27 +899,13 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
     private void waitOutputs() {
 
-        final TimeDuration timeout = mOutputTimeout;
-
-        if (timeout.isZero()) {
-
-            throw new OutputTimeoutException(
-                    "timeout while waiting for room in the output channel [" + timeout + "]");
-        }
-
-        if (mRunner.isExecutionThread()) {
-
-            throw new OutputDeadlockException(
-                    "cannot wait on the channel runner thread: " + Thread.currentThread()
-                            + "\nTry increasing the timeout or the max number of outputs");
-        }
-
         try {
 
-            if (!timeout.waitTrue(mMutex, mHasOutputs)) {
+            final TimeDuration delay = mOutputMaxDelay;
 
-                throw new OutputTimeoutException(
-                        "timeout while waiting for room in the output channel [" + timeout + "]");
+            if (!delay.waitTrue(mMutex, mHasOutputs)) {
+
+                mLogger.dbg("timeout while waiting for room in the output channel [%s]", delay);
             }
 
         } catch (final InterruptedException e) {
@@ -928,7 +929,9 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         void onAbort(@NotNull RoutineException reason, long delay, @NotNull TimeUnit timeUnit);
     }
 
-    // TODO: 1/5/16 javadoc
+    /**
+     * Thread local implementation storing a mutable boolean.
+     */
     private static class LocalMutableBoolean extends ThreadLocal<MutableBoolean> {
 
         @Override
@@ -938,7 +941,9 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
     }
 
-    // TODO: 1/5/16 javadoc
+    /**
+     * Simple data class storing a boolean.
+     */
     private static class MutableBoolean {
 
         private boolean mIsTrue;
@@ -1412,7 +1417,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                 forceClose = mState.isDone();
                 mOutputConsumer = consumer;
                 mConsumerMutex = getMutex(consumer);
-                mMutex.notifyAll();
             }
 
             executeFlush(forceClose);
@@ -2270,6 +2274,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             mSubLogger.dbg("passing iterable [#%d+%d]: %s [%s]", mOutputCount, size, outputs,
                            delay);
             mOutputCount += size;
+            checkMaxSize();
 
             if (delay.isZero()) {
 
@@ -2295,6 +2300,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             final TimeDuration delay = mResultDelay;
             mSubLogger.dbg("passing output [#%d+1]: %s [%s]", mOutputCount, output, delay);
             ++mOutputCount;
+            checkMaxSize();
 
             if (delay.isZero()) {
 
@@ -2327,6 +2333,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             final TimeDuration delay = mResultDelay;
             mSubLogger.dbg("passing array [#%d+%d]: %s [%s]", mOutputCount, size, outputs, delay);
             mOutputCount += size;
+            checkMaxSize();
             final ArrayList<OUT> list = new ArrayList<OUT>(size);
             Collections.addAll(list, outputs);
 

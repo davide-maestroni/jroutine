@@ -158,6 +158,77 @@ public class InvocationConfigurationTest {
     }
 
     @Test
+    public void testInputLimitEquals() {
+
+        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+                                                               .withRunner(Runners.syncRunner())
+                                                               .withLog(new NullLog())
+                                                               .withOutputMaxSize(100)
+                                                               .set();
+        assertThat(configuration).isNotEqualTo(builder().withInputLimit(10).set());
+        assertThat(configuration.builderFrom().withInputLimit(31).set()).isNotEqualTo(
+                builder().withInputLimit(31).set());
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testInputLimitError() {
+
+        try {
+
+            builder().withInputLimit(-1);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testInputMaxDelayEquals() {
+
+        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+                                                               .withRunner(Runners.syncRunner())
+                                                               .withLog(new NullLog())
+                                                               .withOutputMaxSize(100)
+                                                               .set();
+        assertThat(configuration).isNotEqualTo(
+                builder().withInputMaxDelay(TimeDuration.ZERO).set());
+        assertThat(configuration).isNotEqualTo(
+                builder().withInputMaxDelay(1, TimeUnit.MILLISECONDS).set());
+        assertThat(configuration.builderFrom()
+                                .withInputMaxDelay(TimeDuration.millis(1))
+                                .set()).isNotEqualTo(
+                builder().withInputMaxDelay(1, TimeUnit.MILLISECONDS).set());
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testInputMaxDelayError() {
+
+        try {
+
+            builder().withInputMaxDelay(1, null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            builder().withInputMaxDelay(-1, TimeUnit.MILLISECONDS);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    @Test
     public void testInputOrderEquals() {
 
         final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
@@ -191,48 +262,6 @@ public class InvocationConfigurationTest {
         try {
 
             builder().withInputMaxSize(0);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-    }
-
-    @Test
-    public void testInputTimeoutEquals() {
-
-        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
-                                                               .withRunner(Runners.syncRunner())
-                                                               .withLog(new NullLog())
-                                                               .withOutputMaxSize(100)
-                                                               .set();
-        assertThat(configuration).isNotEqualTo(builder().withInputTimeout(TimeDuration.ZERO).set());
-        assertThat(configuration).isNotEqualTo(
-                builder().withInputTimeout(1, TimeUnit.MILLISECONDS).set());
-        assertThat(configuration.builderFrom()
-                                .withInputTimeout(TimeDuration.millis(1))
-                                .set()).isNotEqualTo(
-                builder().withInputTimeout(1, TimeUnit.MILLISECONDS).set());
-    }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testInputTimeoutError() {
-
-        try {
-
-            builder().withInputTimeout(1, null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            builder().withInputTimeout(-1, TimeUnit.MILLISECONDS);
 
             fail();
 
@@ -296,6 +325,77 @@ public class InvocationConfigurationTest {
     }
 
     @Test
+    public void testOutputLimitEquals() {
+
+        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+                                                               .withRunner(Runners.syncRunner())
+                                                               .withLog(new NullLog())
+                                                               .withOutputMaxSize(100)
+                                                               .set();
+        assertThat(configuration).isNotEqualTo(builder().withOutputLimit(10).set());
+        assertThat(configuration.builderFrom().withOutputLimit(31).set()).isNotEqualTo(
+                builder().withOutputLimit(31).set());
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testOutputLimitError() {
+
+        try {
+
+            builder().withOutputLimit(-1);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testOutputMaxDelayEquals() {
+
+        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+                                                               .withRunner(Runners.syncRunner())
+                                                               .withLog(new NullLog())
+                                                               .withOutputMaxSize(100)
+                                                               .set();
+        assertThat(configuration).isNotEqualTo(
+                builder().withOutputMaxDelay(TimeDuration.ZERO).set());
+        assertThat(configuration).isNotEqualTo(
+                builder().withOutputMaxDelay(1, TimeUnit.MILLISECONDS).set());
+        assertThat(configuration.builderFrom()
+                                .withOutputMaxDelay(TimeDuration.millis(1))
+                                .set()).isNotEqualTo(
+                builder().withOutputMaxDelay(1, TimeUnit.MILLISECONDS).set());
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testOutputMaxDelayError() {
+
+        try {
+
+            builder().withOutputMaxDelay(1, null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            builder().withOutputMaxDelay(-1, TimeUnit.MILLISECONDS);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    @Test
     public void testOutputOrderEquals() {
 
         final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
@@ -330,49 +430,6 @@ public class InvocationConfigurationTest {
         try {
 
             builder().withOutputMaxSize(0);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-    }
-
-    @Test
-    public void testOutputTimeoutEquals() {
-
-        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
-                                                               .withRunner(Runners.syncRunner())
-                                                               .withLog(new NullLog())
-                                                               .withOutputMaxSize(100)
-                                                               .set();
-        assertThat(configuration).isNotEqualTo(
-                builder().withOutputTimeout(TimeDuration.ZERO).set());
-        assertThat(configuration).isNotEqualTo(
-                builder().withOutputTimeout(1, TimeUnit.MILLISECONDS).set());
-        assertThat(configuration.builderFrom()
-                                .withOutputTimeout(TimeDuration.millis(1))
-                                .set()).isNotEqualTo(
-                builder().withOutputTimeout(1, TimeUnit.MILLISECONDS).set());
-    }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testOutputTimeoutError() {
-
-        try {
-
-            builder().withOutputTimeout(1, null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            builder().withOutputTimeout(-1, TimeUnit.MILLISECONDS);
 
             fail();
 

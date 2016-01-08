@@ -119,7 +119,6 @@ class SimpleQueue<E> {
      * @return the element.
      * @throws java.util.NoSuchElementException if the queue is empty.
      */
-    @Nullable
     @SuppressWarnings("unchecked")
     public E peekFirst() {
 
@@ -137,7 +136,6 @@ class SimpleQueue<E> {
      * @return the element.
      * @throws java.util.NoSuchElementException if the queue is empty.
      */
-    @Nullable
     @SuppressWarnings("unchecked")
     public E removeFirst() {
 

@@ -20,16 +20,18 @@ import com.github.dm.jrt.annotation.AsyncMethod;
 import com.github.dm.jrt.annotation.AsyncOut;
 import com.github.dm.jrt.annotation.AsyncOut.OutputMode;
 import com.github.dm.jrt.annotation.CoreInstances;
+import com.github.dm.jrt.annotation.InputLimit;
+import com.github.dm.jrt.annotation.InputMaxDelay;
 import com.github.dm.jrt.annotation.InputMaxSize;
 import com.github.dm.jrt.annotation.InputOrder;
-import com.github.dm.jrt.annotation.InputTimeout;
 import com.github.dm.jrt.annotation.Invoke;
 import com.github.dm.jrt.annotation.Invoke.InvocationMode;
 import com.github.dm.jrt.annotation.LogLevel;
 import com.github.dm.jrt.annotation.MaxInstances;
+import com.github.dm.jrt.annotation.OutputLimit;
+import com.github.dm.jrt.annotation.OutputMaxDelay;
 import com.github.dm.jrt.annotation.OutputMaxSize;
 import com.github.dm.jrt.annotation.OutputOrder;
-import com.github.dm.jrt.annotation.OutputTimeout;
 import com.github.dm.jrt.annotation.Priority;
 import com.github.dm.jrt.annotation.ReadTimeout;
 import com.github.dm.jrt.annotation.ReadTimeoutAction;
@@ -202,14 +204,16 @@ public class RoutineBuilders {
      * @param method        the target method.
      * @return the modified configuration.
      * @see com.github.dm.jrt.annotation.CoreInstances CoreInstances
+     * @see com.github.dm.jrt.annotation.InputLimit InputLimit
+     * @see com.github.dm.jrt.annotation.InputMaxDelay InputMaxDelay
      * @see com.github.dm.jrt.annotation.InputMaxSize InputMaxSize
      * @see com.github.dm.jrt.annotation.InputOrder InputOrder
-     * @see com.github.dm.jrt.annotation.InputTimeout InputTimeout
      * @see com.github.dm.jrt.annotation.LogLevel LogLevel
      * @see com.github.dm.jrt.annotation.MaxInstances MaxInstances
+     * @see com.github.dm.jrt.annotation.OutputLimit OutputLimit
+     * @see com.github.dm.jrt.annotation.OutputMaxDelay OutputMaxDelay
      * @see com.github.dm.jrt.annotation.OutputMaxSize OutputMaxSize
      * @see com.github.dm.jrt.annotation.OutputOrder OutputOrder
-     * @see com.github.dm.jrt.annotation.OutputTimeout OutputTimeout
      * @see com.github.dm.jrt.annotation.Priority Priority
      * @see com.github.dm.jrt.annotation.ReadTimeout ReadTimeout
      * @see com.github.dm.jrt.annotation.ReadTimeoutAction ReadTimeoutAction
@@ -227,6 +231,21 @@ public class RoutineBuilders {
             builder.withCoreInstances(coreInstancesAnnotation.value());
         }
 
+        final InputLimit inputLimitAnnotation = method.getAnnotation(InputLimit.class);
+
+        if (inputLimitAnnotation != null) {
+
+            builder.withInputLimit(inputLimitAnnotation.value());
+        }
+
+        final InputMaxDelay inputMaxDelayAnnotation = method.getAnnotation(InputMaxDelay.class);
+
+        if (inputMaxDelayAnnotation != null) {
+
+            builder.withInputMaxDelay(inputMaxDelayAnnotation.value(),
+                                      inputMaxDelayAnnotation.unit());
+        }
+
         final InputMaxSize inputSizeAnnotation = method.getAnnotation(InputMaxSize.class);
 
         if (inputSizeAnnotation != null) {
@@ -239,13 +258,6 @@ public class RoutineBuilders {
         if (inputOrderAnnotation != null) {
 
             builder.withInputOrder(inputOrderAnnotation.value());
-        }
-
-        final InputTimeout inputTimeoutAnnotation = method.getAnnotation(InputTimeout.class);
-
-        if (inputTimeoutAnnotation != null) {
-
-            builder.withInputTimeout(inputTimeoutAnnotation.value(), inputTimeoutAnnotation.unit());
         }
 
         final LogLevel logLevelAnnotation = method.getAnnotation(LogLevel.class);
@@ -262,6 +274,21 @@ public class RoutineBuilders {
             builder.withMaxInstances(maxInstancesAnnotation.value());
         }
 
+        final OutputLimit outputLimitAnnotation = method.getAnnotation(OutputLimit.class);
+
+        if (outputLimitAnnotation != null) {
+
+            builder.withOutputLimit(outputLimitAnnotation.value());
+        }
+
+        final OutputMaxDelay outputMaxDelayAnnotation = method.getAnnotation(OutputMaxDelay.class);
+
+        if (outputMaxDelayAnnotation != null) {
+
+            builder.withOutputMaxDelay(outputMaxDelayAnnotation.value(),
+                                       outputMaxDelayAnnotation.unit());
+        }
+
         final OutputMaxSize outputSizeAnnotation = method.getAnnotation(OutputMaxSize.class);
 
         if (outputSizeAnnotation != null) {
@@ -274,14 +301,6 @@ public class RoutineBuilders {
         if (outputOrderAnnotation != null) {
 
             builder.withOutputOrder(outputOrderAnnotation.value());
-        }
-
-        final OutputTimeout outputTimeoutAnnotation = method.getAnnotation(OutputTimeout.class);
-
-        if (outputTimeoutAnnotation != null) {
-
-            builder.withOutputTimeout(outputTimeoutAnnotation.value(),
-                                      outputTimeoutAnnotation.unit());
         }
 
         final Priority priorityAnnotation = method.getAnnotation(Priority.class);

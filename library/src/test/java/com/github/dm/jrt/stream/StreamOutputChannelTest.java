@@ -17,7 +17,7 @@ import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.channel.AbortException;
 import com.github.dm.jrt.channel.Channel.InputChannel;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
-import com.github.dm.jrt.channel.DeadlockException;
+import com.github.dm.jrt.channel.ExecutionDeadlockException;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InputDeadlockException;
 import com.github.dm.jrt.channel.OutputDeadlockException;
@@ -702,6 +702,44 @@ public class StreamOutputChannelTest {
     }
 
     @Test
+    public void testInvocationDeadlock() {
+
+        try {
+
+            final Runner runner1 = Runners.poolRunner(1);
+            final Runner runner2 = Runners.poolRunner(1);
+            Streams.streamOf("test")
+                   .withInvocations()
+                   .withRunner(runner1)
+                   .set()
+                   .asyncMap(new Function<String, Object>() {
+
+                       public Object apply(final String s) {
+
+                           return Streams.streamOf(s)
+                                         .withInvocations()
+                                         .withRunner(runner1)
+                                         .set()
+                                         .asyncMap(Functions.identity())
+                                         .withInvocations()
+                                         .withRunner(runner2)
+                                         .set()
+                                         .asyncMap(Functions.identity())
+                                         .afterMax(days(3))
+                                         .next();
+                       }
+                   })
+                   .afterMax(days(3))
+                   .next();
+
+            fail();
+
+        } catch (final ExecutionDeadlockException ignored) {
+
+        }
+    }
+
+    @Test
     public void testLift() {
 
         assertThat(Streams.streamOf("test1", null, "test2", null)
@@ -1075,52 +1113,53 @@ public class StreamOutputChannelTest {
 
         try {
 
-            Streams.streamOf()
-                   .asyncRange(1, 1000)
-                   .withStreamInvocations()
-                   .withRunner(mSingleThreadRunner)
-                   .withInputMaxSize(2)
-                   .withInputTimeout(seconds(10))
-                   .withOutputMaxSize(2)
-                   .withOutputTimeout(seconds(10))
-                   .set()
-                   .asyncMap(Functions.<Number>identity())
-                   .asyncMap(new Function<Number, Double>() {
+            assertThat(Streams.streamOf()
+                              .asyncRange(1, 1000)
+                              .withStreamInvocations()
+                              .withRunner(mSingleThreadRunner)
+                              .withInputLimit(2)
+                              .withInputMaxDelay(seconds(10))
+                              .withOutputLimit(2)
+                              .withOutputMaxDelay(seconds(10))
+                              .set()
+                              .asyncMap(Functions.<Number>identity())
+                              .asyncMap(new Function<Number, Double>() {
 
-                       public Double apply(final Number number) {
+                                  public Double apply(final Number number) {
 
-                           final double value = number.doubleValue();
-                           return Math.sqrt(value);
-                       }
-                   })
-                   .syncMap(new Function<Double, SumData>() {
+                                      final double value = number.doubleValue();
+                                      return Math.sqrt(value);
+                                  }
+                              })
+                              .syncMap(new Function<Double, SumData>() {
 
-                       public SumData apply(final Double aDouble) {
+                                  public SumData apply(final Double aDouble) {
 
-                           return new SumData(aDouble, 1);
-                       }
-                   })
-                   .syncReduce(new BiFunction<SumData, SumData, SumData>() {
+                                      return new SumData(aDouble, 1);
+                                  }
+                              })
+                              .syncReduce(new BiFunction<SumData, SumData, SumData>() {
 
-                       public SumData apply(final SumData data1, final SumData data2) {
+                                  public SumData apply(final SumData data1, final SumData data2) {
 
-                           return new SumData(data1.sum + data2.sum, data1.count + data2.count);
-                       }
-                   })
-                   .syncMap(new Function<SumData, Double>() {
+                                      return new SumData(data1.sum + data2.sum,
+                                                         data1.count + data2.count);
+                                  }
+                              })
+                              .syncMap(new Function<SumData, Double>() {
 
-                       public Double apply(final SumData data) {
+                                  public Double apply(final SumData data) {
 
-                           return data.sum / data.count;
-                       }
-                   })
-                   .runOnShared()
-                   .afterMax(days(3))
-                   .next();
+                                      return data.sum / data.count;
+                                  }
+                              })
+                              .runOnShared()
+                              .afterMax(days(3))
+                              .next()).isCloseTo(21, Offset.offset(0.1));
 
             fail();
 
-        } catch (final DeadlockException ignored) {
+        } catch (final InputDeadlockException ignored) {
 
         }
 
@@ -1130,8 +1169,8 @@ public class StreamOutputChannelTest {
                               .asyncRange(1, 1000)
                               .withStreamInvocations()
                               .withRunner(mSingleThreadRunner)
-                              .withOutputMaxSize(2)
-                              .withOutputTimeout(seconds(10))
+                              .withOutputLimit(2)
+                              .withOutputMaxDelay(seconds(10))
                               .set()
                               .asyncMap(Functions.<Number>identity())
                               .asyncMap(new Function<Number, Double>() {
@@ -1174,46 +1213,47 @@ public class StreamOutputChannelTest {
 
         try {
 
-            Streams.streamOf()
-                   .asyncRange(1, 1000)
-                   .withStreamInvocations()
-                   .withRunner(mSingleThreadRunner)
-                   .withInputMaxSize(2)
-                   .withInputTimeout(seconds(10))
-                   .set()
-                   .asyncMap(Functions.<Number>identity())
-                   .asyncMap(new Function<Number, Double>() {
+            assertThat(Streams.streamOf()
+                              .asyncRange(1, 1000)
+                              .withStreamInvocations()
+                              .withRunner(mSingleThreadRunner)
+                              .withInputLimit(2)
+                              .withInputMaxDelay(seconds(10))
+                              .set()
+                              .asyncMap(Functions.<Number>identity())
+                              .asyncMap(new Function<Number, Double>() {
 
-                       public Double apply(final Number number) {
+                                  public Double apply(final Number number) {
 
-                           final double value = number.doubleValue();
-                           return Math.sqrt(value);
-                       }
-                   })
-                   .syncMap(new Function<Double, SumData>() {
+                                      final double value = number.doubleValue();
+                                      return Math.sqrt(value);
+                                  }
+                              })
+                              .syncMap(new Function<Double, SumData>() {
 
-                       public SumData apply(final Double aDouble) {
+                                  public SumData apply(final Double aDouble) {
 
-                           return new SumData(aDouble, 1);
-                       }
-                   })
-                   .syncReduce(new BiFunction<SumData, SumData, SumData>() {
+                                      return new SumData(aDouble, 1);
+                                  }
+                              })
+                              .syncReduce(new BiFunction<SumData, SumData, SumData>() {
 
-                       public SumData apply(final SumData data1, final SumData data2) {
+                                  public SumData apply(final SumData data1, final SumData data2) {
 
-                           return new SumData(data1.sum + data2.sum, data1.count + data2.count);
-                       }
-                   })
-                   .syncMap(new Function<SumData, Double>() {
+                                      return new SumData(data1.sum + data2.sum,
+                                                         data1.count + data2.count);
+                                  }
+                              })
+                              .syncMap(new Function<SumData, Double>() {
 
-                       public Double apply(final SumData data) {
+                                  public Double apply(final SumData data) {
 
-                           return data.sum / data.count;
-                       }
-                   })
-                   .runOnShared()
-                   .afterMax(days(3))
-                   .next();
+                                      return data.sum / data.count;
+                                  }
+                              })
+                              .runOnShared()
+                              .afterMax(days(3))
+                              .next()).isCloseTo(21, Offset.offset(0.1));
 
             fail();
 

@@ -222,30 +222,36 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
             final Level logLevel = logger.getLogLevel();
             final Runner runner = invocationConfiguration.getRunnerOr(Runners.sharedRunner());
             final OrderType inputOrderType = invocationConfiguration.getInputOrderTypeOr(null);
+            final int inputLimit =
+                    invocationConfiguration.getInputLimitOr(ChannelConfiguration.DEFAULT);
+            final TimeDuration inputMaxDelay = invocationConfiguration.getInputMaxDelayOr(null);
             final int inputMaxSize =
                     invocationConfiguration.getInputMaxSizeOr(ChannelConfiguration.DEFAULT);
-            final TimeDuration inputTimeout = invocationConfiguration.getInputTimeoutOr(null);
             mInput = JRoutine.io()
                              .withChannels()
                              .withRunner(runner)
                              .withChannelOrder(inputOrderType)
+                             .withChannelLimit(inputLimit)
+                             .withChannelMaxDelay(inputMaxDelay)
                              .withChannelMaxSize(inputMaxSize)
-                             .withChannelTimeout(inputTimeout)
                              .withLog(log)
                              .withLogLevel(logLevel)
                              .set()
                              .buildChannel();
+            final int outputLimit =
+                    invocationConfiguration.getOutputLimitOr(ChannelConfiguration.DEFAULT);
+            final TimeDuration outputMaxDelay = invocationConfiguration.getOutputMaxDelayOr(null);
             final int outputMaxSize =
                     invocationConfiguration.getOutputMaxSizeOr(ChannelConfiguration.DEFAULT);
-            final TimeDuration outputTimeout = invocationConfiguration.getOutputTimeoutOr(null);
             final TimeDuration executionTimeout = invocationConfiguration.getReadTimeoutOr(null);
             final TimeoutActionType timeoutActionType =
                     invocationConfiguration.getReadTimeoutActionOr(null);
             mOutput = JRoutine.io()
                               .withChannels()
                               .withRunner(Runners.looperRunner(looper))
+                              .withChannelLimit(outputLimit)
+                              .withChannelMaxDelay(outputMaxDelay)
                               .withChannelMaxSize(outputMaxSize)
-                              .withChannelTimeout(outputTimeout)
                               .withReadTimeout(executionTimeout)
                               .withReadTimeoutAction(timeoutActionType)
                               .withLog(log)

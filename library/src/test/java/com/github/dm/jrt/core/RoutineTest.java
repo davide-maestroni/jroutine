@@ -28,10 +28,9 @@ import com.github.dm.jrt.channel.DeadlockException;
 import com.github.dm.jrt.channel.ExecutionTimeoutException;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InputDeadlockException;
-import com.github.dm.jrt.channel.InputTimeoutException;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
-import com.github.dm.jrt.channel.OutputTimeoutException;
+import com.github.dm.jrt.channel.OutputDeadlockException;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.channel.TemplateOutputConsumer;
@@ -1085,8 +1084,8 @@ public class RoutineTest {
         final InvocationChannel<Object, Object> channel =
                 JRoutine.on(new SleepInvocation(millis(500)))
                         .withInvocations()
-                        .withInputMaxSize(1)
-                        .withInputTimeout(seconds(3))
+                        .withInputLimit(1)
+                        .withInputMaxDelay(seconds(3))
                         .set()
                         .asyncInvoke();
         assertThat(channel.isEmpty()).isTrue();
@@ -1103,8 +1102,8 @@ public class RoutineTest {
 
         final Routine<Object, Object> routine = JRoutine.on(new SleepInvocation(millis(500)))
                                                         .withInvocations()
-                                                        .withInputMaxSize(1)
-                                                        .withInputTimeout(seconds(3))
+                                                        .withInputLimit(1)
+                                                        .withInputMaxDelay(seconds(3))
                                                         .set()
                                                         .buildRoutine();
         InvocationChannel<Object, Object> channel = routine.asyncInvoke();
@@ -1422,14 +1421,13 @@ public class RoutineTest {
             JRoutine.on(new SleepInvocation(millis(100)))
                     .withInvocations()
                     .withInputMaxSize(1)
-                    .withInputTimeout(TimeDuration.ZERO)
                     .set()
                     .asyncCall("test", "test")
                     .all();
 
             fail();
 
-        } catch (final InputTimeoutException ignored) {
+        } catch (final InputDeadlockException ignored) {
 
         }
 
@@ -1438,16 +1436,103 @@ public class RoutineTest {
             JRoutine.on(new SleepInvocation(millis(100)))
                     .withInvocations()
                     .withInputMaxSize(1)
-                    .withInputTimeout(TimeDuration.ZERO)
                     .set()
                     .asyncCall(Arrays.asList("test", "test"))
                     .all();
 
             fail();
 
-        } catch (final InputTimeoutException ignored) {
+        } catch (final InputDeadlockException ignored) {
 
         }
+    }
+
+    @Test
+    public void testInputDelay() {
+
+        assertThat(JRoutine.on(PassingInvocation.factoryOf())
+                           .withInvocations()
+                           .withInputOrder(OrderType.BY_CALL)
+                           .withInputLimit(1)
+                           .withInputMaxDelay(TimeDuration.ZERO)
+                           .set()
+                           .asyncInvoke()
+                           .orderByChance()
+                           .orderByDelay()
+                           .orderByCall()
+                           .after(millis(100))
+                           .pass("test1")
+                           .now()
+                           .pass("test2")
+                           .result()
+                           .afterMax(seconds(1))
+                           .all()).containsExactly("test1", "test2");
+
+        assertThat(JRoutine.on(PassingInvocation.factoryOf())
+                           .withInvocations()
+                           .withInputOrder(OrderType.BY_CALL)
+                           .withInputLimit(1)
+                           .withInputMaxDelay(millis(1000))
+                           .set()
+                           .asyncInvoke()
+                           .orderByCall()
+                           .after(millis(100))
+                           .pass("test1")
+                           .now()
+                           .pass("test2")
+                           .result()
+                           .afterMax(seconds(1))
+                           .all()).containsExactly("test1", "test2");
+
+        assertThat(JRoutine.on(PassingInvocation.factoryOf())
+                           .withInvocations()
+                           .withInputOrder(OrderType.BY_CALL)
+                           .withInputLimit(1)
+                           .withInputMaxDelay(millis(1000))
+                           .set()
+                           .asyncInvoke()
+                           .orderByCall()
+                           .after(millis(100))
+                           .pass("test1")
+                           .now()
+                           .pass(asArgs("test2"))
+                           .result()
+                           .afterMax(seconds(1))
+                           .all()).containsExactly("test1", "test2");
+
+        assertThat(JRoutine.on(PassingInvocation.factoryOf())
+                           .withInvocations()
+                           .withInputOrder(OrderType.BY_CALL)
+                           .withInputLimit(1)
+                           .withInputMaxDelay(millis(1000))
+                           .set()
+                           .asyncInvoke()
+                           .orderByCall()
+                           .after(millis(100))
+                           .pass("test1")
+                           .now()
+                           .pass(Collections.singletonList("test2"))
+                           .result()
+                           .afterMax(seconds(1))
+                           .all()).containsExactly("test1", "test2");
+
+        final IOChannel<Object> channel = JRoutine.io().buildChannel();
+        channel.pass("test2").close();
+        assertThat(JRoutine.on(PassingInvocation.factoryOf())
+                           .withInvocations()
+                           .withInputOrder(OrderType.BY_CALL)
+                           .withInputLimit(1)
+                           .withInputMaxDelay(millis(1000))
+                           .set()
+                           .asyncInvoke()
+                           .orderByCall()
+                           .after(millis(100))
+                           .pass("test1")
+                           .now()
+                           .pass(channel)
+                           .result()
+                           .afterMax(seconds(1))
+                           .all()).containsExactly("test1", "test2");
     }
 
     @Test
@@ -1501,101 +1586,6 @@ public class RoutineTest {
     }
 
     @Test
-    public void testInputTimeout() {
-
-        try {
-
-            JRoutine.on(PassingInvocation.factoryOf())
-                    .withInvocations()
-                    .withInputOrder(OrderType.BY_CALL)
-                    .withInputMaxSize(1)
-                    .withInputTimeout(TimeDuration.ZERO)
-                    .set()
-                    .asyncInvoke()
-                    .orderByChance()
-                    .orderByDelay()
-                    .orderByCall()
-                    .after(millis(100))
-                    .pass("test1")
-                    .now()
-                    .pass("test2")
-                    .result()
-                    .all();
-
-            fail();
-
-        } catch (final InputTimeoutException ignored) {
-
-        }
-
-        assertThat(JRoutine.on(PassingInvocation.factoryOf())
-                           .withInvocations()
-                           .withInputOrder(OrderType.BY_CALL)
-                           .withInputMaxSize(1)
-                           .withInputTimeout(millis(1000))
-                           .set()
-                           .asyncInvoke()
-                           .orderByCall()
-                           .after(millis(100))
-                           .pass("test1")
-                           .now()
-                           .pass("test2")
-                           .result()
-                           .afterMax(seconds(1))
-                           .all()).containsExactly("test1", "test2");
-
-        assertThat(JRoutine.on(PassingInvocation.factoryOf())
-                           .withInvocations()
-                           .withInputOrder(OrderType.BY_CALL)
-                           .withInputMaxSize(1)
-                           .withInputTimeout(millis(1000))
-                           .set()
-                           .asyncInvoke()
-                           .orderByCall()
-                           .after(millis(100))
-                           .pass("test1")
-                           .now()
-                           .pass(asArgs("test2"))
-                           .result()
-                           .afterMax(seconds(1))
-                           .all()).containsExactly("test1", "test2");
-
-        assertThat(JRoutine.on(PassingInvocation.factoryOf())
-                           .withInvocations()
-                           .withInputOrder(OrderType.BY_CALL)
-                           .withInputMaxSize(1)
-                           .withInputTimeout(millis(1000))
-                           .set()
-                           .asyncInvoke()
-                           .orderByCall()
-                           .after(millis(100))
-                           .pass("test1")
-                           .now()
-                           .pass(Collections.singletonList("test2"))
-                           .result()
-                           .afterMax(seconds(1))
-                           .all()).containsExactly("test1", "test2");
-
-        final IOChannel<Object> channel = JRoutine.io().buildChannel();
-        channel.pass("test2").close();
-        assertThat(JRoutine.on(PassingInvocation.factoryOf())
-                           .withInvocations()
-                           .withInputOrder(OrderType.BY_CALL)
-                           .withInputMaxSize(1)
-                           .withInputTimeout(millis(1000))
-                           .set()
-                           .asyncInvoke()
-                           .orderByCall()
-                           .after(millis(100))
-                           .pass("test1")
-                           .now()
-                           .pass(channel)
-                           .result()
-                           .afterMax(seconds(1))
-                           .all()).containsExactly("test1", "test2");
-    }
-
-    @Test
     public void testInputTimeoutIssue() {
 
         try {
@@ -1610,7 +1600,7 @@ public class RoutineTest {
                     .withInvocations()
                     .withInputOrder(OrderType.BY_CALL)
                     .withInputMaxSize(1)
-                    .withInputTimeout(millis(1000))
+                    .withInputMaxDelay(millis(1000))
                     .set()
                     .asyncInvoke()
                     .orderByCall()
@@ -1958,12 +1948,7 @@ public class RoutineTest {
 
                         result.pass(strings);
                     }
-                }, this))
-                        .withInvocations()
-                        .withOutputMaxSize(1)
-                        .withOutputTimeout(TimeDuration.ZERO)
-                        .set()
-                        .buildRoutine();
+                }, this)).withInvocations().withOutputMaxSize(1).set().buildRoutine();
 
         try {
 
@@ -1971,7 +1956,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final OutputTimeoutException ignored) {
+        } catch (final OutputDeadlockException ignored) {
 
         }
 
@@ -1984,12 +1969,7 @@ public class RoutineTest {
 
                         result.pass(strings.toArray(new String[strings.size()]));
                     }
-                }, this))
-                        .withInvocations()
-                        .withOutputMaxSize(1)
-                        .withOutputTimeout(TimeDuration.ZERO)
-                        .set()
-                        .buildRoutine();
+                }, this)).withInvocations().withOutputMaxSize(1).set().buildRoutine();
 
         try {
 
@@ -1997,7 +1977,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final OutputTimeoutException ignored) {
+        } catch (final OutputDeadlockException ignored) {
 
         }
     }
@@ -2007,29 +1987,20 @@ public class RoutineTest {
 
         final Routine<String, String> routine = JRoutine.on(PassingInvocation.<String>factoryOf())
                                                         .withInvocations()
-                                                        .withOutputMaxSize(1)
-                                                        .withOutputTimeout(TimeDuration.ZERO)
+                                                        .withOutputLimit(1)
+                                                        .withOutputMaxDelay(TimeDuration.ZERO)
                                                         .set()
                                                         .buildRoutine();
-
-        try {
-
-            final OutputChannel<String> outputChannel =
-                    routine.asyncCall("test1", "test2").afterMax(seconds(1));
-            outputChannel.checkComplete();
-            outputChannel.all();
-
-            fail();
-
-        } catch (final OutputTimeoutException ignored) {
-
-        }
+        final OutputChannel<String> outputChannel =
+                routine.asyncCall("test1", "test2").afterMax(seconds(1));
+        outputChannel.checkComplete();
+        assertThat(outputChannel.all()).containsExactly("test1", "test2");
 
         final IOChannel<String> channel1 = JRoutine.io()
                                                    .withChannels()
                                                    .withRunner(Runners.sharedRunner())
                                                    .withChannelMaxSize(1)
-                                                   .withChannelTimeout(millis(1000))
+                                                   .withChannelMaxDelay(millis(1000))
                                                    .set()
                                                    .buildChannel();
         new Thread() {
@@ -2047,7 +2018,7 @@ public class RoutineTest {
                                                    .withChannels()
                                                    .withRunner(Runners.sharedRunner())
                                                    .withChannelMaxSize(1)
-                                                   .withChannelTimeout(millis(1000))
+                                                   .withChannelMaxDelay(millis(1000))
                                                    .set()
                                                    .buildChannel();
         new Thread() {
@@ -2065,7 +2036,7 @@ public class RoutineTest {
                                                    .withChannels()
                                                    .withRunner(Runners.sharedRunner())
                                                    .withChannelMaxSize(1)
-                                                   .withChannelTimeout(millis(1000))
+                                                   .withChannelMaxDelay(millis(1000))
                                                    .set()
                                                    .buildChannel();
         new Thread() {
@@ -2083,7 +2054,7 @@ public class RoutineTest {
                                                    .withChannels()
                                                    .withRunner(Runners.sharedRunner())
                                                    .withChannelMaxSize(1)
-                                                   .withChannelTimeout(millis(1000))
+                                                   .withChannelMaxDelay(millis(1000))
                                                    .set()
                                                    .buildChannel();
         new Thread() {
@@ -2383,7 +2354,6 @@ public class RoutineTest {
             JRoutine.on(new ResultRunnerDeadlock())
                     .withInvocations()
                     .withOutputMaxSize(1)
-                    .withOutputTimeout(millis(500))
                     .set()
                     .asyncCall("test")
                     .afterMax(seconds(1))
@@ -2391,7 +2361,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final DeadlockException ignored) {
+        } catch (final OutputDeadlockException ignored) {
 
         }
 
@@ -2400,7 +2370,6 @@ public class RoutineTest {
             JRoutine.on(new ResultListRunnerDeadlock())
                     .withInvocations()
                     .withOutputMaxSize(1)
-                    .withOutputTimeout(millis(500))
                     .set()
                     .asyncCall("test")
                     .afterMax(seconds(1))
@@ -2408,7 +2377,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final DeadlockException ignored) {
+        } catch (final OutputDeadlockException ignored) {
 
         }
 
@@ -2417,7 +2386,6 @@ public class RoutineTest {
             JRoutine.on(new ResultArrayRunnerDeadlock())
                     .withInvocations()
                     .withOutputMaxSize(1)
-                    .withOutputTimeout(millis(500))
                     .set()
                     .asyncCall("test")
                     .afterMax(seconds(1))
@@ -2425,24 +2393,7 @@ public class RoutineTest {
 
             fail();
 
-        } catch (final DeadlockException ignored) {
-
-        }
-
-        try {
-
-            JRoutine.on(new ResultConsumerRunnerDeadlock())
-                    .withInvocations()
-                    .withOutputMaxSize(1)
-                    .withOutputTimeout(millis(500))
-                    .set()
-                    .asyncCall("test")
-                    .afterMax(seconds(1))
-                    .all();
-
-            fail();
-
-        } catch (final DeadlockException ignored) {
+        } catch (final OutputDeadlockException ignored) {
 
         }
     }
@@ -2488,10 +2439,12 @@ public class RoutineTest {
                            .withRunner(Runners.poolRunner())
                            .withCoreInstances(0)
                            .withMaxInstances(1)
+                           .withInputLimit(2)
+                           .withInputMaxDelay(1, TimeUnit.SECONDS)
                            .withInputMaxSize(2)
-                           .withInputTimeout(1, TimeUnit.SECONDS)
+                           .withOutputLimit(2)
+                           .withOutputMaxDelay(1, TimeUnit.SECONDS)
                            .withOutputMaxSize(2)
-                           .withOutputTimeout(1, TimeUnit.SECONDS)
                            .withOutputOrder(OrderType.BY_CALL)
                            .set()
                            .syncCall("test1", "test2")
@@ -2502,10 +2455,12 @@ public class RoutineTest {
                            .withRunner(Runners.poolRunner())
                            .withCoreInstances(0)
                            .withMaxInstances(1)
+                           .withInputLimit(2)
+                           .withInputMaxDelay(TimeDuration.ZERO)
                            .withInputMaxSize(2)
-                           .withInputTimeout(TimeDuration.ZERO)
+                           .withOutputLimit(2)
+                           .withOutputMaxDelay(TimeDuration.ZERO)
                            .withOutputMaxSize(2)
-                           .withOutputTimeout(TimeDuration.ZERO)
                            .withOutputOrder(OrderType.BY_CALL)
                            .set()
                            .syncCall("test1", "test2")
@@ -3732,7 +3687,7 @@ public class RoutineTest {
             JRoutine.on(PassingInvocation.<String>factoryOf())
                     .withInvocations()
                     .withInputMaxSize(1)
-                    .withInputTimeout(TimeDuration.INFINITY)
+                    .withInputMaxDelay(TimeDuration.INFINITY)
                     .set()
                     .asyncInvoke()
                     .after(millis(500))
@@ -3752,7 +3707,7 @@ public class RoutineTest {
             result.pass(JRoutine.on(PassingInvocation.<String>factoryOf())
                                 .withInvocations()
                                 .withInputMaxSize(1)
-                                .withInputTimeout(TimeDuration.INFINITY)
+                                .withInputMaxDelay(TimeDuration.INFINITY)
                                 .set()
                                 .asyncInvoke()
                                 .after(millis(500))
@@ -3769,7 +3724,7 @@ public class RoutineTest {
             JRoutine.on(PassingInvocation.<String>factoryOf())
                     .withInvocations()
                     .withInputMaxSize(1)
-                    .withInputTimeout(TimeDuration.INFINITY)
+                    .withInputMaxDelay(TimeDuration.INFINITY)
                     .set()
                     .asyncInvoke()
                     .after(millis(500))
@@ -3788,7 +3743,7 @@ public class RoutineTest {
             JRoutine.on(PassingInvocation.<String>factoryOf())
                     .withInvocations()
                     .withInputMaxSize(1)
-                    .withInputTimeout(TimeDuration.INFINITY)
+                    .withInputMaxDelay(TimeDuration.INFINITY)
                     .set()
                     .asyncInvoke()
                     .after(millis(500))
@@ -3833,16 +3788,6 @@ public class RoutineTest {
         public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
             result.after(millis(500)).pass(s).after(millis(100)).pass(new String[]{s});
-        }
-    }
-
-    private static class ResultConsumerRunnerDeadlock extends FilterInvocation<String, String> {
-
-        public void onInput(final String s, @NotNull final ResultChannel<String> result) {
-
-            final IOChannel<String> channel = JRoutine.io().buildChannel();
-            result.after(millis(500)).pass(channel);
-            channel.pass(s, s).close();
         }
     }
 

@@ -161,8 +161,8 @@ public class Downloader {
                             // make the writing happen in a dedicated runner, so that waiting for
                             // available space becomes allowed
                             .withRunner(sWriteRunner)
-                            .withInputMaxSize(32)
-                            .withInputTimeout(seconds(30))
+                            .withInputLimit(32)
+                            .withInputMaxDelay(seconds(3))
                             .set()
                             .buildRoutine();
             downloads.put(uri, writeFile.asyncCall(mReadConnection.asyncCall(uri)));

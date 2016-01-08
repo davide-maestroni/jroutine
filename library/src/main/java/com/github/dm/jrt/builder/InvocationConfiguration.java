@@ -78,11 +78,13 @@ public final class InvocationConfiguration {
 
     private final int mCoreInstances;
 
+    private final int mInputLimit;
+
+    private final TimeDuration mInputMaxDelay;
+
     private final int mInputMaxSize;
 
     private final OrderType mInputOrderType;
-
-    private final TimeDuration mInputTimeout;
 
     private final Log mLog;
 
@@ -90,11 +92,13 @@ public final class InvocationConfiguration {
 
     private final int mMaxInstances;
 
+    private final int mOutputLimit;
+
+    private final TimeDuration mOutputMaxDelay;
+
     private final int mOutputMaxSize;
 
     private final OrderType mOutputOrderType;
-
-    private final TimeDuration mOutputTimeout;
 
     private final int mPriority;
 
@@ -116,22 +120,27 @@ public final class InvocationConfiguration {
      * @param actionType      the action to be taken if the timeout elapses before a readable
      *                        result is available.
      * @param inputOrderType  the order in which input data are collected from the input channel.
+     * @param inputLimit      the maximum number of buffered input data before applying a delay to
+     *                        the feeding thread. Must not be negative.
+     * @param inputMaxDelay   the maximum delay to apply while waiting for an input to be passed to
+     *                        the input channel.
      * @param inputMaxSize    the maximum number of buffered input data. Must be positive.
-     * @param inputTimeout    the maximum timeout while waiting for an input to be passed to the
-     *                        input channel.
      * @param outputOrderType the order in which output data are collected from the result channel.
+     * @param outputLimit     the maximum number of buffered output data before applying a delay to
+     *                        the feeding thread. Must not be negative.
+     * @param outputMaxDelay  the maximum delay to apply while waiting for an output to be passed to
+     *                        the result channel.
      * @param outputMaxSize   the maximum number of buffered output data. Must be positive.
-     * @param outputTimeout   the maximum timeout while waiting for an output to be passed to the
-     *                        result channel.
      * @param log             the log instance.
      * @param logLevel        the log level.
      */
     private InvocationConfiguration(@Nullable final Runner runner, final int priority,
             final int maxInstances, final int coreInstances,
             @Nullable final TimeDuration readTimeout, @Nullable final TimeoutActionType actionType,
-            @Nullable final OrderType inputOrderType, final int inputMaxSize,
-            @Nullable final TimeDuration inputTimeout, @Nullable final OrderType outputOrderType,
-            final int outputMaxSize, @Nullable final TimeDuration outputTimeout,
+            @Nullable final OrderType inputOrderType, final int inputLimit,
+            @Nullable final TimeDuration inputMaxDelay, final int inputMaxSize,
+            @Nullable final OrderType outputOrderType, final int outputLimit,
+            @Nullable final TimeDuration outputMaxDelay, final int outputMaxSize,
             @Nullable final Log log, @Nullable final Level logLevel) {
 
         mRunner = runner;
@@ -141,11 +150,13 @@ public final class InvocationConfiguration {
         mReadTimeout = readTimeout;
         mTimeoutActionType = actionType;
         mInputOrderType = inputOrderType;
+        mInputLimit = inputLimit;
+        mInputMaxDelay = inputMaxDelay;
         mInputMaxSize = inputMaxSize;
-        mInputTimeout = inputTimeout;
         mOutputOrderType = outputOrderType;
+        mOutputLimit = outputLimit;
+        mOutputMaxDelay = outputMaxDelay;
         mOutputMaxSize = outputMaxSize;
-        mOutputTimeout = outputTimeout;
         mLog = log;
         mLogLevel = logLevel;
     }
@@ -199,6 +210,32 @@ public final class InvocationConfiguration {
     }
 
     /**
+     * Returns the limit of buffered input data (DEFAULT by default) before starting applying a
+     * delay to the feeding thread.
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the limit.
+     */
+    public int getInputLimitOr(final int valueIfNotSet) {
+
+        final int inputLimit = mInputLimit;
+        return (inputLimit != DEFAULT) ? inputLimit : valueIfNotSet;
+    }
+
+    /**
+     * Returns the maximum delay to apply while waiting for an input to be passed to the input
+     * channel (null by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the delay.
+     */
+    public TimeDuration getInputMaxDelayOr(@Nullable final TimeDuration valueIfNotSet) {
+
+        final TimeDuration inputMaxDelay = mInputMaxDelay;
+        return (inputMaxDelay != null) ? inputMaxDelay : valueIfNotSet;
+    }
+
+    /**
      * Returns the maximum number of buffered input data (DEFAULT by default).
      *
      * @param valueIfNotSet the default value if none was set.
@@ -220,19 +257,6 @@ public final class InvocationConfiguration {
 
         final OrderType inputOrderType = mInputOrderType;
         return (inputOrderType != null) ? inputOrderType : valueIfNotSet;
-    }
-
-    /**
-     * Returns the maximum timeout while waiting for an input to be passed to the input channel
-     * (null by default).
-     *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the timeout.
-     */
-    public TimeDuration getInputTimeoutOr(@Nullable final TimeDuration valueIfNotSet) {
-
-        final TimeDuration inputTimeout = mInputTimeout;
-        return (inputTimeout != null) ? inputTimeout : valueIfNotSet;
     }
 
     /**
@@ -272,6 +296,32 @@ public final class InvocationConfiguration {
     }
 
     /**
+     * Returns the limit of buffered output data (DEFAULT by default) before starting applying a
+     * delay to the feeding thread.
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the limit.
+     */
+    public int getOutputLimitOr(final int valueIfNotSet) {
+
+        final int outputLimit = mOutputLimit;
+        return (outputLimit != DEFAULT) ? outputLimit : valueIfNotSet;
+    }
+
+    /**
+     * Returns the maximum delay to apply while waiting for an output to be passed to the result
+     * channel (null by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the delay.
+     */
+    public TimeDuration getOutputMaxDelayOr(@Nullable final TimeDuration valueIfNotSet) {
+
+        final TimeDuration outputMaxDelay = mOutputMaxDelay;
+        return (outputMaxDelay != null) ? outputMaxDelay : valueIfNotSet;
+    }
+
+    /**
      * Returns the maximum number of buffered output data (DEFAULT by default).
      *
      * @param valueIfNotSet the default value if none was set.
@@ -293,19 +343,6 @@ public final class InvocationConfiguration {
 
         final OrderType outputOrderType = mOutputOrderType;
         return (outputOrderType != null) ? outputOrderType : valueIfNotSet;
-    }
-
-    /**
-     * Returns the maximum timeout while waiting for an output to be passed to the result channel
-     * (null by default).
-     *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the timeout.
-     */
-    public TimeDuration getOutputTimeoutOr(@Nullable final TimeDuration valueIfNotSet) {
-
-        final TimeDuration outputTimeout = mOutputTimeout;
-        return (outputTimeout != null) ? outputTimeout : valueIfNotSet;
     }
 
     /**
@@ -363,19 +400,21 @@ public final class InvocationConfiguration {
     public int hashCode() {
 
         // AUTO-GENERATED CODE
-        int result = mRunner != null ? mRunner.hashCode() : 0;
-        result = 31 * result + mCoreInstances;
+        int result = mCoreInstances;
+        result = 31 * result + mInputLimit;
+        result = 31 * result + (mInputMaxDelay != null ? mInputMaxDelay.hashCode() : 0);
         result = 31 * result + mInputMaxSize;
         result = 31 * result + (mInputOrderType != null ? mInputOrderType.hashCode() : 0);
-        result = 31 * result + (mInputTimeout != null ? mInputTimeout.hashCode() : 0);
         result = 31 * result + (mLog != null ? mLog.hashCode() : 0);
         result = 31 * result + (mLogLevel != null ? mLogLevel.hashCode() : 0);
         result = 31 * result + mMaxInstances;
+        result = 31 * result + mOutputLimit;
+        result = 31 * result + (mOutputMaxDelay != null ? mOutputMaxDelay.hashCode() : 0);
         result = 31 * result + mOutputMaxSize;
         result = 31 * result + (mOutputOrderType != null ? mOutputOrderType.hashCode() : 0);
-        result = 31 * result + (mOutputTimeout != null ? mOutputTimeout.hashCode() : 0);
         result = 31 * result + mPriority;
         result = 31 * result + (mReadTimeout != null ? mReadTimeout.hashCode() : 0);
+        result = 31 * result + (mRunner != null ? mRunner.hashCode() : 0);
         result = 31 * result + (mTimeoutActionType != null ? mTimeoutActionType.hashCode() : 0);
         return result;
     }
@@ -390,7 +429,7 @@ public final class InvocationConfiguration {
             return true;
         }
 
-        if (!(o instanceof InvocationConfiguration)) {
+        if (o == null || getClass() != o.getClass()) {
 
             return false;
         }
@@ -398,6 +437,11 @@ public final class InvocationConfiguration {
         final InvocationConfiguration that = (InvocationConfiguration) o;
 
         if (mCoreInstances != that.mCoreInstances) {
+
+            return false;
+        }
+
+        if (mInputLimit != that.mInputLimit) {
 
             return false;
         }
@@ -412,6 +456,11 @@ public final class InvocationConfiguration {
             return false;
         }
 
+        if (mOutputLimit != that.mOutputLimit) {
+
+            return false;
+        }
+
         if (mOutputMaxSize != that.mOutputMaxSize) {
 
             return false;
@@ -422,18 +471,13 @@ public final class InvocationConfiguration {
             return false;
         }
 
-        if (mRunner != null ? !mRunner.equals(that.mRunner) : that.mRunner != null) {
+        if (mInputMaxDelay != null ? !mInputMaxDelay.equals(that.mInputMaxDelay)
+                : that.mInputMaxDelay != null) {
 
             return false;
         }
 
         if (mInputOrderType != that.mInputOrderType) {
-
-            return false;
-        }
-
-        if (mInputTimeout != null ? !mInputTimeout.equals(that.mInputTimeout)
-                : that.mInputTimeout != null) {
 
             return false;
         }
@@ -448,19 +492,24 @@ public final class InvocationConfiguration {
             return false;
         }
 
-        if (mOutputOrderType != that.mOutputOrderType) {
+        if (mOutputMaxDelay != null ? !mOutputMaxDelay.equals(that.mOutputMaxDelay)
+                : that.mOutputMaxDelay != null) {
 
             return false;
         }
 
-        if (mOutputTimeout != null ? !mOutputTimeout.equals(that.mOutputTimeout)
-                : that.mOutputTimeout != null) {
+        if (mOutputOrderType != that.mOutputOrderType) {
 
             return false;
         }
 
         if (mReadTimeout != null ? !mReadTimeout.equals(that.mReadTimeout)
                 : that.mReadTimeout != null) {
+
+            return false;
+        }
+
+        if (mRunner != null ? !mRunner.equals(that.mRunner) : that.mRunner != null) {
 
             return false;
         }
@@ -473,19 +522,21 @@ public final class InvocationConfiguration {
 
         // AUTO-GENERATED CODE
         return "InvocationConfiguration{" +
-                "mRunner=" + mRunner +
-                ", mCoreInstances=" + mCoreInstances +
+                "mCoreInstances=" + mCoreInstances +
+                ", mInputLimit=" + mInputLimit +
+                ", mInputMaxDelay=" + mInputMaxDelay +
                 ", mInputMaxSize=" + mInputMaxSize +
                 ", mInputOrderType=" + mInputOrderType +
-                ", mInputTimeout=" + mInputTimeout +
                 ", mLog=" + mLog +
                 ", mLogLevel=" + mLogLevel +
                 ", mMaxInstances=" + mMaxInstances +
+                ", mOutputLimit=" + mOutputLimit +
+                ", mOutputMaxDelay=" + mOutputMaxDelay +
                 ", mOutputMaxSize=" + mOutputMaxSize +
                 ", mOutputOrderType=" + mOutputOrderType +
-                ", mOutputTimeout=" + mOutputTimeout +
                 ", mPriority=" + mPriority +
                 ", mReadTimeout=" + mReadTimeout +
+                ", mRunner=" + mRunner +
                 ", mTimeoutActionType=" + mTimeoutActionType +
                 '}';
     }
@@ -648,11 +699,13 @@ public final class InvocationConfiguration {
 
         private int mCoreInstances;
 
+        private int mInputLimit;
+
+        private TimeDuration mInputMaxDelay;
+
         private int mInputMaxSize;
 
         private OrderType mInputOrderType;
-
-        private TimeDuration mInputTimeout;
 
         private Log mLog;
 
@@ -660,11 +713,13 @@ public final class InvocationConfiguration {
 
         private int mMaxInstances;
 
+        private int mOutputLimit;
+
+        private TimeDuration mOutputMaxDelay;
+
         private int mOutputMaxSize;
 
         private OrderType mOutputOrderType;
-
-        private TimeDuration mOutputTimeout;
 
         private int mPriority;
 
@@ -772,14 +827,75 @@ public final class InvocationConfiguration {
         }
 
         /**
-         * Sets the maximum number of data that the input channel can retain before they are
-         * consumed. A {@link InvocationConfiguration#DEFAULT DEFAULT} value means that it is up
-         * to the specific implementation to choose a default one.
+         * Sets the limit of data that the input channel can retain before starting to slow down the
+         * feeding thread. A {@link InvocationConfiguration#DEFAULT DEFAULT} value means that it is
+         * up to the specific implementation to choose a default one.
          * <p/>
          * This configuration option is used to slow down the process feeding the routine invocation
          * when its execution time increases. Note, however, that it is not allowed to block the
          * invocation execution thread, so make sure that the feeding routine and this one does not
          * share the same runner.
+         *
+         * @param inputLimit the limit.
+         * @return this builder.
+         * @throws java.lang.IllegalArgumentException if the limit is negative.
+         */
+        @NotNull
+        public Builder<TYPE> withInputLimit(final int inputLimit) {
+
+            if ((inputLimit != DEFAULT) && (inputLimit < 0)) {
+
+                throw new IllegalArgumentException(
+                        "the input limit cannot be negative: " + inputLimit);
+            }
+
+            mInputLimit = inputLimit;
+            return this;
+        }
+
+        /**
+         * Sets the maximum delay to apply to the feeding thread waiting for the input channel to
+         * have room for additional data.
+         * <p/>
+         * This configuration option should be used on conjunction with the input limit, or it might
+         * have no effect on the invocation execution.
+         *
+         * @param delay    the delay.
+         * @param timeUnit the delay time unit.
+         * @return this builder.
+         * @throws java.lang.IllegalArgumentException if the specified delay is negative.
+         * @see #withInputMaxSize(int)
+         */
+        @NotNull
+        public Builder<TYPE> withInputMaxDelay(final long delay, @NotNull final TimeUnit timeUnit) {
+
+            return withInputMaxDelay(fromUnit(delay, timeUnit));
+        }
+
+        /**
+         * Sets the maximum delay to apply to the feeding thread waiting for the input channel to
+         * have room for additional data.
+         * <p/>
+         * This configuration option should be used on conjunction with the input limit, or it might
+         * have no effect on the invocation execution.
+         *
+         * @param delay the delay.
+         * @return this builder.
+         * @see #withInputMaxSize(int)
+         */
+        @NotNull
+        public Builder<TYPE> withInputMaxDelay(@Nullable final TimeDuration delay) {
+
+            mInputMaxDelay = delay;
+            return this;
+        }
+
+        /**
+         * Sets the maximum number of data that the input channel can retain before they are
+         * consumed. A {@link InvocationConfiguration#DEFAULT DEFAULT} value means that it is up
+         * to the specific implementation to choose a default one.<br/>
+         * When the maximum capacity is reached, the invocation will be aborted with an
+         * {@link com.github.dm.jrt.channel.InputDeadlockException InputDeadlockException}.
          *
          * @param inputMaxSize the maximum size.
          * @return this builder.
@@ -811,43 +927,6 @@ public final class InvocationConfiguration {
         public Builder<TYPE> withInputOrder(@Nullable final OrderType orderType) {
 
             mInputOrderType = orderType;
-            return this;
-        }
-
-        /**
-         * Sets the timeout for an input channel to have room for additional data.
-         * <p/>
-         * This configuration option should be used on conjunction with the input max size, or it
-         * might have no effect on the invocation execution.
-         *
-         * @param timeout  the timeout.
-         * @param timeUnit the timeout time unit.
-         * @return this builder.
-         * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
-         * @see #withInputMaxSize(int)
-         */
-        @NotNull
-        public Builder<TYPE> withInputTimeout(final long timeout,
-                @NotNull final TimeUnit timeUnit) {
-
-            return withInputTimeout(fromUnit(timeout, timeUnit));
-        }
-
-        /**
-         * Sets the timeout for an input channel to have room for additional data. A null value
-         * means that it is up to the specific implementation to choose a default one.
-         * <p/>
-         * This configuration option should be used on conjunction with the input max size, or it
-         * might have no effect on the invocation execution.
-         *
-         * @param timeout the timeout.
-         * @return this builder.
-         * @see #withInputMaxSize(int)
-         */
-        @NotNull
-        public Builder<TYPE> withInputTimeout(@Nullable final TimeDuration timeout) {
-
-            mInputTimeout = timeout;
             return this;
         }
 
@@ -903,14 +982,76 @@ public final class InvocationConfiguration {
         }
 
         /**
-         * Sets the maximum number of data that the result channel can retain before they are
-         * consumed. A {@link InvocationConfiguration#DEFAULT DEFAULT} value means that it is up
-         * to the specific implementation to choose a default one.
+         * Sets the limit of data that the output channel can retain before starting to slow down
+         * the feeding thread. A {@link InvocationConfiguration#DEFAULT DEFAULT} value means that it
+         * is up to the specific implementation to choose a default one.
          * <p/>
          * This configuration option is useful when the results coming from the invocation execution
          * are meant to be explicitly read through its output channel. The execution will slow down
          * until enough data are consumed. Note, however, that binding the channel to an output
          * consumer will make the option ineffective.
+         *
+         * @param outputLimit the limit.
+         * @return this builder.
+         * @throws java.lang.IllegalArgumentException if the limit is negative.
+         */
+        @NotNull
+        public Builder<TYPE> withOutputLimit(final int outputLimit) {
+
+            if ((outputLimit != DEFAULT) && (outputLimit < 0)) {
+
+                throw new IllegalArgumentException(
+                        "the output limit cannot be negative: " + outputLimit);
+            }
+
+            mOutputLimit = outputLimit;
+            return this;
+        }
+
+        /**
+         * Sets the maximum delay to apply to the feeding thread waiting for the result channel to
+         * have room for additional data.
+         * <p/>
+         * This configuration option should be used on conjunction with the output limit, or it
+         * might have no effect on the invocation execution.
+         *
+         * @param delay    the delay.
+         * @param timeUnit the delay time unit.
+         * @return this builder.
+         * @throws java.lang.IllegalArgumentException if the specified delay is negative.
+         * @see #withOutputMaxSize(int)
+         */
+        @NotNull
+        public Builder<TYPE> withOutputMaxDelay(final long delay,
+                @NotNull final TimeUnit timeUnit) {
+
+            return withOutputMaxDelay(fromUnit(delay, timeUnit));
+        }
+
+        /**
+         * Sets the maximum delay to apply to the feeding thread waiting for the result channel to
+         * have room for additional data.
+         * <p/>
+         * This configuration option should be used on conjunction with the output limit, or it
+         * might have no effect on the invocation execution.
+         *
+         * @param delay the delay.
+         * @return this builder.
+         * @see #withOutputMaxSize(int)
+         */
+        @NotNull
+        public Builder<TYPE> withOutputMaxDelay(@Nullable final TimeDuration delay) {
+
+            mOutputMaxDelay = delay;
+            return this;
+        }
+
+        /**
+         * Sets the maximum number of data that the result channel can retain before they are
+         * consumed. A {@link InvocationConfiguration#DEFAULT DEFAULT} value means that it is up
+         * to the specific implementation to choose a default one.<br/>
+         * When the maximum capacity is reached, the invocation will be aborted with an
+         * {@link com.github.dm.jrt.channel.InputDeadlockException InputDeadlockException}.
          *
          * @param outputMaxSize the maximum size.
          * @return this builder.
@@ -942,43 +1083,6 @@ public final class InvocationConfiguration {
         public Builder<TYPE> withOutputOrder(@Nullable final OrderType orderType) {
 
             mOutputOrderType = orderType;
-            return this;
-        }
-
-        /**
-         * Sets the timeout for a result channel to have room for additional data.
-         * <p/>
-         * This configuration option should be used on conjunction with the output max size, or it
-         * might have no effect on the invocation execution.
-         *
-         * @param timeout  the timeout.
-         * @param timeUnit the timeout time unit.
-         * @return this builder.
-         * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
-         * @see #withOutputMaxSize(int)
-         */
-        @NotNull
-        public Builder<TYPE> withOutputTimeout(final long timeout,
-                @NotNull final TimeUnit timeUnit) {
-
-            return withOutputTimeout(fromUnit(timeout, timeUnit));
-        }
-
-        /**
-         * Sets the timeout for a result channel to have room for additional data. A null value
-         * means that it is up to the specific implementation to choose a default one.
-         * <p/>
-         * This configuration option should be used on conjunction with the output max size, or it
-         * might have no effect on the invocation execution.
-         *
-         * @param timeout the timeout.
-         * @return this builder.
-         * @see #withOutputMaxSize(int)
-         */
-        @NotNull
-        public Builder<TYPE> withOutputTimeout(@Nullable final TimeDuration timeout) {
-
-            mOutputTimeout = timeout;
             return this;
         }
 
@@ -1115,18 +1219,25 @@ public final class InvocationConfiguration {
                 withInputOrder(inputOrderType);
             }
 
+            final int inputLimit = configuration.mInputLimit;
+
+            if (inputLimit != DEFAULT) {
+
+                withInputLimit(inputLimit);
+            }
+
+            final TimeDuration inputMaxDelay = configuration.mInputMaxDelay;
+
+            if (inputMaxDelay != null) {
+
+                withInputMaxDelay(inputMaxDelay);
+            }
+
             final int inputSize = configuration.mInputMaxSize;
 
             if (inputSize != DEFAULT) {
 
                 withInputMaxSize(inputSize);
-            }
-
-            final TimeDuration inputTimeout = configuration.mInputTimeout;
-
-            if (inputTimeout != null) {
-
-                withInputTimeout(inputTimeout);
             }
 
             final OrderType outputOrderType = configuration.mOutputOrderType;
@@ -1136,18 +1247,25 @@ public final class InvocationConfiguration {
                 withOutputOrder(outputOrderType);
             }
 
+            final int outputLimit = configuration.mOutputLimit;
+
+            if (outputLimit != DEFAULT) {
+
+                withOutputLimit(outputLimit);
+            }
+
+            final TimeDuration outputTimeout = configuration.mOutputMaxDelay;
+
+            if (outputTimeout != null) {
+
+                withOutputMaxDelay(outputTimeout);
+            }
+
             final int outputSize = configuration.mOutputMaxSize;
 
             if (outputSize != DEFAULT) {
 
                 withOutputMaxSize(outputSize);
-            }
-
-            final TimeDuration outputTimeout = configuration.mOutputTimeout;
-
-            if (outputTimeout != null) {
-
-                withOutputTimeout(outputTimeout);
             }
         }
 
@@ -1173,8 +1291,9 @@ public final class InvocationConfiguration {
 
             return new InvocationConfiguration(mRunner, mPriority, mMaxInstances, mCoreInstances,
                                                mReadTimeout, mTimeoutActionType, mInputOrderType,
-                                               mInputMaxSize, mInputTimeout, mOutputOrderType,
-                                               mOutputMaxSize, mOutputTimeout, mLog, mLogLevel);
+                                               mInputLimit, mInputMaxDelay, mInputMaxSize,
+                                               mOutputOrderType, mOutputLimit, mOutputMaxDelay,
+                                               mOutputMaxSize, mLog, mLogLevel);
         }
 
         private void setConfiguration(@NotNull final InvocationConfiguration configuration) {
@@ -1186,11 +1305,13 @@ public final class InvocationConfiguration {
             mReadTimeout = configuration.mReadTimeout;
             mTimeoutActionType = configuration.mTimeoutActionType;
             mInputOrderType = configuration.mInputOrderType;
+            mInputLimit = configuration.mInputLimit;
+            mInputMaxDelay = configuration.mInputMaxDelay;
             mInputMaxSize = configuration.mInputMaxSize;
-            mInputTimeout = configuration.mInputTimeout;
             mOutputOrderType = configuration.mOutputOrderType;
+            mOutputLimit = configuration.mOutputLimit;
+            mOutputMaxDelay = configuration.mOutputMaxDelay;
             mOutputMaxSize = configuration.mOutputMaxSize;
-            mOutputTimeout = configuration.mOutputTimeout;
             mLog = configuration.mLog;
             mLogLevel = configuration.mLogLevel;
         }

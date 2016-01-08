@@ -59,11 +59,13 @@ public final class ChannelConfiguration {
      */
     public static final ChannelConfiguration DEFAULT_CONFIGURATION = builder().buildConfiguration();
 
+    private final int mChannelLimit;
+
+    private final TimeDuration mChannelMaxDelay;
+
     private final int mChannelMaxSize;
 
     private final OrderType mChannelOrderType;
-
-    private final TimeDuration mChannelTimeout;
 
     private final Log mLog;
 
@@ -83,24 +85,27 @@ public final class ChannelConfiguration {
      * @param actionType       the action to be taken if the timeout elapses before a readable
      *                         output is available.
      * @param channelOrderType the order in which data are collected from the output channel.
+     * @param channelLimit     the maximum number of buffered data before applying a delay to the
+     *                         feeding thread. Must not be negative.
+     * @param channelMaxDelay  the maximum delay to apply while waiting for an object to be passed
+     *                         to the channel.
      * @param channelMaxSize   the maximum number of buffered data. Must be positive.
-     * @param channelTimeout   the maximum timeout while waiting for an object to be passed to the
-     *                         channel.
      * @param log              the log instance.
      * @param logLevel         the log level.
      */
     private ChannelConfiguration(@Nullable final Runner runner,
             @Nullable final TimeDuration readTimeout, @Nullable final TimeoutActionType actionType,
-            @Nullable final OrderType channelOrderType, final int channelMaxSize,
-            @Nullable final TimeDuration channelTimeout, @Nullable final Log log,
-            @Nullable final Level logLevel) {
+            @Nullable final OrderType channelOrderType, final int channelLimit,
+            @Nullable final TimeDuration channelMaxDelay, final int channelMaxSize,
+            @Nullable final Log log, @Nullable final Level logLevel) {
 
         mRunner = runner;
         mReadTimeout = readTimeout;
         mTimeoutActionType = actionType;
         mChannelOrderType = channelOrderType;
+        mChannelLimit = channelLimit;
+        mChannelMaxDelay = channelMaxDelay;
         mChannelMaxSize = channelMaxSize;
-        mChannelTimeout = channelTimeout;
         mLog = log;
         mLogLevel = logLevel;
     }
@@ -142,6 +147,32 @@ public final class ChannelConfiguration {
     }
 
     /**
+     * Returns the limit of buffered data (DEFAULT by default) before starting applying a delay to
+     * the feeding thread.
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the limit.
+     */
+    public int getChannelLimitOr(final int valueIfNotSet) {
+
+        final int limit = mChannelLimit;
+        return (limit != DEFAULT) ? limit : valueIfNotSet;
+    }
+
+    /**
+     * Returns the maximum delay to apply while waiting for an object to be passed to the channel
+     * (null by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the delay.
+     */
+    public TimeDuration getChannelMaxDelayOr(@Nullable final TimeDuration valueIfNotSet) {
+
+        final TimeDuration maxDelay = mChannelMaxDelay;
+        return (maxDelay != null) ? maxDelay : valueIfNotSet;
+    }
+
+    /**
      * Returns the maximum number of buffered data (DEFAULT by default).
      *
      * @param valueIfNotSet the default value if none was set.
@@ -163,19 +194,6 @@ public final class ChannelConfiguration {
 
         final OrderType orderType = mChannelOrderType;
         return (orderType != null) ? orderType : valueIfNotSet;
-    }
-
-    /**
-     * Returns the maximum timeout while waiting for an object to be passed to the channel (null by
-     * default).
-     *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the timeout.
-     */
-    public TimeDuration getChannelTimeoutOr(@Nullable final TimeDuration valueIfNotSet) {
-
-        final TimeDuration timeout = mChannelTimeout;
-        return (timeout != null) ? timeout : valueIfNotSet;
     }
 
     /**
@@ -244,9 +262,10 @@ public final class ChannelConfiguration {
     public int hashCode() {
 
         // AUTO-GENERATED CODE
-        int result = mChannelMaxSize;
+        int result = mChannelLimit;
+        result = 31 * result + (mChannelMaxDelay != null ? mChannelMaxDelay.hashCode() : 0);
+        result = 31 * result + mChannelMaxSize;
         result = 31 * result + (mChannelOrderType != null ? mChannelOrderType.hashCode() : 0);
-        result = 31 * result + (mChannelTimeout != null ? mChannelTimeout.hashCode() : 0);
         result = 31 * result + (mLog != null ? mLog.hashCode() : 0);
         result = 31 * result + (mLogLevel != null ? mLogLevel.hashCode() : 0);
         result = 31 * result + (mReadTimeout != null ? mReadTimeout.hashCode() : 0);
@@ -265,25 +284,30 @@ public final class ChannelConfiguration {
             return true;
         }
 
-        if (!(o instanceof ChannelConfiguration)) {
+        if (o == null || getClass() != o.getClass()) {
 
             return false;
         }
 
         final ChannelConfiguration that = (ChannelConfiguration) o;
 
+        if (mChannelLimit != that.mChannelLimit) {
+
+            return false;
+        }
+
         if (mChannelMaxSize != that.mChannelMaxSize) {
 
             return false;
         }
 
-        if (mChannelOrderType != that.mChannelOrderType) {
+        if (mChannelMaxDelay != null ? !mChannelMaxDelay.equals(that.mChannelMaxDelay)
+                : that.mChannelMaxDelay != null) {
 
             return false;
         }
 
-        if (mChannelTimeout != null ? !mChannelTimeout.equals(that.mChannelTimeout)
-                : that.mChannelTimeout != null) {
+        if (mChannelOrderType != that.mChannelOrderType) {
 
             return false;
         }
@@ -317,9 +341,10 @@ public final class ChannelConfiguration {
 
         // AUTO-GENERATED CODE
         return "ChannelConfiguration{" +
-                "mChannelMaxSize=" + mChannelMaxSize +
+                "mChannelLimit=" + mChannelLimit +
+                ", mChannelMaxDelay=" + mChannelMaxDelay +
+                ", mChannelMaxSize=" + mChannelMaxSize +
                 ", mChannelOrderType=" + mChannelOrderType +
-                ", mChannelTimeout=" + mChannelTimeout +
                 ", mLog=" + mLog +
                 ", mLogLevel=" + mLogLevel +
                 ", mReadTimeout=" + mReadTimeout +
@@ -338,10 +363,12 @@ public final class ChannelConfiguration {
     public InvocationConfiguration toInputChannelConfiguration() {
 
         return toInvocationConfiguration().builderFrom()
+                                          .withInputOrder(getChannelOrderTypeOr(null))
+                                          .withInputLimit(getChannelLimitOr(
+                                                  InvocationConfiguration.DEFAULT))
+                                          .withInputMaxDelay(getChannelMaxDelayOr(null))
                                           .withInputMaxSize(getChannelMaxSizeOr(
                                                   InvocationConfiguration.DEFAULT))
-                                          .withInputOrder(getChannelOrderTypeOr(null))
-                                          .withInputTimeout(getChannelTimeoutOr(null))
                                           .set();
     }
 
@@ -372,10 +399,12 @@ public final class ChannelConfiguration {
     public InvocationConfiguration toOutputChannelConfiguration() {
 
         return toInvocationConfiguration().builderFrom()
+                                          .withOutputOrder(getChannelOrderTypeOr(null))
+                                          .withOutputLimit(getChannelLimitOr(
+                                                  InvocationConfiguration.DEFAULT))
+                                          .withOutputMaxDelay(getChannelMaxDelayOr(null))
                                           .withOutputMaxSize(getChannelMaxSizeOr(
                                                   InvocationConfiguration.DEFAULT))
-                                          .withOutputOrder(getChannelOrderTypeOr(null))
-                                          .withOutputTimeout(getChannelTimeoutOr(null))
                                           .set();
     }
 
@@ -405,11 +434,13 @@ public final class ChannelConfiguration {
 
         private final Configurable<? extends TYPE> mConfigurable;
 
+        private int mChannelLimit;
+
+        private TimeDuration mChannelMaxDelay;
+
         private int mChannelMaxSize;
 
         private OrderType mChannelOrderType;
-
-        private TimeDuration mChannelTimeout;
 
         private Log mLog;
 
@@ -513,18 +544,25 @@ public final class ChannelConfiguration {
                 withChannelOrder(orderType);
             }
 
+            final int limit = configuration.mChannelLimit;
+
+            if (limit != DEFAULT) {
+
+                withChannelLimit(limit);
+            }
+
+            final TimeDuration channelTimeout = configuration.mChannelMaxDelay;
+
+            if (channelTimeout != null) {
+
+                withChannelMaxDelay(channelTimeout);
+            }
+
             final int maxSize = configuration.mChannelMaxSize;
 
             if (maxSize != DEFAULT) {
 
                 withChannelMaxSize(maxSize);
-            }
-
-            final TimeDuration channelTimeout = configuration.mChannelTimeout;
-
-            if (channelTimeout != null) {
-
-                withChannelTimeout(channelTimeout);
             }
 
             final Log log = configuration.mLog;
@@ -541,6 +579,69 @@ public final class ChannelConfiguration {
                 withLogLevel(logLevel);
             }
 
+            return this;
+        }
+
+        /**
+         * Sets the limit of data that the channel can retain before starting to slow down the
+         * feeding thread. A {@link InvocationConfiguration#DEFAULT DEFAULT} value means that it is
+         * up to the specific implementation to choose a default one.
+         * <p/>
+         * This configuration option is useful when the data coming from the invocation execution
+         * are meant to be explicitly read through this channel. The execution will slow down until
+         * enough data are consumed. Note, however, that binding the channel to an output consumer
+         * will make the option ineffective.
+         *
+         * @param limit the limit.
+         * @return this builder.
+         * @throws java.lang.IllegalArgumentException if the limit is negative.
+         */
+        @NotNull
+        public Builder<TYPE> withChannelLimit(final int limit) {
+
+            if ((limit != DEFAULT) && (limit < 0)) {
+
+                throw new IllegalArgumentException(
+                        "the channel limit cannot be negative: " + limit);
+            }
+
+            mChannelLimit = limit;
+            return this;
+        }
+
+        /**
+         * Sets the maximum delay to apply to the feeding thread waiting for the channel to have
+         * room for additional data.
+         * <p/>
+         * This configuration option should be used on conjunction with the channel limit, or it
+         * might have no effect on the invocation execution.
+         *
+         * @param delay    the delay.
+         * @param timeUnit the timeout time unit.
+         * @return this builder.
+         * @throws java.lang.IllegalArgumentException if the specified delay is negative.
+         */
+        @NotNull
+        public Builder<TYPE> withChannelMaxDelay(final long delay,
+                @NotNull final TimeUnit timeUnit) {
+
+            return withChannelMaxDelay(fromUnit(delay, timeUnit));
+        }
+
+        /**
+         * Sets the maximum delay to apply to the feeding thread waiting for the channel to have
+         * room for additional data.
+         * <p/>
+         * This configuration option should be used on conjunction with the channel limit, or it
+         * might have no effect on the invocation execution.
+         *
+         * @param delay the delay.
+         * @return this builder.
+         */
+        @NotNull
+        public Builder<TYPE> withChannelMaxDelay(@Nullable final TimeDuration delay) {
+
+            mChannelMaxDelay = delay;
             return this;
         }
 
@@ -579,35 +680,6 @@ public final class ChannelConfiguration {
         public Builder<TYPE> withChannelOrder(@Nullable final OrderType orderType) {
 
             mChannelOrderType = orderType;
-            return this;
-        }
-
-        /**
-         * Sets the timeout for the channel to have room for additional data.
-         *
-         * @param timeout  the timeout.
-         * @param timeUnit the timeout time unit.
-         * @return this builder.
-         * @throws java.lang.IllegalArgumentException if the specified timeout is negative.
-         */
-        @NotNull
-        public Builder<TYPE> withChannelTimeout(final long timeout,
-                @NotNull final TimeUnit timeUnit) {
-
-            return withChannelTimeout(fromUnit(timeout, timeUnit));
-        }
-
-        /**
-         * Sets the timeout for the channel to have room for additional data. A null value means
-         * that it is up to the specific implementation to choose a default one.
-         *
-         * @param timeout the timeout.
-         * @return this builder.
-         */
-        @NotNull
-        public Builder<TYPE> withChannelTimeout(@Nullable final TimeDuration timeout) {
-
-            mChannelTimeout = timeout;
             return this;
         }
 
@@ -706,8 +778,8 @@ public final class ChannelConfiguration {
         private ChannelConfiguration buildConfiguration() {
 
             return new ChannelConfiguration(mRunner, mReadTimeout, mTimeoutActionType,
-                                            mChannelOrderType, mChannelMaxSize, mChannelTimeout,
-                                            mLog, mLogLevel);
+                                            mChannelOrderType, mChannelLimit, mChannelMaxDelay,
+                                            mChannelMaxSize, mLog, mLogLevel);
         }
 
         private void setConfiguration(@NotNull final ChannelConfiguration configuration) {
@@ -716,8 +788,9 @@ public final class ChannelConfiguration {
             mReadTimeout = configuration.mReadTimeout;
             mTimeoutActionType = configuration.mTimeoutActionType;
             mChannelOrderType = configuration.mChannelOrderType;
+            mChannelLimit = configuration.mChannelLimit;
+            mChannelMaxDelay = configuration.mChannelMaxDelay;
             mChannelMaxSize = configuration.mChannelMaxSize;
-            mChannelTimeout = configuration.mChannelTimeout;
             mLog = configuration.mLog;
             mLogLevel = configuration.mLogLevel;
         }

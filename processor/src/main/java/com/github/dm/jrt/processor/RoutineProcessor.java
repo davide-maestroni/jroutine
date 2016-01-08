@@ -20,16 +20,18 @@ import com.github.dm.jrt.annotation.AsyncMethod;
 import com.github.dm.jrt.annotation.AsyncOut;
 import com.github.dm.jrt.annotation.AsyncOut.OutputMode;
 import com.github.dm.jrt.annotation.CoreInstances;
+import com.github.dm.jrt.annotation.InputLimit;
+import com.github.dm.jrt.annotation.InputMaxDelay;
 import com.github.dm.jrt.annotation.InputMaxSize;
 import com.github.dm.jrt.annotation.InputOrder;
-import com.github.dm.jrt.annotation.InputTimeout;
 import com.github.dm.jrt.annotation.Invoke;
 import com.github.dm.jrt.annotation.Invoke.InvocationMode;
 import com.github.dm.jrt.annotation.LogLevel;
 import com.github.dm.jrt.annotation.MaxInstances;
+import com.github.dm.jrt.annotation.OutputLimit;
+import com.github.dm.jrt.annotation.OutputMaxDelay;
 import com.github.dm.jrt.annotation.OutputMaxSize;
 import com.github.dm.jrt.annotation.OutputOrder;
-import com.github.dm.jrt.annotation.OutputTimeout;
 import com.github.dm.jrt.annotation.Priority;
 import com.github.dm.jrt.annotation.ReadTimeout;
 import com.github.dm.jrt.annotation.ReadTimeoutAction;
@@ -541,6 +543,27 @@ public class RoutineProcessor extends AbstractProcessor {
                    .append(")");
         }
 
+        final InputLimit inputLimitAnnotation = methodElement.getAnnotation(InputLimit.class);
+
+        if (inputLimitAnnotation != null) {
+
+            builder.append(".withInputLimit(").append(inputLimitAnnotation.value()).append(")");
+        }
+
+        final InputMaxDelay inputMaxDelayAnnotation =
+                methodElement.getAnnotation(InputMaxDelay.class);
+
+        if (inputMaxDelayAnnotation != null) {
+
+            builder.append(".withInputMaxDelay(")
+                   .append(inputMaxDelayAnnotation.value())
+                   .append(", ")
+                   .append(TimeUnit.class.getCanonicalName())
+                   .append(".")
+                   .append(inputMaxDelayAnnotation.unit())
+                   .append(")");
+        }
+
         final InputMaxSize inputSizeAnnotation = methodElement.getAnnotation(InputMaxSize.class);
 
         if (inputSizeAnnotation != null) {
@@ -556,19 +579,6 @@ public class RoutineProcessor extends AbstractProcessor {
                    .append(OrderType.class.getCanonicalName())
                    .append(".")
                    .append(inputOrderAnnotation.value())
-                   .append(")");
-        }
-
-        final InputTimeout inputTimeoutAnnotation = methodElement.getAnnotation(InputTimeout.class);
-
-        if (inputTimeoutAnnotation != null) {
-
-            builder.append(".withInputTimeout(")
-                   .append(inputTimeoutAnnotation.value())
-                   .append(", ")
-                   .append(TimeUnit.class.getCanonicalName())
-                   .append(".")
-                   .append(inputTimeoutAnnotation.unit())
                    .append(")");
         }
 
@@ -590,6 +600,27 @@ public class RoutineProcessor extends AbstractProcessor {
             builder.append(".withMaxInstances(").append(maxInstancesAnnotation.value()).append(")");
         }
 
+        final OutputLimit outputLimitAnnotation = methodElement.getAnnotation(OutputLimit.class);
+
+        if (outputLimitAnnotation != null) {
+
+            builder.append(".withOutputLimit(").append(outputLimitAnnotation.value()).append(")");
+        }
+
+        final OutputMaxDelay outputMaxDelayAnnotation =
+                methodElement.getAnnotation(OutputMaxDelay.class);
+
+        if (outputMaxDelayAnnotation != null) {
+
+            builder.append(".withOutputMaxDelay(")
+                   .append(outputMaxDelayAnnotation.value())
+                   .append(", ")
+                   .append(TimeUnit.class.getCanonicalName())
+                   .append(".")
+                   .append(outputMaxDelayAnnotation.unit())
+                   .append(")");
+        }
+
         final OutputMaxSize outputSizeAnnotation = methodElement.getAnnotation(OutputMaxSize.class);
 
         if (outputSizeAnnotation != null) {
@@ -605,20 +636,6 @@ public class RoutineProcessor extends AbstractProcessor {
                    .append(OrderType.class.getCanonicalName())
                    .append(".")
                    .append(outputOrderAnnotation.value())
-                   .append(")");
-        }
-
-        final OutputTimeout outputTimeoutAnnotation =
-                methodElement.getAnnotation(OutputTimeout.class);
-
-        if (outputTimeoutAnnotation != null) {
-
-            builder.append(".withOutputTimeout(")
-                   .append(outputTimeoutAnnotation.value())
-                   .append(", ")
-                   .append(TimeUnit.class.getCanonicalName())
-                   .append(".")
-                   .append(outputTimeoutAnnotation.unit())
                    .append(")");
         }
 

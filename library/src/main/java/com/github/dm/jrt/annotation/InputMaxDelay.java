@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Through this annotation it is possible to indicate the maximum delay to apply to the feeding
- * thread while waiting for an input channel to have room for additional data.
+ * thread, while waiting for an input channel to have room for additional data.
  * <p/>
  * This annotation is used to decorate methods that are to be invoked in an asynchronous way.<br/>
  * Note that the piece of code inside such methods will be automatically protected so to avoid

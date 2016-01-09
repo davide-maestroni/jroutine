@@ -33,8 +33,7 @@ import static com.github.dm.jrt.util.TimeDuration.fromUnit;
  * must be created starting from the specific configuration.
  * <p/>
  * The configuration has an asynchronous runner associated.<br/>
- * The default runner is shared among all the routines, but a custom one can be set through the
- * builder.
+ * The default runner is shared among all the routines.
  * <p/>
  * A specific priority can be set. Every invocation will age each time an higher priority one takes
  * the precedence, so that older invocations slowly increases their priority. Such mechanism has
@@ -49,15 +48,21 @@ import static com.github.dm.jrt.util.TimeDuration.fromUnit;
  * limit is reached and an additional instance is required, the call is delayed until one becomes
  * available.
  * <p/>
+ * The maximum time of execution can also be set so that, if no result is produced before the
+ * timeout elapses, an action will be taken choosing between throwing an
+ * {@link com.github.dm.jrt.channel.ExecutionTimeoutException ExecutionTimeoutException}, aborting
+ * the invocation, or continuing with the execution.
+ * <p/>
  * Finally, the number of input and output data buffered in the corresponding channel can be
- * limited in order to avoid excessive memory consumption. In case the maximum number is reached
- * when passing an input or output, the call blocks until enough data are consumed or the specified
- * timeout elapses. In the latter case, a {@link com.github.dm.jrt.channel.TimeoutException
- * TimeoutException} will be thrown.<br/>
- * By default the timeout is set to 0 to avoid unexpected deadlocks.<br/>
+ * limited in order to avoid excessive memory consumption. In case the limit is reached when passing
+ * an input or output, the call blocks until enough data are consumed or the specified maximum delay
+ * elapses. A maximum size can additionally be set so that, when the number of buffered data
+ * exceeds it, a {@link com.github.dm.jrt.channel.DeadlockException DeadlockException} will be
+ * thrown.<br/>
+ * By default the delay is set to 0.<br/>
  * The order of input and output data is not guaranteed. Nevertheless, it is possible to force data
  * to be delivered in the same order as they are passed to the channels, at the cost of a slightly
- * increase in memory usage and computation.
+ * increase in memory usage and computation time.
  * <p/>
  * Created by davide-maestroni on 11/15/2014.
  */
@@ -114,8 +119,8 @@ public final class InvocationConfiguration {
      * @param runner          the runner used for asynchronous invocations.
      * @param priority        the invocation priority.
      * @param maxInstances    the maximum number of parallel running invocations. Must be positive.
-     * @param coreInstances   the maximum number of retained invocation instances. Must be 0 or a
-     *                        positive number.
+     * @param coreInstances   the maximum number of retained invocation instances. Must not be
+     *                        negative.
      * @param readTimeout     the timeout for an invocation instance to produce a result.
      * @param actionType      the action to be taken if the timeout elapses before a readable
      *                        result is available.
@@ -210,7 +215,7 @@ public final class InvocationConfiguration {
     }
 
     /**
-     * Returns the limit of buffered input data (DEFAULT by default) before starting applying a
+     * Returns the limit of buffered input data (DEFAULT by default) before starting to apply a
      * delay to the feeding thread.
      *
      * @param valueIfNotSet the default value if none was set.
@@ -223,8 +228,8 @@ public final class InvocationConfiguration {
     }
 
     /**
-     * Returns the maximum delay to apply while waiting for an input to be passed to the input
-     * channel (null by default).
+     * Returns the maximum delay to apply while waiting for an input to be processed (null by
+     * default).
      *
      * @param valueIfNotSet the default value if none was set.
      * @return the delay.
@@ -296,7 +301,7 @@ public final class InvocationConfiguration {
     }
 
     /**
-     * Returns the limit of buffered output data (DEFAULT by default) before starting applying a
+     * Returns the limit of buffered output data (DEFAULT by default) before starting to apply a
      * delay to the feeding thread.
      *
      * @param valueIfNotSet the default value if none was set.
@@ -309,7 +314,7 @@ public final class InvocationConfiguration {
     }
 
     /**
-     * Returns the maximum delay to apply while waiting for an output to be passed to the result
+     * Returns the maximum delay to apply while waiting for an output to be read from the output
      * channel (null by default).
      *
      * @param valueIfNotSet the default value if none was set.
@@ -746,7 +751,9 @@ public final class InvocationConfiguration {
             mPriority = DEFAULT;
             mMaxInstances = DEFAULT;
             mCoreInstances = DEFAULT;
+            mInputLimit = DEFAULT;
             mInputMaxSize = DEFAULT;
+            mOutputLimit = DEFAULT;
             mOutputMaxSize = DEFAULT;
         }
 
@@ -854,7 +861,7 @@ public final class InvocationConfiguration {
         }
 
         /**
-         * Sets the maximum delay to apply to the feeding thread waiting for the input channel to
+         * Sets the maximum delay to apply to the feeding thread, waiting for the input channel to
          * have room for additional data.
          * <p/>
          * This configuration option should be used on conjunction with the input limit, or it might
@@ -873,7 +880,7 @@ public final class InvocationConfiguration {
         }
 
         /**
-         * Sets the maximum delay to apply to the feeding thread waiting for the input channel to
+         * Sets the maximum delay to apply to the feeding thread, waiting for the input channel to
          * have room for additional data.
          * <p/>
          * This configuration option should be used on conjunction with the input limit, or it might
@@ -989,7 +996,7 @@ public final class InvocationConfiguration {
          * This configuration option is useful when the results coming from the invocation execution
          * are meant to be explicitly read through its output channel. The execution will slow down
          * until enough data are consumed. Note, however, that binding the channel to an output
-         * consumer will make the option ineffective.
+         * consumer might make the option ineffective.
          *
          * @param outputLimit the limit.
          * @return this builder.
@@ -1009,7 +1016,7 @@ public final class InvocationConfiguration {
         }
 
         /**
-         * Sets the maximum delay to apply to the feeding thread waiting for the result channel to
+         * Sets the maximum delay to apply to the feeding thread, waiting for the result channel to
          * have room for additional data.
          * <p/>
          * This configuration option should be used on conjunction with the output limit, or it
@@ -1029,7 +1036,7 @@ public final class InvocationConfiguration {
         }
 
         /**
-         * Sets the maximum delay to apply to the feeding thread waiting for the result channel to
+         * Sets the maximum delay to apply to the feeding thread, waiting for the result channel to
          * have room for additional data.
          * <p/>
          * This configuration option should be used on conjunction with the output limit, or it

@@ -20,8 +20,8 @@ import java.lang.annotation.Target;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Through this annotation it is possible to indicate the delay to apply to the feeding thread while
- * waiting for an output channel to have room for additional data.
+ * Through this annotation it is possible to indicate the delay to apply to the feeding thread,
+ * while waiting for an output channel to have room for additional data.
  * <p/>
  * This annotation is used to decorate methods that are to be invoked in an asynchronous way.<br/>
  * Note that the piece of code inside such methods will be automatically protected so to avoid

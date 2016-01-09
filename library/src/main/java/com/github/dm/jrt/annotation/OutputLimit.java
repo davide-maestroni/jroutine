@@ -20,7 +20,7 @@ import java.lang.annotation.Target;
 
 /**
  * Through this annotation it is possible to indicate the maximum number of data buffered inside
- * the output channel before starting to slow down the feeding thread.
+ * the output channel, before starting to slow down the feeding thread.
  * <p/>
  * This annotation is used to decorate methods that are to be invoked in an asynchronous way.<br/>
  * Note that the piece of code inside such methods will be automatically protected so to avoid

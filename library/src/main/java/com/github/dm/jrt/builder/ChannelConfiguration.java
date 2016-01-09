@@ -36,9 +36,10 @@ import static com.github.dm.jrt.util.TimeDuration.fromUnit;
  * The configuration has an asynchronous runner associated.<br/>
  * The number of input data buffered in the channel can be limited in order to avoid excessive
  * memory consumption. In case the maximum number is reached when passing an input, the call blocks
- * until enough data are consumed or the specified  timeout elapses. In the latter case, a
- * {@link com.github.dm.jrt.channel.TimeoutException TimeoutException} will be thrown.<br/>
- * By default the timeout is set to 0 so to avoid unexpected deadlocks.<br/>
+ * until enough data are consumed or the specified delay elapses. A maximum size can additionally be
+ * set so that, when the number of buffered data exceeds it, a
+ * {@link com.github.dm.jrt.channel.DeadlockException DeadlockException} will be thrown.<br/>
+ * By default the timeout is set to 0.<br/>
  * The order of input data is not guaranteed. Nevertheless, it is possible to force data to be
  * delivered in the same order as they are passed to the channels, at the cost of a slightly
  * increase in memory usage and computation.
@@ -147,7 +148,7 @@ public final class ChannelConfiguration {
     }
 
     /**
-     * Returns the limit of buffered data (DEFAULT by default) before starting applying a delay to
+     * Returns the limit of buffered data (DEFAULT by default) before starting to apply a delay to
      * the feeding thread.
      *
      * @param valueIfNotSet the default value if none was set.

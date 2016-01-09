@@ -75,6 +75,9 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
     private final ArrayList<OutputChannel<?>> mBoundChannels = new ArrayList<OutputChannel<?>>();
 
+    private final SimpleQueue<WrappedExecution> mExecutionQueue =
+            new SimpleQueue<WrappedExecution>();
+
     private final TimeDuration mExecutionTimeout;
 
     private final Object mFlushMutex = new Object();
@@ -102,6 +105,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     private RoutineException mAbortException;
 
     private Object mConsumerMutex;
+
+    private boolean mIsWaitingExecution;
 
     private boolean mIsWaitingInvocation;
 
@@ -288,7 +293,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         } else if (execution != null) {
 
-            mRunner.run(execution, delay.time, delay.unit);
+            runExecution(execution, delay.time, delay.unit);
         }
 
         synchronized (mMutex) {
@@ -320,7 +325,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         } else if (execution != null) {
 
-            mRunner.run(execution, delay.time, delay.unit);
+            runExecution(execution, delay.time, delay.unit);
         }
 
         synchronized (mMutex) {
@@ -352,7 +357,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         } else if (execution != null) {
 
-            mRunner.run(execution, delay.time, delay.unit);
+            runExecution(execution, delay.time, delay.unit);
         }
 
         synchronized (mMutex) {
@@ -563,7 +568,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         } else {
 
-            runner.run(new FlushExecution(forceClose), 0, TimeUnit.MILLISECONDS);
+            runExecution(new FlushExecution(forceClose), 0, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -661,6 +666,43 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         if (abortException != null) {
 
             mHandler.onAbort(abortException, 0, TimeUnit.MILLISECONDS);
+        }
+    }
+
+    private void forceExecution(@NotNull final Execution execution) {
+
+        final SimpleQueue<WrappedExecution> queue = mExecutionQueue;
+
+        synchronized (mMutex) {
+
+            if (mIsWaitingExecution) {
+
+                queue.add(new WrappedExecution(execution));
+                return;
+            }
+
+            mIsWaitingExecution = true;
+        }
+
+        execution.run();
+        final WrappedExecution nextExecution;
+
+        synchronized (mMutex) {
+
+            if (!queue.isEmpty()) {
+
+                nextExecution = queue.removeFirst();
+
+            } else {
+
+                mIsWaitingExecution = false;
+                nextExecution = null;
+            }
+        }
+
+        if (nextExecution != null) {
+
+            mRunner.run(nextExecution, 0, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -768,6 +810,30 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         abort(timeoutException);
         throw AbortException.wrapIfNeeded(timeoutException);
+    }
+
+    private void nextExecution() {
+
+        final SimpleQueue<WrappedExecution> queue = mExecutionQueue;
+        final WrappedExecution nextExecution;
+
+        synchronized (mMutex) {
+
+            if (!queue.isEmpty()) {
+
+                nextExecution = queue.removeFirst();
+
+            } else {
+
+                mIsWaitingExecution = false;
+                nextExecution = null;
+            }
+        }
+
+        if (nextExecution != null) {
+
+            mRunner.run(nextExecution, 0, TimeUnit.MILLISECONDS);
+        }
     }
 
     @Nullable
@@ -886,6 +952,32 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
 
         return nextOutput(timeout);
+    }
+
+    private void runExecution(@NotNull final Execution execution, final long delay,
+            @NotNull final TimeUnit timeUnit) {
+
+        if (delay > 0) {
+
+            mRunner.run(new DelayedWrappedExecution(execution), delay, timeUnit);
+
+        } else {
+
+            final WrappedExecution wrappedExecution = new WrappedExecution(execution);
+
+            synchronized (mMutex) {
+
+                if (mIsWaitingExecution) {
+
+                    mExecutionQueue.add(wrappedExecution);
+                    return;
+                }
+
+                mIsWaitingExecution = true;
+            }
+
+            mRunner.run(wrappedExecution, delay, timeUnit);
+        }
     }
 
     private void verifyBound() {
@@ -1604,7 +1696,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
             } else if (execution != null) {
 
-                mRunner.run(execution, delay.time, delay.unit);
+                runExecution(execution, delay.time, delay.unit);
             }
 
             synchronized (mMutex) {
@@ -1723,6 +1815,34 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
                 flushOutput(false);
             }
+        }
+    }
+
+    /**
+     * Implementation of an execution, wrapping a delayed one, used to handle the execution queue.
+     */
+    private class DelayedWrappedExecution implements Execution {
+
+        private final Execution mExecution;
+
+        /**
+         * Constructor.
+         *
+         * @param execution the wrapped execution.
+         */
+        private DelayedWrappedExecution(@NotNull final Execution execution) {
+
+            mExecution = execution;
+        }
+
+        public boolean mayBeCanceled() {
+
+            return mExecution.mayBeCanceled();
+        }
+
+        public void run() {
+
+            forceExecution(mExecution);
         }
     }
 
@@ -2475,6 +2595,35 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
     }
 
+    /**
+     * Implementation of an execution, wrapping another one, used to handle the execution queue.
+     */
+    private class WrappedExecution implements Execution {
+
+        private final Execution mExecution;
+
+        /**
+         * Constructor.
+         *
+         * @param execution the wrapped execution.
+         */
+        private WrappedExecution(@NotNull final Execution execution) {
+
+            mExecution = execution;
+        }
+
+        public boolean mayBeCanceled() {
+
+            return mExecution.mayBeCanceled();
+        }
+
+        public void run() {
+
+            mExecution.run();
+            nextExecution();
+        }
+    }
+
     public boolean abort(@Nullable final Throwable reason) {
 
         final TimeDuration delay;
@@ -2494,7 +2643,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
             } else {
 
-                mRunner.run(new DelayedAbortExecution(abortException), delay.time, delay.unit);
+                runExecution(new DelayedAbortExecution(abortException), delay.time, delay.unit);
             }
 
             return true;

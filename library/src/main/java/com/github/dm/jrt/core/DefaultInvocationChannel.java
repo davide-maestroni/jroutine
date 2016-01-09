@@ -551,21 +551,27 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
             synchronized (mMutex) {
 
-                final boolean isComplete = mState.onConsumeComplete();
                 final SimpleQueue<Execution> queue = mExecutionQueue;
 
-                if (!isComplete && !queue.isEmpty()) {
+                if (!queue.isEmpty()) {
 
                     execution = queue.removeFirst();
 
                 } else {
 
-                    return isComplete;
+                    execution = null;
                 }
             }
 
-            mRunner.run(execution, 0, TimeUnit.MILLISECONDS);
-            return false;
+            if (execution != null) {
+
+                mRunner.run(execution, 0, TimeUnit.MILLISECONDS);
+            }
+
+            synchronized (mMutex) {
+
+                return mState.onConsumeComplete();
+            }
         }
 
         public void onConsumeStart() {

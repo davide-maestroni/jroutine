@@ -101,6 +101,74 @@ public class ChannelConfigurationTest {
     }
 
     @Test
+    public void testChannelLimitEquals() {
+
+        final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
+                                                            .withRunner(Runners.syncRunner())
+                                                            .withLog(new NullLog())
+                                                            .withChannelLimit(100)
+                                                            .set();
+        assertThat(configuration).isNotEqualTo(builder().withChannelLimit(10).set());
+        assertThat(configuration.builderFrom().withChannelLimit(1).set()).isNotEqualTo(
+                builder().withChannelLimit(1).set());
+    }
+
+    @Test
+    public void testChannelLimitError() {
+
+        try {
+
+            builder().withChannelLimit(-1);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testChannelMaxDelayEquals() {
+
+        final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
+                                                            .withRunner(Runners.syncRunner())
+                                                            .withLog(new NullLog())
+                                                            .withChannelMaxSize(100)
+                                                            .set();
+        assertThat(configuration).isNotEqualTo(
+                builder().withChannelMaxDelay(TimeDuration.ZERO).set());
+        assertThat(configuration).isNotEqualTo(
+                builder().withChannelMaxDelay(1, TimeUnit.MILLISECONDS).set());
+        assertThat(configuration.builderFrom().withChannelMaxDelay(millis(1)).set()).isNotEqualTo(
+                builder().withChannelMaxDelay(1, TimeUnit.MILLISECONDS).set());
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testChannelMaxDelayError() {
+
+        try {
+
+            builder().withChannelMaxDelay(1, null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            builder().withChannelMaxDelay(-1, TimeUnit.MILLISECONDS);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    @Test
     public void testChannelOrderEquals() {
 
         final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
@@ -129,53 +197,11 @@ public class ChannelConfigurationTest {
     }
 
     @Test
-    @SuppressWarnings("ConstantConditions")
     public void testChannelSizeError() {
 
         try {
 
             builder().withChannelMaxSize(0);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-    }
-
-    @Test
-    public void testChannelTimeoutEquals() {
-
-        final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
-                                                            .withRunner(Runners.syncRunner())
-                                                            .withLog(new NullLog())
-                                                            .withChannelMaxSize(100)
-                                                            .set();
-        assertThat(configuration).isNotEqualTo(
-                builder().withChannelMaxDelay(TimeDuration.ZERO).set());
-        assertThat(configuration).isNotEqualTo(
-                builder().withChannelMaxDelay(1, TimeUnit.MILLISECONDS).set());
-        assertThat(configuration.builderFrom().withChannelMaxDelay(millis(1)).set()).isNotEqualTo(
-                builder().withChannelMaxDelay(1, TimeUnit.MILLISECONDS).set());
-    }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testChannelTimeoutError() {
-
-        try {
-
-            builder().withChannelMaxDelay(1, null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            builder().withChannelMaxDelay(-1, TimeUnit.MILLISECONDS);
 
             fail();
 
@@ -211,7 +237,7 @@ public class ChannelConfigurationTest {
     }
 
     @Test
-    public void testPassTimeoutActionEquals() {
+    public void testReadTimeoutActionEquals() {
 
         final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
                                                             .withRunner(Runners.syncRunner())
@@ -227,7 +253,7 @@ public class ChannelConfigurationTest {
     }
 
     @Test
-    public void testPassTimeoutEquals() {
+    public void testReadTimeoutEquals() {
 
         final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
                                                             .withRunner(Runners.syncRunner())

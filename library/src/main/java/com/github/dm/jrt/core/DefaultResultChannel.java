@@ -558,8 +558,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
     private void executeFlush(final boolean forceClose) {
 
-        // We need to make sure to pass the outputs to the consumer in the runner thread, so to
-        // avoid deadlock issues
+        // Need to make sure to pass the outputs to the consumer in the runner thread, so to avoid
+        // deadlock issues
         final Runner runner = mRunner;
 
         if (runner.isExecutionThread()) {

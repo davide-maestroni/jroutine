@@ -118,7 +118,7 @@ public class ConsumerWrapper<IN> implements Consumer<IN> {
             return true;
         }
 
-        if ((o == null) || (getClass() != o.getClass())) {
+        if (!(o instanceof ConsumerWrapper)) {
 
             return false;
         }

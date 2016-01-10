@@ -121,7 +121,7 @@ public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2> {
             return true;
         }
 
-        if ((o == null) || (getClass() != o.getClass())) {
+        if (!(o instanceof BiConsumerWrapper)) {
 
             return false;
         }

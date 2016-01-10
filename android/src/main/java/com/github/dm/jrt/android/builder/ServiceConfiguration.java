@@ -98,6 +98,7 @@ public final class ServiceConfiguration {
     }
 
     @Override
+    @SuppressWarnings("SimplifiableIfStatement")
     public boolean equals(final Object o) {
 
         // AUTO-GENERATED CODE
@@ -106,17 +107,25 @@ public final class ServiceConfiguration {
             return true;
         }
 
-        if (!(o instanceof ServiceConfiguration)) {
+        if (o == null || getClass() != o.getClass()) {
 
             return false;
         }
 
         final ServiceConfiguration that = (ServiceConfiguration) o;
-        return !(mLogClass != null ? !mLogClass.equals(that.mLogClass) : that.mLogClass != null)
-                && !(mLooper != null ? !mLooper.equals(that.mLooper) : that.mLooper != null) && !(
-                mRunnerClass != null ? !mRunnerClass.equals(that.mRunnerClass)
-                        : that.mRunnerClass != null);
 
+        if (mLogClass != null ? !mLogClass.equals(that.mLogClass) : that.mLogClass != null) {
+
+            return false;
+        }
+
+        if (mLooper != null ? !mLooper.equals(that.mLooper) : that.mLooper != null) {
+
+            return false;
+        }
+
+        return !(mRunnerClass != null ? !mRunnerClass.equals(that.mRunnerClass)
+                : that.mRunnerClass != null);
     }
 
     @Override

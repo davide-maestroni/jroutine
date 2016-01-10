@@ -415,7 +415,7 @@ public class PredicateWrapper<IN> implements Predicate<IN> {
                 return true;
             }
 
-            if ((o == null) || (getClass() != o.getClass())) {
+            if (!(o instanceof EqualToPredicate)) {
 
                 return false;
             }
@@ -463,7 +463,7 @@ public class PredicateWrapper<IN> implements Predicate<IN> {
                 return true;
             }
 
-            if ((o == null) || (getClass() != o.getClass())) {
+            if (!(o instanceof InstanceOfPredicate)) {
 
                 return false;
             }
@@ -577,7 +577,7 @@ public class PredicateWrapper<IN> implements Predicate<IN> {
                 return true;
             }
 
-            if ((o == null) || (getClass() != o.getClass())) {
+            if (!(o instanceof SameAsPredicate)) {
 
                 return false;
             }
@@ -595,7 +595,7 @@ public class PredicateWrapper<IN> implements Predicate<IN> {
             return true;
         }
 
-        if ((o == null) || (getClass() != o.getClass())) {
+        if (!(o instanceof PredicateWrapper)) {
 
             return false;
         }

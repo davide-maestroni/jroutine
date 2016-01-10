@@ -93,7 +93,6 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
 
         mConfiguration = configuration;
         mSyncRunner = Runners.syncRunner();
-
         final int priority = configuration.getPriorityOr(InvocationConfiguration.DEFAULT);
         final Runner asyncRunner = configuration.getRunnerOr(Runners.sharedRunner());
 
@@ -193,7 +192,6 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
             }
 
             syncInvocations.clear();
-
             final LinkedList<Invocation<IN, OUT>> asyncInvocations = mAsyncInvocations;
 
             for (final Invocation<IN, OUT> invocation : asyncInvocations) {

@@ -119,7 +119,7 @@ public final class ProxyConfiguration {
             return true;
         }
 
-        if (!(o instanceof ProxyConfiguration)) {
+        if (o == null || getClass() != o.getClass()) {
 
             return false;
         }
@@ -260,7 +260,7 @@ public final class ProxyConfiguration {
         @NotNull
         public Builder<TYPE> withSharedFields(@Nullable final String... fieldNames) {
 
-            mFieldNames = (fieldNames != null) ? Arrays.asList(fieldNames) : null;
+            mFieldNames = (fieldNames != null) ? Arrays.asList(fieldNames.clone()) : null;
             return this;
         }
 

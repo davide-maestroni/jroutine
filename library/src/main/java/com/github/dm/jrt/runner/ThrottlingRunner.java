@@ -242,7 +242,9 @@ class ThrottlingRunner implements Runner {
 
                 synchronized (mMutex) {
 
-                    if ((--mRunningCount < maxRunning) && !queue.isEmpty()) {
+                    --mRunningCount;
+
+                    if (!queue.isEmpty()) {
 
                         pendingExecution = queue.removeFirst();
                     }

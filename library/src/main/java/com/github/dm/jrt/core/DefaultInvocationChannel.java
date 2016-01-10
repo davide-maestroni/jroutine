@@ -547,7 +547,8 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
         public boolean onConsumeComplete() {
 
-            final Execution execution;
+            Execution execution = null;
+            final boolean isComplete;
 
             synchronized (mMutex) {
 
@@ -556,11 +557,9 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
                 if (!queue.isEmpty()) {
 
                     execution = queue.removeFirst();
-
-                } else {
-
-                    execution = null;
                 }
+
+                isComplete = mState.onConsumeComplete();
             }
 
             if (execution != null) {
@@ -568,10 +567,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
                 mRunner.run(execution, 0, TimeUnit.MILLISECONDS);
             }
 
-            synchronized (mMutex) {
-
-                return mState.onConsumeComplete();
-            }
+            return isComplete;
         }
 
         public void onConsumeStart() {

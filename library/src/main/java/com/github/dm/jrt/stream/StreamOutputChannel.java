@@ -382,13 +382,13 @@ public interface StreamOutputChannel<OUT>
 
     // TODO: 30/12/15 unordered, backPressure, runOn
     @NotNull
-    StreamOutputChannel<OUT> backPressureOn(@Nullable Runner runner, int maxOutputs, long maxTime,
+    StreamOutputChannel<OUT> backPressureOn(@Nullable Runner runner, int maxOutputs, long maxDelay,
             TimeUnit timeUnit);
 
     // TODO: 30/12/15 unordered, backPressure, runOn
     @NotNull
     StreamOutputChannel<OUT> backPressureOn(@Nullable Runner runner, int maxOutputs,
-            TimeDuration maxTime);
+            TimeDuration maxDelay);
 
     // TODO: 30/12/15 unordered, backPressure, runOn
     @NotNull

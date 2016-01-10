@@ -1590,11 +1590,7 @@ public class RoutineTest {
 
         try {
 
-            final IOChannel<Object> channel = JRoutine.io()
-                                                      .withChannels()
-                                                      .withRunner(Runners.sharedRunner())
-                                                      .set()
-                                                      .buildChannel();
+            final IOChannel<Object> channel = JRoutine.io().buildChannel();
             channel.pass("test2").close();
             JRoutine.on(PassingInvocation.factoryOf())
                     .withInvocations()
@@ -1998,7 +1994,6 @@ public class RoutineTest {
 
         final IOChannel<String> channel1 = JRoutine.io()
                                                    .withChannels()
-                                                   .withRunner(Runners.sharedRunner())
                                                    .withChannelMaxSize(1)
                                                    .withChannelMaxDelay(millis(1000))
                                                    .set()
@@ -2016,7 +2011,6 @@ public class RoutineTest {
 
         final IOChannel<String> channel2 = JRoutine.io()
                                                    .withChannels()
-                                                   .withRunner(Runners.sharedRunner())
                                                    .withChannelMaxSize(1)
                                                    .withChannelMaxDelay(millis(1000))
                                                    .set()
@@ -2034,7 +2028,6 @@ public class RoutineTest {
 
         final IOChannel<String> channel3 = JRoutine.io()
                                                    .withChannels()
-                                                   .withRunner(Runners.sharedRunner())
                                                    .withChannelMaxSize(1)
                                                    .withChannelMaxDelay(millis(1000))
                                                    .set()
@@ -2052,7 +2045,6 @@ public class RoutineTest {
 
         final IOChannel<String> channel4 = JRoutine.io()
                                                    .withChannels()
-                                                   .withRunner(Runners.sharedRunner())
                                                    .withChannelMaxSize(1)
                                                    .withChannelMaxDelay(millis(1000))
                                                    .set()

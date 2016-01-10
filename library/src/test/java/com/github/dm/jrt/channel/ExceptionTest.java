@@ -37,12 +37,6 @@ public class ExceptionTest {
     }
 
     @Test
-    public void testChannelTimeoutException() {
-
-        assertThat(new ChannelTimeoutException("")).hasNoCause();
-    }
-
-    @Test
     public void testDeadlockException() {
 
         assertThat(new DeadlockException("")).hasNoCause();

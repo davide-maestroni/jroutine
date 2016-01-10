@@ -482,7 +482,7 @@ public class Functions {
     public static <IN1, IN2> BiConsumerWrapper<IN1, IN2> wrapBiConsumer(
             @NotNull final BiConsumer<IN1, IN2> consumer) {
 
-        if (consumer.getClass() == BiConsumerWrapper.class) {
+        if (consumer instanceof BiConsumerWrapper) {
 
             return (BiConsumerWrapper<IN1, IN2>) consumer;
         }
@@ -509,7 +509,7 @@ public class Functions {
     public static <IN1, IN2, OUT> BiFunctionWrapper<IN1, IN2, OUT> wrapBiFunction(
             @NotNull final BiFunction<IN1, IN2, OUT> function) {
 
-        if (function.getClass() == BiFunctionWrapper.class) {
+        if (function instanceof BiFunctionWrapper) {
 
             return (BiFunctionWrapper<IN1, IN2, OUT>) function;
         }
@@ -533,7 +533,7 @@ public class Functions {
     @NotNull
     public static <IN> ConsumerWrapper<IN> wrapConsumer(@NotNull final Consumer<IN> consumer) {
 
-        if (consumer.getClass() == ConsumerWrapper.class) {
+        if (consumer instanceof ConsumerWrapper) {
 
             return (ConsumerWrapper<IN>) consumer;
         }
@@ -559,7 +559,7 @@ public class Functions {
     public static <IN, OUT> FunctionWrapper<IN, OUT> wrapFunction(
             @NotNull final Function<IN, OUT> function) {
 
-        if (function.getClass() == FunctionWrapper.class) {
+        if (function instanceof FunctionWrapper) {
 
             return (FunctionWrapper<IN, OUT>) function;
         }
@@ -583,7 +583,7 @@ public class Functions {
     @NotNull
     public static <IN> PredicateWrapper<IN> wrapPredicate(@NotNull final Predicate<IN> predicate) {
 
-        if (predicate.getClass() == PredicateWrapper.class) {
+        if (predicate instanceof PredicateWrapper) {
 
             return (PredicateWrapper<IN>) predicate;
         }
@@ -607,7 +607,7 @@ public class Functions {
     @NotNull
     public static <OUT> SupplierWrapper<OUT> wrapSupplier(@NotNull final Supplier<OUT> supplier) {
 
-        if (supplier.getClass() == SupplierWrapper.class) {
+        if (supplier instanceof SupplierWrapper) {
 
             return (SupplierWrapper<OUT>) supplier;
         }

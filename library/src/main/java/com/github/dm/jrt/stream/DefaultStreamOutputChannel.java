@@ -471,18 +471,18 @@ class DefaultStreamOutputChannel<OUT>
 
     @NotNull
     public StreamOutputChannel<OUT> backPressureOn(@Nullable final Runner runner,
-            final int maxOutputs, final long maxTime, final TimeUnit timeUnit) {
+            final int maxOutputs, final long maxDelay, final TimeUnit timeUnit) {
 
-        return backPressureOn(runner, maxOutputs, TimeDuration.fromUnit(maxTime, timeUnit));
+        return backPressureOn(runner, maxOutputs, TimeDuration.fromUnit(maxDelay, timeUnit));
     }
 
     @NotNull
     public StreamOutputChannel<OUT> backPressureOn(@Nullable final Runner runner,
-            final int maxOutputs, final TimeDuration maxTime) {
+            final int maxOutputs, final TimeDuration maxDelay) {
 
         return withInvocations().withRunner(runner)
                                 .withInputLimit(maxOutputs)
-                                .withInputMaxDelay(maxTime)
+                                .withInputMaxDelay(maxDelay)
                                 .set();
     }
 

@@ -138,7 +138,7 @@ public class SupplierWrapper<OUT> implements Supplier<OUT> {
                 return true;
             }
 
-            if ((o == null) || (getClass() != o.getClass())) {
+            if (!(o instanceof ConstantSupplier)) {
 
                 return false;
             }
@@ -156,7 +156,7 @@ public class SupplierWrapper<OUT> implements Supplier<OUT> {
             return true;
         }
 
-        if ((o == null) || (getClass() != o.getClass())) {
+        if (!(o instanceof SupplierWrapper)) {
 
             return false;
         }

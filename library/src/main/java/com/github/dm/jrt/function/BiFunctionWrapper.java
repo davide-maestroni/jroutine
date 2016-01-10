@@ -232,7 +232,7 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
             return true;
         }
 
-        if ((o == null) || (getClass() != o.getClass())) {
+        if (!(o instanceof BiFunctionWrapper)) {
 
             return false;
         }

@@ -128,6 +128,7 @@ public final class LoaderConfiguration {
     }
 
     @Override
+    @SuppressWarnings("SimplifiableIfStatement")
     public boolean equals(final Object o) {
 
         // AUTO-GENERATED CODE
@@ -136,17 +137,39 @@ public final class LoaderConfiguration {
             return true;
         }
 
-        if (!(o instanceof LoaderConfiguration)) {
+        if (o == null || getClass() != o.getClass()) {
 
             return false;
         }
 
         final LoaderConfiguration that = (LoaderConfiguration) o;
-        return mLoaderId == that.mLoaderId && mInputResolutionType == that.mInputResolutionType
-                && !(mLooper != null ? !mLooper.equals(that.mLooper) : that.mLooper != null)
-                && mResolutionType == that.mResolutionType && !(mStaleTime != null
-                ? !mStaleTime.equals(that.mStaleTime) : that.mStaleTime != null)
-                && mStrategyType == that.mStrategyType;
+
+        if (mLoaderId != that.mLoaderId) {
+
+            return false;
+        }
+
+        if (mInputResolutionType != that.mInputResolutionType) {
+
+            return false;
+        }
+
+        if (mLooper != null ? !mLooper.equals(that.mLooper) : that.mLooper != null) {
+
+            return false;
+        }
+
+        if (mResolutionType != that.mResolutionType) {
+
+            return false;
+        }
+
+        if (mStaleTime != null ? !mStaleTime.equals(that.mStaleTime) : that.mStaleTime != null) {
+
+            return false;
+        }
+
+        return mStrategyType == that.mStrategyType;
     }
 
     @Override

@@ -40,9 +40,8 @@ public class ChannelsCompat extends Channels {
 
     /**
      * Combines the specified channels into a selectable one.<br/>
-     * Note that the returned channel will employ a synchronous runner to transfer data, and that it
-     * <b>must be explicitly closed</b> in order to ensure the completion of the invocation
-     * lifecycle.
+     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
+     * completion of the invocation lifecycle.
      *
      * @param channels the map of indexes and input channels.
      * @param <IN>     the input data type.
@@ -78,8 +77,7 @@ public class ChannelsCompat extends Channels {
 
     /**
      * Merges the specified channels into a selectable one.<br/>
-     * Note that the returned channel will employ a synchronous runner to transfer data, and that
-     * the passed ones will be bound as a result of the call.
+     * Note that the passed channels will be bound as a result of the call.
      *
      * @param channelMap the map of indexes and output channels.
      * @param <OUT>      the output data type.
@@ -110,9 +108,8 @@ public class ChannelsCompat extends Channels {
     /**
      * Returns a map of input channels accepting the input data identified by the specified indexes.
      * <br/>
-     * Note that the returned channel swill employ a synchronous runner to transfer data, and that
-     * they <b>must be explicitly closed</b> in order to ensure the completion of the invocation
-     * lifecycle.
+     * Note that the returned channels <b>must be explicitly closed</b> in order to ensure the
+     * completion of the invocation lifecycle.
      *
      * @param channel the selectable channel.
      * @param indexes the array of indexes.
@@ -140,9 +137,8 @@ public class ChannelsCompat extends Channels {
     /**
      * Returns a map of input channels accepting the input data identified by the specified indexes.
      * <br/>
-     * Note that the returned channel swill employ a synchronous runner to transfer data, and that
-     * they <b>must be explicitly closed</b> in order to ensure the completion of the invocation
-     * lifecycle.
+     * Note that the returned channels <b>must be explicitly closed</b> in order to ensure the
+     * completion of the invocation lifecycle.
      *
      * @param channel the selectable channel.
      * @param indexes the iterable returning the channel indexes.
@@ -168,9 +164,8 @@ public class ChannelsCompat extends Channels {
     /**
      * Returns a map of input channels accepting the input data identified by the specified indexes.
      * <br/>
-     * Note that the returned channel swill employ a synchronous runner to transfer data, and that
-     * they <b>must be explicitly closed</b> in order to ensure the completion of the invocation
-     * lifecycle.
+     * Note that the returned channels <b>must be explicitly closed</b> in order to ensure the
+     * completion of the invocation lifecycle.
      *
      * @param startIndex the selectable start index.
      * @param rangeSize  the size of the range of indexes (must be positive).
@@ -204,8 +199,7 @@ public class ChannelsCompat extends Channels {
     /**
      * Returns a map of output channels returning the output data filtered by the specified indexes.
      * <br/>
-     * Note that the returned channels will employ a synchronous runner to transfer data, and that
-     * the passed one will be bound as a result of the call.
+     * Note that the passed channel will be bound as a result of the call.
      *
      * @param startIndex the selectable start index.
      * @param rangeSize  the size of the range of indexes (must be positive).
@@ -244,8 +238,7 @@ public class ChannelsCompat extends Channels {
     /**
      * Returns a map of output channels returning the outputs filtered by the specified indexes.
      * <br/>
-     * Note that the returned channels will employ a synchronous runner to transfer data, and that
-     * the passed one will be bound as a result of the call.
+     * Note that the passed channel will be bound as a result of the call.
      *
      * @param channel the selectable output channel.
      * @param indexes the list of indexes.
@@ -277,8 +270,7 @@ public class ChannelsCompat extends Channels {
     /**
      * Returns a map of output channels returning the output data filtered by the specified indexes.
      * <br/>
-     * Note that the returned channels will employ a synchronous runner to transfer data, and that
-     * the passed one will be bound as a result of the call.
+     * Note that the passed channel will be bound as a result of the call.
      *
      * @param channel the selectable output channel.
      * @param indexes the iterable returning the channel indexes.

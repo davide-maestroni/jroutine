@@ -51,7 +51,7 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.function.Functions.functionFilter;
-import static com.github.dm.jrt.util.TimeDuration.days;
+import static com.github.dm.jrt.util.TimeDuration.minutes;
 import static com.github.dm.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -138,11 +138,7 @@ public class StreamOutputChannelTest {
 
         }
 
-        final IOChannel<String> ioChannel = JRoutine.io()
-                                                    .withChannels()
-                                                    .withRunner(Runners.sharedRunner())
-                                                    .set()
-                                                    .buildChannel();
+        final IOChannel<String> ioChannel = JRoutine.io().buildChannel();
         channel = Streams.streamOf(ioChannel.after(1, TimeUnit.DAYS).pass("test"));
 
         try {
@@ -725,11 +721,11 @@ public class StreamOutputChannelTest {
                                          .withRunner(runner2)
                                          .set()
                                          .asyncMap(Functions.identity())
-                                         .afterMax(days(3))
+                                         .afterMax(minutes(3))
                                          .next();
                        }
                    })
-                   .afterMax(days(3))
+                   .afterMax(minutes(3))
                    .next();
 
             fail();
@@ -1154,7 +1150,7 @@ public class StreamOutputChannelTest {
                                   }
                               })
                               .runOnShared()
-                              .afterMax(days(3))
+                              .afterMax(minutes(3))
                               .next()).isCloseTo(21, Offset.offset(0.1));
 
             fail();
@@ -1204,7 +1200,7 @@ public class StreamOutputChannelTest {
                                   }
                               })
                               .runOnShared()
-                              .afterMax(days(3))
+                              .afterMax(minutes(3))
                               .next()).isCloseTo(21, Offset.offset(0.1));
 
         } catch (final OutputDeadlockException ignored) {
@@ -1252,7 +1248,7 @@ public class StreamOutputChannelTest {
                                   }
                               })
                               .runOnShared()
-                              .afterMax(days(3))
+                              .afterMax(minutes(3))
                               .next()).isCloseTo(21, Offset.offset(0.1));
 
             fail();

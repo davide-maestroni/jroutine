@@ -225,7 +225,7 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT> {
                 return true;
             }
 
-            if ((o == null) || (getClass() != o.getClass())) {
+            if (!(o instanceof ClassCastFunction)) {
 
                 return false;
             }
@@ -243,7 +243,7 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT> {
             return true;
         }
 
-        if ((o == null) || (getClass() != o.getClass())) {
+        if (!(o instanceof FunctionWrapper)) {
 
             return false;
         }

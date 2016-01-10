@@ -244,7 +244,6 @@ public class PriorityRunner {
             final long thisAge = e1.mAge;
             final int thatPriority = e2.mPriority;
             final long thatAge = e2.mAge;
-
             final int compare = compareLong(thatAge + thatPriority, thisAge + thisPriority);
             return (compare == 0) ? compareLong(thatAge, thisAge) : compare;
         }

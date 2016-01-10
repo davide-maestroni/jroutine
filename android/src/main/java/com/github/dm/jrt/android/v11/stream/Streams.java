@@ -51,8 +51,7 @@ public class Streams extends Channels {
 
     /**
      * Returns a stream output channel blending the outputs coming from the specified ones.<br/>
-     * Note that the returned channel will employ a synchronous runner to transfer data, and that
-     * the passed ones will be bound as a result of the call.
+     * Note that the channels will be bound as a result of the call.
      *
      * @param channels the list of channels.
      * @param <OUT>    the output data type.
@@ -67,8 +66,7 @@ public class Streams extends Channels {
 
     /**
      * Returns a stream output channel blending the outputs coming from the specified ones.<br/>
-     * Note that the returned channel will employ a synchronous runner to transfer data, and that
-     * the passed ones will be bound as a result of the call.
+     * Note that the channels will be bound as a result of the call.
      *
      * @param channels the array of channels.
      * @param <OUT>    the output data type.
@@ -85,8 +83,7 @@ public class Streams extends Channels {
      * Returns a stream output channel concatenating the outputs coming from the specified ones, so
      * that, all the outputs of the first channel will come before all the outputs of the second
      * one, and so on.<br/>
-     * Note that the returned channel will employ a synchronous runner to transfer data, and that
-     * the passed ones will be bound as a result of the call.
+     * Note that the channels will be bound as a result of the call.
      *
      * @param channels the list of channels.
      * @param <OUT>    the output data type.
@@ -103,8 +100,7 @@ public class Streams extends Channels {
      * Returns a stream output channel concatenating the outputs coming from the specified ones, so
      * that, all the outputs of the first channel will come before all the outputs of the second
      * one, and so on.<br/>
-     * Note that the returned channel will employ a synchronous runner to transfer data, and that
-     * the passed ones will be bound as a result of the call.
+     * Note that the channels will be bound as a result of the call.
      *
      * @param channels the array of channels.
      * @param <OUT>    the output data type.
@@ -155,8 +151,7 @@ public class Streams extends Channels {
      * Returns a stream output channel joining the data coming from the specified list of channels.
      * <br/>
      * An output will be generated only when at least one result is available for each channel.<br/>
-     * Note that the returned channel will employ a synchronous runner to transfer data, and that
-     * the passed ones will be bound as a result of the call.
+     * Note that the channels will be bound as a result of the call.
      *
      * @param channels the list of channels.
      * @param <OUT>    the output data type.
@@ -174,8 +169,7 @@ public class Streams extends Channels {
      * Returns a stream output channel joining the data coming from the specified list of channels.
      * <br/>
      * An output will be generated only when at least one result is available for each channel.<br/>
-     * Note that the returned channel will employ a synchronous runner to transfer data, and that
-     * the passed ones will be bound as a result of the call.
+     * Note that the channels will be bound as a result of the call.
      *
      * @param channels the array of channels.
      * @param <OUT>    the output data type.
@@ -196,8 +190,7 @@ public class Streams extends Channels {
      * Moreover, when all the output channels complete, the remaining outputs will be returned by
      * filling the gaps with the specified placeholder instance, so that the generated list of data
      * will always have the same size of the channel list.<br/>
-     * Note that the returned channel will employ a synchronous runner to transfer data, and that
-     * the passed ones will be bound as a result of the call.
+     * Note that the channels will be bound as a result of the call.
      *
      * @param placeholder the placeholder instance.
      * @param channels    the list of channels.
@@ -220,8 +213,7 @@ public class Streams extends Channels {
      * Moreover, when all the output channels complete, the remaining outputs will be returned by
      * filling the gaps with the specified placeholder instance, so that the generated list of data
      * will always have the same size of the channel list.<br/>
-     * Note that the returned channel will employ a synchronous runner to transfer data, and that
-     * the passed ones will be bound as a result of the call.
+     * Note that the channels will be bound as a result of the call.
      *
      * @param placeholder the placeholder instance.
      * @param channels    the array of channels.
@@ -252,8 +244,7 @@ public class Streams extends Channels {
 
     /**
      * Merges the specified channels into a selectable one.<br/>
-     * Note that the returned channel will employ a synchronous runner to transfer data, and that
-     * the passed ones will be bound as a result of the call.
+     * Note that the channels will be bound as a result of the call.
      *
      * @param startIndex the selectable start index.
      * @param channels   the list of channels.
@@ -271,8 +262,7 @@ public class Streams extends Channels {
 
     /**
      * Merges the specified channels into a selectable one.<br/>
-     * Note that the returned channel will employ a synchronous runner to transfer data, and that
-     * the passed ones will be bound as a result of the call.
+     * Note that the channels will be bound as a result of the call.
      *
      * @param startIndex the selectable start index.
      * @param channels   the array of channels.
@@ -290,8 +280,7 @@ public class Streams extends Channels {
     /**
      * Merges the specified channels into a selectable one. The selectable indexes will be the same
      * as the list ones.<br/>
-     * Note that the returned channel will employ a synchronous runner to transfer data, and that
-     * the passed ones will be bound as a result of the call.
+     * Note that the channels will be bound as a result of the call.
      *
      * @param channels the channels to merge.
      * @param <OUT>    the output data type.
@@ -308,8 +297,7 @@ public class Streams extends Channels {
     /**
      * Merges the specified channels into a selectable one. The selectable indexes will be the same
      * as the array ones.<br/>
-     * Note that the returned channel will employ a synchronous runner to transfer data, and that
-     * the passed ones will be bound as a result of the call.
+     * Note that the channels will be bound as a result of the call.
      *
      * @param channels the channels to merge.
      * @param <OUT>    the output data type.
@@ -325,8 +313,7 @@ public class Streams extends Channels {
 
     /**
      * Merges the specified channels into a selectable one.<br/>
-     * Note that the returned channel will employ a synchronous runner to transfer data, and that
-     * the passed ones will be bound as a result of the call.
+     * Note that the channels will be bound as a result of the call.
      *
      * @param channelMap the map of indexes and output channels.
      * @param <OUT>      the output data type.

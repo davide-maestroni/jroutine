@@ -15,6 +15,7 @@ package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.builder.ConfigurableBuilder;
 import com.github.dm.jrt.builder.InvocationConfiguration.Builder;
+import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.ResultChannel;
@@ -380,23 +381,65 @@ public interface StreamOutputChannel<OUT>
     StreamOutputChannel<OUT> asyncReduce(
             @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
 
-    // TODO: 30/12/15 unordered, backPressure, runOn
+    /**
+     * Short for {@code withInvocations().withRunner(runner).withInputLimit(maxInputs)
+     * .withInputMaxDelay(maxDelay, timeUnit).set()}.<br/>
+     * This method is useful to easily apply a configuration, which will slow down the thread
+     * feeding the next routine concatenated to the stream, when the number of buffered inputs
+     * exceeds the specified limit. Since waiting on the same runner thread is not allowed, it is
+     * advisable to employ a runner instance different from the feeding one, so to avoid deadlock
+     * exceptions.
+     *
+     * @param runner    the configured runner.
+     * @param maxInputs the maximum number of buffered inputs before starting to slow down the
+     *                  feeding thread.
+     * @param maxDelay  the maximum delay to apply to the feeding thread.
+     * @param timeUnit  the delay time unit.
+     * @return the configured stream channel.
+     */
     @NotNull
-    StreamOutputChannel<OUT> backPressureOn(@Nullable Runner runner, int maxOutputs, long maxDelay,
-            TimeUnit timeUnit);
+    StreamOutputChannel<OUT> backPressureOn(@Nullable Runner runner, int maxInputs, long maxDelay,
+            @NotNull TimeUnit timeUnit);
 
-    // TODO: 30/12/15 unordered, backPressure, runOn
+    /**
+     * Short for {@code withInvocations().withRunner(runner).withInputLimit(maxInputs)
+     * .withInputMaxDelay(maxDelay).set()}.<br/>
+     * This method is useful to easily apply a configuration to the next routine concatenated to the
+     * stream, which will slow down the thread feeding it, when the number of buffered inputs
+     * exceeds the specified limit. Since waiting on the same runner thread is not allowed, it is
+     * advisable to employ a runner instance different from the feeding one, so to avoid deadlock
+     * exceptions.
+     *
+     * @param runner    the configured runner.
+     * @param maxInputs the maximum number of buffered inputs before starting to slow down the
+     *                  feeding thread.
+     * @param maxDelay  the maximum delay to apply to the feeding thread.
+     * @return the configured stream channel.
+     */
     @NotNull
-    StreamOutputChannel<OUT> backPressureOn(@Nullable Runner runner, int maxOutputs,
-            TimeDuration maxDelay);
+    StreamOutputChannel<OUT> backPressureOn(@Nullable Runner runner, int maxInputs,
+            @Nullable TimeDuration maxDelay);
 
-    // TODO: 30/12/15 unordered, backPressure, runOn
+    /**
+     * Short for {@code withInvocations().withMaxInstances(maxInvocations).set()}.<br/>
+     * This method is useful to easily apply a configuration to the next routine concatenated to the
+     * stream, which will limit the maximum number of concurrent invocations to the specified value.
+     *
+     * @param maxInvocations the maximum number of concurrent invocations.
+     * @return the configured stream channel.
+     */
     @NotNull
     StreamOutputChannel<OUT> maxParallelInvocations(int maxInvocations);
 
-    // TODO: 30/12/15 unordered, backPressure, runOn
+    /**
+     * Short for {@code withStreamInvocations().withOutputOrder(orderType).set()}.<br/>
+     * This method is useful to easily make the stream ordered or not.<br/>
+     * Note that an ordered channel has a slightly increased cost in memory and computation.
+     *
+     * @return the configured stream channel.
+     */
     @NotNull
-    StreamOutputChannel<OUT> ordered();
+    StreamOutputChannel<OUT> ordered(@Nullable OrderType orderType);
 
     /**
      * Concatenates a stream channel based on the specified predicate to this one.<br/>
@@ -583,11 +626,25 @@ public interface StreamOutputChannel<OUT>
     StreamOutputChannel<Number> parallelRange(@NotNull final Number start,
             @NotNull final Number end, @NotNull final Number increment);
 
-    // TODO: 30/12/15 unordered, backPressure, runOn
+    /**
+     * Short for {@code withStreamInvocations().withRunner(runner).set().asyncMap(Functions
+     * .<OUT>identity())}.<br/>
+     * This method is useful to easily make the stream run on the specified runner.<br/>
+     * Note that it is not necessary to explicitly concatenate a routine to have a channel
+     * delivering the output data with the specified runner.
+     *
+     * @param runner the runner instance.
+     * @return the concatenated stream channel.
+     */
     @NotNull
     StreamOutputChannel<OUT> runOn(@Nullable Runner runner);
 
-    // TODO: 30/12/15 unordered, backPressure, runOn
+    /**
+     * Short for {@code runOn(null)}.
+     *
+     * @return the concatenated stream channel.
+     * @see #runOn(Runner)
+     */
     @NotNull
     StreamOutputChannel<OUT> runOnShared();
 

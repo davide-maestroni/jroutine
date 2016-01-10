@@ -50,6 +50,7 @@ import static com.github.dm.jrt.function.Functions.consumerFilter;
 import static com.github.dm.jrt.function.Functions.functionFactory;
 import static com.github.dm.jrt.function.Functions.functionFilter;
 import static com.github.dm.jrt.function.Functions.predicateFilter;
+import static com.github.dm.jrt.util.TimeDuration.fromUnit;
 
 /**
  * Default implementation of a stream output channel.
@@ -471,17 +472,17 @@ class DefaultStreamOutputChannel<OUT>
 
     @NotNull
     public StreamOutputChannel<OUT> backPressureOn(@Nullable final Runner runner,
-            final int maxOutputs, final long maxDelay, final TimeUnit timeUnit) {
+            final int maxInputs, final long maxDelay, @NotNull final TimeUnit timeUnit) {
 
-        return backPressureOn(runner, maxOutputs, TimeDuration.fromUnit(maxDelay, timeUnit));
+        return backPressureOn(runner, maxInputs, fromUnit(maxDelay, timeUnit));
     }
 
     @NotNull
     public StreamOutputChannel<OUT> backPressureOn(@Nullable final Runner runner,
-            final int maxOutputs, final TimeDuration maxDelay) {
+            final int maxInputs, @Nullable final TimeDuration maxDelay) {
 
         return withInvocations().withRunner(runner)
-                                .withInputLimit(maxOutputs)
+                                .withInputLimit(maxInputs)
                                 .withInputMaxDelay(maxDelay)
                                 .set();
     }
@@ -493,9 +494,9 @@ class DefaultStreamOutputChannel<OUT>
     }
 
     @NotNull
-    public StreamOutputChannel<OUT> ordered() {
+    public StreamOutputChannel<OUT> ordered(@Nullable final OrderType orderType) {
 
-        return withStreamInvocations().withOutputOrder(OrderType.BY_CALL).set();
+        return withStreamInvocations().withOutputOrder(orderType).set();
     }
 
     @NotNull

@@ -326,7 +326,7 @@ public class StreamOutputChannelTest {
                           .afterMax(seconds(3))
                           .all()).containsOnly("TEST1", "TEST2");
         assertThat(Streams.streamOf("test1", "test2")
-                          .ordered()
+                          .ordered(OrderType.BY_CALL)
                           .maxParallelInvocations(1)
                           .parallelMap(new Function<String, String>() {
 
@@ -338,7 +338,7 @@ public class StreamOutputChannelTest {
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
         assertThat(Streams.streamOf("test1", "test2")
-                          .ordered()
+                          .ordered(OrderType.BY_CALL)
                           .maxParallelInvocations(1)
                           .parallelMap(new Function<String, String>() {
 
@@ -822,7 +822,7 @@ public class StreamOutputChannelTest {
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
         assertThat(Streams.streamOf("test1", "test2")
-                          .ordered()
+                          .ordered(OrderType.BY_CALL)
                           .parallelMap(new BiConsumer<String, ResultChannel<String>>() {
 
                               public void accept(final String s,
@@ -889,7 +889,7 @@ public class StreamOutputChannelTest {
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
         assertThat(Streams.streamOf("test1", "test2")
-                          .ordered()
+                          .ordered(OrderType.BY_CALL)
                           .parallelMap(factory)
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
@@ -940,7 +940,7 @@ public class StreamOutputChannelTest {
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
         assertThat(Streams.streamOf("test1", "test2")
-                          .ordered()
+                          .ordered(OrderType.BY_CALL)
                           .parallelMap(new UpperCase())
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2");
@@ -995,7 +995,7 @@ public class StreamOutputChannelTest {
             }
         }).afterMax(seconds(3)).all()).containsExactly("TEST1", "TEST2");
         assertThat(Streams.streamOf("test1", "test2")
-                          .ordered()
+                          .ordered(OrderType.BY_CALL)
                           .parallelMap(new Function<String, String>() {
 
                               public String apply(final String s) {
@@ -1324,7 +1324,7 @@ public class StreamOutputChannelTest {
                           .all()).containsExactly((byte) 0, (byte) 1, (byte) 2, (byte) 3, (byte) 4,
                                                   (byte) 5);
         assertThat(Streams.streamOf()
-                          .ordered()
+                          .ordered(OrderType.BY_CALL)
                           .parallelRange('a', 'e', new Function<Character, Character>() {
 
                               public Character apply(final Character character) {
@@ -1335,70 +1335,75 @@ public class StreamOutputChannelTest {
                           .afterMax(seconds(3))
                           .all()).containsExactly('a', 'b', 'c', 'd', 'e');
         assertThat(Streams.streamOf()
-                          .ordered()
+                          .ordered(OrderType.BY_CALL)
                           .parallelRange(0, -10, -2)
                           .afterMax(seconds(3))
                           .all()).containsExactly(0, -2, -4, -6, -8, -10);
-        assertThat(Streams.streamOf().ordered().parallelRange(0, 2, 0.7).afterMax(seconds(3)).all())
-                .containsExactly(0d, 0.7d, 1.4d);
         assertThat(Streams.streamOf()
-                          .ordered()
+                          .ordered(OrderType.BY_CALL)
+                          .parallelRange(0, 2, 0.7)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly(0d, 0.7d, 1.4d);
+        assertThat(Streams.streamOf()
+                          .ordered(OrderType.BY_CALL)
                           .parallelRange(0, 2, 0.7f)
                           .afterMax(seconds(3))
                           .all()).containsExactly(0f, 0.7f, 1.4f);
         assertThat(Streams.streamOf()
-                          .ordered()
+                          .ordered(OrderType.BY_CALL)
                           .parallelRange(0L, -9, -2)
                           .afterMax(seconds(3))
                           .all()).containsExactly(0L, -2L, -4L, -6L, -8L);
         assertThat(Streams.streamOf()
-                          .ordered()
+                          .ordered(OrderType.BY_CALL)
                           .parallelRange(0, (short) 9, 2)
                           .afterMax(seconds(3))
                           .all()).containsExactly(0, 2, 4, 6, 8);
         assertThat(Streams.streamOf()
-                          .ordered()
+                          .ordered(OrderType.BY_CALL)
                           .parallelRange((byte) 0, (short) 9, (byte) 2)
                           .afterMax(seconds(3))
                           .all()).containsExactly((short) 0, (short) 2, (short) 4, (short) 6,
                                                   (short) 8);
         assertThat(Streams.streamOf()
-                          .ordered()
+                          .ordered(OrderType.BY_CALL)
                           .parallelRange((byte) 0, (byte) 10, (byte) 2)
                           .afterMax(seconds(3))
                           .all()).containsExactly((byte) 0, (byte) 2, (byte) 4, (byte) 6, (byte) 8,
                                                   (byte) 10);
         assertThat(Streams.streamOf()
-                          .ordered()
+                          .ordered(OrderType.BY_CALL)
                           .parallelRange(0, -5)
                           .afterMax(seconds(3))
                           .all()).containsExactly(0, -1, -2, -3, -4, -5);
         assertThat(Streams.streamOf()
-                          .ordered()
+                          .ordered(OrderType.BY_CALL)
                           .parallelRange(0, 2.1)
                           .afterMax(seconds(3))
                           .all()).containsExactly(0d, 1d, 2d);
         assertThat(Streams.streamOf()
-                          .ordered()
+                          .ordered(OrderType.BY_CALL)
                           .parallelRange(0, 1.9f)
                           .afterMax(seconds(3))
                           .all()).containsExactly(0f, 1f);
         assertThat(Streams.streamOf()
-                          .ordered()
+                          .ordered(OrderType.BY_CALL)
                           .parallelRange(0L, -4)
                           .afterMax(seconds(3))
                           .all()).containsExactly(0L, -1L, -2L, -3L, -4L);
-        assertThat(
-                Streams.streamOf().ordered().parallelRange(0, (short) 4).afterMax(seconds(3)).all())
-                .containsExactly(0, 1, 2, 3, 4);
         assertThat(Streams.streamOf()
-                          .ordered()
+                          .ordered(OrderType.BY_CALL)
+                          .parallelRange(0, (short) 4)
+                          .afterMax(seconds(3))
+                          .all()).containsExactly(0, 1, 2, 3, 4);
+        assertThat(Streams.streamOf()
+                          .ordered(OrderType.BY_CALL)
                           .parallelRange((byte) 0, (short) 4)
                           .afterMax(seconds(3))
                           .all()).containsExactly((short) 0, (short) 1, (short) 2, (short) 3,
                                                   (short) 4);
         assertThat(Streams.streamOf()
-                          .ordered()
+                          .ordered(OrderType.BY_CALL)
                           .parallelRange((byte) 0, (byte) 5)
                           .afterMax(seconds(3))
                           .all()).containsExactly((byte) 0, (byte) 1, (byte) 2, (byte) 3, (byte) 4,

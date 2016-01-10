@@ -84,17 +84,21 @@ public class ConsumerWrapper<IN> implements Consumer<IN> {
      * @return the composed consumer.
      */
     @NotNull
+    @SuppressWarnings("ConstantConditions")
     public ConsumerWrapper<IN> andThen(@NotNull final Consumer<? super IN> after) {
 
-        final Class<? extends Consumer> consumerClass = after.getClass();
         final List<Consumer<?>> consumers = mConsumers;
         final ArrayList<Consumer<?>> newConsumers =
                 new ArrayList<Consumer<?>>(consumers.size() + 1);
         newConsumers.addAll(consumers);
 
-        if (consumerClass == ConsumerWrapper.class) {
+        if (after instanceof ConsumerWrapper) {
 
             newConsumers.addAll(((ConsumerWrapper<?>) after).mConsumers);
+
+        } else if (after == null) {
+
+            throw new NullPointerException("the consumer must not be null");
 
         } else {
 

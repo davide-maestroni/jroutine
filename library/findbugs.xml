@@ -11,59 +11,6 @@
         <Bug pattern="IT_NO_SUCH_ELEMENT"/>
     </Match>
     <Match>
-        <Class name="com.github.dm.jrt.function.BiConsumerWrapper"/>
-        <Method name="andThen"/>
-        <Bug pattern="BC_UNCONFIRMED_CAST"/>
-    </Match>
-    <Match>
-        <Class name="com.github.dm.jrt.function.BiFunctionWrapper"/>
-        <Method name="andThen"/>
-        <Bug pattern="BC_UNCONFIRMED_CAST"/>
-    </Match>
-    <Match>
-        <Class name="com.github.dm.jrt.function.ConsumerWrapper"/>
-        <Method name="andThen"/>
-        <Bug pattern="BC_UNCONFIRMED_CAST"/>
-    </Match>
-    <Match>
-        <Class name="com.github.dm.jrt.function.FunctionWrapper"/>
-        <Or>
-            <Method name="andThen"/>
-            <Method name="compose"/>
-        </Or>
-        <Bug pattern="BC_UNCONFIRMED_CAST"/>
-    </Match>
-    <Match>
-        <Class name="com.github.dm.jrt.function.FunctionWrapper"/>
-        <Method name="equals"/>
-        <Bug pattern="EQ_GETCLASS_AND_CLASS_CONSTANT"/>
-    </Match>
-    <Match>
-        <Class name="com.github.dm.jrt.function.PredicateWrapper"/>
-        <Or>
-            <Method name="and"/>
-            <Method name="or"/>
-        </Or>
-        <Bug pattern="BC_UNCONFIRMED_CAST"/>
-    </Match>
-    <Match>
-        <Class name="com.github.dm.jrt.function.SupplierWrapper"/>
-        <Method name="andThen"/>
-        <Bug pattern="BC_UNCONFIRMED_CAST"/>
-    </Match>
-    <Match>
-        <Class name="com.github.dm.jrt.function.Functions"/>
-        <Or>
-            <Method name="wrapBiConsumer"/>
-            <Method name="wrapBiFunction"/>
-            <Method name="wrapConsumer"/>
-            <Method name="wrapFunction"/>
-            <Method name="wrapPredicate"/>
-            <Method name="wrapSupplier"/>
-        </Or>
-        <Bug pattern="BC_UNCONFIRMED_CAST"/>
-    </Match>
-    <Match>
         <Class name="com.github.dm.jrt.util.TimeDuration"/>
         <Or>
             <Method name="wait"/>

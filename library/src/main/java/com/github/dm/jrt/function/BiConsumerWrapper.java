@@ -86,18 +86,22 @@ public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2> {
      * @return the composed bi-consumer.
      */
     @NotNull
+    @SuppressWarnings("ConstantConditions")
     public BiConsumerWrapper<IN1, IN2> andThen(
             @NotNull final BiConsumer<? super IN1, ? super IN2> after) {
 
-        final Class<? extends BiConsumer> consumerClass = after.getClass();
         final List<BiConsumer<?, ?>> consumers = mConsumers;
         final ArrayList<BiConsumer<?, ?>> newConsumers =
                 new ArrayList<BiConsumer<?, ?>>(consumers.size() + 1);
         newConsumers.addAll(consumers);
 
-        if (consumerClass == BiConsumerWrapper.class) {
+        if (after instanceof BiConsumerWrapper) {
 
             newConsumers.addAll(((BiConsumerWrapper<?, ?>) after).mConsumers);
+
+        } else if (after == null) {
+
+            throw new NullPointerException("the consumer must not be null");
 
         } else {
 

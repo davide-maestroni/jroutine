@@ -217,9 +217,9 @@ public class PredicateWrapper<IN> implements Predicate<IN> {
      * @return the composed predicate.
      */
     @NotNull
+    @SuppressWarnings("ConstantConditions")
     public PredicateWrapper<IN> and(@NotNull final Predicate<? super IN> other) {
 
-        final Class<? extends Predicate> otherClass = other.getClass();
         final List<Predicate<?>> predicates = mPredicates;
         final ArrayList<Predicate<?>> newPredicates =
                 new ArrayList<Predicate<?>>(predicates.size() + 4);
@@ -227,9 +227,13 @@ public class PredicateWrapper<IN> implements Predicate<IN> {
         newPredicates.addAll(predicates);
         newPredicates.add(AND_PREDICATE);
 
-        if (otherClass == PredicateWrapper.class) {
+        if (other instanceof PredicateWrapper) {
 
             newPredicates.addAll(((PredicateWrapper<?>) other).mPredicates);
+
+        } else if (other == null) {
+
+            throw new NullPointerException("the predicate must not be null");
 
         } else {
 
@@ -324,9 +328,9 @@ public class PredicateWrapper<IN> implements Predicate<IN> {
      * @return the composed predicate.
      */
     @NotNull
+    @SuppressWarnings("ConstantConditions")
     public PredicateWrapper<IN> or(@NotNull final Predicate<? super IN> other) {
 
-        final Class<? extends Predicate> otherClass = other.getClass();
         final List<Predicate<?>> predicates = mPredicates;
         final ArrayList<Predicate<?>> newPredicates =
                 new ArrayList<Predicate<?>>(predicates.size() + 4);
@@ -334,9 +338,13 @@ public class PredicateWrapper<IN> implements Predicate<IN> {
         newPredicates.addAll(predicates);
         newPredicates.add(OR_PREDICATE);
 
-        if (otherClass == PredicateWrapper.class) {
+        if (other instanceof PredicateWrapper) {
 
             newPredicates.addAll(((PredicateWrapper<?>) other).mPredicates);
+
+        } else if (other == null) {
+
+            throw new NullPointerException("the predicate must not be null");
 
         } else {
 

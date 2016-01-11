@@ -35,6 +35,8 @@ import java.util.concurrent.TimeUnit;
  */
 class DefaultIOChannelBuilder implements IOChannelBuilder, Configurable<IOChannelBuilder> {
 
+    private static final Runner sSyncRunner = Runners.syncRunner();
+
     private ChannelConfiguration mConfiguration = ChannelConfiguration.DEFAULT_CONFIGURATION;
 
     /**
@@ -110,7 +112,7 @@ class DefaultIOChannelBuilder implements IOChannelBuilder, Configurable<IOChanne
 
             if (delay == 0) {
 
-                execution.run();
+                sSyncRunner.run(execution, delay, timeUnit);
 
             } else {
 

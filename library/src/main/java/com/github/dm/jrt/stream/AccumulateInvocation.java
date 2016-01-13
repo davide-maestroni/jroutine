@@ -104,7 +104,7 @@ class AccumulateInvocation<IN> extends TemplateInvocation<IN, IN> {
      */
     private static class AccumulateInvocationFactory<IN> extends InvocationFactory<IN, IN> {
 
-        private final BiFunction<? super IN, ? super IN, ? extends IN> mFunction;
+        private final BiFunctionWrapper<? super IN, ? super IN, ? extends IN> mFunction;
 
         /**
          * Constructor.
@@ -120,7 +120,7 @@ class AccumulateInvocation<IN> extends TemplateInvocation<IN, IN> {
         @Override
         public int hashCode() {
 
-            return mFunction.hashCode();
+            return mFunction.typeHashCode();
         }
 
         @Override
@@ -137,7 +137,7 @@ class AccumulateInvocation<IN> extends TemplateInvocation<IN, IN> {
             }
 
             final AccumulateInvocationFactory<?> that = (AccumulateInvocationFactory<?>) o;
-            return mFunction.equals(that.mFunction);
+            return mFunction.typeEquals(that.mFunction);
         }
 
         @NotNull

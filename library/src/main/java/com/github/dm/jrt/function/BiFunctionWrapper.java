@@ -241,6 +241,46 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
         return mBiFunction.equals(that.mBiFunction) && mFunction.equals(that.mFunction);
     }
 
+    /**
+     * Extra implementation of {@code equals()} checking for wrapped function classes rather than
+     * instances equality.<br/>
+     * In most cases the wrapped functions are instances of anonymous classes, as a consequence the
+     * standard equality test will always fail.
+     *
+     * @param o the reference object with which to compare.
+     * @return whether the wrapped functions share the same classes in the same order.
+     */
+    public boolean typeEquals(final Object o) {
+
+        if (this == o) {
+
+            return true;
+        }
+
+        if (!(o instanceof BiFunctionWrapper)) {
+
+            return false;
+        }
+
+        final BiFunctionWrapper<?, ?, ?> that = (BiFunctionWrapper<?, ?, ?>) o;
+        return mBiFunction.getClass().equals(that.mBiFunction.getClass())
+                && mFunction.typeEquals(that.mFunction);
+    }
+
+    /**
+     * Extra implementation of {@code hashCode()} employing wrapped function class rather than
+     * instance hash codes.
+     *
+     * @return the cumulative hash code of the wrapped functions.
+     * @see #typeEquals(Object)
+     */
+    public int typeHashCode() {
+
+        int result = mBiFunction.getClass().hashCode();
+        result = 31 * result + mFunction.typeHashCode();
+        return result;
+    }
+
     @SuppressWarnings("unchecked")
     public OUT apply(final IN1 in1, final IN2 in2) {
 

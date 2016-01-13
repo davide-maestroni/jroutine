@@ -19,7 +19,7 @@ import com.github.dm.jrt.android.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
 import com.github.dm.jrt.android.v4.core.ChannelsCompat;
 import com.github.dm.jrt.android.v4.core.JRoutineCompat;
-import com.github.dm.jrt.android.v4.core.JRoutineCompat.ContextBuilder;
+import com.github.dm.jrt.android.v4.core.JRoutineCompat.ContextBuilderCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
@@ -31,9 +31,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.WeakHashMap;
 
 import static com.github.dm.jrt.android.core.DelegatingContextInvocation.factoryFrom;
 import static com.github.dm.jrt.function.Functions.wrapFunction;
+import static com.github.dm.jrt.stream.Streams.streamOf;
 
 /**
  * Utility class acting as a factory of stream output channels.
@@ -41,6 +43,9 @@ import static com.github.dm.jrt.function.Functions.wrapFunction;
  * Created by davide-maestroni on 01/04/2016.
  */
 public class StreamsCompat extends ChannelsCompat {
+
+    private static final WeakHashMap<LoaderContextCompat, StreamContextBuilder> sBuilders =
+            new WeakHashMap<LoaderContextCompat, StreamContextBuilder>();
 
     /**
      * Avoid direct instantiation.
@@ -130,7 +135,7 @@ public class StreamsCompat extends ChannelsCompat {
                     StreamOutputChannel<? extends OUT>> function) {
 
         return factoryFrom(com.github.dm.jrt.stream.Streams.on(function),
-                           wrapFunction(function).hashCode(), DelegationType.SYNC);
+                           wrapFunction(function).typeHashCode(), DelegationType.SYNC);
     }
 
     /**
@@ -156,7 +161,7 @@ public class StreamsCompat extends ChannelsCompat {
      * @param channels the list of channels.
      * @param <OUT>    the output data type.
      * @return the output channel.
-     * @throws IllegalArgumentException if the specified list is empty.
+     * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @NotNull
     public static <OUT> StreamOutputChannel<List<? extends OUT>> join(
@@ -174,7 +179,7 @@ public class StreamsCompat extends ChannelsCompat {
      * @param channels the array of channels.
      * @param <OUT>    the output data type.
      * @return the stream channel.
-     * @throws IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
     public static <OUT> StreamOutputChannel<List<? extends OUT>> join(
@@ -196,7 +201,7 @@ public class StreamsCompat extends ChannelsCompat {
      * @param channels    the list of channels.
      * @param <OUT>       the output data type.
      * @return the stream channel.
-     * @throws IllegalArgumentException if the specified list is empty.
+     * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @NotNull
     public static <OUT> StreamOutputChannel<List<? extends OUT>> joinAndFlush(
@@ -219,7 +224,7 @@ public class StreamsCompat extends ChannelsCompat {
      * @param channels    the array of channels.
      * @param <OUT>       the output data type.
      * @return the stream channel.
-     * @throws IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
     public static <OUT> StreamOutputChannel<List<? extends OUT>> joinAndFlush(
@@ -250,7 +255,7 @@ public class StreamsCompat extends ChannelsCompat {
      * @param channels   the list of channels.
      * @param <OUT>      the output data type.
      * @return the selectable stream channel.
-     * @throws IllegalArgumentException if the specified list is empty.
+     * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @NotNull
     public static <OUT> StreamOutputChannel<? extends ParcelableSelectable<OUT>> merge(
@@ -268,7 +273,7 @@ public class StreamsCompat extends ChannelsCompat {
      * @param channels   the array of channels.
      * @param <OUT>      the output data type.
      * @return the selectable stream channel.
-     * @throws IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
     public static <OUT> StreamOutputChannel<? extends ParcelableSelectable<OUT>> merge(
@@ -285,7 +290,7 @@ public class StreamsCompat extends ChannelsCompat {
      * @param channels the channels to merge.
      * @param <OUT>    the output data type.
      * @return the selectable stream channel.
-     * @throws IllegalArgumentException if the specified list is empty.
+     * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @NotNull
     public static <OUT> StreamOutputChannel<? extends ParcelableSelectable<OUT>> merge(
@@ -302,7 +307,7 @@ public class StreamsCompat extends ChannelsCompat {
      * @param channels the channels to merge.
      * @param <OUT>    the output data type.
      * @return the selectable stream channel.
-     * @throws IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
     public static <OUT> StreamOutputChannel<? extends ParcelableSelectable<OUT>> merge(
@@ -318,7 +323,7 @@ public class StreamsCompat extends ChannelsCompat {
      * @param channelMap the map of indexes and output channels.
      * @param <OUT>      the output data type.
      * @return the selectable output channel.
-     * @throws IllegalArgumentException if the specified map is empty.
+     * @throws java.lang.IllegalArgumentException if the specified map is empty.
      */
     @NotNull
     public static <OUT> StreamOutputChannel<? extends ParcelableSelectable<OUT>> merge(
@@ -341,73 +346,6 @@ public class StreamsCompat extends ChannelsCompat {
     }
 
     /**
-     * Builds and returns a new stream output channel.
-     *
-     * @param <OUT> the output data type.
-     * @return the newly created channel instance.
-     */
-    @NotNull
-    public static <OUT> StreamOutputChannel<OUT> streamOf() {
-
-        return com.github.dm.jrt.stream.Streams.streamOf();
-    }
-
-    /**
-     * Builds and returns a new stream output channel generating the specified outputs.
-     *
-     * @param outputs the iterable returning the output data.
-     * @param <OUT>   the output data type.
-     * @return the newly created channel instance.
-     */
-    @NotNull
-    public static <OUT> StreamOutputChannel<OUT> streamOf(@Nullable final Iterable<OUT> outputs) {
-
-        return com.github.dm.jrt.stream.Streams.streamOf(outputs);
-    }
-
-    /**
-     * Builds and returns a new stream output channel generating the specified output.
-     *
-     * @param output the output.
-     * @param <OUT>  the output data type.
-     * @return the newly created channel instance.
-     */
-    @NotNull
-    public static <OUT> StreamOutputChannel<OUT> streamOf(@Nullable final OUT output) {
-
-        return com.github.dm.jrt.stream.Streams.streamOf(output);
-    }
-
-    /**
-     * Builds and returns a new stream output channel generating the specified outputs.
-     *
-     * @param outputs the output data.
-     * @param <OUT>   the output data type.
-     * @return the newly created channel instance.
-     */
-    @NotNull
-    public static <OUT> StreamOutputChannel<OUT> streamOf(@Nullable final OUT... outputs) {
-
-        return com.github.dm.jrt.stream.Streams.streamOf(outputs);
-    }
-
-    /**
-     * Builds and returns a new stream output channel generating the specified outputs.
-     * <p/>
-     * Note that the output channel will be bound as a result of the call.
-     *
-     * @param output the output channel returning the output data.
-     * @param <OUT>  the output data type.
-     * @return the newly created channel instance.
-     */
-    @NotNull
-    public static <OUT> StreamOutputChannel<OUT> streamOf(
-            @NotNull final OutputChannel<OUT> output) {
-
-        return com.github.dm.jrt.stream.Streams.streamOf(output);
-    }
-
-    /**
      * Returns a context based builder of loader routine builders.
      *
      * @param context the loader context.
@@ -416,7 +354,25 @@ public class StreamsCompat extends ChannelsCompat {
     @NotNull
     public static StreamContextBuilder with(@NotNull final LoaderContextCompat context) {
 
-        return new StreamContextBuilder(JRoutineCompat.with(context));
+        synchronized (sBuilders) {
+
+            final WeakHashMap<LoaderContextCompat, StreamContextBuilder> builders = sBuilders;
+            StreamContextBuilder contextBuilder = builders.get(context);
+
+            if (contextBuilder == null) {
+
+                contextBuilder = new StreamContextBuilder(JRoutineCompat.with(context));
+                builders.put(context, contextBuilder);
+            }
+
+            return contextBuilder;
+        }
+    }
+
+    @NotNull
+    public static StreamContextBuilder within(@NotNull final LoaderContextCompat context) {
+
+        return with(context);
     }
 
     /**
@@ -424,14 +380,14 @@ public class StreamsCompat extends ChannelsCompat {
      */
     public static class StreamContextBuilder {
 
-        private final ContextBuilder mContextBuilder;
+        private final ContextBuilderCompat mContextBuilder;
 
         /**
          * Constructor.
          *
          * @param builder the context builder.
          */
-        private StreamContextBuilder(@NotNull final ContextBuilder builder) {
+        private StreamContextBuilder(@NotNull final ContextBuilderCompat builder) {
 
             mContextBuilder = builder;
         }
@@ -453,6 +409,72 @@ public class StreamsCompat extends ChannelsCompat {
                         StreamOutputChannel<? extends OUT>> function) {
 
             return mContextBuilder.on(factory(function));
+        }
+
+        /**
+         * Builds and returns a new stream output channel.
+         *
+         * @param <OUT> the output data type.
+         * @return the newly created channel instance.
+         */
+        @NotNull
+        public <OUT> StreamOutputChannel<OUT> streamOf() {
+
+            return streamOf(JRoutineCompat.io().<OUT>buildChannel().close());
+        }
+
+        /**
+         * Builds and returns a new stream output channel generating the specified outputs.
+         *
+         * @param outputs the iterable returning the output data.
+         * @param <OUT>   the output data type.
+         * @return the newly created channel instance.
+         */
+        @NotNull
+        public <OUT> StreamOutputChannel<OUT> streamOf(@Nullable final Iterable<OUT> outputs) {
+
+            return streamOf(JRoutineCompat.io().of(outputs));
+        }
+
+        /**
+         * Builds and returns a new stream output channel generating the specified output.
+         *
+         * @param output the output.
+         * @param <OUT>  the output data type.
+         * @return the newly created channel instance.
+         */
+        @NotNull
+        public <OUT> StreamOutputChannel<OUT> streamOf(@Nullable final OUT output) {
+
+            return streamOf(JRoutineCompat.io().of(output));
+        }
+
+        /**
+         * Builds and returns a new stream output channel generating the specified outputs.
+         *
+         * @param outputs the output data.
+         * @param <OUT>   the output data type.
+         * @return the newly created channel instance.
+         */
+        @NotNull
+        public <OUT> StreamOutputChannel<OUT> streamOf(@Nullable final OUT... outputs) {
+
+            return streamOf(JRoutineCompat.io().of(outputs));
+        }
+
+        /**
+         * Builds and returns a new stream output channel generating the specified outputs.
+         * <p/>
+         * Note that the output channel will be bound as a result of the call.
+         *
+         * @param output the output channel returning the output data.
+         * @param <OUT>  the output data type.
+         * @return the newly created channel instance.
+         */
+        @NotNull
+        public <OUT> StreamOutputChannel<OUT> streamOf(@NotNull final OutputChannel<OUT> output) {
+
+            return new DefaultLoaderStreamOutputChannel<OUT>(mContextBuilder, output);
         }
     }
 }

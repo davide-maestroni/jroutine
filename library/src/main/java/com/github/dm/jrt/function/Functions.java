@@ -638,7 +638,7 @@ public class Functions {
         @Override
         public int hashCode() {
 
-            return mConsumer.hashCode();
+            return mConsumer.typeHashCode();
         }
 
         @Override
@@ -655,7 +655,7 @@ public class Functions {
             }
 
             final ConsumerCommandInvocation<?> that = (ConsumerCommandInvocation<?>) o;
-            return mConsumer.equals(that.mConsumer);
+            return mConsumer.typeEquals(that.mConsumer);
         }
 
         public void onResult(@NotNull final ResultChannel<OUT> result) {
@@ -693,7 +693,7 @@ public class Functions {
         @Override
         public int hashCode() {
 
-            return mConsumer.hashCode();
+            return mConsumer.typeHashCode();
         }
 
         @Override
@@ -710,7 +710,7 @@ public class Functions {
             }
 
             final ConsumerFilterInvocation<?, ?> that = (ConsumerFilterInvocation<?, ?>) o;
-            return mConsumer.equals(that.mConsumer);
+            return mConsumer.typeEquals(that.mConsumer);
         }
     }
 
@@ -758,7 +758,7 @@ public class Functions {
         @Override
         public int hashCode() {
 
-            return mConsumer.hashCode();
+            return mConsumer.typeHashCode();
         }
 
         @Override
@@ -775,7 +775,7 @@ public class Functions {
             }
 
             final ConsumerInvocationFactory<?, ?> that = (ConsumerInvocationFactory<?, ?>) o;
-            return mConsumer.equals(that.mConsumer);
+            return mConsumer.typeEquals(that.mConsumer);
         }
     }
 
@@ -803,7 +803,7 @@ public class Functions {
         @Override
         public int hashCode() {
 
-            return mFunction.hashCode();
+            return mFunction.typeHashCode();
         }
 
         @Override
@@ -820,7 +820,7 @@ public class Functions {
             }
 
             final FunctionFilterInvocation<?, ?> that = (FunctionFilterInvocation<?, ?>) o;
-            return mFunction.equals(that.mFunction);
+            return mFunction.typeEquals(that.mFunction);
         }
 
         public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
@@ -872,7 +872,7 @@ public class Functions {
         @Override
         public int hashCode() {
 
-            return mFunction.hashCode();
+            return mFunction.typeHashCode();
         }
 
         @Override
@@ -889,7 +889,7 @@ public class Functions {
             }
 
             final FunctionInvocationFactory<?, ?> that = (FunctionInvocationFactory<?, ?>) o;
-            return mFunction.equals(that.mFunction);
+            return mFunction.typeEquals(that.mFunction);
         }
     }
 
@@ -915,7 +915,7 @@ public class Functions {
         @Override
         public int hashCode() {
 
-            return mPredicate.hashCode();
+            return mPredicate.typeHashCode();
         }
 
         @Override
@@ -932,7 +932,7 @@ public class Functions {
             }
 
             final PredicateFilterInvocation<?> that = (PredicateFilterInvocation<?>) o;
-            return mPredicate.equals(that.mPredicate);
+            return mPredicate.typeEquals(that.mPredicate);
         }
 
         public void onInput(final IN input, @NotNull final ResultChannel<IN> result) {
@@ -966,7 +966,7 @@ public class Functions {
         @Override
         public int hashCode() {
 
-            return mSupplier.hashCode();
+            return mSupplier.typeHashCode();
         }
 
         @Override
@@ -983,7 +983,7 @@ public class Functions {
             }
 
             final SupplierCommandInvocation<?> that = (SupplierCommandInvocation<?>) o;
-            return mSupplier.equals(that.mSupplier);
+            return mSupplier.typeEquals(that.mSupplier);
         }
 
         public void onResult(@NotNull final ResultChannel<OUT> result) {
@@ -1036,13 +1036,13 @@ public class Functions {
             }
 
             final SupplierInvocationFactory<?, ?> that = (SupplierInvocationFactory<?, ?>) o;
-            return mSupplier.equals(that.mSupplier);
+            return mSupplier.typeEquals(that.mSupplier);
         }
 
         @Override
         public int hashCode() {
 
-            return mSupplier.hashCode();
+            return mSupplier.typeHashCode();
         }
     }
 }

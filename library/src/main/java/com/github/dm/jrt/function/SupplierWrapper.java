@@ -101,6 +101,46 @@ public class SupplierWrapper<OUT> implements Supplier<OUT> {
     }
 
     /**
+     * Extra implementation of {@code equals()} checking for wrapped supplier classes rather than
+     * instances equality.<br/>
+     * In most cases the wrapped suppliers are instances of anonymous classes, as a consequence the
+     * standard equality test will always fail.
+     *
+     * @param o the reference object with which to compare.
+     * @return whether the wrapped suppliers share the same classes in the same order.
+     */
+    public boolean typeEquals(final Object o) {
+
+        if (this == o) {
+
+            return true;
+        }
+
+        if (!(o instanceof SupplierWrapper)) {
+
+            return false;
+        }
+
+        final SupplierWrapper<?> that = (SupplierWrapper<?>) o;
+        return mFunction.typeEquals(that.mFunction) && mSupplier.getClass()
+                                                                .equals(that.mSupplier.getClass());
+    }
+
+    /**
+     * Extra implementation of {@code hashCode()} employing wrapped supplier class rather than
+     * instance hash codes.
+     *
+     * @return the cumulative hash code of the wrapped suppliers.
+     * @see #typeEquals(Object)
+     */
+    public int typeHashCode() {
+
+        int result = mFunction.typeHashCode();
+        result = 31 * result + mSupplier.getClass().hashCode();
+        return result;
+    }
+
+    /**
      * Supplier implementation returning always the same object.
      *
      * @param <OUT> the output data type.

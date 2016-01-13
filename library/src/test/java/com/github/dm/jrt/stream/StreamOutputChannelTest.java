@@ -1114,9 +1114,9 @@ public class StreamOutputChannelTest {
                               .withStreamInvocations()
                               .withRunner(mSingleThreadRunner)
                               .withInputLimit(2)
-                              .withInputMaxDelay(seconds(10))
+                              .withInputMaxDelay(seconds(3))
                               .withOutputLimit(2)
-                              .withOutputMaxDelay(seconds(10))
+                              .withOutputMaxDelay(seconds(3))
                               .set()
                               .asyncMap(Functions.<Number>identity())
                               .asyncMap(new Function<Number, Double>() {
@@ -1166,7 +1166,7 @@ public class StreamOutputChannelTest {
                               .withStreamInvocations()
                               .withRunner(mSingleThreadRunner)
                               .withOutputLimit(2)
-                              .withOutputMaxDelay(seconds(10))
+                              .withOutputMaxDelay(seconds(3))
                               .set()
                               .asyncMap(Functions.<Number>identity())
                               .asyncMap(new Function<Number, Double>() {
@@ -1214,7 +1214,7 @@ public class StreamOutputChannelTest {
                               .withStreamInvocations()
                               .withRunner(mSingleThreadRunner)
                               .withInputLimit(2)
-                              .withInputMaxDelay(seconds(10))
+                              .withInputMaxDelay(seconds(3))
                               .set()
                               .asyncMap(Functions.<Number>identity())
                               .asyncMap(new Function<Number, Double>() {

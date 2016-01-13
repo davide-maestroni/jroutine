@@ -356,6 +356,83 @@ public class PredicateWrapper<IN> implements Predicate<IN> {
     }
 
     /**
+     * Extra implementation of {@code equals()} checking for wrapped predicate classes rather than
+     * instances equality.<br/>
+     * In most cases the wrapped predicates are instances of anonymous classes, as a consequence the
+     * standard equality test will always fail.
+     *
+     * @param o the reference object with which to compare.
+     * @return whether the wrapped predicates share the same classes in the same order.
+     */
+    public boolean typeEquals(final Object o) {
+
+        if (this == o) {
+
+            return true;
+        }
+
+        if (!(o instanceof PredicateWrapper)) {
+
+            return false;
+        }
+
+        final PredicateWrapper<?> that = (PredicateWrapper<?>) o;
+        final List<Predicate<?>> thisPredicates = mPredicates;
+        final List<Predicate<?>> thatPredicates = that.mPredicates;
+        final int size = thisPredicates.size();
+
+        if (size != thatPredicates.size()) {
+
+            return false;
+        }
+
+        for (int i = 0; i < size; ++i) {
+
+            final Predicate<?> predicate = thisPredicates.get(i);
+
+            if (predicate instanceof LogicalPredicate) {
+
+                if (!predicate.equals(thatPredicates.get(i))) {
+
+                    return false;
+                }
+
+            } else if (!predicate.getClass().equals(thatPredicates.get(i).getClass())) {
+
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Extra implementation of {@code hashCode()} employing wrapped predicate class rather than
+     * instance hash codes.
+     *
+     * @return the cumulative hash code of the wrapped predicates.
+     * @see #typeEquals(Object)
+     */
+    public int typeHashCode() {
+
+        int result = 0;
+
+        for (final Predicate<?> predicate : mPredicates) {
+
+            if (predicate instanceof LogicalPredicate) {
+
+                result += result * 31 + predicate.hashCode();
+
+            } else {
+
+                result += result * 31 + predicate.getClass().hashCode();
+            }
+        }
+
+        return result;
+    }
+
+    /**
      * Predicate implementation logically-ANDing the wrapped ones.
      *
      * @param <IN> the input data type.

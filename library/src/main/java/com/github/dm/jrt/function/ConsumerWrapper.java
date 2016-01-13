@@ -131,6 +131,67 @@ public class ConsumerWrapper<IN> implements Consumer<IN> {
         return mConsumers.equals(that.mConsumers);
     }
 
+    /**
+     * Extra implementation of {@code equals()} checking for wrapped consumer classes rather than
+     * instances equality.<br/>
+     * In most cases the wrapped consumers are instances of anonymous classes, as a consequence the
+     * standard equality test will always fail.
+     *
+     * @param o the reference object with which to compare.
+     * @return whether the wrapped consumers share the same classes in the same order.
+     */
+    public boolean typeEquals(final Object o) {
+
+        if (this == o) {
+
+            return true;
+        }
+
+        if (!(o instanceof ConsumerWrapper)) {
+
+            return false;
+        }
+
+        final ConsumerWrapper<?> that = (ConsumerWrapper<?>) o;
+        final List<Consumer<?>> thisConsumers = mConsumers;
+        final List<Consumer<?>> thatConsumers = that.mConsumers;
+        final int size = thisConsumers.size();
+
+        if (size != thatConsumers.size()) {
+
+            return false;
+        }
+
+        for (int i = 0; i < size; ++i) {
+
+            if (!thisConsumers.get(i).getClass().equals(thatConsumers.get(i).getClass())) {
+
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Extra implementation of {@code hashCode()} employing wrapped consumer class rather than
+     * instance hash codes.
+     *
+     * @return the cumulative hash code of the wrapped consumers.
+     * @see #typeEquals(Object)
+     */
+    public int typeHashCode() {
+
+        int result = 0;
+
+        for (final Consumer<?> consumer : mConsumers) {
+
+            result += result * 31 + consumer.getClass().hashCode();
+        }
+
+        return result;
+    }
+
     @SuppressWarnings("unchecked")
     public void accept(final IN in) {
 

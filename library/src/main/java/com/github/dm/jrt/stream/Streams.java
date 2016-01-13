@@ -21,6 +21,7 @@ import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.core.Channels;
 import com.github.dm.jrt.core.JRoutine;
 import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.function.FunctionWrapper;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.invocation.TemplateInvocation;
@@ -31,6 +32,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static com.github.dm.jrt.function.Functions.wrapFunction;
 
 /**
  * Utility class acting as a factory of stream output channels.
@@ -126,7 +129,7 @@ public class Streams extends Channels {
             @NotNull final Function<? super StreamOutputChannel<? extends IN>, ? extends
                     StreamOutputChannel<? extends OUT>> function) {
 
-        return new StreamInvocationFactory<IN, OUT>(function);
+        return new StreamInvocationFactory<IN, OUT>(wrapFunction(function));
     }
 
     /**
@@ -498,11 +501,34 @@ public class Streams extends Channels {
             mSize = size;
         }
 
+        @Override
+        public int hashCode() {
+
+            return mSize;
+        }
+
         @NotNull
         @Override
         public Invocation<DATA, List<DATA>> newInvocation() {
 
             return new GroupByInvocation<DATA>(mSize);
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if (!(o instanceof GroupByInvocationFactory)) {
+
+                return false;
+            }
+
+            final GroupByInvocationFactory<?> that = (GroupByInvocationFactory<?>) o;
+            return mSize == that.mSize;
         }
     }
 
@@ -561,6 +587,29 @@ public class Streams extends Channels {
         private LimitInvocationFactory(final int count) {
 
             mCount = count;
+        }
+
+        @Override
+        public int hashCode() {
+
+            return mCount;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if (!(o instanceof LimitInvocationFactory)) {
+
+                return false;
+            }
+
+            final LimitInvocationFactory<?> that = (LimitInvocationFactory<?>) o;
+            return mCount == that.mCount;
         }
 
         @NotNull
@@ -629,6 +678,29 @@ public class Streams extends Channels {
         private SkipInvocationFactory(final int count) {
 
             mCount = count;
+        }
+
+        @Override
+        public int hashCode() {
+
+            return mCount;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+
+            }
+            if (!(o instanceof SkipInvocationFactory)) {
+
+                return false;
+            }
+
+            final SkipInvocationFactory<?> that = (SkipInvocationFactory<?>) o;
+            return mCount == that.mCount;
         }
 
         @NotNull
@@ -721,7 +793,7 @@ public class Streams extends Channels {
      */
     private static class StreamInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
-        private final Function<? super StreamOutputChannel<? extends IN>, ? extends
+        private final FunctionWrapper<? super StreamOutputChannel<? extends IN>, ? extends
                 StreamOutputChannel<? extends OUT>> mFunction;
 
         /**
@@ -729,17 +801,34 @@ public class Streams extends Channels {
          *
          * @param function the function used to instantiate the stream output channel.
          */
-        @SuppressWarnings("ConstantConditions")
         private StreamInvocationFactory(
-                @NotNull final Function<? super StreamOutputChannel<? extends IN>, ? extends
+                @NotNull final FunctionWrapper<? super StreamOutputChannel<? extends IN>, ? extends
                         StreamOutputChannel<? extends OUT>> function) {
 
-            if (function == null) {
+            mFunction = function;
+        }
 
-                throw new NullPointerException("the function instance must not be null");
+        @Override
+        public int hashCode() {
+
+            return mFunction.typeHashCode();
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
             }
 
-            mFunction = function;
+            if (!(o instanceof StreamInvocationFactory)) {
+
+                return false;
+            }
+
+            final StreamInvocationFactory<?, ?> that = (StreamInvocationFactory<?, ?>) o;
+            return mFunction.typeEquals(that.mFunction);
         }
 
         @NotNull

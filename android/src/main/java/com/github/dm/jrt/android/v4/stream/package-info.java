@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 /**
- * Streams interfaces and utility classes with support for Android compatibility library.
+ * Streams implementation classes with support for Android compatibility library.
  * <p/>
  * Created by davide-maestroni on 01/04/2016.
  */

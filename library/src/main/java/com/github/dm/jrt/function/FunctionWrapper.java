@@ -195,6 +195,67 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT> {
     }
 
     /**
+     * Extra implementation of {@code equals()} checking for wrapped function classes rather than
+     * instances equality.<br/>
+     * In most cases the wrapped functions are instances of anonymous classes, as a consequence the
+     * standard equality test will always fail.
+     *
+     * @param o the reference object with which to compare.
+     * @return whether the wrapped functions share the same classes in the same order.
+     */
+    public boolean typeEquals(final Object o) {
+
+        if (this == o) {
+
+            return true;
+        }
+
+        if (!(o instanceof FunctionWrapper)) {
+
+            return false;
+        }
+
+        final FunctionWrapper<?, ?> that = (FunctionWrapper<?, ?>) o;
+        final List<Function<?, ?>> thisFunctions = mFunctions;
+        final List<Function<?, ?>> thatFunctions = that.mFunctions;
+        final int size = thisFunctions.size();
+
+        if (size != thatFunctions.size()) {
+
+            return false;
+        }
+
+        for (int i = 0; i < size; ++i) {
+
+            if (!thisFunctions.get(i).getClass().equals(thatFunctions.get(i).getClass())) {
+
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Extra implementation of {@code hashCode()} employing wrapped function class rather than
+     * instance hash codes.
+     *
+     * @return the cumulative hash code of the wrapped functions.
+     * @see #typeEquals(Object)
+     */
+    public int typeHashCode() {
+
+        int result = 0;
+
+        for (final Function<?, ?> function : mFunctions) {
+
+            result += result * 31 + function.getClass().hashCode();
+        }
+
+        return result;
+    }
+
+    /**
      * Function implementation casting inputs to the specified class.
      *
      * @param <IN>  the input data type.

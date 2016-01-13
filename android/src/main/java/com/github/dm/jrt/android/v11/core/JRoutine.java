@@ -21,6 +21,8 @@ import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.WeakHashMap;
+
 /**
  * Utility class extending the base one in order to support additional routine builders specific to
  * the Android platform.<br/>
@@ -138,6 +140,9 @@ import org.jetbrains.annotations.NotNull;
  */
 public class JRoutine extends com.github.dm.jrt.android.core.JRoutine {
 
+    private static final WeakHashMap<LoaderContext, ContextBuilder> sBuilders =
+            new WeakHashMap<LoaderContext, ContextBuilder>();
+
     /**
      * Returns a context based builder of loader routine builders.
      *
@@ -147,7 +152,19 @@ public class JRoutine extends com.github.dm.jrt.android.core.JRoutine {
     @NotNull
     public static ContextBuilder with(@NotNull final LoaderContext context) {
 
-        return new ContextBuilder(context);
+        synchronized (sBuilders) {
+
+            final WeakHashMap<LoaderContext, ContextBuilder> builders = sBuilders;
+            ContextBuilder contextBuilder = builders.get(context);
+
+            if (contextBuilder == null) {
+
+                contextBuilder = new ContextBuilder(context);
+                builders.put(context, contextBuilder);
+            }
+
+            return contextBuilder;
+        }
     }
 
     /**
@@ -167,7 +184,7 @@ public class JRoutine extends com.github.dm.jrt.android.core.JRoutine {
 
             if (context == null) {
 
-                throw new NullPointerException("the context must not be null");
+                throw new NullPointerException("the loader context must not be null");
             }
 
             mContext = context;

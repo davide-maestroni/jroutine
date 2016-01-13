@@ -22,6 +22,8 @@ import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.WeakHashMap;
+
 /**
  * Utility class extending the base one in order to support additional routine builders specific to
  * the Android platform.<br/>
@@ -136,6 +138,9 @@ import org.jetbrains.annotations.NotNull;
  */
 public class JRoutineCompat extends JRoutine {
 
+    private static final WeakHashMap<LoaderContextCompat, ContextBuilderCompat> sBuilders =
+            new WeakHashMap<LoaderContextCompat, ContextBuilderCompat>();
+
     /**
      * Returns a context based builder of loader routine builders.
      *
@@ -143,15 +148,27 @@ public class JRoutineCompat extends JRoutine {
      * @return the context builder.
      */
     @NotNull
-    public static ContextBuilder with(@NotNull final LoaderContextCompat context) {
+    public static ContextBuilderCompat with(@NotNull final LoaderContextCompat context) {
 
-        return new ContextBuilder(context);
+        synchronized (sBuilders) {
+
+            final WeakHashMap<LoaderContextCompat, ContextBuilderCompat> builders = sBuilders;
+            ContextBuilderCompat contextBuilder = builders.get(context);
+
+            if (contextBuilder == null) {
+
+                contextBuilder = new ContextBuilderCompat(context);
+                builders.put(context, contextBuilder);
+            }
+
+            return contextBuilder;
+        }
     }
 
     /**
      * Context based builder of loader routine builders.
      */
-    public static class ContextBuilder {
+    public static class ContextBuilderCompat {
 
         private final LoaderContextCompat mContext;
 
@@ -161,11 +178,11 @@ public class JRoutineCompat extends JRoutine {
          * @param context the loader context.
          */
         @SuppressWarnings("ConstantConditions")
-        private ContextBuilder(@NotNull final LoaderContextCompat context) {
+        private ContextBuilderCompat(@NotNull final LoaderContextCompat context) {
 
             if (context == null) {
 
-                throw new NullPointerException("the context must not be null");
+                throw new NullPointerException("the loader context must not be null");
             }
 
             mContext = context;

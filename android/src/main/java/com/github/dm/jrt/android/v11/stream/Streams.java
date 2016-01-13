@@ -31,9 +31,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.WeakHashMap;
 
 import static com.github.dm.jrt.android.core.DelegatingContextInvocation.factoryFrom;
 import static com.github.dm.jrt.function.Functions.wrapFunction;
+import static com.github.dm.jrt.stream.Streams.streamOf;
 
 /**
  * Utility class acting as a factory of stream output channels.
@@ -41,6 +43,9 @@ import static com.github.dm.jrt.function.Functions.wrapFunction;
  * Created by davide-maestroni on 01/02/2016.
  */
 public class Streams extends Channels {
+
+    private static final WeakHashMap<LoaderContext, StreamContextBuilder> sBuilders =
+            new WeakHashMap<LoaderContext, StreamContextBuilder>();
 
     /**
      * Avoid direct instantiation.
@@ -130,7 +135,7 @@ public class Streams extends Channels {
                     StreamOutputChannel<? extends OUT>> function) {
 
         return factoryFrom(com.github.dm.jrt.stream.Streams.on(function),
-                           wrapFunction(function).hashCode(), DelegationType.SYNC);
+                           wrapFunction(function).typeHashCode(), DelegationType.SYNC);
     }
 
     /**
@@ -341,73 +346,6 @@ public class Streams extends Channels {
     }
 
     /**
-     * Builds and returns a new stream output channel.
-     *
-     * @param <OUT> the output data type.
-     * @return the newly created channel instance.
-     */
-    @NotNull
-    public static <OUT> StreamOutputChannel<OUT> streamOf() {
-
-        return com.github.dm.jrt.stream.Streams.streamOf();
-    }
-
-    /**
-     * Builds and returns a new stream output channel generating the specified outputs.
-     *
-     * @param outputs the iterable returning the output data.
-     * @param <OUT>   the output data type.
-     * @return the newly created channel instance.
-     */
-    @NotNull
-    public static <OUT> StreamOutputChannel<OUT> streamOf(@Nullable final Iterable<OUT> outputs) {
-
-        return com.github.dm.jrt.stream.Streams.streamOf(outputs);
-    }
-
-    /**
-     * Builds and returns a new stream output channel generating the specified output.
-     *
-     * @param output the output.
-     * @param <OUT>  the output data type.
-     * @return the newly created channel instance.
-     */
-    @NotNull
-    public static <OUT> StreamOutputChannel<OUT> streamOf(@Nullable final OUT output) {
-
-        return com.github.dm.jrt.stream.Streams.streamOf(output);
-    }
-
-    /**
-     * Builds and returns a new stream output channel generating the specified outputs.
-     *
-     * @param outputs the output data.
-     * @param <OUT>   the output data type.
-     * @return the newly created channel instance.
-     */
-    @NotNull
-    public static <OUT> StreamOutputChannel<OUT> streamOf(@Nullable final OUT... outputs) {
-
-        return com.github.dm.jrt.stream.Streams.streamOf(outputs);
-    }
-
-    /**
-     * Builds and returns a new stream output channel generating the specified outputs.
-     * <p/>
-     * Note that the output channel will be bound as a result of the call.
-     *
-     * @param output the output channel returning the output data.
-     * @param <OUT>  the output data type.
-     * @return the newly created channel instance.
-     */
-    @NotNull
-    public static <OUT> StreamOutputChannel<OUT> streamOf(
-            @NotNull final OutputChannel<OUT> output) {
-
-        return com.github.dm.jrt.stream.Streams.streamOf(output);
-    }
-
-    /**
      * Returns a context based builder of loader routine builders.
      *
      * @param context the loader context.
@@ -416,7 +354,19 @@ public class Streams extends Channels {
     @NotNull
     public static StreamContextBuilder with(@NotNull final LoaderContext context) {
 
-        return new StreamContextBuilder(JRoutine.with(context));
+        synchronized (sBuilders) {
+
+            final WeakHashMap<LoaderContext, StreamContextBuilder> builders = sBuilders;
+            StreamContextBuilder contextBuilder = builders.get(context);
+
+            if (contextBuilder == null) {
+
+                contextBuilder = new StreamContextBuilder(JRoutine.with(context));
+                builders.put(context, contextBuilder);
+            }
+
+            return contextBuilder;
+        }
     }
 
     /**
@@ -453,6 +403,72 @@ public class Streams extends Channels {
                         StreamOutputChannel<? extends OUT>> function) {
 
             return mContextBuilder.on(factory(function));
+        }
+
+        /**
+         * Builds and returns a new stream output channel.
+         *
+         * @param <OUT> the output data type.
+         * @return the newly created channel instance.
+         */
+        @NotNull
+        public <OUT> StreamOutputChannel<OUT> streamOf() {
+
+            return streamOf(JRoutine.io().<OUT>buildChannel().close());
+        }
+
+        /**
+         * Builds and returns a new stream output channel generating the specified outputs.
+         *
+         * @param outputs the iterable returning the output data.
+         * @param <OUT>   the output data type.
+         * @return the newly created channel instance.
+         */
+        @NotNull
+        public <OUT> StreamOutputChannel<OUT> streamOf(@Nullable final Iterable<OUT> outputs) {
+
+            return streamOf(JRoutine.io().of(outputs));
+        }
+
+        /**
+         * Builds and returns a new stream output channel generating the specified output.
+         *
+         * @param output the output.
+         * @param <OUT>  the output data type.
+         * @return the newly created channel instance.
+         */
+        @NotNull
+        public <OUT> StreamOutputChannel<OUT> streamOf(@Nullable final OUT output) {
+
+            return streamOf(JRoutine.io().of(output));
+        }
+
+        /**
+         * Builds and returns a new stream output channel generating the specified outputs.
+         *
+         * @param outputs the output data.
+         * @param <OUT>   the output data type.
+         * @return the newly created channel instance.
+         */
+        @NotNull
+        public <OUT> StreamOutputChannel<OUT> streamOf(@Nullable final OUT... outputs) {
+
+            return streamOf(JRoutine.io().of(outputs));
+        }
+
+        /**
+         * Builds and returns a new stream output channel generating the specified outputs.
+         * <p/>
+         * Note that the output channel will be bound as a result of the call.
+         *
+         * @param output the output channel returning the output data.
+         * @param <OUT>  the output data type.
+         * @return the newly created channel instance.
+         */
+        @NotNull
+        public <OUT> StreamOutputChannel<OUT> streamOf(@NotNull final OutputChannel<OUT> output) {
+
+            return new DefaultLoaderStreamOutputChannel<OUT>(mContextBuilder, output);
         }
     }
 }

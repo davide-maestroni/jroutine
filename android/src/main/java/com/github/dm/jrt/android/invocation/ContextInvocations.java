@@ -184,6 +184,32 @@ public class ContextInvocations {
             mFactory = factory;
         }
 
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if (!(o instanceof AdaptingContextInvocationFactory)) {
+
+                return false;
+            }
+
+            final AdaptingContextInvocationFactory<?, ?> that =
+                    (AdaptingContextInvocationFactory<?, ?>) o;
+            return mContext.equals(that.mContext) && mFactory.equals(that.mFactory);
+        }
+
+        @Override
+        public int hashCode() {
+
+            int result = mContext.hashCode();
+            result = 31 * result + mFactory.hashCode();
+            return result;
+        }
+
         @NotNull
         @Override
         public Invocation<IN, OUT> newInvocation() {

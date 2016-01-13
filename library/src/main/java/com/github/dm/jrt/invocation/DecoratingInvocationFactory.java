@@ -43,6 +43,29 @@ public abstract class DecoratingInvocationFactory<IN, OUT> extends InvocationFac
         mFactory = wrapped;
     }
 
+    @Override
+    public int hashCode() {
+
+        return mFactory.hashCode();
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+
+        if (this == o) {
+
+            return true;
+        }
+
+        if (!(o instanceof DecoratingInvocationFactory)) {
+
+            return false;
+        }
+
+        final DecoratingInvocationFactory<?, ?> that = (DecoratingInvocationFactory<?, ?>) o;
+        return mFactory.equals(that.mFactory);
+    }
+
     @NotNull
     @Override
     public final Invocation<IN, OUT> newInvocation() {

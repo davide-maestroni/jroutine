@@ -27,7 +27,7 @@ import java.util.List;
  * @param <IN1> the first input data type.
  * @param <IN2> the second input data type.
  */
-public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2> {
+public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2>, Wrapper {
 
     private static final BiConsumerWrapper<Object, Object> sBiSink =
             new BiConsumerWrapper<Object, Object>(new BiConsumer<Object, Object>() {
@@ -134,16 +134,7 @@ public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2> {
         return mConsumers.equals(that.mConsumers);
     }
 
-    /**
-     * Extra implementation of {@code equals()} checking for wrapped consumer classes rather than
-     * instances equality.<br/>
-     * In most cases the wrapped consumers are instances of anonymous classes, as a consequence the
-     * standard equality test will always fail.
-     *
-     * @param o the reference object with which to compare.
-     * @return whether the wrapped consumers share the same classes in the same order.
-     */
-    public boolean typeEquals(final Object o) {
+    public boolean safeEquals(final Object o) {
 
         if (this == o) {
 
@@ -167,7 +158,20 @@ public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2> {
 
         for (int i = 0; i < size; ++i) {
 
-            if (!thisConsumers.get(i).getClass().equals(thatConsumers.get(i).getClass())) {
+            final BiConsumer<?, ?> thisConsumer = thisConsumers.get(i);
+            final BiConsumer<?, ?> thatConsumer = thatConsumers.get(i);
+            final Class<? extends BiConsumer> thisConsumerClass = thisConsumer.getClass();
+            final Class<? extends BiConsumer> thatConsumerClass = thatConsumer.getClass();
+
+            if (thisConsumerClass.isAnonymousClass()) {
+
+                if (!thatConsumerClass.isAnonymousClass() || !thisConsumerClass.equals(
+                        thatConsumerClass)) {
+
+                    return false;
+                }
+
+            } else if (thatConsumerClass.isAnonymousClass() || !thisConsumer.equals(thatConsumer)) {
 
                 return false;
             }
@@ -176,20 +180,15 @@ public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2> {
         return true;
     }
 
-    /**
-     * Extra implementation of {@code hashCode()} employing wrapped consumer class rather than
-     * instance hash codes.
-     *
-     * @return the cumulative hash code of the wrapped consumers.
-     * @see #typeEquals(Object)
-     */
-    public int typeHashCode() {
+    public int safeHashCode() {
 
         int result = 0;
 
         for (final BiConsumer<?, ?> consumer : mConsumers) {
 
-            result += result * 31 + consumer.getClass().hashCode();
+            final Class<? extends BiConsumer> consumerClass = consumer.getClass();
+            result += result * 31 + (consumerClass.isAnonymousClass() ? consumerClass.hashCode()
+                    : consumer.hashCode());
         }
 
         return result;

@@ -55,6 +55,7 @@ public class JRoutineProxy extends com.github.dm.jrt.android.proxy.core.JRoutine
     @NotNull
     public static ContextBuilder with(@NotNull final LoaderContext context) {
 
+        // TODO: 14/01/16 cache?
         return new ContextBuilder(context);
     }
 

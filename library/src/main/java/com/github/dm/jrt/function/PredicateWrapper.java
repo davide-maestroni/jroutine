@@ -27,7 +27,7 @@ import java.util.List;
  *
  * @param <IN> the input data type.
  */
-public class PredicateWrapper<IN> implements Predicate<IN> {
+public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
 
     private static final LogicalPredicate AND_PREDICATE = new LogicalPredicate();
 
@@ -355,16 +355,7 @@ public class PredicateWrapper<IN> implements Predicate<IN> {
         return new PredicateWrapper<IN>(new OrPredicate<IN>(mPredicate, other), newPredicates);
     }
 
-    /**
-     * Extra implementation of {@code equals()} checking for wrapped predicate classes rather than
-     * instances equality.<br/>
-     * In most cases the wrapped predicates are instances of anonymous classes, as a consequence the
-     * standard equality test will always fail.
-     *
-     * @param o the reference object with which to compare.
-     * @return whether the wrapped predicates share the same classes in the same order.
-     */
-    public boolean typeEquals(final Object o) {
+    public boolean safeEquals(final Object o) {
 
         if (this == o) {
 
@@ -388,32 +379,41 @@ public class PredicateWrapper<IN> implements Predicate<IN> {
 
         for (int i = 0; i < size; ++i) {
 
-            final Predicate<?> predicate = thisPredicates.get(i);
+            final Predicate<?> thisPredicate = thisPredicates.get(i);
+            final Predicate<?> thatPredicate = thatPredicates.get(i);
 
-            if (predicate instanceof LogicalPredicate) {
+            if (thisPredicate instanceof LogicalPredicate) {
 
-                if (!predicate.equals(thatPredicates.get(i))) {
+                if (!thisPredicate.equals(thatPredicate)) {
 
                     return false;
                 }
 
-            } else if (!predicate.getClass().equals(thatPredicates.get(i).getClass())) {
+            } else {
 
-                return false;
+                final Class<? extends Predicate> thisPredicateClass = thisPredicate.getClass();
+                final Class<? extends Predicate> thatPredicateClass = thatPredicate.getClass();
+
+                if (thisPredicateClass.isAnonymousClass()) {
+
+                    if (!thatPredicateClass.isAnonymousClass() || !thisPredicateClass.equals(
+                            thatPredicateClass)) {
+
+                        return false;
+                    }
+
+                } else if (thatPredicateClass.isAnonymousClass() || !thisPredicate.equals(
+                        thatPredicate)) {
+
+                    return false;
+                }
             }
         }
 
         return true;
     }
 
-    /**
-     * Extra implementation of {@code hashCode()} employing wrapped predicate class rather than
-     * instance hash codes.
-     *
-     * @return the cumulative hash code of the wrapped predicates.
-     * @see #typeEquals(Object)
-     */
-    public int typeHashCode() {
+    public int safeHashCode() {
 
         int result = 0;
 
@@ -425,7 +425,10 @@ public class PredicateWrapper<IN> implements Predicate<IN> {
 
             } else {
 
-                result += result * 31 + predicate.getClass().hashCode();
+                final Class<? extends Predicate> predicateClass = predicate.getClass();
+                result +=
+                        result * 31 + (predicateClass.isAnonymousClass() ? predicateClass.hashCode()
+                                : predicate.hashCode());
             }
         }
 

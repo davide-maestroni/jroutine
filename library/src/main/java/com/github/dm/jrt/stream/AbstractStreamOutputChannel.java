@@ -73,7 +73,7 @@ public abstract class AbstractStreamOutputChannel<OUT>
 
     private final OutputChannel<OUT> mChannel;
 
-    private InvocationConfiguration mConfiguration;
+    private InvocationConfiguration mConfiguration = InvocationConfiguration.DEFAULT_CONFIGURATION;
 
     private InvocationConfiguration mStreamConfiguration =
             InvocationConfiguration.DEFAULT_CONFIGURATION;
@@ -903,7 +903,7 @@ public abstract class AbstractStreamOutputChannel<OUT>
         @Override
         public int hashCode() {
 
-            return mConsumer.typeHashCode();
+            return mConsumer.safeHashCode();
         }
 
         @Override
@@ -920,7 +920,7 @@ public abstract class AbstractStreamOutputChannel<OUT>
             }
 
             final ConsumerInvocation<?> that = (ConsumerInvocation<?>) o;
-            return mConsumer.typeEquals(that.mConsumer);
+            return mConsumer.safeEquals(that.mConsumer);
         }
 
         public void onInput(final OUT input, @NotNull final ResultChannel<Void> result) {
@@ -976,13 +976,13 @@ public abstract class AbstractStreamOutputChannel<OUT>
             }
 
             final GenerateConsumerInvocation<?, ?> that = (GenerateConsumerInvocation<?, ?>) o;
-            return mConsumer.typeEquals(that.mConsumer);
+            return mConsumer.safeEquals(that.mConsumer);
         }
 
         @Override
         public int hashCode() {
 
-            return mConsumer.typeHashCode();
+            return mConsumer.safeHashCode();
         }
 
 
@@ -1066,14 +1066,14 @@ public abstract class AbstractStreamOutputChannel<OUT>
             }
 
             final GenerateSupplierInvocation<?, ?> that = (GenerateSupplierInvocation<?, ?>) o;
-            return mCount == that.mCount && mSupplier.typeEquals(that.mSupplier);
+            return mCount == that.mCount && mSupplier.safeEquals(that.mSupplier);
         }
 
         @Override
         public int hashCode() {
 
             int result = (int) (mCount ^ (mCount >>> 32));
-            result = 31 * result + mSupplier.typeHashCode();
+            result = 31 * result + mSupplier.safeHashCode();
             return result;
         }
 
@@ -1138,13 +1138,13 @@ public abstract class AbstractStreamOutputChannel<OUT>
             }
 
             final LiftInvocation<?, ?> that = (LiftInvocation<?, ?>) o;
-            return mFunction.typeEquals(that.mFunction);
+            return mFunction.safeEquals(that.mFunction);
         }
 
         @Override
         public int hashCode() {
 
-            return mFunction.typeHashCode();
+            return mFunction.safeHashCode();
         }
 
         public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
@@ -1227,7 +1227,7 @@ public abstract class AbstractStreamOutputChannel<OUT>
                 return false;
             }
 
-            if (!mIncrement.typeEquals(that.mIncrement)) {
+            if (!mIncrement.safeEquals(that.mIncrement)) {
 
                 return false;
             }
@@ -1239,7 +1239,7 @@ public abstract class AbstractStreamOutputChannel<OUT>
         public int hashCode() {
 
             int result = mEnd.hashCode();
-            result = 31 * result + mIncrement.typeHashCode();
+            result = 31 * result + mIncrement.safeHashCode();
             result = 31 * result + mStart.hashCode();
             return result;
         }

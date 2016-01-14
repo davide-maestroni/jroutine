@@ -164,7 +164,7 @@ public interface StreamOutputChannel<OUT>
 
     /**
      * Concatenates a stream channel based on the specified consumer to this one.<br/>
-     * The channel outputs will not be further propagated.
+     * The channel outputs will be no further propagated.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
      * invoked in an asynchronous mode.<br/>
@@ -697,7 +697,7 @@ public interface StreamOutputChannel<OUT>
 
     /**
      * Concatenates a stream channel based on the specified consumer to this one.<br/>
-     * The channel outputs will not be further propagated.
+     * The channel outputs will be no further propagated.
      * <p/>
      * Note that the created routine will be initialized with the current configuration and will be
      * invoked in a synchronous mode.<br/>

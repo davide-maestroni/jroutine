@@ -811,7 +811,7 @@ public class Streams extends Channels {
         @Override
         public int hashCode() {
 
-            return mFunction.typeHashCode();
+            return mFunction.safeHashCode();
         }
 
         @Override
@@ -828,7 +828,7 @@ public class Streams extends Channels {
             }
 
             final StreamInvocationFactory<?, ?> that = (StreamInvocationFactory<?, ?>) o;
-            return mFunction.typeEquals(that.mFunction);
+            return mFunction.safeEquals(that.mFunction);
         }
 
         @NotNull

@@ -29,7 +29,7 @@ import java.util.List;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public class FunctionWrapper<IN, OUT> implements Function<IN, OUT> {
+public class FunctionWrapper<IN, OUT> implements Function<IN, OUT>, Wrapper {
 
     private static final FunctionWrapper<Object, Object> sIdentity =
             new FunctionWrapper<Object, Object>(new Function<Object, Object>() {
@@ -191,19 +191,19 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT> {
     @Override
     public int hashCode() {
 
-        return mFunctions.hashCode();
+        int result = 0;
+
+        for (final Function<?, ?> function : mFunctions) {
+
+            final Class<? extends Function> functionClass = function.getClass();
+            result += result * 31 + (functionClass.isAnonymousClass() ? functionClass.hashCode()
+                    : function.hashCode());
+        }
+
+        return result;
     }
 
-    /**
-     * Extra implementation of {@code equals()} checking for wrapped function classes rather than
-     * instances equality.<br/>
-     * In most cases the wrapped functions are instances of anonymous classes, as a consequence the
-     * standard equality test will always fail.
-     *
-     * @param o the reference object with which to compare.
-     * @return whether the wrapped functions share the same classes in the same order.
-     */
-    public boolean typeEquals(final Object o) {
+    public boolean safeEquals(final Object o) {
 
         if (this == o) {
 
@@ -227,7 +227,20 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT> {
 
         for (int i = 0; i < size; ++i) {
 
-            if (!thisFunctions.get(i).getClass().equals(thatFunctions.get(i).getClass())) {
+            final Function<?, ?> thisFunction = thisFunctions.get(i);
+            final Function<?, ?> thatFunction = thatFunctions.get(i);
+            final Class<? extends Function> thisFunctionClass = thisFunction.getClass();
+            final Class<? extends Function> thatFunctionClass = thatFunction.getClass();
+
+            if (thisFunctionClass.isAnonymousClass()) {
+
+                if (!thatFunctionClass.isAnonymousClass() || !thisFunctionClass.equals(
+                        thatFunctionClass)) {
+
+                    return false;
+                }
+
+            } else if (thatFunctionClass.isAnonymousClass() || !thisFunction.equals(thatFunction)) {
 
                 return false;
             }
@@ -236,14 +249,7 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT> {
         return true;
     }
 
-    /**
-     * Extra implementation of {@code hashCode()} employing wrapped function class rather than
-     * instance hash codes.
-     *
-     * @return the cumulative hash code of the wrapped functions.
-     * @see #typeEquals(Object)
-     */
-    public int typeHashCode() {
+    public int safeHashCode() {
 
         int result = 0;
 

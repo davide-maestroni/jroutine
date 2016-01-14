@@ -135,7 +135,7 @@ public class Streams extends Channels {
                     StreamOutputChannel<? extends OUT>> function) {
 
         return factoryFrom(com.github.dm.jrt.stream.Streams.on(function),
-                           wrapFunction(function).typeHashCode(), DelegationType.SYNC);
+                           wrapFunction(function).safeHashCode(), DelegationType.SYNC);
     }
 
     /**

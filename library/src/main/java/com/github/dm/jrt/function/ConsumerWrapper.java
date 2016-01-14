@@ -26,7 +26,7 @@ import java.util.List;
  *
  * @param <IN> the input data type.
  */
-public class ConsumerWrapper<IN> implements Consumer<IN> {
+public class ConsumerWrapper<IN> implements Consumer<IN>, Wrapper {
 
     private static final ConsumerWrapper<Object> sSink =
             new ConsumerWrapper<Object>(new Consumer<Object>() {
@@ -131,16 +131,7 @@ public class ConsumerWrapper<IN> implements Consumer<IN> {
         return mConsumers.equals(that.mConsumers);
     }
 
-    /**
-     * Extra implementation of {@code equals()} checking for wrapped consumer classes rather than
-     * instances equality.<br/>
-     * In most cases the wrapped consumers are instances of anonymous classes, as a consequence the
-     * standard equality test will always fail.
-     *
-     * @param o the reference object with which to compare.
-     * @return whether the wrapped consumers share the same classes in the same order.
-     */
-    public boolean typeEquals(final Object o) {
+    public boolean safeEquals(final Object o) {
 
         if (this == o) {
 
@@ -164,7 +155,20 @@ public class ConsumerWrapper<IN> implements Consumer<IN> {
 
         for (int i = 0; i < size; ++i) {
 
-            if (!thisConsumers.get(i).getClass().equals(thatConsumers.get(i).getClass())) {
+            final Consumer<?> thisConsumer = thisConsumers.get(i);
+            final Consumer<?> thatConsumer = thatConsumers.get(i);
+            final Class<? extends Consumer> thisConsumerClass = thisConsumer.getClass();
+            final Class<? extends Consumer> thatConsumerClass = thatConsumer.getClass();
+
+            if (thisConsumerClass.isAnonymousClass()) {
+
+                if (!thatConsumerClass.isAnonymousClass() || !thisConsumerClass.equals(
+                        thatConsumerClass)) {
+
+                    return false;
+                }
+
+            } else if (thatConsumerClass.isAnonymousClass() || !thisConsumer.equals(thatConsumer)) {
 
                 return false;
             }
@@ -173,20 +177,15 @@ public class ConsumerWrapper<IN> implements Consumer<IN> {
         return true;
     }
 
-    /**
-     * Extra implementation of {@code hashCode()} employing wrapped consumer class rather than
-     * instance hash codes.
-     *
-     * @return the cumulative hash code of the wrapped consumers.
-     * @see #typeEquals(Object)
-     */
-    public int typeHashCode() {
+    public int safeHashCode() {
 
         int result = 0;
 
         for (final Consumer<?> consumer : mConsumers) {
 
-            result += result * 31 + consumer.getClass().hashCode();
+            final Class<? extends Consumer> consumerClass = consumer.getClass();
+            result += result * 31 + (consumerClass.isAnonymousClass() ? consumerClass.hashCode()
+                    : consumer.hashCode());
         }
 
         return result;

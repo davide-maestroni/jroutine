@@ -28,7 +28,7 @@ import java.util.Comparator;
  * @param <IN2> the second input data type.
  * @param <OUT> the output data type.
  */
-public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OUT> {
+public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OUT>, Wrapper {
 
     private static final WeakIdentityHashMap<Comparator<?>, BiFunctionWrapper<?, ?, ?>>
             mMaxFunctions = new WeakIdentityHashMap<Comparator<?>, BiFunctionWrapper<?, ?, ?>>();
@@ -241,16 +241,7 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
         return mBiFunction.equals(that.mBiFunction) && mFunction.equals(that.mFunction);
     }
 
-    /**
-     * Extra implementation of {@code equals()} checking for wrapped function classes rather than
-     * instances equality.<br/>
-     * In most cases the wrapped functions are instances of anonymous classes, as a consequence the
-     * standard equality test will always fail.
-     *
-     * @param o the reference object with which to compare.
-     * @return whether the wrapped functions share the same classes in the same order.
-     */
-    public boolean typeEquals(final Object o) {
+    public boolean safeEquals(final Object o) {
 
         if (this == o) {
 
@@ -263,21 +254,34 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
         }
 
         final BiFunctionWrapper<?, ?, ?> that = (BiFunctionWrapper<?, ?, ?>) o;
-        return mBiFunction.getClass().equals(that.mBiFunction.getClass())
-                && mFunction.typeEquals(that.mFunction);
+        final BiFunction<IN1, IN2, ?> thisFunction = mBiFunction;
+        final BiFunction<?, ?, ?> thatFunction = that.mBiFunction;
+        final Class<? extends BiFunction> thisFunctionClass = thisFunction.getClass();
+        final Class<? extends BiFunction> thatFunctionClass = thatFunction.getClass();
+
+        if (thisFunctionClass.isAnonymousClass()) {
+
+            if (!thatFunctionClass.isAnonymousClass() || !thisFunctionClass.equals(
+                    thatFunctionClass)) {
+
+                return false;
+            }
+
+        } else if (thatFunctionClass.isAnonymousClass() || !thisFunction.equals(thatFunction)) {
+
+            return false;
+        }
+
+        return mFunction.safeEquals(that.mFunction);
     }
 
-    /**
-     * Extra implementation of {@code hashCode()} employing wrapped function class rather than
-     * instance hash codes.
-     *
-     * @return the cumulative hash code of the wrapped functions.
-     * @see #typeEquals(Object)
-     */
-    public int typeHashCode() {
+    public int safeHashCode() {
 
-        int result = mBiFunction.getClass().hashCode();
-        result = 31 * result + mFunction.typeHashCode();
+        final BiFunction<IN1, IN2, ?> function = mBiFunction;
+        final Class<? extends BiFunction> functionClass = function.getClass();
+        int result =
+                functionClass.isAnonymousClass() ? functionClass.hashCode() : function.hashCode();
+        result = 31 * result + mFunction.safeHashCode();
         return result;
     }
 

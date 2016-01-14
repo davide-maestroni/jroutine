@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <OUT> the output data type.
  */
-public class SupplierWrapper<OUT> implements Supplier<OUT> {
+public class SupplierWrapper<OUT> implements Supplier<OUT>, Wrapper {
 
     private final FunctionWrapper<?, OUT> mFunction;
 
@@ -100,16 +100,7 @@ public class SupplierWrapper<OUT> implements Supplier<OUT> {
         return result;
     }
 
-    /**
-     * Extra implementation of {@code equals()} checking for wrapped supplier classes rather than
-     * instances equality.<br/>
-     * In most cases the wrapped suppliers are instances of anonymous classes, as a consequence the
-     * standard equality test will always fail.
-     *
-     * @param o the reference object with which to compare.
-     * @return whether the wrapped suppliers share the same classes in the same order.
-     */
-    public boolean typeEquals(final Object o) {
+    public boolean safeEquals(final Object o) {
 
         if (this == o) {
 
@@ -122,20 +113,30 @@ public class SupplierWrapper<OUT> implements Supplier<OUT> {
         }
 
         final SupplierWrapper<?> that = (SupplierWrapper<?>) o;
-        return mFunction.typeEquals(that.mFunction) && mSupplier.getClass()
-                                                                .equals(that.mSupplier.getClass());
+        final Supplier<?> thisSupplier = mSupplier;
+        final Supplier<?> thatSupplier = that.mSupplier;
+        final Class<? extends Supplier> thisSupplierClass = thisSupplier.getClass();
+        final Class<? extends Supplier> thatSupplierClass = thatSupplier.getClass();
+
+        if (thisSupplierClass.isAnonymousClass()) {
+
+            if (!thatSupplierClass.isAnonymousClass() || !thisSupplierClass.equals(
+                    thatSupplierClass)) {
+
+                return false;
+            }
+
+        } else if (thatSupplierClass.isAnonymousClass() || !thisSupplier.equals(thatSupplier)) {
+
+            return false;
+        }
+
+        return mFunction.safeEquals(that.mFunction);
     }
 
-    /**
-     * Extra implementation of {@code hashCode()} employing wrapped supplier class rather than
-     * instance hash codes.
-     *
-     * @return the cumulative hash code of the wrapped suppliers.
-     * @see #typeEquals(Object)
-     */
-    public int typeHashCode() {
+    public int safeHashCode() {
 
-        int result = mFunction.typeHashCode();
+        int result = mFunction.safeHashCode();
         result = 31 * result + mSupplier.getClass().hashCode();
         return result;
     }

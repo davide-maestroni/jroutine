@@ -78,12 +78,12 @@ public abstract class AbstractLoaderStreamOutputChannel<OUT>
 
                     final AbstractLoaderStreamOutputChannel<OUT> outer =
                             AbstractLoaderStreamOutputChannel.this;
-                    outer.withStreamInvocations().with(null).with(configuration).set();
+                    outer.setConfiguration(configuration);
                     return outer;
                 }
             };
 
-    private LoaderConfiguration mConfiguration;
+    private LoaderConfiguration mConfiguration = LoaderConfiguration.DEFAULT_CONFIGURATION;
 
     private LoaderConfiguration mStreamConfiguration;
 
@@ -706,7 +706,7 @@ public abstract class AbstractLoaderStreamOutputChannel<OUT>
 
         if (configuration == null) {
 
-            throw new NullPointerException("the invocation configuration must not be null");
+            throw new NullPointerException("the loader configuration must not be null");
         }
 
         mConfiguration = configuration;

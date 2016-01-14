@@ -257,20 +257,18 @@ public class FunctionsTest {
     }
 
     @Test
-    public void testBiConsumerTypeEquals() {
+    public void testBiConsumerSafeEquals() {
 
         final TestBiConsumer consumer = new TestBiConsumer();
         final BiConsumerWrapper<Object, Object> consumerWrapper = wrapBiConsumer(consumer);
-        assertThat(consumerWrapper.typeEquals(null)).isFalse();
-        assertThat(consumerWrapper.typeEquals(new Object())).isFalse();
-        assertThat(consumerWrapper.typeEquals(wrapBiConsumer(Functions.biSink()))).isFalse();
-        assertThat(consumerWrapper.typeEquals(consumerWrapper)).isTrue();
-        assertThat(consumerWrapper.typeEquals(wrapBiConsumer(consumer))).isTrue();
-        assertThat(consumerWrapper.typeHashCode()).isEqualTo(
-                wrapBiConsumer(consumer).typeHashCode());
-        assertThat(consumerWrapper.typeEquals(wrapBiConsumer(new TestBiConsumer()))).isTrue();
-        assertThat(consumerWrapper.typeHashCode()).isEqualTo(
-                wrapBiConsumer(new TestBiConsumer()).typeHashCode());
+        assertThat(consumerWrapper.safeEquals(null)).isFalse();
+        assertThat(consumerWrapper.safeEquals(new Object())).isFalse();
+        assertThat(consumerWrapper.safeEquals(wrapBiConsumer(Functions.biSink()))).isFalse();
+        assertThat(consumerWrapper.safeEquals(consumerWrapper)).isTrue();
+        assertThat(consumerWrapper.safeEquals(wrapBiConsumer(new TestBiConsumer()))).isFalse();
+        assertThat(consumerWrapper.safeEquals(wrapBiConsumer(consumer))).isTrue();
+        assertThat(consumerWrapper.safeHashCode()).isEqualTo(
+                wrapBiConsumer(consumer).safeHashCode());
     }
 
     @Test
@@ -386,20 +384,18 @@ public class FunctionsTest {
     }
 
     @Test
-    public void testBiFunctionTypeEquals() {
+    public void testBiFunctionSafeEquals() {
 
         final TestBiFunction function = new TestBiFunction();
         final BiFunctionWrapper<Object, Object, Object> functionWrapper = wrapBiFunction(function);
-        assertThat(functionWrapper.typeEquals(null)).isFalse();
-        assertThat(functionWrapper.typeEquals(new Object())).isFalse();
-        assertThat(functionWrapper.typeEquals(wrapBiFunction(Functions.first()))).isFalse();
-        assertThat(functionWrapper.typeEquals(functionWrapper)).isTrue();
-        assertThat(functionWrapper.typeEquals(wrapBiFunction(function))).isTrue();
-        assertThat(functionWrapper.typeHashCode()).isEqualTo(
-                wrapBiFunction(function).typeHashCode());
-        assertThat(functionWrapper.typeEquals(wrapBiFunction(new TestBiFunction()))).isTrue();
-        assertThat(functionWrapper.typeHashCode()).isEqualTo(
-                wrapBiFunction(new TestBiFunction()).typeHashCode());
+        assertThat(functionWrapper.safeEquals(null)).isFalse();
+        assertThat(functionWrapper.safeEquals(new Object())).isFalse();
+        assertThat(functionWrapper.safeEquals(wrapBiFunction(Functions.first()))).isFalse();
+        assertThat(functionWrapper.safeEquals(functionWrapper)).isTrue();
+        assertThat(functionWrapper.safeEquals(wrapBiFunction(new TestBiFunction()))).isFalse();
+        assertThat(functionWrapper.safeEquals(wrapBiFunction(function))).isTrue();
+        assertThat(functionWrapper.safeHashCode()).isEqualTo(
+                wrapBiFunction(function).safeHashCode());
     }
 
     @Test
@@ -673,19 +669,17 @@ public class FunctionsTest {
     }
 
     @Test
-    public void testConsumerTypeEquals() {
+    public void testConsumerSafeEquals() {
 
         final TestConsumer consumer = new TestConsumer();
         final ConsumerWrapper<Object> consumerWrapper = wrapConsumer(consumer);
-        assertThat(consumerWrapper.typeEquals(null)).isFalse();
-        assertThat(consumerWrapper.typeEquals(new Object())).isFalse();
-        assertThat(consumerWrapper.typeEquals(wrapConsumer(Functions.sink()))).isFalse();
-        assertThat(consumerWrapper.typeEquals(consumerWrapper)).isTrue();
-        assertThat(consumerWrapper.typeEquals(wrapConsumer(consumer))).isTrue();
-        assertThat(consumerWrapper.typeHashCode()).isEqualTo(wrapConsumer(consumer).typeHashCode());
-        assertThat(consumerWrapper.typeEquals(wrapConsumer(new TestConsumer()))).isTrue();
-        assertThat(consumerWrapper.typeHashCode()).isEqualTo(
-                wrapConsumer(new TestConsumer()).typeHashCode());
+        assertThat(consumerWrapper.safeEquals(null)).isFalse();
+        assertThat(consumerWrapper.safeEquals(new Object())).isFalse();
+        assertThat(consumerWrapper.safeEquals(wrapConsumer(Functions.sink()))).isFalse();
+        assertThat(consumerWrapper.safeEquals(consumerWrapper)).isTrue();
+        assertThat(consumerWrapper.safeEquals(wrapConsumer(new TestConsumer()))).isFalse();
+        assertThat(consumerWrapper.safeEquals(wrapConsumer(consumer))).isTrue();
+        assertThat(consumerWrapper.safeHashCode()).isEqualTo(wrapConsumer(consumer).safeHashCode());
     }
 
     @Test
@@ -1085,19 +1079,17 @@ public class FunctionsTest {
     }
 
     @Test
-    public void testFunctionTypeEquals() {
+    public void testFunctionSafeEquals() {
 
         final TestFunction function = new TestFunction();
         final FunctionWrapper<Object, Object> functionWrapper = wrapFunction(function);
-        assertThat(functionWrapper.typeEquals(null)).isFalse();
-        assertThat(functionWrapper.typeEquals(new Object())).isFalse();
-        assertThat(functionWrapper.typeEquals(wrapFunction(Functions.identity()))).isFalse();
-        assertThat(functionWrapper.typeEquals(functionWrapper)).isTrue();
-        assertThat(functionWrapper.typeEquals(wrapFunction(function))).isTrue();
-        assertThat(functionWrapper.typeHashCode()).isEqualTo(wrapFunction(function).typeHashCode());
-        assertThat(functionWrapper.typeEquals(wrapFunction(new TestFunction()))).isTrue();
-        assertThat(functionWrapper.typeHashCode()).isEqualTo(
-                wrapFunction(new TestFunction()).typeHashCode());
+        assertThat(functionWrapper.safeEquals(null)).isFalse();
+        assertThat(functionWrapper.safeEquals(new Object())).isFalse();
+        assertThat(functionWrapper.safeEquals(wrapFunction(Functions.identity()))).isFalse();
+        assertThat(functionWrapper.safeEquals(functionWrapper)).isTrue();
+        assertThat(functionWrapper.safeEquals(wrapFunction(new TestFunction()))).isFalse();
+        assertThat(functionWrapper.safeEquals(wrapFunction(function))).isTrue();
+        assertThat(functionWrapper.safeHashCode()).isEqualTo(wrapFunction(function).safeHashCode());
     }
 
     @Test
@@ -1430,20 +1422,18 @@ public class FunctionsTest {
     }
 
     @Test
-    public void testPredicateTypeEquals() {
+    public void testPredicateSafeEquals() {
 
         final TestPredicate predicate = new TestPredicate();
         final PredicateWrapper<Object> predicateWrapper = wrapPredicate(predicate);
-        assertThat(predicateWrapper.typeEquals(null)).isFalse();
-        assertThat(predicateWrapper.typeEquals(new Object())).isFalse();
-        assertThat(predicateWrapper.typeEquals(wrapPredicate(Functions.positive()))).isFalse();
-        assertThat(predicateWrapper.typeEquals(predicateWrapper)).isTrue();
-        assertThat(predicateWrapper.typeEquals(wrapPredicate(predicate))).isTrue();
-        assertThat(predicateWrapper.typeHashCode()).isEqualTo(
-                wrapPredicate(predicate).typeHashCode());
-        assertThat(predicateWrapper.typeEquals(wrapPredicate(new TestPredicate()))).isTrue();
-        assertThat(predicateWrapper.typeHashCode()).isEqualTo(
-                wrapPredicate(new TestPredicate()).typeHashCode());
+        assertThat(predicateWrapper.safeEquals(null)).isFalse();
+        assertThat(predicateWrapper.safeEquals(new Object())).isFalse();
+        assertThat(predicateWrapper.safeEquals(wrapPredicate(Functions.positive()))).isFalse();
+        assertThat(predicateWrapper.safeEquals(predicateWrapper)).isTrue();
+        assertThat(predicateWrapper.safeEquals(wrapPredicate(new TestPredicate()))).isFalse();
+        assertThat(predicateWrapper.safeEquals(wrapPredicate(predicate))).isTrue();
+        assertThat(predicateWrapper.safeHashCode()).isEqualTo(
+                wrapPredicate(predicate).safeHashCode());
     }
 
     @Test
@@ -1580,19 +1570,17 @@ public class FunctionsTest {
     }
 
     @Test
-    public void testSupplierTypeEquals() {
+    public void testSupplierSafeEquals() {
 
         final TestSupplier supplier = new TestSupplier();
         final SupplierWrapper<Object> supplierWrapper = wrapSupplier(supplier);
-        assertThat(supplierWrapper.typeEquals(null)).isFalse();
-        assertThat(supplierWrapper.typeEquals(new Object())).isFalse();
-        assertThat(supplierWrapper.typeEquals(wrapSupplier(Functions.constant(null)))).isFalse();
-        assertThat(supplierWrapper.typeEquals(supplierWrapper)).isTrue();
-        assertThat(supplierWrapper.typeEquals(wrapSupplier(supplier))).isTrue();
-        assertThat(supplierWrapper.typeHashCode()).isEqualTo(wrapSupplier(supplier).typeHashCode());
-        assertThat(supplierWrapper.typeEquals(wrapSupplier(new TestSupplier()))).isTrue();
-        assertThat(supplierWrapper.typeHashCode()).isEqualTo(
-                wrapSupplier(new TestSupplier()).typeHashCode());
+        assertThat(supplierWrapper.safeEquals(null)).isFalse();
+        assertThat(supplierWrapper.safeEquals(new Object())).isFalse();
+        assertThat(supplierWrapper.safeEquals(wrapSupplier(Functions.constant(null)))).isFalse();
+        assertThat(supplierWrapper.safeEquals(supplierWrapper)).isTrue();
+        assertThat(supplierWrapper.safeEquals(wrapSupplier(new TestSupplier()))).isFalse();
+        assertThat(supplierWrapper.safeEquals(wrapSupplier(supplier))).isTrue();
+        assertThat(supplierWrapper.safeHashCode()).isEqualTo(wrapSupplier(supplier).safeHashCode());
     }
 
     private static class Identity {

@@ -120,7 +120,7 @@ class AccumulateInvocation<IN> extends TemplateInvocation<IN, IN> {
         @Override
         public int hashCode() {
 
-            return mFunction.typeHashCode();
+            return mFunction.safeHashCode();
         }
 
         @Override
@@ -137,7 +137,7 @@ class AccumulateInvocation<IN> extends TemplateInvocation<IN, IN> {
             }
 
             final AccumulateInvocationFactory<?> that = (AccumulateInvocationFactory<?>) o;
-            return mFunction.typeEquals(that.mFunction);
+            return mFunction.safeEquals(that.mFunction);
         }
 
         @NotNull

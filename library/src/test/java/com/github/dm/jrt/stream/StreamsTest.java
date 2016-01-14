@@ -24,6 +24,7 @@ import com.github.dm.jrt.core.Channels;
 import com.github.dm.jrt.core.Channels.Selectable;
 import com.github.dm.jrt.core.JRoutine;
 import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.invocation.InvocationFactory;
@@ -377,6 +378,35 @@ public class StreamsTest {
     }
 
     @Test
+    public void testFactoryEquals() {
+
+        final Function<StreamOutputChannel<? extends String>, StreamOutputChannel<String>>
+                function =
+                new Function<StreamOutputChannel<? extends String>, StreamOutputChannel<String>>() {
+
+                    public StreamOutputChannel<String> apply(
+                            final StreamOutputChannel<? extends String> channel) {
+
+                        return channel.syncMap(new Function<String, String>() {
+
+                            public String apply(final String s) {
+
+                                return s.toUpperCase();
+                            }
+                        });
+                    }
+                };
+        final InvocationFactory<String, String> factory = Streams.factory(function);
+        assertThat(factory).isEqualTo(factory);
+        assertThat(factory).isNotEqualTo(null);
+        assertThat(factory).isNotEqualTo("test");
+        assertThat(factory).isNotEqualTo(
+                Streams.factory(Functions.<StreamOutputChannel<?>>identity()));
+        assertThat(factory).isEqualTo(Streams.factory(function));
+        assertThat(factory.hashCode()).isEqualTo(Streams.factory(function).hashCode());
+    }
+
+    @Test
     @SuppressWarnings("ConstantConditions")
     public void testFactoryError() {
 
@@ -402,26 +432,6 @@ public class StreamsTest {
     }
 
     @Test
-    public void testFirst() {
-
-        assertThat(Streams.streamOf()
-                          .syncRange(1, 10)
-                          .asyncMap(Streams.limit(5))
-                          .afterMax(seconds(3))
-                          .all()).containsExactly(1, 2, 3, 4, 5);
-        assertThat(Streams.streamOf()
-                          .syncRange(1, 10)
-                          .asyncMap(Streams.limit(0))
-                          .afterMax(seconds(3))
-                          .all()).isEmpty();
-        assertThat(Streams.streamOf()
-                          .syncRange(1, 10)
-                          .asyncMap(Streams.limit(15))
-                          .afterMax(seconds(3))
-                          .all()).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
-    }
-
-    @Test
     @SuppressWarnings("unchecked")
     public void testGroupBy() {
 
@@ -435,15 +445,46 @@ public class StreamsTest {
                                                   Collections.<Number>singletonList(10));
         assertThat(Streams.streamOf()
                           .syncRange(1, 10)
-                          .asyncMap(Streams.<Number>groupBy(0))
-                          .afterMax(seconds(3))
-                          .all()).isEmpty();
-        assertThat(Streams.streamOf()
-                          .syncRange(1, 10)
                           .asyncMap(Streams.<Number>groupBy(13))
                           .afterMax(seconds(3))
                           .all()).containsExactly(
                 Arrays.<Number>asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+    }
+
+    @Test
+    public void testGroupByEquals() {
+
+        final InvocationFactory<Object, List<Object>> factory = Streams.groupBy(2);
+        assertThat(factory).isEqualTo(factory);
+        assertThat(factory).isNotEqualTo(null);
+        assertThat(factory).isNotEqualTo("test");
+        assertThat(factory).isNotEqualTo(Streams.groupBy(3));
+        assertThat(factory).isEqualTo(Streams.groupBy(2));
+        assertThat(factory.hashCode()).isEqualTo(Streams.groupBy(2).hashCode());
+    }
+
+    @Test
+    public void testGroupByError() {
+
+        try {
+
+            Streams.groupBy(-1);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Streams.groupBy(0);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
     }
 
     @Test
@@ -695,6 +736,57 @@ public class StreamsTest {
             fail();
 
         } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testLimit() {
+
+        assertThat(Streams.streamOf()
+                          .syncRange(1, 10)
+                          .asyncMap(Streams.limit(5))
+                          .afterMax(seconds(3))
+                          .all()).containsExactly(1, 2, 3, 4, 5);
+        assertThat(Streams.streamOf()
+                          .syncRange(1, 10)
+                          .asyncMap(Streams.limit(0))
+                          .afterMax(seconds(3))
+                          .all()).isEmpty();
+        assertThat(Streams.streamOf()
+                          .syncRange(1, 10)
+                          .asyncMap(Streams.limit(15))
+                          .afterMax(seconds(3))
+                          .all()).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+        assertThat(Streams.streamOf()
+                          .syncRange(1, 10)
+                          .asyncMap(Streams.limit(0))
+                          .afterMax(seconds(3))
+                          .all()).isEmpty();
+    }
+
+    @Test
+    public void testLimitEquals() {
+
+        final InvocationFactory<Object, Object> factory = Streams.limit(2);
+        assertThat(factory).isEqualTo(factory);
+        assertThat(factory).isNotEqualTo(null);
+        assertThat(factory).isNotEqualTo("test");
+        assertThat(factory).isNotEqualTo(Streams.limit(3));
+        assertThat(factory).isEqualTo(Streams.limit(2));
+        assertThat(factory.hashCode()).isEqualTo(Streams.limit(2).hashCode());
+    }
+
+    @Test
+    public void testLimitError() {
+
+        try {
+
+            Streams.limit(-1);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
 
         }
     }
@@ -1036,6 +1128,32 @@ public class StreamsTest {
                           .asyncMap(Streams.skip(0))
                           .afterMax(seconds(3))
                           .all()).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+    }
+
+    @Test
+    public void testSkipEquals() {
+
+        final InvocationFactory<Object, Object> factory = Streams.skip(2);
+        assertThat(factory).isEqualTo(factory);
+        assertThat(factory).isNotEqualTo(null);
+        assertThat(factory).isNotEqualTo("test");
+        assertThat(factory).isNotEqualTo(Streams.skip(3));
+        assertThat(factory).isEqualTo(Streams.skip(2));
+        assertThat(factory.hashCode()).isEqualTo(Streams.skip(2).hashCode());
+    }
+
+    @Test
+    public void testSkipError() {
+
+        try {
+
+            Streams.skip(-1);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
     }
 
     private static class Amb<DATA> extends TemplateInvocation<Selectable<DATA>, DATA> {

@@ -20,6 +20,8 @@ import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.WeakHashMap;
+
 /**
  * Utility class used to create builders of objects wrapping target ones, so to enable asynchronous
  * calls of their methods, bound to a context lifecycle.
@@ -37,6 +39,9 @@ import org.jetbrains.annotations.NotNull;
  */
 public class JRoutineProxyCompat extends JRoutineProxy {
 
+    private static final WeakHashMap<LoaderContextCompat, ProxyContextBuilderCompat> sBuilders =
+            new WeakHashMap<LoaderContextCompat, ProxyContextBuilderCompat>();
+
     /**
      * Avoid direct instantiation.
      */
@@ -51,16 +56,27 @@ public class JRoutineProxyCompat extends JRoutineProxy {
      * @return the context builder.
      */
     @NotNull
-    public static ContextBuilder with(@NotNull final LoaderContextCompat context) {
+    public static ProxyContextBuilderCompat with(@NotNull final LoaderContextCompat context) {
 
-        // TODO: 14/01/16 cache?
-        return new ContextBuilder(context);
+        synchronized (sBuilders) {
+
+            final WeakHashMap<LoaderContextCompat, ProxyContextBuilderCompat> builders = sBuilders;
+            ProxyContextBuilderCompat contextBuilder = builders.get(context);
+
+            if (contextBuilder == null) {
+
+                contextBuilder = new ProxyContextBuilderCompat(context);
+                builders.put(context, contextBuilder);
+            }
+
+            return contextBuilder;
+        }
     }
 
     /**
      * Context based builder of loader proxy routine builders.
      */
-    public static class ContextBuilder {
+    public static class ProxyContextBuilderCompat {
 
         private final LoaderContextCompat mContext;
 
@@ -70,7 +86,7 @@ public class JRoutineProxyCompat extends JRoutineProxy {
          * @param context the loader context.
          */
         @SuppressWarnings("ConstantConditions")
-        private ContextBuilder(@NotNull final LoaderContextCompat context) {
+        private ProxyContextBuilderCompat(@NotNull final LoaderContextCompat context) {
 
             if (context == null) {
 

@@ -139,6 +139,7 @@ public class Streams extends Channels {
      * @param size   the group size.
      * @param <DATA> the data type.
      * @return the invocation factory.
+     * @throws java.lang.IllegalArgumentException if the size is not positive.
      */
     @NotNull
     public static <DATA> InvocationFactory<DATA, List<DATA>> groupBy(final int size) {
@@ -234,6 +235,7 @@ public class Streams extends Channels {
      * @param count  the maximum number of data to pass.
      * @param <DATA> the data type.
      * @return the invocation factory.
+     * @throws java.lang.IllegalArgumentException if the count is negative.
      */
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> limit(final int count) {
@@ -350,6 +352,7 @@ public class Streams extends Channels {
      * @param count  the number of data to skip.
      * @param <DATA> the data type.
      * @return the invocation factory.
+     * @throws java.lang.IllegalArgumentException if the count is negative.
      */
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> skip(final int count) {
@@ -495,8 +498,14 @@ public class Streams extends Channels {
          * Constructor.
          *
          * @param size the group size.
+         * @throws java.lang.IllegalArgumentException if the size is not positive.
          */
         private GroupByInvocationFactory(final int size) {
+
+            if (size <= 0) {
+
+                throw new IllegalArgumentException("the group size must be positive: " + size);
+            }
 
             mSize = size;
         }
@@ -583,8 +592,14 @@ public class Streams extends Channels {
          * Constructor.
          *
          * @param count the number of data to pass.
+         * @throws java.lang.IllegalArgumentException if the count is negative.
          */
         private LimitInvocationFactory(final int count) {
+
+            if (count < 0) {
+
+                throw new IllegalArgumentException("the count must not be negative: " + count);
+            }
 
             mCount = count;
         }
@@ -674,8 +689,14 @@ public class Streams extends Channels {
          * Constructor.
          *
          * @param count the number of data to skip.
+         * @throws java.lang.IllegalArgumentException if the count is negative.
          */
         private SkipInvocationFactory(final int count) {
+
+            if (count < 0) {
+
+                throw new IllegalArgumentException("the count must not be negative: " + count);
+            }
 
             mCount = count;
         }

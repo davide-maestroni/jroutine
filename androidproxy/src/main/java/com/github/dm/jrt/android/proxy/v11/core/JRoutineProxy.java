@@ -19,6 +19,8 @@ import com.github.dm.jrt.android.v11.core.LoaderContext;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.WeakHashMap;
+
 /**
  * Utility class used to create builders of objects wrapping target ones, so to enable asynchronous
  * calls of their methods, bound to a context lifecycle.
@@ -39,6 +41,9 @@ import org.jetbrains.annotations.NotNull;
  */
 public class JRoutineProxy extends com.github.dm.jrt.android.proxy.core.JRoutineProxy {
 
+    private static final WeakHashMap<LoaderContext, ProxyContextBuilder> sBuilders =
+            new WeakHashMap<LoaderContext, ProxyContextBuilder>();
+
     /**
      * Avoid direct instantiation.
      */
@@ -53,16 +58,27 @@ public class JRoutineProxy extends com.github.dm.jrt.android.proxy.core.JRoutine
      * @return the context builder.
      */
     @NotNull
-    public static ContextBuilder with(@NotNull final LoaderContext context) {
+    public static ProxyContextBuilder with(@NotNull final LoaderContext context) {
 
-        // TODO: 14/01/16 cache?
-        return new ContextBuilder(context);
+        synchronized (sBuilders) {
+
+            final WeakHashMap<LoaderContext, ProxyContextBuilder> builders = sBuilders;
+            ProxyContextBuilder contextBuilder = builders.get(context);
+
+            if (contextBuilder == null) {
+
+                contextBuilder = new ProxyContextBuilder(context);
+                builders.put(context, contextBuilder);
+            }
+
+            return contextBuilder;
+        }
     }
 
     /**
      * Context based builder of loader proxy routine builders.
      */
-    public static class ContextBuilder {
+    public static class ProxyContextBuilder {
 
         private final LoaderContext mContext;
 
@@ -72,7 +88,7 @@ public class JRoutineProxy extends com.github.dm.jrt.android.proxy.core.JRoutine
          * @param context the loader context.
          */
         @SuppressWarnings("ConstantConditions")
-        private ContextBuilder(@NotNull final LoaderContext context) {
+        private ProxyContextBuilder(@NotNull final LoaderContext context) {
 
             if (context == null) {
 

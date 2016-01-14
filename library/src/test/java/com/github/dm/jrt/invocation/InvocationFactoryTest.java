@@ -19,6 +19,7 @@ import com.github.dm.jrt.routine.Routine;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
+import static com.github.dm.jrt.invocation.Invocations.factoryOf;
 import static com.github.dm.jrt.util.TimeDuration.millis;
 import static com.github.dm.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,6 +40,21 @@ public class InvocationFactoryTest {
         final TestInvocationFactory decoratedFactory = new TestInvocationFactory(factory);
         assertThat(decoratedFactory.newInvocation()).isExactlyInstanceOf(
                 TestInvocationDecorator.class);
+    }
+
+    @Test
+    public void testDecoratingInvocationFactoryEquals() {
+
+        final InvocationFactory<String, String> factory = PassingInvocation.factoryOf();
+        final TestInvocationFactory decoratedFactory = new TestInvocationFactory(factory);
+        assertThat(decoratedFactory).isEqualTo(decoratedFactory);
+        assertThat(decoratedFactory).isNotEqualTo(null);
+        assertThat(decoratedFactory).isNotEqualTo("test");
+        assertThat(decoratedFactory).isNotEqualTo(new TestInvocationFactory(
+                factoryOf(TestInvocationDecorator.class, (Invocation<?, ?>) null)));
+        assertThat(decoratedFactory).isEqualTo(new TestInvocationFactory(factory));
+        assertThat(decoratedFactory.hashCode()).isEqualTo(
+                new TestInvocationFactory(factory).hashCode());
     }
 
     @Test

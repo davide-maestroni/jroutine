@@ -20,6 +20,8 @@ import com.github.dm.jrt.log.Logger;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.WeakHashMap;
+
 /**
  * Utility class extending the base one in order to support additional routine builders specific to
  * the Android platform.<br/>
@@ -81,6 +83,9 @@ import org.jetbrains.annotations.NotNull;
  */
 public class JRoutine extends com.github.dm.jrt.core.JRoutine {
 
+    private static final WeakHashMap<ServiceContext, ServiceContextBuilder> sBuilders =
+            new WeakHashMap<ServiceContext, ServiceContextBuilder>();
+
     /**
      * Returns a context based builder of service routine builders.
      *
@@ -88,15 +93,27 @@ public class JRoutine extends com.github.dm.jrt.core.JRoutine {
      * @return the context builder.
      */
     @NotNull
-    public static ContextBuilder with(@NotNull final ServiceContext context) {
+    public static ServiceContextBuilder with(@NotNull final ServiceContext context) {
 
-        return new ContextBuilder(context);
+        synchronized (sBuilders) {
+
+            final WeakHashMap<ServiceContext, ServiceContextBuilder> builders = sBuilders;
+            ServiceContextBuilder contextBuilder = builders.get(context);
+
+            if (contextBuilder == null) {
+
+                contextBuilder = new ServiceContextBuilder(context);
+                builders.put(context, contextBuilder);
+            }
+
+            return contextBuilder;
+        }
     }
 
     /**
      * Context based builder of service proxy routine builders.
      */
-    public static class ContextBuilder {
+    public static class ServiceContextBuilder {
 
         private final ServiceContext mContext;
 
@@ -106,7 +123,7 @@ public class JRoutine extends com.github.dm.jrt.core.JRoutine {
          * @param context the service context.
          */
         @SuppressWarnings("ConstantConditions")
-        private ContextBuilder(@NotNull final ServiceContext context) {
+        private ServiceContextBuilder(@NotNull final ServiceContext context) {
 
             if (context == null) {
 

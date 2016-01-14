@@ -654,6 +654,12 @@ public abstract class AbstractLoaderStreamOutputChannel<OUT>
     }
 
     @NotNull
+    public LoaderStreamOutputChannel<OUT> loadersId(final int loaderId) {
+
+        return withLoaders().withId(loaderId).set();
+    }
+
+    @NotNull
     public LoaderConfiguration.Builder<? extends LoaderStreamOutputChannel<OUT>> withLoaders() {
 
         final LoaderConfiguration configuration = mConfiguration;

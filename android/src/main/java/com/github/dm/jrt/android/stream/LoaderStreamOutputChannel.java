@@ -489,6 +489,17 @@ public interface LoaderStreamOutputChannel<OUT> extends StreamOutputChannel<OUT>
     InvocationConfiguration.Builder<? extends LoaderStreamOutputChannel<OUT>>
     withStreamInvocations();
 
+    /**
+     * Short for {@code withLoaders().withId(loaderId).set()}.<br/>
+     * This method is useful to easily apply a configuration to the next routine concatenated to the
+     * stream, which will force the routine loader ID.
+     *
+     * @param loaderId the loader ID.
+     * @return the configured stream channel.
+     */
+    @NotNull
+    LoaderStreamOutputChannel<OUT> loadersId(int loaderId);
+
     // TODO: 1/12/16 javadoc
     @NotNull
     LoaderConfiguration.Builder<? extends LoaderStreamOutputChannel<OUT>> withLoaders();

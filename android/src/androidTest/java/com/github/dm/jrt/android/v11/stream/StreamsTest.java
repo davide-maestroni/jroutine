@@ -35,8 +35,10 @@ import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.invocation.InvocationException;
+import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.invocation.TemplateInvocation;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.stream.StreamOutputChannel;
@@ -479,6 +481,34 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         }
     }
 
+    public void testFactoryEquals() {
+
+        final Function<StreamOutputChannel<? extends String>, StreamOutputChannel<String>>
+                function =
+                new Function<StreamOutputChannel<? extends String>, StreamOutputChannel<String>>() {
+
+                    public StreamOutputChannel<String> apply(
+                            final StreamOutputChannel<? extends String> channel) {
+
+                        return channel.syncMap(new Function<String, String>() {
+
+                            public String apply(final String s) {
+
+                                return s.toUpperCase();
+                            }
+                        });
+                    }
+                };
+        final FunctionContextInvocationFactory<String, String> factory = Streams.factory(function);
+        assertThat(factory).isEqualTo(factory);
+        assertThat(factory).isNotEqualTo(null);
+        assertThat(factory).isNotEqualTo("test");
+        assertThat(factory).isNotEqualTo(
+                Streams.factory(Functions.<StreamOutputChannel<?>>identity()));
+        assertThat(factory).isEqualTo(Streams.factory(function));
+        assertThat(factory.hashCode()).isEqualTo(Streams.factory(function).hashCode());
+    }
+
     @SuppressWarnings("ConstantConditions")
     public void testFactoryError() {
 
@@ -518,34 +548,6 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         }
     }
 
-    public void testFirst() {
-
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
-        final LoaderContext context = loaderFrom(getActivity());
-        assertThat(Streams.with(context)
-                          .streamOf()
-                          .syncRange(1, 10)
-                          .asyncMap(Streams.limit(5))
-                          .afterMax(seconds(3))
-                          .all()).containsExactly(1, 2, 3, 4, 5);
-        assertThat(Streams.with(context)
-                          .streamOf()
-                          .syncRange(1, 10)
-                          .asyncMap(Streams.limit(0))
-                          .afterMax(seconds(3))
-                          .all()).isEmpty();
-        assertThat(Streams.with(context)
-                          .streamOf()
-                          .syncRange(1, 10)
-                          .asyncMap(Streams.limit(15))
-                          .afterMax(seconds(3))
-                          .all()).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
-    }
-
     @SuppressWarnings("unchecked")
     public void testGroupBy() {
 
@@ -567,16 +569,44 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         assertThat(Streams.with(context)
                           .streamOf()
                           .syncRange(1, 10)
-                          .asyncMap(Streams.<Number>groupBy(0))
-                          .afterMax(seconds(3))
-                          .all()).isEmpty();
-        assertThat(Streams.with(context)
-                          .streamOf()
-                          .syncRange(1, 10)
                           .asyncMap(Streams.<Number>groupBy(13))
                           .afterMax(seconds(3))
                           .all()).containsExactly(
                 Arrays.<Number>asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+    }
+
+    public void testGroupByEquals() {
+
+        final InvocationFactory<Object, List<Object>> factory = Streams.groupBy(2);
+        assertThat(factory).isEqualTo(factory);
+        assertThat(factory).isNotEqualTo(null);
+        assertThat(factory).isNotEqualTo("test");
+        assertThat(factory).isNotEqualTo(Streams.groupBy(3));
+        assertThat(factory).isEqualTo(Streams.groupBy(2));
+        assertThat(factory.hashCode()).isEqualTo(Streams.groupBy(2).hashCode());
+    }
+
+    public void testGroupByError() {
+
+        try {
+
+            Streams.groupBy(-1);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Streams.groupBy(0);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
     }
 
     public void testJoin() {
@@ -872,6 +902,58 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
             fail();
 
         } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    public void testLimit() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final LoaderContext context = loaderFrom(getActivity());
+        assertThat(Streams.with(context)
+                          .streamOf()
+                          .syncRange(1, 10)
+                          .asyncMap(Streams.limit(5))
+                          .afterMax(seconds(3))
+                          .all()).containsExactly(1, 2, 3, 4, 5);
+        assertThat(Streams.with(context)
+                          .streamOf()
+                          .syncRange(1, 10)
+                          .asyncMap(Streams.limit(0))
+                          .afterMax(seconds(3))
+                          .all()).isEmpty();
+        assertThat(Streams.with(context)
+                          .streamOf()
+                          .syncRange(1, 10)
+                          .asyncMap(Streams.limit(15))
+                          .afterMax(seconds(3))
+                          .all()).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+    }
+
+    public void testLimitEquals() {
+
+        final InvocationFactory<Object, Object> factory = com.github.dm.jrt.stream.Streams.limit(2);
+        assertThat(factory).isEqualTo(factory);
+        assertThat(factory).isNotEqualTo(null);
+        assertThat(factory).isNotEqualTo("test");
+        assertThat(factory).isNotEqualTo(Streams.limit(3));
+        assertThat(factory).isEqualTo(Streams.limit(2));
+        assertThat(factory.hashCode()).isEqualTo(Streams.limit(2).hashCode());
+    }
+
+    public void testLimitError() {
+
+        try {
+
+            Streams.limit(-1);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
 
         }
     }
@@ -1253,6 +1335,30 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                           .asyncMap(Streams.skip(0))
                           .afterMax(seconds(3))
                           .all()).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+    }
+
+    public void testSkipEquals() {
+
+        final InvocationFactory<Object, Object> factory = Streams.skip(2);
+        assertThat(factory).isEqualTo(factory);
+        assertThat(factory).isNotEqualTo(null);
+        assertThat(factory).isNotEqualTo("test");
+        assertThat(factory).isNotEqualTo(Streams.skip(3));
+        assertThat(factory).isEqualTo(Streams.skip(2));
+        assertThat(factory.hashCode()).isEqualTo(Streams.skip(2).hashCode());
+    }
+
+    public void testSkipError() {
+
+        try {
+
+            Streams.skip(-1);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
     }
 
     private static class Amb<DATA> extends TemplateInvocation<ParcelableSelectable<DATA>, DATA> {

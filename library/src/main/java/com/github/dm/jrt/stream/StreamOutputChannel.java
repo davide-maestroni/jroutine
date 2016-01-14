@@ -384,7 +384,7 @@ public interface StreamOutputChannel<OUT>
     /**
      * Short for {@code withInvocations().withRunner(runner).withInputLimit(maxInputs)
      * .withInputMaxDelay(maxDelay, timeUnit).set()}.<br/>
-     * This method is useful to easily apply a configuration, which will slow down the thread
+     * This method is useful to easily apply a configuration which will slow down the thread
      * feeding the next routine concatenated to the stream, when the number of buffered inputs
      * exceeds the specified limit. Since waiting on the same runner thread is not allowed, it is
      * advisable to employ a runner instance different from the feeding one, so to avoid deadlock

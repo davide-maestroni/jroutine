@@ -958,7 +958,7 @@ public abstract class AbstractStreamOutputChannel<OUT>
             return this;
         }
 
-        public void onAbort(@Nullable final RoutineException reason) {
+        public void onAbort(@NotNull final RoutineException reason) {
 
         }
 
@@ -1048,7 +1048,7 @@ public abstract class AbstractStreamOutputChannel<OUT>
             return this;
         }
 
-        public void onAbort(@Nullable final RoutineException reason) {
+        public void onAbort(@NotNull final RoutineException reason) {
 
         }
 
@@ -1244,7 +1244,7 @@ public abstract class AbstractStreamOutputChannel<OUT>
             return result;
         }
 
-        public void onAbort(@Nullable final RoutineException reason) {
+        public void onAbort(@NotNull final RoutineException reason) {
 
         }
 

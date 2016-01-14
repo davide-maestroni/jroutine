@@ -32,6 +32,25 @@ import static org.junit.Assert.fail;
 public class InvocationTest {
 
     @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testCommandInvocation() {
+
+        final CommandInvocation<Object> invocation = new CommandInvocation<Object>() {
+
+            public void onResult(@NotNull final ResultChannel<Object> result) {
+
+            }
+        };
+
+        invocation.onInitialize();
+        invocation.onInput(null, null);
+        invocation.onResult(null);
+        invocation.onAbort(null);
+        invocation.onTerminate();
+        invocation.onDestroy();
+    }
+
+    @Test
     @SuppressWarnings("NullArgumentToVariableArgMethod")
     public void testInvocationFactory() {
 

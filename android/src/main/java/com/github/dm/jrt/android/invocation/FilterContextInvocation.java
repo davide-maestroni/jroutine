@@ -19,7 +19,6 @@ import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Abstract implementation of an invocation filtering each input and transforming it in output data.
@@ -49,7 +48,7 @@ public abstract class FilterContextInvocation<IN, OUT> extends ContextInvocation
         return this;
     }
 
-    public final void onAbort(@Nullable final RoutineException reason) {
+    public final void onAbort(@NotNull final RoutineException reason) {
 
     }
 

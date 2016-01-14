@@ -59,7 +59,6 @@ import com.github.dm.jrt.util.ClassToken;
 import com.github.dm.jrt.util.TimeDuration;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -222,7 +221,7 @@ public class RoutineTest {
                 new TemplateInvocation<String, String>() {
 
                     @Override
-                    public void onAbort(@Nullable final RoutineException reason) {
+                    public void onAbort(@NotNull final RoutineException reason) {
 
                         abortReason.set(reason);
                         semaphore.release();
@@ -482,7 +481,7 @@ public class RoutineTest {
                     private InvocationChannel<Integer, Integer> mChannel;
 
                     @Override
-                    public void onAbort(@Nullable final RoutineException reason) {
+                    public void onAbort(@NotNull final RoutineException reason) {
 
                         mChannel.abort(reason);
                     }
@@ -3960,10 +3959,10 @@ public class RoutineTest {
 
     private static class TestInputIterator implements InputIterator<Object> {
 
-        @Nullable
+        @NotNull
         public RoutineException getAbortException() {
 
-            return null;
+            return new RoutineException();
         }
 
         public boolean hasInput() {
@@ -4028,7 +4027,7 @@ public class RoutineTest {
         }
 
         @Override
-        public void onAbort(@Nullable final RoutineException reason) {
+        public void onAbort(@NotNull final RoutineException reason) {
 
             if (!sActive) {
 

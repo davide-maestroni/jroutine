@@ -248,7 +248,7 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
          *
          * @return the reason of the abortion.
          */
-        @Nullable
+        @NotNull
         RoutineException getAbortException();
 
         /**

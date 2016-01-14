@@ -384,7 +384,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
     }
 
     @Override
-    public void onAbort(@Nullable final RoutineException reason) {
+    public void onAbort(@NotNull final RoutineException reason) {
 
         super.onAbort(reason);
         final Context loaderContext = mContext.getLoaderContext();

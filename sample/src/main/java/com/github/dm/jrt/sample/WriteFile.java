@@ -22,7 +22,6 @@ import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.invocation.TemplateInvocation;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -53,7 +52,7 @@ public class WriteFile extends TemplateInvocation<ByteBuffer, Boolean> {
 
     @Override
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public void onAbort(@Nullable final RoutineException reason) {
+    public void onAbort(@NotNull final RoutineException reason) {
 
         closeStream();
         mFile.delete();

@@ -17,7 +17,6 @@ import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Empty abstract implementation of a routine invocation.
@@ -31,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public abstract class TemplateInvocation<IN, OUT> implements Invocation<IN, OUT> {
 
-    public void onAbort(@Nullable final RoutineException reason) {
+    public void onAbort(@NotNull final RoutineException reason) {
 
     }
 

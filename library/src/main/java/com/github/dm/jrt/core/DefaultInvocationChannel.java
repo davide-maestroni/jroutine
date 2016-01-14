@@ -22,6 +22,7 @@ import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.core.DefaultResultChannel.AbortHandler;
 import com.github.dm.jrt.core.InvocationExecution.InputIterator;
+import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.runner.Execution;
@@ -492,7 +493,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
      */
     private class DefaultInputIterator implements InputIterator<IN> {
 
-        @Nullable
+        @NotNull
         public RoutineException getAbortException() {
 
             synchronized (mMutex) {
@@ -1269,10 +1270,10 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
                     list);
         }
 
-        @Nullable
+        @NotNull
         public RoutineException getAbortException() {
 
-            return mAbortException;
+            return InvocationException.wrapIfNeeded(mAbortException);
         }
 
         public boolean hasInput() {

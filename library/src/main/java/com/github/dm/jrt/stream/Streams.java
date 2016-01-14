@@ -759,7 +759,7 @@ public class Streams extends Channels {
             mFunction = function;
         }
 
-        public void onAbort(@Nullable final RoutineException reason) {
+        public void onAbort(@NotNull final RoutineException reason) {
 
             mInputChannel.abort(reason);
         }

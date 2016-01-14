@@ -22,7 +22,6 @@ import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Invocation implementation delegating the execution to another routine.
@@ -73,7 +72,7 @@ public class DelegatingInvocation<IN, OUT> implements Invocation<IN, OUT> {
         return new DelegatingInvocationFactory<IN, OUT>(routine, delegation);
     }
 
-    public void onAbort(@Nullable final RoutineException reason) {
+    public void onAbort(@NotNull final RoutineException reason) {
 
         mInputChannel.abort(reason);
     }

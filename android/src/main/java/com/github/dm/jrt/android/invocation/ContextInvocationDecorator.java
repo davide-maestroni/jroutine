@@ -19,7 +19,6 @@ import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Base context invocation decorator implementation.
@@ -49,7 +48,7 @@ public class ContextInvocationDecorator<IN, OUT> implements ContextInvocation<IN
         mInvocation = wrapped;
     }
 
-    public void onAbort(@Nullable final RoutineException reason) {
+    public void onAbort(@NotNull final RoutineException reason) {
 
         mInvocation.onAbort(reason);
     }

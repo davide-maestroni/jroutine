@@ -17,7 +17,6 @@ import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Interface defining a routine invocation.
@@ -105,7 +104,7 @@ public interface Invocation<IN, OUT> {
      *
      * @param reason the reason of the abortion.
      */
-    void onAbort(@Nullable RoutineException reason);
+    void onAbort(@NotNull RoutineException reason);
 
     /**
      * Called when the routine invocation is no longer needed.

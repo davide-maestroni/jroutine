@@ -1202,7 +1202,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
     public void testSkip() {
 
         final LoaderContextCompat context = loaderFrom(getActivity());
-        assertThat(StreamsCompat.within(context)
+        assertThat(StreamsCompat.with(context)
                                 .streamOf()
                                 .syncRange(1, 10)
                                 .asyncMap(StreamsCompat.skip(5))

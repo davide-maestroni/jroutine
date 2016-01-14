@@ -17,6 +17,7 @@ import android.util.SparseArray;
 
 import com.github.dm.jrt.android.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
+import com.github.dm.jrt.android.stream.LoaderStreamOutputChannel;
 import com.github.dm.jrt.android.v11.core.Channels;
 import com.github.dm.jrt.android.v11.core.JRoutine;
 import com.github.dm.jrt.android.v11.core.JRoutine.ContextBuilder;
@@ -35,7 +36,6 @@ import java.util.WeakHashMap;
 
 import static com.github.dm.jrt.android.core.DelegatingContextInvocation.factoryFrom;
 import static com.github.dm.jrt.function.Functions.wrapFunction;
-import static com.github.dm.jrt.stream.Streams.streamOf;
 
 /**
  * Utility class acting as a factory of stream output channels.
@@ -63,7 +63,7 @@ public class Streams extends Channels {
      * @return the stream channel.
      */
     @NotNull
-    public static <OUT> StreamOutputChannel<OUT> blend(
+    public static <OUT> LoaderStreamOutputChannel<OUT> blend(
             @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
 
         return streamOf(Channels.blend(channels));
@@ -78,7 +78,7 @@ public class Streams extends Channels {
      * @return the stream channel.
      */
     @NotNull
-    public static <OUT> StreamOutputChannel<OUT> blend(
+    public static <OUT> LoaderStreamOutputChannel<OUT> blend(
             @NotNull final OutputChannel<?>... channels) {
 
         return streamOf(Channels.<OUT>blend(channels));
@@ -95,7 +95,7 @@ public class Streams extends Channels {
      * @return the stream channel.
      */
     @NotNull
-    public static <OUT> StreamOutputChannel<OUT> concat(
+    public static <OUT> LoaderStreamOutputChannel<OUT> concat(
             @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
 
         return streamOf(Channels.concat(channels));
@@ -112,7 +112,7 @@ public class Streams extends Channels {
      * @return the stream channel.
      */
     @NotNull
-    public static <OUT> StreamOutputChannel<OUT> concat(
+    public static <OUT> LoaderStreamOutputChannel<OUT> concat(
             @NotNull final OutputChannel<?>... channels) {
 
         return streamOf(Channels.<OUT>concat(channels));
@@ -164,7 +164,7 @@ public class Streams extends Channels {
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @NotNull
-    public static <OUT> StreamOutputChannel<List<? extends OUT>> join(
+    public static <OUT> LoaderStreamOutputChannel<List<? extends OUT>> join(
             @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
 
         return streamOf(Channels.join(channels));
@@ -182,7 +182,7 @@ public class Streams extends Channels {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static <OUT> StreamOutputChannel<List<? extends OUT>> join(
+    public static <OUT> LoaderStreamOutputChannel<List<? extends OUT>> join(
             @NotNull final OutputChannel<?>... channels) {
 
         return streamOf(Channels.<OUT>join(channels));
@@ -204,7 +204,7 @@ public class Streams extends Channels {
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @NotNull
-    public static <OUT> StreamOutputChannel<List<? extends OUT>> joinAndFlush(
+    public static <OUT> LoaderStreamOutputChannel<List<? extends OUT>> joinAndFlush(
             @Nullable final OUT placeholder,
             @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
 
@@ -227,7 +227,7 @@ public class Streams extends Channels {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static <OUT> StreamOutputChannel<List<? extends OUT>> joinAndFlush(
+    public static <OUT> LoaderStreamOutputChannel<List<? extends OUT>> joinAndFlush(
             @Nullable final Object placeholder, @NotNull final OutputChannel<?>... channels) {
 
         return streamOf(Channels.<OUT>joinAndFlush(placeholder, channels));
@@ -258,7 +258,7 @@ public class Streams extends Channels {
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @NotNull
-    public static <OUT> StreamOutputChannel<? extends ParcelableSelectable<OUT>> merge(
+    public static <OUT> LoaderStreamOutputChannel<? extends ParcelableSelectable<OUT>> merge(
             final int startIndex,
             @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
 
@@ -276,7 +276,7 @@ public class Streams extends Channels {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static <OUT> StreamOutputChannel<? extends ParcelableSelectable<OUT>> merge(
+    public static <OUT> LoaderStreamOutputChannel<? extends ParcelableSelectable<OUT>> merge(
             final int startIndex, @NotNull final OutputChannel<?>... channels) {
 
         return streamOf(Channels.<OUT>merge(startIndex, channels));
@@ -293,7 +293,7 @@ public class Streams extends Channels {
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @NotNull
-    public static <OUT> StreamOutputChannel<? extends ParcelableSelectable<OUT>> merge(
+    public static <OUT> LoaderStreamOutputChannel<? extends ParcelableSelectable<OUT>> merge(
             @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
 
         return streamOf(Channels.merge(channels));
@@ -310,7 +310,7 @@ public class Streams extends Channels {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static <OUT> StreamOutputChannel<? extends ParcelableSelectable<OUT>> merge(
+    public static <OUT> LoaderStreamOutputChannel<? extends ParcelableSelectable<OUT>> merge(
             @NotNull final OutputChannel<?>... channels) {
 
         return streamOf(Channels.<OUT>merge(channels));
@@ -326,7 +326,7 @@ public class Streams extends Channels {
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
      */
     @NotNull
-    public static <OUT> StreamOutputChannel<? extends ParcelableSelectable<OUT>> merge(
+    public static <OUT> LoaderStreamOutputChannel<? extends ParcelableSelectable<OUT>> merge(
             @NotNull final SparseArray<? extends OutputChannel<? extends OUT>> channelMap) {
 
         return streamOf(Channels.merge(channelMap));
@@ -343,6 +343,74 @@ public class Streams extends Channels {
     public static <DATA> InvocationFactory<DATA, DATA> skip(final int count) {
 
         return com.github.dm.jrt.stream.Streams.skip(count);
+    }
+
+    /**
+     * Builds and returns a new stream output channel.
+     *
+     * @param <OUT> the output data type.
+     * @return the newly created channel instance.
+     */
+    @NotNull
+    public static <OUT> LoaderStreamOutputChannel<OUT> streamOf() {
+
+        return streamOf(JRoutine.io().<OUT>buildChannel().close());
+    }
+
+    /**
+     * Builds and returns a new stream output channel generating the specified outputs.
+     *
+     * @param outputs the iterable returning the output data.
+     * @param <OUT>   the output data type.
+     * @return the newly created channel instance.
+     */
+    @NotNull
+    public static <OUT> LoaderStreamOutputChannel<OUT> streamOf(
+            @Nullable final Iterable<OUT> outputs) {
+
+        return streamOf(JRoutine.io().of(outputs));
+    }
+
+    /**
+     * Builds and returns a new stream output channel generating the specified output.
+     *
+     * @param output the output.
+     * @param <OUT>  the output data type.
+     * @return the newly created channel instance.
+     */
+    @NotNull
+    public static <OUT> LoaderStreamOutputChannel<OUT> streamOf(@Nullable final OUT output) {
+
+        return streamOf(JRoutine.io().of(output));
+    }
+
+    /**
+     * Builds and returns a new stream output channel generating the specified outputs.
+     *
+     * @param outputs the output data.
+     * @param <OUT>   the output data type.
+     * @return the newly created channel instance.
+     */
+    @NotNull
+    public static <OUT> LoaderStreamOutputChannel<OUT> streamOf(@Nullable final OUT... outputs) {
+
+        return streamOf(JRoutine.io().of(outputs));
+    }
+
+    /**
+     * Builds and returns a new stream output channel generating the specified outputs.
+     * <p/>
+     * Note that the output channel will be bound as a result of the call.
+     *
+     * @param output the output channel returning the output data.
+     * @param <OUT>  the output data type.
+     * @return the newly created channel instance.
+     */
+    @NotNull
+    public static <OUT> LoaderStreamOutputChannel<OUT> streamOf(
+            @NotNull final OutputChannel<OUT> output) {
+
+        return new DefaultLoaderStreamOutputChannel<OUT>(null, output);
     }
 
     /**
@@ -412,7 +480,7 @@ public class Streams extends Channels {
          * @return the newly created channel instance.
          */
         @NotNull
-        public <OUT> StreamOutputChannel<OUT> streamOf() {
+        public <OUT> LoaderStreamOutputChannel<OUT> streamOf() {
 
             return streamOf(JRoutine.io().<OUT>buildChannel().close());
         }
@@ -425,7 +493,8 @@ public class Streams extends Channels {
          * @return the newly created channel instance.
          */
         @NotNull
-        public <OUT> StreamOutputChannel<OUT> streamOf(@Nullable final Iterable<OUT> outputs) {
+        public <OUT> LoaderStreamOutputChannel<OUT> streamOf(
+                @Nullable final Iterable<OUT> outputs) {
 
             return streamOf(JRoutine.io().of(outputs));
         }
@@ -438,7 +507,7 @@ public class Streams extends Channels {
          * @return the newly created channel instance.
          */
         @NotNull
-        public <OUT> StreamOutputChannel<OUT> streamOf(@Nullable final OUT output) {
+        public <OUT> LoaderStreamOutputChannel<OUT> streamOf(@Nullable final OUT output) {
 
             return streamOf(JRoutine.io().of(output));
         }
@@ -451,7 +520,7 @@ public class Streams extends Channels {
          * @return the newly created channel instance.
          */
         @NotNull
-        public <OUT> StreamOutputChannel<OUT> streamOf(@Nullable final OUT... outputs) {
+        public <OUT> LoaderStreamOutputChannel<OUT> streamOf(@Nullable final OUT... outputs) {
 
             return streamOf(JRoutine.io().of(outputs));
         }
@@ -466,7 +535,8 @@ public class Streams extends Channels {
          * @return the newly created channel instance.
          */
         @NotNull
-        public <OUT> StreamOutputChannel<OUT> streamOf(@NotNull final OutputChannel<OUT> output) {
+        public <OUT> LoaderStreamOutputChannel<OUT> streamOf(
+                @NotNull final OutputChannel<OUT> output) {
 
             return new DefaultLoaderStreamOutputChannel<OUT>(mContextBuilder, output);
         }

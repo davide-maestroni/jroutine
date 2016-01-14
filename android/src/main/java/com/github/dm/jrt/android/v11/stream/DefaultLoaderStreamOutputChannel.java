@@ -25,6 +25,7 @@ import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static com.github.dm.jrt.android.core.DelegatingContextInvocation.factoryFrom;
 
@@ -47,19 +48,12 @@ public class DefaultLoaderStreamOutputChannel<OUT> extends AbstractLoaderStreamO
      * @param loaderConfiguration     the initial loader configuration.
      * @param channel                 the wrapped output channel.
      */
-    @SuppressWarnings("ConstantConditions")
-    DefaultLoaderStreamOutputChannel(@NotNull final ContextBuilder builder,
+    DefaultLoaderStreamOutputChannel(@Nullable final ContextBuilder builder,
             @NotNull final InvocationConfiguration invocationConfiguration,
             @NotNull final LoaderConfiguration loaderConfiguration,
             @NotNull final OutputChannel<OUT> channel) {
 
         super(invocationConfiguration, loaderConfiguration, channel);
-
-        if (builder == null) {
-
-            throw new NullPointerException("the context builder must not be null");
-        }
-
         mContextBuilder = builder;
     }
 
@@ -69,18 +63,11 @@ public class DefaultLoaderStreamOutputChannel<OUT> extends AbstractLoaderStreamO
      * @param builder the context builder.
      * @param channel the wrapped output channel.
      */
-    @SuppressWarnings("ConstantConditions")
-    DefaultLoaderStreamOutputChannel(@NotNull final ContextBuilder builder,
+    DefaultLoaderStreamOutputChannel(@Nullable final ContextBuilder builder,
             @NotNull final OutputChannel<OUT> channel) {
 
         super(InvocationConfiguration.DEFAULT_CONFIGURATION,
               LoaderConfiguration.DEFAULT_CONFIGURATION, channel);
-
-        if (builder == null) {
-
-            throw new NullPointerException("the context builder must not be null");
-        }
-
         mContextBuilder = builder;
     }
 
@@ -102,16 +89,27 @@ public class DefaultLoaderStreamOutputChannel<OUT> extends AbstractLoaderStreamO
             @NotNull final LoaderConfiguration loaderConfiguration,
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
 
+        final ContextBuilder contextBuilder = mContextBuilder;
+
+        if (contextBuilder == null) {
+
+            return JRoutine.on(factory)
+                           .withInvocations()
+                           .with(invocationConfiguration)
+                           .set()
+                           .buildRoutine();
+        }
+
         final FunctionContextInvocationFactory<? super OUT, ? extends AFTER> invocationFactory =
                 factoryFrom(JRoutine.on(factory).buildRoutine(), factory.hashCode(),
                             DelegationType.SYNC);
-        return mContextBuilder.on(invocationFactory)
-                              .withInvocations()
-                              .with(invocationConfiguration)
-                              .set()
-                              .withLoaders()
-                              .with(loaderConfiguration)
-                              .set()
-                              .buildRoutine();
+        return contextBuilder.on(invocationFactory)
+                             .withInvocations()
+                             .with(invocationConfiguration)
+                             .set()
+                             .withLoaders()
+                             .with(loaderConfiguration)
+                             .set()
+                             .buildRoutine();
     }
 }

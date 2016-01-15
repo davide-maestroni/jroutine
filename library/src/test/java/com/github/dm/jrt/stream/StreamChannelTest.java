@@ -61,7 +61,7 @@ import static org.junit.Assert.fail;
  * <p/>
  * Created by davide-maestroni on 10/22/2015.
  */
-public class StreamOutputChannelTest {
+public class StreamChannelTest {
 
     private final Runner mSingleThreadRunner = Runners.poolRunner(1);
 
@@ -98,7 +98,7 @@ public class StreamOutputChannelTest {
     @Test
     public void testChannel() {
 
-        StreamOutputChannel<String> channel = Streams.streamOf("test");
+        StreamChannel<String> channel = Streams.streamOf("test");
         assertThat(channel.abort()).isFalse();
         assertThat(channel.abort(null)).isFalse();
         assertThat(channel.isOpen()).isFalse();
@@ -1814,10 +1814,10 @@ public class StreamOutputChannelTest {
                         return o.toString();
                     }
                 })).buildRoutine();
-        final Function<Object, StreamOutputChannel<String>> retryFunction =
-                new Function<Object, StreamOutputChannel<String>>() {
+        final Function<Object, StreamChannel<String>> retryFunction =
+                new Function<Object, StreamChannel<String>>() {
 
-                    public StreamOutputChannel<String> apply(final Object o) {
+                    public StreamChannel<String> apply(final Object o) {
 
                         final int[] count = {0};
                         return Streams.streamOf(o)

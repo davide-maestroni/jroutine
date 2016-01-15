@@ -27,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <OUT> the output data type.
  */
-class DefaultStreamOutputChannel<OUT> extends AbstractStreamOutputChannel<OUT> {
+class DefaultStreamChannel<OUT> extends AbstractStreamChannel<OUT> {
 
     /**
      * Constructor.
@@ -35,7 +35,7 @@ class DefaultStreamOutputChannel<OUT> extends AbstractStreamOutputChannel<OUT> {
      * @param configuration the initial invocation configuration.
      * @param channel       the wrapped output channel.
      */
-    DefaultStreamOutputChannel(@NotNull final InvocationConfiguration configuration,
+    DefaultStreamChannel(@NotNull final InvocationConfiguration configuration,
             @NotNull final OutputChannel<OUT> channel) {
 
         super(configuration, channel);
@@ -46,18 +46,18 @@ class DefaultStreamOutputChannel<OUT> extends AbstractStreamOutputChannel<OUT> {
      *
      * @param channel the wrapped output channel.
      */
-    DefaultStreamOutputChannel(@NotNull final OutputChannel<OUT> channel) {
+    DefaultStreamChannel(@NotNull final OutputChannel<OUT> channel) {
 
         super(InvocationConfiguration.DEFAULT_CONFIGURATION, channel);
     }
 
     @NotNull
     @Override
-    protected <AFTER> StreamOutputChannel<AFTER> newChannel(
+    protected <AFTER> StreamChannel<AFTER> newChannel(
             @NotNull final InvocationConfiguration configuration,
             @NotNull final OutputChannel<AFTER> channel) {
 
-        return new DefaultStreamOutputChannel<AFTER>(configuration, channel);
+        return new DefaultStreamChannel<AFTER>(configuration, channel);
     }
 
     @NotNull

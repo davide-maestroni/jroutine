@@ -41,7 +41,7 @@ import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.invocation.TemplateInvocation;
 import com.github.dm.jrt.routine.Routine;
-import com.github.dm.jrt.stream.StreamOutputChannel;
+import com.github.dm.jrt.stream.StreamChannel;
 import com.github.dm.jrt.util.ClassToken;
 
 import org.jetbrains.annotations.NotNull;
@@ -78,15 +78,13 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         }
 
         final LoaderContext context = loaderFrom(getActivity());
-        StreamOutputChannel<String> channel1 =
-                Streams.with(context).streamOf("test1", "test2", "test3");
-        StreamOutputChannel<String> channel2 =
-                Streams.with(context).streamOf("test4", "test5", "test6");
+        StreamChannel<String> channel1 = Streams.with(context).streamOf("test1", "test2", "test3");
+        StreamChannel<String> channel2 = Streams.with(context).streamOf("test4", "test5", "test6");
         assertThat(Streams.blend(channel2, channel1).afterMax(seconds(1)).all()).containsOnly(
                 "test1", "test2", "test3", "test4", "test5", "test6");
         channel1 = Streams.with(context).streamOf("test1", "test2", "test3");
         channel2 = Streams.with(context).streamOf("test4", "test5", "test6");
-        assertThat(Streams.blend(Arrays.<StreamOutputChannel<?>>asList(channel1, channel2))
+        assertThat(Streams.blend(Arrays.<StreamChannel<?>>asList(channel1, channel2))
                           .afterMax(seconds(1))
                           .all()).containsOnly("test1", "test2", "test3", "test4", "test5",
                                                "test6");
@@ -231,6 +229,16 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                           .streamOf(JRoutine.io().of("test1", "test2", "test3"))
                           .afterMax(seconds(1))
                           .all()).containsExactly("test1", "test2", "test3");
+        assertThat(Streams.streamOf("test").afterMax(seconds(1)).all()).containsExactly("test");
+        assertThat(Streams.streamOf("test1", "test2", "test3")
+                          .afterMax(seconds(1))
+                          .all()).containsExactly("test1", "test2", "test3");
+        assertThat(Streams.streamOf(Arrays.asList("test1", "test2", "test3"))
+                          .afterMax(seconds(1))
+                          .all()).containsExactly("test1", "test2", "test3");
+        assertThat(Streams.streamOf(JRoutine.io().of("test1", "test2", "test3"))
+                          .afterMax(seconds(1))
+                          .all()).containsExactly("test1", "test2", "test3");
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -260,15 +268,13 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         }
 
         final LoaderContext context = loaderFrom(getActivity());
-        StreamOutputChannel<String> channel1 =
-                Streams.with(context).streamOf("test1", "test2", "test3");
-        StreamOutputChannel<String> channel2 =
-                Streams.with(context).streamOf("test4", "test5", "test6");
+        StreamChannel<String> channel1 = Streams.with(context).streamOf("test1", "test2", "test3");
+        StreamChannel<String> channel2 = Streams.with(context).streamOf("test4", "test5", "test6");
         assertThat(Streams.concat(channel2, channel1).afterMax(seconds(1)).all()).containsExactly(
                 "test4", "test5", "test6", "test1", "test2", "test3");
         channel1 = Streams.with(context).streamOf("test1", "test2", "test3");
         channel2 = Streams.with(context).streamOf("test4", "test5", "test6");
-        assertThat(Streams.concat(Arrays.<StreamOutputChannel<?>>asList(channel1, channel2))
+        assertThat(Streams.concat(Arrays.<StreamChannel<?>>asList(channel1, channel2))
                           .afterMax(seconds(1))
                           .all()).containsExactly("test1", "test2", "test3", "test4", "test5",
                                                   "test6");
@@ -398,10 +404,10 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         }
 
         final FunctionContextInvocationFactory<String, String> factory = Streams.factory(
-                new Function<StreamOutputChannel<? extends String>, StreamOutputChannel<String>>() {
+                new Function<StreamChannel<? extends String>, StreamChannel<String>>() {
 
-                    public StreamOutputChannel<String> apply(
-                            final StreamOutputChannel<? extends String> channel) {
+                    public StreamChannel<String> apply(
+                            final StreamChannel<? extends String> channel) {
 
                         return channel.syncMap(new Function<String, String>() {
 
@@ -432,11 +438,11 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         }
 
         assertThat(Streams.with(loaderFrom(getActivity()))
-                          .on(new Function<StreamOutputChannel<? extends String>,
-                                  StreamOutputChannel<String>>() {
+                          .on(new Function<StreamChannel<? extends String>,
+                                  StreamChannel<String>>() {
 
-                              public StreamOutputChannel<String> apply(
-                                      final StreamOutputChannel<? extends String> channel) {
+                              public StreamChannel<String> apply(
+                                      final StreamChannel<? extends String> channel) {
 
                                   return channel.syncMap(new Function<String, String>() {
 
@@ -455,11 +461,11 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
             final InvocationChannel<String, String> channel =
                     Streams.with(loaderFrom(getActivity()))
-                           .on(new Function<StreamOutputChannel<? extends String>,
-                                   StreamOutputChannel<String>>() {
+                           .on(new Function<StreamChannel<? extends String>,
+                                   StreamChannel<String>>() {
 
-                               public StreamOutputChannel<String> apply(
-                                       final StreamOutputChannel<? extends String> channel) {
+                               public StreamChannel<String> apply(
+                                       final StreamChannel<? extends String> channel) {
 
                                    return channel.syncMap(new Function<String, String>() {
 
@@ -483,12 +489,11 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
     public void testFactoryEquals() {
 
-        final Function<StreamOutputChannel<? extends String>, StreamOutputChannel<String>>
-                function =
-                new Function<StreamOutputChannel<? extends String>, StreamOutputChannel<String>>() {
+        final Function<StreamChannel<? extends String>, StreamChannel<String>> function =
+                new Function<StreamChannel<? extends String>, StreamChannel<String>>() {
 
-                    public StreamOutputChannel<String> apply(
-                            final StreamOutputChannel<? extends String> channel) {
+                    public StreamChannel<String> apply(
+                            final StreamChannel<? extends String> channel) {
 
                         return channel.syncMap(new Function<String, String>() {
 
@@ -503,8 +508,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         assertThat(factory).isEqualTo(factory);
         assertThat(factory).isNotEqualTo(null);
         assertThat(factory).isNotEqualTo("test");
-        assertThat(factory).isNotEqualTo(
-                Streams.factory(Functions.<StreamOutputChannel<?>>identity()));
+        assertThat(factory).isNotEqualTo(Streams.factory(Functions.<StreamChannel<?>>identity()));
         assertThat(factory).isEqualTo(Streams.factory(function));
         assertThat(factory.hashCode()).isEqualTo(Streams.factory(function).hashCode());
     }
@@ -569,6 +573,22 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         assertThat(Streams.with(context)
                           .streamOf()
                           .syncRange(1, 10)
+                          .asyncMap(Streams.<Number>groupBy(13))
+                          .afterMax(seconds(3))
+                          .all()).containsExactly(
+                Arrays.<Number>asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+        assertThat(Streams.streamOf()
+                          .syncRange(1, 10)
+                          .with(context)
+                          .asyncMap(Streams.<Number>groupBy(3))
+                          .afterMax(seconds(3))
+                          .all()).containsExactly(Arrays.<Number>asList(1, 2, 3),
+                                                  Arrays.<Number>asList(4, 5, 6),
+                                                  Arrays.<Number>asList(7, 8, 9),
+                                                  Collections.<Number>singletonList(10));
+        assertThat(Streams.streamOf()
+                          .syncRange(1, 10)
+                          .with(context)
                           .asyncMap(Streams.<Number>groupBy(13))
                           .afterMax(seconds(3))
                           .all()).containsExactly(
@@ -929,6 +949,24 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         assertThat(Streams.with(context)
                           .streamOf()
                           .syncRange(1, 10)
+                          .asyncMap(Streams.limit(15))
+                          .afterMax(seconds(3))
+                          .all()).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+        assertThat(Streams.streamOf()
+                          .syncRange(1, 10)
+                          .with(context)
+                          .asyncMap(Streams.limit(5))
+                          .afterMax(seconds(3))
+                          .all()).containsExactly(1, 2, 3, 4, 5);
+        assertThat(Streams.streamOf()
+                          .syncRange(1, 10)
+                          .with(context)
+                          .asyncMap(Streams.limit(0))
+                          .afterMax(seconds(3))
+                          .all()).isEmpty();
+        assertThat(Streams.streamOf()
+                          .syncRange(1, 10)
+                          .with(context)
                           .asyncMap(Streams.limit(15))
                           .afterMax(seconds(3))
                           .all()).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
@@ -1332,6 +1370,24 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         assertThat(Streams.with(context)
                           .streamOf()
                           .syncRange(1, 10)
+                          .asyncMap(Streams.skip(0))
+                          .afterMax(seconds(3))
+                          .all()).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+        assertThat(Streams.streamOf()
+                          .syncRange(1, 10)
+                          .with(context)
+                          .asyncMap(Streams.skip(5))
+                          .afterMax(seconds(3))
+                          .all()).containsExactly(6, 7, 8, 9, 10);
+        assertThat(Streams.streamOf()
+                          .syncRange(1, 10)
+                          .with(context)
+                          .asyncMap(Streams.skip(15))
+                          .afterMax(seconds(3))
+                          .all()).isEmpty();
+        assertThat(Streams.streamOf()
+                          .syncRange(1, 10)
+                          .with(context)
                           .asyncMap(Streams.skip(0))
                           .afterMax(seconds(3))
                           .all()).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);

@@ -58,7 +58,7 @@ public class Streams extends Channels {
      * @return the stream channel.
      */
     @NotNull
-    public static <OUT> StreamOutputChannel<OUT> blend(
+    public static <OUT> StreamChannel<OUT> blend(
             @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
 
         return streamOf(Channels.blend(channels));
@@ -73,7 +73,7 @@ public class Streams extends Channels {
      * @return the stream channel.
      */
     @NotNull
-    public static <OUT> StreamOutputChannel<OUT> blend(
+    public static <OUT> StreamChannel<OUT> blend(
             @NotNull final OutputChannel<?>... channels) {
 
         return streamOf(Channels.<OUT>blend(channels));
@@ -90,7 +90,7 @@ public class Streams extends Channels {
      * @return the stream channel.
      */
     @NotNull
-    public static <OUT> StreamOutputChannel<OUT> concat(
+    public static <OUT> StreamChannel<OUT> concat(
             @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
 
         return streamOf(Channels.concat(channels));
@@ -107,7 +107,7 @@ public class Streams extends Channels {
      * @return the stream channel.
      */
     @NotNull
-    public static <OUT> StreamOutputChannel<OUT> concat(
+    public static <OUT> StreamChannel<OUT> concat(
             @NotNull final OutputChannel<?>... channels) {
 
         return streamOf(Channels.<OUT>concat(channels));
@@ -126,8 +126,8 @@ public class Streams extends Channels {
      */
     @NotNull
     public static <IN, OUT> InvocationFactory<IN, OUT> factory(
-            @NotNull final Function<? super StreamOutputChannel<? extends IN>, ? extends
-                    StreamOutputChannel<? extends OUT>> function) {
+            @NotNull final Function<? super StreamChannel<? extends IN>, ? extends
+                    StreamChannel<? extends OUT>> function) {
 
         return new StreamInvocationFactory<IN, OUT>(wrapFunction(function));
     }
@@ -159,7 +159,7 @@ public class Streams extends Channels {
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @NotNull
-    public static <OUT> StreamOutputChannel<List<? extends OUT>> join(
+    public static <OUT> StreamChannel<List<? extends OUT>> join(
             @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
 
         return streamOf(Channels.join(channels));
@@ -177,7 +177,7 @@ public class Streams extends Channels {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static <OUT> StreamOutputChannel<List<? extends OUT>> join(
+    public static <OUT> StreamChannel<List<? extends OUT>> join(
             @NotNull final OutputChannel<?>... channels) {
 
         return streamOf(Channels.<OUT>join(channels));
@@ -199,7 +199,7 @@ public class Streams extends Channels {
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @NotNull
-    public static <OUT> StreamOutputChannel<List<? extends OUT>> joinAndFlush(
+    public static <OUT> StreamChannel<List<? extends OUT>> joinAndFlush(
             @Nullable final OUT placeholder,
             @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
 
@@ -222,7 +222,7 @@ public class Streams extends Channels {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static <OUT> StreamOutputChannel<List<? extends OUT>> joinAndFlush(
+    public static <OUT> StreamChannel<List<? extends OUT>> joinAndFlush(
             @Nullable final Object placeholder, @NotNull final OutputChannel<?>... channels) {
 
         return streamOf(Channels.<OUT>joinAndFlush(placeholder, channels));
@@ -254,7 +254,7 @@ public class Streams extends Channels {
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @NotNull
-    public static <OUT> StreamOutputChannel<? extends Selectable<OUT>> merge(final int startIndex,
+    public static <OUT> StreamChannel<? extends Selectable<OUT>> merge(final int startIndex,
             @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
 
         return streamOf(Channels.merge(startIndex, channels));
@@ -271,7 +271,7 @@ public class Streams extends Channels {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static <OUT> StreamOutputChannel<? extends Selectable<OUT>> merge(final int startIndex,
+    public static <OUT> StreamChannel<? extends Selectable<OUT>> merge(final int startIndex,
             @NotNull final OutputChannel<?>... channels) {
 
         return streamOf(Channels.<OUT>merge(startIndex, channels));
@@ -288,7 +288,7 @@ public class Streams extends Channels {
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @NotNull
-    public static <OUT> StreamOutputChannel<? extends Selectable<OUT>> merge(
+    public static <OUT> StreamChannel<? extends Selectable<OUT>> merge(
             @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
 
         return streamOf(Channels.merge(channels));
@@ -304,7 +304,7 @@ public class Streams extends Channels {
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
      */
     @NotNull
-    public static <OUT> StreamOutputChannel<? extends Selectable<OUT>> merge(
+    public static <OUT> StreamChannel<? extends Selectable<OUT>> merge(
             @NotNull final Map<Integer, ? extends OutputChannel<? extends OUT>> channelMap) {
 
         return streamOf(Channels.merge(channelMap));
@@ -321,7 +321,7 @@ public class Streams extends Channels {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static <OUT> StreamOutputChannel<? extends Selectable<OUT>> merge(
+    public static <OUT> StreamChannel<? extends Selectable<OUT>> merge(
             @NotNull final OutputChannel<?>... channels) {
 
         return streamOf(Channels.<OUT>merge(channels));
@@ -340,8 +340,8 @@ public class Streams extends Channels {
      */
     @NotNull
     public static <IN, OUT> RoutineBuilder<IN, OUT> on(
-            @NotNull final Function<? super StreamOutputChannel<? extends IN>, ? extends
-                    StreamOutputChannel<? extends OUT>> function) {
+            @NotNull final Function<? super StreamChannel<? extends IN>, ? extends
+                    StreamChannel<? extends OUT>> function) {
 
         return JRoutine.on(factory(function));
     }
@@ -367,7 +367,7 @@ public class Streams extends Channels {
      * @return the newly created channel instance.
      */
     @NotNull
-    public static <OUT> StreamOutputChannel<OUT> streamOf() {
+    public static <OUT> StreamChannel<OUT> streamOf() {
 
         return streamOf(JRoutine.io().<OUT>buildChannel().close());
     }
@@ -380,7 +380,7 @@ public class Streams extends Channels {
      * @return the newly created channel instance.
      */
     @NotNull
-    public static <OUT> StreamOutputChannel<OUT> streamOf(@Nullable final Iterable<OUT> outputs) {
+    public static <OUT> StreamChannel<OUT> streamOf(@Nullable final Iterable<OUT> outputs) {
 
         return streamOf(JRoutine.io().of(outputs));
     }
@@ -393,7 +393,7 @@ public class Streams extends Channels {
      * @return the newly created channel instance.
      */
     @NotNull
-    public static <OUT> StreamOutputChannel<OUT> streamOf(@Nullable final OUT output) {
+    public static <OUT> StreamChannel<OUT> streamOf(@Nullable final OUT output) {
 
         return streamOf(JRoutine.io().of(output));
     }
@@ -406,7 +406,7 @@ public class Streams extends Channels {
      * @return the newly created channel instance.
      */
     @NotNull
-    public static <OUT> StreamOutputChannel<OUT> streamOf(@Nullable final OUT... outputs) {
+    public static <OUT> StreamChannel<OUT> streamOf(@Nullable final OUT... outputs) {
 
         return streamOf(JRoutine.io().of(outputs));
     }
@@ -421,10 +421,10 @@ public class Streams extends Channels {
      * @return the newly created channel instance.
      */
     @NotNull
-    public static <OUT> StreamOutputChannel<OUT> streamOf(
+    public static <OUT> StreamChannel<OUT> streamOf(
             @NotNull final OutputChannel<OUT> output) {
 
-        return new DefaultStreamOutputChannel<OUT>(output);
+        return new DefaultStreamChannel<OUT>(output);
     }
 
     /**
@@ -740,12 +740,12 @@ public class Streams extends Channels {
      */
     private static class StreamInvocation<IN, OUT> implements Invocation<IN, OUT> {
 
-        private final Function<? super StreamOutputChannel<? extends IN>, ? extends
-                StreamOutputChannel<? extends OUT>> mFunction;
+        private final Function<? super StreamChannel<? extends IN>, ? extends
+                StreamChannel<? extends OUT>> mFunction;
 
         private IOChannel<IN> mInputChannel;
 
-        private StreamOutputChannel<? extends OUT> mOutputChannel;
+        private StreamChannel<? extends OUT> mOutputChannel;
 
         /**
          * Constructor.
@@ -753,8 +753,8 @@ public class Streams extends Channels {
          * @param function the function used to instantiate the stream output channel.
          */
         private StreamInvocation(
-                @NotNull final Function<? super StreamOutputChannel<? extends IN>, ? extends
-                        StreamOutputChannel<? extends OUT>> function) {
+                @NotNull final Function<? super StreamChannel<? extends IN>, ? extends
+                        StreamChannel<? extends OUT>> function) {
 
             mFunction = function;
         }
@@ -777,7 +777,7 @@ public class Streams extends Channels {
 
         public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
 
-            final StreamOutputChannel<? extends OUT> outputChannel = mOutputChannel;
+            final StreamChannel<? extends OUT> outputChannel = mOutputChannel;
 
             if (!outputChannel.isBound()) {
 
@@ -789,7 +789,7 @@ public class Streams extends Channels {
 
         public void onResult(@NotNull final ResultChannel<OUT> result) {
 
-            final StreamOutputChannel<? extends OUT> outputChannel = mOutputChannel;
+            final StreamChannel<? extends OUT> outputChannel = mOutputChannel;
 
             if (!outputChannel.isBound()) {
 
@@ -814,8 +814,8 @@ public class Streams extends Channels {
      */
     private static class StreamInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
-        private final FunctionWrapper<? super StreamOutputChannel<? extends IN>, ? extends
-                StreamOutputChannel<? extends OUT>> mFunction;
+        private final FunctionWrapper<? super StreamChannel<? extends IN>, ? extends
+                StreamChannel<? extends OUT>> mFunction;
 
         /**
          * Constructor.
@@ -823,8 +823,8 @@ public class Streams extends Channels {
          * @param function the function used to instantiate the stream output channel.
          */
         private StreamInvocationFactory(
-                @NotNull final FunctionWrapper<? super StreamOutputChannel<? extends IN>, ? extends
-                        StreamOutputChannel<? extends OUT>> function) {
+                @NotNull final FunctionWrapper<? super StreamChannel<? extends IN>, ? extends
+                        StreamChannel<? extends OUT>> function) {
 
             mFunction = function;
         }

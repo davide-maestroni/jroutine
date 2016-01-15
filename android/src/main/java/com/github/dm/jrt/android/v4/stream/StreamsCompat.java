@@ -17,7 +17,6 @@ import android.support.v4.util.SparseArrayCompat;
 
 import com.github.dm.jrt.android.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
-import com.github.dm.jrt.android.stream.LoaderStreamOutputChannel;
 import com.github.dm.jrt.android.v4.core.ChannelsCompat;
 import com.github.dm.jrt.android.v4.core.JRoutineCompat;
 import com.github.dm.jrt.android.v4.core.JRoutineCompat.ContextBuilderCompat;
@@ -26,7 +25,7 @@ import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.invocation.InvocationFactory;
-import com.github.dm.jrt.stream.StreamOutputChannel;
+import com.github.dm.jrt.stream.StreamChannel;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -63,7 +62,7 @@ public class StreamsCompat extends ChannelsCompat {
      * @return the stream channel.
      */
     @NotNull
-    public static <OUT> LoaderStreamOutputChannel<OUT> blend(
+    public static <OUT> LoaderStreamChannelCompat<OUT> blend(
             @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
 
         return streamOf(ChannelsCompat.blend(channels));
@@ -78,7 +77,7 @@ public class StreamsCompat extends ChannelsCompat {
      * @return the stream channel.
      */
     @NotNull
-    public static <OUT> LoaderStreamOutputChannel<OUT> blend(
+    public static <OUT> LoaderStreamChannelCompat<OUT> blend(
             @NotNull final OutputChannel<?>... channels) {
 
         return streamOf(ChannelsCompat.<OUT>blend(channels));
@@ -95,7 +94,7 @@ public class StreamsCompat extends ChannelsCompat {
      * @return the stream channel.
      */
     @NotNull
-    public static <OUT> LoaderStreamOutputChannel<OUT> concat(
+    public static <OUT> LoaderStreamChannelCompat<OUT> concat(
             @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
 
         return streamOf(ChannelsCompat.concat(channels));
@@ -112,7 +111,7 @@ public class StreamsCompat extends ChannelsCompat {
      * @return the stream channel.
      */
     @NotNull
-    public static <OUT> LoaderStreamOutputChannel<OUT> concat(
+    public static <OUT> LoaderStreamChannelCompat<OUT> concat(
             @NotNull final OutputChannel<?>... channels) {
 
         return streamOf(ChannelsCompat.<OUT>concat(channels));
@@ -131,8 +130,8 @@ public class StreamsCompat extends ChannelsCompat {
      */
     @NotNull
     public static <IN, OUT> FunctionContextInvocationFactory<IN, OUT> factory(
-            @NotNull final Function<? super StreamOutputChannel<? extends IN>, ? extends
-                    StreamOutputChannel<? extends OUT>> function) {
+            @NotNull final Function<? super StreamChannel<? extends IN>, ? extends
+                    StreamChannel<? extends OUT>> function) {
 
         return factoryFrom(com.github.dm.jrt.stream.Streams.on(function),
                            wrapFunction(function).safeHashCode(), DelegationType.SYNC);
@@ -164,7 +163,7 @@ public class StreamsCompat extends ChannelsCompat {
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @NotNull
-    public static <OUT> LoaderStreamOutputChannel<List<? extends OUT>> join(
+    public static <OUT> LoaderStreamChannelCompat<List<? extends OUT>> join(
             @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
 
         return streamOf(ChannelsCompat.join(channels));
@@ -182,7 +181,7 @@ public class StreamsCompat extends ChannelsCompat {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static <OUT> LoaderStreamOutputChannel<List<? extends OUT>> join(
+    public static <OUT> LoaderStreamChannelCompat<List<? extends OUT>> join(
             @NotNull final OutputChannel<?>... channels) {
 
         return streamOf(ChannelsCompat.<OUT>join(channels));
@@ -204,7 +203,7 @@ public class StreamsCompat extends ChannelsCompat {
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @NotNull
-    public static <OUT> LoaderStreamOutputChannel<List<? extends OUT>> joinAndFlush(
+    public static <OUT> LoaderStreamChannelCompat<List<? extends OUT>> joinAndFlush(
             @Nullable final OUT placeholder,
             @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
 
@@ -227,7 +226,7 @@ public class StreamsCompat extends ChannelsCompat {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static <OUT> LoaderStreamOutputChannel<List<? extends OUT>> joinAndFlush(
+    public static <OUT> LoaderStreamChannelCompat<List<? extends OUT>> joinAndFlush(
             @Nullable final Object placeholder, @NotNull final OutputChannel<?>... channels) {
 
         return streamOf(ChannelsCompat.<OUT>joinAndFlush(placeholder, channels));
@@ -258,7 +257,7 @@ public class StreamsCompat extends ChannelsCompat {
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @NotNull
-    public static <OUT> LoaderStreamOutputChannel<? extends ParcelableSelectable<OUT>> merge(
+    public static <OUT> LoaderStreamChannelCompat<? extends ParcelableSelectable<OUT>> merge(
             final int startIndex,
             @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
 
@@ -276,7 +275,7 @@ public class StreamsCompat extends ChannelsCompat {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static <OUT> LoaderStreamOutputChannel<? extends ParcelableSelectable<OUT>> merge(
+    public static <OUT> LoaderStreamChannelCompat<? extends ParcelableSelectable<OUT>> merge(
             final int startIndex, @NotNull final OutputChannel<?>... channels) {
 
         return streamOf(ChannelsCompat.<OUT>merge(startIndex, channels));
@@ -293,7 +292,7 @@ public class StreamsCompat extends ChannelsCompat {
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @NotNull
-    public static <OUT> LoaderStreamOutputChannel<? extends ParcelableSelectable<OUT>> merge(
+    public static <OUT> LoaderStreamChannelCompat<? extends ParcelableSelectable<OUT>> merge(
             @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
 
         return streamOf(ChannelsCompat.merge(channels));
@@ -310,7 +309,7 @@ public class StreamsCompat extends ChannelsCompat {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static <OUT> LoaderStreamOutputChannel<? extends ParcelableSelectable<OUT>> merge(
+    public static <OUT> LoaderStreamChannelCompat<? extends ParcelableSelectable<OUT>> merge(
             @NotNull final OutputChannel<?>... channels) {
 
         return streamOf(ChannelsCompat.<OUT>merge(channels));
@@ -326,7 +325,7 @@ public class StreamsCompat extends ChannelsCompat {
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
      */
     @NotNull
-    public static <OUT> LoaderStreamOutputChannel<? extends ParcelableSelectable<OUT>> merge(
+    public static <OUT> LoaderStreamChannelCompat<? extends ParcelableSelectable<OUT>> merge(
             @NotNull final SparseArrayCompat<? extends OutputChannel<? extends OUT>> channelMap) {
 
         return streamOf(ChannelsCompat.merge(channelMap));
@@ -352,7 +351,7 @@ public class StreamsCompat extends ChannelsCompat {
      * @return the newly created channel instance.
      */
     @NotNull
-    public static <OUT> LoaderStreamOutputChannel<OUT> streamOf() {
+    public static <OUT> LoaderStreamChannelCompat<OUT> streamOf() {
 
         return streamOf(JRoutineCompat.io().<OUT>buildChannel().close());
     }
@@ -365,7 +364,7 @@ public class StreamsCompat extends ChannelsCompat {
      * @return the newly created channel instance.
      */
     @NotNull
-    public static <OUT> LoaderStreamOutputChannel<OUT> streamOf(
+    public static <OUT> LoaderStreamChannelCompat<OUT> streamOf(
             @Nullable final Iterable<OUT> outputs) {
 
         return streamOf(JRoutineCompat.io().of(outputs));
@@ -379,7 +378,7 @@ public class StreamsCompat extends ChannelsCompat {
      * @return the newly created channel instance.
      */
     @NotNull
-    public static <OUT> LoaderStreamOutputChannel<OUT> streamOf(@Nullable final OUT output) {
+    public static <OUT> LoaderStreamChannelCompat<OUT> streamOf(@Nullable final OUT output) {
 
         return streamOf(JRoutineCompat.io().of(output));
     }
@@ -392,7 +391,7 @@ public class StreamsCompat extends ChannelsCompat {
      * @return the newly created channel instance.
      */
     @NotNull
-    public static <OUT> LoaderStreamOutputChannel<OUT> streamOf(@Nullable final OUT... outputs) {
+    public static <OUT> LoaderStreamChannelCompat<OUT> streamOf(@Nullable final OUT... outputs) {
 
         return streamOf(JRoutineCompat.io().of(outputs));
     }
@@ -407,10 +406,10 @@ public class StreamsCompat extends ChannelsCompat {
      * @return the newly created channel instance.
      */
     @NotNull
-    public static <OUT> LoaderStreamOutputChannel<OUT> streamOf(
+    public static <OUT> LoaderStreamChannelCompat<OUT> streamOf(
             @NotNull final OutputChannel<OUT> output) {
 
-        return new DefaultLoaderStreamOutputChannel<OUT>(null, output);
+        return new DefaultLoaderStreamChannelCompat<OUT>(null, output);
     }
 
     /**
@@ -467,8 +466,8 @@ public class StreamsCompat extends ChannelsCompat {
          */
         @NotNull
         public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
-                @NotNull final Function<? super StreamOutputChannel<? extends IN>, ? extends
-                        StreamOutputChannel<? extends OUT>> function) {
+                @NotNull final Function<? super StreamChannel<? extends IN>, ? extends
+                        StreamChannel<? extends OUT>> function) {
 
             return mContextBuilder.on(factory(function));
         }
@@ -480,7 +479,7 @@ public class StreamsCompat extends ChannelsCompat {
          * @return the newly created channel instance.
          */
         @NotNull
-        public <OUT> LoaderStreamOutputChannel<OUT> streamOf() {
+        public <OUT> LoaderStreamChannelCompat<OUT> streamOf() {
 
             return streamOf(JRoutineCompat.io().<OUT>buildChannel().close());
         }
@@ -493,7 +492,7 @@ public class StreamsCompat extends ChannelsCompat {
          * @return the newly created channel instance.
          */
         @NotNull
-        public <OUT> LoaderStreamOutputChannel<OUT> streamOf(
+        public <OUT> LoaderStreamChannelCompat<OUT> streamOf(
                 @Nullable final Iterable<OUT> outputs) {
 
             return streamOf(JRoutineCompat.io().of(outputs));
@@ -507,7 +506,7 @@ public class StreamsCompat extends ChannelsCompat {
          * @return the newly created channel instance.
          */
         @NotNull
-        public <OUT> LoaderStreamOutputChannel<OUT> streamOf(@Nullable final OUT output) {
+        public <OUT> LoaderStreamChannelCompat<OUT> streamOf(@Nullable final OUT output) {
 
             return streamOf(JRoutineCompat.io().of(output));
         }
@@ -520,7 +519,7 @@ public class StreamsCompat extends ChannelsCompat {
          * @return the newly created channel instance.
          */
         @NotNull
-        public <OUT> LoaderStreamOutputChannel<OUT> streamOf(@Nullable final OUT... outputs) {
+        public <OUT> LoaderStreamChannelCompat<OUT> streamOf(@Nullable final OUT... outputs) {
 
             return streamOf(JRoutineCompat.io().of(outputs));
         }
@@ -535,10 +534,10 @@ public class StreamsCompat extends ChannelsCompat {
          * @return the newly created channel instance.
          */
         @NotNull
-        public <OUT> LoaderStreamOutputChannel<OUT> streamOf(
+        public <OUT> LoaderStreamChannelCompat<OUT> streamOf(
                 @NotNull final OutputChannel<OUT> output) {
 
-            return new DefaultLoaderStreamOutputChannel<OUT>(mContextBuilder, output);
+            return new DefaultLoaderStreamChannelCompat<OUT>(mContextBuilder, output);
         }
     }
 }

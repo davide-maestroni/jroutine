@@ -27,7 +27,7 @@ import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.invocation.PassingInvocation;
 import com.github.dm.jrt.invocation.TemplateInvocation;
 import com.github.dm.jrt.routine.Routine;
-import com.github.dm.jrt.stream.StreamOutputChannel;
+import com.github.dm.jrt.stream.StreamChannel;
 import com.github.dm.jrt.stream.Streams;
 import com.github.dm.jrt.util.ClassToken;
 
@@ -1770,9 +1770,9 @@ public class ChannelsTest {
                 JRoutine.on(new Sort()).buildRoutine();
         final IOChannel<Selectable<Object>> inputChannel = JRoutine.io().buildChannel();
         final OutputChannel<Selectable<Object>> outputChannel = routine.asyncCall(inputChannel);
-        final StreamOutputChannel<Object> intChannel =
+        final StreamChannel<Object> intChannel =
                 Streams.streamOf(Channels.select(outputChannel).index(Sort.INTEGER)).runOnShared();
-        final StreamOutputChannel<Object> strChannel =
+        final StreamChannel<Object> strChannel =
                 Streams.streamOf(Channels.select(outputChannel).index(Sort.STRING)).runOnShared();
         inputChannel.pass(new Selectable<Object>("test21", Sort.STRING),
                           new Selectable<Object>(-11, Sort.INTEGER));

@@ -17,14 +17,12 @@ import com.github.dm.jrt.builder.IOChannelBuilder;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.channel.AbortException;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
-import com.github.dm.jrt.channel.ExecutionDeadlockException;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.core.Channels;
 import com.github.dm.jrt.core.Channels.Selectable;
 import com.github.dm.jrt.core.JRoutine;
-import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.invocation.FilterInvocation;
@@ -33,12 +31,9 @@ import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.invocation.PassingInvocation;
 import com.github.dm.jrt.invocation.TemplateInvocation;
 import com.github.dm.jrt.routine.Routine;
-import com.github.dm.jrt.runner.Runner;
-import com.github.dm.jrt.runner.Runners;
 import com.github.dm.jrt.util.ClassToken;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -46,13 +41,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.github.dm.jrt.invocation.Invocations.factoryOf;
-import static com.github.dm.jrt.util.TimeDuration.days;
 import static com.github.dm.jrt.util.TimeDuration.millis;
 import static com.github.dm.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -65,228 +55,228 @@ import static org.junit.Assert.fail;
  */
 public class StreamsTest {
 
-    @Test
-    public void muori() {
-
-        final Runner runner1 = Runners.poolRunner(1);
-        final Runner runner2 = Runners.poolRunner(1);
-
-        for (int i = 0; i < 1; i++) {
-
-            final IOChannel<Object> ioChannel = JRoutine.io()
-                                                        .withChannels()
-                                                        .withRunner(Runners.sharedRunner())
-                                                        .set()
-                                                        .buildChannel();
-            final AtomicInteger count = new AtomicInteger();
-            Streams.streamOf(ioChannel)
-                   .withInvocations()
-                   .withRunner(runner1)
-                   .withInputLimit(1)
-                   .withInputMaxDelay(seconds(3))
-                   .set()
-                   .asyncMap(new Function<Object, Object>() {
-
-                       public Object apply(final Object o) {
-
-                           return o;
-                       }
-                   })
-                   .withInvocations()
-                   .withRunner(runner2)
-                   .withInputLimit(1)
-                   .withInputMaxDelay(seconds(3))
-                   .set()
-                   .asyncMap(new BiConsumer<Object, ResultChannel<? extends Object>>() {
-
-                       public void accept(final Object o,
-                               final ResultChannel<? extends Object> result) {
-
-                           if (count.incrementAndGet() > 10) {
-
-                               result.abort();
-
-                           } else {
-
-                               result.pass(o);
-                           }
-                       }
-                   })
-                   .passTo(ioChannel)
-                   .pass("test0", "test1")
-                   .pass("test2", "test3")
-                   .pass("test4", "test5")
-                   .pass("test6", "test7")
-                   .pass("test8", "test9")
-                   .pass("end")
-                   .afterMax(days(3))
-                   .checkComplete();
-        }
-    }
-
-    @Test
-    public void muori2() {
-
-        final Runner runner1 = Runners.poolRunner(1);
-        final Runner runner2 = Runners.poolRunner(1);
-
-        try {
-
-            Streams.streamOf("test")
-                   .withInvocations()
-                   .withRunner(runner1)
-                   .set()
-                   .asyncMap(new Function<String, Object>() {
-
-                       public Object apply(final String s) {
-
-                           return Streams.streamOf(s)
-                                         .runOn(runner1)
-                                         .runOn(runner2)
-                                         .afterMax(days(3))
-                                         .next();
-                       }
-                   })
-                   .afterMax(days(3))
-                   .next();
-
-            fail();
-
-        } catch (final ExecutionDeadlockException ignored) {
-
-        }
-    }
-
-    @Ignore
-    @Test
-    public void muori3() throws InterruptedException {
-
-        final ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
-        final Runner runner1 = Runners.scheduledRunner(service);
-        final Runner runner2 = Runners.poolRunner(1);
-        final Semaphore semaphore = new Semaphore(0);
-
-        service.execute(new Runnable() {
-
-            public void run() {
-
-                try {
-
-                    Streams.streamOf("test").runOn(runner1).runOn(runner2).afterMax(days(3)).next();
-
-                } catch (final Throwable ignored) {
-
-                }
-
-                semaphore.release();
-            }
-        });
-
-        semaphore.acquire();
-    }
-
-    @Test
-    public void muori4() throws InterruptedException {
-
-        final Runner runner1 = Runners.poolRunner(1);
-        final Runner runner2 = Runners.poolRunner(1);
-
-        for (int i = 0; i < 1; i++) {
-
-            final IOChannel<Object> ioChannel = JRoutine.io().buildChannel();
-            final IOChannel<Object> ioChannel1 = JRoutine.io()
-                                                         .withChannels()
-                                                         .withRunner(Runners.sharedRunner())
-                                                         .set()
-                                                         .buildChannel();
-            Streams.streamOf(ioChannel)
-                   .withInvocations()
-                   .withRunner(runner1)
-                   .withInputLimit(1)
-                   .withInputMaxDelay(seconds(3))
-                   .set()
-                   .asyncMap(new Function<Object, Object>() {
-
-                       public Object apply(final Object o) {
-
-                           return o;
-                       }
-                   })
-                   .withInvocations()
-                   .withRunner(runner2)
-                   .withInputLimit(1)
-                   .withInputMaxDelay(seconds(3))
-                   .set()
-                   .asyncMap(new Function<Object, Object>() {
-
-                       public Object apply(final Object o) {
-
-                           return o;
-                       }
-                   })
-                   .withInvocations()
-                   .withRunner(runner1)
-                   .withInputLimit(1)
-                   .withInputMaxDelay(seconds(3))
-                   .set()
-                   .asyncMap(new Function<Object, Object>() {
-
-                       public Object apply(final Object o) {
-
-                           return o;
-                       }
-                   })
-                   .passTo(ioChannel1);
-            ioChannel.pass("test", "test")
-                     .pass("test", "test")
-                     .pass("test", "test")
-                     .pass("test", "test")
-                     .pass("test", "test")
-                     .pass("end")
-                     .close();
-            ioChannel1.close().afterMax(days(3)).all();
-        }
-    }
-
-    @Test
-    public void muori5() throws InterruptedException {
-
-        final Runner runner1 = Runners.poolRunner(1);
-        final Runner runner2 = Runners.poolRunner(1);
-
-        final IOChannel<Object> channel1 = JRoutine.io()
-                                                   .withChannels()
-                                                   .withRunner(runner1)
-                                                   .withChannelLimit(1)
-                                                   .withChannelMaxDelay(seconds(3))
-                                                   .set()
-                                                   .buildChannel();
-        final IOChannel<Object> channel2 = JRoutine.io()
-                                                   .withChannels()
-                                                   .withRunner(runner2)
-                                                   .withChannelLimit(1)
-                                                   .withChannelMaxDelay(seconds(3))
-                                                   .set()
-                                                   .buildChannel();
-        final IOChannel<Object> channel3 = JRoutine.io()
-                                                   .withChannels()
-                                                   .withRunner(runner1)
-                                                   .withChannelLimit(1)
-                                                   .withChannelMaxDelay(seconds(3))
-                                                   .set()
-                                                   .buildChannel();
-
-        channel1.passTo(channel2).passTo(channel3);
-        channel1.pass("test", "test")
-                .pass("test", "test")
-                .pass("test", "test")
-                .pass("test", "test")
-                .pass("test", "test")
-                .pass("end")
-                .close();
-        channel2.close();
-        channel3.close().afterMax(days(3)).all();
-    }
+//    @Test
+//    public void muori() {
+//
+//        final Runner runner1 = Runners.poolRunner(1);
+//        final Runner runner2 = Runners.poolRunner(1);
+//
+//        for (int i = 0; i < 1; i++) {
+//
+//            final IOChannel<Object> ioChannel = JRoutine.io()
+//                                                        .withChannels()
+//                                                        .withRunner(Runners.sharedRunner())
+//                                                        .set()
+//                                                        .buildChannel();
+//            final AtomicInteger count = new AtomicInteger();
+//            Streams.streamOf(ioChannel)
+//                   .withInvocations()
+//                   .withRunner(runner1)
+//                   .withInputLimit(1)
+//                   .withInputMaxDelay(seconds(3))
+//                   .set()
+//                   .asyncMap(new Function<Object, Object>() {
+//
+//                       public Object apply(final Object o) {
+//
+//                           return o;
+//                       }
+//                   })
+//                   .withInvocations()
+//                   .withRunner(runner2)
+//                   .withInputLimit(1)
+//                   .withInputMaxDelay(seconds(3))
+//                   .set()
+//                   .asyncMap(new BiConsumer<Object, ResultChannel<? extends Object>>() {
+//
+//                       public void accept(final Object o,
+//                               final ResultChannel<? extends Object> result) {
+//
+//                           if (count.incrementAndGet() > 10) {
+//
+//                               result.abort();
+//
+//                           } else {
+//
+//                               result.pass(o);
+//                           }
+//                       }
+//                   })
+//                   .passTo(ioChannel)
+//                   .pass("test0", "test1")
+//                   .pass("test2", "test3")
+//                   .pass("test4", "test5")
+//                   .pass("test6", "test7")
+//                   .pass("test8", "test9")
+//                   .pass("end")
+//                   .afterMax(days(3))
+//                   .checkComplete();
+//        }
+//    }
+//
+//    @Test
+//    public void muori2() {
+//
+//        final Runner runner1 = Runners.poolRunner(1);
+//        final Runner runner2 = Runners.poolRunner(1);
+//
+//        try {
+//
+//            Streams.streamOf("test")
+//                   .withInvocations()
+//                   .withRunner(runner1)
+//                   .set()
+//                   .asyncMap(new Function<String, Object>() {
+//
+//                       public Object apply(final String s) {
+//
+//                           return Streams.streamOf(s)
+//                                         .runOn(runner1)
+//                                         .runOn(runner2)
+//                                         .afterMax(days(3))
+//                                         .next();
+//                       }
+//                   })
+//                   .afterMax(days(3))
+//                   .next();
+//
+//            fail();
+//
+//        } catch (final ExecutionDeadlockException ignored) {
+//
+//        }
+//    }
+//
+//    @Ignore
+//    @Test
+//    public void muori3() throws InterruptedException {
+//
+//        final ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
+//        final Runner runner1 = Runners.scheduledRunner(service);
+//        final Runner runner2 = Runners.poolRunner(1);
+//        final Semaphore semaphore = new Semaphore(0);
+//
+//        service.execute(new Runnable() {
+//
+//            public void run() {
+//
+//                try {
+//
+//                    Streams.streamOf("test").runOn(runner1).runOn(runner2).afterMax(days(3)).next();
+//
+//                } catch (final Throwable ignored) {
+//
+//                }
+//
+//                semaphore.release();
+//            }
+//        });
+//
+//        semaphore.acquire();
+//    }
+//
+//    @Test
+//    public void muori4() throws InterruptedException {
+//
+//        final Runner runner1 = Runners.poolRunner(1);
+//        final Runner runner2 = Runners.poolRunner(1);
+//
+//        for (int i = 0; i < 1; i++) {
+//
+//            final IOChannel<Object> ioChannel = JRoutine.io().buildChannel();
+//            final IOChannel<Object> ioChannel1 = JRoutine.io()
+//                                                         .withChannels()
+//                                                         .withRunner(Runners.sharedRunner())
+//                                                         .set()
+//                                                         .buildChannel();
+//            Streams.streamOf(ioChannel)
+//                   .withInvocations()
+//                   .withRunner(runner1)
+//                   .withInputLimit(1)
+//                   .withInputMaxDelay(seconds(3))
+//                   .set()
+//                   .asyncMap(new Function<Object, Object>() {
+//
+//                       public Object apply(final Object o) {
+//
+//                           return o;
+//                       }
+//                   })
+//                   .withInvocations()
+//                   .withRunner(runner2)
+//                   .withInputLimit(1)
+//                   .withInputMaxDelay(seconds(3))
+//                   .set()
+//                   .asyncMap(new Function<Object, Object>() {
+//
+//                       public Object apply(final Object o) {
+//
+//                           return o;
+//                       }
+//                   })
+//                   .withInvocations()
+//                   .withRunner(runner1)
+//                   .withInputLimit(1)
+//                   .withInputMaxDelay(seconds(3))
+//                   .set()
+//                   .asyncMap(new Function<Object, Object>() {
+//
+//                       public Object apply(final Object o) {
+//
+//                           return o;
+//                       }
+//                   })
+//                   .passTo(ioChannel1);
+//            ioChannel.pass("test", "test")
+//                     .pass("test", "test")
+//                     .pass("test", "test")
+//                     .pass("test", "test")
+//                     .pass("test", "test")
+//                     .pass("end")
+//                     .close();
+//            ioChannel1.close().afterMax(days(3)).all();
+//        }
+//    }
+//
+//    @Test
+//    public void muori5() throws InterruptedException {
+//
+//        final Runner runner1 = Runners.poolRunner(1);
+//        final Runner runner2 = Runners.poolRunner(1);
+//
+//        final IOChannel<Object> channel1 = JRoutine.io()
+//                                                   .withChannels()
+//                                                   .withRunner(runner1)
+//                                                   .withChannelLimit(1)
+//                                                   .withChannelMaxDelay(seconds(3))
+//                                                   .set()
+//                                                   .buildChannel();
+//        final IOChannel<Object> channel2 = JRoutine.io()
+//                                                   .withChannels()
+//                                                   .withRunner(runner2)
+//                                                   .withChannelLimit(1)
+//                                                   .withChannelMaxDelay(seconds(3))
+//                                                   .set()
+//                                                   .buildChannel();
+//        final IOChannel<Object> channel3 = JRoutine.io()
+//                                                   .withChannels()
+//                                                   .withRunner(runner1)
+//                                                   .withChannelLimit(1)
+//                                                   .withChannelMaxDelay(seconds(3))
+//                                                   .set()
+//                                                   .buildChannel();
+//
+//        channel1.passTo(channel2).passTo(channel3);
+//        channel1.pass("test", "test")
+//                .pass("test", "test")
+//                .pass("test", "test")
+//                .pass("test", "test")
+//                .pass("test", "test")
+//                .pass("end")
+//                .close();
+//        channel2.close();
+//        channel3.close().afterMax(days(3)).all();
+//    }
 
     @Test
     public void testBlend() {

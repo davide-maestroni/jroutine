@@ -16,7 +16,6 @@ package com.github.dm.jrt.core;
 import com.github.dm.jrt.builder.TemplateRoutineBuilder;
 import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.routine.Routine;
-import com.github.dm.jrt.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -36,18 +35,13 @@ class DefaultRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OUT> {
      * Constructor.
      *
      * @param factory the invocation factory.
-     * @throws java.lang.IllegalArgumentException if the class of the specified factory is not
-     *                                            static.
      */
     @SuppressWarnings("ConstantConditions")
     DefaultRoutineBuilder(@NotNull final InvocationFactory<IN, OUT> factory) {
 
-        final Class<? extends InvocationFactory> factoryClass = factory.getClass();
+        if (factory == null) {
 
-        if (!Reflection.hasStaticContext(factoryClass)) {
-
-            throw new IllegalArgumentException(
-                    "the factory class must have a static context: " + factoryClass.getName());
+            throw new NullPointerException("the invocation factory must not be null");
         }
 
         mFactory = factory;

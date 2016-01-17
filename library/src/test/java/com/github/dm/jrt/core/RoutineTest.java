@@ -1355,24 +1355,16 @@ public class RoutineTest {
     }
 
     @Test
+    @SuppressWarnings("ConstantConditions")
     public void testFactoryError() {
 
         try {
 
-            final FilterInvocation<Object, Object> anonymousFactory =
-                    new FilterInvocation<Object, Object>() {
-
-                        public void onInput(final Object o,
-                                @NotNull final ResultChannel<Object> result) {
-
-                        }
-                    };
-
-            JRoutine.on(anonymousFactory);
+            JRoutine.on((InvocationFactory<?, ?>) null);
 
             fail();
 
-        } catch (final IllegalArgumentException ignored) {
+        } catch (final NullPointerException ignored) {
 
         }
     }

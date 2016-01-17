@@ -1865,9 +1865,13 @@ public class RoutineTest {
         try {
 
             JRoutine.on(PassingInvocation.factoryOf())
-                    .asyncCall("test1")
+                    .asyncInvoke()
+                    .pass("test1")
+                    .after(millis(300))
+                    .pass("test2")
+                    .result()
                     .eventuallyAbort()
-                    .afterMax(seconds(1))
+                    .afterMax(millis(100))
                     .next(2);
 
             fail();
@@ -1879,9 +1883,13 @@ public class RoutineTest {
         try {
 
             JRoutine.on(PassingInvocation.factoryOf())
-                    .asyncCall("test1")
+                    .asyncInvoke()
+                    .pass("test1")
+                    .after(millis(300))
+                    .pass("test2")
+                    .result()
                     .eventuallyAbort(new IllegalStateException())
-                    .afterMax(seconds(1))
+                    .afterMax(millis(100))
                     .next(2);
 
             fail();
@@ -1894,9 +1902,13 @@ public class RoutineTest {
         try {
 
             JRoutine.on(PassingInvocation.factoryOf())
-                    .asyncCall("test1")
+                    .asyncInvoke()
+                    .pass("test1")
+                    .after(millis(300))
+                    .pass("test2")
+                    .result()
                     .eventuallyThrow()
-                    .afterMax(seconds(1))
+                    .afterMax(millis(100))
                     .next(2);
 
             fail();

@@ -865,93 +865,87 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             @NotNull final TimeoutActionType timeoutAction,
             @Nullable final Throwable timeoutException) {
 
-        boolean isAbort = false;
-
-        try {
-
-            synchronized (mMutex) {
-
-                isAbort = (timeoutAction == TimeoutActionType.ABORT);
-                return readQueue(timeout, timeoutAction);
-            }
-
-        } catch (final NoSuchElementException e) {
-
-            if (isAbort) {
-
-                abort(timeoutException);
-                throw AbortException.wrapIfNeeded(timeoutException);
-            }
-
-            throw e;
-        }
-    }
-
-    @Nullable
-    private OUT readQueue(@NotNull final TimeDuration timeout,
-            @NotNull final TimeoutActionType action) {
-
-        verifyBound();
-        final Logger logger = mLogger;
-        final NestedQueue<Object> outputQueue = mOutputQueue;
-
-        if (timeout.isZero() || !outputQueue.isEmpty()) {
-
-            if (outputQueue.isEmpty()) {
-
-                logger.wrn("reading output timeout: [%s] => [%s]", timeout, action);
-
-                if (action == TimeoutActionType.THROW) {
-
-                    throw new ExecutionTimeoutException(
-                            "timeout while waiting for outputs [" + timeout + "]");
-                }
-            }
-
-            return nextOutput(timeout);
-        }
-
-        checkCanWait();
-
-        if (mOutputNotEmpty == null) {
-
-            mOutputNotEmpty = new Condition() {
-
-                public boolean isTrue() {
-
-                    return !outputQueue.isEmpty() || mState.isDone() || mIsWaitingInvocation;
-                }
-            };
-        }
-
         final boolean isTimeout;
 
-        try {
+        synchronized (mMutex) {
 
-            isTimeout = !timeout.waitTrue(mMutex, mOutputNotEmpty);
+            verifyBound();
+            final Logger logger = mLogger;
+            final NestedQueue<Object> outputQueue = mOutputQueue;
+            boolean isAbort = false;
 
-        } catch (final InterruptedException e) {
+            if (timeout.isZero() || !outputQueue.isEmpty()) {
 
-            throw new InvocationInterruptedException(e);
-        }
+                if (outputQueue.isEmpty()) {
 
-        if (mIsWaitingInvocation) {
+                    logger.wrn("reading output timeout: [%s] => [%s]", timeout, timeoutAction);
 
-            throw new InvocationDeadlockException(INVOCATION_DEADLOCK_MESSAGE);
-        }
+                    if (timeoutAction == TimeoutActionType.THROW) {
 
-        if (isTimeout) {
+                        throw new ExecutionTimeoutException(
+                                "timeout while waiting for outputs [" + timeout + "]");
+                    }
 
-            logger.wrn("reading output timeout: [%s] => [%s]", timeout, action);
+                    isAbort = (timeoutAction == TimeoutActionType.ABORT);
+                }
 
-            if (action == TimeoutActionType.THROW) {
+                if (!isAbort) {
 
-                throw new ExecutionTimeoutException(
-                        "timeout while waiting for outputs [" + timeout + "]");
+                    return nextOutput(timeout);
+                }
+
+            } else {
+
+                checkCanWait();
+
+                if (mOutputNotEmpty == null) {
+
+                    mOutputNotEmpty = new Condition() {
+
+                        public boolean isTrue() {
+
+                            return !outputQueue.isEmpty() || mState.isDone() ||
+                                    mIsWaitingInvocation;
+                        }
+                    };
+                }
+
+                try {
+
+                    isTimeout = !timeout.waitTrue(mMutex, mOutputNotEmpty);
+
+                } catch (final InterruptedException e) {
+
+                    throw new InvocationInterruptedException(e);
+                }
+
+                if (mIsWaitingInvocation) {
+
+                    throw new InvocationDeadlockException(INVOCATION_DEADLOCK_MESSAGE);
+                }
+
+                if (isTimeout) {
+
+                    logger.wrn("reading output timeout: [%s] => [%s]", timeout, timeoutAction);
+
+                    if (timeoutAction == TimeoutActionType.THROW) {
+
+                        throw new ExecutionTimeoutException(
+                                "timeout while waiting for outputs [" + timeout + "]");
+                    }
+
+                    isAbort = (timeoutAction == TimeoutActionType.ABORT);
+                }
+
+                if (!isAbort) {
+
+                    return nextOutput(timeout);
+                }
             }
         }
 
-        return nextOutput(timeout);
+        abort(timeoutException);
+        throw AbortException.wrapIfNeeded(timeoutException);
     }
 
     private void runExecution(@NotNull final Execution execution, final long delay,

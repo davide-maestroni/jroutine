@@ -41,12 +41,10 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
- * TODO ...
  * Interface defining a stream output channel, that is, a channel concatenating map and reduce
- * functions.
- * <br/>
- * Each function in the channel is backed by a sub-routine instance, that can have its own specific
- * configuration and invocation mode.
+ * functions, employing Android loaders to run the backing routines.<br/>
+ * In fact, each function in the channel is backed by a routine instance, that can have its own
+ * specific configuration and invocation mode.
  * <p/>
  * Note that, if at least one reduce function is part of the concatenation, the results will be
  * propagated only when the invocation completes.
@@ -163,7 +161,8 @@ public interface LoaderStreamChannelCompat<OUT>
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannelCompat<AFTER> asyncGenerate(@NotNull Supplier<? extends AFTER> supplier);
+    <AFTER> LoaderStreamChannelCompat<AFTER> asyncGenerate(
+            @NotNull Supplier<? extends AFTER> supplier);
 
     /**
      * {@inheritDoc}
@@ -212,14 +211,15 @@ public interface LoaderStreamChannelCompat<OUT>
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<Number> asyncRange(@NotNull final Number start, @NotNull final Number end);
+    LoaderStreamChannelCompat<Number> asyncRange(@NotNull final Number start,
+            @NotNull final Number end);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<Number> asyncRange(@NotNull final Number start, @NotNull final Number end,
-            @NotNull final Number increment);
+    LoaderStreamChannelCompat<Number> asyncRange(@NotNull final Number start,
+            @NotNull final Number end, @NotNull final Number increment);
 
     /**
      * {@inheritDoc}
@@ -232,8 +232,8 @@ public interface LoaderStreamChannelCompat<OUT>
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> backPressureOn(@Nullable Runner runner, int maxInputs, long maxDelay,
-            @NotNull TimeUnit timeUnit);
+    LoaderStreamChannelCompat<OUT> backPressureOn(@Nullable Runner runner, int maxInputs,
+            long maxDelay, @NotNull TimeUnit timeUnit);
 
     /**
      * {@inheritDoc}
@@ -388,7 +388,8 @@ public interface LoaderStreamChannelCompat<OUT>
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannelCompat<AFTER> syncGenerate(@NotNull Supplier<? extends AFTER> supplier);
+    <AFTER> LoaderStreamChannelCompat<AFTER> syncGenerate(
+            @NotNull Supplier<? extends AFTER> supplier);
 
     /**
      * {@inheritDoc}
@@ -437,14 +438,15 @@ public interface LoaderStreamChannelCompat<OUT>
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<Number> syncRange(@NotNull final Number start, @NotNull final Number end);
+    LoaderStreamChannelCompat<Number> syncRange(@NotNull final Number start,
+            @NotNull final Number end);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<Number> syncRange(@NotNull final Number start, @NotNull final Number end,
-            @NotNull final Number increment);
+    LoaderStreamChannelCompat<Number> syncRange(@NotNull final Number start,
+            @NotNull final Number end, @NotNull final Number increment);
 
     /**
      * {@inheritDoc}
@@ -483,7 +485,8 @@ public interface LoaderStreamChannelCompat<OUT>
      * {@inheritDoc}
      */
     @NotNull
-    InvocationConfiguration.Builder<? extends LoaderStreamChannelCompat<OUT>> withStreamInvocations();
+    InvocationConfiguration.Builder<? extends LoaderStreamChannelCompat<OUT>>
+    withStreamInvocations();
 
     /**
      * Short for {@code withLoaders().withId(loaderId).set()}.<br/>
@@ -494,17 +497,44 @@ public interface LoaderStreamChannelCompat<OUT>
      * @return the configured stream channel.
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> loadersId(int loaderId);
+    LoaderStreamChannelCompat<OUT> loaderId(int loaderId);
 
-    // TODO: 1/15/16 javadoc
+    /**
+     * Sets the stream loader context.<br/>
+     * The context will be used by all the concatenated routines until changed.<br/>
+     * If null it will cause the next routines to employ the configured runner instead of an Android
+     * loader.
+     *
+     * @param context the loader context.
+     * @return the configured stream channel.
+     */
     @NotNull
     LoaderStreamChannelCompat<OUT> with(@Nullable LoaderContextCompat context);
 
-    // TODO: 1/12/16 javadoc
+    /**
+     * Gets the loader configuration builder related only to the next concatenated routine instance.
+     * Any further addition to the chain will retain only the stream configuration.<br/>
+     * Only the options set in this configuration (that is, the ones with a value different from the
+     * default) will override the stream one.
+     * <p/>
+     * Note that the configuration builder will be initialized with the current configuration for
+     * the next routine.
+     *
+     * @return the invocation configuration builder.
+     */
     @NotNull
     LoaderConfiguration.Builder<? extends LoaderStreamChannelCompat<OUT>> withLoaders();
 
-    // TODO: 1/12/16 javadoc
+    /**
+     * Gets the loader configuration builder related to the whole stream.<br/>
+     * The configuration options will be applied to all the next concatenated routine unless
+     * overwritten by specific ones.
+     * <p/>
+     * Note that the configuration builder will be initialized with the current stream
+     * configuration.
+     *
+     * @return the invocation configuration builder.
+     */
     @NotNull
     LoaderConfiguration.Builder<? extends LoaderStreamChannelCompat<OUT>> withStreamLoaders();
 }

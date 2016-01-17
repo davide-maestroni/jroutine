@@ -665,7 +665,7 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
     }
 
     @NotNull
-    public LoaderStreamChannel<OUT> loadersId(final int loaderId) {
+    public LoaderStreamChannel<OUT> loaderId(final int loaderId) {
 
         return withLoaders().withId(loaderId).set();
     }

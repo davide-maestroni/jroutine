@@ -480,6 +480,36 @@ public interface Channel {
         List<OUT> next(int count);
 
         /**
+         * Consumes the first available result by waiting at the maximum for the set timeout.<br/>
+         * If the timeout elapses and the channel is not configured to throw an exception, the
+         * specified alternative output is returned.<br/>
+         * Note that this method invocation will likely block the calling thread.
+         *
+         * @return the first available result.
+         * @throws com.github.dm.jrt.channel.ExecutionTimeoutException if the channel is set to
+         *                                                             throw an exception when the
+         *                                                             timeout elapses.
+         * @throws com.github.dm.jrt.channel.RoutineException          if the execution has been
+         *                                                             aborted.
+         * @throws java.lang.IllegalStateException                     if this channel is already
+         *                                                             bound to a consumer or
+         *                                                             another channel.
+         * @throws java.util.NoSuchElementException                    if no output is available (it
+         *                                                             might be thrown also in the
+         *                                                             case the read timeout elapses
+         *                                                             and no timeout exception is
+         *                                                             set to be thrown).
+         * @see #afterMax(TimeDuration)
+         * @see #afterMax(long, TimeUnit)
+         * @see #immediately()
+         * @see #eventuallyAbort()
+         * @see #eventuallyAbort(Throwable)
+         * @see #eventuallyExit()
+         * @see #eventuallyThrow()
+         */
+        OUT nextOr(OUT output);
+
+        /**
          * Binds this channel to the specified one. After the call, all the output will be passed
          * only to the specified input channel. Attempting to read through the dedicated methods
          * will cause an {@link IllegalStateException} to be thrown.

@@ -66,8 +66,7 @@ import org.jetbrains.annotations.NotNull;
  * initialization.
  * <p/>
  * Note also that {@code onAbort()} might be called at any time between {@code onInitialize()} and
- * {@code onTerminate()} in case the execution is aborted.
- * <br/>
+ * {@code onTerminate()} in case the execution is aborted.<br/>
  * The only case in which the {@code onTerminate()} method does not get call at all, is when an
  * exception escapes the {@code onAbort()} method invocation.
  * <p/>

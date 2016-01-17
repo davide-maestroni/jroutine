@@ -798,6 +798,11 @@ public abstract class AbstractStreamChannel<OUT>
         return mChannel.next(count);
     }
 
+    public OUT nextOr(final OUT output) {
+
+        return mChannel.nextOr(output);
+    }
+
     @NotNull
     public <CHANNEL extends InputChannel<? super OUT>> CHANNEL passTo(
             @NotNull final CHANNEL channel) {

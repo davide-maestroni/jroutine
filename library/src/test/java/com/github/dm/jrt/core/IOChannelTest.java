@@ -451,6 +451,71 @@ public class IOChannelTest {
     }
 
     @Test
+    public void testNextOr() {
+
+        assertThat(JRoutine.io()
+                           .buildChannel()
+                           .pass("test1")
+                           .afterMax(seconds(1))
+                           .nextOr(2)).isEqualTo("test1");
+
+        assertThat(JRoutine.io()
+                           .buildChannel()
+                           .eventuallyExit()
+                           .afterMax(seconds(1))
+                           .nextOr(2)).isEqualTo(2);
+
+        try {
+
+            JRoutine.io()
+                    .buildChannel()
+                    .after(millis(300))
+                    .pass("test1")
+                    .eventuallyAbort()
+                    .afterMax(millis(100))
+                    .nextOr("test2");
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.io()
+                    .buildChannel()
+                    .after(millis(300))
+                    .pass("test1")
+                    .eventuallyAbort(new IllegalStateException())
+                    .afterMax(millis(100))
+                    .nextOr("test2");
+
+            fail();
+
+        } catch (final AbortException e) {
+
+            assertThat(e.getCause()).isExactlyInstanceOf(IllegalStateException.class);
+        }
+
+        try {
+
+            JRoutine.io()
+                    .buildChannel()
+                    .after(millis(300))
+                    .pass("test1")
+                    .eventuallyThrow()
+                    .afterMax(millis(100))
+                    .nextOr("test2");
+
+            fail();
+
+        } catch (final TimeoutException ignored) {
+
+        }
+    }
+
+    @Test
     public void testNextTimeout() {
 
         final IOChannel<String> ioChannel = JRoutine.io().buildChannel();

@@ -1849,7 +1849,7 @@ public class RoutineTest {
     }
 
     @Test
-    public void testNext() {
+    public void testNextList() {
 
         assertThat(JRoutine.on(PassingInvocation.factoryOf())
                            .asyncCall("test1", "test2", "test3", "test4")
@@ -1898,6 +1898,64 @@ public class RoutineTest {
                     .eventuallyThrow()
                     .afterMax(seconds(1))
                     .next(2);
+
+            fail();
+
+        } catch (final TimeoutException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testNextOr() {
+
+        assertThat(JRoutine.on(PassingInvocation.factoryOf())
+                           .asyncCall("test1")
+                           .afterMax(seconds(1))
+                           .nextOr(2)).isEqualTo("test1");
+
+        assertThat(JRoutine.on(PassingInvocation.factoryOf())
+                           .asyncCall()
+                           .eventuallyExit()
+                           .afterMax(seconds(1))
+                           .nextOr(2)).isEqualTo(2);
+
+        try {
+
+            JRoutine.on(factoryOf(DelayedInvocation.class, millis(300)))
+                    .asyncCall("test1")
+                    .eventuallyAbort()
+                    .afterMax(millis(100))
+                    .nextOr("test2");
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            JRoutine.on(factoryOf(DelayedInvocation.class, millis(300)))
+                    .asyncCall("test1")
+                    .eventuallyAbort(new IllegalStateException())
+                    .afterMax(millis(100))
+                    .nextOr("test2");
+
+            fail();
+
+        } catch (final AbortException e) {
+
+            assertThat(e.getCause()).isExactlyInstanceOf(IllegalStateException.class);
+        }
+
+        try {
+
+            JRoutine.on(factoryOf(DelayedInvocation.class, millis(300)))
+                    .asyncCall("test1")
+                    .eventuallyThrow()
+                    .afterMax(millis(100))
+                    .nextOr("test2");
 
             fail();
 

@@ -912,6 +912,60 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         }
     }
 
+    public void testLoaderId() {
+
+        final LoaderContextCompat context = loaderFrom(getActivity());
+        StreamsCompat.with(context)
+                     .streamOf("test1")
+                     .loaderId(11)
+                     .asyncMap(new Function<String, String>() {
+
+                         public String apply(final String s) {
+
+                             return s.toUpperCase();
+                         }
+                     });
+        assertThat(JRoutineCompat.with(context)
+                                 .onId(11)
+                                 .buildChannel()
+                                 .afterMax(seconds(10))
+                                 .next()).isEqualTo("TEST1");
+        StreamsCompat.with(context)
+                     .streamOf("test2")
+                     .withLoaders()
+                     .withId(21)
+                     .set()
+                     .asyncMap(new Function<String, String>() {
+
+                         public String apply(final String s) {
+
+                             return s.toUpperCase();
+                         }
+                     });
+        assertThat(JRoutineCompat.with(context)
+                                 .onId(21)
+                                 .buildChannel()
+                                 .afterMax(seconds(10))
+                                 .next()).isEqualTo("TEST2");
+        StreamsCompat.with(context)
+                     .streamOf("test3")
+                     .withStreamLoaders()
+                     .withId(31)
+                     .set()
+                     .asyncMap(new Function<String, String>() {
+
+                         public String apply(final String s) {
+
+                             return s.toUpperCase();
+                         }
+                     });
+        assertThat(JRoutineCompat.with(context)
+                                 .onId(31)
+                                 .buildChannel()
+                                 .afterMax(seconds(10))
+                                 .next()).isEqualTo("TEST3");
+    }
+
     public void testMap() {
 
         final IOChannelBuilder builder =

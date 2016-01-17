@@ -27,8 +27,7 @@ import java.util.concurrent.TimeUnit;
  * <br/>
  * Note that, a proper asynchronous runner implementation will never synchronously run an execution,
  * no matter the delay, unless it employs a single thread. While, a proper synchronous runner, will
- * always run executions in the very same caller thread.
- * <br/>
+ * always run executions in the very same caller thread.<br/>
  * Note also that the runner methods can be called from different threads, so, it is up to the
  * implementing class to ensure synchronization when required.
  * <p/>

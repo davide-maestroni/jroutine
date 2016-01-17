@@ -1466,21 +1466,33 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
             } catch (final NoSuchElementException ignored) {
 
-                mSubLogger.wrn("reading output timeout: [%s] => [%s]", timeout, timeoutAction);
-
-                if (timeoutAction == TimeoutActionType.THROW) {
-
-                    throw new ExecutionTimeoutException(
-                            "timeout while waiting for outputs [" + timeout + "]");
-
-                } else if (timeoutAction == TimeoutActionType.ABORT) {
-
-                    abort(timeoutException);
-                    throw AbortException.wrapIfNeeded(timeoutException);
-                }
             }
 
             return results;
+        }
+
+        public OUT nextOr(final OUT output) {
+
+            final TimeDuration timeout;
+            final TimeoutActionType timeoutAction;
+            final Throwable timeoutException;
+
+            synchronized (mMutex) {
+
+                timeout = mExecutionTimeout;
+                timeoutAction = mTimeoutActionType;
+                timeoutException = mTimeoutException;
+            }
+
+            try {
+
+                return readNext(timeout, timeoutAction, timeoutException);
+
+            } catch (final NoSuchElementException ignored) {
+
+            }
+
+            return output;
         }
 
         @NotNull

@@ -40,9 +40,8 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Interface defining a stream output channel, that is, a channel concatenating map and reduce
- * functions.
- * <br/>
- * Each function in the channel is backed by a sub-routine instance, that can have its own specific
+ * functions.<br/>
+ * Each function in the channel is backed by a routine instance, that can have its own specific
  * configuration and invocation mode.
  * <p/>
  * Note that, if at least one reduce function is part of the concatenation, the results will be
@@ -356,8 +355,7 @@ public interface StreamChannel<OUT>
             @NotNull final Number increment);
 
     /**
-     * Concatenates a stream channel based on the specified accumulating function to this one.
-     * <br/>
+     * Concatenates a stream channel based on the specified accumulating function to this one.<br/>
      * The output will be computed as follows:
      * <pre>
      *     <code>
@@ -884,8 +882,7 @@ public interface StreamChannel<OUT>
             @NotNull final Number increment);
 
     /**
-     * Concatenates a stream channel based on the specified accumulating function to this one.
-     * <br/>
+     * Concatenates a stream channel based on the specified accumulating function to this one.<br/>
      * The output will be computed as follows:
      * <pre>
      *     <code>

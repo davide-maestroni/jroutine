@@ -276,6 +276,11 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA> {
         return mOutputChannel.next(count);
     }
 
+    public DATA nextOr(final DATA output) {
+
+        return mOutputChannel.nextOr(output);
+    }
+
     @NotNull
     public <IN extends InputChannel<? super DATA>> IN passTo(@NotNull final IN channel) {
 

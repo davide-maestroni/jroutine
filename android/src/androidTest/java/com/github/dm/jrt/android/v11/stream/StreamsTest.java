@@ -974,7 +974,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
     public void testLimitEquals() {
 
-        final InvocationFactory<Object, Object> factory = com.github.dm.jrt.stream.Streams.limit(2);
+        final InvocationFactory<Object, Object> factory = Streams.limit(2);
         assertThat(factory).isEqualTo(factory);
         assertThat(factory).isNotEqualTo(null);
         assertThat(factory).isNotEqualTo("test");
@@ -994,6 +994,65 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         } catch (final IllegalArgumentException ignored) {
 
         }
+    }
+
+    public void testLoaderId() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final LoaderContext context = loaderFrom(getActivity());
+        Streams.with(context)
+               .streamOf("test1")
+               .loaderId(11)
+               .asyncMap(new Function<String, String>() {
+
+                   public String apply(final String s) {
+
+                       return s.toUpperCase();
+                   }
+               });
+        assertThat(JRoutine.with(context)
+                           .onId(11)
+                           .buildChannel()
+                           .afterMax(seconds(10))
+                           .next()).isEqualTo("TEST1");
+        Streams.with(context)
+               .streamOf("test2")
+               .withLoaders()
+               .withId(21)
+               .set()
+               .asyncMap(new Function<String, String>() {
+
+                   public String apply(final String s) {
+
+                       return s.toUpperCase();
+                   }
+               });
+        assertThat(JRoutine.with(context)
+                           .onId(21)
+                           .buildChannel()
+                           .afterMax(seconds(10))
+                           .next()).isEqualTo("TEST2");
+        Streams.with(context)
+               .streamOf("test3")
+               .withStreamLoaders()
+               .withId(31)
+               .set()
+               .asyncMap(new Function<String, String>() {
+
+                   public String apply(final String s) {
+
+                       return s.toUpperCase();
+                   }
+               });
+        assertThat(JRoutine.with(context)
+                           .onId(31)
+                           .buildChannel()
+                           .afterMax(seconds(10))
+                           .next()).isEqualTo("TEST3");
     }
 
     public void testMap() {

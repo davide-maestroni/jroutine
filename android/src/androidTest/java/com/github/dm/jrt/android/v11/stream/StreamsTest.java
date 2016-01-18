@@ -40,6 +40,7 @@ import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.invocation.InvocationFactory;
+import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.invocation.TemplateInvocation;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.stream.StreamChannel;
@@ -1015,6 +1016,11 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
                    public String apply(final String s) {
 
+                       try {
+                           seconds(1).sleepAtLeast();
+                       } catch (final InterruptedException e) {
+                           InvocationInterruptedException.wrapIfNeeded(e);
+                       }
                        return s.toUpperCase();
                    }
                });
@@ -1032,6 +1038,11 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
                    public String apply(final String s) {
 
+                       try {
+                           seconds(1).sleepAtLeast();
+                       } catch (final InterruptedException e) {
+                           InvocationInterruptedException.wrapIfNeeded(e);
+                       }
                        return s.toUpperCase();
                    }
                });
@@ -1049,6 +1060,11 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
                    public String apply(final String s) {
 
+                       try {
+                           seconds(1).sleepAtLeast();
+                       } catch (final InterruptedException e) {
+                           InvocationInterruptedException.wrapIfNeeded(e);
+                       }
                        return s.toUpperCase();
                    }
                });

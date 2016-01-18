@@ -18,6 +18,7 @@ import android.os.Build.VERSION_CODES;
 import android.support.v4.util.SparseArrayCompat;
 import android.test.ActivityInstrumentationTestCase2;
 
+import com.github.dm.jrt.android.builder.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.core.Channels.ParcelableSelectable;
 import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
 import com.github.dm.jrt.android.invocation.PassingFunctionContextInvocation;
@@ -48,10 +49,13 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.github.dm.jrt.android.core.DelegatingContextInvocation.factoryFrom;
 import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
 import static com.github.dm.jrt.invocation.Invocations.factoryOf;
+import static com.github.dm.jrt.util.TimeDuration.ZERO;
 import static com.github.dm.jrt.util.TimeDuration.millis;
 import static com.github.dm.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -1360,6 +1364,46 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         } catch (final IllegalArgumentException ignored) {
 
         }
+    }
+
+    public void testStaleTime() throws InterruptedException {
+
+
+        final LoaderContextCompat context = loaderFrom(getActivity());
+        final AtomicInteger count = new AtomicInteger();
+        final Function<String, String> function = new Function<String, String>() {
+
+            public String apply(final String s) {
+
+                return s + count.incrementAndGet();
+            }
+        };
+        StreamsCompat.with(context).streamOf("test").asyncMap(function);
+        assertThat(StreamsCompat.with(context)
+                                .streamOf("test")
+                                .staleAfter(500, TimeUnit.MILLISECONDS)
+                                .asyncMap(function)
+                                .afterMax(seconds(10))
+                                .next()).isEqualTo("test1");
+        seconds(3).sleepAtLeast();
+        assertThat(StreamsCompat.with(context)
+                                .streamOf("test")
+                                .staleAfter(ZERO)
+                                .asyncMap(function)
+                                .afterMax(seconds(10))
+                                .next()).isEqualTo("test2");
+        seconds(3).sleepAtLeast();
+        StreamsCompat.with(context)
+                     .streamOf("test")
+                     .cache(CacheStrategyType.CACHE_IF_SUCCESS)
+                     .asyncMap(function);
+        seconds(3).sleepAtLeast();
+        assertThat(StreamsCompat.with(context)
+                                .streamOf("test")
+                                .staleAfter(ZERO)
+                                .asyncMap(function)
+                                .afterMax(seconds(10))
+                                .next()).isEqualTo("test4");
     }
 
     private static class Amb<DATA> extends TemplateInvocation<ParcelableSelectable<DATA>, DATA> {

@@ -14,6 +14,7 @@
 package com.github.dm.jrt.android.v11.stream;
 
 import com.github.dm.jrt.android.builder.LoaderConfiguration;
+import com.github.dm.jrt.android.builder.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.builder.LoaderConfiguration.Configurable;
 import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
 import com.github.dm.jrt.android.v11.core.JRoutine;
@@ -665,9 +666,27 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
     }
 
     @NotNull
+    public LoaderStreamChannel<OUT> cache(@Nullable final CacheStrategyType strategyType) {
+
+        return withLoaders().withCacheStrategy(strategyType).set();
+    }
+
+    @NotNull
     public LoaderStreamChannel<OUT> loaderId(final int loaderId) {
 
         return withLoaders().withId(loaderId).set();
+    }
+
+    @NotNull
+    public LoaderStreamChannel<OUT> staleAfter(final long time, @NotNull final TimeUnit timeUnit) {
+
+        return withLoaders().withResultStaleTime(time, timeUnit).set();
+    }
+
+    @NotNull
+    public LoaderStreamChannel<OUT> staleAfter(@Nullable final TimeDuration staleTime) {
+
+        return withLoaders().withResultStaleTime(staleTime).set();
     }
 
     @NotNull

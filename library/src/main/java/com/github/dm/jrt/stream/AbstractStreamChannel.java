@@ -29,13 +29,13 @@ import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.ConsumerWrapper;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.FunctionWrapper;
-import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.function.SupplierWrapper;
 import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationFactory;
+import com.github.dm.jrt.invocation.PassingInvocation;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.runner.Runner;
 import com.github.dm.jrt.util.TimeDuration;
@@ -169,15 +169,8 @@ public abstract class AbstractStreamChannel<OUT>
             final double startValue = start.doubleValue();
             final double endValue = end.doubleValue();
             final double incValue = increment.doubleValue();
-            final Function<Double, Double> function = new Function<Double, Double>() {
-
-                public Double apply(final Double aDouble) {
-
-                    return aDouble + incValue;
-                }
-            };
-
-            return new RangeInvocation<IN, Double>(startValue, endValue, wrapFunction(function));
+            return new RangeInvocation<IN, Double>(startValue, endValue,
+                                                   wrapFunction(new DoubleInc(incValue)));
 
         } else if ((start instanceof Float) || (end instanceof Float)
                 || (increment instanceof Float)) {
@@ -185,15 +178,8 @@ public abstract class AbstractStreamChannel<OUT>
             final float startValue = start.floatValue();
             final float endValue = end.floatValue();
             final float incValue = increment.floatValue();
-            final Function<Float, Float> function = new Function<Float, Float>() {
-
-                public Float apply(final Float aFloat) {
-
-                    return aFloat + incValue;
-                }
-            };
-
-            return new RangeInvocation<IN, Float>(startValue, endValue, wrapFunction(function));
+            return new RangeInvocation<IN, Float>(startValue, endValue,
+                                                  wrapFunction(new FloatInc(incValue)));
 
         } else if ((start instanceof Long) || (end instanceof Long)
                 || (increment instanceof Long)) {
@@ -201,15 +187,8 @@ public abstract class AbstractStreamChannel<OUT>
             final long startValue = start.longValue();
             final long endValue = end.longValue();
             final long incValue = increment.longValue();
-            final Function<Long, Long> function = new Function<Long, Long>() {
-
-                public Long apply(final Long aLong) {
-
-                    return aLong + incValue;
-                }
-            };
-
-            return new RangeInvocation<IN, Long>(startValue, endValue, wrapFunction(function));
+            return new RangeInvocation<IN, Long>(startValue, endValue,
+                                                 wrapFunction(new LongInc(incValue)));
 
         } else if ((start instanceof Integer) || (end instanceof Integer)
                 || (increment instanceof Integer)) {
@@ -217,15 +196,8 @@ public abstract class AbstractStreamChannel<OUT>
             final int startValue = start.intValue();
             final int endValue = end.intValue();
             final int incValue = increment.intValue();
-            final Function<Integer, Integer> function = new Function<Integer, Integer>() {
-
-                public Integer apply(final Integer anInteger) {
-
-                    return anInteger + incValue;
-                }
-            };
-
-            return new RangeInvocation<IN, Integer>(startValue, endValue, wrapFunction(function));
+            return new RangeInvocation<IN, Integer>(startValue, endValue,
+                                                    wrapFunction(new IntegerInc(incValue)));
 
         } else if ((start instanceof Short) || (end instanceof Short)
                 || (increment instanceof Short)) {
@@ -233,15 +205,8 @@ public abstract class AbstractStreamChannel<OUT>
             final short startValue = start.shortValue();
             final short endValue = end.shortValue();
             final short incValue = increment.shortValue();
-            final Function<Short, Short> function = new Function<Short, Short>() {
-
-                public Short apply(final Short aShort) {
-
-                    return (short) (aShort + incValue);
-                }
-            };
-
-            return new RangeInvocation<IN, Short>(startValue, endValue, wrapFunction(function));
+            return new RangeInvocation<IN, Short>(startValue, endValue,
+                                                  wrapFunction(new ShortInc(incValue)));
 
         } else if ((start instanceof Byte) || (end instanceof Byte)
                 || (increment instanceof Byte)) {
@@ -249,15 +214,8 @@ public abstract class AbstractStreamChannel<OUT>
             final byte startValue = start.byteValue();
             final byte endValue = end.byteValue();
             final byte incValue = increment.byteValue();
-            final Function<Byte, Byte> function = new Function<Byte, Byte>() {
-
-                public Byte apply(final Byte aByte) {
-
-                    return (byte) (aByte + incValue);
-                }
-            };
-
-            return new RangeInvocation<IN, Byte>(startValue, endValue, wrapFunction(function));
+            return new RangeInvocation<IN, Byte>(startValue, endValue,
+                                                 wrapFunction(new ByteInc(incValue)));
         }
 
         throw new IllegalArgumentException(
@@ -572,27 +530,29 @@ public abstract class AbstractStreamChannel<OUT>
             @NotNull final AFTER start, @NotNull final AFTER end,
             @NotNull final Function<AFTER, AFTER> increment) {
 
-        return asyncRange(start, end, increment).parallelMap(Functions.<AFTER>identity());
+        return asyncRange(start, end, increment).parallelMap(PassingInvocation.<AFTER>factoryOf());
     }
 
     @NotNull
     public StreamChannel<Number> parallelRange(@NotNull final Number start,
             @NotNull final Number end) {
 
-        return asyncRange(start, end).parallelMap(Functions.<Number>identity());
+        return asyncRange(start, end).parallelMap(PassingInvocation.<Number>factoryOf());
     }
 
     @NotNull
     public StreamChannel<Number> parallelRange(@NotNull final Number start,
             @NotNull final Number end, @NotNull final Number increment) {
 
-        return asyncRange(start, end, increment).parallelMap(Functions.<Number>identity());
+        return asyncRange(start, end, increment).parallelMap(PassingInvocation.<Number>factoryOf());
     }
 
     @NotNull
     public StreamChannel<OUT> runOn(@Nullable final Runner runner) {
 
-        return withStreamInvocations().withRunner(runner).set().asyncMap(Functions.<OUT>identity());
+        return withStreamInvocations().withRunner(runner)
+                                      .set()
+                                      .asyncMap(PassingInvocation.<OUT>factoryOf());
     }
 
     @NotNull
@@ -884,6 +844,52 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     /**
+     * Function incrementing a short of a specific value.
+     */
+    private static class ByteInc implements Function<Byte, Byte> {
+
+        private final byte mIncValue;
+
+        /**
+         * Constructor.
+         *
+         * @param incValue the incrementation value.
+         */
+        private ByteInc(final byte incValue) {
+
+            mIncValue = incValue;
+        }
+
+        public Byte apply(final Byte aByte) {
+
+            return (byte) (aByte + mIncValue);
+        }
+
+        @Override
+        public int hashCode() {
+
+            return (int) mIncValue;
+        }        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if (!(o instanceof ByteInc)) {
+
+                return false;
+            }
+
+            final ByteInc byteInc = (ByteInc) o;
+            return mIncValue == byteInc.mIncValue;
+        }
+
+
+    }
+
+    /**
      * Invocation implementation wrapping a consumer accepting output data.
      *
      * @param <OUT> the output data type.
@@ -928,6 +934,99 @@ public abstract class AbstractStreamChannel<OUT>
         public void onInput(final OUT input, @NotNull final ResultChannel<Void> result) {
 
             mConsumer.accept(input);
+        }
+    }
+
+    /**
+     * Function incrementing a double of a specific value.
+     */
+    private static class DoubleInc implements Function<Double, Double> {
+
+        private final double mIncValue;
+
+        /**
+         * Constructor.
+         *
+         * @param incValue the incrementation value.
+         */
+        private DoubleInc(final double incValue) {
+
+            mIncValue = incValue;
+        }
+
+        public Double apply(final Double aDouble) {
+
+            return aDouble + mIncValue;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if (!(o instanceof DoubleInc)) {
+
+                return false;
+            }
+
+            final DoubleInc doubleInc = (DoubleInc) o;
+            return Double.compare(doubleInc.mIncValue, mIncValue) == 0;
+        }
+
+        @Override
+        public int hashCode() {
+
+            final long temp = Double.doubleToLongBits(mIncValue);
+            return (int) (temp ^ (temp >>> 32));
+        }
+    }
+
+    /**
+     * Function incrementing a float of a specific value.
+     */
+    private static class FloatInc implements Function<Float, Float> {
+
+        private final float mIncValue;
+
+        /**
+         * Constructor.
+         *
+         * @param incValue the incrementation value.
+         */
+        private FloatInc(final float incValue) {
+
+            mIncValue = incValue;
+        }
+
+        public Float apply(final Float aFloat) {
+
+            return aFloat + mIncValue;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if (!(o instanceof FloatInc)) {
+
+                return false;
+            }
+
+            final FloatInc floatInc = (FloatInc) o;
+            return Float.compare(floatInc.mIncValue, mIncValue) == 0;
+        }
+
+        @Override
+        public int hashCode() {
+
+            return (mIncValue != +0.0f ? Float.floatToIntBits(mIncValue) : 0);
         }
     }
 
@@ -1105,6 +1204,52 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     /**
+     * Function incrementing an integer of a specific value.
+     */
+    private static class IntegerInc implements Function<Integer, Integer> {
+
+        private final int mIncValue;
+
+        /**
+         * Constructor.
+         *
+         * @param incValue the incrementation value.
+         */
+        private IntegerInc(final int incValue) {
+
+            mIncValue = incValue;
+        }
+
+        public Integer apply(final Integer integer) {
+
+            return integer + mIncValue;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if (!(o instanceof IntegerInc)) {
+
+                return false;
+            }
+
+            final IntegerInc that = (IntegerInc) o;
+            return mIncValue == that.mIncValue;
+        }
+
+        @Override
+        public int hashCode() {
+
+            return mIncValue;
+        }
+    }
+
+    /**
      * Filter invocation implementation wrapping a lifting function.
      *
      * @param <IN>  the input data type.
@@ -1157,6 +1302,52 @@ public abstract class AbstractStreamChannel<OUT>
 
                 channel.passTo(result);
             }
+        }
+    }
+
+    /**
+     * Function incrementing a long of a specific value.
+     */
+    private static class LongInc implements Function<Long, Long> {
+
+        private final long mIncValue;
+
+        /**
+         * Constructor.
+         *
+         * @param incValue the incrementation value.
+         */
+        private LongInc(final long incValue) {
+
+            mIncValue = incValue;
+        }
+
+        public Long apply(final Long aLong) {
+
+            return aLong + mIncValue;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if (!(o instanceof LongInc)) {
+
+                return false;
+            }
+
+            final LongInc longInc = (LongInc) o;
+            return mIncValue == longInc.mIncValue;
+        }
+
+        @Override
+        public int hashCode() {
+
+            return (int) (mIncValue ^ (mIncValue >>> 32));
         }
     }
 
@@ -1289,6 +1480,52 @@ public abstract class AbstractStreamChannel<OUT>
 
         public void onTerminate() {
 
+        }
+    }
+
+    /**
+     * Function incrementing a short of a specific value.
+     */
+    private static class ShortInc implements Function<Short, Short> {
+
+        private final short mIncValue;
+
+        /**
+         * Constructor.
+         *
+         * @param incValue the incrementation value.
+         */
+        private ShortInc(final short incValue) {
+
+            mIncValue = incValue;
+        }
+
+        public Short apply(final Short aShort) {
+
+            return (short) (aShort + mIncValue);
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+
+                return true;
+            }
+
+            if (!(o instanceof ShortInc)) {
+
+                return false;
+            }
+
+            final ShortInc shortInc = (ShortInc) o;
+            return mIncValue == shortInc.mIncValue;
+        }
+
+        @Override
+        public int hashCode() {
+
+            return (int) mIncValue;
         }
     }
 

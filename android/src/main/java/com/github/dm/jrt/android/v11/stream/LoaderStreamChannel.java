@@ -15,6 +15,7 @@ package com.github.dm.jrt.android.v11.stream;
 
 import com.github.dm.jrt.android.builder.LoaderConfigurableBuilder;
 import com.github.dm.jrt.android.builder.LoaderConfiguration;
+import com.github.dm.jrt.android.builder.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
@@ -484,6 +485,15 @@ public interface LoaderStreamChannel<OUT>
     InvocationConfiguration.Builder<? extends LoaderStreamChannel<OUT>> withStreamInvocations();
 
     /**
+     * Short for {@code withLoaders().withCacheStrategy(strategyType).set()}.
+     *
+     * @param strategyType the cache strategy type.
+     * @return the configured stream channel.
+     */
+    @NotNull
+    LoaderStreamChannel<OUT> cache(@Nullable CacheStrategyType strategyType);
+
+    /**
      * Short for {@code withLoaders().withId(loaderId).set()}.<br/>
      * This method is useful to easily apply a configuration to the next routine concatenated to the
      * stream, which will force the routine loader ID.
@@ -493,6 +503,25 @@ public interface LoaderStreamChannel<OUT>
      */
     @NotNull
     LoaderStreamChannel<OUT> loaderId(int loaderId);
+
+    /**
+     * Short for {@code withLoaders().withResultStaleTime(time, timeUnit).set()}.
+     *
+     * @param time     the time.
+     * @param timeUnit the time unit.
+     * @return the configured stream channel.
+     */
+    @NotNull
+    LoaderStreamChannel<OUT> staleAfter(long time, @NotNull TimeUnit timeUnit);
+
+    /**
+     * Short for {@code withLoaders().withResultStaleTime(staleTime).set()}.
+     *
+     * @param staleTime the stale time.
+     * @return the configured stream channel.
+     */
+    @NotNull
+    LoaderStreamChannel<OUT> staleAfter(@Nullable TimeDuration staleTime);
 
     /**
      * Sets the stream loader context.<br/>

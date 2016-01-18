@@ -39,9 +39,9 @@ import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.core.JRoutine;
 import com.github.dm.jrt.invocation.FunctionInvocation;
 import com.github.dm.jrt.invocation.InvocationException;
+import com.github.dm.jrt.invocation.PassingInvocation;
 import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.routine.Routine;
-import com.github.dm.jrt.runner.Runner;
 import com.github.dm.jrt.util.TimeDuration;
 import com.github.dm.jrt.util.WeakIdentityHashMap;
 
@@ -778,12 +778,8 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
             logger.dbg("creating new result channel");
             final InvocationLoader<?, OUT> internalLoader = mLoader;
             final ArrayList<IOChannel<OUT>> channels = mNewChannels;
-            final Runner runner =
-                    ((looper != null) && (looper != Looper.getMainLooper())) ? Runners.looperRunner(
-                            looper) : Runners.mainRunner();
             final IOChannel<OUT> channel = JRoutine.io()
                                                    .withChannels()
-                                                   .withRunner(runner)
                                                    .withLog(logger.getLog())
                                                    .withLogLevel(logger.getLogLevel())
                                                    .set()
@@ -791,6 +787,18 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
             channels.add(channel);
             internalLoader.setInvocationCount(Math.max(channels.size() + mAbortedChannels.size(),
                                                        internalLoader.getInvocationCount()));
+
+            if ((looper != null) && (looper != Looper.getMainLooper())) {
+
+                return JRoutine.on(PassingInvocation.<OUT>factoryOf())
+                               .withInvocations()
+                               .withRunner(Runners.looperRunner(looper))
+                               .withLog(logger.getLog())
+                               .withLogLevel(logger.getLogLevel())
+                               .set()
+                               .asyncCall(channel);
+            }
+
             return channel;
         }
 

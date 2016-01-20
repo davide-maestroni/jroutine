@@ -73,7 +73,6 @@ public class ByteChannel {
     private ByteChannel(final int dataBufferSize, final int corePoolSize) {
 
         if (dataBufferSize < 1) {
-
             throw new IllegalArgumentException("the data buffer size must be greater than 0");
         }
 
@@ -179,15 +178,11 @@ public class ByteChannel {
     public BufferOutputStream passTo(@NotNull final InputChannel<? super ByteBuffer> channel) {
 
         BufferOutputStream stream;
-
         synchronized (mStreams) {
-
             final WeakIdentityHashMap<InputChannel<? super ByteBuffer>, BufferOutputStream>
                     streams = mStreams;
             stream = streams.get(channel);
-
             if (stream == null) {
-
                 stream = new DefaultBufferOutputStream(channel);
                 streams.put(channel, stream);
             }
@@ -214,19 +209,14 @@ public class ByteChannel {
     private ByteBuffer acquire() {
 
         ByteBuffer buffer = null;
-
         synchronized (mBufferPool) {
-
             final LinkedList<ByteBuffer> bufferPool = mBufferPool;
-
             if (!bufferPool.isEmpty()) {
-
                 buffer = bufferPool.removeFirst();
             }
         }
 
         if (buffer != null) {
-
             return buffer;
         }
 
@@ -236,11 +226,8 @@ public class ByteChannel {
     private void release(@NotNull final ByteBuffer buffer) {
 
         synchronized (mBufferPool) {
-
             final LinkedList<ByteBuffer> bufferPool = mBufferPool;
-
             if (bufferPool.size() < mCorePoolSize) {
-
                 bufferPool.add(buffer);
             }
         }
@@ -321,9 +308,7 @@ public class ByteChannel {
         public long readAll(@NotNull final OutputStream out) throws IOException {
 
             long count = 0;
-
             for (int b; (b = read(out)) > 0; ) {
-
                 count += b;
             }
 
@@ -371,9 +356,7 @@ public class ByteChannel {
         public long writeAll(@NotNull final InputStream in) throws IOException {
 
             long count = 0;
-
             for (int b; (b = write(in)) > 0; ) {
-
                 count += b;
             }
 
@@ -444,11 +427,8 @@ public class ByteChannel {
         public void close() {
 
             try {
-
                 mOutputStream.close();
-
             } finally {
-
                 mIOChannel.close();
             }
         }
@@ -476,9 +456,7 @@ public class ByteChannel {
 
             final ArrayList<BufferInputStream> streams =
                     (mStreams = new ArrayList<BufferInputStream>(buffers.length));
-
             for (final ByteBuffer buffer : buffers) {
-
                 streams.add(buffer.getStream());
             }
         }
@@ -492,9 +470,7 @@ public class ByteChannel {
 
             final ArrayList<BufferInputStream> streams =
                     (mStreams = new ArrayList<BufferInputStream>(buffers.size()));
-
             for (final ByteBuffer buffer : buffers) {
-
                 streams.add(buffer.getStream());
             }
         }
@@ -512,21 +488,15 @@ public class ByteChannel {
         public int read(@NotNull final OutputStream out) throws IOException {
 
             synchronized (mMutex) {
-
                 final ArrayList<BufferInputStream> streams = mStreams;
                 final int size = streams.size();
-
                 if (mIndex >= size) {
-
                     return -1;
                 }
 
                 int read = streams.get(mIndex).read(out);
-
                 while (read < 0) {
-
                     if (++mIndex >= size) {
-
                         return -1;
                     }
 
@@ -541,21 +511,15 @@ public class ByteChannel {
         public int read() {
 
             synchronized (mMutex) {
-
                 final ArrayList<BufferInputStream> streams = mStreams;
                 final int size = streams.size();
-
                 if (mIndex >= size) {
-
                     return -1;
                 }
 
                 int read = streams.get(mIndex).read();
-
                 while (read == -1) {
-
                     if (++mIndex >= size) {
-
                         return -1;
                     }
 
@@ -570,41 +534,30 @@ public class ByteChannel {
         public int read(@NotNull final byte[] b) {
 
             final int len = b.length;
-
             if (len == 0) {
-
                 return 0;
             }
 
             synchronized (mMutex) {
-
                 final ArrayList<BufferInputStream> streams = mStreams;
                 final int size = streams.size();
-
                 if (mIndex >= size) {
-
                     return -1;
                 }
 
                 int count = 0;
                 int read = streams.get(mIndex).read(b);
-
                 if (read > 0) {
-
                     count += read;
                 }
 
                 while (count < len) {
-
                     if (++mIndex >= size) {
-
                         return (count > 0) ? count : -1;
                     }
 
                     read = streams.get(mIndex).read(b, count, len - count);
-
                     if (read > 0) {
-
                         count += read;
                     }
                 }
@@ -618,47 +571,35 @@ public class ByteChannel {
         public int read(@NotNull final byte[] b, final int off, final int len) {
 
             if (b == null) {
-
                 throw new NullPointerException();
 
             } else if ((off < 0) || (len < 0) || (len > b.length - off) || ((off + len) < 0)) {
-
                 throw new IndexOutOfBoundsException();
 
             } else if (len == 0) {
-
                 return 0;
             }
 
             synchronized (mMutex) {
-
                 final ArrayList<BufferInputStream> streams = mStreams;
                 final int size = streams.size();
-
                 if (mIndex >= size) {
-
                     return -1;
                 }
 
                 int count = 0;
                 int read = streams.get(mIndex).read(b, off, len);
-
                 if (read > 0) {
-
                     count += read;
                 }
 
                 while (count < len) {
-
                     if (++mIndex >= size) {
-
                         return (count > 0) ? count : -1;
                     }
 
                     read = streams.get(mIndex).read(b, off + count, len - count);
-
                     if (read > 0) {
-
                         count += read;
                     }
                 }
@@ -671,34 +612,25 @@ public class ByteChannel {
         public long skip(final long n) {
 
             synchronized (mMutex) {
-
                 final ArrayList<BufferInputStream> streams = mStreams;
                 final int size = streams.size();
-
                 if (mIndex >= size) {
-
                     return 0;
                 }
 
                 long count = 0;
                 long skipped = streams.get(mIndex).skip(n);
-
                 if (skipped > 0) {
-
                     count += skipped;
                 }
 
                 while (count < n) {
-
                     if (++mIndex >= size) {
-
                         return count;
                     }
 
                     skipped = streams.get(mIndex).skip(n - count);
-
                     if (skipped > 0) {
-
                         count += skipped;
                     }
                 }
@@ -711,14 +643,10 @@ public class ByteChannel {
         public int available() {
 
             int available = 0;
-
             synchronized (mMutex) {
-
                 final ArrayList<BufferInputStream> streams = mStreams;
                 final int size = streams.size();
-
                 for (int i = mIndex; i < size; ++i) {
-
                     available += streams.get(i).available();
                 }
             }
@@ -730,9 +658,7 @@ public class ByteChannel {
         public void close() {
 
             synchronized (mMutex) {
-
                 for (final BufferInputStream stream : mStreams) {
-
                     stream.close();
                 }
             }
@@ -742,7 +668,6 @@ public class ByteChannel {
         public void mark(final int readLimit) {
 
             synchronized (mMutex) {
-
                 final int index = (mMarkIndex = mIndex);
                 mStreams.get(index).mark(readLimit);
             }
@@ -752,14 +677,11 @@ public class ByteChannel {
         public void reset() {
 
             synchronized (mMutex) {
-
                 final int index = (mIndex = mMarkIndex);
                 final ArrayList<BufferInputStream> streams = mStreams;
                 streams.get(index).reset();
                 final int size = streams.size();
-
                 for (int i = index + 1; i < size; ++i) {
-
                     streams.get(i).reset();
                 }
             }
@@ -829,7 +751,6 @@ public class ByteChannel {
         public int getSize() {
 
             synchronized (mMutex) {
-
                 return mSize;
             }
         }
@@ -840,9 +761,7 @@ public class ByteChannel {
             final int size = getSize();
             final byte[] buffer = mBuffer;
             int result = size;
-
             for (int i = 0; i < size; ++i) {
-
                 result = 31 * result + buffer[i];
             }
 
@@ -853,30 +772,23 @@ public class ByteChannel {
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof ByteBuffer)) {
-
                 return false;
             }
 
             final ByteBuffer that = (ByteBuffer) o;
             final int size = getSize();
-
             if (size != that.getSize()) {
-
                 return false;
             }
 
             final byte[] thisBuffer = mBuffer;
             final byte[] thatBuffer = that.mBuffer;
-
             for (int i = 0; i < size; ++i) {
-
                 if (thisBuffer[i] != thatBuffer[i]) {
-
                     return false;
                 }
             }
@@ -888,7 +800,6 @@ public class ByteChannel {
                 @NotNull final BufferState updated, @NotNull final String errorMessage) {
 
             if (mState != expected) {
-
                 throw new IllegalStateException(errorMessage + ": " + mState);
             }
 
@@ -899,7 +810,6 @@ public class ByteChannel {
         private BufferInputStream getStream() {
 
             synchronized (mMutex) {
-
                 changeState(BufferState.TRANSFER, BufferState.READ,
                             "attempting to get buffer stream while in illegal state");
                 return mStream;
@@ -910,7 +820,6 @@ public class ByteChannel {
         private ByteBuffer lock(final int size) {
 
             synchronized (mMutex) {
-
                 changeState(BufferState.WRITE, BufferState.TRANSFER,
                             "attempting to write to output while in illegal state");
                 mSize = size;
@@ -923,11 +832,8 @@ public class ByteChannel {
         private byte[] readBuffer() {
 
             synchronized (mMutex) {
-
                 final BufferState state = mState;
-
                 if (state != BufferState.READ) {
-
                     throw new IllegalStateException(
                             "attempting to read buffer data while in illegal state: " + state);
                 }
@@ -939,7 +845,6 @@ public class ByteChannel {
         private void recycle() {
 
             synchronized (mMutex) {
-
                 changeState(BufferState.READ, BufferState.RECYCLED,
                             "attempting to read from buffer while in illegal state");
                 mSize = 0;
@@ -952,11 +857,8 @@ public class ByteChannel {
         private byte[] writeBuffer() {
 
             synchronized (mMutex) {
-
                 final BufferState state = mState;
-
                 if (state != BufferState.WRITE) {
-
                     throw new IllegalStateException(
                             "attempting to write buffer data while in illegal state: " + state);
                 }
@@ -995,13 +897,10 @@ public class ByteChannel {
         public int read(@NotNull final OutputStream out) throws IOException {
 
             synchronized (mMutex) {
-
                 final ByteBuffer buffer = mBuffer;
                 final int size = buffer.getSize();
                 final int offset = mOffset;
-
                 if (offset >= size) {
-
                     return -1;
                 }
 
@@ -1016,20 +915,15 @@ public class ByteChannel {
         public int read(@NotNull final byte[] b) {
 
             final int len = b.length;
-
             if (len == 0) {
-
                 return 0;
             }
 
             synchronized (mMutex) {
-
                 final ByteBuffer buffer = mBuffer;
                 final int size = buffer.getSize();
                 final int offset = mOffset;
-
                 if (offset >= size) {
-
                     return -1;
                 }
 
@@ -1045,26 +939,20 @@ public class ByteChannel {
         public int read(@NotNull final byte[] b, final int off, final int len) {
 
             if (b == null) {
-
                 throw new NullPointerException();
 
             } else if ((off < 0) || (len < 0) || (len > b.length - off) || ((off + len) < 0)) {
-
                 throw new IndexOutOfBoundsException();
 
             } else if (len == 0) {
-
                 return 0;
             }
 
             synchronized (mMutex) {
-
                 final ByteBuffer buffer = mBuffer;
                 final int size = buffer.getSize();
                 final int offset = mOffset;
-
                 if (offset >= size) {
-
                     return -1;
                 }
 
@@ -1079,11 +967,8 @@ public class ByteChannel {
         public long skip(final long n) {
 
             synchronized (mMutex) {
-
                 final long skipped = Math.min(mBuffer.getSize() - mOffset, n);
-
                 if (skipped > 0) {
-
                     mOffset += skipped;
                 }
 
@@ -1095,7 +980,6 @@ public class ByteChannel {
         public int available() {
 
             synchronized (mMutex) {
-
                 return Math.max(0, mBuffer.getSize() - mOffset);
             }
         }
@@ -1104,9 +988,7 @@ public class ByteChannel {
         public void close() {
 
             synchronized (mMutex) {
-
                 if (mIsClosed) {
-
                     return;
                 }
 
@@ -1120,7 +1002,6 @@ public class ByteChannel {
         public void reset() {
 
             synchronized (mMutex) {
-
                 mOffset = mMark;
             }
         }
@@ -1129,12 +1010,9 @@ public class ByteChannel {
         public int read() {
 
             synchronized (mMutex) {
-
                 final ByteBuffer buffer = mBuffer;
                 final int size = buffer.getSize();
-
                 if (mOffset >= size) {
-
                     return -1;
                 }
 
@@ -1146,7 +1024,6 @@ public class ByteChannel {
         public void mark(final int readLimit) {
 
             synchronized (mMutex) {
-
                 mMark = mOffset;
             }
         }
@@ -1182,7 +1059,6 @@ public class ByteChannel {
         private DefaultBufferOutputStream(@NotNull final InputChannel<? super ByteBuffer> channel) {
 
             if (channel == null) {
-
                 throw new NullPointerException("the input channel must not be null");
             }
 
@@ -1193,9 +1069,7 @@ public class ByteChannel {
         private ByteBuffer getBuffer() {
 
             final ByteBuffer byteBuffer = mBuffer;
-
             if (byteBuffer != null) {
-
                 return byteBuffer;
             }
 
@@ -1209,11 +1083,8 @@ public class ByteChannel {
             final boolean isPass;
             final ByteBuffer byteBuffer;
             final int size;
-
             synchronized (mMutex) {
-
                 if (mIsClosed) {
-
                     throw new IOException("cannot write into a closed output stream");
                 }
 
@@ -1222,28 +1093,22 @@ public class ByteChannel {
                 final int length = buffer.length;
                 final int offset = mOffset;
                 read = in.read(buffer, offset, length - offset);
-
                 if (read > 0) {
-
                     mOffset += Math.max(read, 0);
                     size = mOffset;
                     isPass = (size >= length);
-
                     if (isPass) {
-
                         mOffset = 0;
                         mBuffer = null;
                     }
 
                 } else {
-
                     size = mOffset;
                     isPass = false;
                 }
             }
 
             if (isPass) {
-
                 mChannel.pass(byteBuffer.lock(size));
             }
 
@@ -1255,13 +1120,9 @@ public class ByteChannel {
 
             final ByteBuffer byteBuffer;
             final int size;
-
             synchronized (mMutex) {
-
                 size = mOffset;
-
                 if (size == 0) {
-
                     return;
                 }
 
@@ -1277,9 +1138,7 @@ public class ByteChannel {
         public void close() {
 
             synchronized (mMutex) {
-
                 if (mIsClosed) {
-
                     return;
                 }
 
@@ -1295,11 +1154,8 @@ public class ByteChannel {
             final boolean isPass;
             final ByteBuffer byteBuffer;
             final int size;
-
             synchronized (mMutex) {
-
                 if (mIsClosed) {
-
                     throw new IOException("cannot write into a closed output stream");
                 }
 
@@ -1308,16 +1164,13 @@ public class ByteChannel {
                 buffer[mOffset++] = (byte) b;
                 size = mOffset;
                 isPass = (size >= buffer.length);
-
                 if (isPass) {
-
                     mOffset = 0;
                     mBuffer = null;
                 }
             }
 
             if (isPass) {
-
                 mChannel.pass(byteBuffer.lock(size));
             }
         }
@@ -1326,24 +1179,17 @@ public class ByteChannel {
         public void write(@NotNull final byte[] b) throws IOException {
 
             final int len = b.length;
-
             if (len == 0) {
-
                 return;
             }
 
             int written = 0;
-
             do {
-
                 final boolean isPass;
                 final ByteBuffer byteBuffer;
                 final int size;
-
                 synchronized (mMutex) {
-
                     if (mIsClosed) {
-
                         throw new IOException("cannot write into a closed output stream");
                     }
 
@@ -1357,16 +1203,13 @@ public class ByteChannel {
                     mOffset += count;
                     size = mOffset;
                     isPass = (size >= length);
-
                     if (isPass) {
-
                         mOffset = 0;
                         mBuffer = null;
                     }
                 }
 
                 if (isPass) {
-
                     mChannel.pass(byteBuffer.lock(size));
                 }
 
@@ -1379,30 +1222,22 @@ public class ByteChannel {
                 IOException {
 
             if (b == null) {
-
                 throw new NullPointerException();
 
             } else if ((off < 0) || (len < 0) || (len > b.length - off) || ((off + len) < 0)) {
-
                 throw new IndexOutOfBoundsException();
 
             } else if (len == 0) {
-
                 return;
             }
 
             int written = 0;
-
             do {
-
                 final boolean isPass;
                 final ByteBuffer byteBuffer;
                 final int size;
-
                 synchronized (mMutex) {
-
                     if (mIsClosed) {
-
                         throw new IOException("cannot write into a closed output stream");
                     }
 
@@ -1416,16 +1251,13 @@ public class ByteChannel {
                     mOffset += count;
                     size = mOffset;
                     isPass = (size >= length);
-
                     if (isPass) {
-
                         mOffset = 0;
                         mBuffer = null;
                     }
                 }
 
                 if (isPass) {
-
                     mChannel.pass(byteBuffer.lock(size));
                 }
 

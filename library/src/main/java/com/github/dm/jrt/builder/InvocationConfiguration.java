@@ -430,92 +430,74 @@ public final class InvocationConfiguration {
 
         // AUTO-GENERATED CODE
         if (this == o) {
-
             return true;
         }
 
         if (o == null || getClass() != o.getClass()) {
-
             return false;
         }
 
         final InvocationConfiguration that = (InvocationConfiguration) o;
-
         if (mCoreInstances != that.mCoreInstances) {
-
             return false;
         }
 
         if (mInputLimit != that.mInputLimit) {
-
             return false;
         }
 
         if (mInputMaxSize != that.mInputMaxSize) {
-
             return false;
         }
 
         if (mMaxInstances != that.mMaxInstances) {
-
             return false;
         }
 
         if (mOutputLimit != that.mOutputLimit) {
-
             return false;
         }
 
         if (mOutputMaxSize != that.mOutputMaxSize) {
-
             return false;
         }
 
         if (mPriority != that.mPriority) {
-
             return false;
         }
 
         if (mInputMaxDelay != null ? !mInputMaxDelay.equals(that.mInputMaxDelay)
                 : that.mInputMaxDelay != null) {
-
             return false;
         }
 
         if (mInputOrderType != that.mInputOrderType) {
-
             return false;
         }
 
         if (mLog != null ? !mLog.equals(that.mLog) : that.mLog != null) {
-
             return false;
         }
 
         if (mLogLevel != that.mLogLevel) {
-
             return false;
         }
 
         if (mOutputMaxDelay != null ? !mOutputMaxDelay.equals(that.mOutputMaxDelay)
                 : that.mOutputMaxDelay != null) {
-
             return false;
         }
 
         if (mOutputOrderType != that.mOutputOrderType) {
-
             return false;
         }
 
         if (mReadTimeout != null ? !mReadTimeout.equals(that.mReadTimeout)
                 : that.mReadTimeout != null) {
-
             return false;
         }
 
         if (mRunner != null ? !mRunner.equals(that.mRunner) : that.mRunner != null) {
-
             return false;
         }
 
@@ -572,16 +554,9 @@ public final class InvocationConfiguration {
         /**
          * Order by delay.<br/>
          * Data are passed to the invocation or the output consumer in the same order as they are
-         * passed to the channel based on their delay.<br/>
-         * Note that, if an output channel is passed to the channel with a 0 delay, all its outputs
-         * will be delivered before any other.
+         * passed to the channel based on their delay.
          */
-        BY_DELAY,
-        /**
-         * Order by chance.<br/>
-         * There is no guarantee about the data order.
-         */
-        BY_CHANCE
+        BY_DELAY
     }
 
     /**
@@ -743,7 +718,6 @@ public final class InvocationConfiguration {
         public Builder(@NotNull final Configurable<? extends TYPE> configurable) {
 
             if (configurable == null) {
-
                 throw new NullPointerException("the configurable instance must no be null");
             }
 
@@ -768,7 +742,6 @@ public final class InvocationConfiguration {
                 @NotNull final InvocationConfiguration initialConfiguration) {
 
             if (configurable == null) {
-
                 throw new NullPointerException("the configurable instance must no be null");
             }
 
@@ -799,7 +772,6 @@ public final class InvocationConfiguration {
         public Builder<TYPE> with(@Nullable final InvocationConfiguration configuration) {
 
             if (configuration == null) {
-
                 setConfiguration(DEFAULT_CONFIGURATION);
                 return this;
             }
@@ -823,7 +795,6 @@ public final class InvocationConfiguration {
         public Builder<TYPE> withCoreInstances(final int coreInstances) {
 
             if ((coreInstances != DEFAULT) && (coreInstances < 0)) {
-
                 throw new IllegalArgumentException(
                         "the maximum number of retained instances cannot be negative: "
                                 + coreInstances);
@@ -851,7 +822,6 @@ public final class InvocationConfiguration {
         public Builder<TYPE> withInputLimit(final int inputLimit) {
 
             if ((inputLimit != DEFAULT) && (inputLimit < 0)) {
-
                 throw new IllegalArgumentException(
                         "the input limit cannot be negative: " + inputLimit);
             }
@@ -912,7 +882,6 @@ public final class InvocationConfiguration {
         public Builder<TYPE> withInputMaxSize(final int inputMaxSize) {
 
             if ((inputMaxSize != DEFAULT) && (inputMaxSize <= 0)) {
-
                 throw new IllegalArgumentException(
                         "the input buffer size cannot be 0 or negative: " + inputMaxSize);
             }
@@ -978,7 +947,6 @@ public final class InvocationConfiguration {
         public Builder<TYPE> withMaxInstances(final int maxInstances) {
 
             if ((maxInstances != DEFAULT) && (maxInstances < 1)) {
-
                 throw new IllegalArgumentException(
                         "the maximum number of concurrently running instances cannot be less than"
                                 + " 1: " + maxInstances);
@@ -1006,7 +974,6 @@ public final class InvocationConfiguration {
         public Builder<TYPE> withOutputLimit(final int outputLimit) {
 
             if ((outputLimit != DEFAULT) && (outputLimit < 0)) {
-
                 throw new IllegalArgumentException(
                         "the output limit cannot be negative: " + outputLimit);
             }
@@ -1068,7 +1035,6 @@ public final class InvocationConfiguration {
         public Builder<TYPE> withOutputMaxSize(final int outputMaxSize) {
 
             if ((outputMaxSize != DEFAULT) && (outputMaxSize <= 0)) {
-
                 throw new IllegalArgumentException(
                         "the output buffer size cannot be 0 or negative: " + outputMaxSize);
             }
@@ -1174,44 +1140,32 @@ public final class InvocationConfiguration {
         private void applyBaseConfiguration(@NotNull final InvocationConfiguration configuration) {
 
             final Runner runner = configuration.mRunner;
-
             if (runner != null) {
-
                 withRunner(runner);
             }
 
             final int priority = configuration.mPriority;
-
             if (priority != DEFAULT) {
-
                 withPriority(priority);
             }
 
             final int maxInvocations = configuration.mMaxInstances;
-
             if (maxInvocations != DEFAULT) {
-
                 withMaxInstances(maxInvocations);
             }
 
             final int coreInvocations = configuration.mCoreInstances;
-
             if (coreInvocations != DEFAULT) {
-
                 withCoreInstances(coreInvocations);
             }
 
             final TimeDuration readTimeout = configuration.mReadTimeout;
-
             if (readTimeout != null) {
-
                 withReadTimeout(readTimeout);
             }
 
             final TimeoutActionType timeoutActionType = configuration.mTimeoutActionType;
-
             if (timeoutActionType != null) {
-
                 withReadTimeoutAction(timeoutActionType);
             }
         }
@@ -1220,58 +1174,42 @@ public final class InvocationConfiguration {
                 @NotNull final InvocationConfiguration configuration) {
 
             final OrderType inputOrderType = configuration.mInputOrderType;
-
             if (inputOrderType != null) {
-
                 withInputOrder(inputOrderType);
             }
 
             final int inputLimit = configuration.mInputLimit;
-
             if (inputLimit != DEFAULT) {
-
                 withInputLimit(inputLimit);
             }
 
             final TimeDuration inputMaxDelay = configuration.mInputMaxDelay;
-
             if (inputMaxDelay != null) {
-
                 withInputMaxDelay(inputMaxDelay);
             }
 
             final int inputSize = configuration.mInputMaxSize;
-
             if (inputSize != DEFAULT) {
-
                 withInputMaxSize(inputSize);
             }
 
             final OrderType outputOrderType = configuration.mOutputOrderType;
-
             if (outputOrderType != null) {
-
                 withOutputOrder(outputOrderType);
             }
 
             final int outputLimit = configuration.mOutputLimit;
-
             if (outputLimit != DEFAULT) {
-
                 withOutputLimit(outputLimit);
             }
 
             final TimeDuration outputTimeout = configuration.mOutputMaxDelay;
-
             if (outputTimeout != null) {
-
                 withOutputMaxDelay(outputTimeout);
             }
 
             final int outputSize = configuration.mOutputMaxSize;
-
             if (outputSize != DEFAULT) {
-
                 withOutputMaxSize(outputSize);
             }
         }
@@ -1279,16 +1217,12 @@ public final class InvocationConfiguration {
         private void applyLogConfiguration(@NotNull final InvocationConfiguration configuration) {
 
             final Log log = configuration.mLog;
-
             if (log != null) {
-
                 withLog(log);
             }
 
             final Level logLevel = configuration.mLogLevel;
-
             if (logLevel != null) {
-
                 withLogLevel(logLevel);
             }
         }

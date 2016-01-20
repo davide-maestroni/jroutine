@@ -103,24 +103,19 @@ public final class ServiceConfiguration {
 
         // AUTO-GENERATED CODE
         if (this == o) {
-
             return true;
         }
 
         if (o == null || getClass() != o.getClass()) {
-
             return false;
         }
 
         final ServiceConfiguration that = (ServiceConfiguration) o;
-
         if (mLogClass != null ? !mLogClass.equals(that.mLogClass) : that.mLogClass != null) {
-
             return false;
         }
 
         if (mLooper != null ? !mLooper.equals(that.mLooper) : that.mLooper != null) {
-
             return false;
         }
 
@@ -227,7 +222,6 @@ public final class ServiceConfiguration {
         public Builder(@NotNull final Configurable<? extends TYPE> configurable) {
 
             if (configurable == null) {
-
                 throw new NullPointerException("the configurable instance must no be null");
             }
 
@@ -245,7 +239,6 @@ public final class ServiceConfiguration {
                 @NotNull final ServiceConfiguration initialConfiguration) {
 
             if (configurable == null) {
-
                 throw new NullPointerException("the configurable instance must no be null");
             }
 
@@ -276,29 +269,22 @@ public final class ServiceConfiguration {
         public Builder<TYPE> with(@Nullable final ServiceConfiguration configuration) {
 
             if (configuration == null) {
-
                 setConfiguration(DEFAULT_CONFIGURATION);
                 return this;
             }
 
             final Looper looper = configuration.mLooper;
-
             if (looper != null) {
-
                 withResultLooper(looper);
             }
 
             final Class<? extends Runner> runnerClass = configuration.mRunnerClass;
-
             if (runnerClass != null) {
-
                 withRunnerClass(runnerClass);
             }
 
             final Class<? extends Log> logClass = configuration.mLogClass;
-
             if (logClass != null) {
-
                 withLogClass(logClass);
             }
 
@@ -318,7 +304,6 @@ public final class ServiceConfiguration {
         public Builder<TYPE> withLogClass(@Nullable final Class<? extends Log> logClass) {
 
             if (logClass != null) {
-
                 Reflection.findConstructor(logClass);
             }
 
@@ -353,7 +338,6 @@ public final class ServiceConfiguration {
         public Builder<TYPE> withRunnerClass(@Nullable final Class<? extends Runner> runnerClass) {
 
             if (runnerClass != null) {
-
                 Reflection.findConstructor(runnerClass);
             }
 

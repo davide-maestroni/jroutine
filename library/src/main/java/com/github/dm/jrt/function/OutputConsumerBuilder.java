@@ -46,17 +46,14 @@ public class OutputConsumerBuilder<OUT> implements OutputConsumer<OUT> {
             @NotNull final ConsumerWrapper<OUT> onOutput) {
 
         if (onComplete == null) {
-
             throw new NullPointerException("the complete consumer must not be null");
         }
 
         if (onError == null) {
-
             throw new NullPointerException("the error consumer must not be null");
         }
 
         if (onOutput == null) {
-
             throw new NullPointerException("the output consumer must not be null");
         }
 

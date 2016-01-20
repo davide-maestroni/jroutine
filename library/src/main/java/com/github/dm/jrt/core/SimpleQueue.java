@@ -56,9 +56,7 @@ class SimpleQueue<E> {
         final int i = mLast;
         final int newLast = (i + 1) & (mQueue.length - 1);
         mQueue[i] = element;
-
         if (mFirst == newLast) {
-
             doubleCapacity();
         }
 
@@ -75,7 +73,6 @@ class SimpleQueue<E> {
     public void addAll(@NotNull final Iterable<? extends E> elements) {
 
         for (final E element : elements) {
-
             add(element);
         }
     }
@@ -98,7 +95,6 @@ class SimpleQueue<E> {
     public void drainTo(@NotNull final Collection<? super E> collection) {
 
         while (!isEmpty()) {
-
             collection.add(removeFirst());
         }
     }
@@ -123,7 +119,6 @@ class SimpleQueue<E> {
     public E peekFirst() {
 
         if (isEmpty()) {
-
             throw new NoSuchElementException();
         }
 
@@ -140,7 +135,6 @@ class SimpleQueue<E> {
     public E removeFirst() {
 
         if (isEmpty()) {
-
             throw new NoSuchElementException();
         }
 
@@ -168,9 +162,7 @@ class SimpleQueue<E> {
 
         final int size = mQueue.length;
         final int newSize = size << 1;
-
         if (newSize < size) {
-
             throw new OutOfMemoryError();
         }
 

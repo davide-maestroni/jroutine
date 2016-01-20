@@ -114,13 +114,6 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA> {
     }
 
     @NotNull
-    public IOChannel<DATA> orderByChance() {
-
-        mInputChannel.orderByChance();
-        return this;
-    }
-
-    @NotNull
     public IOChannel<DATA> orderByDelay() {
 
         mInputChannel.orderByDelay();

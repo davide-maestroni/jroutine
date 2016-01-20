@@ -16,6 +16,7 @@ package com.github.dm.jrt.android.v11.stream;
 import com.github.dm.jrt.android.builder.LoaderConfigurableBuilder;
 import com.github.dm.jrt.android.builder.LoaderConfiguration;
 import com.github.dm.jrt.android.builder.LoaderConfiguration.CacheStrategyType;
+import com.github.dm.jrt.android.core.Channels.ParcelableSelectable;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
@@ -334,6 +335,12 @@ public interface LoaderStreamChannel<OUT>
      * {@inheritDoc}
      */
     @NotNull
+    LoaderStreamChannel<OUT> repeat();
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
     LoaderStreamChannel<OUT> runOn(@Nullable Runner runner);
 
     /**
@@ -451,6 +458,12 @@ public interface LoaderStreamChannel<OUT>
     @NotNull
     LoaderStreamChannel<OUT> syncReduce(
             @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    LoaderStreamChannel<? extends ParcelableSelectable<OUT>> toSelectable(int index);
 
     /**
      * {@inheritDoc}

@@ -36,7 +36,6 @@ public abstract class DecoratingInvocationFactory<IN, OUT> extends InvocationFac
     public DecoratingInvocationFactory(@NotNull final InvocationFactory<IN, OUT> wrapped) {
 
         if (wrapped == null) {
-
             throw new NullPointerException("the wrapped invocation factory must not be null");
         }
 
@@ -53,12 +52,10 @@ public abstract class DecoratingInvocationFactory<IN, OUT> extends InvocationFac
     public boolean equals(final Object o) {
 
         if (this == o) {
-
             return true;
         }
 
         if (!(o instanceof DecoratingInvocationFactory)) {
-
             return false;
         }
 

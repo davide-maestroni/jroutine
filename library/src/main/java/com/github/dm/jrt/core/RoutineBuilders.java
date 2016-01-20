@@ -109,89 +109,64 @@ public class RoutineBuilders {
             @Nullable final OutputMode outputMode) {
 
         Reflection.makeAccessible(targetMethod);
-
         try {
-
             final Object methodResult;
             mutex.acquire();
-
             try {
-
                 final Object[] args;
-
                 if (inputMode == InputMode.COLLECTION) {
-
                     final Class<?> paramClass = targetMethod.getParameterTypes()[0];
-
                     if (paramClass.isArray()) {
-
                         final int size = objects.size();
                         final Object array = Array.newInstance(paramClass.getComponentType(), size);
-
                         for (int i = 0; i < size; ++i) {
-
                             Array.set(array, i, objects.get(i));
                         }
 
                         args = asArgs(array);
 
                     } else {
-
                         args = asArgs(objects);
                     }
 
                 } else {
-
                     args = objects.toArray(new Object[objects.size()]);
                 }
 
                 methodResult = targetMethod.invoke(target, args);
 
             } finally {
-
                 mutex.release();
             }
 
             final Class<?> returnType = targetMethod.getReturnType();
-
             if (!Void.class.equals(Reflection.boxingClass(returnType))) {
-
                 if (outputMode == OutputMode.ELEMENT) {
-
                     if (returnType.isArray()) {
-
                         if (methodResult != null) {
-
                             result.orderByCall();
                             final int length = Array.getLength(methodResult);
-
                             for (int i = 0; i < length; ++i) {
-
                                 result.pass(Array.get(methodResult, i));
                             }
                         }
 
                     } else {
-
                         result.pass((Iterable<?>) methodResult);
                     }
 
                 } else {
-
                     result.pass(methodResult);
                 }
             }
 
         } catch (final RoutineException e) {
-
             throw e;
 
         } catch (final InvocationTargetException e) {
-
             throw new InvocationException(e.getCause());
 
         } catch (final Throwable t) {
-
             throw new InvocationException(t);
         }
     }
@@ -225,102 +200,74 @@ public class RoutineBuilders {
         final InvocationConfiguration.Builder<InvocationConfiguration> builder =
                 InvocationConfiguration.builderFrom(configuration);
         final CoreInstances coreInstancesAnnotation = method.getAnnotation(CoreInstances.class);
-
         if (coreInstancesAnnotation != null) {
-
             builder.withCoreInstances(coreInstancesAnnotation.value());
         }
 
         final InputLimit inputLimitAnnotation = method.getAnnotation(InputLimit.class);
-
         if (inputLimitAnnotation != null) {
-
             builder.withInputLimit(inputLimitAnnotation.value());
         }
 
         final InputMaxDelay inputMaxDelayAnnotation = method.getAnnotation(InputMaxDelay.class);
-
         if (inputMaxDelayAnnotation != null) {
-
             builder.withInputMaxDelay(inputMaxDelayAnnotation.value(),
                                       inputMaxDelayAnnotation.unit());
         }
 
         final InputMaxSize inputSizeAnnotation = method.getAnnotation(InputMaxSize.class);
-
         if (inputSizeAnnotation != null) {
-
             builder.withInputMaxSize(inputSizeAnnotation.value());
         }
 
         final InputOrder inputOrderAnnotation = method.getAnnotation(InputOrder.class);
-
         if (inputOrderAnnotation != null) {
-
             builder.withInputOrder(inputOrderAnnotation.value());
         }
 
         final LogLevel logLevelAnnotation = method.getAnnotation(LogLevel.class);
-
         if (logLevelAnnotation != null) {
-
             builder.withLogLevel(logLevelAnnotation.value());
         }
 
         final MaxInstances maxInstancesAnnotation = method.getAnnotation(MaxInstances.class);
-
         if (maxInstancesAnnotation != null) {
-
             builder.withMaxInstances(maxInstancesAnnotation.value());
         }
 
         final OutputLimit outputLimitAnnotation = method.getAnnotation(OutputLimit.class);
-
         if (outputLimitAnnotation != null) {
-
             builder.withOutputLimit(outputLimitAnnotation.value());
         }
 
         final OutputMaxDelay outputMaxDelayAnnotation = method.getAnnotation(OutputMaxDelay.class);
-
         if (outputMaxDelayAnnotation != null) {
-
             builder.withOutputMaxDelay(outputMaxDelayAnnotation.value(),
                                        outputMaxDelayAnnotation.unit());
         }
 
         final OutputMaxSize outputSizeAnnotation = method.getAnnotation(OutputMaxSize.class);
-
         if (outputSizeAnnotation != null) {
-
             builder.withOutputMaxSize(outputSizeAnnotation.value());
         }
 
         final OutputOrder outputOrderAnnotation = method.getAnnotation(OutputOrder.class);
-
         if (outputOrderAnnotation != null) {
-
             builder.withOutputOrder(outputOrderAnnotation.value());
         }
 
         final Priority priorityAnnotation = method.getAnnotation(Priority.class);
-
         if (priorityAnnotation != null) {
-
             builder.withPriority(priorityAnnotation.value());
         }
 
         final ReadTimeout readTimeoutAnnotation = method.getAnnotation(ReadTimeout.class);
-
         if (readTimeoutAnnotation != null) {
-
             builder.withReadTimeout(readTimeoutAnnotation.value(), readTimeoutAnnotation.unit());
         }
 
         final ReadTimeoutAction actionAnnotation = method.getAnnotation(ReadTimeoutAction.class);
-
         if (actionAnnotation != null) {
-
             builder.withReadTimeoutAction(actionAnnotation.value());
         }
 
@@ -343,9 +290,7 @@ public class RoutineBuilders {
         final ProxyConfiguration.Builder<ProxyConfiguration> builder =
                 ProxyConfiguration.builderFrom(configuration);
         final SharedFields sharedFieldsAnnotation = method.getAnnotation(SharedFields.class);
-
         if (sharedFieldsAnnotation != null) {
-
             builder.withSharedFields(sharedFieldsAnnotation.value());
         }
 
@@ -366,23 +311,16 @@ public class RoutineBuilders {
             @NotNull final String name) {
 
         synchronized (sAliasMethods) {
-
             final WeakIdentityHashMap<Class<?>, Map<String, Method>> aliasMethods = sAliasMethods;
             Map<String, Method> methodMap = aliasMethods.get(targetClass);
-
             if (methodMap == null) {
-
                 methodMap = new HashMap<String, Method>();
                 fillMap(methodMap, targetClass.getMethods());
                 final HashMap<String, Method> declaredMethodMap = new HashMap<String, Method>();
                 fillMap(declaredMethodMap, targetClass.getDeclaredMethods());
-
                 for (final Entry<String, Method> methodEntry : declaredMethodMap.entrySet()) {
-
                     final String methodName = methodEntry.getKey();
-
                     if (!methodMap.containsKey(methodName)) {
-
                         methodMap.put(methodName, methodEntry.getValue());
                     }
                 }
@@ -411,47 +349,36 @@ public class RoutineBuilders {
 
         AsyncIn asyncInputAnnotation = null;
         final Annotation[][] annotations = method.getParameterAnnotations();
-
         for (final Annotation annotation : annotations[index]) {
-
             if (annotation.annotationType() == AsyncIn.class) {
-
                 asyncInputAnnotation = (AsyncIn) annotation;
                 break;
             }
         }
 
         if (asyncInputAnnotation == null) {
-
             return null;
         }
 
         InputMode inputMode = asyncInputAnnotation.mode();
         final Class<?>[] parameterTypes = method.getParameterTypes();
         final Class<?> parameterType = parameterTypes[index];
-
         if (inputMode == InputMode.VALUE) {
-
             if (!OutputChannel.class.isAssignableFrom(parameterType)) {
-
                 throw new IllegalArgumentException(
                         "[" + method + "] an async input with mode " + InputMode.VALUE
                                 + " must extends an " + OutputChannel.class.getCanonicalName());
             }
 
         } else { // InputMode.COLLECTION
-
             if (!OutputChannel.class.isAssignableFrom(parameterType)) {
-
                 throw new IllegalArgumentException(
                         "[" + method + "] an async input with mode " + InputMode.COLLECTION
                                 + " must extends an " + OutputChannel.class.getCanonicalName());
             }
 
             final Class<?> paramClass = asyncInputAnnotation.value();
-
             if (!paramClass.isArray() && !paramClass.isAssignableFrom(List.class)) {
-
                 throw new IllegalArgumentException(
                         "[" + method + "] an async input with mode " + InputMode.COLLECTION
                                 + " must be bound to an array or a superclass of "
@@ -459,9 +386,7 @@ public class RoutineBuilders {
             }
 
             final int length = parameterTypes.length;
-
             if (length > 1) {
-
                 throw new IllegalArgumentException(
                         "[" + method + "] an async input with mode " + InputMode.COLLECTION +
                                 " cannot be applied to a method taking " + length
@@ -486,17 +411,13 @@ public class RoutineBuilders {
     public static InvocationMode getInvocationMode(@NotNull final Method method) {
 
         final Invoke invokeAnnotation = method.getAnnotation(Invoke.class);
-
         if (invokeAnnotation == null) {
-
             return null;
         }
 
         final InvocationMode invocationMode = invokeAnnotation.value();
-
         if ((invocationMode == InvocationMode.PARALLEL) && (method.getParameterTypes().length
                 > 1)) {
-
             throw new IllegalArgumentException(
                     "methods annotated with invocation mode " + InvocationMode.PARALLEL
                             + " must have at maximum one input parameter: " + method);
@@ -522,26 +443,20 @@ public class RoutineBuilders {
             @NotNull final Class<?> targetReturnType) {
 
         final AsyncOut asyncOutputAnnotation = method.getAnnotation(AsyncOut.class);
-
         if (asyncOutputAnnotation == null) {
-
             return null;
         }
 
         final Class<?> returnType = method.getReturnType();
-
         if (!returnType.isAssignableFrom(OutputChannel.class)) {
-
             final String channelClassName = OutputChannel.class.getCanonicalName();
             throw new IllegalArgumentException(
                     "[" + method + "] an async output must be a superclass of " + channelClassName);
         }
 
         OutputMode outputMode = asyncOutputAnnotation.value();
-
         if ((outputMode == OutputMode.ELEMENT) && !targetReturnType.isArray()
                 && !Iterable.class.isAssignableFrom(targetReturnType)) {
-
             throw new IllegalArgumentException(
                     "[" + method + "] an async output with mode " + OutputMode.ELEMENT
                             + " must be bound to an array or a type implementing an "
@@ -565,36 +480,27 @@ public class RoutineBuilders {
             @Nullable final List<String> sharedFields) {
 
         if ((target == null) || ((sharedFields != null) && sharedFields.isEmpty())) {
-
             return Mutex.NO_MUTEX;
         }
 
         ExchangeMutex exchangeMutex;
-
         synchronized (sMutexes) {
-
             final WeakIdentityHashMap<Object, ExchangeMutex> mutexes = sMutexes;
             exchangeMutex = mutexes.get(target);
-
             if (exchangeMutex == null) {
-
                 exchangeMutex = new ExchangeMutex();
                 mutexes.put(target, exchangeMutex);
             }
         }
 
         if (sharedFields == null) {
-
             return exchangeMutex;
         }
 
         synchronized (sLocks) {
-
             final WeakIdentityHashMap<Object, Map<String, ReentrantLock>> locksCache = sLocks;
             Map<String, ReentrantLock> lockMap = locksCache.get(target);
-
             if (lockMap == null) {
-
                 lockMap = new HashMap<String, ReentrantLock>();
                 locksCache.put(target, lockMap);
             }
@@ -603,13 +509,9 @@ public class RoutineBuilders {
             final int size = nameSet.size();
             final ReentrantLock[] locks = new ReentrantLock[size];
             int i = 0;
-
             for (final String name : nameSet) {
-
                 ReentrantLock lock = lockMap.get(name);
-
                 if (lock == null) {
-
                     lock = new ReentrantLock();
                     lockMap.put(name, lock);
                 }
@@ -634,43 +536,32 @@ public class RoutineBuilders {
             @NotNull final Method proxyMethod) {
 
         MethodInfo methodInfo;
-
         synchronized (sMethods) {
-
             final WeakIdentityHashMap<Class<?>, Map<Method, MethodInfo>> methodCache = sMethods;
             Map<Method, MethodInfo> methodMap = methodCache.get(targetClass);
-
             if (methodMap == null) {
-
                 methodMap = new HashMap<Method, MethodInfo>();
                 methodCache.put(targetClass, methodMap);
             }
 
             methodInfo = methodMap.get(proxyMethod);
-
             if (methodInfo == null) {
-
                 final InvocationMode invocationMode = getInvocationMode(proxyMethod);
                 final Class<?>[] targetParameterTypes;
                 final AsyncMethod asyncMethodAnnotation =
                         proxyMethod.getAnnotation(AsyncMethod.class);
                 InputMode inputMode = null;
                 OutputMode outputMode = null;
-
                 if (asyncMethodAnnotation != null) {
-
                     if (proxyMethod.getParameterTypes().length > 0) {
-
                         throw new IllegalArgumentException(
                                 "methods annotated with " + AsyncMethod.class.getSimpleName()
                                         + " must have no input parameters: " + proxyMethod);
                     }
 
                     final Class<?> returnType = proxyMethod.getReturnType();
-
                     if (!returnType.isAssignableFrom(InvocationChannel.class)
                             && !returnType.isAssignableFrom(Routine.class)) {
-
                         throw new IllegalArgumentException(
                                 "the proxy method has incompatible return type: " + proxyMethod);
                     }
@@ -680,23 +571,15 @@ public class RoutineBuilders {
                     outputMode = asyncMethodAnnotation.mode();
 
                 } else {
-
                     targetParameterTypes = proxyMethod.getParameterTypes();
                     final Annotation[][] annotations = proxyMethod.getParameterAnnotations();
                     final int length = annotations.length;
-
                     for (int i = 0; i < length; ++i) {
-
                         final InputMode paramMode = getInputMode(proxyMethod, i);
-
                         if (paramMode != null) {
-
                             inputMode = paramMode;
-
                             for (final Annotation paramAnnotation : annotations[i]) {
-
                                 if (paramAnnotation.annotationType() == AsyncIn.class) {
-
                                     targetParameterTypes[i] = ((AsyncIn) paramAnnotation).value();
                                     break;
                                 }
@@ -707,7 +590,6 @@ public class RoutineBuilders {
 
                 if ((invocationMode == InvocationMode.PARALLEL) && (targetParameterTypes.length
                         > 1)) {
-
                     throw new IllegalArgumentException(
                             "methods annotated with invocation mode " + InvocationMode.PARALLEL
                                     + " must have no input parameters: " + proxyMethod);
@@ -718,14 +600,11 @@ public class RoutineBuilders {
                 final Class<?> returnType = proxyMethod.getReturnType();
                 final Class<?> targetReturnType = targetMethod.getReturnType();
                 final AsyncOut asyncOutAnnotation = proxyMethod.getAnnotation(AsyncOut.class);
-
                 if (asyncOutAnnotation != null) {
-
                     outputMode = getOutputMode(proxyMethod, targetReturnType);
 
                 } else if ((asyncMethodAnnotation == null) && !returnType.isAssignableFrom(
                         targetReturnType)) {
-
                     throw new IllegalArgumentException(
                             "the proxy method has incompatible return type: " + proxyMethod);
                 }
@@ -758,11 +637,8 @@ public class RoutineBuilders {
             @Nullable final OutputMode outputMode) {
 
         final Class<?> returnType = method.getReturnType();
-
         if (method.isAnnotationPresent(AsyncMethod.class)) {
-
             if (returnType.isAssignableFrom(InvocationChannel.class)) {
-
                 return (invocationMode == InvocationMode.SYNC) ? routine.syncInvoke()
                         : (invocationMode == InvocationMode.PARALLEL) ? routine.parallelInvoke()
                                 : routine.asyncInvoke();
@@ -776,23 +652,16 @@ public class RoutineBuilders {
                 (invocationMode == InvocationMode.SYNC) ? routine.syncInvoke()
                         : (invocationMode == InvocationMode.PARALLEL) ? routine.parallelInvoke()
                                 : routine.asyncInvoke();
-
         if (inputMode == InputMode.VALUE) {
-
             invocationChannel.orderByCall();
             final Class<?>[] parameterTypes = method.getParameterTypes();
             final int length = args.length;
-
             for (int i = 0; i < length; ++i) {
-
                 final Object arg = args[i];
-
                 if (OutputChannel.class.isAssignableFrom(parameterTypes[i])) {
-
                     invocationChannel.pass((OutputChannel<Object>) arg);
 
                 } else {
-
                     invocationChannel.pass(arg);
                 }
             }
@@ -800,37 +669,28 @@ public class RoutineBuilders {
             outputChannel = invocationChannel.result();
 
         } else if (inputMode == InputMode.COLLECTION) {
-
             outputChannel =
                     invocationChannel.orderByCall().pass((OutputChannel<Object>) args[0]).result();
 
         } else {
-
             outputChannel = invocationChannel.pass(args).result();
         }
 
         if (!Void.class.equals(Reflection.boxingClass(returnType))) {
-
             if (outputMode != null) {
-
                 if (OutputChannel.class.isAssignableFrom(returnType)) {
-
                     return outputChannel;
                 }
 
                 if (returnType.isAssignableFrom(List.class)) {
-
                     return outputChannel.all();
                 }
 
                 if (returnType.isArray()) {
-
                     final List<Object> results = outputChannel.all();
                     final int size = results.size();
                     final Object array = Array.newInstance(returnType.getComponentType(), size);
-
                     for (int i = 0; i < size; ++i) {
-
                         Array.set(array, i, results.get(i));
                     }
 
@@ -849,15 +709,10 @@ public class RoutineBuilders {
             @NotNull final Method[] methods) {
 
         for (final Method method : methods) {
-
             final Alias annotation = method.getAnnotation(Alias.class);
-
             if (annotation != null) {
-
                 final String name = annotation.value();
-
                 if (map.containsKey(name)) {
-
                     throw new IllegalArgumentException(
                             "the name '" + name + "' has already been used to identify a different"
                                     + " method");
@@ -875,24 +730,19 @@ public class RoutineBuilders {
         String name = null;
         Method targetMethod = null;
         final Alias annotation = method.getAnnotation(Alias.class);
-
         if (annotation != null) {
-
             name = annotation.value();
             targetMethod = getAnnotatedMethod(targetClass, name);
         }
 
         if (targetMethod == null) {
-
             if (name == null) {
-
                 name = method.getName();
             }
 
             targetMethod = Reflection.findMethod(targetClass, name, targetParameterTypes);
 
         } else {
-
             // Validate method parameters
             Reflection.findMethod(targetClass, targetMethod.getName(), targetParameterTypes);
         }
@@ -969,9 +819,7 @@ public class RoutineBuilders {
         public void acquire() {
 
             mMutex.acquirePartialMutex();
-
             for (final ReentrantLock lock : mLocks) {
-
                 lock.lock();
             }
         }
@@ -980,9 +828,7 @@ public class RoutineBuilders {
 
             final ReentrantLock[] locks = mLocks;
             final int length = locks.length;
-
             for (int i = length - 1; i >= 0; --i) {
-
                 locks[i].unlock();
             }
 
@@ -1009,11 +855,8 @@ public class RoutineBuilders {
         public void acquirePartialMutex() {
 
             try {
-
                 synchronized (mMutex) {
-
                     while (mFullMutexCount > 0) {
-
                         mMutex.wait();
                     }
 
@@ -1021,7 +864,6 @@ public class RoutineBuilders {
                 }
 
             } catch (final InterruptedException e) {
-
                 InvocationInterruptedException.throwIfInterrupt(e);
             }
         }
@@ -1032,7 +874,6 @@ public class RoutineBuilders {
         public void releasePartialMutex() {
 
             synchronized (mMutex) {
-
                 --mPartialMutexCount;
                 mMutex.notifyAll();
             }
@@ -1041,11 +882,8 @@ public class RoutineBuilders {
         public void acquire() {
 
             try {
-
                 synchronized (mMutex) {
-
                     while (mPartialMutexCount > 0) {
-
                         mMutex.wait();
                     }
 
@@ -1055,7 +893,6 @@ public class RoutineBuilders {
                 mLock.lock();
 
             } catch (final InterruptedException e) {
-
                 InvocationInterruptedException.throwIfInterrupt(e);
             }
         }
@@ -1063,9 +900,7 @@ public class RoutineBuilders {
         public void release() {
 
             mLock.unlock();
-
             synchronized (mMutex) {
-
                 --mFullMutexCount;
                 mMutex.notifyAll();
             }

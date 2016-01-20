@@ -281,56 +281,45 @@ public final class ChannelConfiguration {
 
         // AUTO-GENERATED CODE
         if (this == o) {
-
             return true;
         }
 
         if (o == null || getClass() != o.getClass()) {
-
             return false;
         }
 
         final ChannelConfiguration that = (ChannelConfiguration) o;
-
         if (mChannelLimit != that.mChannelLimit) {
-
             return false;
         }
 
         if (mChannelMaxSize != that.mChannelMaxSize) {
-
             return false;
         }
 
         if (mChannelMaxDelay != null ? !mChannelMaxDelay.equals(that.mChannelMaxDelay)
                 : that.mChannelMaxDelay != null) {
-
             return false;
         }
 
         if (mChannelOrderType != that.mChannelOrderType) {
-
             return false;
         }
 
         if (mLog != null ? !mLog.equals(that.mLog) : that.mLog != null) {
-
             return false;
         }
 
         if (mLogLevel != that.mLogLevel) {
-
             return false;
         }
 
         if (mReadTimeout != null ? !mReadTimeout.equals(that.mReadTimeout)
                 : that.mReadTimeout != null) {
-
             return false;
         }
 
         if (mRunner != null ? !mRunner.equals(that.mRunner) : that.mRunner != null) {
-
             return false;
         }
 
@@ -462,7 +451,6 @@ public final class ChannelConfiguration {
         public Builder(@NotNull final Configurable<? extends TYPE> configurable) {
 
             if (configurable == null) {
-
                 throw new NullPointerException("the configurable instance must no be null");
             }
 
@@ -481,7 +469,6 @@ public final class ChannelConfiguration {
                 @NotNull final ChannelConfiguration initialConfiguration) {
 
             if (configurable == null) {
-
                 throw new NullPointerException("the configurable instance must no be null");
             }
 
@@ -512,71 +499,52 @@ public final class ChannelConfiguration {
         public Builder<TYPE> with(@Nullable final ChannelConfiguration configuration) {
 
             if (configuration == null) {
-
                 setConfiguration(DEFAULT_CONFIGURATION);
                 return this;
             }
 
             final Runner runner = configuration.mRunner;
-
             if (runner != null) {
-
                 withRunner(runner);
             }
 
             final TimeDuration readTimeout = configuration.mReadTimeout;
-
             if (readTimeout != null) {
-
                 withReadTimeout(readTimeout);
             }
 
             final TimeoutActionType timeoutActionType = configuration.mTimeoutActionType;
-
             if (timeoutActionType != null) {
-
                 withReadTimeoutAction(timeoutActionType);
             }
 
             final OrderType orderType = configuration.mChannelOrderType;
-
             if (orderType != null) {
-
                 withChannelOrder(orderType);
             }
 
             final int limit = configuration.mChannelLimit;
-
             if (limit != DEFAULT) {
-
                 withChannelLimit(limit);
             }
 
             final TimeDuration channelTimeout = configuration.mChannelMaxDelay;
-
             if (channelTimeout != null) {
-
                 withChannelMaxDelay(channelTimeout);
             }
 
             final int maxSize = configuration.mChannelMaxSize;
-
             if (maxSize != DEFAULT) {
-
                 withChannelMaxSize(maxSize);
             }
 
             final Log log = configuration.mLog;
-
             if (log != null) {
-
                 withLog(log);
             }
 
             final Level logLevel = configuration.mLogLevel;
-
             if (logLevel != null) {
-
                 withLogLevel(logLevel);
             }
 
@@ -601,7 +569,6 @@ public final class ChannelConfiguration {
         public Builder<TYPE> withChannelLimit(final int limit) {
 
             if ((limit != DEFAULT) && (limit < 0)) {
-
                 throw new IllegalArgumentException(
                         "the channel limit cannot be negative: " + limit);
             }
@@ -659,7 +626,6 @@ public final class ChannelConfiguration {
         public Builder<TYPE> withChannelMaxSize(final int maxSize) {
 
             if ((maxSize != DEFAULT) && (maxSize <= 0)) {
-
                 throw new IllegalArgumentException(
                         "the channel buffer size cannot be 0 or negative: " + maxSize);
             }

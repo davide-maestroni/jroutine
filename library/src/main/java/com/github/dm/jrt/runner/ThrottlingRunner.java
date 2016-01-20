@@ -54,12 +54,10 @@ class ThrottlingRunner implements Runner {
     ThrottlingRunner(@NotNull final Runner wrapped, final int maxExecutions) {
 
         if (wrapped == null) {
-
             throw new NullPointerException("the wrapped runner must not be null");
         }
 
         if (maxExecutions < 1) {
-
             throw new IllegalArgumentException(
                     "the maximum number of running executions must be at least 1, while it was: "
                             + maxExecutions);
@@ -72,32 +70,23 @@ class ThrottlingRunner implements Runner {
     public void cancel(@NotNull final Execution execution) {
 
         ThrottlingExecution throttlingExecution = null;
-
         synchronized (mMutex) {
-
             final Iterator<PendingExecution> iterator = mQueue.iterator();
-
             while (iterator.hasNext()) {
-
                 final PendingExecution pendingExecution = iterator.next();
-
                 if (pendingExecution.mExecution == execution) {
-
                     iterator.remove();
                 }
             }
 
             final WeakReference<ThrottlingExecution> executionReference =
                     mExecutions.get(execution);
-
             if (executionReference != null) {
-
                 throttlingExecution = executionReference.get();
             }
         }
 
         if (throttlingExecution != null) {
-
             mRunner.cancel(throttlingExecution);
         }
     }
@@ -111,23 +100,17 @@ class ThrottlingRunner implements Runner {
             @NotNull final TimeUnit timeUnit) {
 
         ThrottlingExecution throttlingExecution = null;
-
         synchronized (mMutex) {
-
             final LinkedList<PendingExecution> queue = mQueue;
-
             if ((mRunningCount + queue.size()) >= mMaxRunning) {
-
                 queue.add(new PendingExecution(execution, delay, timeUnit));
 
             } else {
-
                 throttlingExecution = getThrottlingExecution(execution);
             }
         }
 
         if (throttlingExecution != null) {
-
             mRunner.run(throttlingExecution, delay, timeUnit);
         }
     }
@@ -138,13 +121,9 @@ class ThrottlingRunner implements Runner {
         final WeakReference<ThrottlingExecution> executionReference = mExecutions.get(execution);
         ThrottlingExecution throttlingExecution =
                 (executionReference != null) ? executionReference.get() : null;
-
         if (throttlingExecution == null) {
-
             throttlingExecution = new ThrottlingExecution(execution);
-
             if (execution.mayBeCanceled()) {
-
                 mExecutions.put(execution,
                                 new WeakReference<ThrottlingExecution>(throttlingExecution));
             }
@@ -182,9 +161,7 @@ class ThrottlingRunner implements Runner {
         public void run() {
 
             final ThrottlingExecution throttlingExecution;
-
             synchronized (mMutex) {
-
                 throttlingExecution = getThrottlingExecution(mExecution);
             }
 
@@ -220,11 +197,8 @@ class ThrottlingRunner implements Runner {
             final int maxRunning = mMaxRunning;
             final Execution execution = mExecution;
             final LinkedList<PendingExecution> queue = mQueue;
-
             synchronized (mMutex) {
-
                 if (mRunningCount >= maxRunning) {
-
                     queue.addFirst(new PendingExecution(execution, 0, TimeUnit.MILLISECONDS));
                     return;
                 }
@@ -233,25 +207,18 @@ class ThrottlingRunner implements Runner {
             }
 
             try {
-
                 execution.run();
 
             } finally {
-
                 PendingExecution pendingExecution = null;
-
                 synchronized (mMutex) {
-
                     --mRunningCount;
-
                     if (!queue.isEmpty()) {
-
                         pendingExecution = queue.removeFirst();
                     }
                 }
 
                 if (pendingExecution != null) {
-
                     pendingExecution.run();
                 }
             }

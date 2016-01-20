@@ -22,6 +22,8 @@ import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
+import com.github.dm.jrt.core.Channels;
+import com.github.dm.jrt.core.Channels.Selectable;
 import com.github.dm.jrt.core.JRoutine;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
@@ -101,12 +103,10 @@ public abstract class AbstractStreamChannel<OUT>
             @NotNull final OutputChannel<OUT> channel) {
 
         if (configuration == null) {
-
             throw new NullPointerException("the configuration must not be null");
         }
 
         if (channel == null) {
-
             throw new NullPointerException("the output channel instance must not be null");
         }
 
@@ -119,37 +119,31 @@ public abstract class AbstractStreamChannel<OUT>
             @NotNull final Number end) {
 
         if ((start instanceof Double) || (end instanceof Double)) {
-
             final double startValue = start.doubleValue();
             final double endValue = end.doubleValue();
             return range(start, end, (startValue <= endValue) ? 1 : -1);
 
         } else if ((start instanceof Float) || (end instanceof Float)) {
-
             final float startValue = start.floatValue();
             final float endValue = end.floatValue();
             return range(start, end, (startValue <= endValue) ? 1 : -1);
 
         } else if ((start instanceof Long) || (end instanceof Long)) {
-
             final long startValue = start.longValue();
             final long endValue = end.longValue();
             return range(start, end, (startValue <= endValue) ? 1 : -1);
 
         } else if ((start instanceof Integer) || (end instanceof Integer)) {
-
             final int startValue = start.intValue();
             final int endValue = end.intValue();
             return range(start, end, (startValue <= endValue) ? 1 : -1);
 
         } else if ((start instanceof Short) || (end instanceof Short)) {
-
             final short startValue = start.shortValue();
             final short endValue = end.shortValue();
             return range(start, end, (short) ((startValue <= endValue) ? 1 : -1));
 
         } else if ((start instanceof Byte) || (end instanceof Byte)) {
-
             final byte startValue = start.byteValue();
             final byte endValue = end.byteValue();
             return range(start, end, (byte) ((startValue <= endValue) ? 1 : -1));
@@ -165,57 +159,45 @@ public abstract class AbstractStreamChannel<OUT>
             @NotNull final Number end, @NotNull final Number increment) {
 
         if ((start instanceof Double) || (end instanceof Double) || (increment instanceof Double)) {
-
             final double startValue = start.doubleValue();
             final double endValue = end.doubleValue();
             final double incValue = increment.doubleValue();
-            return new RangeInvocation<IN, Double>(startValue, endValue,
-                                                   wrapFunction(new DoubleInc(incValue)));
+            return new RangeInvocation<IN, Double>(startValue, endValue, new DoubleInc(incValue));
 
         } else if ((start instanceof Float) || (end instanceof Float)
                 || (increment instanceof Float)) {
-
             final float startValue = start.floatValue();
             final float endValue = end.floatValue();
             final float incValue = increment.floatValue();
-            return new RangeInvocation<IN, Float>(startValue, endValue,
-                                                  wrapFunction(new FloatInc(incValue)));
+            return new RangeInvocation<IN, Float>(startValue, endValue, new FloatInc(incValue));
 
         } else if ((start instanceof Long) || (end instanceof Long)
                 || (increment instanceof Long)) {
-
             final long startValue = start.longValue();
             final long endValue = end.longValue();
             final long incValue = increment.longValue();
-            return new RangeInvocation<IN, Long>(startValue, endValue,
-                                                 wrapFunction(new LongInc(incValue)));
+            return new RangeInvocation<IN, Long>(startValue, endValue, new LongInc(incValue));
 
         } else if ((start instanceof Integer) || (end instanceof Integer)
                 || (increment instanceof Integer)) {
-
             final int startValue = start.intValue();
             final int endValue = end.intValue();
             final int incValue = increment.intValue();
-            return new RangeInvocation<IN, Integer>(startValue, endValue,
-                                                    wrapFunction(new IntegerInc(incValue)));
+            return new RangeInvocation<IN, Integer>(startValue, endValue, new IntegerInc(incValue));
 
         } else if ((start instanceof Short) || (end instanceof Short)
                 || (increment instanceof Short)) {
-
             final short startValue = start.shortValue();
             final short endValue = end.shortValue();
             final short incValue = increment.shortValue();
-            return new RangeInvocation<IN, Short>(startValue, endValue,
-                                                  wrapFunction(new ShortInc(incValue)));
+            return new RangeInvocation<IN, Short>(startValue, endValue, new ShortInc(incValue));
 
         } else if ((start instanceof Byte) || (end instanceof Byte)
                 || (increment instanceof Byte)) {
-
             final byte startValue = start.byteValue();
             final byte endValue = end.byteValue();
             final byte incValue = increment.byteValue();
-            return new RangeInvocation<IN, Byte>(startValue, endValue,
-                                                 wrapFunction(new ByteInc(incValue)));
+            return new RangeInvocation<IN, Byte>(startValue, endValue, new ByteInc(incValue));
         }
 
         throw new IllegalArgumentException(
@@ -468,7 +450,6 @@ public abstract class AbstractStreamChannel<OUT>
             @NotNull final Consumer<? super ResultChannel<AFTER>> consumer) {
 
         if (count <= 0) {
-
             throw new IllegalArgumentException("the count number must be positive: " + count);
         }
 
@@ -481,7 +462,6 @@ public abstract class AbstractStreamChannel<OUT>
             @NotNull final Supplier<? extends AFTER> supplier) {
 
         if (count <= 0) {
-
             throw new IllegalArgumentException("the count number must be positive: " + count);
         }
 
@@ -545,6 +525,12 @@ public abstract class AbstractStreamChannel<OUT>
             @NotNull final Number end, @NotNull final Number increment) {
 
         return asyncRange(start, end, increment).parallelMap(PassingInvocation.<Number>factoryOf());
+    }
+
+    @NotNull
+    public StreamChannel<OUT> repeat() {
+
+        return newChannel(mStreamConfiguration, Channels.repeat(this));
     }
 
     @NotNull
@@ -674,13 +660,19 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
+    @SuppressWarnings("unchecked")
+    public StreamChannel<? extends Selectable<OUT>> toSelectable(final int index) {
+
+        return newChannel(mStreamConfiguration, Channels.toSelectable(this, index));
+    }
+
+    @NotNull
     @SuppressWarnings("ConstantConditions")
     public StreamChannel<OUT> tryCatch(
             @NotNull final BiConsumer<? super RoutineException, ? super InputChannel<OUT>>
                     consumer) {
 
         if (consumer == null) {
-
             throw new NullPointerException("the consumer instance must not be null");
         }
 
@@ -694,7 +686,6 @@ public abstract class AbstractStreamChannel<OUT>
     public StreamChannel<OUT> tryCatch(@NotNull final Consumer<? super RoutineException> consumer) {
 
         if (consumer == null) {
-
             throw new NullPointerException("the consumer instance must not be null");
         }
 
@@ -707,7 +698,6 @@ public abstract class AbstractStreamChannel<OUT>
             @NotNull final Function<? super RoutineException, ? extends OUT> function) {
 
         if (function == null) {
-
             throw new NullPointerException("the function instance must not be null");
         }
 
@@ -846,7 +836,7 @@ public abstract class AbstractStreamChannel<OUT>
     /**
      * Function incrementing a short of a specific value.
      */
-    private static class ByteInc implements Function<Byte, Byte> {
+    private static class ByteInc extends NumberInc<Byte> {
 
         private final byte mIncValue;
 
@@ -857,6 +847,7 @@ public abstract class AbstractStreamChannel<OUT>
          */
         private ByteInc(final byte incValue) {
 
+            super(incValue);
             mIncValue = incValue;
         }
 
@@ -864,29 +855,6 @@ public abstract class AbstractStreamChannel<OUT>
 
             return (byte) (aByte + mIncValue);
         }
-
-        @Override
-        public int hashCode() {
-
-            return (int) mIncValue;
-        }        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-
-                return true;
-            }
-
-            if (!(o instanceof ByteInc)) {
-
-                return false;
-            }
-
-            final ByteInc byteInc = (ByteInc) o;
-            return mIncValue == byteInc.mIncValue;
-        }
-
-
     }
 
     /**
@@ -911,24 +879,22 @@ public abstract class AbstractStreamChannel<OUT>
         @Override
         public int hashCode() {
 
-            return mConsumer.safeHashCode();
+            return mConsumer.hashCode();
         }
 
         @Override
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof ConsumerInvocation)) {
-
                 return false;
             }
 
             final ConsumerInvocation<?> that = (ConsumerInvocation<?>) o;
-            return mConsumer.safeEquals(that.mConsumer);
+            return mConsumer.equals(that.mConsumer);
         }
 
         public void onInput(final OUT input, @NotNull final ResultChannel<Void> result) {
@@ -940,7 +906,7 @@ public abstract class AbstractStreamChannel<OUT>
     /**
      * Function incrementing a double of a specific value.
      */
-    private static class DoubleInc implements Function<Double, Double> {
+    private static class DoubleInc extends NumberInc<Double> {
 
         private final double mIncValue;
 
@@ -951,6 +917,7 @@ public abstract class AbstractStreamChannel<OUT>
          */
         private DoubleInc(final double incValue) {
 
+            super(incValue);
             mIncValue = incValue;
         }
 
@@ -958,36 +925,12 @@ public abstract class AbstractStreamChannel<OUT>
 
             return aDouble + mIncValue;
         }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-
-                return true;
-            }
-
-            if (!(o instanceof DoubleInc)) {
-
-                return false;
-            }
-
-            final DoubleInc doubleInc = (DoubleInc) o;
-            return Double.compare(doubleInc.mIncValue, mIncValue) == 0;
-        }
-
-        @Override
-        public int hashCode() {
-
-            final long temp = Double.doubleToLongBits(mIncValue);
-            return (int) (temp ^ (temp >>> 32));
-        }
     }
 
     /**
      * Function incrementing a float of a specific value.
      */
-    private static class FloatInc implements Function<Float, Float> {
+    private static class FloatInc extends NumberInc<Float> {
 
         private final float mIncValue;
 
@@ -998,35 +941,13 @@ public abstract class AbstractStreamChannel<OUT>
          */
         private FloatInc(final float incValue) {
 
+            super(incValue);
             mIncValue = incValue;
         }
 
         public Float apply(final Float aFloat) {
 
             return aFloat + mIncValue;
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-
-                return true;
-            }
-
-            if (!(o instanceof FloatInc)) {
-
-                return false;
-            }
-
-            final FloatInc floatInc = (FloatInc) o;
-            return Float.compare(floatInc.mIncValue, mIncValue) == 0;
-        }
-
-        @Override
-        public int hashCode() {
-
-            return (mIncValue != +0.0f ? Float.floatToIntBits(mIncValue) : 0);
         }
     }
 
@@ -1067,23 +988,21 @@ public abstract class AbstractStreamChannel<OUT>
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof GenerateConsumerInvocation)) {
-
                 return false;
             }
 
             final GenerateConsumerInvocation<?, ?> that = (GenerateConsumerInvocation<?, ?>) o;
-            return mConsumer.safeEquals(that.mConsumer);
+            return mConsumer.equals(that.mConsumer);
         }
 
         @Override
         public int hashCode() {
 
-            return mConsumer.safeHashCode();
+            return mConsumer.hashCode();
         }
 
 
@@ -1134,7 +1053,6 @@ public abstract class AbstractStreamChannel<OUT>
                 @NotNull final SupplierWrapper<? extends OUT> supplier) {
 
             if (count <= 0) {
-
                 throw new IllegalArgumentException("the count number must be positive: " + count);
             }
 
@@ -1157,24 +1075,22 @@ public abstract class AbstractStreamChannel<OUT>
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof GenerateSupplierInvocation)) {
-
                 return false;
             }
 
             final GenerateSupplierInvocation<?, ?> that = (GenerateSupplierInvocation<?, ?>) o;
-            return mCount == that.mCount && mSupplier.safeEquals(that.mSupplier);
+            return mCount == that.mCount && mSupplier.equals(that.mSupplier);
         }
 
         @Override
         public int hashCode() {
 
             int result = (int) (mCount ^ (mCount >>> 32));
-            result = 31 * result + mSupplier.safeHashCode();
+            result = 31 * result + mSupplier.hashCode();
             return result;
         }
 
@@ -1193,7 +1109,6 @@ public abstract class AbstractStreamChannel<OUT>
         public void onResult(@NotNull final ResultChannel<OUT> result) {
 
             for (int i = 0; i < mCount; ++i) {
-
                 result.pass(mSupplier.get());
             }
         }
@@ -1206,7 +1121,7 @@ public abstract class AbstractStreamChannel<OUT>
     /**
      * Function incrementing an integer of a specific value.
      */
-    private static class IntegerInc implements Function<Integer, Integer> {
+    private static class IntegerInc extends NumberInc<Integer> {
 
         private final int mIncValue;
 
@@ -1217,35 +1132,13 @@ public abstract class AbstractStreamChannel<OUT>
          */
         private IntegerInc(final int incValue) {
 
+            super(incValue);
             mIncValue = incValue;
         }
 
         public Integer apply(final Integer integer) {
 
             return integer + mIncValue;
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-
-                return true;
-            }
-
-            if (!(o instanceof IntegerInc)) {
-
-                return false;
-            }
-
-            final IntegerInc that = (IntegerInc) o;
-            return mIncValue == that.mIncValue;
-        }
-
-        @Override
-        public int hashCode() {
-
-            return mIncValue;
         }
     }
 
@@ -1275,31 +1168,27 @@ public abstract class AbstractStreamChannel<OUT>
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof LiftInvocation)) {
-
                 return false;
             }
 
             final LiftInvocation<?, ?> that = (LiftInvocation<?, ?>) o;
-            return mFunction.safeEquals(that.mFunction);
+            return mFunction.equals(that.mFunction);
         }
 
         @Override
         public int hashCode() {
 
-            return mFunction.safeHashCode();
+            return mFunction.hashCode();
         }
 
         public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
 
             final OutputChannel<? extends OUT> channel = mFunction.apply(input);
-
             if (channel != null) {
-
                 channel.passTo(result);
             }
         }
@@ -1308,7 +1197,7 @@ public abstract class AbstractStreamChannel<OUT>
     /**
      * Function incrementing a long of a specific value.
      */
-    private static class LongInc implements Function<Long, Long> {
+    private static class LongInc extends NumberInc<Long> {
 
         private final long mIncValue;
 
@@ -1319,6 +1208,7 @@ public abstract class AbstractStreamChannel<OUT>
          */
         private LongInc(final long incValue) {
 
+            super(incValue);
             mIncValue = incValue;
         }
 
@@ -1326,28 +1216,45 @@ public abstract class AbstractStreamChannel<OUT>
 
             return aLong + mIncValue;
         }
+    }
 
-        @Override
-        public boolean equals(final Object o) {
+    /**
+     * Base abstract function incrementing a number of a specific value.<br/>
+     * It provides an implementation for {@code equals()} and {@code hashCode()} methods.
+     */
+    private static abstract class NumberInc<N extends Number> implements Function<N, N> {
 
-            if (this == o) {
+        private final N mIncValue;
 
-                return true;
-            }
+        /**
+         * Constructor.
+         *
+         * @param incValue the incrementation value.
+         */
+        private NumberInc(@NotNull final N incValue) {
 
-            if (!(o instanceof LongInc)) {
-
-                return false;
-            }
-
-            final LongInc longInc = (LongInc) o;
-            return mIncValue == longInc.mIncValue;
+            mIncValue = incValue;
         }
 
         @Override
         public int hashCode() {
 
-            return (int) (mIncValue ^ (mIncValue >>> 32));
+            return mIncValue.hashCode();
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+                return true;
+            }
+
+            if (!(o instanceof NumberInc)) {
+                return false;
+            }
+
+            final NumberInc<?> numberInc = (NumberInc<?>) o;
+            return mIncValue.equals(numberInc.mIncValue);
         }
     }
 
@@ -1362,7 +1269,7 @@ public abstract class AbstractStreamChannel<OUT>
 
         private final OUT mEnd;
 
-        private final FunctionWrapper<OUT, OUT> mIncrement;
+        private final Function<OUT, OUT> mIncrement;
 
         private final OUT mStart;
 
@@ -1375,15 +1282,13 @@ public abstract class AbstractStreamChannel<OUT>
          */
         @SuppressWarnings("ConstantConditions")
         private RangeInvocation(@NotNull final OUT start, @NotNull final OUT end,
-                @NotNull final FunctionWrapper<OUT, OUT> increment) {
+                @NotNull final Function<OUT, OUT> increment) {
 
             if (start == null) {
-
                 throw new NullPointerException("the start element must not be null");
             }
 
             if (end == null) {
-
                 throw new NullPointerException("the end element must not be null");
             }
 
@@ -1404,24 +1309,19 @@ public abstract class AbstractStreamChannel<OUT>
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof RangeInvocation)) {
-
                 return false;
             }
 
             final RangeInvocation<?, ?> that = (RangeInvocation<?, ?>) o;
-
             if (!mEnd.equals(that.mEnd)) {
-
                 return false;
             }
 
-            if (!mIncrement.safeEquals(that.mIncrement)) {
-
+            if (!mIncrement.equals(that.mIncrement)) {
                 return false;
             }
 
@@ -1432,7 +1332,7 @@ public abstract class AbstractStreamChannel<OUT>
         public int hashCode() {
 
             int result = mEnd.hashCode();
-            result = 31 * result + mIncrement.safeHashCode();
+            result = 31 * result + mIncrement.hashCode();
             result = 31 * result + mStart.hashCode();
             return result;
         }
@@ -1459,19 +1359,14 @@ public abstract class AbstractStreamChannel<OUT>
             final OUT end = mEnd;
             final Function<OUT, OUT> increment = mIncrement;
             OUT current = start;
-
             if (start.compareTo(end) <= 0) {
-
                 while (current.compareTo(end) <= 0) {
-
                     result.pass(current);
                     current = increment.apply(current);
                 }
 
             } else {
-
                 while (current.compareTo(end) >= 0) {
-
                     result.pass(current);
                     current = increment.apply(current);
                 }
@@ -1486,7 +1381,7 @@ public abstract class AbstractStreamChannel<OUT>
     /**
      * Function incrementing a short of a specific value.
      */
-    private static class ShortInc implements Function<Short, Short> {
+    private static class ShortInc extends NumberInc<Short> {
 
         private final short mIncValue;
 
@@ -1497,35 +1392,13 @@ public abstract class AbstractStreamChannel<OUT>
          */
         private ShortInc(final short incValue) {
 
+            super(incValue);
             mIncValue = incValue;
         }
 
         public Short apply(final Short aShort) {
 
             return (short) (aShort + mIncValue);
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-
-                return true;
-            }
-
-            if (!(o instanceof ShortInc)) {
-
-                return false;
-            }
-
-            final ShortInc shortInc = (ShortInc) o;
-            return mIncValue == shortInc.mIncValue;
-        }
-
-        @Override
-        public int hashCode() {
-
-            return (int) mIncValue;
         }
     }
 
@@ -1617,14 +1490,11 @@ public abstract class AbstractStreamChannel<OUT>
         public void onError(@NotNull final RoutineException error) {
 
             final IOChannel<OUT> channel = mOutputChannel;
-
             try {
-
                 mConsumer.accept(error, channel);
                 channel.close();
 
             } catch (final Throwable t) {
-
                 channel.abort(t);
             }
         }
@@ -1641,7 +1511,6 @@ public abstract class AbstractStreamChannel<OUT>
             @NotNull final InvocationConfiguration configuration) {
 
         if (configuration == null) {
-
             throw new NullPointerException("the invocation configuration must not be null");
         }
 

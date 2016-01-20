@@ -57,15 +57,12 @@ public class Channels extends com.github.dm.jrt.core.Channels {
             @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
 
         if (channels.isEmpty()) {
-
             throw new IllegalArgumentException("the list of channels must not be empty");
         }
 
         final IOChannel<ParcelableSelectable<OUT>> ioChannel = JRoutine.io().buildChannel();
         int i = startIndex;
-
         for (final OutputChannel<? extends OUT> channel : channels) {
-
             ioChannel.pass(toSelectable(channel, i++));
         }
 
@@ -88,15 +85,12 @@ public class Channels extends com.github.dm.jrt.core.Channels {
             final int startIndex, @NotNull final OutputChannel<?>... channels) {
 
         if (channels.length == 0) {
-
             throw new IllegalArgumentException("the array of channels must not be empty");
         }
 
         final IOChannel<ParcelableSelectable<OUT>> ioChannel = JRoutine.io().buildChannel();
         int i = startIndex;
-
         for (final OutputChannel<?> channel : channels) {
-
             ioChannel.pass(toSelectable((OutputChannel<? extends OUT>) channel, i++));
         }
 

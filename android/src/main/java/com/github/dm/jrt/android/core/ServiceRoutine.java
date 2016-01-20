@@ -103,9 +103,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
             @NotNull final ServiceConfiguration serviceConfiguration) {
 
         final Context serviceContext = context.getServiceContext();
-
         if (serviceContext == null) {
-
             throw new IllegalStateException("the service context has been destroyed");
         }
 
@@ -312,13 +310,6 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
         }
 
         @NotNull
-        public InvocationChannel<IN, OUT> orderByChance() {
-
-            mInput.orderByChance();
-            return this;
-        }
-
-        @NotNull
         public InvocationChannel<IN, OUT> orderByDelay() {
 
             mInput.orderByDelay();
@@ -369,17 +360,13 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
         private void bindService() {
 
             synchronized (mMutex) {
-
                 if (mIsBound) {
-
                     return;
                 }
 
                 final ServiceContext context = mContext;
                 final Context serviceContext = context.getServiceContext();
-
                 if (serviceContext == null) {
-
                     throw new IllegalStateException("the service context has been destroyed");
                 }
 
@@ -387,9 +374,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
                 mConnection = new RoutineServiceConnection();
                 mIsBound =
                         serviceContext.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-
                 if (!mIsBound) {
-
                     throw new RoutineException("failed to bind to service: " + intent
                                                        + ", remember to add the service "
                                                        + "declaration to the Android manifest "
@@ -401,9 +386,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
         private void unbindService() {
 
             synchronized (mMutex) {
-
                 if (mIsUnbound) {
-
                     return;
                 }
 
@@ -416,16 +399,12 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
                 public void run() {
 
                     final Context serviceContext = mContext.getServiceContext();
-
                     if (serviceContext != null) {
-
                         // Unfortunately there is no way to know if the context is still valid
                         try {
-
                             serviceContext.unbindService(mConnection);
 
                         } catch (final Throwable t) {
-
                             InvocationInterruptedException.throwIfInterrupt(t);
                             mLogger.wrn(t, "unbinding failed (maybe the connection was leaked...)");
                         }
@@ -444,13 +423,10 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
                 final Message message = Message.obtain(null, InvocationService.MSG_COMPLETE);
                 putInvocationId(message.getData(), mUUID);
                 message.replyTo = mInMessenger;
-
                 try {
-
                     mOutMessenger.send(message);
 
                 } catch (final RemoteException e) {
-
                     unbindService();
                     throw new InvocationException(e);
                 }
@@ -461,13 +437,10 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
                 final Message message = Message.obtain(null, InvocationService.MSG_ABORT);
                 putError(message.getData(), mUUID, error);
                 message.replyTo = mInMessenger;
-
                 try {
-
                     mOutMessenger.send(message);
 
                 } catch (final RemoteException e) {
-
                     unbindService();
                     throw new InvocationException(e);
                 }
@@ -478,13 +451,10 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
                 final Message message = Message.obtain(null, InvocationService.MSG_DATA);
                 putValue(message.getData(), mUUID, input);
                 message.replyTo = mInMessenger;
-
                 try {
-
                     mOutMessenger.send(message);
 
                 } catch (final RemoteException e) {
-
                     throw new InvocationException(e);
                 }
             }
@@ -511,52 +481,34 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
 
                 final Logger logger = mLogger;
                 logger.dbg("incoming service message: %s", msg);
-
                 try {
-
                     switch (msg.what) {
-
-                        case InvocationService.MSG_DATA: {
-
+                        case InvocationService.MSG_DATA:
                             mOutput.pass((OUT) getValue(msg));
-                        }
+                            break;
 
-                        break;
-
-                        case InvocationService.MSG_COMPLETE: {
-
+                        case InvocationService.MSG_COMPLETE:
                             mOutput.close();
                             unbindService();
-                        }
+                            break;
 
-                        break;
-
-                        case InvocationService.MSG_ABORT: {
-
+                        case InvocationService.MSG_ABORT:
                             mOutput.abort(InvocationException.wrapIfNeeded(getAbortError(msg)));
                             unbindService();
-                        }
+                            break;
 
-                        break;
-
-                        default: {
-
+                        default:
                             super.handleMessage(msg);
-                        }
                     }
 
                 } catch (final Throwable t) {
-
                     logger.wrn(t, "error while handling service message");
-
                     try {
-
                         final Message message = Message.obtain(null, InvocationService.MSG_ABORT);
                         putError(message.getData(), mUUID, t);
                         mOutMessenger.send(message);
 
                     } catch (final Throwable ignored) {
-
                         logger.err(ignored, "error while sending service abort message");
                     }
 
@@ -581,9 +533,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
                 final ServiceConfiguration serviceConfiguration = mServiceConfiguration;
                 final Message message = Message.obtain(null, InvocationService.MSG_INIT);
                 final TargetInvocationFactory<IN, OUT> targetFactory = mTargetFactory;
-
                 if (mIsParallel) {
-
                     logger.dbg("sending parallel invocation message");
                     putParallelInvocation(message.getData(), mUUID,
                                           targetFactory.getInvocationClass(),
@@ -592,7 +542,6 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
                                           serviceConfiguration.getLogClassOr(null));
 
                 } else {
-
                     logger.dbg("sending async invocation message");
                     putAsyncInvocation(message.getData(), mUUID, targetFactory.getInvocationClass(),
                                        targetFactory.getFactoryArgs(), mInvocationConfiguration,
@@ -601,15 +550,12 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
                 }
 
                 message.replyTo = mInMessenger;
-
                 try {
-
                     mOutMessenger.send(message);
                     mConsumer = new ConnectionOutputConsumer();
                     mInput.passTo(mConsumer);
 
                 } catch (final RemoteException e) {
-
                     logger.err(e, "error while sending service invocation message");
                     mOutput.abort(e);
                     unbindService();

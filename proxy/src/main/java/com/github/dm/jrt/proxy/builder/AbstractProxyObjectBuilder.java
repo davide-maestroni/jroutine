@@ -47,14 +47,10 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
     public TYPE buildProxy() {
 
         final Object target = getTarget();
-
         synchronized (sProxies) {
-
             final WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>> proxies = sProxies;
             HashMap<ClassInfo, Object> proxyMap = proxies.get(target);
-
             if (proxyMap == null) {
-
                 proxyMap = new HashMap<ClassInfo, Object>();
                 proxies.put(target, proxyMap);
             }
@@ -64,20 +60,16 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
             final ClassInfo classInfo =
                     new ClassInfo(getInterfaceClass(), invocationConfiguration, proxyConfiguration);
             final Object instance = proxyMap.get(classInfo);
-
             if (instance != null) {
-
                 return (TYPE) instance;
             }
 
             try {
-
                 final TYPE newInstance = newProxy(invocationConfiguration, proxyConfiguration);
                 proxyMap.put(classInfo, newInstance);
                 return newInstance;
 
             } catch (final Throwable t) {
-
                 throw new IllegalArgumentException(t);
             }
         }
@@ -89,7 +81,6 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
             @NotNull final ProxyConfiguration configuration) {
 
         if (configuration == null) {
-
             throw new NullPointerException("the proxy configuration must not be null");
         }
 
@@ -103,7 +94,6 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
             @NotNull final InvocationConfiguration configuration) {
 
         if (configuration == null) {
-
             throw new NullPointerException("the invocation configuration must not be null");
         }
 
@@ -194,12 +184,10 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
 
             // AUTO-GENERATED CODE
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof ClassInfo)) {
-
                 return false;
             }
 

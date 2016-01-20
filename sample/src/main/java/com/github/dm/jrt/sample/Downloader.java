@@ -77,9 +77,7 @@ public class Downloader {
 
         final String path = uri.getPath();
         final String fileName = path.substring(path.lastIndexOf('/') + 1);
-
         if (fileName.equals("")) {
-
             return Long.toString(path.hashCode()) + ".tmp";
         }
 
@@ -100,9 +98,7 @@ public class Downloader {
 
         final File downloadDir = new File(args[0]);
         final Downloader downloader = new Downloader(Integer.parseInt(args[1]));
-
         for (int i = 2; i < args.length; ++i) {
-
             final URI uri = new URI(args[i]);
             downloader.download(uri, new File(downloadDir, getFileName(uri)));
         }
@@ -143,10 +139,8 @@ public class Downloader {
     public void download(final URI uri, final File dstFile) {
 
         final HashMap<URI, OutputChannel<Boolean>> downloads = mDownloads;
-
         // Check if we are already downloading the same resource
         if (!downloads.containsKey(uri)) {
-
             // Remove it from the downloaded set
             mDownloaded.remove(uri);
             // In order to be able to abort the download at any time, we need to split the
@@ -202,15 +196,11 @@ public class Downloader {
 
         final HashMap<URI, OutputChannel<Boolean>> downloads = mDownloads;
         final OutputChannel<Boolean> channel = downloads.get(uri);
-
         // Check if the output channel is in the map, that is, the resource is currently downloading
         if (channel != null) {
-
             try {
-
                 // Wait for the routine to complete
                 if (channel.afterMax(timeout).checkComplete()) {
-
                     // If completed, remove the resource from the download map
                     downloads.remove(uri);
                     // Read the result and, if successful, add the resource to the downloaded set
@@ -218,7 +208,6 @@ public class Downloader {
                 }
 
             } catch (final InvocationException ignored) {
-
                 // Something went wrong or the routine has been aborted
                 // Just remove the resource from the download map
                 downloads.remove(uri);

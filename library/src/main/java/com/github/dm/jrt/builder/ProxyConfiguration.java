@@ -115,12 +115,10 @@ public final class ProxyConfiguration {
 
         // AUTO-GENERATED CODE
         if (this == o) {
-
             return true;
         }
 
         if (o == null || getClass() != o.getClass()) {
-
             return false;
         }
 
@@ -175,7 +173,6 @@ public final class ProxyConfiguration {
         public Builder(@NotNull final Configurable<? extends TYPE> configurable) {
 
             if (configurable == null) {
-
                 throw new NullPointerException("the configurable instance must no be null");
             }
 
@@ -193,7 +190,6 @@ public final class ProxyConfiguration {
                 @NotNull final ProxyConfiguration initialConfiguration) {
 
             if (configurable == null) {
-
                 throw new NullPointerException("the configurable instance must no be null");
             }
 
@@ -224,15 +220,12 @@ public final class ProxyConfiguration {
         public Builder<TYPE> with(@Nullable final ProxyConfiguration configuration) {
 
             if (configuration == null) {
-
                 setConfiguration(DEFAULT_CONFIGURATION);
                 return this;
             }
 
             final List<String> fieldNames = configuration.mFieldNames;
-
             if (fieldNames != null) {
-
                 withSharedFields(fieldNames);
             }
 

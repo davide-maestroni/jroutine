@@ -53,27 +53,19 @@ class NestedQueue<E> {
     private static Object prune(@NotNull final NestedQueue<?> queue) {
 
         final SimpleQueue<Object> simpleQueue = queue.mQueue;
-
         if (simpleQueue.isEmpty()) {
-
             return EMPTY_ELEMENT;
         }
 
         Object element = simpleQueue.peekFirst();
-
         while (element instanceof NestedQueue) {
-
             final NestedQueue<?> nested = ((NestedQueue<?>) element);
-
             if (!nested.mClosed || (prune(nested) != EMPTY_ELEMENT)) {
-
                 return nested;
             }
 
             simpleQueue.removeFirst();
-
             if (simpleQueue.isEmpty()) {
-
                 return EMPTY_ELEMENT;
             }
 
@@ -153,30 +145,22 @@ class NestedQueue<E> {
     public void drainTo(@NotNull final Collection<? super E> collection) {
 
         if (prune(this) == EMPTY_ELEMENT) {
-
             return;
         }
 
         final SimpleQueue<Object> queue = mQueue;
-
         while (!queue.isEmpty()) {
-
             final Object element = queue.peekFirst();
-
             if (element instanceof NestedQueue) {
-
                 final NestedQueue<E> nested = (NestedQueue<E>) element;
                 nested.drainTo(collection);
-
                 if (!nested.mClosed || !nested.mQueue.isEmpty()) {
-
                     return;
                 }
 
                 queue.removeFirst();
 
             } else {
-
                 collection.add((E) queue.removeFirst());
             }
         }
@@ -204,9 +188,7 @@ class NestedQueue<E> {
     public E removeFirst() {
 
         final Object element = prune(this);
-
         if (element instanceof NestedQueue) {
-
             return ((NestedQueue<E>) element).removeFirst();
         }
 
@@ -216,7 +198,6 @@ class NestedQueue<E> {
     private void checkOpen() {
 
         if (mClosed) {
-
             throw new IllegalStateException("the queue is closed");
         }
     }

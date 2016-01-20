@@ -65,12 +65,10 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
             @NotNull final ContextInvocationTarget<?> target) {
 
         if (context == null) {
-
             throw new NullPointerException("the invocation context must not be null");
         }
 
         if (target == null) {
-
             throw new NullPointerException("the invocation target must not be null");
         }
 
@@ -82,13 +80,11 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
     public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
 
         if (!itf.isInterface()) {
-
             throw new IllegalArgumentException(
                     "the specified class is not an interface: " + itf.getName());
         }
 
         if (!itf.isAnnotationPresent(ServiceProxy.class)) {
-
             throw new IllegalArgumentException(
                     "the specified class is not annotated with " + ServiceProxy.class.getName()
                             + ": " + itf.getName());
@@ -134,7 +130,6 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
             @NotNull final InvocationConfiguration configuration) {
 
         if (configuration == null) {
-
             throw new NullPointerException("the invocation configuration must not be null");
         }
 
@@ -148,7 +143,6 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
             @NotNull final ProxyConfiguration configuration) {
 
         if (configuration == null) {
-
             throw new NullPointerException("the proxy configuration must not be null");
         }
 
@@ -162,7 +156,6 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
             @NotNull final ServiceConfiguration configuration) {
 
         if (configuration == null) {
-
             throw new NullPointerException("the service configuration must not be null");
         }
 
@@ -236,32 +229,24 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
                 @NotNull final ServiceConfiguration serviceConfiguration) {
 
             try {
-
                 final ServiceContext context = mContext;
                 final ContextInvocationTarget<?> target = mTarget;
                 final Class<? super TYPE> interfaceClass = mInterfaceClass;
                 final ServiceProxy annotation = interfaceClass.getAnnotation(ServiceProxy.class);
                 String packageName = annotation.classPackage();
-
                 if (packageName.equals(Proxy.DEFAULT)) {
-
                     final Package classPackage = interfaceClass.getPackage();
                     packageName = (classPackage != null) ? classPackage.getName() + "." : "";
 
                 } else {
-
                     packageName += ".";
                 }
 
                 String className = annotation.className();
-
                 if (className.equals(Proxy.DEFAULT)) {
-
                     className = interfaceClass.getSimpleName();
                     Class<?> enclosingClass = interfaceClass.getEnclosingClass();
-
                     while (enclosingClass != null) {
-
                         className = enclosingClass.getSimpleName() + "_" + className;
                         enclosingClass = enclosingClass.getEnclosingClass();
                     }
@@ -277,7 +262,6 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
                                                       proxyConfiguration, serviceConfiguration);
 
             } catch (final Throwable t) {
-
                 throw new IllegalArgumentException(t);
             }
         }

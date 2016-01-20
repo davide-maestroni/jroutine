@@ -133,9 +133,7 @@ public class InvocationService extends Service {
     public static Throwable getAbortError(@NotNull final Message message) {
 
         final Bundle data = message.peekData();
-
         if (data == null) {
-
             return null;
         }
 
@@ -153,9 +151,7 @@ public class InvocationService extends Service {
     public static Object getValue(@NotNull final Message message) {
 
         final Bundle data = message.peekData();
-
         if (data == null) {
-
             return null;
         }
 
@@ -265,12 +261,10 @@ public class InvocationService extends Service {
             @Nullable final Class<? extends Log> logClass, boolean isParallel) {
 
         if (invocationId == null) {
-
             throw new NullPointerException("the invocation ID must not be null");
         }
 
         if (targetClass == null) {
-
             throw new NullPointerException("the target invocation class must not be null");
         }
 
@@ -316,14 +310,11 @@ public class InvocationService extends Service {
     public void onDestroy() {
 
         final ArrayList<RoutineState> routineStates;
-
         synchronized (mMutex) {
-
             routineStates = new ArrayList<RoutineState>(mRoutines.values());
         }
 
         for (final RoutineState routineState : routineStates) {
-
             routineState.mRoutine.purge();
         }
 
@@ -340,9 +331,7 @@ public class InvocationService extends Service {
     private RoutineInvocation getInvocation(@NotNull final Message message) {
 
         final Bundle data = message.peekData();
-
         if (data == null) {
-
             mLogger.err("the service message has no data");
             throw new IllegalArgumentException(
                     "[" + getClass().getName() + "] the service message has no data");
@@ -350,20 +339,15 @@ public class InvocationService extends Service {
 
         data.setClassLoader(getClassLoader());
         final String invocationId = data.getString(KEY_INVOCATION_ID);
-
         if (invocationId == null) {
-
             mLogger.err("the service message has no invocation ID");
             throw new IllegalArgumentException(
                     "[" + getClass().getName() + "] the service message has no invocation ID");
         }
 
         synchronized (mMutex) {
-
             final RoutineInvocation invocation = mInvocations.get(invocationId);
-
             if (invocation == null) {
-
                 mLogger.err("the service message has no invalid invocation ID: %d", invocationId);
                 throw new IllegalArgumentException(
                         "[" + getClass().getName() + "] the service message has invalid "
@@ -378,9 +362,7 @@ public class InvocationService extends Service {
     private void initRoutine(@NotNull final Message message) {
 
         final Bundle data = message.peekData();
-
         if (data == null) {
-
             mLogger.err("the service message has no data");
             throw new IllegalArgumentException(
                     "[" + getClass().getName() + "] the service message has no data");
@@ -388,9 +370,7 @@ public class InvocationService extends Service {
 
         data.setClassLoader(getClassLoader());
         final String invocationId = data.getString(KEY_INVOCATION_ID);
-
         if (invocationId == null) {
-
             mLogger.err("the service message has no invocation ID");
             throw new IllegalArgumentException(
                     "[" + getClass().getName() + "] the service message has no invocation ID");
@@ -399,9 +379,7 @@ public class InvocationService extends Service {
         final Class<? extends ContextInvocation<?, ?>> targetClass =
                 (Class<? extends ContextInvocation<?, ?>>) data.getSerializable(
                         KEY_TARGET_INVOCATION);
-
         if (targetClass == null) {
-
             mLogger.err("the service message has no target invocation class");
             throw new IllegalArgumentException(
                     "[" + getClass().getName() + "] the service message has no target "
@@ -412,13 +390,9 @@ public class InvocationService extends Service {
         final Object[] args =
                 ((value != null) && (value.getValue() != null)) ? (Object[]) value.getValue()
                         : Reflection.NO_ARGS;
-
         synchronized (mMutex) {
-
             final HashMap<String, RoutineInvocation> invocations = mInvocations;
-
             if (invocations.containsKey(invocationId)) {
-
                 mLogger.err("an invocation with the same ID is already running: %d", invocationId);
                 throw new IllegalArgumentException(
                         "[" + getClass().getName() + "] an invocation with the same ID is"
@@ -438,33 +412,24 @@ public class InvocationService extends Service {
                                     logLevel);
             final HashMap<RoutineInfo, RoutineState> routines = mRoutines;
             RoutineState routineState = routines.get(routineInfo);
-
             if (routineState == null) {
-
                 final InvocationConfiguration.Builder<InvocationConfiguration> builder =
                         InvocationConfiguration.builder();
-
                 if (runnerClass != null) {
-
                     try {
-
                         builder.withRunner(findConstructor(runnerClass).newInstance());
 
                     } catch (final Throwable t) {
-
                         mLogger.err(t, "error creating the runner instance");
                         throw new IllegalArgumentException(t);
                     }
                 }
 
                 if (logClass != null) {
-
                     try {
-
                         builder.withLog(findConstructor(logClass).newInstance());
 
                     } catch (final Throwable t) {
-
                         mLogger.err(t, "error creating the log instance");
                         throw new IllegalArgumentException(t);
                     }
@@ -523,9 +488,7 @@ public class InvocationService extends Service {
         protected Invocation<Object, Object> newInvocation(@NotNull final InvocationType type) {
 
             final Logger logger = getLogger();
-
             try {
-
                 final ContextInvocationFactory<?, ?> factory = mFactory;
                 logger.dbg("creating a new instance");
                 final ContextInvocation<?, ?> invocation = factory.newInvocation();
@@ -533,7 +496,6 @@ public class InvocationService extends Service {
                 return (Invocation<Object, Object>) invocation;
 
             } catch (final Throwable t) {
-
                 logger.err(t, "error creating the invocation instance");
                 throw InvocationException.wrapIfNeeded(t);
             }
@@ -561,79 +523,50 @@ public class InvocationService extends Service {
         public void handleMessage(@NotNull final Message msg) {
 
             final InvocationService service = mService.get();
-
             if (service == null) {
-
                 super.handleMessage(msg);
                 return;
             }
 
             final Logger logger = service.mLogger;
             logger.dbg("incoming routine message: %s", msg);
-
             try {
-
                 switch (msg.what) {
-
-                    case MSG_DATA: {
-
+                    case MSG_DATA:
                         service.getInvocation(msg).pass(getValue(msg));
-                    }
+                        break;
 
-                    break;
+                    case MSG_COMPLETE:
+                        final RoutineInvocation completeInvocation = service.getInvocation(msg);
+                        completeInvocation.close();
+                        break;
 
-                    case MSG_COMPLETE: {
+                    case MSG_ABORT:
+                        final RoutineInvocation abortInvocation = service.getInvocation(msg);
+                        abortInvocation.abort(getAbortError(msg));
+                        abortInvocation.close();
+                        break;
 
-                        final RoutineInvocation invocation = service.getInvocation(msg);
-                        invocation.close();
-                    }
-
-                    break;
-
-                    case MSG_ABORT: {
-
-                        final RoutineInvocation invocation = service.getInvocation(msg);
-                        invocation.abort(getAbortError(msg));
-                        invocation.close();
-                    }
-
-                    break;
-
-                    case MSG_INIT: {
-
+                    case MSG_INIT:
                         service.initRoutine(msg);
-                    }
+                        break;
 
-                    break;
-
-                    default: {
-
+                    default:
                         super.handleMessage(msg);
-                    }
                 }
 
             } catch (final Throwable t) {
-
                 logger.err(t, "error while parsing routine message");
-
                 try {
-
                     final Bundle data = msg.peekData();
-
                     if (data != null) {
-
                         data.setClassLoader(service.getClassLoader());
                         final String invocationId = data.getString(KEY_INVOCATION_ID);
-
                         if (invocationId != null) {
-
                             synchronized (service.mMutex) {
-
                                 final RoutineInvocation invocation =
                                         service.mInvocations.get(invocationId);
-
                                 if (invocation != null) {
-
                                     invocation.recycle();
                                 }
                             }
@@ -641,16 +574,12 @@ public class InvocationService extends Service {
                     }
 
                 } catch (final Throwable ignored) {
-
                     logger.err(ignored, "error while destroying invocation");
                 }
 
                 try {
-
                     final Messenger outMessenger = msg.replyTo;
-
                     if (outMessenger == null) {
-
                         logger.err("avoid aborting since reply messenger is null");
                         return;
                     }
@@ -660,7 +589,6 @@ public class InvocationService extends Service {
                     outMessenger.send(message);
 
                 } catch (final Throwable ignored) {
-
                     logger.err(ignored, "error while sending routine abort message");
                 }
             }
@@ -712,12 +640,10 @@ public class InvocationService extends Service {
 
             // AUTO-GENERATED CODE
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof RoutineInfo)) {
-
                 return false;
             }
 
@@ -817,7 +743,6 @@ public class InvocationService extends Service {
                 @NotNull final Messenger messenger) {
 
             if (messenger == null) {
-
                 throw new NullPointerException("the output messenger must not be null");
             }
 
@@ -828,13 +753,10 @@ public class InvocationService extends Service {
         public void onComplete() {
 
             mInvocation.recycle();
-
             try {
-
                 mOutMessenger.send(Message.obtain(null, MSG_COMPLETE));
 
             } catch (final RemoteException e) {
-
                 throw new InvocationException(e);
             }
         }
@@ -844,13 +766,10 @@ public class InvocationService extends Service {
             mInvocation.recycle();
             final Message message = Message.obtain(null, MSG_ABORT);
             putError(message.getData(), error);
-
             try {
-
                 mOutMessenger.send(message);
 
             } catch (final RemoteException e) {
-
                 throw new InvocationException(e);
             }
         }
@@ -859,13 +778,10 @@ public class InvocationService extends Service {
 
             final Message message = Message.obtain(null, MSG_DATA);
             putValue(message.getData(), o);
-
             try {
-
                 mOutMessenger.send(message);
 
             } catch (final RemoteException e) {
-
                 throw new InvocationException(e);
             }
         }
@@ -954,11 +870,8 @@ public class InvocationService extends Service {
         void recycle() {
 
             synchronized (mMutex) {
-
                 mInvocations.remove(mId);
-
                 if (mRoutineState.releaseInvocation() <= 0) {
-
                     mRoutines.remove(mRoutineInfo);
                 }
             }

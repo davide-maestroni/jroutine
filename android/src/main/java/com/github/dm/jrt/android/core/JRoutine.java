@@ -96,12 +96,9 @@ public class JRoutine extends com.github.dm.jrt.core.JRoutine {
     public static ServiceContextBuilder with(@NotNull final ServiceContext context) {
 
         synchronized (sBuilders) {
-
             final WeakHashMap<ServiceContext, ServiceContextBuilder> builders = sBuilders;
             ServiceContextBuilder contextBuilder = builders.get(context);
-
             if (contextBuilder == null) {
-
                 contextBuilder = new ServiceContextBuilder(context);
                 builders.put(context, contextBuilder);
             }
@@ -126,7 +123,6 @@ public class JRoutine extends com.github.dm.jrt.core.JRoutine {
         private ServiceContextBuilder(@NotNull final ServiceContext context) {
 
             if (context == null) {
-
                 throw new NullPointerException("the context must not be null");
             }
 

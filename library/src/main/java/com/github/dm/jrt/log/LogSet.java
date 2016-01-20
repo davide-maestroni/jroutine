@@ -32,7 +32,6 @@ public class LogSet extends CopyOnWriteArraySet<Log> implements Log {
             @Nullable final Throwable throwable) {
 
         for (final Log log : this) {
-
             log.dbg(contexts, message, throwable);
         }
     }
@@ -41,7 +40,6 @@ public class LogSet extends CopyOnWriteArraySet<Log> implements Log {
             @Nullable final Throwable throwable) {
 
         for (final Log log : this) {
-
             log.err(contexts, message, throwable);
         }
     }
@@ -50,7 +48,6 @@ public class LogSet extends CopyOnWriteArraySet<Log> implements Log {
             @Nullable final Throwable throwable) {
 
         for (final Log log : this) {
-
             log.wrn(contexts, message, throwable);
         }
     }

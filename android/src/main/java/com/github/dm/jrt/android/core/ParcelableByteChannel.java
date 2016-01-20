@@ -158,9 +158,7 @@ public class ParcelableByteChannel {
     public static BufferInputStream inputStream(@NotNull final ParcelableByteBuffer buffer) {
 
         final ByteBuffer byteBuffer = buffer.getBuffer();
-
         if (byteBuffer != null) {
-
             return ByteChannel.inputStream(byteBuffer);
         }
 
@@ -181,13 +179,9 @@ public class ParcelableByteChannel {
     public static BufferInputStream inputStream(@NotNull final ParcelableByteBuffer... buffers) {
 
         final ArrayList<ByteBuffer> byteBuffers = new ArrayList<ByteBuffer>(buffers.length);
-
         for (final ParcelableByteBuffer buffer : buffers) {
-
             final ByteBuffer byteBuffer = buffer.getBuffer();
-
             if (byteBuffer != null) {
-
                 byteBuffers.add(byteBuffer);
             }
         }
@@ -209,13 +203,9 @@ public class ParcelableByteChannel {
     public static BufferInputStream inputStream(@NotNull final List<ParcelableByteBuffer> buffers) {
 
         final ArrayList<ByteBuffer> byteBuffers = new ArrayList<ByteBuffer>(buffers.size());
-
         for (final ParcelableByteBuffer buffer : buffers) {
-
             final ByteBuffer byteBuffer = buffer.getBuffer();
-
             if (byteBuffer != null) {
-
                 byteBuffers.add(byteBuffer);
             }
         }
@@ -234,16 +224,12 @@ public class ParcelableByteChannel {
             @NotNull final InputChannel<? super ParcelableByteBuffer> channel) {
 
         IOChannel<ByteBuffer> ioChannel;
-
         synchronized (mChannels) {
-
             final WeakIdentityHashMap<InputChannel<? super ParcelableByteBuffer>,
                     IOChannel<ByteBuffer>>
                     channels = mChannels;
             ioChannel = channels.get(channel);
-
             if (ioChannel == null) {
-
                 ioChannel = JRoutine.io().buildChannel();
                 ioChannel.passTo(new BufferOutputConsumer(channel));
                 channels.put(channel, ioChannel);
@@ -266,16 +252,12 @@ public class ParcelableByteChannel {
             @NotNull final IOChannel<? super ParcelableByteBuffer> channel) {
 
         IOChannel<ByteBuffer> ioChannel;
-
         synchronized (mIOChannels) {
-
             final WeakIdentityHashMap<IOChannel<? super ParcelableByteBuffer>,
                     IOChannel<ByteBuffer>>
                     channels = mIOChannels;
             ioChannel = channels.get(channel);
-
             if (ioChannel == null) {
-
                 ioChannel = JRoutine.io().buildChannel();
                 ioChannel.passTo(new IOBufferOutputConsumer(channel));
                 channels.put(channel, ioChannel);
@@ -312,21 +294,16 @@ public class ParcelableByteChannel {
                     public ParcelableByteBuffer createFromParcel(final Parcel in) {
 
                         final byte[] data = in.createByteArray();
-
                         if (data.length > 0) {
-
                             final IOChannel<ByteBuffer> ioChannel = JRoutine.io().buildChannel();
                             final BufferOutputStream outputStream =
                                     ByteChannel.byteChannel(data.length).passTo(ioChannel);
-
                             try {
-
                                 outputStream.write(data);
                                 outputStream.close();
                                 return new ParcelableByteBuffer(ioChannel.next());
 
                             } catch (final IOException ignored) {
-
                                 // It should never happen...
                             }
                         }
@@ -362,26 +339,20 @@ public class ParcelableByteChannel {
         public void writeToParcel(final Parcel dest, final int flags) {
 
             final ByteBuffer buffer = mBuffer;
-
             if (buffer != null) {
-
                 final BufferInputStream inputStream = ByteChannel.inputStream(buffer);
                 final ParcelOutputStream outputStream =
                         new ParcelOutputStream(inputStream.available());
-
                 try {
-
                     inputStream.readAll(outputStream);
                     outputStream.writeToParcel(dest);
 
                 } catch (final IOException ignored) {
-
                     // It should never happen...
                     dest.writeByteArray(EMPTY_ARRAY);
                 }
 
             } else {
-
                 dest.writeByteArray(EMPTY_ARRAY);
             }
         }
@@ -391,12 +362,10 @@ public class ParcelableByteChannel {
 
             // AUTO-GENERATED CODE
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof ParcelableByteBuffer)) {
-
                 return false;
             }
 
@@ -435,7 +404,6 @@ public class ParcelableByteChannel {
                 @NotNull final InputChannel<? super ParcelableByteBuffer> channel) {
 
             if (channel == null) {
-
                 throw new NullPointerException("the input channel must not be null");
             }
 
@@ -535,7 +503,6 @@ public class ParcelableByteChannel {
                 @NotNull final IOChannel<? super ParcelableByteBuffer> channel) {
 
             if (channel == null) {
-
                 throw new NullPointerException("the I/O channel must not be null");
             }
 

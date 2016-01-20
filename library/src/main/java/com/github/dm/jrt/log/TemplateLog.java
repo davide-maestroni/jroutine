@@ -95,9 +95,7 @@ public abstract class TemplateLog implements Log {
             @Nullable final String message, @Nullable final Throwable throwable) {
 
         String formatted = format(level, contexts, message);
-
         if (throwable != null) {
-
             formatted += String.format(EXCEPTION_FORMAT, printStackTrace(throwable));
         }
 

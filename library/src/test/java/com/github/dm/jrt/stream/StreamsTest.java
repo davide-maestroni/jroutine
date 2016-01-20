@@ -335,21 +335,19 @@ public class StreamsTest {
         assertThat(
                 Streams.on(new Function<StreamChannel<? extends String>, StreamChannel<String>>() {
 
-                               public StreamChannel<String> apply(
-                                       final StreamChannel<? extends String> channel) {
+                    public StreamChannel<String> apply(
+                            final StreamChannel<? extends String> channel) {
 
-                                   return channel.syncMap(new Function<String, String>() {
+                        return channel.syncMap(new Function<String, String>() {
 
-                                       public String apply(final String s) {
+                            public String apply(final String s) {
 
-                                           return s.toUpperCase();
-                                       }
-                                   });
-                               }
-                           })
-                       .asyncCall("test1", "test2", "test3")
-                       .afterMax(seconds(3))
-                       .all()).containsExactly("TEST1", "TEST2", "TEST3");
+                                return s.toUpperCase();
+                            }
+                        });
+                    }
+                }).asyncCall("test1", "test2", "test3").afterMax(seconds(3)).all()).containsExactly(
+                "TEST1", "TEST2", "TEST3");
 
         try {
 
@@ -381,8 +379,7 @@ public class StreamsTest {
     @Test
     public void testFactoryEquals() {
 
-        final Function<StreamChannel<? extends String>, StreamChannel<String>>
-                function =
+        final Function<StreamChannel<? extends String>, StreamChannel<String>> function =
                 new Function<StreamChannel<? extends String>, StreamChannel<String>>() {
 
                     public StreamChannel<String> apply(
@@ -401,8 +398,7 @@ public class StreamsTest {
         assertThat(factory).isEqualTo(factory);
         assertThat(factory).isNotEqualTo(null);
         assertThat(factory).isNotEqualTo("test");
-        assertThat(factory).isNotEqualTo(
-                Streams.factory(Functions.<StreamChannel<?>>identity()));
+        assertThat(factory).isNotEqualTo(Streams.factory(Functions.<StreamChannel<?>>identity()));
         assertThat(factory).isEqualTo(Streams.factory(function));
         assertThat(factory.hashCode()).isEqualTo(Streams.factory(function).hashCode());
     }

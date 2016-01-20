@@ -42,7 +42,6 @@ public class Runners extends com.github.dm.jrt.runner.Runners {
     public static Runner handlerRunner(@NotNull final HandlerThread thread) {
 
         if (!thread.isAlive()) {
-
             thread.start();
         }
 

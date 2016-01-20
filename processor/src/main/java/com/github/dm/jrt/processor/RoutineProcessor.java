@@ -224,21 +224,15 @@ public class RoutineProcessor extends AbstractProcessor {
             final RoundEnvironment roundEnvironment) {
 
         if (roundEnvironment.processingOver()) {
-
             return false;
         }
 
         final Types typeUtils = processingEnv.getTypeUtils();
-
         for (final TypeElement annotationElement : getSupportedAnnotationElements()) {
-
             final TypeMirror annotationType = annotationElement.asType();
-
             for (final Element element : ElementFilter.typesIn(
                     roundEnvironment.getElementsAnnotatedWith(annotationElement))) {
-
                 if (element.getKind() != ElementKind.INTERFACE) {
-
                     processingEnv.getMessager()
                                  .printMessage(Kind.ERROR,
                                                "Annotated element is not an interface: " + element);
@@ -248,22 +242,16 @@ public class RoutineProcessor extends AbstractProcessor {
                 final TypeElement classElement = (TypeElement) element;
                 final List<ExecutableElement> methodElements =
                         ElementFilter.methodsIn(element.getEnclosedElements());
-
                 for (final TypeMirror typeMirror : classElement.getInterfaces()) {
-
                     final Element superElement = typeUtils.asElement(typeMirror);
-
                     if (superElement != null) {
-
                         mergeParentMethods(methodElements, ElementFilter.methodsIn(
                                 superElement.getEnclosedElements()));
                     }
                 }
 
                 final Object targetElement = getAnnotationValue(element, annotationType, "value");
-
                 if (targetElement != null) {
-
                     createProxy(annotationElement, classElement,
                                 typeUtils.asElement(getMirrorFromName(targetElement.toString())),
                                 methodElements);
@@ -307,18 +295,13 @@ public class RoutineProcessor extends AbstractProcessor {
             @NotNull final TypeElement element, @NotNull final Element targetElement) {
 
         final List<? extends TypeParameterElement> typeParameters = element.getTypeParameters();
-
         if (typeParameters.isEmpty()) {
-
             return "";
         }
 
         final StringBuilder builder = new StringBuilder("<");
-
         for (final TypeParameterElement typeParameterElement : typeParameters) {
-
             if (builder.length() > 1) {
-
                 builder.append(", ");
             }
 
@@ -366,19 +349,14 @@ public class RoutineProcessor extends AbstractProcessor {
         final Types typeUtils = processingEnv.getTypeUtils();
         final TypeMirror outputChannelType = this.outputChannelType;
         final StringBuilder builder = new StringBuilder();
-
         for (final VariableElement variableElement : methodElement.getParameters()) {
-
             builder.append(".pass(");
-
             if (typeUtils.isAssignable(outputChannelType,
                                        typeUtils.erasure(variableElement.asType())) && (
                     variableElement.getAnnotation(AsyncIn.class) != null)) {
-
                 builder.append("(").append(typeUtils.erasure(outputChannelType)).append("<?>)");
 
             } else {
-
                 builder.append("(Object)");
             }
 
@@ -405,11 +383,8 @@ public class RoutineProcessor extends AbstractProcessor {
 
         int count = 0;
         final StringBuilder builder = new StringBuilder();
-
         for (final VariableElement variableElement : targetMethodElement.getParameters()) {
-
             if (builder.length() > 0) {
-
                 builder.append(", ");
             }
 
@@ -439,11 +414,8 @@ public class RoutineProcessor extends AbstractProcessor {
             @NotNull final ExecutableElement methodElement) {
 
         final StringBuilder builder = new StringBuilder();
-
         for (final VariableElement variableElement : methodElement.getParameters()) {
-
             if (builder.length() > 0) {
-
                 builder.append(", ");
             }
 
@@ -472,11 +444,8 @@ public class RoutineProcessor extends AbstractProcessor {
             @NotNull final ExecutableElement methodElement) {
 
         final StringBuilder builder = new StringBuilder();
-
         for (final VariableElement variableElement : methodElement.getParameters()) {
-
             if (builder.length() > 0) {
-
                 builder.append(", ");
             }
 
@@ -502,9 +471,7 @@ public class RoutineProcessor extends AbstractProcessor {
             final int size) {
 
         final StringBuilder builder = new StringBuilder();
-
         for (int i = 1; i <= size; ++i) {
-
             builder.append("mRoutine")
                    .append(i)
                    .append(" = ")
@@ -535,26 +502,20 @@ public class RoutineProcessor extends AbstractProcessor {
         final StringBuilder builder = new StringBuilder();
         final CoreInstances coreInstancesAnnotation =
                 methodElement.getAnnotation(CoreInstances.class);
-
         if (coreInstancesAnnotation != null) {
-
             builder.append(".withCoreInstances(")
                    .append(coreInstancesAnnotation.value())
                    .append(")");
         }
 
         final InputLimit inputLimitAnnotation = methodElement.getAnnotation(InputLimit.class);
-
         if (inputLimitAnnotation != null) {
-
             builder.append(".withInputLimit(").append(inputLimitAnnotation.value()).append(")");
         }
 
         final InputMaxDelay inputMaxDelayAnnotation =
                 methodElement.getAnnotation(InputMaxDelay.class);
-
         if (inputMaxDelayAnnotation != null) {
-
             builder.append(".withInputMaxDelay(")
                    .append(inputMaxDelayAnnotation.value())
                    .append(", ")
@@ -565,16 +526,12 @@ public class RoutineProcessor extends AbstractProcessor {
         }
 
         final InputMaxSize inputSizeAnnotation = methodElement.getAnnotation(InputMaxSize.class);
-
         if (inputSizeAnnotation != null) {
-
             builder.append(".withInputMaxSize(").append(inputSizeAnnotation.value()).append(")");
         }
 
         final InputOrder inputOrderAnnotation = methodElement.getAnnotation(InputOrder.class);
-
         if (inputOrderAnnotation != null) {
-
             builder.append(".withInputOrder(")
                    .append(OrderType.class.getCanonicalName())
                    .append(".")
@@ -583,9 +540,7 @@ public class RoutineProcessor extends AbstractProcessor {
         }
 
         final LogLevel logLevelAnnotation = methodElement.getAnnotation(LogLevel.class);
-
         if (logLevelAnnotation != null) {
-
             builder.append(".withLogLevel(")
                    .append(Level.class.getCanonicalName())
                    .append(".")
@@ -594,24 +549,18 @@ public class RoutineProcessor extends AbstractProcessor {
         }
 
         final MaxInstances maxInstancesAnnotation = methodElement.getAnnotation(MaxInstances.class);
-
         if (maxInstancesAnnotation != null) {
-
             builder.append(".withMaxInstances(").append(maxInstancesAnnotation.value()).append(")");
         }
 
         final OutputLimit outputLimitAnnotation = methodElement.getAnnotation(OutputLimit.class);
-
         if (outputLimitAnnotation != null) {
-
             builder.append(".withOutputLimit(").append(outputLimitAnnotation.value()).append(")");
         }
 
         final OutputMaxDelay outputMaxDelayAnnotation =
                 methodElement.getAnnotation(OutputMaxDelay.class);
-
         if (outputMaxDelayAnnotation != null) {
-
             builder.append(".withOutputMaxDelay(")
                    .append(outputMaxDelayAnnotation.value())
                    .append(", ")
@@ -622,16 +571,12 @@ public class RoutineProcessor extends AbstractProcessor {
         }
 
         final OutputMaxSize outputSizeAnnotation = methodElement.getAnnotation(OutputMaxSize.class);
-
         if (outputSizeAnnotation != null) {
-
             builder.append(".withOutputMaxSize(").append(outputSizeAnnotation.value()).append(")");
         }
 
         final OutputOrder outputOrderAnnotation = methodElement.getAnnotation(OutputOrder.class);
-
         if (outputOrderAnnotation != null) {
-
             builder.append(".withOutputOrder(")
                    .append(OrderType.class.getCanonicalName())
                    .append(".")
@@ -640,16 +585,12 @@ public class RoutineProcessor extends AbstractProcessor {
         }
 
         final Priority priorityAnnotation = methodElement.getAnnotation(Priority.class);
-
         if (priorityAnnotation != null) {
-
             builder.append(".withPriority(").append(priorityAnnotation.value()).append(")");
         }
 
         final ReadTimeout readTimeoutAnnotation = methodElement.getAnnotation(ReadTimeout.class);
-
         if (readTimeoutAnnotation != null) {
-
             builder.append(".withReadTimeout(")
                    .append(readTimeoutAnnotation.value())
                    .append(", ")
@@ -661,9 +602,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
         final ReadTimeoutAction actionAnnotation =
                 methodElement.getAnnotation(ReadTimeoutAction.class);
-
         if (actionAnnotation != null) {
-
             builder.append(".withReadTimeoutAction(")
                    .append(TimeoutActionType.class.getCanonicalName())
                    .append(".")
@@ -690,9 +629,7 @@ public class RoutineProcessor extends AbstractProcessor {
             @NotNull final TypeMirror returnType) {
 
         final StringBuilder builder = new StringBuilder();
-
         if (returnType.getKind() == TypeKind.ARRAY) {
-
             final String typeString = returnType.toString();
             final int firstBracket = typeString.indexOf('[');
             builder.append(typeString.substring(0, firstBracket))
@@ -700,7 +637,6 @@ public class RoutineProcessor extends AbstractProcessor {
                    .append(typeString.substring(firstBracket));
 
         } else {
-
             builder.append(returnType).append("[$$size]");
         }
 
@@ -724,9 +660,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
         final Types typeUtils = processingEnv.getTypeUtils();
         final StringBuilder builder = new StringBuilder();
-
         for (final VariableElement variableElement : targetMethodElement.getParameters()) {
-
             builder.append(", ")
                    .append(typeUtils.erasure(variableElement.asType()))
                    .append(".class");
@@ -748,21 +682,15 @@ public class RoutineProcessor extends AbstractProcessor {
             @NotNull final TypeMirror annotationType, @NotNull final String attributeName) {
 
         AnnotationValue value = null;
-
         for (final AnnotationMirror mirror : element.getAnnotationMirrors()) {
-
             if (!mirror.getAnnotationType().equals(annotationType)) {
-
                 continue;
             }
 
             final Set<? extends Entry<? extends ExecutableElement, ? extends AnnotationValue>> set =
                     mirror.getElementValues().entrySet();
-
             for (final Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : set) {
-
                 if (attributeName.equals(entry.getKey().getSimpleName().toString())) {
-
                     value = entry.getValue();
                     break;
                 }
@@ -781,7 +709,6 @@ public class RoutineProcessor extends AbstractProcessor {
     protected TypeMirror getBoxedType(@Nullable final TypeMirror type) {
 
         if ((type != null) && (type.getKind().isPrimitive() || (type.getKind() == TypeKind.VOID))) {
-
             return processingEnv.getTypeUtils().boxedClass((PrimitiveType) type).asType();
         }
 
@@ -802,11 +729,8 @@ public class RoutineProcessor extends AbstractProcessor {
             @NotNull final TypeElement element, @NotNull final Element targetElement) {
 
         String defaultPrefix = null;
-
         for (final Element valueElement : annotationElement.getEnclosedElements()) {
-
             if (valueElement.getSimpleName().toString().equals("DEFAULT_CLASS_PREFIX")) {
-
                 defaultPrefix = (String) ((VariableElement) valueElement).getConstantValue();
                 break;
             }
@@ -829,11 +753,8 @@ public class RoutineProcessor extends AbstractProcessor {
             @NotNull final TypeElement element, @NotNull final Element targetElement) {
 
         String defaultSuffix = null;
-
         for (final Element valueElement : annotationElement.getEnclosedElements()) {
-
             if (valueElement.getSimpleName().toString().equals("DEFAULT_CLASS_SUFFIX")) {
-
                 defaultSuffix = (String) ((VariableElement) valueElement).getConstantValue();
                 break;
             }
@@ -858,7 +779,6 @@ public class RoutineProcessor extends AbstractProcessor {
             IOException {
 
         if (mFooter == null) {
-
             mFooter = parseTemplate("/templates/footer.txt");
         }
 
@@ -880,14 +800,10 @@ public class RoutineProcessor extends AbstractProcessor {
 
         String className =
                 (String) getAnnotationValue(element, annotationElement.asType(), "className");
-
         if ((className == null) || className.equals("*")) {
-
             className = element.getSimpleName().toString();
             Element enclosingElement = element.getEnclosingElement();
-
             while ((enclosingElement != null) && !(enclosingElement instanceof PackageElement)) {
-
                 className = enclosingElement.getSimpleName().toString() + "_" + className;
                 enclosingElement = enclosingElement.getEnclosingElement();
             }
@@ -911,9 +827,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
         String classPackage =
                 (String) getAnnotationValue(element, annotationElement.asType(), "classPackage");
-
         if ((classPackage == null) || classPackage.equals("*")) {
-
             classPackage = getPackage(element).getQualifiedName().toString();
         }
 
@@ -974,7 +888,6 @@ public class RoutineProcessor extends AbstractProcessor {
             IOException {
 
         if (mHeader == null) {
-
             mHeader = parseTemplate("/templates/header.txt");
         }
 
@@ -1005,11 +918,8 @@ public class RoutineProcessor extends AbstractProcessor {
         final TypeMirror targetMirror =
                 (TypeMirror) getAnnotationValue(targetParameter, annotationType, "value");
         InputMode inputMode = annotation.mode();
-
         if (inputMode == InputMode.VALUE) {
-
             if (!typeUtils.isAssignable(targetTypeErasure, outputChannelType)) {
-
                 throw new IllegalArgumentException(
                         "[" + methodElement.getEnclosingElement() + "." + methodElement
                                 + "] an async input with mode " + InputMode.VALUE
@@ -1017,9 +927,7 @@ public class RoutineProcessor extends AbstractProcessor {
             }
 
         } else { // InputMode.COLLECTION
-
             if (!typeUtils.isAssignable(targetTypeErasure, outputChannelType)) {
-
                 throw new IllegalArgumentException(
                         "[" + methodElement.getEnclosingElement() + "." + methodElement
                                 + "] an async input with mode " + InputMode.COLLECTION
@@ -1028,7 +936,6 @@ public class RoutineProcessor extends AbstractProcessor {
 
             if ((targetMirror != null) && (targetMirror.getKind() != TypeKind.ARRAY)
                     && !typeUtils.isAssignable(listType, targetMirror)) {
-
                 throw new IllegalArgumentException(
                         "[" + methodElement.getEnclosingElement() + "." + methodElement
                                 + "] an async input with mode " + InputMode.COLLECTION
@@ -1036,7 +943,6 @@ public class RoutineProcessor extends AbstractProcessor {
             }
 
             if (length > 1) {
-
                 throw new IllegalArgumentException(
                         "[" + methodElement.getEnclosingElement() + "." + methodElement
                                 + "] an async input with mode " + InputMode.COLLECTION
@@ -1060,10 +966,8 @@ public class RoutineProcessor extends AbstractProcessor {
             @NotNull final Invoke annotation) {
 
         final InvocationMode invocationMode = annotation.value();
-
         if ((invocationMode == InvocationMode.PARALLEL) && (methodElement.getParameters().size()
                 > 1)) {
-
             throw new IllegalArgumentException(
                     "methods annotated with invocation mode " + InvocationMode.PARALLEL
                             + " must have at maximum one input parameter: " + methodElement);
@@ -1091,7 +995,6 @@ public class RoutineProcessor extends AbstractProcessor {
             final int count) throws IOException {
 
         if (mMethodArrayInvocationCollection == null) {
-
             mMethodArrayInvocationCollection =
                     parseTemplate("/templates/method_array_invocation_collection.txt");
         }
@@ -1117,7 +1020,6 @@ public class RoutineProcessor extends AbstractProcessor {
             @NotNull final ExecutableElement methodElement, final int count) throws IOException {
 
         if (mMethodArrayInvocation == null) {
-
             mMethodArrayInvocation = parseTemplate("/templates/method_array_invocation.txt");
         }
 
@@ -1143,7 +1045,6 @@ public class RoutineProcessor extends AbstractProcessor {
             final int count) throws IOException {
 
         if (mMethodArrayInvocationVoid == null) {
-
             mMethodArrayInvocationVoid =
                     parseTemplate("/templates/method_array_invocation_void.txt");
         }
@@ -1169,7 +1070,6 @@ public class RoutineProcessor extends AbstractProcessor {
             @NotNull final ExecutableElement methodElement, final int count) throws IOException {
 
         if (mMethodAsync == null) {
-
             mMethodAsync = parseTemplate("/templates/method_async.txt");
         }
 
@@ -1194,7 +1094,6 @@ public class RoutineProcessor extends AbstractProcessor {
             @NotNull final ExecutableElement methodElement, final int count) throws IOException {
 
         if (mMethodHeader == null) {
-
             mMethodHeader = parseTemplate("/templates/method_header.txt");
         }
 
@@ -1219,7 +1118,6 @@ public class RoutineProcessor extends AbstractProcessor {
             @NotNull final ExecutableElement methodElement, final int count) throws IOException {
 
         if (mMethodInputsChannel == null) {
-
             mMethodInputsChannel = parseTemplate("/templates/method_inputs_channel.txt");
         }
 
@@ -1244,7 +1142,6 @@ public class RoutineProcessor extends AbstractProcessor {
             @NotNull final ExecutableElement methodElement, final int count) throws IOException {
 
         if (mMethodInputsRoutine == null) {
-
             mMethodInputsRoutine = parseTemplate("/templates/method_inputs_routine.txt");
         }
 
@@ -1270,7 +1167,6 @@ public class RoutineProcessor extends AbstractProcessor {
             final int count) throws IOException {
 
         if (mMethodInvocationCollection == null) {
-
             mMethodInvocationCollection =
                     parseTemplate("/templates/method_invocation_collection.txt");
         }
@@ -1296,7 +1192,6 @@ public class RoutineProcessor extends AbstractProcessor {
             @NotNull final ExecutableElement methodElement, final int count) throws IOException {
 
         if (mMethodInvocationFooter == null) {
-
             mMethodInvocationFooter = parseTemplate("/templates/method_invocation_footer.txt");
         }
 
@@ -1321,7 +1216,6 @@ public class RoutineProcessor extends AbstractProcessor {
             @NotNull final ExecutableElement methodElement, final int count) throws IOException {
 
         if (mMethodInvocationHeader == null) {
-
             mMethodInvocationHeader = parseTemplate("/templates/method_invocation_header.txt");
         }
 
@@ -1346,7 +1240,6 @@ public class RoutineProcessor extends AbstractProcessor {
             @NotNull final ExecutableElement methodElement, final int count) throws IOException {
 
         if (mMethodInvocation == null) {
-
             mMethodInvocation = parseTemplate("/templates/method_invocation.txt");
         }
 
@@ -1371,7 +1264,6 @@ public class RoutineProcessor extends AbstractProcessor {
             @NotNull final ExecutableElement methodElement, final int count) throws IOException {
 
         if (mMethodInvocationVoid == null) {
-
             mMethodInvocationVoid = parseTemplate("/templates/method_invocation_void.txt");
         }
 
@@ -1396,7 +1288,6 @@ public class RoutineProcessor extends AbstractProcessor {
             @NotNull final ExecutableElement methodElement, final int count) throws IOException {
 
         if (mMethodResult == null) {
-
             mMethodResult = parseTemplate("/templates/method_result.txt");
         }
 
@@ -1421,7 +1312,6 @@ public class RoutineProcessor extends AbstractProcessor {
             @NotNull final ExecutableElement methodElement, final int count) throws IOException {
 
         if (mMethodVoid == null) {
-
             mMethodVoid = parseTemplate("/templates/method_void.txt");
         }
 
@@ -1438,9 +1328,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
         final String name = normalizeTypeName(typeName);
         final TypeMirror typeMirror = mPrimitiveMirrors.get(name);
-
         if (typeMirror != null) {
-
             return typeMirror;
         }
 
@@ -1464,19 +1352,15 @@ public class RoutineProcessor extends AbstractProcessor {
         final TypeMirror returnType = methodElement.getReturnType();
         final TypeMirror erasure = typeUtils.erasure(returnType);
         final TypeMirror targetMirror = typeUtils.erasure(targetMethodElement.getReturnType());
-
         if (!typeUtils.isAssignable(outputChannelType, erasure)) {
-
             throw new IllegalArgumentException(
                     "[" + methodElement.getEnclosingElement() + "." + methodElement
                             + "] an async output must be a superclass of " + outputChannelType);
         }
 
         OutputMode outputMode = methodElement.getAnnotation(AsyncOut.class).value();
-
         if ((outputMode == OutputMode.ELEMENT) && (targetMirror != null) && (targetMirror.getKind()
                 != TypeKind.ARRAY) && !typeUtils.isAssignable(targetMirror, iterableType)) {
-
             throw new IllegalArgumentException(
                     "[" + methodElement.getEnclosingElement() + "." + methodElement
                             + "] an async output with mode " + OutputMode.ELEMENT
@@ -1514,9 +1398,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
         final StringBuilder builder = new StringBuilder(
                 getGeneratedClassPackage(annotationElement, element, targetElement));
-
         if (builder.length() > 0) {
-
             builder.append('.');
         }
 
@@ -1537,9 +1419,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
         final Types typeUtils = processingEnv.getTypeUtils();
         final ArrayList<TypeElement> elements = new ArrayList<TypeElement>();
-
         for (final String name : getSupportedAnnotationTypes()) {
-
             elements.add((TypeElement) typeUtils.asElement(getMirrorFromName(name)));
         }
 
@@ -1562,22 +1442,16 @@ public class RoutineProcessor extends AbstractProcessor {
         final List<? extends VariableElement> secondTypeParameters =
                 secondMethodElement.getParameters();
         final int length = firstTypeParameters.size();
-
         if (length != secondTypeParameters.size()) {
-
             return false;
         }
 
         final Types typeUtils = processingEnv.getTypeUtils();
-
         for (int i = 0; i < length; ++i) {
-
             final TypeMirror firstType = firstTypeParameters.get(i).asType();
             final TypeMirror secondType = secondTypeParameters.get(i).asType();
-
             if (!typeUtils.isAssignable(typeUtils.erasure(firstType),
                                         typeUtils.erasure(secondType))) {
-
                 return false;
             }
         }
@@ -1595,7 +1469,6 @@ public class RoutineProcessor extends AbstractProcessor {
     protected String normalizeTypeName(@NotNull final String typeName) {
 
         if (typeName.endsWith(".class")) {
-
             return typeName.substring(0, typeName.length() - ".class".length());
         }
 
@@ -1614,14 +1487,10 @@ public class RoutineProcessor extends AbstractProcessor {
 
         final byte[] buffer = mByteBuffer;
         final InputStream resourceStream = getClass().getResourceAsStream(path);
-
         try {
-
             final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             int length;
-
             while ((length = resourceStream.read(buffer)) > 0) {
-
                 outputStream.write(buffer, 0, length);
             }
 
@@ -1629,9 +1498,7 @@ public class RoutineProcessor extends AbstractProcessor {
             return outputStream.toString("UTF-8");
 
         } finally {
-
             try {
-
                 resourceStream.close();
 
             } catch (final IOException ignored) {
@@ -1646,19 +1513,14 @@ public class RoutineProcessor extends AbstractProcessor {
             @NotNull final List<ExecutableElement> methodElements) {
 
         Writer writer = null;
-
         try {
-
             final Filer filer = processingEnv.getFiler();
-
             if (!DEBUG) {
-
                 final JavaFileObject sourceFile = filer.createSourceFile(
                         getSourceName(annotationElement, element, targetElement));
                 writer = sourceFile.openWriter();
 
             } else {
-
                 writer = new StringWriter();
             }
 
@@ -1689,9 +1551,7 @@ public class RoutineProcessor extends AbstractProcessor {
                                                            targetElement, methodElements.size()));
             writer.append(header);
             int count = 0;
-
             for (final ExecutableElement methodElement : methodElements) {
-
                 ++count;
                 writeMethod(writer, annotationElement, element, targetElement, methodElement,
                             count);
@@ -1700,18 +1560,14 @@ public class RoutineProcessor extends AbstractProcessor {
             writer.append(getFooterTemplate(annotationElement, element, targetElement));
 
         } catch (final IOException e) {
-
             processingEnv.getMessager()
                          .printMessage(Kind.ERROR,
                                        "IOException while writing template; " + printStackTrace(e));
             throw new RuntimeException(e);
 
         } finally {
-
             if (writer != null) {
-
                 try {
-
                     writer.close();
 
                 } catch (final IOException ignored) {
@@ -1721,7 +1577,6 @@ public class RoutineProcessor extends AbstractProcessor {
         }
 
         if (DEBUG) {
-
             System.out.println(writer.toString());
         }
     }
@@ -1734,21 +1589,14 @@ public class RoutineProcessor extends AbstractProcessor {
         String methodName = methodElement.getSimpleName().toString();
         ExecutableElement targetMethod = null;
         final Alias asyncAnnotation = methodElement.getAnnotation(Alias.class);
-
         if (asyncAnnotation != null) {
-
             methodName = asyncAnnotation.value();
-
             for (final ExecutableElement targetMethodElement : ElementFilter.methodsIn(
                     targetElement.getEnclosedElements())) {
-
                 final Alias targetAsyncAnnotation = targetMethodElement.getAnnotation(Alias.class);
-
                 if ((targetAsyncAnnotation != null) && methodName.equals(
                         targetAsyncAnnotation.value())) {
-
                     targetMethod = targetMethodElement;
-
                     break;
                 }
             }
@@ -1758,50 +1606,35 @@ public class RoutineProcessor extends AbstractProcessor {
         final TypeMirror inputAnnotationType = getMirrorFromName(AsyncIn.class.getCanonicalName());
         final TypeMirror methodAnnotationType =
                 getMirrorFromName(AsyncMethod.class.getCanonicalName());
-
         if (targetMethod == null) {
-
             if (methodElement.getAnnotation(AsyncMethod.class) != null) {
-
                 final List<?> annotationParams =
                         (List<?>) getAnnotationValue(methodElement, methodAnnotationType, "value");
-
                 if (annotationParams != null) {
-
                     final int length = annotationParams.size();
-
                     for (final ExecutableElement targetMethodElement : ElementFilter.methodsIn(
                             targetElement.getEnclosedElements())) {
-
                         if (!methodName.equals(targetMethodElement.getSimpleName().toString())) {
-
                             continue;
                         }
 
                         final List<? extends VariableElement> typeParameterElements =
                                 targetMethodElement.getParameters();
-
                         if (length == typeParameterElements.size()) {
-
                             boolean matches = true;
-
                             for (int i = 0; i < length; ++i) {
-
                                 final TypeMirror paramMirror =
                                         getMirrorFromName(annotationParams.get(i).toString());
                                 final TypeMirror typeParameterMirror =
                                         typeParameterElements.get(i).asType();
-
                                 if (!typeUtils.isSameType(typeUtils.erasure(paramMirror),
                                                           typeUtils.erasure(typeParameterMirror))) {
-
                                     matches = false;
                                     break;
                                 }
                             }
 
                             if (matches) {
-
                                 targetMethod = targetMethodElement;
                                 break;
                             }
@@ -1810,52 +1643,39 @@ public class RoutineProcessor extends AbstractProcessor {
                 }
 
             } else {
-
                 final List<? extends VariableElement> interfaceTypeParameters =
                         methodElement.getParameters();
                 final int length = interfaceTypeParameters.size();
-
                 for (final ExecutableElement targetMethodElement : ElementFilter.methodsIn(
                         targetElement.getEnclosedElements())) {
-
                     if (!methodName.equals(targetMethodElement.getSimpleName().toString())) {
-
                         continue;
                     }
 
                     final List<? extends VariableElement> typeParameterElements =
                             targetMethodElement.getParameters();
-
                     if (length == typeParameterElements.size()) {
-
                         boolean matches = true;
-
                         for (int i = 0; i < length; ++i) {
-
                             Object value = null;
                             final VariableElement variableElement = interfaceTypeParameters.get(i);
-
                             if (variableElement.getAnnotation(AsyncIn.class) != null) {
-
                                 value = getAnnotationValue(variableElement, inputAnnotationType,
                                                            "value");
                             }
 
                             final TypeMirror typeParameterMirror =
                                     typeParameterElements.get(i).asType();
-
                             if (!typeUtils.isSameType(typeUtils.erasure(
                                                               (value != null) ? (TypeMirror) value
                                                                       : variableElement.asType()),
                                                       typeUtils.erasure(typeParameterMirror))) {
-
                                 matches = false;
                                 break;
                             }
                         }
 
                         if (matches) {
-
                             targetMethod = targetMethodElement;
                             break;
                         }
@@ -1864,22 +1684,15 @@ public class RoutineProcessor extends AbstractProcessor {
             }
 
         } else if (methodElement.getAnnotation(AsyncMethod.class) != null) {
-
             final List<?> annotationParams =
                     (List<?>) getAnnotationValue(methodElement, methodAnnotationType, "value");
-
             if (annotationParams != null) {
-
                 final int length = annotationParams.size();
                 final List<? extends VariableElement> typeParameterElements =
                         targetMethod.getParameters();
-
                 if (length == typeParameterElements.size()) {
-
                     for (int i = 0; i < length; ++i) {
-
                         if (getMirrorFromName(annotationParams.get(i).toString()) == null) {
-
                             throw new NullPointerException(
                                     annotationParams.get(i).toString() + " - "
                                             + typeUtils.asElement(
@@ -1890,64 +1703,50 @@ public class RoutineProcessor extends AbstractProcessor {
                                 getMirrorFromName(annotationParams.get(i).toString());
                         final TypeMirror typeParameterMirror =
                                 typeParameterElements.get(i).asType();
-
                         if (!typeUtils.isSameType(typeUtils.erasure(paramMirror),
                                                   typeUtils.erasure(typeParameterMirror))) {
-
                             targetMethod = null;
                             break;
                         }
                     }
 
                 } else {
-
                     targetMethod = null;
                 }
 
             } else {
-
                 targetMethod = null;
             }
 
         } else {
-
             final List<? extends VariableElement> interfaceTypeParameters =
                     methodElement.getParameters();
             final int length = interfaceTypeParameters.size();
             final List<? extends VariableElement> typeParameterElements =
                     targetMethod.getParameters();
-
             if (length == typeParameterElements.size()) {
-
                 for (int i = 0; i < length; ++i) {
-
                     Object value = null;
                     final VariableElement variableElement = interfaceTypeParameters.get(i);
-
                     if (variableElement.getAnnotation(AsyncIn.class) != null) {
-
                         value = getAnnotationValue(variableElement, inputAnnotationType, "value");
                     }
 
                     final TypeMirror typeParameterMirror = typeParameterElements.get(i).asType();
-
                     if (!typeUtils.isSameType(typeUtils.erasure((value != null) ? (TypeMirror) value
                                                                         : variableElement.asType()),
                                               typeUtils.erasure(typeParameterMirror))) {
-
                         targetMethod = null;
                         break;
                     }
                 }
 
             } else {
-
                 targetMethod = null;
             }
         }
 
         if (targetMethod == null) {
-
             throw new IllegalArgumentException(
                     "[" + methodElement + "] cannot find matching method in target class");
         }
@@ -1959,20 +1758,14 @@ public class RoutineProcessor extends AbstractProcessor {
             @NotNull final List<ExecutableElement> parentMethods) {
 
         final Types typeUtils = processingEnv.getTypeUtils();
-
         for (final ExecutableElement parentMethod : parentMethods) {
-
             boolean isOverride = false;
-
             for (final ExecutableElement method : methods) {
-
                 if (parentMethod.getSimpleName().equals(method.getSimpleName())
                         && typeUtils.isAssignable(typeUtils.erasure(method.getReturnType()),
                                                   typeUtils.erasure(
                                                           parentMethod.getReturnType()))) {
-
                     if (haveAssignableParameters(method, parentMethod)) {
-
                         isOverride = true;
                         break;
                     }
@@ -1980,7 +1773,6 @@ public class RoutineProcessor extends AbstractProcessor {
             }
 
             if (!isOverride) {
-
                 methods.add(parentMethod);
             }
         }
@@ -2002,15 +1794,10 @@ public class RoutineProcessor extends AbstractProcessor {
                 (invokeAnnotation != null) ? getInvocationMode(methodElement, invokeAnnotation)
                         : null;
         InputMode inputMode = null;
-
         final List<? extends VariableElement> parameters = methodElement.getParameters();
-
         for (final VariableElement parameter : parameters) {
-
             final AsyncIn annotation = parameter.getAnnotation(AsyncIn.class);
-
             if (annotation == null) {
-
                 continue;
             }
 
@@ -2019,11 +1806,8 @@ public class RoutineProcessor extends AbstractProcessor {
 
         OutputMode outputMode = null;
         String method;
-
         if (asyncMethodAnnotation != null) {
-
             if (!methodElement.getParameters().isEmpty()) {
-
                 throw new IllegalArgumentException(
                         "methods annotated with " + AsyncMethod.class.getSimpleName()
                                 + " must have no input parameters: " + methodElement);
@@ -2031,60 +1815,46 @@ public class RoutineProcessor extends AbstractProcessor {
 
             final TypeMirror returnType = methodElement.getReturnType();
             final TypeMirror returnErasure = typeUtils.erasure(returnType);
-
             if (!typeUtils.isAssignable(invocationChannelType, returnErasure)
                     && !typeUtils.isAssignable(routineType, returnErasure)) {
-
                 throw new IllegalArgumentException(
                         "the proxy method has incompatible return type: " + methodElement);
             }
 
             final List<? extends TypeMirror> typeArguments =
                     ((DeclaredType) returnType).getTypeArguments();
-
             if (typeArguments.isEmpty()) {
-
                 targetReturnType = objectType;
 
             } else {
-
                 targetReturnType = typeArguments.get(1);
             }
 
             inputMode = InputMode.VALUE;
             outputMode = asyncMethodAnnotation.mode();
-
             if (typeUtils.isAssignable(invocationChannelType, returnErasure)) {
-
                 method = getMethodInputsChannelTemplate(annotationElement, element, targetElement,
                                                         methodElement, count);
 
             } else {
-
                 method = getMethodInputsRoutineTemplate(annotationElement, element, targetElement,
                                                         methodElement, count);
             }
 
         } else if (asyncOutputAnnotation != null) {
-
             final TypeMirror returnType = methodElement.getReturnType();
             final TypeMirror returnTypeErasure = typeUtils.erasure(returnType);
-
             if (!typeUtils.isAssignable(outputChannelType, returnTypeErasure)) {
-
                 throw new IllegalArgumentException(
                         "the proxy method has incompatible return type: " + methodElement);
             }
 
             final List<? extends TypeMirror> typeArguments =
                     ((DeclaredType) returnType).getTypeArguments();
-
             if (typeArguments.isEmpty()) {
-
                 targetReturnType = objectType;
 
             } else {
-
                 targetReturnType = typeArguments.get(0);
             }
 
@@ -2093,25 +1863,21 @@ public class RoutineProcessor extends AbstractProcessor {
                                            count);
 
         } else if (isVoid) {
-
             method = getMethodVoidTemplate(annotationElement, element, targetElement, methodElement,
                                            count);
 
         } else {
-
             targetReturnType = methodElement.getReturnType();
             method = getMethodResultTemplate(annotationElement, element, targetElement,
                                              methodElement, count);
         }
 
         if (asyncOutputAnnotation != null) {
-
             outputMode = getOutputMode(methodElement, targetMethod);
         }
 
         if ((invocationMode == InvocationMode.PARALLEL) && (targetMethod.getParameters().size()
                 > 1)) {
-
             throw new IllegalArgumentException(
                     "methods annotated with invocation mode " + InvocationMode.PARALLEL
                             + " must have no input parameters: " + methodElement);
@@ -2131,17 +1897,12 @@ public class RoutineProcessor extends AbstractProcessor {
                                             buildRoutineOptions(annotationElement, element,
                                                                 targetElement, methodElement));
         final SharedFields sharedFieldsAnnotation = methodElement.getAnnotation(SharedFields.class);
-
         if (sharedFieldsAnnotation != null) {
-
             final String[] names = sharedFieldsAnnotation.value();
             final StringBuilder builder = new StringBuilder("java.util.Arrays.asList(");
             final int length = names.length;
-
             for (int i = 0; i < length; ++i) {
-
                 if (i != 0) {
-
                     builder.append(", ");
                 }
 
@@ -2152,7 +1913,6 @@ public class RoutineProcessor extends AbstractProcessor {
             methodHeader = methodHeader.replace("${sharedFields}", builder.toString());
 
         } else {
-
             methodHeader = methodHeader.replace("${sharedFields}",
                                                 "proxyConfiguration.getSharedFieldsOr(null)");
         }
@@ -2196,17 +1956,12 @@ public class RoutineProcessor extends AbstractProcessor {
                                                                 buildGenericTypes(annotationElement,
                                                                                   element,
                                                                                   targetElement));
-
         if (sharedFieldsAnnotation != null) {
-
             final String[] names = sharedFieldsAnnotation.value();
             final StringBuilder builder = new StringBuilder("java.util.Arrays.asList(");
             final int length = names.length;
-
             for (int i = 0; i < length; ++i) {
-
                 if (i != 0) {
-
                     builder.append(", ");
                 }
 
@@ -2218,7 +1973,6 @@ public class RoutineProcessor extends AbstractProcessor {
                     methodInvocationHeader.replace("${sharedFields}", builder.toString());
 
         } else {
-
             methodInvocationHeader = methodInvocationHeader.replace("${sharedFields}",
                                                                     "proxyConfiguration"
                                                                             + ".getSharedFieldsOr"
@@ -2230,10 +1984,8 @@ public class RoutineProcessor extends AbstractProcessor {
                 ? "target.getTargetClass()" : "target.getTarget()");
         writer.append(methodInvocationHeader);
         String methodInvocation;
-
         if ((inputMode == InputMode.COLLECTION) && (
                 targetMethod.getParameters().get(0).asType().getKind() == TypeKind.ARRAY)) {
-
             final ArrayType arrayType = (ArrayType) targetMethod.getParameters().get(0).asType();
             methodInvocation =
                     (isVoid) ? getMethodArrayInvocationVoidTemplate(annotationElement, element,
@@ -2254,7 +2006,6 @@ public class RoutineProcessor extends AbstractProcessor {
                     arrayType.getComponentType()).toString());
 
         } else {
-
             methodInvocation =
                     (isVoid) ? getMethodInvocationVoidTemplate(annotationElement, element,
                                                                targetElement, methodElement, count)
@@ -2282,9 +2033,7 @@ public class RoutineProcessor extends AbstractProcessor {
                                                                     + ") mTarget.getTarget())");
         methodInvocation =
                 methodInvocation.replace("${targetMethodName}", targetMethod.getSimpleName());
-
         if (inputMode == InputMode.COLLECTION) {
-
             methodInvocation = methodInvocation.replace("${maxParamSize}",
                                                         Integer.toString(Integer.MAX_VALUE));
             methodInvocation = methodInvocation.replace("${paramValues}",
@@ -2293,7 +2042,6 @@ public class RoutineProcessor extends AbstractProcessor {
                                                                 targetElement, targetMethod));
 
         } else {
-
             methodInvocation = methodInvocation.replace("${maxParamSize}", Integer.toString(
                     targetMethod.getParameters().size()));
             methodInvocation = methodInvocation.replace("${paramValues}",

@@ -140,19 +140,17 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             @NotNull final Logger logger) {
 
         if (handler == null) {
-
             throw new NullPointerException("the abort handler must not be null");
         }
 
         if (runner == null) {
-
             throw new NullPointerException("the runner instance must not be null");
         }
 
         mLogger = logger.subContextLogger(this);
         mHandler = handler;
         mRunner = runner;
-        mResultOrder = configuration.getOutputOrderTypeOr(OrderType.BY_CHANCE);
+        mResultOrder = configuration.getOutputOrderTypeOr(OrderType.BY_DELAY);
         mExecutionTimeout = configuration.getReadTimeoutOr(ZERO);
         mTimeoutActionType = configuration.getReadTimeoutActionOr(TimeoutActionType.THROW);
         mOutputLimit = configuration.getOutputLimitOr(Integer.MAX_VALUE);
@@ -182,12 +180,9 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     private static Object getMutex(@NotNull final OutputConsumer<?> consumer) {
 
         synchronized (sConsumerMutexes) {
-
             final WeakIdentityHashMap<OutputConsumer<?>, Object> consumerMutexes = sConsumerMutexes;
             Object mutex = consumerMutexes.get(consumer);
-
             if (mutex == null) {
-
                 mutex = new Object();
                 consumerMutexes.put(consumer, mutex);
             }
@@ -205,7 +200,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     public ResultChannel<OUT> after(@NotNull final TimeDuration delay) {
 
         synchronized (mMutex) {
-
             mState.after(delay);
         }
 
@@ -228,19 +222,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     public ResultChannel<OUT> orderByCall() {
 
         synchronized (mMutex) {
-
             mState.orderBy(OrderType.BY_CALL);
-        }
-
-        return this;
-    }
-
-    @NotNull
-    public ResultChannel<OUT> orderByChance() {
-
-        synchronized (mMutex) {
-
-            mState.orderBy(OrderType.BY_CHANCE);
         }
 
         return this;
@@ -250,7 +232,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     public ResultChannel<OUT> orderByDelay() {
 
         synchronized (mMutex) {
-
             mState.orderBy(OrderType.BY_DELAY);
         }
 
@@ -261,14 +242,11 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     public ResultChannel<OUT> pass(@Nullable final OutputChannel<? extends OUT> channel) {
 
         final OutputConsumer<OUT> consumer;
-
         synchronized (mMutex) {
-
             consumer = mState.pass(channel);
         }
 
         if ((consumer != null) && (channel != null)) {
-
             channel.passTo(consumer);
         }
 
@@ -280,26 +258,20 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         final TimeDuration delay;
         final Execution execution;
-
         synchronized (mMutex) {
-
             delay = mResultDelay;
             execution = mState.pass(outputs);
         }
 
         if (delay.isZero()) {
-
             executeFlush(false);
 
         } else if (execution != null) {
-
             runExecution(execution, delay.time, delay.unit);
         }
 
         synchronized (mMutex) {
-
             if (!mHasOutputs.isTrue()) {
-
                 waitOutputs();
             }
         }
@@ -312,26 +284,20 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         final TimeDuration delay;
         final Execution execution;
-
         synchronized (mMutex) {
-
             delay = mResultDelay;
             execution = mState.pass(output);
         }
 
         if (delay.isZero()) {
-
             executeFlush(false);
 
         } else if (execution != null) {
-
             runExecution(execution, delay.time, delay.unit);
         }
 
         synchronized (mMutex) {
-
             if (!mHasOutputs.isTrue()) {
-
                 waitOutputs();
             }
         }
@@ -344,26 +310,20 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         final TimeDuration delay;
         final Execution execution;
-
         synchronized (mMutex) {
-
             delay = mResultDelay;
             execution = mState.pass(outputs);
         }
 
         if (delay.isZero()) {
-
             executeFlush(false);
 
         } else if (execution != null) {
-
             runExecution(execution, delay.time, delay.unit);
         }
 
         synchronized (mMutex) {
-
             if (!mHasOutputs.isTrue()) {
-
                 waitOutputs();
             }
         }
@@ -380,14 +340,11 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     void abortImmediately(@Nullable final Throwable reason) {
 
         RoutineException abortException = InvocationException.wrapIfNeeded(reason);
-
         synchronized (mMutex) {
-
             abortException = mState.abortInvocation(abortException, ZERO);
         }
 
         if (abortException != null) {
-
             mHandler.onAbort(abortException, 0, TimeUnit.MILLISECONDS);
         }
     }
@@ -401,17 +358,13 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         final ArrayList<OutputChannel<?>> channels;
         final RoutineException abortException = InvocationException.wrapIfNeeded(throwable);
-
         synchronized (mMutex) {
-
             mLogger.dbg(throwable, "aborting result channel");
             channels = new ArrayList<OutputChannel<?>>(mBoundChannels);
             mBoundChannels.clear();
             mOutputQueue.add(RoutineExceptionWrapper.wrap(throwable));
             mPendingOutputCount = 0;
-
             if (mAbortException == null) {
-
                 mAbortException = abortException;
             }
 
@@ -420,7 +373,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
 
         for (final OutputChannel<?> channel : channels) {
-
             channel.abort(abortException);
         }
 
@@ -433,14 +385,11 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     void close() {
 
         final boolean needsFlush;
-
         synchronized (mMutex) {
-
             needsFlush = mState.closeResultChannel();
         }
 
         if (needsFlush) {
-
             executeFlush(false);
         }
     }
@@ -472,13 +421,10 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         final TimeoutActionType action = mTimeoutActionType;
         final OutputChannel<OUT> outputChannel =
                 new DefaultOutputChannel().afterMax(mExecutionTimeout);
-
         if (action == TimeoutActionType.EXIT) {
-
             outputChannel.eventuallyExit();
 
         } else if (action == TimeoutActionType.ABORT) {
-
             outputChannel.eventuallyAbort();
         }
 
@@ -491,7 +437,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     void startWaitingInvocation() {
 
         synchronized (mMutex) {
-
             mIsWaitingInvocation = true;
             mMutex.notifyAll();
         }
@@ -503,7 +448,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     void stopWaitingInvocation() {
 
         synchronized (mMutex) {
-
             mIsWaitingInvocation = false;
         }
     }
@@ -511,21 +455,18 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     private void checkCanWait() {
 
         if (sInsideInvocation.get().mIsTrue) {
-
             throw new ExecutionDeadlockException(
                     "cannot wait inside an invocation execution: " + Thread.currentThread()
                             + "\nTry binding the output channel");
         }
 
         if (mRunner.isExecutionThread()) {
-
             throw new ExecutionDeadlockException(
                     "cannot wait on the channel runner thread: " + Thread.currentThread()
                             + "\nTry binding the output channel or employing a different runner");
         }
 
         if (mIsWaitingInvocation) {
-
             throw new InvocationDeadlockException(INVOCATION_DEADLOCK_MESSAGE);
         }
     }
@@ -533,7 +474,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     private void checkMaxSize() {
 
         if (mOutputCount > mMaxOutput) {
-
             throw new OutputDeadlockException(
                     "maximum output channel size has been reached: " + mMaxOutput);
         }
@@ -543,13 +483,9 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             @NotNull final OutputConsumer<? super OUT> consumer) {
 
         state.closeConsumer(consumer);
-
         synchronized (mMutex) {
-
             final OutputChannelState currentState = mState;
-
             if (currentState.isReadyToComplete()) {
-
                 mState = currentState.toDoneState();
                 mMutex.notifyAll();
             }
@@ -561,13 +497,10 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         // Need to make sure to pass the outputs to the consumer in the runner thread, so to avoid
         // deadlock issues
         final Runner runner = mRunner;
-
         if (runner.isExecutionThread()) {
-
             flushOutput(forceClose);
 
         } else {
-
             runExecution(new FlushExecution(forceClose), 0, TimeUnit.MILLISECONDS);
         }
     }
@@ -576,27 +509,19 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     private void flushOutput(final boolean forceClose) {
 
         RoutineException abortException = null;
-
         synchronized (mFlushMutex) {
-
             final Logger logger = mLogger;
             final OutputChannelState state;
             final ArrayList<Object> outputs;
             final OutputConsumer<? super OUT> consumer;
             final boolean isFinal;
-
             synchronized (mMutex) {
-
                 state = mState;
                 isFinal = state.isReadyToComplete();
                 consumer = mOutputConsumer;
-
                 if (consumer == null) {
-
                     logger.dbg("avoiding flushing output since channel is not bound");
-
                     if (isFinal) {
-
                         mState = state.toDoneState();
                     }
 
@@ -611,25 +536,18 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             }
 
             synchronized (mConsumerMutex) {
-
                 try {
-
                     for (final Object output : outputs) {
-
                         if (output instanceof RoutineExceptionWrapper) {
-
                             try {
-
                                 logger.dbg("aborting consumer (%s): %s", consumer, output);
                                 consumer.onError(((RoutineExceptionWrapper) output).raise());
 
                             } catch (final RoutineException e) {
-
                                 InvocationInterruptedException.throwIfInterrupt(e);
                                 logger.wrn(e, "ignoring consumer exception (%s)", consumer);
 
                             } catch (final Throwable t) {
-
                                 InvocationInterruptedException.throwIfInterrupt(t);
                                 logger.err(t, "ignoring consumer exception (%s)", consumer);
                             }
@@ -637,25 +555,20 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                             break;
 
                         } else {
-
                             logger.dbg("output consumer (%s): %s", consumer, output);
                             consumer.onOutput((OUT) output);
                         }
                     }
 
                     if (forceClose || isFinal) {
-
                         closeConsumer(state, consumer);
                     }
 
                 } catch (final InvocationInterruptedException e) {
-
                     throw e;
 
                 } catch (final Throwable t) {
-
                     synchronized (mMutex) {
-
                         logger.wrn(t, "consumer exception (%s)", consumer);
                         abortException = mState.abortConsumer(t);
                     }
@@ -664,7 +577,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
 
         if (abortException != null) {
-
             mHandler.onAbort(abortException, 0, TimeUnit.MILLISECONDS);
         }
     }
@@ -672,11 +584,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     private void forceExecution(@NotNull final Execution execution) {
 
         final SimpleQueue<WrappedExecution> queue = mExecutionQueue;
-
         synchronized (mMutex) {
-
             if (mIsWaitingExecution) {
-
                 queue.add(new WrappedExecution(execution));
                 return;
             }
@@ -686,22 +595,17 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         execution.run();
         final WrappedExecution nextExecution;
-
         synchronized (mMutex) {
-
             if (!queue.isEmpty()) {
-
                 nextExecution = queue.removeFirst();
 
             } else {
-
                 mIsWaitingExecution = false;
                 nextExecution = null;
             }
         }
 
         if (nextExecution != null) {
-
             mRunner.run(nextExecution, 0, TimeUnit.MILLISECONDS);
         }
     }
@@ -720,43 +624,31 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             @Nullable final Throwable timeoutException) {
 
         boolean isAbort = false;
-
         synchronized (mMutex) {
-
             verifyBound();
             final Logger logger = mLogger;
             final NestedQueue<Object> outputQueue = mOutputQueue;
             final boolean isDone = mState.isDone();
-
             if (timeout.isZero() || isDone) {
-
                 if (outputQueue.isEmpty() && !isDone) {
-
                     logger.wrn("has output timeout: [%s] => [%s]", timeout, timeoutAction);
-
                     if (timeoutAction == TimeoutActionType.THROW) {
-
                         throw new ExecutionTimeoutException(
                                 "timeout while waiting to know if more outputs are coming ["
                                         + timeout + "]");
 
                     } else {
-
                         isAbort = (timeoutAction == TimeoutActionType.ABORT);
                     }
                 }
 
             } else if (!outputQueue.isEmpty()) {
-
                 logger.dbg("has output: true [%s]", timeout);
                 return true;
 
             } else {
-
                 checkCanWait();
-
                 if (mOutputHasNext == null) {
-
                     mOutputHasNext = new Condition() {
 
                         public boolean isTrue() {
@@ -768,40 +660,31 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                 }
 
                 final boolean isTimeout;
-
                 try {
-
                     isTimeout = !timeout.waitTrue(mMutex, mOutputHasNext);
 
                 } catch (final InterruptedException e) {
-
                     throw new InvocationInterruptedException(e);
                 }
 
                 if (mIsWaitingInvocation) {
-
                     throw new InvocationDeadlockException(INVOCATION_DEADLOCK_MESSAGE);
                 }
 
                 if (isTimeout) {
-
                     logger.wrn("has output timeout: [%s] => [%s]", timeout, timeoutAction);
-
                     if (timeoutAction == TimeoutActionType.THROW) {
-
                         throw new ExecutionTimeoutException(
                                 "timeout while waiting to know if more outputs are coming ["
                                         + timeout + "]");
 
                     } else {
-
                         isAbort = (timeoutAction == TimeoutActionType.ABORT);
                     }
                 }
             }
 
             if (!isAbort) {
-
                 final boolean hasNext = !outputQueue.isEmpty();
                 logger.dbg("has output: %s [%s]", hasNext, timeout);
                 return hasNext;
@@ -816,22 +699,17 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         final SimpleQueue<WrappedExecution> queue = mExecutionQueue;
         final WrappedExecution nextExecution;
-
         synchronized (mMutex) {
-
             if (!queue.isEmpty()) {
-
                 nextExecution = queue.removeFirst();
 
             } else {
-
                 mIsWaitingExecution = false;
                 nextExecution = null;
             }
         }
 
         if (nextExecution != null) {
-
             mRunner.run(nextExecution, 0, TimeUnit.MILLISECONDS);
         }
     }
@@ -842,18 +720,14 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         final Object result = mOutputQueue.removeFirst();
         mLogger.dbg("reading output [#%d]: %s [%s]", mOutputCount, result, timeout);
-
         if (result instanceof RoutineExceptionWrapper) {
-
             mOutputQueue.add(result);
             throw ((RoutineExceptionWrapper) result).raise();
         }
 
         final int outputLimit = mOutputLimit;
         final int prevOutputCount = mOutputCount;
-
         if ((--mOutputCount <= outputLimit) && (prevOutputCount > outputLimit)) {
-
             mMutex.notifyAll();
         }
 
@@ -866,22 +740,15 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             @Nullable final Throwable timeoutException) {
 
         final boolean isTimeout;
-
         synchronized (mMutex) {
-
             verifyBound();
             final Logger logger = mLogger;
             final NestedQueue<Object> outputQueue = mOutputQueue;
             boolean isAbort = false;
-
             if (timeout.isZero() || !outputQueue.isEmpty()) {
-
                 if (outputQueue.isEmpty()) {
-
                     logger.wrn("reading output timeout: [%s] => [%s]", timeout, timeoutAction);
-
                     if (timeoutAction == TimeoutActionType.THROW) {
-
                         throw new ExecutionTimeoutException(
                                 "timeout while waiting for outputs [" + timeout + "]");
                     }
@@ -890,16 +757,12 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                 }
 
                 if (!isAbort) {
-
                     return nextOutput(timeout);
                 }
 
             } else {
-
                 checkCanWait();
-
                 if (mOutputNotEmpty == null) {
-
                     mOutputNotEmpty = new Condition() {
 
                         public boolean isTrue() {
@@ -911,25 +774,19 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                 }
 
                 try {
-
                     isTimeout = !timeout.waitTrue(mMutex, mOutputNotEmpty);
 
                 } catch (final InterruptedException e) {
-
                     throw new InvocationInterruptedException(e);
                 }
 
                 if (mIsWaitingInvocation) {
-
                     throw new InvocationDeadlockException(INVOCATION_DEADLOCK_MESSAGE);
                 }
 
                 if (isTimeout) {
-
                     logger.wrn("reading output timeout: [%s] => [%s]", timeout, timeoutAction);
-
                     if (timeoutAction == TimeoutActionType.THROW) {
-
                         throw new ExecutionTimeoutException(
                                 "timeout while waiting for outputs [" + timeout + "]");
                     }
@@ -938,7 +795,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                 }
 
                 if (!isAbort) {
-
                     return nextOutput(timeout);
                 }
             }
@@ -952,17 +808,12 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             @NotNull final TimeUnit timeUnit) {
 
         if (delay > 0) {
-
             mRunner.run(new DelayedWrappedExecution(execution), delay, timeUnit);
 
         } else {
-
             final WrappedExecution wrappedExecution = new WrappedExecution(execution);
-
             synchronized (mMutex) {
-
                 if (mIsWaitingExecution) {
-
                     mExecutionQueue.add(wrappedExecution);
                     return;
                 }
@@ -977,7 +828,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     private void verifyBound() {
 
         if (mOutputConsumer != null) {
-
             mLogger.err("invalid call on bound channel");
             throw new IllegalStateException("the channel is already bound");
         }
@@ -986,16 +836,12 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     private void waitOutputs() {
 
         try {
-
             final TimeDuration delay = mOutputMaxDelay;
-
             if (!delay.waitTrue(mMutex, mHasOutputs)) {
-
                 mLogger.dbg("timeout while waiting for room in the output channel [%s]", delay);
             }
 
         } catch (final InterruptedException e) {
-
             throw new InvocationInterruptedException(e);
         }
     }
@@ -1149,9 +995,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         public OutputChannel<OUT> afterMax(@NotNull final TimeDuration timeout) {
 
             synchronized (mMutex) {
-
                 if (timeout == null) {
-
                     mSubLogger.err("invalid null timeout");
                     throw new NullPointerException("the output timeout must not be null");
                 }
@@ -1182,59 +1026,44 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
             boolean isAbort = false;
             final Throwable timeoutException;
-
             synchronized (mMutex) {
-
                 verifyBound();
                 final Logger logger = mSubLogger;
-
                 if (results == null) {
-
                     logger.err("invalid null output list");
                     throw new NullPointerException("the result list must not be null");
                 }
 
                 final TimeDuration executionTimeout = mExecutionTimeout;
                 final NestedQueue<Object> outputQueue = mOutputQueue;
-
                 if (executionTimeout.isZero() || mState.isDone()) {
-
                     while (!outputQueue.isEmpty()) {
-
                         final OUT result = nextOutput(executionTimeout);
                         logger.dbg("adding output to list: %s [%s]", result, executionTimeout);
                         results.add(result);
                     }
 
                     if (!mState.isDone()) {
-
                         final TimeoutActionType timeoutAction = mTimeoutActionType;
                         logger.wrn("list output timeout: [%s] => [%s]", executionTimeout,
                                    timeoutAction);
 
                         if (timeoutAction == TimeoutActionType.THROW) {
-
                             throw new ExecutionTimeoutException(
                                     "timeout while waiting to collect all outputs ["
                                             + executionTimeout + "]");
 
                         } else {
-
                             isAbort = (timeoutAction == TimeoutActionType.ABORT);
                         }
                     }
 
                 } else {
-
                     final long startTime = System.currentTimeMillis();
                     final boolean isTimeout;
-
                     try {
-
                         do {
-
                             while (!outputQueue.isEmpty()) {
-
                                 final OUT result = nextOutput(executionTimeout);
                                 logger.dbg("adding output to list: %s [%s]", result,
                                            executionTimeout);
@@ -1242,7 +1071,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                             }
 
                             if (mState.isDone()) {
-
                                 break;
                             }
 
@@ -1253,23 +1081,18 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                         isTimeout = !mState.isDone();
 
                     } catch (final InterruptedException e) {
-
                         throw new InvocationInterruptedException(e);
                     }
 
                     if (isTimeout) {
-
                         final TimeoutActionType action = mTimeoutActionType;
                         logger.wrn("list output timeout: [%s] => [%s]", executionTimeout, action);
-
                         if (action == TimeoutActionType.THROW) {
-
                             throw new ExecutionTimeoutException(
                                     "timeout while waiting to collect all outputs ["
                                             + executionTimeout + "]");
 
                         } else {
-
                             isAbort = (action == TimeoutActionType.ABORT);
                         }
                     }
@@ -1279,7 +1102,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             }
 
             if (isAbort) {
-
                 abort(timeoutException);
                 throw AbortException.wrapIfNeeded(timeoutException);
             }
@@ -1290,23 +1112,17 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         public boolean checkComplete() {
 
             synchronized (mMutex) {
-
                 if (mState.isDone()) {
-
                     return true;
                 }
 
                 final TimeDuration executionTimeout = mExecutionTimeout;
-
                 if (!executionTimeout.isZero()) {
-
                     checkCanWait();
                 }
 
                 final boolean isDone;
-
                 try {
-
                     isDone = executionTimeout.waitTrue(mMutex, new Condition() {
 
                         public boolean isTrue() {
@@ -1316,17 +1132,14 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                     });
 
                 } catch (final InterruptedException e) {
-
                     throw new InvocationInterruptedException(e);
                 }
 
                 if (mIsWaitingInvocation) {
-
                     throw new InvocationDeadlockException(INVOCATION_DEADLOCK_MESSAGE);
                 }
 
                 if (!isDone) {
-
                     mSubLogger.wrn("waiting complete timeout: [%s]", executionTimeout);
                 }
 
@@ -1338,7 +1151,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         public OutputChannel<OUT> eventuallyAbort() {
 
             synchronized (mMutex) {
-
                 mTimeoutActionType = TimeoutActionType.ABORT;
                 mTimeoutException = null;
             }
@@ -1350,7 +1162,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         public OutputChannel<OUT> eventuallyAbort(@Nullable final Throwable reason) {
 
             synchronized (mMutex) {
-
                 mTimeoutActionType = TimeoutActionType.ABORT;
                 mTimeoutException = reason;
             }
@@ -1362,7 +1173,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         public OutputChannel<OUT> eventuallyExit() {
 
             synchronized (mMutex) {
-
                 mTimeoutActionType = TimeoutActionType.EXIT;
                 mTimeoutException = null;
             }
@@ -1374,7 +1184,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         public OutputChannel<OUT> eventuallyThrow() {
 
             synchronized (mMutex) {
-
                 mTimeoutActionType = TimeoutActionType.THROW;
                 mTimeoutException = null;
             }
@@ -1387,9 +1196,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             final TimeDuration timeout;
             final TimeoutActionType timeoutAction;
             final Throwable timeoutException;
-
             synchronized (mMutex) {
-
                 timeout = mExecutionTimeout;
                 timeoutAction = mTimeoutActionType;
                 timeoutException = mTimeoutException;
@@ -1403,9 +1210,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             final TimeDuration timeout;
             final TimeoutActionType timeoutAction;
             final Throwable timeoutException;
-
             synchronized (mMutex) {
-
                 timeout = mExecutionTimeout;
                 timeoutAction = mTimeoutActionType;
                 timeoutException = mTimeoutException;
@@ -1423,7 +1228,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         public boolean isBound() {
 
             synchronized (mMutex) {
-
                 return (mOutputConsumer != null);
             }
         }
@@ -1432,16 +1236,13 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         public List<OUT> next(final int count) {
 
             if (count <= 0) {
-
                 return Collections.emptyList();
             }
 
             final TimeDuration timeout;
             final TimeoutActionType timeoutAction;
             final Throwable timeoutException;
-
             synchronized (mMutex) {
-
                 timeout = mExecutionTimeout;
                 timeoutAction = mTimeoutActionType;
                 timeoutException = mTimeoutException;
@@ -1449,11 +1250,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
             final ArrayList<OUT> results = new ArrayList<OUT>(count);
             final long endTime = current().plus(timeout).toMillis();
-
             try {
-
                 for (int i = 0; i < count; ++i) {
-
                     results.add(
                             readNext(timeUntilMillis(endTime), timeoutAction, timeoutException));
                 }
@@ -1470,16 +1268,13 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             final TimeDuration timeout;
             final TimeoutActionType timeoutAction;
             final Throwable timeoutException;
-
             synchronized (mMutex) {
-
                 timeout = mExecutionTimeout;
                 timeoutAction = mTimeoutActionType;
                 timeoutException = mTimeoutException;
             }
 
             try {
-
                 return readNext(timeout, timeoutAction, timeoutException);
 
             } catch (final NoSuchElementException ignored) {
@@ -1501,13 +1296,9 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         public OutputChannel<OUT> passTo(@NotNull final OutputConsumer<? super OUT> consumer) {
 
             final boolean forceClose;
-
             synchronized (mMutex) {
-
                 verifyBound();
-
                 if (consumer == null) {
-
                     mSubLogger.err("invalid null consumer");
                     throw new NullPointerException("the output consumer must not be null");
                 }
@@ -1525,38 +1316,28 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         public OutputChannel<OUT> skip(final int count) {
 
             if (count > 0) {
-
                 final TimeDuration timeout;
                 final TimeoutActionType timeoutAction;
                 final Throwable timeoutException;
-
                 synchronized (mMutex) {
-
                     timeout = mExecutionTimeout;
                     timeoutAction = mTimeoutActionType;
                     timeoutException = mTimeoutException;
                 }
 
                 final long endTime = current().plus(timeout).toMillis();
-
                 try {
-
                     for (int i = 0; i < count; ++i) {
-
                         readNext(timeUntilMillis(endTime), timeoutAction, timeoutException);
                     }
 
                 } catch (final NoSuchElementException ignored) {
-
                     mSubLogger.wrn("skipping output timeout: [%s] => [%s]", timeout, timeoutAction);
-
                     if (timeoutAction == TimeoutActionType.THROW) {
-
                         throw new ExecutionTimeoutException(
                                 "timeout while waiting for outputs [" + timeout + "]");
 
                     } else if (timeoutAction == TimeoutActionType.ABORT) {
-
                         abort(timeoutException);
                         throw AbortException.wrapIfNeeded(timeoutException);
                     }
@@ -1572,9 +1353,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             final TimeDuration timeout;
             final TimeoutActionType timeoutAction;
             final Throwable timeoutException;
-
             synchronized (mMutex) {
-
                 verifyBound();
                 timeout = mExecutionTimeout;
                 timeoutAction = mTimeoutActionType;
@@ -1597,14 +1376,11 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         public boolean abort(@Nullable final Throwable reason) {
 
             final RoutineException abortException;
-
             synchronized (mMutex) {
-
                 abortException = mState.abortOutputChannel(reason);
             }
 
             if (abortException != null) {
-
                 mHandler.onAbort(abortException, 0, TimeUnit.MILLISECONDS);
                 return true;
             }
@@ -1615,7 +1391,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         public boolean isEmpty() {
 
             synchronized (mMutex) {
-
                 return mOutputQueue.isEmpty();
             }
         }
@@ -1623,7 +1398,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         public boolean isOpen() {
 
             synchronized (mMutex) {
-
                 return mState.isOpen();
             }
         }
@@ -1648,24 +1422,20 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
          */
         private DefaultOutputConsumer() {
 
-            final TimeDuration delay = (mDelay = mResultDelay);
+            mDelay = mResultDelay;
             final OrderType order = (mOrderType = mResultOrder);
-            mQueue = ((order == OrderType.BY_CALL) || ((order == OrderType.BY_DELAY)
-                    && delay.isZero())) ? mOutputQueue.addNested() : mOutputQueue;
+            mQueue = (order == OrderType.BY_CALL) ? mOutputQueue.addNested() : mOutputQueue;
         }
 
         public void onComplete() {
 
             final boolean needsFlush;
-
             synchronized (mMutex) {
-
                 needsFlush = mState.onConsumerComplete(mQueue);
                 mSubLogger.dbg("closing output [%s]", needsFlush);
             }
 
             if (needsFlush) {
-
                 executeFlush(false);
             }
         }
@@ -1673,14 +1443,11 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         public void onError(@NotNull final RoutineException error) {
 
             final boolean needsAbort;
-
             synchronized (mMutex) {
-
                 needsAbort = mState.onConsumerError(error);
             }
 
             if (needsAbort) {
-
                 final TimeDuration delay = mDelay;
                 mHandler.onAbort(error, delay.time, delay.unit);
             }
@@ -1690,25 +1457,19 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
             final Execution execution;
             final TimeDuration delay = mDelay;
-
             synchronized (mMutex) {
-
                 execution = mState.onConsumerOutput(mQueue, output, delay, mOrderType);
             }
 
             if (delay.isZero()) {
-
                 executeFlush(false);
 
             } else if (execution != null) {
-
                 runExecution(execution, delay.time, delay.unit);
             }
 
             synchronized (mMutex) {
-
                 if (!mHasOutputs.isTrue()) {
-
                     waitOutputs();
                 }
             }
@@ -1735,14 +1496,11 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         public void run() {
 
             final RoutineException abortException;
-
             synchronized (mMutex) {
-
                 abortException = mState.delayedAbortInvocation(mAbortException);
             }
 
             if (abortException != null) {
-
                 mHandler.onAbort(abortException, 0, TimeUnit.MILLISECONDS);
             }
         }
@@ -1773,14 +1531,11 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         public void run() {
 
             final boolean needsFlush;
-
             synchronized (mMutex) {
-
                 needsFlush = mState.delayedOutputs(mQueue, mOutputs);
             }
 
             if (needsFlush) {
-
                 flushOutput(false);
             }
         }
@@ -1811,14 +1566,11 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         public void run() {
 
             final boolean needsFlush;
-
             synchronized (mMutex) {
-
                 needsFlush = mState.delayedOutput(mQueue, mOutput);
             }
 
             if (needsFlush) {
-
                 flushOutput(false);
             }
         }
@@ -1864,7 +1616,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         RoutineException delayedAbortInvocation(@NotNull final RoutineException reason) {
 
             if (mOutputQueue.isEmpty()) {
-
                 mSubLogger.dbg(reason, "avoiding aborting since channel is closed");
                 return null;
             }
@@ -2122,9 +1873,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                 @NotNull final TimeDuration delay) {
 
             final RoutineException abortException = AbortException.wrapIfNeeded(reason);
-
             if (delay.isZero()) {
-
                 mSubLogger.dbg(reason, "aborting channel");
                 internalAbort(abortException);
             }
@@ -2156,7 +1905,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         void after(@NotNull final TimeDuration delay) {
 
             if (delay == null) {
-
                 mSubLogger.err("invalid null delay");
                 throw new NullPointerException("the input delay must not be null");
             }
@@ -2172,19 +1920,15 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         void closeConsumer(@NotNull final OutputConsumer<? super OUT> consumer) {
 
             final Logger logger = mSubLogger;
-
             try {
-
                 logger.dbg("closing consumer (%s)", consumer);
                 consumer.onComplete();
 
             } catch (final RoutineException e) {
-
                 InvocationInterruptedException.throwIfInterrupt(e);
                 logger.wrn(e, "ignoring consumer exception (%s)", consumer);
 
             } catch (final Throwable t) {
-
                 InvocationInterruptedException.throwIfInterrupt(t);
                 logger.err(t, "ignoring consumer exception (%s)", consumer);
             }
@@ -2198,13 +1942,10 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         boolean closeResultChannel() {
 
             mSubLogger.dbg("closing result channel [#%d]", mPendingOutputCount);
-
             if (mPendingOutputCount > 0) {
-
                 mState = new ResultChannelState();
 
             } else {
-
                 mState = new FlushChannelState();
             }
 
@@ -2330,16 +2071,14 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
             mSubLogger.dbg("consumer output [#%d+1]: %s [%s]", mOutputCount, output, delay);
             ++mOutputCount;
-
             if (delay.isZero()) {
-
                 queue.add(output);
                 return null;
             }
 
             ++mPendingOutputCount;
             return new DelayedOutputExecution(
-                    (orderType != OrderType.BY_CHANCE) ? queue.addNested() : queue, output);
+                    (orderType != OrderType.BY_DELAY) ? queue.addNested() : queue, output);
         }
 
         /**
@@ -2362,7 +2101,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         OutputConsumer<OUT> pass(@Nullable final OutputChannel<? extends OUT> channel) {
 
             if (channel == null) {
-
                 mSubLogger.wrn("passing null channel");
                 return null;
             }
@@ -2383,15 +2121,12 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         Execution pass(@Nullable final Iterable<? extends OUT> outputs) {
 
             if (outputs == null) {
-
                 mSubLogger.wrn("passing null iterable");
                 return null;
             }
 
             final ArrayList<OUT> list = new ArrayList<OUT>();
-
             for (final OUT output : outputs) {
-
                 list.add(output);
             }
 
@@ -2401,16 +2136,14 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                            delay);
             mOutputCount += size;
             checkMaxSize();
-
             if (delay.isZero()) {
-
                 mOutputQueue.addAll(list);
                 return null;
             }
 
             ++mPendingOutputCount;
             return new DelayedListOutputExecution(
-                    (mResultOrder != OrderType.BY_CHANCE) ? mOutputQueue.addNested() : mOutputQueue,
+                    (mResultOrder != OrderType.BY_DELAY) ? mOutputQueue.addNested() : mOutputQueue,
                     list);
         }
 
@@ -2427,16 +2160,14 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             mSubLogger.dbg("passing output [#%d+1]: %s [%s]", mOutputCount, output, delay);
             ++mOutputCount;
             checkMaxSize();
-
             if (delay.isZero()) {
-
                 mOutputQueue.add(output);
                 return null;
             }
 
             ++mPendingOutputCount;
             return new DelayedOutputExecution(
-                    (mResultOrder != OrderType.BY_CHANCE) ? mOutputQueue.addNested() : mOutputQueue,
+                    (mResultOrder != OrderType.BY_DELAY) ? mOutputQueue.addNested() : mOutputQueue,
                     output);
         }
 
@@ -2450,7 +2181,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         Execution pass(@Nullable final OUT... outputs) {
 
             if (outputs == null) {
-
                 mSubLogger.wrn("passing null output array");
                 return null;
             }
@@ -2462,16 +2192,14 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             checkMaxSize();
             final ArrayList<OUT> list = new ArrayList<OUT>(size);
             Collections.addAll(list, outputs);
-
             if (delay.isZero()) {
-
                 mOutputQueue.addAll(list);
                 return null;
             }
 
             ++mPendingOutputCount;
             return new DelayedListOutputExecution(
-                    (mResultOrder != OrderType.BY_CHANCE) ? mOutputQueue.addNested() : mOutputQueue,
+                    (mResultOrder != OrderType.BY_DELAY) ? mOutputQueue.addNested() : mOutputQueue,
                     list);
         }
 
@@ -2519,9 +2247,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                 @Nullable final OUT output) {
 
             mSubLogger.dbg("delayed output execution: %s", output);
-
             if (--mPendingOutputCount == 0) {
-
                 mState = new FlushChannelState();
             }
 
@@ -2534,9 +2260,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         boolean delayedOutputs(@NotNull final NestedQueue<Object> queue, final List<OUT> outputs) {
 
             mSubLogger.dbg("delayed output execution: %s", outputs);
-
             if (--mPendingOutputCount == 0) {
-
                 mState = new FlushChannelState();
             }
 
@@ -2561,9 +2285,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         boolean onConsumerComplete(@NotNull final NestedQueue<Object> queue) {
 
             queue.close();
-
             if (--mPendingOutputCount == 0) {
-
                 mState = new FlushChannelState();
                 return true;
             }
@@ -2634,21 +2356,16 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         final TimeDuration delay;
         final RoutineException abortException;
-
         synchronized (mMutex) {
-
             delay = mResultDelay;
             abortException = mState.abortInvocation(reason, delay);
         }
 
         if (abortException != null) {
-
             if (delay.isZero()) {
-
                 mHandler.onAbort(abortException, 0, TimeUnit.MILLISECONDS);
 
             } else {
-
                 runExecution(new DelayedAbortExecution(abortException), delay.time, delay.unit);
             }
 
@@ -2661,7 +2378,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     public boolean isEmpty() {
 
         synchronized (mMutex) {
-
             return mOutputQueue.isEmpty();
         }
     }
@@ -2669,7 +2385,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     public boolean isOpen() {
 
         synchronized (mMutex) {
-
             return mState.isOpen();
         }
     }

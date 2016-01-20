@@ -59,7 +59,6 @@ class DefaultLoaderChannelBuilder
     DefaultLoaderChannelBuilder(@NotNull final LoaderContext context) {
 
         if (context == null) {
-
             throw new NullPointerException("the channel context must not be null");
         }
 
@@ -71,17 +70,13 @@ class DefaultLoaderChannelBuilder
 
         final LoaderConfiguration loaderConfiguration = mLoaderConfiguration;
         final int loaderId = loaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO);
-
         if (loaderId == LoaderConfiguration.AUTO) {
-
             throw new IllegalArgumentException("the loader ID must not be generated");
         }
 
         final LoaderContext context = mContext;
         final Object component = context.getComponent();
-
         if (component == null) {
-
             final IOChannel<OUT> ioChannel = JRoutine.io().buildChannel();
             ioChannel.abort(new MissingInvocationException(loaderId));
             return ioChannel.close();
@@ -96,25 +91,19 @@ class DefaultLoaderChannelBuilder
         final Logger logger = invocationConfiguration.newLogger(this);
         final ClashResolutionType resolutionType =
                 loaderConfiguration.getClashResolutionTypeOr(null);
-
         if (resolutionType != null) {
-
             logger.wrn("the specified clash resolution type will be ignored: %s", resolutionType);
         }
 
         final ClashResolutionType inputResolutionType =
                 loaderConfiguration.getInputClashResolutionTypeOr(null);
-
         if (inputResolutionType != null) {
-
             logger.wrn("the specified input clash resolution type will be ignored: %s",
                        inputResolutionType);
         }
 
         final TimeDuration resultStaleTime = loaderConfiguration.getResultStaleTimeOr(null);
-
         if (resultStaleTime != null) {
-
             logger.wrn("the specified results stale time will be ignored: %s", resultStaleTime);
         }
 
@@ -133,21 +122,14 @@ class DefaultLoaderChannelBuilder
     public void purge(@Nullable final Iterable<?> inputs) {
 
         final LoaderContext context = mContext;
-
         if (context.getComponent() != null) {
-
             final List<Object> inputList;
-
             if (inputs == null) {
-
                 inputList = Collections.emptyList();
 
             } else {
-
                 inputList = new ArrayList<Object>();
-
                 for (final Object input : inputs) {
-
                     inputList.add(input);
                 }
             }
@@ -161,9 +143,7 @@ class DefaultLoaderChannelBuilder
     public void purge() {
 
         final LoaderContext context = mContext;
-
         if (context.getComponent() != null) {
-
             Runners.mainRunner()
                    .run(new PurgeExecution(context, mLoaderConfiguration.getLoaderIdOr(
                            LoaderConfiguration.AUTO)), 0, TimeUnit.MILLISECONDS);
@@ -173,9 +153,7 @@ class DefaultLoaderChannelBuilder
     public void purge(@Nullable final Object input) {
 
         final LoaderContext context = mContext;
-
         if (context.getComponent() != null) {
-
             final List<Object> inputList = Collections.singletonList(input);
             Runners.mainRunner()
                    .run(new PurgeInputsExecution(context, mLoaderConfiguration.getLoaderIdOr(
@@ -186,17 +164,12 @@ class DefaultLoaderChannelBuilder
     public void purge(@Nullable final Object... inputs) {
 
         final LoaderContext context = mContext;
-
         if (context.getComponent() != null) {
-
             final List<Object> inputList;
-
             if (inputs == null) {
-
                 inputList = Collections.emptyList();
 
             } else {
-
                 inputList = new ArrayList<Object>(inputs.length);
                 Collections.addAll(inputList, inputs);
             }
@@ -219,7 +192,6 @@ class DefaultLoaderChannelBuilder
     public LoaderChannelBuilder setConfiguration(@NotNull final LoaderConfiguration configuration) {
 
         if (configuration == null) {
-
             throw new NullPointerException("the loader configuration must not be null");
         }
 
@@ -233,7 +205,6 @@ class DefaultLoaderChannelBuilder
             @NotNull final ChannelConfiguration configuration) {
 
         if (configuration == null) {
-
             throw new NullPointerException("the channel configuration must not be null");
         }
 

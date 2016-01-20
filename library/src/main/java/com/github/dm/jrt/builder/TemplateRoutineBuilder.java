@@ -60,7 +60,6 @@ public abstract class TemplateRoutineBuilder<IN, OUT> extends TemplateRoutine<IN
             @NotNull final InvocationConfiguration configuration) {
 
         if (configuration == null) {
-
             throw new NullPointerException("the invocation configuration must not be null");
         }
 

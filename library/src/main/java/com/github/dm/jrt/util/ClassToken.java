@@ -58,7 +58,6 @@ public abstract class ClassToken<TYPE> {
     public static <TYPE> ClassToken<TYPE> tokenOf(@NotNull final Class<TYPE> rawClass) {
 
         if (rawClass == null) {
-
             throw new NullPointerException("the classification raw type must not be null");
         }
 
@@ -105,25 +104,19 @@ public abstract class ClassToken<TYPE> {
     public final Type getGenericType() {
 
         if (mGenericType == null) {
-
             Class<?> subClass = getClass();
             Class<?> superClass = subClass.getSuperclass();
-
             while (!ClassToken.class.equals(superClass)) {
-
                 subClass = superClass;
                 superClass = subClass.getSuperclass();
             }
 
             final Type type = subClass.getGenericSuperclass();
-
             if (type instanceof ParameterizedType) {
-
                 final ParameterizedType paramType = (ParameterizedType) type;
                 mGenericType = paramType.getActualTypeArguments()[0];
 
             } else {
-
                 mGenericType = Object.class;
             }
         }
@@ -143,19 +136,14 @@ public abstract class ClassToken<TYPE> {
     public final Class<TYPE> getRawClass() {
 
         if (mRawClass == null) {
-
             final Type type = getGenericType();
-
             if (type instanceof Class) {
-
                 mRawClass = ((Class<TYPE>) type);
 
             } else if (type instanceof ParameterizedType) {
-
                 mRawClass = ((Class<TYPE>) ((ParameterizedType) type).getRawType());
 
             } else {
-
                 throw new IllegalStateException(
                         "the class does not correctly extend a class token: "
                                 + getClass().getName());
@@ -175,12 +163,10 @@ public abstract class ClassToken<TYPE> {
     public boolean equals(final Object o) {
 
         if (this == o) {
-
             return true;
         }
 
         if (!(o instanceof ClassToken)) {
-
             return false;
         }
 

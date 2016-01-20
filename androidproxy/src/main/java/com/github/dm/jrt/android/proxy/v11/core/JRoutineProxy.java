@@ -61,12 +61,9 @@ public class JRoutineProxy extends com.github.dm.jrt.android.proxy.core.JRoutine
     public static ProxyContextBuilder with(@NotNull final LoaderContext context) {
 
         synchronized (sBuilders) {
-
             final WeakHashMap<LoaderContext, ProxyContextBuilder> builders = sBuilders;
             ProxyContextBuilder contextBuilder = builders.get(context);
-
             if (contextBuilder == null) {
-
                 contextBuilder = new ProxyContextBuilder(context);
                 builders.put(context, contextBuilder);
             }
@@ -91,7 +88,6 @@ public class JRoutineProxy extends com.github.dm.jrt.android.proxy.core.JRoutine
         private ProxyContextBuilder(@NotNull final LoaderContext context) {
 
             if (context == null) {
-
                 throw new NullPointerException("the context must not be null");
             }
 

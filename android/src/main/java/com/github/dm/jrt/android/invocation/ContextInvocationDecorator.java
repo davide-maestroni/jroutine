@@ -41,7 +41,6 @@ public class ContextInvocationDecorator<IN, OUT> implements ContextInvocation<IN
     public ContextInvocationDecorator(@NotNull final ContextInvocation<IN, OUT> wrapped) {
 
         if (wrapped == null) {
-
             throw new NullPointerException("the wrapped invocation instance must not be null");
         }
 

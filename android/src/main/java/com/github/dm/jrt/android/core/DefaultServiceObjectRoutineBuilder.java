@@ -88,12 +88,10 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             @NotNull final ContextInvocationTarget<?> target) {
 
         if (context == null) {
-
             throw new NullPointerException("the context must not be null");
         }
 
         if (target == null) {
-
             throw new NullPointerException("the invocation target must not be null");
         }
 
@@ -106,9 +104,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             @NotNull final ProxyConfiguration configuration, @NotNull final Method method) {
 
         final SharedFields sharedFieldsAnnotation = method.getAnnotation(SharedFields.class);
-
         if (sharedFieldsAnnotation != null) {
-
             return Arrays.asList(sharedFieldsAnnotation.value());
         }
 
@@ -123,18 +119,13 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         final int length = names.length;
         final Class<?>[] classes = new Class[length];
         final HashMap<String, Class<?>> classMap = sPrimitiveClassMap;
-
         for (int i = 0; i < length; ++i) {
-
             final String name = names[i];
             final Class<?> primitiveClass = classMap.get(name);
-
             if (primitiveClass != null) {
-
                 classes[i] = primitiveClass;
 
             } else {
-
                 classes[i] = Class.forName(name);
             }
         }
@@ -147,9 +138,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         final int length = classes.length;
         final String[] names = new String[length];
-
         for (int i = 0; i < length; ++i) {
-
             names[i] = classes[i].getName();
         }
 
@@ -162,9 +151,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         final ContextInvocationTarget<?> target = mTarget;
         final Method targetMethod = getAnnotatedMethod(target.getTargetClass(), name);
-
         if (targetMethod == null) {
-
             throw new IllegalArgumentException(
                     "no annotated method with alias '" + name + "' has been found");
         }
@@ -196,7 +183,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
 
         if (!itf.isInterface()) {
-
             throw new IllegalArgumentException(
                     "the specified class is not an interface: " + itf.getName());
         }
@@ -242,7 +228,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             @NotNull final ProxyConfiguration configuration) {
 
         if (configuration == null) {
-
             throw new NullPointerException("the proxy configuration must not be null");
         }
 
@@ -256,7 +241,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             @NotNull final InvocationConfiguration configuration) {
 
         if (configuration == null) {
-
             throw new NullPointerException("the invocation configuration must not be null");
         }
 
@@ -270,7 +254,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             @NotNull final ServiceConfiguration configuration) {
 
         if (configuration == null) {
-
             throw new NullPointerException("the service configuration must not be null");
         }
 
@@ -334,9 +317,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         public void onContext(@NotNull final Context context) {
 
             super.onContext(context);
-
             try {
-
                 final InvocationTarget target = mTarget.getInvocationTarget(context);
                 mInstance = target.getTarget();
                 mRoutine = JRoutine.on(target)
@@ -346,7 +327,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                                    .aliasMethod(mAliasName);
 
             } catch (final Throwable t) {
-
                 throw InvocationException.wrapIfNeeded(t);
             }
         }
@@ -356,9 +336,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                 @NotNull final ResultChannel<Object> result) {
 
             final Routine<Object, Object> routine = mRoutine;
-
             if ((routine == null) || (mInstance == null)) {
-
                 throw new IllegalStateException("such error should never happen");
             }
 
@@ -408,9 +386,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                 @NotNull final ResultChannel<Object> result) {
 
             final Routine<Object, Object> routine = mRoutine;
-
             if ((routine == null) || (mInstance == null)) {
-
                 throw new IllegalStateException("such error should never happen");
             }
 
@@ -421,9 +397,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         public void onContext(@NotNull final Context context) {
 
             super.onContext(context);
-
             try {
-
                 final InvocationTarget target = mTarget.getInvocationTarget(context);
                 mInstance = target.getTarget();
                 mRoutine = JRoutine.on(target)
@@ -433,7 +407,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                                    .method(mMethodName, mParameterTypes);
 
             } catch (final Throwable t) {
-
                 throw InvocationException.wrapIfNeeded(t);
             }
         }
@@ -490,9 +463,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                 @NotNull final ResultChannel<Object> result) {
 
             final Object targetInstance = mInstance;
-
             if (targetInstance == null) {
-
                 throw new IllegalStateException("such error should never happen");
             }
 
@@ -504,9 +475,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         public void onContext(@NotNull final Context context) {
 
             super.onContext(context);
-
             try {
-
                 final InvocationTarget target = mTarget.getInvocationTarget(context);
                 final Object mutexTarget =
                         (Modifier.isStatic(mTargetMethod.getModifiers())) ? target.getTargetClass()
@@ -515,7 +484,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                 mInstance = target.getTarget();
 
             } catch (final Throwable t) {
-
                 throw InvocationException.wrapIfNeeded(t);
             }
         }

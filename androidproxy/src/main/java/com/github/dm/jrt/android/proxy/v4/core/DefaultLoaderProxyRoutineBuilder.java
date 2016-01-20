@@ -63,12 +63,10 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
             @NotNull final ContextInvocationTarget<?> target) {
 
         if (context == null) {
-
             throw new NullPointerException("the routine context must not be null");
         }
 
         if (target == null) {
-
             throw new NullPointerException("the invocation target must not be null");
         }
 
@@ -80,13 +78,11 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
     public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
 
         if (!itf.isInterface()) {
-
             throw new IllegalArgumentException(
                     "the specified class is not an interface: " + itf.getName());
         }
 
         if (!itf.isAnnotationPresent(LoaderProxyCompat.class)) {
-
             throw new IllegalArgumentException(
                     "the specified class is not annotated with " + LoaderProxyCompat.class.getName()
                             + ": " + itf.getName());
@@ -132,7 +128,6 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
             @NotNull final InvocationConfiguration configuration) {
 
         if (configuration == null) {
-
             throw new NullPointerException("the invocation configuration must not be null");
         }
 
@@ -146,7 +141,6 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
             @NotNull final ProxyConfiguration configuration) {
 
         if (configuration == null) {
-
             throw new NullPointerException("the proxy configuration must not be null");
         }
 
@@ -160,7 +154,6 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
             @NotNull final LoaderConfiguration configuration) {
 
         if (configuration == null) {
-
             throw new NullPointerException("the loader configuration must not be null");
         }
 
@@ -234,33 +227,25 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
                 @NotNull final LoaderConfiguration loaderConfiguration) {
 
             try {
-
                 final LoaderContextCompat context = mContext;
                 final ContextInvocationTarget<?> target = mTarget;
                 final Class<? super TYPE> interfaceClass = mInterfaceClass;
                 final LoaderProxyCompat annotation =
                         interfaceClass.getAnnotation(LoaderProxyCompat.class);
                 String packageName = annotation.classPackage();
-
                 if (packageName.equals(Proxy.DEFAULT)) {
-
                     final Package classPackage = interfaceClass.getPackage();
                     packageName = (classPackage != null) ? classPackage.getName() + "." : "";
 
                 } else {
-
                     packageName += ".";
                 }
 
                 String className = annotation.className();
-
                 if (className.equals(Proxy.DEFAULT)) {
-
                     className = interfaceClass.getSimpleName();
                     Class<?> enclosingClass = interfaceClass.getEnclosingClass();
-
                     while (enclosingClass != null) {
-
                         className = enclosingClass.getSimpleName() + "_" + className;
                         enclosingClass = enclosingClass.getEnclosingClass();
                     }
@@ -276,7 +261,6 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
                                                       proxyConfiguration, loaderConfiguration);
 
             } catch (final Throwable t) {
-
                 throw new IllegalArgumentException(t);
             }
         }

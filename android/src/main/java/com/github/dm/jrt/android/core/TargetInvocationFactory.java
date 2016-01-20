@@ -210,7 +210,6 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
                 @Nullable final Object[] factoryArgs) {
 
             if (targetClass == null) {
-
                 throw new NullPointerException("the target class must not be null");
             }
 
@@ -233,12 +232,10 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof DefaultTargetInvocationFactory)) {
-
                 return false;
             }
 

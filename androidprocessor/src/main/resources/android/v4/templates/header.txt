@@ -28,28 +28,23 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.builder.LoaderConfiguration loaderConfiguration) {
 
         if (context == null) {
-
             throw new NullPointerException("the routine context must not be null");
         }
 
         if (!target.isSameTypeOf(${classErasure}.class)) {
-
             throw new IllegalArgumentException("the invocation target must be the class or an instance of " +
                     "${classFullName}");
         }
 
         if (invocationConfiguration == null) {
-
             throw new NullPointerException("the invocation configuration must not be null");
         }
 
         if (proxyConfiguration == null) {
-
             throw new NullPointerException("the proxy configuration must not be null");
         }
 
         if (loaderConfiguration == null) {
-
             throw new NullPointerException("the loader configuration must not be null");
         }
 
@@ -79,7 +74,6 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
         private ContextBuilder(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.v4.core.LoaderContextCompat context) {
 
             if (context == null) {
-
                 throw new NullPointerException("the context must not be null");
             }
 
@@ -110,12 +104,10 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
                 @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.ContextInvocationTarget<?> target) {
 
             if (context == null) {
-
                 throw new NullPointerException("the routine context must not be null");
             }
 
             if (target == null) {
-
                 throw new NullPointerException("the invocation target must not be null");
             }
 

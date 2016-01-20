@@ -64,13 +64,9 @@ class AsyncTaskRunner extends MainRunner {
     public void cancel(@NotNull final Execution execution) {
 
         synchronized (mTasks) {
-
             final WeakHashMap<ExecutionTask, Void> executionTasks = mTasks.remove(execution);
-
             if (executionTasks != null) {
-
                 for (final ExecutionTask task : executionTasks.keySet()) {
-
                     super.cancel(task);
                     task.cancel(false);
                 }
@@ -89,17 +85,12 @@ class AsyncTaskRunner extends MainRunner {
             @NotNull final TimeUnit timeUnit) {
 
         final ExecutionTask task = new ExecutionTask(execution, mExecutor, mThreads);
-
         if (execution.mayBeCanceled()) {
-
             synchronized (mTasks) {
-
                 final WeakIdentityHashMap<Execution, WeakHashMap<ExecutionTask, Void>> tasks =
                         mTasks;
                 WeakHashMap<ExecutionTask, Void> executionTasks = tasks.get(execution);
-
                 if (executionTasks == null) {
-
                     executionTasks = new WeakHashMap<ExecutionTask, Void>();
                     tasks.put(execution, executionTasks);
                 }
@@ -149,13 +140,10 @@ class AsyncTaskRunner extends MainRunner {
         public void run() {
 
             mCurrentThread = Thread.currentThread();
-
             if ((mExecutor != null) && (VERSION.SDK_INT >= VERSION_CODES.HONEYCOMB)) {
-
                 executeOnExecutor(mExecutor, NO_PARAMS);
 
             } else {
-
                 execute(NO_PARAMS);
             }
         }
@@ -164,9 +152,7 @@ class AsyncTaskRunner extends MainRunner {
         protected Void doInBackground(@NotNull final Void... voids) {
 
             final Thread currentThread = Thread.currentThread();
-
             if (currentThread != mCurrentThread) {
-
                 mThreads.put(currentThread, null);
             }
 

@@ -26,7 +26,7 @@ import java.util.List;
  *
  * @param <IN> the input data type.
  */
-public class ConsumerWrapper<IN> implements Consumer<IN>, Wrapper {
+public class ConsumerWrapper<IN> implements Consumer<IN> {
 
     private static final ConsumerWrapper<Object> sSink =
             new ConsumerWrapper<Object>(new Consumer<Object>() {
@@ -45,9 +45,7 @@ public class ConsumerWrapper<IN> implements Consumer<IN>, Wrapper {
     ConsumerWrapper(@NotNull final Consumer<?> consumer) {
 
         this(Collections.<Consumer<?>>singletonList(consumer));
-
         if (consumer == null) {
-
             throw new NullPointerException("the consumer instance must not be null");
         }
     }
@@ -91,17 +89,13 @@ public class ConsumerWrapper<IN> implements Consumer<IN>, Wrapper {
         final ArrayList<Consumer<?>> newConsumers =
                 new ArrayList<Consumer<?>>(consumers.size() + 1);
         newConsumers.addAll(consumers);
-
         if (after instanceof ConsumerWrapper) {
-
             newConsumers.addAll(((ConsumerWrapper<?>) after).mConsumers);
 
         } else if (after == null) {
-
             throw new NullPointerException("the consumer must not be null");
 
         } else {
-
             newConsumers.add(after);
         }
 
@@ -118,12 +112,10 @@ public class ConsumerWrapper<IN> implements Consumer<IN>, Wrapper {
     public boolean equals(final Object o) {
 
         if (this == o) {
-
             return true;
         }
 
         if (!(o instanceof ConsumerWrapper)) {
-
             return false;
         }
 
@@ -131,71 +123,10 @@ public class ConsumerWrapper<IN> implements Consumer<IN>, Wrapper {
         return mConsumers.equals(that.mConsumers);
     }
 
-    public boolean safeEquals(final Object o) {
-
-        if (this == o) {
-
-            return true;
-        }
-
-        if (!(o instanceof ConsumerWrapper)) {
-
-            return false;
-        }
-
-        final ConsumerWrapper<?> that = (ConsumerWrapper<?>) o;
-        final List<Consumer<?>> thisConsumers = mConsumers;
-        final List<Consumer<?>> thatConsumers = that.mConsumers;
-        final int size = thisConsumers.size();
-
-        if (size != thatConsumers.size()) {
-
-            return false;
-        }
-
-        for (int i = 0; i < size; ++i) {
-
-            final Consumer<?> thisConsumer = thisConsumers.get(i);
-            final Consumer<?> thatConsumer = thatConsumers.get(i);
-            final Class<? extends Consumer> thisConsumerClass = thisConsumer.getClass();
-            final Class<? extends Consumer> thatConsumerClass = thatConsumer.getClass();
-
-            if (thisConsumerClass.isAnonymousClass()) {
-
-                if (!thatConsumerClass.isAnonymousClass() || !thisConsumerClass.equals(
-                        thatConsumerClass)) {
-
-                    return false;
-                }
-
-            } else if (thatConsumerClass.isAnonymousClass() || !thisConsumer.equals(thatConsumer)) {
-
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    public int safeHashCode() {
-
-        int result = 0;
-
-        for (final Consumer<?> consumer : mConsumers) {
-
-            final Class<? extends Consumer> consumerClass = consumer.getClass();
-            result += result * 31 + (consumerClass.isAnonymousClass() ? consumerClass.hashCode()
-                    : consumer.hashCode());
-        }
-
-        return result;
-    }
-
     @SuppressWarnings("unchecked")
     public void accept(final IN in) {
 
         for (final Consumer<?> consumer : mConsumers) {
-
             ((Consumer<Object>) consumer).accept(in);
         }
     }

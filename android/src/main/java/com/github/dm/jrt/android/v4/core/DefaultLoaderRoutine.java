@@ -73,14 +73,11 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
             @NotNull final LoaderConfiguration loaderConfiguration) {
 
         super(invocationConfiguration);
-
         if (context == null) {
-
             throw new NullPointerException("the routine context must not be null");
         }
 
         if (factory == null) {
-
             throw new NullPointerException("the context invocation factory must not be null");
         }
 
@@ -97,9 +94,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
 
         super.purge();
         final LoaderContextCompat context = mContext;
-
         if (context.getComponent() != null) {
-
             Runners.mainRunner()
                    .run(new PurgeExecution(context, mFactory, mLoaderId), 0, TimeUnit.MILLISECONDS);
         }
@@ -111,11 +106,9 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
             @NotNull final InvocationType type) {
 
         try {
-
             invocation.onDestroy();
 
         } catch (final Throwable t) {
-
             InvocationInterruptedException.throwIfInterrupt(t);
             getLogger().wrn(t, "ignoring exception while destroying invocation instance");
         }
@@ -128,22 +121,17 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
     protected Invocation<IN, OUT> newInvocation(@NotNull final InvocationType type) {
 
         final Logger logger = getLogger();
-
         if (type == InvocationType.ASYNC) {
-
             return new LoaderInvocation<IN, OUT>(mContext, mFactory, mConfiguration, mOrderType,
                                                  logger);
         }
 
         final Context loaderContext = mContext.getLoaderContext();
-
         if (loaderContext == null) {
-
             throw new IllegalStateException("the routine context has been destroyed");
         }
 
         try {
-
             final FunctionContextInvocationFactory<IN, OUT> factory = mFactory;
             logger.dbg("creating a new invocation instance");
             final ContextInvocation<IN, OUT> invocation = factory.newInvocation();
@@ -151,7 +139,6 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
             return invocation;
 
         } catch (final Throwable t) {
-
             logger.err(t, "error creating the invocation instance");
             throw InvocationException.wrapIfNeeded(t);
         }
@@ -160,9 +147,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
     public void purge(@Nullable final IN input) {
 
         final LoaderContextCompat context = mContext;
-
         if (context.getComponent() != null) {
-
             final List<IN> inputList = Collections.singletonList(input);
             final PurgeInputsExecution<IN> execution =
                     new PurgeInputsExecution<IN>(context, mFactory, mLoaderId, inputList);
@@ -173,17 +158,12 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
     public void purge(@Nullable final IN... inputs) {
 
         final LoaderContextCompat context = mContext;
-
         if (context.getComponent() != null) {
-
             final List<IN> inputList;
-
             if (inputs == null) {
-
                 inputList = Collections.emptyList();
 
             } else {
-
                 inputList = new ArrayList<IN>(inputs.length);
                 Collections.addAll(inputList, inputs);
             }
@@ -197,21 +177,14 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
     public void purge(@Nullable final Iterable<? extends IN> inputs) {
 
         final LoaderContextCompat context = mContext;
-
         if (context.getComponent() != null) {
-
             final List<IN> inputList;
-
             if (inputs == null) {
-
                 inputList = Collections.emptyList();
 
             } else {
-
                 inputList = new ArrayList<IN>();
-
                 for (final IN input : inputs) {
-
                     inputList.add(input);
                 }
             }

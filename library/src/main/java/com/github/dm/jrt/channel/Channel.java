@@ -129,25 +129,10 @@ public interface Channel {
          * @return this channel.
          * @throws com.github.dm.jrt.channel.RoutineException if the execution has been aborted.
          * @throws java.lang.IllegalStateException            if this channel is already closed.
-         * @see #orderByChance()
          * @see #orderByDelay()
          */
         @NotNull
         InputChannel<IN> orderByCall();
-
-        /**
-         * Tells the channel to avoid sorting the passed input in any particular order.
-         * <p/>
-         * This is the default behavior.
-         *
-         * @return this channel.
-         * @throws com.github.dm.jrt.channel.RoutineException if the execution has been aborted.
-         * @throws java.lang.IllegalStateException            if this channel is already closed.
-         * @see #orderByCall()
-         * @see #orderByDelay()
-         */
-        @NotNull
-        InputChannel<IN> orderByChance();
 
         /**
          * Tells the channel to sort the passed input data based on the specific delay.<br/>
@@ -161,7 +146,6 @@ public interface Channel {
          * @throws com.github.dm.jrt.channel.RoutineException if the execution has been aborted.
          * @throws java.lang.IllegalStateException            if this channel is already closed.
          * @see #orderByCall()
-         * @see #orderByChance()
          */
         @NotNull
         InputChannel<IN> orderByDelay();

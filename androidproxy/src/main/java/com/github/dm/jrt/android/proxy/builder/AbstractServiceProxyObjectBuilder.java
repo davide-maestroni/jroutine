@@ -56,29 +56,22 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
     public TYPE buildProxy() {
 
         synchronized (sContextProxies) {
-
             final Context context = getInvocationContext();
-
             if (context == null) {
-
                 throw new IllegalStateException("the invocation context has been destroyed");
             }
 
             final WeakIdentityHashMap<Context, HashMap<Class<?>, HashMap<ProxyInfo, Object>>>
                     contextProxies = sContextProxies;
             HashMap<Class<?>, HashMap<ProxyInfo, Object>> proxyMap = contextProxies.get(context);
-
             if (proxyMap == null) {
-
                 proxyMap = new HashMap<Class<?>, HashMap<ProxyInfo, Object>>();
                 contextProxies.put(context, proxyMap);
             }
 
             final Class<?> targetClass = getTargetClass();
             HashMap<ProxyInfo, Object> proxies = proxyMap.get(targetClass);
-
             if (proxies == null) {
-
                 proxies = new HashMap<ProxyInfo, Object>();
                 proxyMap.put(targetClass, proxies);
             }
@@ -90,21 +83,17 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
                     new ProxyInfo(getInterfaceClass(), invocationConfiguration, proxyConfiguration,
                                   serviceConfiguration);
             final Object instance = proxies.get(proxyInfo);
-
             if (instance != null) {
-
                 return (TYPE) instance;
             }
 
             try {
-
                 final TYPE newInstance =
                         newProxy(invocationConfiguration, proxyConfiguration, serviceConfiguration);
                 proxies.put(proxyInfo, newInstance);
                 return newInstance;
 
             } catch (final Throwable t) {
-
                 throw new IllegalArgumentException(t);
             }
         }
@@ -131,7 +120,6 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
             @NotNull final ServiceConfiguration configuration) {
 
         if (configuration == null) {
-
             throw new NullPointerException("the service configuration must not be null");
         }
 
@@ -145,7 +133,6 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
             @NotNull final InvocationConfiguration configuration) {
 
         if (configuration == null) {
-
             throw new NullPointerException("the invocation configuration must not be null");
         }
 
@@ -159,7 +146,6 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
             @NotNull final ProxyConfiguration configuration) {
 
         if (configuration == null) {
-
             throw new NullPointerException("the proxy configuration must not be null");
         }
 
@@ -249,12 +235,10 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
 
             // AUTO-GENERATED CODE
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof ProxyInfo)) {
-
                 return false;
             }
 

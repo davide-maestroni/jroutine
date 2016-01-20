@@ -118,14 +118,11 @@ public class DelegatingContextInvocation<IN, OUT> extends FunctionContextInvocat
                 final int routineId, @NotNull final DelegationType delegation) {
 
             super(asArgs(routineId, delegation));
-
             if (routine == null) {
-
                 throw new NullPointerException("the routine must not be null");
             }
 
             if (delegation == null) {
-
                 throw new NullPointerException("the invocation type must not be null");
             }
 

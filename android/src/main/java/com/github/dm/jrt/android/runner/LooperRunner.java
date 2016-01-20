@@ -70,11 +70,9 @@ class LooperRunner implements Runner {
             @NotNull final TimeUnit timeUnit) {
 
         if (delay > 0) {
-
             mHandler.postDelayed(execution, timeUnit.toMillis(delay));
 
         } else {
-
             mHandler.post(execution);
         }
     }
@@ -113,11 +111,9 @@ class LooperRunner implements Runner {
                 @NotNull final TimeUnit timeUnit) {
 
             if (delay == 0) {
-
                 mQueuedRunner.run(execution, delay, timeUnit);
 
             } else {
-
                 mLooperRunner.internalRun(execution, delay, timeUnit);
             }
         }
@@ -171,11 +167,9 @@ class LooperRunner implements Runner {
             @NotNull final TimeUnit timeUnit) {
 
         if (Thread.currentThread() == mThread) {
-
             mSameThreadRunner.run(execution, delay, timeUnit);
 
         } else {
-
             internalRun(execution, delay, timeUnit);
         }
     }

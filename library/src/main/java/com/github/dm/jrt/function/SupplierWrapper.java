@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <OUT> the output data type.
  */
-public class SupplierWrapper<OUT> implements Supplier<OUT>, Wrapper {
+public class SupplierWrapper<OUT> implements Supplier<OUT> {
 
     private final FunctionWrapper<?, OUT> mFunction;
 
@@ -37,9 +37,7 @@ public class SupplierWrapper<OUT> implements Supplier<OUT>, Wrapper {
     SupplierWrapper(@NotNull final Supplier<?> supplier) {
 
         this(supplier, FunctionWrapper.<OUT>identity());
-
         if (supplier == null) {
-
             throw new NullPointerException("the supplier instance must not be null");
         }
     }
@@ -100,47 +98,6 @@ public class SupplierWrapper<OUT> implements Supplier<OUT>, Wrapper {
         return result;
     }
 
-    public boolean safeEquals(final Object o) {
-
-        if (this == o) {
-
-            return true;
-        }
-
-        if (!(o instanceof SupplierWrapper)) {
-
-            return false;
-        }
-
-        final SupplierWrapper<?> that = (SupplierWrapper<?>) o;
-        final Supplier<?> thisSupplier = mSupplier;
-        final Supplier<?> thatSupplier = that.mSupplier;
-        final Class<? extends Supplier> thisSupplierClass = thisSupplier.getClass();
-        final Class<? extends Supplier> thatSupplierClass = thatSupplier.getClass();
-
-        if (thisSupplierClass.isAnonymousClass()) {
-
-            if (!thatSupplierClass.isAnonymousClass() || !thisSupplierClass.equals(
-                    thatSupplierClass)) {
-
-                return false;
-            }
-
-        } else if (thatSupplierClass.isAnonymousClass() || !thisSupplier.equals(thatSupplier)) {
-
-            return false;
-        }
-
-        return mFunction.safeEquals(that.mFunction);
-    }
-
-    public int safeHashCode() {
-
-        int result = mFunction.safeHashCode();
-        result = 31 * result + mSupplier.getClass().hashCode();
-        return result;
-    }
-
     /**
      * Supplier implementation returning always the same object.
      *
@@ -175,12 +132,10 @@ public class SupplierWrapper<OUT> implements Supplier<OUT>, Wrapper {
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof ConstantSupplier)) {
-
                 return false;
             }
 
@@ -193,12 +148,10 @@ public class SupplierWrapper<OUT> implements Supplier<OUT>, Wrapper {
     public boolean equals(final Object o) {
 
         if (this == o) {
-
             return true;
         }
 
         if (!(o instanceof SupplierWrapper)) {
-
             return false;
         }
 

@@ -73,8 +73,7 @@ public class Streams extends Channels {
      * @return the stream channel.
      */
     @NotNull
-    public static <OUT> StreamChannel<OUT> blend(
-            @NotNull final OutputChannel<?>... channels) {
+    public static <OUT> StreamChannel<OUT> blend(@NotNull final OutputChannel<?>... channels) {
 
         return streamOf(Channels.<OUT>blend(channels));
     }
@@ -107,8 +106,7 @@ public class Streams extends Channels {
      * @return the stream channel.
      */
     @NotNull
-    public static <OUT> StreamChannel<OUT> concat(
-            @NotNull final OutputChannel<?>... channels) {
+    public static <OUT> StreamChannel<OUT> concat(@NotNull final OutputChannel<?>... channels) {
 
         return streamOf(Channels.<OUT>concat(channels));
     }
@@ -421,8 +419,7 @@ public class Streams extends Channels {
      * @return the newly created channel instance.
      */
     @NotNull
-    public static <OUT> StreamChannel<OUT> streamOf(
-            @NotNull final OutputChannel<OUT> output) {
+    public static <OUT> StreamChannel<OUT> streamOf(@NotNull final OutputChannel<OUT> output) {
 
         return new DefaultStreamChannel<OUT>(output);
     }
@@ -453,13 +450,9 @@ public class Streams extends Channels {
 
             final ArrayList<DATA> inputs = mInputs;
             final int size = mSize;
-
             if (inputs.size() < size) {
-
                 inputs.add(input);
-
                 if (inputs.size() == size) {
-
                     result.pass(new ArrayList<DATA>(inputs));
                     inputs.clear();
                 }
@@ -470,9 +463,7 @@ public class Streams extends Channels {
         public void onResult(@NotNull final ResultChannel<List<DATA>> result) {
 
             final ArrayList<DATA> inputs = mInputs;
-
             if (!inputs.isEmpty()) {
-
                 result.pass(new ArrayList<DATA>(inputs));
             }
         }
@@ -503,7 +494,6 @@ public class Streams extends Channels {
         private GroupByInvocationFactory(final int size) {
 
             if (size <= 0) {
-
                 throw new IllegalArgumentException("the group size must be positive: " + size);
             }
 
@@ -527,12 +517,10 @@ public class Streams extends Channels {
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof GroupByInvocationFactory)) {
-
                 return false;
             }
 
@@ -572,7 +560,6 @@ public class Streams extends Channels {
         public void onInput(final DATA input, @NotNull final ResultChannel<DATA> result) {
 
             if (mCurrent < mCount) {
-
                 ++mCurrent;
                 result.pass(input);
             }
@@ -597,7 +584,6 @@ public class Streams extends Channels {
         private LimitInvocationFactory(final int count) {
 
             if (count < 0) {
-
                 throw new IllegalArgumentException("the count must not be negative: " + count);
             }
 
@@ -614,12 +600,10 @@ public class Streams extends Channels {
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof LimitInvocationFactory)) {
-
                 return false;
             }
 
@@ -666,11 +650,9 @@ public class Streams extends Channels {
         public void onInput(final DATA input, @NotNull final ResultChannel<DATA> result) {
 
             if (mCurrent < mCount) {
-
                 ++mCurrent;
 
             } else {
-
                 result.pass(input);
             }
         }
@@ -694,7 +676,6 @@ public class Streams extends Channels {
         private SkipInvocationFactory(final int count) {
 
             if (count < 0) {
-
                 throw new IllegalArgumentException("the count must not be negative: " + count);
             }
 
@@ -711,12 +692,10 @@ public class Streams extends Channels {
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
 
             }
             if (!(o instanceof SkipInvocationFactory)) {
-
                 return false;
             }
 
@@ -778,9 +757,7 @@ public class Streams extends Channels {
         public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
 
             final StreamChannel<? extends OUT> outputChannel = mOutputChannel;
-
             if (!outputChannel.isBound()) {
-
                 outputChannel.passTo(result);
             }
 
@@ -790,9 +767,7 @@ public class Streams extends Channels {
         public void onResult(@NotNull final ResultChannel<OUT> result) {
 
             final StreamChannel<? extends OUT> outputChannel = mOutputChannel;
-
             if (!outputChannel.isBound()) {
-
                 outputChannel.passTo(result);
             }
 
@@ -832,24 +807,22 @@ public class Streams extends Channels {
         @Override
         public int hashCode() {
 
-            return mFunction.safeHashCode();
+            return mFunction.hashCode();
         }
 
         @Override
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof StreamInvocationFactory)) {
-
                 return false;
             }
 
             final StreamInvocationFactory<?, ?> that = (StreamInvocationFactory<?, ?>) o;
-            return mFunction.safeEquals(that.mFunction);
+            return mFunction.equals(that.mFunction);
         }
 
         @NotNull

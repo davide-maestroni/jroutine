@@ -39,7 +39,6 @@ public class InvocationDecorator<IN, OUT> implements Invocation<IN, OUT> {
     public InvocationDecorator(@NotNull final Invocation<IN, OUT> wrapped) {
 
         if (wrapped == null) {
-
             throw new NullPointerException("the wrapped invocation instance must not be null");
         }
 

@@ -1448,7 +1448,6 @@ public class RoutineTest {
                            .withInputMaxDelay(TimeDuration.ZERO)
                            .set()
                            .asyncInvoke()
-                           .orderByChance()
                            .orderByDelay()
                            .orderByCall()
                            .after(millis(100))
@@ -3422,7 +3421,7 @@ public class RoutineTest {
 
         public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
-            result.orderByCall().orderByDelay().orderByChance();
+            result.orderByCall().orderByDelay();
             assertThat(result.isOpen()).isTrue();
             assertThat(result.abort(new IllegalArgumentException(s))).isTrue();
             assertThat(result.abort()).isFalse();
@@ -3441,16 +3440,6 @@ public class RoutineTest {
             try {
 
                 result.orderByDelay();
-
-                fail();
-
-            } catch (final InvocationException ignored) {
-
-            }
-
-            try {
-
-                result.orderByChance();
 
                 fail();
 

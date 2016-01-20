@@ -126,7 +126,6 @@ public class Time {
     public static Time days(final long days) {
 
         if ((days > MAX_DAYS) || (days < -MAX_DAYS)) {
-
             throw new IllegalArgumentException("time value overflow: " + days + " days");
         }
 
@@ -146,7 +145,6 @@ public class Time {
     public static Time fromUnit(final long time, @NotNull final TimeUnit unit) {
 
         if (unit == null) {
-
             throw new NullPointerException("the time unit must not be null");
         }
 
@@ -163,7 +161,6 @@ public class Time {
     public static Time hours(final long hours) {
 
         if ((hours > MAX_HOURS) || (hours < -MAX_HOURS)) {
-
             throw new IllegalArgumentException("time value overflow: " + hours + " hours");
         }
 
@@ -204,7 +201,6 @@ public class Time {
     public static Time minutes(final long minutes) {
 
         if ((minutes > MAX_MINUTES) || (minutes < -MAX_MINUTES)) {
-
             throw new IllegalArgumentException("time value overflow: " + minutes + " minutes");
         }
 
@@ -258,19 +254,15 @@ public class Time {
     public boolean equals(final Object o) {
 
         if (this == o) {
-
             return true;
         }
 
         if (!(o instanceof Time)) {
-
             return false;
         }
 
         final Time that = (Time) o;
-
         if (unit != that.unit) {
-
             return (to(that.unit) == that.time) && (that.to(unit) == time);
         }
 
@@ -337,7 +329,6 @@ public class Time {
     public Time minus(@NotNull final Time time) {
 
         if (unit.compareTo(time.unit) > 0) {
-
             return fromUnit(time.unit.convert(this.time, unit) - time.time, time.unit);
         }
 
@@ -377,7 +368,6 @@ public class Time {
     public Time plus(@NotNull final Time time) {
 
         if (unit.compareTo(time.unit) > 0) {
-
             return fromUnit(time.unit.convert(this.time, unit) + time.time, time.unit);
         }
 

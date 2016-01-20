@@ -62,11 +62,9 @@ public class WriteFile extends TemplateInvocation<ByteBuffer, Boolean> {
     public void onInitialize() {
 
         try {
-
             mOutputStream = new BufferedOutputStream(new FileOutputStream(mFile));
 
         } catch (final FileNotFoundException e) {
-
             throw new InvocationException(e);
         }
     }
@@ -76,17 +74,13 @@ public class WriteFile extends TemplateInvocation<ByteBuffer, Boolean> {
 
         final BufferInputStream inputStream = ByteChannel.inputStream(buffer);
         final BufferedOutputStream outputStream = mOutputStream;
-
         try {
-
             inputStream.readAll(outputStream);
 
         } catch (final IOException e) {
-
             throw new InvocationException(e);
 
         } finally {
-
             inputStream.close();
         }
     }
@@ -101,11 +95,9 @@ public class WriteFile extends TemplateInvocation<ByteBuffer, Boolean> {
     private void closeStream() {
 
         try {
-
             mOutputStream.close();
 
         } catch (final IOException e) {
-
             throw new InvocationException(e);
         }
     }

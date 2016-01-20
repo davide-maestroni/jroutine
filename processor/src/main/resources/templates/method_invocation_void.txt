@@ -20,7 +20,6 @@
                 @org.jetbrains.annotations.NotNull final com.github.dm.jrt.channel.ResultChannel<${resultClassName}> result) {
 
             if (objects.size() > ${maxParamSize}) {
-
                 throw new IllegalArgumentException(
                         "wrong number of input parameters for method '${targetMethodName}': was " +
                         objects.size() + " while expected " + (${maxParamSize}));
@@ -28,17 +27,13 @@
 
             final com.github.dm.jrt.util.Mutex mutex = mMutex;
             mutex.acquire();
-
             try {
-
                 ${invocationTarget}.${targetMethodName}(${paramValues});
 
             } catch (final Throwable t) {
-
                 throw com.github.dm.jrt.invocation.InvocationException.wrapIfNeeded(t);
 
             } finally {
-
                 mutex.release();
             }
         }

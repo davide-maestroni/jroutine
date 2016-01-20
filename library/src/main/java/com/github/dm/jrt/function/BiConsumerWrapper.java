@@ -27,7 +27,7 @@ import java.util.List;
  * @param <IN1> the first input data type.
  * @param <IN2> the second input data type.
  */
-public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2>, Wrapper {
+public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2> {
 
     private static final BiConsumerWrapper<Object, Object> sBiSink =
             new BiConsumerWrapper<Object, Object>(new BiConsumer<Object, Object>() {
@@ -46,9 +46,7 @@ public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2>, Wrappe
     BiConsumerWrapper(@NotNull final BiConsumer<?, ?> consumer) {
 
         this(Collections.<BiConsumer<?, ?>>singletonList(consumer));
-
         if (consumer == null) {
-
             throw new NullPointerException("the consumer instance must not be null");
         }
     }
@@ -94,17 +92,13 @@ public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2>, Wrappe
         final ArrayList<BiConsumer<?, ?>> newConsumers =
                 new ArrayList<BiConsumer<?, ?>>(consumers.size() + 1);
         newConsumers.addAll(consumers);
-
         if (after instanceof BiConsumerWrapper) {
-
             newConsumers.addAll(((BiConsumerWrapper<?, ?>) after).mConsumers);
 
         } else if (after == null) {
-
             throw new NullPointerException("the consumer must not be null");
 
         } else {
-
             newConsumers.add(after);
         }
 
@@ -121,12 +115,10 @@ public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2>, Wrappe
     public boolean equals(final Object o) {
 
         if (this == o) {
-
             return true;
         }
 
         if (!(o instanceof BiConsumerWrapper)) {
-
             return false;
         }
 
@@ -134,71 +126,10 @@ public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2>, Wrappe
         return mConsumers.equals(that.mConsumers);
     }
 
-    public boolean safeEquals(final Object o) {
-
-        if (this == o) {
-
-            return true;
-        }
-
-        if (!(o instanceof BiConsumerWrapper)) {
-
-            return false;
-        }
-
-        final BiConsumerWrapper<?, ?> that = (BiConsumerWrapper<?, ?>) o;
-        final List<BiConsumer<?, ?>> thisConsumers = mConsumers;
-        final List<BiConsumer<?, ?>> thatConsumers = that.mConsumers;
-        final int size = thisConsumers.size();
-
-        if (size != thatConsumers.size()) {
-
-            return false;
-        }
-
-        for (int i = 0; i < size; ++i) {
-
-            final BiConsumer<?, ?> thisConsumer = thisConsumers.get(i);
-            final BiConsumer<?, ?> thatConsumer = thatConsumers.get(i);
-            final Class<? extends BiConsumer> thisConsumerClass = thisConsumer.getClass();
-            final Class<? extends BiConsumer> thatConsumerClass = thatConsumer.getClass();
-
-            if (thisConsumerClass.isAnonymousClass()) {
-
-                if (!thatConsumerClass.isAnonymousClass() || !thisConsumerClass.equals(
-                        thatConsumerClass)) {
-
-                    return false;
-                }
-
-            } else if (thatConsumerClass.isAnonymousClass() || !thisConsumer.equals(thatConsumer)) {
-
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    public int safeHashCode() {
-
-        int result = 0;
-
-        for (final BiConsumer<?, ?> consumer : mConsumers) {
-
-            final Class<? extends BiConsumer> consumerClass = consumer.getClass();
-            result += result * 31 + (consumerClass.isAnonymousClass() ? consumerClass.hashCode()
-                    : consumer.hashCode());
-        }
-
-        return result;
-    }
-
     @SuppressWarnings("unchecked")
     public void accept(final IN1 in1, final IN2 in2) {
 
         for (final BiConsumer<?, ?> consumer : mConsumers) {
-
             ((BiConsumer<Object, Object>) consumer).accept(in1, in2);
         }
     }

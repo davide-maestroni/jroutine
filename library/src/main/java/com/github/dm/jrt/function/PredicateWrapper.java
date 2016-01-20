@@ -27,7 +27,7 @@ import java.util.List;
  *
  * @param <IN> the input data type.
  */
-public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
+public class PredicateWrapper<IN> implements Predicate<IN> {
 
     private static final LogicalPredicate AND_PREDICATE = new LogicalPredicate();
 
@@ -74,9 +74,7 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
     PredicateWrapper(@NotNull final Predicate<? super IN> predicate) {
 
         this(predicate, Collections.<Predicate<?>>singletonList(predicate));
-
         if (predicate == null) {
-
             throw new NullPointerException("the predicate must not be null");
         }
     }
@@ -106,7 +104,6 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
     public static <IN> PredicateWrapper<IN> isEqual(@Nullable final Object targetRef) {
 
         if (targetRef == null) {
-
             return isNull();
         }
 
@@ -127,7 +124,6 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
     public static <IN> PredicateWrapper<IN> isInstanceOf(@NotNull final Class<?> type) {
 
         if (type == null) {
-
             throw new NullPointerException("the type must not be null");
         }
 
@@ -160,7 +156,6 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
     public static <IN> PredicateWrapper<IN> isSame(@Nullable final Object targetRef) {
 
         if (targetRef == null) {
-
             return isNull();
         }
 
@@ -226,17 +221,13 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
         newPredicates.add(OPEN_PREDICATE);
         newPredicates.addAll(predicates);
         newPredicates.add(AND_PREDICATE);
-
         if (other instanceof PredicateWrapper) {
-
             newPredicates.addAll(((PredicateWrapper<?>) other).mPredicates);
 
         } else if (other == null) {
-
             throw new NullPointerException("the predicate must not be null");
 
         } else {
-
             newPredicates.add(other);
         }
 
@@ -262,44 +253,30 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
         final List<Predicate<?>> predicates = mPredicates;
         final int size = predicates.size();
         final ArrayList<Predicate<?>> newPredicates = new ArrayList<Predicate<?>>(size + 1);
-
         if (size == 1) {
-
             newPredicates.add(NEGATE_PREDICATE);
             newPredicates.add(predicates.get(0));
 
         } else {
-
             final Predicate<?> first = predicates.get(0);
-
             if (first == NEGATE_PREDICATE) {
-
                 newPredicates.add(predicates.get(1));
 
             } else {
-
                 newPredicates.add(first);
-
                 for (int i = 1; i < size; ++i) {
-
                     final Predicate<?> predicate = predicates.get(i);
-
                     if (predicate == NEGATE_PREDICATE) {
-
                         ++i;
 
                     } else if (predicate == OR_PREDICATE) {
-
                         newPredicates.add(AND_PREDICATE);
 
                     } else if (predicate == AND_PREDICATE) {
-
                         newPredicates.add(OR_PREDICATE);
 
                     } else {
-
                         if ((predicate != OPEN_PREDICATE) && (predicate != CLOSE_PREDICATE)) {
-
                             newPredicates.add(NEGATE_PREDICATE);
                         }
 
@@ -310,9 +287,7 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
         }
 
         final Predicate<? super IN> predicate = mPredicate;
-
         if (predicate instanceof NegatePredicate) {
-
             return new PredicateWrapper<IN>(((NegatePredicate<? super IN>) predicate).mPredicate,
                                             newPredicates);
         }
@@ -337,102 +312,18 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
         newPredicates.add(OPEN_PREDICATE);
         newPredicates.addAll(predicates);
         newPredicates.add(OR_PREDICATE);
-
         if (other instanceof PredicateWrapper) {
-
             newPredicates.addAll(((PredicateWrapper<?>) other).mPredicates);
 
         } else if (other == null) {
-
             throw new NullPointerException("the predicate must not be null");
 
         } else {
-
             newPredicates.add(other);
         }
 
         newPredicates.add(CLOSE_PREDICATE);
         return new PredicateWrapper<IN>(new OrPredicate<IN>(mPredicate, other), newPredicates);
-    }
-
-    public boolean safeEquals(final Object o) {
-
-        if (this == o) {
-
-            return true;
-        }
-
-        if (!(o instanceof PredicateWrapper)) {
-
-            return false;
-        }
-
-        final PredicateWrapper<?> that = (PredicateWrapper<?>) o;
-        final List<Predicate<?>> thisPredicates = mPredicates;
-        final List<Predicate<?>> thatPredicates = that.mPredicates;
-        final int size = thisPredicates.size();
-
-        if (size != thatPredicates.size()) {
-
-            return false;
-        }
-
-        for (int i = 0; i < size; ++i) {
-
-            final Predicate<?> thisPredicate = thisPredicates.get(i);
-            final Predicate<?> thatPredicate = thatPredicates.get(i);
-
-            if (thisPredicate instanceof LogicalPredicate) {
-
-                if (!thisPredicate.equals(thatPredicate)) {
-
-                    return false;
-                }
-
-            } else {
-
-                final Class<? extends Predicate> thisPredicateClass = thisPredicate.getClass();
-                final Class<? extends Predicate> thatPredicateClass = thatPredicate.getClass();
-
-                if (thisPredicateClass.isAnonymousClass()) {
-
-                    if (!thatPredicateClass.isAnonymousClass() || !thisPredicateClass.equals(
-                            thatPredicateClass)) {
-
-                        return false;
-                    }
-
-                } else if (thatPredicateClass.isAnonymousClass() || !thisPredicate.equals(
-                        thatPredicate)) {
-
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-    public int safeHashCode() {
-
-        int result = 0;
-
-        for (final Predicate<?> predicate : mPredicates) {
-
-            if (predicate instanceof LogicalPredicate) {
-
-                result += result * 31 + predicate.hashCode();
-
-            } else {
-
-                final Class<? extends Predicate> predicateClass = predicate.getClass();
-                result +=
-                        result * 31 + (predicateClass.isAnonymousClass() ? predicateClass.hashCode()
-                                : predicate.hashCode());
-            }
-        }
-
-        return result;
     }
 
     /**
@@ -499,12 +390,10 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof EqualToPredicate)) {
-
                 return false;
             }
 
@@ -547,12 +436,10 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof InstanceOfPredicate)) {
-
                 return false;
             }
 
@@ -661,12 +548,10 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof SameAsPredicate)) {
-
                 return false;
             }
 
@@ -679,12 +564,10 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
     public boolean equals(final Object o) {
 
         if (this == o) {
-
             return true;
         }
 
         if (!(o instanceof PredicateWrapper)) {
-
             return false;
         }
 

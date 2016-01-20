@@ -153,12 +153,9 @@ public class JRoutine extends com.github.dm.jrt.android.core.JRoutine {
     public static ContextBuilder with(@NotNull final LoaderContext context) {
 
         synchronized (sBuilders) {
-
             final WeakHashMap<LoaderContext, ContextBuilder> builders = sBuilders;
             ContextBuilder contextBuilder = builders.get(context);
-
             if (contextBuilder == null) {
-
                 contextBuilder = new ContextBuilder(context);
                 builders.put(context, contextBuilder);
             }
@@ -183,7 +180,6 @@ public class JRoutine extends com.github.dm.jrt.android.core.JRoutine {
         private ContextBuilder(@NotNull final LoaderContext context) {
 
             if (context == null) {
-
                 throw new NullPointerException("the loader context must not be null");
             }
 

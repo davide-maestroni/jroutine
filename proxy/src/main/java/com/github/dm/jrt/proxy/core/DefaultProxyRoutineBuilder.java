@@ -53,7 +53,6 @@ class DefaultProxyRoutineBuilder
     DefaultProxyRoutineBuilder(@NotNull final InvocationTarget<?> target) {
 
         if (target == null) {
-
             throw new NullPointerException("the invocation target must not be null");
         }
 
@@ -64,13 +63,11 @@ class DefaultProxyRoutineBuilder
     public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
 
         if (!itf.isInterface()) {
-
             throw new IllegalArgumentException(
                     "the specified class is not an interface: " + itf.getName());
         }
 
         if (!itf.isAnnotationPresent(Proxy.class)) {
-
             throw new IllegalArgumentException(
                     "the specified class is not annotated with " + Proxy.class.getName() + ": "
                             + itf.getName());
@@ -98,7 +95,6 @@ class DefaultProxyRoutineBuilder
     public ProxyRoutineBuilder setConfiguration(@NotNull final ProxyConfiguration configuration) {
 
         if (configuration == null) {
-
             throw new NullPointerException("the proxy configuration must not be null");
         }
 
@@ -112,7 +108,6 @@ class DefaultProxyRoutineBuilder
             @NotNull final InvocationConfiguration configuration) {
 
         if (configuration == null) {
-
             throw new NullPointerException("the invocation configuration must not be null");
         }
 
@@ -179,31 +174,23 @@ class DefaultProxyRoutineBuilder
                 @NotNull final ProxyConfiguration proxyConfiguration) {
 
             try {
-
                 final Object target = mTarget;
                 final Class<? super TYPE> interfaceClass = mInterfaceClass;
                 final Proxy annotation = interfaceClass.getAnnotation(Proxy.class);
                 String packageName = annotation.classPackage();
-
                 if (packageName.equals(Proxy.DEFAULT)) {
-
                     final Package classPackage = interfaceClass.getPackage();
                     packageName = (classPackage != null) ? classPackage.getName() + "." : "";
 
                 } else {
-
                     packageName += ".";
                 }
 
                 String className = annotation.className();
-
                 if (className.equals(Proxy.DEFAULT)) {
-
                     className = interfaceClass.getSimpleName();
                     Class<?> enclosingClass = interfaceClass.getEnclosingClass();
-
                     while (enclosingClass != null) {
-
                         className = enclosingClass.getSimpleName() + "_" + className;
                         enclosingClass = enclosingClass.getEnclosingClass();
                     }
@@ -218,7 +205,6 @@ class DefaultProxyRoutineBuilder
                                                       proxyConfiguration);
 
             } catch (final Throwable t) {
-
                 throw new IllegalArgumentException(t);
             }
         }

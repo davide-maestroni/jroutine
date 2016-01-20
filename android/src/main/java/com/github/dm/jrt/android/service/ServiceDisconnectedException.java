@@ -46,12 +46,10 @@ public class ServiceDisconnectedException extends RoutineException {
     public ServiceDisconnectedException(@Nullable final ComponentName name) {
 
         if (name != null) {
-
             mPackageName = name.getPackageName();
             mClassName = name.getClassName();
 
         } else {
-
             mPackageName = null;
             mClassName = null;
         }
@@ -66,7 +64,6 @@ public class ServiceDisconnectedException extends RoutineException {
     public ComponentName getComponentName() {
 
         if ((mPackageName != null) && (mClassName != null)) {
-
             return new ComponentName(mPackageName, mClassName);
         }
 

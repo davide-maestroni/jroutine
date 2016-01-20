@@ -171,12 +171,10 @@ public class ContextInvocations {
                 @NotNull final ContextInvocationFactory<IN, OUT> factory) {
 
             if (context == null) {
-
                 throw new NullPointerException("the routine context must not be null");
             }
 
             if (factory == null) {
-
                 throw new NullPointerException("the context invocation factory must not be null");
             }
 
@@ -188,12 +186,10 @@ public class ContextInvocations {
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof AdaptingContextInvocationFactory)) {
-
                 return false;
             }
 

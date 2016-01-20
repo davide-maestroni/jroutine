@@ -20,6 +20,7 @@ import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
+import com.github.dm.jrt.core.Channels.Selectable;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Consumer;
@@ -53,6 +54,8 @@ import java.util.concurrent.TimeUnit;
  */
 public interface StreamChannel<OUT>
         extends OutputChannel<OUT>, ConfigurableBuilder<StreamChannel<OUT>> {
+
+    // TODO: 20/01/16 sync(), async(), parallel()
 
     /**
      * {@inheritDoc}
@@ -619,6 +622,10 @@ public interface StreamChannel<OUT>
     StreamChannel<Number> parallelRange(@NotNull final Number start, @NotNull final Number end,
             @NotNull final Number increment);
 
+    // TODO: 18/01/16 javadoc
+    @NotNull
+    StreamChannel<OUT> repeat();
+
     /**
      * Short for {@code withStreamInvocations().withRunner(runner).set().asyncMap(Functions
      * .<OUT>identity())}.<br/>
@@ -902,6 +909,10 @@ public interface StreamChannel<OUT>
     @NotNull
     StreamChannel<OUT> syncReduce(
             @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
+
+    // TODO: 18/01/16 javadoc
+    @NotNull
+    StreamChannel<? extends Selectable<OUT>> toSelectable(int index);
 
     /**
      * Concatenates a consumer handling the invocation exceptions.<br/>

@@ -111,7 +111,6 @@ public abstract class InvocationTarget<TYPE> {
         private ClassInvocationTarget(@NotNull final Class<TYPE> targetClass) {
 
             if (targetClass == null) {
-
                 throw new NullPointerException("the target class must not be null");
             }
 
@@ -141,12 +140,10 @@ public abstract class InvocationTarget<TYPE> {
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof ClassInvocationTarget)) {
-
                 return false;
             }
 
@@ -201,12 +198,10 @@ public abstract class InvocationTarget<TYPE> {
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof InstanceInvocationTarget)) {
-
                 return false;
             }
 

@@ -16,8 +16,10 @@ package com.github.dm.jrt.android.v4.stream;
 import com.github.dm.jrt.android.builder.LoaderConfiguration;
 import com.github.dm.jrt.android.builder.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.builder.LoaderConfiguration.Configurable;
+import com.github.dm.jrt.android.core.Channels.ParcelableSelectable;
 import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
 import com.github.dm.jrt.android.v11.core.JRoutine;
+import com.github.dm.jrt.android.v4.core.ChannelsCompat;
 import com.github.dm.jrt.android.v4.core.JRoutineCompat;
 import com.github.dm.jrt.android.v4.core.JRoutineCompat.ContextBuilderCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
@@ -121,9 +123,7 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
             @NotNull final OutputChannel<OUT> channel) {
 
         super(invocationConfiguration, channel);
-
         if (loaderConfiguration == null) {
-
             throw new NullPointerException("the loader configuration must not be null");
         }
 
@@ -470,6 +470,13 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
 
     @NotNull
     @Override
+    public LoaderStreamChannelCompat<OUT> repeat() {
+
+        return (LoaderStreamChannelCompat<OUT>) super.repeat();
+    }
+
+    @NotNull
+    @Override
     public LoaderStreamChannelCompat<OUT> runOn(@Nullable final Runner runner) {
 
         return (LoaderStreamChannelCompat<OUT>) super.runOn(runner);
@@ -615,6 +622,15 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
 
     @NotNull
     @Override
+    @SuppressWarnings("unchecked")
+    public LoaderStreamChannelCompat<? extends ParcelableSelectable<OUT>> toSelectable(
+            final int index) {
+
+        return newChannel(getStreamConfiguration(), ChannelsCompat.toSelectable(this, index));
+    }
+
+    @NotNull
+    @Override
     public LoaderStreamChannelCompat<OUT> tryCatch(
             @NotNull final BiConsumer<? super RoutineException, ? super InputChannel<OUT>>
                     consumer) {
@@ -662,7 +678,7 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
             @NotNull final InvocationConfiguration configuration,
             @NotNull final OutputChannel<AFTER> channel) {
 
-        return newChannel(configuration, mConfiguration, channel);
+        return newChannel(configuration, mStreamConfiguration, channel);
     }
 
     @NotNull
@@ -740,9 +756,7 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
 
         final ContextBuilderCompat contextBuilder = mContextBuilder;
-
         if (contextBuilder == null) {
-
             return JRoutine.on(factory)
                            .withInvocations()
                            .with(invocationConfiguration)
@@ -769,7 +783,6 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
             @NotNull final LoaderConfiguration configuration) {
 
         if (configuration == null) {
-
             throw new NullPointerException("the loader configuration must not be null");
         }
 

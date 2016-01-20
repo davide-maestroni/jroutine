@@ -483,7 +483,6 @@ public class Functions {
             @NotNull final BiConsumer<IN1, IN2> consumer) {
 
         if (consumer instanceof BiConsumerWrapper) {
-
             return (BiConsumerWrapper<IN1, IN2>) consumer;
         }
 
@@ -510,7 +509,6 @@ public class Functions {
             @NotNull final BiFunction<IN1, IN2, OUT> function) {
 
         if (function instanceof BiFunctionWrapper) {
-
             return (BiFunctionWrapper<IN1, IN2, OUT>) function;
         }
 
@@ -534,7 +532,6 @@ public class Functions {
     public static <IN> ConsumerWrapper<IN> wrapConsumer(@NotNull final Consumer<IN> consumer) {
 
         if (consumer instanceof ConsumerWrapper) {
-
             return (ConsumerWrapper<IN>) consumer;
         }
 
@@ -560,7 +557,6 @@ public class Functions {
             @NotNull final Function<IN, OUT> function) {
 
         if (function instanceof FunctionWrapper) {
-
             return (FunctionWrapper<IN, OUT>) function;
         }
 
@@ -584,7 +580,6 @@ public class Functions {
     public static <IN> PredicateWrapper<IN> wrapPredicate(@NotNull final Predicate<IN> predicate) {
 
         if (predicate instanceof PredicateWrapper) {
-
             return (PredicateWrapper<IN>) predicate;
         }
 
@@ -608,7 +603,6 @@ public class Functions {
     public static <OUT> SupplierWrapper<OUT> wrapSupplier(@NotNull final Supplier<OUT> supplier) {
 
         if (supplier instanceof SupplierWrapper) {
-
             return (SupplierWrapper<OUT>) supplier;
         }
 
@@ -638,24 +632,22 @@ public class Functions {
         @Override
         public int hashCode() {
 
-            return mConsumer.safeHashCode();
+            return mConsumer.hashCode();
         }
 
         @Override
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof ConsumerCommandInvocation)) {
-
                 return false;
             }
 
             final ConsumerCommandInvocation<?> that = (ConsumerCommandInvocation<?>) o;
-            return mConsumer.safeEquals(that.mConsumer);
+            return mConsumer.equals(that.mConsumer);
         }
 
         public void onResult(@NotNull final ResultChannel<OUT> result) {
@@ -693,24 +685,22 @@ public class Functions {
         @Override
         public int hashCode() {
 
-            return mConsumer.safeHashCode();
+            return mConsumer.hashCode();
         }
 
         @Override
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof ConsumerFilterInvocation)) {
-
                 return false;
             }
 
             final ConsumerFilterInvocation<?, ?> that = (ConsumerFilterInvocation<?, ?>) o;
-            return mConsumer.safeEquals(that.mConsumer);
+            return mConsumer.equals(that.mConsumer);
         }
     }
 
@@ -758,24 +748,22 @@ public class Functions {
         @Override
         public int hashCode() {
 
-            return mConsumer.safeHashCode();
+            return mConsumer.hashCode();
         }
 
         @Override
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof ConsumerInvocationFactory)) {
-
                 return false;
             }
 
             final ConsumerInvocationFactory<?, ?> that = (ConsumerInvocationFactory<?, ?>) o;
-            return mConsumer.safeEquals(that.mConsumer);
+            return mConsumer.equals(that.mConsumer);
         }
     }
 
@@ -803,24 +791,22 @@ public class Functions {
         @Override
         public int hashCode() {
 
-            return mFunction.safeHashCode();
+            return mFunction.hashCode();
         }
 
         @Override
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof FunctionFilterInvocation)) {
-
                 return false;
             }
 
             final FunctionFilterInvocation<?, ?> that = (FunctionFilterInvocation<?, ?>) o;
-            return mFunction.safeEquals(that.mFunction);
+            return mFunction.equals(that.mFunction);
         }
 
         public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
@@ -872,24 +858,22 @@ public class Functions {
         @Override
         public int hashCode() {
 
-            return mFunction.safeHashCode();
+            return mFunction.hashCode();
         }
 
         @Override
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof FunctionInvocationFactory)) {
-
                 return false;
             }
 
             final FunctionInvocationFactory<?, ?> that = (FunctionInvocationFactory<?, ?>) o;
-            return mFunction.safeEquals(that.mFunction);
+            return mFunction.equals(that.mFunction);
         }
     }
 
@@ -915,30 +899,27 @@ public class Functions {
         @Override
         public int hashCode() {
 
-            return mPredicate.safeHashCode();
+            return mPredicate.hashCode();
         }
 
         @Override
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof PredicateFilterInvocation)) {
-
                 return false;
             }
 
             final PredicateFilterInvocation<?> that = (PredicateFilterInvocation<?>) o;
-            return mPredicate.safeEquals(that.mPredicate);
+            return mPredicate.equals(that.mPredicate);
         }
 
         public void onInput(final IN input, @NotNull final ResultChannel<IN> result) {
 
             if (mPredicate.test(input)) {
-
                 result.pass(input);
             }
         }
@@ -966,24 +947,22 @@ public class Functions {
         @Override
         public int hashCode() {
 
-            return mSupplier.safeHashCode();
+            return mSupplier.hashCode();
         }
 
         @Override
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof SupplierCommandInvocation)) {
-
                 return false;
             }
 
             final SupplierCommandInvocation<?> that = (SupplierCommandInvocation<?>) o;
-            return mSupplier.safeEquals(that.mSupplier);
+            return mSupplier.equals(that.mSupplier);
         }
 
         public void onResult(@NotNull final ResultChannel<OUT> result) {
@@ -1026,23 +1005,21 @@ public class Functions {
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof SupplierInvocationFactory)) {
-
                 return false;
             }
 
             final SupplierInvocationFactory<?, ?> that = (SupplierInvocationFactory<?, ?>) o;
-            return mSupplier.safeEquals(that.mSupplier);
+            return mSupplier.equals(that.mSupplier);
         }
 
         @Override
         public int hashCode() {
 
-            return mSupplier.safeHashCode();
+            return mSupplier.hashCode();
         }
     }
 }

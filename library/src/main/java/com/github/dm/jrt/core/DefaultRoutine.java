@@ -44,9 +44,7 @@ class DefaultRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
             @NotNull final InvocationFactory<IN, OUT> factory) {
 
         super(configuration);
-
         if (factory == null) {
-
             throw new NullPointerException("the invocation factory must not be null");
         }
 
@@ -58,9 +56,7 @@ class DefaultRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
     protected Invocation<IN, OUT> newInvocation(@NotNull final InvocationType type) {
 
         final Logger logger = getLogger();
-
         try {
-
             final InvocationFactory<IN, OUT> factory = mFactory;
             logger.dbg("creating a new invocation instance with factory: %s", factory);
             final Invocation<IN, OUT> invocation = factory.newInvocation();
@@ -68,7 +64,6 @@ class DefaultRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
             return invocation;
 
         } catch (final Throwable t) {
-
             logger.err(t, "error creating the invocation instance");
             throw InvocationException.wrapIfNeeded(t);
         }

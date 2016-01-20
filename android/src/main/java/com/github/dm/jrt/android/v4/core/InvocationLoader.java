@@ -73,19 +73,15 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
             @NotNull final Logger logger) {
 
         super(context);
-
         if (invocation == null) {
-
             throw new NullPointerException("the invocation instance must not be null");
         }
 
         if (invocationFactory == null) {
-
             throw new NullPointerException("the invocation factory must not be null");
         }
 
         if (inputs == null) {
-
             throw new NullPointerException("the list of input data must not be null");
         }
 
@@ -122,13 +118,10 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
         final Logger logger = mLogger;
         logger.dbg("start background invocation");
         final InvocationResult<OUT> result = mResult;
-
         if (takeContentChanged() || (result == null)) {
-
             forceLoad();
 
         } else {
-
             logger.dbg("re-delivering result: %s", result);
             super.deliverResult(result);
         }
@@ -138,11 +131,9 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
     protected void onReset() {
 
         try {
-
             mInvocation.onDestroy();
 
         } catch (final Throwable t) {
-
             InvocationInterruptedException.throwIfInterrupt(t);
             mLogger.wrn(t, "ignoring exception while destroying invocation instance");
         }

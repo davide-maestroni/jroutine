@@ -138,7 +138,6 @@ public abstract class LoaderContextCompat {
         private ActivityContextCompat(@NotNull final FragmentActivity activity) {
 
             if (activity == null) {
-
                 throw new NullPointerException("the activity must not be null");
             }
 
@@ -149,12 +148,10 @@ public abstract class LoaderContextCompat {
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof ActivityContextCompat)) {
-
                 return false;
             }
 
@@ -209,7 +206,6 @@ public abstract class LoaderContextCompat {
         private FragmentContextCompat(@NotNull final Fragment fragment) {
 
             if (fragment == null) {
-
                 throw new NullPointerException("the fragment must not be null");
             }
 
@@ -220,12 +216,10 @@ public abstract class LoaderContextCompat {
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof FragmentContextCompat)) {
-
                 return false;
             }
 
@@ -283,11 +277,8 @@ public abstract class LoaderContextCompat {
                 @NotNull final Context context) {
 
             super(activity);
-
             final Class<? extends Context> contextClass = context.getClass();
-
             if (!Reflection.hasStaticContext(contextClass)) {
-
                 throw new IllegalArgumentException(
                         "the context class must have a static context: " + contextClass.getName());
             }
@@ -299,17 +290,14 @@ public abstract class LoaderContextCompat {
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof WrappedActivityContextCompat)) {
-
                 return false;
             }
 
             if (!super.equals(o)) {
-
                 return false;
             }
 
@@ -353,11 +341,8 @@ public abstract class LoaderContextCompat {
                 @NotNull final Context context) {
 
             super(fragment);
-
             final Class<? extends Context> contextClass = context.getClass();
-
             if (!Reflection.hasStaticContext(contextClass)) {
-
                 throw new IllegalArgumentException(
                         "the context class must have a static context: " + contextClass.getName());
             }
@@ -369,17 +354,14 @@ public abstract class LoaderContextCompat {
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof WrappedFragmentContextCompat)) {
-
                 return false;
             }
 
             if (!super.equals(o)) {
-
                 return false;
             }
 

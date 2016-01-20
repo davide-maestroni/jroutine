@@ -40,16 +40,13 @@
         public void onContext(@org.jetbrains.annotations.NotNull final android.content.Context context) {
 
             super.onContext(context);
-
             try {
-
                 final com.github.dm.jrt.core.InvocationTarget<?> target = mContextTarget.getInvocationTarget(context);
                 mMutex = com.github.dm.jrt.core.RoutineBuilders.getSharedMutex(${mutexTarget}, mSharedFields);
                 mTarget = target;
                 mInstance = target.getTarget();
 
             } catch (final Throwable t) {
-
                 throw com.github.dm.jrt.invocation.InvocationException.wrapIfNeeded(t);
             }
         }

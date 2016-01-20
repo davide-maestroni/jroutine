@@ -50,9 +50,7 @@ public class TimeDuration extends Time {
     protected TimeDuration(final long duration, @NotNull final TimeUnit unit) {
 
         super(duration, unit);
-
         if (duration < 0) {
-
             throw new IllegalArgumentException("the time duration cannot be negative: " + duration);
         }
     }
@@ -68,7 +66,6 @@ public class TimeDuration extends Time {
     public static TimeDuration days(final long days) {
 
         if ((days > MAX_DAYS) || (days < -MAX_DAYS)) {
-
             throw new IllegalArgumentException("time value overflow: " + days + " days");
         }
 
@@ -89,7 +86,6 @@ public class TimeDuration extends Time {
     public static TimeDuration fromUnit(final long time, @NotNull final TimeUnit unit) {
 
         if (unit == null) {
-
             throw new NullPointerException("the time unit must not be null");
         }
 
@@ -107,7 +103,6 @@ public class TimeDuration extends Time {
     public static TimeDuration hours(final long hours) {
 
         if ((hours > MAX_HOURS) || (hours < -MAX_HOURS)) {
-
             throw new IllegalArgumentException("time value overflow: " + hours + " hours");
         }
 
@@ -151,7 +146,6 @@ public class TimeDuration extends Time {
     public static TimeDuration minutes(final long minutes) {
 
         if ((minutes > MAX_MINUTES) || (minutes < -MAX_MINUTES)) {
-
             throw new IllegalArgumentException("time value overflow: " + minutes + " minutes");
         }
 
@@ -309,7 +303,6 @@ public class TimeDuration extends Time {
     public TimeDuration minus(@NotNull final Time time) {
 
         if (unit.compareTo(time.unit) > 0) {
-
             return fromUnit(Math.max(0, time.unit.convert(this.time, unit) - time.time), time.unit);
         }
 
@@ -353,7 +346,6 @@ public class TimeDuration extends Time {
     public TimeDuration plus(@NotNull final Time time) {
 
         if (unit.compareTo(time.unit) > 0) {
-
             return fromUnit(Math.max(0, time.unit.convert(this.time, unit) + time.time), time.unit);
         }
 
@@ -412,29 +404,21 @@ public class TimeDuration extends Time {
     public void sleepAtLeast() throws InterruptedException {
 
         if (isZero()) {
-
             return;
         }
 
         if (((toNanos() % ONE_MILLI_NANOS) == 0) || (toDays() > NANO_DAYS_OVERFLOW)) {
-
             final long startMillis = System.currentTimeMillis();
-
             while (true) {
-
                 if (!sleepSinceMillis(startMillis)) {
-
                     return;
                 }
             }
         }
 
         final long startNanos = System.nanoTime();
-
         while (true) {
-
             if (!sleepSinceNanos(startNanos)) {
-
                 return;
             }
         }
@@ -453,20 +437,16 @@ public class TimeDuration extends Time {
     public boolean sleepSinceMillis(final long milliTime) throws InterruptedException {
 
         if (isZero()) {
-
             return false;
         }
 
         if (toDays() > MILLI_DAYS_OVERFLOW) {
-
             throw new IllegalStateException("the duration overflows the maximum sleep time: " +
                                                     toDays() + " days");
         }
 
         final long millisToSleep = milliTime - System.currentTimeMillis() + toMillis();
-
         if (millisToSleep <= 0) {
-
             return false;
         }
 
@@ -487,20 +467,16 @@ public class TimeDuration extends Time {
     public boolean sleepSinceNanos(final long nanoTime) throws InterruptedException {
 
         if (isZero()) {
-
             return false;
         }
 
         if (toDays() > NANO_DAYS_OVERFLOW) {
-
             throw new IllegalStateException("the duration overflows the maximum sleep time: " +
                                                     toDays() + " days");
         }
 
         final long nanosToSleep = nanoTime - System.nanoTime() + toNanos();
-
         if (nanosToSleep <= 0) {
-
             return false;
         }
 
@@ -517,12 +493,10 @@ public class TimeDuration extends Time {
     public void wait(@NotNull final Object target) throws InterruptedException {
 
         if (isZero()) {
-
             return;
         }
 
         if (isInfinity()) {
-
             target.wait();
             return;
         }
@@ -544,20 +518,16 @@ public class TimeDuration extends Time {
             InterruptedException {
 
         if (isZero()) {
-
             return false;
         }
 
         if (isInfinity() || (toDays() > MILLI_DAYS_OVERFLOW)) {
-
             target.wait();
             return true;
         }
 
         final long millisToWait = milliTime - System.currentTimeMillis() + toMillis();
-
         if (millisToWait <= 0) {
-
             return false;
         }
 
@@ -579,20 +549,16 @@ public class TimeDuration extends Time {
             InterruptedException {
 
         if (isZero()) {
-
             return false;
         }
 
         if (isInfinity() || (toDays() > NANO_DAYS_OVERFLOW)) {
-
             target.wait();
             return true;
         }
 
         final long nanosToWait = nanoTime - System.nanoTime() + toNanos();
-
         if (nanosToWait <= 0) {
-
             return false;
         }
 
@@ -613,14 +579,11 @@ public class TimeDuration extends Time {
             InterruptedException {
 
         if (isZero()) {
-
             return condition.isTrue();
         }
 
         if (isInfinity()) {
-
             while (!condition.isTrue()) {
-
                 target.wait();
             }
 
@@ -628,25 +591,17 @@ public class TimeDuration extends Time {
         }
 
         if ((toNanos() % ONE_MILLI_NANOS) == 0) {
-
             final long startMillis = System.currentTimeMillis();
-
             while (!condition.isTrue()) {
-
                 if (!waitSinceMillis(target, startMillis)) {
-
                     return false;
                 }
             }
 
         } else {
-
             final long startNanos = System.nanoTime();
-
             while (!condition.isTrue()) {
-
                 if (!waitSinceNanos(target, startNanos)) {
-
                     return false;
                 }
             }

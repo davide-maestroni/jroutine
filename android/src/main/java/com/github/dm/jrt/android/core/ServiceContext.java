@@ -120,12 +120,10 @@ public abstract class ServiceContext {
                 @NotNull final Intent service) {
 
             if (context == null) {
-
                 throw new NullPointerException("the service context must not be null");
             }
 
             if (service == null) {
-
                 throw new NullPointerException("the service intent must not be null");
             }
 
@@ -137,12 +135,10 @@ public abstract class ServiceContext {
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof IntentServiceContext)) {
-
                 return false;
             }
 

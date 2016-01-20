@@ -70,7 +70,6 @@ class InvocationOutputConsumer<OUT> extends TemplateOutputConsumer<OUT> {
             @NotNull final Logger logger) {
 
         if (loader == null) {
-
             throw new NullPointerException("the loader must not be null");
         }
 
@@ -88,13 +87,9 @@ class InvocationOutputConsumer<OUT> extends TemplateOutputConsumer<OUT> {
     public void onComplete() {
 
         final boolean deliverResult;
-
         synchronized (mMutex) {
-
             mIsComplete = true;
-
             if (mAbortException != null) {
-
                 mLogger.dbg("aborting channel");
                 throw mAbortException;
             }
@@ -104,7 +99,6 @@ class InvocationOutputConsumer<OUT> extends TemplateOutputConsumer<OUT> {
         }
 
         if (deliverResult) {
-
             mLogger.dbg("delivering final result");
             deliverResult();
         }
@@ -114,16 +108,13 @@ class InvocationOutputConsumer<OUT> extends TemplateOutputConsumer<OUT> {
     public void onError(@NotNull final RoutineException error) {
 
         final boolean deliverResult;
-
         synchronized (mMutex) {
-
             mIsComplete = true;
             mAbortException = error;
             deliverResult = mLastResults.isEmpty();
         }
 
         if (deliverResult) {
-
             mLogger.dbg(error, "delivering error");
             deliverResult();
         }
@@ -133,11 +124,8 @@ class InvocationOutputConsumer<OUT> extends TemplateOutputConsumer<OUT> {
     public void onOutput(final OUT output) {
 
         final boolean deliverResult;
-
         synchronized (mMutex) {
-
             if (mAbortException != null) {
-
                 mLogger.dbg("aborting channel");
                 throw mAbortException;
             }
@@ -147,7 +135,6 @@ class InvocationOutputConsumer<OUT> extends TemplateOutputConsumer<OUT> {
         }
 
         if (deliverResult) {
-
             mLogger.dbg("delivering result: %s", output);
             deliverResult();
         }
@@ -179,7 +166,6 @@ class InvocationOutputConsumer<OUT> extends TemplateOutputConsumer<OUT> {
         public void abort() {
 
             synchronized (mMutex) {
-
                 mIsComplete = true;
                 mAbortException = new AbortException(null);
             }
@@ -189,7 +175,6 @@ class InvocationOutputConsumer<OUT> extends TemplateOutputConsumer<OUT> {
         public RoutineException getAbortException() {
 
             synchronized (mMutex) {
-
                 return mAbortException;
             }
         }
@@ -197,7 +182,6 @@ class InvocationOutputConsumer<OUT> extends TemplateOutputConsumer<OUT> {
         public long getResultTimestamp() {
 
             synchronized (mMutex) {
-
                 return mResultTimestamp;
             }
         }
@@ -205,7 +189,6 @@ class InvocationOutputConsumer<OUT> extends TemplateOutputConsumer<OUT> {
         public boolean isError() {
 
             synchronized (mMutex) {
-
                 return (mAbortException != null);
             }
         }
@@ -215,50 +198,37 @@ class InvocationOutputConsumer<OUT> extends TemplateOutputConsumer<OUT> {
                 @NotNull final Collection<IOChannel<OUT>> abortedChannels) {
 
             synchronized (mMutex) {
-
                 final Logger logger = mLogger;
                 final ArrayList<OUT> lastResults = mLastResults;
                 final ArrayList<OUT> cachedResults = mCachedResults;
-
                 if (mAbortException != null) {
-
                     logger.dbg("avoiding passing results since invocation is aborted");
                     lastResults.clear();
                     cachedResults.clear();
                     return true;
 
                 } else {
-
                     logger.dbg("passing result: %s + %s", cachedResults, lastResults);
-
                     for (final IOChannel<OUT> newChannel : newChannels) {
-
                         try {
-
                             newChannel.pass(cachedResults).pass(lastResults);
 
                         } catch (final InvocationInterruptedException e) {
-
                             throw e;
 
                         } catch (final Throwable t) {
-
                             abortedChannels.add(newChannel);
                         }
                     }
 
                     for (final IOChannel<OUT> channel : oldChannels) {
-
                         try {
-
                             channel.pass(lastResults);
 
                         } catch (final InvocationInterruptedException e) {
-
                             throw e;
 
                         } catch (final Throwable t) {
-
                             abortedChannels.add(channel);
                         }
                     }

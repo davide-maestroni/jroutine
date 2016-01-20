@@ -57,12 +57,10 @@ public abstract class ContextInvocationFactory<IN, OUT> {
     public boolean equals(final Object o) {
 
         if (this == o) {
-
             return true;
         }
 
         if (!getClass().isInstance(o)) {
-
             return false;
         }
 

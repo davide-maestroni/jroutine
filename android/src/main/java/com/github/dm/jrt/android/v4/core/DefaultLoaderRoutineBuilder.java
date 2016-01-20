@@ -69,14 +69,11 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
             @NotNull final FunctionContextInvocationFactory<IN, OUT> factory) {
 
         if (context == null) {
-
             throw new NullPointerException("the routine context must not be null");
         }
 
         final Class<? extends FunctionContextInvocationFactory> factoryClass = factory.getClass();
-
         if (!Reflection.hasStaticContext(factoryClass)) {
-
             throw new IllegalArgumentException(
                     "the factory class must have a static context: " + factoryClass.getName());
         }
@@ -91,9 +88,7 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
         final InvocationConfiguration configuration = getConfiguration();
         final Runner mainRunner = Runners.mainRunner();
         final Runner asyncRunner = configuration.getRunnerOr(mainRunner);
-
         if (asyncRunner != mainRunner) {
-
             configuration.newLogger(this)
                          .wrn("the specified async runner will be ignored: %s", asyncRunner);
         }
@@ -148,7 +143,6 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
             @NotNull final LoaderConfiguration configuration) {
 
         if (configuration == null) {
-
             throw new NullPointerException("the loader configuration must not be null");
         }
 

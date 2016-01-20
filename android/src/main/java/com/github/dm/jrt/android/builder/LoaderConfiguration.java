@@ -133,39 +133,31 @@ public final class LoaderConfiguration {
 
         // AUTO-GENERATED CODE
         if (this == o) {
-
             return true;
         }
 
         if (o == null || getClass() != o.getClass()) {
-
             return false;
         }
 
         final LoaderConfiguration that = (LoaderConfiguration) o;
-
         if (mLoaderId != that.mLoaderId) {
-
             return false;
         }
 
         if (mInputResolutionType != that.mInputResolutionType) {
-
             return false;
         }
 
         if (mLooper != null ? !mLooper.equals(that.mLooper) : that.mLooper != null) {
-
             return false;
         }
 
         if (mResolutionType != that.mResolutionType) {
-
             return false;
         }
 
         if (mStaleTime != null ? !mStaleTime.equals(that.mStaleTime) : that.mStaleTime != null) {
-
             return false;
         }
 
@@ -382,7 +374,6 @@ public final class LoaderConfiguration {
         public Builder(@NotNull final Configurable<? extends TYPE> configurable) {
 
             if (configurable == null) {
-
                 throw new NullPointerException("the configurable instance must no be null");
             }
 
@@ -400,7 +391,6 @@ public final class LoaderConfiguration {
                 @NotNull final LoaderConfiguration initialConfiguration) {
 
             if (configurable == null) {
-
                 throw new NullPointerException("the configurable instance must no be null");
             }
 
@@ -431,50 +421,37 @@ public final class LoaderConfiguration {
         public Builder<TYPE> with(@Nullable final LoaderConfiguration configuration) {
 
             if (configuration == null) {
-
                 setConfiguration(DEFAULT_CONFIGURATION);
                 return this;
             }
 
             final Looper looper = configuration.mLooper;
-
             if (looper != null) {
-
                 withResultLooper(looper);
             }
 
             final int loaderId = configuration.mLoaderId;
-
             if (loaderId != AUTO) {
-
                 withId(loaderId);
             }
 
             final ClashResolutionType resolutionType = configuration.mResolutionType;
-
             if (resolutionType != null) {
-
                 withClashResolution(resolutionType);
             }
 
             final ClashResolutionType inputResolutionType = configuration.mInputResolutionType;
-
             if (inputResolutionType != null) {
-
                 withInputClashResolution(inputResolutionType);
             }
 
             final CacheStrategyType strategyType = configuration.mStrategyType;
-
             if (strategyType != null) {
-
                 withCacheStrategy(strategyType);
             }
 
             final TimeDuration staleTime = configuration.mStaleTime;
-
             if (staleTime != null) {
-
                 withResultStaleTime(staleTime);
             }
 

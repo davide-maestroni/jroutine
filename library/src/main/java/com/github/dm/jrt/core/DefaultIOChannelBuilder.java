@@ -77,7 +77,6 @@ class DefaultIOChannelBuilder implements IOChannelBuilder, Configurable<IOChanne
     public IOChannelBuilder setConfiguration(@NotNull final ChannelConfiguration configuration) {
 
         if (configuration == null) {
-
             throw new NullPointerException("the invocation configuration must not be null");
         }
 
@@ -111,11 +110,9 @@ class DefaultIOChannelBuilder implements IOChannelBuilder, Configurable<IOChanne
                 @NotNull final TimeUnit timeUnit) {
 
             if (delay == 0) {
-
                 sSyncRunner.run(execution, delay, timeUnit);
 
             } else {
-
                 super.run(execution, delay, timeUnit);
             }
         }

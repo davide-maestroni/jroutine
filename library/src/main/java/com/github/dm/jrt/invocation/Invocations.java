@@ -205,12 +205,10 @@ public class Invocations {
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof DefaultInvocationFactory)) {
-
                 return false;
             }
 
@@ -223,11 +221,9 @@ public class Invocations {
         public Invocation<IN, OUT> newInvocation() {
 
             try {
-
                 return mConstructor.newInstance(mArgs);
 
             } catch (final Throwable t) {
-
                 throw InvocationException.wrapIfNeeded(t);
             }
         }

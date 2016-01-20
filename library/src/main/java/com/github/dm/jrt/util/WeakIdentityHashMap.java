@@ -138,9 +138,7 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
         cleanUp();
         final ReferenceQueue<Object> queue = mQueue;
         final HashMap<IdentityWeakReference, V> referenceMap = mMap;
-
         for (final Entry<? extends K, ? extends V> entry : map.entrySet()) {
-
             referenceMap.put(new IdentityWeakReference(entry.getKey(), queue), entry.getValue());
         }
     }
@@ -154,7 +152,6 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
     public Set<K> keySet() {
 
         if (mKeySet == null) {
-
             mKeySet = new AbstractSet<K>() {
 
                 @NotNull
@@ -185,7 +182,6 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
     public Set<Entry<K, V>> entrySet() {
 
         if (mEntrySet == null) {
-
             mEntrySet = new AbstractSet<Entry<K, V>>() {
 
                 @NotNull
@@ -212,9 +208,7 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
         final HashMap<IdentityWeakReference, V> map = mMap;
         final ReferenceQueue<Object> queue = mQueue;
         IdentityWeakReference reference = (IdentityWeakReference) queue.poll();
-
         while (reference != null) {
-
             map.remove(reference);
             reference = (IdentityWeakReference) queue.poll();
         }
@@ -263,19 +257,15 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
         public boolean equals(final Object obj) {
 
             if (this == obj) {
-
                 return true;
             }
 
             if (!(obj instanceof IdentityWeakReference)) {
-
                 return false;
             }
 
             final IdentityWeakReference that = (IdentityWeakReference) obj;
-
             if (mHashCode != that.mHashCode) {
-
                 return false;
             }
 
@@ -370,12 +360,10 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
     public boolean equals(final Object o) {
 
         if (this == o) {
-
             return true;
         }
 
         if (!(o instanceof WeakIdentityHashMap)) {
-
             return (o instanceof Map) && o.equals(this);
         }
 

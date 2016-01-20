@@ -1763,6 +1763,22 @@ public class ChannelsTest {
     }
 
     @Test
+    public void testRepeat() {
+
+        final IOChannel<Object> ioChannel = JRoutine.io().buildChannel();
+        final OutputChannel<Object> channel = Channels.repeat(ioChannel);
+        ioChannel.pass("test1", "test2");
+        final IOChannel<Object> output1 = JRoutine.io().buildChannel();
+        channel.passTo(output1).close();
+        assertThat(output1.next()).isEqualTo("test1");
+        final IOChannel<Object> output2 = JRoutine.io().buildChannel();
+        channel.passTo(output2).close();
+        ioChannel.pass("test3").close();
+        assertThat(output2.all()).containsExactly("test1", "test2", "test3");
+        assertThat(output1.all()).containsExactly("test2", "test3");
+    }
+
+    @Test
     @SuppressWarnings("unchecked")
     public void testSelectableOutput() {
 

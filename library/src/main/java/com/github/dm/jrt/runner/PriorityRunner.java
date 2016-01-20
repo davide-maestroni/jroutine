@@ -66,9 +66,7 @@ public class PriorityRunner {
         public void run() {
 
             final PriorityExecution execution = mQueue.poll();
-
             if (execution != null) {
-
                 execution.run();
             }
         }
@@ -88,7 +86,6 @@ public class PriorityRunner {
     private PriorityRunner(@NotNull final Runner wrapped) {
 
         if (wrapped == null) {
-
             throw new NullPointerException("the wrapped runner must not be null");
         }
 
@@ -100,17 +97,13 @@ public class PriorityRunner {
     static PriorityRunner getInstance(@NotNull final Runner wrapped) {
 
         if (wrapped instanceof QueuingRunner) {
-
             return ((QueuingRunner) wrapped).enclosingRunner();
         }
 
         synchronized (sRunners) {
-
             final WeakIdentityHashMap<Runner, PriorityRunner> runners = sRunners;
             PriorityRunner runner = runners.get(wrapped);
-
             if (runner == null) {
-
                 runner = new PriorityRunner(wrapped);
                 runners.put(wrapped, runner);
             }
@@ -134,13 +127,9 @@ public class PriorityRunner {
     public Runner getRunner(final int priority) {
 
         synchronized (mRunners) {
-
             final WeakHashMap<QueuingRunner, Void> runners = mRunners;
-
             for (final QueuingRunner runner : runners.keySet()) {
-
                 if (runner.mPriority == priority) {
-
                     return runner;
                 }
             }
@@ -183,9 +172,7 @@ public class PriorityRunner {
             final PriorityBlockingQueue<PriorityExecution> queue = mQueue;
             queue.put(mExecution);
             final PriorityExecution execution = queue.poll();
-
             if (execution != null) {
-
                 execution.run();
             }
         }
@@ -269,21 +256,15 @@ public class PriorityRunner {
         public void cancel(@NotNull final Execution execution) {
 
             synchronized (mExecutions) {
-
                 final WeakHashMap<PriorityExecution, Void> priorityExecutions =
                         mExecutions.remove(execution);
-
                 if (priorityExecutions != null) {
-
                     final Runner runner = mRunner;
                     final PriorityBlockingQueue<PriorityExecution> queue = mQueue;
                     final Map<PriorityExecution, DelayedExecution> delayedExecutions =
                             mDelayedExecutions;
-
                     for (final PriorityExecution priorityExecution : priorityExecutions.keySet()) {
-
                         if (!queue.remove(priorityExecution)) {
-
                             runner.cancel(delayedExecutions.remove(priorityExecution));
                         }
                     }
@@ -302,18 +283,13 @@ public class PriorityRunner {
             final boolean mayBeCanceled = execution.mayBeCanceled();
             final PriorityExecution priorityExecution =
                     new PriorityExecution(execution, mPriority, mAge.getAndDecrement());
-
             if (mayBeCanceled) {
-
                 synchronized (mExecutions) {
-
                     final WeakIdentityHashMap<Execution, WeakHashMap<PriorityExecution, Void>>
                             executions = mExecutions;
                     WeakHashMap<PriorityExecution, Void> priorityExecutions =
                             executions.get(execution);
-
                     if (priorityExecutions == null) {
-
                         priorityExecutions = new WeakHashMap<PriorityExecution, Void>();
                         executions.put(execution, priorityExecutions);
                     }
@@ -323,17 +299,13 @@ public class PriorityRunner {
             }
 
             if (delay == 0) {
-
                 mQueue.put(priorityExecution);
                 mRunner.run(mExecution, 0, timeUnit);
 
             } else {
-
                 final DelayedExecution delayedExecution =
                         new DelayedExecution(mQueue, priorityExecution);
-
                 if (mayBeCanceled) {
-
                     mDelayedExecutions.put(priorityExecution, delayedExecution);
                 }
 

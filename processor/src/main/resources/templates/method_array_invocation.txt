@@ -21,25 +21,19 @@
 
             int i = 0;
             final ${componentType}[] array = new ${componentType}[objects.size()];
-
             for (final Object object : objects) {
-
                 array[i++] = (${boxedType}) object;
             }
 
             final com.github.dm.jrt.util.Mutex mutex = mMutex;
             mutex.acquire();
-
             try {
-
                 result.pass(${invocationTarget}.${targetMethodName}(array));
 
             } catch (final Throwable t) {
-
                 throw com.github.dm.jrt.invocation.InvocationException.wrapIfNeeded(t);
 
             } finally {
-
                 mutex.release();
             }
         }

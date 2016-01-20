@@ -40,7 +40,6 @@ class DefaultRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OUT> {
     DefaultRoutineBuilder(@NotNull final InvocationFactory<IN, OUT> factory) {
 
         if (factory == null) {
-
             throw new NullPointerException("the invocation factory must not be null");
         }
 

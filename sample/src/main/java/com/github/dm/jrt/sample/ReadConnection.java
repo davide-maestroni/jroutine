@@ -40,18 +40,12 @@ public class ReadConnection extends FilterInvocation<URI, ByteBuffer> {
     public void onInput(final URI uri, @NotNull final ResultChannel<ByteBuffer> result) {
 
         InputStream inputStream = null;
-
         try {
-
             final URLConnection connection = uri.toURL().openConnection();
             connection.setConnectTimeout(3000);
-
             if (connection instanceof HttpURLConnection) {
-
                 final int code = ((HttpURLConnection) connection).getResponseCode();
-
                 if ((code < 200) || (code >= 300)) {
-
                     throw new IOException();
                 }
             }
@@ -61,26 +55,19 @@ public class ReadConnection extends FilterInvocation<URI, ByteBuffer> {
             // routine channel
             final BufferOutputStream outputStream =
                     ByteChannel.byteChannel(MAX_CHUNK_SIZE).passTo(result);
-
             try {
-
                 outputStream.writeAll(inputStream);
 
             } finally {
-
                 outputStream.close();
             }
 
         } catch (final IOException e) {
-
             throw new InvocationException(e);
 
         } finally {
-
             if (inputStream != null) {
-
                 try {
-
                     inputStream.close();
 
                 } catch (final IOException ignored) {

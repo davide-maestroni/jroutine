@@ -106,20 +106,14 @@ public class ContextRoutineProcessor extends RoutineProcessor {
             final int size) {
 
         final TypeElement serviceProxyElement = mServiceProxyElement;
-
         final StringBuilder builder = new StringBuilder();
-
         for (int i = 1; i <= size; ++i) {
-
             builder.append("mRoutine").append(i).append(" = ").append("initRoutine").append(i);
-
             if (annotationElement == serviceProxyElement) {
-
                 builder.append("(target, invocationConfiguration, proxyConfiguration, "
                                        + "serviceConfiguration);");
 
             } else {
-
                 builder.append("(target, invocationConfiguration, proxyConfiguration, "
                                        + "loaderConfiguration);");
             }
@@ -139,29 +133,24 @@ public class ContextRoutineProcessor extends RoutineProcessor {
         final TypeElement serviceProxyElement = mServiceProxyElement;
         final TypeElement loaderProxyCompatElement = mLoaderProxyCompatElement;
         final TypeElement loaderProxyElement = mLoaderProxyElement;
-
         if (annotationElement == serviceProxyElement) {
-
             if (mHeaderService == null) {
-
                 mHeaderService = parseTemplate("/android/templates/header.txt");
             }
 
             return mHeaderService;
+        }
 
-        } else if (annotationElement == loaderProxyCompatElement) {
-
+        if (annotationElement == loaderProxyCompatElement) {
             if (mHeaderV4 == null) {
-
                 mHeaderV4 = parseTemplate("/android/v4/templates/header.txt");
             }
 
             return mHeaderV4;
+        }
 
-        } else if (annotationElement == loaderProxyElement) {
-
+        if (annotationElement == loaderProxyElement) {
             if (mHeaderV11 == null) {
-
                 mHeaderV11 = parseTemplate("/android/v11/templates/header.txt");
             }
 
@@ -178,9 +167,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
             @NotNull final ExecutableElement methodElement, final int count) throws IOException {
 
         if (annotationElement != mServiceProxyElement) {
-
             if (mMethodHeaderV1 == null) {
-
                 mMethodHeaderV1 = parseTemplate("/android/v1/templates/method_header.txt");
             }
 
@@ -189,7 +176,6 @@ public class ContextRoutineProcessor extends RoutineProcessor {
         }
 
         if (mMethodHeader == null) {
-
             mMethodHeader = parseTemplate("/android/templates/method_header.txt");
         }
 
@@ -203,7 +189,6 @@ public class ContextRoutineProcessor extends RoutineProcessor {
             @NotNull final ExecutableElement methodElement, final int count) throws IOException {
 
         if (mMethodInvocationFooter == null) {
-
             mMethodInvocationFooter =
                     parseTemplate("/android/templates/method_invocation_footer.txt");
         }
@@ -218,7 +203,6 @@ public class ContextRoutineProcessor extends RoutineProcessor {
             @NotNull final ExecutableElement methodElement, final int count) throws IOException {
 
         if (mMethodInvocationHeader == null) {
-
             mMethodInvocationHeader =
                     parseTemplate("/android/templates/method_invocation_header.txt");
         }
@@ -233,17 +217,13 @@ public class ContextRoutineProcessor extends RoutineProcessor {
         // We need to avoid explicit dependency on the android module...
         final StringBuilder builder = new StringBuilder();
         final Integer id = (Integer) getAnnotationValue(methodElement, mIdAnnotationType, "value");
-
         if (id != null) {
-
             builder.append(".withId(").append(id).append(")");
         }
 
         final Object resolutionType =
                 getAnnotationValue(methodElement, mClashAnnotationType, "value");
-
         if (resolutionType != null) {
-
             builder.append(
                     ".withClashResolution(com.github.dm.jrt.android.builder.LoaderConfiguration"
                             + ".ClashResolutionType.").append(resolutionType).append(")");
@@ -251,9 +231,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
         final Object inputResolutionType =
                 getAnnotationValue(methodElement, mInputClashAnnotationType, "value");
-
         if (inputResolutionType != null) {
-
             builder.append(".withInputClashResolution(com.github.dm.jrt.android.builder"
                                    + ".LoaderConfiguration" + ".ClashResolutionType.")
                    .append(resolutionType)
@@ -262,9 +240,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
         final Object strategyType =
                 getAnnotationValue(methodElement, mCacheAnnotationType, "value");
-
         if (strategyType != null) {
-
             builder.append(
                     ".withCacheStrategy(com.github.dm.jrt.android.builder.LoaderConfiguration"
                             + ".CacheStrategyType.").append(strategyType).append(")");
@@ -273,12 +249,9 @@ public class ContextRoutineProcessor extends RoutineProcessor {
         final TypeMirror staleTimeAnnotationType = mStaleTimeAnnotationType;
         final Object staleTime =
                 getAnnotationValue(methodElement, staleTimeAnnotationType, "value");
-
         if (staleTime != null) {
-
             final Object staleTimeUnit =
                     getAnnotationValue(methodElement, staleTimeAnnotationType, "unit");
-
             builder.append(".withResultStaleTime(")
                    .append(staleTime)
                    .append(", ")

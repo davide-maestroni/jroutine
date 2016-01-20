@@ -217,11 +217,11 @@ public class LoaderObjectRoutineFragmentTest
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final InvocationConfiguration configuration = builder().withRunner(Runners.poolRunner())
-                                                               .withInputOrder(OrderType.BY_CHANCE)
+                                                               .withInputOrder(OrderType.BY_DELAY)
                                                                .withInputLimit(3)
                                                                .withInputMaxDelay(seconds(10))
                                                                .withInputMaxSize(33)
-                                                               .withOutputOrder(OrderType.BY_CHANCE)
+                                                               .withOutputOrder(OrderType.BY_DELAY)
                                                                .withOutputLimit(3)
                                                                .withOutputMaxDelay(seconds(10))
                                                                .withOutputMaxSize(33)

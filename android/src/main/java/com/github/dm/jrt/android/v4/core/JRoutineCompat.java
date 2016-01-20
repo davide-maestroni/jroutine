@@ -151,12 +151,9 @@ public class JRoutineCompat extends JRoutine {
     public static ContextBuilderCompat with(@NotNull final LoaderContextCompat context) {
 
         synchronized (sBuilders) {
-
             final WeakHashMap<LoaderContextCompat, ContextBuilderCompat> builders = sBuilders;
             ContextBuilderCompat contextBuilder = builders.get(context);
-
             if (contextBuilder == null) {
-
                 contextBuilder = new ContextBuilderCompat(context);
                 builders.put(context, contextBuilder);
             }
@@ -181,7 +178,6 @@ public class JRoutineCompat extends JRoutine {
         private ContextBuilderCompat(@NotNull final LoaderContextCompat context) {
 
             if (context == null) {
-
                 throw new NullPointerException("the loader context must not be null");
             }
 

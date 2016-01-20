@@ -40,9 +40,7 @@ public abstract class DecoratingContextInvocationFactory<IN, OUT>
             @NotNull final ContextInvocationFactory<IN, OUT> wrapped) {
 
         super(asArgs(wrapped));
-
         if (wrapped == null) {
-
             throw new NullPointerException("the wrapped invocation factory must not be null");
         }
 

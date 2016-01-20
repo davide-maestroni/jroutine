@@ -59,12 +59,9 @@ public class JRoutineProxyCompat extends JRoutineProxy {
     public static ProxyContextBuilderCompat with(@NotNull final LoaderContextCompat context) {
 
         synchronized (sBuilders) {
-
             final WeakHashMap<LoaderContextCompat, ProxyContextBuilderCompat> builders = sBuilders;
             ProxyContextBuilderCompat contextBuilder = builders.get(context);
-
             if (contextBuilder == null) {
-
                 contextBuilder = new ProxyContextBuilderCompat(context);
                 builders.put(context, contextBuilder);
             }
@@ -89,7 +86,6 @@ public class JRoutineProxyCompat extends JRoutineProxy {
         private ProxyContextBuilderCompat(@NotNull final LoaderContextCompat context) {
 
             if (context == null) {
-
                 throw new NullPointerException("the context must not be null");
             }
 

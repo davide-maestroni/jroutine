@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * TODO
  * Interface defining a channel which is both an input and an output.
  * <p/>
  * An I/O channel is useful to make other asynchronous tasks communicate with a routine.<br/>
@@ -60,12 +61,6 @@ public interface IOChannel<DATA> extends InputChannel<DATA>, OutputChannel<DATA>
      */
     @NotNull
     IOChannel<DATA> orderByCall();
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    IOChannel<DATA> orderByChance();
 
     /**
      * {@inheritDoc}

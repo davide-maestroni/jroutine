@@ -106,12 +106,10 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
             @NotNull final Logger logger) {
 
         if (context == null) {
-
             throw new NullPointerException("the routine context must not be null");
         }
 
         if (factory == null) {
-
             throw new NullPointerException("the context invocation factory must not be null");
         }
 
@@ -144,35 +142,25 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
                 callbackMap = sCallbacks;
         final SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
                 callbackMap.get(component);
-
         if (callbackArray == null) {
-
             return;
         }
 
         final LoaderManager loaderManager = context.getLoaderManager();
-
         if (loaderManager == null) {
-
             return;
         }
 
         int i = 0;
-
         while (i < callbackArray.size()) {
-
             final RoutineLoaderCallbacks<?> callbacks = callbackArray.valueAt(i).get();
-
             if (callbacks == null) {
-
                 callbackArray.removeAt(i);
                 continue;
             }
 
             final InvocationLoader<?, ?> loader = callbacks.mLoader;
-
             if ((loaderId == callbackArray.keyAt(i)) && (loader.getInvocationCount() == 0)) {
-
                 loaderManager.destroyLoader(loaderId);
                 callbackArray.removeAt(i);
                 continue;
@@ -182,7 +170,6 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
         }
 
         if (callbackArray.size() == 0) {
-
             callbackMap.remove(component);
         }
     }
@@ -206,39 +193,28 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
                 callbackMap = sCallbacks;
         final SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
                 callbackMap.get(component);
-
         if (callbackArray == null) {
-
             return;
         }
 
         final LoaderManager loaderManager = context.getLoaderManager();
-
         if (loaderManager == null) {
-
             return;
         }
 
         int i = 0;
-
         while (i < callbackArray.size()) {
-
             final RoutineLoaderCallbacks<?> callbacks = callbackArray.valueAt(i).get();
-
             if (callbacks == null) {
-
                 callbackArray.removeAt(i);
                 continue;
             }
 
             final InvocationLoader<Object, Object> loader =
                     (InvocationLoader<Object, Object>) callbacks.mLoader;
-
             if (loader.getInvocationFactory().equals(factory) && (loader.getInvocationCount()
                     == 0)) {
-
                 final int id = callbackArray.keyAt(i);
-
                 if (((loaderId == LoaderConfiguration.AUTO) || (loaderId == id))
                         && loader.areSameInputs(inputs)) {
 
@@ -252,7 +228,6 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
         }
 
         if (callbackArray.size() == 0) {
-
             callbackMap.remove(component);
         }
     }
@@ -274,37 +249,27 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
                 callbackMap = sCallbacks;
         final SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
                 callbackMap.get(component);
-
         if (callbackArray == null) {
-
             return;
         }
 
         final LoaderManager loaderManager = context.getLoaderManager();
-
         if (loaderManager == null) {
-
             return;
         }
 
         int i = 0;
-
         while (i < callbackArray.size()) {
-
             final RoutineLoaderCallbacks<?> callbacks = callbackArray.valueAt(i).get();
-
             if (callbacks == null) {
-
                 callbackArray.removeAt(i);
                 continue;
             }
 
             final InvocationLoader<Object, Object> loader =
                     (InvocationLoader<Object, Object>) callbacks.mLoader;
-
             if ((loader.getInvocationCount() == 0) && (loaderId == callbackArray.keyAt(i)) && loader
                     .areSameInputs(inputs)) {
-
                 loaderManager.destroyLoader(loaderId);
                 callbackArray.removeAt(i);
                 continue;
@@ -314,7 +279,6 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
         }
 
         if (callbackArray.size() == 0) {
-
             callbackMap.remove(component);
         }
     }
@@ -335,40 +299,28 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
                 callbackMap = sCallbacks;
         final SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
                 callbackMap.get(component);
-
         if (callbackArray == null) {
-
             return;
         }
 
         final LoaderManager loaderManager = context.getLoaderManager();
-
         if (loaderManager == null) {
-
             return;
         }
 
         int i = 0;
-
         while (i < callbackArray.size()) {
-
             final RoutineLoaderCallbacks<?> callbacks = callbackArray.valueAt(i).get();
-
             if (callbacks == null) {
-
                 callbackArray.removeAt(i);
                 continue;
             }
 
             final InvocationLoader<?, ?> loader = callbacks.mLoader;
-
             if (loader.getInvocationFactory().equals(factory) && (loader.getInvocationCount()
                     == 0)) {
-
                 final int id = callbackArray.keyAt(i);
-
                 if ((loaderId == LoaderConfiguration.AUTO) || (loaderId == id)) {
-
                     loaderManager.destroyLoader(id);
                     callbackArray.removeAt(i);
                     continue;
@@ -379,7 +331,6 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
         }
 
         if (callbackArray.size() == 0) {
-
             callbackMap.remove(component);
         }
     }
@@ -389,9 +340,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
 
         super.onAbort(reason);
         final Context loaderContext = mContext.getLoaderContext();
-
         if (loaderContext == null) {
-
             mLogger.dbg("avoiding aborting invocation since context is null");
             return;
         }
@@ -414,17 +363,13 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
         final Object component = context.getComponent();
         final Context loaderContext = context.getLoaderContext();
         final LoaderManager loaderManager = context.getLoaderManager();
-
         if ((component == null) || (loaderContext == null) || (loaderManager == null)) {
-
             throw new IllegalArgumentException("the routine context has been destroyed");
         }
 
         final Logger logger = mLogger;
         int loaderId = mLoaderId;
-
         if (loaderId == LoaderConfiguration.AUTO) {
-
             loaderId = 31 * mFactory.hashCode() + inputs.hashCode();
             logger.dbg("generating loader ID: %d", loaderId);
         }
@@ -436,9 +381,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
                 callbackMap = sCallbacks;
         SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>> callbackArray =
                 callbackMap.get(component);
-
         if (callbackArray == null) {
-
             callbackArray = new SparseArrayCompat<WeakReference<RoutineLoaderCallbacks<?>>>();
             callbackMap.put(component, callbackArray);
         }
@@ -448,13 +391,9 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
         RoutineLoaderCallbacks<OUT> callbacks =
                 (callbackReference != null) ? (RoutineLoaderCallbacks<OUT>) callbackReference.get()
                         : null;
-
         if (clashType == ClashType.ABORT_BOTH) {
-
             final InvocationClashException clashException = new InvocationClashException(loaderId);
-
             if (callbacks != null) {
-
                 logger.dbg("resetting existing callbacks [%d]", loaderId);
                 callbacks.reset(clashException);
             }
@@ -467,27 +406,20 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
         final boolean isStaleResult =
                 isRoutineLoader && ((InvocationLoader<?, OUT>) loader).isStaleResult(
                         mResultStaleTimeMillis);
-
         if ((callbacks == null) || (loader == null) || (clashType == ClashType.ABORT_THAT)
                 || isStaleResult) {
-
             final InvocationLoader<IN, OUT> invocationLoader;
-
             if ((clashType == ClashType.NONE) && isRoutineLoader && !isStaleResult) {
-
                 invocationLoader = (InvocationLoader<IN, OUT>) loader;
 
             } else {
-
                 invocationLoader = null;
             }
 
             final RoutineLoaderCallbacks<OUT> newCallbacks =
                     createCallbacks(loaderContext, loaderManager, invocationLoader, inputs,
                                     loaderId);
-
             if (callbacks != null) {
-
                 logger.dbg("resetting existing callbacks [%d]", loaderId);
                 callbacks.reset(((clashType == ClashType.ABORT_THAT) || !isStaleResult)
                                         ? new InvocationClashException(loaderId)
@@ -502,14 +434,11 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
         logger.dbg("setting result cache type [%d]: %s", loaderId, strategyType);
         callbacks.setCacheStrategy(strategyType);
         result.pass(callbacks.newChannel(mLooper));
-
         if ((clashType == ClashType.ABORT_THAT) || isStaleResult) {
-
             logger.dbg("restarting loader [%d]", loaderId);
             loaderManager.restartLoader(loaderId, Bundle.EMPTY, callbacks);
 
         } else {
-
             logger.dbg("initializing loader [%d]", loaderId);
             loaderManager.initLoader(loaderId, Bundle.EMPTY, callbacks);
         }
@@ -534,14 +463,11 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
         final Logger logger = mLogger;
         final FunctionContextInvocationFactory<IN, OUT> factory = mFactory;
         final ContextInvocation<IN, OUT> invocation;
-
         try {
-
             logger.dbg("creating a new invocation instance [%d]", loaderId);
             invocation = factory.newInvocation();
 
         } catch (final Throwable t) {
-
             logger.err(t, "error creating the invocation instance [%d]", loaderId);
             throw InvocationException.wrapIfNeeded(t);
         }
@@ -555,24 +481,19 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
             final int loaderId, @NotNull final List<? extends IN> inputs) {
 
         if (loader == null) {
-
             return ClashType.NONE;
         }
 
         final Logger logger = mLogger;
-
         if (loader.getClass() != InvocationLoader.class) {
-
             logger.err("clashing loader ID [%d]: %s", loaderId, loader.getClass().getName());
             throw new InvocationTypeException(loaderId);
         }
 
         final FunctionContextInvocationFactory<IN, OUT> factory = mFactory;
         final InvocationLoader<IN, OUT> invocationLoader = (InvocationLoader<IN, OUT>) loader;
-
         if (!(factory instanceof MissingLoaderInvocationFactory)
                 && !invocationLoader.getInvocationFactory().equals(factory)) {
-
             logger.wrn("clashing loader ID [%d]: %s", loaderId,
                        invocationLoader.getInvocationFactory());
             throw new InvocationTypeException(loaderId);
@@ -581,24 +502,19 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
         final ClashResolutionType resolution =
                 invocationLoader.areSameInputs(inputs) ? mInputClashResolutionType
                         : mClashResolutionType;
-
         if (resolution == ClashResolutionType.JOIN) {
-
             logger.dbg("keeping existing invocation [%d]", loaderId);
             return ClashType.NONE;
 
         } else if (resolution == ClashResolutionType.ABORT) {
-
             logger.dbg("restarting existing invocation [%d]", loaderId);
             return ClashType.ABORT_BOTH;
 
         } else if (resolution == ClashResolutionType.ABORT_THAT) {
-
             logger.dbg("restarting existing invocation [%d]", loaderId);
             return ClashType.ABORT_THAT;
 
         } else if (resolution == ClashResolutionType.ABORT_THIS) {
-
             logger.dbg("aborting invocation [%d]", loaderId);
             throw new InvocationClashException(loaderId);
         }
@@ -707,9 +623,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
             final ArrayList<IOChannel<OUT>> newChannels = mNewChannels;
             final ArrayList<IOChannel<OUT>> abortedChannels = mAbortedChannels;
             logger.dbg("dispatching invocation result: %s", data);
-
             if (data.passTo(newChannels, channels, abortedChannels)) {
-
                 final ArrayList<IOChannel<OUT>> channelsToClose =
                         new ArrayList<IOChannel<OUT>>(channels);
                 channelsToClose.addAll(newChannels);
@@ -717,17 +631,13 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
                 channels.clear();
                 newChannels.clear();
                 abortedChannels.clear();
-
                 if (mResultCount >= internalLoader.getInvocationCount()) {
-
                     mResultCount = 0;
                     internalLoader.setInvocationCount(0);
                     final CacheStrategyType strategyType = mCacheStrategyType;
-
                     if ((strategyType == CacheStrategyType.CLEAR) || (data.isError() ? (strategyType
                             == CacheStrategyType.CACHE_IF_SUCCESS)
                             : (strategyType == CacheStrategyType.CACHE_IF_ERROR))) {
-
                         final int id = internalLoader.getId();
                         logger.dbg("destroying Android loader: %d", id);
                         mLoaderManager.destroyLoader(id);
@@ -735,31 +645,23 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
                 }
 
                 if (data.isError()) {
-
                     final RoutineException exception = data.getAbortException();
-
                     for (final IOChannel<OUT> channel : channelsToClose) {
-
                         channel.abort(exception);
                     }
 
                 } else {
-
                     for (final IOChannel<OUT> channel : channelsToClose) {
-
                         channel.close();
                     }
                 }
 
             } else {
-
                 mResultCount += abortedChannels.size();
                 channels.addAll(newChannels);
                 channels.removeAll(abortedChannels);
                 newChannels.clear();
-
                 if (channels.isEmpty() && (mResultCount >= internalLoader.getInvocationCount())) {
-
                     data.abort();
                 }
             }
@@ -787,9 +689,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
             channels.add(channel);
             internalLoader.setInvocationCount(Math.max(channels.size() + mAbortedChannels.size(),
                                                        internalLoader.getInvocationCount()));
-
             if ((looper != null) && (looper != Looper.getMainLooper())) {
-
                 return JRoutine.on(PassingInvocation.<OUT>factoryOf())
                                .withInvocations()
                                .withRunner(Runners.looperRunner(looper))
@@ -808,16 +708,12 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
             mResultCount = 0;
             final ArrayList<IOChannel<OUT>> channels = mChannels;
             final ArrayList<IOChannel<OUT>> newChannels = mNewChannels;
-
             for (final IOChannel<OUT> channel : channels) {
-
                 channel.abort(reason);
             }
 
             channels.clear();
-
             for (final IOChannel<OUT> newChannel : newChannels) {
-
                 newChannel.abort(reason);
             }
 

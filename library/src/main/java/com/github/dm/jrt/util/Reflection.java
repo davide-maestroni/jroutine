@@ -70,7 +70,6 @@ public class Reflection {
     public static Class<?> boxingClass(@NotNull final Class<?> type) {
 
         if (!type.isPrimitive()) {
-
             return type;
         }
 
@@ -96,13 +95,9 @@ public class Reflection {
             @NotNull final Object... args) {
 
         Constructor<?> constructor = findBestMatchingConstructor(type.getConstructors(), args);
-
         if (constructor == null) {
-
             constructor = findBestMatchingConstructor(type.getDeclaredConstructors(), args);
-
             if (constructor == null) {
-
                 throw new IllegalArgumentException(
                         "no suitable constructor found for type: " + type.getName());
             }
@@ -128,19 +123,14 @@ public class Reflection {
             @NotNull final Class<?>... parameterTypes) {
 
         Method method;
-
         try {
-
             method = type.getMethod(name, parameterTypes);
 
         } catch (final NoSuchMethodException ignored) {
-
             try {
-
                 method = type.getDeclaredMethod(name, parameterTypes);
 
             } catch (final NoSuchMethodException e) {
-
                 throw new IllegalArgumentException(e);
             }
         }
@@ -169,7 +159,6 @@ public class Reflection {
     public static Constructor<?> makeAccessible(@NotNull final Constructor<?> constructor) {
 
         if (!constructor.isAccessible()) {
-
             AccessController.doPrivileged(new SetAccessibleConstructorAction(constructor));
         }
 
@@ -186,7 +175,6 @@ public class Reflection {
     public static Method makeAccessible(@NotNull final Method method) {
 
         if (!method.isAccessible()) {
-
             AccessController.doPrivileged(new SetAccessibleMethodAction(method));
         }
 
@@ -200,62 +188,46 @@ public class Reflection {
         final int argsLength = args.length;
         Constructor<?> bestMatch = null;
         int maxConfidence = 0;
-
         for (final Constructor<?> constructor : constructors) {
-
             final Class<?>[] params = constructor.getParameterTypes();
             final int length = params.length;
-
             if (length != argsLength) {
-
                 continue;
             }
 
             boolean isValid = true;
             int confidence = 0;
-
             for (int i = 0; i < argsLength; ++i) {
-
                 final Object contextArg = args[i];
                 final Class<?> param = params[i];
-
                 if (contextArg != null) {
-
                     final Class<?> boxingClass = boxingClass(param);
-
                     if (!boxingClass.isInstance(contextArg)) {
-
                         isValid = false;
                         break;
                     }
 
                     if (contextArg.getClass().equals(boxingClass)) {
-
                         ++confidence;
                     }
 
                 } else if (param.isPrimitive()) {
-
                     isValid = false;
                     break;
                 }
             }
 
             if (!isValid) {
-
                 continue;
             }
 
             if ((bestMatch == null) || (confidence > maxConfidence)) {
-
                 bestMatch = constructor;
                 maxConfidence = confidence;
 
             } else if (confidence == maxConfidence) {
-
                 throw new IllegalArgumentException(
                         "more than one constructor found for arguments: " + Arrays.toString(args));
-
             }
         }
 

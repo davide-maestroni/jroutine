@@ -31,11 +31,9 @@ public class AndroidLog implements com.github.dm.jrt.log.Log {
             @Nullable final Throwable throwable) {
 
         if (throwable != null) {
-
             Log.d(contexts.get(contexts.size() - 1).toString(), message, throwable);
 
         } else {
-
             Log.d(contexts.get(contexts.size() - 1).toString(), message);
         }
     }
@@ -44,11 +42,9 @@ public class AndroidLog implements com.github.dm.jrt.log.Log {
             @Nullable final Throwable throwable) {
 
         if (throwable != null) {
-
             Log.e(contexts.get(contexts.size() - 1).toString(), message, throwable);
 
         } else {
-
             Log.e(contexts.get(contexts.size() - 1).toString(), message);
         }
     }
@@ -57,11 +53,9 @@ public class AndroidLog implements com.github.dm.jrt.log.Log {
             @Nullable final Throwable throwable) {
 
         if (throwable != null) {
-
             Log.w(contexts.get(contexts.size() - 1).toString(), message, throwable);
 
         } else {
-
             Log.w(contexts.get(contexts.size() - 1).toString(), message);
         }
     }

@@ -29,7 +29,7 @@ import java.util.List;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public class FunctionWrapper<IN, OUT> implements Function<IN, OUT>, Wrapper {
+public class FunctionWrapper<IN, OUT> implements Function<IN, OUT> {
 
     private static final FunctionWrapper<Object, Object> sIdentity =
             new FunctionWrapper<Object, Object>(new Function<Object, Object>() {
@@ -51,9 +51,7 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT>, Wrapper {
     FunctionWrapper(@NotNull final Function<?, ?> function) {
 
         this(Collections.<Function<?, ?>>singletonList(function));
-
         if (function == null) {
-
             throw new NullPointerException("the function instance must not be null");
         }
     }
@@ -83,7 +81,6 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT>, Wrapper {
             @NotNull final Class<? extends OUT> type) {
 
         if (type == null) {
-
             throw new NullPointerException("the type must not be null");
         }
 
@@ -137,17 +134,13 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT>, Wrapper {
         final ArrayList<Function<?, ?>> newFunctions =
                 new ArrayList<Function<?, ?>>(functions.size() + 1);
         newFunctions.addAll(functions);
-
         if (after instanceof FunctionWrapper) {
-
             newFunctions.addAll(((FunctionWrapper<?, ?>) after).mFunctions);
 
         } else if (after == null) {
-
             throw new NullPointerException("the function must not be null");
 
         } else {
-
             newFunctions.add(after);
         }
 
@@ -170,17 +163,13 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT>, Wrapper {
         final List<Function<?, ?>> functions = mFunctions;
         final ArrayList<Function<?, ?>> newFunctions =
                 new ArrayList<Function<?, ?>>(functions.size() + 1);
-
         if (before instanceof FunctionWrapper) {
-
             newFunctions.addAll(((FunctionWrapper<?, ?>) before).mFunctions);
 
         } else if (before == null) {
-
             throw new NullPointerException("the consumer must not be null");
 
         } else {
-
             newFunctions.add(before);
         }
 
@@ -192,70 +181,10 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT>, Wrapper {
     public int hashCode() {
 
         int result = 0;
-
         for (final Function<?, ?> function : mFunctions) {
-
             final Class<? extends Function> functionClass = function.getClass();
             result += result * 31 + (functionClass.isAnonymousClass() ? functionClass.hashCode()
                     : function.hashCode());
-        }
-
-        return result;
-    }
-
-    public boolean safeEquals(final Object o) {
-
-        if (this == o) {
-
-            return true;
-        }
-
-        if (!(o instanceof FunctionWrapper)) {
-
-            return false;
-        }
-
-        final FunctionWrapper<?, ?> that = (FunctionWrapper<?, ?>) o;
-        final List<Function<?, ?>> thisFunctions = mFunctions;
-        final List<Function<?, ?>> thatFunctions = that.mFunctions;
-        final int size = thisFunctions.size();
-
-        if (size != thatFunctions.size()) {
-
-            return false;
-        }
-
-        for (int i = 0; i < size; ++i) {
-
-            final Function<?, ?> thisFunction = thisFunctions.get(i);
-            final Function<?, ?> thatFunction = thatFunctions.get(i);
-            final Class<? extends Function> thisFunctionClass = thisFunction.getClass();
-            final Class<? extends Function> thatFunctionClass = thatFunction.getClass();
-
-            if (thisFunctionClass.isAnonymousClass()) {
-
-                if (!thatFunctionClass.isAnonymousClass() || !thisFunctionClass.equals(
-                        thatFunctionClass)) {
-
-                    return false;
-                }
-
-            } else if (thatFunctionClass.isAnonymousClass() || !thisFunction.equals(thatFunction)) {
-
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    public int safeHashCode() {
-
-        int result = 0;
-
-        for (final Function<?, ?> function : mFunctions) {
-
-            result += result * 31 + function.getClass().hashCode();
         }
 
         return result;
@@ -296,12 +225,10 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT>, Wrapper {
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof ClassCastFunction)) {
-
                 return false;
             }
 
@@ -314,12 +241,10 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT>, Wrapper {
     public boolean equals(final Object o) {
 
         if (this == o) {
-
             return true;
         }
 
         if (!(o instanceof FunctionWrapper)) {
-
             return false;
         }
 
@@ -331,9 +256,7 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT>, Wrapper {
     public OUT apply(final IN in) {
 
         Object result = in;
-
         for (final Function<?, ?> function : mFunctions) {
-
             result = ((Function<Object, Object>) function).apply(result);
         }
 

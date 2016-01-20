@@ -24,18 +24,15 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.builder.ProxyConfiguration proxyConfiguration) {
 
         if (!target.isSameTypeOf(${classErasure}.class)) {
-
             throw new IllegalArgumentException("the invocation target must be the class or an instance of " +
                     "${classFullName}");
         }
 
         if (invocationConfiguration == null) {
-
             throw new NullPointerException("the invocation configuration must not be null");
         }
 
         if (proxyConfiguration == null) {
-
             throw new NullPointerException("the proxy configuration must not be null");
         }
 

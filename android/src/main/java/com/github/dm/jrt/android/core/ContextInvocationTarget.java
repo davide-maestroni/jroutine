@@ -161,7 +161,6 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
         private ClassContextInvocationTarget(@NotNull final Class<TYPE> targetClass) {
 
             if (targetClass.isPrimitive()) {
-
                 // The parceling of primitive classes is broken...
                 throw new IllegalArgumentException("the target class cannot be primitive");
             }
@@ -178,12 +177,10 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof ClassContextInvocationTarget)) {
-
                 return false;
             }
 
@@ -271,7 +268,6 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
                 @Nullable final Object[] factoryArgs) {
 
             if (targetClass.isPrimitive()) {
-
                 // The parceling of primitive classes is broken...
                 throw new IllegalArgumentException("the target class cannot be primitive");
             }
@@ -284,12 +280,10 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof ObjectContextInvocationTarget)) {
-
                 return false;
             }
 
@@ -314,29 +308,22 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
             TYPE target = null;
             final Class<TYPE> targetClass = mTargetClass;
             final Object[] factoryArgs = mFactoryArgs;
-
             if (context instanceof FactoryContext) {
-
                 // The only safe way is to synchronize the factory using the very same instance
                 synchronized (context) {
-
                     target = ((FactoryContext) context).geInstance(targetClass, factoryArgs);
                 }
             }
 
             if (target == null) {
-
                 try {
-
                     target = findConstructor(targetClass, factoryArgs).newInstance(factoryArgs);
 
                 } catch (final Throwable t) {
-
                     throw InvocationException.wrapIfNeeded(t);
                 }
 
             } else if (!targetClass.isInstance(target)) {
-
                 throw new RoutineException(
                         target + " is not an instance of " + targetClass.getName());
             }

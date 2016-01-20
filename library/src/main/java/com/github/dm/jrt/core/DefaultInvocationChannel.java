@@ -106,7 +106,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
         mLogger = logger.subContextLogger(this);
         mRunner = runner;
-        mInputOrder = configuration.getInputOrderTypeOr(OrderType.BY_CHANCE);
+        mInputOrder = configuration.getInputOrderTypeOr(OrderType.BY_DELAY);
         mInputLimit = configuration.getInputLimitOr(Integer.MAX_VALUE);
         mInputMaxDelay = configuration.getInputMaxDelayOr(ZERO);
         mMaxInput = configuration.getInputMaxSizeOr(Integer.MAX_VALUE);
@@ -132,18 +132,14 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
                     @NotNull final TimeUnit timeUnit) {
 
                 final Execution execution;
-
                 synchronized (mMutex) {
-
                     execution = mState.onHandlerAbort(reason);
                 }
 
                 if (execution != null) {
-
                     runExecution(execution, delay, timeUnit);
 
                 } else {
-
                     mResultChanel.close(reason);
                 }
             }
@@ -163,15 +159,12 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
         final TimeDuration delay;
         final Execution execution;
-
         synchronized (mMutex) {
-
             delay = mInputDelay;
             execution = mState.abortInvocation(reason);
         }
 
         if (execution != null) {
-
             runExecution(execution, delay.time, delay.unit);
             return true;
         }
@@ -182,7 +175,6 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
     public boolean isEmpty() {
 
         synchronized (mMutex) {
-
             return mInputQueue.isEmpty();
         }
     }
@@ -190,7 +182,6 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
     public boolean isOpen() {
 
         synchronized (mMutex) {
-
             return mState.isChannelOpen();
         }
     }
@@ -199,7 +190,6 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
     public InvocationChannel<IN, OUT> after(@NotNull final TimeDuration delay) {
 
         synchronized (mMutex) {
-
             mState.after(delay);
         }
 
@@ -222,19 +212,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
     public InvocationChannel<IN, OUT> orderByCall() {
 
         synchronized (mMutex) {
-
             mState.orderBy(OrderType.BY_CALL);
-        }
-
-        return this;
-    }
-
-    @NotNull
-    public InvocationChannel<IN, OUT> orderByChance() {
-
-        synchronized (mMutex) {
-
-            mState.orderBy(OrderType.BY_CHANCE);
         }
 
         return this;
@@ -244,7 +222,6 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
     public InvocationChannel<IN, OUT> orderByDelay() {
 
         synchronized (mMutex) {
-
             mState.orderBy(OrderType.BY_DELAY);
         }
 
@@ -255,14 +232,11 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
     public InvocationChannel<IN, OUT> pass(@Nullable final OutputChannel<? extends IN> channel) {
 
         final OutputConsumer<IN> consumer;
-
         synchronized (mMutex) {
-
             consumer = mState.pass(channel);
         }
 
         if ((consumer != null) && (channel != null)) {
-
             channel.passTo(consumer);
         }
 
@@ -274,22 +248,17 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
         final Execution execution;
         final TimeDuration delay;
-
         synchronized (mMutex) {
-
             delay = mInputDelay;
             execution = mState.pass(inputs);
         }
 
         if (execution != null) {
-
             runExecution(execution, delay.time, delay.unit);
         }
 
         synchronized (mMutex) {
-
             if (!mHasInputs.isTrue()) {
-
                 waitInputs();
             }
         }
@@ -302,22 +271,17 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
         final TimeDuration delay;
         final Execution execution;
-
         synchronized (mMutex) {
-
             delay = mInputDelay;
             execution = mState.pass(input);
         }
 
         if (execution != null) {
-
             runExecution(execution, delay.time, delay.unit);
         }
 
         synchronized (mMutex) {
-
             if (!mHasInputs.isTrue()) {
-
                 waitInputs();
             }
         }
@@ -330,22 +294,17 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
         final TimeDuration delay;
         final Execution execution;
-
         synchronized (mMutex) {
-
             delay = mInputDelay;
             execution = mState.pass(inputs);
         }
 
         if (execution != null) {
-
             runExecution(execution, delay.time, delay.unit);
         }
 
         synchronized (mMutex) {
-
             if (!mHasInputs.isTrue()) {
-
                 waitInputs();
             }
         }
@@ -359,9 +318,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         final TimeDuration delay;
         final Execution execution;
         final OutputChannel<OUT> result;
-
         synchronized (mMutex) {
-
             final InputChannelState state = mState;
             delay = mInputDelay;
             execution = state.onResult();
@@ -369,7 +326,6 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         }
 
         if (execution != null) {
-
             runExecution(execution, delay.time, delay.unit);
         }
 
@@ -379,7 +335,6 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
     private void checkMaxSize() {
 
         if (mInputCount > mMaxInput) {
-
             throw new InputDeadlockException(
                     "maximum input channel size has been reached: " + mMaxInput);
         }
@@ -388,9 +343,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
     private void forceExecution(@NotNull final Execution execution) {
 
         synchronized (mMutex) {
-
             if (mIsConsuming) {
-
                 mExecutionQueue.add(execution);
                 return;
             }
@@ -410,15 +363,11 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
             @NotNull final TimeUnit timeUnit) {
 
         if (delay > 0) {
-
             mRunner.run(execution, delay, timeUnit);
 
         } else {
-
             synchronized (mMutex) {
-
                 if (mIsConsuming) {
-
                     mExecutionQueue.add(execution);
                     return;
                 }
@@ -431,23 +380,18 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
     private void waitInputs() {
 
         final TimeDuration delay = mInputMaxDelay;
-
         if (!delay.isZero() && mRunner.isExecutionThread()) {
-
             throw new InputDeadlockException(
                     "cannot wait on the invocation runner thread: " + Thread.currentThread()
                             + "\nTry employing a different runner");
         }
 
         try {
-
             if (!delay.waitTrue(mMutex, mHasInputs)) {
-
                 mLogger.dbg("timeout while waiting for room in the input channel [%s]", delay);
             }
 
         } catch (final InterruptedException e) {
-
             throw new InvocationInterruptedException(e);
         }
     }
@@ -497,7 +441,6 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         public RoutineException getAbortException() {
 
             synchronized (mMutex) {
-
                 return mState.getAbortException();
             }
         }
@@ -505,7 +448,6 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         public boolean hasInput() {
 
             synchronized (mMutex) {
-
                 return mState.hasInput();
             }
         }
@@ -513,7 +455,6 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         public boolean isAborting() {
 
             synchronized (mMutex) {
-
                 return mState.isAborting();
             }
         }
@@ -522,7 +463,6 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         public IN nextInput() {
 
             synchronized (mMutex) {
-
                 return mState.nextInput();
             }
         }
@@ -531,9 +471,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
             final Throwable abortException;
             final List<OutputChannel<?>> channels;
-
             synchronized (mMutex) {
-
                 abortException = mAbortException;
                 mLogger.dbg(abortException, "aborting bound channels [%d]", mBoundChannels.size());
                 channels = new ArrayList<OutputChannel<?>>(mBoundChannels);
@@ -541,7 +479,6 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
             }
 
             for (final OutputChannel<?> channel : channels) {
-
                 channel.abort(abortException);
             }
         }
@@ -550,13 +487,9 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
             Execution execution = null;
             final boolean isComplete;
-
             synchronized (mMutex) {
-
                 final SimpleQueue<Execution> queue = mExecutionQueue;
-
                 if (!queue.isEmpty()) {
-
                     execution = queue.removeFirst();
                 }
 
@@ -564,7 +497,6 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
             }
 
             if (execution != null) {
-
                 mRunner.run(execution, 0, TimeUnit.MILLISECONDS);
             }
 
@@ -574,7 +506,6 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         public void onConsumeStart() {
 
             synchronized (mMutex) {
-
                 mState.onConsumeStart();
             }
         }
@@ -582,7 +513,6 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         public void onInvocationComplete() {
 
             synchronized (mMutex) {
-
                 mState.onInvocationComplete();
             }
         }
@@ -605,23 +535,19 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
          */
         private DefaultOutputConsumer() {
 
-            final TimeDuration delay = (mDelay = mInputDelay);
+            mDelay = mInputDelay;
             final OrderType order = (mOrderType = mInputOrder);
-            mQueue = ((order == OrderType.BY_CALL) || ((order == OrderType.BY_DELAY)
-                    && delay.isZero())) ? mInputQueue.addNested() : mInputQueue;
+            mQueue = (order == OrderType.BY_CALL) ? mInputQueue.addNested() : mInputQueue;
         }
 
         public void onComplete() {
 
             final Execution execution;
-
             synchronized (mMutex) {
-
                 execution = mState.onConsumerComplete(mQueue);
             }
 
             if (execution != null) {
-
                 runExecution(execution, 0, TimeUnit.MILLISECONDS);
             }
         }
@@ -629,14 +555,11 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         public void onError(@NotNull final RoutineException error) {
 
             final Execution execution;
-
             synchronized (mMutex) {
-
                 execution = mState.onConsumerError(error);
             }
 
             if (execution != null) {
-
                 final TimeDuration delay = mDelay;
                 runExecution(execution, delay.time, delay.unit);
             }
@@ -646,21 +569,16 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
             final Execution execution;
             final TimeDuration delay = mDelay;
-
             synchronized (mMutex) {
-
                 execution = mState.onConsumerOutput(output, mQueue, delay, mOrderType);
             }
 
             if (execution != null) {
-
                 runExecution(execution, delay.time, delay.unit);
             }
 
             synchronized (mMutex) {
-
                 if (!mHasInputs.isTrue()) {
-
                     waitInputs();
                 }
             }
@@ -687,14 +605,11 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         public void run() {
 
             final Execution execution;
-
             synchronized (mMutex) {
-
                 execution = mState.delayedAbortInvocation(mAbortException);
             }
 
             if (execution != null) {
-
                 forceExecution(execution);
             }
         }
@@ -725,14 +640,11 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         public void run() {
 
             final Execution execution;
-
             synchronized (mMutex) {
-
                 execution = mState.delayedInput(mQueue, mInput);
             }
 
             if (execution != null) {
-
                 forceExecution(execution);
             }
         }
@@ -763,14 +675,11 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         public void run() {
 
             final Execution execution;
-
             synchronized (mMutex) {
-
                 execution = mState.delayedInputs(mQueue, mInputs);
             }
 
             if (execution != null) {
-
                 forceExecution(execution);
             }
         }
@@ -901,9 +810,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         Execution abortInvocation(@Nullable final Throwable reason) {
 
             final RoutineException abortException = AbortException.wrapIfNeeded(reason);
-
             if (mInputDelay.isZero()) {
-
                 mSubLogger.dbg(reason, "aborting channel");
                 internalAbort(abortException);
                 mState = new AbortedChannelState();
@@ -923,7 +830,6 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         void after(@NotNull final TimeDuration delay) {
 
             if (delay == null) {
-
                 mLogger.err("invalid null delay");
                 throw new NullPointerException("the input delay must not be null");
             }
@@ -1012,14 +918,11 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
             mSubLogger.dbg("closing consumer");
             queue.close();
-
             if (!mIsPendingExecution && !mIsConsuming) {
-
                 mIsPendingExecution = true;
                 return mExecution;
 
             } else {
-
                 --mPendingExecutionCount;
             }
 
@@ -1058,13 +961,9 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
             mSubLogger.dbg("consumer input [#%d+1]: %s [%s]", mInputCount, input, delay);
             ++mInputCount;
             checkMaxSize();
-
             if (delay.isZero()) {
-
                 queue.add(input);
-
                 if (!mIsPendingExecution) {
-
                     ++mPendingExecutionCount;
                     mIsPendingExecution = true;
                     return mExecution;
@@ -1075,7 +974,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
             ++mPendingExecutionCount;
             return new DelayedInputExecution(
-                    (orderType != OrderType.BY_CHANCE) ? queue.addNested() : queue, input);
+                    (orderType != OrderType.BY_DELAY) ? queue.addNested() : queue, input);
         }
 
         /**
@@ -1103,9 +1002,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         Execution onResult() {
 
             mSubLogger.dbg("closing input channel");
-
             if (!mIsPendingExecution && !mIsConsuming) {
-
                 ++mPendingExecutionCount;
                 mIsPendingExecution = true;
                 return mExecution;
@@ -1134,7 +1031,6 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         OutputConsumer<IN> pass(@Nullable final OutputChannel<? extends IN> channel) {
 
             if (channel == null) {
-
                 mSubLogger.wrn("passing null channel");
                 return null;
             }
@@ -1155,15 +1051,12 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         Execution pass(@Nullable final Iterable<? extends IN> inputs) {
 
             if (inputs == null) {
-
                 mSubLogger.wrn("passing null iterable");
                 return null;
             }
 
             final ArrayList<IN> list = new ArrayList<IN>();
-
             for (final IN input : inputs) {
-
                 list.add(input);
             }
 
@@ -1172,13 +1065,9 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
             mSubLogger.dbg("passing iterable [#%d+%d]: %s [%s]", mInputCount, size, inputs, delay);
             mInputCount += size;
             checkMaxSize();
-
             if (delay.isZero()) {
-
                 mInputQueue.addAll(list);
-
                 if (!mIsPendingExecution) {
-
                     ++mPendingExecutionCount;
                     mIsPendingExecution = true;
                     return mExecution;
@@ -1189,7 +1078,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
             ++mPendingExecutionCount;
             return new DelayedListInputExecution(
-                    (mInputOrder != OrderType.BY_CHANCE) ? mInputQueue.addNested() : mInputQueue,
+                    (mInputOrder != OrderType.BY_DELAY) ? mInputQueue.addNested() : mInputQueue,
                     list);
         }
 
@@ -1206,13 +1095,9 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
             mSubLogger.dbg("passing input [#%d+1]: %s [%s]", mInputCount, input, delay);
             ++mInputCount;
             checkMaxSize();
-
             if (delay.isZero()) {
-
                 mInputQueue.add(input);
-
                 if (!mIsPendingExecution) {
-
                     ++mPendingExecutionCount;
                     mIsPendingExecution = true;
                     return mExecution;
@@ -1223,7 +1108,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
             ++mPendingExecutionCount;
             return new DelayedInputExecution(
-                    (mInputOrder != OrderType.BY_CHANCE) ? mInputQueue.addNested() : mInputQueue,
+                    (mInputOrder != OrderType.BY_DELAY) ? mInputQueue.addNested() : mInputQueue,
                     input);
         }
 
@@ -1237,7 +1122,6 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         Execution pass(@Nullable final IN... inputs) {
 
             if (inputs == null) {
-
                 mSubLogger.wrn("passing null input array");
                 return null;
             }
@@ -1249,13 +1133,9 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
             checkMaxSize();
             final ArrayList<IN> list = new ArrayList<IN>(size);
             Collections.addAll(list, inputs);
-
             if (delay.isZero()) {
-
                 mInputQueue.addAll(list);
-
                 if (!mIsPendingExecution) {
-
                     ++mPendingExecutionCount;
                     mIsPendingExecution = true;
                     return mExecution;
@@ -1266,7 +1146,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
             ++mPendingExecutionCount;
             return new DelayedListInputExecution(
-                    (mInputOrder != OrderType.BY_CHANCE) ? mInputQueue.addNested() : mInputQueue,
+                    (mInputOrder != OrderType.BY_DELAY) ? mInputQueue.addNested() : mInputQueue,
                     list);
         }
 
@@ -1293,9 +1173,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
             mSubLogger.dbg("reading input [#%d]: %s", mInputCount, input);
             final int inputLimit = mInputLimit;
             final int prevInputCount = mInputCount;
-
             if ((--mInputCount <= inputLimit) && (prevInputCount > inputLimit)) {
-
                 mMutex.notifyAll();
             }
 
@@ -1352,7 +1230,6 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         Execution delayedAbortInvocation(@NotNull final RoutineException reason) {
 
             if ((mPendingExecutionCount <= 0) && !mIsConsuming) {
-
                 mSubLogger.dbg(reason, "avoiding aborting since channel is closed");
                 return null;
             }

@@ -88,7 +88,6 @@ public class Logger {
     public static void setDefaultLevel(@NotNull final Level level) {
 
         if (level == null) {
-
             throw new NullPointerException("the default log level must not be null");
         }
 
@@ -115,7 +114,6 @@ public class Logger {
     public static void setDefaultLog(@NotNull final Log log) {
 
         if (log == null) {
-
             throw new NullPointerException("the default log instance must not be null");
         }
 
@@ -136,7 +134,6 @@ public class Logger {
             @NotNull final Object context) {
 
         if (context == null) {
-
             throw new NullPointerException("the context must not be null");
         }
 
@@ -151,7 +148,6 @@ public class Logger {
     public void dbg(@Nullable final String message) {
 
         if (mLevel <= DEBUG_LEVEL) {
-
             mLog.dbg(mContextList, message, null);
         }
     }
@@ -165,7 +161,6 @@ public class Logger {
     public void dbg(@NotNull final String format, @Nullable final Object arg1) {
 
         if (mLevel <= DEBUG_LEVEL) {
-
             mLog.dbg(mContextList, String.format(format, arg1), null);
         }
     }
@@ -181,7 +176,6 @@ public class Logger {
             @Nullable final Object arg2) {
 
         if (mLevel <= DEBUG_LEVEL) {
-
             mLog.dbg(mContextList, String.format(format, arg1, arg2), null);
         }
     }
@@ -198,7 +192,6 @@ public class Logger {
             @Nullable final Object arg2, @Nullable final Object arg3) {
 
         if (mLevel <= DEBUG_LEVEL) {
-
             mLog.dbg(mContextList, String.format(format, arg1, arg2, arg3), null);
         }
     }
@@ -216,7 +209,6 @@ public class Logger {
             @Nullable final Object arg2, @Nullable final Object arg3, @Nullable final Object arg4) {
 
         if (mLevel <= DEBUG_LEVEL) {
-
             mLog.dbg(mContextList, String.format(format, arg1, arg2, arg3, arg4), null);
         }
     }
@@ -230,7 +222,6 @@ public class Logger {
     public void dbg(@NotNull final String format, @Nullable final Object... args) {
 
         if (mLevel <= DEBUG_LEVEL) {
-
             mLog.dbg(mContextList, String.format(format, args), null);
         }
     }
@@ -243,7 +234,6 @@ public class Logger {
     public void dbg(@Nullable final Throwable throwable) {
 
         if (mLevel <= DEBUG_LEVEL) {
-
             mLog.dbg(mContextList, "", throwable);
         }
     }
@@ -257,7 +247,6 @@ public class Logger {
     public void dbg(@Nullable final Throwable throwable, @Nullable final String message) {
 
         if (mLevel <= DEBUG_LEVEL) {
-
             mLog.dbg(mContextList, message, throwable);
         }
     }
@@ -273,7 +262,6 @@ public class Logger {
             @Nullable final Object arg1) {
 
         if (mLevel <= DEBUG_LEVEL) {
-
             mLog.dbg(mContextList, String.format(format, arg1), throwable);
         }
     }
@@ -290,7 +278,6 @@ public class Logger {
             @Nullable final Object arg1, @Nullable final Object arg2) {
 
         if (mLevel <= DEBUG_LEVEL) {
-
             mLog.dbg(mContextList, String.format(format, arg1, arg2), throwable);
         }
     }
@@ -308,7 +295,6 @@ public class Logger {
             @Nullable final Object arg1, @Nullable final Object arg2, @Nullable final Object arg3) {
 
         if (mLevel <= DEBUG_LEVEL) {
-
             mLog.dbg(mContextList, String.format(format, arg1, arg2, arg3), throwable);
         }
     }
@@ -328,7 +314,6 @@ public class Logger {
             @Nullable final Object arg4) {
 
         if (mLevel <= DEBUG_LEVEL) {
-
             mLog.dbg(mContextList, String.format(format, arg1, arg2, arg3, arg4), throwable);
         }
     }
@@ -344,7 +329,6 @@ public class Logger {
             @Nullable final Object... args) {
 
         if (mLevel <= DEBUG_LEVEL) {
-
             mLog.dbg(mContextList, String.format(format, args), throwable);
         }
     }
@@ -357,7 +341,6 @@ public class Logger {
     public void err(@Nullable final String message) {
 
         if (mLevel <= ERROR_LEVEL) {
-
             mLog.err(mContextList, message, null);
         }
     }
@@ -371,7 +354,6 @@ public class Logger {
     public void err(@NotNull final String format, @Nullable final Object arg1) {
 
         if (mLevel <= ERROR_LEVEL) {
-
             mLog.err(mContextList, String.format(format, arg1), null);
         }
     }
@@ -387,7 +369,6 @@ public class Logger {
             @Nullable final Object arg2) {
 
         if (mLevel <= ERROR_LEVEL) {
-
             mLog.err(mContextList, String.format(format, arg1, arg2), null);
         }
     }
@@ -404,7 +385,6 @@ public class Logger {
             @Nullable final Object arg2, @Nullable final Object arg3) {
 
         if (mLevel <= ERROR_LEVEL) {
-
             mLog.err(mContextList, String.format(format, arg1, arg2, arg3), null);
         }
     }
@@ -422,7 +402,6 @@ public class Logger {
             @Nullable final Object arg2, @Nullable final Object arg3, @Nullable final Object arg4) {
 
         if (mLevel <= ERROR_LEVEL) {
-
             mLog.err(mContextList, String.format(format, arg1, arg2, arg3, arg4), null);
         }
     }
@@ -436,7 +415,6 @@ public class Logger {
     public void err(@NotNull final String format, @Nullable final Object... args) {
 
         if (mLevel <= ERROR_LEVEL) {
-
             mLog.err(mContextList, String.format(format, args), null);
         }
     }
@@ -449,7 +427,6 @@ public class Logger {
     public void err(@NotNull final Throwable throwable) {
 
         if (mLevel <= ERROR_LEVEL) {
-
             mLog.err(mContextList, "", throwable);
         }
     }
@@ -463,7 +440,6 @@ public class Logger {
     public void err(@NotNull final Throwable throwable, @Nullable final String message) {
 
         if (mLevel <= ERROR_LEVEL) {
-
             mLog.err(mContextList, message, throwable);
         }
     }
@@ -479,7 +455,6 @@ public class Logger {
             @Nullable final Object arg1) {
 
         if (mLevel <= ERROR_LEVEL) {
-
             mLog.err(mContextList, String.format(format, arg1), throwable);
         }
     }
@@ -496,7 +471,6 @@ public class Logger {
             @Nullable final Object arg1, @Nullable final Object arg2) {
 
         if (mLevel <= ERROR_LEVEL) {
-
             mLog.err(mContextList, String.format(format, arg1, arg2), throwable);
         }
     }
@@ -514,7 +488,6 @@ public class Logger {
             @Nullable final Object arg1, @Nullable final Object arg2, @Nullable final Object arg3) {
 
         if (mLevel <= ERROR_LEVEL) {
-
             mLog.err(mContextList, String.format(format, arg1, arg2, arg3), throwable);
         }
     }
@@ -534,7 +507,6 @@ public class Logger {
             @Nullable final Object arg4) {
 
         if (mLevel <= ERROR_LEVEL) {
-
             mLog.err(mContextList, String.format(format, arg1, arg2, arg3, arg4), throwable);
         }
     }
@@ -550,7 +522,6 @@ public class Logger {
             @Nullable final Object... args) {
 
         if (mLevel <= ERROR_LEVEL) {
-
             mLog.err(mContextList, String.format(format, args), throwable);
         }
     }
@@ -600,7 +571,6 @@ public class Logger {
     public Logger subContextLogger(@NotNull final Object context) {
 
         if (context == null) {
-
             throw new NullPointerException("the context must not be null");
         }
 
@@ -620,7 +590,6 @@ public class Logger {
     public void wrn(@Nullable final String message) {
 
         if (mLevel <= WARNING_LEVEL) {
-
             mLog.wrn(mContextList, message, null);
         }
     }
@@ -634,7 +603,6 @@ public class Logger {
     public void wrn(@NotNull final String format, @Nullable final Object arg1) {
 
         if (mLevel <= WARNING_LEVEL) {
-
             mLog.wrn(mContextList, String.format(format, arg1), null);
         }
     }
@@ -650,7 +618,6 @@ public class Logger {
             @Nullable final Object arg2) {
 
         if (mLevel <= WARNING_LEVEL) {
-
             mLog.wrn(mContextList, String.format(format, arg1, arg2), null);
         }
     }
@@ -667,7 +634,6 @@ public class Logger {
             @Nullable final Object arg2, @Nullable final Object arg3) {
 
         if (mLevel <= WARNING_LEVEL) {
-
             mLog.wrn(mContextList, String.format(format, arg1, arg2, arg3), null);
         }
     }
@@ -685,7 +651,6 @@ public class Logger {
             @Nullable final Object arg2, @Nullable final Object arg3, @Nullable final Object arg4) {
 
         if (mLevel <= WARNING_LEVEL) {
-
             mLog.wrn(mContextList, String.format(format, arg1, arg2, arg3, arg4), null);
         }
     }
@@ -699,7 +664,6 @@ public class Logger {
     public void wrn(@NotNull final String format, @Nullable final Object... args) {
 
         if (mLevel <= WARNING_LEVEL) {
-
             mLog.wrn(mContextList, String.format(format, args), null);
         }
     }
@@ -712,7 +676,6 @@ public class Logger {
     public void wrn(@NotNull final Throwable throwable) {
 
         if (mLevel <= WARNING_LEVEL) {
-
             mLog.wrn(mContextList, "", throwable);
         }
     }
@@ -726,7 +689,6 @@ public class Logger {
     public void wrn(@NotNull final Throwable throwable, @Nullable final String message) {
 
         if (mLevel <= WARNING_LEVEL) {
-
             mLog.wrn(mContextList, message, throwable);
         }
     }
@@ -742,7 +704,6 @@ public class Logger {
             @Nullable final Object arg1) {
 
         if (mLevel <= WARNING_LEVEL) {
-
             mLog.wrn(mContextList, String.format(format, arg1), throwable);
         }
     }
@@ -759,7 +720,6 @@ public class Logger {
             @Nullable final Object arg1, @Nullable final Object arg2) {
 
         if (mLevel <= WARNING_LEVEL) {
-
             mLog.wrn(mContextList, String.format(format, arg1, arg2), throwable);
         }
     }
@@ -777,7 +737,6 @@ public class Logger {
             @Nullable final Object arg1, @Nullable final Object arg2, @Nullable final Object arg3) {
 
         if (mLevel <= WARNING_LEVEL) {
-
             mLog.wrn(mContextList, String.format(format, arg1, arg2, arg3), throwable);
         }
     }
@@ -797,7 +756,6 @@ public class Logger {
             @Nullable final Object arg4) {
 
         if (mLevel <= WARNING_LEVEL) {
-
             mLog.wrn(mContextList, String.format(format, arg1, arg2, arg3, arg4), throwable);
         }
     }
@@ -813,7 +771,6 @@ public class Logger {
             @Nullable final Object... args) {
 
         if (mLevel <= WARNING_LEVEL) {
-
             mLog.wrn(mContextList, String.format(format, args), throwable);
         }
     }

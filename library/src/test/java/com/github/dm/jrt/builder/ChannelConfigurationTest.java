@@ -177,7 +177,7 @@ public class ChannelConfigurationTest {
                                                             .withChannelMaxSize(100)
                                                             .set();
         assertThat(configuration).isNotEqualTo(
-                builder().withChannelOrder(OrderType.BY_CHANCE).set());
+                builder().withChannelOrder(OrderType.BY_DELAY).set());
         assertThat(
                 configuration.builderFrom().withChannelOrder(OrderType.BY_CALL).set()).isNotEqualTo(
                 builder().withChannelOrder(OrderType.BY_CALL).set());

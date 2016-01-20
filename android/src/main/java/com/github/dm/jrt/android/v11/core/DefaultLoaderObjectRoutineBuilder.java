@@ -89,12 +89,10 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             @NotNull final ContextInvocationTarget<?> target) {
 
         if (context == null) {
-
             throw new NullPointerException("the routine context must not be null");
         }
 
         if (target == null) {
-
             throw new NullPointerException("the invocation target must not be null");
         }
 
@@ -108,40 +106,29 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         final LoaderConfiguration.Builder<LoaderConfiguration> builder =
                 configuration.builderFrom();
-
         final LoaderId idAnnotation = method.getAnnotation(LoaderId.class);
-
         if (idAnnotation != null) {
-
             builder.withId(idAnnotation.value());
         }
 
         final ClashResolution clashAnnotation = method.getAnnotation(ClashResolution.class);
-
         if (clashAnnotation != null) {
-
             builder.withClashResolution(clashAnnotation.value());
         }
 
         final InputClashResolution inputClashAnnotation =
                 method.getAnnotation(InputClashResolution.class);
-
         if (inputClashAnnotation != null) {
-
             builder.withInputClashResolution(inputClashAnnotation.value());
         }
 
         final CacheStrategy cacheAnnotation = method.getAnnotation(CacheStrategy.class);
-
         if (cacheAnnotation != null) {
-
             builder.withCacheStrategy(cacheAnnotation.value());
         }
 
         final ResultStaleTime staleTimeAnnotation = method.getAnnotation(ResultStaleTime.class);
-
         if (staleTimeAnnotation != null) {
-
             builder.withResultStaleTime(staleTimeAnnotation.value(), staleTimeAnnotation.unit());
         }
 
@@ -154,9 +141,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         final ContextInvocationTarget<?> target = mTarget;
         final Method targetMethod = getAnnotatedMethod(target.getTargetClass(), name);
-
         if (targetMethod == null) {
-
             throw new IllegalArgumentException(
                     "no annotated method with alias '" + name + "' has been found");
         }
@@ -191,7 +176,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
 
         if (!itf.isInterface()) {
-
             throw new IllegalArgumentException(
                     "the specified class is not an interface: " + itf.getName());
         }
@@ -252,7 +236,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             @NotNull final LoaderConfiguration configuration) {
 
         if (configuration == null) {
-
             throw new NullPointerException("the loader configuration must not be null");
         }
 
@@ -266,7 +249,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             @NotNull final ProxyConfiguration configuration) {
 
         if (configuration == null) {
-
             throw new NullPointerException("the proxy configuration must not be null");
         }
 
@@ -280,7 +262,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             @NotNull final InvocationConfiguration configuration) {
 
         if (configuration == null) {
-
             throw new NullPointerException("the invocation configuration must not be null");
         }
 
@@ -334,9 +315,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         public void onContext(@NotNull final Context context) {
 
             super.onContext(context);
-
             try {
-
                 final InvocationTarget<?> target = mTarget.getInvocationTarget(context);
                 mInstance = target.getTarget();
                 mRoutine = JRoutine.on(target)
@@ -346,7 +325,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                                    .aliasMethod(mAliasName);
 
             } catch (final Throwable t) {
-
                 throw InvocationException.wrapIfNeeded(t);
             }
         }
@@ -356,9 +334,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 @NotNull final ResultChannel<OUT> result) {
 
             final Routine<IN, OUT> routine = mRoutine;
-
             if ((routine == null) || (mInstance == null)) {
-
                 throw new IllegalStateException("such error should never happen");
             }
 
@@ -446,9 +422,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 @NotNull final ResultChannel<OUT> result) {
 
             final Routine<IN, OUT> routine = mRoutine;
-
             if ((routine == null) || (mInstance == null)) {
-
                 throw new IllegalStateException("such error should never happen");
             }
 
@@ -459,9 +433,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         public void onContext(@NotNull final Context context) {
 
             super.onContext(context);
-
             try {
-
                 final InvocationTarget<?> target = mTarget.getInvocationTarget(context);
                 mInstance = target.getTarget();
                 mRoutine = JRoutine.on(target)
@@ -471,7 +443,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                                    .method(mMethod);
 
             } catch (final Throwable t) {
-
                 throw InvocationException.wrapIfNeeded(t);
             }
         }
@@ -562,9 +533,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 @NotNull final ResultChannel<Object> result) {
 
             final Object targetInstance = mInstance;
-
             if (targetInstance == null) {
-
                 throw new IllegalStateException("the target object has been destroyed");
             }
 
@@ -576,9 +545,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         public void onContext(@NotNull final Context context) {
 
             super.onContext(context);
-
             try {
-
                 final InvocationTarget<?> target = mTarget.getInvocationTarget(context);
                 final Object mutexTarget =
                         (Modifier.isStatic(mTargetMethod.getModifiers())) ? target.getTargetClass()
@@ -587,7 +554,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 mInstance = target.getTarget();
 
             } catch (final Throwable t) {
-
                 throw InvocationException.wrapIfNeeded(t);
             }
         }

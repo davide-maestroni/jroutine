@@ -77,9 +77,7 @@ class DefaultObjectRoutineBuilder
     DefaultObjectRoutineBuilder(@NotNull final InvocationTarget<?> target) {
 
         final Class<?> targetClass = target.getTargetClass();
-
         if (targetClass.isInterface()) {
-
             throw new IllegalArgumentException(
                     "the target class must not be an interface: " + targetClass.getName());
         }
@@ -91,9 +89,7 @@ class DefaultObjectRoutineBuilder
     public <IN, OUT> Routine<IN, OUT> aliasMethod(@NotNull final String name) {
 
         final Method method = getAnnotatedMethod(mTarget.getTargetClass(), name);
-
         if (method == null) {
-
             throw new IllegalArgumentException(
                     "no annotated method with alias '" + name + "' has been found");
         }
@@ -111,7 +107,6 @@ class DefaultObjectRoutineBuilder
     public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
 
         if (!itf.isInterface()) {
-
             throw new IllegalArgumentException(
                     "the specified class is not an interface: " + itf.getName());
         }
@@ -141,7 +136,6 @@ class DefaultObjectRoutineBuilder
     public ObjectRoutineBuilder setConfiguration(@NotNull final ProxyConfiguration configuration) {
 
         if (configuration == null) {
-
             throw new NullPointerException("the proxy configuration must not be null");
         }
 
@@ -155,7 +149,6 @@ class DefaultObjectRoutineBuilder
             @NotNull final InvocationConfiguration configuration) {
 
         if (configuration == null) {
-
             throw new NullPointerException("the invocation configuration must not be null");
         }
 
@@ -186,20 +179,15 @@ class DefaultObjectRoutineBuilder
 
         final InvocationTarget<?> target = mTarget;
         final Object targetInstance = target.getTarget();
-
         if (targetInstance == null) {
-
             throw new IllegalStateException("the target object has been destroyed");
         }
 
         synchronized (sRoutines) {
-
             final WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<?, ?>>> routines =
                     sRoutines;
             HashMap<RoutineInfo, Routine<?, ?>> routineMap = routines.get(targetInstance);
-
             if (routineMap == null) {
-
                 routineMap = new HashMap<RoutineInfo, Routine<?, ?>>();
                 routines.put(targetInstance, routineMap);
             }
@@ -208,9 +196,7 @@ class DefaultObjectRoutineBuilder
                     new RoutineInfo(invocationConfiguration, proxyConfiguration, method, inputMode,
                                     outputMode);
             Routine<?, ?> routine = routineMap.get(routineInfo);
-
             if (routine == null) {
-
                 final MethodInvocationFactory factory =
                         new MethodInvocationFactory(proxyConfiguration, target, method, inputMode,
                                                     outputMode);
@@ -265,9 +251,7 @@ class DefaultObjectRoutineBuilder
                 @NotNull final ResultChannel<Object> result) {
 
             final Object target = mTarget.getTarget();
-
             if (target == null) {
-
                 throw new IllegalStateException("the target object has been destroyed");
             }
 
@@ -371,12 +355,10 @@ class DefaultObjectRoutineBuilder
 
             // AUTO-GENERATED CODE
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof RoutineInfo)) {
-
                 return false;
             }
 

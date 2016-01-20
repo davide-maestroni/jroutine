@@ -35,7 +35,6 @@ public class RunnerDecorator implements Runner {
     public RunnerDecorator(@NotNull final Runner wrapped) {
 
         if (wrapped == null) {
-
             throw new NullPointerException("the wrapped runner must not be null");
         }
 

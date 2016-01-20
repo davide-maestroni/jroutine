@@ -95,9 +95,7 @@ public class DelegatingInvocation<IN, OUT> implements Invocation<IN, OUT> {
     public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
 
         final OutputChannel<OUT> outputChannel = mOutputChannel;
-
         if (!outputChannel.isBound()) {
-
             outputChannel.passTo(result);
         }
 
@@ -107,9 +105,7 @@ public class DelegatingInvocation<IN, OUT> implements Invocation<IN, OUT> {
     public void onResult(@NotNull final ResultChannel<OUT> result) {
 
         final OutputChannel<OUT> outputChannel = mOutputChannel;
-
         if (!outputChannel.isBound()) {
-
             outputChannel.passTo(result);
         }
 
@@ -164,12 +160,10 @@ public class DelegatingInvocation<IN, OUT> implements Invocation<IN, OUT> {
                 @NotNull final DelegationType delegationType) {
 
             if (routine == null) {
-
                 throw new NullPointerException("the routine must not be null");
             }
 
             if (delegationType == null) {
-
                 throw new NullPointerException("the invocation type must not be null");
             }
 

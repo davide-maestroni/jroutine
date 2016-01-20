@@ -28,7 +28,7 @@ import java.util.Comparator;
  * @param <IN2> the second input data type.
  * @param <OUT> the output data type.
  */
-public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OUT>, Wrapper {
+public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OUT> {
 
     private static final WeakIdentityHashMap<Comparator<?>, BiFunctionWrapper<?, ?, ?>>
             mMaxFunctions = new WeakIdentityHashMap<Comparator<?>, BiFunctionWrapper<?, ?, ?>>();
@@ -67,9 +67,7 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
     BiFunctionWrapper(@NotNull final BiFunction<IN1, IN2, ?> biFunction) {
 
         this(biFunction, FunctionWrapper.<OUT>identity());
-
         if (biFunction == null) {
-
             throw new NullPointerException("the bi-function instance must not be null");
         }
     }
@@ -116,27 +114,16 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
             @NotNull final Comparator<? super IN> comparator) {
 
         if (comparator == null) {
-
             throw new NullPointerException("the comparator must not be null");
         }
 
         synchronized (mMaxFunctions) {
-
             final WeakIdentityHashMap<Comparator<?>, BiFunctionWrapper<?, ?, ?>> functions =
                     mMaxFunctions;
             BiFunctionWrapper<IN, IN, IN> function =
                     (BiFunctionWrapper<IN, IN, IN>) functions.get(comparator);
-
             if (function == null) {
-
-                function = new BiFunctionWrapper<IN, IN, IN>(new BiFunction<IN, IN, IN>() {
-
-                    public IN apply(final IN in1, final IN in2) {
-
-                        return (comparator.compare(in1, in2) > 0) ? in1 : in2;
-                    }
-                });
-
+                function = new BiFunctionWrapper<IN, IN, IN>(new MaxByFunction<IN>(comparator));
                 functions.put(comparator, function);
             }
 
@@ -158,27 +145,16 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
             @NotNull final Comparator<? super IN> comparator) {
 
         if (comparator == null) {
-
             throw new NullPointerException("the comparator must not be null");
         }
 
         synchronized (mMinFunctions) {
-
             final WeakIdentityHashMap<Comparator<?>, BiFunctionWrapper<?, ?, ?>> functions =
                     mMinFunctions;
             BiFunctionWrapper<IN, IN, IN> function =
                     (BiFunctionWrapper<IN, IN, IN>) functions.get(comparator);
-
             if (function == null) {
-
-                function = new BiFunctionWrapper<IN, IN, IN>(new BiFunction<IN, IN, IN>() {
-
-                    public IN apply(final IN in1, final IN in2) {
-
-                        return (comparator.compare(in1, in2) < 0) ? in1 : in2;
-                    }
-                });
-
+                function = new BiFunctionWrapper<IN, IN, IN>(new MinByFunction<IN>(comparator));
                 functions.put(comparator, function);
             }
 
@@ -224,65 +200,111 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
         return result;
     }
 
+    /**
+     * Bi-function returning the maximum between the two inputs.
+     *
+     * @param <IN> the input data type.
+     */
+    private static class MaxByFunction<IN> implements BiFunction<IN, IN, IN> {
+
+        private final Comparator<? super IN> mComparator;
+
+        /**
+         * Constructor.
+         *
+         * @param comparator the input comparator.
+         */
+        private MaxByFunction(@NotNull final Comparator<? super IN> comparator) {
+
+            mComparator = comparator;
+        }
+
+        public IN apply(final IN in1, final IN in2) {
+
+            return (mComparator.compare(in1, in2) > 0) ? in1 : in2;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+                return true;
+            }
+
+            if (!(o instanceof MaxByFunction)) {
+                return false;
+            }
+
+            final MaxByFunction<?> that = (MaxByFunction<?>) o;
+            return mComparator.equals(that.mComparator);
+        }
+
+        @Override
+        public int hashCode() {
+
+            return mComparator.hashCode();
+        }
+    }
+
+    /**
+     * Bi-function returning the minimum between the two inputs.
+     *
+     * @param <IN> the input data type.
+     */
+    private static class MinByFunction<IN> implements BiFunction<IN, IN, IN> {
+
+        private final Comparator<? super IN> mComparator;
+
+        /**
+         * Constructor.
+         *
+         * @param comparator the input comparator.
+         */
+        private MinByFunction(@NotNull final Comparator<? super IN> comparator) {
+
+            mComparator = comparator;
+        }
+
+        public IN apply(final IN in1, final IN in2) {
+
+            return (mComparator.compare(in1, in2) < 0) ? in1 : in2;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+                return true;
+            }
+
+            if (!(o instanceof MinByFunction)) {
+                return false;
+            }
+
+            final MinByFunction<?> that = (MinByFunction<?>) o;
+            return mComparator.equals(that.mComparator);
+        }
+
+        @Override
+        public int hashCode() {
+
+            return mComparator.hashCode();
+        }
+    }
+
     @Override
     public boolean equals(final Object o) {
 
         if (this == o) {
-
             return true;
         }
 
         if (!(o instanceof BiFunctionWrapper)) {
-
             return false;
         }
 
         final BiFunctionWrapper<?, ?, ?> that = (BiFunctionWrapper<?, ?, ?>) o;
         return mBiFunction.equals(that.mBiFunction) && mFunction.equals(that.mFunction);
-    }
-
-    public boolean safeEquals(final Object o) {
-
-        if (this == o) {
-
-            return true;
-        }
-
-        if (!(o instanceof BiFunctionWrapper)) {
-
-            return false;
-        }
-
-        final BiFunctionWrapper<?, ?, ?> that = (BiFunctionWrapper<?, ?, ?>) o;
-        final BiFunction<IN1, IN2, ?> thisFunction = mBiFunction;
-        final BiFunction<?, ?, ?> thatFunction = that.mBiFunction;
-        final Class<? extends BiFunction> thisFunctionClass = thisFunction.getClass();
-        final Class<? extends BiFunction> thatFunctionClass = thatFunction.getClass();
-
-        if (thisFunctionClass.isAnonymousClass()) {
-
-            if (!thatFunctionClass.isAnonymousClass() || !thisFunctionClass.equals(
-                    thatFunctionClass)) {
-
-                return false;
-            }
-
-        } else if (thatFunctionClass.isAnonymousClass() || !thisFunction.equals(thatFunction)) {
-
-            return false;
-        }
-
-        return mFunction.safeEquals(that.mFunction);
-    }
-
-    public int safeHashCode() {
-
-        final BiFunction<IN1, IN2, ?> function = mBiFunction;
-        final Class<? extends BiFunction> functionClass = function.getClass();
-        int result =
-                functionClass.isAnonymousClass() ? functionClass.hashCode() : function.hashCode();
-        result = 31 * result + mFunction.safeHashCode();
-        return result;
     }
 
     @SuppressWarnings("unchecked")

@@ -75,12 +75,10 @@ class AccumulateInvocation<IN> extends TemplateInvocation<IN, IN> {
     public void onInput(final IN input, @NotNull final ResultChannel<IN> result) {
 
         if (mIsFirst) {
-
             mIsFirst = false;
             mAccumulated = input;
 
         } else {
-
             mAccumulated = mFunction.apply(mAccumulated, input);
         }
     }
@@ -120,24 +118,22 @@ class AccumulateInvocation<IN> extends TemplateInvocation<IN, IN> {
         @Override
         public int hashCode() {
 
-            return mFunction.safeHashCode();
+            return mFunction.hashCode();
         }
 
         @Override
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof AccumulateInvocationFactory)) {
-
                 return false;
             }
 
             final AccumulateInvocationFactory<?> that = (AccumulateInvocationFactory<?>) o;
-            return mFunction.safeEquals(that.mFunction);
+            return mFunction.equals(that.mFunction);
         }
 
         @NotNull

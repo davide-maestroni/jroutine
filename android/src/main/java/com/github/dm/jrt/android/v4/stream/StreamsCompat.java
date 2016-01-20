@@ -134,7 +134,7 @@ public class StreamsCompat extends ChannelsCompat {
                     StreamChannel<? extends OUT>> function) {
 
         return factoryFrom(com.github.dm.jrt.stream.Streams.on(function),
-                           wrapFunction(function).safeHashCode(), DelegationType.SYNC);
+                           wrapFunction(function).hashCode(), DelegationType.SYNC);
     }
 
     /**
@@ -422,12 +422,9 @@ public class StreamsCompat extends ChannelsCompat {
     public static StreamContextBuilder with(@NotNull final LoaderContextCompat context) {
 
         synchronized (sBuilders) {
-
             final WeakHashMap<LoaderContextCompat, StreamContextBuilder> builders = sBuilders;
             StreamContextBuilder contextBuilder = builders.get(context);
-
             if (contextBuilder == null) {
-
                 contextBuilder = new StreamContextBuilder(JRoutineCompat.with(context));
                 builders.put(context, contextBuilder);
             }

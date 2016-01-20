@@ -62,12 +62,10 @@ class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, O
             @NotNull final TargetInvocationFactory<IN, OUT> target) {
 
         if (context == null) {
-
             throw new NullPointerException("the context must not be null");
         }
 
         if (target == null) {
-
             throw new NullPointerException("the invocation target not be null");
         }
 
@@ -107,7 +105,6 @@ class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, O
             @NotNull final ServiceConfiguration configuration) {
 
         if (configuration == null) {
-
             throw new NullPointerException("the service configuration must not be null");
         }
 

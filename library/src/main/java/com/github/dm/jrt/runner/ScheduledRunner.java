@@ -48,7 +48,6 @@ class ScheduledRunner implements Runner {
     ScheduledRunner(@NotNull final ScheduledExecutorService service) {
 
         if (service == null) {
-
             throw new NullPointerException("the executor service must not be null");
         }
 
@@ -58,14 +57,10 @@ class ScheduledRunner implements Runner {
     public void cancel(@NotNull final Execution execution) {
 
         synchronized (mFutures) {
-
             final WeakHashMap<ScheduledFuture<?>, Void> scheduledFutures =
                     mFutures.remove(execution);
-
             if (scheduledFutures != null) {
-
                 for (final ScheduledFuture<?> future : scheduledFutures.keySet()) {
-
                     future.cancel(false);
                 }
             }
@@ -82,17 +77,12 @@ class ScheduledRunner implements Runner {
 
         final ScheduledFuture<?> future =
                 mService.schedule(new ExecutionWrapper(execution, mThreads), delay, timeUnit);
-
         if (execution.mayBeCanceled()) {
-
             synchronized (mFutures) {
-
                 final WeakIdentityHashMap<Execution, WeakHashMap<ScheduledFuture<?>, Void>>
                         futures = mFutures;
                 WeakHashMap<ScheduledFuture<?>, Void> scheduledFutures = futures.get(execution);
-
                 if (scheduledFutures == null) {
-
                     scheduledFutures = new WeakHashMap<ScheduledFuture<?>, Void>();
                     futures.put(execution, scheduledFutures);
                 }
@@ -130,9 +120,7 @@ class ScheduledRunner implements Runner {
         public void run() {
 
             final Thread currentThread = Thread.currentThread();
-
             if (currentThread != mCurrentThread) {
-
                 mThreads.put(currentThread, null);
             }
 

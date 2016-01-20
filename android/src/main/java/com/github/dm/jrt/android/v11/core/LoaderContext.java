@@ -55,7 +55,6 @@ public abstract class LoaderContext {
     public static LoaderContext loaderFrom(@NotNull final Activity activity) {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
             throw new UnsupportedOperationException(
                     "this method is supported only for API level >= " + VERSION_CODES.HONEYCOMB
                             + ": use com.github.dm.jrt.android.v4.routine.JRoutineCompat class "
@@ -79,7 +78,6 @@ public abstract class LoaderContext {
             @NotNull final Context context) {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
             throw new UnsupportedOperationException(
                     "this method is supported only for API level >= " + VERSION_CODES.HONEYCOMB
                             + ": use com.github.dm.jrt.android.v4.routine.JRoutineCompat class "
@@ -158,7 +156,6 @@ public abstract class LoaderContext {
         private ActivityContext(@NotNull final Activity activity) {
 
             if (activity == null) {
-
                 throw new NullPointerException("the activity must not be null");
             }
 
@@ -169,12 +166,10 @@ public abstract class LoaderContext {
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof ActivityContext)) {
-
                 return false;
             }
 
@@ -230,7 +225,6 @@ public abstract class LoaderContext {
         private FragmentContext(@NotNull final Fragment fragment) {
 
             if (fragment == null) {
-
                 throw new NullPointerException("the fragment must not be null");
             }
 
@@ -241,12 +235,10 @@ public abstract class LoaderContext {
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof FragmentContext)) {
-
                 return false;
             }
 
@@ -304,11 +296,8 @@ public abstract class LoaderContext {
                 @NotNull final Context context) {
 
             super(activity);
-
             final Class<? extends Context> contextClass = context.getClass();
-
             if (!Reflection.hasStaticContext(contextClass)) {
-
                 throw new IllegalArgumentException(
                         "the context class must have a static context: " + contextClass.getName());
             }
@@ -320,17 +309,14 @@ public abstract class LoaderContext {
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof WrappedActivityContext)) {
-
                 return false;
             }
 
             if (!super.equals(o)) {
-
                 return false;
             }
 
@@ -374,11 +360,8 @@ public abstract class LoaderContext {
                 @NotNull final Context context) {
 
             super(fragment);
-
             final Class<? extends Context> contextClass = context.getClass();
-
             if (!Reflection.hasStaticContext(contextClass)) {
-
                 throw new IllegalArgumentException(
                         "the context class must have a static context: " + contextClass.getName());
             }
@@ -390,17 +373,14 @@ public abstract class LoaderContext {
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof WrappedFragmentContext)) {
-
                 return false;
             }
 
             if (!super.equals(o)) {
-
                 return false;
             }
 

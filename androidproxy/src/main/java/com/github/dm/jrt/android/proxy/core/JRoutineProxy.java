@@ -70,7 +70,6 @@ public class JRoutineProxy extends com.github.dm.jrt.proxy.core.JRoutineProxy {
         private ContextBuilder(@NotNull final ServiceContext context) {
 
             if (context == null) {
-
                 throw new NullPointerException("the context must not be null");
             }
 

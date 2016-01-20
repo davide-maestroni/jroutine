@@ -60,12 +60,6 @@ public interface InvocationChannel<IN, OUT> extends InputChannel<IN> {
      * {@inheritDoc}
      */
     @NotNull
-    InvocationChannel<IN, OUT> orderByChance();
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
     InvocationChannel<IN, OUT> orderByDelay();
 
     /**

@@ -306,7 +306,7 @@ public class StreamsTest {
                     public StreamChannel<String> apply(
                             final StreamChannel<? extends String> channel) {
 
-                        return channel.syncMap(new Function<String, String>() {
+                        return channel.sync().map(new Function<String, String>() {
 
                             public String apply(final String s) {
 
@@ -338,7 +338,7 @@ public class StreamsTest {
                     public StreamChannel<String> apply(
                             final StreamChannel<? extends String> channel) {
 
-                        return channel.syncMap(new Function<String, String>() {
+                        return channel.sync().map(new Function<String, String>() {
 
                             public String apply(final String s) {
 
@@ -357,7 +357,7 @@ public class StreamsTest {
                         public StreamChannel<String> apply(
                                 final StreamChannel<? extends String> channel) {
 
-                            return channel.syncMap(new Function<String, String>() {
+                            return channel.sync().map(new Function<String, String>() {
 
                                 public String apply(final String s) {
 
@@ -385,7 +385,7 @@ public class StreamsTest {
                     public StreamChannel<String> apply(
                             final StreamChannel<? extends String> channel) {
 
-                        return channel.syncMap(new Function<String, String>() {
+                        return channel.sync().map(new Function<String, String>() {
 
                             public String apply(final String s) {
 
@@ -433,16 +433,20 @@ public class StreamsTest {
     public void testGroupBy() {
 
         assertThat(Streams.streamOf()
-                          .syncRange(1, 10)
-                          .asyncMap(Streams.<Number>groupBy(3))
+                          .sync()
+                          .range(1, 10)
+                          .async()
+                          .map(Streams.<Number>groupBy(3))
                           .afterMax(seconds(3))
                           .all()).containsExactly(Arrays.<Number>asList(1, 2, 3),
                                                   Arrays.<Number>asList(4, 5, 6),
                                                   Arrays.<Number>asList(7, 8, 9),
                                                   Collections.<Number>singletonList(10));
         assertThat(Streams.streamOf()
-                          .syncRange(1, 10)
-                          .asyncMap(Streams.<Number>groupBy(13))
+                          .sync()
+                          .range(1, 10)
+                          .async()
+                          .map(Streams.<Number>groupBy(13))
                           .afterMax(seconds(3))
                           .all()).containsExactly(
                 Arrays.<Number>asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
@@ -741,23 +745,31 @@ public class StreamsTest {
     public void testLimit() {
 
         assertThat(Streams.streamOf()
-                          .syncRange(1, 10)
-                          .asyncMap(Streams.limit(5))
+                          .sync()
+                          .range(1, 10)
+                          .async()
+                          .map(Streams.limit(5))
                           .afterMax(seconds(3))
                           .all()).containsExactly(1, 2, 3, 4, 5);
         assertThat(Streams.streamOf()
-                          .syncRange(1, 10)
-                          .asyncMap(Streams.limit(0))
+                          .sync()
+                          .range(1, 10)
+                          .async()
+                          .map(Streams.limit(0))
                           .afterMax(seconds(3))
                           .all()).isEmpty();
         assertThat(Streams.streamOf()
-                          .syncRange(1, 10)
-                          .asyncMap(Streams.limit(15))
+                          .sync()
+                          .range(1, 10)
+                          .async()
+                          .map(Streams.limit(15))
                           .afterMax(seconds(3))
                           .all()).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
         assertThat(Streams.streamOf()
-                          .syncRange(1, 10)
-                          .asyncMap(Streams.limit(0))
+                          .sync()
+                          .range(1, 10)
+                          .async()
+                          .map(Streams.limit(0))
                           .afterMax(seconds(3))
                           .all()).isEmpty();
     }
@@ -1111,18 +1123,24 @@ public class StreamsTest {
     public void testSkip() {
 
         assertThat(Streams.streamOf()
-                          .syncRange(1, 10)
-                          .asyncMap(Streams.skip(5))
+                          .sync()
+                          .range(1, 10)
+                          .async()
+                          .map(Streams.skip(5))
                           .afterMax(seconds(3))
                           .all()).containsExactly(6, 7, 8, 9, 10);
         assertThat(Streams.streamOf()
-                          .syncRange(1, 10)
-                          .asyncMap(Streams.skip(15))
+                          .sync()
+                          .range(1, 10)
+                          .async()
+                          .map(Streams.skip(15))
                           .afterMax(seconds(3))
                           .all()).isEmpty();
         assertThat(Streams.streamOf()
-                          .syncRange(1, 10)
-                          .asyncMap(Streams.skip(0))
+                          .sync()
+                          .range(1, 10)
+                          .async()
+                          .map(Streams.skip(0))
                           .afterMax(seconds(3))
                           .all()).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
     }

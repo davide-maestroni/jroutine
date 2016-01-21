@@ -122,111 +122,7 @@ public interface LoaderStreamChannel<OUT>
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> asyncCollect(
-            @NotNull BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
-                    consumer);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> asyncCollect(
-            @NotNull Function<? super List<? extends OUT>, ? extends AFTER> function);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    LoaderStreamChannel<OUT> asyncFilter(@NotNull Predicate<? super OUT> predicate);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    LoaderStreamChannel<Void> asyncForEach(@NotNull Consumer<? super OUT> consumer);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> asyncGenerate(
-            @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> asyncGenerate(long count,
-            @NotNull Supplier<? extends AFTER> supplier);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> asyncGenerate(@NotNull Supplier<? extends AFTER> supplier);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> asyncLift(
-            @NotNull Function<? super OUT, ? extends OutputChannel<? extends AFTER>> function);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> asyncMap(
-            @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> asyncMap(
-            @NotNull Function<? super OUT, ? extends AFTER> function);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> asyncMap(
-            @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> asyncMap(
-            @NotNull Routine<? super OUT, ? extends AFTER> routine);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    <AFTER extends Comparable<AFTER>> LoaderStreamChannel<AFTER> asyncRange(
-            @NotNull final AFTER start, @NotNull final AFTER end,
-            @NotNull final Function<AFTER, AFTER> increment);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    LoaderStreamChannel<Number> asyncRange(@NotNull final Number start, @NotNull final Number end);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    LoaderStreamChannel<Number> asyncRange(@NotNull final Number start, @NotNull final Number end,
-            @NotNull final Number increment);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    LoaderStreamChannel<OUT> asyncReduce(
-            @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
+    LoaderStreamChannel<OUT> async();
 
     /**
      * {@inheritDoc}
@@ -246,6 +142,112 @@ public interface LoaderStreamChannel<OUT>
      * {@inheritDoc}
      */
     @NotNull
+    <AFTER> LoaderStreamChannel<AFTER> collect(
+            @NotNull BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
+                    consumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    <AFTER> LoaderStreamChannel<AFTER> collect(
+            @NotNull Function<? super List<? extends OUT>, ? extends AFTER> function);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    LoaderStreamChannel<OUT> filter(@NotNull Predicate<? super OUT> predicate);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    <AFTER> LoaderStreamChannel<AFTER> flatMap(
+            @NotNull Function<? super OUT, ? extends OutputChannel<? extends AFTER>> function);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    LoaderStreamChannel<Void> forEach(@NotNull Consumer<? super OUT> consumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    <AFTER> LoaderStreamChannel<AFTER> generate(AFTER output);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    <AFTER> LoaderStreamChannel<AFTER> generate(AFTER... outputs);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    <AFTER> LoaderStreamChannel<AFTER> generate(Iterable<? extends AFTER> outputs);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    <AFTER> LoaderStreamChannel<AFTER> generate(long count,
+            @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    <AFTER> LoaderStreamChannel<AFTER> generate(
+            @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    <AFTER> LoaderStreamChannel<AFTER> generate(long count,
+            @NotNull Supplier<? extends AFTER> supplier);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    <AFTER> LoaderStreamChannel<AFTER> generate(@NotNull Supplier<? extends AFTER> supplier);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    <AFTER> LoaderStreamChannel<AFTER> map(
+            @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    <AFTER> LoaderStreamChannel<AFTER> map(
+            @NotNull Function<? super OUT, ? extends AFTER> function);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    <AFTER> LoaderStreamChannel<AFTER> map(
+            @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    <AFTER> LoaderStreamChannel<AFTER> map(@NotNull Routine<? super OUT, ? extends AFTER> routine);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
     LoaderStreamChannel<OUT> maxParallelInvocations(int maxInvocations);
 
     /**
@@ -258,78 +260,34 @@ public interface LoaderStreamChannel<OUT>
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannel<OUT> parallelFilter(@NotNull Predicate<? super OUT> predicate);
+    LoaderStreamChannel<OUT> parallel();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> parallelGenerate(long count,
-            @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
+    <AFTER extends Comparable<AFTER>> LoaderStreamChannel<AFTER> range(@NotNull final AFTER start,
+            @NotNull final AFTER end, @NotNull final Function<AFTER, AFTER> increment);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> parallelGenerate(long count,
-            @NotNull Supplier<? extends AFTER> supplier);
+    LoaderStreamChannel<Number> range(@NotNull final Number start, @NotNull final Number end);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> parallelLift(
-            @NotNull Function<? super OUT, ? extends OutputChannel<? extends AFTER>> function);
+    LoaderStreamChannel<Number> range(@NotNull final Number start, @NotNull final Number end,
+            @NotNull final Number increment);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> parallelMap(
-            @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> parallelMap(
-            @NotNull Function<? super OUT, ? extends AFTER> function);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> parallelMap(
-            @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> parallelMap(
-            @NotNull Routine<? super OUT, ? extends AFTER> routine);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    <AFTER extends Comparable<AFTER>> LoaderStreamChannel<AFTER> parallelRange(
-            @NotNull final AFTER start, @NotNull final AFTER end,
-            @NotNull final Function<AFTER, AFTER> increment);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    LoaderStreamChannel<Number> parallelRange(@NotNull final Number start,
-            @NotNull final Number end);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    LoaderStreamChannel<Number> parallelRange(@NotNull final Number start,
-            @NotNull final Number end, @NotNull final Number increment);
+    LoaderStreamChannel<OUT> reduce(
+            @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
 
     /**
      * {@inheritDoc}
@@ -353,111 +311,7 @@ public interface LoaderStreamChannel<OUT>
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> syncCollect(
-            @NotNull BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
-                    consumer);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> syncCollect(
-            @NotNull Function<? super List<? extends OUT>, ? extends AFTER> function);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    LoaderStreamChannel<OUT> syncFilter(@NotNull Predicate<? super OUT> predicate);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    LoaderStreamChannel<Void> syncForEach(@NotNull Consumer<? super OUT> consumer);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> syncGenerate(
-            @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> syncGenerate(long count,
-            @NotNull Supplier<? extends AFTER> supplier);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> syncGenerate(@NotNull Supplier<? extends AFTER> supplier);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> syncLift(
-            @NotNull Function<? super OUT, ? extends OutputChannel<? extends AFTER>> function);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> syncMap(
-            @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> syncMap(
-            @NotNull Function<? super OUT, ? extends AFTER> function);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> syncMap(
-            @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> syncMap(
-            @NotNull Routine<? super OUT, ? extends AFTER> routine);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    <AFTER extends Comparable<AFTER>> LoaderStreamChannel<AFTER> syncRange(
-            @NotNull final AFTER start, @NotNull final AFTER end,
-            @NotNull final Function<AFTER, AFTER> increment);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    LoaderStreamChannel<Number> syncRange(@NotNull final Number start, @NotNull final Number end);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    LoaderStreamChannel<Number> syncRange(@NotNull final Number start, @NotNull final Number end,
-            @NotNull final Number increment);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    LoaderStreamChannel<OUT> syncReduce(
-            @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
+    LoaderStreamChannel<OUT> sync();
 
     /**
      * {@inheritDoc}

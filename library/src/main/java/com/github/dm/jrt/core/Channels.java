@@ -559,7 +559,8 @@ public class Channels {
 
     /**
      * Returns a new channel repeating the output data to any newly bound channel or consumer, thus
-     * effectively supporting binding of several output consumers.
+     * effectively supporting binding of several output consumers.<br/>
+     * Note that the passed channels will be bound as a result of the call.
      *
      * @param channel the output channel.
      * @param <OUT>   the output data type.

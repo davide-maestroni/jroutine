@@ -1779,6 +1779,36 @@ public class ChannelsTest {
     }
 
     @Test
+    public void testRepeatAbort() {
+
+        final IOChannel<Object> ioChannel = JRoutine.io().buildChannel();
+        final OutputChannel<Object> channel = Channels.repeat(ioChannel);
+        ioChannel.pass("test1", "test2");
+        final IOChannel<Object> output1 = JRoutine.io().buildChannel();
+        channel.passTo(output1).close();
+        assertThat(output1.next()).isEqualTo("test1");
+        final IOChannel<Object> output2 = JRoutine.io().buildChannel();
+        channel.passTo(output2).close();
+        ioChannel.abort();
+
+        try {
+            output1.all();
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+            output2.all();
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+    }
+
+    @Test
     @SuppressWarnings("unchecked")
     public void testSelectableOutput() {
 

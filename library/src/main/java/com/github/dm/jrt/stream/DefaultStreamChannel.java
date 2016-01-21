@@ -14,6 +14,7 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.builder.InvocationConfiguration;
+import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.core.JRoutine;
 import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.routine.Routine;
@@ -32,32 +33,36 @@ class DefaultStreamChannel<OUT> extends AbstractStreamChannel<OUT> {
     /**
      * Constructor.
      *
-     * @param configuration the initial invocation configuration.
-     * @param channel       the wrapped output channel.
+     * @param channel the wrapped output channel.
      */
-    DefaultStreamChannel(@NotNull final InvocationConfiguration configuration,
-            @NotNull final OutputChannel<OUT> channel) {
+    DefaultStreamChannel(@NotNull final OutputChannel<OUT> channel) {
 
-        super(configuration, channel);
+        super(InvocationConfiguration.DEFAULT_CONFIGURATION, DelegationType.ASYNC, channel);
     }
 
     /**
      * Constructor.
      *
-     * @param channel the wrapped output channel.
+     * @param configuration  the initial invocation configuration.
+     * @param delegationType the delegation type.
+     * @param channel        the wrapped output channel.
      */
-    DefaultStreamChannel(@NotNull final OutputChannel<OUT> channel) {
+    @SuppressWarnings("ConstantConditions")
+    private DefaultStreamChannel(@NotNull final InvocationConfiguration configuration,
+            @NotNull final DelegationType delegationType,
+            @NotNull final OutputChannel<OUT> channel) {
 
-        super(InvocationConfiguration.DEFAULT_CONFIGURATION, channel);
+        super(configuration, delegationType, channel);
     }
 
     @NotNull
     @Override
     protected <AFTER> StreamChannel<AFTER> newChannel(
             @NotNull final InvocationConfiguration configuration,
+            @NotNull final DelegationType delegationType,
             @NotNull final OutputChannel<AFTER> channel) {
 
-        return new DefaultStreamChannel<AFTER>(configuration, channel);
+        return new DefaultStreamChannel<AFTER>(configuration, delegationType, channel);
     }
 
     @NotNull

@@ -1101,6 +1101,7 @@ public class FunctionsTest {
                 return o2.compareTo(o1);
             }
         }));
+        assertThat(function).isNotEqualTo(null);
         assertThat(function).isNotEqualTo("");
         assertThat(function.hashCode()).isEqualTo(maxBy(String.CASE_INSENSITIVE_ORDER).hashCode());
     }
@@ -1150,6 +1151,7 @@ public class FunctionsTest {
                 return o1.compareTo(o2);
             }
         }));
+        assertThat(function).isNotEqualTo(null);
         assertThat(function).isNotEqualTo("");
         assertThat(function.hashCode()).isEqualTo(minBy(String.CASE_INSENSITIVE_ORDER).hashCode());
     }

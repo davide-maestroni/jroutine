@@ -24,8 +24,9 @@ import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 /**
- * TODO
- * Interface defining a channel which is both an input and an output.
+ * Interface defining a channel which is both an input and an output.<br/>
+ * The channel synchronously delivers the passed inputs the the bound output consumer or input
+ * channel, unless a specific delay is specified by calling the proper methods.
  * <p/>
  * An I/O channel is useful to make other asynchronous tasks communicate with a routine.<br/>
  * The channel output can be passed to a routine input channel in order to feed it with data coming

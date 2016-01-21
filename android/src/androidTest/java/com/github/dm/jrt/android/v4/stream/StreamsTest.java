@@ -378,7 +378,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                     public StreamChannel<String> apply(
                             final StreamChannel<? extends String> channel) {
 
-                        return channel.syncMap(new Function<String, String>() {
+                        return channel.sync().map(new Function<String, String>() {
 
                             public String apply(final String s) {
 
@@ -413,7 +413,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                                     public StreamChannel<String> apply(
                                             final StreamChannel<? extends String> channel) {
 
-                                        return channel.syncMap(new Function<String, String>() {
+                                        return channel.sync().map(new Function<String, String>() {
 
                                             public String apply(final String s) {
 
@@ -436,7 +436,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                                      public StreamChannel<String> apply(
                                              final StreamChannel<? extends String> channel) {
 
-                                         return channel.syncMap(new Function<String, String>() {
+                                         return channel.sync().map(new Function<String, String>() {
 
                                              public String apply(final String s) {
 
@@ -464,7 +464,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                     public StreamChannel<String> apply(
                             final StreamChannel<? extends String> channel) {
 
-                        return channel.syncMap(new Function<String, String>() {
+                        return channel.sync().map(new Function<String, String>() {
 
                             public String apply(final String s) {
 
@@ -524,8 +524,10 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         final LoaderContextCompat context = loaderFrom(getActivity());
         assertThat(StreamsCompat.with(context)
                                 .streamOf()
-                                .syncRange(1, 10)
-                                .asyncMap(StreamsCompat.<Number>groupBy(3))
+                                .sync()
+                                .range(1, 10)
+                                .async()
+                                .map(StreamsCompat.<Number>groupBy(3))
                                 .afterMax(seconds(3))
                                 .all()).containsExactly(Arrays.<Number>asList(1, 2, 3),
                                                         Arrays.<Number>asList(4, 5, 6),
@@ -533,24 +535,30 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                                                         Collections.<Number>singletonList(10));
         assertThat(StreamsCompat.with(context)
                                 .streamOf()
-                                .syncRange(1, 10)
-                                .asyncMap(StreamsCompat.<Number>groupBy(13))
+                                .sync()
+                                .range(1, 10)
+                                .async()
+                                .map(StreamsCompat.<Number>groupBy(13))
                                 .afterMax(seconds(3))
                                 .all()).containsExactly(
                 Arrays.<Number>asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
         assertThat(StreamsCompat.streamOf()
-                                .syncRange(1, 10)
+                                .sync()
+                                .range(1, 10)
                                 .with(context)
-                                .asyncMap(StreamsCompat.<Number>groupBy(3))
+                                .async()
+                                .map(StreamsCompat.<Number>groupBy(3))
                                 .afterMax(seconds(3))
                                 .all()).containsExactly(Arrays.<Number>asList(1, 2, 3),
                                                         Arrays.<Number>asList(4, 5, 6),
                                                         Arrays.<Number>asList(7, 8, 9),
                                                         Collections.<Number>singletonList(10));
         assertThat(StreamsCompat.streamOf()
-                                .syncRange(1, 10)
+                                .sync()
+                                .range(1, 10)
                                 .with(context)
-                                .asyncMap(StreamsCompat.<Number>groupBy(13))
+                                .async()
+                                .map(StreamsCompat.<Number>groupBy(13))
                                 .afterMax(seconds(3))
                                 .all()).containsExactly(
                 Arrays.<Number>asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
@@ -857,38 +865,50 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         final LoaderContextCompat context = loaderFrom(getActivity());
         assertThat(StreamsCompat.with(context)
                                 .streamOf()
-                                .syncRange(1, 10)
-                                .asyncMap(StreamsCompat.limit(5))
+                                .sync()
+                                .range(1, 10)
+                                .async()
+                                .map(StreamsCompat.limit(5))
                                 .afterMax(seconds(3))
                                 .all()).containsExactly(1, 2, 3, 4, 5);
         assertThat(StreamsCompat.with(context)
                                 .streamOf()
-                                .syncRange(1, 10)
-                                .asyncMap(StreamsCompat.limit(0))
+                                .sync()
+                                .range(1, 10)
+                                .async()
+                                .map(StreamsCompat.limit(0))
                                 .afterMax(seconds(3))
                                 .all()).isEmpty();
         assertThat(StreamsCompat.with(context)
                                 .streamOf()
-                                .syncRange(1, 10)
-                                .asyncMap(StreamsCompat.limit(15))
+                                .sync()
+                                .range(1, 10)
+                                .async()
+                                .map(StreamsCompat.limit(15))
                                 .afterMax(seconds(3))
                                 .all()).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
         assertThat(StreamsCompat.streamOf()
-                                .syncRange(1, 10)
+                                .sync()
+                                .range(1, 10)
                                 .with(context)
-                                .asyncMap(StreamsCompat.limit(5))
+                                .async()
+                                .map(StreamsCompat.limit(5))
                                 .afterMax(seconds(3))
                                 .all()).containsExactly(1, 2, 3, 4, 5);
         assertThat(StreamsCompat.streamOf()
-                                .syncRange(1, 10)
+                                .sync()
+                                .range(1, 10)
                                 .with(context)
-                                .asyncMap(StreamsCompat.limit(0))
+                                .async()
+                                .map(StreamsCompat.limit(0))
                                 .afterMax(seconds(3))
                                 .all()).isEmpty();
         assertThat(StreamsCompat.streamOf()
-                                .syncRange(1, 10)
+                                .sync()
+                                .range(1, 10)
                                 .with(context)
-                                .asyncMap(StreamsCompat.limit(15))
+                                .async()
+                                .map(StreamsCompat.limit(15))
                                 .afterMax(seconds(3))
                                 .all()).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
     }
@@ -923,14 +943,15 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         StreamsCompat.with(context)
                      .streamOf("test1")
                      .loaderId(11)
-                     .asyncMap(new Function<String, String>() {
+                     .async()
+                     .map(new Function<String, String>() {
 
                          public String apply(final String s) {
 
                              try {
                                  seconds(1).sleepAtLeast();
                              } catch (final InterruptedException e) {
-                                 InvocationInterruptedException.wrapIfNeeded(e);
+                                 throw InvocationInterruptedException.wrapIfNeeded(e);
                              }
                              return s.toUpperCase();
                          }
@@ -945,14 +966,15 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                      .withLoaders()
                      .withId(21)
                      .set()
-                     .asyncMap(new Function<String, String>() {
+                     .async()
+                     .map(new Function<String, String>() {
 
                          public String apply(final String s) {
 
                              try {
                                  seconds(1).sleepAtLeast();
                              } catch (final InterruptedException e) {
-                                 InvocationInterruptedException.wrapIfNeeded(e);
+                                 throw InvocationInterruptedException.wrapIfNeeded(e);
                              }
                              return s.toUpperCase();
                          }
@@ -967,14 +989,15 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                      .withStreamLoaders()
                      .withId(31)
                      .set()
-                     .asyncMap(new Function<String, String>() {
+                     .async()
+                     .map(new Function<String, String>() {
 
                          public String apply(final String s) {
 
                              try {
                                  seconds(1).sleepAtLeast();
                              } catch (final InterruptedException e) {
-                                 InvocationInterruptedException.wrapIfNeeded(e);
+                                 throw InvocationInterruptedException.wrapIfNeeded(e);
                              }
                              return s.toUpperCase();
                          }
@@ -1322,38 +1345,50 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         final LoaderContextCompat context = loaderFrom(getActivity());
         assertThat(StreamsCompat.with(context)
                                 .streamOf()
-                                .syncRange(1, 10)
-                                .asyncMap(StreamsCompat.skip(5))
+                                .sync()
+                                .range(1, 10)
+                                .async()
+                                .map(StreamsCompat.skip(5))
                                 .afterMax(seconds(3))
                                 .all()).containsExactly(6, 7, 8, 9, 10);
         assertThat(StreamsCompat.with(context)
                                 .streamOf()
-                                .syncRange(1, 10)
-                                .asyncMap(StreamsCompat.skip(15))
+                                .sync()
+                                .range(1, 10)
+                                .async()
+                                .map(StreamsCompat.skip(15))
                                 .afterMax(seconds(3))
                                 .all()).isEmpty();
         assertThat(StreamsCompat.with(context)
                                 .streamOf()
-                                .syncRange(1, 10)
-                                .asyncMap(StreamsCompat.skip(0))
+                                .sync()
+                                .range(1, 10)
+                                .async()
+                                .map(StreamsCompat.skip(0))
                                 .afterMax(seconds(3))
                                 .all()).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
         assertThat(StreamsCompat.streamOf()
-                                .syncRange(1, 10)
+                                .sync()
+                                .range(1, 10)
                                 .with(context)
-                                .asyncMap(StreamsCompat.skip(5))
+                                .async()
+                                .map(StreamsCompat.skip(5))
                                 .afterMax(seconds(3))
                                 .all()).containsExactly(6, 7, 8, 9, 10);
         assertThat(StreamsCompat.streamOf()
-                                .syncRange(1, 10)
+                                .sync()
+                                .range(1, 10)
                                 .with(context)
-                                .asyncMap(StreamsCompat.skip(15))
+                                .async()
+                                .map(StreamsCompat.skip(15))
                                 .afterMax(seconds(3))
                                 .all()).isEmpty();
         assertThat(StreamsCompat.streamOf()
-                                .syncRange(1, 10)
+                                .sync()
+                                .range(1, 10)
                                 .with(context)
-                                .asyncMap(StreamsCompat.skip(0))
+                                .async()
+                                .map(StreamsCompat.skip(0))
                                 .afterMax(seconds(3))
                                 .all()).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
     }
@@ -1394,30 +1429,34 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                 return s + count.incrementAndGet();
             }
         };
-        StreamsCompat.with(context).streamOf("test").asyncMap(function);
+        StreamsCompat.with(context).streamOf("test").async().map(function);
         assertThat(StreamsCompat.with(context)
                                 .streamOf("test")
                                 .staleAfter(500, TimeUnit.MILLISECONDS)
-                                .asyncMap(function)
+                                .async()
+                                .map(function)
                                 .afterMax(seconds(10))
                                 .next()).isEqualTo("test1");
         seconds(3).sleepAtLeast();
         assertThat(StreamsCompat.with(context)
                                 .streamOf("test")
                                 .staleAfter(ZERO)
-                                .asyncMap(function)
+                                .async()
+                                .map(function)
                                 .afterMax(seconds(10))
                                 .next()).isEqualTo("test2");
         seconds(3).sleepAtLeast();
         StreamsCompat.with(context)
                      .streamOf("test")
                      .cache(CacheStrategyType.CACHE_IF_SUCCESS)
-                     .asyncMap(function);
+                     .async()
+                     .map(function);
         seconds(3).sleepAtLeast();
         assertThat(StreamsCompat.with(context)
                                 .streamOf("test")
                                 .staleAfter(ZERO)
-                                .asyncMap(function)
+                                .async()
+                                .map(function)
                                 .afterMax(seconds(10))
                                 .next()).isEqualTo("test4");
     }

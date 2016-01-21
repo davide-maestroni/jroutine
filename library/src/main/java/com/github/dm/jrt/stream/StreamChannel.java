@@ -115,7 +115,12 @@ public interface StreamChannel<OUT>
     @NotNull
     StreamChannel<OUT> skip(int count);
 
-    // TODO: 20/01/16 javadoc
+    /**
+     * Makes the stream asynchronous, that is, the concatenated routines will be invoked in
+     * asynchronous mode.
+     *
+     * @return this channel.
+     */
     @NotNull
     StreamChannel<OUT> async();
 
@@ -229,13 +234,42 @@ public interface StreamChannel<OUT>
     @NotNull
     StreamChannel<Void> forEach(@NotNull Consumer<? super OUT> consumer);
 
-    // TODO: 21/01/16 generate(iterable)??
+    /**
+     * Concatenates a stream channel generating the specified output.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration.<br/>
+     * Note also that this channel will be bound as a result of the call.
+     *
+     * @param output  the output.
+     * @param <AFTER> the concatenation output type.
+     * @return the concatenated stream channel.
+     */
     @NotNull
     <AFTER> StreamChannel<AFTER> generate(@Nullable AFTER output);
 
+    /**
+     * Concatenates a stream channel generating the specified outputs.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration.<br/>
+     * Note also that this channel will be bound as a result of the call.
+     *
+     * @param outputs the outputs.
+     * @param <AFTER> the concatenation output type.
+     * @return the concatenated stream channel.
+     */
     @NotNull
     <AFTER> StreamChannel<AFTER> generate(@Nullable AFTER... outputs);
 
+    /**
+     * Concatenates a stream channel generating the output returned by the specified iterable.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration.<br/>
+     * Note also that this channel will be bound as a result of the call.
+     *
+     * @param outputs the iterable returning the outputs.
+     * @param <AFTER> the concatenation output type.
+     * @return the concatenated stream channel.
+     */
     @NotNull
     <AFTER> StreamChannel<AFTER> generate(@Nullable Iterable<? extends AFTER> outputs);
 
@@ -250,7 +284,7 @@ public interface StreamChannel<OUT>
      * @param count    the number of generated outputs.
      * @param consumer the consumer instance.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream channel
+     * @return the concatenated stream channel.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
@@ -282,7 +316,7 @@ public interface StreamChannel<OUT>
      * @param count    the number of generated outputs.
      * @param supplier the supplier instance.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream channel
+     * @return the concatenated stream channel.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative..
      */
     @NotNull
@@ -377,7 +411,12 @@ public interface StreamChannel<OUT>
     @NotNull
     StreamChannel<OUT> ordered(@Nullable OrderType orderType);
 
-    // TODO: 20/01/16 javadoc
+    /**
+     * Makes the stream parallel, that is, the concatenated routines will be invoked in parallel
+     * mode.
+     *
+     * @return this channel.
+     */
     @NotNull
     StreamChannel<OUT> parallel();
 
@@ -455,7 +494,13 @@ public interface StreamChannel<OUT>
     StreamChannel<OUT> reduce(
             @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
 
-    // TODO: 18/01/16 javadoc
+    /**
+     * Returns a new channel repeating the output data to any newly bound channel or consumer, thus
+     * effectively supporting binding of several output consumers.<br/>
+     * Note that this channel will be bound as a result of the call.
+     *
+     * @return the repeating channel.
+     */
     @NotNull
     StreamChannel<OUT> repeat();
 
@@ -481,11 +526,23 @@ public interface StreamChannel<OUT>
     @NotNull
     StreamChannel<OUT> runOnShared();
 
-    // TODO: 20/01/16 javadoc
+    /**
+     * Makes the stream synchronous, that is, the concatenated routines will be invoked in
+     * synchronous mode.
+     *
+     * @return this channel.
+     */
     @NotNull
     StreamChannel<OUT> sync();
 
-    // TODO: 18/01/16 javadoc
+    /**
+     * Returns a new channel making the this one selectable.<br/>
+     * Each output will be passed along unchanged.<br/>
+     * Note that this channel will be bound as a result of the call.
+     *
+     * @param index the channel index.
+     * @return the selectable output channel.
+     */
     @NotNull
     StreamChannel<? extends Selectable<OUT>> toSelectable(int index);
 

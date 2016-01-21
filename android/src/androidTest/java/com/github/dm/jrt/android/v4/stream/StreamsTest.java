@@ -1429,7 +1429,11 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                 return s + count.incrementAndGet();
             }
         };
-        StreamsCompat.with(context).streamOf("test").async().map(function);
+        StreamsCompat.with(context)
+                     .streamOf("test")
+                     .async()
+                     .cache(CacheStrategyType.CACHE)
+                     .map(function);
         assertThat(StreamsCompat.with(context)
                                 .streamOf("test")
                                 .staleAfter(2000, TimeUnit.MILLISECONDS)

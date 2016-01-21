@@ -1547,7 +1547,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                 return s + count.incrementAndGet();
             }
         };
-        Streams.with(context).streamOf("test").async().map(function);
+        Streams.with(context).streamOf("test").async().cache(CacheStrategyType.CACHE).map(function);
         assertThat(Streams.with(context)
                           .streamOf("test")
                           .staleAfter(2000, TimeUnit.MILLISECONDS)

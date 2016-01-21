@@ -370,13 +370,13 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
-    public <AFTER> StreamChannel<AFTER> generate(final AFTER output) {
+    public <AFTER> StreamChannel<AFTER> generate(@Nullable final AFTER output) {
 
         return map(new GenerateOutputInvocation<AFTER>(Collections.singletonList(output)));
     }
 
     @NotNull
-    public <AFTER> StreamChannel<AFTER> generate(final AFTER... outputs) {
+    public <AFTER> StreamChannel<AFTER> generate(@Nullable final AFTER... outputs) {
 
         final List<AFTER> list;
         if (outputs != null) {
@@ -403,7 +403,8 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
-    public <AFTER> StreamChannel<AFTER> generate(final Iterable<? extends AFTER> outputs) {
+    public <AFTER> StreamChannel<AFTER> generate(
+            @Nullable final Iterable<? extends AFTER> outputs) {
 
         final List<AFTER> list;
         if (outputs != null) {

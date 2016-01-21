@@ -176,19 +176,19 @@ public interface LoaderStreamChannelCompat<OUT>
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannelCompat<AFTER> generate(AFTER output);
+    <AFTER> LoaderStreamChannelCompat<AFTER> generate(@Nullable AFTER output);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannelCompat<AFTER> generate(AFTER... outputs);
+    <AFTER> LoaderStreamChannelCompat<AFTER> generate(@Nullable AFTER... outputs);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannelCompat<AFTER> generate(Iterable<? extends AFTER> outputs);
+    <AFTER> LoaderStreamChannelCompat<AFTER> generate(@Nullable Iterable<? extends AFTER> outputs);
 
     /**
      * {@inheritDoc}

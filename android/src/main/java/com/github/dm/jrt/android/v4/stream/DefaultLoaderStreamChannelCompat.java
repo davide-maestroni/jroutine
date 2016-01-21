@@ -284,14 +284,14 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannelCompat<AFTER> generate(final AFTER output) {
+    public <AFTER> LoaderStreamChannelCompat<AFTER> generate(@Nullable final AFTER output) {
 
         return (LoaderStreamChannelCompat<AFTER>) super.generate(output);
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannelCompat<AFTER> generate(final AFTER... outputs) {
+    public <AFTER> LoaderStreamChannelCompat<AFTER> generate(@Nullable final AFTER... outputs) {
 
         return (LoaderStreamChannelCompat<AFTER>) super.generate(outputs);
     }
@@ -299,7 +299,7 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
     @NotNull
     @Override
     public <AFTER> LoaderStreamChannelCompat<AFTER> generate(
-            final Iterable<? extends AFTER> outputs) {
+            @Nullable final Iterable<? extends AFTER> outputs) {
 
         return (LoaderStreamChannelCompat<AFTER>) super.generate(outputs);
     }

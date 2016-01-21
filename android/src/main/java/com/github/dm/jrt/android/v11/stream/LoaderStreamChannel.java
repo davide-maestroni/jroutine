@@ -176,19 +176,19 @@ public interface LoaderStreamChannel<OUT>
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> generate(AFTER output);
+    <AFTER> LoaderStreamChannel<AFTER> generate(@Nullable AFTER output);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> generate(AFTER... outputs);
+    <AFTER> LoaderStreamChannel<AFTER> generate(@Nullable AFTER... outputs);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> generate(Iterable<? extends AFTER> outputs);
+    <AFTER> LoaderStreamChannel<AFTER> generate(@Nullable Iterable<? extends AFTER> outputs);
 
     /**
      * {@inheritDoc}

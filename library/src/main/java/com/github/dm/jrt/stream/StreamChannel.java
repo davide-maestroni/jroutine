@@ -231,13 +231,13 @@ public interface StreamChannel<OUT>
 
     // TODO: 21/01/16 generate(iterable)??
     @NotNull
-    <AFTER> StreamChannel<AFTER> generate(AFTER output);
+    <AFTER> StreamChannel<AFTER> generate(@Nullable AFTER output);
 
     @NotNull
-    <AFTER> StreamChannel<AFTER> generate(AFTER... outputs);
+    <AFTER> StreamChannel<AFTER> generate(@Nullable AFTER... outputs);
 
     @NotNull
-    <AFTER> StreamChannel<AFTER> generate(Iterable<? extends AFTER> outputs);
+    <AFTER> StreamChannel<AFTER> generate(@Nullable Iterable<? extends AFTER> outputs);
 
     /**
      * Concatenates a stream channel based on the specified consumer to this one.<br/>

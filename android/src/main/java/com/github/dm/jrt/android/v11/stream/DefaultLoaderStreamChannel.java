@@ -279,21 +279,22 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannel<AFTER> generate(final AFTER output) {
+    public <AFTER> LoaderStreamChannel<AFTER> generate(@Nullable final AFTER output) {
 
         return (LoaderStreamChannel<AFTER>) super.generate(output);
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannel<AFTER> generate(final AFTER... outputs) {
+    public <AFTER> LoaderStreamChannel<AFTER> generate(@Nullable final AFTER... outputs) {
 
         return (LoaderStreamChannel<AFTER>) super.generate(outputs);
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannel<AFTER> generate(final Iterable<? extends AFTER> outputs) {
+    public <AFTER> LoaderStreamChannel<AFTER> generate(
+            @Nullable final Iterable<? extends AFTER> outputs) {
 
         return (LoaderStreamChannel<AFTER>) super.generate(outputs);
     }

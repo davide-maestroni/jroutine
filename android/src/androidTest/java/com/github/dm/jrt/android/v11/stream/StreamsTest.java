@@ -1550,12 +1550,12 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         Streams.with(context).streamOf("test").async().map(function);
         assertThat(Streams.with(context)
                           .streamOf("test")
-                          .staleAfter(500, TimeUnit.MILLISECONDS)
+                          .staleAfter(2000, TimeUnit.MILLISECONDS)
                           .async()
                           .map(function)
                           .afterMax(seconds(10))
                           .next()).isEqualTo("test1");
-        seconds(3).sleepAtLeast();
+        seconds(5).sleepAtLeast();
         assertThat(Streams.with(context)
                           .streamOf("test")
                           .staleAfter(ZERO)
@@ -1563,13 +1563,13 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                           .map(function)
                           .afterMax(seconds(10))
                           .next()).isEqualTo("test2");
-        seconds(3).sleepAtLeast();
+        seconds(5).sleepAtLeast();
         Streams.with(context)
                .streamOf("test")
                .cache(CacheStrategyType.CACHE_IF_SUCCESS)
                .async()
                .map(function);
-        seconds(3).sleepAtLeast();
+        seconds(5).sleepAtLeast();
         assertThat(Streams.with(context)
                           .streamOf("test")
                           .staleAfter(ZERO)

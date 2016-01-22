@@ -332,6 +332,22 @@ public class StreamsCompat extends ChannelsCompat {
     }
 
     /**
+     * Returns a new channel repeating the output data to any newly bound channel or consumer, thus
+     * effectively supporting binding of several output consumers.<br/>
+     * Note that the passed channels will be bound as a result of the call.
+     *
+     * @param channel the output channel.
+     * @param <OUT>   the output data type.
+     * @return the repeating channel.
+     */
+    @NotNull
+    public static <OUT> LoaderStreamChannelCompat<OUT> repeat(
+            @NotNull final OutputChannel<OUT> channel) {
+
+        return streamOf(ChannelsCompat.repeat(channel));
+    }
+
+    /**
      * Returns an factory of invocations skipping the specified number of input data.
      *
      * @param count  the number of data to skip.
@@ -410,6 +426,23 @@ public class StreamsCompat extends ChannelsCompat {
             @NotNull final OutputChannel<OUT> output) {
 
         return new DefaultLoaderStreamChannelCompat<OUT>(null, output);
+    }
+
+    /**
+     * Returns a new channel making the specified one selectable.<br/>
+     * Each output will be passed along unchanged.<br/>
+     * Note that the passed channel will be bound as a result of the call.
+     *
+     * @param channel the channel to make selectable.
+     * @param index   the channel index.
+     * @param <OUT>   the output data type.
+     * @return the selectable output channel.
+     */
+    @NotNull
+    public static <OUT> LoaderStreamChannelCompat<? extends ParcelableSelectable<OUT>> toSelectable(
+            @NotNull final OutputChannel<? extends OUT> channel, final int index) {
+
+        return streamOf(ChannelsCompat.toSelectable(channel, index));
     }
 
     /**

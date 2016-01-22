@@ -344,7 +344,6 @@ public class Streams extends Channels {
         return JRoutine.on(factory(function));
     }
 
-
     /**
      * Returns a new channel repeating the output data to any newly bound channel or consumer, thus
      * effectively supporting binding of several output consumers.<br/>

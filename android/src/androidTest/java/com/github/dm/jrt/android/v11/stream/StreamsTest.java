@@ -1449,6 +1449,76 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public void testOutputToSelectable() {
+
+        final IOChannel<String> channel = JRoutine.io().buildChannel();
+        channel.pass("test1", "test2", "test3").close();
+        assertThat(Streams.toSelectable(channel.asOutput(), 33)
+                          .afterMax(seconds(1))
+                          .all()).containsExactly(new ParcelableSelectable<String>("test1", 33),
+                                                  new ParcelableSelectable<String>("test2", 33),
+                                                  new ParcelableSelectable<String>("test3", 33));
+    }
+
+    public void testOutputToSelectableAbort() {
+
+        final IOChannel<String> channel = JRoutine.io().buildChannel();
+        channel.pass("test1", "test2", "test3").abort();
+
+        try {
+            Streams.toSelectable(channel.asOutput(), 33).afterMax(seconds(1)).all();
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+    }
+
+    public void testRepeat() {
+
+        final IOChannel<Object> ioChannel = JRoutine.io().buildChannel();
+        final OutputChannel<Object> channel = Streams.repeat(ioChannel);
+        ioChannel.pass("test1", "test2");
+        final IOChannel<Object> output1 = JRoutine.io().buildChannel();
+        channel.passTo(output1).close();
+        assertThat(output1.next()).isEqualTo("test1");
+        final IOChannel<Object> output2 = JRoutine.io().buildChannel();
+        channel.passTo(output2).close();
+        ioChannel.pass("test3").close();
+        assertThat(output2.all()).containsExactly("test1", "test2", "test3");
+        assertThat(output1.all()).containsExactly("test2", "test3");
+    }
+
+    public void testRepeatAbort() {
+
+        final IOChannel<Object> ioChannel = JRoutine.io().buildChannel();
+        final OutputChannel<Object> channel = Streams.repeat(ioChannel);
+        ioChannel.pass("test1", "test2");
+        final IOChannel<Object> output1 = JRoutine.io().buildChannel();
+        channel.passTo(output1).close();
+        assertThat(output1.next()).isEqualTo("test1");
+        final IOChannel<Object> output2 = JRoutine.io().buildChannel();
+        channel.passTo(output2).close();
+        ioChannel.abort();
+
+        try {
+            output1.all();
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+            output2.all();
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+    }
+
     public void testSkip() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {

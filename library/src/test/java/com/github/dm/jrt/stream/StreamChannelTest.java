@@ -24,6 +24,7 @@ import com.github.dm.jrt.channel.OutputDeadlockException;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
 import com.github.dm.jrt.channel.TimeoutException;
+import com.github.dm.jrt.core.Channels.Selectable;
 import com.github.dm.jrt.core.JRoutine;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
@@ -570,6 +571,101 @@ public class StreamChannelTest {
                 return "TEST2";
             }
         }).afterMax(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
+    }
+
+    @Test
+    public void testGenerate2() {
+
+        assertThat(Streams.streamOf("test1").sync().generate((String) null).all()).containsOnly(
+                (String) null);
+        assertThat(Streams.streamOf("test1").sync().generate((String[]) null).all()).isEmpty();
+        assertThat(Streams.streamOf("test1").sync().generate().all()).isEmpty();
+        assertThat(Streams.streamOf("test1").sync().generate((List<String>) null).all()).isEmpty();
+        assertThat(Streams.streamOf("test1").sync().generate(Collections.<String>emptyList()).all())
+                .isEmpty();
+        assertThat(Streams.streamOf("test1").sync().generate("TEST2").all()).containsOnly("TEST2");
+        assertThat(Streams.streamOf("test1").sync().generate("TEST2", "TEST2").all()).containsOnly(
+                "TEST2", "TEST2");
+        assertThat(
+                Streams.streamOf("test1").sync().generate(Collections.singletonList("TEST2")).all())
+                .containsOnly("TEST2");
+        assertThat(Streams.streamOf("test1")
+                          .async()
+                          .generate((String) null)
+                          .afterMax(seconds(1))
+                          .all()).containsOnly((String) null);
+        assertThat(Streams.streamOf("test1")
+                          .async()
+                          .generate((String[]) null)
+                          .afterMax(seconds(1))
+                          .all()).isEmpty();
+        assertThat(
+                Streams.streamOf("test1").async().generate().afterMax(seconds(1)).all()).isEmpty();
+        assertThat(Streams.streamOf("test1")
+                          .async()
+                          .generate((List<String>) null)
+                          .afterMax(seconds(1))
+                          .all()).isEmpty();
+        assertThat(Streams.streamOf("test1")
+                          .async()
+                          .generate(Collections.<String>emptyList())
+                          .afterMax(seconds(1))
+                          .all()).isEmpty();
+        assertThat(Streams.streamOf("test1")
+                          .async()
+                          .generate("TEST2")
+                          .afterMax(seconds(1))
+                          .all()).containsOnly("TEST2");
+        assertThat(Streams.streamOf("test1")
+                          .async()
+                          .generate("TEST2", "TEST2")
+                          .afterMax(seconds(1))
+                          .all()).containsOnly("TEST2", "TEST2");
+        assertThat(Streams.streamOf("test1")
+                          .async()
+                          .generate(Collections.singletonList("TEST2"))
+                          .afterMax(seconds(1))
+                          .all()).containsOnly("TEST2");
+        assertThat(Streams.streamOf("test1")
+                          .parallel()
+                          .generate((String) null)
+                          .afterMax(seconds(1))
+                          .all()).containsOnly((String) null);
+        assertThat(Streams.streamOf("test1")
+                          .parallel()
+                          .generate((String[]) null)
+                          .afterMax(seconds(1))
+                          .all()).isEmpty();
+        assertThat(Streams.streamOf("test1")
+                          .parallel()
+                          .generate()
+                          .afterMax(seconds(1))
+                          .all()).isEmpty();
+        assertThat(Streams.streamOf("test1")
+                          .parallel()
+                          .generate((List<String>) null)
+                          .afterMax(seconds(1))
+                          .all()).isEmpty();
+        assertThat(Streams.streamOf("test1")
+                          .parallel()
+                          .generate(Collections.<String>emptyList())
+                          .afterMax(seconds(1))
+                          .all()).isEmpty();
+        assertThat(Streams.streamOf("test1")
+                          .parallel()
+                          .generate("TEST2")
+                          .afterMax(seconds(1))
+                          .all()).containsOnly("TEST2");
+        assertThat(Streams.streamOf("test1")
+                          .parallel()
+                          .generate("TEST2", "TEST2")
+                          .afterMax(seconds(1))
+                          .all()).containsOnly("TEST2", "TEST2");
+        assertThat(Streams.streamOf("test1")
+                          .parallel()
+                          .generate(Collections.singletonList("TEST2"))
+                          .afterMax(seconds(1))
+                          .all()).containsOnly("TEST2");
     }
 
     @Test
@@ -1312,6 +1408,35 @@ public class StreamChannelTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
+    public void testOutputToSelectable() {
+
+        final IOChannel<String> channel = JRoutine.io().buildChannel();
+        channel.pass("test1", "test2", "test3").close();
+        assertThat(Streams.streamOf(channel)
+                          .toSelectable(33)
+                          .afterMax(seconds(1))
+                          .all()).containsExactly(new Selectable<String>("test1", 33),
+                                                  new Selectable<String>("test2", 33),
+                                                  new Selectable<String>("test3", 33));
+    }
+
+    @Test
+    public void testOutputToSelectableAbort() {
+
+        final IOChannel<String> channel = JRoutine.io().buildChannel();
+        channel.pass("test1", "test2", "test3").abort();
+
+        try {
+            Streams.streamOf(channel).toSelectable(33).afterMax(seconds(1)).all();
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+    }
+
+    @Test
     public void testRange() {
 
         assertThat(Streams.streamOf().async().range('a', 'e', new Function<Character, Character>() {
@@ -1890,6 +2015,52 @@ public class StreamChannelTest {
     }
 
     @Test
+    public void testRepeat() {
+
+        final IOChannel<Object> ioChannel = JRoutine.io().buildChannel();
+        final OutputChannel<Object> channel = Streams.streamOf(ioChannel).repeat();
+        ioChannel.pass("test1", "test2");
+        final IOChannel<Object> output1 = JRoutine.io().buildChannel();
+        channel.passTo(output1).close();
+        assertThat(output1.next()).isEqualTo("test1");
+        final IOChannel<Object> output2 = JRoutine.io().buildChannel();
+        channel.passTo(output2).close();
+        ioChannel.pass("test3").close();
+        assertThat(output2.all()).containsExactly("test1", "test2", "test3");
+        assertThat(output1.all()).containsExactly("test2", "test3");
+    }
+
+    @Test
+    public void testRepeatAbort() {
+
+        final IOChannel<Object> ioChannel = JRoutine.io().buildChannel();
+        final OutputChannel<Object> channel = Streams.streamOf(ioChannel).repeat();
+        ioChannel.pass("test1", "test2");
+        final IOChannel<Object> output1 = JRoutine.io().buildChannel();
+        channel.passTo(output1).close();
+        assertThat(output1.next()).isEqualTo("test1");
+        final IOChannel<Object> output2 = JRoutine.io().buildChannel();
+        channel.passTo(output2).close();
+        ioChannel.abort();
+
+        try {
+            output1.all();
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+            output2.all();
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+    }
+
+    @Test
     public void testRetry() {
 
         final Routine<Object, String> routine =
@@ -1934,7 +2105,11 @@ public class StreamChannelTest {
 
         try {
 
-            Streams.streamOf((Object) null).async().flatMap(retryFunction).afterMax(seconds(3)).all();
+            Streams.streamOf((Object) null)
+                   .async()
+                   .flatMap(retryFunction)
+                   .afterMax(seconds(3))
+                   .all();
 
             fail();
 

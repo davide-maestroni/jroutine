@@ -569,7 +569,12 @@ public class Streams extends Channels {
 
         public void run() {
 
-            mOutput.passTo(mChannel).close();
+            try {
+                mOutput.passTo(mChannel).close();
+
+            } catch (final IllegalStateException ignored) {
+
+            }
         }
     }
 

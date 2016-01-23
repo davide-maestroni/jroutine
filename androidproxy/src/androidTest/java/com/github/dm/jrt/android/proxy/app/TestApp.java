@@ -48,16 +48,12 @@ public class TestApp extends Application implements FactoryContext {
         final HashMap<InstanceInfo, Object> instances = sInstances;
         final InstanceInfo instanceInfo = new InstanceInfo(type, args);
         Object instance = instances.get(instanceInfo);
-
         if (instance == null) {
-
             try {
-
                 instance = findConstructor(type, args).newInstance(args);
                 instances.put(instanceInfo, instance);
 
             } catch (final Throwable t) {
-
                 throw InvocationException.wrapIfNeeded(t);
             }
         }
@@ -81,12 +77,10 @@ public class TestApp extends Application implements FactoryContext {
         public boolean equals(final Object o) {
 
             if (this == o) {
-
                 return true;
             }
 
             if (!(o instanceof InstanceInfo)) {
-
                 return false;
             }
 

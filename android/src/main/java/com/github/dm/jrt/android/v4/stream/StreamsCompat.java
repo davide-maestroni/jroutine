@@ -762,7 +762,12 @@ public class StreamsCompat extends ChannelsCompat {
 
         public void run() {
 
-            mOutput.passTo(mChannel).close();
+            try {
+                mOutput.passTo(mChannel).close();
+
+            } catch (final IllegalStateException ignored) {
+
+            }
         }
     }
 }

@@ -35,6 +35,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.github.dm.jrt.function.Functions.wrapFunction;
 
@@ -552,6 +553,8 @@ public class Streams extends Channels {
 
         private final IOChannel<OUT> mChannel;
 
+        private final AtomicBoolean mIsBound = new AtomicBoolean();
+
         private final OutputChannel<OUT> mOutput;
 
         /**
@@ -569,11 +572,8 @@ public class Streams extends Channels {
 
         public void run() {
 
-            try {
+            if (!mIsBound.getAndSet(true)) {
                 mOutput.passTo(mChannel).close();
-
-            } catch (final IllegalStateException ignored) {
-
             }
         }
     }

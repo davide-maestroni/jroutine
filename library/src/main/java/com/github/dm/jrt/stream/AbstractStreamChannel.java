@@ -141,8 +141,8 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
-    private static <IN> RangeInvocation<IN, ? extends Number> numberRange(
-            @NotNull final Number start, @NotNull final Number end) {
+    private static RangeInvocation<? extends Number> numberRange(@NotNull final Number start,
+            @NotNull final Number end) {
 
         if ((start instanceof Double) || (end instanceof Double)) {
             final double startValue = start.doubleValue();
@@ -181,50 +181,49 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
-    private static <IN> RangeInvocation<IN, ? extends Number> numberRange(
-            @NotNull final Number start, @NotNull final Number end,
-            @NotNull final Number increment) {
+    private static RangeInvocation<? extends Number> numberRange(@NotNull final Number start,
+            @NotNull final Number end, @NotNull final Number increment) {
 
         if ((start instanceof Double) || (end instanceof Double) || (increment instanceof Double)) {
             final double startValue = start.doubleValue();
             final double endValue = end.doubleValue();
             final double incValue = increment.doubleValue();
-            return new RangeInvocation<IN, Double>(startValue, endValue, new DoubleInc(incValue));
+            return new RangeInvocation<Double>(startValue, endValue, new DoubleInc(incValue));
 
         } else if ((start instanceof Float) || (end instanceof Float)
                 || (increment instanceof Float)) {
             final float startValue = start.floatValue();
             final float endValue = end.floatValue();
             final float incValue = increment.floatValue();
-            return new RangeInvocation<IN, Float>(startValue, endValue, new FloatInc(incValue));
+            return new RangeInvocation<Float>(startValue, endValue, new FloatInc(incValue));
 
         } else if ((start instanceof Long) || (end instanceof Long)
                 || (increment instanceof Long)) {
             final long startValue = start.longValue();
             final long endValue = end.longValue();
             final long incValue = increment.longValue();
-            return new RangeInvocation<IN, Long>(startValue, endValue, new LongInc(incValue));
+            return new RangeInvocation<Long>(startValue, endValue, new LongInc(incValue));
 
         } else if ((start instanceof Integer) || (end instanceof Integer)
                 || (increment instanceof Integer)) {
             final int startValue = start.intValue();
             final int endValue = end.intValue();
             final int incValue = increment.intValue();
-            return new RangeInvocation<IN, Integer>(startValue, endValue, new IntegerInc(incValue));
+            return new RangeInvocation<Integer>(startValue, endValue, new IntegerInc(incValue));
 
         } else if ((start instanceof Short) || (end instanceof Short)
                 || (increment instanceof Short)) {
             final short startValue = start.shortValue();
             final short endValue = end.shortValue();
             final short incValue = increment.shortValue();
-            return new RangeInvocation<IN, Short>(startValue, endValue, new ShortInc(incValue));
+            return new RangeInvocation<Short>(startValue, endValue, new ShortInc(incValue));
 
         } else if ((start instanceof Byte) || (end instanceof Byte)
                 || (increment instanceof Byte)) {
             final byte startValue = start.byteValue();
             final byte endValue = end.byteValue();
             final byte incValue = increment.byteValue();
-            return new RangeInvocation<IN, Byte>(startValue, endValue, new ByteInc(incValue));
+            return new RangeInvocation<Byte>(startValue, endValue, new ByteInc(incValue));
         }
 
         throw new IllegalArgumentException(
@@ -542,7 +541,7 @@ public abstract class AbstractStreamChannel<OUT>
     public <AFTER extends Comparable<AFTER>> StreamChannel<AFTER> range(@NotNull final AFTER start,
             @NotNull final AFTER end, @NotNull final Function<AFTER, AFTER> increment) {
 
-        return map(new RangeInvocation<OUT, AFTER>(start, end, wrapFunction(increment)));
+        return map(new RangeInvocation<AFTER>(start, end, wrapFunction(increment)));
     }
 
     @NotNull
@@ -955,8 +954,7 @@ public abstract class AbstractStreamChannel<OUT>
      *
      * @param <OUT> the output data type.
      */
-    private static class GenerateConsumerInvocation<OUT> extends InvocationFactory<Object, OUT>
-            implements Invocation<Object, OUT> {
+    private static class GenerateConsumerInvocation<OUT> extends FilterInvocation<Object, OUT> {
 
         private final ConsumerWrapper<? super ResultChannel<OUT>> mConsumer;
 
@@ -971,17 +969,6 @@ public abstract class AbstractStreamChannel<OUT>
                 @NotNull final ConsumerWrapper<? super ResultChannel<OUT>> consumer) {
 
             mConsumer = consumer;
-        }
-
-        @NotNull
-        @Override
-        public Invocation<Object, OUT> newInvocation() {
-
-            return this;
-        }
-
-        public void onAbort(@NotNull final RoutineException reason) {
-
         }
 
         @Override
@@ -1005,24 +992,44 @@ public abstract class AbstractStreamChannel<OUT>
             return mConsumer.hashCode();
         }
 
-        public void onDestroy() {
-
-        }
-
-        public void onInitialize() {
-
-        }
-
         public void onInput(final Object input, @NotNull final ResultChannel<OUT> result) {
 
             mConsumer.accept(result);
         }
+    }
 
-        public void onResult(@NotNull final ResultChannel<OUT> result) {
+    /**
+     * Base abstract implementation of an invocation generating output data.
+     *
+     * @param <OUT> the output data type.
+     */
+    private abstract static class GenerateInvocation<OUT> extends InvocationFactory<Object, OUT>
+            implements Invocation<Object, OUT> {
+
+        @NotNull
+        @Override
+        public final Invocation<Object, OUT> newInvocation() {
+
+            return this;
+        }
+
+        public final void onAbort(@NotNull final RoutineException reason) {
 
         }
 
-        public void onTerminate() {
+        public final void onDestroy() {
+
+        }
+
+        public final void onInitialize() {
+
+        }
+
+        public final void onInput(final Object input, @NotNull final ResultChannel<OUT> result) {
+
+        }
+
+        public final void onTerminate() {
 
         }
     }
@@ -1032,8 +1039,7 @@ public abstract class AbstractStreamChannel<OUT>
      *
      * @param <OUT> the output data type.
      */
-    private static class GenerateOutputInvocation<OUT> extends InvocationFactory<Object, OUT>
-            implements Invocation<Object, OUT> {
+    private static class GenerateOutputInvocation<OUT> extends GenerateInvocation<OUT> {
 
         private final List<OUT> mOutputs;
 
@@ -1045,13 +1051,6 @@ public abstract class AbstractStreamChannel<OUT>
         private GenerateOutputInvocation(@NotNull final List<OUT> outputs) {
 
             mOutputs = outputs;
-        }
-
-        @NotNull
-        @Override
-        public Invocation<Object, OUT> newInvocation() {
-
-            return this;
         }
 
         @Override
@@ -1075,29 +1074,9 @@ public abstract class AbstractStreamChannel<OUT>
             return mOutputs.hashCode();
         }
 
-        public void onAbort(@NotNull final RoutineException reason) {
-
-        }
-
-        public void onDestroy() {
-
-        }
-
-        public void onInitialize() {
-
-        }
-
-        public void onInput(final Object input, @NotNull final ResultChannel<OUT> result) {
-
-        }
-
         public void onResult(@NotNull final ResultChannel<OUT> result) {
 
             result.pass(mOutputs);
-        }
-
-        public void onTerminate() {
-
         }
     }
 
@@ -1106,8 +1085,7 @@ public abstract class AbstractStreamChannel<OUT>
      *
      * @param <OUT> the output data type.
      */
-    private static class GenerateSupplierInvocation<OUT> extends InvocationFactory<Object, OUT>
-            implements Invocation<Object, OUT> {
+    private static class GenerateSupplierInvocation<OUT> extends FilterInvocation<Object, OUT> {
 
         private final SupplierWrapper<? extends OUT> mSupplier;
 
@@ -1121,17 +1099,6 @@ public abstract class AbstractStreamChannel<OUT>
         private GenerateSupplierInvocation(@NotNull final SupplierWrapper<? extends OUT> supplier) {
 
             mSupplier = supplier;
-        }
-
-        @NotNull
-        @Override
-        public Invocation<Object, OUT> newInvocation() {
-
-            return this;
-        }
-
-        public void onAbort(@NotNull final RoutineException reason) {
-
         }
 
         @Override
@@ -1155,25 +1122,9 @@ public abstract class AbstractStreamChannel<OUT>
             return mSupplier.hashCode();
         }
 
-        public void onDestroy() {
-
-        }
-
-        public void onInitialize() {
-
-        }
-
         public void onInput(final Object input, @NotNull final ResultChannel<OUT> result) {
 
             result.pass(mSupplier.get());
-        }
-
-        public void onResult(@NotNull final ResultChannel<OUT> result) {
-
-        }
-
-        public void onTerminate() {
-
         }
     }
 
@@ -1320,11 +1271,10 @@ public abstract class AbstractStreamChannel<OUT>
     /**
      * Invocation implementation generating a range of data.
      *
-     * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class RangeInvocation<IN, OUT extends Comparable<OUT>>
-            extends InvocationFactory<IN, OUT> implements Invocation<IN, OUT> {
+    private static class RangeInvocation<OUT extends Comparable<OUT>>
+            extends GenerateInvocation<OUT> {
 
         private final OUT mEnd;
 
@@ -1356,13 +1306,6 @@ public abstract class AbstractStreamChannel<OUT>
             mIncrement = increment;
         }
 
-        @NotNull
-        @Override
-        public Invocation<IN, OUT> newInvocation() {
-
-            return this;
-        }
-
         @Override
         @SuppressWarnings({"SimplifiableIfStatement", "EqualsBetweenInconvertibleTypes"})
         public boolean equals(final Object o) {
@@ -1375,7 +1318,7 @@ public abstract class AbstractStreamChannel<OUT>
                 return false;
             }
 
-            final RangeInvocation<?, ?> that = (RangeInvocation<?, ?>) o;
+            final RangeInvocation<?> that = (RangeInvocation<?>) o;
             if (!mEnd.equals(that.mEnd)) {
                 return false;
             }
@@ -1396,22 +1339,6 @@ public abstract class AbstractStreamChannel<OUT>
             return result;
         }
 
-        public void onAbort(@NotNull final RoutineException reason) {
-
-        }
-
-        public void onDestroy() {
-
-        }
-
-        public void onInitialize() {
-
-        }
-
-        public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
-
-        }
-
         public void onResult(@NotNull final ResultChannel<OUT> result) {
 
             final OUT start = mStart;
@@ -1430,10 +1357,6 @@ public abstract class AbstractStreamChannel<OUT>
                     current = increment.apply(current);
                 }
             }
-        }
-
-        public void onTerminate() {
-
         }
     }
 

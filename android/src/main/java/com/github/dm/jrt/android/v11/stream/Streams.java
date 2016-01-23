@@ -566,8 +566,7 @@ public class Streams extends Channels {
         /**
          * Builds and returns a new lazy stream output channel.<br/>
          * The stream will start producing results only when it is bound to another channel or an
-         * output
-         * consumer, or when any of the read methods is called.
+         * output consumer, or when any of the read methods is called.
          *
          * @param <OUT> the output data type.
          * @return the newly created channel instance.
@@ -579,11 +578,10 @@ public class Streams extends Channels {
         }
 
         /**
-         * Builds and returns a new lazy stream output channel generating the specified outputs
-         * .<br/>
+         * Builds and returns a new lazy stream output channel generating the specified outputs.
+         * <br/>
          * The stream will start producing results only when it is bound to another channel or an
-         * output
-         * consumer, or when any of the read methods is called.
+         * output consumer, or when any of the read methods is called.
          *
          * @param outputs the iterable returning the output data.
          * @param <OUT>   the output data type.
@@ -598,8 +596,7 @@ public class Streams extends Channels {
         /**
          * Builds and returns a new lazy stream output channel generating the specified output.<br/>
          * The stream will start producing results only when it is bound to another channel or an
-         * output
-         * consumer, or when any of the read methods is called.
+         * output consumer, or when any of the read methods is called.
          *
          * @param output the output.
          * @param <OUT>  the output data type.
@@ -612,11 +609,10 @@ public class Streams extends Channels {
         }
 
         /**
-         * Builds and returns a new lazy stream output channel generating the specified outputs
-         * .<br/>
+         * Builds and returns a new lazy stream output channel generating the specified outputs.
+         * <br/>
          * The stream will start producing results only when it is bound to another channel or an
-         * output
-         * consumer, or when any of the read methods is called.
+         * output consumer, or when any of the read methods is called.
          *
          * @param outputs the output data.
          * @param <OUT>   the output data type.
@@ -629,11 +625,10 @@ public class Streams extends Channels {
         }
 
         /**
-         * Builds and returns a new lazy stream output channel generating the specified outputs
-         * .<br/>
+         * Builds and returns a new lazy stream output channel generating the specified outputs.
+         * <br/>
          * The stream will start producing results only when it is bound to another channel or an
-         * output
-         * consumer, or when any of the read methods is called.
+         * output consumer, or when any of the read methods is called.
          * <p/>
          * Note that the output channel will be bound as a result of the call.
          *

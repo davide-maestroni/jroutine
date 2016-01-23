@@ -114,20 +114,33 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
     /**
      * Constructor.
      *
+     * @param builder the context builder.
+     * @param channel the wrapped output channel.
+     */
+    DefaultLoaderStreamChannelCompat(@Nullable final ContextBuilderCompat builder,
+            @NotNull final OutputChannel<OUT> channel) {
+
+        this(builder, channel, null);
+    }
+
+    /**
+     * Constructor.
+     *
      * @param builder                 the context builder.
+     * @param channel                 the wrapped output channel.
      * @param invocationConfiguration the initial invocation configuration.
      * @param loaderConfiguration     the initial loader configuration.
      * @param delegationType          the delegation type.
-     * @param channel                 the wrapped output channel.
+     * @param bind                    the binding runnable.
      */
     @SuppressWarnings("ConstantConditions")
     DefaultLoaderStreamChannelCompat(@Nullable final ContextBuilderCompat builder,
+            @NotNull final OutputChannel<OUT> channel,
             @NotNull final InvocationConfiguration invocationConfiguration,
             @NotNull final LoaderConfiguration loaderConfiguration,
-            @NotNull final DelegationType delegationType,
-            @NotNull final OutputChannel<OUT> channel) {
+            @NotNull final DelegationType delegationType, @Nullable final Runnable bind) {
 
-        super(invocationConfiguration, delegationType, channel);
+        super(channel, invocationConfiguration, delegationType, bind);
         if (loaderConfiguration == null) {
             throw new NullPointerException("the loader configuration must not be null");
         }
@@ -141,12 +154,13 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
      *
      * @param builder the context builder.
      * @param channel the wrapped output channel.
+     * @param bind    the binding runnable.
      */
     DefaultLoaderStreamChannelCompat(@Nullable final ContextBuilderCompat builder,
-            @NotNull final OutputChannel<OUT> channel) {
+            @NotNull final OutputChannel<OUT> channel, @Nullable final Runnable bind) {
 
-        this(builder, InvocationConfiguration.DEFAULT_CONFIGURATION,
-             LoaderConfiguration.DEFAULT_CONFIGURATION, DelegationType.ASYNC, channel);
+        this(builder, channel, InvocationConfiguration.DEFAULT_CONFIGURATION,
+             LoaderConfiguration.DEFAULT_CONFIGURATION, DelegationType.ASYNC, bind);
     }
 
     @NotNull
@@ -458,8 +472,8 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
     public LoaderStreamChannelCompat<? extends ParcelableSelectable<OUT>> toSelectable(
             final int index) {
 
-        return newChannel(getStreamConfiguration(), getDelegationType(),
-                          ChannelsCompat.toSelectable(this, index));
+        return newChannel(ChannelsCompat.toSelectable(this, index), getStreamConfiguration(),
+                          getDelegationType(), getBind());
     }
 
     @NotNull
@@ -508,11 +522,11 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
     @NotNull
     @Override
     protected <AFTER> LoaderStreamChannelCompat<AFTER> newChannel(
+            @NotNull final OutputChannel<AFTER> channel,
             @NotNull final InvocationConfiguration configuration,
-            @NotNull final DelegationType delegationType,
-            @NotNull final OutputChannel<AFTER> channel) {
+            @NotNull final DelegationType delegationType, @Nullable final Runnable bind) {
 
-        return newChannel(configuration, mStreamConfiguration, delegationType, channel);
+        return newChannel(channel, configuration, mStreamConfiguration, delegationType, bind);
     }
 
     @NotNull
@@ -575,14 +589,15 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
 
     @NotNull
     private <AFTER> LoaderStreamChannelCompat<AFTER> newChannel(
+            @NotNull final OutputChannel<AFTER> channel,
             @NotNull final InvocationConfiguration invocationConfiguration,
             @NotNull final LoaderConfiguration loaderConfiguration,
-            @NotNull final DelegationType delegationType,
-            @NotNull final OutputChannel<AFTER> channel) {
+            @NotNull final DelegationType delegationType, @Nullable final Runnable bind) {
 
-        return new DefaultLoaderStreamChannelCompat<AFTER>(mContextBuilder, invocationConfiguration,
+        return new DefaultLoaderStreamChannelCompat<AFTER>(mContextBuilder, channel,
+                                                           invocationConfiguration,
                                                            loaderConfiguration, delegationType,
-                                                           channel);
+                                                           bind);
     }
 
     @NotNull

@@ -72,6 +72,7 @@ public class StreamChannelTest {
     @Test
     public void testBuilder() {
 
+        assertThat(Streams.streamOf().afterMax(seconds(1)).all()).isEmpty();
         assertThat(Streams.streamOf("test").afterMax(seconds(1)).all()).containsExactly("test");
         assertThat(Streams.streamOf("test1", "test2", "test3")
                           .afterMax(seconds(1))
@@ -864,6 +865,37 @@ public class StreamChannelTest {
             fail();
 
         } catch (final ExecutionDeadlockException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testLazyBuilder() {
+
+        assertThat(Streams.lazyStreamOf().afterMax(seconds(1)).all()).isEmpty();
+        assertThat(Streams.lazyStreamOf("test").afterMax(seconds(1)).all()).containsExactly("test");
+        assertThat(Streams.lazyStreamOf("test1", "test2", "test3")
+                          .afterMax(seconds(1))
+                          .all()).containsExactly("test1", "test2", "test3");
+        assertThat(Streams.lazyStreamOf(Arrays.asList("test1", "test2", "test3"))
+                          .afterMax(seconds(1))
+                          .all()).containsExactly("test1", "test2", "test3");
+        assertThat(Streams.lazyStreamOf(JRoutine.io().of("test1", "test2", "test3"))
+                          .afterMax(seconds(1))
+                          .all()).containsExactly("test1", "test2", "test3");
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testLazyBuilderNullPointerError() {
+
+        try {
+
+            Streams.lazyStreamOf((OutputChannel<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
 
         }
     }

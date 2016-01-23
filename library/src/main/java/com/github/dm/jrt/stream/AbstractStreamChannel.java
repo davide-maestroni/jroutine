@@ -79,6 +79,15 @@ import static com.github.dm.jrt.util.TimeDuration.fromUnit;
 public abstract class AbstractStreamChannel<OUT>
         implements StreamChannel<OUT>, Configurable<StreamChannel<OUT>> {
 
+    private static final Runnable NO_OP = new Runnable() {
+
+        public void run() {
+
+        }
+    };
+
+    private final Runnable mBind;
+
     private final OutputChannel<OUT> mChannel;
 
     private InvocationConfiguration mConfiguration = InvocationConfiguration.DEFAULT_CONFIGURATION;
@@ -103,14 +112,15 @@ public abstract class AbstractStreamChannel<OUT>
     /**
      * Constructor.
      *
+     * @param channel        the wrapped output channel.
      * @param configuration  the initial invocation configuration.
      * @param delegationType the delegation type.
-     * @param channel        the wrapped output channel.
+     * @param bind           the binding runnable.
      */
     @SuppressWarnings("ConstantConditions")
-    protected AbstractStreamChannel(@NotNull final InvocationConfiguration configuration,
-            @NotNull final DelegationType delegationType,
-            @NotNull final OutputChannel<OUT> channel) {
+    protected AbstractStreamChannel(@NotNull final OutputChannel<OUT> channel,
+            @NotNull final InvocationConfiguration configuration,
+            @NotNull final DelegationType delegationType, @Nullable final Runnable bind) {
 
         if (configuration == null) {
             throw new NullPointerException("the configuration must not be null");
@@ -127,6 +137,7 @@ public abstract class AbstractStreamChannel<OUT>
         mStreamConfiguration = configuration;
         mDelegationType = delegationType;
         mChannel = channel;
+        mBind = (bind != null) ? bind : NO_OP;
     }
 
     @NotNull
@@ -225,11 +236,13 @@ public abstract class AbstractStreamChannel<OUT>
 
     public boolean abort() {
 
+        mBind.run();
         return mChannel.abort();
     }
 
     public boolean abort(@Nullable final Throwable reason) {
 
+        mBind.run();
         return mChannel.abort(reason);
     }
 
@@ -260,6 +273,7 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public StreamChannel<OUT> allInto(@NotNull final Collection<? super OUT> results) {
 
+        mBind.run();
         mChannel.allInto(results);
         return this;
     }
@@ -302,6 +316,7 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public StreamChannel<OUT> passTo(@NotNull final OutputConsumer<? super OUT> consumer) {
 
+        mBind.run();
         mChannel.passTo(consumer);
         return this;
     }
@@ -309,6 +324,7 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public StreamChannel<OUT> skip(final int count) {
 
+        mBind.run();
         mChannel.skip(count);
         return this;
     }
@@ -552,7 +568,7 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public StreamChannel<OUT> repeat() {
 
-        return newChannel(mStreamConfiguration, mDelegationType, Channels.repeat(this));
+        return newChannel(Channels.repeat(this), mStreamConfiguration, mDelegationType, mBind);
     }
 
     @NotNull
@@ -592,8 +608,8 @@ public abstract class AbstractStreamChannel<OUT>
     @SuppressWarnings("unchecked")
     public StreamChannel<? extends Selectable<OUT>> toSelectable(final int index) {
 
-        return newChannel(mStreamConfiguration, mDelegationType,
-                          Channels.toSelectable(this, index));
+        return newChannel(Channels.toSelectable(this, index), mStreamConfiguration, mDelegationType,
+                          mBind);
     }
 
     @NotNull
@@ -608,7 +624,7 @@ public abstract class AbstractStreamChannel<OUT>
 
         final IOChannel<OUT> ioChannel = JRoutine.io().buildChannel();
         mChannel.passTo(new TryCatchOutputConsumer<OUT>(consumer, ioChannel));
-        return newChannel(mStreamConfiguration, mDelegationType, ioChannel);
+        return newChannel(ioChannel, mStreamConfiguration, mDelegationType, mBind);
     }
 
     @NotNull
@@ -649,21 +665,25 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public List<OUT> all() {
 
+        mBind.run();
         return mChannel.all();
     }
 
     public boolean checkComplete() {
 
+        mBind.run();
         return mChannel.checkComplete();
     }
 
     public boolean hasNext() {
 
+        mBind.run();
         return mChannel.hasNext();
     }
 
     public OUT next() {
 
+        mBind.run();
         return mChannel.next();
     }
 
@@ -675,11 +695,13 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public List<OUT> next(final int count) {
 
+        mBind.run();
         return mChannel.next(count);
     }
 
     public OUT nextOr(final OUT output) {
 
+        mBind.run();
         return mChannel.nextOr(output);
     }
 
@@ -687,17 +709,31 @@ public abstract class AbstractStreamChannel<OUT>
     public <CHANNEL extends InputChannel<? super OUT>> CHANNEL passTo(
             @NotNull final CHANNEL channel) {
 
+        mBind.run();
         return mChannel.passTo(channel);
     }
 
     public Iterator<OUT> iterator() {
 
+        mBind.run();
         return mChannel.iterator();
     }
 
     public void remove() {
 
+        mBind.run();
         mChannel.remove();
+    }
+
+    /**
+     * Returns the binding runnable.
+     *
+     * @return the runnable.
+     */
+    @NotNull
+    protected Runnable getBind() {
+
+        return mBind;
     }
 
     /**
@@ -714,7 +750,7 @@ public abstract class AbstractStreamChannel<OUT>
     /**
      * Returns the delegation type used by all the routines concatenated to the stream.
      *
-     * @return the configuration.
+     * @return the delegation type.
      */
     @NotNull
     protected DelegationType getDelegationType() {
@@ -736,16 +772,17 @@ public abstract class AbstractStreamChannel<OUT>
     /**
      * Creates a new channel instance.
      *
+     * @param <AFTER>        the concatenation output type.
+     * @param channel        the wrapped output channel.
      * @param configuration  the stream configuration.
      * @param delegationType the delegation type.
-     * @param channel        the wrapped output channel.
-     * @param <AFTER>        the concatenation output type.
+     * @param bind           the binding runnable.
      * @return the newly created channel instance.
      */
     @NotNull
     protected abstract <AFTER> StreamChannel<AFTER> newChannel(
-            @NotNull InvocationConfiguration configuration, @NotNull DelegationType delegationType,
-            @NotNull OutputChannel<AFTER> channel);
+            @NotNull OutputChannel<AFTER> channel, @NotNull InvocationConfiguration configuration,
+            @NotNull DelegationType delegationType, @Nullable Runnable bind);
 
     /**
      * Creates a new routine instance based on the specified factory.
@@ -772,8 +809,8 @@ public abstract class AbstractStreamChannel<OUT>
     private <AFTER> StreamChannel<AFTER> concatRoutine(
             @NotNull final InvocationChannel<? super OUT, ? extends AFTER> channel) {
 
-        return newChannel(mStreamConfiguration, mDelegationType,
-                          (OutputChannel<AFTER>) mChannel.passTo(channel).result());
+        return newChannel((OutputChannel<AFTER>) mChannel.passTo(channel).result(),
+                          mStreamConfiguration, mDelegationType, mBind);
     }
 
     @NotNull

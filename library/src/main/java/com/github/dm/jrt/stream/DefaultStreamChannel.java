@@ -23,6 +23,7 @@ import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Default implementation of a stream output channel.
@@ -40,32 +41,42 @@ class DefaultStreamChannel<OUT> extends AbstractStreamChannel<OUT> {
      */
     DefaultStreamChannel(@NotNull final OutputChannel<OUT> channel) {
 
-        super(InvocationConfiguration.DEFAULT_CONFIGURATION, DelegationType.ASYNC, channel);
+        this(channel, null);
     }
 
     /**
      * Constructor.
      *
+     * @param channel the wrapped output channel.
+     * @param bind    the binding runnable.
+     */
+    DefaultStreamChannel(@NotNull final OutputChannel<OUT> channel, @Nullable final Runnable bind) {
+
+        super(channel, InvocationConfiguration.DEFAULT_CONFIGURATION, DelegationType.ASYNC, bind);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param channel        the wrapped output channel.
      * @param configuration  the initial invocation configuration.
      * @param delegationType the delegation type.
-     * @param channel        the wrapped output channel.
+     * @param bind           the binding runnable.
      */
-    @SuppressWarnings("ConstantConditions")
-    private DefaultStreamChannel(@NotNull final InvocationConfiguration configuration,
-            @NotNull final DelegationType delegationType,
-            @NotNull final OutputChannel<OUT> channel) {
+    private DefaultStreamChannel(@NotNull final OutputChannel<OUT> channel,
+            @NotNull final InvocationConfiguration configuration,
+            @NotNull final DelegationType delegationType, @Nullable final Runnable bind) {
 
-        super(configuration, delegationType, channel);
+        super(channel, configuration, delegationType, bind);
     }
 
     @NotNull
     @Override
-    protected <AFTER> StreamChannel<AFTER> newChannel(
+    protected <AFTER> StreamChannel<AFTER> newChannel(@NotNull final OutputChannel<AFTER> channel,
             @NotNull final InvocationConfiguration configuration,
-            @NotNull final DelegationType delegationType,
-            @NotNull final OutputChannel<AFTER> channel) {
+            @NotNull final DelegationType delegationType, @Nullable final Runnable bind) {
 
-        return new DefaultStreamChannel<AFTER>(configuration, delegationType, channel);
+        return new DefaultStreamChannel<AFTER>(channel, configuration, delegationType, bind);
     }
 
     @NotNull

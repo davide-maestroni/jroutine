@@ -230,6 +230,90 @@ public class Streams extends Channels {
     }
 
     /**
+     * Builds and returns a new lazy stream output channel.<br/>
+     * The stream will start producing results only when it is bound to another channel or an output
+     * consumer, or when any of the read methods is called.
+     *
+     * @param <OUT> the output data type.
+     * @return the newly created channel instance.
+     */
+    @NotNull
+    public static <OUT> StreamChannel<OUT> lazyStreamOf() {
+
+        return lazyStreamOf(JRoutine.io().<OUT>buildChannel().close());
+    }
+
+    /**
+     * Builds and returns a new lazy stream output channel generating the specified outputs.<br/>
+     * The stream will start producing results only when it is bound to another channel or an output
+     * consumer, or when any of the read methods is called.
+     *
+     * @param outputs the iterable returning the output data.
+     * @param <OUT>   the output data type.
+     * @return the newly created channel instance.
+     */
+    @NotNull
+    public static <OUT> StreamChannel<OUT> lazyStreamOf(@Nullable final Iterable<OUT> outputs) {
+
+        return lazyStreamOf(JRoutine.io().of(outputs));
+    }
+
+    /**
+     * Builds and returns a new lazy stream output channel generating the specified output.<br/>
+     * The stream will start producing results only when it is bound to another channel or an output
+     * consumer, or when any of the read methods is called.
+     *
+     * @param output the output.
+     * @param <OUT>  the output data type.
+     * @return the newly created channel instance.
+     */
+    @NotNull
+    public static <OUT> StreamChannel<OUT> lazyStreamOf(@Nullable final OUT output) {
+
+        return lazyStreamOf(JRoutine.io().of(output));
+    }
+
+    /**
+     * Builds and returns a new lazy stream output channel generating the specified outputs.<br/>
+     * The stream will start producing results only when it is bound to another channel or an output
+     * consumer, or when any of the read methods is called.
+     *
+     * @param outputs the output data.
+     * @param <OUT>   the output data type.
+     * @return the newly created channel instance.
+     */
+    @NotNull
+    public static <OUT> StreamChannel<OUT> lazyStreamOf(@Nullable final OUT... outputs) {
+
+        return lazyStreamOf(JRoutine.io().of(outputs));
+    }
+
+    /**
+     * Builds and returns a new lazy stream output channel generating the specified outputs.<br/>
+     * The stream will start producing results only when it is bound to another channel or an output
+     * consumer, or when any of the read methods is called.
+     * <p/>
+     * Note that the output channel will be bound as a result of the call.
+     *
+     * @param output the output channel returning the output data.
+     * @param <OUT>  the output data type.
+     * @return the newly created channel instance.
+     */
+    @NotNull
+    @SuppressWarnings("ConstantConditions")
+    public static <OUT> StreamChannel<OUT> lazyStreamOf(@NotNull final OutputChannel<OUT> output) {
+
+        if (output == null) {
+
+            throw new NullPointerException("the output channel instance must not be null");
+        }
+
+        final IOChannel<OUT> ioChannel = JRoutine.io().buildChannel();
+        return new DefaultStreamChannel<OUT>(ioChannel,
+                                             new BindingRunnable<OUT>(ioChannel, output));
+    }
+
+    /**
      * Returns an factory of invocations passing at max the specified number of input data and
      * discarding the following ones.
      *
@@ -457,6 +541,36 @@ public class Streams extends Channels {
             @NotNull final OutputChannel<? extends OUT> channel, final int index) {
 
         return streamOf(Channels.toSelectable(channel, index));
+    }
+
+    /**
+     * Runnable binding two channels together.
+     *
+     * @param <OUT> the output data type.
+     */
+    private static class BindingRunnable<OUT> implements Runnable {
+
+        private final IOChannel<OUT> mChannel;
+
+        private final OutputChannel<OUT> mOutput;
+
+        /**
+         * Constructor.
+         *
+         * @param channel the I/O channel.
+         * @param output  the output channel.
+         */
+        private BindingRunnable(@NotNull final IOChannel<OUT> channel,
+                @NotNull final OutputChannel<OUT> output) {
+
+            mChannel = channel;
+            mOutput = output;
+        }
+
+        public void run() {
+
+            mOutput.passTo(mChannel).close();
+        }
     }
 
     /**

@@ -33,10 +33,12 @@ import static com.github.dm.jrt.util.TimeDuration.fromUnit;
  * Each instance is immutable, thus, in order to modify a configuration parameter, a new builder
  * must be created starting from the specific configuration instance.
  * <p/>
- * The configuration is used to set a specific ID to each invocation created by a routine.<br/>
+ * The configuration is used to set a specific loader ID to each invocation created by a routine, or
+ * to override the factory {@code equals()} and {@code hashCode()} by specifying a routine ID.<br/>
  * Moreover, it is possible to set a specific type of resolution when two invocations clashes, that
- * is, they share the same ID, and to set a specific type of caching of the invocation results.<br/>
- * In case is a clash resolved by joining the two invocations, it is possible to specify a maximum
+ * is, they share the same loader ID, and to set a specific type of caching of the invocation
+ * results.<br/>
+ * In case a clash is resolved by joining the two invocations, it is possible to specify a maximum
  * time after which the results of the first invocation are considered to be stale, and thus the
  * invocation is repeated.<br/>
  * Finally, a specific looper, other than the main thread one, can be chosen to dispatch the results
@@ -66,6 +68,8 @@ public final class LoaderConfiguration {
 
     private final ClashResolutionType mResolutionType;
 
+    private final int mRoutineId;
+
     private final TimeDuration mStaleTime;
 
     private final CacheStrategyType mStrategyType;
@@ -75,19 +79,21 @@ public final class LoaderConfiguration {
      *
      * @param looper              the looper instance.
      * @param loaderId            the the loader ID.
+     * @param routineId           the the routine ID.
      * @param resolutionType      the type of resolution.
      * @param inputResolutionType the type of input resolution.
      * @param strategyType        the cache strategy type.
      * @param staleTime           the stale time.
      */
     private LoaderConfiguration(@Nullable final Looper looper, final int loaderId,
-            @Nullable final ClashResolutionType resolutionType,
+            final int routineId, @Nullable final ClashResolutionType resolutionType,
             @Nullable final ClashResolutionType inputResolutionType,
             @Nullable final CacheStrategyType strategyType,
             @Nullable final TimeDuration staleTime) {
 
         mLooper = looper;
         mLoaderId = loaderId;
+        mRoutineId = routineId;
         mResolutionType = resolutionType;
         mInputResolutionType = inputResolutionType;
         mStrategyType = strategyType;
@@ -148,6 +154,10 @@ public final class LoaderConfiguration {
             return false;
         }
 
+        if (mRoutineId != that.mRoutineId) {
+            return false;
+        }
+
         if (mInputResolutionType != that.mInputResolutionType) {
             return false;
         }
@@ -175,6 +185,7 @@ public final class LoaderConfiguration {
         result = 31 * result + mLoaderId;
         result = 31 * result + (mLooper != null ? mLooper.hashCode() : 0);
         result = 31 * result + (mResolutionType != null ? mResolutionType.hashCode() : 0);
+        result = 31 * result + mRoutineId;
         result = 31 * result + (mStaleTime != null ? mStaleTime.hashCode() : 0);
         result = 31 * result + (mStrategyType != null ? mStrategyType.hashCode() : 0);
         return result;
@@ -189,6 +200,7 @@ public final class LoaderConfiguration {
                 ", mLoaderId=" + mLoaderId +
                 ", mLooper=" + mLooper +
                 ", mResolutionType=" + mResolutionType +
+                ", mRoutineId=" + mRoutineId +
                 ", mStaleTime=" + mStaleTime +
                 ", mStrategyType=" + mStrategyType +
                 '}';
@@ -267,6 +279,18 @@ public final class LoaderConfiguration {
 
         final TimeDuration staleTime = mStaleTime;
         return (staleTime != null) ? staleTime : valueIfNotSet;
+    }
+
+    /**
+     * Returns the routine ID (AUTO by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the routine ID.
+     */
+    public int getRoutineIdOr(final int valueIfNotSet) {
+
+        final int routineId = mRoutineId;
+        return (routineId != AUTO) ? routineId : valueIfNotSet;
     }
 
     /**
@@ -364,6 +388,8 @@ public final class LoaderConfiguration {
 
         private ClashResolutionType mResolutionType;
 
+        private int mRoutineId;
+
         private TimeDuration mStaleTime;
 
         private CacheStrategyType mStrategyType;
@@ -382,6 +408,7 @@ public final class LoaderConfiguration {
 
             mConfigurable = configurable;
             mLoaderId = AUTO;
+            mRoutineId = AUTO;
         }
 
         /**
@@ -436,6 +463,11 @@ public final class LoaderConfiguration {
             final int loaderId = configuration.mLoaderId;
             if (loaderId != AUTO) {
                 withId(loaderId);
+            }
+
+            final int routineId = configuration.mRoutineId;
+            if (routineId != AUTO) {
+                withRoutineId(routineId);
             }
 
             final ClashResolutionType resolutionType = configuration.mResolutionType;
@@ -564,10 +596,23 @@ public final class LoaderConfiguration {
             return withResultStaleTime(fromUnit(time, timeUnit));
         }
 
+        /**
+         * Tells the builder to identify the routine with the specified ID.
+         *
+         * @param routineId the routine ID.
+         * @return this builder.
+         */
+        @NotNull
+        public Builder<TYPE> withRoutineId(final int routineId) {
+
+            mRoutineId = routineId;
+            return this;
+        }
+
         @NotNull
         private LoaderConfiguration buildConfiguration() {
 
-            return new LoaderConfiguration(mLooper, mLoaderId, mResolutionType,
+            return new LoaderConfiguration(mLooper, mLoaderId, mRoutineId, mResolutionType,
                                            mInputResolutionType, mStrategyType, mStaleTime);
         }
 

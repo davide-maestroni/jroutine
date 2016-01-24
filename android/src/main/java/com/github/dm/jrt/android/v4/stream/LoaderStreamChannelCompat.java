@@ -378,6 +378,17 @@ public interface LoaderStreamChannelCompat<OUT>
     LoaderStreamChannelCompat<OUT> loaderId(int loaderId);
 
     /**
+     * Short for {@code withLoaders().withRoutineId(routineId).set()}.<br/>
+     * This method is useful to easily apply a configuration to the next routine concatenated to the
+     * stream, which will force the routine ID.
+     *
+     * @param routineId the routine ID.
+     * @return the configured stream channel.
+     */
+    @NotNull
+    LoaderStreamChannelCompat<OUT> routineId(int routineId);
+
+    /**
      * Short for {@code withLoaders().withResultStaleTime(time, timeUnit).set()}.
      *
      * @param time     the time.

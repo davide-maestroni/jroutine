@@ -23,6 +23,7 @@ import com.github.dm.jrt.android.annotation.ClashResolution;
 import com.github.dm.jrt.android.annotation.InputClashResolution;
 import com.github.dm.jrt.android.annotation.LoaderId;
 import com.github.dm.jrt.android.annotation.ResultStaleTime;
+import com.github.dm.jrt.android.annotation.RoutineId;
 import com.github.dm.jrt.android.builder.LoaderConfiguration;
 import com.github.dm.jrt.android.builder.LoaderObjectRoutineBuilder;
 import com.github.dm.jrt.android.core.ContextInvocationTarget;
@@ -112,6 +113,11 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         final LoaderId idAnnotation = method.getAnnotation(LoaderId.class);
         if (idAnnotation != null) {
             builder.withId(idAnnotation.value());
+        }
+
+        final RoutineId routineIdAnnotation = method.getAnnotation(RoutineId.class);
+        if (routineIdAnnotation != null) {
+            builder.withRoutineId(routineIdAnnotation.value());
         }
 
         final ClashResolution clashAnnotation = method.getAnnotation(ClashResolution.class);

@@ -366,13 +366,24 @@ public interface LoaderStreamChannel<OUT>
     /**
      * Short for {@code withLoaders().withId(loaderId).set()}.<br/>
      * This method is useful to easily apply a configuration to the next routine concatenated to the
-     * stream, which will force the routine loader ID.
+     * stream, which will force the loader ID.
      *
      * @param loaderId the loader ID.
      * @return the configured stream channel.
      */
     @NotNull
     LoaderStreamChannel<OUT> loaderId(int loaderId);
+
+    /**
+     * Short for {@code withLoaders().withRoutineId(routineId).set()}.<br/>
+     * This method is useful to easily apply a configuration to the next routine concatenated to the
+     * stream, which will force the routine ID.
+     *
+     * @param routineId the routine ID.
+     * @return the configured stream channel.
+     */
+    @NotNull
+    LoaderStreamChannel<OUT> routineId(int routineId);
 
     /**
      * Short for {@code withLoaders().withResultStaleTime(time, timeUnit).set()}.

@@ -20,6 +20,7 @@ import android.content.Context;
 
 import com.github.dm.jrt.android.builder.LoaderConfiguration;
 import com.github.dm.jrt.android.invocation.ContextInvocation;
+import com.github.dm.jrt.android.invocation.FunctionContextInvocation;
 import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
 import com.github.dm.jrt.android.routine.LoaderRoutine;
 import com.github.dm.jrt.android.runner.Runners;
@@ -39,6 +40,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import static com.github.dm.jrt.util.Reflection.asArgs;
 
 /**
  * Routine implementation delegating to Android loaders the asynchronous processing.
@@ -84,8 +87,10 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
             throw new NullPointerException("the context invocation factory must not be null");
         }
 
+        final int routineId = loaderConfiguration.getRoutineIdOr(LoaderConfiguration.AUTO);
         mContext = context;
-        mFactory = factory;
+        mFactory = (routineId == LoaderConfiguration.AUTO) ? factory
+                : new FactoryWrapper<IN, OUT>(factory, routineId);
         mConfiguration = loaderConfiguration;
         mLoaderId = loaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO);
         mOrderType = invocationConfiguration.getOutputOrderTypeOr(null);
@@ -195,6 +200,38 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
             final PurgeInputsExecution<IN> execution =
                     new PurgeInputsExecution<IN>(context, mFactory, mLoaderId, inputList);
             Runners.mainRunner().run(execution, 0, TimeUnit.MILLISECONDS);
+        }
+    }
+
+    /**
+     * Wrapper of function context invocation factory overriding {@code equals()} and
+     * {@code hashCode()}.
+     *
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
+     */
+    private static class FactoryWrapper<IN, OUT> extends FunctionContextInvocationFactory<IN, OUT> {
+
+        private final FunctionContextInvocationFactory<IN, OUT> mFactory;
+
+        /**
+         * Constructor.
+         *
+         * @param factory   the wrapped factory.
+         * @param routineId the routine ID.
+         */
+        protected FactoryWrapper(@NotNull final FunctionContextInvocationFactory<IN, OUT> factory,
+                final int routineId) {
+
+            super(asArgs(routineId));
+            mFactory = factory;
+        }
+
+        @NotNull
+        @Override
+        public FunctionContextInvocation<IN, OUT> newInvocation() {
+
+            return mFactory.newInvocation();
         }
     }
 

@@ -545,6 +545,12 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
     }
 
     @NotNull
+    public LoaderStreamChannel<OUT> routineId(final int routineId) {
+
+        return withLoaders().withRoutineId(routineId).set();
+    }
+
+    @NotNull
     public LoaderStreamChannel<OUT> staleAfter(final long time, @NotNull final TimeUnit timeUnit) {
 
         return withLoaders().withResultStaleTime(time, timeUnit).set();

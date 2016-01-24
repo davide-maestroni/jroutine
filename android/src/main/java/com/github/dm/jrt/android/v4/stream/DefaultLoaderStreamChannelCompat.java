@@ -552,6 +552,12 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
     }
 
     @NotNull
+    public LoaderStreamChannelCompat<OUT> routineId(final int routineId) {
+
+        return withLoaders().withRoutineId(routineId).set();
+    }
+
+    @NotNull
     public LoaderStreamChannelCompat<OUT> staleAfter(final long time,
             @NotNull final TimeUnit timeUnit) {
 

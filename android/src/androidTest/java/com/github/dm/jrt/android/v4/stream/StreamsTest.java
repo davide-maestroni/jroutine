@@ -24,6 +24,7 @@ import android.test.ActivityInstrumentationTestCase2;
 import com.github.dm.jrt.android.builder.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.core.Channels.ParcelableSelectable;
 import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
+import com.github.dm.jrt.android.invocation.MissingInvocationException;
 import com.github.dm.jrt.android.invocation.PassingFunctionContextInvocation;
 import com.github.dm.jrt.android.v4.core.ChannelsCompat;
 import com.github.dm.jrt.android.v4.core.JRoutineCompat;
@@ -39,6 +40,7 @@ import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Functions;
+import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.invocation.InvocationFactory;
@@ -1412,6 +1414,81 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         } catch (final AbortException ignored) {
 
         }
+    }
+
+    public void testRoutineId() {
+
+        final LoaderContextCompat context = loaderFrom(getActivity());
+        StreamsCompat.with(context)
+                     .streamOf("test1")
+                     .routineId(11)
+                     .async()
+                     .map(new Function<String, String>() {
+
+                         public String apply(final String s) {
+
+                             try {
+                                 seconds(1).sleepAtLeast();
+                             } catch (final InterruptedException e) {
+                                 throw InvocationInterruptedException.wrapIfNeeded(e);
+                             }
+                             return s.toUpperCase();
+                         }
+                     });
+
+        try {
+            JRoutineCompat.with(context).onId(11).buildChannel().afterMax(seconds(10)).next();
+            fail();
+
+        } catch (final MissingInvocationException ignored) {
+
+        }
+
+        assertThat(StreamsCompat.with(context)
+                                .streamOf("test2")
+                                .withLoaders()
+                                .withRoutineId(11)
+                                .set()
+                                .async()
+                                .map(new Function<String, String>() {
+
+                                    public String apply(final String s) {
+
+                                        try {
+                                            seconds(1).sleepAtLeast();
+                                        } catch (final InterruptedException e) {
+                                            throw InvocationInterruptedException.wrapIfNeeded(e);
+                                        }
+                                        return s.toUpperCase();
+                                    }
+                                })
+                                .afterMax(seconds(10))
+                                .next()).isEqualTo("TEST2");
+        final AtomicInteger count = new AtomicInteger();
+        StreamsCompat.with(context).streamOf().routineId(11).generate(new Supplier<Integer>() {
+
+            public Integer get() {
+
+                try {
+                    seconds(1).sleepAtLeast();
+                } catch (final InterruptedException e) {
+                    throw InvocationInterruptedException.wrapIfNeeded(e);
+                }
+                return count.incrementAndGet();
+            }
+        });
+        assertThat(StreamsCompat.with(context)
+                                .streamOf()
+                                .routineId(11)
+                                .generate(new Supplier<Integer>() {
+
+                                    public Integer get() {
+
+                                        return count.incrementAndGet();
+                                    }
+                                })
+                                .afterMax(seconds(10))
+                                .next()).isEqualTo(1);
     }
 
     public void testSkip() {

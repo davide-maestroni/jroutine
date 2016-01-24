@@ -944,6 +944,73 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         }
     }
 
+    public void testLazyBuilder() {
+
+        assertThat(Streams.lazyStreamOf().afterMax(seconds(1)).all()).isEmpty();
+        assertThat(Streams.lazyStreamOf("test").afterMax(seconds(1)).all()).containsExactly("test");
+        assertThat(Streams.lazyStreamOf("test1", "test2", "test3")
+                          .afterMax(seconds(1))
+                          .all()).containsExactly("test1", "test2", "test3");
+        assertThat(Streams.lazyStreamOf(Arrays.asList("test1", "test2", "test3"))
+                          .afterMax(seconds(1))
+                          .all()).containsExactly("test1", "test2", "test3");
+        assertThat(Streams.lazyStreamOf(JRoutine.io().of("test1", "test2", "test3"))
+                          .afterMax(seconds(1))
+                          .all()).containsExactly("test1", "test2", "test3");
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+        final LoaderContext context = loaderFrom(getActivity());
+        assertThat(Streams.with(context).lazyStreamOf().afterMax(seconds(1)).all()).isEmpty();
+        assertThat(Streams.with(context)
+                          .lazyStreamOf("test")
+                          .afterMax(seconds(1))
+                          .all()).containsExactly("test");
+        assertThat(Streams.with(context)
+                          .lazyStreamOf("test1", "test2", "test3")
+                          .afterMax(seconds(1))
+                          .all()).containsExactly("test1", "test2", "test3");
+        assertThat(Streams.with(context)
+                          .lazyStreamOf(Arrays.asList("test1", "test2", "test3"))
+                          .afterMax(seconds(1))
+                          .all()).containsExactly("test1", "test2", "test3");
+        assertThat(Streams.with(context)
+                          .lazyStreamOf(JRoutine.io().of("test1", "test2", "test3"))
+                          .afterMax(seconds(1))
+                          .all()).containsExactly("test1", "test2", "test3");
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public void testLazyBuilderNullPointerError() {
+
+        try {
+
+            Streams.lazyStreamOf((OutputChannel<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        try {
+
+            Streams.with(loaderFrom(getActivity())).lazyStreamOf((OutputChannel<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
     public void testLimit() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {

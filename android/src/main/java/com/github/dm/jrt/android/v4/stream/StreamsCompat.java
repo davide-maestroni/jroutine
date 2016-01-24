@@ -308,7 +308,13 @@ public class StreamsCompat extends ChannelsCompat {
      * @return the newly created channel instance.
      */
     @NotNull
+    @SuppressWarnings("ConstantConditions")
     public static <OUT> StreamChannel<OUT> lazyStreamOf(@NotNull final OutputChannel<OUT> output) {
+
+        if (output == null) {
+
+            throw new NullPointerException("the output channel instance must not be null");
+        }
 
         final IOChannel<OUT> ioChannel = JRoutineCompat.io().buildChannel();
         return new DefaultLoaderStreamChannelCompat<OUT>(null, ioChannel,
@@ -641,7 +647,13 @@ public class StreamsCompat extends ChannelsCompat {
          * @return the newly created channel instance.
          */
         @NotNull
+        @SuppressWarnings("ConstantConditions")
         public <OUT> StreamChannel<OUT> lazyStreamOf(@NotNull final OutputChannel<OUT> output) {
+
+            if (output == null) {
+
+                throw new NullPointerException("the output channel instance must not be null");
+            }
 
             final IOChannel<OUT> ioChannel = JRoutineCompat.io().buildChannel();
             return new DefaultLoaderStreamChannelCompat<OUT>(mContextBuilder, ioChannel,

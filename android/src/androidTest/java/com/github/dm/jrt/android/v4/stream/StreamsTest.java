@@ -865,6 +865,63 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         }
     }
 
+    public void testLazyBuilder() {
+
+        assertThat(StreamsCompat.lazyStreamOf().afterMax(seconds(1)).all()).isEmpty();
+        assertThat(StreamsCompat.lazyStreamOf("test").afterMax(seconds(1)).all()).containsExactly(
+                "test");
+        assertThat(StreamsCompat.lazyStreamOf("test1", "test2", "test3").afterMax(seconds(1)).all())
+                .containsExactly("test1", "test2", "test3");
+        assertThat(StreamsCompat.lazyStreamOf(Arrays.asList("test1", "test2", "test3"))
+                                .afterMax(seconds(1))
+                                .all()).containsExactly("test1", "test2", "test3");
+        assertThat(StreamsCompat.lazyStreamOf(JRoutineCompat.io().of("test1", "test2", "test3"))
+                                .afterMax(seconds(1))
+                                .all()).containsExactly("test1", "test2", "test3");
+        final LoaderContextCompat context = loaderFrom(getActivity());
+        assertThat(StreamsCompat.with(context).lazyStreamOf().afterMax(seconds(1)).all()).isEmpty();
+        assertThat(StreamsCompat.with(context)
+                                .lazyStreamOf("test")
+                                .afterMax(seconds(1))
+                                .all()).containsExactly("test");
+        assertThat(StreamsCompat.with(context)
+                                .lazyStreamOf("test1", "test2", "test3")
+                                .afterMax(seconds(1))
+                                .all()).containsExactly("test1", "test2", "test3");
+        assertThat(StreamsCompat.with(context)
+                                .lazyStreamOf(Arrays.asList("test1", "test2", "test3"))
+                                .afterMax(seconds(1))
+                                .all()).containsExactly("test1", "test2", "test3");
+        assertThat(StreamsCompat.with(context)
+                                .lazyStreamOf(JRoutineCompat.io().of("test1", "test2", "test3"))
+                                .afterMax(seconds(1))
+                                .all()).containsExactly("test1", "test2", "test3");
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public void testLazyBuilderNullPointerError() {
+
+        try {
+
+            StreamsCompat.lazyStreamOf((OutputChannel<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            StreamsCompat.with(loaderFrom(getActivity())).lazyStreamOf((OutputChannel<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
     public void testLimit() {
 
         final LoaderContextCompat context = loaderFrom(getActivity());

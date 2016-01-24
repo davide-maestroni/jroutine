@@ -308,7 +308,13 @@ public class Streams extends Channels {
      * @return the newly created channel instance.
      */
     @NotNull
+    @SuppressWarnings("ConstantConditions")
     public static <OUT> StreamChannel<OUT> lazyStreamOf(@NotNull final OutputChannel<OUT> output) {
+
+        if (output == null) {
+
+            throw new NullPointerException("the output channel instance must not be null");
+        }
 
         final IOChannel<OUT> ioChannel = JRoutine.io().buildChannel();
         return new DefaultLoaderStreamChannel<OUT>(null, ioChannel,
@@ -638,7 +644,13 @@ public class Streams extends Channels {
          * @return the newly created channel instance.
          */
         @NotNull
+        @SuppressWarnings("ConstantConditions")
         public <OUT> StreamChannel<OUT> lazyStreamOf(@NotNull final OutputChannel<OUT> output) {
+
+            if (output == null) {
+
+                throw new NullPointerException("the output channel instance must not be null");
+            }
 
             final IOChannel<OUT> ioChannel = JRoutine.io().buildChannel();
             return new DefaultLoaderStreamChannel<OUT>(mContextBuilder, ioChannel,

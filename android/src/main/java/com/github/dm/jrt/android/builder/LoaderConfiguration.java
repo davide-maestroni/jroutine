@@ -620,6 +620,7 @@ public final class LoaderConfiguration {
 
             mLooper = configuration.mLooper;
             mLoaderId = configuration.mLoaderId;
+            mRoutineId = configuration.mRoutineId;
             mResolutionType = configuration.mResolutionType;
             mInputResolutionType = configuration.mInputResolutionType;
             mStrategyType = configuration.mStrategyType;

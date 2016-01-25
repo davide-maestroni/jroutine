@@ -31,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 /**
- * Utility class supporting functional programming.
+ * Utility class back-porting functional programming.
  * <p/>
  * Created by davide-maestroni on 09/21/2015.
  */

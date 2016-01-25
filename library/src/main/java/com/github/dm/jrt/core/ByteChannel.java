@@ -33,6 +33,31 @@ import java.util.List;
  * Utility class focused on the optimization of the transfer of byte chunks through routine
  * channels.
  * <p/>
+ * For example, an invocation writing bytes can be implemented as:
+ * <pre>
+ *     <code>
+ *
+ *         public void onInput(final IN in, final ResultChannel&lt;ByteBuffer&gt; result) {
+ *
+ *             ...
+ *             final BufferOutputStream outputStream = ByteChannel.byteChannel().passTo(result);
+ *             ...
+ *         }
+ *     </code>
+ * </pre>
+ * While an invocation reading them:
+ * <pre>
+ *     <code>
+ *
+ *         public void onInput(final ByteBuffer buffer, final ResultChannel&lt;OUT&gt; result) {
+ *
+ *             ...
+ *             final BufferInputStream inputStream = ByteChannel.inputStream(buffer);
+ *             ...
+ *         }
+ *     </code>
+ * </pre>
+ * <p/>
  * Each instance maintains a pool of byte buffers which are re-used to minimize memory consumption.
  * When the pool is empty, additional buffers are created in order to avoid blocking the caller
  * thread. Though, the pool will retain its maximum capacity and every buffer exceeding it will be

@@ -35,7 +35,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * Utility class for handling routine channels.
+ * Utility class for handling routine channels.<br/>
+ * The class provides several methods to split and merge channels together, making also possible to
+ * transfer data in multiple sub-channels, each one identified by a specific index.
  * <p/>
  * Created by davide-maestroni on 03/15/2015.
  */
@@ -118,7 +120,8 @@ public class Channels {
     }
 
     /**
-     * Combines the specified channels into a selectable one.<br/>
+     * Combines the specified channels into a selectable one. The selectable indexes will start from
+     * the specified one.<br/>
      * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
      * completion of the invocation lifecycle.
      *
@@ -150,7 +153,8 @@ public class Channels {
     }
 
     /**
-     * Combines the specified channels into a selectable one.<br/>
+     * Combines the specified channels into a selectable one. The selectable indexes will start from
+     * the specified one.<br/>
      * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
      * completion of the invocation lifecycle.
      *
@@ -200,7 +204,8 @@ public class Channels {
     }
 
     /**
-     * Combines the specified channels into a selectable one.<br/>
+     * Combines the specified channels into a selectable one. The selectable indexes will be the
+     * keys of the specified map.<br/>
      * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
      * completion of the invocation lifecycle.
      *
@@ -328,7 +333,7 @@ public class Channels {
 
     /**
      * Returns a new channel distributing the input data among the specified channels. If the list
-     * of data is smaller of the specified number of channels, the remaining ones will be fed with
+     * of data is smaller than the specified number of channels, the remaining ones will be fed with
      * the specified placeholder instance. While, if the list of data exceeds the number of
      * channels, the invocation will be aborted.<br/>
      * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
@@ -348,7 +353,7 @@ public class Channels {
 
     /**
      * Returns a new channel distributing the input data among the specified channels. If the list
-     * of data is smaller of the specified number of channels, the remaining ones will be fed with
+     * of data is smaller than the specified number of channels, the remaining ones will be fed with
      * the specified placeholder instance. While, if the list of data exceeds the number of
      * channels, the invocation will be aborted.<br/>
      * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
@@ -407,7 +412,7 @@ public class Channels {
      * An output will be generated only when at least one result is available for each channel.
      * Moreover, when all the output channels complete, the remaining outputs will be returned by
      * filling the gaps with the specified placeholder instance, so that the generated list of data
-     * will always have the same size of the channel list.<br/>
+     * will always have the same size as the channel list.<br/>
      * Note that the passed channels will be bound as a result of the call.
      *
      * @param placeholder the placeholder instance.
@@ -429,7 +434,7 @@ public class Channels {
      * An output will be generated only when at least one result is available for each channel.
      * Moreover, when all the output channels complete, the remaining outputs will be returned by
      * filling the gaps with the specified placeholder instance, so that the generated list of data
-     * will always have the same size of the channel list.<br/>
+     * will always have the same size as the channel list.<br/>
      * Note that the passed channels will be bound as a result of the call.
      *
      * @param placeholder the placeholder instance.
@@ -446,7 +451,8 @@ public class Channels {
     }
 
     /**
-     * Merges the specified channels into a selectable one.<br/>
+     * Merges the specified channels into a selectable one. The selectable indexes will start from
+     * the specified one.<br/>
      * Note that the passed channels will be bound as a result of the call.
      *
      * @param startIndex the selectable start index.
@@ -473,7 +479,8 @@ public class Channels {
     }
 
     /**
-     * Merges the specified channels into a selectable one.<br/>
+     * Merges the specified channels into a selectable one. The selectable indexes will start from
+     * the specified one.<br/>
      * Note that the passed channels will be bound as a result of the call.
      *
      * @param startIndex the selectable start index.
@@ -518,7 +525,8 @@ public class Channels {
     }
 
     /**
-     * Merges the specified channels into a selectable one.<br/>
+     * Merges the specified channels into a selectable one. The selectable indexes will be the keys
+     * of the specified map.<br/>
      * Note that the passed channels will be bound as a result of the call.
      *
      * @param channelMap the map of indexes and output channels.
@@ -562,7 +570,7 @@ public class Channels {
 
     /**
      * Returns a new channel repeating the output data to any newly bound channel or consumer, thus
-     * effectively supporting binding of several output consumers.<br/>
+     * effectively supporting multiple binding.<br/>
      * Note that the passed channels will be bound as a result of the call.
      *
      * @param channel the output channel.

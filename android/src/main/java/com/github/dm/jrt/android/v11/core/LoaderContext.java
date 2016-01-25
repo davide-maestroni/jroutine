@@ -35,7 +35,7 @@ import java.lang.ref.WeakReference;
  * Class representing an Android loader context (like activities or fragments).
  * <p/>
  * No strong reference to the wrapped objects will be retained by this class implementations. So,
- * it is up to the caller to ensure that they are not garbage collected before time.
+ * it is up to the caller to ensure that they are not garbage collected before being called.
  * <p/>
  * Created by davide-maestroni on 07/08/2015.
  */

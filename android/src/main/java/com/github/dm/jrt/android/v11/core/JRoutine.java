@@ -83,7 +83,7 @@ import java.util.WeakHashMap;
  *                        .passTo(new TemplateOutputConsumer&lt;MyResource&gt;() {
  *
  *                            &#64;Override
- *                            public void onError(&#64;Nullable final Throwable error) {
+ *                            public void onError(&#64;NotNull final RoutineException error) {
  *
  *                                displayError(error);
  *                            }

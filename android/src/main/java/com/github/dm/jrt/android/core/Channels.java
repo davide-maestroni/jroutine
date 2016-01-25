@@ -45,7 +45,8 @@ public class Channels extends com.github.dm.jrt.core.Channels {
     }
 
     /**
-     * Merges the specified channels into a selectable one.<br/>
+     * Merges the specified channels into a selectable one. The selectable indexes will start from
+     * the specified one.<br/>
      * Note that the passed channels will be bound as a result of the call.
      *
      * @param startIndex the selectable start index.
@@ -73,7 +74,8 @@ public class Channels extends com.github.dm.jrt.core.Channels {
     }
 
     /**
-     * Merges the specified channels into a selectable one.<br/>
+     * Merges the specified channels into a selectable one. The selectable indexes will start from
+     * the specified one.<br/>
      * Note that the passed channels will be bound as a result of the call.
      *
      * @param startIndex the selectable start index.

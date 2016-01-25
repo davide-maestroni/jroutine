@@ -41,7 +41,8 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
     }
 
     /**
-     * Combines the specified channels into a selectable one.<br/>
+     * Combines the specified channels into a selectable one. The selectable indexes will be the
+     * keys of the specified sparse array.<br/>
      * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
      * completion of the invocation lifecycle.
      *
@@ -73,7 +74,8 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
     }
 
     /**
-     * Merges the specified channels into a selectable one.<br/>
+     * Merges the specified channels into a selectable one. The selectable indexes will be the
+     * keys of the specified sparse array.<br/>
      * Note that the passed channels will be bound as a result of the call.
      *
      * @param channelMap the map of indexes and output channels.

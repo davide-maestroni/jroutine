@@ -39,8 +39,9 @@ import java.util.concurrent.TimeUnit;
 /**
  * Basic abstract implementation of a routine.
  * <p/>
- * This class provides a default implementation of all the routine features. The inheriting class
- * just needs to create invocation objects when required.
+ * This class provides a default implementation of all the routine features, like invocation modes
+ * and recycling of invocation objects.<br/>
+ * The inheriting class just needs to create invocation objects when required.
  * <p/>
  * Created by davide-maestroni on 09/07/2014.
  *

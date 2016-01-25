@@ -24,7 +24,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 
 /**
- * Abstract class defining a factory of context invocations.
+ * Abstract class defining a factory of context invocations.<br/>
+ * The inheriting class must specify the constructor arguments to be used in the {@code equals()}
+ * and {@code hashCode()} implementations. Note that such methods might be employed to uniquely
+ * identify the loader backing the routine execution.
  * <p/>
  * Created by davide-maestroni on 05/01/2015.
  *

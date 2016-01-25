@@ -34,7 +34,8 @@ import java.util.Arrays;
 import static com.github.dm.jrt.util.Reflection.findConstructor;
 
 /**
- * Class representing a context invocation target.
+ * Class representing a context invocation target.<br/>
+ * The target identifies a class or an instance whose methods are to be called asynchronously.
  * <p/>
  * Created by davide-maestroni on 08/21/2015.
  *

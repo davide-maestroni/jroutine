@@ -52,7 +52,7 @@ import java.util.concurrent.TimeUnit;
  * specific configuration and invocation mode.
  * <p/>
  * Note that, if at least one reduce function is part of the concatenation, the results will be
- * propagated only when the invocation completes.
+ * propagated only when the previous routine invocations complete.
  * <p/>
  * Created by davide-maestroni on 01/15/2016.
  *

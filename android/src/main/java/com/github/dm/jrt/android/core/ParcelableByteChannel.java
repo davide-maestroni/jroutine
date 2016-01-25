@@ -42,6 +42,35 @@ import java.util.List;
 /**
  * Utility class focused on the optimization of the transfer of byte chunks through routine
  * channels.<br/>
+ * <p/>
+ * For example, an invocation writing bytes can be implemented as:
+ * <pre>
+ *     <code>
+ *
+ *         public void onInput(final IN in,
+ *                 final ResultChannel&lt;ParcelableByteBuffer&gt; result) {
+ *
+ *             ...
+ *             final BufferOutputStream outputStream =
+ *                     ParcelableByteChannel.byteChannel().passTo(result);
+ *             ...
+ *         }
+ *     </code>
+ * </pre>
+ * While an invocation reading them:
+ * <pre>
+ *     <code>
+ *
+ *         public void onInput(final ParcelableByteBuffer buffer,
+ *                 final ResultChannel&lt;OUT&gt; result) {
+ *
+ *             ...
+ *             final BufferInputStream inputStream =
+ *                     ParcelableByteChannel.inputStream(buffer);
+ *             ...
+ *         }
+ *     </code>
+ * </pre>
  * The generated buffers implement the parcelable interface.<br/>
  * Note that the streams used to write into and read from buffers should be properly closed as the
  * Java best practices suggest.

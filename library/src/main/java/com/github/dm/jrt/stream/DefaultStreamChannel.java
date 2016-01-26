@@ -17,6 +17,7 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.builder.InvocationConfiguration;
+import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.core.JRoutine;
 import com.github.dm.jrt.invocation.InvocationFactory;
@@ -24,6 +25,8 @@ import com.github.dm.jrt.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import static com.github.dm.jrt.stream.AbstractStreamChannel.Binder.binderOf;
 
 /**
  * Default implementation of a stream output channel.
@@ -41,18 +44,31 @@ class DefaultStreamChannel<OUT> extends AbstractStreamChannel<OUT> {
      */
     DefaultStreamChannel(@NotNull final OutputChannel<OUT> channel) {
 
-        this(channel, null);
+        this(channel, (Binder) null);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param input  the channel returning the inputs.
+     * @param output the channel consuming them.
+     */
+    DefaultStreamChannel(@NotNull final OutputChannel<OUT> input,
+            @NotNull final IOChannel<OUT> output) {
+
+        this(output, binderOf(input, output));
     }
 
     /**
      * Constructor.
      *
      * @param channel the wrapped output channel.
-     * @param bind    the binding runnable.
+     * @param binder  the binder instance.
      */
-    DefaultStreamChannel(@NotNull final OutputChannel<OUT> channel, @Nullable final Runnable bind) {
+    private DefaultStreamChannel(@NotNull final OutputChannel<OUT> channel,
+            @Nullable final Binder binder) {
 
-        super(channel, InvocationConfiguration.DEFAULT_CONFIGURATION, DelegationType.ASYNC, bind);
+        super(channel, InvocationConfiguration.DEFAULT_CONFIGURATION, DelegationType.ASYNC, binder);
     }
 
     /**
@@ -61,22 +77,22 @@ class DefaultStreamChannel<OUT> extends AbstractStreamChannel<OUT> {
      * @param channel        the wrapped output channel.
      * @param configuration  the initial invocation configuration.
      * @param delegationType the delegation type.
-     * @param bind           the binding runnable.
+     * @param binder         the binder instance.
      */
     private DefaultStreamChannel(@NotNull final OutputChannel<OUT> channel,
             @NotNull final InvocationConfiguration configuration,
-            @NotNull final DelegationType delegationType, @Nullable final Runnable bind) {
+            @NotNull final DelegationType delegationType, @Nullable final Binder binder) {
 
-        super(channel, configuration, delegationType, bind);
+        super(channel, configuration, delegationType, binder);
     }
 
     @NotNull
     @Override
     protected <AFTER> StreamChannel<AFTER> newChannel(@NotNull final OutputChannel<AFTER> channel,
             @NotNull final InvocationConfiguration configuration,
-            @NotNull final DelegationType delegationType, @Nullable final Runnable bind) {
+            @NotNull final DelegationType delegationType, @Nullable final Binder binder) {
 
-        return new DefaultStreamChannel<AFTER>(channel, configuration, delegationType, bind);
+        return new DefaultStreamChannel<AFTER>(channel, configuration, delegationType, binder);
     }
 
     @NotNull

@@ -55,6 +55,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.github.dm.jrt.function.Functions.consumerFactory;
 import static com.github.dm.jrt.function.Functions.consumerFilter;
@@ -79,14 +80,14 @@ import static com.github.dm.jrt.util.TimeDuration.fromUnit;
 public abstract class AbstractStreamChannel<OUT>
         implements StreamChannel<OUT>, Configurable<StreamChannel<OUT>> {
 
-    private static final Runnable NO_OP = new Runnable() {
+    private static final Binder NO_OP = new Binder() {
 
-        public void run() {
+        protected void bind() {
 
         }
     };
 
-    private final Runnable mBind;
+    private final Binder mBinder;
 
     private final OutputChannel<OUT> mChannel;
 
@@ -115,12 +116,12 @@ public abstract class AbstractStreamChannel<OUT>
      * @param channel        the wrapped output channel.
      * @param configuration  the initial invocation configuration.
      * @param delegationType the delegation type.
-     * @param bind           the binding runnable.
+     * @param binder         the binding runnable.
      */
     @SuppressWarnings("ConstantConditions")
     protected AbstractStreamChannel(@NotNull final OutputChannel<OUT> channel,
             @NotNull final InvocationConfiguration configuration,
-            @NotNull final DelegationType delegationType, @Nullable final Runnable bind) {
+            @NotNull final DelegationType delegationType, @Nullable final Binder binder) {
 
         if (configuration == null) {
             throw new NullPointerException("the configuration must not be null");
@@ -137,7 +138,7 @@ public abstract class AbstractStreamChannel<OUT>
         mStreamConfiguration = configuration;
         mDelegationType = delegationType;
         mChannel = channel;
-        mBind = (bind != null) ? bind : NO_OP;
+        mBinder = (binder != null) ? binder : NO_OP;
     }
 
     @NotNull
@@ -235,13 +236,13 @@ public abstract class AbstractStreamChannel<OUT>
 
     public boolean abort() {
 
-        mBind.run();
+        bind();
         return mChannel.abort();
     }
 
     public boolean abort(@Nullable final Throwable reason) {
 
-        mBind.run();
+        bind();
         return mChannel.abort(reason);
     }
 
@@ -272,7 +273,7 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public StreamChannel<OUT> allInto(@NotNull final Collection<? super OUT> results) {
 
-        mBind.run();
+        bind();
         mChannel.allInto(results);
         return this;
     }
@@ -315,7 +316,7 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public StreamChannel<OUT> passTo(@NotNull final OutputConsumer<? super OUT> consumer) {
 
-        mBind.run();
+        bind();
         mChannel.passTo(consumer);
         return this;
     }
@@ -323,7 +324,7 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public StreamChannel<OUT> skip(final int count) {
 
-        mBind.run();
+        bind();
         mChannel.skip(count);
         return this;
     }
@@ -350,6 +351,11 @@ public abstract class AbstractStreamChannel<OUT>
                                 .withInputLimit(maxInputs)
                                 .withInputMaxDelay(maxDelay)
                                 .set();
+    }
+
+    public void bind() {
+
+        mBinder.bind();
     }
 
     @NotNull
@@ -567,7 +573,7 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public StreamChannel<OUT> repeat() {
 
-        return newChannel(Channels.repeat(this), mStreamConfiguration, mDelegationType, mBind);
+        return newChannel(Channels.repeat(this), mStreamConfiguration, mDelegationType, mBinder);
     }
 
     @NotNull
@@ -608,7 +614,7 @@ public abstract class AbstractStreamChannel<OUT>
     public StreamChannel<? extends Selectable<OUT>> toSelectable(final int index) {
 
         return newChannel(Channels.toSelectable(this, index), mStreamConfiguration, mDelegationType,
-                          mBind);
+                          mBinder);
     }
 
     @NotNull
@@ -623,7 +629,7 @@ public abstract class AbstractStreamChannel<OUT>
 
         final IOChannel<OUT> ioChannel = JRoutine.io().buildChannel();
         mChannel.passTo(new TryCatchOutputConsumer<OUT>(consumer, ioChannel));
-        return newChannel(ioChannel, mStreamConfiguration, mDelegationType, mBind);
+        return newChannel(ioChannel, mStreamConfiguration, mDelegationType, mBinder);
     }
 
     @NotNull
@@ -664,25 +670,25 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public List<OUT> all() {
 
-        mBind.run();
+        bind();
         return mChannel.all();
     }
 
     public boolean checkComplete() {
 
-        mBind.run();
+        bind();
         return mChannel.checkComplete();
     }
 
     public boolean hasNext() {
 
-        mBind.run();
+        bind();
         return mChannel.hasNext();
     }
 
     public OUT next() {
 
-        mBind.run();
+        bind();
         return mChannel.next();
     }
 
@@ -694,13 +700,13 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public List<OUT> next(final int count) {
 
-        mBind.run();
+        bind();
         return mChannel.next(count);
     }
 
     public OUT nextOr(final OUT output) {
 
-        mBind.run();
+        bind();
         return mChannel.nextOr(output);
     }
 
@@ -708,31 +714,31 @@ public abstract class AbstractStreamChannel<OUT>
     public <CHANNEL extends InputChannel<? super OUT>> CHANNEL passTo(
             @NotNull final CHANNEL channel) {
 
-        mBind.run();
+        bind();
         return mChannel.passTo(channel);
     }
 
     public Iterator<OUT> iterator() {
 
-        mBind.run();
+        bind();
         return mChannel.iterator();
     }
 
     public void remove() {
 
-        mBind.run();
+        bind();
         mChannel.remove();
     }
 
     /**
-     * Returns the binding runnable.
+     * Returns the binder instance.
      *
-     * @return the runnable.
+     * @return the binder.
      */
     @NotNull
-    protected Runnable getBind() {
+    protected Binder getBinder() {
 
-        return mBind;
+        return mBinder;
     }
 
     /**
@@ -775,13 +781,13 @@ public abstract class AbstractStreamChannel<OUT>
      * @param channel        the wrapped output channel.
      * @param configuration  the stream configuration.
      * @param delegationType the delegation type.
-     * @param bind           the binding runnable.
+     * @param binder         the binder instance.
      * @return the newly created channel instance.
      */
     @NotNull
     protected abstract <AFTER> StreamChannel<AFTER> newChannel(
             @NotNull OutputChannel<AFTER> channel, @NotNull InvocationConfiguration configuration,
-            @NotNull DelegationType delegationType, @Nullable Runnable bind);
+            @NotNull DelegationType delegationType, @Nullable Binder binder);
 
     /**
      * Creates a new routine instance based on the specified factory.
@@ -809,7 +815,7 @@ public abstract class AbstractStreamChannel<OUT>
             @NotNull final InvocationChannel<? super OUT, ? extends AFTER> channel) {
 
         return newChannel((OutputChannel<AFTER>) mChannel.passTo(channel).result(),
-                          mStreamConfiguration, mDelegationType, mBind);
+                          mStreamConfiguration, mDelegationType, mBinder);
     }
 
     @NotNull
@@ -829,6 +835,82 @@ public abstract class AbstractStreamChannel<OUT>
         }
 
         return range(1, count).map(factory);
+    }
+
+    /**
+     * Class binding two channels together.
+     */
+    protected static abstract class Binder {
+
+        /**
+         * Avoid instantiation.
+         */
+        private Binder() {
+
+        }
+
+        /**
+         * Returns a new binder of the two specified channels.
+         *
+         * @param input  the channel returning the inputs.
+         * @param output the channel consuming them.
+         * @param <DATA> the data type.
+         * @return the binder instance.
+         */
+        @SuppressWarnings("ConstantConditions")
+        public static <DATA> Binder binderOf(@NotNull final OutputChannel<DATA> input,
+                @NotNull final IOChannel<DATA> output) {
+
+            if (input == null) {
+                throw new NullPointerException("the input channel must not be null");
+            }
+
+            if (output == null) {
+                throw new NullPointerException("the output channel must not be null");
+            }
+
+            return new InputBinder<DATA>(input, output);
+        }
+
+        /**
+         * Binds the two channel.<br/>
+         * The call will have no effect if the method has been already invoked at least once.
+         */
+        protected abstract void bind();
+
+        /**
+         * Default implementation of a binder.
+         *
+         * @param <DATA> the data type.
+         */
+        private static class InputBinder<DATA> extends Binder {
+
+            private final OutputChannel<DATA> mInput;
+
+            private final AtomicBoolean mIsBound = new AtomicBoolean();
+
+            private final IOChannel<DATA> mOutput;
+
+            /**
+             * Constructor.
+             *
+             * @param input  the channel returning the inputs.
+             * @param output the channel consuming them.
+             */
+            protected InputBinder(@NotNull final OutputChannel<DATA> input,
+                    @NotNull final IOChannel<DATA> output) {
+
+                mInput = input;
+                mOutput = output;
+            }
+
+            protected void bind() {
+
+                if (!mIsBound.getAndSet(true)) {
+                    mInput.passTo(mOutput).close();
+                }
+            }
+        }
     }
 
     /**

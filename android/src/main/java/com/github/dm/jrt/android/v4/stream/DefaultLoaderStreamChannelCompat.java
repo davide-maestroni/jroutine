@@ -28,6 +28,7 @@ import com.github.dm.jrt.android.v4.core.JRoutineCompat.ContextBuilderCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
+import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.channel.RoutineException;
@@ -120,7 +121,34 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
     DefaultLoaderStreamChannelCompat(@Nullable final ContextBuilderCompat builder,
             @NotNull final OutputChannel<OUT> channel) {
 
-        this(builder, channel, null);
+        this(builder, channel, (Binder) null);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param builder the context builder.
+     * @param input   the channel returning the inputs.
+     * @param output  the channel consuming them.
+     */
+    DefaultLoaderStreamChannelCompat(@Nullable final ContextBuilderCompat builder,
+            @NotNull final OutputChannel<OUT> input, @NotNull final IOChannel<OUT> output) {
+
+        this(builder, output, Binder.binderOf(input, output));
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param builder the context builder.
+     * @param channel the wrapped output channel.
+     * @param binder  the binder instance.
+     */
+    private DefaultLoaderStreamChannelCompat(@Nullable final ContextBuilderCompat builder,
+            @NotNull final OutputChannel<OUT> channel, @Nullable final Binder binder) {
+
+        this(builder, channel, InvocationConfiguration.DEFAULT_CONFIGURATION,
+             LoaderConfiguration.DEFAULT_CONFIGURATION, DelegationType.ASYNC, binder);
     }
 
     /**
@@ -131,36 +159,22 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
      * @param invocationConfiguration the initial invocation configuration.
      * @param loaderConfiguration     the initial loader configuration.
      * @param delegationType          the delegation type.
-     * @param bind                    the binding runnable.
+     * @param binder                  the binder instance.
      */
     @SuppressWarnings("ConstantConditions")
-    DefaultLoaderStreamChannelCompat(@Nullable final ContextBuilderCompat builder,
+    private DefaultLoaderStreamChannelCompat(@Nullable final ContextBuilderCompat builder,
             @NotNull final OutputChannel<OUT> channel,
             @NotNull final InvocationConfiguration invocationConfiguration,
             @NotNull final LoaderConfiguration loaderConfiguration,
-            @NotNull final DelegationType delegationType, @Nullable final Runnable bind) {
+            @NotNull final DelegationType delegationType, @Nullable final Binder binder) {
 
-        super(channel, invocationConfiguration, delegationType, bind);
+        super(channel, invocationConfiguration, delegationType, binder);
         if (loaderConfiguration == null) {
             throw new NullPointerException("the loader configuration must not be null");
         }
 
         mContextBuilder = builder;
         mStreamConfiguration = loaderConfiguration;
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param builder the context builder.
-     * @param channel the wrapped output channel.
-     * @param bind    the binding runnable.
-     */
-    DefaultLoaderStreamChannelCompat(@Nullable final ContextBuilderCompat builder,
-            @NotNull final OutputChannel<OUT> channel, @Nullable final Runnable bind) {
-
-        this(builder, channel, InvocationConfiguration.DEFAULT_CONFIGURATION,
-             LoaderConfiguration.DEFAULT_CONFIGURATION, DelegationType.ASYNC, bind);
     }
 
     @NotNull
@@ -473,7 +487,7 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
             final int index) {
 
         return newChannel(ChannelsCompat.toSelectable(this, index), getStreamConfiguration(),
-                          getDelegationType(), getBind());
+                          getDelegationType(), getBinder());
     }
 
     @NotNull
@@ -524,9 +538,9 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
     protected <AFTER> LoaderStreamChannelCompat<AFTER> newChannel(
             @NotNull final OutputChannel<AFTER> channel,
             @NotNull final InvocationConfiguration configuration,
-            @NotNull final DelegationType delegationType, @Nullable final Runnable bind) {
+            @NotNull final DelegationType delegationType, @Nullable final Binder binder) {
 
-        return newChannel(channel, configuration, mStreamConfiguration, delegationType, bind);
+        return newChannel(channel, configuration, mStreamConfiguration, delegationType, binder);
     }
 
     @NotNull
@@ -598,12 +612,12 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
             @NotNull final OutputChannel<AFTER> channel,
             @NotNull final InvocationConfiguration invocationConfiguration,
             @NotNull final LoaderConfiguration loaderConfiguration,
-            @NotNull final DelegationType delegationType, @Nullable final Runnable bind) {
+            @NotNull final DelegationType delegationType, @Nullable final Binder binder) {
 
         return new DefaultLoaderStreamChannelCompat<AFTER>(mContextBuilder, channel,
                                                            invocationConfiguration,
                                                            loaderConfiguration, delegationType,
-                                                           bind);
+                                                           binder);
     }
 
     @NotNull

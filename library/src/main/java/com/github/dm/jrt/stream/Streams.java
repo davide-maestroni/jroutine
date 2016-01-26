@@ -35,7 +35,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.github.dm.jrt.function.Functions.wrapFunction;
 
@@ -233,7 +232,8 @@ public class Streams extends Channels {
     /**
      * Builds and returns a new lazy stream output channel.<br/>
      * The stream will start producing results only when it is bound to another channel or an output
-     * consumer, or when any of the read methods is called.
+     * consumer or the {@code bind()} method is explicitly called; or when any of the read methods
+     * is invoked.
      *
      * @param <OUT> the output data type.
      * @return the newly created channel instance.
@@ -247,7 +247,8 @@ public class Streams extends Channels {
     /**
      * Builds and returns a new lazy stream output channel generating the specified outputs.<br/>
      * The stream will start producing results only when it is bound to another channel or an output
-     * consumer, or when any of the read methods is called.
+     * consumer or the {@code bind()} method is explicitly called; or when any of the read methods
+     * is invoked.
      *
      * @param outputs the iterable returning the output data.
      * @param <OUT>   the output data type.
@@ -262,7 +263,8 @@ public class Streams extends Channels {
     /**
      * Builds and returns a new lazy stream output channel generating the specified output.<br/>
      * The stream will start producing results only when it is bound to another channel or an output
-     * consumer, or when any of the read methods is called.
+     * consumer or the {@code bind()} method is explicitly called; or when any of the read methods
+     * is invoked.
      *
      * @param output the output.
      * @param <OUT>  the output data type.
@@ -277,7 +279,8 @@ public class Streams extends Channels {
     /**
      * Builds and returns a new lazy stream output channel generating the specified outputs.<br/>
      * The stream will start producing results only when it is bound to another channel or an output
-     * consumer, or when any of the read methods is called.
+     * consumer or the {@code bind()} method is explicitly called; or when any of the read methods
+     * is invoked.
      *
      * @param outputs the output data.
      * @param <OUT>   the output data type.
@@ -292,7 +295,8 @@ public class Streams extends Channels {
     /**
      * Builds and returns a new lazy stream output channel generating the specified outputs.<br/>
      * The stream will start producing results only when it is bound to another channel or an output
-     * consumer, or when any of the read methods is called.
+     * consumer or the {@code bind()} method is explicitly called; or when any of the read methods
+     * is invoked.
      * <p/>
      * Note that the output channel will be bound as a result of the call.
      *
@@ -310,8 +314,7 @@ public class Streams extends Channels {
         }
 
         final IOChannel<OUT> ioChannel = JRoutine.io().buildChannel();
-        return new DefaultStreamChannel<OUT>(ioChannel,
-                                             new BindingRunnable<OUT>(ioChannel, output));
+        return new DefaultStreamChannel<OUT>(output, ioChannel);
     }
 
     /**
@@ -542,40 +545,6 @@ public class Streams extends Channels {
             @NotNull final OutputChannel<? extends OUT> channel, final int index) {
 
         return streamOf(Channels.toSelectable(channel, index));
-    }
-
-    /**
-     * Runnable binding two channels together.
-     *
-     * @param <OUT> the output data type.
-     */
-    private static class BindingRunnable<OUT> implements Runnable {
-
-        private final IOChannel<OUT> mChannel;
-
-        private final AtomicBoolean mIsBound = new AtomicBoolean();
-
-        private final OutputChannel<OUT> mOutput;
-
-        /**
-         * Constructor.
-         *
-         * @param channel the I/O channel.
-         * @param output  the output channel.
-         */
-        private BindingRunnable(@NotNull final IOChannel<OUT> channel,
-                @NotNull final OutputChannel<OUT> output) {
-
-            mChannel = channel;
-            mOutput = output;
-        }
-
-        public void run() {
-
-            if (!mIsBound.getAndSet(true)) {
-                mOutput.passTo(mChannel).close();
-            }
-        }
     }
 
     /**

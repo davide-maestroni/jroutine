@@ -167,6 +167,13 @@ public interface StreamChannel<OUT>
             @Nullable TimeDuration maxDelay);
 
     /**
+     * Binds the inputs to this stream channel.<br/>
+     * The method will have no effect unless the stream is "lazy" and inputs have not already been
+     * bound.
+     */
+    void bind();
+
+    /**
      * Concatenates a stream channel based on the specified collecting consumer to this one.<br/>
      * The outputs will be collected by applying the function, only when the previous routine
      * invocations complete.
@@ -236,7 +243,6 @@ public interface StreamChannel<OUT>
      * @param consumer the consumer instance.
      * @return the concatenated stream channel.
      */
-    // TODO: 1/25/16 lazy
     @NotNull
     StreamChannel<Void> forEach(@NotNull Consumer<? super OUT> consumer);
 

@@ -82,7 +82,7 @@ public abstract class AbstractStreamChannel<OUT>
 
     private static final Binder NO_OP = new Binder() {
 
-        protected void bind() {
+        public void bind() {
 
         }
     };
@@ -876,7 +876,7 @@ public abstract class AbstractStreamChannel<OUT>
          * Binds the two channel.<br/>
          * The call will have no effect if the method has been already invoked at least once.
          */
-        protected abstract void bind();
+        public abstract void bind();
 
         /**
          * Default implementation of a binder.
@@ -897,14 +897,14 @@ public abstract class AbstractStreamChannel<OUT>
              * @param input  the channel returning the inputs.
              * @param output the channel consuming them.
              */
-            protected InputBinder(@NotNull final OutputChannel<DATA> input,
+            private InputBinder(@NotNull final OutputChannel<DATA> input,
                     @NotNull final IOChannel<DATA> output) {
 
                 mInput = input;
                 mOutput = output;
             }
 
-            protected void bind() {
+            public void bind() {
 
                 if (!mIsBound.getAndSet(true)) {
                     mInput.passTo(mOutput).close();

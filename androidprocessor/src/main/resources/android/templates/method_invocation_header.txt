@@ -44,7 +44,7 @@
             super.onContext(context);
             try {
                 final com.github.dm.jrt.core.InvocationTarget<?> target = mContextTarget.getInvocationTarget(context);
-                mMutex = com.github.dm.jrt.core.RoutineBuilders.getSharedMutex(${mutexTarget}, mSharedFields);
+                mMutex = com.github.dm.jrt.android.core.Builders.getSharedMutex(${mutexTarget}, mSharedFields);
                 mTarget = target;
                 mInstance = target.getTarget();
 

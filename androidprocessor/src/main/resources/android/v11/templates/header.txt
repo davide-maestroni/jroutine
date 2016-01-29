@@ -33,7 +33,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
             throw new NullPointerException("the routine context must not be null");
         }
 
-        if (!target.isSameTypeOf(${classErasure}.class)) {
+        if (!target.isTypeOf(${classErasure}.class)) {
             throw new IllegalArgumentException("the invocation target must be the class or an instance of " +
                     "${classFullName}");
         }

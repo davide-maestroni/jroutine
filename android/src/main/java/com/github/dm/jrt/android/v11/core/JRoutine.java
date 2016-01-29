@@ -247,7 +247,9 @@ public class JRoutine extends com.github.dm.jrt.android.core.JRoutine {
         @NotNull
         public LoaderChannelBuilder onId(final int loaderId) {
 
-            return new DefaultLoaderChannelBuilder(mContext).withLoaders().withId(loaderId).set();
+            return new DefaultLoaderChannelBuilder(mContext).withLoaders()
+                                                            .withLoaderId(loaderId)
+                                                            .set();
         }
     }
 }

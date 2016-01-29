@@ -40,11 +40,11 @@ public class InvocationTargetTest {
         assertThat(target.getTarget()).isSameAs(TargetClass.class);
         assertThat(target.getTargetClass()).isSameAs(TargetClass.class);
         assertThat(target.isAssignableTo(TargetClass.class)).isTrue();
-        assertThat(target.isSameTypeOf(TargetClass.class)).isTrue();
+        assertThat(target.isTypeOf(TargetClass.class)).isTrue();
         assertThat(target.isAssignableTo(TestClass.class)).isTrue();
-        assertThat(target.isSameTypeOf(TestClass.class)).isFalse();
+        assertThat(target.isTypeOf(TestClass.class)).isFalse();
         assertThat(target.isAssignableTo(String.class)).isFalse();
-        assertThat(target.isSameTypeOf(String.class)).isFalse();
+        assertThat(target.isTypeOf(String.class)).isFalse();
     }
 
     @Test
@@ -82,11 +82,11 @@ public class InvocationTargetTest {
         assertThat(target.getTarget()).isSameAs(t);
         assertThat(target.getTargetClass()).isSameAs(TargetClass.class);
         assertThat(target.isAssignableTo(TargetClass.class)).isTrue();
-        assertThat(target.isSameTypeOf(TargetClass.class)).isTrue();
+        assertThat(target.isTypeOf(TargetClass.class)).isTrue();
         assertThat(target.isAssignableTo(TestClass.class)).isTrue();
-        assertThat(target.isSameTypeOf(TestClass.class)).isTrue();
+        assertThat(target.isTypeOf(TestClass.class)).isTrue();
         assertThat(target.isAssignableTo(String.class)).isFalse();
-        assertThat(target.isSameTypeOf(String.class)).isFalse();
+        assertThat(target.isTypeOf(String.class)).isFalse();
     }
 
     @Test

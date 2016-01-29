@@ -1026,7 +1026,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         StreamsCompat.with(context)
                      .streamOf("test2")
                      .withLoaders()
-                     .withId(21)
+                     .withLoaderId(21)
                      .set()
                      .async()
                      .map(new Function<String, String>() {
@@ -1049,7 +1049,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         StreamsCompat.with(context)
                      .streamOf("test3")
                      .withStreamLoaders()
-                     .withId(31)
+                     .withLoaderId(31)
                      .set()
                      .async()
                      .map(new Function<String, String>() {

@@ -27,9 +27,9 @@ import com.github.dm.jrt.annotation.SharedFields;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.ProxyConfiguration;
 import com.github.dm.jrt.channel.ResultChannel;
+import com.github.dm.jrt.core.Builders.MethodInfo;
 import com.github.dm.jrt.core.InvocationTarget;
 import com.github.dm.jrt.core.JRoutine;
-import com.github.dm.jrt.core.RoutineBuilders.MethodInfo;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.util.ClassToken;
@@ -47,12 +47,12 @@ import java.util.HashMap;
 import java.util.List;
 
 import static com.github.dm.jrt.android.core.TargetInvocationFactory.factoryOf;
-import static com.github.dm.jrt.core.RoutineBuilders.callFromInvocation;
-import static com.github.dm.jrt.core.RoutineBuilders.configurationWithAnnotations;
-import static com.github.dm.jrt.core.RoutineBuilders.getAnnotatedMethod;
-import static com.github.dm.jrt.core.RoutineBuilders.getSharedMutex;
-import static com.github.dm.jrt.core.RoutineBuilders.getTargetMethodInfo;
-import static com.github.dm.jrt.core.RoutineBuilders.invokeRoutine;
+import static com.github.dm.jrt.core.Builders.callFromInvocation;
+import static com.github.dm.jrt.core.Builders.configurationWithAnnotations;
+import static com.github.dm.jrt.core.Builders.getAnnotatedMethod;
+import static com.github.dm.jrt.core.Builders.getSharedMutex;
+import static com.github.dm.jrt.core.Builders.getTargetMethodInfo;
+import static com.github.dm.jrt.core.Builders.invokeRoutine;
 import static com.github.dm.jrt.util.Reflection.asArgs;
 import static com.github.dm.jrt.util.Reflection.findMethod;
 
@@ -554,7 +554,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     static {
-
         final HashMap<String, Class<?>> classMap = sPrimitiveClassMap;
         classMap.put(byte.class.getName(), byte.class);
         classMap.put(char.class.getName(), char.class);

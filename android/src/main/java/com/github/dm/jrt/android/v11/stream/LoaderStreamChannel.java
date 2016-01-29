@@ -364,7 +364,7 @@ public interface LoaderStreamChannel<OUT>
     LoaderStreamChannel<OUT> cache(@Nullable CacheStrategyType strategyType);
 
     /**
-     * Short for {@code withLoaders().withId(loaderId).set()}.<br/>
+     * Short for {@code withLoaders().withLoaderId(loaderId).set()}.<br/>
      * This method is useful to easily apply a configuration to the next routine concatenated to the
      * stream, which will force the loader ID.
      *

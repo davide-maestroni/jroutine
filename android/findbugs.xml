@@ -5,6 +5,10 @@
         <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT"/>
     </Match>
     <Match>
+        <Class name="com.github.dm.jrt.android.core.Builders"/>
+        <Bug pattern="NM_SAME_SIMPLE_NAME_AS_SUPERCLASS"/>
+    </Match>
+    <Match>
         <Class name="com.github.dm.jrt.android.core.Channels"/>
         <Bug pattern="NM_SAME_SIMPLE_NAME_AS_SUPERCLASS"/>
     </Match>

@@ -180,7 +180,6 @@ public class JRoutine extends com.github.dm.jrt.core.JRoutine {
     }
 
     static {
-
         // Sets the Android log as default
         Logger.setDefaultLog(Logs.androidLog());
     }

@@ -223,9 +223,10 @@ public class ContextRoutineProcessor extends RoutineProcessor {
 
         // We need to avoid explicit dependency on the android module...
         final StringBuilder builder = new StringBuilder();
-        final Integer id = (Integer) getAnnotationValue(methodElement, mIdAnnotationType, "value");
-        if (id != null) {
-            builder.append(".withId(").append(id).append(")");
+        final Integer loaderId =
+                (Integer) getAnnotationValue(methodElement, mIdAnnotationType, "value");
+        if (loaderId != null) {
+            builder.append(".withLoaderId(").append(loaderId).append(")");
         }
 
         final Integer routineId =

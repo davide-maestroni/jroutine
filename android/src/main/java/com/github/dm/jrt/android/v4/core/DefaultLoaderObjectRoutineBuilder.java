@@ -18,12 +18,6 @@ package com.github.dm.jrt.android.v4.core;
 
 import android.content.Context;
 
-import com.github.dm.jrt.android.annotation.CacheStrategy;
-import com.github.dm.jrt.android.annotation.ClashResolution;
-import com.github.dm.jrt.android.annotation.InputClashResolution;
-import com.github.dm.jrt.android.annotation.LoaderId;
-import com.github.dm.jrt.android.annotation.ResultStaleTime;
-import com.github.dm.jrt.android.annotation.RoutineId;
 import com.github.dm.jrt.android.builder.LoaderConfiguration;
 import com.github.dm.jrt.android.builder.LoaderObjectRoutineBuilder;
 import com.github.dm.jrt.android.core.ContextInvocationTarget;
@@ -35,9 +29,9 @@ import com.github.dm.jrt.annotation.AsyncOut.OutputMode;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.ProxyConfiguration;
 import com.github.dm.jrt.channel.ResultChannel;
+import com.github.dm.jrt.core.Builders.MethodInfo;
 import com.github.dm.jrt.core.InvocationTarget;
 import com.github.dm.jrt.core.JRoutine;
-import com.github.dm.jrt.core.RoutineBuilders.MethodInfo;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.util.ClassToken;
@@ -52,12 +46,12 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.util.List;
 
-import static com.github.dm.jrt.core.RoutineBuilders.callFromInvocation;
-import static com.github.dm.jrt.core.RoutineBuilders.configurationWithAnnotations;
-import static com.github.dm.jrt.core.RoutineBuilders.getAnnotatedMethod;
-import static com.github.dm.jrt.core.RoutineBuilders.getSharedMutex;
-import static com.github.dm.jrt.core.RoutineBuilders.getTargetMethodInfo;
-import static com.github.dm.jrt.core.RoutineBuilders.invokeRoutine;
+import static com.github.dm.jrt.android.core.Builders.callFromInvocation;
+import static com.github.dm.jrt.android.core.Builders.configurationWithAnnotations;
+import static com.github.dm.jrt.android.core.Builders.getAnnotatedMethod;
+import static com.github.dm.jrt.android.core.Builders.getSharedMutex;
+import static com.github.dm.jrt.android.core.Builders.getTargetMethodInfo;
+import static com.github.dm.jrt.android.core.Builders.invokeRoutine;
 import static com.github.dm.jrt.util.Reflection.asArgs;
 import static com.github.dm.jrt.util.Reflection.findMethod;
 
@@ -105,46 +99,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     }
 
     @NotNull
-    private static LoaderConfiguration loaderConfigurationWithAnnotations(
-            @NotNull final LoaderConfiguration configuration, @NotNull final Method method) {
-
-        final LoaderConfiguration.Builder<LoaderConfiguration> builder =
-                configuration.builderFrom();
-        final LoaderId idAnnotation = method.getAnnotation(LoaderId.class);
-        if (idAnnotation != null) {
-            builder.withId(idAnnotation.value());
-        }
-
-        final RoutineId routineIdAnnotation = method.getAnnotation(RoutineId.class);
-        if (routineIdAnnotation != null) {
-            builder.withRoutineId(routineIdAnnotation.value());
-        }
-
-        final ClashResolution clashAnnotation = method.getAnnotation(ClashResolution.class);
-        if (clashAnnotation != null) {
-            builder.withClashResolution(clashAnnotation.value());
-        }
-
-        final InputClashResolution inputClashAnnotation =
-                method.getAnnotation(InputClashResolution.class);
-        if (inputClashAnnotation != null) {
-            builder.withInputClashResolution(inputClashAnnotation.value());
-        }
-
-        final CacheStrategy cacheAnnotation = method.getAnnotation(CacheStrategy.class);
-        if (cacheAnnotation != null) {
-            builder.withCacheStrategy(cacheAnnotation.value());
-        }
-
-        final ResultStaleTime staleTimeAnnotation = method.getAnnotation(ResultStaleTime.class);
-        if (staleTimeAnnotation != null) {
-            builder.withResultStaleTime(staleTimeAnnotation.value(), staleTimeAnnotation.unit());
-        }
-
-        return builder.set();
-    }
-
-    @NotNull
     @SuppressWarnings("unchecked")
     public <IN, OUT> LoaderRoutine<IN, OUT> aliasMethod(@NotNull final String name) {
 
@@ -163,7 +117,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         final InvocationConfiguration invocationConfiguration =
                 configurationWithAnnotations(mInvocationConfiguration, targetMethod);
         final LoaderConfiguration loaderConfiguration =
-                loaderConfigurationWithAnnotations(mLoaderConfiguration, targetMethod);
+                configurationWithAnnotations(mLoaderConfiguration, targetMethod);
         final DefaultLoaderRoutineBuilder<IN, OUT> builder =
                 new DefaultLoaderRoutineBuilder<IN, OUT>(mContext, factory);
         return builder.withInvocations()
@@ -213,7 +167,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         final InvocationConfiguration invocationConfiguration =
                 configurationWithAnnotations(mInvocationConfiguration, method);
         final LoaderConfiguration loaderConfiguration =
-                loaderConfigurationWithAnnotations(mLoaderConfiguration, method);
+                configurationWithAnnotations(mLoaderConfiguration, method);
         final DefaultLoaderRoutineBuilder<IN, OUT> builder =
                 new DefaultLoaderRoutineBuilder<IN, OUT>(mContext, factory);
         return builder.withInvocations()
@@ -656,7 +610,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             final InvocationConfiguration invocationConfiguration =
                     configurationWithAnnotations(mInvocationConfiguration, method);
             final LoaderConfiguration loaderConfiguration =
-                    loaderConfigurationWithAnnotations(mLoaderConfiguration, method);
+                    configurationWithAnnotations(mLoaderConfiguration, method);
             final ProxyInvocationFactory factory =
                     new ProxyInvocationFactory(targetMethod, proxyConfiguration, target, inputMode,
                                                outputMode);

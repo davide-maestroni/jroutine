@@ -37,11 +37,11 @@ public class ContextInvocationTargetTest extends AndroidTestCase {
         final ClassContextInvocationTarget<TargetClass> target = classOfType(TargetClass.class);
         assertThat(target.getTargetClass()).isSameAs(TargetClass.class);
         assertThat(target.isAssignableTo(TargetClass.class)).isTrue();
-        assertThat(target.isSameTypeOf(TargetClass.class)).isTrue();
+        assertThat(target.isTypeOf(TargetClass.class)).isTrue();
         assertThat(target.isAssignableTo(TestClass.class)).isTrue();
-        assertThat(target.isSameTypeOf(TestClass.class)).isFalse();
+        assertThat(target.isTypeOf(TestClass.class)).isFalse();
         assertThat(target.isAssignableTo(String.class)).isFalse();
-        assertThat(target.isSameTypeOf(String.class)).isFalse();
+        assertThat(target.isTypeOf(String.class)).isFalse();
     }
 
     public void testClassTargetEquals() {
@@ -74,11 +74,11 @@ public class ContextInvocationTargetTest extends AndroidTestCase {
         final ObjectContextInvocationTarget<TargetClass> target = instanceOf(TargetClass.class);
         assertThat(target.getTargetClass()).isSameAs(TargetClass.class);
         assertThat(target.isAssignableTo(TargetClass.class)).isTrue();
-        assertThat(target.isSameTypeOf(TargetClass.class)).isTrue();
+        assertThat(target.isTypeOf(TargetClass.class)).isTrue();
         assertThat(target.isAssignableTo(TestClass.class)).isTrue();
-        assertThat(target.isSameTypeOf(TestClass.class)).isTrue();
+        assertThat(target.isTypeOf(TestClass.class)).isTrue();
         assertThat(target.isAssignableTo(String.class)).isFalse();
-        assertThat(target.isSameTypeOf(String.class)).isFalse();
+        assertThat(target.isTypeOf(String.class)).isFalse();
     }
 
     public void testObjectTargetEquals() {

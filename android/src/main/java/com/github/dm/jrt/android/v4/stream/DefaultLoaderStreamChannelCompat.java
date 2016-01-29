@@ -562,7 +562,7 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
     @NotNull
     public LoaderStreamChannelCompat<OUT> loaderId(final int loaderId) {
 
-        return withLoaders().withId(loaderId).set();
+        return withLoaders().withLoaderId(loaderId).set();
     }
 
     @NotNull

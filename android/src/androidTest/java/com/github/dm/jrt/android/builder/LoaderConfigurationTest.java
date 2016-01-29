@@ -42,7 +42,7 @@ public class LoaderConfigurationTest extends AndroidTestCase {
 
         final ClashResolutionType resolutionType = ClashResolutionType.ABORT_THAT;
         final CacheStrategyType strategyType = CacheStrategyType.CACHE;
-        final LoaderConfiguration configuration = builder().withId(-1)
+        final LoaderConfiguration configuration = builder().withLoaderId(-1)
                                                            .withRoutineId(71)
                                                            .withClashResolution(resolutionType)
                                                            .withInputClashResolution(resolutionType)
@@ -82,7 +82,7 @@ public class LoaderConfigurationTest extends AndroidTestCase {
 
         final ClashResolutionType resolutionType = ClashResolutionType.ABORT_THAT;
         final CacheStrategyType strategyType = CacheStrategyType.CACHE;
-        final LoaderConfiguration configuration = builder().withId(-1)
+        final LoaderConfiguration configuration = builder().withLoaderId(-1)
                                                            .withRoutineId(71)
                                                            .withClashResolution(resolutionType)
                                                            .withInputClashResolution(resolutionType)
@@ -100,7 +100,7 @@ public class LoaderConfigurationTest extends AndroidTestCase {
 
         final ClashResolutionType resolutionType = ClashResolutionType.ABORT_THAT;
         final CacheStrategyType strategyType = CacheStrategyType.CACHE;
-        final LoaderConfiguration configuration = builder().withId(-1)
+        final LoaderConfiguration configuration = builder().withLoaderId(-1)
                                                            .withClashResolution(resolutionType)
                                                            .withInputClashResolution(resolutionType)
                                                            .withCacheStrategy(strategyType)
@@ -119,7 +119,7 @@ public class LoaderConfigurationTest extends AndroidTestCase {
 
         final ClashResolutionType resolutionType = ClashResolutionType.ABORT_THAT;
         final CacheStrategyType strategyType = CacheStrategyType.CACHE;
-        final LoaderConfiguration configuration = builder().withId(-1)
+        final LoaderConfiguration configuration = builder().withLoaderId(-1)
                                                            .withClashResolution(resolutionType)
                                                            .withInputClashResolution(resolutionType)
                                                            .withCacheStrategy(strategyType)
@@ -138,23 +138,23 @@ public class LoaderConfigurationTest extends AndroidTestCase {
 
         final ClashResolutionType resolutionType = ClashResolutionType.ABORT_THAT;
         final CacheStrategyType strategyType = CacheStrategyType.CACHE;
-        final LoaderConfiguration configuration = builder().withId(-1)
+        final LoaderConfiguration configuration = builder().withLoaderId(-1)
                                                            .withClashResolution(resolutionType)
                                                            .withInputClashResolution(resolutionType)
                                                            .withCacheStrategy(strategyType)
                                                            .withResultLooper(Looper.getMainLooper())
                                                            .withResultStaleTime(1, TimeUnit.SECONDS)
                                                            .set();
-        assertThat(configuration).isNotEqualTo(builder().withId(3).set());
-        assertThat(configuration.builderFrom().withId(27).set()).isNotEqualTo(
-                builder().withId(27).set());
+        assertThat(configuration).isNotEqualTo(builder().withLoaderId(3).set());
+        assertThat(configuration.builderFrom().withLoaderId(27).set()).isNotEqualTo(
+                builder().withLoaderId(27).set());
     }
 
     public void testInputClashResolutionEquals() {
 
         final ClashResolutionType resolutionType = ClashResolutionType.ABORT_THAT;
         final CacheStrategyType strategyType = CacheStrategyType.CACHE;
-        final LoaderConfiguration configuration = builder().withId(-1)
+        final LoaderConfiguration configuration = builder().withLoaderId(-1)
                                                            .withClashResolution(resolutionType)
                                                            .withInputClashResolution(resolutionType)
                                                            .withCacheStrategy(strategyType)
@@ -173,7 +173,7 @@ public class LoaderConfigurationTest extends AndroidTestCase {
 
         final ClashResolutionType resolutionType = ClashResolutionType.ABORT_THAT;
         final CacheStrategyType strategyType = CacheStrategyType.CACHE;
-        final LoaderConfiguration configuration = builder().withId(-1)
+        final LoaderConfiguration configuration = builder().withLoaderId(-1)
                                                            .withClashResolution(resolutionType)
                                                            .withInputClashResolution(resolutionType)
                                                            .withCacheStrategy(strategyType)
@@ -191,7 +191,7 @@ public class LoaderConfigurationTest extends AndroidTestCase {
 
         final ClashResolutionType resolutionType = ClashResolutionType.ABORT_THAT;
         final CacheStrategyType strategyType = CacheStrategyType.CACHE;
-        final LoaderConfiguration configuration = builder().withId(-1)
+        final LoaderConfiguration configuration = builder().withLoaderId(-1)
                                                            .withRoutineId(71)
                                                            .withClashResolution(resolutionType)
                                                            .withInputClashResolution(resolutionType)
@@ -208,7 +208,7 @@ public class LoaderConfigurationTest extends AndroidTestCase {
 
         final ClashResolutionType resolutionType = ClashResolutionType.ABORT_THAT;
         final CacheStrategyType strategyType = CacheStrategyType.CACHE;
-        final LoaderConfiguration configuration = builder().withId(-1)
+        final LoaderConfiguration configuration = builder().withLoaderId(-1)
                                                            .withClashResolution(resolutionType)
                                                            .withInputClashResolution(resolutionType)
                                                            .withCacheStrategy(strategyType)

@@ -286,7 +286,6 @@ public class Reflection {
     }
 
     static {
-
         final HashMap<Class<?>, Class<?>> boxMap = sBoxingClasses;
         boxMap.put(boolean.class, Boolean.class);
         boxMap.put(byte.class, Byte.class);

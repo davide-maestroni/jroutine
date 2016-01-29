@@ -75,7 +75,7 @@ import static com.github.dm.jrt.util.Reflection.asArgs;
  * <p/>
  * Created by davide-maestroni on 03/23/2015.
  */
-public class RoutineBuilders {
+public class Builders {
 
     private static final WeakIdentityHashMap<Class<?>, Map<String, Method>> sAliasMethods =
             new WeakIdentityHashMap<Class<?>, Map<String, Method>>();
@@ -92,7 +92,7 @@ public class RoutineBuilders {
     /**
      * Avoid direct instantiation.
      */
-    protected RoutineBuilders() {
+    protected Builders() {
 
     }
 
@@ -177,6 +177,90 @@ public class RoutineBuilders {
     }
 
     /**
+     * Returns a configuration properly modified by taking into account the specified annotations.
+     *
+     * @param configuration the initial configuration.
+     * @param annotations   the annotations.
+     * @return the modified configuration.
+     * @see com.github.dm.jrt.annotation.CoreInstances CoreInstances
+     * @see com.github.dm.jrt.annotation.InputLimit InputLimit
+     * @see com.github.dm.jrt.annotation.InputMaxDelay InputMaxDelay
+     * @see com.github.dm.jrt.annotation.InputMaxSize InputMaxSize
+     * @see com.github.dm.jrt.annotation.InputOrder InputOrder
+     * @see com.github.dm.jrt.annotation.LogLevel LogLevel
+     * @see com.github.dm.jrt.annotation.MaxInstances MaxInstances
+     * @see com.github.dm.jrt.annotation.OutputLimit OutputLimit
+     * @see com.github.dm.jrt.annotation.OutputMaxDelay OutputMaxDelay
+     * @see com.github.dm.jrt.annotation.OutputMaxSize OutputMaxSize
+     * @see com.github.dm.jrt.annotation.OutputOrder OutputOrder
+     * @see com.github.dm.jrt.annotation.Priority Priority
+     * @see com.github.dm.jrt.annotation.ReadTimeout ReadTimeout
+     * @see com.github.dm.jrt.annotation.ReadTimeoutAction ReadTimeoutAction
+     */
+    @NotNull
+    public static InvocationConfiguration configurationWithAnnotations(
+            @Nullable final InvocationConfiguration configuration,
+            @Nullable final Annotation... annotations) {
+
+        final InvocationConfiguration.Builder<InvocationConfiguration> builder =
+                InvocationConfiguration.builderFrom(configuration);
+        if (annotations == null) {
+            return builder.set();
+        }
+
+        for (final Annotation annotation : annotations) {
+            final Class<? extends Annotation> annotationType = annotation.annotationType();
+            if (annotationType == CoreInstances.class) {
+                builder.withCoreInstances(((CoreInstances) annotation).value());
+
+            } else if (annotationType == InputLimit.class) {
+                builder.withInputLimit(((InputLimit) annotation).value());
+
+            } else if (annotationType == InputMaxDelay.class) {
+                final InputMaxDelay delayAnnotation = (InputMaxDelay) annotation;
+                builder.withInputMaxDelay(delayAnnotation.value(), delayAnnotation.unit());
+
+            } else if (annotationType == InputMaxSize.class) {
+                builder.withInputMaxSize(((InputMaxSize) annotation).value());
+
+            } else if (annotationType == InputOrder.class) {
+                builder.withInputOrder(((InputOrder) annotation).value());
+
+            } else if (annotationType == LogLevel.class) {
+                builder.withLogLevel(((LogLevel) annotation).value());
+
+            } else if (annotationType == MaxInstances.class) {
+                builder.withMaxInstances(((MaxInstances) annotation).value());
+
+            } else if (annotationType == OutputLimit.class) {
+                builder.withOutputLimit(((OutputLimit) annotation).value());
+
+            } else if (annotationType == OutputMaxDelay.class) {
+                final OutputMaxDelay delayAnnotation = (OutputMaxDelay) annotation;
+                builder.withOutputMaxDelay(delayAnnotation.value(), delayAnnotation.unit());
+
+            } else if (annotationType == OutputMaxSize.class) {
+                builder.withOutputMaxSize(((OutputMaxSize) annotation).value());
+
+            } else if (annotationType == OutputOrder.class) {
+                builder.withOutputOrder(((OutputOrder) annotation).value());
+
+            } else if (annotationType == Priority.class) {
+                builder.withPriority(((Priority) annotation).value());
+
+            } else if (annotationType == ReadTimeout.class) {
+                final ReadTimeout timeoutAnnotation = (ReadTimeout) annotation;
+                builder.withReadTimeout(timeoutAnnotation.value(), timeoutAnnotation.unit());
+
+            } else if (annotationType == ReadTimeoutAction.class) {
+                builder.withReadTimeoutAction(((ReadTimeoutAction) annotation).value());
+            }
+        }
+
+        return builder.set();
+    }
+
+    /**
      * Returns a configuration properly modified by taking into account the annotations added to the
      * specified method.
      *
@@ -202,78 +286,33 @@ public class RoutineBuilders {
     public static InvocationConfiguration configurationWithAnnotations(
             @Nullable final InvocationConfiguration configuration, @NotNull final Method method) {
 
-        final InvocationConfiguration.Builder<InvocationConfiguration> builder =
-                InvocationConfiguration.builderFrom(configuration);
-        final CoreInstances coreInstancesAnnotation = method.getAnnotation(CoreInstances.class);
-        if (coreInstancesAnnotation != null) {
-            builder.withCoreInstances(coreInstancesAnnotation.value());
+        return configurationWithAnnotations(configuration, method.getDeclaredAnnotations());
+    }
+
+    /**
+     * Returns a configuration properly modified by taking into account the specified annotations.
+     *
+     * @param configuration the initial configuration.
+     * @param annotations   the annotations.
+     * @return the modified configuration.
+     * @see com.github.dm.jrt.annotation.SharedFields SharedFields
+     */
+    @NotNull
+    public static ProxyConfiguration configurationWithAnnotations(
+            @Nullable final ProxyConfiguration configuration,
+            @Nullable final Annotation... annotations) {
+
+        final ProxyConfiguration.Builder<ProxyConfiguration> builder =
+                ProxyConfiguration.builderFrom(configuration);
+        if (annotations == null) {
+            return builder.set();
         }
 
-        final InputLimit inputLimitAnnotation = method.getAnnotation(InputLimit.class);
-        if (inputLimitAnnotation != null) {
-            builder.withInputLimit(inputLimitAnnotation.value());
-        }
-
-        final InputMaxDelay inputMaxDelayAnnotation = method.getAnnotation(InputMaxDelay.class);
-        if (inputMaxDelayAnnotation != null) {
-            builder.withInputMaxDelay(inputMaxDelayAnnotation.value(),
-                                      inputMaxDelayAnnotation.unit());
-        }
-
-        final InputMaxSize inputSizeAnnotation = method.getAnnotation(InputMaxSize.class);
-        if (inputSizeAnnotation != null) {
-            builder.withInputMaxSize(inputSizeAnnotation.value());
-        }
-
-        final InputOrder inputOrderAnnotation = method.getAnnotation(InputOrder.class);
-        if (inputOrderAnnotation != null) {
-            builder.withInputOrder(inputOrderAnnotation.value());
-        }
-
-        final LogLevel logLevelAnnotation = method.getAnnotation(LogLevel.class);
-        if (logLevelAnnotation != null) {
-            builder.withLogLevel(logLevelAnnotation.value());
-        }
-
-        final MaxInstances maxInstancesAnnotation = method.getAnnotation(MaxInstances.class);
-        if (maxInstancesAnnotation != null) {
-            builder.withMaxInstances(maxInstancesAnnotation.value());
-        }
-
-        final OutputLimit outputLimitAnnotation = method.getAnnotation(OutputLimit.class);
-        if (outputLimitAnnotation != null) {
-            builder.withOutputLimit(outputLimitAnnotation.value());
-        }
-
-        final OutputMaxDelay outputMaxDelayAnnotation = method.getAnnotation(OutputMaxDelay.class);
-        if (outputMaxDelayAnnotation != null) {
-            builder.withOutputMaxDelay(outputMaxDelayAnnotation.value(),
-                                       outputMaxDelayAnnotation.unit());
-        }
-
-        final OutputMaxSize outputSizeAnnotation = method.getAnnotation(OutputMaxSize.class);
-        if (outputSizeAnnotation != null) {
-            builder.withOutputMaxSize(outputSizeAnnotation.value());
-        }
-
-        final OutputOrder outputOrderAnnotation = method.getAnnotation(OutputOrder.class);
-        if (outputOrderAnnotation != null) {
-            builder.withOutputOrder(outputOrderAnnotation.value());
-        }
-
-        final Priority priorityAnnotation = method.getAnnotation(Priority.class);
-        if (priorityAnnotation != null) {
-            builder.withPriority(priorityAnnotation.value());
-        }
-
-        final ReadTimeout readTimeoutAnnotation = method.getAnnotation(ReadTimeout.class);
-        if (readTimeoutAnnotation != null) {
-            builder.withReadTimeout(readTimeoutAnnotation.value(), readTimeoutAnnotation.unit());
-        }
-
-        final ReadTimeoutAction actionAnnotation = method.getAnnotation(ReadTimeoutAction.class);
-        if (actionAnnotation != null) {
-            builder.withReadTimeoutAction(actionAnnotation.value());
+        for (final Annotation annotation : annotations) {
+            if (annotation.annotationType() == SharedFields.class) {
+                builder.withSharedFields(((SharedFields) annotation).value());
+                break;
+            }
         }
 
         return builder.set();
@@ -292,14 +331,7 @@ public class RoutineBuilders {
     public static ProxyConfiguration configurationWithAnnotations(
             @Nullable final ProxyConfiguration configuration, @NotNull final Method method) {
 
-        final ProxyConfiguration.Builder<ProxyConfiguration> builder =
-                ProxyConfiguration.builderFrom(configuration);
-        final SharedFields sharedFieldsAnnotation = method.getAnnotation(SharedFields.class);
-        if (sharedFieldsAnnotation != null) {
-            builder.withSharedFields(sharedFieldsAnnotation.value());
-        }
-
-        return builder.set();
+        return configurationWithAnnotations(configuration, method.getDeclaredAnnotations());
     }
 
     /**

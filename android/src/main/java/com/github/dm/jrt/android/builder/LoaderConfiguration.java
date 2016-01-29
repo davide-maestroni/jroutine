@@ -462,7 +462,7 @@ public final class LoaderConfiguration {
 
             final int loaderId = configuration.mLoaderId;
             if (loaderId != AUTO) {
-                withId(loaderId);
+                withLoaderId(loaderId);
             }
 
             final int routineId = configuration.mRoutineId;
@@ -524,19 +524,6 @@ public final class LoaderConfiguration {
         }
 
         /**
-         * Tells the builder to identify the loader with the specified ID.
-         *
-         * @param loaderId the loader ID.
-         * @return this builder.
-         */
-        @NotNull
-        public Builder<TYPE> withId(final int loaderId) {
-
-            mLoaderId = loaderId;
-            return this;
-        }
-
-        /**
          * Tells the builder how to resolve clashes of invocations with same inputs. A clash happens
          * when a loader with the same ID is still running. A null value means that it is up to the
          * specific implementation to choose a default resolution type.
@@ -549,6 +536,19 @@ public final class LoaderConfiguration {
                 @Nullable final ClashResolutionType resolutionType) {
 
             mInputResolutionType = resolutionType;
+            return this;
+        }
+
+        /**
+         * Tells the builder to identify the loader with the specified ID.
+         *
+         * @param loaderId the loader ID.
+         * @return this builder.
+         */
+        @NotNull
+        public Builder<TYPE> withLoaderId(final int loaderId) {
+
+            mLoaderId = loaderId;
             return this;
         }
 

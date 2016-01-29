@@ -74,9 +74,9 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.builder.InvocationConfiguration.builder;
+import static com.github.dm.jrt.core.Builders.configurationWithAnnotations;
 import static com.github.dm.jrt.core.InvocationTarget.classOfType;
 import static com.github.dm.jrt.core.InvocationTarget.instance;
-import static com.github.dm.jrt.core.RoutineBuilders.configurationWithAnnotations;
 import static com.github.dm.jrt.util.TimeDuration.INFINITY;
 import static com.github.dm.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;

@@ -63,7 +63,7 @@ public class LoaderRoutineRotationTest
         final Routine<String, String> routine = JRoutineCompat.with(loaderFrom(getActivity()))
                                                               .on(factoryOf(ToUpperCase.class))
                                                               .withLoaders()
-                                                              .withId(0)
+                                                              .withLoaderId(0)
                                                               .withClashResolution(
                                                                       ClashResolutionType.JOIN)
                                                               .withResultStaleTime(
@@ -91,7 +91,7 @@ public class LoaderRoutineRotationTest
                       .withOutputOrder(OrderType.BY_CALL)
                       .set()
                       .withLoaders()
-                      .withId(0)
+                      .withLoaderId(0)
                       .set()
                       .asyncCall("test1", "test2");
 
@@ -167,7 +167,7 @@ public class LoaderRoutineRotationTest
         final Routine<String, String> routine = JRoutineCompat.with(loaderFrom(getActivity()))
                                                               .on(factoryOf(ToUpperCase.class))
                                                               .withLoaders()
-                                                              .withId(0)
+                                                              .withLoaderId(0)
                                                               .withClashResolution(
                                                                       ClashResolutionType.JOIN)
                                                               .withResultStaleTime(

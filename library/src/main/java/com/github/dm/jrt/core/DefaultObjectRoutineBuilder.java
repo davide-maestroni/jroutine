@@ -23,7 +23,7 @@ import com.github.dm.jrt.builder.InvocationConfiguration.Configurable;
 import com.github.dm.jrt.builder.ObjectRoutineBuilder;
 import com.github.dm.jrt.builder.ProxyConfiguration;
 import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.core.RoutineBuilders.MethodInfo;
+import com.github.dm.jrt.core.Builders.MethodInfo;
 import com.github.dm.jrt.invocation.FunctionInvocation;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationFactory;
@@ -43,12 +43,12 @@ import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.github.dm.jrt.core.RoutineBuilders.callFromInvocation;
-import static com.github.dm.jrt.core.RoutineBuilders.configurationWithAnnotations;
-import static com.github.dm.jrt.core.RoutineBuilders.getAnnotatedMethod;
-import static com.github.dm.jrt.core.RoutineBuilders.getSharedMutex;
-import static com.github.dm.jrt.core.RoutineBuilders.getTargetMethodInfo;
-import static com.github.dm.jrt.core.RoutineBuilders.invokeRoutine;
+import static com.github.dm.jrt.core.Builders.callFromInvocation;
+import static com.github.dm.jrt.core.Builders.configurationWithAnnotations;
+import static com.github.dm.jrt.core.Builders.getAnnotatedMethod;
+import static com.github.dm.jrt.core.Builders.getSharedMutex;
+import static com.github.dm.jrt.core.Builders.getTargetMethodInfo;
+import static com.github.dm.jrt.core.Builders.invokeRoutine;
 import static com.github.dm.jrt.util.Reflection.asArgs;
 
 /**

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.util;
+package com.github.dm.jrt.common;
 
 /**
  * Interface defining a reentrant mutex.

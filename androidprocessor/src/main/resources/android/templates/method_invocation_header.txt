@@ -25,7 +25,7 @@
         @SuppressWarnings("unused")
         private Object mInstance;
 
-        private com.github.dm.jrt.util.Mutex mMutex = com.github.dm.jrt.util.Mutex.NO_MUTEX;
+        private com.github.dm.jrt.common.Mutex mMutex = com.github.dm.jrt.common.Mutex.NO_MUTEX;
 
         @SuppressWarnings("unused")
         private com.github.dm.jrt.core.InvocationTarget mTarget;

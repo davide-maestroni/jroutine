@@ -27,13 +27,13 @@ import com.github.dm.jrt.annotation.SharedFields;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.ProxyConfiguration;
 import com.github.dm.jrt.channel.ResultChannel;
+import com.github.dm.jrt.common.Mutex;
 import com.github.dm.jrt.core.Builders.MethodInfo;
 import com.github.dm.jrt.core.InvocationTarget;
 import com.github.dm.jrt.core.JRoutine;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.util.ClassToken;
-import com.github.dm.jrt.util.Mutex;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

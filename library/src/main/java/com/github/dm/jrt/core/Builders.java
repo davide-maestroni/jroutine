@@ -44,11 +44,11 @@ import com.github.dm.jrt.builder.ProxyConfiguration;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.ResultChannel;
+import com.github.dm.jrt.common.Mutex;
 import com.github.dm.jrt.common.RoutineException;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.routine.Routine;
-import com.github.dm.jrt.util.Mutex;
 import com.github.dm.jrt.util.Reflection;
 import com.github.dm.jrt.util.WeakIdentityHashMap;
 

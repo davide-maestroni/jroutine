@@ -23,13 +23,13 @@ import com.github.dm.jrt.builder.InvocationConfiguration.Configurable;
 import com.github.dm.jrt.builder.ObjectRoutineBuilder;
 import com.github.dm.jrt.builder.ProxyConfiguration;
 import com.github.dm.jrt.channel.ResultChannel;
+import com.github.dm.jrt.common.Mutex;
 import com.github.dm.jrt.core.Builders.MethodInfo;
 import com.github.dm.jrt.invocation.FunctionInvocation;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.util.ClassToken;
-import com.github.dm.jrt.util.Mutex;
 import com.github.dm.jrt.util.Reflection;
 import com.github.dm.jrt.util.WeakIdentityHashMap;
 

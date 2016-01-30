@@ -18,7 +18,7 @@
 
     private static class Invocation${methodCount}${genericTypes} extends com.github.dm.jrt.invocation.FunctionInvocation<Object, ${resultClassName}> {
 
-        private final com.github.dm.jrt.util.Mutex mMutex;
+        private final com.github.dm.jrt.common.Mutex mMutex;
 
         @SuppressWarnings("unused")
         private final com.github.dm.jrt.core.InvocationTarget<?> mTarget;

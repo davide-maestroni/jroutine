@@ -25,7 +25,7 @@ import com.github.dm.jrt.channel.ExecutionTimeoutException;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.OutputDeadlockException;
 import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.channel.RoutineException;
+import com.github.dm.jrt.common.RoutineException;
 import com.github.dm.jrt.invocation.InvocationDeadlockException;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;

@@ -20,7 +20,7 @@ import com.github.dm.jrt.builder.RoutineBuilder;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.channel.RoutineException;
+import com.github.dm.jrt.common.RoutineException;
 import com.github.dm.jrt.core.Channels;
 import com.github.dm.jrt.core.JRoutine;
 import com.github.dm.jrt.function.Function;

@@ -17,7 +17,7 @@
 package com.github.dm.jrt.invocation;
 
 import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.channel.RoutineException;
+import com.github.dm.jrt.common.RoutineException;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -90,7 +90,7 @@ import org.jetbrains.annotations.NotNull;
  * might return one or more output for each input, or no output at all.
  * <p/>
  * Any exception escaping the invocation methods, unless it extends the base
- * {@link com.github.dm.jrt.channel.RoutineException RoutineException}, will be wrapped as the cause
+ * {@link RoutineException RoutineException}, will be wrapped as the cause
  * of an {@link com.github.dm.jrt.invocation.InvocationException InvocationException} instance.
  * <p/>
  * Created by davide-maestroni on 09/07/2014.

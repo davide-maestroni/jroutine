@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.android.invocation;
 
-import com.github.dm.jrt.channel.RoutineException;
+import com.github.dm.jrt.common.RoutineException;
 
 /**
  * Base exception indicating that an unrecoverable error occurred during a loader invocation

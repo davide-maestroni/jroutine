@@ -14,41 +14,34 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.channel;
+package com.github.dm.jrt.common;
 
-import org.jetbrains.annotations.Nullable;
+import org.junit.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Common base exception class.
+ * Exception unit tests.
  * <p/>
- * Created by davide-maestroni on 01/23/2015.
+ * Created by davide-maestroni on 01/30/2016.
  */
-public class RoutineException extends RuntimeException {
+public class ExceptionTest {
 
-    /**
-     * Constructor.
-     */
-    public RoutineException() {
+    @Test
+    public void testDeadlockException() {
 
+        assertThat(new DeadlockException("")).hasNoCause();
     }
 
-    /**
-     * Constructor.
-     *
-     * @param message the error message.
-     */
-    public RoutineException(@Nullable final String message) {
+    @Test
+    public void testRoutineException() {
 
-        super(message);
+        assertThat(new RoutineException()).hasNoCause();
     }
 
-    /**
-     * Constructor.
-     *
-     * @param cause the error cause.
-     */
-    public RoutineException(@Nullable final Throwable cause) {
+    @Test
+    public void testTimeoutException() {
 
-        super(cause);
+        assertThat(new TimeoutException("")).hasNoCause();
     }
 }

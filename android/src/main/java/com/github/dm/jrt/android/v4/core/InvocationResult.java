@@ -17,7 +17,7 @@
 package com.github.dm.jrt.android.v4.core;
 
 import com.github.dm.jrt.channel.IOChannel;
-import com.github.dm.jrt.channel.RoutineException;
+import com.github.dm.jrt.common.RoutineException;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

@@ -16,6 +16,8 @@
 
 package com.github.dm.jrt.channel;
 
+import com.github.dm.jrt.common.RoutineException;
+
 import org.jetbrains.annotations.NotNull;
 
 /**

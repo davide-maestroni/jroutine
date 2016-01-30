@@ -41,7 +41,7 @@ import static com.github.dm.jrt.util.TimeDuration.fromUnit;
  * memory consumption. In case the maximum number is reached when passing an input, the call blocks
  * until enough data are consumed or the specified delay elapses. A maximum size can additionally be
  * set so that, when the number of buffered data exceeds it, a
- * {@link com.github.dm.jrt.channel.DeadlockException DeadlockException} will be thrown.<br/>
+ * {@link com.github.dm.jrt.common.DeadlockException DeadlockException} will be thrown.<br/>
  * By default the timeout is set to 0.<br/>
  * The order of input data is not guaranteed. Nevertheless, it is possible to force data to be
  * delivered in the same order as they are passed to the channels, at the cost of a slightly

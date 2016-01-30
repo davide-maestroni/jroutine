@@ -16,6 +16,8 @@
 
 package com.github.dm.jrt.channel;
 
+import com.github.dm.jrt.common.RoutineException;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,7 +40,7 @@ public class AbortException extends RoutineException {
 
     /**
      * Wraps the specified throwable only if it is not an instance of
-     * {@link com.github.dm.jrt.channel.RoutineException RoutineException}.
+     * {@link com.github.dm.jrt.common.RoutineException RoutineException}.
      *
      * @param cause the throwable to wrap.
      * @return the throwable or an abort exception wrapping it.

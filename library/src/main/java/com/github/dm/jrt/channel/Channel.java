@@ -51,7 +51,7 @@ public interface Channel {
     /**
      * Closes the channel and abort the transfer of data, thus aborting the routine invocation and
      * causing the specified throwable to be passed as the abortion reason.<br/>
-     * The throwable, unless it extends the base {@link com.github.dm.jrt.channel.RoutineException
+     * The throwable, unless it extends the base {@link com.github.dm.jrt.common.RoutineException
      * RoutineException}, will be wrapped as the cause of an
      * {@link com.github.dm.jrt.channel.AbortException AbortException} instance.
      * <p/>
@@ -92,8 +92,8 @@ public interface Channel {
          *
          * @param delay the delay.
          * @return this channel.
-         * @throws com.github.dm.jrt.channel.RoutineException if the execution has been aborted.
-         * @throws java.lang.IllegalStateException            if this channel is already closed.
+         * @throws com.github.dm.jrt.common.RoutineException if the execution has been aborted.
+         * @throws java.lang.IllegalStateException           if this channel is already closed.
          */
         @NotNull
         InputChannel<IN> after(@NotNull TimeDuration delay);
@@ -106,9 +106,9 @@ public interface Channel {
          * @param delay    the delay value.
          * @param timeUnit the delay time unit.
          * @return this channel.
-         * @throws com.github.dm.jrt.channel.RoutineException if the execution has been aborted.
-         * @throws java.lang.IllegalArgumentException         if the specified delay is negative.
-         * @throws java.lang.IllegalStateException            if this channel is already closed.
+         * @throws com.github.dm.jrt.common.RoutineException if the execution has been aborted.
+         * @throws java.lang.IllegalArgumentException        if the specified delay is negative.
+         * @throws java.lang.IllegalStateException           if this channel is already closed.
          */
         @NotNull
         InputChannel<IN> after(long delay, @NotNull TimeUnit timeUnit);
@@ -117,8 +117,8 @@ public interface Channel {
          * Tells the channel to not delay the transfer of data.
          *
          * @return this channel.
-         * @throws com.github.dm.jrt.channel.RoutineException if the execution has been aborted.
-         * @throws java.lang.IllegalStateException            if this channel is already closed.
+         * @throws com.github.dm.jrt.common.RoutineException if the execution has been aborted.
+         * @throws java.lang.IllegalStateException           if this channel is already closed.
          */
         @NotNull
         InputChannel<IN> now();
@@ -130,8 +130,8 @@ public interface Channel {
          * By default no particular order is applied.
          *
          * @return this channel.
-         * @throws com.github.dm.jrt.channel.RoutineException if the execution has been aborted.
-         * @throws java.lang.IllegalStateException            if this channel is already closed.
+         * @throws com.github.dm.jrt.common.RoutineException if the execution has been aborted.
+         * @throws java.lang.IllegalStateException           if this channel is already closed.
          * @see #orderByDelay()
          */
         @NotNull
@@ -146,8 +146,8 @@ public interface Channel {
          * By default no particular order is applied.
          *
          * @return this channel.
-         * @throws com.github.dm.jrt.channel.RoutineException if the execution has been aborted.
-         * @throws java.lang.IllegalStateException            if this channel is already closed.
+         * @throws com.github.dm.jrt.common.RoutineException if the execution has been aborted.
+         * @throws java.lang.IllegalStateException           if this channel is already closed.
          * @see #orderByCall()
          */
         @NotNull
@@ -161,8 +161,8 @@ public interface Channel {
          *
          * @param channel the output channel.
          * @return this channel.
-         * @throws com.github.dm.jrt.channel.RoutineException if the execution has been aborted.
-         * @throws java.lang.IllegalStateException            if this channel is already closed.
+         * @throws com.github.dm.jrt.common.RoutineException if the execution has been aborted.
+         * @throws java.lang.IllegalStateException           if this channel is already closed.
          */
         @NotNull
         InputChannel<IN> pass(@Nullable OutputChannel<? extends IN> channel);
@@ -172,8 +172,8 @@ public interface Channel {
          *
          * @param inputs the iterable returning the input data.
          * @return this channel.
-         * @throws com.github.dm.jrt.channel.RoutineException if the execution has been aborted.
-         * @throws java.lang.IllegalStateException            if this channel is already closed.
+         * @throws com.github.dm.jrt.common.RoutineException if the execution has been aborted.
+         * @throws java.lang.IllegalStateException           if this channel is already closed.
          */
         @NotNull
         InputChannel<IN> pass(@Nullable Iterable<? extends IN> inputs);
@@ -183,8 +183,8 @@ public interface Channel {
          *
          * @param input the input.
          * @return this channel.
-         * @throws com.github.dm.jrt.channel.RoutineException if the execution has been aborted.
-         * @throws java.lang.IllegalStateException            if this channel is already closed.
+         * @throws com.github.dm.jrt.common.RoutineException if the execution has been aborted.
+         * @throws java.lang.IllegalStateException           if this channel is already closed.
          */
         @NotNull
         InputChannel<IN> pass(@Nullable IN input);
@@ -194,8 +194,8 @@ public interface Channel {
          *
          * @param inputs the input data.
          * @return this channel.
-         * @throws com.github.dm.jrt.channel.RoutineException if the execution has been aborted.
-         * @throws java.lang.IllegalStateException            if this channel is already closed.
+         * @throws com.github.dm.jrt.common.RoutineException if the execution has been aborted.
+         * @throws java.lang.IllegalStateException           if this channel is already closed.
          */
         @NotNull
         InputChannel<IN> pass(@Nullable IN... inputs);
@@ -247,7 +247,7 @@ public interface Channel {
          * @throws com.github.dm.jrt.channel.ExecutionTimeoutException if the channel is set to
          *                                                             throw an exception when the
          *                                                             timeout elapses.
-         * @throws com.github.dm.jrt.channel.RoutineException          if the execution has been
+         * @throws com.github.dm.jrt.common.RoutineException           if the execution has been
          *                                                             aborted.
          * @throws java.lang.IllegalStateException                     if this channel is already
          *                                                             bound to a consumer or
@@ -274,7 +274,7 @@ public interface Channel {
          * @throws com.github.dm.jrt.channel.ExecutionTimeoutException if the channel is set to
          *                                                             throw an exception when the
          *                                                             timeout elapses.
-         * @throws com.github.dm.jrt.channel.RoutineException          if the execution has been
+         * @throws com.github.dm.jrt.common.RoutineException           if the execution has been
          *                                                             aborted.
          * @throws java.lang.IllegalStateException                     if this channel is already
          *                                                             bound to a consumer or
@@ -383,7 +383,7 @@ public interface Channel {
          * @throws com.github.dm.jrt.channel.ExecutionTimeoutException if the channel is set to
          *                                                             throw an exception when the
          *                                                             timeout elapses.
-         * @throws com.github.dm.jrt.channel.RoutineException          if the execution has been
+         * @throws com.github.dm.jrt.common.RoutineException           if the execution has been
          *                                                             aborted.
          * @throws java.lang.IllegalStateException                     if this channel is already
          *                                                             bound to a consumer or
@@ -407,7 +407,7 @@ public interface Channel {
          * @throws com.github.dm.jrt.channel.ExecutionTimeoutException if the channel is set to
          *                                                             throw an exception when the
          *                                                             timeout elapses.
-         * @throws com.github.dm.jrt.channel.RoutineException          if the execution has been
+         * @throws com.github.dm.jrt.common.RoutineException           if the execution has been
          *                                                             aborted.
          * @throws java.lang.IllegalStateException                     if this channel is already
          *                                                             bound to a consumer or
@@ -456,7 +456,7 @@ public interface Channel {
          * @throws com.github.dm.jrt.channel.ExecutionTimeoutException if the channel is set to
          *                                                             throw an exception when the
          *                                                             timeout elapses.
-         * @throws com.github.dm.jrt.channel.RoutineException          if the execution has been
+         * @throws com.github.dm.jrt.common.RoutineException           if the execution has been
          *                                                             aborted.
          * @throws java.lang.IllegalStateException                     if this channel is already
          *                                                             bound to a consumer or
@@ -483,7 +483,7 @@ public interface Channel {
          * @throws com.github.dm.jrt.channel.ExecutionTimeoutException if the channel is set to
          *                                                             throw an exception when the
          *                                                             timeout elapses.
-         * @throws com.github.dm.jrt.channel.RoutineException          if the execution has been
+         * @throws com.github.dm.jrt.common.RoutineException           if the execution has been
          *                                                             aborted.
          * @throws java.lang.IllegalStateException                     if this channel is already
          *                                                             bound to a consumer or
@@ -539,7 +539,7 @@ public interface Channel {
          * @throws com.github.dm.jrt.channel.ExecutionTimeoutException if the channel is set to
          *                                                             throw an exception when the
          *                                                             timeout elapses.
-         * @throws com.github.dm.jrt.channel.RoutineException          if the execution has been
+         * @throws com.github.dm.jrt.common.RoutineException           if the execution has been
          *                                                             aborted.
          * @throws java.lang.IllegalStateException                     if this channel is already
          *                                                             bound to a consumer or

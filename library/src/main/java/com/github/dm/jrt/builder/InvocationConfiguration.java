@@ -60,7 +60,7 @@ import static com.github.dm.jrt.util.TimeDuration.fromUnit;
  * limited in order to avoid excessive memory consumption. In case the limit is reached when passing
  * an input or output, the call blocks until enough data are consumed or the specified maximum delay
  * elapses. A maximum size can additionally be set so that, when the number of buffered data
- * exceeds it, a {@link com.github.dm.jrt.channel.DeadlockException DeadlockException} will be
+ * exceeds it, a {@link com.github.dm.jrt.common.DeadlockException DeadlockException} will be
  * thrown.<br/>
  * By default the delay is set to 0.<br/>
  * The order of input and output data is not guaranteed. Nevertheless, it is possible to force data

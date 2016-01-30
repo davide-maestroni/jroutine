@@ -14,25 +14,23 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.channel;
-
-import com.github.dm.jrt.common.DeadlockException;
+package com.github.dm.jrt.common;
 
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Exception indicating a possible deadlock while waiting for room in the input channel buffer.
+ * Exception indicating that a timeout occurred.
  * <p/>
- * Created by davide-maestroni on 07/19/2015.
+ * Created by davide-maestroni on 11/25/2014.
  */
-public class InputDeadlockException extends DeadlockException {
+public class TimeoutException extends RoutineException {
 
     /**
      * Constructor.
      *
      * @param message the error message.
      */
-    public InputDeadlockException(@Nullable final String message) {
+    public TimeoutException(@Nullable final String message) {
 
         super(message);
     }

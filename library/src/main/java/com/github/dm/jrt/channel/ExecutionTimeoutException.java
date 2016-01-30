@@ -16,6 +16,8 @@
 
 package com.github.dm.jrt.channel;
 
+import com.github.dm.jrt.common.TimeoutException;
+
 import org.jetbrains.annotations.Nullable;
 
 /**

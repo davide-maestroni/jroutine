@@ -19,7 +19,7 @@ package com.github.dm.jrt.android.invocation;
 import android.content.Context;
 
 import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.channel.RoutineException;
+import com.github.dm.jrt.common.RoutineException;
 
 import org.jetbrains.annotations.NotNull;
 

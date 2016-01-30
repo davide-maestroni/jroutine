@@ -34,7 +34,7 @@ import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
-import com.github.dm.jrt.channel.RoutineException;
+import com.github.dm.jrt.common.RoutineException;
 import com.github.dm.jrt.core.AbstractRoutine;
 import com.github.dm.jrt.core.JRoutine;
 import com.github.dm.jrt.invocation.Invocation;
@@ -847,8 +847,8 @@ public class InvocationService extends Service {
          * Passes the specified input to the invocation channel.
          *
          * @param input the input.
-         * @throws com.github.dm.jrt.channel.RoutineException if the execution has been aborted.
-         * @throws java.lang.IllegalStateException            if the channel is already closed.
+         * @throws RoutineException                if the execution has been aborted.
+         * @throws java.lang.IllegalStateException if the channel is already closed.
          */
         void pass(@Nullable final Object input) {
 
@@ -858,9 +858,9 @@ public class InvocationService extends Service {
         /**
          * Binds the specified consumer to the output channel.
          *
-         * @throws com.github.dm.jrt.channel.RoutineException if the execution has been aborted.
-         * @throws java.lang.IllegalStateException            if the channel is already closed or
-         *                                                    already bound to a consumer.
+         * @throws RoutineException                if the execution has been aborted.
+         * @throws java.lang.IllegalStateException if the channel is already closed or
+         *                                         already bound to a consumer.
          */
         void passTo(@NotNull final OutputConsumer<Object> consumer) {
 

@@ -16,6 +16,8 @@
 
 package com.github.dm.jrt.channel;
 
+import com.github.dm.jrt.common.RoutineException;
+
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,18 +42,6 @@ public class ExceptionTest {
     }
 
     @Test
-    public void testDeadlockException() {
-
-        assertThat(new DeadlockException("")).hasNoCause();
-    }
-
-    @Test
-    public void testExceptions() {
-
-        assertThat(new ExecutionTimeoutException("")).hasNoCause();
-    }
-
-    @Test
     public void testExecutionDeadlockException() {
 
         assertThat(new ExecutionDeadlockException("")).hasNoCause();
@@ -73,17 +63,5 @@ public class ExceptionTest {
     public void testOutputDeadlockException() {
 
         assertThat(new OutputDeadlockException("")).hasNoCause();
-    }
-
-    @Test
-    public void testRoutineException() {
-
-        assertThat(new RoutineException()).hasNoCause();
-    }
-
-    @Test
-    public void testTimeoutException() {
-
-        assertThat(new TimeoutException("")).hasNoCause();
     }
 }

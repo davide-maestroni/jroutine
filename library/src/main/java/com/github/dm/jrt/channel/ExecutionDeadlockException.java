@@ -16,6 +16,8 @@
 
 package com.github.dm.jrt.channel;
 
+import com.github.dm.jrt.common.DeadlockException;
+
 import org.jetbrains.annotations.Nullable;
 
 /**

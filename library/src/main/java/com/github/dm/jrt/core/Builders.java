@@ -44,7 +44,7 @@ import com.github.dm.jrt.builder.ProxyConfiguration;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.channel.RoutineException;
+import com.github.dm.jrt.common.RoutineException;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.routine.Routine;
@@ -106,7 +106,7 @@ public class Builders {
      * @param result       the invocation result channel.
      * @param inputMode    the input transfer mode.
      * @param outputMode   the output transfer mode.
-     * @throws com.github.dm.jrt.channel.RoutineException in case of errors.
+     * @throws com.github.dm.jrt.common.RoutineException in case of errors.
      */
     public static void callFromInvocation(@NotNull final Mutex mutex, @NotNull final Object target,
             @NotNull final Method targetMethod, @NotNull final List<?> objects,
@@ -664,7 +664,7 @@ public class Builders {
      * @param inputMode      the input transfer mode.
      * @param outputMode     the output transfer mode.
      * @return the invocation output.
-     * @throws com.github.dm.jrt.channel.RoutineException in case of errors.
+     * @throws com.github.dm.jrt.common.RoutineException in case of errors.
      */
     @Nullable
     @SuppressWarnings("unchecked")

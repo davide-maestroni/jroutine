@@ -95,7 +95,7 @@ public abstract class InvocationTarget<TYPE> {
      * @param type the type class.
      * @return whether the invocation target is of the specified type.
      */
-    public abstract boolean isTypeOf(@NotNull Class<?> type);
+    public abstract boolean isOfType(@NotNull Class<?> type);
 
     /**
      * Invocation target wrapping a class.
@@ -135,9 +135,8 @@ public abstract class InvocationTarget<TYPE> {
         }
 
         @Override
-        public boolean isTypeOf(@NotNull final Class<?> type) {
+        public boolean isOfType(@NotNull final Class<?> type) {
 
-            // TODO: 29/01/16 ???
             return (mTargetClass == type);
         }
 
@@ -194,7 +193,7 @@ public abstract class InvocationTarget<TYPE> {
         }
 
         @Override
-        public boolean isTypeOf(@NotNull final Class<?> type) {
+        public boolean isOfType(@NotNull final Class<?> type) {
 
             return type.isInstance(mTarget.get());
         }

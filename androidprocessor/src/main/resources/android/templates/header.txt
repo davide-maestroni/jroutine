@@ -38,7 +38,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
             throw new IllegalArgumentException("the target class cannot be primitive");
         }
 
-        if (!target.isTypeOf(${classErasure}.class)) {
+        if (!target.isOfType(${classErasure}.class)) {
             throw new IllegalArgumentException("the invocation target must be the class or an instance of " +
                     "${classFullName}");
         }

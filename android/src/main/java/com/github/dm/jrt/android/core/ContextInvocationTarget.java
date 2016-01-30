@@ -126,7 +126,7 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
      * @param type the type class.
      * @return whether the invocation target is of the specified type.
      */
-    public abstract boolean isTypeOf(@NotNull Class<?> type);
+    public abstract boolean isOfType(@NotNull Class<?> type);
 
     /**
      * Context invocation target wrapping a class.
@@ -219,7 +219,7 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
         }
 
         @Override
-        public boolean isTypeOf(@NotNull final Class<?> type) {
+        public boolean isOfType(@NotNull final Class<?> type) {
 
             return (mTargetClass == type);
         }
@@ -349,7 +349,7 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
         }
 
         @Override
-        public boolean isTypeOf(@NotNull final Class<?> type) {
+        public boolean isOfType(@NotNull final Class<?> type) {
 
             return isAssignableTo(type);
         }

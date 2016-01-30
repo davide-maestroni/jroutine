@@ -25,7 +25,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.builder.InvocationConfiguration invocationConfiguration,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.builder.ProxyConfiguration proxyConfiguration) {
 
-        if (!target.isTypeOf(${classErasure}.class)) {
+        if (!target.isOfType(${classErasure}.class)) {
             throw new IllegalArgumentException("the invocation target must be the class or an instance of " +
                     "${classFullName}");
         }

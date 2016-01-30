@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.invocation;
+package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.core.InvocationTarget.ClassInvocationTarget;
 import com.github.dm.jrt.core.InvocationTarget.InstanceInvocationTarget;
@@ -40,11 +40,11 @@ public class InvocationTargetTest {
         assertThat(target.getTarget()).isSameAs(TargetClass.class);
         assertThat(target.getTargetClass()).isSameAs(TargetClass.class);
         assertThat(target.isAssignableTo(TargetClass.class)).isTrue();
-        assertThat(target.isTypeOf(TargetClass.class)).isTrue();
+        assertThat(target.isOfType(TargetClass.class)).isTrue();
         assertThat(target.isAssignableTo(TestClass.class)).isTrue();
-        assertThat(target.isTypeOf(TestClass.class)).isFalse();
+        assertThat(target.isOfType(TestClass.class)).isFalse();
         assertThat(target.isAssignableTo(String.class)).isFalse();
-        assertThat(target.isTypeOf(String.class)).isFalse();
+        assertThat(target.isOfType(String.class)).isFalse();
     }
 
     @Test
@@ -82,11 +82,11 @@ public class InvocationTargetTest {
         assertThat(target.getTarget()).isSameAs(t);
         assertThat(target.getTargetClass()).isSameAs(TargetClass.class);
         assertThat(target.isAssignableTo(TargetClass.class)).isTrue();
-        assertThat(target.isTypeOf(TargetClass.class)).isTrue();
+        assertThat(target.isOfType(TargetClass.class)).isTrue();
         assertThat(target.isAssignableTo(TestClass.class)).isTrue();
-        assertThat(target.isTypeOf(TestClass.class)).isTrue();
+        assertThat(target.isOfType(TestClass.class)).isTrue();
         assertThat(target.isAssignableTo(String.class)).isFalse();
-        assertThat(target.isTypeOf(String.class)).isFalse();
+        assertThat(target.isOfType(String.class)).isFalse();
     }
 
     @Test

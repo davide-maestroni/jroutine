@@ -665,6 +665,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                 final boolean isTimeout;
                 try {
                     isTimeout = !timeout.waitTrue(mMutex, mOutputHasNext);
+                    verifyBound();
 
                 } catch (final InterruptedException e) {
                     throw new InvocationInterruptedException(e);

@@ -93,7 +93,8 @@ import org.jetbrains.annotations.NotNull;
  * {@link RoutineException RoutineException}, will be wrapped as the cause
  * of an {@link com.github.dm.jrt.invocation.InvocationException InvocationException} instance.
  * <p/>
- * TODO template
+ * The class {@link com.github.dm.jrt.invocation.TemplateInvocation TemplateInvocation} provides
+ * an abstract empty implementation of the invocation interface.
  * <p/>
  * Created by davide-maestroni on 09/07/2014.
  *

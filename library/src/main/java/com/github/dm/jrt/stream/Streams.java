@@ -148,6 +148,13 @@ public class Streams extends Channels {
         return new GroupByInvocationFactory<DATA>(size);
     }
 
+    // TODO: 01/02/16 javadoc
+    @NotNull
+    public static <DATA> IOStreamChannel<DATA, DATA> ioStream() {
+
+        return new DefaultIOStreamChannel<DATA, DATA>(Streams.<DATA>streamOf());
+    }
+
     /**
      * Returns a stream output channel joining the data coming from the specified list of channels.
      * <br/>

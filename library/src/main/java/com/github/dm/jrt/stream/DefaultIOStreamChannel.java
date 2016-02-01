@@ -25,6 +25,7 @@ import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.common.RoutineException;
 import com.github.dm.jrt.core.Channels.Selectable;
+import com.github.dm.jrt.core.JRoutine;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Consumer;
@@ -45,7 +46,12 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * Default implementation of an I/O stream channel.
+ * <p/>
  * Created by davide-maestroni on 02/01/2016.
+ *
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
 public class DefaultIOStreamChannel<IN, OUT> implements IOStreamChannel<IN, OUT> {
 
@@ -86,17 +92,28 @@ public class DefaultIOStreamChannel<IN, OUT> implements IOStreamChannel<IN, OUT>
     /**
      * Constructor.
      *
-     * @param input   the input I/O channel.
      * @param channel the wrapped stream channel.
      */
-    DefaultIOStreamChannel(@NotNull final IOChannel<IN> input,
-            @NotNull final StreamChannel<OUT> channel) {
+    DefaultIOStreamChannel(@NotNull final StreamChannel<OUT> channel) {
 
-        this(InvocationConfiguration.DEFAULT_CONFIGURATION, input, channel);
+        this(InvocationConfiguration.DEFAULT_CONFIGURATION, JRoutine.io().<IN>buildChannel(),
+             channel);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param configuration the initial stream configuration.
+     * @param input         the input I/O channel.
+     * @param channel       the wrapped stream channel.
+     */
+    @SuppressWarnings("ConstantConditions")
     private DefaultIOStreamChannel(@NotNull final InvocationConfiguration configuration,
             @NotNull final IOChannel<IN> input, @NotNull final StreamChannel<OUT> channel) {
+
+        if (channel == null) {
+            throw new NullPointerException("the stream channel must not be null");
+        }
 
         mStreamConfiguration = configuration;
         mInputChannel = input;
@@ -542,6 +559,18 @@ public class DefaultIOStreamChannel<IN, OUT> implements IOStreamChannel<IN, OUT>
     }
 
     @NotNull
+    public InputChannel<IN> asInput() {
+
+        return this;
+    }
+
+    @NotNull
+    public OutputChannel<OUT> asOutput() {
+
+        return this;
+    }
+
+    @NotNull
     public IOStreamChannel<IN, OUT> close() {
 
         mInputChannel.close();
@@ -601,18 +630,6 @@ public class DefaultIOStreamChannel<IN, OUT> implements IOStreamChannel<IN, OUT>
     public void throwError() {
 
         mStreamChannel.throwError();
-    }
-
-    @NotNull
-    public InputChannel<IN> asInput() {
-
-        return this;
-    }
-
-    @NotNull
-    public OutputChannel<OUT> asOutput() {
-
-        return this;
     }
 
     public Iterator<OUT> iterator() {

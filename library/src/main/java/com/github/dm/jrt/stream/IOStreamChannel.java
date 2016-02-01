@@ -400,6 +400,22 @@ public interface IOStreamChannel<IN, OUT> extends InputChannel<IN>, StreamChanne
     Builder<? extends IOStreamChannel<IN, OUT>> withStreamInvocations();
 
     /**
+     * Returns this channel as an input one.
+     *
+     * @return this channel.
+     */
+    @NotNull
+    InputChannel<IN> asInput();
+
+    /**
+     * Returns this channel as an output one.
+     *
+     * @return this channel.
+     */
+    @NotNull
+    OutputChannel<OUT> asOutput();
+
+    /**
      * Closes the channel input.<br/>
      * If the channel is already closed, this method has no effect.
      * <p/>

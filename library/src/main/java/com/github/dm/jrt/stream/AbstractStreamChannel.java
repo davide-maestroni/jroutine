@@ -353,9 +353,11 @@ public abstract class AbstractStreamChannel<OUT>
                                 .set();
     }
 
-    public void bind() {
+    @NotNull
+    public StreamChannel<OUT> bind() {
 
         mBinder.bind();
+        return this;
     }
 
     @NotNull
@@ -674,10 +676,17 @@ public abstract class AbstractStreamChannel<OUT>
         return mChannel.all();
     }
 
-    public boolean checkComplete() {
+    public boolean checkDone() {
 
         bind();
-        return mChannel.checkComplete();
+        return mChannel.checkDone();
+    }
+
+    @Nullable
+    public RoutineException getError() {
+
+        bind();
+        return mChannel.getError();
     }
 
     public boolean hasNext() {
@@ -716,6 +725,12 @@ public abstract class AbstractStreamChannel<OUT>
 
         bind();
         return mChannel.passTo(channel);
+    }
+
+    public void throwError() {
+
+        bind();
+        mChannel.throwError();
     }
 
     public Iterator<OUT> iterator() {

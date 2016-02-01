@@ -181,7 +181,8 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
     @Override
     public LoaderStreamChannelCompat<OUT> afterMax(@NotNull final TimeDuration timeout) {
 
-        return (LoaderStreamChannelCompat<OUT>) super.afterMax(timeout);
+        super.afterMax(timeout);
+        return this;
     }
 
     @NotNull
@@ -189,49 +190,56 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
     public LoaderStreamChannelCompat<OUT> afterMax(final long timeout,
             @NotNull final TimeUnit timeUnit) {
 
-        return (LoaderStreamChannelCompat<OUT>) super.afterMax(timeout, timeUnit);
+        super.afterMax(timeout, timeUnit);
+        return this;
     }
 
     @NotNull
     @Override
     public LoaderStreamChannelCompat<OUT> allInto(@NotNull final Collection<? super OUT> results) {
 
-        return (LoaderStreamChannelCompat<OUT>) super.allInto(results);
+        super.allInto(results);
+        return this;
     }
 
     @NotNull
     @Override
     public LoaderStreamChannelCompat<OUT> eventuallyAbort() {
 
-        return (LoaderStreamChannelCompat<OUT>) super.eventuallyAbort();
+        super.eventuallyAbort();
+        return this;
     }
 
     @NotNull
     @Override
     public LoaderStreamChannelCompat<OUT> eventuallyAbort(@Nullable final Throwable reason) {
 
-        return (LoaderStreamChannelCompat<OUT>) super.eventuallyAbort(reason);
+        super.eventuallyAbort(reason);
+        return this;
     }
 
     @NotNull
     @Override
     public LoaderStreamChannelCompat<OUT> eventuallyExit() {
 
-        return (LoaderStreamChannelCompat<OUT>) super.eventuallyExit();
+        super.eventuallyExit();
+        return this;
     }
 
     @NotNull
     @Override
     public LoaderStreamChannelCompat<OUT> eventuallyThrow() {
 
-        return (LoaderStreamChannelCompat<OUT>) super.eventuallyThrow();
+        super.eventuallyThrow();
+        return this;
     }
 
     @NotNull
     @Override
     public LoaderStreamChannelCompat<OUT> immediately() {
 
-        return (LoaderStreamChannelCompat<OUT>) super.immediately();
+        super.immediately();
+        return this;
     }
 
     @NotNull
@@ -239,21 +247,24 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
     public LoaderStreamChannelCompat<OUT> passTo(
             @NotNull final OutputConsumer<? super OUT> consumer) {
 
-        return (LoaderStreamChannelCompat<OUT>) super.passTo(consumer);
+        super.passTo(consumer);
+        return this;
     }
 
     @NotNull
     @Override
     public LoaderStreamChannelCompat<OUT> skip(final int count) {
 
-        return (LoaderStreamChannelCompat<OUT>) super.skip(count);
+        super.skip(count);
+        return this;
     }
 
     @NotNull
     @Override
     public LoaderStreamChannelCompat<OUT> async() {
 
-        return (LoaderStreamChannelCompat<OUT>) super.async();
+        super.async();
+        return this;
     }
 
     @NotNull
@@ -261,8 +272,8 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
     public LoaderStreamChannelCompat<OUT> backPressureOn(@Nullable final Runner runner,
             final int maxInputs, final long maxDelay, @NotNull final TimeUnit timeUnit) {
 
-        return (LoaderStreamChannelCompat<OUT>) super.backPressureOn(runner, maxInputs, maxDelay,
-                                                                     timeUnit);
+        super.backPressureOn(runner, maxInputs, maxDelay, timeUnit);
+        return this;
     }
 
     @NotNull
@@ -270,7 +281,16 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
     public LoaderStreamChannelCompat<OUT> backPressureOn(@Nullable final Runner runner,
             final int maxInputs, @Nullable final TimeDuration maxDelay) {
 
-        return (LoaderStreamChannelCompat<OUT>) super.backPressureOn(runner, maxInputs, maxDelay);
+        super.backPressureOn(runner, maxInputs, maxDelay);
+        return this;
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannelCompat<OUT> bind() {
+
+        super.bind();
+        return this;
     }
 
     @NotNull
@@ -403,21 +423,24 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
     @Override
     public LoaderStreamChannelCompat<OUT> maxParallelInvocations(final int maxInvocations) {
 
-        return (LoaderStreamChannelCompat<OUT>) super.maxParallelInvocations(maxInvocations);
+        super.maxParallelInvocations(maxInvocations);
+        return this;
     }
 
     @NotNull
     @Override
     public LoaderStreamChannelCompat<OUT> ordered(@Nullable final OrderType orderType) {
 
-        return (LoaderStreamChannelCompat<OUT>) super.ordered(orderType);
+        super.ordered(orderType);
+        return this;
     }
 
     @NotNull
     @Override
     public LoaderStreamChannelCompat<OUT> parallel() {
 
-        return (LoaderStreamChannelCompat<OUT>) super.parallel();
+        super.parallel();
+        return this;
     }
 
     @NotNull
@@ -478,7 +501,8 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
     @Override
     public LoaderStreamChannelCompat<OUT> sync() {
 
-        return (LoaderStreamChannelCompat<OUT>) super.sync();
+        super.sync();
+        return this;
     }
 
     @NotNull

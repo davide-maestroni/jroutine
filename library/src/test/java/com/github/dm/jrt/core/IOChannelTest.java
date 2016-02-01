@@ -22,7 +22,6 @@ import com.github.dm.jrt.channel.AbortException;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.ExecutionTimeoutException;
 import com.github.dm.jrt.channel.IOChannel;
-import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.common.TimeoutException;
 import com.github.dm.jrt.invocation.PassingInvocation;
 import com.github.dm.jrt.log.Log;
@@ -55,26 +54,24 @@ import static org.junit.Assert.fail;
 public class IOChannelTest {
 
     @Test
+    @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
     public void testAbort() {
 
         final TimeDuration timeout = seconds(1);
         final IOChannel<String> ioChannel = JRoutine.io().buildChannel();
-        final InvocationChannel<String, String> invocationChannel =
-                JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke();
-        final OutputChannel<String> outputChannel = ioChannel.passTo(invocationChannel).result();
-
         ioChannel.abort(new IllegalStateException());
 
         try {
 
-            outputChannel.afterMax(timeout).next();
-
-            fail();
+            ioChannel.afterMax(timeout).throwError();
 
         } catch (final AbortException ex) {
 
             assertThat(ex.getCause()).isExactlyInstanceOf(IllegalStateException.class);
         }
+
+        assertThat(ioChannel.getError().getCause()).isExactlyInstanceOf(
+                IllegalStateException.class);
     }
 
     @Test
@@ -88,7 +85,7 @@ public class IOChannelTest {
         final ArrayList<String> results = new ArrayList<String>();
         ioChannel.afterMax(10, TimeUnit.MILLISECONDS).allInto(results);
         assertThat(results).isEmpty();
-        assertThat(ioChannel.immediately().eventuallyExit().checkComplete()).isFalse();
+        assertThat(ioChannel.immediately().eventuallyExit().checkDone()).isFalse();
         assertThat(ioChannel.now().abort()).isTrue();
 
         try {
@@ -124,7 +121,7 @@ public class IOChannelTest {
 
         }
 
-        assertThat(ioChannel.checkComplete()).isFalse();
+        assertThat(ioChannel.checkDone()).isFalse();
     }
 
     @Test
@@ -147,7 +144,7 @@ public class IOChannelTest {
 
         }
 
-        assertThat(ioChannel.checkComplete()).isFalse();
+        assertThat(ioChannel.checkDone()).isFalse();
     }
 
     @Test
@@ -170,7 +167,7 @@ public class IOChannelTest {
 
         }
 
-        assertThat(ioChannel.checkComplete()).isFalse();
+        assertThat(ioChannel.checkDone()).isFalse();
     }
 
     @Test
@@ -193,7 +190,7 @@ public class IOChannelTest {
 
         }
 
-        assertThat(ioChannel.checkComplete()).isFalse();
+        assertThat(ioChannel.checkDone()).isFalse();
     }
 
     @Test
@@ -223,7 +220,7 @@ public class IOChannelTest {
         final OutputChannel<String> outputChannel =
                 JRoutine.on(PassingInvocation.<String>factoryOf()).asyncCall(ioChannel);
         assertThat(outputChannel.afterMax(timeout).next()).isEqualTo("test");
-        assertThat(outputChannel.checkComplete()).isTrue();
+        assertThat(outputChannel.checkDone()).isTrue();
     }
 
     @Test
@@ -279,7 +276,7 @@ public class IOChannelTest {
         ioChannel.afterMax(seconds(1)).next();
         assertThat(ioChannel.isEmpty()).isTrue();
         assertThat(ioChannel.after(millis(100)).pass("test").isEmpty()).isTrue();
-        assertThat(ioChannel.close().afterMax(seconds(10)).checkComplete()).isTrue();
+        assertThat(ioChannel.close().afterMax(seconds(10)).checkDone()).isTrue();
         assertThat(ioChannel.isEmpty()).isFalse();
     }
 
@@ -313,7 +310,7 @@ public class IOChannelTest {
 
         }
 
-        assertThat(ioChannel.checkComplete()).isFalse();
+        assertThat(ioChannel.checkDone()).isFalse();
     }
 
     @Test
@@ -336,7 +333,7 @@ public class IOChannelTest {
 
         }
 
-        assertThat(ioChannel.checkComplete()).isFalse();
+        assertThat(ioChannel.checkDone()).isFalse();
     }
 
     @Test
@@ -359,7 +356,7 @@ public class IOChannelTest {
 
         }
 
-        assertThat(ioChannel.checkComplete()).isFalse();
+        assertThat(ioChannel.checkDone()).isFalse();
     }
 
     @Test
@@ -382,7 +379,7 @@ public class IOChannelTest {
 
         }
 
-        assertThat(ioChannel.checkComplete()).isFalse();
+        assertThat(ioChannel.checkDone()).isFalse();
     }
 
     @Test
@@ -521,7 +518,7 @@ public class IOChannelTest {
 
         }
 
-        assertThat(ioChannel.checkComplete()).isFalse();
+        assertThat(ioChannel.checkDone()).isFalse();
     }
 
     @Test
@@ -544,7 +541,7 @@ public class IOChannelTest {
 
         }
 
-        assertThat(ioChannel.checkComplete()).isFalse();
+        assertThat(ioChannel.checkDone()).isFalse();
     }
 
     @Test
@@ -612,10 +609,10 @@ public class IOChannelTest {
 
         assertThat(System.currentTimeMillis() - startTime).isLessThan(2000);
 
-        assertThat(outputChannel.immediately().checkComplete()).isFalse();
+        assertThat(outputChannel.immediately().checkDone()).isFalse();
         ioChannel.close();
         assertThat(ioChannel.isOpen()).isFalse();
-        assertThat(outputChannel.afterMax(millis(500)).checkComplete()).isTrue();
+        assertThat(outputChannel.afterMax(millis(500)).checkDone()).isTrue();
     }
 
     @Test

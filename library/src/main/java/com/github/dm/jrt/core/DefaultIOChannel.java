@@ -246,9 +246,15 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA> {
         return mOutputChannel.all();
     }
 
-    public boolean checkComplete() {
+    public boolean checkDone() {
 
-        return mOutputChannel.checkComplete();
+        return mOutputChannel.checkDone();
+    }
+
+    @Nullable
+    public RoutineException getError() {
+
+        return mOutputChannel.getError();
     }
 
     public boolean hasNext() {
@@ -281,6 +287,11 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA> {
     public <IN extends InputChannel<? super DATA>> IN passTo(@NotNull final IN channel) {
 
         return mOutputChannel.passTo(channel);
+    }
+
+    public void throwError() {
+
+        mOutputChannel.throwError();
     }
 
     public Iterator<DATA> iterator() {

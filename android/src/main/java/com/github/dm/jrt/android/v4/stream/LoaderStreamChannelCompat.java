@@ -145,6 +145,12 @@ public interface LoaderStreamChannelCompat<OUT>
      * {@inheritDoc}
      */
     @NotNull
+    LoaderStreamChannelCompat<OUT> bind();
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
     <AFTER> LoaderStreamChannelCompat<AFTER> collect(
             @NotNull BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
                     consumer);
@@ -270,22 +276,21 @@ public interface LoaderStreamChannelCompat<OUT>
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER extends Comparable<AFTER>> LoaderStreamChannelCompat<AFTER> range(
-            @NotNull final AFTER start, @NotNull final AFTER end,
-            @NotNull final Function<AFTER, AFTER> increment);
+    <AFTER extends Comparable<AFTER>> LoaderStreamChannelCompat<AFTER> range(@NotNull AFTER start,
+            @NotNull AFTER end, @NotNull Function<AFTER, AFTER> increment);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<Number> range(@NotNull final Number start, @NotNull final Number end);
+    LoaderStreamChannelCompat<Number> range(@NotNull Number start, @NotNull Number end);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<Number> range(@NotNull final Number start, @NotNull final Number end,
-            @NotNull final Number increment);
+    LoaderStreamChannelCompat<Number> range(@NotNull Number start, @NotNull Number end,
+            @NotNull Number increment);
 
     /**
      * {@inheritDoc}

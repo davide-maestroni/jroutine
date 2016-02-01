@@ -175,7 +175,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                               .buildRoutine();
         final OutputChannel<String> channel4 = routine.asyncCall("test");
         assertThat(channel4.next()).isEqualTo("test");
-        assertThat(channel4.checkComplete());
+        assertThat(channel4.checkDone());
         JRoutine.with(loaderFrom(getActivity())).onId(0).purge();
         assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
     }
@@ -206,19 +206,19 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                               .buildRoutine();
         final OutputChannel<String> channel5 = routine.asyncCall("test");
         assertThat(channel5.next()).isEqualTo("test");
-        assertThat(channel5.checkComplete());
+        assertThat(channel5.checkDone());
         JRoutine.with(loaderFrom(getActivity())).onId(0).purge("test");
         assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
 
         final OutputChannel<String> channel6 = routine.asyncCall("test1", "test2");
         assertThat(channel6.all()).containsExactly("test1", "test2");
-        assertThat(channel6.checkComplete());
+        assertThat(channel6.checkDone());
         JRoutine.with(loaderFrom(getActivity())).onId(0).purge("test1", "test2");
         assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
 
         final OutputChannel<String> channel7 = routine.asyncCall("test1", "test2");
         assertThat(channel7.all()).containsExactly("test1", "test2");
-        assertThat(channel7.checkComplete());
+        assertThat(channel7.checkDone());
         JRoutine.with(loaderFrom(getActivity()))
                 .onId(0)
                 .purge(Arrays.asList((Object) "test1", "test2"));
@@ -254,7 +254,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         }
 
-        result1.checkComplete();
+        result1.checkDone();
 
         final OutputChannel<Data> result2 = JRoutine.with(loaderFrom(getActivity()))
                                                     .on(factoryOf(Delay.class))
@@ -267,7 +267,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                     .afterMax(timeout);
 
         assertThat(result2.next()).isSameAs(data1);
-        result2.checkComplete();
+        result2.checkDone();
 
         final OutputChannel<Data> result3 = JRoutine.with(loaderFrom(getActivity()))
                                                     .on(factoryOf(Delay.class))
@@ -278,7 +278,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                     .afterMax(timeout);
 
         assertThat(result3.next()).isSameAs(data1);
-        result3.checkComplete();
+        result3.checkDone();
     }
 
     public void testActivityClearResult() {
@@ -301,7 +301,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                     .afterMax(timeout);
 
         assertThat(result1.next()).isSameAs(data1);
-        result1.checkComplete();
+        result1.checkDone();
 
         AbortException error = null;
         final OutputChannel<Data> result2 = JRoutine.with(loaderFrom(getActivity()))
@@ -325,7 +325,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
             error = e;
         }
 
-        result2.checkComplete();
+        result2.checkDone();
 
         final OutputChannel<Data> result3 = JRoutine.with(loaderFrom(getActivity()))
                                                     .on(factoryOf(Abort.class))
@@ -346,7 +346,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
             assertThat(e.getCause()).isSameAs(error.getCause());
         }
 
-        result3.checkComplete();
+        result3.checkDone();
     }
 
     public void testActivityContext() {
@@ -660,7 +660,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                     .afterMax(timeout);
 
         assertThat(result1.next()).isSameAs(data1);
-        result1.checkComplete();
+        result1.checkDone();
 
         final OutputChannel<Data> result2 = JRoutine.with(loaderFrom(getActivity()))
                                                     .on(factoryOf(Delay.class))
@@ -671,7 +671,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                     .afterMax(timeout);
 
         assertThat(result2.next()).isSameAs(data1);
-        result2.checkComplete();
+        result2.checkDone();
 
         AbortException error = null;
         final OutputChannel<Data> result3 = JRoutine.with(loaderFrom(getActivity()))
@@ -694,7 +694,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
             error = e;
         }
 
-        result3.checkComplete();
+        result3.checkDone();
 
         final OutputChannel<Data> result4 = JRoutine.with(loaderFrom(getActivity()))
                                                     .on(factoryOf(Abort.class))
@@ -715,7 +715,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
             assertThat(e.getCause()).isSameAs(error.getCause());
         }
 
-        result4.checkComplete();
+        result4.checkDone();
     }
 
     public void testActivityRoutinePurge() throws InterruptedException {
@@ -744,7 +744,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                               .buildRoutine();
         final OutputChannel<String> channel = routine.asyncCall("test");
         assertThat(channel.next()).isEqualTo("test");
-        assertThat(channel.checkComplete());
+        assertThat(channel.checkDone());
         routine.purge();
         assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
     }
@@ -772,19 +772,19 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                               .buildRoutine();
         final OutputChannel<String> channel1 = routine.asyncCall("test");
         assertThat(channel1.next()).isEqualTo("test");
-        assertThat(channel1.checkComplete());
+        assertThat(channel1.checkDone());
         routine.purge("test");
         assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
 
         final OutputChannel<String> channel2 = routine.asyncCall("test1", "test2");
         assertThat(channel2.all()).containsExactly("test1", "test2");
-        assertThat(channel2.checkComplete());
+        assertThat(channel2.checkDone());
         routine.purge("test1", "test2");
         assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
 
         final OutputChannel<String> channel3 = routine.asyncCall("test1", "test2");
         assertThat(channel3.all()).containsExactly("test1", "test2");
-        assertThat(channel3.checkComplete());
+        assertThat(channel3.checkDone());
         routine.purge(Arrays.asList("test1", "test2"));
         assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
     }
@@ -861,7 +861,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                     .afterMax(timeout);
 
         assertThat(result1.next()).isSameAs(data1);
-        result1.checkComplete();
+        result1.checkDone();
 
         final OutputChannel<Data> result2 = JRoutine.with(loaderFrom(getActivity()))
                                                     .on(factoryOf(Abort.class))
@@ -881,7 +881,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         }
 
-        result2.checkComplete();
+        result2.checkDone();
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -981,7 +981,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                               .buildRoutine();
         final OutputChannel<String> channel4 = routine.asyncCall("test");
         assertThat(channel4.next()).isEqualTo("test");
-        assertThat(channel4.checkComplete());
+        assertThat(channel4.checkDone());
         JRoutine.with(loaderFrom(fragment)).onId(0).purge();
         assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
     }
@@ -1012,19 +1012,19 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                               .buildRoutine();
         final OutputChannel<String> channel5 = routine.asyncCall("test");
         assertThat(channel5.next()).isEqualTo("test");
-        assertThat(channel5.checkComplete());
+        assertThat(channel5.checkDone());
         JRoutine.with(loaderFrom(fragment)).onId(0).purge("test");
         assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
 
         final OutputChannel<String> channel6 = routine.asyncCall("test1", "test2");
         assertThat(channel6.all()).containsExactly("test1", "test2");
-        assertThat(channel6.checkComplete());
+        assertThat(channel6.checkDone());
         JRoutine.with(loaderFrom(fragment)).onId(0).purge("test1", "test2");
         assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
 
         final OutputChannel<String> channel7 = routine.asyncCall("test1", "test2");
         assertThat(channel7.all()).containsExactly("test1", "test2");
-        assertThat(channel7.checkComplete());
+        assertThat(channel7.checkDone());
         JRoutine.with(loaderFrom(fragment)).onId(0).purge(Arrays.asList((Object) "test1", "test2"));
         assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
     }
@@ -1383,7 +1383,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                               .buildRoutine();
         final OutputChannel<String> channel = routine.asyncCall("test");
         assertThat(channel.next()).isEqualTo("test");
-        assertThat(channel.checkComplete());
+        assertThat(channel.checkDone());
         routine.purge();
         assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
     }
@@ -1414,19 +1414,19 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                               .buildRoutine();
         final OutputChannel<String> channel1 = routine.asyncCall("test");
         assertThat(channel1.next()).isEqualTo("test");
-        assertThat(channel1.checkComplete());
+        assertThat(channel1.checkDone());
         routine.purge("test");
         assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
 
         final OutputChannel<String> channel2 = routine.asyncCall("test1", "test2");
         assertThat(channel2.all()).containsExactly("test1", "test2");
-        assertThat(channel2.checkComplete());
+        assertThat(channel2.checkDone());
         routine.purge("test1", "test2");
         assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
 
         final OutputChannel<String> channel3 = routine.asyncCall("test1", "test2");
         assertThat(channel3.all()).containsExactly("test1", "test2");
-        assertThat(channel3.checkComplete());
+        assertThat(channel3.checkDone());
         routine.purge(Arrays.asList("test1", "test2"));
         assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
     }

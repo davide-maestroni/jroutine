@@ -93,6 +93,8 @@ import org.jetbrains.annotations.NotNull;
  * {@link RoutineException RoutineException}, will be wrapped as the cause
  * of an {@link com.github.dm.jrt.invocation.InvocationException InvocationException} instance.
  * <p/>
+ * TODO template
+ * <p/>
  * Created by davide-maestroni on 09/07/2014.
  *
  * @param <IN>  the input data type.

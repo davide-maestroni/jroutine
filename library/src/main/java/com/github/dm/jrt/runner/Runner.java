@@ -37,6 +37,9 @@ import java.util.concurrent.TimeUnit;
  * The implementing class can optionally support the cancellation of executions not yet run (
  * waiting, for example, in a consuming queue).
  * <p/>
+ * The class {@link com.github.dm.jrt.runner.Runners Runners} provides a few implementations
+ * employing concurrent Java classes.
+ * <p/>
  * Created by davide-maestroni on 09/07/2014.
  */
 public interface Runner {

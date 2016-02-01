@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.channel;
 
+import com.github.dm.jrt.common.RoutineException;
 import com.github.dm.jrt.util.TimeDuration;
 
 import org.jetbrains.annotations.NotNull;
@@ -291,7 +292,7 @@ public interface Channel {
         OutputChannel<OUT> allInto(@NotNull Collection<? super OUT> results);
 
         /**
-         * Checks if the routine is complete, waiting at the maximum for the set timeout.<br/>
+         * Checks if the invocation is done, waiting at the maximum for the set timeout.<br/>
          * Note that this method invocation will block the calling thread until the routine
          * invocation completes or the timeout elapses.
          *
@@ -300,7 +301,7 @@ public interface Channel {
          * @see #afterMax(long, TimeUnit)
          * @see #immediately()
          */
-        boolean checkComplete();
+        boolean checkDone();
 
         /**
          * Tells the channel to abort the invocation execution in case no result is available before
@@ -373,6 +374,20 @@ public interface Channel {
          */
         @NotNull
         OutputChannel<OUT> eventuallyThrow();
+
+        /**
+         * Gets the invocation error or abort exception, if the invocation is aborted, waiting at
+         * the maximum for the set timeout.<br/>
+         * Note that this method invocation will block the calling thread until the routine
+         * invocation completes or is aborted, or the timeout elapses.
+         *
+         * @return the invocation error or null.
+         * @see #afterMax(TimeDuration)
+         * @see #afterMax(long, TimeUnit)
+         * @see #immediately()
+         */
+        @Nullable
+        RoutineException getError();
 
         /**
          * Checks if more results are available by waiting at the maximum for the set timeout.<br/>
@@ -554,5 +569,18 @@ public interface Channel {
          */
         @NotNull
         OutputChannel<OUT> skip(int count);
+
+        /**
+         * Throws the invocation error or abort exception, if the invocation is aborted, waiting at
+         * the maximum for the set timeout.<br/>
+         * Note that this method invocation will block the calling thread until the routine
+         * invocation completes or is aborted, or the timeout elapses.
+         *
+         * @throws com.github.dm.jrt.common.RoutineException if the execution has been aborted.
+         * @see #afterMax(TimeDuration)
+         * @see #afterMax(long, TimeUnit)
+         * @see #immediately()
+         */
+        void throwError();
     }
 }

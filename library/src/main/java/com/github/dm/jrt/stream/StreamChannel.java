@@ -170,8 +170,11 @@ public interface StreamChannel<OUT>
      * Binds the inputs to this stream channel.<br/>
      * The method will have no effect unless the stream is "lazy" and inputs have not already been
      * bound.
+     *
+     * @return this channel.
      */
-    void bind();
+    @NotNull
+    StreamChannel<OUT> bind();
 
     /**
      * Concatenates a stream channel based on the specified collecting consumer to this one.<br/>
@@ -452,8 +455,8 @@ public interface StreamChannel<OUT>
      * @return the concatenated stream channel.
      */
     @NotNull
-    <AFTER extends Comparable<AFTER>> StreamChannel<AFTER> range(@NotNull final AFTER start,
-            @NotNull final AFTER end, @NotNull final Function<AFTER, AFTER> increment);
+    <AFTER extends Comparable<AFTER>> StreamChannel<AFTER> range(@NotNull AFTER start,
+            @NotNull AFTER end, @NotNull Function<AFTER, AFTER> increment);
 
     /**
      * Concatenates a stream channel generating the specified range of data.<br/>
@@ -472,7 +475,7 @@ public interface StreamChannel<OUT>
      * @return the concatenated stream channel.
      */
     @NotNull
-    StreamChannel<Number> range(@NotNull final Number start, @NotNull final Number end);
+    StreamChannel<Number> range(@NotNull Number start, @NotNull Number end);
 
     /**
      * Concatenates a stream channel generating the specified range of data.<br/>
@@ -489,8 +492,8 @@ public interface StreamChannel<OUT>
      * @return the concatenated stream channel.
      */
     @NotNull
-    StreamChannel<Number> range(@NotNull final Number start, @NotNull final Number end,
-            @NotNull final Number increment);
+    StreamChannel<Number> range(@NotNull Number start, @NotNull Number end,
+            @NotNull Number increment);
 
     /**
      * Concatenates a stream channel based on the specified accumulating function to this one.<br/>

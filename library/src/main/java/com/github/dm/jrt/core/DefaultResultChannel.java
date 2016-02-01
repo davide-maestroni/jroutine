@@ -778,6 +778,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
                 try {
                     isTimeout = !timeout.waitTrue(mMutex, mOutputNotEmpty);
+                    verifyBound();
 
                 } catch (final InterruptedException e) {
                     throw new InvocationInterruptedException(e);
@@ -1066,6 +1067,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                     final boolean isTimeout;
                     try {
                         do {
+                            verifyBound();
                             while (!outputQueue.isEmpty()) {
                                 final OUT result = nextOutput(executionTimeout);
                                 logger.dbg("adding output to list: %s [%s]", result,
@@ -1112,7 +1114,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             return this;
         }
 
-        public boolean checkComplete() {
+        public boolean checkDone() {
 
             synchronized (mMutex) {
                 if (mState.isDone()) {
@@ -1143,7 +1145,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                 }
 
                 if (!isDone) {
-                    mSubLogger.wrn("waiting complete timeout: [%s]", executionTimeout);
+                    mSubLogger.wrn("waiting done timeout: [%s]", executionTimeout);
                 }
 
                 return isDone;
@@ -1192,6 +1194,46 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             }
 
             return this;
+        }
+
+        @Nullable
+        public RoutineException getError() {
+
+            synchronized (mMutex) {
+                if (mState.isDone()) {
+                    return mAbortException;
+                }
+
+                final TimeDuration executionTimeout = mExecutionTimeout;
+                if (!executionTimeout.isZero()) {
+                    checkCanWait();
+                }
+
+                final boolean isDone;
+                try {
+                    isDone = executionTimeout.waitTrue(mMutex, new Condition() {
+
+                        public boolean isTrue() {
+
+                            return mState.isDone() || (mAbortException != null)
+                                    || mIsWaitingInvocation;
+                        }
+                    });
+
+                } catch (final InterruptedException e) {
+                    throw new InvocationInterruptedException(e);
+                }
+
+                if (mIsWaitingInvocation) {
+                    throw new InvocationDeadlockException(INVOCATION_DEADLOCK_MESSAGE);
+                }
+
+                if (!isDone) {
+                    mSubLogger.wrn("waiting error timeout: [%s]", executionTimeout);
+                }
+
+                return mAbortException;
+            }
         }
 
         public boolean hasNext() {
@@ -1348,6 +1390,14 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             }
 
             return this;
+        }
+
+        public void throwError() {
+
+            final RoutineException error = getError();
+            if (error != null) {
+                throw error;
+            }
         }
 
         @NotNull

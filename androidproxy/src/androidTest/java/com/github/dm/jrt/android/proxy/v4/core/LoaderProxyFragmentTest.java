@@ -352,8 +352,8 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
                                                .getTwo();
 
         assertThat(getOne.next()).isEqualTo(1);
-        assertThat(getOne.checkComplete()).isTrue();
-        assertThat(getTwo.checkComplete()).isTrue();
+        assertThat(getOne.checkDone()).isTrue();
+        assertThat(getTwo.checkDone()).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isLessThan(2000);
 
         startTime = System.currentTimeMillis();
@@ -361,8 +361,8 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         getOne = builder.buildProxy(TestClassAsync.class).getOne();
         getTwo = builder.buildProxy(TestClassAsync.class).getTwo();
 
-        assertThat(getOne.checkComplete()).isTrue();
-        assertThat(getTwo.checkComplete()).isTrue();
+        assertThat(getOne.checkDone()).isTrue();
+        assertThat(getTwo.checkDone()).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(2000);
     }
 
@@ -558,8 +558,8 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         final IOChannel<Integer> channel36 = JRoutineCompat.io().buildChannel();
         channel36.pass(-17).close();
         itf.set2(channel36);
-        itf.set3().pass(-17).result().checkComplete();
-        itf.set5().asyncCall(-17).checkComplete();
+        itf.set3().pass(-17).result().checkDone();
+        itf.set5().asyncCall(-17).checkDone();
         itf.setA0(new int[]{1, 2, 3});
         final IOChannel<int[]> channel37 = JRoutineCompat.io().buildChannel();
         channel37.pass(new int[]{1, 2, 3}).close();
@@ -570,8 +570,8 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         final IOChannel<int[]> channel39 = JRoutineCompat.io().buildChannel();
         channel39.pass(new int[]{1, 2, 3}).close();
         itf.setA3(channel39);
-        itf.setA4().pass(new int[]{1, 2, 3}).result().checkComplete();
-        itf.setA6().asyncCall(new int[]{1, 2, 3}).checkComplete();
+        itf.setA4().pass(new int[]{1, 2, 3}).result().checkDone();
+        itf.setA6().asyncCall(new int[]{1, 2, 3}).checkDone();
         itf.setL0(Arrays.asList(1, 2, 3));
         final IOChannel<List<Integer>> channel40 = JRoutineCompat.io().buildChannel();
         channel40.pass(Arrays.asList(1, 2, 3)).close();
@@ -582,8 +582,8 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         final IOChannel<List<Integer>> channel42 = JRoutineCompat.io().buildChannel();
         channel42.pass(Arrays.asList(1, 2, 3)).close();
         itf.setL3(channel42);
-        itf.setL4().pass(Arrays.asList(1, 2, 3)).result().checkComplete();
-        itf.setL6().asyncCall(Arrays.asList(1, 2, 3)).checkComplete();
+        itf.setL4().pass(Arrays.asList(1, 2, 3)).result().checkDone();
+        itf.setL6().asyncCall(Arrays.asList(1, 2, 3)).checkDone();
     }
 
     public void testTimeoutActionAnnotation() throws NoSuchMethodException {

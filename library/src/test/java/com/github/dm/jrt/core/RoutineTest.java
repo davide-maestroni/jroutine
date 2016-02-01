@@ -95,6 +95,7 @@ import static org.junit.Assert.fail;
 public class RoutineTest {
 
     @Test
+    @SuppressWarnings({"ThrowableResultOfMethodCallIgnored", "ConstantConditions"})
     public void testAbort() throws InterruptedException {
 
         final TimeDuration timeout = seconds(1);
@@ -141,7 +142,20 @@ public class RoutineTest {
             assertThat(ex.getCause().getMessage()).isEqualTo("test2");
         }
 
-        assertThat(channel.checkComplete()).isTrue();
+        try {
+
+            channel.throwError();
+
+        } catch (final AbortException ex) {
+
+            assertThat(ex.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
+            assertThat(ex.getCause().getMessage()).isEqualTo("test2");
+        }
+
+        final RoutineException error = channel.getError();
+        assertThat(error.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
+        assertThat(error.getCause().getMessage()).isEqualTo("test2");
+        assertThat(channel.checkDone()).isTrue();
         assertThat(channel.isOpen()).isFalse();
 
         final OutputChannel<String> channel1 =
@@ -162,7 +176,7 @@ public class RoutineTest {
             assertThat(ex.getCause()).isNull();
         }
 
-        assertThat(channel1.checkComplete()).isTrue();
+        assertThat(channel1.checkDone()).isTrue();
         assertThat(channel1.isOpen()).isFalse();
 
         try {
@@ -944,26 +958,24 @@ public class RoutineTest {
 
         final Routine<String, String> routine3 =
                 JRoutine.on(factoryOf(TestDestroyDiscard.class)).buildRoutine();
-        assertThat(routine3.syncCall("1", "2", "3", "4", "5")
+        assertThat(
+                routine3.syncCall("1", "2", "3", "4", "5").afterMax(timeout).checkDone()).isTrue();
+        assertThat(routine3.parallelCall("1", "2", "3", "4", "5")
                            .afterMax(timeout)
-                           .checkComplete()).isTrue();
-        assertThat(routine3.parallelCall("1", "2", "3", "4", "5").afterMax(timeout).checkComplete())
-                .isTrue();
-        assertThat(routine3.asyncCall("1", "2", "3", "4", "5")
-                           .afterMax(timeout)
-                           .checkComplete()).isTrue();
+                           .checkDone()).isTrue();
+        assertThat(
+                routine3.asyncCall("1", "2", "3", "4", "5").afterMax(timeout).checkDone()).isTrue();
         assertThat(TestDestroy.getInstanceCount()).isZero();
 
         final Routine<String, String> routine4 =
                 JRoutine.on(factoryOf(TestDestroyDiscardException.class)).buildRoutine();
-        assertThat(routine4.syncCall("1", "2", "3", "4", "5")
+        assertThat(
+                routine4.syncCall("1", "2", "3", "4", "5").afterMax(timeout).checkDone()).isTrue();
+        assertThat(routine4.parallelCall("1", "2", "3", "4", "5")
                            .afterMax(timeout)
-                           .checkComplete()).isTrue();
-        assertThat(routine4.parallelCall("1", "2", "3", "4", "5").afterMax(timeout).checkComplete())
-                .isTrue();
-        assertThat(routine4.asyncCall("1", "2", "3", "4", "5")
-                           .afterMax(timeout)
-                           .checkComplete()).isTrue();
+                           .checkDone()).isTrue();
+        assertThat(
+                routine4.asyncCall("1", "2", "3", "4", "5").afterMax(timeout).checkDone()).isTrue();
         assertThat(TestDestroy.getInstanceCount()).isZero();
 
         final Routine<String, String> routine5 =
@@ -1030,26 +1042,24 @@ public class RoutineTest {
 
         final Routine<String, String> routine3 =
                 JRoutine.on(factoryOf(TestDestroyDiscard.class)).buildRoutine();
-        assertThat(routine3.parallelCall("1", "2", "3", "4", "5").afterMax(timeout).checkComplete())
-                .isTrue();
-        assertThat(routine3.asyncCall("1", "2", "3", "4", "5")
+        assertThat(routine3.parallelCall("1", "2", "3", "4", "5")
                            .afterMax(timeout)
-                           .checkComplete()).isTrue();
-        assertThat(routine3.syncCall("1", "2", "3", "4", "5")
-                           .afterMax(timeout)
-                           .checkComplete()).isTrue();
+                           .checkDone()).isTrue();
+        assertThat(
+                routine3.asyncCall("1", "2", "3", "4", "5").afterMax(timeout).checkDone()).isTrue();
+        assertThat(
+                routine3.syncCall("1", "2", "3", "4", "5").afterMax(timeout).checkDone()).isTrue();
         assertThat(TestDestroy.getInstanceCount()).isZero();
 
         final Routine<String, String> routine4 =
                 JRoutine.on(factoryOf(TestDestroyDiscardException.class)).buildRoutine();
-        assertThat(routine4.parallelCall("1", "2", "3", "4", "5").afterMax(timeout).checkComplete())
-                .isTrue();
-        assertThat(routine4.asyncCall("1", "2", "3", "4", "5")
+        assertThat(routine4.parallelCall("1", "2", "3", "4", "5")
                            .afterMax(timeout)
-                           .checkComplete()).isTrue();
-        assertThat(routine4.syncCall("1", "2", "3", "4", "5")
-                           .afterMax(timeout)
-                           .checkComplete()).isTrue();
+                           .checkDone()).isTrue();
+        assertThat(
+                routine4.asyncCall("1", "2", "3", "4", "5").afterMax(timeout).checkDone()).isTrue();
+        assertThat(
+                routine4.syncCall("1", "2", "3", "4", "5").afterMax(timeout).checkDone()).isTrue();
         assertThat(TestDestroy.getInstanceCount()).isZero();
 
         final Routine<String, String> routine5 =
@@ -1094,7 +1104,7 @@ public class RoutineTest {
         assertThat(channel.pass("test1").pass("test2").isEmpty()).isFalse();
         final OutputChannel<Object> result = channel.result();
         assertThat(result.isEmpty()).isTrue();
-        assertThat(result.afterMax(seconds(10)).checkComplete()).isTrue();
+        assertThat(result.afterMax(seconds(10)).checkDone()).isTrue();
         assertThat(channel.isEmpty()).isTrue();
         assertThat(result.isEmpty()).isFalse();
     }
@@ -1732,7 +1742,7 @@ public class RoutineTest {
         Thread.sleep(500);
 
         outputChannel.abort();
-        outputChannel.afterMax(INFINITY).checkComplete();
+        outputChannel.afterMax(INFINITY).checkDone();
         assertThat(TestLifecycle.sIsError).isFalse();
     }
 
@@ -2052,7 +2062,7 @@ public class RoutineTest {
                                                         .buildRoutine();
         final OutputChannel<String> outputChannel =
                 routine.asyncCall("test1", "test2").afterMax(seconds(1));
-        outputChannel.checkComplete();
+        outputChannel.checkDone();
         assertThat(outputChannel.all()).containsExactly("test1", "test2");
 
         final IOChannel<String> channel1 = JRoutine.io()
@@ -2687,7 +2697,7 @@ public class RoutineTest {
 
         }
 
-        assertThat(routine1.asyncCall("test1").checkComplete()).isFalse();
+        assertThat(routine1.asyncCall("test1").checkDone()).isFalse();
 
         final Routine<String, String> routine2 =
                 JRoutine.on(factoryOf(DelayedInvocation.class, seconds(1)))
@@ -2748,7 +2758,7 @@ public class RoutineTest {
 
         }
 
-        assertThat(routine2.asyncCall("test1").checkComplete()).isFalse();
+        assertThat(routine2.asyncCall("test1").checkDone()).isFalse();
 
         final Routine<String, String> routine3 =
                 JRoutine.on(factoryOf(DelayedInvocation.class, seconds(1)))
@@ -2809,7 +2819,7 @@ public class RoutineTest {
 
         }
 
-        assertThat(channel3.checkComplete()).isFalse();
+        assertThat(channel3.checkDone()).isFalse();
 
         channel3.afterMax(millis(10));
 
@@ -2864,7 +2874,7 @@ public class RoutineTest {
 
         }
 
-        assertThat(channel3.checkComplete()).isFalse();
+        assertThat(channel3.checkDone()).isFalse();
 
         final Routine<String, String> routine4 =
                 JRoutine.on(factoryOf(DelayedInvocation.class, seconds(1)))
@@ -2902,7 +2912,7 @@ public class RoutineTest {
 
         }
 
-        assertThat(channel4.checkComplete()).isFalse();
+        assertThat(channel4.checkDone()).isFalse();
 
         channel4.afterMax(millis(10));
 
@@ -2934,7 +2944,7 @@ public class RoutineTest {
 
         }
 
-        assertThat(channel4.checkComplete()).isFalse();
+        assertThat(channel4.checkDone()).isFalse();
     }
 
     private void testChained(final Routine<String, String> before,
@@ -3215,36 +3225,31 @@ public class RoutineTest {
         final Routine<String, String> routine =
                 JRoutine.on(factoryOf(DelayedInvocation.class, TimeDuration.ZERO)).buildRoutine();
 
-        assertThat(routine.syncCall(input)
-                          .passTo(consumer)
-                          .afterMax(timeout)
-                          .checkComplete()).isTrue();
-        assertThat(routine.asyncCall(input)
-                          .passTo(consumer)
-                          .afterMax(timeout)
-                          .checkComplete()).isTrue();
+        assertThat(routine.syncCall(input).passTo(consumer).afterMax(timeout).checkDone()).isTrue();
+        assertThat(
+                routine.asyncCall(input).passTo(consumer).afterMax(timeout).checkDone()).isTrue();
         assertThat(routine.parallelCall(input)
                           .passTo(consumer)
                           .afterMax(timeout)
-                          .checkComplete()).isTrue();
+                          .checkDone()).isTrue();
         assertThat(routine.syncInvoke()
                           .pass(input)
                           .result()
                           .passTo(consumer)
                           .afterMax(timeout)
-                          .checkComplete()).isTrue();
+                          .checkDone()).isTrue();
         assertThat(routine.asyncInvoke()
                           .pass(input)
                           .result()
                           .passTo(consumer)
                           .afterMax(timeout)
-                          .checkComplete()).isTrue();
+                          .checkDone()).isTrue();
         assertThat(routine.parallelInvoke()
                           .pass(input)
                           .result()
                           .passTo(consumer)
                           .afterMax(timeout)
-                          .checkComplete()).isTrue();
+                          .checkDone()).isTrue();
     }
 
     private void testException(final Routine<String, String> routine, final String input,
@@ -3509,7 +3514,7 @@ public class RoutineTest {
             JRoutine.on(factoryOf(DelayedInvocation.class, millis(100)))
                     .asyncCall("test")
                     .afterMax(seconds(1))
-                    .checkComplete();
+                    .checkDone();
         }
     }
 

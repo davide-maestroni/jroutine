@@ -246,15 +246,15 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA> {
         return mOutputChannel.all();
     }
 
-    public boolean checkDone() {
-
-        return mOutputChannel.checkDone();
-    }
-
     @Nullable
     public RoutineException getError() {
 
         return mOutputChannel.getError();
+    }
+
+    public boolean hasCompleted() {
+
+        return mOutputChannel.hasCompleted();
     }
 
     public boolean hasNext() {

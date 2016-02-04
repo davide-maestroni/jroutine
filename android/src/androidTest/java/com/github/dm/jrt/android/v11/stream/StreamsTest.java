@@ -448,21 +448,22 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         }
 
         assertThat(Streams.with(loaderFrom(getActivity()))
-                          .on(new Function<StreamChannel<? extends String>,
-                                  StreamChannel<String>>() {
+                          .onStream(
+                                  new Function<StreamChannel<? extends String>,
+                                          StreamChannel<String>>() {
 
-                              public StreamChannel<String> apply(
-                                      final StreamChannel<? extends String> channel) {
+                                      public StreamChannel<String> apply(
+                                              final StreamChannel<? extends String> channel) {
 
-                                  return channel.sync().map(new Function<String, String>() {
+                                          return channel.sync().map(new Function<String, String>() {
 
-                                      public String apply(final String s) {
+                                              public String apply(final String s) {
 
-                                          return s.toUpperCase();
+                                                  return s.toUpperCase();
+                                              }
+                                          });
                                       }
-                                  });
-                              }
-                          })
+                                  })
                           .asyncCall("test1", "test2", "test3")
                           .afterMax(seconds(3))
                           .all()).containsExactly("TEST1", "TEST2", "TEST3");
@@ -471,21 +472,23 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
             final InvocationChannel<String, String> channel =
                     Streams.with(loaderFrom(getActivity()))
-                           .on(new Function<StreamChannel<? extends String>,
-                                   StreamChannel<String>>() {
+                           .onStream(
+                                   new Function<StreamChannel<? extends String>,
+                                           StreamChannel<String>>() {
 
-                               public StreamChannel<String> apply(
-                                       final StreamChannel<? extends String> channel) {
+                                       public StreamChannel<String> apply(
+                                               final StreamChannel<? extends String> channel) {
 
-                                   return channel.sync().map(new Function<String, String>() {
+                                           return channel.sync()
+                                                         .map(new Function<String, String>() {
 
-                                       public String apply(final String s) {
+                                                             public String apply(final String s) {
 
-                                           return s.toUpperCase();
+                                                                 return s.toUpperCase();
+                                                             }
+                                                         });
                                        }
-                                   });
-                               }
-                           })
+                                   })
                            .asyncInvoke();
             channel.after(millis(100)).abort(new IllegalArgumentException());
             channel.result().afterMax(seconds(1)).next();
@@ -553,7 +556,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
         try {
 
-            Streams.with(loaderFrom(getActivity())).on(null);
+            Streams.with(loaderFrom(getActivity())).onStream(null);
 
             fail();
 

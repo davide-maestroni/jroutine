@@ -145,12 +145,6 @@ public interface LoaderStreamChannel<OUT>
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannel<OUT> bind();
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
     <AFTER> LoaderStreamChannel<AFTER> collect(
             @NotNull BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
                     consumer);

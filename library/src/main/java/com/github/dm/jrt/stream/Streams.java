@@ -148,13 +148,6 @@ public class Streams extends Channels {
         return new GroupByInvocationFactory<DATA>(size);
     }
 
-    // TODO: 01/02/16 javadoc
-    @NotNull
-    public static <DATA> IOStreamChannel<DATA, DATA> ioStream() {
-
-        return new DefaultIOStreamChannel<DATA, DATA>(Streams.<DATA>streamOf());
-    }
-
     /**
      * Returns a stream output channel joining the data coming from the specified list of channels.
      * <br/>
@@ -239,8 +232,7 @@ public class Streams extends Channels {
     /**
      * Builds and returns a new lazy stream output channel.<br/>
      * The stream will start producing results only when it is bound to another channel or an output
-     * consumer or the {@code bind()} method is explicitly called; or when any of the read methods
-     * is invoked.
+     * consumer or when any of the read methods is invoked.
      *
      * @param <OUT> the output data type.
      * @return the newly created channel instance.
@@ -254,8 +246,7 @@ public class Streams extends Channels {
     /**
      * Builds and returns a new lazy stream output channel generating the specified outputs.<br/>
      * The stream will start producing results only when it is bound to another channel or an output
-     * consumer or the {@code bind()} method is explicitly called; or when any of the read methods
-     * is invoked.
+     * consumer or when any of the read methods is invoked.
      *
      * @param outputs the iterable returning the output data.
      * @param <OUT>   the output data type.
@@ -270,8 +261,7 @@ public class Streams extends Channels {
     /**
      * Builds and returns a new lazy stream output channel generating the specified output.<br/>
      * The stream will start producing results only when it is bound to another channel or an output
-     * consumer or the {@code bind()} method is explicitly called; or when any of the read methods
-     * is invoked.
+     * consumer or when any of the read methods is invoked.
      *
      * @param output the output.
      * @param <OUT>  the output data type.
@@ -286,8 +276,7 @@ public class Streams extends Channels {
     /**
      * Builds and returns a new lazy stream output channel generating the specified outputs.<br/>
      * The stream will start producing results only when it is bound to another channel or an output
-     * consumer or the {@code bind()} method is explicitly called; or when any of the read methods
-     * is invoked.
+     * consumer or when any of the read methods is invoked.
      *
      * @param outputs the output data.
      * @param <OUT>   the output data type.
@@ -302,8 +291,7 @@ public class Streams extends Channels {
     /**
      * Builds and returns a new lazy stream output channel generating the specified outputs.<br/>
      * The stream will start producing results only when it is bound to another channel or an output
-     * consumer or the {@code bind()} method is explicitly called; or when any of the read methods
-     * is invoked.
+     * consumer or when any of the read methods is invoked.
      * <p/>
      * Note that the output channel will be bound as a result of the call.
      *
@@ -435,7 +423,7 @@ public class Streams extends Channels {
      * @return the routine builder.
      */
     @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> on(
+    public static <IN, OUT> RoutineBuilder<IN, OUT> onStream(
             @NotNull final Function<? super StreamChannel<? extends IN>, ? extends
                     StreamChannel<? extends OUT>> function) {
 

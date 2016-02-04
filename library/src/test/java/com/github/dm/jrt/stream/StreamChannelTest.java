@@ -108,7 +108,7 @@ public class StreamChannelTest {
         assertThat(channel.abort(null)).isFalse();
         assertThat(channel.isOpen()).isFalse();
         assertThat(channel.isEmpty()).isFalse();
-        assertThat(channel.checkDone()).isTrue();
+        assertThat(channel.hasCompleted()).isTrue();
         assertThat(channel.isBound()).isFalse();
         final ArrayList<String> results = new ArrayList<String>();
         assertThat(channel.afterMax(1, TimeUnit.SECONDS).hasNext()).isTrue();

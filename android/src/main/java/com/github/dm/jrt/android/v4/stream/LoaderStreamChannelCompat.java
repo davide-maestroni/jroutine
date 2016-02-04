@@ -145,12 +145,6 @@ public interface LoaderStreamChannelCompat<OUT>
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> bind();
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
     <AFTER> LoaderStreamChannelCompat<AFTER> collect(
             @NotNull BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
                     consumer);

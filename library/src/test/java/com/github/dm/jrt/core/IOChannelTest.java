@@ -85,7 +85,7 @@ public class IOChannelTest {
         final ArrayList<String> results = new ArrayList<String>();
         ioChannel.afterMax(10, TimeUnit.MILLISECONDS).allInto(results);
         assertThat(results).isEmpty();
-        assertThat(ioChannel.immediately().eventuallyExit().checkDone()).isFalse();
+        assertThat(ioChannel.immediately().eventuallyExit().hasCompleted()).isFalse();
         assertThat(ioChannel.now().abort()).isTrue();
 
         try {
@@ -121,7 +121,7 @@ public class IOChannelTest {
 
         }
 
-        assertThat(ioChannel.checkDone()).isFalse();
+        assertThat(ioChannel.hasCompleted()).isFalse();
     }
 
     @Test
@@ -144,7 +144,7 @@ public class IOChannelTest {
 
         }
 
-        assertThat(ioChannel.checkDone()).isFalse();
+        assertThat(ioChannel.hasCompleted()).isFalse();
     }
 
     @Test
@@ -167,7 +167,7 @@ public class IOChannelTest {
 
         }
 
-        assertThat(ioChannel.checkDone()).isFalse();
+        assertThat(ioChannel.hasCompleted()).isFalse();
     }
 
     @Test
@@ -190,7 +190,7 @@ public class IOChannelTest {
 
         }
 
-        assertThat(ioChannel.checkDone()).isFalse();
+        assertThat(ioChannel.hasCompleted()).isFalse();
     }
 
     @Test
@@ -220,7 +220,7 @@ public class IOChannelTest {
         final OutputChannel<String> outputChannel =
                 JRoutine.on(PassingInvocation.<String>factoryOf()).asyncCall(ioChannel);
         assertThat(outputChannel.afterMax(timeout).next()).isEqualTo("test");
-        assertThat(outputChannel.checkDone()).isTrue();
+        assertThat(outputChannel.hasCompleted()).isTrue();
     }
 
     @Test
@@ -276,7 +276,7 @@ public class IOChannelTest {
         ioChannel.afterMax(seconds(1)).next();
         assertThat(ioChannel.isEmpty()).isTrue();
         assertThat(ioChannel.after(millis(100)).pass("test").isEmpty()).isTrue();
-        assertThat(ioChannel.close().afterMax(seconds(10)).checkDone()).isTrue();
+        assertThat(ioChannel.close().afterMax(seconds(10)).hasCompleted()).isTrue();
         assertThat(ioChannel.isEmpty()).isFalse();
     }
 
@@ -310,7 +310,7 @@ public class IOChannelTest {
 
         }
 
-        assertThat(ioChannel.checkDone()).isFalse();
+        assertThat(ioChannel.hasCompleted()).isFalse();
     }
 
     @Test
@@ -333,7 +333,7 @@ public class IOChannelTest {
 
         }
 
-        assertThat(ioChannel.checkDone()).isFalse();
+        assertThat(ioChannel.hasCompleted()).isFalse();
     }
 
     @Test
@@ -356,7 +356,7 @@ public class IOChannelTest {
 
         }
 
-        assertThat(ioChannel.checkDone()).isFalse();
+        assertThat(ioChannel.hasCompleted()).isFalse();
     }
 
     @Test
@@ -379,7 +379,7 @@ public class IOChannelTest {
 
         }
 
-        assertThat(ioChannel.checkDone()).isFalse();
+        assertThat(ioChannel.hasCompleted()).isFalse();
     }
 
     @Test
@@ -518,7 +518,7 @@ public class IOChannelTest {
 
         }
 
-        assertThat(ioChannel.checkDone()).isFalse();
+        assertThat(ioChannel.hasCompleted()).isFalse();
     }
 
     @Test
@@ -541,7 +541,7 @@ public class IOChannelTest {
 
         }
 
-        assertThat(ioChannel.checkDone()).isFalse();
+        assertThat(ioChannel.hasCompleted()).isFalse();
     }
 
     @Test
@@ -609,10 +609,10 @@ public class IOChannelTest {
 
         assertThat(System.currentTimeMillis() - startTime).isLessThan(2000);
 
-        assertThat(outputChannel.immediately().checkDone()).isFalse();
+        assertThat(outputChannel.immediately().hasCompleted()).isFalse();
         ioChannel.close();
         assertThat(ioChannel.isOpen()).isFalse();
-        assertThat(outputChannel.afterMax(millis(500)).checkDone()).isTrue();
+        assertThat(outputChannel.afterMax(millis(500)).hasCompleted()).isTrue();
     }
 
     @Test

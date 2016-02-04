@@ -282,14 +282,6 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
 
     @NotNull
     @Override
-    public LoaderStreamChannel<OUT> bind() {
-
-        super.bind();
-        return this;
-    }
-
-    @NotNull
-    @Override
     public <AFTER> LoaderStreamChannel<AFTER> collect(
             @NotNull final BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
                     consumer) {

@@ -137,7 +137,7 @@ public class StreamsCompat extends ChannelsCompat {
             @NotNull final Function<? super StreamChannel<? extends IN>, ? extends
                     StreamChannel<? extends OUT>> function) {
 
-        return factoryFrom(com.github.dm.jrt.stream.Streams.on(function),
+        return factoryFrom(com.github.dm.jrt.stream.Streams.onStream(function),
                            wrapFunction(function).hashCode(), DelegationType.SYNC);
     }
 
@@ -239,8 +239,7 @@ public class StreamsCompat extends ChannelsCompat {
     /**
      * Builds and returns a new lazy stream output channel.<br/>
      * The stream will start producing results only when it is bound to another channel or an output
-     * consumer or the {@code bind()} method is explicitly called; or when any of the read methods
-     * is invoked.
+     * consumer or when any of the read methods is invoked.
      *
      * @param <OUT> the output data type.
      * @return the newly created channel instance.
@@ -254,8 +253,7 @@ public class StreamsCompat extends ChannelsCompat {
     /**
      * Builds and returns a new lazy stream output channel generating the specified outputs.<br/>
      * The stream will start producing results only when it is bound to another channel or an output
-     * consumer or the {@code bind()} method is explicitly called; or when any of the read methods
-     * is invoked.
+     * consumer or when any of the read methods is invoked.
      *
      * @param outputs the iterable returning the output data.
      * @param <OUT>   the output data type.
@@ -270,8 +268,7 @@ public class StreamsCompat extends ChannelsCompat {
     /**
      * Builds and returns a new lazy stream output channel generating the specified output.<br/>
      * The stream will start producing results only when it is bound to another channel or an output
-     * consumer or the {@code bind()} method is explicitly called; or when any of the read methods
-     * is invoked.
+     * consumer or when any of the read methods is invoked.
      *
      * @param output the output.
      * @param <OUT>  the output data type.
@@ -286,8 +283,7 @@ public class StreamsCompat extends ChannelsCompat {
     /**
      * Builds and returns a new lazy stream output channel generating the specified outputs.<br/>
      * The stream will start producing results only when it is bound to another channel or an output
-     * consumer or the {@code bind()} method is explicitly called; or when any of the read methods
-     * is invoked.
+     * consumer or when any of the read methods is invoked.
      *
      * @param outputs the output data.
      * @param <OUT>   the output data type.
@@ -302,8 +298,7 @@ public class StreamsCompat extends ChannelsCompat {
     /**
      * Builds and returns a new lazy stream output channel generating the specified outputs.<br/>
      * The stream will start producing results only when it is bound to another channel or an output
-     * consumer or the {@code bind()} method is explicitly called; or when any of the read methods
-     * is invoked.
+     * consumer or when any of the read methods is invoked.
      * <p/>
      * Note that the output channel will be bound as a result of the call.
      *
@@ -578,8 +573,7 @@ public class StreamsCompat extends ChannelsCompat {
         /**
          * Builds and returns a new lazy stream output channel.<br/>
          * The stream will start producing results only when it is bound to another channel or an
-         * output consumer or the {@code bind()} method is explicitly called; or when any of the
-         * read methods is invoked.
+         * output consumer or when any of the read methods is invoked.
          *
          * @param <OUT> the output data type.
          * @return the newly created channel instance.
@@ -594,8 +588,7 @@ public class StreamsCompat extends ChannelsCompat {
          * Builds and returns a new lazy stream output channel generating the specified outputs.
          * <br/>
          * The stream will start producing results only when it is bound to another channel or an
-         * output consumer or the {@code bind()} method is explicitly called; or when any of the
-         * read methods is invoked.
+         * output consumer or when any of the read methods is invoked.
          *
          * @param outputs the iterable returning the output data.
          * @param <OUT>   the output data type.
@@ -610,8 +603,7 @@ public class StreamsCompat extends ChannelsCompat {
         /**
          * Builds and returns a new lazy stream output channel generating the specified output.<br/>
          * The stream will start producing results only when it is bound to another channel or an
-         * output consumer or the {@code bind()} method is explicitly called; or when any of the
-         * read methods is invoked.
+         * output consumer or when any of the read methods is invoked.
          *
          * @param output the output.
          * @param <OUT>  the output data type.
@@ -627,8 +619,7 @@ public class StreamsCompat extends ChannelsCompat {
          * Builds and returns a new lazy stream output channel generating the specified outputs.
          * <br/>
          * The stream will start producing results only when it is bound to another channel or an
-         * output consumer or the {@code bind()} method is explicitly called; or when any of the
-         * read methods is invoked.
+         * output consumer or when any of the read methods is invoked.
          *
          * @param outputs the output data.
          * @param <OUT>   the output data type.
@@ -644,8 +635,7 @@ public class StreamsCompat extends ChannelsCompat {
          * Builds and returns a new lazy stream output channel generating the specified outputs.
          * <br/>
          * The stream will start producing results only when it is bound to another channel or an
-         * output consumer or the {@code bind()} method is explicitly called; or when any of the
-         * read methods is invoked.
+         * output consumer or when any of the read methods is invoked.
          * <p/>
          * Note that the output channel will be bound as a result of the call.
          *
@@ -678,7 +668,7 @@ public class StreamsCompat extends ChannelsCompat {
          * @return the loader routine builder.
          */
         @NotNull
-        public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
+        public <IN, OUT> LoaderRoutineBuilder<IN, OUT> onStream(
                 @NotNull final Function<? super StreamChannel<? extends IN>, ? extends
                         StreamChannel<? extends OUT>> function) {
 

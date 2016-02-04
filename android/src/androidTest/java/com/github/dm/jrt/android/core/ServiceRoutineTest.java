@@ -208,7 +208,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                                                       .set()
                                                       .asyncCall("test1");
         assertThat(channel.all()).isEmpty();
-        assertThat(channel.afterMax(seconds(10)).checkDone()).isTrue();
+        assertThat(channel.afterMax(seconds(10)).hasCompleted()).isTrue();
     }
 
     public void testExecutionTimeout2() {
@@ -232,7 +232,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         }
 
-        assertThat(channel.afterMax(seconds(10)).checkDone()).isTrue();
+        assertThat(channel.afterMax(seconds(10)).hasCompleted()).isTrue();
     }
 
     public void testExecutionTimeout3() {
@@ -256,7 +256,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         }
 
-        assertThat(channel.afterMax(seconds(10)).checkDone()).isTrue();
+        assertThat(channel.afterMax(seconds(10)).hasCompleted()).isTrue();
     }
 
     public void testInvocations() throws InterruptedException {

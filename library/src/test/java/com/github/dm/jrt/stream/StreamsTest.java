@@ -335,8 +335,8 @@ public class StreamsTest {
 
         }
 
-        assertThat(
-                Streams.on(new Function<StreamChannel<? extends String>, StreamChannel<String>>() {
+        assertThat(Streams.onStream(
+                new Function<StreamChannel<? extends String>, StreamChannel<String>>() {
 
                     public StreamChannel<String> apply(
                             final StreamChannel<? extends String> channel) {
@@ -354,7 +354,7 @@ public class StreamsTest {
 
         try {
 
-            final InvocationChannel<String, String> channel = Streams.on(
+            final InvocationChannel<String, String> channel = Streams.onStream(
                     new Function<StreamChannel<? extends String>, StreamChannel<String>>() {
 
                         public StreamChannel<String> apply(
@@ -422,7 +422,7 @@ public class StreamsTest {
 
         try {
 
-            Streams.on(null);
+            Streams.onStream(null);
 
             fail();
 

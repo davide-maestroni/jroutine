@@ -292,18 +292,6 @@ public interface Channel {
         OutputChannel<OUT> allInto(@NotNull Collection<? super OUT> results);
 
         /**
-         * Checks if the invocation is done, waiting at the maximum for the set timeout.<br/>
-         * Note that this method invocation will block the calling thread until the routine
-         * invocation completes or the timeout elapses.
-         *
-         * @return whether the routine execution has complete.
-         * @see #afterMax(TimeDuration)
-         * @see #afterMax(long, TimeUnit)
-         * @see #immediately()
-         */
-        boolean checkDone();
-
-        /**
          * Tells the channel to abort the invocation execution in case no result is available before
          * the timeout has elapsed.
          * <p/>
@@ -388,6 +376,18 @@ public interface Channel {
          */
         @Nullable
         RoutineException getError();
+
+        /**
+         * Checks if the invocation has completed, waiting at the maximum for the set timeout.<br/>
+         * Note that this method invocation will block the calling thread until the routine
+         * invocation completes or the timeout elapses.
+         *
+         * @return whether the routine execution has complete.
+         * @see #afterMax(TimeDuration)
+         * @see #afterMax(long, TimeUnit)
+         * @see #immediately()
+         */
+        boolean hasCompleted();
 
         /**
          * Checks if more results are available by waiting at the maximum for the set timeout.<br/>

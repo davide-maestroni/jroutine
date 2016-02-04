@@ -236,13 +236,13 @@ public abstract class AbstractStreamChannel<OUT>
 
     public boolean abort() {
 
-        bind();
+        mBinder.bind();
         return mChannel.abort();
     }
 
     public boolean abort(@Nullable final Throwable reason) {
 
-        bind();
+        mBinder.bind();
         return mChannel.abort(reason);
     }
 
@@ -273,7 +273,7 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public StreamChannel<OUT> allInto(@NotNull final Collection<? super OUT> results) {
 
-        bind();
+        mBinder.bind();
         mChannel.allInto(results);
         return this;
     }
@@ -316,7 +316,7 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public StreamChannel<OUT> passTo(@NotNull final OutputConsumer<? super OUT> consumer) {
 
-        bind();
+        mBinder.bind();
         mChannel.passTo(consumer);
         return this;
     }
@@ -324,7 +324,7 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public StreamChannel<OUT> skip(final int count) {
 
-        bind();
+        mBinder.bind();
         mChannel.skip(count);
         return this;
     }
@@ -351,13 +351,6 @@ public abstract class AbstractStreamChannel<OUT>
                                 .withInputLimit(maxInputs)
                                 .withInputMaxDelay(maxDelay)
                                 .set();
-    }
-
-    @NotNull
-    public StreamChannel<OUT> bind() {
-
-        mBinder.bind();
-        return this;
     }
 
     @NotNull
@@ -672,32 +665,32 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public List<OUT> all() {
 
-        bind();
+        mBinder.bind();
         return mChannel.all();
-    }
-
-    public boolean checkDone() {
-
-        bind();
-        return mChannel.checkDone();
     }
 
     @Nullable
     public RoutineException getError() {
 
-        bind();
+        mBinder.bind();
         return mChannel.getError();
+    }
+
+    public boolean hasCompleted() {
+
+        mBinder.bind();
+        return mChannel.hasCompleted();
     }
 
     public boolean hasNext() {
 
-        bind();
+        mBinder.bind();
         return mChannel.hasNext();
     }
 
     public OUT next() {
 
-        bind();
+        mBinder.bind();
         return mChannel.next();
     }
 
@@ -709,13 +702,13 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public List<OUT> next(final int count) {
 
-        bind();
+        mBinder.bind();
         return mChannel.next(count);
     }
 
     public OUT nextOr(final OUT output) {
 
-        bind();
+        mBinder.bind();
         return mChannel.nextOr(output);
     }
 
@@ -723,25 +716,25 @@ public abstract class AbstractStreamChannel<OUT>
     public <CHANNEL extends InputChannel<? super OUT>> CHANNEL passTo(
             @NotNull final CHANNEL channel) {
 
-        bind();
+        mBinder.bind();
         return mChannel.passTo(channel);
     }
 
     public void throwError() {
 
-        bind();
+        mBinder.bind();
         mChannel.throwError();
     }
 
     public Iterator<OUT> iterator() {
 
-        bind();
+        mBinder.bind();
         return mChannel.iterator();
     }
 
     public void remove() {
 
-        bind();
+        mBinder.bind();
         mChannel.remove();
     }
 

@@ -817,8 +817,8 @@ public class LoaderObjectRoutineActivityTest
         final IOChannel<Integer> channel36 = JRoutineCompat.io().buildChannel();
         channel36.pass(-17).close();
         itf.set2(channel36);
-        itf.set3().pass(-17).result().checkDone();
-        itf.set5().asyncCall(-17).checkDone();
+        itf.set3().pass(-17).result().hasCompleted();
+        itf.set5().asyncCall(-17).hasCompleted();
         itf.setA0(new int[]{1, 2, 3});
         final IOChannel<int[]> channel37 = JRoutineCompat.io().buildChannel();
         channel37.pass(new int[]{1, 2, 3}).close();
@@ -829,8 +829,8 @@ public class LoaderObjectRoutineActivityTest
         final IOChannel<int[]> channel39 = JRoutineCompat.io().buildChannel();
         channel39.pass(new int[]{1, 2, 3}).close();
         itf.setA3(channel39);
-        itf.setA4().pass(new int[]{1, 2, 3}).result().checkDone();
-        itf.setA6().asyncCall(new int[]{1, 2, 3}).checkDone();
+        itf.setA4().pass(new int[]{1, 2, 3}).result().hasCompleted();
+        itf.setA6().asyncCall(new int[]{1, 2, 3}).hasCompleted();
         itf.setL0(Arrays.asList(1, 2, 3));
         final IOChannel<List<Integer>> channel40 = JRoutineCompat.io().buildChannel();
         channel40.pass(Arrays.asList(1, 2, 3)).close();
@@ -841,8 +841,8 @@ public class LoaderObjectRoutineActivityTest
         final IOChannel<List<Integer>> channel42 = JRoutineCompat.io().buildChannel();
         channel42.pass(Arrays.asList(1, 2, 3)).close();
         itf.setL3(channel42);
-        itf.setL4().pass(Arrays.asList(1, 2, 3)).result().checkDone();
-        itf.setL6().asyncCall(Arrays.asList(1, 2, 3)).checkDone();
+        itf.setL4().pass(Arrays.asList(1, 2, 3)).result().hasCompleted();
+        itf.setL6().asyncCall(Arrays.asList(1, 2, 3)).hasCompleted();
     }
 
     @SuppressWarnings("NullArgumentToVariableArgMethod")
@@ -880,8 +880,8 @@ public class LoaderObjectRoutineActivityTest
         OutputChannel<Object> getTwo =
                 builder.withProxies().withSharedFields("2").set().method("getTwo").asyncCall();
 
-        assertThat(getOne.checkDone()).isTrue();
-        assertThat(getTwo.checkDone()).isTrue();
+        assertThat(getOne.hasCompleted()).isTrue();
+        assertThat(getTwo.hasCompleted()).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isLessThan(2000);
 
         startTime = System.currentTimeMillis();
@@ -889,8 +889,8 @@ public class LoaderObjectRoutineActivityTest
         getOne = builder.method("getOne").asyncCall();
         getTwo = builder.method("getTwo").asyncCall();
 
-        assertThat(getOne.checkDone()).isTrue();
-        assertThat(getTwo.checkDone()).isTrue();
+        assertThat(getOne.hasCompleted()).isTrue();
+        assertThat(getTwo.hasCompleted()).isTrue();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(2000);
     }
 

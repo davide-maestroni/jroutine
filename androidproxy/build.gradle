@@ -34,6 +34,7 @@ android {
         targetSdkVersion 22
         versionCode Integer.parseInt(project.getProperty('releaseVersionCode'))
         versionName version
+        multiDexEnabled true
     }
 
     buildTypes {

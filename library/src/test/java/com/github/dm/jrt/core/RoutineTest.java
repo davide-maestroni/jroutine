@@ -3821,7 +3821,7 @@ public class RoutineTest {
         public void onInput(final Object o, @NotNull final ResultChannel<Object> result) {
 
             JRoutine.on(factoryOf(DelayedInvocation.class, millis(100)))
-                    .asyncCall("test")
+                    .parallelCall("test")
                     .afterMax(seconds(1))
                     .iterator()
                     .next();

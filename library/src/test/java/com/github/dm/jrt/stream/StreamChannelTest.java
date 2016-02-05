@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.stream;
 
+import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.channel.AbortException;
 import com.github.dm.jrt.channel.Channel.InputChannel;
@@ -28,6 +29,7 @@ import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.common.RoutineException;
 import com.github.dm.jrt.common.TimeoutException;
 import com.github.dm.jrt.core.Channels.Selectable;
+import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.core.JRoutine;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
@@ -44,6 +46,7 @@ import com.github.dm.jrt.runner.Runners;
 
 import org.assertj.core.data.Offset;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -68,6 +71,24 @@ import static org.junit.Assert.fail;
 public class StreamChannelTest {
 
     private final Runner mSingleThreadRunner = Runners.poolRunner(1);
+
+    @Test
+    @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
+    public void testAbort() {
+
+        final IOChannel<Object> ioChannel = JRoutine.io().buildChannel();
+        final StreamChannel<Object> streamChannel = Streams.streamOf(ioChannel);
+        ioChannel.abort(new IllegalArgumentException());
+        try {
+            streamChannel.afterMax(seconds(3)).throwError();
+
+        } catch (final AbortException e) {
+            assertThat(e.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
+        }
+
+        assertThat(streamChannel.getError().getCause()).isExactlyInstanceOf(
+                IllegalArgumentException.class);
+    }
 
     @Test
     public void testBuilder() {
@@ -128,6 +149,7 @@ public class StreamChannelTest {
 
         assertThat(channel.skip(1).next(1)).containsExactly("test2");
         assertThat(channel.eventuallyExit().next(4)).containsExactly("test3");
+        assertThat(channel.eventuallyExit().nextOr("test4")).isEqualTo("test4");
 
         final Iterator<String> iterator = Streams.streamOf("test1", "test2", "test3").iterator();
         assertThat(iterator.hasNext()).isTrue();
@@ -405,6 +427,60 @@ public class StreamChannelTest {
                           .runOnShared()
                           .afterMax(seconds(3))
                           .next()).isCloseTo(21, Offset.offset(0.1));
+    }
+
+    @Test
+    public void testConstructor() {
+
+        final IOChannel<Object> channel = JRoutine.io().buildChannel();
+        final TestStreamChannel streamChannel =
+                new TestStreamChannel(channel, InvocationConfiguration.DEFAULT_CONFIGURATION,
+                                      DelegationType.ASYNC, null);
+        assertThat(streamChannel.getBinder()).isNotNull();
+        assertThat(streamChannel.getConfiguration()).isNotNull();
+        assertThat(streamChannel.getStreamConfiguration()).isNotNull();
+        assertThat(streamChannel.getDelegationType()).isNotNull();
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testConstructorError() {
+
+        try {
+            new TestStreamChannel(null, InvocationConfiguration.DEFAULT_CONFIGURATION,
+                                  DelegationType.ASYNC, null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        final IOChannel<Object> channel = JRoutine.io().buildChannel();
+        try {
+            new TestStreamChannel(channel, null, DelegationType.ASYNC, null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+            new TestStreamChannel(channel, InvocationConfiguration.DEFAULT_CONFIGURATION, null,
+                                  null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+            new TestStreamChannel(channel, InvocationConfiguration.DEFAULT_CONFIGURATION,
+                                  DelegationType.ASYNC, null).setConfiguration(null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
     }
 
     @Test
@@ -2281,6 +2357,44 @@ public class StreamChannelTest {
 
             this.sum = sum;
             this.count = count;
+        }
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    private static class TestStreamChannel extends AbstractStreamChannel<Object> {
+
+        /**
+         * Constructor.
+         *
+         * @param channel        the wrapped output channel.
+         * @param configuration  the initial invocation configuration.
+         * @param delegationType the delegation type.
+         * @param binder         the binding runnable.
+         */
+        protected TestStreamChannel(@NotNull final OutputChannel<Object> channel,
+                @NotNull final InvocationConfiguration configuration,
+                @NotNull final DelegationType delegationType, @Nullable final Binder binder) {
+
+            super(channel, configuration, delegationType, binder);
+        }
+
+        @NotNull
+        @Override
+        protected <AFTER> StreamChannel<AFTER> newChannel(
+                @NotNull final OutputChannel<AFTER> channel,
+                @NotNull final InvocationConfiguration configuration,
+                @NotNull final DelegationType delegationType, @Nullable final Binder binder) {
+
+            return null;
+        }
+
+        @NotNull
+        @Override
+        protected <AFTER> Routine<? super Object, ? extends AFTER> newRoutine(
+                @NotNull final InvocationConfiguration configuration,
+                @NotNull final InvocationFactory<? super Object, ? extends AFTER> factory) {
+
+            return null;
         }
     }
 

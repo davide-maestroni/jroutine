@@ -225,6 +225,17 @@ public class RoutineTest {
                            .all()).isEmpty();
         semaphore.tryAcquire(1, 1, TimeUnit.SECONDS);
         assertThat(isFailed.get()).isFalse();
+
+        final InvocationChannel<Object, Object> channel2 =
+                JRoutine.on(PassingInvocation.factoryOf()).asyncInvoke();
+        channel2.after(millis(300)).abort(new IllegalArgumentException("test_abort"));
+        try {
+            channel2.result().afterMax(seconds(1)).throwError();
+
+        } catch (final AbortException ex) {
+            assertThat(ex.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
+            assertThat(ex.getCause().getMessage()).isEqualTo("test_abort");
+        }
     }
 
     @Test

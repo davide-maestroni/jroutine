@@ -44,12 +44,14 @@ import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.invocation.PassingInvocation;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.runner.Runner;
+import com.github.dm.jrt.util.Reflection;
 import com.github.dm.jrt.util.TimeDuration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -65,6 +67,7 @@ import static com.github.dm.jrt.function.Functions.predicateFilter;
 import static com.github.dm.jrt.function.Functions.wrapConsumer;
 import static com.github.dm.jrt.function.Functions.wrapFunction;
 import static com.github.dm.jrt.function.Functions.wrapSupplier;
+import static com.github.dm.jrt.util.Reflection.asArgs;
 import static com.github.dm.jrt.util.TimeDuration.fromUnit;
 
 /**
@@ -946,11 +949,54 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     /**
+     * Filter invocation implementing {@code equals()} and {@code hashCode()}.
+     *
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
+     */
+    private abstract static class ComparableFilterInvocation<IN, OUT>
+            extends FilterInvocation<IN, OUT> {
+
+        private final Object[] mArgs;
+
+        /**
+         * Constructor.
+         *
+         * @param args the constructor arguments.
+         */
+        private ComparableFilterInvocation(@Nullable final Object[] args) {
+
+            mArgs = (args != null) ? args.clone() : Reflection.NO_ARGS;
+        }
+
+        @Override
+        public int hashCode() {
+
+            return 31 * getClass().hashCode() + Arrays.deepHashCode(mArgs);
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+                return true;
+            }
+
+            if (!getClass().isInstance(o)) {
+                return false;
+            }
+
+            final GenerateInvocation<?> that = (GenerateInvocation<?>) o;
+            return Arrays.deepEquals(mArgs, that.mArgs);
+        }
+    }
+
+    /**
      * Invocation implementation wrapping a consumer accepting output data.
      *
      * @param <OUT> the output data type.
      */
-    private static class ConsumerInvocation<OUT> extends FilterInvocation<OUT, Void> {
+    private static class ConsumerInvocation<OUT> extends ComparableFilterInvocation<OUT, Void> {
 
         private final ConsumerWrapper<? super OUT> mConsumer;
 
@@ -961,28 +1007,8 @@ public abstract class AbstractStreamChannel<OUT>
          */
         private ConsumerInvocation(@NotNull final ConsumerWrapper<? super OUT> consumer) {
 
+            super(asArgs(consumer));
             mConsumer = consumer;
-        }
-
-        @Override
-        public int hashCode() {
-
-            return mConsumer.hashCode();
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof ConsumerInvocation)) {
-                return false;
-            }
-
-            final ConsumerInvocation<?> that = (ConsumerInvocation<?>) o;
-            return mConsumer.equals(that.mConsumer);
         }
 
         public void onInput(final OUT input, @NotNull final ResultChannel<Void> result) {
@@ -1044,7 +1070,8 @@ public abstract class AbstractStreamChannel<OUT>
      *
      * @param <OUT> the output data type.
      */
-    private static class GenerateConsumerInvocation<OUT> extends FilterInvocation<Object, OUT> {
+    private static class GenerateConsumerInvocation<OUT>
+            extends ComparableFilterInvocation<Object, OUT> {
 
         private final ConsumerWrapper<? super ResultChannel<OUT>> mConsumer;
 
@@ -1058,28 +1085,8 @@ public abstract class AbstractStreamChannel<OUT>
         private GenerateConsumerInvocation(
                 @NotNull final ConsumerWrapper<? super ResultChannel<OUT>> consumer) {
 
+            super(asArgs(consumer));
             mConsumer = consumer;
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof GenerateConsumerInvocation)) {
-                return false;
-            }
-
-            final GenerateConsumerInvocation<?> that = (GenerateConsumerInvocation<?>) o;
-            return mConsumer.equals(that.mConsumer);
-        }
-
-        @Override
-        public int hashCode() {
-
-            return mConsumer.hashCode();
         }
 
         public void onInput(final Object input, @NotNull final ResultChannel<OUT> result) {
@@ -1095,6 +1102,18 @@ public abstract class AbstractStreamChannel<OUT>
      */
     private abstract static class GenerateInvocation<OUT> extends InvocationFactory<Object, OUT>
             implements Invocation<Object, OUT> {
+
+        private final Object[] mArgs;
+
+        /**
+         * Constructor.
+         *
+         * @param args the constructor arguments.
+         */
+        private GenerateInvocation(@Nullable final Object[] args) {
+
+            mArgs = (args != null) ? args.clone() : Reflection.NO_ARGS;
+        }
 
         @NotNull
         @Override
@@ -1119,6 +1138,27 @@ public abstract class AbstractStreamChannel<OUT>
 
         }
 
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+                return true;
+            }
+
+            if (!getClass().isInstance(o)) {
+                return false;
+            }
+
+            final GenerateInvocation<?> that = (GenerateInvocation<?>) o;
+            return Arrays.deepEquals(mArgs, that.mArgs);
+        }
+
+        @Override
+        public int hashCode() {
+
+            return 31 * getClass().hashCode() + Arrays.deepHashCode(mArgs);
+        }
+
         public final void onTerminate() {
 
         }
@@ -1140,28 +1180,8 @@ public abstract class AbstractStreamChannel<OUT>
          */
         private GenerateOutputInvocation(@NotNull final List<OUT> outputs) {
 
+            super(asArgs(outputs));
             mOutputs = outputs;
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof GenerateOutputInvocation)) {
-                return false;
-            }
-
-            final GenerateOutputInvocation<?> that = (GenerateOutputInvocation<?>) o;
-            return mOutputs.equals(that.mOutputs);
-        }
-
-        @Override
-        public int hashCode() {
-
-            return mOutputs.hashCode();
         }
 
         public void onResult(@NotNull final ResultChannel<OUT> result) {
@@ -1175,7 +1195,8 @@ public abstract class AbstractStreamChannel<OUT>
      *
      * @param <OUT> the output data type.
      */
-    private static class GenerateSupplierInvocation<OUT> extends FilterInvocation<Object, OUT> {
+    private static class GenerateSupplierInvocation<OUT>
+            extends ComparableFilterInvocation<Object, OUT> {
 
         private final SupplierWrapper<? extends OUT> mSupplier;
 
@@ -1188,28 +1209,8 @@ public abstract class AbstractStreamChannel<OUT>
          */
         private GenerateSupplierInvocation(@NotNull final SupplierWrapper<? extends OUT> supplier) {
 
+            super(asArgs(supplier));
             mSupplier = supplier;
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof GenerateSupplierInvocation)) {
-                return false;
-            }
-
-            final GenerateSupplierInvocation<?> that = (GenerateSupplierInvocation<?>) o;
-            return mSupplier.equals(that.mSupplier);
-        }
-
-        @Override
-        public int hashCode() {
-
-            return mSupplier.hashCode();
         }
 
         public void onInput(final Object input, @NotNull final ResultChannel<OUT> result) {
@@ -1272,7 +1273,7 @@ public abstract class AbstractStreamChannel<OUT>
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class MapInvocation<IN, OUT> extends FilterInvocation<IN, OUT> {
+    private static class MapInvocation<IN, OUT> extends ComparableFilterInvocation<IN, OUT> {
 
         private final FunctionWrapper<? super IN, ? extends OutputChannel<? extends OUT>> mFunction;
 
@@ -1285,28 +1286,8 @@ public abstract class AbstractStreamChannel<OUT>
                 @NotNull final FunctionWrapper<? super IN, ? extends OutputChannel<? extends
                         OUT>> function) {
 
+            super(asArgs(function));
             mFunction = function;
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof MapInvocation)) {
-                return false;
-            }
-
-            final MapInvocation<?, ?> that = (MapInvocation<?, ?>) o;
-            return mFunction.equals(that.mFunction);
-        }
-
-        @Override
-        public int hashCode() {
-
-            return mFunction.hashCode();
         }
 
         public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
@@ -1383,6 +1364,7 @@ public abstract class AbstractStreamChannel<OUT>
         private RangeInvocation(@NotNull final OUT start, @NotNull final OUT end,
                 @NotNull final Function<OUT, OUT> increment) {
 
+            super(asArgs(start, end, increment));
             if (start == null) {
                 throw new NullPointerException("the start element must not be null");
             }
@@ -1394,39 +1376,6 @@ public abstract class AbstractStreamChannel<OUT>
             mStart = start;
             mEnd = end;
             mIncrement = increment;
-        }
-
-        @Override
-        @SuppressWarnings({"SimplifiableIfStatement", "EqualsBetweenInconvertibleTypes"})
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof RangeInvocation)) {
-                return false;
-            }
-
-            final RangeInvocation<?> that = (RangeInvocation<?>) o;
-            if (!mEnd.equals(that.mEnd)) {
-                return false;
-            }
-
-            if (!mIncrement.equals(that.mIncrement)) {
-                return false;
-            }
-
-            return mStart.equals(that.mStart);
-        }
-
-        @Override
-        public int hashCode() {
-
-            int result = mEnd.hashCode();
-            result = 31 * result + mIncrement.hashCode();
-            result = 31 * result + mStart.hashCode();
-            return result;
         }
 
         public void onResult(@NotNull final ResultChannel<OUT> result) {

@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.android.proxy.app;
 
-import android.support.multidex.MultiDexApplication;
+import android.app.Application;
 
 import com.github.dm.jrt.android.builder.FactoryContext;
 import com.github.dm.jrt.invocation.InvocationException;
@@ -35,7 +35,7 @@ import static com.github.dm.jrt.util.Reflection.findConstructor;
  * Created by davide-maestroni on 04/06/2015.
  */
 @SuppressWarnings("unused")
-public class TestApp extends MultiDexApplication implements FactoryContext {
+public class TestApp extends Application implements FactoryContext {
 
     private static final HashMap<InstanceInfo, Object> sInstances =
             new HashMap<InstanceInfo, Object>();

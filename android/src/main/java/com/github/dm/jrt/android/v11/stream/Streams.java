@@ -245,7 +245,7 @@ public class Streams extends Channels {
      * @return the newly created channel instance.
      */
     @NotNull
-    public static <OUT> StreamChannel<OUT> lazyStreamOf() {
+    public static <OUT> LoaderStreamChannel<OUT> lazyStreamOf() {
 
         return lazyStreamOf(JRoutine.io().<OUT>buildChannel().close());
     }
@@ -260,7 +260,8 @@ public class Streams extends Channels {
      * @return the newly created channel instance.
      */
     @NotNull
-    public static <OUT> StreamChannel<OUT> lazyStreamOf(@Nullable final Iterable<OUT> outputs) {
+    public static <OUT> LoaderStreamChannel<OUT> lazyStreamOf(
+            @Nullable final Iterable<OUT> outputs) {
 
         return lazyStreamOf(JRoutine.io().of(outputs));
     }
@@ -275,7 +276,7 @@ public class Streams extends Channels {
      * @return the newly created channel instance.
      */
     @NotNull
-    public static <OUT> StreamChannel<OUT> lazyStreamOf(@Nullable final OUT output) {
+    public static <OUT> LoaderStreamChannel<OUT> lazyStreamOf(@Nullable final OUT output) {
 
         return lazyStreamOf(JRoutine.io().of(output));
     }
@@ -290,7 +291,7 @@ public class Streams extends Channels {
      * @return the newly created channel instance.
      */
     @NotNull
-    public static <OUT> StreamChannel<OUT> lazyStreamOf(@Nullable final OUT... outputs) {
+    public static <OUT> LoaderStreamChannel<OUT> lazyStreamOf(@Nullable final OUT... outputs) {
 
         return lazyStreamOf(JRoutine.io().of(outputs));
     }
@@ -308,7 +309,8 @@ public class Streams extends Channels {
      */
     @NotNull
     @SuppressWarnings("ConstantConditions")
-    public static <OUT> StreamChannel<OUT> lazyStreamOf(@NotNull final OutputChannel<OUT> output) {
+    public static <OUT> LoaderStreamChannel<OUT> lazyStreamOf(
+            @NotNull final OutputChannel<OUT> output) {
 
         if (output == null) {
 
@@ -569,92 +571,6 @@ public class Streams extends Channels {
         }
 
         /**
-         * Builds and returns a new lazy stream output channel.<br/>
-         * The stream will start producing results only when it is bound to another channel or an
-         * output consumer or when any of the read methods is invoked.
-         *
-         * @param <OUT> the output data type.
-         * @return the newly created channel instance.
-         */
-        @NotNull
-        public <OUT> StreamChannel<OUT> lazyStreamOf() {
-
-            return lazyStreamOf(JRoutine.io().<OUT>buildChannel().close());
-        }
-
-        /**
-         * Builds and returns a new lazy stream output channel generating the specified outputs.
-         * <br/>
-         * The stream will start producing results only when it is bound to another channel or an
-         * output consumer or when any of the read methods is invoked.
-         *
-         * @param outputs the iterable returning the output data.
-         * @param <OUT>   the output data type.
-         * @return the newly created channel instance.
-         */
-        @NotNull
-        public <OUT> StreamChannel<OUT> lazyStreamOf(@Nullable final Iterable<OUT> outputs) {
-
-            return lazyStreamOf(JRoutine.io().of(outputs));
-        }
-
-        /**
-         * Builds and returns a new lazy stream output channel generating the specified output.<br/>
-         * The stream will start producing results only when it is bound to another channel or an
-         * output consumer or when any of the read methods is invoked.
-         *
-         * @param output the output.
-         * @param <OUT>  the output data type.
-         * @return the newly created channel instance.
-         */
-        @NotNull
-        public <OUT> StreamChannel<OUT> lazyStreamOf(@Nullable final OUT output) {
-
-            return lazyStreamOf(JRoutine.io().of(output));
-        }
-
-        /**
-         * Builds and returns a new lazy stream output channel generating the specified outputs.
-         * <br/>
-         * The stream will start producing results only when it is bound to another channel or an
-         * output consumer or when any of the read methods is invoked.
-         *
-         * @param outputs the output data.
-         * @param <OUT>   the output data type.
-         * @return the newly created channel instance.
-         */
-        @NotNull
-        public <OUT> StreamChannel<OUT> lazyStreamOf(@Nullable final OUT... outputs) {
-
-            return lazyStreamOf(JRoutine.io().of(outputs));
-        }
-
-        /**
-         * Builds and returns a new lazy stream output channel generating the specified outputs.
-         * <br/>
-         * The stream will start producing results only when it is bound to another channel or an
-         * output consumer or when any of the read methods is invoked.
-         * <p/>
-         * Note that the output channel will be bound as a result of the call.
-         *
-         * @param output the output channel returning the output data.
-         * @param <OUT>  the output data type.
-         * @return the newly created channel instance.
-         */
-        @NotNull
-        @SuppressWarnings("ConstantConditions")
-        public <OUT> StreamChannel<OUT> lazyStreamOf(@NotNull final OutputChannel<OUT> output) {
-
-            if (output == null) {
-
-                throw new NullPointerException("the output channel instance must not be null");
-            }
-
-            final IOChannel<OUT> ioChannel = JRoutine.io().buildChannel();
-            return new DefaultLoaderStreamChannel<OUT>(mContextBuilder, output, ioChannel);
-        }
-
-        /**
          * Returns a loader routine builder, whose invocation instances employ the stream output
          * channels, provided by the specified function, to process input data.<br/>
          * The function should return a new instance each time it is called, starting from the
@@ -671,72 +587,6 @@ public class Streams extends Channels {
                         StreamChannel<? extends OUT>> function) {
 
             return mContextBuilder.on(factory(function));
-        }
-
-        /**
-         * Builds and returns a new stream output channel.
-         *
-         * @param <OUT> the output data type.
-         * @return the newly created channel instance.
-         */
-        @NotNull
-        public <OUT> LoaderStreamChannel<OUT> streamOf() {
-
-            return streamOf(JRoutine.io().<OUT>buildChannel().close());
-        }
-
-        /**
-         * Builds and returns a new stream output channel generating the specified outputs.
-         *
-         * @param outputs the iterable returning the output data.
-         * @param <OUT>   the output data type.
-         * @return the newly created channel instance.
-         */
-        @NotNull
-        public <OUT> LoaderStreamChannel<OUT> streamOf(@Nullable final Iterable<OUT> outputs) {
-
-            return streamOf(JRoutine.io().of(outputs));
-        }
-
-        /**
-         * Builds and returns a new stream output channel generating the specified output.
-         *
-         * @param output the output.
-         * @param <OUT>  the output data type.
-         * @return the newly created channel instance.
-         */
-        @NotNull
-        public <OUT> LoaderStreamChannel<OUT> streamOf(@Nullable final OUT output) {
-
-            return streamOf(JRoutine.io().of(output));
-        }
-
-        /**
-         * Builds and returns a new stream output channel generating the specified outputs.
-         *
-         * @param outputs the output data.
-         * @param <OUT>   the output data type.
-         * @return the newly created channel instance.
-         */
-        @NotNull
-        public <OUT> LoaderStreamChannel<OUT> streamOf(@Nullable final OUT... outputs) {
-
-            return streamOf(JRoutine.io().of(outputs));
-        }
-
-        /**
-         * Builds and returns a new stream output channel generating the specified outputs.
-         * <p/>
-         * Note that the output channel will be bound as a result of the call.
-         *
-         * @param output the output channel returning the output data.
-         * @param <OUT>  the output data type.
-         * @return the newly created channel instance.
-         */
-        @NotNull
-        public <OUT> LoaderStreamChannel<OUT> streamOf(@NotNull final OutputChannel<OUT> output) {
-
-            return new DefaultLoaderStreamChannel<OUT>(mContextBuilder, output);
         }
     }
 }

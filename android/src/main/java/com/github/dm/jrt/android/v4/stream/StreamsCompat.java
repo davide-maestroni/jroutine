@@ -245,7 +245,7 @@ public class StreamsCompat extends ChannelsCompat {
      * @return the newly created channel instance.
      */
     @NotNull
-    public static <OUT> StreamChannel<OUT> lazyStreamOf() {
+    public static <OUT> LoaderStreamChannelCompat<OUT> lazyStreamOf() {
 
         return lazyStreamOf(JRoutineCompat.io().<OUT>buildChannel().close());
     }
@@ -260,7 +260,8 @@ public class StreamsCompat extends ChannelsCompat {
      * @return the newly created channel instance.
      */
     @NotNull
-    public static <OUT> StreamChannel<OUT> lazyStreamOf(@Nullable final Iterable<OUT> outputs) {
+    public static <OUT> LoaderStreamChannelCompat<OUT> lazyStreamOf(
+            @Nullable final Iterable<OUT> outputs) {
 
         return lazyStreamOf(JRoutineCompat.io().of(outputs));
     }
@@ -275,7 +276,7 @@ public class StreamsCompat extends ChannelsCompat {
      * @return the newly created channel instance.
      */
     @NotNull
-    public static <OUT> StreamChannel<OUT> lazyStreamOf(@Nullable final OUT output) {
+    public static <OUT> LoaderStreamChannelCompat<OUT> lazyStreamOf(@Nullable final OUT output) {
 
         return lazyStreamOf(JRoutineCompat.io().of(output));
     }
@@ -290,7 +291,8 @@ public class StreamsCompat extends ChannelsCompat {
      * @return the newly created channel instance.
      */
     @NotNull
-    public static <OUT> StreamChannel<OUT> lazyStreamOf(@Nullable final OUT... outputs) {
+    public static <OUT> LoaderStreamChannelCompat<OUT> lazyStreamOf(
+            @Nullable final OUT... outputs) {
 
         return lazyStreamOf(JRoutineCompat.io().of(outputs));
     }
@@ -308,7 +310,8 @@ public class StreamsCompat extends ChannelsCompat {
      */
     @NotNull
     @SuppressWarnings("ConstantConditions")
-    public static <OUT> StreamChannel<OUT> lazyStreamOf(@NotNull final OutputChannel<OUT> output) {
+    public static <OUT> LoaderStreamChannelCompat<OUT> lazyStreamOf(
+            @NotNull final OutputChannel<OUT> output) {
 
         if (output == null) {
 
@@ -571,92 +574,6 @@ public class StreamsCompat extends ChannelsCompat {
         }
 
         /**
-         * Builds and returns a new lazy stream output channel.<br/>
-         * The stream will start producing results only when it is bound to another channel or an
-         * output consumer or when any of the read methods is invoked.
-         *
-         * @param <OUT> the output data type.
-         * @return the newly created channel instance.
-         */
-        @NotNull
-        public <OUT> StreamChannel<OUT> lazyStreamOf() {
-
-            return lazyStreamOf(JRoutineCompat.io().<OUT>buildChannel().close());
-        }
-
-        /**
-         * Builds and returns a new lazy stream output channel generating the specified outputs.
-         * <br/>
-         * The stream will start producing results only when it is bound to another channel or an
-         * output consumer or when any of the read methods is invoked.
-         *
-         * @param outputs the iterable returning the output data.
-         * @param <OUT>   the output data type.
-         * @return the newly created channel instance.
-         */
-        @NotNull
-        public <OUT> StreamChannel<OUT> lazyStreamOf(@Nullable final Iterable<OUT> outputs) {
-
-            return lazyStreamOf(JRoutineCompat.io().of(outputs));
-        }
-
-        /**
-         * Builds and returns a new lazy stream output channel generating the specified output.<br/>
-         * The stream will start producing results only when it is bound to another channel or an
-         * output consumer or when any of the read methods is invoked.
-         *
-         * @param output the output.
-         * @param <OUT>  the output data type.
-         * @return the newly created channel instance.
-         */
-        @NotNull
-        public <OUT> StreamChannel<OUT> lazyStreamOf(@Nullable final OUT output) {
-
-            return lazyStreamOf(JRoutineCompat.io().of(output));
-        }
-
-        /**
-         * Builds and returns a new lazy stream output channel generating the specified outputs.
-         * <br/>
-         * The stream will start producing results only when it is bound to another channel or an
-         * output consumer or when any of the read methods is invoked.
-         *
-         * @param outputs the output data.
-         * @param <OUT>   the output data type.
-         * @return the newly created channel instance.
-         */
-        @NotNull
-        public <OUT> StreamChannel<OUT> lazyStreamOf(@Nullable final OUT... outputs) {
-
-            return lazyStreamOf(JRoutineCompat.io().of(outputs));
-        }
-
-        /**
-         * Builds and returns a new lazy stream output channel generating the specified outputs.
-         * <br/>
-         * The stream will start producing results only when it is bound to another channel or an
-         * output consumer or when any of the read methods is invoked.
-         * <p/>
-         * Note that the output channel will be bound as a result of the call.
-         *
-         * @param output the output channel returning the output data.
-         * @param <OUT>  the output data type.
-         * @return the newly created channel instance.
-         */
-        @NotNull
-        @SuppressWarnings("ConstantConditions")
-        public <OUT> StreamChannel<OUT> lazyStreamOf(@NotNull final OutputChannel<OUT> output) {
-
-            if (output == null) {
-
-                throw new NullPointerException("the output channel instance must not be null");
-            }
-
-            final IOChannel<OUT> ioChannel = JRoutineCompat.io().buildChannel();
-            return new DefaultLoaderStreamChannelCompat<OUT>(mContextBuilder, output, ioChannel);
-        }
-
-        /**
          * Returns a loader routine builder, whose invocation instances employ the stream output
          * channels, provided by the specified function, to process input data.<br/>
          * The function should return a new instance each time it is called, starting from the
@@ -673,74 +590,6 @@ public class StreamsCompat extends ChannelsCompat {
                         StreamChannel<? extends OUT>> function) {
 
             return mContextBuilder.on(factory(function));
-        }
-
-        /**
-         * Builds and returns a new stream output channel.
-         *
-         * @param <OUT> the output data type.
-         * @return the newly created channel instance.
-         */
-        @NotNull
-        public <OUT> LoaderStreamChannelCompat<OUT> streamOf() {
-
-            return streamOf(JRoutineCompat.io().<OUT>buildChannel().close());
-        }
-
-        /**
-         * Builds and returns a new stream output channel generating the specified outputs.
-         *
-         * @param outputs the iterable returning the output data.
-         * @param <OUT>   the output data type.
-         * @return the newly created channel instance.
-         */
-        @NotNull
-        public <OUT> LoaderStreamChannelCompat<OUT> streamOf(
-                @Nullable final Iterable<OUT> outputs) {
-
-            return streamOf(JRoutineCompat.io().of(outputs));
-        }
-
-        /**
-         * Builds and returns a new stream output channel generating the specified output.
-         *
-         * @param output the output.
-         * @param <OUT>  the output data type.
-         * @return the newly created channel instance.
-         */
-        @NotNull
-        public <OUT> LoaderStreamChannelCompat<OUT> streamOf(@Nullable final OUT output) {
-
-            return streamOf(JRoutineCompat.io().of(output));
-        }
-
-        /**
-         * Builds and returns a new stream output channel generating the specified outputs.
-         *
-         * @param outputs the output data.
-         * @param <OUT>   the output data type.
-         * @return the newly created channel instance.
-         */
-        @NotNull
-        public <OUT> LoaderStreamChannelCompat<OUT> streamOf(@Nullable final OUT... outputs) {
-
-            return streamOf(JRoutineCompat.io().of(outputs));
-        }
-
-        /**
-         * Builds and returns a new stream output channel generating the specified outputs.
-         * <p/>
-         * Note that the output channel will be bound as a result of the call.
-         *
-         * @param output the output channel returning the output data.
-         * @param <OUT>  the output data type.
-         * @return the newly created channel instance.
-         */
-        @NotNull
-        public <OUT> LoaderStreamChannelCompat<OUT> streamOf(
-                @NotNull final OutputChannel<OUT> output) {
-
-            return new DefaultLoaderStreamChannelCompat<OUT>(mContextBuilder, output);
         }
     }
 }

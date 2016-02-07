@@ -34,8 +34,6 @@ android {
         targetSdkVersion 22
         versionCode Integer.parseInt(project.getProperty('releaseVersionCode'))
         versionName version
-        testInstrumentationRunner 'com.android.test.runner.MultiDexTestRunner'
-        multiDexEnabled true
     }
 
     buildTypes {

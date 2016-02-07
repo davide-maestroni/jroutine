@@ -83,13 +83,13 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
         final LoaderContextCompat context = loaderFrom(getActivity());
         StreamChannel<String> channel1 =
-                StreamsCompat.with(context).streamOf("test1", "test2", "test3");
+                StreamsCompat.streamOf("test1", "test2", "test3").with(context).runOnShared();
         StreamChannel<String> channel2 =
-                StreamsCompat.with(context).streamOf("test4", "test5", "test6");
+                StreamsCompat.streamOf("test4", "test5", "test6").with(context).runOnShared();
         assertThat(StreamsCompat.blend(channel2, channel1).afterMax(seconds(1)).all()).containsOnly(
                 "test1", "test2", "test3", "test4", "test5", "test6");
-        channel1 = StreamsCompat.with(context).streamOf("test1", "test2", "test3");
-        channel2 = StreamsCompat.with(context).streamOf("test4", "test5", "test6");
+        channel1 = StreamsCompat.streamOf("test1", "test2", "test3").with(context).runOnShared();
+        channel2 = StreamsCompat.streamOf("test4", "test5", "test6").with(context).runOnShared();
         assertThat(StreamsCompat.blend(Arrays.<StreamChannel<?>>asList(channel1, channel2))
                                 .afterMax(seconds(1))
                                 .all()).containsOnly("test1", "test2", "test3", "test4", "test5",
@@ -206,31 +206,24 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
     public void testBuilder() {
 
         final LoaderContextCompat context = loaderFrom(getActivity());
-        assertThat(StreamsCompat.with(context)
-                                .streamOf("test")
+        assertThat(StreamsCompat.streamOf("test")
+                                .with(context)
+                                .runOnShared()
                                 .afterMax(seconds(1))
                                 .all()).containsExactly("test");
-        assertThat(StreamsCompat.with(context)
-                                .streamOf("test1", "test2", "test3")
-                                .afterMax(seconds(1))
-                                .all()).containsExactly("test1", "test2", "test3");
-        assertThat(StreamsCompat.with(context)
-                                .streamOf(Arrays.asList("test1", "test2", "test3"))
-                                .afterMax(seconds(1))
-                                .all()).containsExactly("test1", "test2", "test3");
-        assertThat(StreamsCompat.with(context)
-                                .streamOf(JRoutineCompat.io().of("test1", "test2", "test3"))
-                                .afterMax(seconds(1))
-                                .all()).containsExactly("test1", "test2", "test3");
-        assertThat(StreamsCompat.streamOf("test").afterMax(seconds(1)).all()).containsExactly(
-                "test");
         assertThat(StreamsCompat.streamOf("test1", "test2", "test3")
+                                .with(context)
+                                .runOnShared()
                                 .afterMax(seconds(1))
                                 .all()).containsExactly("test1", "test2", "test3");
         assertThat(StreamsCompat.streamOf(Arrays.asList("test1", "test2", "test3"))
+                                .with(context)
+                                .runOnShared()
                                 .afterMax(seconds(1))
                                 .all()).containsExactly("test1", "test2", "test3");
         assertThat(StreamsCompat.streamOf(JRoutineCompat.io().of("test1", "test2", "test3"))
+                                .with(context)
+                                .runOnShared()
                                 .afterMax(seconds(1))
                                 .all()).containsExactly("test1", "test2", "test3");
     }
@@ -240,7 +233,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
         try {
 
-            StreamsCompat.with(loaderFrom(getActivity())).streamOf((OutputChannel<?>) null);
+            StreamsCompat.streamOf((OutputChannel<?>) null);
 
             fail();
 
@@ -253,15 +246,15 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
         final LoaderContextCompat context = loaderFrom(getActivity());
         StreamChannel<String> channel1 =
-                StreamsCompat.with(context).streamOf("test1", "test2", "test3");
+                StreamsCompat.streamOf("test1", "test2", "test3").with(context).runOnShared();
         StreamChannel<String> channel2 =
-                StreamsCompat.with(context).streamOf("test4", "test5", "test6");
+                StreamsCompat.streamOf("test4", "test5", "test6").with(context).runOnShared();
         assertThat(StreamsCompat.concat(channel2, channel1)
                                 .afterMax(seconds(1))
                                 .all()).containsExactly("test4", "test5", "test6", "test1", "test2",
                                                         "test3");
-        channel1 = StreamsCompat.with(context).streamOf("test1", "test2", "test3");
-        channel2 = StreamsCompat.with(context).streamOf("test4", "test5", "test6");
+        channel1 = StreamsCompat.streamOf("test1", "test2", "test3").with(context).runOnShared();
+        channel2 = StreamsCompat.streamOf("test4", "test5", "test6").with(context).runOnShared();
         assertThat(StreamsCompat.concat(Arrays.<StreamChannel<?>>asList(channel1, channel2))
                                 .afterMax(seconds(1))
                                 .all()).containsExactly("test1", "test2", "test3", "test4", "test5",
@@ -534,8 +527,8 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
     public void testGroupBy() {
 
         final LoaderContextCompat context = loaderFrom(getActivity());
-        assertThat(StreamsCompat.with(context)
-                                .streamOf()
+        assertThat(StreamsCompat.streamOf()
+                                .with(context)
                                 .sync()
                                 .range(1, 10)
                                 .async()
@@ -545,8 +538,8 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                                                         Arrays.<Number>asList(4, 5, 6),
                                                         Arrays.<Number>asList(7, 8, 9),
                                                         Collections.<Number>singletonList(10));
-        assertThat(StreamsCompat.with(context)
-                                .streamOf()
+        assertThat(StreamsCompat.streamOf()
+                                .with(context)
                                 .sync()
                                 .range(1, 10)
                                 .async()
@@ -886,21 +879,27 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                                 .afterMax(seconds(1))
                                 .all()).containsExactly("test1", "test2", "test3");
         final LoaderContextCompat context = loaderFrom(getActivity());
-        assertThat(StreamsCompat.with(context).lazyStreamOf().afterMax(seconds(1)).all()).isEmpty();
-        assertThat(StreamsCompat.with(context)
-                                .lazyStreamOf("test")
+        assertThat(
+                StreamsCompat.lazyStreamOf().with(context).runOnShared().afterMax(seconds(1)).all())
+                .isEmpty();
+        assertThat(StreamsCompat.lazyStreamOf("test")
+                                .with(context)
+                                .runOnShared()
                                 .afterMax(seconds(1))
                                 .all()).containsExactly("test");
-        assertThat(StreamsCompat.with(context)
-                                .lazyStreamOf("test1", "test2", "test3")
+        assertThat(StreamsCompat.lazyStreamOf("test1", "test2", "test3")
+                                .with(context)
+                                .runOnShared()
                                 .afterMax(seconds(1))
                                 .all()).containsExactly("test1", "test2", "test3");
-        assertThat(StreamsCompat.with(context)
-                                .lazyStreamOf(Arrays.asList("test1", "test2", "test3"))
+        assertThat(StreamsCompat.lazyStreamOf(Arrays.asList("test1", "test2", "test3"))
+                                .with(context)
+                                .runOnShared()
                                 .afterMax(seconds(1))
                                 .all()).containsExactly("test1", "test2", "test3");
-        assertThat(StreamsCompat.with(context)
-                                .lazyStreamOf(JRoutineCompat.io().of("test1", "test2", "test3"))
+        assertThat(StreamsCompat.lazyStreamOf(JRoutineCompat.io().of("test1", "test2", "test3"))
+                                .with(context)
+                                .runOnShared()
                                 .afterMax(seconds(1))
                                 .all()).containsExactly("test1", "test2", "test3");
     }
@@ -917,39 +916,29 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         } catch (final NullPointerException ignored) {
 
         }
-
-        try {
-
-            StreamsCompat.with(loaderFrom(getActivity())).lazyStreamOf((OutputChannel<?>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
     }
 
     public void testLimit() {
 
         final LoaderContextCompat context = loaderFrom(getActivity());
-        assertThat(StreamsCompat.with(context)
-                                .streamOf()
+        assertThat(StreamsCompat.streamOf()
+                                .with(context)
                                 .sync()
                                 .range(1, 10)
                                 .async()
                                 .map(StreamsCompat.limit(5))
                                 .afterMax(seconds(3))
                                 .all()).containsExactly(1, 2, 3, 4, 5);
-        assertThat(StreamsCompat.with(context)
-                                .streamOf()
+        assertThat(StreamsCompat.streamOf()
+                                .with(context)
                                 .sync()
                                 .range(1, 10)
                                 .async()
                                 .map(StreamsCompat.limit(0))
                                 .afterMax(seconds(3))
                                 .all()).isEmpty();
-        assertThat(StreamsCompat.with(context)
-                                .streamOf()
+        assertThat(StreamsCompat.streamOf()
+                                .with(context)
                                 .sync()
                                 .range(1, 10)
                                 .async()
@@ -1009,8 +998,8 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
     public void testLoaderId() {
 
         final LoaderContextCompat context = loaderFrom(getActivity());
-        StreamsCompat.with(context)
-                     .streamOf("test1")
+        StreamsCompat.streamOf("test1")
+                     .with(context)
                      .loaderId(11)
                      .async()
                      .map(new Function<String, String>() {
@@ -1030,8 +1019,8 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                                  .buildChannel()
                                  .afterMax(seconds(10))
                                  .next()).isEqualTo("TEST1");
-        StreamsCompat.with(context)
-                     .streamOf("test2")
+        StreamsCompat.streamOf("test2")
+                     .with(context)
                      .withLoaders()
                      .withLoaderId(21)
                      .set()
@@ -1053,8 +1042,8 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                                  .buildChannel()
                                  .afterMax(seconds(10))
                                  .next()).isEqualTo("TEST2");
-        StreamsCompat.with(context)
-                     .streamOf("test3")
+        StreamsCompat.streamOf("test3")
+                     .with(context)
                      .withStreamLoaders()
                      .withLoaderId(31)
                      .set()
@@ -1109,13 +1098,13 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         channel2.close();
 
         final LoaderContextCompat context = loaderFrom(getActivity());
-        assertThat(StreamsCompat.with(context)
-                                .streamOf(channelMap.get(Sort.STRING))
+        assertThat(StreamsCompat.streamOf(channelMap.get(Sort.STRING))
+                                .with(context)
                                 .runOnShared()
                                 .afterMax(seconds(1))
                                 .all()).containsExactly("0", "1", "2", "3");
-        assertThat(StreamsCompat.with(context)
-                                .streamOf(channelMap.get(Sort.INTEGER))
+        assertThat(StreamsCompat.streamOf(channelMap.get(Sort.INTEGER))
+                                .with(context)
                                 .runOnShared()
                                 .afterMax(seconds(1))
                                 .all()).containsExactly(0, 1, 2, 3);
@@ -1483,8 +1472,8 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
     public void testRoutineId() {
 
         final LoaderContextCompat context = loaderFrom(getActivity());
-        StreamsCompat.with(context)
-                     .streamOf("test1")
+        StreamsCompat.streamOf("test1")
+                     .with(context)
                      .routineId(11)
                      .async()
                      .map(new Function<String, String>() {
@@ -1508,8 +1497,8 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
         }
 
-        assertThat(StreamsCompat.with(context)
-                                .streamOf("test2")
+        assertThat(StreamsCompat.streamOf("test2")
+                                .with(context)
                                 .withLoaders()
                                 .withRoutineId(11)
                                 .set()
@@ -1529,7 +1518,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                                 .afterMax(seconds(10))
                                 .next()).isEqualTo("TEST2");
         final AtomicInteger count = new AtomicInteger();
-        StreamsCompat.with(context).streamOf().routineId(11).generate(new Supplier<Integer>() {
+        StreamsCompat.streamOf().with(context).routineId(11).generate(new Supplier<Integer>() {
 
             public Integer get() {
 
@@ -1541,8 +1530,8 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                 return count.incrementAndGet();
             }
         });
-        assertThat(StreamsCompat.with(context)
-                                .streamOf()
+        assertThat(StreamsCompat.streamOf()
+                                .with(context)
                                 .routineId(11)
                                 .generate(new Supplier<Integer>() {
 
@@ -1558,24 +1547,24 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
     public void testSkip() {
 
         final LoaderContextCompat context = loaderFrom(getActivity());
-        assertThat(StreamsCompat.with(context)
-                                .streamOf()
+        assertThat(StreamsCompat.streamOf()
+                                .with(context)
                                 .sync()
                                 .range(1, 10)
                                 .async()
                                 .map(StreamsCompat.skip(5))
                                 .afterMax(seconds(3))
                                 .all()).containsExactly(6, 7, 8, 9, 10);
-        assertThat(StreamsCompat.with(context)
-                                .streamOf()
+        assertThat(StreamsCompat.streamOf()
+                                .with(context)
                                 .sync()
                                 .range(1, 10)
                                 .async()
                                 .map(StreamsCompat.skip(15))
                                 .afterMax(seconds(3))
                                 .all()).isEmpty();
-        assertThat(StreamsCompat.with(context)
-                                .streamOf()
+        assertThat(StreamsCompat.streamOf()
+                                .with(context)
                                 .sync()
                                 .range(1, 10)
                                 .async()
@@ -1644,35 +1633,35 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                 return s + count.incrementAndGet();
             }
         };
-        StreamsCompat.with(context)
-                     .streamOf("test")
+        StreamsCompat.streamOf("test")
+                     .with(context)
                      .async()
                      .cache(CacheStrategyType.CACHE)
                      .map(function);
-        assertThat(StreamsCompat.with(context)
-                                .streamOf("test")
+        assertThat(StreamsCompat.streamOf("test")
+                                .with(context)
                                 .staleAfter(2000, TimeUnit.MILLISECONDS)
                                 .async()
                                 .map(function)
                                 .afterMax(seconds(10))
                                 .next()).isEqualTo("test1");
         seconds(5).sleepAtLeast();
-        assertThat(StreamsCompat.with(context)
-                                .streamOf("test")
+        assertThat(StreamsCompat.streamOf("test")
+                                .with(context)
                                 .staleAfter(ZERO)
                                 .async()
                                 .map(function)
                                 .afterMax(seconds(10))
                                 .next()).isEqualTo("test2");
         seconds(5).sleepAtLeast();
-        StreamsCompat.with(context)
-                     .streamOf("test")
+        StreamsCompat.streamOf("test")
+                     .with(context)
                      .cache(CacheStrategyType.CACHE_IF_SUCCESS)
                      .async()
                      .map(function);
         seconds(5).sleepAtLeast();
-        assertThat(StreamsCompat.with(context)
-                                .streamOf("test")
+        assertThat(StreamsCompat.streamOf("test")
+                                .with(context)
                                 .staleAfter(ZERO)
                                 .async()
                                 .map(function)

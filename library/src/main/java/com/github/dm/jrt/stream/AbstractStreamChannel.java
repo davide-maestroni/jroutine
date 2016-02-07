@@ -986,7 +986,7 @@ public abstract class AbstractStreamChannel<OUT>
                 return false;
             }
 
-            final GenerateInvocation<?> that = (GenerateInvocation<?>) o;
+            final ComparableFilterInvocation<?, ?> that = (ComparableFilterInvocation<?, ?>) o;
             return Arrays.deepEquals(mArgs, that.mArgs);
         }
     }

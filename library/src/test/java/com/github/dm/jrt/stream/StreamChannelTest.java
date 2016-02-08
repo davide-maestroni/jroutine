@@ -538,6 +538,49 @@ public class StreamChannelTest {
     }
 
     @Test
+    public void testFlatMap() {
+
+        assertThat(Streams.streamOf("test1", null, "test2", null)
+                          .sync()
+                          .flatMap(new Function<String, OutputChannel<String>>() {
+
+                              public OutputChannel<String> apply(final String s) {
+
+                                  return Streams.streamOf(s)
+                                                .sync()
+                                                .filter(Functions.<String>notNull());
+                              }
+                          })
+                          .all()).containsExactly("test1", "test2");
+        assertThat(Streams.streamOf("test1", null, "test2", null)
+                          .async()
+                          .flatMap(new Function<String, OutputChannel<String>>() {
+
+                              public OutputChannel<String> apply(final String s) {
+
+                                  return Streams.streamOf(s)
+                                                .sync()
+                                                .filter(Functions.<String>notNull());
+                              }
+                          })
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1", "test2");
+        assertThat(Streams.streamOf("test1", null, "test2", null)
+                          .parallel()
+                          .flatMap(new Function<String, OutputChannel<String>>() {
+
+                              public OutputChannel<String> apply(final String s) {
+
+                                  return Streams.streamOf(s)
+                                                .sync()
+                                                .filter(Functions.<String>notNull());
+                              }
+                          })
+                          .afterMax(seconds(3))
+                          .all()).containsOnly("test1", "test2");
+    }
+
+    @Test
     public void testForEach() {
 
         final List<String> list = Collections.synchronizedList(new ArrayList<String>());
@@ -974,49 +1017,6 @@ public class StreamChannelTest {
         } catch (final NullPointerException ignored) {
 
         }
-    }
-
-    @Test
-    public void testLift() {
-
-        assertThat(Streams.streamOf("test1", null, "test2", null)
-                          .sync()
-                          .flatMap(new Function<String, OutputChannel<String>>() {
-
-                              public OutputChannel<String> apply(final String s) {
-
-                                  return Streams.streamOf(s)
-                                                .sync()
-                                                .filter(Functions.<String>notNull());
-                              }
-                          })
-                          .all()).containsExactly("test1", "test2");
-        assertThat(Streams.streamOf("test1", null, "test2", null)
-                          .async()
-                          .flatMap(new Function<String, OutputChannel<String>>() {
-
-                              public OutputChannel<String> apply(final String s) {
-
-                                  return Streams.streamOf(s)
-                                                .sync()
-                                                .filter(Functions.<String>notNull());
-                              }
-                          })
-                          .afterMax(seconds(3))
-                          .all()).containsExactly("test1", "test2");
-        assertThat(Streams.streamOf("test1", null, "test2", null)
-                          .parallel()
-                          .flatMap(new Function<String, OutputChannel<String>>() {
-
-                              public OutputChannel<String> apply(final String s) {
-
-                                  return Streams.streamOf(s)
-                                                .sync()
-                                                .filter(Functions.<String>notNull());
-                              }
-                          })
-                          .afterMax(seconds(3))
-                          .all()).containsOnly("test1", "test2");
     }
 
     @Test

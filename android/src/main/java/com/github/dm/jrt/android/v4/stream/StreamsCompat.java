@@ -22,7 +22,6 @@ import com.github.dm.jrt.android.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
 import com.github.dm.jrt.android.v4.core.ChannelsCompat;
 import com.github.dm.jrt.android.v4.core.JRoutineCompat;
-import com.github.dm.jrt.android.v4.core.JRoutineCompat.ContextBuilderCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
@@ -35,7 +34,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.WeakHashMap;
 
 import static com.github.dm.jrt.android.core.DelegatingContextInvocation.factoryFrom;
 import static com.github.dm.jrt.function.Functions.wrapFunction;
@@ -46,9 +44,6 @@ import static com.github.dm.jrt.function.Functions.wrapFunction;
  * Created by davide-maestroni on 01/04/2016.
  */
 public class StreamsCompat extends ChannelsCompat {
-
-    private static final WeakHashMap<LoaderContextCompat, StreamContextBuilder> sBuilders =
-            new WeakHashMap<LoaderContextCompat, StreamContextBuilder>();
 
     /**
      * Avoid direct instantiation.
@@ -422,6 +417,27 @@ public class StreamsCompat extends ChannelsCompat {
     }
 
     /**
+     * Returns a loader routine builder, whose invocation instances employ the stream output
+     * channels, provided by the specified function, to process input data.<br/>
+     * The function should return a new instance each time it is called, starting from the passed
+     * one.
+     *
+     * @param context  the loader context.
+     * @param function the function providing the stream output channels.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the loader routine builder.
+     */
+    @NotNull
+    public static <IN, OUT> LoaderRoutineBuilder<IN, OUT> onStreamWith(
+            @NotNull final LoaderContextCompat context,
+            @NotNull final Function<? super StreamChannel<? extends IN>, ? extends
+                    StreamChannel<? extends OUT>> function) {
+
+        return JRoutineCompat.with(context).on(factory(function));
+    }
+
+    /**
      * Returns a new channel repeating the output data to any newly bound channel or consumer, thus
      * effectively supporting binding of several output consumers.<br/>
      * Note that the passed channels will be bound as a result of the call.
@@ -533,63 +549,5 @@ public class StreamsCompat extends ChannelsCompat {
             @NotNull final OutputChannel<? extends OUT> channel, final int index) {
 
         return streamOf(ChannelsCompat.toSelectable(channel, index));
-    }
-
-    /**
-     * Returns a context based builder of loader routine builders.
-     *
-     * @param context the loader context.
-     * @return the context builder.
-     */
-    @NotNull
-    public static StreamContextBuilder with(@NotNull final LoaderContextCompat context) {
-
-        synchronized (sBuilders) {
-            final WeakHashMap<LoaderContextCompat, StreamContextBuilder> builders = sBuilders;
-            StreamContextBuilder contextBuilder = builders.get(context);
-            if (contextBuilder == null) {
-                contextBuilder = new StreamContextBuilder(JRoutineCompat.with(context));
-                builders.put(context, contextBuilder);
-            }
-
-            return contextBuilder;
-        }
-    }
-
-    /**
-     * Context based builder of loader routine builders.
-     */
-    public static class StreamContextBuilder {
-
-        private final ContextBuilderCompat mContextBuilder;
-
-        /**
-         * Constructor.
-         *
-         * @param builder the context builder.
-         */
-        private StreamContextBuilder(@NotNull final ContextBuilderCompat builder) {
-
-            mContextBuilder = builder;
-        }
-
-        /**
-         * Returns a loader routine builder, whose invocation instances employ the stream output
-         * channels, provided by the specified function, to process input data.<br/>
-         * The function should return a new instance each time it is called, starting from the
-         * passed one.
-         *
-         * @param function the function providing the stream output channels.
-         * @param <IN>     the input data type.
-         * @param <OUT>    the output data type.
-         * @return the loader routine builder.
-         */
-        @NotNull
-        public <IN, OUT> LoaderRoutineBuilder<IN, OUT> onStream(
-                @NotNull final Function<? super StreamChannel<? extends IN>, ? extends
-                        StreamChannel<? extends OUT>> function) {
-
-            return mContextBuilder.on(factory(function));
-        }
     }
 }

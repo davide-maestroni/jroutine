@@ -571,7 +571,8 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public StreamChannel<OUT> repeat() {
 
-        return newChannel(Channels.repeat(this), mStreamConfiguration, mDelegationType, mBinder);
+        return newChannel(Channels.repeat(this), getStreamConfiguration(), mDelegationType,
+                          mBinder);
     }
 
     @NotNull
@@ -611,8 +612,8 @@ public abstract class AbstractStreamChannel<OUT>
     @SuppressWarnings("unchecked")
     public StreamChannel<? extends Selectable<OUT>> toSelectable(final int index) {
 
-        return newChannel(Channels.toSelectable(this, index), mStreamConfiguration, mDelegationType,
-                          mBinder);
+        return newChannel(Channels.toSelectable(this, index), getStreamConfiguration(),
+                          mDelegationType, mBinder);
     }
 
     @NotNull
@@ -627,7 +628,7 @@ public abstract class AbstractStreamChannel<OUT>
 
         final IOChannel<OUT> ioChannel = JRoutine.io().buildChannel();
         mChannel.passTo(new TryCatchOutputConsumer<OUT>(consumer, ioChannel));
-        return newChannel(ioChannel, mStreamConfiguration, mDelegationType, mBinder);
+        return newChannel(ioChannel, getStreamConfiguration(), mDelegationType, mBinder);
     }
 
     @NotNull
@@ -662,7 +663,7 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public Builder<? extends StreamChannel<OUT>> withStreamInvocations() {
 
-        return new Builder<StreamChannel<OUT>>(mStreamConfigurable, mStreamConfiguration);
+        return new Builder<StreamChannel<OUT>>(mStreamConfigurable, getStreamConfiguration());
     }
 
     @NotNull
@@ -817,7 +818,8 @@ public abstract class AbstractStreamChannel<OUT>
     private <AFTER> Routine<? super OUT, ? extends AFTER> buildRoutine(
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
 
-        return newRoutine(mStreamConfiguration.builderFrom().with(mConfiguration).set(), factory);
+        return newRoutine(getStreamConfiguration().builderFrom().with(mConfiguration).set(),
+                          factory);
     }
 
     @NotNull
@@ -826,7 +828,7 @@ public abstract class AbstractStreamChannel<OUT>
             @NotNull final InvocationChannel<? super OUT, ? extends AFTER> channel) {
 
         return newChannel((OutputChannel<AFTER>) mChannel.passTo(channel).result(),
-                          mStreamConfiguration, mDelegationType, mBinder);
+                          getStreamConfiguration(), mDelegationType, mBinder);
     }
 
     @NotNull

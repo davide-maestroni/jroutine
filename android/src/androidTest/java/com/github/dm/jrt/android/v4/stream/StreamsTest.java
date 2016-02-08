@@ -404,25 +404,26 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
         }
 
-        assertThat(StreamsCompat.with(loaderFrom(getActivity()))
-                                .onStream(
-                                        new Function<StreamChannel<? extends String>,
-                                                StreamChannel<String>>() {
+        assertThat(StreamsCompat.onStreamWith(loaderFrom(getActivity()),
+                                              new Function<StreamChannel<? extends String>,
+                                                      StreamChannel<String>>() {
 
-                                            public StreamChannel<String> apply(
-                                                    final StreamChannel<? extends String> channel) {
+                                                  public StreamChannel<String> apply(
+                                                          final StreamChannel<? extends String>
+                                                                  channel) {
 
-                                                return channel.sync()
-                                                              .map(new Function<String, String>() {
+                                                      return channel.sync()
+                                                                    .map(new Function<String,
+                                                                            String>() {
 
-                                                                  public String apply(
-                                                                          final String s) {
+                                                                        public String apply(
+                                                                                final String s) {
 
-                                                                      return s.toUpperCase();
-                                                                  }
-                                                              });
-                                            }
-                                        })
+                                                                            return s.toUpperCase();
+                                                                        }
+                                                                    });
+                                                  }
+                                              })
                                 .asyncCall("test1", "test2", "test3")
                                 .afterMax(seconds(3))
                                 .all()).containsExactly("TEST1", "TEST2", "TEST3");
@@ -430,27 +431,26 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         try {
 
             final InvocationChannel<String, String> channel =
-                    StreamsCompat.with(loaderFrom(getActivity()))
-                                 .onStream(
-                                         new Function<StreamChannel<? extends String>,
-                                                 StreamChannel<String>>() {
+                    StreamsCompat.onStreamWith(loaderFrom(getActivity()),
+                                               new Function<StreamChannel<? extends String>,
+                                                       StreamChannel<String>>() {
 
-                                             public StreamChannel<String> apply(
-                                                     final StreamChannel<? extends String>
-                                                             channel) {
+                                                   public StreamChannel<String> apply(
+                                                           final StreamChannel<? extends String>
+                                                                   channel) {
 
-                                                 return channel.sync()
-                                                               .map(new Function<String, String>() {
+                                                       return channel.sync()
+                                                                     .map(new Function<String,
+                                                                             String>() {
 
-                                                                   public String apply(
-                                                                           final String s) {
+                                                                         public String apply(
+                                                                                 final String s) {
 
-                                                                       return s.toUpperCase();
-                                                                   }
-                                                               });
-                                             }
-                                         })
-                                 .asyncInvoke();
+                                                                             return s.toUpperCase();
+                                                                         }
+                                                                     });
+                                                   }
+                                               }).asyncInvoke();
             channel.after(millis(100)).abort(new IllegalArgumentException());
             channel.result().afterMax(seconds(1)).next();
 
@@ -504,7 +504,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
         try {
 
-            StreamsCompat.with(null);
+            StreamsCompat.onStreamWith(null, Functions.<StreamChannel<?>>identity());
 
             fail();
 
@@ -514,7 +514,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
         try {
 
-            StreamsCompat.with(loaderFrom(getActivity())).onStream(null);
+            StreamsCompat.onStreamWith(loaderFrom(getActivity()), null);
 
             fail();
 

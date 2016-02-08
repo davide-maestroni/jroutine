@@ -360,7 +360,7 @@ public interface LoaderStreamChannelCompat<OUT>
      * Short for {@code withLoaders().withCacheStrategy(strategyType).set()}.
      *
      * @param strategyType the cache strategy type.
-     * @return the configured stream channel.
+     * @return the configured stream.
      */
     @NotNull
     LoaderStreamChannelCompat<OUT> cache(@Nullable CacheStrategyType strategyType);
@@ -371,7 +371,7 @@ public interface LoaderStreamChannelCompat<OUT>
      * stream, which will force the routine loader ID.
      *
      * @param loaderId the loader ID.
-     * @return the configured stream channel.
+     * @return the configured stream.
      */
     @NotNull
     LoaderStreamChannelCompat<OUT> loaderId(int loaderId);
@@ -382,7 +382,7 @@ public interface LoaderStreamChannelCompat<OUT>
      * stream, which will force the routine ID.
      *
      * @param routineId the routine ID.
-     * @return the configured stream channel.
+     * @return the configured stream.
      */
     @NotNull
     LoaderStreamChannelCompat<OUT> routineId(int routineId);
@@ -392,7 +392,7 @@ public interface LoaderStreamChannelCompat<OUT>
      *
      * @param time     the time.
      * @param timeUnit the time unit.
-     * @return the configured stream channel.
+     * @return the configured stream.
      */
     @NotNull
     LoaderStreamChannelCompat<OUT> staleAfter(long time, @NotNull TimeUnit timeUnit);
@@ -401,7 +401,7 @@ public interface LoaderStreamChannelCompat<OUT>
      * Short for {@code withLoaders().withResultStaleTime(staleTime).set()}.
      *
      * @param staleTime the stale time.
-     * @return the configured stream channel.
+     * @return the configured stream.
      */
     @NotNull
     LoaderStreamChannelCompat<OUT> staleAfter(@Nullable TimeDuration staleTime);
@@ -413,7 +413,7 @@ public interface LoaderStreamChannelCompat<OUT>
      * loader.
      *
      * @param context the loader context.
-     * @return the configured stream channel.
+     * @return the configured stream.
      */
     @NotNull
     LoaderStreamChannelCompat<OUT> with(@Nullable LoaderContextCompat context);

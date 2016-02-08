@@ -358,7 +358,7 @@ public interface LoaderStreamChannel<OUT>
      * Short for {@code withLoaders().withCacheStrategy(strategyType).set()}.
      *
      * @param strategyType the cache strategy type.
-     * @return the configured stream channel.
+     * @return the configured stream.
      */
     @NotNull
     LoaderStreamChannel<OUT> cache(@Nullable CacheStrategyType strategyType);
@@ -366,10 +366,10 @@ public interface LoaderStreamChannel<OUT>
     /**
      * Short for {@code withLoaders().withLoaderId(loaderId).set()}.<br/>
      * This method is useful to easily apply a configuration to the next routine concatenated to the
-     * stream, which will force the loader ID.
+     * stream, which will force the routine loader ID.
      *
      * @param loaderId the loader ID.
-     * @return the configured stream channel.
+     * @return the configured stream.
      */
     @NotNull
     LoaderStreamChannel<OUT> loaderId(int loaderId);
@@ -380,7 +380,7 @@ public interface LoaderStreamChannel<OUT>
      * stream, which will force the routine ID.
      *
      * @param routineId the routine ID.
-     * @return the configured stream channel.
+     * @return the configured stream.
      */
     @NotNull
     LoaderStreamChannel<OUT> routineId(int routineId);
@@ -390,7 +390,7 @@ public interface LoaderStreamChannel<OUT>
      *
      * @param time     the time.
      * @param timeUnit the time unit.
-     * @return the configured stream channel.
+     * @return the configured stream.
      */
     @NotNull
     LoaderStreamChannel<OUT> staleAfter(long time, @NotNull TimeUnit timeUnit);
@@ -399,7 +399,7 @@ public interface LoaderStreamChannel<OUT>
      * Short for {@code withLoaders().withResultStaleTime(staleTime).set()}.
      *
      * @param staleTime the stale time.
-     * @return the configured stream channel.
+     * @return the configured stream.
      */
     @NotNull
     LoaderStreamChannel<OUT> staleAfter(@Nullable TimeDuration staleTime);
@@ -411,7 +411,7 @@ public interface LoaderStreamChannel<OUT>
      * loader.
      *
      * @param context the loader context.
-     * @return the configured stream channel.
+     * @return the configured stream.
      */
     @NotNull
     LoaderStreamChannel<OUT> with(@Nullable LoaderContext context);

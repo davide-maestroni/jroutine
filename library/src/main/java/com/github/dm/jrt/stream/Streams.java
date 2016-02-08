@@ -28,15 +28,18 @@ import com.github.dm.jrt.function.FunctionWrapper;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.invocation.TemplateInvocation;
+import com.github.dm.jrt.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import static com.github.dm.jrt.function.Functions.wrapFunction;
+import static com.github.dm.jrt.util.Reflection.asArgs;
 
 /**
  * Utility class acting as a factory of stream output channels.
@@ -543,6 +546,49 @@ public class Streams extends Channels {
     }
 
     /**
+     * Invocation factory implementing {@code equals()} and {@code hashCode()}.
+     *
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
+     */
+    private abstract static class ComparableInvocationFactory<IN, OUT>
+            extends InvocationFactory<IN, OUT> {
+
+        private final Object[] mArgs;
+
+        /**
+         * Constructor.
+         *
+         * @param args the constructor arguments.
+         */
+        private ComparableInvocationFactory(@Nullable final Object[] args) {
+
+            mArgs = (args != null) ? args.clone() : Reflection.NO_ARGS;
+        }
+
+        @Override
+        public int hashCode() {
+
+            return 31 * getClass().hashCode() + Arrays.deepHashCode(mArgs);
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+                return true;
+            }
+
+            if (!getClass().isInstance(o)) {
+                return false;
+            }
+
+            final ComparableInvocationFactory<?, ?> that = (ComparableInvocationFactory<?, ?>) o;
+            return Arrays.deepEquals(mArgs, that.mArgs);
+        }
+    }
+
+    /**
      * Routine invocation grouping data into collections of the same size.
      *
      * @param <DATA> the data type.
@@ -599,7 +645,7 @@ public class Streams extends Channels {
      * @param <DATA> the data type.
      */
     private static class GroupByInvocationFactory<DATA>
-            extends InvocationFactory<DATA, List<DATA>> {
+            extends ComparableInvocationFactory<DATA, List<DATA>> {
 
         private final int mSize;
 
@@ -611,6 +657,7 @@ public class Streams extends Channels {
          */
         private GroupByInvocationFactory(final int size) {
 
+            super(asArgs(size));
             if (size <= 0) {
                 throw new IllegalArgumentException("the group size must be positive: " + size);
             }
@@ -618,32 +665,11 @@ public class Streams extends Channels {
             mSize = size;
         }
 
-        @Override
-        public int hashCode() {
-
-            return mSize;
-        }
-
         @NotNull
         @Override
         public Invocation<DATA, List<DATA>> newInvocation() {
 
             return new GroupByInvocation<DATA>(mSize);
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof GroupByInvocationFactory)) {
-                return false;
-            }
-
-            final GroupByInvocationFactory<?> that = (GroupByInvocationFactory<?>) o;
-            return mSize == that.mSize;
         }
     }
 
@@ -689,7 +715,8 @@ public class Streams extends Channels {
      *
      * @param <DATA> the data type.
      */
-    private static class LimitInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
+    private static class LimitInvocationFactory<DATA>
+            extends ComparableInvocationFactory<DATA, DATA> {
 
         private final int mCount;
 
@@ -701,32 +728,12 @@ public class Streams extends Channels {
          */
         private LimitInvocationFactory(final int count) {
 
+            super(asArgs(count));
             if (count < 0) {
                 throw new IllegalArgumentException("the count must not be negative: " + count);
             }
 
             mCount = count;
-        }
-
-        @Override
-        public int hashCode() {
-
-            return mCount;
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof LimitInvocationFactory)) {
-                return false;
-            }
-
-            final LimitInvocationFactory<?> that = (LimitInvocationFactory<?>) o;
-            return mCount == that.mCount;
         }
 
         @NotNull
@@ -781,7 +788,8 @@ public class Streams extends Channels {
      *
      * @param <DATA> the data type.
      */
-    private static class SkipInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
+    private static class SkipInvocationFactory<DATA>
+            extends ComparableInvocationFactory<DATA, DATA> {
 
         private final int mCount;
 
@@ -793,32 +801,12 @@ public class Streams extends Channels {
          */
         private SkipInvocationFactory(final int count) {
 
+            super(asArgs(count));
             if (count < 0) {
                 throw new IllegalArgumentException("the count must not be negative: " + count);
             }
 
             mCount = count;
-        }
-
-        @Override
-        public int hashCode() {
-
-            return mCount;
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-                return true;
-
-            }
-            if (!(o instanceof SkipInvocationFactory)) {
-                return false;
-            }
-
-            final SkipInvocationFactory<?> that = (SkipInvocationFactory<?>) o;
-            return mCount == that.mCount;
         }
 
         @NotNull
@@ -905,7 +893,8 @@ public class Streams extends Channels {
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class StreamInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
+    private static class StreamInvocationFactory<IN, OUT>
+            extends ComparableInvocationFactory<IN, OUT> {
 
         private final FunctionWrapper<? super StreamChannel<? extends IN>, ? extends
                 StreamChannel<? extends OUT>> mFunction;
@@ -919,28 +908,8 @@ public class Streams extends Channels {
                 @NotNull final FunctionWrapper<? super StreamChannel<? extends IN>, ? extends
                         StreamChannel<? extends OUT>> function) {
 
+            super(asArgs(function));
             mFunction = function;
-        }
-
-        @Override
-        public int hashCode() {
-
-            return mFunction.hashCode();
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof StreamInvocationFactory)) {
-                return false;
-            }
-
-            final StreamInvocationFactory<?, ?> that = (StreamInvocationFactory<?, ?>) o;
-            return mFunction.equals(that.mFunction);
         }
 
         @NotNull

@@ -23,6 +23,7 @@ import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
 import com.github.dm.jrt.android.v11.core.Channels;
 import com.github.dm.jrt.android.v11.core.JRoutine;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
+import com.github.dm.jrt.builder.RoutineBuilder;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
@@ -413,6 +414,25 @@ public class Streams extends Channels {
             @NotNull final SparseArray<? extends OutputChannel<? extends OUT>> channelMap) {
 
         return streamOf(Channels.merge(channelMap));
+    }
+
+    /**
+     * Returns a routine builder, whose invocation instances employ the streams provided by the
+     * specified function to process input data.<br/>
+     * The function should return a new instance each time it is called, starting from the passed
+     * one.
+     *
+     * @param function the function providing the stream output channels.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the routine builder.
+     */
+    @NotNull
+    public static <IN, OUT> RoutineBuilder<IN, OUT> onStream(
+            @NotNull final Function<? super StreamChannel<? extends IN>, ? extends
+                    StreamChannel<? extends OUT>> function) {
+
+        return com.github.dm.jrt.stream.Streams.onStream(function);
     }
 
     /**

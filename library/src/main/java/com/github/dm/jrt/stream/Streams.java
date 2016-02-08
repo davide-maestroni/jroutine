@@ -415,8 +415,8 @@ public class Streams extends Channels {
     }
 
     /**
-     * Returns an routine builder, whose invocation instances employ the stream output channels,
-     * provided by the specified function, to process input data.<br/>
+     * Returns a routine builder, whose invocation instances employ the streams provided by the
+     * specified function to process input data.<br/>
      * The function should return a new instance each time it is called, starting from the passed
      * one.
      *

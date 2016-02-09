@@ -436,8 +436,8 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                             });
                         }
                     }).asyncInvoke();
-            channel.after(millis(100)).abort(new IllegalArgumentException());
-            channel.result().afterMax(seconds(1)).next();
+            channel.abort(new IllegalArgumentException());
+            channel.result().afterMax(seconds(3)).next();
 
             fail();
 
@@ -475,8 +475,8 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
             final InvocationChannel<String, String> channel =
                     JRoutine.with(loaderFrom(getActivity())).on(factory).asyncInvoke();
-            channel.after(millis(100)).abort(new IllegalArgumentException());
-            channel.result().afterMax(seconds(1)).next();
+            channel.abort(new IllegalArgumentException());
+            channel.result().afterMax(seconds(3)).next();
 
             fail();
 
@@ -528,8 +528,8 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                                                                });
                                              }
                                          }).asyncInvoke();
-            channel.after(millis(100)).abort(new IllegalArgumentException());
-            channel.result().afterMax(seconds(1)).next();
+            channel.abort(new IllegalArgumentException());
+            channel.result().afterMax(seconds(3)).next();
 
             fail();
 

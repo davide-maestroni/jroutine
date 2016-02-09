@@ -326,8 +326,8 @@ public class StreamsTest {
         try {
 
             final InvocationChannel<String, String> channel = JRoutine.on(factory).asyncInvoke();
-            channel.after(millis(100)).abort(new IllegalArgumentException());
-            channel.result().afterMax(seconds(1)).next();
+            channel.abort(new IllegalArgumentException());
+            channel.result().afterMax(seconds(3)).next();
 
             fail();
 
@@ -369,8 +369,8 @@ public class StreamsTest {
                             });
                         }
                     }).asyncInvoke();
-            channel.after(millis(100)).abort(new IllegalArgumentException());
-            channel.result().afterMax(seconds(1)).next();
+            channel.abort(new IllegalArgumentException());
+            channel.result().afterMax(seconds(3)).next();
 
             fail();
 

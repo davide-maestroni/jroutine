@@ -25,16 +25,15 @@ import com.github.dm.jrt.core.Channels;
 import com.github.dm.jrt.core.JRoutine;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.FunctionWrapper;
+import com.github.dm.jrt.invocation.ComparableInvocationFactory;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.invocation.TemplateInvocation;
-import com.github.dm.jrt.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -543,49 +542,6 @@ public class Streams extends Channels {
             @NotNull final OutputChannel<? extends OUT> channel, final int index) {
 
         return streamOf(Channels.toSelectable(channel, index));
-    }
-
-    /**
-     * Invocation factory implementing {@code equals()} and {@code hashCode()}.
-     *
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
-     */
-    private abstract static class ComparableInvocationFactory<IN, OUT>
-            extends InvocationFactory<IN, OUT> {
-
-        private final Object[] mArgs;
-
-        /**
-         * Constructor.
-         *
-         * @param args the constructor arguments.
-         */
-        private ComparableInvocationFactory(@Nullable final Object[] args) {
-
-            mArgs = (args != null) ? args.clone() : Reflection.NO_ARGS;
-        }
-
-        @Override
-        public int hashCode() {
-
-            return 31 * getClass().hashCode() + Arrays.deepHashCode(mArgs);
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-                return true;
-            }
-
-            if (!getClass().isInstance(o)) {
-                return false;
-            }
-
-            final ComparableInvocationFactory<?, ?> that = (ComparableInvocationFactory<?, ?>) o;
-            return Arrays.deepEquals(mArgs, that.mArgs);
-        }
     }
 
     /**

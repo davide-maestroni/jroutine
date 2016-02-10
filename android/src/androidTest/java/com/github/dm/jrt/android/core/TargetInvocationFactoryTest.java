@@ -69,6 +69,11 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
     private static class PassingStringInvocation extends FilterContextInvocation<String, String>
             implements StringInvocation {
 
+        private PassingStringInvocation() {
+
+            super(null);
+        }
+
         public void onInput(final String input, @NotNull final ResultChannel<String> result) {
 
             result.pass(input);

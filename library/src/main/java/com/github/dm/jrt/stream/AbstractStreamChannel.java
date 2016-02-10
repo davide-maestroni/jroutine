@@ -38,20 +38,19 @@ import com.github.dm.jrt.function.FunctionWrapper;
 import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.function.SupplierWrapper;
-import com.github.dm.jrt.invocation.FilterInvocation;
+import com.github.dm.jrt.invocation.ComparableFilterInvocation;
+import com.github.dm.jrt.invocation.ComparableInvocationFactory;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.invocation.PassingInvocation;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.runner.Runner;
-import com.github.dm.jrt.util.Reflection;
 import com.github.dm.jrt.util.TimeDuration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -951,49 +950,6 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     /**
-     * Filter invocation implementing {@code equals()} and {@code hashCode()}.
-     *
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
-     */
-    private abstract static class ComparableFilterInvocation<IN, OUT>
-            extends FilterInvocation<IN, OUT> {
-
-        private final Object[] mArgs;
-
-        /**
-         * Constructor.
-         *
-         * @param args the constructor arguments.
-         */
-        private ComparableFilterInvocation(@Nullable final Object[] args) {
-
-            mArgs = (args != null) ? args.clone() : Reflection.NO_ARGS;
-        }
-
-        @Override
-        public int hashCode() {
-
-            return 31 * getClass().hashCode() + Arrays.deepHashCode(mArgs);
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-                return true;
-            }
-
-            if (!getClass().isInstance(o)) {
-                return false;
-            }
-
-            final ComparableFilterInvocation<?, ?> that = (ComparableFilterInvocation<?, ?>) o;
-            return Arrays.deepEquals(mArgs, that.mArgs);
-        }
-    }
-
-    /**
      * Invocation implementation wrapping a consumer accepting output data.
      *
      * @param <OUT> the output data type.
@@ -1102,10 +1058,8 @@ public abstract class AbstractStreamChannel<OUT>
      *
      * @param <OUT> the output data type.
      */
-    private abstract static class GenerateInvocation<OUT> extends InvocationFactory<Object, OUT>
-            implements Invocation<Object, OUT> {
-
-        private final Object[] mArgs;
+    private abstract static class GenerateInvocation<OUT>
+            extends ComparableInvocationFactory<Object, OUT> implements Invocation<Object, OUT> {
 
         /**
          * Constructor.
@@ -1114,7 +1068,7 @@ public abstract class AbstractStreamChannel<OUT>
          */
         private GenerateInvocation(@Nullable final Object[] args) {
 
-            mArgs = (args != null) ? args.clone() : Reflection.NO_ARGS;
+            super(args);
         }
 
         @NotNull
@@ -1138,27 +1092,6 @@ public abstract class AbstractStreamChannel<OUT>
 
         public final void onInput(final Object input, @NotNull final ResultChannel<OUT> result) {
 
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-                return true;
-            }
-
-            if (!getClass().isInstance(o)) {
-                return false;
-            }
-
-            final GenerateInvocation<?> that = (GenerateInvocation<?>) o;
-            return Arrays.deepEquals(mArgs, that.mArgs);
-        }
-
-        @Override
-        public int hashCode() {
-
-            return 31 * getClass().hashCode() + Arrays.deepHashCode(mArgs);
         }
 
         public final void onTerminate() {

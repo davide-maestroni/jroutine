@@ -21,9 +21,11 @@ import com.github.dm.jrt.util.ClassToken;
 import com.github.dm.jrt.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
 import static com.github.dm.jrt.invocation.Invocations.factoryOf;
+import static com.github.dm.jrt.util.Reflection.asArgs;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -51,6 +53,72 @@ public class InvocationTest {
         invocation.onAbort(null);
         invocation.onTerminate();
         invocation.onDestroy();
+    }
+
+    @Test
+    public void testComparableCommandInvocation() {
+
+        final TestComparableCommandInvocation factory =
+                new TestComparableCommandInvocation(asArgs(1));
+        assertThat(factory).isEqualTo(factory);
+        assertThat(factory).isNotEqualTo(null);
+        assertThat(factory).isNotEqualTo(new InvocationFactory<Object, Object>() {
+
+            @NotNull
+            @Override
+            public Invocation<Object, Object> newInvocation() {
+
+                return new TemplateInvocation<Object, Object>() {};
+            }
+        });
+        assertThat(factory).isNotEqualTo(new TestComparableCommandInvocation(asArgs(2)));
+        assertThat(factory.hashCode()).isEqualTo(
+                new TestComparableCommandInvocation(asArgs(1)).hashCode());
+        assertThat(factory).isEqualTo(new TestComparableCommandInvocation(asArgs(1)));
+    }
+
+    @Test
+    public void testComparableFilterInvocation() {
+
+        final TestComparableFilterInvocation factory =
+                new TestComparableFilterInvocation(asArgs(1));
+        assertThat(factory).isEqualTo(factory);
+        assertThat(factory).isNotEqualTo(null);
+        assertThat(factory).isNotEqualTo(new InvocationFactory<Object, Object>() {
+
+            @NotNull
+            @Override
+            public Invocation<Object, Object> newInvocation() {
+
+                return new TemplateInvocation<Object, Object>() {};
+            }
+        });
+        assertThat(factory).isNotEqualTo(new TestComparableFilterInvocation(asArgs(2)));
+        assertThat(factory.hashCode()).isEqualTo(
+                new TestComparableFilterInvocation(asArgs(1)).hashCode());
+        assertThat(factory).isEqualTo(new TestComparableFilterInvocation(asArgs(1)));
+    }
+
+    @Test
+    public void testComparableInvocationFactory() {
+
+        final TestComparableInvocationFactory factory =
+                new TestComparableInvocationFactory(asArgs(1));
+        assertThat(factory).isEqualTo(factory);
+        assertThat(factory).isNotEqualTo(null);
+        assertThat(factory).isNotEqualTo(new InvocationFactory<Object, Object>() {
+
+            @NotNull
+            @Override
+            public Invocation<Object, Object> newInvocation() {
+
+                return new TemplateInvocation<Object, Object>() {};
+            }
+        });
+        assertThat(factory).isNotEqualTo(new TestComparableInvocationFactory(asArgs(2)));
+        assertThat(factory.hashCode()).isEqualTo(
+                new TestComparableInvocationFactory(asArgs(1)).hashCode());
+        assertThat(factory).isEqualTo(new TestComparableInvocationFactory(asArgs(1)));
     }
 
     @Test
@@ -173,6 +241,63 @@ public class InvocationTest {
 
         } catch (final NullPointerException ignored) {
 
+        }
+    }
+
+    private static class TestComparableCommandInvocation
+            extends ComparableCommandInvocation<Object> {
+
+        /**
+         * Constructor.
+         *
+         * @param args the constructor arguments.
+         */
+        protected TestComparableCommandInvocation(@Nullable final Object[] args) {
+
+            super(args);
+        }
+
+        public void onResult(@NotNull final ResultChannel<Object> result) {
+
+        }
+    }
+
+    private static class TestComparableFilterInvocation
+            extends ComparableFilterInvocation<Object, Object> {
+
+        /**
+         * Constructor.
+         *
+         * @param args the constructor arguments.
+         */
+        protected TestComparableFilterInvocation(@Nullable final Object[] args) {
+
+            super(args);
+        }
+
+        public void onInput(final Object input, @NotNull final ResultChannel<Object> result) {
+
+        }
+    }
+
+    private static class TestComparableInvocationFactory
+            extends ComparableInvocationFactory<Object, Object> {
+
+        /**
+         * Constructor.
+         *
+         * @param args the constructor arguments.
+         */
+        protected TestComparableInvocationFactory(@Nullable final Object[] args) {
+
+            super(args);
+        }
+
+        @NotNull
+        @Override
+        public Invocation<Object, Object> newInvocation() {
+
+            return new TemplateInvocation<Object, Object>() {};
         }
     }
 

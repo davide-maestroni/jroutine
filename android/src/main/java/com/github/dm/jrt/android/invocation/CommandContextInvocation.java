@@ -22,6 +22,7 @@ import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.common.RoutineException;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Abstract implementation of an invocation performing a command (that is, no input is required)
@@ -38,10 +39,12 @@ public abstract class CommandContextInvocation<OUT> extends ContextInvocationFac
 
     /**
      * Constructor.
+     *
+     * @param args the constructor arguments.
      */
-    protected CommandContextInvocation() {
+    protected CommandContextInvocation(@Nullable final Object[] args) {
 
-        super(null);
+        super(args);
     }
 
     @NotNull

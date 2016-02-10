@@ -17,7 +17,6 @@
 package com.github.dm.jrt.android.invocation;
 
 import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -33,7 +32,7 @@ import java.util.List;
 public class PassingFunctionContextInvocation<DATA> extends FunctionContextInvocation<DATA, DATA> {
 
     private static final FunctionContextInvocationFactory<Object, Object> sFactory =
-            new FunctionContextInvocationFactory<Object, Object>(Reflection.NO_ARGS) {
+            new FunctionContextInvocationFactory<Object, Object>(null) {
 
                 @NotNull
                 @Override

@@ -22,6 +22,7 @@ import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.common.RoutineException;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Abstract implementation of an invocation filtering each input and transforming it in output data.
@@ -38,10 +39,12 @@ public abstract class FilterContextInvocation<IN, OUT> extends ContextInvocation
 
     /**
      * Constructor.
+     *
+     * @param args the constructor arguments.
      */
-    protected FilterContextInvocation() {
+    protected FilterContextInvocation(@Nullable final Object[] args) {
 
-        super(null);
+        super(args);
     }
 
     @NotNull

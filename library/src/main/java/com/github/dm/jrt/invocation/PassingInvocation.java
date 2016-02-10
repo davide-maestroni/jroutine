@@ -27,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <DATA> the data type.
  */
-public class PassingInvocation<DATA> extends FilterInvocation<DATA, DATA> {
+public class PassingInvocation<DATA> extends ComparableFilterInvocation<DATA, DATA> {
 
     private static final PassingInvocation<Object> sInvocation = new PassingInvocation<Object>();
 
@@ -36,6 +36,7 @@ public class PassingInvocation<DATA> extends FilterInvocation<DATA, DATA> {
      */
     private PassingInvocation() {
 
+        super(null);
     }
 
     /**

@@ -19,6 +19,9 @@ package com.github.dm.jrt.function;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.common.RoutineException;
 import com.github.dm.jrt.invocation.CommandInvocation;
+import com.github.dm.jrt.invocation.ComparableCommandInvocation;
+import com.github.dm.jrt.invocation.ComparableFilterInvocation;
+import com.github.dm.jrt.invocation.ComparableInvocationFactory;
 import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.invocation.FunctionInvocation;
 import com.github.dm.jrt.invocation.Invocation;
@@ -29,6 +32,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+
+import static com.github.dm.jrt.util.Reflection.asArgs;
 
 /**
  * Utility class back-porting functional programming.
@@ -125,7 +130,8 @@ public class Functions {
     }
 
     /**
-     * Builds and returns a new invocation factory based on the specified bi-consumer instance.<br/>
+     * Builds and returns a new function invocation factory based on the specified bi-consumer
+     * instance.<br/>
      * It's up to the caller to prevent undesired leaks.
      * <p/>
      * Note that the passed object is expected to behave like a function, that is, it must not
@@ -182,7 +188,8 @@ public class Functions {
     }
 
     /**
-     * Builds and returns a new invocation factory based on the specified function instance.<br/>
+     * Builds and returns a new function invocation factory based on the specified function
+     * instance.<br/>
      * It's up to the caller to prevent undesired leaks.
      * <p/>
      * Note that the passed object is expected to behave like a function, that is, it must not
@@ -617,7 +624,7 @@ public class Functions {
      *
      * @param <OUT> the output data type.
      */
-    private static class ConsumerCommandInvocation<OUT> extends CommandInvocation<OUT> {
+    private static class ConsumerCommandInvocation<OUT> extends ComparableCommandInvocation<OUT> {
 
         private final ConsumerWrapper<? super ResultChannel<OUT>> mConsumer;
 
@@ -626,31 +633,11 @@ public class Functions {
          *
          * @param consumer the consumer instance.
          */
-        public ConsumerCommandInvocation(
+        private ConsumerCommandInvocation(
                 @NotNull final ConsumerWrapper<? super ResultChannel<OUT>> consumer) {
 
+            super(asArgs(consumer));
             mConsumer = consumer;
-        }
-
-        @Override
-        public int hashCode() {
-
-            return mConsumer.hashCode();
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof ConsumerCommandInvocation)) {
-                return false;
-            }
-
-            final ConsumerCommandInvocation<?> that = (ConsumerCommandInvocation<?>) o;
-            return mConsumer.equals(that.mConsumer);
         }
 
         public void onResult(@NotNull final ResultChannel<OUT> result) {
@@ -665,7 +652,8 @@ public class Functions {
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class ConsumerFilterInvocation<IN, OUT> extends FilterInvocation<IN, OUT> {
+    private static class ConsumerFilterInvocation<IN, OUT>
+            extends ComparableFilterInvocation<IN, OUT> {
 
         private final BiConsumerWrapper<? super IN, ? super ResultChannel<OUT>> mConsumer;
 
@@ -677,33 +665,13 @@ public class Functions {
         private ConsumerFilterInvocation(
                 @NotNull final BiConsumerWrapper<? super IN, ? super ResultChannel<OUT>> consumer) {
 
+            super(asArgs(consumer));
             mConsumer = consumer;
         }
 
         public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
 
             mConsumer.accept(input, result);
-        }
-
-        @Override
-        public int hashCode() {
-
-            return mConsumer.hashCode();
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof ConsumerFilterInvocation)) {
-                return false;
-            }
-
-            final ConsumerFilterInvocation<?, ?> that = (ConsumerFilterInvocation<?, ?>) o;
-            return mConsumer.equals(that.mConsumer);
         }
     }
 
@@ -713,10 +681,8 @@ public class Functions {
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class ConsumerInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
-
-        private final BiConsumerWrapper<? super List<? extends IN>, ? super ResultChannel<OUT>>
-                mConsumer;
+    private static class ConsumerInvocationFactory<IN, OUT>
+            extends ComparableInvocationFactory<IN, OUT> {
 
         private final FunctionInvocation<IN, OUT> mInvocation;
 
@@ -729,7 +695,7 @@ public class Functions {
                 @NotNull final BiConsumerWrapper<? super List<? extends IN>, ? super
                         ResultChannel<OUT>> consumer) {
 
-            mConsumer = consumer;
+            super(asArgs(consumer));
             mInvocation = new FunctionInvocation<IN, OUT>() {
 
                 @Override
@@ -747,27 +713,6 @@ public class Functions {
 
             return mInvocation;
         }
-
-        @Override
-        public int hashCode() {
-
-            return mConsumer.hashCode();
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof ConsumerInvocationFactory)) {
-                return false;
-            }
-
-            final ConsumerInvocationFactory<?, ?> that = (ConsumerInvocationFactory<?, ?>) o;
-            return mConsumer.equals(that.mConsumer);
-        }
     }
 
     /**
@@ -776,7 +721,8 @@ public class Functions {
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class FunctionFilterInvocation<IN, OUT> extends FilterInvocation<IN, OUT> {
+    private static class FunctionFilterInvocation<IN, OUT>
+            extends ComparableFilterInvocation<IN, OUT> {
 
         private final FunctionWrapper<? super IN, ? extends OUT> mFunction;
 
@@ -788,28 +734,8 @@ public class Functions {
         private FunctionFilterInvocation(
                 @NotNull final FunctionWrapper<? super IN, ? extends OUT> function) {
 
+            super(asArgs(function));
             mFunction = function;
-        }
-
-        @Override
-        public int hashCode() {
-
-            return mFunction.hashCode();
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof FunctionFilterInvocation)) {
-                return false;
-            }
-
-            final FunctionFilterInvocation<?, ?> that = (FunctionFilterInvocation<?, ?>) o;
-            return mFunction.equals(that.mFunction);
         }
 
         public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
@@ -824,9 +750,8 @@ public class Functions {
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class FunctionInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
-
-        private final FunctionWrapper<? super List<? extends IN>, ? extends OUT> mFunction;
+    private static class FunctionInvocationFactory<IN, OUT>
+            extends ComparableInvocationFactory<IN, OUT> {
 
         private final FunctionInvocation<IN, OUT> mInvocation;
 
@@ -839,7 +764,7 @@ public class Functions {
                 @NotNull final FunctionWrapper<? super List<? extends IN>, ? extends OUT>
                         function) {
 
-            mFunction = function;
+            super(asArgs(function));
             mInvocation = new FunctionInvocation<IN, OUT>() {
 
                 @Override
@@ -857,27 +782,6 @@ public class Functions {
 
             return mInvocation;
         }
-
-        @Override
-        public int hashCode() {
-
-            return mFunction.hashCode();
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof FunctionInvocationFactory)) {
-                return false;
-            }
-
-            final FunctionInvocationFactory<?, ?> that = (FunctionInvocationFactory<?, ?>) o;
-            return mFunction.equals(that.mFunction);
-        }
     }
 
     /**
@@ -885,7 +789,7 @@ public class Functions {
      *
      * @param <IN> the input data type.
      */
-    private static class PredicateFilterInvocation<IN> extends FilterInvocation<IN, IN> {
+    private static class PredicateFilterInvocation<IN> extends ComparableFilterInvocation<IN, IN> {
 
         private final PredicateWrapper<? super IN> mPredicate;
 
@@ -896,28 +800,8 @@ public class Functions {
          */
         private PredicateFilterInvocation(@NotNull final PredicateWrapper<? super IN> predicate) {
 
+            super(asArgs(predicate));
             mPredicate = predicate;
-        }
-
-        @Override
-        public int hashCode() {
-
-            return mPredicate.hashCode();
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof PredicateFilterInvocation)) {
-                return false;
-            }
-
-            final PredicateFilterInvocation<?> that = (PredicateFilterInvocation<?>) o;
-            return mPredicate.equals(that.mPredicate);
         }
 
         public void onInput(final IN input, @NotNull final ResultChannel<IN> result) {
@@ -933,7 +817,7 @@ public class Functions {
      *
      * @param <OUT> the output data type.
      */
-    private static class SupplierCommandInvocation<OUT> extends CommandInvocation<OUT> {
+    private static class SupplierCommandInvocation<OUT> extends ComparableCommandInvocation<OUT> {
 
         private final SupplierWrapper<? extends OUT> mSupplier;
 
@@ -944,28 +828,8 @@ public class Functions {
          */
         public SupplierCommandInvocation(@NotNull final SupplierWrapper<? extends OUT> supplier) {
 
+            super(asArgs(supplier));
             mSupplier = supplier;
-        }
-
-        @Override
-        public int hashCode() {
-
-            return mSupplier.hashCode();
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof SupplierCommandInvocation)) {
-                return false;
-            }
-
-            final SupplierCommandInvocation<?> that = (SupplierCommandInvocation<?>) o;
-            return mSupplier.equals(that.mSupplier);
         }
 
         public void onResult(@NotNull final ResultChannel<OUT> result) {
@@ -980,7 +844,8 @@ public class Functions {
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class SupplierInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
+    private static class SupplierInvocationFactory<IN, OUT>
+            extends ComparableInvocationFactory<IN, OUT> {
 
         private final SupplierWrapper<? extends Invocation<? super IN, ? extends OUT>> mSupplier;
 
@@ -993,6 +858,7 @@ public class Functions {
                 @NotNull final SupplierWrapper<? extends Invocation<? super IN, ? extends OUT>>
                         supplier) {
 
+            super(asArgs(supplier));
             mSupplier = supplier;
         }
 
@@ -1002,27 +868,6 @@ public class Functions {
         public Invocation<IN, OUT> newInvocation() {
 
             return (Invocation<IN, OUT>) mSupplier.get();
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof SupplierInvocationFactory)) {
-                return false;
-            }
-
-            final SupplierInvocationFactory<?, ?> that = (SupplierInvocationFactory<?, ?>) o;
-            return mSupplier.equals(that.mSupplier);
-        }
-
-        @Override
-        public int hashCode() {
-
-            return mSupplier.hashCode();
         }
     }
 }

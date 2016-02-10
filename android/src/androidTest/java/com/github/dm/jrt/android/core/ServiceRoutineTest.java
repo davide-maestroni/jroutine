@@ -564,6 +564,11 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
     private static class MyParcelableInvocation
             extends FilterContextInvocation<MyParcelable, MyParcelable> {
 
+        private MyParcelableInvocation() {
+
+            super(null);
+        }
+
         public void onInput(final MyParcelable myParcelable,
                 @NotNull final ResultChannel<MyParcelable> result) {
 
@@ -601,6 +606,11 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
     private static class StringPassingInvocation extends FilterContextInvocation<String, String> {
 
+        private StringPassingInvocation() {
+
+            super(null);
+        }
+
         public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
             result.pass(s);
@@ -608,6 +618,11 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
     }
 
     private static class TextCommandInvocation extends CommandContextInvocation<String> {
+
+        private TextCommandInvocation() {
+
+            super(null);
+        }
 
         public void onResult(@NotNull final ResultChannel<String> result) {
 

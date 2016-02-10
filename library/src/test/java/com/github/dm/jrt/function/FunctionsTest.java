@@ -147,7 +147,7 @@ public class FunctionsTest {
         });
     }
 
-    private static InvocationFactory<?, String> createFunction() {
+    private static InvocationFactory<Object, String> createFunction() {
 
         return consumerFactory(new BiConsumer<List<?>, ResultChannel<String>>() {
 
@@ -161,7 +161,7 @@ public class FunctionsTest {
         });
     }
 
-    private static InvocationFactory<?, String> createFunction2() {
+    private static InvocationFactory<Object, String> createFunction2() {
 
         return functionFactory(new com.github.dm.jrt.function.Function<List<?>, String>() {
 
@@ -958,7 +958,7 @@ public class FunctionsTest {
     @Test
     public void testFunctionFactory() {
 
-        final Routine<?, String> routine = JRoutine.on(createFunction()).buildRoutine();
+        final Routine<Object, String> routine = JRoutine.on(createFunction()).buildRoutine();
         assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
                                                                                          "1");
     }
@@ -966,7 +966,7 @@ public class FunctionsTest {
     @Test
     public void testFunctionFactory2() {
 
-        final Routine<?, String> routine = JRoutine.on(createFunction2()).buildRoutine();
+        final Routine<Object, String> routine = JRoutine.on(createFunction2()).buildRoutine();
         assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test1");
     }
 

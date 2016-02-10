@@ -708,6 +708,11 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
     private static class PassingInteger extends FilterContextInvocation<Integer, Integer> {
 
+        private PassingInteger() {
+
+            super(null);
+        }
+
         public void onInput(final Integer i, @NotNull final ResultChannel<Integer> result) {
 
             result.pass(i);
@@ -715,6 +720,11 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     }
 
     private static class PassingString extends FilterContextInvocation<String, String> {
+
+        private PassingString() {
+
+            super(null);
+        }
 
         public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
@@ -728,6 +738,11 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         private static final int INTEGER = 1;
 
         private static final int STRING = 0;
+
+        private Sort() {
+
+            super(null);
+        }
 
         public void onInput(final ParcelableSelectable<Object> selectable,
                 @NotNull final ResultChannel<ParcelableSelectable<Object>> result) {

@@ -18,6 +18,8 @@ package com.github.dm.jrt.invocation;
 
 import org.jetbrains.annotations.NotNull;
 
+import static com.github.dm.jrt.util.Reflection.asArgs;
+
 /**
  * Class decorating the invocations produced by an invocation factory.
  * <p/>
@@ -26,7 +28,8 @@ import org.jetbrains.annotations.NotNull;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public abstract class DecoratingInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
+public abstract class DecoratingInvocationFactory<IN, OUT>
+        extends ComparableInvocationFactory<IN, OUT> {
 
     private final InvocationFactory<IN, OUT> mFactory;
 
@@ -38,32 +41,12 @@ public abstract class DecoratingInvocationFactory<IN, OUT> extends InvocationFac
     @SuppressWarnings("ConstantConditions")
     public DecoratingInvocationFactory(@NotNull final InvocationFactory<IN, OUT> wrapped) {
 
+        super(asArgs(wrapped));
         if (wrapped == null) {
             throw new NullPointerException("the wrapped invocation factory must not be null");
         }
 
         mFactory = wrapped;
-    }
-
-    @Override
-    public int hashCode() {
-
-        return mFactory.hashCode();
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-
-        if (this == o) {
-            return true;
-        }
-
-        if (!(o instanceof DecoratingInvocationFactory)) {
-            return false;
-        }
-
-        final DecoratingInvocationFactory<?, ?> that = (DecoratingInvocationFactory<?, ?>) o;
-        return mFactory.equals(that.mFactory);
     }
 
     @NotNull

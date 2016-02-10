@@ -37,6 +37,7 @@ public class PassingContextInvocation<DATA> extends FilterContextInvocation<DATA
      */
     private PassingContextInvocation() {
 
+        super(null);
     }
 
     /**

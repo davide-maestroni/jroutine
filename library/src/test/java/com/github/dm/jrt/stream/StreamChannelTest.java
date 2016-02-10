@@ -609,9 +609,11 @@ public class StreamChannelTest {
     @SuppressWarnings("ConstantConditions")
     public void testForEachNullPointerError() {
 
+        final Consumer<Object> consumer = null;
+
         try {
 
-            Streams.streamOf().sync().forEach(null);
+            Streams.streamOf().sync().forEach(consumer);
 
             fail();
 
@@ -621,7 +623,7 @@ public class StreamChannelTest {
 
         try {
 
-            Streams.streamOf().async().forEach(null);
+            Streams.streamOf().async().forEach(consumer);
 
             fail();
 

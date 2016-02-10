@@ -1161,6 +1161,11 @@ public class ParcelableByteChannelTest extends ActivityInstrumentationTestCase2<
     private static class PassingInvocation
             extends FilterContextInvocation<ParcelableByteBuffer, ParcelableByteBuffer> {
 
+        private PassingInvocation() {
+
+            super(null);
+        }
+
         public void onInput(final ParcelableByteBuffer input,
                 @NotNull final ResultChannel<ParcelableByteBuffer> result) {
 

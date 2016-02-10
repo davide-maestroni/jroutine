@@ -18,6 +18,7 @@ package com.github.dm.jrt.android.invocation;
 
 import android.content.Context;
 
+import com.github.dm.jrt.invocation.ComparableInvocationFactory;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.invocation.Invocations;
@@ -158,7 +159,7 @@ public class ContextInvocations {
      * @param <OUT> the output data type.
      */
     private static class AdaptingContextInvocationFactory<IN, OUT>
-            extends InvocationFactory<IN, OUT> {
+            extends ComparableInvocationFactory<IN, OUT> {
 
         private final Context mContext;
 
@@ -173,6 +174,7 @@ public class ContextInvocations {
         private AdaptingContextInvocationFactory(@NotNull final Context context,
                 @NotNull final ContextInvocationFactory<IN, OUT> factory) {
 
+            super(asArgs(context, factory));
             if (context == null) {
                 throw new NullPointerException("the routine context must not be null");
             }
@@ -183,30 +185,6 @@ public class ContextInvocations {
 
             mContext = context;
             mFactory = factory;
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof AdaptingContextInvocationFactory)) {
-                return false;
-            }
-
-            final AdaptingContextInvocationFactory<?, ?> that =
-                    (AdaptingContextInvocationFactory<?, ?>) o;
-            return mContext.equals(that.mContext) && mFactory.equals(that.mFactory);
-        }
-
-        @Override
-        public int hashCode() {
-
-            int result = mContext.hashCode();
-            result = 31 * result + mFactory.hashCode();
-            return result;
         }
 
         @NotNull

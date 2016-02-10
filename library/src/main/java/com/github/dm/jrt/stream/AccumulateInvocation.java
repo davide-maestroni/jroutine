@@ -19,6 +19,7 @@ package com.github.dm.jrt.stream;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.BiFunctionWrapper;
+import com.github.dm.jrt.invocation.ComparableInvocationFactory;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.invocation.TemplateInvocation;
@@ -26,6 +27,7 @@ import com.github.dm.jrt.invocation.TemplateInvocation;
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.function.Functions.wrapBiFunction;
+import static com.github.dm.jrt.util.Reflection.asArgs;
 
 /**
  * Invocation implementation accumulating the result returned by a bi-function instance.
@@ -103,7 +105,8 @@ class AccumulateInvocation<IN> extends TemplateInvocation<IN, IN> {
      *
      * @param <IN> the input data type.
      */
-    private static class AccumulateInvocationFactory<IN> extends InvocationFactory<IN, IN> {
+    private static class AccumulateInvocationFactory<IN>
+            extends ComparableInvocationFactory<IN, IN> {
 
         private final BiFunctionWrapper<? super IN, ? super IN, ? extends IN> mFunction;
 
@@ -115,28 +118,8 @@ class AccumulateInvocation<IN> extends TemplateInvocation<IN, IN> {
         private AccumulateInvocationFactory(
                 @NotNull final BiFunctionWrapper<? super IN, ? super IN, ? extends IN> function) {
 
+            super(asArgs(function));
             mFunction = function;
-        }
-
-        @Override
-        public int hashCode() {
-
-            return mFunction.hashCode();
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof AccumulateInvocationFactory)) {
-                return false;
-            }
-
-            final AccumulateInvocationFactory<?> that = (AccumulateInvocationFactory<?>) o;
-            return mFunction.equals(that.mFunction);
         }
 
         @NotNull

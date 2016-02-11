@@ -26,6 +26,7 @@ import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.core.Channels;
 import com.github.dm.jrt.core.Channels.Selectable;
 import com.github.dm.jrt.core.JRoutine;
+import com.github.dm.jrt.function.BiConsumerWrapper;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.invocation.FilterInvocation;
@@ -492,6 +493,85 @@ public class StreamsTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
+    public void testGroupByPlaceholder() {
+
+        assertThat(Streams.streamOf()
+                          .sync()
+                          .range(1, 10)
+                          .async()
+                          .map(Streams.<Number>groupBy(3, 0))
+                          .afterMax(seconds(3))
+                          .all()).containsExactly(Arrays.<Number>asList(1, 2, 3),
+                                                  Arrays.<Number>asList(4, 5, 6),
+                                                  Arrays.<Number>asList(7, 8, 9),
+                                                  Arrays.<Number>asList(10, 0, 0));
+        assertThat(Streams.streamOf()
+                          .sync()
+                          .range(1, 10)
+                          .async()
+                          .map(Streams.<Number>groupBy(13, -1))
+                          .afterMax(seconds(3))
+                          .all()).containsExactly(
+                Arrays.<Number>asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, -1, -1, -1));
+        assertThat(Streams.streamOf()
+                          .sync()
+                          .range(1, 10)
+                          .async()
+                          .map(Streams.<Number>groupBy(3, -31))
+                          .afterMax(seconds(3))
+                          .all()).containsExactly(Arrays.<Number>asList(1, 2, 3),
+                                                  Arrays.<Number>asList(4, 5, 6),
+                                                  Arrays.<Number>asList(7, 8, 9),
+                                                  Arrays.<Number>asList(10, -31, -31));
+        assertThat(Streams.streamOf()
+                          .sync()
+                          .range(1, 10)
+                          .async()
+                          .map(Streams.<Number>groupBy(13, 71))
+                          .afterMax(seconds(3))
+                          .all()).containsExactly(
+                Arrays.<Number>asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 71, 71, 71));
+    }
+
+    @Test
+    public void testGroupByPlaceholderEquals() {
+
+        final Object placeholder = -11;
+        final InvocationFactory<Object, List<Object>> factory = Streams.groupBy(2, placeholder);
+        assertThat(factory).isEqualTo(factory);
+        assertThat(factory).isNotEqualTo(null);
+        assertThat(factory).isNotEqualTo("test");
+        assertThat(factory).isNotEqualTo(Streams.groupBy(3, -11));
+        assertThat(factory).isEqualTo(Streams.groupBy(2, -11));
+        assertThat(factory.hashCode()).isEqualTo(Streams.groupBy(2, -11).hashCode());
+    }
+
+    @Test
+    public void testGroupByPlaceholderError() {
+
+        try {
+
+            Streams.groupBy(-1, 77);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Streams.groupBy(0, null);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    @Test
     public void testJoin() {
 
         final IOChannelBuilder builder = JRoutine.io();
@@ -568,139 +648,6 @@ public class StreamsTest {
     }
 
     @Test
-    public void testJoinAndFlush() {
-
-        final IOChannelBuilder builder = JRoutine.io();
-        final Routine<List<?>, Character> routine = JRoutine.on(new CharAt()).buildRoutine();
-        IOChannel<String> channel1;
-        IOChannel<Integer> channel2;
-        channel1 = builder.buildChannel();
-        channel2 = builder.buildChannel();
-        channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
-        channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
-        assertThat(routine.asyncCall(Streams.joinAndFlush(new Object(), channel1, channel2))
-                          .afterMax(seconds(10))
-                          .all()).containsExactly('s', '2');
-        channel1 = builder.buildChannel();
-        channel2 = builder.buildChannel();
-        channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
-        channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
-        assertThat(routine.asyncCall(
-                Streams.joinAndFlush(null, Arrays.<OutputChannel<?>>asList(channel1, channel2)))
-                          .afterMax(seconds(10))
-                          .all()).containsExactly('s', '2');
-        channel1 = builder.buildChannel();
-        channel2 = builder.buildChannel();
-        channel1.orderByCall()
-                .after(millis(100))
-                .pass("testtest")
-                .pass("test2")
-                .pass("test3")
-                .close();
-        channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
-
-        try {
-
-            routine.asyncCall(Streams.joinAndFlush(new Object(), channel1, channel2))
-                   .afterMax(seconds(10))
-                   .all();
-
-            fail();
-
-        } catch (final InvocationException ignored) {
-
-        }
-    }
-
-    @Test
-    public void testJoinAndFlushAbort() {
-
-        final IOChannelBuilder builder = JRoutine.io();
-        final Routine<List<?>, Character> routine = JRoutine.on(new CharAt()).buildRoutine();
-        IOChannel<String> channel1;
-        IOChannel<Integer> channel2;
-        channel1 = builder.buildChannel();
-        channel2 = builder.buildChannel();
-        channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
-        channel2.orderByCall().abort();
-
-        try {
-
-            routine.asyncCall(Streams.joinAndFlush(null, channel1, channel2))
-                   .afterMax(seconds(1))
-                   .all();
-
-            fail();
-
-        } catch (final AbortException ignored) {
-
-        }
-
-        channel1 = builder.buildChannel();
-        channel2 = builder.buildChannel();
-        channel1.orderByCall().abort();
-        channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
-
-        try {
-
-            routine.asyncCall(Streams.joinAndFlush(new Object(),
-                                                   Arrays.<OutputChannel<?>>asList(channel1,
-                                                                                   channel2)))
-                   .afterMax(seconds(1))
-                   .all();
-
-            fail();
-
-        } catch (final AbortException ignored) {
-
-        }
-    }
-
-    @Test
-    public void testJoinAndFlushError() {
-
-        try {
-
-            Streams.joinAndFlush(new Object());
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            Streams.joinAndFlush(null, Collections.<OutputChannel<?>>emptyList());
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            Streams.joinAndFlush(new Object(), new OutputChannel[]{null});
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.joinAndFlush(new Object(), Collections.<OutputChannel<?>>singletonList(null));
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-    }
-
-    @Test
     public void testJoinError() {
 
         try {
@@ -736,6 +683,138 @@ public class StreamsTest {
         try {
 
             Streams.join(Collections.<OutputChannel<?>>singletonList(null));
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testJoinPlaceholder() {
+
+        final IOChannelBuilder builder = JRoutine.io();
+        final Routine<List<?>, Character> routine = JRoutine.on(new CharAt()).buildRoutine();
+        IOChannel<String> channel1;
+        IOChannel<Integer> channel2;
+        channel1 = builder.buildChannel();
+        channel2 = builder.buildChannel();
+        channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
+        channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
+        assertThat(routine.asyncCall(Streams.join(new Object(), channel1, channel2))
+                          .afterMax(seconds(10))
+                          .all()).containsExactly('s', '2');
+        channel1 = builder.buildChannel();
+        channel2 = builder.buildChannel();
+        channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
+        channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
+        assertThat(routine.asyncCall(
+                Streams.join(null, Arrays.<OutputChannel<?>>asList(channel1, channel2)))
+                          .afterMax(seconds(10))
+                          .all()).containsExactly('s', '2');
+        channel1 = builder.buildChannel();
+        channel2 = builder.buildChannel();
+        channel1.orderByCall()
+                .after(millis(100))
+                .pass("testtest")
+                .pass("test2")
+                .pass("test3")
+                .close();
+        channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
+
+        try {
+
+            routine.asyncCall(Streams.join(new Object(), channel1, channel2))
+                   .afterMax(seconds(10))
+                   .all();
+
+            fail();
+
+        } catch (final InvocationException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testJoinPlaceholderAbort() {
+
+        final IOChannelBuilder builder = JRoutine.io();
+        final Routine<List<?>, Character> routine = JRoutine.on(new CharAt()).buildRoutine();
+        IOChannel<String> channel1;
+        IOChannel<Integer> channel2;
+        channel1 = builder.buildChannel();
+        channel2 = builder.buildChannel();
+        channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
+        channel2.orderByCall().abort();
+
+        try {
+
+            routine.asyncCall(Streams.join((Object) null, channel1, channel2))
+                   .afterMax(seconds(1))
+                   .all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        channel1 = builder.buildChannel();
+        channel2 = builder.buildChannel();
+        channel1.orderByCall().abort();
+        channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
+
+        try {
+
+            routine.asyncCall(
+                    Streams.join(new Object(), Arrays.<OutputChannel<?>>asList(channel1, channel2)))
+                   .afterMax(seconds(1))
+                   .all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testJoinPlaceholderError() {
+
+        try {
+
+            Streams.join(new Object());
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Streams.join(null, Collections.<OutputChannel<?>>emptyList());
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Streams.join(new Object(), new OutputChannel[]{null});
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.join(new Object(), Collections.<OutputChannel<?>>singletonList(null));
 
             fail();
 
@@ -819,7 +898,8 @@ public class StreamsTest {
                                                                  .set()
                                                                  .asyncCall(channel);
         final Map<Integer, OutputChannel<Object>> channelMap =
-                Streams.select(output, Sort.INTEGER, Sort.STRING);
+                Channels.select(output, Sort.INTEGER, Sort.STRING);
+        // TODO: 10/02/16 Streams.select()???
 
         for (int i = 0; i < 4; i++) {
 
@@ -1246,6 +1326,33 @@ public class StreamsTest {
         } catch (final IllegalArgumentException ignored) {
 
         }
+    }
+
+    @Test
+    public void testUnwrap() {
+
+        assertThat(Streams.streamOf()
+                          .sync()
+                          .range(1, 10)
+                          .async()
+                          .map(Streams.<Number>groupBy(3))
+                          .parallel()
+                          .map(Streams.<Number>unwrap())
+                          .afterMax(seconds(3))
+                          .all()).containsOnly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+    }
+
+    @Test
+    public void testUnwrapEquals() {
+
+        final BiConsumerWrapper<Iterable<Object>, ResultChannel<Object>> consumer =
+                Streams.unwrap();
+        assertThat(consumer).isEqualTo(consumer);
+        assertThat(consumer).isNotEqualTo(null);
+        assertThat(consumer).isNotEqualTo("test");
+        assertThat(consumer).isNotEqualTo(Streams.groupBy(3));
+        assertThat(consumer).isEqualTo(Streams.unwrap());
+        assertThat(consumer.hashCode()).isEqualTo(Streams.unwrap().hashCode());
     }
 
     private static class Amb<DATA> extends TemplateInvocation<Selectable<DATA>, DATA> {

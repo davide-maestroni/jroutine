@@ -48,6 +48,34 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
                 }
             });
 
+    private static final BiFunctionWrapper<? extends Comparable<?>, ? extends Comparable<?>, ?
+            extends
+            Comparable<?>> sMax =
+            new BiFunctionWrapper<Comparable<Object>, Comparable<Object>, Comparable<Object>>(
+                    new BiFunction<Comparable<Object>, Comparable<Object>, Comparable<Object>>() {
+
+                        @SuppressWarnings("unchecked")
+                        public Comparable<Object> apply(final Comparable<Object> in1,
+                                final Comparable<Object> in2) {
+
+                            return (in1.compareTo(in2) >= 0) ? in1 : in2;
+                        }
+                    });
+
+    private static final BiFunctionWrapper<? extends Comparable<?>, ? extends Comparable<?>, ?
+            extends
+            Comparable<?>> sMin =
+            new BiFunctionWrapper<Comparable<Object>, Comparable<Object>, Comparable<Object>>(
+                    new BiFunction<Comparable<Object>, Comparable<Object>, Comparable<Object>>() {
+
+                        @SuppressWarnings("unchecked")
+                        public Comparable<Object> apply(final Comparable<Object> in1,
+                                final Comparable<Object> in2) {
+
+                            return (in1.compareTo(in2) <= 0) ? in1 : in2;
+                        }
+                    });
+
     private static final BiFunctionWrapper<Object, Object, Object> sSecond =
             new BiFunctionWrapper<Object, Object, Object>(new BiFunction<Object, Object, Object>() {
 
@@ -104,6 +132,21 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
     }
 
     /**
+     * Returns a bi-function wrapper returning the greater of the two inputs as per natural
+     * ordering.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN> the input data type.
+     * @return the bi-function wrapper.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <IN extends Comparable<IN>> BiFunctionWrapper<IN, IN, IN> max() {
+
+        return (BiFunctionWrapper<IN, IN, IN>) sMax;
+    }
+
+    /**
      * Returns a bi-function wrapper returning the greater of the two inputs as indicated by the
      * specified comparator.<br/>
      * The returned object will support concatenation and comparison.
@@ -132,6 +175,21 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
 
             return function;
         }
+    }
+
+    /**
+     * Returns a bi-function wrapper returning the smaller of the two inputs as per natural
+     * ordering.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN> the input data type.
+     * @return the bi-function wrapper.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <IN extends Comparable<IN>> BiFunctionWrapper<IN, IN, IN> min() {
+
+        return (BiFunctionWrapper<IN, IN, IN>) sMin;
     }
 
     /**

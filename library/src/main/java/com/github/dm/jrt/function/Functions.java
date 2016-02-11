@@ -31,6 +31,7 @@ import com.github.dm.jrt.util.ClassToken;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Comparator;
 import java.util.List;
 
 import static com.github.dm.jrt.util.Reflection.asArgs;
@@ -297,6 +298,64 @@ public class Functions {
     public static <IN> PredicateWrapper<IN> isSame(@Nullable final Object targetRef) {
 
         return PredicateWrapper.isSame(targetRef);
+    }
+
+    /**
+     * Returns a bi-function wrapper returning the greater of the two inputs as per natural
+     * ordering.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN> the input data type.
+     * @return the bi-function wrapper.
+     */
+    @NotNull
+    public static <IN extends Comparable<IN>> BiFunctionWrapper<IN, IN, IN> max() {
+
+        return BiFunctionWrapper.max();
+    }
+
+    /**
+     * Returns a bi-function wrapper returning the greater of the two inputs as indicated by the
+     * specified comparator.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param comparator the comparator instance.
+     * @param <IN>       the input data type.
+     * @return the bi-function wrapper.
+     */
+    public static <IN> BiFunctionWrapper<IN, IN, IN> maxBy(
+            @NotNull final Comparator<? super IN> comparator) {
+
+        return BiFunctionWrapper.maxBy(comparator);
+    }
+
+    /**
+     * Returns a bi-function wrapper returning the smaller of the two inputs as per natural
+     * ordering.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN> the input data type.
+     * @return the bi-function wrapper.
+     */
+    @NotNull
+    public static <IN extends Comparable<IN>> BiFunctionWrapper<IN, IN, IN> min() {
+
+        return BiFunctionWrapper.min();
+    }
+
+    /**
+     * Returns a bi-function wrapper returning the smaller of the two inputs as indicated by the
+     * specified comparator.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param comparator the comparator instance.
+     * @param <IN>       the input data type.
+     * @return the bi-function wrapper.
+     */
+    public static <IN> BiFunctionWrapper<IN, IN, IN> minBy(
+            @NotNull final Comparator<? super IN> comparator) {
+
+        return BiFunctionWrapper.minBy(comparator);
     }
 
     /**

@@ -35,8 +35,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static com.github.dm.jrt.function.BiFunctionWrapper.maxBy;
-import static com.github.dm.jrt.function.BiFunctionWrapper.minBy;
 import static com.github.dm.jrt.function.Functions.biSink;
 import static com.github.dm.jrt.function.Functions.castTo;
 import static com.github.dm.jrt.function.Functions.constant;
@@ -50,6 +48,10 @@ import static com.github.dm.jrt.function.Functions.isEqual;
 import static com.github.dm.jrt.function.Functions.isInstanceOf;
 import static com.github.dm.jrt.function.Functions.isNull;
 import static com.github.dm.jrt.function.Functions.isSame;
+import static com.github.dm.jrt.function.Functions.max;
+import static com.github.dm.jrt.function.Functions.maxBy;
+import static com.github.dm.jrt.function.Functions.min;
+import static com.github.dm.jrt.function.Functions.minBy;
 import static com.github.dm.jrt.function.Functions.negative;
 import static com.github.dm.jrt.function.Functions.notNull;
 import static com.github.dm.jrt.function.Functions.positive;
@@ -1075,6 +1077,39 @@ public class FunctionsTest {
     }
 
     @Test
+    public void testMaxBiFunction() {
+
+        final BiFunctionWrapper<String, String, String> function = max();
+        assertThat(function.apply("A TEST", "test")).isEqualTo("test");
+        assertThat(function.andThen(new Function<String, String>() {
+
+            public String apply(final String s) {
+
+                return s.toLowerCase();
+            }
+        }).apply("A TEST", "test")).isEqualTo("test");
+        assertThat(function.apply("2", "1")).isEqualTo("2");
+    }
+
+    @Test
+    public void testMaxBiFunctionEquals() {
+
+        final BiFunctionWrapper<String, String, String> function = max();
+        assertThat(function).isEqualTo(function);
+        assertThat(function).isEqualTo(max());
+        assertThat(function).isNotEqualTo(maxBy(new Comparator<String>() {
+
+            public int compare(final String o1, final String o2) {
+
+                return o2.compareTo(o1);
+            }
+        }));
+        assertThat(function).isNotEqualTo(null);
+        assertThat(function).isNotEqualTo("");
+        assertThat(function.hashCode()).isEqualTo(max().hashCode());
+    }
+
+    @Test
     public void testMaxByBiFunction() {
 
         final BiFunctionWrapper<String, String, String> function =
@@ -1122,6 +1157,39 @@ public class FunctionsTest {
         } catch (final NullPointerException ignored) {
 
         }
+    }
+
+    @Test
+    public void testMinBiFunction() {
+
+        final BiFunctionWrapper<String, String, String> function = min();
+        assertThat(function.apply("A TEST", "test")).isEqualTo("A TEST");
+        assertThat(function.andThen(new Function<String, String>() {
+
+            public String apply(final String s) {
+
+                return s.toLowerCase();
+            }
+        }).apply("A TEST", "test")).isEqualTo("a test");
+        assertThat(function.apply("2", "1")).isEqualTo("1");
+    }
+
+    @Test
+    public void testMinBiFunctionEquals() {
+
+        final BiFunctionWrapper<String, String, String> function = min();
+        assertThat(function).isEqualTo(function);
+        assertThat(function).isEqualTo(min());
+        assertThat(function).isNotEqualTo(minBy(new Comparator<String>() {
+
+            public int compare(final String o1, final String o2) {
+
+                return o2.compareTo(o1);
+            }
+        }));
+        assertThat(function).isNotEqualTo(null);
+        assertThat(function).isNotEqualTo("");
+        assertThat(function.hashCode()).isEqualTo(min().hashCode());
     }
 
     @Test

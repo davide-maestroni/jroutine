@@ -635,148 +635,6 @@ public class ChannelsTest {
     }
 
     @Test
-    public void testDistributeAndFlush() {
-
-        final InvocationChannel<String, String> channel1 =
-                JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
-        final InvocationChannel<String, String> channel2 =
-                JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
-        Channels.distributeAndFlush(null, channel1, channel2)
-                .pass(Arrays.asList("test1-1", "test1-2"))
-                .close();
-        final String placeholder = "placeholder";
-        Channels.distributeAndFlush((Object) placeholder,
-                                    Arrays.<InputChannel<?>>asList(channel1, channel2))
-                .pass(Arrays.asList("test2-1", "test2-2"))
-                .close();
-        Channels.distributeAndFlush(placeholder, channel1, channel2)
-                .pass(Collections.singletonList("test3-1"))
-                .close();
-        assertThat(channel1.result().afterMax(seconds(1)).all()).containsExactly("test1-1",
-                                                                                 "test2-1",
-                                                                                 "test3-1");
-        assertThat(channel2.result().afterMax(seconds(1)).all()).containsExactly("test1-2",
-                                                                                 "test2-2",
-                                                                                 placeholder);
-    }
-
-    @Test
-    public void testDistributeAndFlushAbort() {
-
-        InvocationChannel<String, String> channel1;
-        InvocationChannel<String, String> channel2;
-        channel1 = JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
-        channel2 = JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
-        Channels.distributeAndFlush(null, channel1, channel2).abort();
-
-        try {
-
-            channel1.result().afterMax(seconds(1)).next();
-
-            fail();
-
-        } catch (final AbortException ignored) {
-
-        }
-
-        try {
-
-            channel2.result().afterMax(seconds(1)).next();
-
-            fail();
-
-        } catch (final AbortException ignored) {
-
-        }
-
-        channel1 = JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
-        channel2 = JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
-        Channels.distributeAndFlush(null, Arrays.<InputChannel<?>>asList(channel1, channel2))
-                .abort();
-
-        try {
-
-            channel1.result().afterMax(seconds(1)).next();
-
-            fail();
-
-        } catch (final AbortException ignored) {
-
-        }
-
-        try {
-
-            channel2.result().afterMax(seconds(1)).next();
-
-            fail();
-
-        } catch (final AbortException ignored) {
-
-        }
-    }
-
-    @Test
-    public void testDistributeAndFlushError() {
-
-        final InvocationChannel<String, String> channel1 =
-                JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
-        Channels.distributeAndFlush(null, channel1)
-                .pass(Arrays.asList("test1-1", "test1-2"))
-                .close();
-
-        try {
-
-            channel1.result().afterMax(seconds(1)).all();
-
-            fail();
-
-        } catch (final InvocationException ignored) {
-
-        }
-
-        try {
-
-            Channels.distributeAndFlush(new Object());
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            Channels.distributeAndFlush(null, Collections.<InputChannel<?>>emptyList());
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            Channels.distributeAndFlush(new Object(), new InputChannel[]{null});
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Channels.distributeAndFlush(new Object(),
-                                        Collections.<InputChannel<?>>singletonList(null));
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-    }
-
-    @Test
     public void testDistributeError() {
 
         final InvocationChannel<String, String> channel1 =
@@ -830,6 +688,146 @@ public class ChannelsTest {
             fail();
 
         } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testDistributePlaceHolderError() {
+
+        final InvocationChannel<String, String> channel1 =
+                JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
+        Channels.distribute((Object) null, channel1)
+                .pass(Arrays.asList("test1-1", "test1-2"))
+                .close();
+
+        try {
+
+            channel1.result().afterMax(seconds(1)).all();
+
+            fail();
+
+        } catch (final InvocationException ignored) {
+
+        }
+
+        try {
+
+            Channels.distribute(new Object());
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Channels.distribute(null, Collections.<InputChannel<?>>emptyList());
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Channels.distribute(new Object(), new InputChannel[]{null});
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Channels.distribute(new Object(), Collections.<InputChannel<?>>singletonList(null));
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testDistributePlaceholder() {
+
+        final InvocationChannel<String, String> channel1 =
+                JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
+        final InvocationChannel<String, String> channel2 =
+                JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
+        Channels.distribute((Object) null, channel1, channel2)
+                .pass(Arrays.asList("test1-1", "test1-2"))
+                .close();
+        final String placeholder = "placeholder";
+        Channels.distribute((Object) placeholder,
+                            Arrays.<InputChannel<?>>asList(channel1, channel2))
+                .pass(Arrays.asList("test2-1", "test2-2"))
+                .close();
+        Channels.distribute(placeholder, channel1, channel2)
+                .pass(Collections.singletonList("test3-1"))
+                .close();
+        assertThat(channel1.result().afterMax(seconds(1)).all()).containsExactly("test1-1",
+                                                                                 "test2-1",
+                                                                                 "test3-1");
+        assertThat(channel2.result().afterMax(seconds(1)).all()).containsExactly("test1-2",
+                                                                                 "test2-2",
+                                                                                 placeholder);
+    }
+
+    @Test
+    public void testDistributePlaceholderAbort() {
+
+        InvocationChannel<String, String> channel1;
+        InvocationChannel<String, String> channel2;
+        channel1 = JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
+        channel2 = JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
+        Channels.distribute((Object) null, channel1, channel2).abort();
+
+        try {
+
+            channel1.result().afterMax(seconds(1)).next();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            channel2.result().afterMax(seconds(1)).next();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        channel1 = JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
+        channel2 = JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
+        Channels.distribute(null, Arrays.<InputChannel<?>>asList(channel1, channel2)).abort();
+
+        try {
+
+            channel1.result().afterMax(seconds(1)).next();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            channel2.result().afterMax(seconds(1)).next();
+
+            fail();
+
+        } catch (final AbortException ignored) {
 
         }
     }
@@ -1060,139 +1058,6 @@ public class ChannelsTest {
     }
 
     @Test
-    public void testJoinAndFlush() {
-
-        final IOChannelBuilder builder = JRoutine.io();
-        final Routine<List<?>, Character> routine = JRoutine.on(new CharAt()).buildRoutine();
-        IOChannel<String> channel1;
-        IOChannel<Integer> channel2;
-        channel1 = builder.buildChannel();
-        channel2 = builder.buildChannel();
-        channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
-        channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
-        assertThat(routine.asyncCall(Channels.joinAndFlush(new Object(), channel1, channel2))
-                          .afterMax(seconds(10))
-                          .all()).containsExactly('s', '2');
-        channel1 = builder.buildChannel();
-        channel2 = builder.buildChannel();
-        channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
-        channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
-        assertThat(routine.asyncCall(
-                Channels.joinAndFlush(null, Arrays.<OutputChannel<?>>asList(channel1, channel2)))
-                          .afterMax(seconds(10))
-                          .all()).containsExactly('s', '2');
-        channel1 = builder.buildChannel();
-        channel2 = builder.buildChannel();
-        channel1.orderByCall()
-                .after(millis(100))
-                .pass("testtest")
-                .pass("test2")
-                .pass("test3")
-                .close();
-        channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
-
-        try {
-
-            routine.asyncCall(Channels.joinAndFlush(new Object(), channel1, channel2))
-                   .afterMax(seconds(10))
-                   .all();
-
-            fail();
-
-        } catch (final InvocationException ignored) {
-
-        }
-    }
-
-    @Test
-    public void testJoinAndFlushAbort() {
-
-        final IOChannelBuilder builder = JRoutine.io();
-        final Routine<List<?>, Character> routine = JRoutine.on(new CharAt()).buildRoutine();
-        IOChannel<String> channel1;
-        IOChannel<Integer> channel2;
-        channel1 = builder.buildChannel();
-        channel2 = builder.buildChannel();
-        channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
-        channel2.orderByCall().abort();
-
-        try {
-
-            routine.asyncCall(Channels.joinAndFlush(null, channel1, channel2))
-                   .afterMax(seconds(1))
-                   .all();
-
-            fail();
-
-        } catch (final AbortException ignored) {
-
-        }
-
-        channel1 = builder.buildChannel();
-        channel2 = builder.buildChannel();
-        channel1.orderByCall().abort();
-        channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
-
-        try {
-
-            routine.asyncCall(Channels.joinAndFlush(new Object(),
-                                                    Arrays.<OutputChannel<?>>asList(channel1,
-                                                                                    channel2)))
-                   .afterMax(seconds(1))
-                   .all();
-
-            fail();
-
-        } catch (final AbortException ignored) {
-
-        }
-    }
-
-    @Test
-    public void testJoinAndFlushError() {
-
-        try {
-
-            Channels.joinAndFlush(new Object());
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            Channels.joinAndFlush(null, Collections.<OutputChannel<?>>emptyList());
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            Channels.joinAndFlush(new Object(), new OutputChannel[]{null});
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Channels.joinAndFlush(new Object(), Collections.<OutputChannel<?>>singletonList(null));
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-    }
-
-    @Test
     public void testJoinError() {
 
         try {
@@ -1228,6 +1093,138 @@ public class ChannelsTest {
         try {
 
             Channels.join(Collections.<OutputChannel<?>>singletonList(null));
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testJoinPlaceholder() {
+
+        final IOChannelBuilder builder = JRoutine.io();
+        final Routine<List<?>, Character> routine = JRoutine.on(new CharAt()).buildRoutine();
+        IOChannel<String> channel1;
+        IOChannel<Integer> channel2;
+        channel1 = builder.buildChannel();
+        channel2 = builder.buildChannel();
+        channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
+        channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
+        assertThat(routine.asyncCall(Channels.join(new Object(), channel1, channel2))
+                          .afterMax(seconds(10))
+                          .all()).containsExactly('s', '2');
+        channel1 = builder.buildChannel();
+        channel2 = builder.buildChannel();
+        channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
+        channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
+        assertThat(routine.asyncCall(
+                Channels.join(null, Arrays.<OutputChannel<?>>asList(channel1, channel2)))
+                          .afterMax(seconds(10))
+                          .all()).containsExactly('s', '2');
+        channel1 = builder.buildChannel();
+        channel2 = builder.buildChannel();
+        channel1.orderByCall()
+                .after(millis(100))
+                .pass("testtest")
+                .pass("test2")
+                .pass("test3")
+                .close();
+        channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
+
+        try {
+
+            routine.asyncCall(Channels.join(new Object(), channel1, channel2))
+                   .afterMax(seconds(10))
+                   .all();
+
+            fail();
+
+        } catch (final InvocationException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testJoinPlaceholderAbort() {
+
+        final IOChannelBuilder builder = JRoutine.io();
+        final Routine<List<?>, Character> routine = JRoutine.on(new CharAt()).buildRoutine();
+        IOChannel<String> channel1;
+        IOChannel<Integer> channel2;
+        channel1 = builder.buildChannel();
+        channel2 = builder.buildChannel();
+        channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
+        channel2.orderByCall().abort();
+
+        try {
+
+            routine.asyncCall(Channels.join((Object) null, channel1, channel2))
+                   .afterMax(seconds(1))
+                   .all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        channel1 = builder.buildChannel();
+        channel2 = builder.buildChannel();
+        channel1.orderByCall().abort();
+        channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
+
+        try {
+
+            routine.asyncCall(Channels.join(new Object(),
+                                            Arrays.<OutputChannel<?>>asList(channel1, channel2)))
+                   .afterMax(seconds(1))
+                   .all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testJoinPlaceholderError() {
+
+        try {
+
+            Channels.join(new Object());
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Channels.join(null, Collections.<OutputChannel<?>>emptyList());
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Channels.join(new Object(), new OutputChannel[]{null});
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Channels.join(new Object(), Collections.<OutputChannel<?>>singletonList(null));
 
             fail();
 

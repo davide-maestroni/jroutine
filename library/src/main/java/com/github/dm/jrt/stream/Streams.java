@@ -22,9 +22,13 @@ import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.common.RoutineException;
 import com.github.dm.jrt.core.Channels;
+import com.github.dm.jrt.core.Channels.Selectable;
 import com.github.dm.jrt.core.JRoutine;
+import com.github.dm.jrt.function.BiConsumer;
+import com.github.dm.jrt.function.BiConsumerWrapper;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.FunctionWrapper;
+import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.invocation.ComparableInvocationFactory;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationFactory;
@@ -34,10 +38,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static com.github.dm.jrt.function.Functions.wrapFunction;
 import static com.github.dm.jrt.util.Reflection.asArgs;
 
 /**
@@ -45,7 +49,17 @@ import static com.github.dm.jrt.util.Reflection.asArgs;
  * <p/>
  * Created by davide-maestroni on 11/26/2015.
  */
-public class Streams extends Channels {
+public class Streams extends Functions {
+
+    private static final BiConsumerWrapper<? extends Iterable<?>, ? extends ResultChannel<?>>
+            sUnwrap = wrapBiConsumer(new BiConsumer<Iterable<?>, ResultChannel<?>>() {
+
+        @SuppressWarnings("unchecked")
+        public void accept(final Iterable<?> objects, final ResultChannel<?> resultChannel) {
+
+            resultChannel.pass((Iterable) objects);
+        }
+    });
 
     /**
      * Avoid direct instantiation.
@@ -55,7 +69,7 @@ public class Streams extends Channels {
     }
 
     /**
-     * Returns a stream output channel blending the outputs coming from the specified ones.<br/>
+     * Returns a stream blending the outputs coming from the specified ones.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param channels the list of channels.
@@ -70,7 +84,7 @@ public class Streams extends Channels {
     }
 
     /**
-     * Returns a stream output channel blending the outputs coming from the specified ones.<br/>
+     * Returns a stream blending the outputs coming from the specified ones.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param channels the array of channels.
@@ -84,9 +98,9 @@ public class Streams extends Channels {
     }
 
     /**
-     * Returns a stream output channel concatenating the outputs coming from the specified ones, so
-     * that, all the outputs of the first channel will come before all the outputs of the second
-     * one, and so on.<br/>
+     * Returns a stream concatenating the outputs coming from the specified ones, so that, all the
+     * outputs of the first channel will come before all the outputs of the second one, and so on.
+     * <br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param channels the list of channels.
@@ -101,9 +115,9 @@ public class Streams extends Channels {
     }
 
     /**
-     * Returns a stream output channel concatenating the outputs coming from the specified ones, so
-     * that, all the outputs of the first channel will come before all the outputs of the second
-     * one, and so on.<br/>
+     * Returns a stream concatenating the outputs coming from the specified ones, so that, all the
+     * outputs of the first channel will come before all the outputs of the second one, and so on.
+     * <br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param channels the array of channels.
@@ -151,14 +165,33 @@ public class Streams extends Channels {
     }
 
     /**
-     * Returns a stream output channel joining the data coming from the specified list of channels.
-     * <br/>
+     * Returns a factory of invocations grouping the input data in collections of the specified
+     * size.<br/>
+     * If the inputs complete and the last group length is less than the target size, the missing
+     * spaces will be filled with the specified placeholder instance.
+     *
+     * @param size        the group size.
+     * @param placeholder the placeholder object used to fill the missing data needed to reach
+     *                    the group size.
+     * @param <DATA>      the data type.
+     * @return the invocation factory.
+     * @throws java.lang.IllegalArgumentException if the size is not positive.
+     */
+    @NotNull
+    public static <DATA> InvocationFactory<DATA, List<DATA>> groupBy(final int size,
+            @Nullable final DATA placeholder) {
+
+        return new GroupByInvocationFactory<DATA>(size, placeholder);
+    }
+
+    /**
+     * Returns a stream joining the data coming from the specified list of channels.<br/>
      * An output will be generated only when at least one result is available for each channel.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param channels the list of channels.
      * @param <OUT>    the output data type.
-     * @return the output channel.
+     * @return the stream channel.
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @NotNull
@@ -169,8 +202,7 @@ public class Streams extends Channels {
     }
 
     /**
-     * Returns a stream output channel joining the data coming from the specified list of channels.
-     * <br/>
+     * Returns a stream joining the data coming from the specified list of channels.<br/>
      * An output will be generated only when at least one result is available for each channel.<br/>
      * Note that the channels will be bound as a result of the call.
      *
@@ -187,8 +219,7 @@ public class Streams extends Channels {
     }
 
     /**
-     * Returns a stream output channel joining the data coming from the specified list of channels.
-     * <br/>
+     * Returns a stream joining the data coming from the specified list of channels.<br/>
      * An output will be generated only when at least one result is available for each channel.
      * Moreover, when all the output channels complete, the remaining outputs will be returned by
      * filling the gaps with the specified placeholder instance, so that the generated list of data
@@ -202,16 +233,14 @@ public class Streams extends Channels {
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @NotNull
-    public static <OUT> StreamChannel<List<? extends OUT>> joinAndFlush(
-            @Nullable final OUT placeholder,
+    public static <OUT> StreamChannel<List<? extends OUT>> join(@Nullable final OUT placeholder,
             @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
 
-        return streamOf(Channels.joinAndFlush(placeholder, channels));
+        return streamOf(Channels.join(placeholder, channels));
     }
 
     /**
-     * Returns a stream output channel joining the data coming from the specified list of channels.
-     * <br/>
+     * Returns a stream joining the data coming from the specified list of channels.<br/>
      * An output will be generated only when at least one result is available for each channel.
      * Moreover, when all the output channels complete, the remaining outputs will be returned by
      * filling the gaps with the specified placeholder instance, so that the generated list of data
@@ -225,19 +254,19 @@ public class Streams extends Channels {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static <OUT> StreamChannel<List<? extends OUT>> joinAndFlush(
-            @Nullable final Object placeholder, @NotNull final OutputChannel<?>... channels) {
+    public static <OUT> StreamChannel<List<? extends OUT>> join(@Nullable final Object placeholder,
+            @NotNull final OutputChannel<?>... channels) {
 
-        return streamOf(Channels.<OUT>joinAndFlush(placeholder, channels));
+        return streamOf(Channels.<OUT>join(placeholder, channels));
     }
 
     /**
-     * Builds and returns a new lazy stream output channel.<br/>
+     * Builds and returns a new lazy stream channel.<br/>
      * The stream will start producing results only when it is bound to another channel or an output
      * consumer or when any of the read methods is invoked.
      *
      * @param <OUT> the output data type.
-     * @return the newly created channel instance.
+     * @return the newly created stream instance.
      */
     @NotNull
     public static <OUT> StreamChannel<OUT> lazyStreamOf() {
@@ -246,13 +275,13 @@ public class Streams extends Channels {
     }
 
     /**
-     * Builds and returns a new lazy stream output channel generating the specified outputs.<br/>
+     * Builds and returns a new lazy stream channel generating the specified outputs.<br/>
      * The stream will start producing results only when it is bound to another channel or an output
      * consumer or when any of the read methods is invoked.
      *
      * @param outputs the iterable returning the output data.
      * @param <OUT>   the output data type.
-     * @return the newly created channel instance.
+     * @return the newly created stream instance.
      */
     @NotNull
     public static <OUT> StreamChannel<OUT> lazyStreamOf(@Nullable final Iterable<OUT> outputs) {
@@ -261,13 +290,13 @@ public class Streams extends Channels {
     }
 
     /**
-     * Builds and returns a new lazy stream output channel generating the specified output.<br/>
+     * Builds and returns a new lazy stream channel generating the specified output.<br/>
      * The stream will start producing results only when it is bound to another channel or an output
      * consumer or when any of the read methods is invoked.
      *
      * @param output the output.
      * @param <OUT>  the output data type.
-     * @return the newly created channel instance.
+     * @return the newly created stream instance.
      */
     @NotNull
     public static <OUT> StreamChannel<OUT> lazyStreamOf(@Nullable final OUT output) {
@@ -276,13 +305,13 @@ public class Streams extends Channels {
     }
 
     /**
-     * Builds and returns a new lazy stream output channel generating the specified outputs.<br/>
+     * Builds and returns a new lazy stream channel generating the specified outputs.<br/>
      * The stream will start producing results only when it is bound to another channel or an output
      * consumer or when any of the read methods is invoked.
      *
      * @param outputs the output data.
      * @param <OUT>   the output data type.
-     * @return the newly created channel instance.
+     * @return the newly created stream instance.
      */
     @NotNull
     public static <OUT> StreamChannel<OUT> lazyStreamOf(@Nullable final OUT... outputs) {
@@ -291,7 +320,7 @@ public class Streams extends Channels {
     }
 
     /**
-     * Builds and returns a new lazy stream output channel generating the specified outputs.<br/>
+     * Builds and returns a new lazy stream channel generating the specified outputs.<br/>
      * The stream will start producing results only when it is bound to another channel or an output
      * consumer or when any of the read methods is invoked.
      * <p/>
@@ -299,7 +328,7 @@ public class Streams extends Channels {
      *
      * @param output the output channel returning the output data.
      * @param <OUT>  the output data type.
-     * @return the newly created channel instance.
+     * @return the newly created stream instance.
      */
     @NotNull
     @SuppressWarnings("ConstantConditions")
@@ -330,7 +359,7 @@ public class Streams extends Channels {
     }
 
     /**
-     * Merges the specified channels into a selectable one.<br/>
+     * Merges the specified channels into a selectable stream.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param startIndex the selectable start index.
@@ -347,7 +376,7 @@ public class Streams extends Channels {
     }
 
     /**
-     * Merges the specified channels into a selectable one.<br/>
+     * Merges the specified channels into a selectable stream.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param startIndex the selectable start index.
@@ -364,8 +393,8 @@ public class Streams extends Channels {
     }
 
     /**
-     * Merges the specified channels into a selectable one. The selectable indexes will be the same
-     * as the list ones.<br/>
+     * Merges the specified channels into a selectable stream. The selectable indexes will be the
+     * same as the list ones.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param channels the channels to merge.
@@ -381,7 +410,7 @@ public class Streams extends Channels {
     }
 
     /**
-     * Merges the specified channels into a selectable one.<br/>
+     * Merges the specified channels into a selectable stream.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param channelMap the map of indexes and output channels.
@@ -397,8 +426,8 @@ public class Streams extends Channels {
     }
 
     /**
-     * Merges the specified channels into a selectable one. The selectable indexes will be the same
-     * as the array ones.<br/>
+     * Merges the specified channels into a selectable stream. The selectable indexes will be the
+     * same as the array ones.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param channels the channels to merge.
@@ -415,7 +444,7 @@ public class Streams extends Channels {
 
     /**
      * Returns a routine builder, whose invocation instances employ the streams provided by the
-     * specified function to process input data.<br/>
+     * specified function, to process input data.<br/>
      * The function should return a new instance each time it is called, starting from the passed
      * one.
      *
@@ -433,13 +462,13 @@ public class Streams extends Channels {
     }
 
     /**
-     * Returns a new channel repeating the output data to any newly bound channel or consumer, thus
+     * Returns a new stream repeating the output data to any newly bound channel or consumer, thus
      * effectively supporting binding of several output consumers.<br/>
      * Note that the passed channels will be bound as a result of the call.
      *
      * @param channel the output channel.
      * @param <OUT>   the output data type.
-     * @return the repeating channel.
+     * @return the repeating stream channel.
      */
     @NotNull
     public static <OUT> StreamChannel<OUT> repeat(@NotNull final OutputChannel<OUT> channel) {
@@ -462,10 +491,10 @@ public class Streams extends Channels {
     }
 
     /**
-     * Builds and returns a new stream output channel.
+     * Builds and returns a new stream channel.
      *
      * @param <OUT> the output data type.
-     * @return the newly created channel instance.
+     * @return the newly created stream instance.
      */
     @NotNull
     public static <OUT> StreamChannel<OUT> streamOf() {
@@ -474,11 +503,11 @@ public class Streams extends Channels {
     }
 
     /**
-     * Builds and returns a new stream output channel generating the specified outputs.
+     * Builds and returns a new stream channel generating the specified outputs.
      *
      * @param outputs the iterable returning the output data.
      * @param <OUT>   the output data type.
-     * @return the newly created channel instance.
+     * @return the newly created stream instance.
      */
     @NotNull
     public static <OUT> StreamChannel<OUT> streamOf(@Nullable final Iterable<OUT> outputs) {
@@ -487,11 +516,11 @@ public class Streams extends Channels {
     }
 
     /**
-     * Builds and returns a new stream output channel generating the specified output.
+     * Builds and returns a new stream channel generating the specified output.
      *
      * @param output the output.
      * @param <OUT>  the output data type.
-     * @return the newly created channel instance.
+     * @return the newly created stream instance.
      */
     @NotNull
     public static <OUT> StreamChannel<OUT> streamOf(@Nullable final OUT output) {
@@ -500,11 +529,11 @@ public class Streams extends Channels {
     }
 
     /**
-     * Builds and returns a new stream output channel generating the specified outputs.
+     * Builds and returns a new stream channel generating the specified outputs.
      *
      * @param outputs the output data.
      * @param <OUT>   the output data type.
-     * @return the newly created channel instance.
+     * @return the newly created stream instance.
      */
     @NotNull
     public static <OUT> StreamChannel<OUT> streamOf(@Nullable final OUT... outputs) {
@@ -513,13 +542,13 @@ public class Streams extends Channels {
     }
 
     /**
-     * Builds and returns a new stream output channel generating the specified outputs.
+     * Builds and returns a new stream channel generating the specified outputs.
      * <p/>
      * Note that the output channel will be bound as a result of the call.
      *
      * @param output the output channel returning the output data.
      * @param <OUT>  the output data type.
-     * @return the newly created channel instance.
+     * @return the newly created stream instance.
      */
     @NotNull
     public static <OUT> StreamChannel<OUT> streamOf(@NotNull final OutputChannel<OUT> output) {
@@ -535,13 +564,27 @@ public class Streams extends Channels {
      * @param channel the channel to make selectable.
      * @param index   the channel index.
      * @param <OUT>   the output data type.
-     * @return the selectable output channel.
+     * @return the selectable stream.
      */
     @NotNull
     public static <OUT> StreamChannel<? extends Selectable<OUT>> toSelectable(
             @NotNull final OutputChannel<? extends OUT> channel, final int index) {
 
         return streamOf(Channels.toSelectable(channel, index));
+    }
+
+    /**
+     * Returns a bi-consumer wrapper unwrapping iterable inputs into the returned elements.<br/>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <OUT> the output data type.
+     * @return the bi-consumer instance.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <OUT> BiConsumerWrapper<Iterable<OUT>, ResultChannel<OUT>> unwrap() {
+
+        return (BiConsumerWrapper<Iterable<OUT>, ResultChannel<OUT>>) sUnwrap;
     }
 
     /**
@@ -553,6 +596,10 @@ public class Streams extends Channels {
 
         private final ArrayList<DATA> mInputs = new ArrayList<DATA>();
 
+        private final boolean mIsPlaceholder;
+
+        private final DATA mPlaceholder;
+
         private final int mSize;
 
         /**
@@ -563,6 +610,22 @@ public class Streams extends Channels {
         private GroupByInvocation(final int size) {
 
             mSize = size;
+            mPlaceholder = null;
+            mIsPlaceholder = false;
+        }
+
+        /**
+         * Constructor.
+         *
+         * @param size        the group size.
+         * @param placeholder the placeholder object used to fill the missing data needed to reach
+         *                    the group size.
+         */
+        private GroupByInvocation(final int size, @Nullable final DATA placeholder) {
+
+            mSize = size;
+            mPlaceholder = placeholder;
+            mIsPlaceholder = true;
         }
 
         @Override
@@ -583,8 +646,14 @@ public class Streams extends Channels {
         public void onResult(@NotNull final ResultChannel<List<DATA>> result) {
 
             final ArrayList<DATA> inputs = mInputs;
-            if (!inputs.isEmpty()) {
-                result.pass(new ArrayList<DATA>(inputs));
+            final int inputSize = inputs.size();
+            if (inputSize > 0) {
+                final ArrayList<DATA> data = new ArrayList<DATA>(inputs);
+                final int size = mSize - inputSize;
+                if (mIsPlaceholder && (size > 0)) {
+                    data.addAll(Collections.nCopies(size, mPlaceholder));
+                }
+                result.pass(data);
             }
         }
 
@@ -603,6 +672,10 @@ public class Streams extends Channels {
     private static class GroupByInvocationFactory<DATA>
             extends ComparableInvocationFactory<DATA, List<DATA>> {
 
+        private final boolean mIsPlaceholder;
+
+        private final DATA mPlaceholder;
+
         private final int mSize;
 
         /**
@@ -619,13 +692,36 @@ public class Streams extends Channels {
             }
 
             mSize = size;
+            mPlaceholder = null;
+            mIsPlaceholder = false;
+        }
+
+        /**
+         * Constructor.
+         *
+         * @param size        the group size.
+         * @param placeholder the placeholder object used to fill the missing data needed to reach
+         *                    the group size.
+         * @throws java.lang.IllegalArgumentException if the size is not positive.
+         */
+        private GroupByInvocationFactory(final int size, @Nullable final DATA placeholder) {
+
+            super(asArgs(size, placeholder));
+            if (size <= 0) {
+                throw new IllegalArgumentException("the group size must be positive: " + size);
+            }
+
+            mSize = size;
+            mPlaceholder = placeholder;
+            mIsPlaceholder = true;
         }
 
         @NotNull
         @Override
         public Invocation<DATA, List<DATA>> newInvocation() {
 
-            return new GroupByInvocation<DATA>(mSize);
+            return (mIsPlaceholder) ? new GroupByInvocation<DATA>(mSize, mPlaceholder)
+                    : new GroupByInvocation<DATA>(mSize);
         }
     }
 

@@ -304,6 +304,13 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
 
     @NotNull
     @Override
+    public LoaderStreamChannelCompat<Void> consume(@NotNull final Consumer<? super OUT> consumer) {
+
+        return (LoaderStreamChannelCompat<Void>) super.consume(consumer);
+    }
+
+    @NotNull
+    @Override
     public LoaderStreamChannelCompat<OUT> filter(@NotNull final Predicate<? super OUT> predicate) {
 
         return (LoaderStreamChannelCompat<OUT>) super.filter(predicate);
@@ -316,13 +323,6 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
                     function) {
 
         return (LoaderStreamChannelCompat<AFTER>) super.flatMap(function);
-    }
-
-    @NotNull
-    @Override
-    public LoaderStreamChannelCompat<Void> forEach(@NotNull final Consumer<? super OUT> consumer) {
-
-        return (LoaderStreamChannelCompat<Void>) super.forEach(consumer);
     }
 
     @NotNull

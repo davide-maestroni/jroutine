@@ -484,6 +484,58 @@ public class StreamChannelTest {
     }
 
     @Test
+    public void testConsume() {
+
+        final List<String> list = Collections.synchronizedList(new ArrayList<String>());
+        assertThat(
+                Streams.streamOf("test1", "test2", "test3").sync().consume(new Consumer<String>() {
+
+                    public void accept(final String s) {
+
+                        list.add(s);
+                    }
+                }).all()).isEmpty();
+        assertThat(list).containsOnly("test1", "test2", "test3");
+        list.clear();
+        assertThat(
+                Streams.streamOf("test1", "test2", "test3").async().consume(new Consumer<String>() {
+
+                    public void accept(final String s) {
+
+                        list.add(s);
+                    }
+                }).afterMax(seconds(3)).all()).isEmpty();
+        assertThat(list).containsOnly("test1", "test2", "test3");
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testConsumeNullPointerError() {
+
+        final Consumer<Object> consumer = null;
+
+        try {
+
+            Streams.streamOf().sync().consume(consumer);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().async().consume(consumer);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
     public void testFilter() {
 
         assertThat(Streams.streamOf(null, "test")
@@ -578,58 +630,6 @@ public class StreamChannelTest {
                           })
                           .afterMax(seconds(3))
                           .all()).containsOnly("test1", "test2");
-    }
-
-    @Test
-    public void testForEach() {
-
-        final List<String> list = Collections.synchronizedList(new ArrayList<String>());
-        assertThat(
-                Streams.streamOf("test1", "test2", "test3").sync().forEach(new Consumer<String>() {
-
-                    public void accept(final String s) {
-
-                        list.add(s);
-                    }
-                }).all()).isEmpty();
-        assertThat(list).containsOnly("test1", "test2", "test3");
-        list.clear();
-        assertThat(
-                Streams.streamOf("test1", "test2", "test3").async().forEach(new Consumer<String>() {
-
-                    public void accept(final String s) {
-
-                        list.add(s);
-                    }
-                }).afterMax(seconds(3)).all()).isEmpty();
-        assertThat(list).containsOnly("test1", "test2", "test3");
-    }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testForEachNullPointerError() {
-
-        final Consumer<Object> consumer = null;
-
-        try {
-
-            Streams.streamOf().sync().forEach(consumer);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.streamOf().async().forEach(consumer);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
     }
 
     @Test

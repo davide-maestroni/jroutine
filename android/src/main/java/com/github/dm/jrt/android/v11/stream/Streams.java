@@ -19,16 +19,15 @@ package com.github.dm.jrt.android.v11.stream;
 import android.util.SparseArray;
 
 import com.github.dm.jrt.android.builder.LoaderRoutineBuilder;
+import com.github.dm.jrt.android.core.Channels.ParcelableSelectable;
 import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
 import com.github.dm.jrt.android.v11.core.Channels;
 import com.github.dm.jrt.android.v11.core.JRoutine;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
-import com.github.dm.jrt.builder.RoutineBuilder;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.function.Function;
-import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.stream.StreamChannel;
 
 import org.jetbrains.annotations.NotNull;
@@ -37,14 +36,13 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 import static com.github.dm.jrt.android.core.DelegatingContextInvocation.factoryFrom;
-import static com.github.dm.jrt.function.Functions.wrapFunction;
 
 /**
  * Utility class acting as a factory of stream output channels.
  * <p/>
  * Created by davide-maestroni on 01/02/2016.
  */
-public class Streams extends Channels {
+public class Streams extends com.github.dm.jrt.stream.Streams {
 
     /**
      * Avoid direct instantiation.
@@ -54,7 +52,7 @@ public class Streams extends Channels {
     }
 
     /**
-     * Returns a stream output channel blending the outputs coming from the specified ones.<br/>
+     * Returns a loader stream blending the outputs coming from the specified ones.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param channels the list of channels.
@@ -69,7 +67,7 @@ public class Streams extends Channels {
     }
 
     /**
-     * Returns a stream output channel blending the outputs coming from the specified ones.<br/>
+     * Returns a loader stream blending the outputs coming from the specified ones.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param channels the array of channels.
@@ -84,9 +82,9 @@ public class Streams extends Channels {
     }
 
     /**
-     * Returns a stream output channel concatenating the outputs coming from the specified ones, so
-     * that, all the outputs of the first channel will come before all the outputs of the second
-     * one, and so on.<br/>
+     * Returns a loader stream concatenating the outputs coming from the specified ones, so that,
+     * all the outputs of the first channel will come before all the outputs of the second one, and
+     * so on.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param channels the list of channels.
@@ -101,9 +99,9 @@ public class Streams extends Channels {
     }
 
     /**
-     * Returns a stream output channel concatenating the outputs coming from the specified ones, so
-     * that, all the outputs of the first channel will come before all the outputs of the second
-     * one, and so on.<br/>
+     * Returns a loader stream concatenating the outputs coming from the specified ones, so that,
+     * all the outputs of the first channel will come before all the outputs of the second one, and
+     * so on.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param channels the array of channels.
@@ -129,31 +127,16 @@ public class Streams extends Channels {
      * @return the invocation factory.
      */
     @NotNull
-    public static <IN, OUT> FunctionContextInvocationFactory<IN, OUT> factory(
+    public static <IN, OUT> FunctionContextInvocationFactory<IN, OUT> contextFactory(
             @NotNull final Function<? super StreamChannel<? extends IN>, ? extends
                     StreamChannel<? extends OUT>> function) {
 
-        return factoryFrom(com.github.dm.jrt.stream.Streams.onStream(function),
-                           wrapFunction(function).hashCode(), DelegationType.SYNC);
+        return factoryFrom(onStream(function), wrapFunction(function).hashCode(),
+                           DelegationType.SYNC);
     }
 
     /**
-     * Returns a factory of invocations grouping the input data in collections of the specified
-     * size.
-     *
-     * @param size   the group size.
-     * @param <DATA> the data type.
-     * @return the invocation factory.
-     */
-    @NotNull
-    public static <DATA> InvocationFactory<DATA, List<DATA>> groupBy(final int size) {
-
-        return com.github.dm.jrt.stream.Streams.groupBy(size);
-    }
-
-    /**
-     * Returns a stream output channel joining the data coming from the specified list of channels.
-     * <br/>
+     * Returns a loader stream joining the data coming from the specified list of channels.<br/>
      * An output will be generated only when at least one result is available for each channel.<br/>
      * Note that the channels will be bound as a result of the call.
      *
@@ -170,8 +153,7 @@ public class Streams extends Channels {
     }
 
     /**
-     * Returns a stream output channel joining the data coming from the specified list of channels.
-     * <br/>
+     * Returns a loader stream joining the data coming from the specified list of channels.<br/>
      * An output will be generated only when at least one result is available for each channel.<br/>
      * Note that the channels will be bound as a result of the call.
      *
@@ -188,8 +170,7 @@ public class Streams extends Channels {
     }
 
     /**
-     * Returns a stream output channel joining the data coming from the specified list of channels.
-     * <br/>
+     * Returns a loader stream joining the data coming from the specified list of channels.<br/>
      * An output will be generated only when at least one result is available for each channel.
      * Moreover, when all the output channels complete, the remaining outputs will be returned by
      * filling the gaps with the specified placeholder instance, so that the generated list of data
@@ -203,16 +184,15 @@ public class Streams extends Channels {
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @NotNull
-    public static <OUT> LoaderStreamChannel<List<? extends OUT>> joinAndFlush(
+    public static <OUT> LoaderStreamChannel<List<? extends OUT>> join(
             @Nullable final OUT placeholder,
             @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
 
-        return streamOf(Channels.joinAndFlush(placeholder, channels));
+        return streamOf(Channels.join(placeholder, channels));
     }
 
     /**
-     * Returns a stream output channel joining the data coming from the specified list of channels.
-     * <br/>
+     * Returns a loader stream joining the data coming from the specified list of channels.<br/>
      * An output will be generated only when at least one result is available for each channel.
      * Moreover, when all the output channels complete, the remaining outputs will be returned by
      * filling the gaps with the specified placeholder instance, so that the generated list of data
@@ -226,19 +206,19 @@ public class Streams extends Channels {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static <OUT> LoaderStreamChannel<List<? extends OUT>> joinAndFlush(
+    public static <OUT> LoaderStreamChannel<List<? extends OUT>> join(
             @Nullable final Object placeholder, @NotNull final OutputChannel<?>... channels) {
 
-        return streamOf(Channels.<OUT>joinAndFlush(placeholder, channels));
+        return streamOf(Channels.<OUT>join(placeholder, channels));
     }
 
     /**
-     * Builds and returns a new lazy stream output channel.<br/>
+     * Builds and returns a new lazy loader stream channel.<br/>
      * The stream will start producing results only when it is bound to another channel or an output
      * consumer or when any of the read methods is invoked.
      *
      * @param <OUT> the output data type.
-     * @return the newly created channel instance.
+     * @return the newly created stream instance.
      */
     @NotNull
     public static <OUT> LoaderStreamChannel<OUT> lazyStreamOf() {
@@ -247,13 +227,13 @@ public class Streams extends Channels {
     }
 
     /**
-     * Builds and returns a new lazy stream output channel generating the specified outputs.<br/>
+     * Builds and returns a new lazy loader stream channel generating the specified outputs.<br/>
      * The stream will start producing results only when it is bound to another channel or an output
      * consumer or when any of the read methods is invoked.
      *
      * @param outputs the iterable returning the output data.
      * @param <OUT>   the output data type.
-     * @return the newly created channel instance.
+     * @return the newly created stream instance.
      */
     @NotNull
     public static <OUT> LoaderStreamChannel<OUT> lazyStreamOf(
@@ -263,13 +243,13 @@ public class Streams extends Channels {
     }
 
     /**
-     * Builds and returns a new lazy stream output channel generating the specified output.<br/>
+     * Builds and returns a new lazy loader stream channel generating the specified output.<br/>
      * The stream will start producing results only when it is bound to another channel or an output
      * consumer or when any of the read methods is invoked.
      *
      * @param output the output.
      * @param <OUT>  the output data type.
-     * @return the newly created channel instance.
+     * @return the newly created stream instance.
      */
     @NotNull
     public static <OUT> LoaderStreamChannel<OUT> lazyStreamOf(@Nullable final OUT output) {
@@ -278,13 +258,13 @@ public class Streams extends Channels {
     }
 
     /**
-     * Builds and returns a new lazy stream output channel generating the specified outputs.<br/>
+     * Builds and returns a new lazy loader stream channel generating the specified outputs.<br/>
      * The stream will start producing results only when it is bound to another channel or an output
      * consumer or when any of the read methods is invoked.
      *
      * @param outputs the output data.
      * @param <OUT>   the output data type.
-     * @return the newly created channel instance.
+     * @return the newly created stream instance.
      */
     @NotNull
     public static <OUT> LoaderStreamChannel<OUT> lazyStreamOf(@Nullable final OUT... outputs) {
@@ -293,7 +273,7 @@ public class Streams extends Channels {
     }
 
     /**
-     * Builds and returns a new lazy stream output channel generating the specified outputs.<br/>
+     * Builds and returns a new lazy loader stream channel generating the specified outputs.<br/>
      * The stream will start producing results only when it is bound to another channel or an output
      * consumer or when any of the read methods is invoked.
      * <p/>
@@ -301,7 +281,7 @@ public class Streams extends Channels {
      *
      * @param output the output channel returning the output data.
      * @param <OUT>  the output data type.
-     * @return the newly created channel instance.
+     * @return the newly created stream instance.
      */
     @NotNull
     @SuppressWarnings("ConstantConditions")
@@ -318,21 +298,7 @@ public class Streams extends Channels {
     }
 
     /**
-     * Returns an factory of invocations passing at max the specified number of input data and
-     * discarding the following ones.
-     *
-     * @param count  the maximum number of data to pass.
-     * @param <DATA> the data type.
-     * @return the invocation factory.
-     */
-    @NotNull
-    public static <DATA> InvocationFactory<DATA, DATA> limit(final int count) {
-
-        return com.github.dm.jrt.stream.Streams.limit(count);
-    }
-
-    /**
-     * Merges the specified channels into a selectable one.<br/>
+     * Merges the specified channels into a selectable loader stream.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param startIndex the selectable start index.
@@ -350,7 +316,7 @@ public class Streams extends Channels {
     }
 
     /**
-     * Merges the specified channels into a selectable one.<br/>
+     * Merges the specified channels into a selectable loader stream.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param startIndex the selectable start index.
@@ -367,8 +333,8 @@ public class Streams extends Channels {
     }
 
     /**
-     * Merges the specified channels into a selectable one. The selectable indexes will be the same
-     * as the list ones.<br/>
+     * Merges the specified channels into a selectable loader stream. The selectable indexes will be
+     * the same as the list ones.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param channels the channels to merge.
@@ -384,8 +350,8 @@ public class Streams extends Channels {
     }
 
     /**
-     * Merges the specified channels into a selectable one. The selectable indexes will be the same
-     * as the array ones.<br/>
+     * Merges the specified channels into a selectable loader stream. The selectable indexes will be
+     * the same as the array ones.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param channels the channels to merge.
@@ -401,12 +367,12 @@ public class Streams extends Channels {
     }
 
     /**
-     * Merges the specified channels into a selectable one.<br/>
+     * Merges the specified channels into a selectable loader stream.<br/>
      * Note that the channels will be bound as a result of the call.
      *
      * @param channelMap the map of indexes and output channels.
      * @param <OUT>      the output data type.
-     * @return the selectable output channel.
+     * @return the selectable stream channel.
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
      */
     @NotNull
@@ -417,27 +383,8 @@ public class Streams extends Channels {
     }
 
     /**
-     * Returns a routine builder, whose invocation instances employ the streams provided by the
-     * specified function to process input data.<br/>
-     * The function should return a new instance each time it is called, starting from the passed
-     * one.
-     *
-     * @param function the function providing the stream output channels.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the routine builder.
-     */
-    @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> onStream(
-            @NotNull final Function<? super StreamChannel<? extends IN>, ? extends
-                    StreamChannel<? extends OUT>> function) {
-
-        return com.github.dm.jrt.stream.Streams.onStream(function);
-    }
-
-    /**
-     * Returns a loader routine builder, whose invocation instances employ the stream output
-     * channels, provided by the specified function, to process input data.<br/>
+     * Returns a loader routine builder, whose invocation instances employ the streams provided by
+     * the specified function, to process input data.<br/>
      * The function should return a new instance each time it is called, starting from the passed
      * one.
      *
@@ -453,17 +400,17 @@ public class Streams extends Channels {
             @NotNull final Function<? super StreamChannel<? extends IN>, ? extends
                     StreamChannel<? extends OUT>> function) {
 
-        return JRoutine.with(context).on(factory(function));
+        return JRoutine.with(context).on(contextFactory(function));
     }
 
     /**
-     * Returns a new channel repeating the output data to any newly bound channel or consumer, thus
-     * effectively supporting binding of several output consumers.<br/>
+     * Returns a new loader stream repeating the output data to any newly bound channel or consumer,
+     * thus effectively supporting binding of several output consumers.<br/>
      * Note that the passed channels will be bound as a result of the call.
      *
      * @param channel the output channel.
      * @param <OUT>   the output data type.
-     * @return the repeating channel.
+     * @return the repeating stream channel.
      */
     @NotNull
     public static <OUT> LoaderStreamChannel<OUT> repeat(@NotNull final OutputChannel<OUT> channel) {
@@ -472,23 +419,10 @@ public class Streams extends Channels {
     }
 
     /**
-     * Returns an factory of invocations skipping the specified number of input data.
-     *
-     * @param count  the number of data to skip.
-     * @param <DATA> the data type.
-     * @return the invocation factory.
-     */
-    @NotNull
-    public static <DATA> InvocationFactory<DATA, DATA> skip(final int count) {
-
-        return com.github.dm.jrt.stream.Streams.skip(count);
-    }
-
-    /**
-     * Builds and returns a new stream output channel.
+     * Builds and returns a new loader stream channel.
      *
      * @param <OUT> the output data type.
-     * @return the newly created channel instance.
+     * @return the newly created stream instance.
      */
     @NotNull
     public static <OUT> LoaderStreamChannel<OUT> streamOf() {
@@ -497,11 +431,11 @@ public class Streams extends Channels {
     }
 
     /**
-     * Builds and returns a new stream output channel generating the specified outputs.
+     * Builds and returns a new loader stream channel generating the specified outputs.
      *
      * @param outputs the iterable returning the output data.
      * @param <OUT>   the output data type.
-     * @return the newly created channel instance.
+     * @return the newly created stream instance.
      */
     @NotNull
     public static <OUT> LoaderStreamChannel<OUT> streamOf(@Nullable final Iterable<OUT> outputs) {
@@ -510,11 +444,11 @@ public class Streams extends Channels {
     }
 
     /**
-     * Builds and returns a new stream output channel generating the specified output.
+     * Builds and returns a new loader stream channel generating the specified output.
      *
      * @param output the output.
      * @param <OUT>  the output data type.
-     * @return the newly created channel instance.
+     * @return the newly created stream instance.
      */
     @NotNull
     public static <OUT> LoaderStreamChannel<OUT> streamOf(@Nullable final OUT output) {
@@ -523,11 +457,11 @@ public class Streams extends Channels {
     }
 
     /**
-     * Builds and returns a new stream output channel generating the specified outputs.
+     * Builds and returns a new loader stream channel generating the specified outputs.
      *
      * @param outputs the output data.
      * @param <OUT>   the output data type.
-     * @return the newly created channel instance.
+     * @return the newly created stream instance.
      */
     @NotNull
     public static <OUT> LoaderStreamChannel<OUT> streamOf(@Nullable final OUT... outputs) {
@@ -536,13 +470,13 @@ public class Streams extends Channels {
     }
 
     /**
-     * Builds and returns a new stream output channel generating the specified outputs.
+     * Builds and returns a new loader stream channel generating the specified outputs.
      * <p/>
      * Note that the output channel will be bound as a result of the call.
      *
      * @param output the output channel returning the output data.
      * @param <OUT>  the output data type.
-     * @return the newly created channel instance.
+     * @return the newly created stream instance.
      */
     @NotNull
     public static <OUT> LoaderStreamChannel<OUT> streamOf(
@@ -559,7 +493,7 @@ public class Streams extends Channels {
      * @param channel the channel to make selectable.
      * @param index   the channel index.
      * @param <OUT>   the output data type.
-     * @return the selectable output channel.
+     * @return the selectable loader stream.
      */
     @NotNull
     public static <OUT> LoaderStreamChannel<? extends ParcelableSelectable<OUT>> toSelectable(

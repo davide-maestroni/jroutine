@@ -200,6 +200,19 @@ public interface StreamChannel<OUT>
             @NotNull Function<? super List<? extends OUT>, ? extends AFTER> function);
 
     /**
+     * Concatenates a stream based on the specified consumer to this one.<br/>
+     * The stream outputs will be no further propagated.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration.<br/>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param consumer the consumer instance.
+     * @return the concatenated stream.
+     */
+    @NotNull
+    StreamChannel<Void> consume(@NotNull Consumer<? super OUT> consumer);
+
+    /**
      * Concatenates a stream based on the specified predicate to this one.<br/>
      * The output will be filtered according to the result returned by the predicate.
      * <p/>
@@ -219,25 +232,12 @@ public interface StreamChannel<OUT>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param function the function instance.
-     * @param <AFTER>  the lifting output type.
-     * @return the lifted stream.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream.
      */
     @NotNull
     <AFTER> StreamChannel<AFTER> flatMap(
             @NotNull Function<? super OUT, ? extends OutputChannel<? extends AFTER>> function);
-
-    /**
-     * Concatenates a stream based on the specified consumer to this one.<br/>
-     * The stream outputs will be no further propagated.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration.<br/>
-     * Note also that this stream will be bound as a result of the call.
-     *
-     * @param consumer the consumer instance.
-     * @return the concatenated stream.
-     */
-    @NotNull
-    StreamChannel<Void> forEach(@NotNull Consumer<? super OUT> consumer);
 
     /**
      * Concatenates a stream generating the specified output.<br/>

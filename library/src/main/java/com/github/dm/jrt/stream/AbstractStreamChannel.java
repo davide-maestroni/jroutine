@@ -371,6 +371,12 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
+    public StreamChannel<Void> consume(@NotNull final Consumer<? super OUT> consumer) {
+
+        return map(new ConsumerInvocation<OUT>(wrapConsumer(consumer)));
+    }
+
+    @NotNull
     public StreamChannel<OUT> filter(@NotNull final Predicate<? super OUT> predicate) {
 
         return map(predicateFilter(predicate));
@@ -382,12 +388,6 @@ public abstract class AbstractStreamChannel<OUT>
                     function) {
 
         return map(new MapInvocation<OUT, AFTER>(wrapFunction(function)));
-    }
-
-    @NotNull
-    public StreamChannel<Void> forEach(@NotNull final Consumer<? super OUT> consumer) {
-
-        return map(new ConsumerInvocation<OUT>(wrapConsumer(consumer)));
     }
 
     @NotNull

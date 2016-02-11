@@ -42,4 +42,8 @@
         <Method name="getClashType"/>
         <Bug pattern="BC_UNCONFIRMED_CAST"/>
     </Match>
+    <Match>
+        <Class name="com.github.dm.jrt.android.v11.stream.Streams"/>
+        <Bug pattern="NM_SAME_SIMPLE_NAME_AS_SUPERCLASS"/>
+    </Match>
 </FindBugsFilter>

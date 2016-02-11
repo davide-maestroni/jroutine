@@ -160,6 +160,12 @@ public interface LoaderStreamChannelCompat<OUT>
      * {@inheritDoc}
      */
     @NotNull
+    LoaderStreamChannelCompat<Void> consume(@NotNull Consumer<? super OUT> consumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
     LoaderStreamChannelCompat<OUT> filter(@NotNull Predicate<? super OUT> predicate);
 
     /**
@@ -168,12 +174,6 @@ public interface LoaderStreamChannelCompat<OUT>
     @NotNull
     <AFTER> LoaderStreamChannelCompat<AFTER> flatMap(
             @NotNull Function<? super OUT, ? extends OutputChannel<? extends AFTER>> function);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    LoaderStreamChannelCompat<Void> forEach(@NotNull Consumer<? super OUT> consumer);
 
     /**
      * {@inheritDoc}

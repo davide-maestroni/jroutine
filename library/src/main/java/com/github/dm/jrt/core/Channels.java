@@ -345,7 +345,7 @@ public class Channels {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static IOChannel<List<?>> distributeAndFlush(@Nullable final Object placeholder,
+    public static IOChannel<List<?>> distribute(@Nullable final Object placeholder,
             @NotNull final InputChannel<?>... channels) {
 
         return distribute(true, placeholder, channels);
@@ -366,8 +366,7 @@ public class Channels {
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @NotNull
-    public static <IN> IOChannel<List<? extends IN>> distributeAndFlush(
-            @Nullable final IN placeholder,
+    public static <IN> IOChannel<List<? extends IN>> distribute(@Nullable final IN placeholder,
             @NotNull final List<? extends InputChannel<? extends IN>> channels) {
 
         return distribute(true, placeholder, channels);
@@ -422,8 +421,7 @@ public class Channels {
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @NotNull
-    public static <OUT> OutputChannel<List<? extends OUT>> joinAndFlush(
-            @Nullable final OUT placeholder,
+    public static <OUT> OutputChannel<List<? extends OUT>> join(@Nullable final OUT placeholder,
             @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
 
         return join(true, placeholder, channels);
@@ -444,8 +442,8 @@ public class Channels {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static <OUT> OutputChannel<List<? extends OUT>> joinAndFlush(
-            @Nullable final Object placeholder, @NotNull final OutputChannel<?>... channels) {
+    public static <OUT> OutputChannel<List<? extends OUT>> join(@Nullable final Object placeholder,
+            @NotNull final OutputChannel<?>... channels) {
 
         return join(true, placeholder, channels);
     }

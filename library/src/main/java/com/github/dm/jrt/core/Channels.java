@@ -43,9 +43,9 @@ import java.util.Map.Entry;
  */
 public class Channels {
 
-    private static final WeakIdentityHashMap<OutputChannel<?>, DefaultSelectableOutputChannel<?>>
+    private static final WeakIdentityHashMap<OutputChannel<?>, DefaultSelectableChannels<?>>
             sSelectableChannels =
-            new WeakIdentityHashMap<OutputChannel<?>, DefaultSelectableOutputChannel<?>>();
+            new WeakIdentityHashMap<OutputChannel<?>, DefaultSelectableChannels<?>>();
 
     /**
      * Avoid direct instantiation.
@@ -57,6 +57,14 @@ public class Channels {
     /**
      * Returns an output channel blending the outputs coming from the specified ones.<br/>
      * Note that the passed channels will be bound as a result of the call.
+     * <p/>
+     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+     * <pre>
+     *     <code>
+     *
+     *         [B, A, A, C, B, C, B, A, B, ...]
+     *     </code>
+     * </pre>
      *
      * @param channels the list of channels.
      * @param <OUT>    the output data type.
@@ -81,6 +89,14 @@ public class Channels {
     /**
      * Returns an output channel blending the outputs coming from the specified ones.<br/>
      * Note that the passed channels will be bound as a result of the call.
+     * <p/>
+     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+     * <pre>
+     *     <code>
+     *
+     *         [B, A, A, C, B, C, B, A, B, ...]
+     *     </code>
+     * </pre>
      *
      * @param channels the array of channels.
      * @param <OUT>    the output data type.
@@ -108,6 +124,16 @@ public class Channels {
      * same as the array ones.<br/>
      * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
      * completion of the invocation lifecycle.
+     * <p/>
+     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+     * <pre>
+     *     <code>
+     *
+     *         A - [s(?, 0).data, s(?, 0).data, s(?, 0).data, ...]
+     *         B - [s(?, 1).data, s(?, 1).data, s(?, 1).data, ...]
+     *         C - [s(?, 2).data, s(?, 2).data, s(?, 2).data, ...]
+     *     </code>
+     * </pre>
      *
      * @param channels the array of input channels.
      * @return the selectable I/O channel.
@@ -124,6 +150,16 @@ public class Channels {
      * the specified one.<br/>
      * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
      * completion of the invocation lifecycle.
+     * <p/>
+     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+     * <pre>
+     *     <code>
+     *
+     *         A - [s(?, SI + 0).data, s(?, SI + 0).data, s(?, SI + 0).data, ...]
+     *         B - [s(?, SI + 1).data, s(?, SI + 1).data, s(?, SI + 1).data, ...]
+     *         C - [s(?, SI + 2).data, s(?, SI + 2).data, s(?, SI + 2).data, ...]
+     *     </code>
+     * </pre>
      *
      * @param startIndex the selectable start index.
      * @param channels   the array of input channels.
@@ -157,6 +193,16 @@ public class Channels {
      * the specified one.<br/>
      * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
      * completion of the invocation lifecycle.
+     * <p/>
+     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+     * <pre>
+     *     <code>
+     *
+     *         A - [s(?, SI + 0).data, s(?, SI + 0).data, s(?, SI + 0).data, ...]
+     *         B - [s(?, SI + 1).data, s(?, SI + 1).data, s(?, SI + 1).data, ...]
+     *         C - [s(?, SI + 2).data, s(?, SI + 2).data, s(?, SI + 2).data, ...]
+     *     </code>
+     * </pre>
      *
      * @param startIndex the selectable start index.
      * @param channels   the list of input channels.
@@ -190,6 +236,16 @@ public class Channels {
      * same as the list ones.<br/>
      * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
      * completion of the invocation lifecycle.
+     * <p/>
+     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+     * <pre>
+     *     <code>
+     *
+     *         A - [s(?, 0).data, s(?, 0).data, s(?, 0).data, ...]
+     *         B - [s(?, 1).data, s(?, 1).data, s(?, 1).data, ...]
+     *         C - [s(?, 2).data, s(?, 2).data, s(?, 2).data, ...]
+     *     </code>
+     * </pre>
      *
      * @param channels the list of input channels.
      * @param <IN>     the input data type.
@@ -208,6 +264,16 @@ public class Channels {
      * keys of the specified map.<br/>
      * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
      * completion of the invocation lifecycle.
+     * <p/>
+     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+     * <pre>
+     *     <code>
+     *
+     *         A - [s(?, key(A)).data, s(?, key(A)).data, s(?, key(A)).data, ...]
+     *         B - [s(?, key(B)).data, s(?, key(B)).data, s(?, key(B)).data, ...]
+     *         C - [s(?, key(C)).data, s(?, key(C)).data, s(?, key(C)).data, ...]
+     *     </code>
+     * </pre>
      *
      * @param channels the map of indexes and input channels.
      * @param <IN>     the input data type.
@@ -241,6 +307,14 @@ public class Channels {
      * all the outputs of the first channel will come before all the outputs of the second one, and
      * so on.<br/>
      * Note that the passed channels will be bound as a result of the call.
+     * <p/>
+     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+     * <pre>
+     *     <code>
+     *
+     *         [A, A, A, ..., B, B, B, ..., C, C, C, ...]
+     *     </code>
+     * </pre>
      *
      * @param channels the list of channels.
      * @param <OUT>    the output data type.
@@ -271,6 +345,14 @@ public class Channels {
      * all the outputs of the first channel will come before all the outputs of the second one, and
      * so on.<br/>
      * Note that the passed channels will be bound as a result of the call.
+     * <p/>
+     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+     * <pre>
+     *     <code>
+     *
+     *         [A, A, A, ..., B, B, B, ..., C, C, C, ...]
+     *     </code>
+     * </pre>
      *
      * @param channels the array of channels.
      * @param <OUT>    the output data type.
@@ -302,6 +384,16 @@ public class Channels {
      * of data exceeds the number of channels, the invocation will be aborted.<br/>
      * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
      * completion of the invocation lifecycle.
+     * <p/>
+     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+     * <pre>
+     *     <code>
+     *
+     *         A - [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
+     *         B - [list(1), list(1), list(1), ..., list(1), ..., list(1)]
+     *         C - [list(2), list(2), list(2), ..., list(2)]
+     *     </code>
+     * </pre>
      *
      * @param channels the array of channels.
      * @return the I/O channel.
@@ -318,6 +410,16 @@ public class Channels {
      * of data exceeds the number of channels, the invocation will be aborted.<br/>
      * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
      * completion of the invocation lifecycle.
+     * <p/>
+     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+     * <pre>
+     *     <code>
+     *
+     *         A - [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
+     *         B - [list(1), list(1), list(1), ..., list(1), ..., list(1)]
+     *         C - [list(2), list(2), list(2), ..., list(2)]
+     *     </code>
+     * </pre>
      *
      * @param channels the list of channels.
      * @param <IN>     the input data type.
@@ -338,6 +440,16 @@ public class Channels {
      * channels, the invocation will be aborted.<br/>
      * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
      * completion of the invocation lifecycle.
+     * <p/>
+     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+     * <pre>
+     *     <code>
+     *
+     *         A - [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
+     *         B - [list(1), list(1), list(1), ..., list(1), ..., list(1), PH, ...]
+     *         C - [list(2), list(2), list(2), ..., list(2), PH, ...]
+     *     </code>
+     * </pre>
      *
      * @param placeholder the placeholder instance.
      * @param channels    the array of channels.
@@ -358,6 +470,16 @@ public class Channels {
      * channels, the invocation will be aborted.<br/>
      * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
      * completion of the invocation lifecycle.
+     * <p/>
+     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+     * <pre>
+     *     <code>
+     *
+     *         A - [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
+     *         B - [list(1), list(1), list(1), ..., list(1), ..., list(1), PH, ...]
+     *         C - [list(2), list(2), list(2), ..., list(2), PH, ...]
+     *     </code>
+     * </pre>
      *
      * @param placeholder the placeholder instance.
      * @param channels    the list of channels.
@@ -376,6 +498,14 @@ public class Channels {
      * Returns an output channel joining the data coming from the specified list of channels.<br/>
      * An output will be generated only when at least one result is available for each channel.<br/>
      * Note that the passed channels will be bound as a result of the call.
+     * <p/>
+     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+     * <pre>
+     *     <code>
+     *
+     *         [(A, B, C), (A, B, C), ..., (B, C), ..., (B), ...]
+     *     </code>
+     * </pre>
      *
      * @param channels the list of channels.
      * @param <OUT>    the output data type.
@@ -393,6 +523,14 @@ public class Channels {
      * Returns an output channel joining the data coming from the specified list of channels.<br/>
      * An output will be generated only when at least one result is available for each channel.<br/>
      * Note that the passed channels will be bound as a result of the call.
+     * <p/>
+     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+     * <pre>
+     *     <code>
+     *
+     *         [(A, B, C), (A, B, C), ..., (B, C), ..., (B), ...]
+     *     </code>
+     * </pre>
      *
      * @param channels the array of channels.
      * @param <OUT>    the output data type.
@@ -413,6 +551,14 @@ public class Channels {
      * filling the gaps with the specified placeholder instance, so that the generated list of data
      * will always have the same size as the channel list.<br/>
      * Note that the passed channels will be bound as a result of the call.
+     * <p/>
+     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+     * <pre>
+     *     <code>
+     *
+     *         [(A, B, C), (A, B, C), ..., (PH, B, C), ..., (PH, B, PH), ...]
+     *     </code>
+     * </pre>
      *
      * @param placeholder the placeholder instance.
      * @param channels    the list of channels.
@@ -434,6 +580,14 @@ public class Channels {
      * filling the gaps with the specified placeholder instance, so that the generated list of data
      * will always have the same size as the channel list.<br/>
      * Note that the passed channels will be bound as a result of the call.
+     * <p/>
+     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+     * <pre>
+     *     <code>
+     *
+     *         [(A, B, C), (A, B, C), ..., (PH, B, C), ..., (PH, B, PH), ...]
+     *     </code>
+     * </pre>
      *
      * @param placeholder the placeholder instance.
      * @param channels    the array of channels.
@@ -452,6 +606,14 @@ public class Channels {
      * Merges the specified channels into a selectable one. The selectable indexes will start from
      * the specified one.<br/>
      * Note that the passed channels will be bound as a result of the call.
+     * <p/>
+     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+     * <pre>
+     *     <code>
+     *
+     *         [s(B, SI + 1), s(A, SI + 0), s(A, SI + 0), s(C, SI + 2), s(A, SI + 0), ...]
+     *     </code>
+     * </pre>
      *
      * @param startIndex the selectable start index.
      * @param channels   the list of channels.
@@ -480,6 +642,14 @@ public class Channels {
      * Merges the specified channels into a selectable one. The selectable indexes will start from
      * the specified one.<br/>
      * Note that the passed channels will be bound as a result of the call.
+     * <p/>
+     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+     * <pre>
+     *     <code>
+     *
+     *         [s(B, SI + 1), s(A, SI + 0), s(A, SI + 0), s(C, SI + 2), s(A, SI + 0), ...]
+     *     </code>
+     * </pre>
      *
      * @param startIndex the selectable start index.
      * @param channels   the array of channels.
@@ -509,6 +679,14 @@ public class Channels {
      * Merges the specified channels into a selectable one. The selectable indexes will be the same
      * as the list ones.<br/>
      * Note that the passed channels will be bound as a result of the call.
+     * <p/>
+     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+     * <pre>
+     *     <code>
+     *
+     *         [s(B, 1), s(A, 0), s(A, 0), s(C, 2), s(A, 0), ...]
+     *     </code>
+     * </pre>
      *
      * @param channels the channels to merge.
      * @param <OUT>    the output data type.
@@ -526,6 +704,14 @@ public class Channels {
      * Merges the specified channels into a selectable one. The selectable indexes will be the keys
      * of the specified map.<br/>
      * Note that the passed channels will be bound as a result of the call.
+     * <p/>
+     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+     * <pre>
+     *     <code>
+     *
+     *         [s(B, key(B)), s(A, key(A)), s(A, key(A)), s(C, key(C)), s(A, key(A)), ...]
+     *     </code>
+     * </pre>
      *
      * @param channelMap the map of indexes and output channels.
      * @param <OUT>      the output data type.
@@ -553,6 +739,14 @@ public class Channels {
      * Merges the specified channels into a selectable one. The selectable indexes will be the same
      * as the array ones.<br/>
      * Note that the passed channels will be bound as a result of the call.
+     * <p/>
+     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+     * <pre>
+     *     <code>
+     *
+     *         [s(B, 1), s(A, 0), s(A, 0), s(C, 2), s(A, 0), ...]
+     *     </code>
+     * </pre>
      *
      * @param channels the channels to merge.
      * @param <OUT>    the output data type.
@@ -570,6 +764,14 @@ public class Channels {
      * Returns a new channel repeating the output data to any newly bound channel or consumer, thus
      * effectively supporting multiple binding.<br/>
      * Note that the passed channels will be bound as a result of the call.
+     * <p/>
+     * Given channels {@code A}, the final output will be:
+     * <pre>
+     *     <code>
+     *
+     *         [A, A, A, ...] [A, A, A, ...] [A, A, A, ...] ...
+     *     </code>
+     * </pre>
      *
      * @param channel the output channel.
      * @param <OUT>   the output data type.
@@ -587,6 +789,14 @@ public class Channels {
      * Returns a new channel transforming the input data into selectable ones.<br/>
      * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
      * completion of the invocation lifecycle.
+     * <p/>
+     * Given channels {@code A}, the final output will be:
+     * <pre>
+     *     <code>
+     *
+     *         [s(A, I), s(A, I), s(A, I), ...]
+     *     </code>
+     * </pre>
      *
      * @param channel the selectable channel.
      * @param index   the channel index.
@@ -609,6 +819,15 @@ public class Channels {
      * <br/>
      * Note that the returned channels <b>must be explicitly closed</b> in order to ensure the
      * completion of the invocation lifecycle.
+     * <p/>
+     * Given channels {@code A}, {@code B} and {@code C}, in the returned map, the final output will
+     * be:
+     * <pre>
+     *     <code>
+     *
+     *         [s(B, key(B)), s(A, key(A)), s(A, key(A)), s(C, key(C)), s(A, key(A)), ...]
+     *     </code>
+     * </pre>
      *
      * @param channel the selectable channel.
      * @param indexes the iterable returning the channel indexes.
@@ -634,6 +853,15 @@ public class Channels {
      * <br/>
      * Note that the returned channels <b>must be explicitly closed</b> in order to ensure the
      * completion of the invocation lifecycle.
+     * <p/>
+     * Given channels {@code A}, {@code B} and {@code C}, in the returned map, the final output will
+     * be:
+     * <pre>
+     *     <code>
+     *
+     *         [s(B, key(B)), s(A, key(A)), s(A, key(A)), s(C, key(C)), s(A, key(A)), ...]
+     *     </code>
+     * </pre>
      *
      * @param channel the selectable channel.
      * @param indexes the array of indexes.
@@ -661,6 +889,15 @@ public class Channels {
      * <br/>
      * Note that the returned channels <b>must be explicitly closed</b> in order to ensure the
      * completion of the invocation lifecycle.
+     * <p/>
+     * Given channels {@code A}, {@code B} and {@code C}, in the returned map, the final output will
+     * be:
+     * <pre>
+     *     <code>
+     *
+     *         [s(B, key(B)), s(A, key(A)), s(A, key(A)), s(C, key(C)), s(A, key(A)), ...]
+     *     </code>
+     * </pre>
      *
      * @param startIndex the selectable start index.
      * @param rangeSize  the size of the range of indexes (must be positive).
@@ -691,6 +928,17 @@ public class Channels {
      * Returns a map of output channels returning the output data filtered by the specified indexes.
      * <br/>
      * Note that the passed channel will be bound as a result of the call.
+     * <p/>
+     * Given channels {@code A}, {@code B} and {@code C}, in the returned map, the final output will
+     * be:
+     * <pre>
+     *     <code>
+     *
+     *         A - [s(?, key(A)).data, s(?, key(A)).data, s(?, key(A)).data, ...]
+     *         B - [s(?, key(B)).data, s(?, key(B)).data, s(?, key(B)).data, ...]
+     *         C - [s(?, key(C)).data, s(?, key(C)).data, s(?, key(C)).data, ...]
+     *     </code>
+     * </pre>
      *
      * @param startIndex the selectable start index.
      * @param rangeSize  the size of the range of indexes (must be positive).
@@ -724,31 +972,41 @@ public class Channels {
     }
 
     /**
-     * Returns a selectable output filtering the data coming from the specified channel.<br/>
+     * Returns a selectable collection filtering the data coming from the specified channel.<br/>
      * Note that the passed channel will be bound as a result of the call.
+     * <p/>
+     * Given channels {@code A}, {@code B} and {@code C}, in the returned channel, the final output
+     * will be:
+     * <pre>
+     *     <code>
+     *
+     *         A - [s(?, key(A)).data, s(?, key(A)).data, s(?, key(A)).data, ...]
+     *         B - [s(?, key(B)).data, s(?, key(B)).data, s(?, key(B)).data, ...]
+     *         C - [s(?, key(C)).data, s(?, key(C)).data, s(?, key(C)).data, ...]
+     *     </code>
+     * </pre>
      *
      * @param channel the selectable output channel.
      * @param <OUT>   the output data type.
-     * @return the selectable output.
+     * @return the selectable collection of channels.
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <OUT> SelectableOutputChannel<OUT> select(
+    public static <OUT> SelectableChannels<OUT> select(
             @NotNull final OutputChannel<? extends Selectable<? extends OUT>> channel) {
 
         synchronized (sSelectableChannels) {
-            final WeakIdentityHashMap<OutputChannel<?>, DefaultSelectableOutputChannel<?>>
+            final WeakIdentityHashMap<OutputChannel<?>, DefaultSelectableChannels<?>>
                     selectableOutputs = sSelectableChannels;
-            DefaultSelectableOutputChannel<?> selectableOutput = selectableOutputs.get(channel);
+            DefaultSelectableChannels<?> selectableOutput = selectableOutputs.get(channel);
             if (selectableOutput == null) {
-                final DefaultSelectableOutputChannel<OUT> output =
-                        new DefaultSelectableOutputChannel<OUT>();
+                final DefaultSelectableChannels<OUT> output = new DefaultSelectableChannels<OUT>();
                 channel.passTo(output);
                 selectableOutputs.put(channel, output);
                 return output;
             }
 
-            return (SelectableOutputChannel<OUT>) selectableOutput;
+            return (SelectableChannels<OUT>) selectableOutput;
         }
     }
 
@@ -756,6 +1014,17 @@ public class Channels {
      * Returns a map of output channels returning the outputs filtered by the specified indexes.
      * <br/>
      * Note that the passed channel will be bound as a result of the call.
+     * <p/>
+     * Given channels {@code A}, {@code B} and {@code C}, in the returned map, the final output will
+     * be:
+     * <pre>
+     *     <code>
+     *
+     *         A - [s(?, key(A)).data, s(?, key(A)).data, s(?, key(A)).data, ...]
+     *         B - [s(?, key(B)).data, s(?, key(B)).data, s(?, key(B)).data, ...]
+     *         C - [s(?, key(C)).data, s(?, key(C)).data, s(?, key(C)).data, ...]
+     *     </code>
+     * </pre>
      *
      * @param channel the selectable output channel.
      * @param indexes the list of indexes.
@@ -786,6 +1055,17 @@ public class Channels {
      * Returns a map of output channels returning the output data filtered by the specified indexes.
      * <br/>
      * Note that the passed channel will be bound as a result of the call.
+     * <p/>
+     * Given channels {@code A}, {@code B} and {@code C}, in the returned map, the final output will
+     * be:
+     * <pre>
+     *     <code>
+     *
+     *         A - [s(?, key(A)).data, s(?, key(A)).data, s(?, key(A)).data, ...]
+     *         B - [s(?, key(B)).data, s(?, key(B)).data, s(?, key(B)).data, ...]
+     *         C - [s(?, key(C)).data, s(?, key(C)).data, s(?, key(C)).data, ...]
+     *     </code>
+     * </pre>
      *
      * @param channel the selectable output channel.
      * @param indexes the iterable returning the channel indexes.
@@ -815,6 +1095,14 @@ public class Channels {
      * Each output will be filtered based on the specified index.<br/>
      * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
      * completion of the invocation lifecycle.
+     * <p/>
+     * Given channel {@code A}, the final output will be:
+     * <pre>
+     *     <code>
+     *
+     *         [s(?, I).data, s(?, I).data, s(?, I).data, ...]
+     *     </code>
+     * </pre>
      *
      * @param channel the channel to make selectable.
      * @param index   the channel index.
@@ -835,6 +1123,14 @@ public class Channels {
      * Returns a new channel making the specified one selectable.<br/>
      * Each output will be passed along unchanged.<br/>
      * Note that the passed channel will be bound as a result of the call.
+     * <p/>
+     * Given channel {@code A}, the final output will be:
+     * <pre>
+     *     <code>
+     *
+     *         [s(A, I), s(A, I), s(A, I), ...]
+     *     </code>
+     * </pre>
      *
      * @param channel the channel to make selectable.
      * @param index   the channel index.
@@ -927,12 +1223,12 @@ public class Channels {
     }
 
     /**
-     * Interface defining a selectable output channel, that is a channel filtering selectable data
-     * and dispatching them to a specific output channel based on their index.
+     * Interface defining a collection of selectable output channels, that is an object filtering
+     * selectable data and dispatching them to a specific output channel based on their index.
      *
      * @param <OUT> the output data type.
      */
-    public interface SelectableOutputChannel<OUT> {
+    public interface SelectableChannels<OUT> {
 
         /**
          * Returns an output channel returning selectable data matching the specify index.<br/>
@@ -1028,12 +1324,12 @@ public class Channels {
     }
 
     /**
-     * Default implementation of a selectable output channel.
+     * Default implementation of a selectable channel collection.
      *
      * @param <OUT> the output data type.
      */
-    private static class DefaultSelectableOutputChannel<OUT>
-            implements SelectableOutputChannel<OUT>, OutputConsumer<Selectable<? extends OUT>> {
+    private static class DefaultSelectableChannels<OUT>
+            implements SelectableChannels<OUT>, OutputConsumer<Selectable<? extends OUT>> {
 
         private final HashMap<Integer, IOChannel<OUT>> mChannels =
                 new HashMap<Integer, IOChannel<OUT>>();

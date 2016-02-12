@@ -59,6 +59,7 @@ public class StreamsCompat extends Streams {
      * @param channels the list of channels.
      * @param <OUT>    the output data type.
      * @return the stream channel.
+     * @see com.github.dm.jrt.android.v4.core.ChannelsCompat#blend(List)
      */
     @NotNull
     public static <OUT> LoaderStreamChannelCompat<OUT> blend(
@@ -74,6 +75,7 @@ public class StreamsCompat extends Streams {
      * @param channels the array of channels.
      * @param <OUT>    the output data type.
      * @return the stream channel.
+     * @see com.github.dm.jrt.android.v4.core.ChannelsCompat#blend(OutputChannel[])
      */
     @NotNull
     public static <OUT> LoaderStreamChannelCompat<OUT> blend(
@@ -91,6 +93,7 @@ public class StreamsCompat extends Streams {
      * @param channels the list of channels.
      * @param <OUT>    the output data type.
      * @return the stream channel.
+     * @see com.github.dm.jrt.android.v4.core.ChannelsCompat#concat(List)
      */
     @NotNull
     public static <OUT> LoaderStreamChannelCompat<OUT> concat(
@@ -108,6 +111,7 @@ public class StreamsCompat extends Streams {
      * @param channels the array of channels.
      * @param <OUT>    the output data type.
      * @return the stream channel.
+     * @see com.github.dm.jrt.android.v4.core.ChannelsCompat#concat(OutputChannel[])
      */
     @NotNull
     public static <OUT> LoaderStreamChannelCompat<OUT> concat(
@@ -145,6 +149,7 @@ public class StreamsCompat extends Streams {
      * @param <OUT>    the output data type.
      * @return the output channel.
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
+     * @see com.github.dm.jrt.android.v4.core.ChannelsCompat#join(List)
      */
     @NotNull
     public static <OUT> LoaderStreamChannelCompat<List<? extends OUT>> join(
@@ -162,6 +167,7 @@ public class StreamsCompat extends Streams {
      * @param <OUT>    the output data type.
      * @return the stream channel.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @see com.github.dm.jrt.android.v4.core.ChannelsCompat#join(OutputChannel[])
      */
     @NotNull
     public static <OUT> LoaderStreamChannelCompat<List<? extends OUT>> join(
@@ -183,6 +189,7 @@ public class StreamsCompat extends Streams {
      * @param <OUT>       the output data type.
      * @return the stream channel.
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
+     * @see com.github.dm.jrt.android.v4.core.ChannelsCompat#join(Object, List)
      */
     @NotNull
     public static <OUT> LoaderStreamChannelCompat<List<? extends OUT>> join(
@@ -205,6 +212,7 @@ public class StreamsCompat extends Streams {
      * @param <OUT>       the output data type.
      * @return the stream channel.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @see com.github.dm.jrt.android.v4.core.ChannelsCompat#join(Object, OutputChannel[])
      */
     @NotNull
     public static <OUT> LoaderStreamChannelCompat<List<? extends OUT>> join(
@@ -308,6 +316,7 @@ public class StreamsCompat extends Streams {
      * @param <OUT>      the output data type.
      * @return the selectable stream channel.
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
+     * @see com.github.dm.jrt.android.v4.core.ChannelsCompat#merge(int, List)
      */
     @NotNull
     public static <OUT> LoaderStreamChannelCompat<? extends ParcelableSelectable<OUT>> merge(
@@ -326,6 +335,7 @@ public class StreamsCompat extends Streams {
      * @param <OUT>      the output data type.
      * @return the selectable stream channel.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @see com.github.dm.jrt.android.v4.core.ChannelsCompat#merge(int, OutputChannel[])
      */
     @NotNull
     public static <OUT> LoaderStreamChannelCompat<? extends ParcelableSelectable<OUT>> merge(
@@ -343,6 +353,7 @@ public class StreamsCompat extends Streams {
      * @param <OUT>    the output data type.
      * @return the selectable stream channel.
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
+     * @see com.github.dm.jrt.android.v4.core.ChannelsCompat#merge(List)
      */
     @NotNull
     public static <OUT> LoaderStreamChannelCompat<? extends ParcelableSelectable<OUT>> merge(
@@ -360,6 +371,7 @@ public class StreamsCompat extends Streams {
      * @param <OUT>    the output data type.
      * @return the selectable stream channel.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @see com.github.dm.jrt.android.v4.core.ChannelsCompat#merge(OutputChannel[])
      */
     @NotNull
     public static <OUT> LoaderStreamChannelCompat<? extends ParcelableSelectable<OUT>> merge(
@@ -376,6 +388,7 @@ public class StreamsCompat extends Streams {
      * @param <OUT>      the output data type.
      * @return the selectable stream channel.
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
+     * @see com.github.dm.jrt.android.v4.core.ChannelsCompat#merge(SparseArrayCompat)
      */
     @NotNull
     public static <OUT> LoaderStreamChannelCompat<? extends ParcelableSelectable<OUT>> merge(
@@ -413,6 +426,7 @@ public class StreamsCompat extends Streams {
      * @param channel the output channel.
      * @param <OUT>   the output data type.
      * @return the repeating stream channel.
+     * @see com.github.dm.jrt.android.v4.core.ChannelsCompat#repeat(OutputChannel)
      */
     @NotNull
     public static <OUT> LoaderStreamChannelCompat<OUT> repeat(
@@ -498,6 +512,7 @@ public class StreamsCompat extends Streams {
      * @param index   the channel index.
      * @param <OUT>   the output data type.
      * @return the selectable loader stream.
+     * @see com.github.dm.jrt.android.v4.core.ChannelsCompat#toSelectable(OutputChannel, int)
      */
     @NotNull
     public static <OUT> LoaderStreamChannelCompat<? extends ParcelableSelectable<OUT>> toSelectable(

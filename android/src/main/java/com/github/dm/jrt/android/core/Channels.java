@@ -54,6 +54,7 @@ public class Channels extends com.github.dm.jrt.core.Channels {
      * @param <OUT>      the output data type.
      * @return the selectable output channel.
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
+     * @see com.github.dm.jrt.core.Channels#merge(int, List)
      */
     @NotNull
     public static <OUT> OutputChannel<? extends ParcelableSelectable<OUT>> merge(
@@ -83,6 +84,7 @@ public class Channels extends com.github.dm.jrt.core.Channels {
      * @param <OUT>      the output data type.
      * @return the selectable output channel.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @see com.github.dm.jrt.core.Channels#merge(int, OutputChannel[])
      */
     @NotNull
     @SuppressWarnings("unchecked")
@@ -111,6 +113,7 @@ public class Channels extends com.github.dm.jrt.core.Channels {
      * @param <OUT>    the output data type.
      * @return the selectable output channel.
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
+     * @see com.github.dm.jrt.core.Channels#merge(List)
      */
     @NotNull
     public static <OUT> OutputChannel<? extends ParcelableSelectable<OUT>> merge(
@@ -128,6 +131,7 @@ public class Channels extends com.github.dm.jrt.core.Channels {
      * @param <OUT>    the output data type.
      * @return the selectable output channel.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @see com.github.dm.jrt.core.Channels#merge(OutputChannel[])
      */
     @NotNull
     public static <OUT> OutputChannel<? extends ParcelableSelectable<OUT>> merge(
@@ -146,6 +150,7 @@ public class Channels extends com.github.dm.jrt.core.Channels {
      * @param <DATA>  the channel data type.
      * @param <IN>    the input data type.
      * @return the I/O channel.
+     * @see com.github.dm.jrt.core.Channels#select(InputChannel, int)
      */
     @NotNull
     public static <DATA, IN extends DATA> IOChannel<IN> selectParcelable(
@@ -167,6 +172,7 @@ public class Channels extends com.github.dm.jrt.core.Channels {
      * @param index   the channel index.
      * @param <OUT>   the output data type.
      * @return the selectable output channel.
+     * @see com.github.dm.jrt.core.Channels#toSelectable(OutputChannel, int)
      */
     @NotNull
     public static <OUT> OutputChannel<? extends ParcelableSelectable<OUT>> toSelectable(

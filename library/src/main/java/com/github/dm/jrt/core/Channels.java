@@ -129,9 +129,9 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         A - [s(?, 0).data, s(?, 0).data, s(?, 0).data, ...]
-     *         B - [s(?, 1).data, s(?, 1).data, s(?, 1).data, ...]
-     *         C - [s(?, 2).data, s(?, 2).data, s(?, 2).data, ...]
+     *         A - [Select(?, 0).data, Select(?, 0).data, Select(?, 0).data, ...]
+     *         B - [Select(?, 1).data, Select(?, 1).data, Select(?, 1).data, ...]
+     *         C - [Select(?, 2).data, Select(?, 2).data, Select(?, 2).data, ...]
      *     </code>
      * </pre>
      *
@@ -155,9 +155,9 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         A - [s(?, SI + 0).data, s(?, SI + 0).data, s(?, SI + 0).data, ...]
-     *         B - [s(?, SI + 1).data, s(?, SI + 1).data, s(?, SI + 1).data, ...]
-     *         C - [s(?, SI + 2).data, s(?, SI + 2).data, s(?, SI + 2).data, ...]
+     *         A - [Select(?, SI + 0).data, Select(?, SI + 0).data, Select(?, SI + 0).data, ...]
+     *         B - [Select(?, SI + 1).data, Select(?, SI + 1).data, Select(?, SI + 1).data, ...]
+     *         C - [Select(?, SI + 2).data, Select(?, SI + 2).data, Select(?, SI + 2).data, ...]
      *     </code>
      * </pre>
      *
@@ -198,9 +198,9 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         A - [s(?, SI + 0).data, s(?, SI + 0).data, s(?, SI + 0).data, ...]
-     *         B - [s(?, SI + 1).data, s(?, SI + 1).data, s(?, SI + 1).data, ...]
-     *         C - [s(?, SI + 2).data, s(?, SI + 2).data, s(?, SI + 2).data, ...]
+     *         A - [Select(?, SI + 0).data, Select(?, SI + 0).data, Select(?, SI + 0).data, ...]
+     *         B - [Select(?, SI + 1).data, Select(?, SI + 1).data, Select(?, SI + 1).data, ...]
+     *         C - [Select(?, SI + 2).data, Select(?, SI + 2).data, Select(?, SI + 2).data, ...]
      *     </code>
      * </pre>
      *
@@ -241,9 +241,9 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         A - [s(?, 0).data, s(?, 0).data, s(?, 0).data, ...]
-     *         B - [s(?, 1).data, s(?, 1).data, s(?, 1).data, ...]
-     *         C - [s(?, 2).data, s(?, 2).data, s(?, 2).data, ...]
+     *         A - [Select(?, 0).data, Select(?, 0).data, Select(?, 0).data, ...]
+     *         B - [Select(?, 1).data, Select(?, 1).data, Select(?, 1).data, ...]
+     *         C - [Select(?, 2).data, Select(?, 2).data, Select(?, 2).data, ...]
      *     </code>
      * </pre>
      *
@@ -269,9 +269,9 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         A - [s(?, key(A)).data, s(?, key(A)).data, s(?, key(A)).data, ...]
-     *         B - [s(?, key(B)).data, s(?, key(B)).data, s(?, key(B)).data, ...]
-     *         C - [s(?, key(C)).data, s(?, key(C)).data, s(?, key(C)).data, ...]
+     *         A - [Select(?, key(A)).data, Select(?, key(A)).data, Select(?, key(A)).data, ...]
+     *         B - [Select(?, key(B)).data, Select(?, key(B)).data, Select(?, key(B)).data, ...]
+     *         C - [Select(?, key(C)).data, Select(?, key(C)).data, Select(?, key(C)).data, ...]
      *     </code>
      * </pre>
      *
@@ -611,7 +611,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         [s(B, SI + 1), s(A, SI + 0), s(A, SI + 0), s(C, SI + 2), s(A, SI + 0), ...]
+     *         [Select(B, SI + 1), Select(A, SI + 0), Select(C, SI + 2), Select(A, SI + 0), ...]
      *     </code>
      * </pre>
      *
@@ -647,7 +647,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         [s(B, SI + 1), s(A, SI + 0), s(A, SI + 0), s(C, SI + 2), s(A, SI + 0), ...]
+     *         [Select(B, SI + 1), Select(A, SI + 0), Select(C, SI + 2), Select(A, SI + 0), ...]
      *     </code>
      * </pre>
      *
@@ -684,7 +684,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         [s(B, 1), s(A, 0), s(A, 0), s(C, 2), s(A, 0), ...]
+     *         [Select(B, 1), Select(A, 0), Select(A, 0), Select(C, 2), Select(A, 0), ...]
      *     </code>
      * </pre>
      *
@@ -709,7 +709,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         [s(B, key(B)), s(A, key(A)), s(A, key(A)), s(C, key(C)), s(A, key(A)), ...]
+     *         [Select(B, key(B)), Select(A, key(A)), Select(C, key(C)), Select(A, key(A)), ...]
      *     </code>
      * </pre>
      *
@@ -744,7 +744,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         [s(B, 1), s(A, 0), s(A, 0), s(C, 2), s(A, 0), ...]
+     *         [Select(B, 1), Select(A, 0), Select(A, 0), Select(C, 2), Select(A, 0), ...]
      *     </code>
      * </pre>
      *
@@ -794,7 +794,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         [s(A, I), s(A, I), s(A, I), ...]
+     *         [Select(A, I), Select(A, I), Select(A, I), ...]
      *     </code>
      * </pre>
      *
@@ -825,7 +825,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         [s(B, key(B)), s(A, key(A)), s(A, key(A)), s(C, key(C)), s(A, key(A)), ...]
+     *         [Select(B, key(B)), Select(A, key(A)), Select(C, key(C)), Select(A, key(A)), ...]
      *     </code>
      * </pre>
      *
@@ -859,7 +859,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         [s(B, key(B)), s(A, key(A)), s(A, key(A)), s(C, key(C)), s(A, key(A)), ...]
+     *         [Select(B, key(B)), Select(A, key(A)), Select(C, key(C)), Select(A, key(A)), ...]
      *     </code>
      * </pre>
      *
@@ -895,7 +895,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         [s(B, key(B)), s(A, key(A)), s(A, key(A)), s(C, key(C)), s(A, key(A)), ...]
+     *         [Select(B, key(B)), Select(A, key(A)), Select(C, key(C)), Select(A, key(A)), ...]
      *     </code>
      * </pre>
      *
@@ -934,9 +934,9 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         A - [s(?, key(A)).data, s(?, key(A)).data, s(?, key(A)).data, ...]
-     *         B - [s(?, key(B)).data, s(?, key(B)).data, s(?, key(B)).data, ...]
-     *         C - [s(?, key(C)).data, s(?, key(C)).data, s(?, key(C)).data, ...]
+     *         A - [Select(?, key(A)).data, Select(?, key(A)).data, Select(?, key(A)).data, ...]
+     *         B - [Select(?, key(B)).data, Select(?, key(B)).data, Select(?, key(B)).data, ...]
+     *         C - [Select(?, key(C)).data, Select(?, key(C)).data, Select(?, key(C)).data, ...]
      *     </code>
      * </pre>
      *
@@ -980,9 +980,9 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         A - [s(?, key(A)).data, s(?, key(A)).data, s(?, key(A)).data, ...]
-     *         B - [s(?, key(B)).data, s(?, key(B)).data, s(?, key(B)).data, ...]
-     *         C - [s(?, key(C)).data, s(?, key(C)).data, s(?, key(C)).data, ...]
+     *         A - [Select(?, key(A)).data, Select(?, key(A)).data, Select(?, key(A)).data, ...]
+     *         B - [Select(?, key(B)).data, Select(?, key(B)).data, Select(?, key(B)).data, ...]
+     *         C - [Select(?, key(C)).data, Select(?, key(C)).data, Select(?, key(C)).data, ...]
      *     </code>
      * </pre>
      *
@@ -1020,9 +1020,9 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         A - [s(?, key(A)).data, s(?, key(A)).data, s(?, key(A)).data, ...]
-     *         B - [s(?, key(B)).data, s(?, key(B)).data, s(?, key(B)).data, ...]
-     *         C - [s(?, key(C)).data, s(?, key(C)).data, s(?, key(C)).data, ...]
+     *         A - [Select(?, key(A)).data, Select(?, key(A)).data, Select(?, key(A)).data, ...]
+     *         B - [Select(?, key(B)).data, Select(?, key(B)).data, Select(?, key(B)).data, ...]
+     *         C - [Select(?, key(C)).data, Select(?, key(C)).data, Select(?, key(C)).data, ...]
      *     </code>
      * </pre>
      *
@@ -1061,9 +1061,9 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         A - [s(?, key(A)).data, s(?, key(A)).data, s(?, key(A)).data, ...]
-     *         B - [s(?, key(B)).data, s(?, key(B)).data, s(?, key(B)).data, ...]
-     *         C - [s(?, key(C)).data, s(?, key(C)).data, s(?, key(C)).data, ...]
+     *         A - [Select(?, key(A)).data, Select(?, key(A)).data, Select(?, key(A)).data, ...]
+     *         B - [Select(?, key(B)).data, Select(?, key(B)).data, Select(?, key(B)).data, ...]
+     *         C - [Select(?, key(C)).data, Select(?, key(C)).data, Select(?, key(C)).data, ...]
      *     </code>
      * </pre>
      *
@@ -1100,7 +1100,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         [s(?, I).data, s(?, I).data, s(?, I).data, ...]
+     *         [Select(?, I).data, Select(?, I).data, Select(?, I).data, ...]
      *     </code>
      * </pre>
      *
@@ -1128,7 +1128,7 @@ public class Channels {
      * <pre>
      *     <code>
      *
-     *         [s(A, I), s(A, I), s(A, I), ...]
+     *         [Select(A, I), Select(A, I), Select(A, I), ...]
      *     </code>
      * </pre>
      *

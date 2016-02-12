@@ -76,6 +76,7 @@ public class Streams extends Functions {
      * @param channels the list of channels.
      * @param <OUT>    the output data type.
      * @return the stream channel.
+     * @see com.github.dm.jrt.core.Channels#blend(List)
      */
     @NotNull
     public static <OUT> StreamChannel<OUT> blend(
@@ -91,6 +92,7 @@ public class Streams extends Functions {
      * @param channels the array of channels.
      * @param <OUT>    the output data type.
      * @return the stream channel.
+     * @see com.github.dm.jrt.core.Channels#blend(OutputChannel[])
      */
     @NotNull
     public static <OUT> StreamChannel<OUT> blend(@NotNull final OutputChannel<?>... channels) {
@@ -107,6 +109,7 @@ public class Streams extends Functions {
      * @param channels the list of channels.
      * @param <OUT>    the output data type.
      * @return the stream channel.
+     * @see com.github.dm.jrt.core.Channels#concat(List)
      */
     @NotNull
     public static <OUT> StreamChannel<OUT> concat(
@@ -124,6 +127,7 @@ public class Streams extends Functions {
      * @param channels the array of channels.
      * @param <OUT>    the output data type.
      * @return the stream channel.
+     * @see com.github.dm.jrt.core.Channels#concat(OutputChannel[])
      */
     @NotNull
     public static <OUT> StreamChannel<OUT> concat(@NotNull final OutputChannel<?>... channels) {
@@ -153,6 +157,15 @@ public class Streams extends Functions {
     /**
      * Returns a factory of invocations grouping the input data in collections of the specified
      * size.
+     * <p/>
+     * Given a numeric sequence of inputs starting from 0, and a size of 3, the final output will
+     * be:
+     * <pre>
+     *     <code>
+     *
+     *         [(0, 1, 2), (3, 4, 5), ..., (N, N + 1)]
+     *     </code>
+     * </pre>
      *
      * @param size   the group size.
      * @param <DATA> the data type.
@@ -170,6 +183,15 @@ public class Streams extends Functions {
      * size.<br/>
      * If the inputs complete and the last group length is less than the target size, the missing
      * spaces will be filled with the specified placeholder instance.
+     * <p/>
+     * Given a numeric sequence of inputs starting from 0, and a size of 3, the final output will
+     * be:
+     * <pre>
+     *     <code>
+     *
+     *         [(0, 1, 2), (3, 4, 5), ..., (N, N + 1, PH)]
+     *     </code>
+     * </pre>
      *
      * @param size        the group size.
      * @param placeholder the placeholder object used to fill the missing data needed to reach
@@ -194,6 +216,7 @@ public class Streams extends Functions {
      * @param <OUT>    the output data type.
      * @return the stream channel.
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
+     * @see com.github.dm.jrt.core.Channels#join(List)
      */
     @NotNull
     public static <OUT> StreamChannel<List<? extends OUT>> join(
@@ -211,6 +234,7 @@ public class Streams extends Functions {
      * @param <OUT>    the output data type.
      * @return the stream channel.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @see com.github.dm.jrt.core.Channels#join(OutputChannel[])
      */
     @NotNull
     public static <OUT> StreamChannel<List<? extends OUT>> join(
@@ -232,6 +256,7 @@ public class Streams extends Functions {
      * @param <OUT>       the output data type.
      * @return the stream channel.
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
+     * @see com.github.dm.jrt.core.Channels#join(Object, List)
      */
     @NotNull
     public static <OUT> StreamChannel<List<? extends OUT>> join(@Nullable final OUT placeholder,
@@ -253,6 +278,7 @@ public class Streams extends Functions {
      * @param <OUT>       the output data type.
      * @return the stream channel.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @see com.github.dm.jrt.core.Channels#join(Object, OutputChannel[])
      */
     @NotNull
     public static <OUT> StreamChannel<List<? extends OUT>> join(@Nullable final Object placeholder,
@@ -347,6 +373,15 @@ public class Streams extends Functions {
     /**
      * Returns an factory of invocations passing at max the specified number of input data and
      * discarding the following ones.
+     * <p/>
+     * Given a numeric sequence of inputs starting from 0, and a limit count of 5, the final output
+     * will be:
+     * <pre>
+     *     <code>
+     *
+     *         [0, 1, 2, 3, 4]
+     *     </code>
+     * </pre>
      *
      * @param count  the maximum number of data to pass.
      * @param <DATA> the data type.
@@ -368,6 +403,7 @@ public class Streams extends Functions {
      * @param <OUT>      the output data type.
      * @return the selectable stream channel.
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
+     * @see com.github.dm.jrt.core.Channels#merge(int, List)
      */
     @NotNull
     public static <OUT> StreamChannel<? extends Selectable<OUT>> merge(final int startIndex,
@@ -385,6 +421,7 @@ public class Streams extends Functions {
      * @param <OUT>      the output data type.
      * @return the selectable stream channel.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @see com.github.dm.jrt.core.Channels#merge(int, OutputChannel[])
      */
     @NotNull
     public static <OUT> StreamChannel<? extends Selectable<OUT>> merge(final int startIndex,
@@ -402,6 +439,7 @@ public class Streams extends Functions {
      * @param <OUT>    the output data type.
      * @return the selectable stream channel.
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
+     * @see com.github.dm.jrt.core.Channels#merge(List)
      */
     @NotNull
     public static <OUT> StreamChannel<? extends Selectable<OUT>> merge(
@@ -418,6 +456,7 @@ public class Streams extends Functions {
      * @param <OUT>      the output data type.
      * @return the selectable stream channel.
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
+     * @see com.github.dm.jrt.core.Channels#merge(Map)
      */
     @NotNull
     public static <OUT> StreamChannel<? extends Selectable<OUT>> merge(
@@ -435,6 +474,7 @@ public class Streams extends Functions {
      * @param <OUT>    the output data type.
      * @return the selectable stream channel.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @see com.github.dm.jrt.core.Channels#merge(OutputChannel[])
      */
     @NotNull
     public static <OUT> StreamChannel<? extends Selectable<OUT>> merge(
@@ -470,6 +510,7 @@ public class Streams extends Functions {
      * @param channel the output channel.
      * @param <OUT>   the output data type.
      * @return the repeating stream channel.
+     * @see com.github.dm.jrt.core.Channels#repeat(OutputChannel)
      */
     @NotNull
     public static <OUT> StreamChannel<OUT> repeat(@NotNull final OutputChannel<OUT> channel) {
@@ -479,6 +520,15 @@ public class Streams extends Functions {
 
     /**
      * Returns an factory of invocations skipping the specified number of input data.
+     * <p/>
+     * Given a numeric sequence of inputs starting from 0, and a skip count of 5, the final output
+     * will be:
+     * <pre>
+     *     <code>
+     *
+     *         [5, 6, 7, ...]
+     *     </code>
+     * </pre>
      *
      * @param count  the number of data to skip.
      * @param <DATA> the data type.
@@ -566,6 +616,7 @@ public class Streams extends Functions {
      * @param index   the channel index.
      * @param <OUT>   the output data type.
      * @return the selectable stream.
+     * @see com.github.dm.jrt.core.Channels#toSelectable(OutputChannel, int)
      */
     @NotNull
     public static <OUT> StreamChannel<? extends Selectable<OUT>> toSelectable(

@@ -27,6 +27,8 @@ import com.github.dm.jrt.common.RoutineException;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Map;
+
 /**
  * Utility class for handling routine channels.
  * <p/>
@@ -51,6 +53,7 @@ public class ChannelsCompat extends Channels {
      * @param <IN>     the input data type.
      * @return the selectable I/O channel.
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
+     * @see com.github.dm.jrt.core.Channels#combine(Map)
      */
     @NotNull
     @SuppressWarnings("unchecked")
@@ -84,6 +87,7 @@ public class ChannelsCompat extends Channels {
      * @param <OUT>      the output data type.
      * @return the selectable output channel.
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
+     * @see com.github.dm.jrt.core.Channels#merge(Map)
      */
     @NotNull
     public static <OUT> OutputChannel<? extends ParcelableSelectable<OUT>> merge(
@@ -113,6 +117,7 @@ public class ChannelsCompat extends Channels {
      * @param <DATA>  the channel data type.
      * @param <IN>    the input data type.
      * @return the map of indexes and I/O channels.
+     * @see com.github.dm.jrt.core.Channels#select(InputChannel, int...)
      */
     @NotNull
     public static <DATA, IN extends DATA> SparseArrayCompat<IOChannel<IN>> selectParcelable(
@@ -140,6 +145,7 @@ public class ChannelsCompat extends Channels {
      * @param <DATA>  the channel data type.
      * @param <IN>    the input data type.
      * @return the map of indexes and I/O channels.
+     * @see com.github.dm.jrt.core.Channels#select(InputChannel, Iterable)
      */
     @NotNull
     public static <DATA, IN extends DATA> SparseArrayCompat<IOChannel<IN>> selectParcelable(
@@ -167,6 +173,7 @@ public class ChannelsCompat extends Channels {
      * @param <IN>       the input data type.
      * @return the map of indexes and I/O channels.
      * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
+     * @see com.github.dm.jrt.core.Channels#select(int, int, InputChannel)
      */
     @NotNull
     public static <DATA, IN extends DATA> SparseArrayCompat<IOChannel<IN>> selectParcelable(
@@ -197,6 +204,7 @@ public class ChannelsCompat extends Channels {
      * @param <OUT>      the output data type.
      * @return the map of indexes and output channels.
      * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
+     * @see com.github.dm.jrt.core.Channels#select(int, int, OutputChannel)
      */
     @NotNull
     public static <OUT> SparseArrayCompat<OutputChannel<OUT>> selectParcelable(final int startIndex,
@@ -231,6 +239,7 @@ public class ChannelsCompat extends Channels {
      * @param indexes the list of indexes.
      * @param <OUT>   the output data type.
      * @return the map of indexes and output channels.
+     * @see com.github.dm.jrt.core.Channels#select(OutputChannel, int...)
      */
     @NotNull
     public static <OUT> SparseArrayCompat<OutputChannel<OUT>> selectParcelable(
@@ -261,6 +270,7 @@ public class ChannelsCompat extends Channels {
      * @param indexes the iterable returning the channel indexes.
      * @param <OUT>   the output data type.
      * @return the map of indexes and output channels.
+     * @see com.github.dm.jrt.core.Channels#select(OutputChannel, Iterable)
      */
     @NotNull
     public static <OUT> SparseArrayCompat<OutputChannel<OUT>> selectParcelable(

@@ -19,6 +19,7 @@ package com.github.dm.jrt.stream;
 import com.github.dm.jrt.builder.IOChannelBuilder;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.channel.AbortException;
+import com.github.dm.jrt.channel.Channel.InputChannel;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
@@ -1329,7 +1330,7 @@ public class StreamsTest {
     }
 
     @Test
-    public void testUnwrap() {
+    public void testUnfold() {
 
         assertThat(Streams.streamOf()
                           .sync()
@@ -1337,22 +1338,22 @@ public class StreamsTest {
                           .async()
                           .map(Streams.<Number>groupBy(3))
                           .parallel()
-                          .map(Streams.<Number>unwrap())
+                          .map(Streams.<Number>unfold())
                           .afterMax(seconds(3))
                           .all()).containsOnly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
     }
 
     @Test
-    public void testUnwrapEquals() {
+    public void testUnfoldEquals() {
 
-        final BiConsumerWrapper<Iterable<Object>, ResultChannel<Object>> consumer =
-                Streams.unwrap();
+        final BiConsumerWrapper<Iterable<Object>, InputChannel<Object>> consumer =
+                Streams.unfold();
         assertThat(consumer).isEqualTo(consumer);
         assertThat(consumer).isNotEqualTo(null);
         assertThat(consumer).isNotEqualTo("test");
         assertThat(consumer).isNotEqualTo(Streams.groupBy(3));
-        assertThat(consumer).isEqualTo(Streams.unwrap());
-        assertThat(consumer.hashCode()).isEqualTo(Streams.unwrap().hashCode());
+        assertThat(consumer).isEqualTo(Streams.unfold());
+        assertThat(consumer.hashCode()).isEqualTo(Streams.unfold().hashCode());
     }
 
     private static class Amb<DATA> extends TemplateInvocation<Selectable<DATA>, DATA> {

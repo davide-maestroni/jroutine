@@ -17,6 +17,7 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.builder.RoutineBuilder;
+import com.github.dm.jrt.channel.Channel.InputChannel;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.ResultChannel;
@@ -51,13 +52,13 @@ import static com.github.dm.jrt.util.Reflection.asArgs;
  */
 public class Streams extends Functions {
 
-    private static final BiConsumerWrapper<? extends Iterable<?>, ? extends ResultChannel<?>>
-            sUnwrap = wrapBiConsumer(new BiConsumer<Iterable<?>, ResultChannel<?>>() {
+    private static final BiConsumerWrapper<? extends Iterable<?>, ? extends InputChannel<?>>
+            sUnfold = wrapBiConsumer(new BiConsumer<Iterable<?>, InputChannel<?>>() {
 
         @SuppressWarnings("unchecked")
-        public void accept(final Iterable<?> objects, final ResultChannel<?> resultChannel) {
+        public void accept(final Iterable<?> objects, final InputChannel<?> inputChannel) {
 
-            resultChannel.pass((Iterable) objects);
+            inputChannel.pass((Iterable) objects);
         }
     });
 
@@ -574,7 +575,7 @@ public class Streams extends Functions {
     }
 
     /**
-     * Returns a bi-consumer wrapper unwrapping iterable inputs into the returned elements.<br/>
+     * Returns a bi-consumer wrapper unfolding iterable inputs into the returned elements.<br/>
      * The returned object will support concatenation and comparison.
      *
      * @param <OUT> the output data type.
@@ -582,9 +583,9 @@ public class Streams extends Functions {
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <OUT> BiConsumerWrapper<Iterable<OUT>, ResultChannel<OUT>> unwrap() {
+    public static <OUT> BiConsumerWrapper<Iterable<OUT>, InputChannel<OUT>> unfold() {
 
-        return (BiConsumerWrapper<Iterable<OUT>, ResultChannel<OUT>>) sUnwrap;
+        return (BiConsumerWrapper<Iterable<OUT>, InputChannel<OUT>>) sUnfold;
     }
 
     /**

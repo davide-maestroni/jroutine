@@ -14,26 +14,27 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android.v4.core;
+package com.github.dm.jrt.android.v4;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
-import android.view.WindowManager.LayoutParams;
-
-import com.github.dm.jrt.android.R;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 /**
- * Test activity.
+ * Test fragment.
  * <p/>
  * Created by davide-maestroni on 12/16/2014.
  */
-public class TestActivity extends FragmentActivity {
+public class TestFragment extends Fragment {
 
+    @Nullable
     @Override
-    protected void onCreate(final Bundle savedInstanceState) {
+    public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
+            final Bundle savedInstanceState) {
 
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.test_v4_layout);
-        getWindow().addFlags(LayoutParams.FLAG_KEEP_SCREEN_ON);
+        return new View(getActivity());
     }
 }

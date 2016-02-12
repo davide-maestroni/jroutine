@@ -26,7 +26,7 @@
             android:label="test">
         </activity>
         <activity
-            android:name="com.github.dm.jrt.android.v11.core.TestActivity"
+            android:name="com.github.dm.jrt.android.v11.TestActivity"
             android:label="test">
         </activity>
         <activity
@@ -34,7 +34,7 @@
             android:label="test">
         </activity>
         <activity
-            android:name="com.github.dm.jrt.android.v4.core.TestActivity"
+            android:name="com.github.dm.jrt.android.v4.TestActivity"
             android:label="test">
         </activity>
         <activity

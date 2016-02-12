@@ -14,32 +14,29 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android.v11.core;
+package com.github.dm.jrt.android.v11;
 
 import android.annotation.TargetApi;
-import android.app.Fragment;
+import android.app.Activity;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.WindowManager.LayoutParams;
 
-import org.jetbrains.annotations.NotNull;
+import com.github.dm.jrt.android.R;
 
 /**
- * Test fragment.
+ * Test activity.
  * <p/>
  * Created by davide-maestroni on 12/16/2014.
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)
-public class TestFragment extends Fragment {
+public class TestActivity extends Activity {
 
-    @Nullable
     @Override
-    public View onCreateView(@NotNull final LayoutInflater inflater, final ViewGroup container,
-            final Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
 
-        return new View(getActivity());
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.test_v11_layout);
+        getWindow().addFlags(LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 }

@@ -34,6 +34,8 @@ import com.github.dm.jrt.android.invocation.PassingFunctionContextInvocation;
 import com.github.dm.jrt.android.log.Logs;
 import com.github.dm.jrt.android.routine.LoaderRoutine;
 import com.github.dm.jrt.android.runner.Runners;
+import com.github.dm.jrt.android.v4.TestActivity;
+import com.github.dm.jrt.android.v4.TestFragment;
 import com.github.dm.jrt.builder.ChannelConfiguration;
 import com.github.dm.jrt.builder.ChannelConfiguration.Builder;
 import com.github.dm.jrt.builder.InvocationConfiguration;

@@ -24,6 +24,7 @@ import android.test.ActivityInstrumentationTestCase2;
 import com.github.dm.jrt.android.core.Channels.ParcelableSelectable;
 import com.github.dm.jrt.android.core.JRoutine;
 import com.github.dm.jrt.android.invocation.FilterContextInvocation;
+import com.github.dm.jrt.android.v4.TestActivity;
 import com.github.dm.jrt.builder.IOChannelBuilder;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.channel.AbortException;

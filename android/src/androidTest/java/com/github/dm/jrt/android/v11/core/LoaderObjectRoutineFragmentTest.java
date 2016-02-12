@@ -27,6 +27,8 @@ import com.github.dm.jrt.android.builder.LoaderConfiguration;
 import com.github.dm.jrt.android.builder.LoaderObjectRoutineBuilder;
 import com.github.dm.jrt.android.core.ContextInvocationTarget;
 import com.github.dm.jrt.android.core.FactoryContextWrapper;
+import com.github.dm.jrt.android.v11.TestActivity;
+import com.github.dm.jrt.android.v11.TestFragment;
 import com.github.dm.jrt.annotation.Alias;
 import com.github.dm.jrt.annotation.AsyncIn;
 import com.github.dm.jrt.annotation.AsyncIn.InputMode;

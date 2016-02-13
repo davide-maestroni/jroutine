@@ -24,6 +24,7 @@ import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
 import com.github.dm.jrt.android.v11.core.Channels;
 import com.github.dm.jrt.android.v11.core.JRoutine;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
+import com.github.dm.jrt.builder.RoutineBuilder;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
@@ -122,6 +123,8 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
     /**
      * Returns an invocation factory, whose invocation instances employ the stream output channels,
      * provided by the specified function, to process input data.<br/>
+     * In order to prevent undesired leaks, the class of the specified function must have a static
+     * context.<br/>
      * The function should return a new instance each time it is called, starting from the passed
      * one.
      *
@@ -129,14 +132,15 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
      * @param <IN>     the input data type.
      * @param <OUT>    the output data type.
      * @return the invocation factory.
+     * @throws java.lang.IllegalArgumentException if the class of the specified function is not
+     *                                            static.
      */
     @NotNull
     public static <IN, OUT> FunctionContextInvocationFactory<IN, OUT> contextFactory(
-            @NotNull final Function<? super StreamChannel<? extends IN>, ? extends
+            @NotNull final Function<? super StreamChannel<IN>, ? extends
                     StreamChannel<? extends OUT>> function) {
 
-        return factoryFrom(onStream(function), wrapFunction(function).hashCode(),
-                           DelegationType.SYNC);
+        return factoryFrom(onStream(function), wrap(function).hashCode(), DelegationType.SYNC);
     }
 
     /**
@@ -396,8 +400,39 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
     }
 
     /**
+     * Returns a routine builder, whose invocation instances employ the streams provided by the
+     * specified function, to process input data.<br/>
+     * In order to prevent undesired leaks, the class of the specified function must have a static
+     * context.<br/>
+     * The function should return a new instance each time it is called, starting from the passed
+     * one.
+     *
+     * @param function the function providing the stream output channels.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the routine builder.
+     * @throws java.lang.IllegalArgumentException if the class of the specified function is not
+     *                                            static.
+     */
+    @NotNull
+    public static <IN, OUT> RoutineBuilder<IN, OUT> onStream(
+            @NotNull final Function<? super StreamChannel<IN>, ? extends
+                    StreamChannel<? extends OUT>> function) {
+
+        if (!wrap(function).hasStaticContext()) {
+            throw new IllegalArgumentException(
+                    "the function instance does not have a static context: " + function.getClass()
+                                                                                       .getName());
+        }
+
+        return com.github.dm.jrt.stream.Streams.onStream(function);
+    }
+
+    /**
      * Returns a loader routine builder, whose invocation instances employ the streams provided by
      * the specified function, to process input data.<br/>
+     * In order to prevent undesired leaks, the class of the specified function must have a static
+     * context.<br/>
      * The function should return a new instance each time it is called, starting from the passed
      * one.
      *
@@ -410,7 +445,7 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
     @NotNull
     public static <IN, OUT> LoaderRoutineBuilder<IN, OUT> onStreamWith(
             @NotNull final LoaderContext context,
-            @NotNull final Function<? super StreamChannel<? extends IN>, ? extends
+            @NotNull final Function<? super StreamChannel<IN>, ? extends
                     StreamChannel<? extends OUT>> function) {
 
         return JRoutine.with(context).on(contextFactory(function));

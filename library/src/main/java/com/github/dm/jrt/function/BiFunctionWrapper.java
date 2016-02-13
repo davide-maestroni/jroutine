@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.function;
 
+import com.github.dm.jrt.util.Reflection;
 import com.github.dm.jrt.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
@@ -31,7 +32,7 @@ import java.util.Comparator;
  * @param <IN2> the second input data type.
  * @param <OUT> the output data type.
  */
-public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OUT> {
+public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OUT>, Wrapper {
 
     private static final WeakIdentityHashMap<Comparator<?>, BiFunctionWrapper<?, ?, ?>>
             mMaxFunctions = new WeakIdentityHashMap<Comparator<?>, BiFunctionWrapper<?, ?, ?>>();
@@ -251,6 +252,11 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
             @NotNull final Function<? super OUT, ? extends AFTER> after) {
 
         return new BiFunctionWrapper<IN1, IN2, AFTER>(mBiFunction, mFunction.andThen(after));
+    }
+
+    public boolean hasStaticContext() {
+
+        return Reflection.hasStaticContext(mBiFunction) && mFunction.hasStaticContext();
     }
 
     @Override

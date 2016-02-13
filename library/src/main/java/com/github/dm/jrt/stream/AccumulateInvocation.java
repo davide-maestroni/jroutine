@@ -26,7 +26,7 @@ import com.github.dm.jrt.invocation.TemplateInvocation;
 
 import org.jetbrains.annotations.NotNull;
 
-import static com.github.dm.jrt.function.Functions.wrapBiFunction;
+import static com.github.dm.jrt.function.Functions.wrap;
 import static com.github.dm.jrt.util.Reflection.asArgs;
 
 /**
@@ -67,7 +67,7 @@ class AccumulateInvocation<IN> extends TemplateInvocation<IN, IN> {
     public static <IN> InvocationFactory<IN, IN> functionFactory(
             @NotNull final BiFunction<? super IN, ? super IN, ? extends IN> function) {
 
-        return new AccumulateInvocationFactory<IN>(wrapBiFunction(function));
+        return new AccumulateInvocationFactory<IN>(wrap(function));
     }
 
     @Override

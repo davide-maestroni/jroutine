@@ -16,6 +16,8 @@
 
 package com.github.dm.jrt.function;
 
+import com.github.dm.jrt.util.Reflection;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -29,7 +31,7 @@ import java.util.List;
  *
  * @param <IN> the input data type.
  */
-public class ConsumerWrapper<IN> implements Consumer<IN> {
+public class ConsumerWrapper<IN> implements Consumer<IN>, Wrapper {
 
     private static final ConsumerWrapper<Object> sSink =
             new ConsumerWrapper<Object>(new Consumer<Object>() {
@@ -103,6 +105,17 @@ public class ConsumerWrapper<IN> implements Consumer<IN> {
         }
 
         return new ConsumerWrapper<IN>(newConsumers);
+    }
+
+    public boolean hasStaticContext() {
+
+        for (final Consumer<?> consumer : mConsumers) {
+            if (!Reflection.hasStaticContext(consumer)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Override

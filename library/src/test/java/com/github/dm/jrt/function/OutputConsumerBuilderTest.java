@@ -24,7 +24,7 @@ import static com.github.dm.jrt.function.Functions.onComplete;
 import static com.github.dm.jrt.function.Functions.onError;
 import static com.github.dm.jrt.function.Functions.onOutput;
 import static com.github.dm.jrt.function.Functions.sink;
-import static com.github.dm.jrt.function.Functions.wrapConsumer;
+import static com.github.dm.jrt.function.Functions.wrap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -97,8 +97,7 @@ public class OutputConsumerBuilderTest {
         assertThat(consumer2.isCalled()).isTrue();
         consumer1.reset();
         consumer2.reset();
-        outputConsumer =
-                onComplete(consumer1).thenOnComplete(wrapConsumer(consumer2).andThen(consumer3));
+        outputConsumer = onComplete(consumer1).thenOnComplete(wrap(consumer2).andThen(consumer3));
         outputConsumer.onOutput("test");
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(consumer2.isCalled()).isFalse();
@@ -197,7 +196,7 @@ public class OutputConsumerBuilderTest {
         assertThat(consumer2.isCalled()).isTrue();
         consumer1.reset();
         consumer2.reset();
-        outputConsumer = onError(consumer1).thenOnError(wrapConsumer(consumer2).andThen(consumer3));
+        outputConsumer = onError(consumer1).thenOnError(wrap(consumer2).andThen(consumer3));
         outputConsumer.onOutput("test");
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(consumer2.isCalled()).isFalse();
@@ -297,8 +296,7 @@ public class OutputConsumerBuilderTest {
         assertThat(consumer2.isCalled()).isTrue();
         consumer1.reset();
         consumer2.reset();
-        outputConsumer =
-                onOutput(consumer1).thenOnOutput(wrapConsumer(consumer2).andThen(consumer3));
+        outputConsumer = onOutput(consumer1).thenOnOutput(wrap(consumer2).andThen(consumer3));
         outputConsumer.onError(new RoutineException());
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(consumer2.isCalled()).isFalse();

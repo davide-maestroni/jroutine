@@ -153,6 +153,17 @@ public class Reflection {
     }
 
     /**
+     * Checks if the specified instance is static or is a top level class.
+     *
+     * @param instance the instance.
+     * @return whether the instance has a static context.
+     */
+    public static boolean hasStaticContext(@NotNull final Object instance) {
+
+        return hasStaticContext(instance.getClass());
+    }
+
+    /**
      * Makes the specified constructor accessible.
      *
      * @param constructor the constructor instance.

@@ -147,6 +147,8 @@ public class RoutineProcessor extends AbstractProcessor {
 
     private String mMethodVoid;
 
+    private TypeMirror voidType;
+
     /**
      * Prints the stacktrace of the specified throwable into a string.
      *
@@ -179,12 +181,6 @@ public class RoutineProcessor extends AbstractProcessor {
     public synchronized void init(final ProcessingEnvironment processingEnv) {
 
         super.init(processingEnv);
-        routineType = getMirrorFromName(Routine.class.getCanonicalName());
-        invocationChannelType = getMirrorFromName(InvocationChannel.class.getCanonicalName());
-        outputChannelType = getMirrorFromName(OutputChannel.class.getCanonicalName());
-        iterableType = getMirrorFromName(Iterable.class.getCanonicalName());
-        listType = getMirrorFromName(List.class.getCanonicalName());
-        objectType = getMirrorFromName(Object.class.getCanonicalName());
         final Types typeUtils = processingEnv.getTypeUtils();
         final HashMap<String, TypeMirror> primitiveMirrors = mPrimitiveMirrors;
         primitiveMirrors.put(char.class.getCanonicalName(),
@@ -219,6 +215,13 @@ public class RoutineProcessor extends AbstractProcessor {
                              typeUtils.getArrayType(typeUtils.getPrimitiveType(TypeKind.FLOAT)));
         primitiveMirrors.put(double[].class.getCanonicalName(),
                              typeUtils.getArrayType(typeUtils.getPrimitiveType(TypeKind.DOUBLE)));
+        routineType = getMirrorFromName(Routine.class.getCanonicalName());
+        invocationChannelType = getMirrorFromName(InvocationChannel.class.getCanonicalName());
+        outputChannelType = getMirrorFromName(OutputChannel.class.getCanonicalName());
+        iterableType = getMirrorFromName(Iterable.class.getCanonicalName());
+        listType = getMirrorFromName(List.class.getCanonicalName());
+        objectType = getMirrorFromName(Object.class.getCanonicalName());
+        voidType = getMirrorFromName(Void.class.getCanonicalName());
     }
 
     @Override
@@ -711,8 +714,14 @@ public class RoutineProcessor extends AbstractProcessor {
      */
     protected TypeMirror getBoxedType(@Nullable final TypeMirror type) {
 
-        if ((type != null) && (type.getKind().isPrimitive() || (type.getKind() == TypeKind.VOID))) {
-            return processingEnv.getTypeUtils().boxedClass((PrimitiveType) type).asType();
+        if (type != null) {
+            if (type.getKind() == TypeKind.VOID) {
+                return voidType;
+            }
+
+            if (type.getKind().isPrimitive()) {
+                return processingEnv.getTypeUtils().boxedClass((PrimitiveType) type).asType();
+            }
         }
 
         return type;

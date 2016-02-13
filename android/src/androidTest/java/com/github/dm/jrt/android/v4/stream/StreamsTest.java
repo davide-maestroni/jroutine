@@ -79,6 +79,82 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         super(TestActivity.class);
     }
 
+    @NotNull
+    private static Supplier<Integer> delayedIncrement(@NotNull final AtomicInteger count) {
+
+        return new Supplier<Integer>() {
+
+            public Integer get() {
+
+                try {
+                    seconds(1).sleepAtLeast();
+                } catch (final InterruptedException e) {
+                    throw InvocationInterruptedException.wrapIfNeeded(e);
+                }
+                return count.incrementAndGet();
+            }
+        };
+    }
+
+    @NotNull
+    private static Supplier<Integer> increment(@NotNull final AtomicInteger count) {
+
+        return new Supplier<Integer>() {
+
+            public Integer get() {
+
+                return count.incrementAndGet();
+            }
+        };
+    }
+
+    @NotNull
+    private static Function<String, String> stringIncrement(@NotNull final AtomicInteger count) {
+
+        return new Function<String, String>() {
+
+            public String apply(final String s) {
+
+                return s + count.incrementAndGet();
+            }
+        };
+    }
+
+    @NotNull
+    private static Function<String, String> toUpperCase() {
+
+        return new Function<String, String>() {
+
+            public String apply(final String s) {
+
+                try {
+                    seconds(1).sleepAtLeast();
+                } catch (final InterruptedException e) {
+                    throw InvocationInterruptedException.wrapIfNeeded(e);
+                }
+                return s.toUpperCase();
+            }
+        };
+    }
+
+    @NotNull
+    private static Function<StreamChannel<String>, StreamChannel<String>> toUpperCaseChannel() {
+
+        return new Function<StreamChannel<String>, StreamChannel<String>>() {
+
+            public StreamChannel<String> apply(final StreamChannel<String> channel) {
+
+                return channel.sync().map(new Function<String, String>() {
+
+                    public String apply(final String s) {
+
+                        return s.toUpperCase();
+                    }
+                });
+            }
+        };
+    }
+
     public void testBlend() {
 
         final LoaderContextCompat context = loaderFrom(getActivity());
@@ -370,40 +446,15 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
     public void testFactory() {
 
-        assertThat(StreamsCompat.onStream(
-                new Function<StreamChannel<? extends String>, StreamChannel<String>>() {
-
-                    public StreamChannel<String> apply(
-                            final StreamChannel<? extends String> channel) {
-
-                        return channel.sync().map(new Function<String, String>() {
-
-                            public String apply(final String s) {
-
-                                return s.toUpperCase();
-                            }
-                        });
-                    }
-                }).asyncCall("test1", "test2", "test3").afterMax(seconds(3)).all()).containsExactly(
-                "TEST1", "TEST2", "TEST3");
+        assertThat(StreamsCompat.onStream(toUpperCaseChannel())
+                                .asyncCall("test1", "test2", "test3")
+                                .afterMax(seconds(3))
+                                .all()).containsExactly("TEST1", "TEST2", "TEST3");
 
         try {
 
-            final InvocationChannel<String, String> channel = StreamsCompat.onStream(
-                    new Function<StreamChannel<? extends String>, StreamChannel<String>>() {
-
-                        public StreamChannel<String> apply(
-                                final StreamChannel<? extends String> channel) {
-
-                            return channel.sync().map(new Function<String, String>() {
-
-                                public String apply(final String s) {
-
-                                    return s.toUpperCase();
-                                }
-                            });
-                        }
-                    }).asyncInvoke();
+            final InvocationChannel<String, String> channel =
+                    StreamsCompat.onStream(toUpperCaseChannel()).asyncInvoke();
             channel.abort(new IllegalArgumentException());
             channel.result().afterMax(seconds(3)).next();
 
@@ -414,21 +465,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         }
 
         final FunctionContextInvocationFactory<String, String> factory =
-                StreamsCompat.contextFactory(
-                        new Function<StreamChannel<? extends String>, StreamChannel<String>>() {
-
-                            public StreamChannel<String> apply(
-                                    final StreamChannel<? extends String> channel) {
-
-                                return channel.sync().map(new Function<String, String>() {
-
-                                    public String apply(final String s) {
-
-                                        return s.toUpperCase();
-                                    }
-                                });
-                            }
-                        });
+                StreamsCompat.contextFactory(toUpperCaseChannel());
         assertThat(JRoutineCompat.with(loaderFrom(getActivity()))
                                  .on(factory)
                                  .asyncCall("test1", "test2", "test3")
@@ -448,26 +485,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
         }
 
-        assertThat(StreamsCompat.onStreamWith(loaderFrom(getActivity()),
-                                              new Function<StreamChannel<? extends String>,
-                                                      StreamChannel<String>>() {
-
-                                                  public StreamChannel<String> apply(
-                                                          final StreamChannel<? extends String>
-                                                                  channel) {
-
-                                                      return channel.sync()
-                                                                    .map(new Function<String,
-                                                                            String>() {
-
-                                                                        public String apply(
-                                                                                final String s) {
-
-                                                                            return s.toUpperCase();
-                                                                        }
-                                                                    });
-                                                  }
-                                              })
+        assertThat(StreamsCompat.onStreamWith(loaderFrom(getActivity()), toUpperCaseChannel())
                                 .asyncCall("test1", "test2", "test3")
                                 .afterMax(seconds(3))
                                 .all()).containsExactly("TEST1", "TEST2", "TEST3");
@@ -475,26 +493,8 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         try {
 
             final InvocationChannel<String, String> channel =
-                    StreamsCompat.onStreamWith(loaderFrom(getActivity()),
-                                               new Function<StreamChannel<? extends String>,
-                                                       StreamChannel<String>>() {
-
-                                                   public StreamChannel<String> apply(
-                                                           final StreamChannel<? extends String>
-                                                                   channel) {
-
-                                                       return channel.sync()
-                                                                     .map(new Function<String,
-                                                                             String>() {
-
-                                                                         public String apply(
-                                                                                 final String s) {
-
-                                                                             return s.toUpperCase();
-                                                                         }
-                                                                     });
-                                                   }
-                                               }).asyncInvoke();
+                    StreamsCompat.onStreamWith(loaderFrom(getActivity()), toUpperCaseChannel())
+                                 .asyncInvoke();
             channel.abort(new IllegalArgumentException());
             channel.result().afterMax(seconds(3)).next();
 
@@ -507,21 +507,8 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
     public void testFactoryEquals() {
 
-        final Function<StreamChannel<? extends String>, StreamChannel<String>> function =
-                new Function<StreamChannel<? extends String>, StreamChannel<String>>() {
-
-                    public StreamChannel<String> apply(
-                            final StreamChannel<? extends String> channel) {
-
-                        return channel.sync().map(new Function<String, String>() {
-
-                            public String apply(final String s) {
-
-                                return s.toUpperCase();
-                            }
-                        });
-                    }
-                };
+        final Function<StreamChannel<String>, StreamChannel<String>> function =
+                toUpperCaseChannel();
         final FunctionContextInvocationFactory<String, String> factory =
                 StreamsCompat.contextFactory(function);
         assertThat(factory).isEqualTo(factory);
@@ -1122,22 +1109,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
     public void testLoaderId() {
 
         final LoaderContextCompat context = loaderFrom(getActivity());
-        StreamsCompat.streamOf("test1")
-                     .with(context)
-                     .loaderId(11)
-                     .async()
-                     .map(new Function<String, String>() {
-
-                         public String apply(final String s) {
-
-                             try {
-                                 seconds(1).sleepAtLeast();
-                             } catch (final InterruptedException e) {
-                                 throw InvocationInterruptedException.wrapIfNeeded(e);
-                             }
-                             return s.toUpperCase();
-                         }
-                     });
+        StreamsCompat.streamOf("test1").with(context).loaderId(11).async().map(toUpperCase());
         assertThat(JRoutineCompat.with(context)
                                  .onId(11)
                                  .buildChannel()
@@ -1149,18 +1121,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                      .withLoaderId(21)
                      .set()
                      .async()
-                     .map(new Function<String, String>() {
-
-                         public String apply(final String s) {
-
-                             try {
-                                 seconds(1).sleepAtLeast();
-                             } catch (final InterruptedException e) {
-                                 throw InvocationInterruptedException.wrapIfNeeded(e);
-                             }
-                             return s.toUpperCase();
-                         }
-                     });
+                     .map(toUpperCase());
         assertThat(JRoutineCompat.with(context)
                                  .onId(21)
                                  .buildChannel()
@@ -1172,18 +1133,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                      .withLoaderId(31)
                      .set()
                      .async()
-                     .map(new Function<String, String>() {
-
-                         public String apply(final String s) {
-
-                             try {
-                                 seconds(1).sleepAtLeast();
-                             } catch (final InterruptedException e) {
-                                 throw InvocationInterruptedException.wrapIfNeeded(e);
-                             }
-                             return s.toUpperCase();
-                         }
-                     });
+                     .map(toUpperCase());
         assertThat(JRoutineCompat.with(context)
                                  .onId(31)
                                  .buildChannel()
@@ -1596,22 +1546,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
     public void testRoutineId() {
 
         final LoaderContextCompat context = loaderFrom(getActivity());
-        StreamsCompat.streamOf("test1")
-                     .with(context)
-                     .routineId(11)
-                     .async()
-                     .map(new Function<String, String>() {
-
-                         public String apply(final String s) {
-
-                             try {
-                                 seconds(1).sleepAtLeast();
-                             } catch (final InterruptedException e) {
-                                 throw InvocationInterruptedException.wrapIfNeeded(e);
-                             }
-                             return s.toUpperCase();
-                         }
-                     });
+        StreamsCompat.streamOf("test1").with(context).routineId(11).async().map(toUpperCase());
 
         try {
             JRoutineCompat.with(context).onId(11).buildChannel().afterMax(seconds(10)).next();
@@ -1627,43 +1562,15 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                                 .withRoutineId(11)
                                 .set()
                                 .async()
-                                .map(new Function<String, String>() {
-
-                                    public String apply(final String s) {
-
-                                        try {
-                                            seconds(1).sleepAtLeast();
-                                        } catch (final InterruptedException e) {
-                                            throw InvocationInterruptedException.wrapIfNeeded(e);
-                                        }
-                                        return s.toUpperCase();
-                                    }
-                                })
+                                .map(toUpperCase())
                                 .afterMax(seconds(10))
                                 .next()).isEqualTo("TEST2");
         final AtomicInteger count = new AtomicInteger();
-        StreamsCompat.streamOf().with(context).routineId(11).generate(new Supplier<Integer>() {
-
-            public Integer get() {
-
-                try {
-                    seconds(1).sleepAtLeast();
-                } catch (final InterruptedException e) {
-                    throw InvocationInterruptedException.wrapIfNeeded(e);
-                }
-                return count.incrementAndGet();
-            }
-        });
+        StreamsCompat.streamOf().with(context).routineId(11).then(delayedIncrement(count));
         assertThat(StreamsCompat.streamOf()
                                 .with(context)
                                 .routineId(11)
-                                .generate(new Supplier<Integer>() {
-
-                                    public Integer get() {
-
-                                        return count.incrementAndGet();
-                                    }
-                                })
+                                .then(increment(count))
                                 .afterMax(seconds(10))
                                 .next()).isEqualTo(1);
     }
@@ -1750,13 +1657,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
         final LoaderContextCompat context = loaderFrom(getActivity());
         final AtomicInteger count = new AtomicInteger();
-        final Function<String, String> function = new Function<String, String>() {
-
-            public String apply(final String s) {
-
-                return s + count.incrementAndGet();
-            }
-        };
+        final Function<String, String> function = stringIncrement(count);
         StreamsCompat.streamOf("test")
                      .with(context)
                      .async()

@@ -49,7 +49,9 @@ import java.util.concurrent.TimeUnit;
  * Interface defining a stream output channel, that is, a channel concatenating map and reduce
  * functions, employing Android loaders to run the backing routines.<br/>
  * In fact, each function in the channel is backed by a routine instance, that can have its own
- * specific configuration and invocation mode.
+ * specific configuration and invocation mode.<br/>
+ * In order to prevent undesired leaks, the class of the specified functions must have a static
+ * context.
  * <p/>
  * Note that, if at least one reduce function is part of the concatenation, the results will be
  * propagated only when the previous routine invocations complete.
@@ -179,51 +181,6 @@ public interface LoaderStreamChannelCompat<OUT>
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannelCompat<AFTER> generate(@Nullable AFTER output);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    <AFTER> LoaderStreamChannelCompat<AFTER> generate(@Nullable AFTER... outputs);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    <AFTER> LoaderStreamChannelCompat<AFTER> generate(@Nullable Iterable<? extends AFTER> outputs);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    <AFTER> LoaderStreamChannelCompat<AFTER> generate(long count,
-            @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    <AFTER> LoaderStreamChannelCompat<AFTER> generate(
-            @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    <AFTER> LoaderStreamChannelCompat<AFTER> generate(long count,
-            @NotNull Supplier<? extends AFTER> supplier);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    <AFTER> LoaderStreamChannelCompat<AFTER> generate(@NotNull Supplier<? extends AFTER> supplier);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
     <AFTER> LoaderStreamChannelCompat<AFTER> map(
             @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
 
@@ -316,6 +273,51 @@ public interface LoaderStreamChannelCompat<OUT>
      */
     @NotNull
     LoaderStreamChannelCompat<OUT> sync();
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    <AFTER> LoaderStreamChannelCompat<AFTER> then(@Nullable AFTER output);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    <AFTER> LoaderStreamChannelCompat<AFTER> then(@Nullable AFTER... outputs);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    <AFTER> LoaderStreamChannelCompat<AFTER> then(@Nullable Iterable<? extends AFTER> outputs);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    <AFTER> LoaderStreamChannelCompat<AFTER> then(long count,
+            @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    <AFTER> LoaderStreamChannelCompat<AFTER> then(
+            @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    <AFTER> LoaderStreamChannelCompat<AFTER> then(long count,
+            @NotNull Supplier<? extends AFTER> supplier);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    <AFTER> LoaderStreamChannelCompat<AFTER> then(@NotNull Supplier<? extends AFTER> supplier);
 
     /**
      * {@inheritDoc}

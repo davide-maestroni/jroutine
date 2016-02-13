@@ -17,6 +17,7 @@
 package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.util.ClassToken;
+import com.github.dm.jrt.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -32,7 +33,7 @@ import java.util.List;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public class FunctionWrapper<IN, OUT> implements Function<IN, OUT> {
+public class FunctionWrapper<IN, OUT> implements Function<IN, OUT>, Wrapper {
 
     private static final FunctionWrapper<Object, Object> sIdentity =
             new FunctionWrapper<Object, Object>(new Function<Object, Object>() {
@@ -178,6 +179,17 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT> {
 
         newFunctions.addAll(functions);
         return new FunctionWrapper<BEFORE, OUT>(newFunctions);
+    }
+
+    public boolean hasStaticContext() {
+
+        for (final Function<?, ?> function : mFunctions) {
+            if (!Reflection.hasStaticContext(function)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Override

@@ -127,7 +127,7 @@ public class Functions {
     public static <OUT> CommandInvocation<OUT> consumerCommand(
             @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
 
-        return new ConsumerCommandInvocation<OUT>(wrapConsumer(consumer));
+        return new ConsumerCommandInvocation<OUT>(wrap(consumer));
     }
 
     /**
@@ -150,7 +150,7 @@ public class Functions {
             @NotNull final BiConsumer<? super List<? extends IN>, ? super ResultChannel<OUT>>
                     consumer) {
 
-        return new ConsumerInvocationFactory<IN, OUT>(wrapBiConsumer(consumer));
+        return new ConsumerInvocationFactory<IN, OUT>(wrap(consumer));
     }
 
     /**
@@ -171,7 +171,7 @@ public class Functions {
     public static <IN, OUT> FilterInvocation<IN, OUT> consumerFilter(
             @NotNull final BiConsumer<? super IN, ? super ResultChannel<OUT>> consumer) {
 
-        return new ConsumerFilterInvocation<IN, OUT>(wrapBiConsumer(consumer));
+        return new ConsumerFilterInvocation<IN, OUT>(wrap(consumer));
     }
 
     /**
@@ -207,7 +207,7 @@ public class Functions {
     public static <IN, OUT> InvocationFactory<IN, OUT> functionFactory(
             @NotNull final Function<? super List<? extends IN>, ? extends OUT> function) {
 
-        return new FunctionInvocationFactory<IN, OUT>(wrapFunction(function));
+        return new FunctionInvocationFactory<IN, OUT>(wrap(function));
     }
 
     /**
@@ -228,7 +228,7 @@ public class Functions {
     public static <IN, OUT> FilterInvocation<IN, OUT> functionFilter(
             @NotNull final Function<? super IN, ? extends OUT> function) {
 
-        return new FunctionFilterInvocation<IN, OUT>(wrapFunction(function));
+        return new FunctionFilterInvocation<IN, OUT>(wrap(function));
     }
 
     /**
@@ -394,8 +394,7 @@ public class Functions {
     @NotNull
     public static OutputConsumerBuilder<Object> onComplete(@NotNull final Consumer<Void> consumer) {
 
-        return new OutputConsumerBuilder<Object>(wrapConsumer(consumer),
-                                                 Functions.<RoutineException>sink(),
+        return new OutputConsumerBuilder<Object>(wrap(consumer), Functions.<RoutineException>sink(),
                                                  Functions.sink());
     }
 
@@ -410,7 +409,7 @@ public class Functions {
     public static OutputConsumerBuilder<Object> onError(
             @NotNull final Consumer<RoutineException> consumer) {
 
-        return new OutputConsumerBuilder<Object>(Functions.<Void>sink(), wrapConsumer(consumer),
+        return new OutputConsumerBuilder<Object>(Functions.<Void>sink(), wrap(consumer),
                                                  Functions.sink());
     }
 
@@ -426,8 +425,7 @@ public class Functions {
     public static <OUT> OutputConsumerBuilder<OUT> onOutput(@NotNull final Consumer<OUT> consumer) {
 
         return new OutputConsumerBuilder<OUT>(Functions.<Void>sink(),
-                                              Functions.<RoutineException>sink(),
-                                              wrapConsumer(consumer));
+                                              Functions.<RoutineException>sink(), wrap(consumer));
     }
 
     /**
@@ -462,7 +460,7 @@ public class Functions {
     public static <IN> FilterInvocation<IN, IN> predicateFilter(
             @NotNull final Predicate<? super IN> predicate) {
 
-        return new PredicateFilterInvocation<IN>(wrapPredicate(predicate));
+        return new PredicateFilterInvocation<IN>(wrap(predicate));
     }
 
     /**
@@ -509,7 +507,7 @@ public class Functions {
     public static <OUT> CommandInvocation<OUT> supplierCommand(
             @NotNull final Supplier<? extends OUT> supplier) {
 
-        return new SupplierCommandInvocation<OUT>(wrapSupplier(supplier));
+        return new SupplierCommandInvocation<OUT>(wrap(supplier));
     }
 
     /**
@@ -530,7 +528,7 @@ public class Functions {
     public static <IN, OUT> InvocationFactory<IN, OUT> supplierFactory(
             @NotNull final Supplier<? extends Invocation<? super IN, ? extends OUT>> supplier) {
 
-        return new SupplierInvocationFactory<IN, OUT>(wrapSupplier(supplier));
+        return new SupplierInvocationFactory<IN, OUT>(wrap(supplier));
     }
 
     /**
@@ -548,7 +546,7 @@ public class Functions {
      * @return the wrapped bi-consumer.
      */
     @NotNull
-    public static <IN1, IN2> BiConsumerWrapper<IN1, IN2> wrapBiConsumer(
+    public static <IN1, IN2> BiConsumerWrapper<IN1, IN2> wrap(
             @NotNull final BiConsumer<IN1, IN2> consumer) {
 
         if (consumer instanceof BiConsumerWrapper) {
@@ -574,7 +572,7 @@ public class Functions {
      * @return the wrapped bi-function.
      */
     @NotNull
-    public static <IN1, IN2, OUT> BiFunctionWrapper<IN1, IN2, OUT> wrapBiFunction(
+    public static <IN1, IN2, OUT> BiFunctionWrapper<IN1, IN2, OUT> wrap(
             @NotNull final BiFunction<IN1, IN2, OUT> function) {
 
         if (function instanceof BiFunctionWrapper) {
@@ -598,7 +596,7 @@ public class Functions {
      * @return the wrapped consumer.
      */
     @NotNull
-    public static <IN> ConsumerWrapper<IN> wrapConsumer(@NotNull final Consumer<IN> consumer) {
+    public static <IN> ConsumerWrapper<IN> wrap(@NotNull final Consumer<IN> consumer) {
 
         if (consumer instanceof ConsumerWrapper) {
             return (ConsumerWrapper<IN>) consumer;
@@ -622,7 +620,7 @@ public class Functions {
      * @return the wrapped function.
      */
     @NotNull
-    public static <IN, OUT> FunctionWrapper<IN, OUT> wrapFunction(
+    public static <IN, OUT> FunctionWrapper<IN, OUT> wrap(
             @NotNull final Function<IN, OUT> function) {
 
         if (function instanceof FunctionWrapper) {
@@ -646,7 +644,7 @@ public class Functions {
      * @return the wrapped predicate.
      */
     @NotNull
-    public static <IN> PredicateWrapper<IN> wrapPredicate(@NotNull final Predicate<IN> predicate) {
+    public static <IN> PredicateWrapper<IN> wrap(@NotNull final Predicate<IN> predicate) {
 
         if (predicate instanceof PredicateWrapper) {
             return (PredicateWrapper<IN>) predicate;
@@ -669,7 +667,7 @@ public class Functions {
      * @return the wrapped supplier.
      */
     @NotNull
-    public static <OUT> SupplierWrapper<OUT> wrapSupplier(@NotNull final Supplier<OUT> supplier) {
+    public static <OUT> SupplierWrapper<OUT> wrap(@NotNull final Supplier<OUT> supplier) {
 
         if (supplier instanceof SupplierWrapper) {
             return (SupplierWrapper<OUT>) supplier;

@@ -59,12 +59,7 @@ import static com.github.dm.jrt.function.Functions.predicateFilter;
 import static com.github.dm.jrt.function.Functions.sink;
 import static com.github.dm.jrt.function.Functions.supplierCommand;
 import static com.github.dm.jrt.function.Functions.supplierFactory;
-import static com.github.dm.jrt.function.Functions.wrapBiConsumer;
-import static com.github.dm.jrt.function.Functions.wrapBiFunction;
-import static com.github.dm.jrt.function.Functions.wrapConsumer;
-import static com.github.dm.jrt.function.Functions.wrapFunction;
-import static com.github.dm.jrt.function.Functions.wrapPredicate;
-import static com.github.dm.jrt.function.Functions.wrapSupplier;
+import static com.github.dm.jrt.function.Functions.wrap;
 import static com.github.dm.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -76,6 +71,7 @@ import static org.junit.Assert.fail;
  */
 public class FunctionsTest {
 
+    @NotNull
     private static CommandInvocation<String> createCommand() {
 
         return consumerCommand(new Consumer<ResultChannel<String>>() {
@@ -87,6 +83,7 @@ public class FunctionsTest {
         });
     }
 
+    @NotNull
     private static CommandInvocation<String> createCommand2() {
 
         return supplierCommand(new Supplier<String>() {
@@ -98,6 +95,7 @@ public class FunctionsTest {
         });
     }
 
+    @NotNull
     private static InvocationFactory<Object, String> createFactory() {
 
         return supplierFactory(new Supplier<Invocation<Object, String>>() {
@@ -116,6 +114,7 @@ public class FunctionsTest {
         });
     }
 
+    @NotNull
     private static FilterInvocation<Object, String> createFilter() {
 
         return consumerFilter(new BiConsumer<Object, ResultChannel<String>>() {
@@ -127,6 +126,7 @@ public class FunctionsTest {
         });
     }
 
+    @NotNull
     private static FilterInvocation<Object, String> createFilter2() {
 
         return functionFilter(new com.github.dm.jrt.function.Function<Object, String>() {
@@ -138,6 +138,7 @@ public class FunctionsTest {
         });
     }
 
+    @NotNull
     private static FilterInvocation<String, String> createFilter3() {
 
         return predicateFilter(new Predicate<String>() {
@@ -149,6 +150,7 @@ public class FunctionsTest {
         });
     }
 
+    @NotNull
     private static InvocationFactory<Object, String> createFunction() {
 
         return consumerFactory(new BiConsumer<List<?>, ResultChannel<String>>() {
@@ -163,6 +165,7 @@ public class FunctionsTest {
         });
     }
 
+    @NotNull
     private static InvocationFactory<Object, String> createFunction2() {
 
         return functionFactory(new com.github.dm.jrt.function.Function<List<?>, String>() {
@@ -185,8 +188,8 @@ public class FunctionsTest {
     public void testBiConsumer() {
 
         final TestBiConsumer consumer1 = new TestBiConsumer();
-        final BiConsumerWrapper<Object, Object> consumer2 = wrapBiConsumer(consumer1);
-        assertThat(wrapBiConsumer(consumer2)).isSameAs(consumer2);
+        final BiConsumerWrapper<Object, Object> consumer2 = wrap(consumer1);
+        assertThat(wrap(consumer2)).isSameAs(consumer2);
         consumer2.accept("test", "test");
         assertThat(consumer1.isCalled()).isTrue();
         consumer1.reset();
@@ -198,38 +201,46 @@ public class FunctionsTest {
     }
 
     @Test
+    public void testBiConsumerContext() {
+
+        assertThat(wrap(new TestBiConsumer()).hasStaticContext()).isTrue();
+        assertThat(wrap(new BiConsumer<Object, Object>() {
+
+            public void accept(final Object o, final Object o2) {
+
+            }
+        }).hasStaticContext()).isFalse();
+    }
+
+    @Test
     public void testBiConsumerEquals() {
 
         final TestBiConsumer consumer1 = new TestBiConsumer();
-        assertThat(wrapBiConsumer(consumer1)).isEqualTo(wrapBiConsumer(consumer1));
-        final BiConsumerWrapper<Object, Object> consumer2 = wrapBiConsumer(consumer1);
+        assertThat(wrap(consumer1)).isEqualTo(wrap(consumer1));
+        final BiConsumerWrapper<Object, Object> consumer2 = wrap(consumer1);
         assertThat(consumer2).isEqualTo(consumer2);
         assertThat(consumer2).isNotEqualTo(null);
         assertThat(consumer2).isNotEqualTo("test");
-        assertThat(wrapBiConsumer(consumer1).andThen(consumer2).hashCode()).isEqualTo(
+        assertThat(wrap(consumer1).andThen(consumer2).hashCode()).isEqualTo(
                 consumer2.andThen(consumer2).hashCode());
-        assertThat(wrapBiConsumer(consumer1).andThen(consumer2)).isEqualTo(
-                consumer2.andThen(consumer2));
-        assertThat(consumer2.andThen(consumer2)).isEqualTo(
-                wrapBiConsumer(consumer1).andThen(consumer2));
-        assertThat(wrapBiConsumer(consumer1).andThen(consumer2).hashCode()).isEqualTo(
+        assertThat(wrap(consumer1).andThen(consumer2)).isEqualTo(consumer2.andThen(consumer2));
+        assertThat(consumer2.andThen(consumer2)).isEqualTo(wrap(consumer1).andThen(consumer2));
+        assertThat(wrap(consumer1).andThen(consumer2).hashCode()).isEqualTo(
                 consumer2.andThen(consumer1).hashCode());
-        assertThat(wrapBiConsumer(consumer1).andThen(consumer2)).isEqualTo(
-                consumer2.andThen(consumer1));
-        assertThat(consumer2.andThen(consumer1)).isEqualTo(
-                wrapBiConsumer(consumer1).andThen(consumer2));
-        assertThat(wrapBiConsumer(consumer1).andThen(consumer2).hashCode()).isNotEqualTo(
+        assertThat(wrap(consumer1).andThen(consumer2)).isEqualTo(consumer2.andThen(consumer1));
+        assertThat(consumer2.andThen(consumer1)).isEqualTo(wrap(consumer1).andThen(consumer2));
+        assertThat(wrap(consumer1).andThen(consumer2).hashCode()).isNotEqualTo(
                 consumer2.andThen(consumer2.andThen(consumer1)).hashCode());
-        assertThat(wrapBiConsumer(consumer1).andThen(consumer2)).isNotEqualTo(
+        assertThat(wrap(consumer1).andThen(consumer2)).isNotEqualTo(
                 consumer2.andThen(consumer2.andThen(consumer1)));
         assertThat(consumer2.andThen(consumer2.andThen(consumer1))).isNotEqualTo(
-                wrapBiConsumer(consumer1).andThen(consumer2));
-        assertThat(wrapBiConsumer(consumer1).andThen(consumer1).hashCode()).isNotEqualTo(
+                wrap(consumer1).andThen(consumer2));
+        assertThat(wrap(consumer1).andThen(consumer1).hashCode()).isNotEqualTo(
                 consumer2.andThen(consumer2.andThen(consumer1)).hashCode());
-        assertThat(wrapBiConsumer(consumer1).andThen(consumer1)).isNotEqualTo(
+        assertThat(wrap(consumer1).andThen(consumer1)).isNotEqualTo(
                 consumer2.andThen(consumer2.andThen(consumer1)));
         assertThat(consumer2.andThen(consumer2.andThen(consumer1))).isNotEqualTo(
-                wrapBiConsumer(consumer1).andThen(consumer1));
+                wrap(consumer1).andThen(consumer1));
         assertThat(consumer2.andThen(consumer1).hashCode()).isNotEqualTo(
                 consumer2.andThen(biSink()).hashCode());
         assertThat(consumer2.andThen(consumer1)).isNotEqualTo(consumer2.andThen(biSink()));
@@ -252,7 +263,17 @@ public class FunctionsTest {
 
         try {
 
-            wrapBiConsumer(new TestBiConsumer()).andThen(null);
+            wrap((BiConsumer<?, ?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            wrap(new TestBiConsumer()).andThen(null);
 
             fail();
 
@@ -265,8 +286,8 @@ public class FunctionsTest {
     public void testBiFunction() {
 
         final TestBiFunction function1 = new TestBiFunction();
-        final BiFunctionWrapper<Object, Object, Object> function2 = wrapBiFunction(function1);
-        assertThat(wrapBiFunction(function2)).isSameAs(function2);
+        final BiFunctionWrapper<Object, Object, Object> function2 = wrap(function1);
+        assertThat(wrap(function2)).isSameAs(function2);
         assertThat(function2.apply("test", function1)).isSameAs(function1);
         assertThat(function1.isCalled()).isTrue();
         function1.reset();
@@ -298,40 +319,48 @@ public class FunctionsTest {
     }
 
     @Test
+    public void testBiFunctionContext() {
+
+        assertThat(wrap(new TestBiFunction()).hasStaticContext()).isTrue();
+        assertThat(wrap(new BiFunction<Object, Object, Object>() {
+
+            public Object apply(final Object o, final Object o2) {
+
+                return null;
+            }
+        }).hasStaticContext()).isFalse();
+    }
+
+    @Test
     public void testBiFunctionEquals() {
 
         final TestBiFunction function1 = new TestBiFunction();
-        assertThat(wrapBiFunction(function1)).isEqualTo(wrapBiFunction(function1));
-        final BiFunctionWrapper<Object, Object, Object> function2 = wrapBiFunction(function1);
+        assertThat(wrap(function1)).isEqualTo(wrap(function1));
+        final BiFunctionWrapper<Object, Object, Object> function2 = wrap(function1);
         assertThat(function2).isEqualTo(function2);
         assertThat(function2).isNotEqualTo(null);
         assertThat(function2).isNotEqualTo("test");
         final TestFunction function = new TestFunction();
-        assertThat(wrapBiFunction(function1).andThen(function).hashCode()).isEqualTo(
+        assertThat(wrap(function1).andThen(function).hashCode()).isEqualTo(
                 function2.andThen(function).hashCode());
-        assertThat(wrapBiFunction(function1).andThen(function)).isEqualTo(
-                function2.andThen(function));
-        assertThat(function2.andThen(function)).isEqualTo(
-                wrapBiFunction(function1).andThen(function));
-        assertThat(wrapBiFunction(function1).andThen(wrapFunction(function)).hashCode()).isEqualTo(
+        assertThat(wrap(function1).andThen(function)).isEqualTo(function2.andThen(function));
+        assertThat(function2.andThen(function)).isEqualTo(wrap(function1).andThen(function));
+        assertThat(wrap(function1).andThen(wrap(function)).hashCode()).isEqualTo(
                 function2.andThen(function).hashCode());
-        assertThat(wrapBiFunction(function1).andThen(wrapFunction(function))).isEqualTo(
-                function2.andThen(function));
-        assertThat(function2.andThen(function)).isEqualTo(
-                wrapBiFunction(function1).andThen(wrapFunction(function)));
-        assertThat(
-                wrapBiFunction(function1).andThen(wrapFunction(function)).hashCode()).isNotEqualTo(
-                function2.andThen(wrapFunction(function).andThen(function)).hashCode());
-        assertThat(wrapBiFunction(function1).andThen(wrapFunction(function))).isNotEqualTo(
-                function2.andThen(wrapFunction(function).andThen(function)));
-        assertThat(function2.andThen(wrapFunction(function).andThen(function))).isNotEqualTo(
-                wrapBiFunction(function1).andThen(wrapFunction(function)));
-        assertThat(wrapBiFunction(function1).andThen(function).hashCode()).isNotEqualTo(
-                function2.andThen(wrapFunction(function).andThen(function)).hashCode());
-        assertThat(wrapBiFunction(function1).andThen(function)).isNotEqualTo(
-                function2.andThen(wrapFunction(function).andThen(function)));
-        assertThat(function2.andThen(wrapFunction(function).andThen(function))).isNotEqualTo(
-                wrapBiFunction(function1).andThen(function));
+        assertThat(wrap(function1).andThen(wrap(function))).isEqualTo(function2.andThen(function));
+        assertThat(function2.andThen(function)).isEqualTo(wrap(function1).andThen(wrap(function)));
+        assertThat(wrap(function1).andThen(wrap(function)).hashCode()).isNotEqualTo(
+                function2.andThen(wrap(function).andThen(function)).hashCode());
+        assertThat(wrap(function1).andThen(wrap(function))).isNotEqualTo(
+                function2.andThen(wrap(function).andThen(function)));
+        assertThat(function2.andThen(wrap(function).andThen(function))).isNotEqualTo(
+                wrap(function1).andThen(wrap(function)));
+        assertThat(wrap(function1).andThen(function).hashCode()).isNotEqualTo(
+                function2.andThen(wrap(function).andThen(function)).hashCode());
+        assertThat(wrap(function1).andThen(function)).isNotEqualTo(
+                function2.andThen(wrap(function).andThen(function)));
+        assertThat(function2.andThen(wrap(function).andThen(function))).isNotEqualTo(
+                wrap(function1).andThen(function));
         assertThat(function2.andThen(function).hashCode()).isNotEqualTo(
                 function2.andThen(identity()).hashCode());
         assertThat(function2.andThen(function)).isNotEqualTo(function2.andThen(identity()));
@@ -354,7 +383,7 @@ public class FunctionsTest {
 
         try {
 
-            wrapBiFunction(null);
+            wrap((BiFunction<?, ?, ?>) null);
 
             fail();
 
@@ -364,7 +393,7 @@ public class FunctionsTest {
 
         try {
 
-            wrapBiFunction(new TestBiFunction()).andThen(null);
+            wrap(new TestBiFunction()).andThen(null);
 
             fail();
 
@@ -565,8 +594,8 @@ public class FunctionsTest {
     public void testConsumer() {
 
         final TestConsumer consumer1 = new TestConsumer();
-        final ConsumerWrapper<Object> consumer2 = wrapConsumer(consumer1);
-        assertThat(wrapConsumer(consumer2)).isSameAs(consumer2);
+        final ConsumerWrapper<Object> consumer2 = wrap(consumer1);
+        assertThat(wrap(consumer2)).isSameAs(consumer2);
         consumer2.accept("test");
         assertThat(consumer1.isCalled()).isTrue();
         consumer1.reset();
@@ -578,38 +607,46 @@ public class FunctionsTest {
     }
 
     @Test
+    public void testConsumerContext() {
+
+        assertThat(wrap(new TestConsumer()).hasStaticContext()).isTrue();
+        assertThat(wrap(new Consumer<Object>() {
+
+            public void accept(final Object o) {
+
+            }
+        }).hasStaticContext()).isFalse();
+    }
+
+    @Test
     public void testConsumerEquals() {
 
         final TestConsumer consumer1 = new TestConsumer();
-        assertThat(wrapConsumer(consumer1)).isEqualTo(wrapConsumer(consumer1));
-        final ConsumerWrapper<Object> consumer2 = wrapConsumer(consumer1);
+        assertThat(wrap(consumer1)).isEqualTo(wrap(consumer1));
+        final ConsumerWrapper<Object> consumer2 = wrap(consumer1);
         assertThat(consumer2).isEqualTo(consumer2);
         assertThat(consumer2).isNotEqualTo(null);
         assertThat(consumer2).isNotEqualTo("test");
-        assertThat(wrapConsumer(consumer1).andThen(consumer2).hashCode()).isEqualTo(
+        assertThat(wrap(consumer1).andThen(consumer2).hashCode()).isEqualTo(
                 consumer2.andThen(consumer2).hashCode());
-        assertThat(wrapConsumer(consumer1).andThen(consumer2)).isEqualTo(
-                consumer2.andThen(consumer2));
-        assertThat(consumer2.andThen(consumer2)).isEqualTo(
-                wrapConsumer(consumer1).andThen(consumer2));
-        assertThat(wrapConsumer(consumer1).andThen(consumer2).hashCode()).isEqualTo(
+        assertThat(wrap(consumer1).andThen(consumer2)).isEqualTo(consumer2.andThen(consumer2));
+        assertThat(consumer2.andThen(consumer2)).isEqualTo(wrap(consumer1).andThen(consumer2));
+        assertThat(wrap(consumer1).andThen(consumer2).hashCode()).isEqualTo(
                 consumer2.andThen(consumer1).hashCode());
-        assertThat(wrapConsumer(consumer1).andThen(consumer2)).isEqualTo(
-                consumer2.andThen(consumer1));
-        assertThat(consumer2.andThen(consumer1)).isEqualTo(
-                wrapConsumer(consumer1).andThen(consumer2));
-        assertThat(wrapConsumer(consumer1).andThen(consumer2).hashCode()).isNotEqualTo(
+        assertThat(wrap(consumer1).andThen(consumer2)).isEqualTo(consumer2.andThen(consumer1));
+        assertThat(consumer2.andThen(consumer1)).isEqualTo(wrap(consumer1).andThen(consumer2));
+        assertThat(wrap(consumer1).andThen(consumer2).hashCode()).isNotEqualTo(
                 consumer2.andThen(consumer2.andThen(consumer1)).hashCode());
-        assertThat(wrapConsumer(consumer1).andThen(consumer2)).isNotEqualTo(
+        assertThat(wrap(consumer1).andThen(consumer2)).isNotEqualTo(
                 consumer2.andThen(consumer2.andThen(consumer1)));
         assertThat(consumer2.andThen(consumer2.andThen(consumer1))).isNotEqualTo(
-                wrapConsumer(consumer1).andThen(consumer2));
-        assertThat(wrapConsumer(consumer1).andThen(consumer1).hashCode()).isNotEqualTo(
+                wrap(consumer1).andThen(consumer2));
+        assertThat(wrap(consumer1).andThen(consumer1).hashCode()).isNotEqualTo(
                 consumer2.andThen(consumer2.andThen(consumer1)).hashCode());
-        assertThat(wrapConsumer(consumer1).andThen(consumer1)).isNotEqualTo(
+        assertThat(wrap(consumer1).andThen(consumer1)).isNotEqualTo(
                 consumer2.andThen(consumer2.andThen(consumer1)));
         assertThat(consumer2.andThen(consumer2.andThen(consumer1))).isNotEqualTo(
-                wrapConsumer(consumer1).andThen(consumer1));
+                wrap(consumer1).andThen(consumer1));
         assertThat(consumer2.andThen(consumer1).hashCode()).isNotEqualTo(
                 consumer2.andThen(sink()).hashCode());
         assertThat(consumer2.andThen(consumer1)).isNotEqualTo(consumer2.andThen(sink()));
@@ -632,7 +669,17 @@ public class FunctionsTest {
 
         try {
 
-            wrapConsumer(new TestConsumer()).andThen(null);
+            wrap((Consumer<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            wrap(new TestConsumer()).andThen(null);
 
             fail();
 
@@ -821,8 +868,8 @@ public class FunctionsTest {
     public void testFunction() {
 
         final TestFunction function1 = new TestFunction();
-        final FunctionWrapper<Object, Object> function2 = wrapFunction(function1);
-        assertThat(wrapFunction(function2)).isSameAs(function2);
+        final FunctionWrapper<Object, Object> function2 = wrap(function1);
+        assertThat(wrap(function2)).isSameAs(function2);
         assertThat(function2.apply("test")).isEqualTo("test");
         assertThat(function1.isCalled()).isTrue();
         function1.reset();
@@ -831,20 +878,19 @@ public class FunctionsTest {
         assertThat(function4.apply("test")).isEqualTo("test");
         assertThat(function1.isCalled()).isTrue();
         assertThat(function3.isCalled()).isTrue();
-        final FunctionWrapper<String, Integer> function5 =
-                wrapFunction(new Function<String, Integer>() {
+        final FunctionWrapper<String, Integer> function5 = wrap(new Function<String, Integer>() {
 
-                    public Integer apply(final String s) {
+            public Integer apply(final String s) {
 
-                        return s.length();
-                    }
-                }).andThen(new Function<Integer, Integer>() {
+                return s.length();
+            }
+        }).andThen(new Function<Integer, Integer>() {
 
-                    public Integer apply(final Integer integer) {
+            public Integer apply(final Integer integer) {
 
-                        return integer * 3;
-                    }
-                });
+                return integer * 3;
+            }
+        });
         assertThat(function5.apply("test")).isEqualTo(12);
         assertThat(function5.compose(new Function<String, String>() {
 
@@ -856,66 +902,71 @@ public class FunctionsTest {
     }
 
     @Test
+    public void testFunctionContext() {
+
+        assertThat(wrap(new TestFunction()).hasStaticContext()).isTrue();
+        assertThat(wrap(new Function<Object, Object>() {
+
+            public Object apply(final Object o) {
+
+                return null;
+            }
+        }).hasStaticContext()).isFalse();
+    }
+
+    @Test
     public void testFunctionEquals() {
 
         final TestFunction function1 = new TestFunction();
-        assertThat(wrapFunction(function1)).isEqualTo(wrapFunction(function1));
-        final FunctionWrapper<Object, Object> function2 = wrapFunction(function1);
+        assertThat(wrap(function1)).isEqualTo(wrap(function1));
+        final FunctionWrapper<Object, Object> function2 = wrap(function1);
         assertThat(function2).isEqualTo(function2);
         assertThat(function2).isNotEqualTo(null);
         assertThat(function2).isNotEqualTo("test");
-        assertThat(wrapFunction(function1).andThen(function2).hashCode()).isEqualTo(
+        assertThat(wrap(function1).andThen(function2).hashCode()).isEqualTo(
                 function2.andThen(function2).hashCode());
-        assertThat(wrapFunction(function1).andThen(function2)).isEqualTo(
-                function2.andThen(function2));
-        assertThat(function2.andThen(function2)).isEqualTo(
-                wrapFunction(function1).andThen(function2));
-        assertThat(wrapFunction(function1).andThen(function2).hashCode()).isEqualTo(
+        assertThat(wrap(function1).andThen(function2)).isEqualTo(function2.andThen(function2));
+        assertThat(function2.andThen(function2)).isEqualTo(wrap(function1).andThen(function2));
+        assertThat(wrap(function1).andThen(function2).hashCode()).isEqualTo(
                 function2.andThen(function1).hashCode());
-        assertThat(wrapFunction(function1).andThen(function2)).isEqualTo(
-                function2.andThen(function1));
-        assertThat(function2.andThen(function1)).isEqualTo(
-                wrapFunction(function1).andThen(function2));
-        assertThat(wrapFunction(function1).andThen(function2).hashCode()).isNotEqualTo(
+        assertThat(wrap(function1).andThen(function2)).isEqualTo(function2.andThen(function1));
+        assertThat(function2.andThen(function1)).isEqualTo(wrap(function1).andThen(function2));
+        assertThat(wrap(function1).andThen(function2).hashCode()).isNotEqualTo(
                 function2.andThen(function2.andThen(function1)).hashCode());
-        assertThat(wrapFunction(function1).andThen(function2)).isNotEqualTo(
+        assertThat(wrap(function1).andThen(function2)).isNotEqualTo(
                 function2.andThen(function2.andThen(function1)));
         assertThat(function2.andThen(function2.andThen(function1))).isNotEqualTo(
-                wrapFunction(function1).andThen(function2));
-        assertThat(wrapFunction(function1).andThen(function1).hashCode()).isNotEqualTo(
+                wrap(function1).andThen(function2));
+        assertThat(wrap(function1).andThen(function1).hashCode()).isNotEqualTo(
                 function2.andThen(function2.andThen(function1)).hashCode());
-        assertThat(wrapFunction(function1).andThen(function1)).isNotEqualTo(
+        assertThat(wrap(function1).andThen(function1)).isNotEqualTo(
                 function2.andThen(function2.andThen(function1)));
         assertThat(function2.andThen(function2.andThen(function1))).isNotEqualTo(
-                wrapFunction(function1).andThen(function1));
+                wrap(function1).andThen(function1));
         assertThat(function2.andThen(function1).hashCode()).isNotEqualTo(
                 function2.andThen(identity()).hashCode());
         assertThat(function2.andThen(function1)).isNotEqualTo(function2.andThen(identity()));
         assertThat(function2.andThen(identity())).isNotEqualTo(function2.andThen(function1));
-        assertThat(wrapFunction(function1).compose(function2).hashCode()).isEqualTo(
+        assertThat(wrap(function1).compose(function2).hashCode()).isEqualTo(
                 function2.compose(function2).hashCode());
-        assertThat(wrapFunction(function1).compose(function2)).isEqualTo(
-                function2.compose(function2));
-        assertThat(function2.compose(function2)).isEqualTo(
-                wrapFunction(function1).compose(function2));
-        assertThat(wrapFunction(function1).compose(function2).hashCode()).isEqualTo(
+        assertThat(wrap(function1).compose(function2)).isEqualTo(function2.compose(function2));
+        assertThat(function2.compose(function2)).isEqualTo(wrap(function1).compose(function2));
+        assertThat(wrap(function1).compose(function2).hashCode()).isEqualTo(
                 function2.compose(function1).hashCode());
-        assertThat(wrapFunction(function1).compose(function2)).isEqualTo(
-                function2.compose(function1));
-        assertThat(function2.compose(function1)).isEqualTo(
-                wrapFunction(function1).compose(function2));
-        assertThat(wrapFunction(function1).compose(function2).hashCode()).isNotEqualTo(
+        assertThat(wrap(function1).compose(function2)).isEqualTo(function2.compose(function1));
+        assertThat(function2.compose(function1)).isEqualTo(wrap(function1).compose(function2));
+        assertThat(wrap(function1).compose(function2).hashCode()).isNotEqualTo(
                 function2.compose(function2.compose(function1)).hashCode());
-        assertThat(wrapFunction(function1).compose(function2)).isNotEqualTo(
+        assertThat(wrap(function1).compose(function2)).isNotEqualTo(
                 function2.compose(function2.compose(function1)));
         assertThat(function2.compose(function2.compose(function1))).isNotEqualTo(
-                wrapFunction(function1).compose(function2));
-        assertThat(wrapFunction(function1).compose(function1).hashCode()).isNotEqualTo(
+                wrap(function1).compose(function2));
+        assertThat(wrap(function1).compose(function1).hashCode()).isNotEqualTo(
                 function2.compose(function2.compose(function1)).hashCode());
-        assertThat(wrapFunction(function1).compose(function1)).isNotEqualTo(
+        assertThat(wrap(function1).compose(function1)).isNotEqualTo(
                 function2.compose(function2.compose(function1)));
         assertThat(function2.compose(function2.compose(function1))).isNotEqualTo(
-                wrapFunction(function1).compose(function1));
+                wrap(function1).compose(function1));
         assertThat(function2.compose(function1).hashCode()).isNotEqualTo(
                 function2.compose(identity()).hashCode());
         assertThat(function2.compose(function1)).isNotEqualTo(function2.compose(identity()));
@@ -938,7 +989,17 @@ public class FunctionsTest {
 
         try {
 
-            wrapFunction(new TestFunction()).andThen(null);
+            wrap((Function<?, ?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            wrap(new TestFunction()).andThen(null);
 
             fail();
 
@@ -1246,8 +1307,8 @@ public class FunctionsTest {
     public void testPredicate() {
 
         final TestPredicate predicate1 = new TestPredicate();
-        final PredicateWrapper<Object> predicate2 = wrapPredicate(predicate1);
-        assertThat(wrapPredicate(predicate2)).isSameAs(predicate2);
+        final PredicateWrapper<Object> predicate2 = wrap(predicate1);
+        assertThat(wrap(predicate2)).isSameAs(predicate2);
         assertThat(predicate2.test(this)).isTrue();
         assertThat(predicate1.isCalled()).isTrue();
         predicate1.reset();
@@ -1303,67 +1364,80 @@ public class FunctionsTest {
     }
 
     @Test
+    public void testPredicateContext() {
+
+        assertThat(wrap(new TestPredicate()).hasStaticContext()).isTrue();
+        assertThat(wrap(new Predicate<Object>() {
+
+            public boolean test(final Object o) {
+
+                return false;
+            }
+        }).hasStaticContext()).isFalse();
+    }
+
+    @Test
     public void testPredicateEquals() {
 
         final TestPredicate predicate1 = new TestPredicate();
-        assertThat(wrapPredicate(predicate1)).isEqualTo(wrapPredicate(predicate1));
-        final PredicateWrapper<Object> predicate2 = wrapPredicate(predicate1);
+        assertThat(wrap(predicate1)).isEqualTo(wrap(predicate1));
+        final PredicateWrapper<Object> predicate2 = wrap(predicate1);
         assertThat(predicate2).isEqualTo(predicate2);
         assertThat(predicate2).isNotEqualTo(null);
         assertThat(predicate2).isNotEqualTo("test");
-        assertThat(wrapPredicate(predicate1).and(predicate2).hashCode()).isEqualTo(
+        assertThat(wrap(predicate1).and(predicate2).hashCode()).isEqualTo(
                 predicate2.and(predicate2).hashCode());
-        assertThat(wrapPredicate(predicate1).and(predicate2)).isEqualTo(predicate2.and(predicate2));
-        assertThat(predicate2.and(predicate2)).isEqualTo(wrapPredicate(predicate1).and(predicate2));
-        assertThat(wrapPredicate(predicate1).and(predicate2).hashCode()).isEqualTo(
+        assertThat(wrap(predicate1).and(predicate2)).isEqualTo(predicate2.and(predicate2));
+        assertThat(predicate2.and(predicate2)).isEqualTo(wrap(predicate1).and(predicate2));
+        assertThat(wrap(predicate1).and(predicate2).hashCode()).isEqualTo(
                 predicate2.and(predicate1).hashCode());
-        assertThat(wrapPredicate(predicate1).and(predicate2)).isEqualTo(predicate2.and(predicate1));
-        assertThat(predicate2.and(predicate1)).isEqualTo(wrapPredicate(predicate1).and(predicate2));
-        assertThat(wrapPredicate(predicate1).and(predicate2).hashCode()).isNotEqualTo(
+        assertThat(wrap(predicate1).and(predicate2)).isEqualTo(predicate2.and(predicate1));
+        assertThat(predicate2.and(predicate1)).isEqualTo(wrap(predicate1).and(predicate2));
+        assertThat(wrap(predicate1).and(predicate2).hashCode()).isNotEqualTo(
                 predicate2.and(predicate2.and(predicate1)).hashCode());
-        assertThat(wrapPredicate(predicate1).and(predicate2)).isNotEqualTo(
+        assertThat(wrap(predicate1).and(predicate2)).isNotEqualTo(
                 predicate2.and(predicate2.and(predicate1)));
         assertThat(predicate2.and(predicate2.and(predicate1))).isNotEqualTo(
-                wrapPredicate(predicate1).and(predicate2));
-        assertThat(wrapPredicate(predicate1).and(predicate1).hashCode()).isNotEqualTo(
+                wrap(predicate1).and(predicate2));
+        assertThat(wrap(predicate1).and(predicate1).hashCode()).isNotEqualTo(
                 predicate2.and(predicate2.and(predicate1)).hashCode());
-        assertThat(wrapPredicate(predicate1).and(predicate1)).isNotEqualTo(
+        assertThat(wrap(predicate1).and(predicate1)).isNotEqualTo(
                 predicate2.and(predicate2.and(predicate1)));
         assertThat(predicate2.and(predicate2.and(predicate1))).isNotEqualTo(
-                wrapPredicate(predicate1).and(predicate1));
+                wrap(predicate1).and(predicate1));
         assertThat(predicate2.and(predicate1).hashCode()).isNotEqualTo(
                 predicate2.and(positive()).hashCode());
         assertThat(predicate2.and(predicate1)).isNotEqualTo(predicate2.and(positive()));
         assertThat(predicate2.and(positive())).isNotEqualTo(predicate2.and(predicate1));
-        assertThat(wrapPredicate(predicate1).or(predicate2).hashCode()).isEqualTo(
+        assertThat(wrap(predicate1).or(predicate2).hashCode()).isEqualTo(
                 predicate2.or(predicate2).hashCode());
-        assertThat(wrapPredicate(predicate1).or(predicate2)).isEqualTo(predicate2.or(predicate2));
-        assertThat(predicate2.or(predicate2)).isEqualTo(wrapPredicate(predicate1).or(predicate2));
-        assertThat(wrapPredicate(predicate1).or(predicate2).hashCode()).isEqualTo(
+        assertThat(wrap(predicate1).or(predicate2)).isEqualTo(predicate2.or(predicate2));
+        assertThat(predicate2.or(predicate2)).isEqualTo(wrap(predicate1).or(predicate2));
+        assertThat(wrap(predicate1).or(predicate2).hashCode()).isEqualTo(
                 predicate2.or(predicate1).hashCode());
-        assertThat(wrapPredicate(predicate1).or(predicate2)).isEqualTo(predicate2.or(predicate1));
-        assertThat(predicate2.or(predicate1)).isEqualTo(wrapPredicate(predicate1).or(predicate2));
-        assertThat(wrapPredicate(predicate1).or(predicate2).hashCode()).isNotEqualTo(
+        assertThat(wrap(predicate1).or(predicate2)).isEqualTo(predicate2.or(predicate1));
+        assertThat(predicate2.or(predicate1)).isEqualTo(wrap(predicate1).or(predicate2));
+        assertThat(wrap(predicate1).or(predicate2).hashCode()).isNotEqualTo(
                 predicate2.or(predicate2.or(predicate1)).hashCode());
-        assertThat(wrapPredicate(predicate1).or(predicate2)).isNotEqualTo(
+        assertThat(wrap(predicate1).or(predicate2)).isNotEqualTo(
                 predicate2.or(predicate2.or(predicate1)));
         assertThat(predicate2.or(predicate2.or(predicate1))).isNotEqualTo(
-                wrapPredicate(predicate1).or(predicate2));
-        assertThat(wrapPredicate(predicate1).or(predicate1).hashCode()).isNotEqualTo(
+                wrap(predicate1).or(predicate2));
+        assertThat(wrap(predicate1).or(predicate1).hashCode()).isNotEqualTo(
                 predicate2.or(predicate2.or(predicate1)).hashCode());
-        assertThat(wrapPredicate(predicate1).or(predicate1)).isNotEqualTo(
+        assertThat(wrap(predicate1).or(predicate1)).isNotEqualTo(
                 predicate2.or(predicate2.or(predicate1)));
         assertThat(predicate2.or(predicate2.or(predicate1))).isNotEqualTo(
-                wrapPredicate(predicate1).or(predicate1));
+                wrap(predicate1).or(predicate1));
         assertThat(predicate2.or(predicate1).hashCode()).isNotEqualTo(
                 predicate2.or(positive()).hashCode());
         assertThat(predicate2.or(predicate1)).isNotEqualTo(predicate2.or(positive()));
         assertThat(predicate2.or(positive())).isNotEqualTo(predicate2.or(predicate1));
-        assertThat(predicate2.negate().negate()).isEqualTo(wrapPredicate(predicate1));
+        assertThat(predicate2.negate().negate()).isEqualTo(wrap(predicate1));
         assertThat(predicate2.and(predicate1).negate()).isEqualTo(
-                predicate2.negate().or(wrapPredicate(predicate1).negate()));
+                predicate2.negate().or(wrap(predicate1).negate()));
         assertThat(predicate2.and(predicate1).negate().hashCode()).isEqualTo(
-                predicate2.negate().or(wrapPredicate(predicate1).negate()).hashCode());
+                predicate2.negate().or(wrap(predicate1).negate()).hashCode());
         final PredicateWrapper<Object> chain =
                 predicate2.negate().or(predicate2.negate().and(predicate2.negate()));
         assertThat(predicate2.and(predicate2.or(predicate1)).negate()).isEqualTo(chain);
@@ -1389,7 +1463,7 @@ public class FunctionsTest {
 
         try {
 
-            wrapPredicate(new TestPredicate()).and(null);
+            wrap((Predicate<?>) null);
 
             fail();
 
@@ -1399,7 +1473,17 @@ public class FunctionsTest {
 
         try {
 
-            wrapPredicate(new TestPredicate()).or(null);
+            wrap(new TestPredicate()).and(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            wrap(new TestPredicate()).or(null);
 
             fail();
 
@@ -1471,8 +1555,8 @@ public class FunctionsTest {
     public void testSupplier() {
 
         final TestSupplier supplier1 = new TestSupplier();
-        final SupplierWrapper<Object> supplier2 = wrapSupplier(supplier1);
-        assertThat(wrapSupplier(supplier2)).isSameAs(supplier2);
+        final SupplierWrapper<Object> supplier2 = wrap(supplier1);
+        assertThat(wrap(supplier2)).isSameAs(supplier2);
         assertThat(supplier2.get()).isSameAs(supplier1);
         assertThat(supplier1.isCalled()).isTrue();
         supplier1.reset();
@@ -1497,39 +1581,48 @@ public class FunctionsTest {
     }
 
     @Test
+    public void testSupplierContext() {
+
+        assertThat(wrap(new TestSupplier()).hasStaticContext()).isTrue();
+        assertThat(wrap(new Supplier<Object>() {
+
+            public Object get() {
+
+                return null;
+            }
+        }).hasStaticContext()).isFalse();
+    }
+
+    @Test
     public void testSupplierEquals() {
 
         final TestSupplier supplier1 = new TestSupplier();
-        assertThat(wrapSupplier(supplier1)).isEqualTo(wrapSupplier(supplier1));
-        final SupplierWrapper<Object> supplier2 = wrapSupplier(supplier1);
+        assertThat(wrap(supplier1)).isEqualTo(wrap(supplier1));
+        final SupplierWrapper<Object> supplier2 = wrap(supplier1);
         assertThat(supplier2).isEqualTo(supplier2);
         assertThat(supplier2).isNotEqualTo(null);
         assertThat(supplier2).isNotEqualTo("test");
         final TestFunction function = new TestFunction();
-        assertThat(wrapSupplier(supplier1).andThen(function).hashCode()).isEqualTo(
+        assertThat(wrap(supplier1).andThen(function).hashCode()).isEqualTo(
                 supplier2.andThen(function).hashCode());
-        assertThat(wrapSupplier(supplier1).andThen(function)).isEqualTo(
-                supplier2.andThen(function));
-        assertThat(supplier2.andThen(function)).isEqualTo(
-                wrapSupplier(supplier1).andThen(function));
-        assertThat(wrapSupplier(supplier1).andThen(wrapFunction(function)).hashCode()).isEqualTo(
+        assertThat(wrap(supplier1).andThen(function)).isEqualTo(supplier2.andThen(function));
+        assertThat(supplier2.andThen(function)).isEqualTo(wrap(supplier1).andThen(function));
+        assertThat(wrap(supplier1).andThen(wrap(function)).hashCode()).isEqualTo(
                 supplier2.andThen(function).hashCode());
-        assertThat(wrapSupplier(supplier1).andThen(wrapFunction(function))).isEqualTo(
-                supplier2.andThen(function));
-        assertThat(supplier2.andThen(function)).isEqualTo(
-                wrapSupplier(supplier1).andThen(wrapFunction(function)));
-        assertThat(wrapSupplier(supplier1).andThen(wrapFunction(function)).hashCode()).isNotEqualTo(
-                supplier2.andThen(wrapFunction(function).andThen(function)).hashCode());
-        assertThat(wrapSupplier(supplier1).andThen(wrapFunction(function))).isNotEqualTo(
-                supplier2.andThen(wrapFunction(function).andThen(function)));
-        assertThat(supplier2.andThen(wrapFunction(function).andThen(function))).isNotEqualTo(
-                wrapSupplier(supplier1).andThen(wrapFunction(function)));
-        assertThat(wrapSupplier(supplier1).andThen(function).hashCode()).isNotEqualTo(
-                supplier2.andThen(wrapFunction(function).andThen(function)).hashCode());
-        assertThat(wrapSupplier(supplier1).andThen(function)).isNotEqualTo(
-                supplier2.andThen(wrapFunction(function).andThen(function)));
-        assertThat(supplier2.andThen(wrapFunction(function).andThen(function))).isNotEqualTo(
-                wrapSupplier(supplier1).andThen(function));
+        assertThat(wrap(supplier1).andThen(wrap(function))).isEqualTo(supplier2.andThen(function));
+        assertThat(supplier2.andThen(function)).isEqualTo(wrap(supplier1).andThen(wrap(function)));
+        assertThat(wrap(supplier1).andThen(wrap(function)).hashCode()).isNotEqualTo(
+                supplier2.andThen(wrap(function).andThen(function)).hashCode());
+        assertThat(wrap(supplier1).andThen(wrap(function))).isNotEqualTo(
+                supplier2.andThen(wrap(function).andThen(function)));
+        assertThat(supplier2.andThen(wrap(function).andThen(function))).isNotEqualTo(
+                wrap(supplier1).andThen(wrap(function)));
+        assertThat(wrap(supplier1).andThen(function).hashCode()).isNotEqualTo(
+                supplier2.andThen(wrap(function).andThen(function)).hashCode());
+        assertThat(wrap(supplier1).andThen(function)).isNotEqualTo(
+                supplier2.andThen(wrap(function).andThen(function)));
+        assertThat(supplier2.andThen(wrap(function).andThen(function))).isNotEqualTo(
+                wrap(supplier1).andThen(function));
         assertThat(supplier2.andThen(function).hashCode()).isNotEqualTo(
                 supplier2.andThen(identity()).hashCode());
         assertThat(supplier2.andThen(function)).isNotEqualTo(supplier2.andThen(identity()));
@@ -1552,7 +1645,17 @@ public class FunctionsTest {
 
         try {
 
-            wrapSupplier(new TestSupplier()).andThen(null);
+            wrap((Supplier<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            wrap(new TestSupplier()).andThen(null);
 
             fail();
 
@@ -1594,12 +1697,6 @@ public class FunctionsTest {
 
         private boolean mIsCalled;
 
-        public Object apply(final Object in1, final Object in2) {
-
-            mIsCalled = true;
-            return in2;
-        }
-
         public boolean isCalled() {
 
             return mIsCalled;
@@ -1609,6 +1706,14 @@ public class FunctionsTest {
 
             mIsCalled = false;
         }
+
+        public Object apply(final Object in1, final Object in2) {
+
+            mIsCalled = true;
+            return in2;
+        }
+
+
     }
 
     private static class TestConsumer implements Consumer<Object> {

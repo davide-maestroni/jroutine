@@ -16,6 +16,8 @@
 
 package com.github.dm.jrt.function;
 
+import com.github.dm.jrt.util.Reflection;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -30,7 +32,7 @@ import java.util.List;
  * @param <IN1> the first input data type.
  * @param <IN2> the second input data type.
  */
-public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2> {
+public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2>, Wrapper {
 
     private static final BiConsumerWrapper<Object, Object> sBiSink =
             new BiConsumerWrapper<Object, Object>(new BiConsumer<Object, Object>() {
@@ -106,6 +108,17 @@ public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2> {
         }
 
         return new BiConsumerWrapper<IN1, IN2>(newConsumers);
+    }
+
+    public boolean hasStaticContext() {
+
+        for (final BiConsumer<?, ?> consumer : mConsumers) {
+            if (!Reflection.hasStaticContext(consumer)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Override

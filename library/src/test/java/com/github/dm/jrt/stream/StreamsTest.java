@@ -337,30 +337,28 @@ public class StreamsTest {
 
         }
 
-        assertThat(Streams.onStream(
-                new Function<StreamChannel<? extends String>, StreamChannel<String>>() {
+        assertThat(Streams.onStream(new Function<StreamChannel<String>, StreamChannel<String>>() {
 
-                    public StreamChannel<String> apply(
-                            final StreamChannel<? extends String> channel) {
+            public StreamChannel<String> apply(final StreamChannel<String> channel) {
 
-                        return channel.sync().map(new Function<String, String>() {
+                return channel.sync().map(new Function<String, String>() {
 
-                            public String apply(final String s) {
+                    public String apply(final String s) {
 
-                                return s.toUpperCase();
-                            }
-                        });
+                        return s.toUpperCase();
                     }
-                }).asyncCall("test1", "test2", "test3").afterMax(seconds(3)).all()).containsExactly(
-                "TEST1", "TEST2", "TEST3");
+                });
+            }
+        }).asyncCall("test1", "test2", "test3").afterMax(seconds(3)).all()).containsExactly("TEST1",
+                                                                                            "TEST2",
+                                                                                            "TEST3");
 
         try {
 
-            final InvocationChannel<String, String> channel = Streams.onStream(
-                    new Function<StreamChannel<? extends String>, StreamChannel<String>>() {
+            final InvocationChannel<String, String> channel =
+                    Streams.onStream(new Function<StreamChannel<String>, StreamChannel<String>>() {
 
-                        public StreamChannel<String> apply(
-                                final StreamChannel<? extends String> channel) {
+                        public StreamChannel<String> apply(final StreamChannel<String> channel) {
 
                             return channel.sync().map(new Function<String, String>() {
 
@@ -384,11 +382,10 @@ public class StreamsTest {
     @Test
     public void testFactoryEquals() {
 
-        final Function<StreamChannel<? extends String>, StreamChannel<String>> function =
-                new Function<StreamChannel<? extends String>, StreamChannel<String>>() {
+        final Function<StreamChannel<String>, StreamChannel<String>> function =
+                new Function<StreamChannel<String>, StreamChannel<String>>() {
 
-                    public StreamChannel<String> apply(
-                            final StreamChannel<? extends String> channel) {
+                    public StreamChannel<String> apply(final StreamChannel<String> channel) {
 
                         return channel.sync().map(new Function<String, String>() {
 
@@ -900,7 +897,6 @@ public class StreamsTest {
                                                                  .asyncCall(channel);
         final Map<Integer, OutputChannel<Object>> channelMap =
                 Channels.select(output, Sort.INTEGER, Sort.STRING);
-        // TODO: 10/02/16 Streams.select()???
 
         for (int i = 0; i < 4; i++) {
 
@@ -1346,8 +1342,7 @@ public class StreamsTest {
     @Test
     public void testUnfoldEquals() {
 
-        final BiConsumerWrapper<Iterable<Object>, InputChannel<Object>> consumer =
-                Streams.unfold();
+        final BiConsumerWrapper<Iterable<Object>, InputChannel<Object>> consumer = Streams.unfold();
         assertThat(consumer).isEqualTo(consumer);
         assertThat(consumer).isNotEqualTo(null);
         assertThat(consumer).isNotEqualTo("test");

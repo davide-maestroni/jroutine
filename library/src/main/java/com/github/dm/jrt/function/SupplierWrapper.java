@@ -16,6 +16,8 @@
 
 package com.github.dm.jrt.function;
 
+import com.github.dm.jrt.util.Reflection;
+
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -25,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <OUT> the output data type.
  */
-public class SupplierWrapper<OUT> implements Supplier<OUT> {
+public class SupplierWrapper<OUT> implements Supplier<OUT>, Wrapper {
 
     private final FunctionWrapper<?, OUT> mFunction;
 
@@ -91,6 +93,11 @@ public class SupplierWrapper<OUT> implements Supplier<OUT> {
     public OUT get() {
 
         return ((Function<Object, OUT>) mFunction).apply(mSupplier.get());
+    }
+
+    public boolean hasStaticContext() {
+
+        return Reflection.hasStaticContext(mSupplier) && mFunction.hasStaticContext();
     }
 
     @Override

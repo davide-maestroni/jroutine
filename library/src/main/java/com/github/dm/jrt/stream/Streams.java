@@ -53,7 +53,7 @@ import static com.github.dm.jrt.util.Reflection.asArgs;
 public class Streams extends Functions {
 
     private static final BiConsumerWrapper<? extends Iterable<?>, ? extends InputChannel<?>>
-            sUnfold = wrapBiConsumer(new BiConsumer<Iterable<?>, InputChannel<?>>() {
+            sUnfold = wrap(new BiConsumer<Iterable<?>, InputChannel<?>>() {
 
         @SuppressWarnings("unchecked")
         public void accept(final Iterable<?> objects, final InputChannel<?> inputChannel) {
@@ -148,10 +148,10 @@ public class Streams extends Functions {
      */
     @NotNull
     public static <IN, OUT> InvocationFactory<IN, OUT> factory(
-            @NotNull final Function<? super StreamChannel<? extends IN>, ? extends
+            @NotNull final Function<? super StreamChannel<IN>, ? extends
                     StreamChannel<? extends OUT>> function) {
 
-        return new StreamInvocationFactory<IN, OUT>(wrapFunction(function));
+        return new StreamInvocationFactory<IN, OUT>(wrap(function));
     }
 
     /**
@@ -496,7 +496,7 @@ public class Streams extends Functions {
      */
     @NotNull
     public static <IN, OUT> RoutineBuilder<IN, OUT> onStream(
-            @NotNull final Function<? super StreamChannel<? extends IN>, ? extends
+            @NotNull final Function<? super StreamChannel<IN>, ? extends
                     StreamChannel<? extends OUT>> function) {
 
         return JRoutine.on(factory(function));
@@ -929,7 +929,7 @@ public class Streams extends Functions {
      */
     private static class StreamInvocation<IN, OUT> implements Invocation<IN, OUT> {
 
-        private final Function<? super StreamChannel<? extends IN>, ? extends
+        private final Function<? super StreamChannel<IN>, ? extends
                 StreamChannel<? extends OUT>> mFunction;
 
         private IOChannel<IN> mInputChannel;
@@ -941,9 +941,8 @@ public class Streams extends Functions {
          *
          * @param function the function used to instantiate the stream output channel.
          */
-        private StreamInvocation(
-                @NotNull final Function<? super StreamChannel<? extends IN>, ? extends
-                        StreamChannel<? extends OUT>> function) {
+        private StreamInvocation(@NotNull final Function<? super StreamChannel<IN>, ? extends
+                StreamChannel<? extends OUT>> function) {
 
             mFunction = function;
         }
@@ -1000,7 +999,7 @@ public class Streams extends Functions {
     private static class StreamInvocationFactory<IN, OUT>
             extends ComparableInvocationFactory<IN, OUT> {
 
-        private final FunctionWrapper<? super StreamChannel<? extends IN>, ? extends
+        private final FunctionWrapper<? super StreamChannel<IN>, ? extends
                 StreamChannel<? extends OUT>> mFunction;
 
         /**
@@ -1009,7 +1008,7 @@ public class Streams extends Functions {
          * @param function the function used to instantiate the stream output channel.
          */
         private StreamInvocationFactory(
-                @NotNull final FunctionWrapper<? super StreamChannel<? extends IN>, ? extends
+                @NotNull final FunctionWrapper<? super StreamChannel<IN>, ? extends
                         StreamChannel<? extends OUT>> function) {
 
             super(asArgs(function));

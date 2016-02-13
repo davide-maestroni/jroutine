@@ -240,111 +240,6 @@ public interface StreamChannel<OUT>
             @NotNull Function<? super OUT, ? extends OutputChannel<? extends AFTER>> function);
 
     /**
-     * Concatenates a stream generating the specified output.<br/>
-     * The outputs will be generated only when the previous routine invocations complete.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration.<br/>
-     * Note also that this stream will be bound as a result of the call.
-     *
-     * @param output  the output.
-     * @param <AFTER> the concatenation output type.
-     * @return the concatenated stream.
-     */
-    @NotNull
-    <AFTER> StreamChannel<AFTER> generate(@Nullable AFTER output);
-
-    /**
-     * Concatenates a stream generating the specified outputs.<br/>
-     * The outputs will be generated only when the previous routine invocations complete.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration.<br/>
-     * Note also that this stream will be bound as a result of the call.
-     *
-     * @param outputs the outputs.
-     * @param <AFTER> the concatenation output type.
-     * @return the concatenated stream.
-     */
-    @NotNull
-    <AFTER> StreamChannel<AFTER> generate(@Nullable AFTER... outputs);
-
-    /**
-     * Concatenates a stream generating the output returned by the specified iterable.<br/>
-     * The outputs will be generated only when the previous routine invocations complete.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration.<br/>
-     * Note also that this stream will be bound as a result of the call.
-     *
-     * @param outputs the iterable returning the outputs.
-     * @param <AFTER> the concatenation output type.
-     * @return the concatenated stream.
-     */
-    @NotNull
-    <AFTER> StreamChannel<AFTER> generate(@Nullable Iterable<? extends AFTER> outputs);
-
-    /**
-     * Concatenates a stream based on the specified consumer to this one.<br/>
-     * The consumer will be called {@code count} number of times only when the previous routine
-     * invocations complete. The count number must be positive.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration.<br/>
-     * Note also that this stream will be bound as a result of the call.
-     *
-     * @param count    the number of generated outputs.
-     * @param consumer the consumer instance.
-     * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream.
-     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
-     */
-    @NotNull
-    <AFTER> StreamChannel<AFTER> generate(long count,
-            @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
-
-    /**
-     * Concatenates a stream based on the specified consumer to this one.<br/>
-     * The consumer will be called only when the previous routine invocations complete.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration.<br/>
-     * Note also that this stream will be bound as a result of the call.
-     *
-     * @param consumer the consumer instance.
-     * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream.
-     */
-    @NotNull
-    <AFTER> StreamChannel<AFTER> generate(@NotNull Consumer<? super ResultChannel<AFTER>> consumer);
-
-    /**
-     * Concatenates a stream based on the specified supplier to this one.<br/>
-     * The supplier will be called {@code count} number of times only when the previous routine
-     * invocations complete. The count number must be positive.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration.<br/>
-     * Note also that this stream will be bound as a result of the call.
-     *
-     * @param count    the number of generated outputs.
-     * @param supplier the supplier instance.
-     * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream.
-     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative..
-     */
-    @NotNull
-    <AFTER> StreamChannel<AFTER> generate(long count, @NotNull Supplier<? extends AFTER> supplier);
-
-    /**
-     * Concatenates a stream based on the specified supplier to this one.<br/>
-     * The supplier will be called only when the previous routine invocations complete.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration.<br/>
-     * Note also that this stream will be bound as a result of the call.
-     *
-     * @param supplier the supplier instance.
-     * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream.
-     */
-    @NotNull
-    <AFTER> StreamChannel<AFTER> generate(@NotNull Supplier<? extends AFTER> supplier);
-
-    /**
      * Concatenates a stream based on the specified mapping consumer to this one.
      * <p/>
      * Note that the created routine will be initialized with the current configuration.<br/>
@@ -546,6 +441,111 @@ public interface StreamChannel<OUT>
      */
     @NotNull
     StreamChannel<OUT> sync();
+
+    /**
+     * Concatenates a stream generating the specified output.<br/>
+     * The outputs will be generated only when the previous routine invocations complete.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration.<br/>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param output  the output.
+     * @param <AFTER> the concatenation output type.
+     * @return the concatenated stream.
+     */
+    @NotNull
+    <AFTER> StreamChannel<AFTER> then(@Nullable AFTER output);
+
+    /**
+     * Concatenates a stream generating the specified outputs.<br/>
+     * The outputs will be generated only when the previous routine invocations complete.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration.<br/>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param outputs the outputs.
+     * @param <AFTER> the concatenation output type.
+     * @return the concatenated stream.
+     */
+    @NotNull
+    <AFTER> StreamChannel<AFTER> then(@Nullable AFTER... outputs);
+
+    /**
+     * Concatenates a stream generating the output returned by the specified iterable.<br/>
+     * The outputs will be generated only when the previous routine invocations complete.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration.<br/>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param outputs the iterable returning the outputs.
+     * @param <AFTER> the concatenation output type.
+     * @return the concatenated stream.
+     */
+    @NotNull
+    <AFTER> StreamChannel<AFTER> then(@Nullable Iterable<? extends AFTER> outputs);
+
+    /**
+     * Concatenates a stream based on the specified consumer to this one.<br/>
+     * The consumer will be called {@code count} number of times only when the previous routine
+     * invocations complete. The count number must be positive.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration.<br/>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param count    the number of generated outputs.
+     * @param consumer the consumer instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream.
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+     */
+    @NotNull
+    <AFTER> StreamChannel<AFTER> then(long count,
+            @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
+
+    /**
+     * Concatenates a stream based on the specified consumer to this one.<br/>
+     * The consumer will be called only when the previous routine invocations complete.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration.<br/>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param consumer the consumer instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream.
+     */
+    @NotNull
+    <AFTER> StreamChannel<AFTER> then(@NotNull Consumer<? super ResultChannel<AFTER>> consumer);
+
+    /**
+     * Concatenates a stream based on the specified supplier to this one.<br/>
+     * The supplier will be called {@code count} number of times only when the previous routine
+     * invocations complete. The count number must be positive.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration.<br/>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param count    the number of generated outputs.
+     * @param supplier the supplier instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream.
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative..
+     */
+    @NotNull
+    <AFTER> StreamChannel<AFTER> then(long count, @NotNull Supplier<? extends AFTER> supplier);
+
+    /**
+     * Concatenates a stream based on the specified supplier to this one.<br/>
+     * The supplier will be called only when the previous routine invocations complete.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration.<br/>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param supplier the supplier instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream.
+     */
+    @NotNull
+    <AFTER> StreamChannel<AFTER> then(@NotNull Supplier<? extends AFTER> supplier);
 
     /**
      * Returns a new stream making the this one selectable.<br/>

@@ -16,6 +16,8 @@
 
 package com.github.dm.jrt.function;
 
+import com.github.dm.jrt.util.Reflection;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,7 +32,7 @@ import java.util.List;
  *
  * @param <IN> the input data type.
  */
-public class PredicateWrapper<IN> implements Predicate<IN> {
+public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
 
     private static final LogicalPredicate AND_PREDICATE = new LogicalPredicate();
 
@@ -236,6 +238,17 @@ public class PredicateWrapper<IN> implements Predicate<IN> {
 
         newPredicates.add(CLOSE_PREDICATE);
         return new PredicateWrapper<IN>(new AndPredicate<IN>(mPredicate, other), newPredicates);
+    }
+
+    public boolean hasStaticContext() {
+
+        for (final Predicate<?> predicate : mPredicates) {
+            if (!Reflection.hasStaticContext(predicate)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Override

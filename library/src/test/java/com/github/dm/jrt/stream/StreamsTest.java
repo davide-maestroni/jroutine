@@ -36,6 +36,7 @@ import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.invocation.PassingInvocation;
 import com.github.dm.jrt.invocation.TemplateInvocation;
 import com.github.dm.jrt.routine.Routine;
+import com.github.dm.jrt.stream.Streams.RangeConsumer;
 import com.github.dm.jrt.util.ClassToken;
 
 import org.jetbrains.annotations.NotNull;
@@ -1458,6 +1459,41 @@ public class StreamsTest {
                 Arrays.asList((short) 0, (short) 1, (short) 2, (short) 3, (short) 4));
         assertThat(Streams.streamOf().sync().then(range((byte) 0, (byte) 5)).all()).isEqualTo(
                 Arrays.asList((byte) 0, (byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5));
+    }
+
+    @Test
+    public void testRangeEquals() {
+
+        final RangeConsumer<? extends Number> range1 = Streams.range(1, 10);
+        assertThat(range1).isEqualTo(range1);
+        assertThat(range1).isNotEqualTo(null);
+        assertThat(range1).isNotEqualTo("test");
+        assertThat(range1).isNotEqualTo(Streams.range(1, 10, 3));
+        assertThat(range1).isEqualTo(Streams.range(1, 10));
+        assertThat(range1.hashCode()).isEqualTo(Streams.range(1, 10).hashCode());
+
+        final RangeConsumer<? extends Number> range2 = Streams.range(1, 10, -2);
+        assertThat(range2).isEqualTo(range2);
+        assertThat(range2).isNotEqualTo(null);
+        assertThat(range2).isNotEqualTo("test");
+        assertThat(range2).isNotEqualTo(Streams.range(1, 10, 1));
+        assertThat(range2).isEqualTo(Streams.range(1, 10, -2));
+        assertThat(range2.hashCode()).isEqualTo(Streams.range(1, 10, -2).hashCode());
+
+        final Function<Character, Character> function = new Function<Character, Character>() {
+
+            public Character apply(final Character character) {
+
+                return (char) (character + 1);
+            }
+        };
+        final RangeConsumer<Character> range3 = Streams.range('a', 'f', function);
+        assertThat(range3).isEqualTo(range3);
+        assertThat(range3).isNotEqualTo(null);
+        assertThat(range3).isNotEqualTo("test");
+        assertThat(range3).isNotEqualTo(Streams.range('b', 'f', function));
+        assertThat(range3).isEqualTo(Streams.range('a', 'f', function));
+        assertThat(range3.hashCode()).isEqualTo(Streams.range('a', 'f', function).hashCode());
     }
 
     @Test

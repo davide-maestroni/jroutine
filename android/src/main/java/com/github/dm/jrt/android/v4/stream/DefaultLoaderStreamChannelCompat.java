@@ -300,6 +300,25 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
 
     @NotNull
     @Override
+    public <AFTER> LoaderStreamChannelCompat<AFTER> collect(
+            @NotNull final BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
+                    consumer) {
+
+        checkStatic(wrap(consumer), consumer);
+        return (LoaderStreamChannelCompat<AFTER>) super.collect(consumer);
+    }
+
+    @NotNull
+    @Override
+    public <AFTER> LoaderStreamChannelCompat<AFTER> collect(
+            @NotNull final Function<? super List<? extends OUT>, ? extends AFTER> function) {
+
+        checkStatic(wrap(function), function);
+        return (LoaderStreamChannelCompat<AFTER>) super.collect(function);
+    }
+
+    @NotNull
+    @Override
     public LoaderStreamChannelCompat<Void> consume(@NotNull final Consumer<? super OUT> consumer) {
 
         checkStatic(wrap(consumer), consumer);
@@ -362,25 +381,6 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
             @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
 
         return (LoaderStreamChannelCompat<AFTER>) super.map(routine);
-    }
-
-    @NotNull
-    @Override
-    public <AFTER> LoaderStreamChannelCompat<AFTER> mapAll(
-            @NotNull final BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
-                    consumer) {
-
-        checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannelCompat<AFTER>) super.mapAll(consumer);
-    }
-
-    @NotNull
-    @Override
-    public <AFTER> LoaderStreamChannelCompat<AFTER> mapAll(
-            @NotNull final Function<? super List<? extends OUT>, ? extends AFTER> function) {
-
-        checkStatic(wrap(function), function);
-        return (LoaderStreamChannelCompat<AFTER>) super.mapAll(function);
     }
 
     @NotNull

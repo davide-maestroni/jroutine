@@ -147,6 +147,21 @@ public interface LoaderStreamChannel<OUT>
      * {@inheritDoc}
      */
     @NotNull
+    <AFTER> LoaderStreamChannel<AFTER> collect(
+            @NotNull BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
+                    consumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    <AFTER> LoaderStreamChannel<AFTER> collect(
+            @NotNull Function<? super List<? extends OUT>, ? extends AFTER> function);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
     LoaderStreamChannel<Void> consume(@NotNull Consumer<? super OUT> consumer);
 
     /**
@@ -188,21 +203,6 @@ public interface LoaderStreamChannel<OUT>
      */
     @NotNull
     <AFTER> LoaderStreamChannel<AFTER> map(@NotNull Routine<? super OUT, ? extends AFTER> routine);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> mapAll(
-            @NotNull BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
-                    consumer);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> mapAll(
-            @NotNull Function<? super List<? extends OUT>, ? extends AFTER> function);
 
     /**
      * {@inheritDoc}

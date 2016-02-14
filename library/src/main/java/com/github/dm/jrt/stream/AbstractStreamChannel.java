@@ -260,10 +260,19 @@ public abstract class AbstractStreamChannel<OUT>
                                 .set();
     }
 
-    @Nullable
-    public <AFTER> AFTER collect(@NotNull final Function<List<? extends OUT>, AFTER> function) {
+    @NotNull
+    public <AFTER> StreamChannel<AFTER> collect(
+            @NotNull final BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
+                    consumer) {
 
-        return function.apply(all());
+        return map(consumerFactory(consumer));
+    }
+
+    @NotNull
+    public <AFTER> StreamChannel<AFTER> collect(
+            @NotNull final Function<? super List<? extends OUT>, ? extends AFTER> function) {
+
+        return map(functionFactory(function));
     }
 
     @NotNull
@@ -324,21 +333,6 @@ public abstract class AbstractStreamChannel<OUT>
         }
 
         return concatRoutine(channel);
-    }
-
-    @NotNull
-    public <AFTER> StreamChannel<AFTER> mapAll(
-            @NotNull final BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
-                    consumer) {
-
-        return map(consumerFactory(consumer));
-    }
-
-    @NotNull
-    public <AFTER> StreamChannel<AFTER> mapAll(
-            @NotNull final Function<? super List<? extends OUT>, ? extends AFTER> function) {
-
-        return map(functionFactory(function));
     }
 
     @NotNull

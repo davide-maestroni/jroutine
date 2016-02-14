@@ -515,7 +515,7 @@ public class Streams extends Functions {
      * @return the consumer instance.
      */
     @NotNull
-    public static <AFTER extends Comparable<AFTER>> Consumer<? super ResultChannel<AFTER>> range(
+    public static <AFTER extends Comparable<AFTER>> RangeConsumer<AFTER> range(
             @NotNull final AFTER start, @NotNull final AFTER end,
             @NotNull final Function<AFTER, AFTER> increment) {
 
@@ -535,7 +535,6 @@ public class Streams extends Functions {
      * @return the consumer instance.
      */
     @NotNull
-    @SuppressWarnings("unchecked")
     public static RangeConsumer<? extends Number> range(@NotNull final Number start,
             @NotNull final Number end) {
 
@@ -787,6 +786,91 @@ public class Streams extends Functions {
                         + end.getClass().getCanonicalName() + ", " + increment.getClass()
                                                                               .getCanonicalName()
                         + "]");
+    }
+
+    /**
+     * Consumer implementation generating a range of data.
+     *
+     * @param <OUT> the output data type.
+     */
+    public static class RangeConsumer<OUT extends Comparable<OUT>>
+            implements Consumer<ResultChannel<OUT>> {
+
+        private final OUT mEnd;
+
+        private final Function<OUT, OUT> mIncrement;
+
+        private final OUT mStart;
+
+        /**
+         * Constructor.
+         *
+         * @param start     the first element of the range.
+         * @param end       the last element of the range.
+         * @param increment the function incrementing the current element.
+         */
+        @SuppressWarnings("ConstantConditions")
+        private RangeConsumer(@NotNull final OUT start, @NotNull final OUT end,
+                @NotNull final Function<OUT, OUT> increment) {
+
+            if (start == null) {
+                throw new NullPointerException("the start element must not be null");
+            }
+
+            if (end == null) {
+                throw new NullPointerException("the end element must not be null");
+            }
+
+            mStart = start;
+            mEnd = end;
+            mIncrement = increment;
+        }
+
+        public void accept(final ResultChannel<OUT> result) {
+
+            final OUT start = mStart;
+            final OUT end = mEnd;
+            final Function<OUT, OUT> increment = mIncrement;
+            OUT current = start;
+            if (start.compareTo(end) <= 0) {
+                while (current.compareTo(end) <= 0) {
+                    result.pass(current);
+                    current = increment.apply(current);
+                }
+
+            } else {
+                while (current.compareTo(end) >= 0) {
+                    result.pass(current);
+                    current = increment.apply(current);
+                }
+            }
+        }
+
+        @Override
+        public int hashCode() {
+
+            int result = mEnd.hashCode();
+            result = 31 * result + mIncrement.hashCode();
+            result = 31 * result + mStart.hashCode();
+            return result;
+        }        @Override
+        @SuppressWarnings("EqualsBetweenInconvertibleTypes")
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+                return true;
+            }
+
+            if (!(o instanceof RangeConsumer)) {
+                return false;
+            }
+
+            final RangeConsumer<?> that = (RangeConsumer<?>) o;
+            return mEnd.equals(that.mEnd) && mIncrement.equals(that.mIncrement) && mStart.equals(
+                    that.mStart);
+        }
+
+
     }
 
     /**
@@ -1155,91 +1239,6 @@ public class Streams extends Functions {
 
             final NumberInc<?> numberInc = (NumberInc<?>) o;
             return mIncValue.equals(numberInc.mIncValue);
-        }
-    }
-
-    /**
-     * Consumer implementation generating a range of data.
-     *
-     * @param <OUT> the output data type.
-     */
-    private static class RangeConsumer<OUT extends Comparable<OUT>>
-            implements Consumer<ResultChannel<OUT>> {
-
-        private final OUT mEnd;
-
-        private final Function<OUT, OUT> mIncrement;
-
-        private final OUT mStart;
-
-        /**
-         * Constructor.
-         *
-         * @param start     the first element of the range.
-         * @param end       the last element of the range.
-         * @param increment the function incrementing the current element.
-         */
-        @SuppressWarnings("ConstantConditions")
-        private RangeConsumer(@NotNull final OUT start, @NotNull final OUT end,
-                @NotNull final Function<OUT, OUT> increment) {
-
-            if (start == null) {
-                throw new NullPointerException("the start element must not be null");
-            }
-
-            if (end == null) {
-                throw new NullPointerException("the end element must not be null");
-            }
-
-            mStart = start;
-            mEnd = end;
-            mIncrement = increment;
-        }
-
-        public void accept(final ResultChannel<OUT> result) {
-
-            final OUT start = mStart;
-            final OUT end = mEnd;
-            final Function<OUT, OUT> increment = mIncrement;
-            OUT current = start;
-            if (start.compareTo(end) <= 0) {
-                while (current.compareTo(end) <= 0) {
-                    result.pass(current);
-                    current = increment.apply(current);
-                }
-
-            } else {
-                while (current.compareTo(end) >= 0) {
-                    result.pass(current);
-                    current = increment.apply(current);
-                }
-            }
-        }
-
-        @Override
-        @SuppressWarnings("EqualsBetweenInconvertibleTypes")
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof RangeConsumer)) {
-                return false;
-            }
-
-            final RangeConsumer<?> that = (RangeConsumer<?>) o;
-            return mEnd.equals(that.mEnd) && mIncrement.equals(that.mIncrement) && mStart.equals(
-                    that.mStart);
-        }
-
-        @Override
-        public int hashCode() {
-
-            int result = mEnd.hashCode();
-            result = 31 * result + mIncrement.hashCode();
-            result = 31 * result + mStart.hashCode();
-            return result;
         }
     }
 

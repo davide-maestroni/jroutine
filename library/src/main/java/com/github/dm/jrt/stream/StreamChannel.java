@@ -166,9 +166,36 @@ public interface StreamChannel<OUT>
     StreamChannel<OUT> backPressureOn(@Nullable Runner runner, int maxInputs,
             @Nullable TimeDuration maxDelay);
 
-    // TODO: 14/02/16 AFTER collect()
-    @Nullable
-    <AFTER> AFTER collect(@NotNull Function<List<? extends OUT>, AFTER> function);
+    /**
+     * Concatenates a stream based on the specified consumer to this one.<br/>
+     * All the outputs are collected and then passed to the consumer.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration.<br/>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param consumer the bi-consumer instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream.
+     */
+    @NotNull
+    <AFTER> StreamChannel<AFTER> collect(
+            @NotNull BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
+                    consumer);
+
+    /**
+     * Concatenates a stream based on the specified function to this one.<br/>
+     * All the outputs are collected and then the function will be applied to them.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration.<br/>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param function the function instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream.
+     */
+    @NotNull
+    <AFTER> StreamChannel<AFTER> collect(
+            @NotNull Function<? super List<? extends OUT>, ? extends AFTER> function);
 
     /**
      * Concatenates a stream based on the specified consumer to this one.<br/>
@@ -264,37 +291,6 @@ public interface StreamChannel<OUT>
      */
     @NotNull
     <AFTER> StreamChannel<AFTER> map(@NotNull Routine<? super OUT, ? extends AFTER> routine);
-
-    /**
-     * Concatenates a stream based on the specified consumer to this one.<br/>
-     * All the outputs are collected and then passed to the consumer.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration.<br/>
-     * Note also that this stream will be bound as a result of the call.
-     *
-     * @param consumer the bi-consumer instance.
-     * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream.
-     */
-    @NotNull
-    <AFTER> StreamChannel<AFTER> mapAll(
-            @NotNull BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
-                    consumer);
-
-    /**
-     * Concatenates a stream based on the specified function to this one.<br/>
-     * All the outputs are collected and then the function will be applied to them.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration.<br/>
-     * Note also that this stream will be bound as a result of the call.
-     *
-     * @param function the function instance.
-     * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream.
-     */
-    @NotNull
-    <AFTER> StreamChannel<AFTER> mapAll(
-            @NotNull Function<? super List<? extends OUT>, ? extends AFTER> function);
 
     /**
      * Short for {@code withInvocations().withMaxInstances(maxInvocations).set()}.<br/>

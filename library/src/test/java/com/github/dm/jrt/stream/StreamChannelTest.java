@@ -214,7 +214,7 @@ public class StreamChannelTest {
     @Test
     public void testCollectConsumer() {
 
-        assertThat(Streams.streamOf("test1", "test2", "test3").async().mapAll(new BiConsumer<List<?
+        assertThat(Streams.streamOf("test1", "test2", "test3").async().collect(new BiConsumer<List<?
                 extends String>, ResultChannel<String>>() {
 
             public void accept(final List<?
@@ -233,7 +233,7 @@ public class StreamChannelTest {
         }).afterMax(seconds(3)).all()).containsExactly("test1test2test3");
         assertThat(Streams.streamOf("test1", "test2", "test3")
                           .sync()
-                          .mapAll(new BiConsumer<List<? extends String>, ResultChannel<String>>() {
+                          .collect(new BiConsumer<List<? extends String>, ResultChannel<String>>() {
 
                               public void accept(final List<? extends String> strings,
                                       final ResultChannel<String> result) {
@@ -257,7 +257,7 @@ public class StreamChannelTest {
 
         try {
 
-            Streams.streamOf().async().mapAll((BiConsumer<List<?>, ResultChannel<Object>>) null);
+            Streams.streamOf().async().collect((BiConsumer<List<?>, ResultChannel<Object>>) null);
 
             fail();
 
@@ -267,7 +267,7 @@ public class StreamChannelTest {
 
         try {
 
-            Streams.streamOf().sync().mapAll((BiConsumer<List<?>, ResultChannel<Object>>) null);
+            Streams.streamOf().sync().collect((BiConsumer<List<?>, ResultChannel<Object>>) null);
 
             fail();
 
@@ -281,7 +281,7 @@ public class StreamChannelTest {
 
         assertThat(Streams.streamOf("test1", "test2", "test3")
                           .async()
-                          .mapAll(new Function<List<? extends String>, String>() {
+                          .collect(new Function<List<? extends String>, String>() {
 
                               public String apply(final List<? extends String> strings) {
 
@@ -299,7 +299,7 @@ public class StreamChannelTest {
                           .all()).containsExactly("test1test2test3");
         assertThat(Streams.streamOf("test1", "test2", "test3")
                           .sync()
-                          .mapAll(new Function<List<? extends String>, String>() {
+                          .collect(new Function<List<? extends String>, String>() {
 
                               public String apply(final List<? extends String> strings) {
 
@@ -322,7 +322,7 @@ public class StreamChannelTest {
 
         try {
 
-            Streams.streamOf().async().mapAll((Function<List<?>, Object>) null);
+            Streams.streamOf().async().collect((Function<List<?>, Object>) null);
 
             fail();
 
@@ -332,7 +332,7 @@ public class StreamChannelTest {
 
         try {
 
-            Streams.streamOf().sync().mapAll((Function<List<?>, Object>) null);
+            Streams.streamOf().sync().collect((Function<List<?>, Object>) null);
 
             fail();
 
@@ -631,314 +631,6 @@ public class StreamChannelTest {
                           })
                           .afterMax(seconds(3))
                           .all()).containsOnly("test1", "test2");
-    }
-
-    @Test
-    public void testGenerate() {
-
-        assertThat(Streams.streamOf("test1").sync().then(new Consumer<ResultChannel<String>>() {
-
-            public void accept(final ResultChannel<String> resultChannel) {
-
-                resultChannel.pass("TEST2");
-            }
-        }).all()).containsOnly("TEST2");
-        assertThat(Streams.streamOf("test1").sync().then(new Supplier<String>() {
-
-            public String get() {
-
-                return "TEST2";
-            }
-        }).all()).containsOnly("TEST2");
-        assertThat(Streams.streamOf("test1").sync().then(3, new Supplier<String>() {
-
-            public String get() {
-
-                return "TEST2";
-            }
-        }).afterMax(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
-        assertThat(Streams.streamOf("test1").async().then(new Consumer<ResultChannel<String>>() {
-
-            public void accept(final ResultChannel<String> resultChannel) {
-
-                resultChannel.pass("TEST2");
-            }
-        }).afterMax(seconds(3)).all()).containsOnly("TEST2");
-        assertThat(Streams.streamOf("test1").async().then(new Supplier<String>() {
-
-            public String get() {
-
-                return "TEST2";
-            }
-        }).afterMax(seconds(3)).all()).containsOnly("TEST2");
-        assertThat(Streams.streamOf("test1").async().then(3, new Supplier<String>() {
-
-            public String get() {
-
-                return "TEST2";
-            }
-        }).afterMax(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
-        assertThat(
-                Streams.streamOf("test1").parallel().then(3, new Consumer<ResultChannel<String>>() {
-
-                    public void accept(final ResultChannel<String> resultChannel) {
-
-                        resultChannel.pass("TEST2");
-                    }
-                }).afterMax(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
-        assertThat(Streams.streamOf("test1").parallel().then(3, new Supplier<String>() {
-
-            public String get() {
-
-                return "TEST2";
-            }
-        }).afterMax(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
-    }
-
-    @Test
-    public void testGenerate2() {
-
-        assertThat(Streams.streamOf("test1").sync().then((String) null).all()).containsOnly(
-                (String) null);
-        assertThat(Streams.streamOf("test1").sync().then((String[]) null).all()).isEmpty();
-        assertThat(Streams.streamOf("test1").sync().then().all()).isEmpty();
-        assertThat(Streams.streamOf("test1").sync().then((List<String>) null).all()).isEmpty();
-        assertThat(Streams.streamOf("test1")
-                          .sync()
-                          .then(Collections.<String>emptyList())
-                          .all()).isEmpty();
-        assertThat(Streams.streamOf("test1").sync().then("TEST2").all()).containsOnly("TEST2");
-        assertThat(Streams.streamOf("test1").sync().then("TEST2", "TEST2").all()).containsOnly(
-                "TEST2", "TEST2");
-        assertThat(Streams.streamOf("test1")
-                          .sync()
-                          .then(Collections.singletonList("TEST2"))
-                          .all()).containsOnly("TEST2");
-        assertThat(Streams.streamOf("test1").async().then((String) null).afterMax(seconds(1)).all())
-                .containsOnly((String) null);
-        assertThat(Streams.streamOf("test1")
-                          .async()
-                          .then((String[]) null)
-                          .afterMax(seconds(1))
-                          .all()).isEmpty();
-        assertThat(Streams.streamOf("test1").async().then().afterMax(seconds(1)).all()).isEmpty();
-        assertThat(Streams.streamOf("test1")
-                          .async()
-                          .then((List<String>) null)
-                          .afterMax(seconds(1))
-                          .all()).isEmpty();
-        assertThat(Streams.streamOf("test1")
-                          .async()
-                          .then(Collections.<String>emptyList())
-                          .afterMax(seconds(1))
-                          .all()).isEmpty();
-        assertThat(Streams.streamOf("test1")
-                          .async()
-                          .then("TEST2")
-                          .afterMax(seconds(1))
-                          .all()).containsOnly("TEST2");
-        assertThat(
-                Streams.streamOf("test1").async().then("TEST2", "TEST2").afterMax(seconds(1)).all())
-                .containsOnly("TEST2", "TEST2");
-        assertThat(Streams.streamOf("test1")
-                          .async()
-                          .then(Collections.singletonList("TEST2"))
-                          .afterMax(seconds(1))
-                          .all()).containsOnly("TEST2");
-        assertThat(
-                Streams.streamOf("test1").parallel().then((String) null).afterMax(seconds(1)).all())
-                .containsOnly((String) null);
-        assertThat(Streams.streamOf("test1")
-                          .parallel()
-                          .then((String[]) null)
-                          .afterMax(seconds(1))
-                          .all()).isEmpty();
-        assertThat(
-                Streams.streamOf("test1").parallel().then().afterMax(seconds(1)).all()).isEmpty();
-        assertThat(Streams.streamOf("test1")
-                          .parallel()
-                          .then((List<String>) null)
-                          .afterMax(seconds(1))
-                          .all()).isEmpty();
-        assertThat(Streams.streamOf("test1")
-                          .parallel()
-                          .then(Collections.<String>emptyList())
-                          .afterMax(seconds(1))
-                          .all()).isEmpty();
-        assertThat(Streams.streamOf("test1")
-                          .parallel()
-                          .then("TEST2")
-                          .afterMax(seconds(1))
-                          .all()).containsOnly("TEST2");
-        assertThat(Streams.streamOf("test1")
-                          .parallel()
-                          .then("TEST2", "TEST2")
-                          .afterMax(seconds(1))
-                          .all()).containsOnly("TEST2", "TEST2");
-        assertThat(Streams.streamOf("test1")
-                          .parallel()
-                          .then(Collections.singletonList("TEST2"))
-                          .afterMax(seconds(1))
-                          .all()).containsOnly("TEST2");
-    }
-
-    @Test
-    public void testGenerateNegativeCount() {
-
-        try {
-
-            Streams.streamOf().sync().then(-1, Functions.constant(null));
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            Streams.streamOf().async().then(0, Functions.constant(null));
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            Streams.streamOf().parallel().then(-1, Functions.constant(null));
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            Streams.streamOf().parallel().then(-1, Functions.constant(null));
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            Streams.streamOf().parallel().then(-1, Functions.sink());
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-    }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testGenerateNullPointerError() {
-
-        try {
-
-            Streams.streamOf().sync().then(3, (Consumer<ResultChannel<?>>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.streamOf().sync().then((Consumer<ResultChannel<?>>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.streamOf().sync().then(3, (Supplier<?>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.streamOf().sync().then((Supplier<?>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.streamOf().async().then(3, (Consumer<ResultChannel<?>>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.streamOf().async().then((Consumer<ResultChannel<?>>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.streamOf().async().then((Supplier<?>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.streamOf().async().then(3, (Supplier<?>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.streamOf().parallel().then(3, (Supplier<?>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.streamOf().parallel().then(3, (Consumer<ResultChannel<?>>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
     }
 
     @Test
@@ -1691,6 +1383,314 @@ public class StreamChannelTest {
         } catch (final RoutineException e) {
 
             assertThat(e.getCause()).isExactlyInstanceOf(NullPointerException.class);
+        }
+    }
+
+    @Test
+    public void testThen() {
+
+        assertThat(Streams.streamOf("test1").sync().then(new Consumer<ResultChannel<String>>() {
+
+            public void accept(final ResultChannel<String> resultChannel) {
+
+                resultChannel.pass("TEST2");
+            }
+        }).all()).containsOnly("TEST2");
+        assertThat(Streams.streamOf("test1").sync().then(new Supplier<String>() {
+
+            public String get() {
+
+                return "TEST2";
+            }
+        }).all()).containsOnly("TEST2");
+        assertThat(Streams.streamOf("test1").sync().then(3, new Supplier<String>() {
+
+            public String get() {
+
+                return "TEST2";
+            }
+        }).afterMax(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
+        assertThat(Streams.streamOf("test1").async().then(new Consumer<ResultChannel<String>>() {
+
+            public void accept(final ResultChannel<String> resultChannel) {
+
+                resultChannel.pass("TEST2");
+            }
+        }).afterMax(seconds(3)).all()).containsOnly("TEST2");
+        assertThat(Streams.streamOf("test1").async().then(new Supplier<String>() {
+
+            public String get() {
+
+                return "TEST2";
+            }
+        }).afterMax(seconds(3)).all()).containsOnly("TEST2");
+        assertThat(Streams.streamOf("test1").async().then(3, new Supplier<String>() {
+
+            public String get() {
+
+                return "TEST2";
+            }
+        }).afterMax(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
+        assertThat(
+                Streams.streamOf("test1").parallel().then(3, new Consumer<ResultChannel<String>>() {
+
+                    public void accept(final ResultChannel<String> resultChannel) {
+
+                        resultChannel.pass("TEST2");
+                    }
+                }).afterMax(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
+        assertThat(Streams.streamOf("test1").parallel().then(3, new Supplier<String>() {
+
+            public String get() {
+
+                return "TEST2";
+            }
+        }).afterMax(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
+    }
+
+    @Test
+    public void testThen2() {
+
+        assertThat(Streams.streamOf("test1").sync().then((String) null).all()).containsOnly(
+                (String) null);
+        assertThat(Streams.streamOf("test1").sync().then((String[]) null).all()).isEmpty();
+        assertThat(Streams.streamOf("test1").sync().then().all()).isEmpty();
+        assertThat(Streams.streamOf("test1").sync().then((List<String>) null).all()).isEmpty();
+        assertThat(Streams.streamOf("test1")
+                          .sync()
+                          .then(Collections.<String>emptyList())
+                          .all()).isEmpty();
+        assertThat(Streams.streamOf("test1").sync().then("TEST2").all()).containsOnly("TEST2");
+        assertThat(Streams.streamOf("test1").sync().then("TEST2", "TEST2").all()).containsOnly(
+                "TEST2", "TEST2");
+        assertThat(Streams.streamOf("test1")
+                          .sync()
+                          .then(Collections.singletonList("TEST2"))
+                          .all()).containsOnly("TEST2");
+        assertThat(Streams.streamOf("test1").async().then((String) null).afterMax(seconds(1)).all())
+                .containsOnly((String) null);
+        assertThat(Streams.streamOf("test1")
+                          .async()
+                          .then((String[]) null)
+                          .afterMax(seconds(1))
+                          .all()).isEmpty();
+        assertThat(Streams.streamOf("test1").async().then().afterMax(seconds(1)).all()).isEmpty();
+        assertThat(Streams.streamOf("test1")
+                          .async()
+                          .then((List<String>) null)
+                          .afterMax(seconds(1))
+                          .all()).isEmpty();
+        assertThat(Streams.streamOf("test1")
+                          .async()
+                          .then(Collections.<String>emptyList())
+                          .afterMax(seconds(1))
+                          .all()).isEmpty();
+        assertThat(Streams.streamOf("test1")
+                          .async()
+                          .then("TEST2")
+                          .afterMax(seconds(1))
+                          .all()).containsOnly("TEST2");
+        assertThat(
+                Streams.streamOf("test1").async().then("TEST2", "TEST2").afterMax(seconds(1)).all())
+                .containsOnly("TEST2", "TEST2");
+        assertThat(Streams.streamOf("test1")
+                          .async()
+                          .then(Collections.singletonList("TEST2"))
+                          .afterMax(seconds(1))
+                          .all()).containsOnly("TEST2");
+        assertThat(
+                Streams.streamOf("test1").parallel().then((String) null).afterMax(seconds(1)).all())
+                .containsOnly((String) null);
+        assertThat(Streams.streamOf("test1")
+                          .parallel()
+                          .then((String[]) null)
+                          .afterMax(seconds(1))
+                          .all()).isEmpty();
+        assertThat(
+                Streams.streamOf("test1").parallel().then().afterMax(seconds(1)).all()).isEmpty();
+        assertThat(Streams.streamOf("test1")
+                          .parallel()
+                          .then((List<String>) null)
+                          .afterMax(seconds(1))
+                          .all()).isEmpty();
+        assertThat(Streams.streamOf("test1")
+                          .parallel()
+                          .then(Collections.<String>emptyList())
+                          .afterMax(seconds(1))
+                          .all()).isEmpty();
+        assertThat(Streams.streamOf("test1")
+                          .parallel()
+                          .then("TEST2")
+                          .afterMax(seconds(1))
+                          .all()).containsOnly("TEST2");
+        assertThat(Streams.streamOf("test1")
+                          .parallel()
+                          .then("TEST2", "TEST2")
+                          .afterMax(seconds(1))
+                          .all()).containsOnly("TEST2", "TEST2");
+        assertThat(Streams.streamOf("test1")
+                          .parallel()
+                          .then(Collections.singletonList("TEST2"))
+                          .afterMax(seconds(1))
+                          .all()).containsOnly("TEST2");
+    }
+
+    @Test
+    public void testThenNegativeCount() {
+
+        try {
+
+            Streams.streamOf().sync().then(-1, Functions.constant(null));
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().async().then(0, Functions.constant(null));
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().parallel().then(-1, Functions.constant(null));
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().parallel().then(-1, Functions.constant(null));
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().parallel().then(-1, Functions.sink());
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testThenNullPointerError() {
+
+        try {
+
+            Streams.streamOf().sync().then(3, (Consumer<ResultChannel<?>>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().sync().then((Consumer<ResultChannel<?>>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().sync().then(3, (Supplier<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().sync().then((Supplier<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().async().then(3, (Consumer<ResultChannel<?>>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().async().then((Consumer<ResultChannel<?>>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().async().then((Supplier<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().async().then(3, (Supplier<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().parallel().then(3, (Supplier<?>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().parallel().then(3, (Consumer<ResultChannel<?>>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
         }
     }
 

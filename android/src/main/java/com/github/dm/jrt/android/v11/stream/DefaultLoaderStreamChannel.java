@@ -285,25 +285,6 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannel<AFTER> collect(
-            @NotNull final BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
-                    consumer) {
-
-        checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannel<AFTER>) super.collect(consumer);
-    }
-
-    @NotNull
-    @Override
-    public <AFTER> LoaderStreamChannel<AFTER> collect(
-            @NotNull final Function<? super List<? extends OUT>, ? extends AFTER> function) {
-
-        checkStatic(wrap(function), function);
-        return (LoaderStreamChannel<AFTER>) super.collect(function);
-    }
-
-    @NotNull
-    @Override
     public LoaderStreamChannel<Void> consume(@NotNull final Consumer<? super OUT> consumer) {
 
         checkStatic(wrap(consumer), consumer);
@@ -351,10 +332,10 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
     public <AFTER> LoaderStreamChannel<AFTER> map(
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
 
-        if (!Reflection.hasStaticContext(factory)) {
+        if (!Reflection.hasStaticScope(factory)) {
             throw new IllegalArgumentException(
-                    "the factory instance does not have a static context: " + factory.getClass()
-                                                                                     .getName());
+                    "the factory instance does not have a static scope: " + factory.getClass()
+                                                                                   .getName());
         }
 
         return (LoaderStreamChannel<AFTER>) super.map(factory);
@@ -366,6 +347,25 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
             @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
 
         return (LoaderStreamChannel<AFTER>) super.map(routine);
+    }
+
+    @NotNull
+    @Override
+    public <AFTER> LoaderStreamChannel<AFTER> mapAll(
+            @NotNull final BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
+                    consumer) {
+
+        checkStatic(wrap(consumer), consumer);
+        return (LoaderStreamChannel<AFTER>) super.mapAll(consumer);
+    }
+
+    @NotNull
+    @Override
+    public <AFTER> LoaderStreamChannel<AFTER> mapAll(
+            @NotNull final Function<? super List<? extends OUT>, ? extends AFTER> function) {
+
+        checkStatic(wrap(function), function);
+        return (LoaderStreamChannel<AFTER>) super.mapAll(function);
     }
 
     @NotNull
@@ -390,32 +390,6 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
 
         super.parallel();
         return this;
-    }
-
-    @NotNull
-    @Override
-    public <AFTER extends Comparable<AFTER>> LoaderStreamChannel<AFTER> range(
-            @NotNull final AFTER start, @NotNull final AFTER end,
-            @NotNull final Function<AFTER, AFTER> increment) {
-
-        checkStatic(wrap(increment), increment);
-        return (LoaderStreamChannel<AFTER>) super.range(start, end, increment);
-    }
-
-    @NotNull
-    @Override
-    public LoaderStreamChannel<Number> range(@NotNull final Number start,
-            @NotNull final Number end) {
-
-        return (LoaderStreamChannel<Number>) super.range(start, end);
-    }
-
-    @NotNull
-    @Override
-    public LoaderStreamChannel<Number> range(@NotNull final Number start, @NotNull final Number end,
-            @NotNull final Number increment) {
-
-        return (LoaderStreamChannel<Number>) super.range(start, end, increment);
     }
 
     @NotNull
@@ -641,10 +615,10 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
 
     private void checkStatic(@NotNull final Wrapper wrapper, @NotNull final Object function) {
 
-        if (!wrapper.hasStaticContext()) {
+        if (!wrapper.hasStaticScope()) {
             throw new IllegalArgumentException(
-                    "the function instance does not have a static context: " + function.getClass()
-                                                                                       .getName());
+                    "the function instance does not have a static scope: " + function.getClass()
+                                                                                     .getName());
         }
     }
 

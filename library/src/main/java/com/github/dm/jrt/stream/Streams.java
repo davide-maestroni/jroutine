@@ -27,6 +27,7 @@ import com.github.dm.jrt.core.Channels.Selectable;
 import com.github.dm.jrt.core.JRoutine;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiConsumerWrapper;
+import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.FunctionWrapper;
 import com.github.dm.jrt.function.Functions;
@@ -503,6 +504,62 @@ public class Streams extends Functions {
     }
 
     /**
+     * Returns a consumer generating the specified range of data.<br/>
+     * The generated data will start from the specified first one up to and including the specified
+     * last one, by computing each next element through the specified function.
+     *
+     * @param start     the first element of the range.
+     * @param end       the last element of the range.
+     * @param increment the function incrementing the current element.
+     * @param <AFTER>   the concatenation output type.
+     * @return the consumer instance.
+     */
+    @NotNull
+    public static <AFTER extends Comparable<AFTER>> Consumer<? super ResultChannel<AFTER>> range(
+            @NotNull final AFTER start, @NotNull final AFTER end,
+            @NotNull final Function<AFTER, AFTER> increment) {
+
+        return new RangeConsumer<AFTER>(start, end, wrap(increment));
+    }
+
+    /**
+     * Returns a consumer generating the specified range of data.<br/>
+     * The stream will generate a range of numbers up to and including the {@code end} element, by
+     * applying a default increment of {@code +1} or {@code -1} depending on the comparison between
+     * the first and the last element. That is, if the first element is less than the last, the
+     * increment will be {@code +1}. On the contrary, if the former is greater than the latter, the
+     * increment will be {@code -1}.
+     *
+     * @param start the first element of the range.
+     * @param end   the last element of the range.
+     * @return the consumer instance.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static RangeConsumer<? extends Number> range(@NotNull final Number start,
+            @NotNull final Number end) {
+
+        return numberRange(start, end);
+    }
+
+    /**
+     * Returns a consumer generating the specified range of data.<br/>
+     * The stream will generate a range of numbers by applying the specified increment up to and
+     * including the {@code end} element.
+     *
+     * @param start     the first element of the range.
+     * @param end       the last element of the range.
+     * @param increment the increment to apply to the current element.
+     * @return the consumer instance.
+     */
+    @NotNull
+    public static RangeConsumer<? extends Number> range(@NotNull final Number start,
+            @NotNull final Number end, @NotNull final Number increment) {
+
+        return numberRange(start, end, increment);
+    }
+
+    /**
      * Returns a new stream repeating the output data to any newly bound channel or consumer, thus
      * effectively supporting binding of several output consumers.<br/>
      * Note that the passed channels will be bound as a result of the call.
@@ -637,6 +694,171 @@ public class Streams extends Functions {
     public static <OUT> BiConsumerWrapper<Iterable<OUT>, InputChannel<OUT>> unfold() {
 
         return (BiConsumerWrapper<Iterable<OUT>, InputChannel<OUT>>) sUnfold;
+    }
+
+    @NotNull
+    private static RangeConsumer<? extends Number> numberRange(@NotNull final Number start,
+            @NotNull final Number end) {
+
+        if ((start instanceof Double) || (end instanceof Double)) {
+            final double startValue = start.doubleValue();
+            final double endValue = end.doubleValue();
+            return numberRange(start, end, (startValue <= endValue) ? 1 : -1);
+
+        } else if ((start instanceof Float) || (end instanceof Float)) {
+            final float startValue = start.floatValue();
+            final float endValue = end.floatValue();
+            return numberRange(start, end, (startValue <= endValue) ? 1 : -1);
+
+        } else if ((start instanceof Long) || (end instanceof Long)) {
+            final long startValue = start.longValue();
+            final long endValue = end.longValue();
+            return numberRange(start, end, (startValue <= endValue) ? 1 : -1);
+
+        } else if ((start instanceof Integer) || (end instanceof Integer)) {
+            final int startValue = start.intValue();
+            final int endValue = end.intValue();
+            return numberRange(start, end, (startValue <= endValue) ? 1 : -1);
+
+        } else if ((start instanceof Short) || (end instanceof Short)) {
+            final short startValue = start.shortValue();
+            final short endValue = end.shortValue();
+            return numberRange(start, end, (short) ((startValue <= endValue) ? 1 : -1));
+
+        } else if ((start instanceof Byte) || (end instanceof Byte)) {
+            final byte startValue = start.byteValue();
+            final byte endValue = end.byteValue();
+            return numberRange(start, end, (byte) ((startValue <= endValue) ? 1 : -1));
+        }
+
+        throw new IllegalArgumentException(
+                "unsupported Number class: [" + start.getClass().getCanonicalName() + ", "
+                        + end.getClass().getCanonicalName() + "]");
+    }
+
+    @NotNull
+    private static RangeConsumer<? extends Number> numberRange(@NotNull final Number start,
+            @NotNull final Number end, @NotNull final Number increment) {
+
+        if ((start instanceof Double) || (end instanceof Double) || (increment instanceof Double)) {
+            final double startValue = start.doubleValue();
+            final double endValue = end.doubleValue();
+            final double incValue = increment.doubleValue();
+            return new RangeConsumer<Double>(startValue, endValue, new DoubleInc(incValue));
+
+        } else if ((start instanceof Float) || (end instanceof Float)
+                || (increment instanceof Float)) {
+            final float startValue = start.floatValue();
+            final float endValue = end.floatValue();
+            final float incValue = increment.floatValue();
+            return new RangeConsumer<Float>(startValue, endValue, new FloatInc(incValue));
+
+        } else if ((start instanceof Long) || (end instanceof Long)
+                || (increment instanceof Long)) {
+            final long startValue = start.longValue();
+            final long endValue = end.longValue();
+            final long incValue = increment.longValue();
+            return new RangeConsumer<Long>(startValue, endValue, new LongInc(incValue));
+
+        } else if ((start instanceof Integer) || (end instanceof Integer)
+                || (increment instanceof Integer)) {
+            final int startValue = start.intValue();
+            final int endValue = end.intValue();
+            final int incValue = increment.intValue();
+            return new RangeConsumer<Integer>(startValue, endValue, new IntegerInc(incValue));
+
+        } else if ((start instanceof Short) || (end instanceof Short)
+                || (increment instanceof Short)) {
+            final short startValue = start.shortValue();
+            final short endValue = end.shortValue();
+            final short incValue = increment.shortValue();
+            return new RangeConsumer<Short>(startValue, endValue, new ShortInc(incValue));
+
+        } else if ((start instanceof Byte) || (end instanceof Byte)
+                || (increment instanceof Byte)) {
+            final byte startValue = start.byteValue();
+            final byte endValue = end.byteValue();
+            final byte incValue = increment.byteValue();
+            return new RangeConsumer<Byte>(startValue, endValue, new ByteInc(incValue));
+        }
+
+        throw new IllegalArgumentException(
+                "unsupported Number class: [" + start.getClass().getCanonicalName() + ", "
+                        + end.getClass().getCanonicalName() + ", " + increment.getClass()
+                                                                              .getCanonicalName()
+                        + "]");
+    }
+
+    /**
+     * Function incrementing a short of a specific value.
+     */
+    private static class ByteInc extends NumberInc<Byte> {
+
+        private final byte mIncValue;
+
+        /**
+         * Constructor.
+         *
+         * @param incValue the incrementation value.
+         */
+        private ByteInc(final byte incValue) {
+
+            super(incValue);
+            mIncValue = incValue;
+        }
+
+        public Byte apply(final Byte aByte) {
+
+            return (byte) (aByte + mIncValue);
+        }
+    }
+
+    /**
+     * Function incrementing a double of a specific value.
+     */
+    private static class DoubleInc extends NumberInc<Double> {
+
+        private final double mIncValue;
+
+        /**
+         * Constructor.
+         *
+         * @param incValue the incrementation value.
+         */
+        private DoubleInc(final double incValue) {
+
+            super(incValue);
+            mIncValue = incValue;
+        }
+
+        public Double apply(final Double aDouble) {
+
+            return aDouble + mIncValue;
+        }
+    }
+
+    /**
+     * Function incrementing a float of a specific value.
+     */
+    private static class FloatInc extends NumberInc<Float> {
+
+        private final float mIncValue;
+
+        /**
+         * Constructor.
+         *
+         * @param incValue the incrementation value.
+         */
+        private FloatInc(final float incValue) {
+
+            super(incValue);
+            mIncValue = incValue;
+        }
+
+        public Float apply(final Float aFloat) {
+
+            return aFloat + mIncValue;
+        }
     }
 
     /**
@@ -778,6 +1000,30 @@ public class Streams extends Functions {
     }
 
     /**
+     * Function incrementing an integer of a specific value.
+     */
+    private static class IntegerInc extends NumberInc<Integer> {
+
+        private final int mIncValue;
+
+        /**
+         * Constructor.
+         *
+         * @param incValue the incrementation value.
+         */
+        private IntegerInc(final int incValue) {
+
+            super(incValue);
+            mIncValue = incValue;
+        }
+
+        public Integer apply(final Integer integer) {
+
+            return integer + mIncValue;
+        }
+    }
+
+    /**
      * Routine invocation passing only the first {@code count} input data.
      *
      * @param <DATA> the data type.
@@ -845,6 +1091,179 @@ public class Streams extends Functions {
         public Invocation<DATA, DATA> newInvocation() {
 
             return new LimitInvocation<DATA>(mCount);
+        }
+    }
+
+    /**
+     * Function incrementing a long of a specific value.
+     */
+    private static class LongInc extends NumberInc<Long> {
+
+        private final long mIncValue;
+
+        /**
+         * Constructor.
+         *
+         * @param incValue the incrementation value.
+         */
+        private LongInc(final long incValue) {
+
+            super(incValue);
+            mIncValue = incValue;
+        }
+
+        public Long apply(final Long aLong) {
+
+            return aLong + mIncValue;
+        }
+    }
+
+    /**
+     * Base abstract function incrementing a number of a specific value.<br/>
+     * It provides an implementation for {@code equals()} and {@code hashCode()} methods.
+     */
+    private static abstract class NumberInc<N extends Number> implements Function<N, N> {
+
+        private final N mIncValue;
+
+        /**
+         * Constructor.
+         *
+         * @param incValue the incrementation value.
+         */
+        private NumberInc(@NotNull final N incValue) {
+
+            mIncValue = incValue;
+        }
+
+        @Override
+        public int hashCode() {
+
+            return mIncValue.hashCode();
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+                return true;
+            }
+
+            if (!(o instanceof NumberInc)) {
+                return false;
+            }
+
+            final NumberInc<?> numberInc = (NumberInc<?>) o;
+            return mIncValue.equals(numberInc.mIncValue);
+        }
+    }
+
+    /**
+     * Consumer implementation generating a range of data.
+     *
+     * @param <OUT> the output data type.
+     */
+    private static class RangeConsumer<OUT extends Comparable<OUT>>
+            implements Consumer<ResultChannel<OUT>> {
+
+        private final OUT mEnd;
+
+        private final Function<OUT, OUT> mIncrement;
+
+        private final OUT mStart;
+
+        /**
+         * Constructor.
+         *
+         * @param start     the first element of the range.
+         * @param end       the last element of the range.
+         * @param increment the function incrementing the current element.
+         */
+        @SuppressWarnings("ConstantConditions")
+        private RangeConsumer(@NotNull final OUT start, @NotNull final OUT end,
+                @NotNull final Function<OUT, OUT> increment) {
+
+            if (start == null) {
+                throw new NullPointerException("the start element must not be null");
+            }
+
+            if (end == null) {
+                throw new NullPointerException("the end element must not be null");
+            }
+
+            mStart = start;
+            mEnd = end;
+            mIncrement = increment;
+        }
+
+        public void accept(final ResultChannel<OUT> result) {
+
+            final OUT start = mStart;
+            final OUT end = mEnd;
+            final Function<OUT, OUT> increment = mIncrement;
+            OUT current = start;
+            if (start.compareTo(end) <= 0) {
+                while (current.compareTo(end) <= 0) {
+                    result.pass(current);
+                    current = increment.apply(current);
+                }
+
+            } else {
+                while (current.compareTo(end) >= 0) {
+                    result.pass(current);
+                    current = increment.apply(current);
+                }
+            }
+        }
+
+        @Override
+        @SuppressWarnings("EqualsBetweenInconvertibleTypes")
+        public boolean equals(final Object o) {
+
+            if (this == o) {
+                return true;
+            }
+
+            if (!(o instanceof RangeConsumer)) {
+                return false;
+            }
+
+            final RangeConsumer<?> that = (RangeConsumer<?>) o;
+            return mEnd.equals(that.mEnd) && mIncrement.equals(that.mIncrement) && mStart.equals(
+                    that.mStart);
+        }
+
+        @Override
+        public int hashCode() {
+
+            int result = mEnd.hashCode();
+            result = 31 * result + mIncrement.hashCode();
+            result = 31 * result + mStart.hashCode();
+            return result;
+        }
+    }
+
+    /**
+     * Function incrementing a short of a specific value.
+     */
+    private static class ShortInc extends NumberInc<Short> {
+
+        private final short mIncValue;
+
+        /**
+         * Constructor.
+         *
+         * @param incValue the incrementation value.
+         */
+        private ShortInc(final short incValue) {
+
+            super(incValue);
+            mIncValue = incValue;
+        }
+
+        public Short apply(final Short aShort) {
+
+            return (short) (aShort + mIncValue);
         }
     }
 

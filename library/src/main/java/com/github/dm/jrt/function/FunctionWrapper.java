@@ -181,10 +181,10 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT>, Wrapper {
         return new FunctionWrapper<BEFORE, OUT>(newFunctions);
     }
 
-    public boolean hasStaticContext() {
+    public boolean hasStaticScope() {
 
         for (final Function<?, ?> function : mFunctions) {
-            if (!Reflection.hasStaticContext(function)) {
+            if (!Reflection.hasStaticScope(function)) {
                 return false;
             }
         }

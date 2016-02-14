@@ -95,9 +95,9 @@ public class SupplierWrapper<OUT> implements Supplier<OUT>, Wrapper {
         return ((Function<Object, OUT>) mFunction).apply(mSupplier.get());
     }
 
-    public boolean hasStaticContext() {
+    public boolean hasStaticScope() {
 
-        return Reflection.hasStaticContext(mSupplier) && mFunction.hasStaticContext();
+        return Reflection.hasStaticScope(mSupplier) && mFunction.hasStaticScope();
     }
 
     @Override

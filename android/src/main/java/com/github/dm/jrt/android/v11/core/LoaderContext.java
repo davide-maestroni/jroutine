@@ -75,6 +75,8 @@ public abstract class LoaderContext {
      * @param activity the activity instance.
      * @param context  the context used to get the application one.
      * @return the loader context.
+     * @throws java.lang.IllegalArgumentException if the class of the specified context has not a
+     *                                            static scope.
      */
     @NotNull
     public static LoaderContext loaderFrom(@NotNull final Activity activity,
@@ -110,6 +112,8 @@ public abstract class LoaderContext {
      * @param fragment the fragment instance.
      * @param context  the context used to get the application one.
      * @return the loader context.
+     * @throws java.lang.IllegalArgumentException if the class of the specified context has not a
+     *                                            static scope.
      */
     @NotNull
     public static LoaderContext loaderFrom(@NotNull final Fragment fragment,
@@ -293,6 +297,8 @@ public abstract class LoaderContext {
          *
          * @param activity the wrapped activity.
          * @param context  the wrapped context.
+         * @throws java.lang.IllegalArgumentException if the class of the specified context has not
+         *                                            a static scope.
          */
         @SuppressWarnings("ConstantConditions")
         private WrappedActivityContext(@NotNull final Activity activity,
@@ -300,9 +306,9 @@ public abstract class LoaderContext {
 
             super(activity);
             final Class<? extends Context> contextClass = context.getClass();
-            if (!Reflection.hasStaticContext(contextClass)) {
+            if (!Reflection.hasStaticScope(contextClass)) {
                 throw new IllegalArgumentException(
-                        "the context class must have a static context: " + contextClass.getName());
+                        "the context class must have a static scope: " + contextClass.getName());
             }
 
             mContext = new WeakReference<Context>(context);
@@ -357,6 +363,8 @@ public abstract class LoaderContext {
          *
          * @param fragment the wrapped fragment.
          * @param context  the wrapped context.
+         * @throws java.lang.IllegalArgumentException if the class of the specified context has not
+         *                                            a static scope.
          */
         @SuppressWarnings("ConstantConditions")
         private WrappedFragmentContext(@NotNull final Fragment fragment,
@@ -364,9 +372,9 @@ public abstract class LoaderContext {
 
             super(fragment);
             final Class<? extends Context> contextClass = context.getClass();
-            if (!Reflection.hasStaticContext(contextClass)) {
+            if (!Reflection.hasStaticScope(contextClass)) {
                 throw new IllegalArgumentException(
-                        "the context class must have a static context: " + contextClass.getName());
+                        "the context class must have a static scope: " + contextClass.getName());
             }
 
             mContext = new WeakReference<Context>(context);

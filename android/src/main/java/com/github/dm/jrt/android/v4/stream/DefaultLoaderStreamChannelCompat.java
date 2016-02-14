@@ -183,10 +183,10 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
     private static void checkStatic(@NotNull final Wrapper wrapper,
             @NotNull final Object function) {
 
-        if (!wrapper.hasStaticContext()) {
+        if (!wrapper.hasStaticScope()) {
             throw new IllegalArgumentException(
-                    "the function instance does not have a static context: " + function.getClass()
-                                                                                       .getName());
+                    "the function instance does not have a static scope: " + function.getClass()
+                                                                                     .getName());
         }
     }
 
@@ -300,25 +300,6 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannelCompat<AFTER> collect(
-            @NotNull final BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
-                    consumer) {
-
-        checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannelCompat<AFTER>) super.collect(consumer);
-    }
-
-    @NotNull
-    @Override
-    public <AFTER> LoaderStreamChannelCompat<AFTER> collect(
-            @NotNull final Function<? super List<? extends OUT>, ? extends AFTER> function) {
-
-        checkStatic(wrap(function), function);
-        return (LoaderStreamChannelCompat<AFTER>) super.collect(function);
-    }
-
-    @NotNull
-    @Override
     public LoaderStreamChannelCompat<Void> consume(@NotNull final Consumer<? super OUT> consumer) {
 
         checkStatic(wrap(consumer), consumer);
@@ -366,10 +347,10 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
     public <AFTER> LoaderStreamChannelCompat<AFTER> map(
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
 
-        if (!Reflection.hasStaticContext(factory)) {
+        if (!Reflection.hasStaticScope(factory)) {
             throw new IllegalArgumentException(
-                    "the factory instance does not have a static context: " + factory.getClass()
-                                                                                     .getName());
+                    "the factory instance does not have a static scope: " + factory.getClass()
+                                                                                   .getName());
         }
 
         return (LoaderStreamChannelCompat<AFTER>) super.map(factory);
@@ -381,6 +362,25 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
             @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
 
         return (LoaderStreamChannelCompat<AFTER>) super.map(routine);
+    }
+
+    @NotNull
+    @Override
+    public <AFTER> LoaderStreamChannelCompat<AFTER> mapAll(
+            @NotNull final BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
+                    consumer) {
+
+        checkStatic(wrap(consumer), consumer);
+        return (LoaderStreamChannelCompat<AFTER>) super.mapAll(consumer);
+    }
+
+    @NotNull
+    @Override
+    public <AFTER> LoaderStreamChannelCompat<AFTER> mapAll(
+            @NotNull final Function<? super List<? extends OUT>, ? extends AFTER> function) {
+
+        checkStatic(wrap(function), function);
+        return (LoaderStreamChannelCompat<AFTER>) super.mapAll(function);
     }
 
     @NotNull
@@ -405,32 +405,6 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
 
         super.parallel();
         return this;
-    }
-
-    @NotNull
-    @Override
-    public <AFTER extends Comparable<AFTER>> LoaderStreamChannelCompat<AFTER> range(
-            @NotNull final AFTER start, @NotNull final AFTER end,
-            @NotNull final Function<AFTER, AFTER> increment) {
-
-        checkStatic(wrap(increment), increment);
-        return (LoaderStreamChannelCompat<AFTER>) super.range(start, end, increment);
-    }
-
-    @NotNull
-    @Override
-    public LoaderStreamChannelCompat<Number> range(@NotNull final Number start,
-            @NotNull final Number end) {
-
-        return (LoaderStreamChannelCompat<Number>) super.range(start, end);
-    }
-
-    @NotNull
-    @Override
-    public LoaderStreamChannelCompat<Number> range(@NotNull final Number start,
-            @NotNull final Number end, @NotNull final Number increment) {
-
-        return (LoaderStreamChannelCompat<Number>) super.range(start, end, increment);
     }
 
     @NotNull

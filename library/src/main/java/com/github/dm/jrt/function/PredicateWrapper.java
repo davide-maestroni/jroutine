@@ -240,10 +240,10 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
         return new PredicateWrapper<IN>(new AndPredicate<IN>(mPredicate, other), newPredicates);
     }
 
-    public boolean hasStaticContext() {
+    public boolean hasStaticScope() {
 
         for (final Predicate<?> predicate : mPredicates) {
-            if (!Reflection.hasStaticContext(predicate)) {
+            if (!Reflection.hasStaticScope(predicate)) {
                 return false;
             }
         }

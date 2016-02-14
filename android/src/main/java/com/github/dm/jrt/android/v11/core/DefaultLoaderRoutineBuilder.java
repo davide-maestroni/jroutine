@@ -64,8 +64,8 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
      *
      * @param context the routine context.
      * @param factory the invocation factory.
-     * @throws java.lang.IllegalArgumentException if the class of the specified factory is not
-     *                                            static.
+     * @throws java.lang.IllegalArgumentException if the class of the specified factory has not a
+     *                                            static scope.
      */
     @SuppressWarnings("ConstantConditions")
     DefaultLoaderRoutineBuilder(@NotNull final LoaderContext context,
@@ -76,9 +76,9 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
         }
 
         final Class<? extends FunctionContextInvocationFactory> factoryClass = factory.getClass();
-        if (!Reflection.hasStaticContext(factoryClass)) {
+        if (!Reflection.hasStaticScope(factoryClass)) {
             throw new IllegalArgumentException(
-                    "the factory class must have a static context: " + factoryClass.getName());
+                    "the factory class must have a static scope: " + factoryClass.getName());
         }
 
         mContext = context;

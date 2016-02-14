@@ -24,9 +24,9 @@ package com.github.dm.jrt.function;
 public interface Wrapper {
 
     /**
-     * Checks if the classes of the wrapped functions are static or top level.
+     * Checks if the class of the wrapped functions are static or top level.
      *
-     * @return whether this wrapper has a static context.
+     * @return whether this wrapper has a static scope.
      */
-    boolean hasStaticContext();
+    boolean hasStaticScope();
 }

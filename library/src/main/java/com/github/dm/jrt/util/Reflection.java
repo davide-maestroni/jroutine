@@ -145,22 +145,22 @@ public class Reflection {
      * Checks if the specified class is static or is a top level class.
      *
      * @param type the class.
-     * @return whether the class has a static context.
+     * @return whether the class has a static scope.
      */
-    public static boolean hasStaticContext(@NotNull final Class<?> type) {
+    public static boolean hasStaticScope(@NotNull final Class<?> type) {
 
         return ((type.getEnclosingClass() == null) || Modifier.isStatic(type.getModifiers()));
     }
 
     /**
-     * Checks if the specified instance is static or is a top level class.
+     * Checks if the class of the specified instance is static or is a top level class.
      *
      * @param instance the instance.
-     * @return whether the instance has a static context.
+     * @return whether the instance has a static scope.
      */
-    public static boolean hasStaticContext(@NotNull final Object instance) {
+    public static boolean hasStaticScope(@NotNull final Object instance) {
 
-        return hasStaticContext(instance.getClass());
+        return hasStaticScope(instance.getClass());
     }
 
     /**

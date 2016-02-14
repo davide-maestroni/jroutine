@@ -51,7 +51,7 @@ import java.util.concurrent.TimeUnit;
  * In fact, each function in the channel is backed by a routine instance, that can have its own
  * specific configuration and invocation mode.<br/>
  * In order to prevent undesired leaks, the class of the specified functions must have a static
- * context.
+ * scope.
  * <p/>
  * Note that, if at least one reduce function is part of the concatenation, the results will be
  * propagated only when the previous routine invocations complete.
@@ -147,21 +147,6 @@ public interface LoaderStreamChannelCompat<OUT>
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannelCompat<AFTER> collect(
-            @NotNull BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
-                    consumer);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    <AFTER> LoaderStreamChannelCompat<AFTER> collect(
-            @NotNull Function<? super List<? extends OUT>, ? extends AFTER> function);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
     LoaderStreamChannelCompat<Void> consume(@NotNull Consumer<? super OUT> consumer);
 
     /**
@@ -209,6 +194,21 @@ public interface LoaderStreamChannelCompat<OUT>
      * {@inheritDoc}
      */
     @NotNull
+    <AFTER> LoaderStreamChannelCompat<AFTER> mapAll(
+            @NotNull BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
+                    consumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    <AFTER> LoaderStreamChannelCompat<AFTER> mapAll(
+            @NotNull Function<? super List<? extends OUT>, ? extends AFTER> function);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
     LoaderStreamChannelCompat<OUT> maxParallelInvocations(int maxInvocations);
 
     /**
@@ -222,26 +222,6 @@ public interface LoaderStreamChannelCompat<OUT>
      */
     @NotNull
     LoaderStreamChannelCompat<OUT> parallel();
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    <AFTER extends Comparable<AFTER>> LoaderStreamChannelCompat<AFTER> range(@NotNull AFTER start,
-            @NotNull AFTER end, @NotNull Function<AFTER, AFTER> increment);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    LoaderStreamChannelCompat<Number> range(@NotNull Number start, @NotNull Number end);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    LoaderStreamChannelCompat<Number> range(@NotNull Number start, @NotNull Number end,
-            @NotNull Number increment);
 
     /**
      * {@inheritDoc}

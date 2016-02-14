@@ -166,38 +166,9 @@ public interface StreamChannel<OUT>
     StreamChannel<OUT> backPressureOn(@Nullable Runner runner, int maxInputs,
             @Nullable TimeDuration maxDelay);
 
-    /**
-     * Concatenates a stream based on the specified collecting consumer to this one.<br/>
-     * The outputs will be collected by applying the function, only when the previous routine
-     * invocations complete.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration.<br/>
-     * Note also that this stream will be bound as a result of the call.
-     *
-     * @param consumer the bi-consumer instance.
-     * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream.
-     */
-    @NotNull
-    <AFTER> StreamChannel<AFTER> collect(
-            @NotNull BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
-                    consumer);
-
-    /**
-     * Concatenates a stream based on the specified collecting function to this one.<br/>
-     * The outputs will be collected by applying the function, only when the previous routine
-     * invocations complete.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration.<br/>
-     * Note also that this stream will be bound as a result of the call.
-     *
-     * @param function the function instance.
-     * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream.
-     */
-    @NotNull
-    <AFTER> StreamChannel<AFTER> collect(
-            @NotNull Function<? super List<? extends OUT>, ? extends AFTER> function);
+    // TODO: 14/02/16 AFTER collect()
+    @Nullable
+    <AFTER> AFTER collect(@NotNull Function<List<? extends OUT>, AFTER> function);
 
     /**
      * Concatenates a stream based on the specified consumer to this one.<br/>
@@ -295,6 +266,37 @@ public interface StreamChannel<OUT>
     <AFTER> StreamChannel<AFTER> map(@NotNull Routine<? super OUT, ? extends AFTER> routine);
 
     /**
+     * Concatenates a stream based on the specified consumer to this one.<br/>
+     * All the outputs are collected and then passed to the consumer.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration.<br/>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param consumer the bi-consumer instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream.
+     */
+    @NotNull
+    <AFTER> StreamChannel<AFTER> mapAll(
+            @NotNull BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
+                    consumer);
+
+    /**
+     * Concatenates a stream based on the specified function to this one.<br/>
+     * All the outputs are collected and then the function will be applied to them.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration.<br/>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param function the function instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream.
+     */
+    @NotNull
+    <AFTER> StreamChannel<AFTER> mapAll(
+            @NotNull Function<? super List<? extends OUT>, ? extends AFTER> function);
+
+    /**
      * Short for {@code withInvocations().withMaxInstances(maxInvocations).set()}.<br/>
      * This method is useful to easily apply a configuration to the next routine concatenated to the
      * stream, which will limit the maximum number of concurrent invocations to the specified value.
@@ -323,62 +325,6 @@ public interface StreamChannel<OUT>
      */
     @NotNull
     StreamChannel<OUT> parallel();
-
-    /**
-     * Concatenates a stream generating the specified range of data.<br/>
-     * The generated data will start from the specified first one up to and including the specified
-     * last one, by computing each next element through the specified function.<br/>
-     * The outputs will be generated only when the previous routine invocations complete.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration.<br/>
-     * Note also that this stream will be bound as a result of the call.
-     *
-     * @param start     the first element of the range.
-     * @param end       the last element of the range.
-     * @param increment the function incrementing the current element.
-     * @param <AFTER>   the concatenation output type.
-     * @return the concatenated stream.
-     */
-    @NotNull
-    <AFTER extends Comparable<AFTER>> StreamChannel<AFTER> range(@NotNull AFTER start,
-            @NotNull AFTER end, @NotNull Function<AFTER, AFTER> increment);
-
-    /**
-     * Concatenates a stream generating the specified range of data.<br/>
-     * The stream will generate a range of numbers up to and including the {@code end} element, by
-     * applying a default increment of {@code +1} or {@code -1} depending on the comparison between
-     * the first and the last element. That is, if the first element is less than the last, the
-     * increment will be {@code +1}. On the contrary, if the former is greater than the latter, the
-     * increment will be {@code -1}.<br/>
-     * The outputs will be generated only when the previous routine invocations complete.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration.<br/>
-     * Note also that this stream will be bound as a result of the call.
-     *
-     * @param start the first element of the range.
-     * @param end   the last element of the range.
-     * @return the concatenated stream.
-     */
-    @NotNull
-    StreamChannel<Number> range(@NotNull Number start, @NotNull Number end);
-
-    /**
-     * Concatenates a stream generating the specified range of data.<br/>
-     * The stream will generate a range of numbers by applying the specified increment up to and
-     * including the {@code end} element.<br/>
-     * The outputs will be generated only when the previous routine invocations complete.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration.<br/>
-     * Note also that this stream will be bound as a result of the call.
-     *
-     * @param start     the first element of the range.
-     * @param end       the last element of the range.
-     * @param increment the increment to apply to the current element.
-     * @return the concatenated stream.
-     */
-    @NotNull
-    StreamChannel<Number> range(@NotNull Number start, @NotNull Number end,
-            @NotNull Number increment);
 
     /**
      * Concatenates a stream based on the specified accumulating function to this one.<br/>

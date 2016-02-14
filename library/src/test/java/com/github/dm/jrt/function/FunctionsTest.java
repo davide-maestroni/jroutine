@@ -203,13 +203,13 @@ public class FunctionsTest {
     @Test
     public void testBiConsumerContext() {
 
-        assertThat(wrap(new TestBiConsumer()).hasStaticContext()).isTrue();
+        assertThat(wrap(new TestBiConsumer()).hasStaticScope()).isTrue();
         assertThat(wrap(new BiConsumer<Object, Object>() {
 
             public void accept(final Object o, final Object o2) {
 
             }
-        }).hasStaticContext()).isFalse();
+        }).hasStaticScope()).isFalse();
     }
 
     @Test
@@ -321,14 +321,14 @@ public class FunctionsTest {
     @Test
     public void testBiFunctionContext() {
 
-        assertThat(wrap(new TestBiFunction()).hasStaticContext()).isTrue();
+        assertThat(wrap(new TestBiFunction()).hasStaticScope()).isTrue();
         assertThat(wrap(new BiFunction<Object, Object, Object>() {
 
             public Object apply(final Object o, final Object o2) {
 
                 return null;
             }
-        }).hasStaticContext()).isFalse();
+        }).hasStaticScope()).isFalse();
     }
 
     @Test
@@ -609,13 +609,13 @@ public class FunctionsTest {
     @Test
     public void testConsumerContext() {
 
-        assertThat(wrap(new TestConsumer()).hasStaticContext()).isTrue();
+        assertThat(wrap(new TestConsumer()).hasStaticScope()).isTrue();
         assertThat(wrap(new Consumer<Object>() {
 
             public void accept(final Object o) {
 
             }
-        }).hasStaticContext()).isFalse();
+        }).hasStaticScope()).isFalse();
     }
 
     @Test
@@ -904,14 +904,14 @@ public class FunctionsTest {
     @Test
     public void testFunctionContext() {
 
-        assertThat(wrap(new TestFunction()).hasStaticContext()).isTrue();
+        assertThat(wrap(new TestFunction()).hasStaticScope()).isTrue();
         assertThat(wrap(new Function<Object, Object>() {
 
             public Object apply(final Object o) {
 
                 return null;
             }
-        }).hasStaticContext()).isFalse();
+        }).hasStaticScope()).isFalse();
     }
 
     @Test
@@ -1366,14 +1366,14 @@ public class FunctionsTest {
     @Test
     public void testPredicateContext() {
 
-        assertThat(wrap(new TestPredicate()).hasStaticContext()).isTrue();
+        assertThat(wrap(new TestPredicate()).hasStaticScope()).isTrue();
         assertThat(wrap(new Predicate<Object>() {
 
             public boolean test(final Object o) {
 
                 return false;
             }
-        }).hasStaticContext()).isFalse();
+        }).hasStaticScope()).isFalse();
     }
 
     @Test
@@ -1583,14 +1583,14 @@ public class FunctionsTest {
     @Test
     public void testSupplierContext() {
 
-        assertThat(wrap(new TestSupplier()).hasStaticContext()).isTrue();
+        assertThat(wrap(new TestSupplier()).hasStaticScope()).isTrue();
         assertThat(wrap(new Supplier<Object>() {
 
             public Object get() {
 
                 return null;
             }
-        }).hasStaticContext()).isFalse();
+        }).hasStaticScope()).isFalse();
     }
 
     @Test

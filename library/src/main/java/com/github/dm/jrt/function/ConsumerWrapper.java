@@ -107,10 +107,10 @@ public class ConsumerWrapper<IN> implements Consumer<IN>, Wrapper {
         return new ConsumerWrapper<IN>(newConsumers);
     }
 
-    public boolean hasStaticContext() {
+    public boolean hasStaticScope() {
 
         for (final Consumer<?> consumer : mConsumers) {
-            if (!Reflection.hasStaticContext(consumer)) {
+            if (!Reflection.hasStaticScope(consumer)) {
                 return false;
             }
         }

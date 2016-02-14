@@ -254,9 +254,9 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
         return new BiFunctionWrapper<IN1, IN2, AFTER>(mBiFunction, mFunction.andThen(after));
     }
 
-    public boolean hasStaticContext() {
+    public boolean hasStaticScope() {
 
-        return Reflection.hasStaticContext(mBiFunction) && mFunction.hasStaticContext();
+        return Reflection.hasStaticScope(mBiFunction) && mFunction.hasStaticScope();
     }
 
     @Override

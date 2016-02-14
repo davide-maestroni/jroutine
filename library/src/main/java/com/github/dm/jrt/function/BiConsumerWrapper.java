@@ -110,10 +110,10 @@ public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2>, Wrappe
         return new BiConsumerWrapper<IN1, IN2>(newConsumers);
     }
 
-    public boolean hasStaticContext() {
+    public boolean hasStaticScope() {
 
         for (final BiConsumer<?, ?> consumer : mConsumers) {
-            if (!Reflection.hasStaticContext(consumer)) {
+            if (!Reflection.hasStaticScope(consumer)) {
                 return false;
             }
         }

@@ -141,99 +141,6 @@ public abstract class AbstractStreamChannel<OUT>
         mBinder = (binder != null) ? binder : NO_OP;
     }
 
-    @NotNull
-    private static RangeInvocation<? extends Number> numberRange(@NotNull final Number start,
-            @NotNull final Number end) {
-
-        if ((start instanceof Double) || (end instanceof Double)) {
-            final double startValue = start.doubleValue();
-            final double endValue = end.doubleValue();
-            return numberRange(start, end, (startValue <= endValue) ? 1 : -1);
-
-        } else if ((start instanceof Float) || (end instanceof Float)) {
-            final float startValue = start.floatValue();
-            final float endValue = end.floatValue();
-            return numberRange(start, end, (startValue <= endValue) ? 1 : -1);
-
-        } else if ((start instanceof Long) || (end instanceof Long)) {
-            final long startValue = start.longValue();
-            final long endValue = end.longValue();
-            return numberRange(start, end, (startValue <= endValue) ? 1 : -1);
-
-        } else if ((start instanceof Integer) || (end instanceof Integer)) {
-            final int startValue = start.intValue();
-            final int endValue = end.intValue();
-            return numberRange(start, end, (startValue <= endValue) ? 1 : -1);
-
-        } else if ((start instanceof Short) || (end instanceof Short)) {
-            final short startValue = start.shortValue();
-            final short endValue = end.shortValue();
-            return numberRange(start, end, (short) ((startValue <= endValue) ? 1 : -1));
-
-        } else if ((start instanceof Byte) || (end instanceof Byte)) {
-            final byte startValue = start.byteValue();
-            final byte endValue = end.byteValue();
-            return numberRange(start, end, (byte) ((startValue <= endValue) ? 1 : -1));
-        }
-
-        throw new IllegalArgumentException(
-                "unsupported Number class: [" + start.getClass().getCanonicalName() + ", "
-                        + end.getClass().getCanonicalName() + "]");
-    }
-
-    @NotNull
-    private static RangeInvocation<? extends Number> numberRange(@NotNull final Number start,
-            @NotNull final Number end, @NotNull final Number increment) {
-
-        if ((start instanceof Double) || (end instanceof Double) || (increment instanceof Double)) {
-            final double startValue = start.doubleValue();
-            final double endValue = end.doubleValue();
-            final double incValue = increment.doubleValue();
-            return new RangeInvocation<Double>(startValue, endValue, new DoubleInc(incValue));
-
-        } else if ((start instanceof Float) || (end instanceof Float)
-                || (increment instanceof Float)) {
-            final float startValue = start.floatValue();
-            final float endValue = end.floatValue();
-            final float incValue = increment.floatValue();
-            return new RangeInvocation<Float>(startValue, endValue, new FloatInc(incValue));
-
-        } else if ((start instanceof Long) || (end instanceof Long)
-                || (increment instanceof Long)) {
-            final long startValue = start.longValue();
-            final long endValue = end.longValue();
-            final long incValue = increment.longValue();
-            return new RangeInvocation<Long>(startValue, endValue, new LongInc(incValue));
-
-        } else if ((start instanceof Integer) || (end instanceof Integer)
-                || (increment instanceof Integer)) {
-            final int startValue = start.intValue();
-            final int endValue = end.intValue();
-            final int incValue = increment.intValue();
-            return new RangeInvocation<Integer>(startValue, endValue, new IntegerInc(incValue));
-
-        } else if ((start instanceof Short) || (end instanceof Short)
-                || (increment instanceof Short)) {
-            final short startValue = start.shortValue();
-            final short endValue = end.shortValue();
-            final short incValue = increment.shortValue();
-            return new RangeInvocation<Short>(startValue, endValue, new ShortInc(incValue));
-
-        } else if ((start instanceof Byte) || (end instanceof Byte)
-                || (increment instanceof Byte)) {
-            final byte startValue = start.byteValue();
-            final byte endValue = end.byteValue();
-            final byte incValue = increment.byteValue();
-            return new RangeInvocation<Byte>(startValue, endValue, new ByteInc(incValue));
-        }
-
-        throw new IllegalArgumentException(
-                "unsupported Number class: [" + start.getClass().getCanonicalName() + ", "
-                        + end.getClass().getCanonicalName() + ", " + increment.getClass()
-                                                                              .getCanonicalName()
-                        + "]");
-    }
-
     public boolean abort() {
 
         mBinder.bind();
@@ -353,19 +260,10 @@ public abstract class AbstractStreamChannel<OUT>
                                 .set();
     }
 
-    @NotNull
-    public <AFTER> StreamChannel<AFTER> collect(
-            @NotNull final BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
-                    consumer) {
+    @Nullable
+    public <AFTER> AFTER collect(@NotNull final Function<List<? extends OUT>, AFTER> function) {
 
-        return map(consumerFactory(consumer));
-    }
-
-    @NotNull
-    public <AFTER> StreamChannel<AFTER> collect(
-            @NotNull final Function<? super List<? extends OUT>, ? extends AFTER> function) {
-
-        return map(functionFactory(function));
+        return function.apply(all());
     }
 
     @NotNull
@@ -429,6 +327,21 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
+    public <AFTER> StreamChannel<AFTER> mapAll(
+            @NotNull final BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
+                    consumer) {
+
+        return map(consumerFactory(consumer));
+    }
+
+    @NotNull
+    public <AFTER> StreamChannel<AFTER> mapAll(
+            @NotNull final Function<? super List<? extends OUT>, ? extends AFTER> function) {
+
+        return map(functionFactory(function));
+    }
+
+    @NotNull
     public StreamChannel<OUT> maxParallelInvocations(final int maxInvocations) {
 
         return withInvocations().withMaxInstances(maxInvocations).set();
@@ -445,26 +358,6 @@ public abstract class AbstractStreamChannel<OUT>
 
         mDelegationType = DelegationType.PARALLEL;
         return this;
-    }
-
-    @NotNull
-    public <AFTER extends Comparable<AFTER>> StreamChannel<AFTER> range(@NotNull final AFTER start,
-            @NotNull final AFTER end, @NotNull final Function<AFTER, AFTER> increment) {
-
-        return map(new RangeInvocation<AFTER>(start, end, wrap(increment)));
-    }
-
-    @NotNull
-    public StreamChannel<Number> range(@NotNull final Number start, @NotNull final Number end) {
-
-        return this.<Number>map(numberRange(start, end));
-    }
-
-    @NotNull
-    public StreamChannel<Number> range(@NotNull final Number start, @NotNull final Number end,
-            @NotNull final Number increment) {
-
-        return this.<Number>map(numberRange(start, end, increment));
     }
 
     @NotNull
@@ -836,13 +729,13 @@ public abstract class AbstractStreamChannel<OUT>
 
         final DelegationType delegationType = mDelegationType;
         if (delegationType == DelegationType.ASYNC) {
-            return sync().range(1, count).async().map(factory);
+            return sync().map(new LoopInvocation(count)).async().map(factory);
 
         } else if (delegationType == DelegationType.PARALLEL) {
-            return async().range(1, count).parallel().map(factory);
+            return async().map(new LoopInvocation(count)).parallel().map(factory);
         }
 
-        return range(1, count).map(factory);
+        return map(new LoopInvocation(count)).map(factory);
     }
 
     /**
@@ -922,30 +815,6 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     /**
-     * Function incrementing a short of a specific value.
-     */
-    private static class ByteInc extends NumberInc<Byte> {
-
-        private final byte mIncValue;
-
-        /**
-         * Constructor.
-         *
-         * @param incValue the incrementation value.
-         */
-        private ByteInc(final byte incValue) {
-
-            super(incValue);
-            mIncValue = incValue;
-        }
-
-        public Byte apply(final Byte aByte) {
-
-            return (byte) (aByte + mIncValue);
-        }
-    }
-
-    /**
      * Invocation implementation wrapping a consumer accepting output data.
      *
      * @param <OUT> the output data type.
@@ -968,54 +837,6 @@ public abstract class AbstractStreamChannel<OUT>
         public void onInput(final OUT input, @NotNull final ResultChannel<Void> result) {
 
             mConsumer.accept(input);
-        }
-    }
-
-    /**
-     * Function incrementing a double of a specific value.
-     */
-    private static class DoubleInc extends NumberInc<Double> {
-
-        private final double mIncValue;
-
-        /**
-         * Constructor.
-         *
-         * @param incValue the incrementation value.
-         */
-        private DoubleInc(final double incValue) {
-
-            super(incValue);
-            mIncValue = incValue;
-        }
-
-        public Double apply(final Double aDouble) {
-
-            return aDouble + mIncValue;
-        }
-    }
-
-    /**
-     * Function incrementing a float of a specific value.
-     */
-    private static class FloatInc extends NumberInc<Float> {
-
-        private final float mIncValue;
-
-        /**
-         * Constructor.
-         *
-         * @param incValue the incrementation value.
-         */
-        private FloatInc(final float incValue) {
-
-            super(incValue);
-            mIncValue = incValue;
-        }
-
-        public Float apply(final Float aFloat) {
-
-            return aFloat + mIncValue;
         }
     }
 
@@ -1151,50 +972,29 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     /**
-     * Function incrementing an integer of a specific value.
+     * Invocation factory used to call another function a specific number of times.
      */
-    private static class IntegerInc extends NumberInc<Integer> {
+    private static class LoopInvocation extends GenerateInvocation<Void> {
 
-        private final int mIncValue;
+        private final long mCount;
 
         /**
          * Constructor.
          *
-         * @param incValue the incrementation value.
+         * @param count the loop count.
          */
-        private IntegerInc(final int incValue) {
+        private LoopInvocation(final long count) {
 
-            super(incValue);
-            mIncValue = incValue;
+            super(asArgs(count));
+            mCount = count;
         }
 
-        public Integer apply(final Integer integer) {
+        public void onResult(@NotNull final ResultChannel<Void> result) {
 
-            return integer + mIncValue;
-        }
-    }
-
-    /**
-     * Function incrementing a long of a specific value.
-     */
-    private static class LongInc extends NumberInc<Long> {
-
-        private final long mIncValue;
-
-        /**
-         * Constructor.
-         *
-         * @param incValue the incrementation value.
-         */
-        private LongInc(final long incValue) {
-
-            super(incValue);
-            mIncValue = incValue;
-        }
-
-        public Long apply(final Long aLong) {
-
-            return aLong + mIncValue;
+            final long count = mCount;
+            for (long i = 0; i < count; i++) {
+                result.pass((Void) null);
+            }
         }
     }
 
@@ -1227,130 +1027,6 @@ public abstract class AbstractStreamChannel<OUT>
             if (channel != null) {
                 channel.passTo(result);
             }
-        }
-    }
-
-    /**
-     * Base abstract function incrementing a number of a specific value.<br/>
-     * It provides an implementation for {@code equals()} and {@code hashCode()} methods.
-     */
-    private static abstract class NumberInc<N extends Number> implements Function<N, N> {
-
-        private final N mIncValue;
-
-        /**
-         * Constructor.
-         *
-         * @param incValue the incrementation value.
-         */
-        private NumberInc(@NotNull final N incValue) {
-
-            mIncValue = incValue;
-        }
-
-        @Override
-        public int hashCode() {
-
-            return mIncValue.hashCode();
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof NumberInc)) {
-                return false;
-            }
-
-            final NumberInc<?> numberInc = (NumberInc<?>) o;
-            return mIncValue.equals(numberInc.mIncValue);
-        }
-    }
-
-    /**
-     * Invocation implementation generating a range of data.
-     *
-     * @param <OUT> the output data type.
-     */
-    private static class RangeInvocation<OUT extends Comparable<OUT>>
-            extends GenerateInvocation<OUT> {
-
-        private final OUT mEnd;
-
-        private final Function<OUT, OUT> mIncrement;
-
-        private final OUT mStart;
-
-        /**
-         * Constructor.
-         *
-         * @param start     the first element of the range.
-         * @param end       the last element of the range.
-         * @param increment the function incrementing the current element.
-         */
-        @SuppressWarnings("ConstantConditions")
-        private RangeInvocation(@NotNull final OUT start, @NotNull final OUT end,
-                @NotNull final Function<OUT, OUT> increment) {
-
-            super(asArgs(start, end, increment));
-            if (start == null) {
-                throw new NullPointerException("the start element must not be null");
-            }
-
-            if (end == null) {
-                throw new NullPointerException("the end element must not be null");
-            }
-
-            mStart = start;
-            mEnd = end;
-            mIncrement = increment;
-        }
-
-        public void onResult(@NotNull final ResultChannel<OUT> result) {
-
-            final OUT start = mStart;
-            final OUT end = mEnd;
-            final Function<OUT, OUT> increment = mIncrement;
-            OUT current = start;
-            if (start.compareTo(end) <= 0) {
-                while (current.compareTo(end) <= 0) {
-                    result.pass(current);
-                    current = increment.apply(current);
-                }
-
-            } else {
-                while (current.compareTo(end) >= 0) {
-                    result.pass(current);
-                    current = increment.apply(current);
-                }
-            }
-        }
-    }
-
-    /**
-     * Function incrementing a short of a specific value.
-     */
-    private static class ShortInc extends NumberInc<Short> {
-
-        private final short mIncValue;
-
-        /**
-         * Constructor.
-         *
-         * @param incValue the incrementation value.
-         */
-        private ShortInc(final short incValue) {
-
-            super(incValue);
-            mIncValue = incValue;
-        }
-
-        public Short apply(final Short aShort) {
-
-            return (short) (aShort + mIncValue);
         }
     }
 

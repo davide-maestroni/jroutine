@@ -48,6 +48,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.github.dm.jrt.function.Functions.wrap;
 import static com.github.dm.jrt.invocation.Invocations.factoryOf;
 import static com.github.dm.jrt.stream.Streams.range;
 import static com.github.dm.jrt.util.TimeDuration.millis;
@@ -1735,13 +1736,14 @@ public class StreamsTest {
     @Test
     public void testUnfoldEquals() {
 
-        final BiConsumerWrapper<Iterable<Object>, InputChannel<Object>> consumer = Streams.unfold();
+        final BiConsumerWrapper<Iterable<Object>, InputChannel<Object>> consumer =
+                wrap(Streams.unfold());
         assertThat(consumer).isEqualTo(consumer);
         assertThat(consumer).isNotEqualTo(null);
         assertThat(consumer).isNotEqualTo("test");
         assertThat(consumer).isNotEqualTo(Streams.groupBy(3));
-        assertThat(consumer).isEqualTo(Streams.unfold());
-        assertThat(consumer.hashCode()).isEqualTo(Streams.unfold().hashCode());
+        assertThat(consumer).isEqualTo(wrap(Streams.unfold()));
+        assertThat(consumer.hashCode()).isEqualTo(wrap(Streams.unfold()).hashCode());
     }
 
     private static class Amb<DATA> extends TemplateInvocation<Selectable<DATA>, DATA> {

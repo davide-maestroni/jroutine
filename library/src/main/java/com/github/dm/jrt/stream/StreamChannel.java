@@ -179,8 +179,28 @@ public interface StreamChannel<OUT>
      */
     @NotNull
     <AFTER> StreamChannel<AFTER> collect(
-            @NotNull BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
-                    consumer);
+            @NotNull BiConsumer<? super List<OUT>, ? super ResultChannel<AFTER>> consumer);
+
+    /**
+     * Concatenates a stream based on the specified accumulating function to this one.<br/>
+     * The output will be computed as follows:
+     * <pre>
+     *     <code>
+     *
+     *         acc = function.apply(acc, input);
+     *     </code>
+     * </pre>
+     * The accumulated value will be passed as result only when the outputs complete.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration.<br/>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param function the bi-function instance.
+     * @return the concatenated stream.
+     */
+    @NotNull
+    StreamChannel<OUT> collect(
+            @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
 
     /**
      * Concatenates a stream based on the specified function to this one.<br/>
@@ -195,7 +215,7 @@ public interface StreamChannel<OUT>
      */
     @NotNull
     <AFTER> StreamChannel<AFTER> collect(
-            @NotNull Function<? super List<? extends OUT>, ? extends AFTER> function);
+            @NotNull Function<? super List<OUT>, ? extends AFTER> function);
 
     /**
      * Concatenates a stream based on the specified consumer to this one.<br/>
@@ -321,27 +341,6 @@ public interface StreamChannel<OUT>
      */
     @NotNull
     StreamChannel<OUT> parallel();
-
-    /**
-     * Concatenates a stream based on the specified accumulating function to this one.<br/>
-     * The output will be computed as follows:
-     * <pre>
-     *     <code>
-     *
-     *         acc = function.apply(acc, input);
-     *     </code>
-     * </pre>
-     * The accumulated value will be passed as result only when the outputs complete.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration.<br/>
-     * Note also that this stream will be bound as a result of the call.
-     *
-     * @param function the bi-function instance.
-     * @return the concatenated stream.
-     */
-    @NotNull
-    StreamChannel<OUT> reduce(
-            @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
 
     /**
      * Returns a new stream repeating the output data to any newly bound channel or consumer, thus

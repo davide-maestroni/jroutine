@@ -37,7 +37,7 @@ public abstract class TemplateContextInvocation<IN, OUT> extends TemplateInvocat
 
     private Context mContext;
 
-    public void onContext(@NotNull final Context context) {
+    public void onContext(@NotNull final Context context) throws Exception {
 
         mContext = context;
     }

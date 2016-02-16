@@ -37,13 +37,11 @@ public class DecoratingService extends InvocationService {
     @SuppressWarnings("unchecked")
     public ContextInvocationFactory<?, ?> getInvocationFactory(
             @NotNull final Class<? extends ContextInvocation<?, ?>> targetClass,
-            @Nullable final Object... args) {
+            @Nullable final Object... args) throws Exception {
 
         final ContextInvocationFactory<?, ?> factory =
                 super.getInvocationFactory(targetClass, args);
-
         if (StringInvocation.class.isAssignableFrom(targetClass)) {
-
             return new TestInvocationFactory((ContextInvocationFactory<String, String>) factory);
         }
 
@@ -85,7 +83,7 @@ public class DecoratingService extends InvocationService {
         @NotNull
         @Override
         protected ContextInvocation<String, String> decorate(
-                @NotNull final ContextInvocation<String, String> invocation) {
+                @NotNull final ContextInvocation<String, String> invocation) throws Exception {
 
             return new TestInvocationDecorator(invocation);
         }

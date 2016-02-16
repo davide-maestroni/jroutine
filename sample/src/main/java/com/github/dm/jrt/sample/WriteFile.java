@@ -21,16 +21,13 @@ import com.github.dm.jrt.common.RoutineException;
 import com.github.dm.jrt.core.ByteChannel;
 import com.github.dm.jrt.core.ByteChannel.BufferInputStream;
 import com.github.dm.jrt.core.ByteChannel.ByteBuffer;
-import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.invocation.TemplateInvocation;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 
 /**
  * Invocation writing the downloaded data into the output file.
@@ -55,33 +52,26 @@ public class WriteFile extends TemplateInvocation<ByteBuffer, Boolean> {
 
     @Override
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public void onAbort(@NotNull final RoutineException reason) {
+    public void onAbort(@NotNull final RoutineException reason) throws Exception {
 
         closeStream();
         mFile.delete();
     }
 
     @Override
-    public void onInitialize() {
+    public void onInitialize() throws Exception {
 
-        try {
-            mOutputStream = new BufferedOutputStream(new FileOutputStream(mFile));
-
-        } catch (final FileNotFoundException e) {
-            throw new InvocationException(e);
-        }
+        mOutputStream = new BufferedOutputStream(new FileOutputStream(mFile));
     }
 
     @Override
-    public void onInput(final ByteBuffer buffer, @NotNull final ResultChannel<Boolean> result) {
+    public void onInput(final ByteBuffer buffer,
+            @NotNull final ResultChannel<Boolean> result) throws Exception {
 
         final BufferInputStream inputStream = ByteChannel.inputStream(buffer);
         final BufferedOutputStream outputStream = mOutputStream;
         try {
             inputStream.readAll(outputStream);
-
-        } catch (final IOException e) {
-            throw new InvocationException(e);
 
         } finally {
             inputStream.close();
@@ -89,19 +79,14 @@ public class WriteFile extends TemplateInvocation<ByteBuffer, Boolean> {
     }
 
     @Override
-    public void onResult(@NotNull final ResultChannel<Boolean> result) {
+    public void onResult(@NotNull final ResultChannel<Boolean> result) throws Exception {
 
         closeStream();
         result.pass(true);
     }
 
-    private void closeStream() {
+    private void closeStream() throws Exception {
 
-        try {
-            mOutputStream.close();
-
-        } catch (final IOException e) {
-            throw new InvocationException(e);
-        }
+        mOutputStream.close();
     }
 }

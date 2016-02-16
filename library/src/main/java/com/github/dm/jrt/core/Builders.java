@@ -45,9 +45,7 @@ import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.common.Mutex;
-import com.github.dm.jrt.common.RoutineException;
 import com.github.dm.jrt.invocation.InvocationException;
-import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.util.Reflection;
 import com.github.dm.jrt.util.WeakIdentityHashMap;
@@ -106,73 +104,65 @@ public class Builders {
      * @param result       the invocation result channel.
      * @param inputMode    the input transfer mode.
      * @param outputMode   the output transfer mode.
-     * @throws com.github.dm.jrt.common.RoutineException in case of errors.
+     * @throws java.lang.Exception if an unexpected error occurs.
      */
     public static void callFromInvocation(@NotNull final Mutex mutex, @NotNull final Object target,
             @NotNull final Method targetMethod, @NotNull final List<?> objects,
             @NotNull final ResultChannel<Object> result, @Nullable final InputMode inputMode,
-            @Nullable final OutputMode outputMode) {
+            @Nullable final OutputMode outputMode) throws Exception {
 
         Reflection.makeAccessible(targetMethod);
+        final Object methodResult;
+        mutex.acquire();
         try {
-            final Object methodResult;
-            mutex.acquire();
-            try {
-                final Object[] args;
-                if (inputMode == InputMode.COLLECTION) {
-                    final Class<?> paramClass = targetMethod.getParameterTypes()[0];
-                    if (paramClass.isArray()) {
-                        final int size = objects.size();
-                        final Object array = Array.newInstance(paramClass.getComponentType(), size);
-                        for (int i = 0; i < size; ++i) {
-                            Array.set(array, i, objects.get(i));
-                        }
-
-                        args = asArgs(array);
-
-                    } else {
-                        args = asArgs(objects);
+            final Object[] args;
+            if (inputMode == InputMode.COLLECTION) {
+                final Class<?> paramClass = targetMethod.getParameterTypes()[0];
+                if (paramClass.isArray()) {
+                    final int size = objects.size();
+                    final Object array = Array.newInstance(paramClass.getComponentType(), size);
+                    for (int i = 0; i < size; ++i) {
+                        Array.set(array, i, objects.get(i));
                     }
 
-                } else {
-                    args = objects.toArray(new Object[objects.size()]);
-                }
-
-                methodResult = targetMethod.invoke(target, args);
-
-            } finally {
-                mutex.release();
-            }
-
-            final Class<?> returnType = targetMethod.getReturnType();
-            if (!Void.class.equals(Reflection.boxingClass(returnType))) {
-                if (outputMode == OutputMode.ELEMENT) {
-                    if (returnType.isArray()) {
-                        if (methodResult != null) {
-                            result.orderByCall();
-                            final int length = Array.getLength(methodResult);
-                            for (int i = 0; i < length; ++i) {
-                                result.pass(Array.get(methodResult, i));
-                            }
-                        }
-
-                    } else {
-                        result.pass((Iterable<?>) methodResult);
-                    }
+                    args = asArgs(array);
 
                 } else {
-                    result.pass(methodResult);
+                    args = asArgs(objects);
                 }
+
+            } else {
+                args = objects.toArray(new Object[objects.size()]);
             }
 
-        } catch (final RoutineException e) {
-            throw e;
+            methodResult = targetMethod.invoke(target, args);
 
         } catch (final InvocationTargetException e) {
             throw new InvocationException(e.getCause());
 
-        } catch (final Throwable t) {
-            throw new InvocationException(t);
+        } finally {
+            mutex.release();
+        }
+
+        final Class<?> returnType = targetMethod.getReturnType();
+        if (!Void.class.equals(Reflection.boxingClass(returnType))) {
+            if (outputMode == OutputMode.ELEMENT) {
+                if (returnType.isArray()) {
+                    if (methodResult != null) {
+                        result.orderByCall();
+                        final int length = Array.getLength(methodResult);
+                        for (int i = 0; i < length; ++i) {
+                            result.pass(Array.get(methodResult, i));
+                        }
+                    }
+
+                } else {
+                    result.pass((Iterable<?>) methodResult);
+                }
+
+            } else {
+                result.pass(methodResult);
+            }
         }
     }
 
@@ -853,7 +843,7 @@ public class Builders {
             mLocks = locks;
         }
 
-        public void acquire() {
+        public void acquire() throws InterruptedException {
 
             mMutex.acquirePartialMutex();
             for (final ReentrantLock lock : mLocks) {
@@ -888,20 +878,17 @@ public class Builders {
 
         /**
          * Acquires a partial mutex making sure that no full one is already taken.
+         *
+         * @throws java.lang.InterruptedException if the current thread is interrupted.
          */
-        public void acquirePartialMutex() {
+        public void acquirePartialMutex() throws InterruptedException {
 
-            try {
-                synchronized (mMutex) {
-                    while (mFullMutexCount > 0) {
-                        mMutex.wait();
-                    }
-
-                    ++mPartialMutexCount;
+            synchronized (mMutex) {
+                while (mFullMutexCount > 0) {
+                    mMutex.wait();
                 }
 
-            } catch (final InterruptedException e) {
-                InvocationInterruptedException.throwIfInterrupt(e);
+                ++mPartialMutexCount;
             }
         }
 
@@ -916,22 +903,17 @@ public class Builders {
             }
         }
 
-        public void acquire() {
+        public void acquire() throws InterruptedException {
 
-            try {
-                synchronized (mMutex) {
-                    while (mPartialMutexCount > 0) {
-                        mMutex.wait();
-                    }
-
-                    ++mFullMutexCount;
+            synchronized (mMutex) {
+                while (mPartialMutexCount > 0) {
+                    mMutex.wait();
                 }
 
-                mLock.lock();
-
-            } catch (final InterruptedException e) {
-                InvocationInterruptedException.throwIfInterrupt(e);
+                ++mFullMutexCount;
             }
+
+            mLock.lock();
         }
 
         public void release() {

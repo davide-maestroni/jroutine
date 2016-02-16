@@ -3881,16 +3881,9 @@ public class RoutineTest {
 
     private static class SleepCommand extends CommandInvocation<Void> {
 
-        public void onResult(@NotNull final ResultChannel<Void> result) {
+        public void onResult(@NotNull final ResultChannel<Void> result) throws Exception {
 
-            try {
-
-                seconds(1).sleepAtLeast();
-
-            } catch (final InterruptedException e) {
-
-                throw new InvocationInterruptedException(e);
-            }
+            seconds(1).sleepAtLeast();
         }
     }
 
@@ -4001,7 +3994,7 @@ public class RoutineTest {
         }
 
         @Override
-        public void onTerminate() {
+        public void onTerminate() throws Exception {
 
             super.onTerminate();
             throw new IllegalArgumentException("test");
@@ -4011,7 +4004,7 @@ public class RoutineTest {
     private static class TestDestroyDiscardException extends TestDestroyException {
 
         @Override
-        public void onTerminate() {
+        public void onTerminate() throws Exception {
 
             super.onTerminate();
             throw new IllegalArgumentException("test");
@@ -4031,7 +4024,7 @@ public class RoutineTest {
     private static class TestDiscardException extends TestDestroy {
 
         @Override
-        public void onTerminate() {
+        public void onTerminate() throws Exception {
 
             super.onTerminate();
             throw new IllegalArgumentException("test");

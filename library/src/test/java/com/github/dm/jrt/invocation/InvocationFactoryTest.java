@@ -36,7 +36,7 @@ import static org.junit.Assert.fail;
 public class InvocationFactoryTest {
 
     @Test
-    public void testDecoratingInvocationFactory() {
+    public void testDecoratingInvocationFactory() throws Exception {
 
         final InvocationFactory<String, String> factory = PassingInvocation.factoryOf();
         assertThat(factory.newInvocation()).isExactlyInstanceOf(PassingInvocation.class);

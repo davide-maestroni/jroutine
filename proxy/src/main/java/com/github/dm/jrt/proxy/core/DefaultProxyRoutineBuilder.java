@@ -174,42 +174,37 @@ class DefaultProxyRoutineBuilder
         @Override
         @SuppressWarnings("unchecked")
         protected TYPE newProxy(@NotNull final InvocationConfiguration invocationConfiguration,
-                @NotNull final ProxyConfiguration proxyConfiguration) {
+                @NotNull final ProxyConfiguration proxyConfiguration) throws Exception {
 
-            try {
-                final Object target = mTarget;
-                final Class<? super TYPE> interfaceClass = mInterfaceClass;
-                final Proxy annotation = interfaceClass.getAnnotation(Proxy.class);
-                String packageName = annotation.classPackage();
-                if (packageName.equals(Proxy.DEFAULT)) {
-                    final Package classPackage = interfaceClass.getPackage();
-                    packageName = (classPackage != null) ? classPackage.getName() + "." : "";
+            final Object target = mTarget;
+            final Class<? super TYPE> interfaceClass = mInterfaceClass;
+            final Proxy annotation = interfaceClass.getAnnotation(Proxy.class);
+            String packageName = annotation.classPackage();
+            if (packageName.equals(Proxy.DEFAULT)) {
+                final Package classPackage = interfaceClass.getPackage();
+                packageName = (classPackage != null) ? classPackage.getName() + "." : "";
 
-                } else {
-                    packageName += ".";
-                }
-
-                String className = annotation.className();
-                if (className.equals(Proxy.DEFAULT)) {
-                    className = interfaceClass.getSimpleName();
-                    Class<?> enclosingClass = interfaceClass.getEnclosingClass();
-                    while (enclosingClass != null) {
-                        className = enclosingClass.getSimpleName() + "_" + className;
-                        enclosingClass = enclosingClass.getEnclosingClass();
-                    }
-                }
-
-                final String fullClassName = packageName + annotation.classPrefix() + className
-                        + annotation.classSuffix();
-                final Constructor<?> constructor =
-                        findConstructor(Class.forName(fullClassName), target,
-                                        invocationConfiguration, proxyConfiguration);
-                return (TYPE) constructor.newInstance(target, invocationConfiguration,
-                                                      proxyConfiguration);
-
-            } catch (final Throwable t) {
-                throw new IllegalArgumentException(t);
+            } else {
+                packageName += ".";
             }
+
+            String className = annotation.className();
+            if (className.equals(Proxy.DEFAULT)) {
+                className = interfaceClass.getSimpleName();
+                Class<?> enclosingClass = interfaceClass.getEnclosingClass();
+                while (enclosingClass != null) {
+                    className = enclosingClass.getSimpleName() + "_" + className;
+                    enclosingClass = enclosingClass.getEnclosingClass();
+                }
+            }
+
+            final String fullClassName =
+                    packageName + annotation.classPrefix() + className + annotation.classSuffix();
+            final Constructor<?> constructor =
+                    findConstructor(Class.forName(fullClassName), target, invocationConfiguration,
+                                    proxyConfiguration);
+            return (TYPE) constructor.newInstance(target, invocationConfiguration,
+                                                  proxyConfiguration);
         }
     }
 }

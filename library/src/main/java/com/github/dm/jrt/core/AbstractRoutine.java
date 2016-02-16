@@ -206,11 +206,12 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
      * @param invocation the invocation to convert.
      * @param type       the converted invocation type.
      * @return the converted invocation.
+     * @throws java.lang.Exception if an unexpected error occurs.
      */
     @NotNull
     @SuppressWarnings("UnusedParameters")
     protected Invocation<IN, OUT> convertInvocation(@NotNull final Invocation<IN, OUT> invocation,
-            @NotNull final InvocationType type) {
+            @NotNull final InvocationType type) throws Exception {
 
         return invocation;
     }
@@ -242,9 +243,11 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
      *
      * @param type the invocation type.
      * @return the invocation instance.
+     * @throws java.lang.Exception if an unexpected error occurs.
      */
     @NotNull
-    protected abstract Invocation<IN, OUT> newInvocation(@NotNull InvocationType type);
+    protected abstract Invocation<IN, OUT> newInvocation(@NotNull InvocationType type) throws
+            Exception;
 
     @NotNull
     private DefaultInvocationManager getInvocationManager(@NotNull final InvocationType type) {
@@ -523,7 +526,8 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
                 throw e;
 
             } catch (final Throwable t) {
-                mLogger.err(t, "error while creating new invocation instance", mMaxInvocations);
+                mLogger.err(t, "error while creating a new invocation instance [%d]",
+                            mMaxInvocations);
                 invocationObserver.onError(t);
             }
         }

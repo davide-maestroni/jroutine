@@ -37,8 +37,10 @@ public interface Mutex {
     /**
      * Acquires this mutex.<br/>
      * The calling thread will block until the resource becomes available.
+     *
+     * @throws java.lang.InterruptedException if the current thread is interrupted.
      */
-    void acquire();
+    void acquire() throws InterruptedException;
 
     /**
      * Releases this mutex.<br/>

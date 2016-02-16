@@ -229,44 +229,39 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
         @SuppressWarnings("unchecked")
         protected TYPE newProxy(@NotNull final InvocationConfiguration invocationConfiguration,
                 @NotNull final ProxyConfiguration proxyConfiguration,
-                @NotNull final ServiceConfiguration serviceConfiguration) {
+                @NotNull final ServiceConfiguration serviceConfiguration) throws Exception {
 
-            try {
-                final ServiceContext context = mContext;
-                final ContextInvocationTarget<?> target = mTarget;
-                final Class<? super TYPE> interfaceClass = mInterfaceClass;
-                final ServiceProxy annotation = interfaceClass.getAnnotation(ServiceProxy.class);
-                String packageName = annotation.classPackage();
-                if (packageName.equals(Proxy.DEFAULT)) {
-                    final Package classPackage = interfaceClass.getPackage();
-                    packageName = (classPackage != null) ? classPackage.getName() + "." : "";
+            final ServiceContext context = mContext;
+            final ContextInvocationTarget<?> target = mTarget;
+            final Class<? super TYPE> interfaceClass = mInterfaceClass;
+            final ServiceProxy annotation = interfaceClass.getAnnotation(ServiceProxy.class);
+            String packageName = annotation.classPackage();
+            if (packageName.equals(Proxy.DEFAULT)) {
+                final Package classPackage = interfaceClass.getPackage();
+                packageName = (classPackage != null) ? classPackage.getName() + "." : "";
 
-                } else {
-                    packageName += ".";
-                }
-
-                String className = annotation.className();
-                if (className.equals(Proxy.DEFAULT)) {
-                    className = interfaceClass.getSimpleName();
-                    Class<?> enclosingClass = interfaceClass.getEnclosingClass();
-                    while (enclosingClass != null) {
-                        className = enclosingClass.getSimpleName() + "_" + className;
-                        enclosingClass = enclosingClass.getEnclosingClass();
-                    }
-                }
-
-                final String fullClassName = packageName + annotation.classPrefix() + className
-                        + annotation.classSuffix();
-                final Constructor<?> constructor =
-                        findConstructor(Class.forName(fullClassName), context, target,
-                                        invocationConfiguration, proxyConfiguration,
-                                        serviceConfiguration);
-                return (TYPE) constructor.newInstance(context, target, invocationConfiguration,
-                                                      proxyConfiguration, serviceConfiguration);
-
-            } catch (final Throwable t) {
-                throw new IllegalArgumentException(t);
+            } else {
+                packageName += ".";
             }
+
+            String className = annotation.className();
+            if (className.equals(Proxy.DEFAULT)) {
+                className = interfaceClass.getSimpleName();
+                Class<?> enclosingClass = interfaceClass.getEnclosingClass();
+                while (enclosingClass != null) {
+                    className = enclosingClass.getSimpleName() + "_" + className;
+                    enclosingClass = enclosingClass.getEnclosingClass();
+                }
+            }
+
+            final String fullClassName =
+                    packageName + annotation.classPrefix() + className + annotation.classSuffix();
+            final Constructor<?> constructor =
+                    findConstructor(Class.forName(fullClassName), context, target,
+                                    invocationConfiguration, proxyConfiguration,
+                                    serviceConfiguration);
+            return (TYPE) constructor.newInstance(context, target, invocationConfiguration,
+                                                  proxyConfiguration, serviceConfiguration);
         }
     }
 }

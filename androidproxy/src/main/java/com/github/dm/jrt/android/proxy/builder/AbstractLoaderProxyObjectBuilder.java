@@ -201,11 +201,12 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
      * @param proxyConfiguration      the proxy configuration.
      * @param loaderConfiguration     the loader configuration.
      * @return the proxy instance.
+     * @throws java.lang.Exception if an unexpected error occurs.
      */
     @NotNull
     protected abstract TYPE newProxy(@NotNull InvocationConfiguration invocationConfiguration,
             @NotNull ProxyConfiguration proxyConfiguration,
-            @NotNull LoaderConfiguration loaderConfiguration);
+            @NotNull LoaderConfiguration loaderConfiguration) throws Exception;
 
     /**
      * Class used as key to identify a specific proxy instance.

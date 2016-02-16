@@ -298,12 +298,13 @@ public class InvocationService extends Service {
      * @param targetClass the target invocation class.
      * @param args        the factory arguments.
      * @return the context invocation factory.
+     * @throws java.lang.Exception if an unexpected error occurs.
      */
     @NotNull
     @SuppressWarnings("unchecked")
     public ContextInvocationFactory<?, ?> getInvocationFactory(
             @NotNull final Class<? extends ContextInvocation<?, ?>> targetClass,
-            @Nullable final Object... args) {
+            @Nullable final Object... args) throws Exception {
 
         return ContextInvocations.factoryOf(
                 (Class<? extends ContextInvocation<Object, Object>>) targetClass, args);
@@ -362,7 +363,7 @@ public class InvocationService extends Service {
     }
 
     @SuppressWarnings("unchecked")
-    private void initRoutine(@NotNull final Message message) {
+    private void initRoutine(@NotNull final Message message) throws Exception {
 
         final Bundle data = message.peekData();
         if (data == null) {
@@ -422,9 +423,9 @@ public class InvocationService extends Service {
                     try {
                         builder.withRunner(findConstructor(runnerClass).newInstance());
 
-                    } catch (final Throwable t) {
-                        mLogger.err(t, "error creating the runner instance");
-                        throw new IllegalArgumentException(t);
+                    } catch (final Exception e) {
+                        mLogger.err(e, "error creating the runner instance");
+                        throw e;
                     }
                 }
 
@@ -432,9 +433,9 @@ public class InvocationService extends Service {
                     try {
                         builder.withLog(findConstructor(logClass).newInstance());
 
-                    } catch (final Throwable t) {
-                        mLogger.err(t, "error creating the log instance");
-                        throw new IllegalArgumentException(t);
+                    } catch (final Exception e) {
+                        mLogger.err(e, "error creating the log instance");
+                        throw e;
                     }
                 }
 
@@ -488,20 +489,14 @@ public class InvocationService extends Service {
         @NotNull
         @Override
         @SuppressWarnings("unchecked")
-        protected Invocation<Object, Object> newInvocation(@NotNull final InvocationType type) {
+        protected Invocation<Object, Object> newInvocation(
+                @NotNull final InvocationType type) throws Exception {
 
-            final Logger logger = getLogger();
-            try {
-                final ContextInvocationFactory<?, ?> factory = mFactory;
-                logger.dbg("creating a new instance");
-                final ContextInvocation<?, ?> invocation = factory.newInvocation();
-                invocation.onContext(mContext);
-                return (Invocation<Object, Object>) invocation;
-
-            } catch (final Throwable t) {
-                logger.err(t, "error creating the invocation instance");
-                throw InvocationException.wrapIfNeeded(t);
-            }
+            final ContextInvocationFactory<?, ?> factory = mFactory;
+            getLogger().dbg("creating a new instance");
+            final ContextInvocation<?, ?> invocation = factory.newInvocation();
+            invocation.onContext(mContext);
+            return (Invocation<Object, Object>) invocation;
         }
     }
 

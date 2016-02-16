@@ -48,32 +48,32 @@ public class InvocationDecorator<IN, OUT> implements Invocation<IN, OUT> {
         mInvocation = wrapped;
     }
 
-    public void onAbort(@NotNull final RoutineException reason) {
+    public void onAbort(@NotNull final RoutineException reason) throws Exception {
 
         mInvocation.onAbort(reason);
     }
 
-    public void onDestroy() {
+    public void onDestroy() throws Exception {
 
         mInvocation.onDestroy();
     }
 
-    public void onInitialize() {
+    public void onInitialize() throws Exception {
 
         mInvocation.onInitialize();
     }
 
-    public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
+    public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) throws Exception {
 
         mInvocation.onInput(input, result);
     }
 
-    public void onResult(@NotNull final ResultChannel<OUT> result) {
+    public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
 
         mInvocation.onResult(result);
     }
 
-    public void onTerminate() {
+    public void onTerminate() throws Exception {
 
         mInvocation.onTerminate();
     }

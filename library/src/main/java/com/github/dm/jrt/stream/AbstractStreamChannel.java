@@ -262,15 +262,21 @@ public abstract class AbstractStreamChannel<OUT>
 
     @NotNull
     public <AFTER> StreamChannel<AFTER> collect(
-            @NotNull final BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
-                    consumer) {
+            @NotNull final BiConsumer<? super List<OUT>, ? super ResultChannel<AFTER>> consumer) {
 
         return map(consumerFactory(consumer));
     }
 
     @NotNull
+    public StreamChannel<OUT> collect(
+            @NotNull final BiFunction<? super OUT, ? super OUT, ? extends OUT> function) {
+
+        return map(AccumulateInvocation.functionFactory(function));
+    }
+
+    @NotNull
     public <AFTER> StreamChannel<AFTER> collect(
-            @NotNull final Function<? super List<? extends OUT>, ? extends AFTER> function) {
+            @NotNull final Function<? super List<OUT>, ? extends AFTER> function) {
 
         return map(functionFactory(function));
     }
@@ -352,13 +358,6 @@ public abstract class AbstractStreamChannel<OUT>
 
         mDelegationType = DelegationType.PARALLEL;
         return this;
-    }
-
-    @NotNull
-    public StreamChannel<OUT> reduce(
-            @NotNull final BiFunction<? super OUT, ? super OUT, ? extends OUT> function) {
-
-        return map(AccumulateInvocation.functionFactory(function));
     }
 
     @NotNull

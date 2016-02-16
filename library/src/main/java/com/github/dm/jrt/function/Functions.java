@@ -31,6 +31,7 @@ import com.github.dm.jrt.util.ClassToken;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -147,8 +148,7 @@ public class Functions {
      */
     @NotNull
     public static <IN, OUT> InvocationFactory<IN, OUT> consumerFactory(
-            @NotNull final BiConsumer<? super List<? extends IN>, ? super ResultChannel<OUT>>
-                    consumer) {
+            @NotNull final BiConsumer<? super List<IN>, ? super ResultChannel<OUT>> consumer) {
 
         return new ConsumerInvocationFactory<IN, OUT>(wrap(consumer));
     }
@@ -205,7 +205,7 @@ public class Functions {
      */
     @NotNull
     public static <IN, OUT> InvocationFactory<IN, OUT> functionFactory(
-            @NotNull final Function<? super List<? extends IN>, ? extends OUT> function) {
+            @NotNull final Function<? super List<IN>, ? extends OUT> function) {
 
         return new FunctionInvocationFactory<IN, OUT>(wrap(function));
     }
@@ -748,9 +748,8 @@ public class Functions {
          *
          * @param consumer the consumer instance.
          */
-        private ConsumerInvocationFactory(
-                @NotNull final BiConsumerWrapper<? super List<? extends IN>, ? super
-                        ResultChannel<OUT>> consumer) {
+        private ConsumerInvocationFactory(@NotNull final BiConsumerWrapper<? super List<IN>, ? super
+                ResultChannel<OUT>> consumer) {
 
             super(asArgs(consumer));
             mInvocation = new FunctionInvocation<IN, OUT>() {
@@ -759,7 +758,7 @@ public class Functions {
                 protected void onCall(@NotNull final List<? extends IN> inputs,
                         @NotNull final ResultChannel<OUT> result) {
 
-                    consumer.accept(inputs, result);
+                    consumer.accept(new ArrayList<IN>(inputs), result);
                 }
             };
         }
@@ -818,8 +817,7 @@ public class Functions {
          * @param function the function instance.
          */
         private FunctionInvocationFactory(
-                @NotNull final FunctionWrapper<? super List<? extends IN>, ? extends OUT>
-                        function) {
+                @NotNull final FunctionWrapper<? super List<IN>, ? extends OUT> function) {
 
             super(asArgs(function));
             mInvocation = new FunctionInvocation<IN, OUT>() {
@@ -828,7 +826,7 @@ public class Functions {
                 protected void onCall(@NotNull final List<? extends IN> inputs,
                         @NotNull final ResultChannel<OUT> result) {
 
-                    result.pass(function.apply(inputs));
+                    result.pass(function.apply(new ArrayList<IN>(inputs)));
                 }
             };
         }

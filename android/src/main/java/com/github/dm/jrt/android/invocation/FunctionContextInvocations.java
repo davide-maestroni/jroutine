@@ -161,7 +161,7 @@ public class FunctionContextInvocations {
         }
 
         @NotNull
-        public FunctionContextInvocation<IN, OUT> newInvocation() {
+        public FunctionContextInvocation<IN, OUT> newInvocation() throws Exception {
 
             return (FunctionContextInvocation<IN, OUT>) mFactory.newInvocation();
         }

@@ -221,14 +221,9 @@ public class Invocations {
 
         @NotNull
         @Override
-        public Invocation<IN, OUT> newInvocation() {
+        public Invocation<IN, OUT> newInvocation() throws Exception {
 
-            try {
-                return mConstructor.newInstance(mArgs);
-
-            } catch (final Throwable t) {
-                throw InvocationException.wrapIfNeeded(t);
-            }
+            return mConstructor.newInstance(mArgs);
         }
     }
 }

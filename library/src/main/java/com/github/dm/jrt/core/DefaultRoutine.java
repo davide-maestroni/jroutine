@@ -18,7 +18,6 @@ package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.invocation.Invocation;
-import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.log.Logger;
 
@@ -56,19 +55,14 @@ class DefaultRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
 
     @NotNull
     @Override
-    protected Invocation<IN, OUT> newInvocation(@NotNull final InvocationType type) {
+    protected Invocation<IN, OUT> newInvocation(@NotNull final InvocationType type) throws
+            Exception {
 
         final Logger logger = getLogger();
-        try {
-            final InvocationFactory<IN, OUT> factory = mFactory;
-            logger.dbg("creating a new invocation instance with factory: %s", factory);
-            final Invocation<IN, OUT> invocation = factory.newInvocation();
-            logger.dbg("created a new instance of class: %s", invocation.getClass());
-            return invocation;
-
-        } catch (final Throwable t) {
-            logger.err(t, "error creating the invocation instance");
-            throw InvocationException.wrapIfNeeded(t);
-        }
+        final InvocationFactory<IN, OUT> factory = mFactory;
+        logger.dbg("creating a new invocation instance with factory: %s", factory);
+        final Invocation<IN, OUT> invocation = factory.newInvocation();
+        logger.dbg("created a new instance of class: %s", invocation.getClass());
+        return invocation;
     }
 }

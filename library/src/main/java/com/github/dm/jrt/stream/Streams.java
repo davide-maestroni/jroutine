@@ -26,7 +26,6 @@ import com.github.dm.jrt.core.Channels;
 import com.github.dm.jrt.core.Channels.Selectable;
 import com.github.dm.jrt.core.JRoutine;
 import com.github.dm.jrt.function.BiConsumer;
-import com.github.dm.jrt.function.BiConsumerWrapper;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.FunctionWrapper;
@@ -53,15 +52,15 @@ import static com.github.dm.jrt.util.Reflection.asArgs;
  */
 public class Streams extends Functions {
 
-    private static final BiConsumerWrapper<? extends Iterable<?>, ? extends InputChannel<?>>
-            sUnfold = wrap(new BiConsumer<Iterable<?>, InputChannel<?>>() {
+    private static final BiConsumer<? extends Iterable<?>, ? extends InputChannel<?>> sUnfold =
+            new BiConsumer<Iterable<?>, InputChannel<?>>() {
 
-        @SuppressWarnings("unchecked")
-        public void accept(final Iterable<?> objects, final InputChannel<?> inputChannel) {
+                @SuppressWarnings("unchecked")
+                public void accept(final Iterable<?> objects, final InputChannel<?> inputChannel) {
 
-            inputChannel.pass((Iterable) objects);
-        }
-    });
+                    inputChannel.pass((Iterable) objects);
+                }
+            };
 
     /**
      * Avoid direct instantiation.
@@ -682,17 +681,16 @@ public class Streams extends Functions {
     }
 
     /**
-     * Returns a bi-consumer wrapper unfolding iterable inputs into the returned elements.<br/>
-     * The returned object will support concatenation and comparison.
+     * Returns a bi-consumer unfolding iterable inputs into the returned elements.
      *
      * @param <OUT> the output data type.
      * @return the bi-consumer instance.
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <OUT> BiConsumerWrapper<Iterable<OUT>, InputChannel<OUT>> unfold() {
+    public static <OUT> BiConsumer<Iterable<OUT>, InputChannel<OUT>> unfold() {
 
-        return (BiConsumerWrapper<Iterable<OUT>, InputChannel<OUT>>) sUnfold;
+        return (BiConsumer<Iterable<OUT>, InputChannel<OUT>>) sUnfold;
     }
 
     @NotNull
@@ -853,7 +851,9 @@ public class Streams extends Functions {
             result = 31 * result + mIncrement.hashCode();
             result = 31 * result + mStart.hashCode();
             return result;
-        }        @Override
+        }
+
+        @Override
         @SuppressWarnings("EqualsBetweenInconvertibleTypes")
         public boolean equals(final Object o) {
 
@@ -869,8 +869,6 @@ public class Streams extends Functions {
             return mEnd.equals(that.mEnd) && mIncrement.equals(that.mIncrement) && mStart.equals(
                     that.mStart);
         }
-
-
     }
 
     /**
@@ -1011,6 +1009,7 @@ public class Streams extends Functions {
                 if (mIsPlaceholder && (size > 0)) {
                     data.addAll(Collections.nCopies(size, mPlaceholder));
                 }
+
                 result.pass(data);
             }
         }

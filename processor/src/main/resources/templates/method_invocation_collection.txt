@@ -19,13 +19,7 @@
         @Override
         @SuppressWarnings({"unchecked", "ConstantConditions", "SynchronizeOnNonFinalField"})
         protected void onCall(@org.jetbrains.annotations.NotNull final java.util.List<?> objects,
-                @org.jetbrains.annotations.NotNull final com.github.dm.jrt.channel.ResultChannel<${resultClassName}> result) {
-
-            if (objects.size() > ${maxParamSize}) {
-                throw new IllegalArgumentException(
-                        "wrong number of input parameters for method '${targetMethodName}': was " +
-                        objects.size() + " while expected " + (${maxParamSize}));
-            }
+                @org.jetbrains.annotations.NotNull final com.github.dm.jrt.channel.ResultChannel<${resultClassName}> result) throws Exception {
 
             final com.github.dm.jrt.common.Mutex mutex = mMutex;
             mutex.acquire();
@@ -34,9 +28,6 @@
                 for (final ${resultClassName} element : ${invocationTarget}.${targetMethodName}(${paramValues})) {
                     result.pass(element);
                 }
-
-            } catch (final Throwable t) {
-                throw com.github.dm.jrt.invocation.InvocationException.wrapIfNeeded(t);
 
             } finally {
                 mutex.release();

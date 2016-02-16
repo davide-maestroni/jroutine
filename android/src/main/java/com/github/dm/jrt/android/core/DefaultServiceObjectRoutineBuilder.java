@@ -317,7 +317,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         }
 
         @Override
-        public void onContext(@NotNull final Context context) {
+        public void onContext(@NotNull final Context context) throws Exception {
 
             super.onContext(context);
             try {
@@ -397,7 +397,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         }
 
         @Override
-        public void onContext(@NotNull final Context context) {
+        public void onContext(@NotNull final Context context) throws Exception {
 
             super.onContext(context);
             try {
@@ -463,7 +463,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         @Override
         protected void onCall(@NotNull final List<?> objects,
-                @NotNull final ResultChannel<Object> result) {
+                @NotNull final ResultChannel<Object> result) throws Exception {
 
             final Object targetInstance = mInstance;
             if (targetInstance == null) {
@@ -475,7 +475,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         }
 
         @Override
-        public void onContext(@NotNull final Context context) {
+        public void onContext(@NotNull final Context context) throws Exception {
 
             super.onContext(context);
             try {

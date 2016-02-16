@@ -212,6 +212,57 @@ public class StreamChannelTest {
     }
 
     @Test
+    public void testCollectBiFunction() {
+
+        assertThat(Streams.streamOf("test1", "test2", "test3")
+                          .async()
+                          .collect(new BiFunction<String, String, String>() {
+
+                              public String apply(final String s, final String s2) {
+
+                                  return s + s2;
+                              }
+                          })
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1test2test3");
+        assertThat(Streams.streamOf("test1", "test2", "test3")
+                          .sync()
+                          .collect(new BiFunction<String, String, String>() {
+
+                              public String apply(final String s, final String s2) {
+
+                                  return s + s2;
+                              }
+                          })
+                          .all()).containsExactly("test1test2test3");
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testCollectBiFunctionNullPointerError() {
+
+        try {
+
+            Streams.streamOf().async().collect((BiFunction<Object, Object, Object>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().sync().collect((BiFunction<Object, Object, Object>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
     public void testCollectConsumer() {
 
         assertThat(Streams.streamOf("test1", "test2", "test3").async().collect(new BiConsumer<List<?
@@ -410,7 +461,7 @@ public class StreamChannelTest {
                                   return new SumData(aDouble, 1);
                               }
                           })
-                          .reduce(new BiFunction<SumData, SumData, SumData>() {
+                          .collect(new BiFunction<SumData, SumData, SumData>() {
 
                               public SumData apply(final SumData data1, final SumData data2) {
 
@@ -1075,7 +1126,7 @@ public class StreamChannelTest {
                                       return new SumData(aDouble, 1);
                                   }
                               })
-                              .reduce(new BiFunction<SumData, SumData, SumData>() {
+                              .collect(new BiFunction<SumData, SumData, SumData>() {
 
                                   public SumData apply(final SumData data1, final SumData data2) {
 
@@ -1126,7 +1177,7 @@ public class StreamChannelTest {
                                       return new SumData(aDouble, 1);
                                   }
                               })
-                              .reduce(new BiFunction<SumData, SumData, SumData>() {
+                              .collect(new BiFunction<SumData, SumData, SumData>() {
 
                                   public SumData apply(final SumData data1, final SumData data2) {
 
@@ -1175,7 +1226,7 @@ public class StreamChannelTest {
                                       return new SumData(aDouble, 1);
                                   }
                               })
-                              .reduce(new BiFunction<SumData, SumData, SumData>() {
+                              .collect(new BiFunction<SumData, SumData, SumData>() {
 
                                   public SumData apply(final SumData data1, final SumData data2) {
 
@@ -1226,57 +1277,6 @@ public class StreamChannelTest {
             fail();
 
         } catch (final AbortException ignored) {
-
-        }
-    }
-
-    @Test
-    public void testReduce() {
-
-        assertThat(Streams.streamOf("test1", "test2", "test3")
-                          .async()
-                          .reduce(new BiFunction<String, String, String>() {
-
-                              public String apply(final String s, final String s2) {
-
-                                  return s + s2;
-                              }
-                          })
-                          .afterMax(seconds(3))
-                          .all()).containsExactly("test1test2test3");
-        assertThat(Streams.streamOf("test1", "test2", "test3")
-                          .sync()
-                          .reduce(new BiFunction<String, String, String>() {
-
-                              public String apply(final String s, final String s2) {
-
-                                  return s + s2;
-                              }
-                          })
-                          .all()).containsExactly("test1test2test3");
-    }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testReduceNullPointerError() {
-
-        try {
-
-            Streams.streamOf().async().reduce(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.streamOf().sync().reduce(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
 
         }
     }

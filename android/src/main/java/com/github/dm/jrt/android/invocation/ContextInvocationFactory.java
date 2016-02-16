@@ -87,7 +87,8 @@ public abstract class ContextInvocationFactory<IN, OUT> {
      * Any behavior other than that may lead to unexpected results.
      *
      * @return the context invocation instance.
+     * @throws java.lang.Exception if an unexpected error occurs.
      */
     @NotNull
-    public abstract ContextInvocation<IN, OUT> newInvocation();
+    public abstract ContextInvocation<IN, OUT> newInvocation() throws Exception;
 }

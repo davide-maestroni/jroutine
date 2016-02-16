@@ -51,7 +51,7 @@ public abstract class DecoratingInvocationFactory<IN, OUT>
 
     @NotNull
     @Override
-    public final Invocation<IN, OUT> newInvocation() {
+    public final Invocation<IN, OUT> newInvocation() throws Exception {
 
         return decorate(mFactory.newInvocation());
     }

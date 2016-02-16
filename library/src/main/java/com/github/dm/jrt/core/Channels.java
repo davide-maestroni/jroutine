@@ -18,11 +18,14 @@ package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.builder.ChannelConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
+import com.github.dm.jrt.channel.AbortException;
 import com.github.dm.jrt.channel.Channel.InputChannel;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.common.RoutineException;
+import com.github.dm.jrt.invocation.InvocationInterruptedException;
+import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
@@ -780,7 +783,9 @@ public class Channels {
     @NotNull
     public static <OUT> OutputChannel<OUT> repeat(@NotNull final OutputChannel<OUT> channel) {
 
-        final RepeatedChannel<OUT> repeatedChannel = new RepeatedChannel<OUT>();
+        // TODO: 2/15/16 configuration??
+        final RepeatedChannel<OUT> repeatedChannel =
+                new RepeatedChannel<OUT>(ChannelConfiguration.DEFAULT_CONFIGURATION);
         channel.passTo((OutputConsumer<OUT>) repeatedChannel);
         return repeatedChannel.close();
     }
@@ -1624,6 +1629,8 @@ public class Channels {
         private final ArrayList<OutputConsumer<? super DATA>> mConsumers =
                 new ArrayList<OutputConsumer<? super DATA>>();
 
+        private final Logger mLogger;
+
         private final Object mMutex = new Object();
 
         private RoutineException mAbortException;
@@ -1632,10 +1639,13 @@ public class Channels {
 
         /**
          * Constructor.
+         *
+         * @param configuration the channel configuration.
          */
-        private RepeatedChannel() {
+        private RepeatedChannel(@NotNull final ChannelConfiguration configuration) {
 
-            super(ChannelConfiguration.DEFAULT_CONFIGURATION);
+            super(configuration);
+            mLogger = configuration.toInvocationConfiguration().newLogger(this);
         }
 
         @NotNull
@@ -1643,9 +1653,20 @@ public class Channels {
         public IOChannel<DATA> passTo(@NotNull final OutputConsumer<? super DATA> consumer) {
 
             synchronized (mMutex) {
+                final Logger logger = mLogger;
                 final RoutineException abortException = mAbortException;
                 if (abortException != null) {
-                    consumer.onError(abortException);
+                    try {
+                        consumer.onError(abortException);
+
+                    } catch (final RoutineException e) {
+                        InvocationInterruptedException.throwIfInterrupt(e);
+                        logger.wrn(e, "ignoring consumer exception (%s)", consumer);
+
+                    } catch (final Throwable t) {
+                        InvocationInterruptedException.throwIfInterrupt(t);
+                        logger.err(t, "ignoring consumer exception (%s)", consumer);
+                    }
 
                 } else {
                     final boolean isComplete = mIsComplete;
@@ -1653,12 +1674,29 @@ public class Channels {
                         mConsumers.add(consumer);
                     }
 
-                    for (final DATA data : mCached) {
-                        consumer.onOutput(data);
-                    }
+                    try {
+                        for (final DATA data : mCached) {
+                            consumer.onOutput(data);
+                        }
 
-                    if (isComplete) {
-                        consumer.onComplete();
+                        try {
+                            if (isComplete) {
+                                consumer.onComplete();
+                            }
+
+                        } catch (final RoutineException e) {
+                            InvocationInterruptedException.throwIfInterrupt(e);
+                            logger.wrn(e, "ignoring consumer exception (%s)", consumer);
+
+                        } catch (final Throwable t) {
+                            InvocationInterruptedException.throwIfInterrupt(t);
+                            logger.err(t, "ignoring consumer exception (%s)", consumer);
+                        }
+
+                    } catch (final Throwable t) {
+                        InvocationInterruptedException.throwIfInterrupt(t);
+                        mAbortException = AbortException.wrapIfNeeded(t);
+                        abort(t);
                     }
                 }
             }
@@ -1674,7 +1712,7 @@ public class Channels {
             return channel;
         }
 
-        public void onComplete() {
+        public void onComplete() throws Exception {
 
             final ArrayList<OutputConsumer<? super DATA>> boundConsumers;
             synchronized (mMutex) {
@@ -1684,12 +1722,23 @@ public class Channels {
                 consumers.clear();
             }
 
+            final Logger logger = mLogger;
             for (final OutputConsumer<? super DATA> consumer : boundConsumers) {
-                consumer.onComplete();
+                try {
+                    consumer.onComplete();
+
+                } catch (final RoutineException e) {
+                    InvocationInterruptedException.throwIfInterrupt(e);
+                    logger.wrn(e, "ignoring consumer exception (%s)", consumer);
+
+                } catch (final Throwable t) {
+                    InvocationInterruptedException.throwIfInterrupt(t);
+                    logger.err(t, "ignoring consumer exception (%s)", consumer);
+                }
             }
         }
 
-        public void onError(@NotNull final RoutineException error) {
+        public void onError(@NotNull final RoutineException error) throws Exception {
 
             final ArrayList<OutputConsumer<? super DATA>> boundConsumers;
             synchronized (mMutex) {
@@ -1699,12 +1748,23 @@ public class Channels {
                 consumers.clear();
             }
 
+            final Logger logger = mLogger;
             for (final OutputConsumer<? super DATA> consumer : boundConsumers) {
-                consumer.onError(error);
+                try {
+                    consumer.onError(error);
+
+                } catch (final RoutineException e) {
+                    InvocationInterruptedException.throwIfInterrupt(e);
+                    logger.wrn(e, "ignoring consumer exception (%s)", consumer);
+
+                } catch (final Throwable t) {
+                    InvocationInterruptedException.throwIfInterrupt(t);
+                    logger.err(t, "ignoring consumer exception (%s)", consumer);
+                }
             }
         }
 
-        public void onOutput(final DATA output) {
+        public void onOutput(final DATA output) throws Exception {
 
             final ArrayList<OutputConsumer<? super DATA>> boundConsumers;
             synchronized (mMutex) {

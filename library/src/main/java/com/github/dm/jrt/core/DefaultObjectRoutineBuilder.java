@@ -251,7 +251,7 @@ class DefaultObjectRoutineBuilder
 
         @Override
         protected void onCall(@NotNull final List<?> objects,
-                @NotNull final ResultChannel<Object> result) {
+                @NotNull final ResultChannel<Object> result) throws Exception {
 
             final Object target = mTarget.getTarget();
             if (target == null) {

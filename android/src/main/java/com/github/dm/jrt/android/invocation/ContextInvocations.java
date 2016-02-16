@@ -189,7 +189,7 @@ public class ContextInvocations {
 
         @NotNull
         @Override
-        public Invocation<IN, OUT> newInvocation() {
+        public Invocation<IN, OUT> newInvocation() throws Exception {
 
             final ContextInvocation<IN, OUT> invocation = mFactory.newInvocation();
             invocation.onContext(mContext);
@@ -224,7 +224,7 @@ public class ContextInvocations {
         }
 
         @NotNull
-        public ContextInvocation<IN, OUT> newInvocation() {
+        public ContextInvocation<IN, OUT> newInvocation() throws Exception {
 
             return (ContextInvocation<IN, OUT>) mFactory.newInvocation();
         }

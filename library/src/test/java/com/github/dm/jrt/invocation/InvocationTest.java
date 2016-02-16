@@ -38,11 +38,11 @@ public class InvocationTest {
 
     @Test
     @SuppressWarnings("ConstantConditions")
-    public void testCommandInvocation() {
+    public void testCommandInvocation() throws Exception {
 
         final CommandInvocation<Object> invocation = new CommandInvocation<Object>() {
 
-            public void onResult(@NotNull final ResultChannel<Object> result) {
+            public void onResult(@NotNull final ResultChannel<Object> result) throws Exception {
 
             }
         };
@@ -123,7 +123,7 @@ public class InvocationTest {
 
     @Test
     @SuppressWarnings("NullArgumentToVariableArgMethod")
-    public void testInvocationFactory() {
+    public void testInvocationFactory() throws Exception {
 
         assertThat(factoryOf(TestInvocation.class).newInvocation()).isExactlyInstanceOf(
                 TestInvocation.class);

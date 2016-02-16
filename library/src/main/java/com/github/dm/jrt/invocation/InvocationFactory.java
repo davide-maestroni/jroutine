@@ -38,7 +38,8 @@ public abstract class InvocationFactory<IN, OUT> {
      * Any behavior other than that may lead to unexpected results.
      *
      * @return the invocation instance.
+     * @throws java.lang.Exception if an unexpected error occurs.
      */
     @NotNull
-    public abstract Invocation<IN, OUT> newInvocation();
+    public abstract Invocation<IN, OUT> newInvocation() throws Exception;
 }

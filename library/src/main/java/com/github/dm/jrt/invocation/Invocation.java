@@ -108,19 +108,24 @@ public interface Invocation<IN, OUT> {
      * This method may be called at any time after the invocation initialization.
      *
      * @param reason the reason of the abortion.
+     * @throws java.lang.Exception if an unexpected error occurs.
      */
-    void onAbort(@NotNull RoutineException reason);
+    void onAbort(@NotNull RoutineException reason) throws Exception;
 
     /**
      * Called when the routine invocation is no longer needed.
+     *
+     * @throws java.lang.Exception if an unexpected error occurs.
      */
-    void onDestroy();
+    void onDestroy() throws Exception;
 
     /**
      * Called when the routine invocation is initialized.<br/>
      * This is always the first method in the invocation lifecycle.
+     *
+     * @throws java.lang.Exception if an unexpected error occurs.
      */
-    void onInitialize();
+    void onInitialize() throws Exception;
 
     /**
      * Called when an input is passed to the routine.<br/>
@@ -128,8 +133,9 @@ public interface Invocation<IN, OUT> {
      *
      * @param input  the input.
      * @param result the result channel.
+     * @throws java.lang.Exception if an unexpected error occurs.
      */
-    void onInput(IN input, @NotNull ResultChannel<OUT> result);
+    void onInput(IN input, @NotNull ResultChannel<OUT> result) throws Exception;
 
     /**
      * Called when all the inputs has been passed to the routine.<br/>
@@ -137,11 +143,14 @@ public interface Invocation<IN, OUT> {
      * results should be passed to the result channel.
      *
      * @param result the result channel.
+     * @throws java.lang.Exception if an unexpected error occurs.
      */
-    void onResult(@NotNull ResultChannel<OUT> result);
+    void onResult(@NotNull ResultChannel<OUT> result) throws Exception;
 
     /**
      * Called when the invocation execution has completed.
+     *
+     * @throws java.lang.Exception if an unexpected error occurs.
      */
-    void onTerminate();
+    void onTerminate() throws Exception;
 }

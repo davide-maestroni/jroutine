@@ -52,7 +52,7 @@ public abstract class DecoratingContextInvocationFactory<IN, OUT>
 
     @NotNull
     @Override
-    public final ContextInvocation<IN, OUT> newInvocation() {
+    public final ContextInvocation<IN, OUT> newInvocation() throws Exception {
 
         return decorate(mFactory.newInvocation());
     }
@@ -62,8 +62,9 @@ public abstract class DecoratingContextInvocationFactory<IN, OUT>
      *
      * @param invocation the context invocation instance to decorate.
      * @return the decorated context invocation.
+     * @throws java.lang.Exception if an unexpected error occurs.
      */
     @NotNull
     protected abstract ContextInvocation<IN, OUT> decorate(
-            @NotNull ContextInvocation<IN, OUT> invocation);
+            @NotNull ContextInvocation<IN, OUT> invocation) throws Exception;
 }

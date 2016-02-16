@@ -195,11 +195,12 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
      * @param proxyConfiguration      the proxy configuration.
      * @param serviceConfiguration    the service configuration.
      * @return the proxy instance.
+     * @throws java.lang.Exception if an unexpected error occurs.
      */
     @NotNull
     protected abstract TYPE newProxy(@NotNull InvocationConfiguration invocationConfiguration,
             @NotNull ProxyConfiguration proxyConfiguration,
-            @NotNull ServiceConfiguration serviceConfiguration);
+            @NotNull ServiceConfiguration serviceConfiguration) throws Exception;
 
     /**
      * Class used as key to identify a specific proxy instance.

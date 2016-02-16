@@ -47,7 +47,7 @@ public abstract class FunctionInvocation<IN, OUT> extends TemplateInvocation<IN,
     }
 
     @Override
-    public final void onResult(@NotNull final ResultChannel<OUT> result) {
+    public final void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
 
         final ArrayList<IN> inputs = mInputs;
         final ArrayList<IN> clone;
@@ -75,7 +75,8 @@ public abstract class FunctionInvocation<IN, OUT> extends TemplateInvocation<IN,
      *
      * @param inputs the input list.
      * @param result the result channel.
+     * @throws java.lang.Exception if an unexpected error occurs.
      */
     protected abstract void onCall(@NotNull List<? extends IN> inputs,
-            @NotNull ResultChannel<OUT> result);
+            @NotNull ResultChannel<OUT> result) throws Exception;
 }

@@ -42,5 +42,5 @@ public abstract class FunctionContextInvocationFactory<IN, OUT>
 
     @NotNull
     @Override
-    public abstract FunctionContextInvocation<IN, OUT> newInvocation();
+    public abstract FunctionContextInvocation<IN, OUT> newInvocation() throws Exception;
 }

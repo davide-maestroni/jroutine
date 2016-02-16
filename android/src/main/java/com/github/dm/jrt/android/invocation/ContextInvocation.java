@@ -36,6 +36,7 @@ public interface ContextInvocation<IN, OUT> extends Invocation<IN, OUT> {
      * Called right after the instantiation to specify the invocation context.
      *
      * @param context the context of the invocation.
+     * @throws java.lang.Exception if an unexpected error occurs.
      */
-    void onContext(@NotNull Context context);
+    void onContext(@NotNull Context context) throws Exception;
 }

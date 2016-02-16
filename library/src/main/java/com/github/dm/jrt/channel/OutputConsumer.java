@@ -53,20 +53,24 @@ public interface OutputConsumer<OUT> {
 
     /**
      * Called when the channel closes after the invocation completes its execution.
+     *
+     * @throws java.lang.Exception if an unexpected error occurs.
      */
-    void onComplete();
+    void onComplete() throws Exception;
 
     /**
      * Called when the bounded channel transfer is aborted.
      *
      * @param error the reason of the abortion.
+     * @throws java.lang.Exception if an unexpected error occurs.
      */
-    void onError(@NotNull RoutineException error);
+    void onError(@NotNull RoutineException error) throws Exception;
 
     /**
      * Called when an output is passed to the channel.
      *
      * @param output the output.
+     * @throws java.lang.Exception if an unexpected error occurs.
      */
-    void onOutput(OUT output);
+    void onOutput(OUT output) throws Exception;
 }

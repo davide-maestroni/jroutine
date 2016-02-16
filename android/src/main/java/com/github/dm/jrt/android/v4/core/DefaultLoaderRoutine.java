@@ -28,7 +28,6 @@ import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.AbstractRoutine;
 import com.github.dm.jrt.invocation.Invocation;
-import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.runner.TemplateExecution;
@@ -111,7 +110,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
     @NotNull
     @Override
     protected Invocation<IN, OUT> convertInvocation(@NotNull final Invocation<IN, OUT> invocation,
-            @NotNull final InvocationType type) {
+            @NotNull final InvocationType type) throws Exception {
 
         try {
             invocation.onDestroy();
@@ -126,7 +125,8 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
 
     @NotNull
     @Override
-    protected Invocation<IN, OUT> newInvocation(@NotNull final InvocationType type) {
+    protected Invocation<IN, OUT> newInvocation(@NotNull final InvocationType type) throws
+            Exception {
 
         final Logger logger = getLogger();
         if (type == InvocationType.ASYNC) {
@@ -139,17 +139,11 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
             throw new IllegalStateException("the routine context has been destroyed");
         }
 
-        try {
-            final FunctionContextInvocationFactory<IN, OUT> factory = mFactory;
-            logger.dbg("creating a new invocation instance");
-            final ContextInvocation<IN, OUT> invocation = factory.newInvocation();
-            invocation.onContext(loaderContext.getApplicationContext());
-            return invocation;
-
-        } catch (final Throwable t) {
-            logger.err(t, "error creating the invocation instance");
-            throw InvocationException.wrapIfNeeded(t);
-        }
+        final FunctionContextInvocationFactory<IN, OUT> factory = mFactory;
+        logger.dbg("creating a new invocation instance");
+        final ContextInvocation<IN, OUT> invocation = factory.newInvocation();
+        invocation.onContext(loaderContext.getApplicationContext());
+        return invocation;
     }
 
     public void purge(@Nullable final IN input) {
@@ -229,7 +223,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
 
         @NotNull
         @Override
-        public FunctionContextInvocation<IN, OUT> newInvocation() {
+        public FunctionContextInvocation<IN, OUT> newInvocation() throws Exception {
 
             return mFactory.newInvocation();
         }

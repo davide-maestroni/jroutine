@@ -21,7 +21,6 @@ import com.github.dm.jrt.core.ByteChannel;
 import com.github.dm.jrt.core.ByteChannel.BufferOutputStream;
 import com.github.dm.jrt.core.ByteChannel.ByteBuffer;
 import com.github.dm.jrt.invocation.FilterInvocation;
-import com.github.dm.jrt.invocation.InvocationException;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -40,7 +39,8 @@ public class ReadConnection extends FilterInvocation<URI, ByteBuffer> {
 
     private static final int MAX_CHUNK_SIZE = 2048;
 
-    public void onInput(final URI uri, @NotNull final ResultChannel<ByteBuffer> result) {
+    public void onInput(final URI uri, @NotNull final ResultChannel<ByteBuffer> result) throws
+            Exception {
 
         InputStream inputStream = null;
         try {
@@ -65,17 +65,9 @@ public class ReadConnection extends FilterInvocation<URI, ByteBuffer> {
                 outputStream.close();
             }
 
-        } catch (final IOException e) {
-            throw new InvocationException(e);
-
         } finally {
             if (inputStream != null) {
-                try {
-                    inputStream.close();
-
-                } catch (final IOException ignored) {
-
-                }
+                inputStream.close();
             }
         }
     }

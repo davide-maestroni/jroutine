@@ -301,8 +301,7 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
     @NotNull
     @Override
     public <AFTER> LoaderStreamChannelCompat<AFTER> collect(
-            @NotNull final BiConsumer<? super List<? extends OUT>, ? super ResultChannel<AFTER>>
-                    consumer) {
+            @NotNull final BiConsumer<? super List<OUT>, ? super ResultChannel<AFTER>> consumer) {
 
         checkStatic(wrap(consumer), consumer);
         return (LoaderStreamChannelCompat<AFTER>) super.collect(consumer);
@@ -310,8 +309,17 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
 
     @NotNull
     @Override
+    public LoaderStreamChannelCompat<OUT> collect(
+            @NotNull final BiFunction<? super OUT, ? super OUT, ? extends OUT> function) {
+
+        checkStatic(wrap(function), function);
+        return (LoaderStreamChannelCompat<OUT>) super.collect(function);
+    }
+
+    @NotNull
+    @Override
     public <AFTER> LoaderStreamChannelCompat<AFTER> collect(
-            @NotNull final Function<? super List<? extends OUT>, ? extends AFTER> function) {
+            @NotNull final Function<? super List<OUT>, ? extends AFTER> function) {
 
         checkStatic(wrap(function), function);
         return (LoaderStreamChannelCompat<AFTER>) super.collect(function);
@@ -405,15 +413,6 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
 
         super.parallel();
         return this;
-    }
-
-    @NotNull
-    @Override
-    public LoaderStreamChannelCompat<OUT> reduce(
-            @NotNull final BiFunction<? super OUT, ? super OUT, ? extends OUT> function) {
-
-        checkStatic(wrap(function), function);
-        return (LoaderStreamChannelCompat<OUT>) super.reduce(function);
     }
 
     @NotNull

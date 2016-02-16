@@ -33,27 +33,27 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class TemplateInvocation<IN, OUT> implements Invocation<IN, OUT> {
 
-    public void onAbort(@NotNull final RoutineException reason) {
+    public void onAbort(@NotNull final RoutineException reason) throws Exception {
 
     }
 
-    public void onDestroy() {
+    public void onDestroy() throws Exception {
 
     }
 
-    public void onInitialize() {
+    public void onInitialize() throws Exception {
 
     }
 
-    public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
+    public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) throws Exception {
 
     }
 
-    public void onResult(@NotNull final ResultChannel<OUT> result) {
+    public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
 
     }
 
-    public void onTerminate() {
+    public void onTerminate() throws Exception {
 
     }
 }

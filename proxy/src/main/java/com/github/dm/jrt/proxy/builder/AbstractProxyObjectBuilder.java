@@ -140,10 +140,11 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
      * @param invocationConfiguration the invocation configuration.
      * @param proxyConfiguration      the proxy configuration.
      * @return the proxy instance.
+     * @throws java.lang.Exception if an unexpected error occurs.
      */
     @NotNull
     protected abstract TYPE newProxy(@NotNull InvocationConfiguration invocationConfiguration,
-            @NotNull ProxyConfiguration proxyConfiguration);
+            @NotNull ProxyConfiguration proxyConfiguration) throws Exception;
 
     /**
      * Class used as key to identify a specific proxy instance.

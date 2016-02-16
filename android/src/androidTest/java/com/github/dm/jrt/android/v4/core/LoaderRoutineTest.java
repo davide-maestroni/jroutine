@@ -45,7 +45,6 @@ import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
-import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.log.Log;
 import com.github.dm.jrt.log.Log.Level;
 import com.github.dm.jrt.log.Logger;
@@ -1478,17 +1477,9 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         @Override
         protected void onCall(@NotNull final List<? extends Data> inputs,
-                @NotNull final ResultChannel<Data> result) {
+                @NotNull final ResultChannel<Data> result) throws Exception {
 
-            try {
-
-                Thread.sleep(500);
-
-            } catch (final InterruptedException e) {
-
-                throw new InvocationInterruptedException(e);
-            }
-
+            Thread.sleep(500);
             result.abort(new IllegalStateException());
         }
     }
@@ -1586,7 +1577,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         }
 
         @Override
-        public void onDestroy() {
+        public void onDestroy() throws Exception {
 
             super.onDestroy();
             sSemaphore.release();

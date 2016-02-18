@@ -327,7 +327,11 @@ public class Channels {
                     ioChannelMap.put(entry.getKey(), ioChannel);
                 }
 
-                final IOChannel<Selectable<? extends IN>> ioChannel = JRoutine.io().buildChannel();
+                final IOChannel<Selectable<? extends IN>> ioChannel = JRoutine.io()
+                                                                              .withChannels()
+                                                                              .with(configuration)
+                                                                              .configured()
+                                                                              .buildChannel();
                 ioChannel.passTo(new SortingMapOutputConsumer(ioChannelMap));
                 return ioChannel;
             }

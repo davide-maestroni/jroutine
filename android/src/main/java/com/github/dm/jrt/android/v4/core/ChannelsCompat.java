@@ -83,8 +83,11 @@ public class ChannelsCompat extends Channels {
                     ioChannelMap.put(channelMap.keyAt(i), ioChannel);
                 }
 
-                final IOChannel<Selectable<? extends IN>> ioChannel =
-                        JRoutineCompat.io().buildChannel();
+                final IOChannel<Selectable<? extends IN>> ioChannel = JRoutineCompat.io()
+                                                                                    .withChannels()
+                                                                                    .with(configuration)
+                                                                                    .configured()
+                                                                                    .buildChannel();
                 ioChannel.passTo(new SortingMapOutputConsumer(ioChannelMap));
                 return ioChannel;
             }

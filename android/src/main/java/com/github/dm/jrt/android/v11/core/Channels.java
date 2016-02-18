@@ -81,7 +81,11 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
                     ioChannelMap.put(channelMap.keyAt(i), ioChannel);
                 }
 
-                final IOChannel<Selectable<? extends IN>> ioChannel = JRoutine.io().buildChannel();
+                final IOChannel<Selectable<? extends IN>> ioChannel = JRoutine.io()
+                                                                              .withChannels()
+                                                                              .with(configuration)
+                                                                              .configured()
+                                                                              .buildChannel();
                 ioChannel.passTo(new SortingMapOutputConsumer(ioChannelMap));
                 return ioChannel;
             }

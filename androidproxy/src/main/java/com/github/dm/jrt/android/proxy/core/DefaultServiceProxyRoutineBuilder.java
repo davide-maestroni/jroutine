@@ -97,13 +97,13 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
                 new TargetServiceProxyObjectBuilder<TYPE>(mContext, mTarget, itf);
         return builder.withInvocations()
                       .with(mInvocationConfiguration)
-                      .set()
+                      .configured()
                       .withProxies()
                       .with(mProxyConfiguration)
-                      .set()
+                      .configured()
                       .withService()
                       .with(mServiceConfiguration)
-                      .set()
+                      .configured()
                       .buildProxy();
     }
 

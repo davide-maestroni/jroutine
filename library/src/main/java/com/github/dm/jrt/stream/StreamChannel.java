@@ -129,7 +129,7 @@ public interface StreamChannel<OUT>
 
     /**
      * Short for {@code withInvocations().withRunner(runner).withInputLimit(maxInputs)
-     * .withInputMaxDelay(maxDelay, timeUnit).set()}.<br/>
+     * .withInputMaxDelay(maxDelay, timeUnit).configured()}.<br/>
      * This method is useful to easily apply a configuration which will slow down the thread
      * feeding the next routine concatenated to the stream, when the number of buffered inputs
      * exceeds the specified limit. Since waiting on the same runner thread is not allowed, it is
@@ -149,7 +149,7 @@ public interface StreamChannel<OUT>
 
     /**
      * Short for {@code withInvocations().withRunner(runner).withInputLimit(maxInputs)
-     * .withInputMaxDelay(maxDelay).set()}.<br/>
+     * .withInputMaxDelay(maxDelay).configured()}.<br/>
      * This method is useful to easily apply a configuration to the next routine concatenated to the
      * stream, which will slow down the thread feeding it, when the number of buffered inputs
      * exceeds the specified limit. Since waiting on the same runner thread is not allowed, it is
@@ -313,7 +313,7 @@ public interface StreamChannel<OUT>
     <AFTER> StreamChannel<AFTER> map(@NotNull Routine<? super OUT, ? extends AFTER> routine);
 
     /**
-     * Short for {@code withInvocations().withMaxInstances(maxInvocations).set()}.<br/>
+     * Short for {@code withInvocations().withMaxInstances(maxInvocations).configured()}.<br/>
      * This method is useful to easily apply a configuration to the next routine concatenated to the
      * stream, which will limit the maximum number of concurrent invocations to the specified value.
      *
@@ -324,7 +324,7 @@ public interface StreamChannel<OUT>
     StreamChannel<OUT> maxParallelInvocations(int maxInvocations);
 
     /**
-     * Short for {@code withStreamInvocations().withOutputOrder(orderType).set()}.<br/>
+     * Short for {@code withStreamInvocations().withOutputOrder(orderType).configured()}.<br/>
      * This method is useful to easily make the stream ordered or not.<br/>
      * Note that an ordered stream has a slightly increased cost in memory and computation.
      *
@@ -353,7 +353,7 @@ public interface StreamChannel<OUT>
     StreamChannel<OUT> repeat();
 
     /**
-     * Short for {@code withStreamInvocations().withRunner(runner).set().asyncMap(Functions
+     * Short for {@code withStreamInvocations().withRunner(runner).configured().asyncMap(Functions
      * .<OUT>identity())}.<br/>
      * This method is useful to easily make the stream run on the specified runner.<br/>
      * Note that it is not necessary to explicitly concatenate a routine to have a stream delivering

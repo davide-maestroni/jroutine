@@ -230,7 +230,7 @@ public class IOChannelTest {
         final IOChannel<String> ioChannel1 = JRoutine.io()
                                                      .withChannels()
                                                      .withChannelOrder(OrderType.BY_CALL)
-                                                     .set()
+                                                     .configured()
                                                      .buildChannel();
 
         new Thread() {
@@ -570,7 +570,7 @@ public class IOChannelTest {
                                                   .withChannelMaxDelay(seconds(1))
                                                   .withLogLevel(Level.DEBUG)
                                                   .withLog(new NullLog())
-                                                  .set()
+                                                  .configured()
                                                   .buildChannel();
         channel.pass(-77L);
         assertThat(channel.afterMax(timeout).next()).isEqualTo(-77L);
@@ -622,7 +622,7 @@ public class IOChannelTest {
                                                    .withChannels()
                                                    .withReadTimeout(millis(10))
                                                    .withReadTimeoutAction(TimeoutActionType.EXIT)
-                                                   .set()
+                                                   .configured()
                                                    .buildChannel();
 
         assertThat(channel1.all()).isEmpty();
@@ -635,7 +635,7 @@ public class IOChannelTest {
                                                    .withChannels()
                                                    .withReadTimeout(millis(10))
                                                    .withReadTimeoutAction(TimeoutActionType.ABORT)
-                                                   .set()
+                                                   .configured()
                                                    .buildChannel();
 
         try {
@@ -656,7 +656,7 @@ public class IOChannelTest {
                                                    .withChannels()
                                                    .withReadTimeout(millis(10))
                                                    .withReadTimeoutAction(TimeoutActionType.THROW)
-                                                   .set()
+                                                   .configured()
                                                    .buildChannel();
 
         try {

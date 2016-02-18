@@ -56,6 +56,39 @@ public class Channels {
     protected Channels() {
 
     }
+/*
+    @NotNull
+    public static <OUT> Builder<OutputChannel<OUT>> blend2(
+            @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
+
+        if (channels.isEmpty()) {
+            throw new IllegalArgumentException("the list of channels must not be empty");
+        }
+
+        if (channels.contains(null)) {
+            throw new NullPointerException("the list of channels must contain null objects");
+        }
+
+        final ArrayList<OutputChannel<? extends OUT>> outputChannels =
+                new ArrayList<OutputChannel<? extends OUT>>(channels);
+        return new DefaultBuilder<OutputChannel<OUT>>() {
+
+            @NotNull
+            @Override
+            protected OutputChannel<OUT> build(@NotNull final ChannelConfiguration configuration) {
+
+                final IOChannel<OUT> ioChannel =
+                        JRoutine.io().withChannels().with(configuration).configured()
+                        .buildChannel();
+                for (final OutputChannel<? extends OUT> channel : outputChannels) {
+                    channel.passTo(ioChannel);
+                }
+
+                return ioChannel.close();
+            }
+        };
+    }
+    */
 
     /**
      * Returns an output channel blending the outputs coming from the specified ones.<br/>
@@ -334,7 +367,7 @@ public class Channels {
         final IOChannel<OUT> ioChannel = JRoutine.io()
                                                  .withChannels()
                                                  .withChannelOrder(OrderType.BY_CALL)
-                                                 .set()
+                                                 .configured()
                                                  .buildChannel();
         for (final OutputChannel<? extends OUT> channel : channels) {
             channel.passTo(ioChannel);
@@ -373,7 +406,7 @@ public class Channels {
         final IOChannel<Object> ioChannel = JRoutine.io()
                                                     .withChannels()
                                                     .withChannelOrder(OrderType.BY_CALL)
-                                                    .set()
+                                                    .configured()
                                                     .buildChannel();
         for (final OutputChannel<?> channel : channels) {
             channel.passTo(ioChannel);
@@ -1226,6 +1259,47 @@ public class Channels {
         merge(channels).passTo(consumer);
         return ioChannel;
     }
+
+    /*
+    public interface Builder<TYPE> extends ConfigurableChannelBuilder<Builder<TYPE>> {
+
+        @NotNull
+        TYPE build();
+    }
+
+    private abstract static class DefaultBuilder<TYPE> implements Builder<TYPE>,
+    Configurable<Builder<TYPE>> {
+
+        private ChannelConfiguration mConfiguration = ChannelConfiguration.DEFAULT_CONFIGURATION;
+
+        @NotNull
+        public ChannelConfiguration.Builder<Builder<TYPE>> withChannels() {
+
+            return new ChannelConfiguration.Builder<Builder<TYPE>>(this, mConfiguration);
+        }
+
+        @NotNull
+        @SuppressWarnings("ConstantConditions")
+        public Builder<TYPE> setConfiguration(@NotNull final ChannelConfiguration configuration) {
+
+            if (configuration == null) {
+                throw new NullPointerException("the invocation configuration must not be null");
+            }
+
+            mConfiguration = configuration;
+            return this;
+        }
+
+        @NotNull
+        public TYPE build() {
+
+            return build(mConfiguration);
+        }
+
+        @NotNull
+        protected abstract TYPE build(@NotNull ChannelConfiguration configuration);
+    }
+    */
 
     /**
      * Interface defining a collection of selectable output channels, that is an object filtering

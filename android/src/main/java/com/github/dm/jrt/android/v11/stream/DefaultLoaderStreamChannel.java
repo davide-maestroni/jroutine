@@ -557,37 +557,38 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
 
         return newRoutine(configuration,
-                          mStreamConfiguration.builderFrom().with(mConfiguration).set(), factory);
+                          mStreamConfiguration.builderFrom().with(mConfiguration).configured(),
+                          factory);
     }
 
     @NotNull
     public LoaderStreamChannel<OUT> cache(@Nullable final CacheStrategyType strategyType) {
 
-        return withLoaders().withCacheStrategy(strategyType).set();
+        return withLoaders().withCacheStrategy(strategyType).configured();
     }
 
     @NotNull
     public LoaderStreamChannel<OUT> loaderId(final int loaderId) {
 
-        return withLoaders().withLoaderId(loaderId).set();
+        return withLoaders().withLoaderId(loaderId).configured();
     }
 
     @NotNull
     public LoaderStreamChannel<OUT> routineId(final int routineId) {
 
-        return withLoaders().withRoutineId(routineId).set();
+        return withLoaders().withRoutineId(routineId).configured();
     }
 
     @NotNull
     public LoaderStreamChannel<OUT> staleAfter(final long time, @NotNull final TimeUnit timeUnit) {
 
-        return withLoaders().withResultStaleTime(time, timeUnit).set();
+        return withLoaders().withResultStaleTime(time, timeUnit).configured();
     }
 
     @NotNull
     public LoaderStreamChannel<OUT> staleAfter(@Nullable final TimeDuration staleTime) {
 
-        return withLoaders().withResultStaleTime(staleTime).set();
+        return withLoaders().withResultStaleTime(staleTime).configured();
     }
 
     @NotNull
@@ -644,7 +645,7 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
             return JRoutine.on(factory)
                            .withInvocations()
                            .with(invocationConfiguration)
-                           .set()
+                           .configured()
                            .buildRoutine();
         }
 
@@ -654,10 +655,10 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
         return contextBuilder.on(invocationFactory)
                              .withInvocations()
                              .with(invocationConfiguration)
-                             .set()
+                             .configured()
                              .withLoaders()
                              .with(loaderConfiguration)
-                             .set()
+                             .configured()
                              .buildRoutine();
     }
 

@@ -753,12 +753,12 @@ public final class InvocationConfiguration {
         }
 
         /**
-         * Sets the configuration and returns the configurable object.
+         * Sets the configuration and returns the configured object.
          *
-         * @return the configurable object.
+         * @return the configured object.
          */
         @NotNull
-        public TYPE set() {
+        public TYPE configured() {
 
             return mConfigurable.setConfiguration(buildConfiguration());
         }

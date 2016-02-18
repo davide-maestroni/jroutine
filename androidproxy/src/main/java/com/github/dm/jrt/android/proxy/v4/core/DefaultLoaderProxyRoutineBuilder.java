@@ -95,13 +95,13 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
                 new TargetLoaderProxyObjectBuilder<TYPE>(mContext, mTarget, itf);
         return builder.withInvocations()
                       .with(mInvocationConfiguration)
-                      .set()
+                      .configured()
                       .withProxies()
                       .with(mProxyConfiguration)
-                      .set()
+                      .configured()
                       .withLoaders()
                       .with(mLoaderConfiguration)
-                      .set()
+                      .configured()
                       .buildProxy();
     }
 

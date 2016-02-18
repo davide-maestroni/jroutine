@@ -1222,7 +1222,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                .with(context)
                .withLoaders()
                .withLoaderId(21)
-               .set()
+               .configured()
                .async()
                .map(toUpperCase());
         assertThat(JRoutine.with(context)
@@ -1234,7 +1234,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                .with(context)
                .withStreamLoaders()
                .withLoaderId(31)
-               .set()
+               .configured()
                .async()
                .map(toUpperCase());
         assertThat(JRoutine.with(context)
@@ -1252,7 +1252,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         }
 
         final IOChannelBuilder builder =
-                JRoutine.io().withChannels().withChannelOrder(OrderType.BY_CALL).set();
+                JRoutine.io().withChannels().withChannelOrder(OrderType.BY_CALL).configured();
         final IOChannel<String> channel1 = builder.buildChannel();
         final IOChannel<Integer> channel2 = builder.buildChannel();
 
@@ -1264,7 +1264,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                                         DelegationType.SYNC))
                         .withInvocations()
                         .withInputOrder(OrderType.BY_CALL)
-                        .set()
+                        .configured()
                         .asyncCall(channel);
         final SparseArray<OutputChannel<Object>> channelMap =
                 Channels.selectParcelable(output, Sort.INTEGER, Sort.STRING);
@@ -1300,7 +1300,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         }
 
         final IOChannelBuilder builder =
-                JRoutine.io().withChannels().withChannelOrder(OrderType.BY_CALL).set();
+                JRoutine.io().withChannels().withChannelOrder(OrderType.BY_CALL).configured();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
         OutputChannel<? extends ParcelableSelectable<?>> outputChannel;
@@ -1359,7 +1359,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         }
 
         final IOChannelBuilder builder =
-                JRoutine.io().withChannels().withChannelOrder(OrderType.BY_CALL).set();
+                JRoutine.io().withChannels().withChannelOrder(OrderType.BY_CALL).configured();
         final IOChannel<String> channel1 = builder.buildChannel();
         final IOChannel<String> channel2 = builder.buildChannel();
         final IOChannel<String> channel3 = builder.buildChannel();
@@ -1398,7 +1398,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         }
 
         final IOChannelBuilder builder =
-                JRoutine.io().withChannels().withChannelOrder(OrderType.BY_CALL).set();
+                JRoutine.io().withChannels().withChannelOrder(OrderType.BY_CALL).configured();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
         OutputChannel<? extends ParcelableSelectable<?>> outputChannel;
@@ -1687,7 +1687,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                           .with(context)
                           .withLoaders()
                           .withRoutineId(11)
-                          .set()
+                          .configured()
                           .async()
                           .map(toUpperCase())
                           .afterMax(seconds(10))

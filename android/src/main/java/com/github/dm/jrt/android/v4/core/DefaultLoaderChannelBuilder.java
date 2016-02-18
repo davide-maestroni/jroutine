@@ -112,13 +112,13 @@ class DefaultLoaderChannelBuilder
 
         return builder.withInvocations()
                       .with(invocationConfiguration)
-                      .set()
+                      .configured()
                       .withLoaders()
                       .with(loaderConfiguration)
                       .withClashResolution(ClashResolutionType.JOIN)
                       .withInputClashResolution(ClashResolutionType.JOIN)
                       .withResultStaleTime(TimeDuration.INFINITY)
-                      .set()
+                      .configured()
                       .asyncCall();
     }
 

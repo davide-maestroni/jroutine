@@ -209,10 +209,10 @@
                 final ObjectRoutineBuilder builder = JRoutine.on(classOfType(Main.class))
                                                              .withProxies()
                                                              .withSharedFields()
-                                                             .set()
+                                                             .configured()
                                                              .withInvocations()
                                                              .withReadTimeout(seconds(3))
-                                                             .set();
+                                                             .configured();
                 final Routine&lt;String, Integer&gt; parseRoutine = builder.aliasMethod(PARSE);
                 final Routine&lt;Integer, Integer&gt; squareRoutine = builder.aliasMethod(SQUARE);
                 final Routine&lt;List&lt;Integer&gt;, Double&gt; meanRoutine = builder.aliasMethod(MEAN);
@@ -269,10 +269,10 @@
                 final AsyncMain proxy = JRoutine.on(instance(main))
                                                 .withProxies()
                                                 .withSharedFields()
-                                                .set()
+                                                .configured()
                                                 .withInvocations()
                                                 .withReadTimeout(seconds(3))
-                                                .set()
+                                                .configured()
                                                 .buildProxy(AsyncMain.class);
                 final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(JRoutine.io().of(args))));
                 System.out.println(rms);

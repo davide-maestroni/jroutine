@@ -257,7 +257,7 @@ public abstract class AbstractStreamChannel<OUT>
         return withInvocations().withRunner(runner)
                                 .withInputLimit(maxInputs)
                                 .withInputMaxDelay(maxDelay)
-                                .set();
+                                .configured();
     }
 
     @NotNull
@@ -344,13 +344,13 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public StreamChannel<OUT> maxParallelInvocations(final int maxInvocations) {
 
-        return withInvocations().withMaxInstances(maxInvocations).set();
+        return withInvocations().withMaxInstances(maxInvocations).configured();
     }
 
     @NotNull
     public StreamChannel<OUT> ordered(@Nullable final OrderType orderType) {
 
-        return withStreamInvocations().withOutputOrder(orderType).set();
+        return withStreamInvocations().withOutputOrder(orderType).configured();
     }
 
     @NotNull
@@ -372,7 +372,7 @@ public abstract class AbstractStreamChannel<OUT>
 
         final DelegationType delegationType = mDelegationType;
         final StreamChannel<OUT> channel = withStreamInvocations().withRunner(runner)
-                                                                  .set()
+                                                                  .configured()
                                                                   .async()
                                                                   .map(PassingInvocation
                                                                                .<OUT>factoryOf());
@@ -699,7 +699,7 @@ public abstract class AbstractStreamChannel<OUT>
     private <AFTER> Routine<? super OUT, ? extends AFTER> buildRoutine(
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
 
-        return newRoutine(getStreamConfiguration().builderFrom().with(mConfiguration).set(),
+        return newRoutine(getStreamConfiguration().builderFrom().with(mConfiguration).configured(),
                           factory);
     }
 

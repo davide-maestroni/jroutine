@@ -18,6 +18,7 @@ package com.github.dm.jrt.android.v11.core;
 
 import android.util.SparseArray;
 
+import com.github.dm.jrt.builder.ChannelConfiguration;
 import com.github.dm.jrt.channel.Channel.InputChannel;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
@@ -43,20 +44,21 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
     }
 
     /**
-     * Combines the specified channels into a selectable one. The selectable indexes will be the
-     * keys of the specified sparse array.<br/>
-     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
-     * completion of the invocation lifecycle.
+     * Returns a builder of input channels combining the specified channels into a selectable one.
+     * The selectable indexes will be the keys of the specified map.<br/>
+     * Note that the builder will successfully create only one input channel instance, and that the
+     * returned channel <b>must be explicitly closed</b> in order to ensure the completion of the
+     * invocation lifecycle.
      *
      * @param channels the map of indexes and input channels.
      * @param <IN>     the input data type.
-     * @return the selectable I/O channel.
+     * @return the selectable I/O channel builder.
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
      * @see com.github.dm.jrt.core.Channels#combine(Map)
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <IN> IOChannel<Selectable<? extends IN>> combine(
+    public static <IN> Builder<? extends IOChannel<Selectable<? extends IN>>> combine(
             @NotNull final SparseArray<? extends InputChannel<? extends IN>> channels) {
 
         final int size = channels.size();
@@ -64,16 +66,26 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
             throw new IllegalArgumentException("the map of channels must not be empty");
         }
 
-        final SparseArray<IOChannel<?>> channelMap = new SparseArray<IOChannel<?>>(size);
-        for (int i = 0; i < size; ++i) {
-            final IOChannel<?> ioChannel = JRoutine.io().buildChannel();
-            ioChannel.passTo(((InputChannel<Object>) channels.valueAt(i)));
-            channelMap.put(channels.keyAt(i), ioChannel);
-        }
+        final SparseArray<? extends InputChannel<? extends IN>> channelMap = channels.clone();
+        return new AbstractBuilder<IOChannel<Selectable<? extends IN>>>() {
 
-        final IOChannel<Selectable<? extends IN>> ioChannel = JRoutine.io().buildChannel();
-        ioChannel.passTo(new SortingMapOutputConsumer(channelMap));
-        return ioChannel;
+            @NotNull
+            @Override
+            protected IOChannel<Selectable<? extends IN>> build(
+                    @NotNull final ChannelConfiguration configuration) {
+
+                final SparseArray<IOChannel<?>> ioChannelMap = new SparseArray<IOChannel<?>>(size);
+                for (int i = 0; i < size; ++i) {
+                    final IOChannel<?> ioChannel = JRoutine.io().buildChannel();
+                    ioChannel.passTo(((InputChannel<Object>) channelMap.valueAt(i)));
+                    ioChannelMap.put(channelMap.keyAt(i), ioChannel);
+                }
+
+                final IOChannel<Selectable<? extends IN>> ioChannel = JRoutine.io().buildChannel();
+                ioChannel.passTo(new SortingMapOutputConsumer(ioChannelMap));
+                return ioChannel;
+            }
+        };
     }
 
     /**

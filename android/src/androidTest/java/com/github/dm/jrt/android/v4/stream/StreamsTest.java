@@ -163,11 +163,15 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                 StreamsCompat.streamOf("test1", "test2", "test3").with(context).runOnShared();
         StreamChannel<String> channel2 =
                 StreamsCompat.streamOf("test4", "test5", "test6").with(context).runOnShared();
-        assertThat(StreamsCompat.blend(channel2, channel1).afterMax(seconds(1)).all()).containsOnly(
-                "test1", "test2", "test3", "test4", "test5", "test6");
+        assertThat(StreamsCompat.blend(channel2, channel1)
+                                .build()
+                                .afterMax(seconds(1))
+                                .all()).containsOnly("test1", "test2", "test3", "test4", "test5",
+                                                     "test6");
         channel1 = StreamsCompat.streamOf("test1", "test2", "test3").with(context).runOnShared();
         channel2 = StreamsCompat.streamOf("test4", "test5", "test6").with(context).runOnShared();
         assertThat(StreamsCompat.blend(Arrays.<StreamChannel<?>>asList(channel1, channel2))
+                                .build()
                                 .afterMax(seconds(1))
                                 .all()).containsOnly("test1", "test2", "test3", "test4", "test5",
                                                      "test6");
@@ -189,7 +193,9 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
         try {
 
-            routine.asyncCall(StreamsCompat.blend(channel1, channel2)).afterMax(seconds(1)).all();
+            routine.asyncCall(StreamsCompat.blend(channel1, channel2).build())
+                   .afterMax(seconds(1))
+                   .all();
 
             fail();
 
@@ -205,9 +211,8 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         try {
 
             routine.asyncCall(
-                    StreamsCompat.blend(Arrays.<OutputChannel<?>>asList(channel1, channel2)))
-                   .afterMax(seconds(1))
-                   .all();
+                    StreamsCompat.blend(Arrays.<OutputChannel<?>>asList(channel1, channel2))
+                                 .build()).afterMax(seconds(1)).all();
 
             fail();
 
@@ -327,12 +332,14 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         StreamChannel<String> channel2 =
                 StreamsCompat.streamOf("test4", "test5", "test6").with(context).runOnShared();
         assertThat(StreamsCompat.concat(channel2, channel1)
+                                .build()
                                 .afterMax(seconds(1))
                                 .all()).containsExactly("test4", "test5", "test6", "test1", "test2",
                                                         "test3");
         channel1 = StreamsCompat.streamOf("test1", "test2", "test3").with(context).runOnShared();
         channel2 = StreamsCompat.streamOf("test4", "test5", "test6").with(context).runOnShared();
         assertThat(StreamsCompat.concat(Arrays.<StreamChannel<?>>asList(channel1, channel2))
+                                .build()
                                 .afterMax(seconds(1))
                                 .all()).containsExactly("test1", "test2", "test3", "test4", "test5",
                                                         "test6");
@@ -354,7 +361,9 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
         try {
 
-            routine.asyncCall(StreamsCompat.concat(channel1, channel2)).afterMax(seconds(1)).all();
+            routine.asyncCall(StreamsCompat.concat(channel1, channel2).build())
+                   .afterMax(seconds(1))
+                   .all();
 
             fail();
 
@@ -370,9 +379,8 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         try {
 
             routine.asyncCall(
-                    StreamsCompat.concat(Arrays.<OutputChannel<?>>asList(channel1, channel2)))
-                   .afterMax(seconds(1))
-                   .all();
+                    StreamsCompat.concat(Arrays.<OutputChannel<?>>asList(channel1, channel2))
+                                 .build()).afterMax(seconds(1)).all();
 
             fail();
 

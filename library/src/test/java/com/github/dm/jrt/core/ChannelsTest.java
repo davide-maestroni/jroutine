@@ -62,11 +62,15 @@ public class ChannelsTest {
 
         IOChannel<String> ioChannel1 = JRoutine.io().of("test1", "test2", "test3");
         IOChannel<String> ioChannel2 = JRoutine.io().of("test4", "test5", "test6");
-        assertThat(Channels.blend(ioChannel2, ioChannel1).afterMax(seconds(1)).all()).containsOnly(
-                "test1", "test2", "test3", "test4", "test5", "test6");
+        assertThat(Channels.blend(ioChannel2, ioChannel1)
+                           .build()
+                           .afterMax(seconds(1))
+                           .all()).containsOnly("test1", "test2", "test3", "test4", "test5",
+                                                "test6");
         ioChannel1 = JRoutine.io().of("test1", "test2", "test3");
         ioChannel2 = JRoutine.io().of("test4", "test5", "test6");
         assertThat(Channels.blend(Arrays.<OutputChannel<?>>asList(ioChannel1, ioChannel2))
+                           .build()
                            .afterMax(seconds(1))
                            .all()).containsOnly("test1", "test2", "test3", "test4", "test5",
                                                 "test6");
@@ -87,7 +91,9 @@ public class ChannelsTest {
 
         try {
 
-            routine.asyncCall(Channels.blend(channel1, channel2)).afterMax(seconds(1)).all();
+            routine.asyncCall(Channels.blend(channel1, channel2).build())
+                   .afterMax(seconds(1))
+                   .all();
 
             fail();
 
@@ -102,7 +108,8 @@ public class ChannelsTest {
 
         try {
 
-            routine.asyncCall(Channels.blend(Arrays.<OutputChannel<?>>asList(channel1, channel2)))
+            routine.asyncCall(
+                    Channels.blend(Arrays.<OutputChannel<?>>asList(channel1, channel2)).build())
                    .afterMax(seconds(1))
                    .all();
 
@@ -186,18 +193,22 @@ public class ChannelsTest {
         final InvocationChannel<Integer, Integer> channel2 =
                 JRoutine.on(PassingInvocation.<Integer>factoryOf()).asyncInvoke().orderByCall();
         Channels.combine(channel1, channel2)
+                .build()
                 .pass(new Selectable<String>("test1", 0))
                 .pass(new Selectable<Integer>(1, 1))
                 .close();
         Channels.combine(3, channel1, channel2)
+                .build()
                 .pass(new Selectable<String>("test2", 3))
                 .pass(new Selectable<Integer>(2, 4))
                 .close();
         Channels.combine(Arrays.<InvocationChannel<?, ?>>asList(channel1, channel2))
+                .build()
                 .pass(new Selectable<String>("test3", 0))
                 .pass(new Selectable<Integer>(3, 1))
                 .close();
         Channels.combine(-5, Arrays.<InvocationChannel<?, ?>>asList(channel1, channel2))
+                .build()
                 .pass(new Selectable<String>("test4", -5))
                 .pass(new Selectable<Integer>(4, -4))
                 .close();
@@ -206,6 +217,7 @@ public class ChannelsTest {
         map.put(31, channel1);
         map.put(17, channel2);
         Channels.combine(map)
+                .build()
                 .pass(new Selectable<String>("test5", 31))
                 .pass(new Selectable<Integer>(5, 17))
                 .close();
@@ -222,7 +234,7 @@ public class ChannelsTest {
         InvocationChannel<Integer, Integer> channel2;
         channel1 = JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         channel2 = JRoutine.on(PassingInvocation.<Integer>factoryOf()).asyncInvoke().orderByCall();
-        Channels.<Object>combine(channel1, channel2).abort();
+        Channels.combine(channel1, channel2).build().abort();
 
         try {
 
@@ -246,7 +258,7 @@ public class ChannelsTest {
 
         channel1 = JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         channel2 = JRoutine.on(PassingInvocation.<Integer>factoryOf()).asyncInvoke().orderByCall();
-        Channels.<Object>combine(3, channel1, channel2).abort();
+        Channels.combine(3, channel1, channel2).build().abort();
 
         try {
 
@@ -270,7 +282,9 @@ public class ChannelsTest {
 
         channel1 = JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         channel2 = JRoutine.on(PassingInvocation.<Integer>factoryOf()).asyncInvoke().orderByCall();
-        Channels.combine(Arrays.<InvocationChannel<?, ?>>asList(channel1, channel2)).abort();
+        Channels.combine(Arrays.<InvocationChannel<?, ?>>asList(channel1, channel2))
+                .build()
+                .abort();
 
         try {
 
@@ -294,7 +308,9 @@ public class ChannelsTest {
 
         channel1 = JRoutine.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         channel2 = JRoutine.on(PassingInvocation.<Integer>factoryOf()).asyncInvoke().orderByCall();
-        Channels.combine(-5, Arrays.<InvocationChannel<?, ?>>asList(channel1, channel2)).abort();
+        Channels.combine(-5, Arrays.<InvocationChannel<?, ?>>asList(channel1, channel2))
+                .build()
+                .abort();
 
         try {
 
@@ -322,7 +338,7 @@ public class ChannelsTest {
                 new HashMap<Integer, InvocationChannel<?, ?>>(2);
         map.put(31, channel1);
         map.put(17, channel2);
-        Channels.combine(map).abort();
+        Channels.combine(map).build().abort();
 
         try {
 
@@ -444,12 +460,15 @@ public class ChannelsTest {
 
         IOChannel<String> ioChannel1 = JRoutine.io().of("test1", "test2", "test3");
         IOChannel<String> ioChannel2 = JRoutine.io().of("test4", "test5", "test6");
-        assertThat(
-                Channels.concat(ioChannel2, ioChannel1).afterMax(seconds(1)).all()).containsExactly(
-                "test4", "test5", "test6", "test1", "test2", "test3");
+        assertThat(Channels.concat(ioChannel2, ioChannel1)
+                           .build()
+                           .afterMax(seconds(1))
+                           .all()).containsExactly("test4", "test5", "test6", "test1", "test2",
+                                                   "test3");
         ioChannel1 = JRoutine.io().of("test1", "test2", "test3");
         ioChannel2 = JRoutine.io().of("test4", "test5", "test6");
         assertThat(Channels.concat(Arrays.<OutputChannel<?>>asList(ioChannel1, ioChannel2))
+                           .build()
                            .afterMax(seconds(1))
                            .all()).containsExactly("test1", "test2", "test3", "test4", "test5",
                                                    "test6");
@@ -470,7 +489,9 @@ public class ChannelsTest {
 
         try {
 
-            routine.asyncCall(Channels.concat(channel1, channel2)).afterMax(seconds(1)).all();
+            routine.asyncCall(Channels.concat(channel1, channel2).build())
+                   .afterMax(seconds(1))
+                   .all();
 
             fail();
 
@@ -485,7 +506,8 @@ public class ChannelsTest {
 
         try {
 
-            routine.asyncCall(Channels.concat(Arrays.<OutputChannel<?>>asList(channel1, channel2)))
+            routine.asyncCall(
+                    Channels.concat(Arrays.<OutputChannel<?>>asList(channel1, channel2)).build())
                    .afterMax(seconds(1))
                    .all();
 

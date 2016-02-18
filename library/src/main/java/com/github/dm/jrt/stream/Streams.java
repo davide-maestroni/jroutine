@@ -16,6 +16,8 @@
 
 package com.github.dm.jrt.stream;
 
+import com.github.dm.jrt.builder.ChannelConfiguration;
+import com.github.dm.jrt.builder.ChannelConfiguration.Configurable;
 import com.github.dm.jrt.builder.RoutineBuilder;
 import com.github.dm.jrt.channel.Channel.InputChannel;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
@@ -23,6 +25,7 @@ import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.common.RoutineException;
 import com.github.dm.jrt.core.Channels;
+import com.github.dm.jrt.core.Channels.Builder;
 import com.github.dm.jrt.core.Channels.Selectable;
 import com.github.dm.jrt.core.JRoutine;
 import com.github.dm.jrt.function.BiConsumer;
@@ -39,6 +42,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -70,69 +74,79 @@ public class Streams extends Functions {
     }
 
     /**
-     * Returns a stream blending the outputs coming from the specified ones.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Returns a builder of streams blending the outputs coming from the specified ones.<br/>
+     * Note that the builder will successfully create only one stream channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      *
      * @param channels the list of channels.
      * @param <OUT>    the output data type.
-     * @return the stream channel.
-     * @see com.github.dm.jrt.core.Channels#blend(List)
+     * @return the stream channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @see com.github.dm.jrt.core.Channels#blend(Collection)
      */
     @NotNull
-    public static <OUT> StreamChannel<OUT> blend(
-            @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
+    public static <OUT> Builder<? extends StreamChannel<OUT>> blend(
+            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
 
-        return streamOf(Channels.blend(channels));
+        return new BuilderWrapper<OUT>(Channels.blend(channels));
     }
 
     /**
-     * Returns a stream blending the outputs coming from the specified ones.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Returns a builder of streams blending the outputs coming from the specified ones.<br/>
+     * Note that the builder will successfully create only one stream channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      *
      * @param channels the array of channels.
      * @param <OUT>    the output data type.
-     * @return the stream channel.
+     * @return the stream channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @see com.github.dm.jrt.core.Channels#blend(OutputChannel[])
      */
     @NotNull
-    public static <OUT> StreamChannel<OUT> blend(@NotNull final OutputChannel<?>... channels) {
+    public static <OUT> Builder<? extends StreamChannel<OUT>> blend(
+            @NotNull final OutputChannel<?>... channels) {
 
-        return streamOf(Channels.<OUT>blend(channels));
+        return new BuilderWrapper<OUT>(Channels.<OUT>blend(channels));
     }
 
     /**
-     * Returns a stream concatenating the outputs coming from the specified ones, so that, all the
-     * outputs of the first channel will come before all the outputs of the second one, and so on.
-     * <br/>
-     * Note that the channels will be bound as a result of the call.
+     * Returns a builder of stream channels concatenating the outputs coming from the specified
+     * ones, so that, all the outputs of the first channel will come before all the outputs of the
+     * second one, and so on.<br/>
+     * Note that the builder will successfully create only one stream channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      *
      * @param channels the list of channels.
      * @param <OUT>    the output data type.
-     * @return the stream channel.
-     * @see com.github.dm.jrt.core.Channels#concat(List)
+     * @return the stream channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @see com.github.dm.jrt.core.Channels#concat(Collection)
      */
     @NotNull
-    public static <OUT> StreamChannel<OUT> concat(
-            @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
+    public static <OUT> Builder<? extends StreamChannel<OUT>> concat(
+            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
 
-        return streamOf(Channels.concat(channels));
+        return new BuilderWrapper<OUT>(Channels.concat(channels));
     }
 
     /**
-     * Returns a stream concatenating the outputs coming from the specified ones, so that, all the
-     * outputs of the first channel will come before all the outputs of the second one, and so on.
-     * <br/>
-     * Note that the channels will be bound as a result of the call.
+     * Returns a builder of stream channels concatenating the outputs coming from the specified
+     * ones, so that, all the outputs of the first channel will come before all the outputs of the
+     * second one, and so on.<br/>
+     * Note that the builder will successfully create only one stream channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      *
      * @param channels the array of channels.
      * @param <OUT>    the output data type.
-     * @return the stream channel.
+     * @return the stream channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @see com.github.dm.jrt.core.Channels#concat(OutputChannel[])
      */
     @NotNull
-    public static <OUT> StreamChannel<OUT> concat(@NotNull final OutputChannel<?>... channels) {
+    public static <OUT> Builder<? extends StreamChannel<OUT>> concat(
+            @NotNull final OutputChannel<?>... channels) {
 
-        return streamOf(Channels.<OUT>concat(channels));
+        return new BuilderWrapper<OUT>(Channels.<OUT>concat(channels));
     }
 
     /**
@@ -868,6 +882,47 @@ public class Streams extends Functions {
             final RangeConsumer<?> that = (RangeConsumer<?>) o;
             return mEnd.equals(that.mEnd) && mIncrement.equals(that.mIncrement) && mStart.equals(
                     that.mStart);
+        }
+    }
+
+    // TODO: 18/02/16 javadoc
+    private static class BuilderWrapper<OUT>
+            implements Builder<StreamChannel<OUT>>, Configurable<Builder<StreamChannel<OUT>>> {
+
+        private final Builder<? extends OutputChannel<OUT>> mBuilder;
+
+        private ChannelConfiguration mConfiguration = ChannelConfiguration.DEFAULT_CONFIGURATION;
+
+        private BuilderWrapper(@NotNull final Builder<? extends OutputChannel<OUT>> wrapped) {
+
+            mBuilder = wrapped;
+        }
+
+        @NotNull
+        public StreamChannel<OUT> build() {
+
+            return streamOf(mBuilder.build());
+        }
+
+        @NotNull
+        @SuppressWarnings("ConstantConditions")
+        public Builder<StreamChannel<OUT>> setConfiguration(
+                @NotNull final ChannelConfiguration configuration) {
+
+            if (configuration == null) {
+                throw new NullPointerException("the invocation configuration must not be null");
+            }
+
+            mConfiguration = configuration;
+            mBuilder.withChannels().with(null).with(configuration).configured();
+            return this;
+        }
+
+        @NotNull
+        public ChannelConfiguration.Builder<? extends Builder<StreamChannel<OUT>>> withChannels() {
+
+            final ChannelConfiguration config = mConfiguration;
+            return new ChannelConfiguration.Builder<Builder<StreamChannel<OUT>>>(this, config);
         }
     }
 

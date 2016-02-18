@@ -68,11 +68,13 @@ public class StreamsTest {
 
         StreamChannel<String> channel1 = Streams.streamOf("test1", "test2", "test3");
         StreamChannel<String> channel2 = Streams.streamOf("test4", "test5", "test6");
-        assertThat(Streams.blend(channel2, channel1).afterMax(seconds(1)).all()).containsOnly(
+        assertThat(
+                Streams.blend(channel2, channel1).build().afterMax(seconds(1)).all()).containsOnly(
                 "test1", "test2", "test3", "test4", "test5", "test6");
         channel1 = Streams.streamOf("test1", "test2", "test3");
         channel2 = Streams.streamOf("test4", "test5", "test6");
         assertThat(Streams.blend(Arrays.<StreamChannel<?>>asList(channel1, channel2))
+                          .build()
                           .afterMax(seconds(1))
                           .all()).containsOnly("test1", "test2", "test3", "test4", "test5",
                                                "test6");
@@ -93,7 +95,7 @@ public class StreamsTest {
 
         try {
 
-            routine.asyncCall(Streams.blend(channel1, channel2)).afterMax(seconds(1)).all();
+            routine.asyncCall(Streams.blend(channel1, channel2).build()).afterMax(seconds(1)).all();
 
             fail();
 
@@ -108,7 +110,8 @@ public class StreamsTest {
 
         try {
 
-            routine.asyncCall(Streams.blend(Arrays.<OutputChannel<?>>asList(channel1, channel2)))
+            routine.asyncCall(
+                    Streams.blend(Arrays.<OutputChannel<?>>asList(channel1, channel2)).build())
                    .afterMax(seconds(1))
                    .all();
 
@@ -189,11 +192,15 @@ public class StreamsTest {
 
         StreamChannel<String> channel1 = Streams.streamOf("test1", "test2", "test3");
         StreamChannel<String> channel2 = Streams.streamOf("test4", "test5", "test6");
-        assertThat(Streams.concat(channel2, channel1).afterMax(seconds(1)).all()).containsExactly(
-                "test4", "test5", "test6", "test1", "test2", "test3");
+        assertThat(Streams.concat(channel2, channel1)
+                          .build()
+                          .afterMax(seconds(1))
+                          .all()).containsExactly("test4", "test5", "test6", "test1", "test2",
+                                                  "test3");
         channel1 = Streams.streamOf("test1", "test2", "test3");
         channel2 = Streams.streamOf("test4", "test5", "test6");
         assertThat(Streams.concat(Arrays.<StreamChannel<?>>asList(channel1, channel2))
+                          .build()
                           .afterMax(seconds(1))
                           .all()).containsExactly("test1", "test2", "test3", "test4", "test5",
                                                   "test6");
@@ -214,7 +221,9 @@ public class StreamsTest {
 
         try {
 
-            routine.asyncCall(Streams.concat(channel1, channel2)).afterMax(seconds(1)).all();
+            routine.asyncCall(Streams.concat(channel1, channel2).build())
+                   .afterMax(seconds(1))
+                   .all();
 
             fail();
 
@@ -229,7 +238,8 @@ public class StreamsTest {
 
         try {
 
-            routine.asyncCall(Streams.concat(Arrays.<OutputChannel<?>>asList(channel1, channel2)))
+            routine.asyncCall(
+                    Streams.concat(Arrays.<OutputChannel<?>>asList(channel1, channel2)).build())
                    .afterMax(seconds(1))
                    .all();
 

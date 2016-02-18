@@ -78,18 +78,22 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
                         .asyncInvoke()
                         .orderByCall();
         Channels.combine(channel1, channel2)
+                .build()
                 .pass(new ParcelableSelectable<String>("test1", 0))
                 .pass(new ParcelableSelectable<Integer>(1, 1))
                 .close();
         Channels.combine(3, channel1, channel2)
+                .build()
                 .pass(new ParcelableSelectable<String>("test2", 3))
                 .pass(new ParcelableSelectable<Integer>(2, 4))
                 .close();
         Channels.combine(Arrays.<InvocationChannel<?, ?>>asList(channel1, channel2))
+                .build()
                 .pass(new ParcelableSelectable<String>("test3", 0))
                 .pass(new ParcelableSelectable<Integer>(3, 1))
                 .close();
         Channels.combine(-5, Arrays.<InvocationChannel<?, ?>>asList(channel1, channel2))
+                .build()
                 .pass(new ParcelableSelectable<String>("test4", -5))
                 .pass(new ParcelableSelectable<Integer>(4, -4))
                 .close();
@@ -98,6 +102,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         map.put(31, channel1);
         map.put(17, channel2);
         Channels.combine(map)
+                .build()
                 .pass(new ParcelableSelectable<String>("test5", 31))
                 .pass(new ParcelableSelectable<Integer>(5, 17))
                 .close();
@@ -119,7 +124,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
                            .on(factoryOf(PassingInteger.class))
                            .asyncInvoke()
                            .orderByCall();
-        Channels.combine(channel1, channel2).abort();
+        Channels.combine(channel1, channel2).build().abort();
 
         try {
 
@@ -149,7 +154,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
                            .on(factoryOf(PassingInteger.class))
                            .asyncInvoke()
                            .orderByCall();
-        Channels.combine(3, channel1, channel2).abort();
+        Channels.combine(3, channel1, channel2).build().abort();
 
         try {
 
@@ -179,7 +184,9 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
                            .on(factoryOf(PassingInteger.class))
                            .asyncInvoke()
                            .orderByCall();
-        Channels.combine(Arrays.<InvocationChannel<?, ?>>asList(channel1, channel2)).abort();
+        Channels.combine(Arrays.<InvocationChannel<?, ?>>asList(channel1, channel2))
+                .build()
+                .abort();
 
         try {
 
@@ -209,7 +216,9 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
                            .on(factoryOf(PassingInteger.class))
                            .asyncInvoke()
                            .orderByCall();
-        Channels.combine(-5, Arrays.<InvocationChannel<?, ?>>asList(channel1, channel2)).abort();
+        Channels.combine(-5, Arrays.<InvocationChannel<?, ?>>asList(channel1, channel2))
+                .build()
+                .abort();
 
         try {
 
@@ -243,7 +252,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
                 new HashMap<Integer, InvocationChannel<?, ?>>(2);
         map.put(31, channel1);
         map.put(17, channel2);
-        Channels.combine(map).abort();
+        Channels.combine(map).build().abort();
 
         try {
 

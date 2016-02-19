@@ -738,7 +738,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         channel2 = builder.buildChannel();
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
         channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
-        assertThat(routine.asyncCall(StreamsCompat.join(channel1, channel2))
+        assertThat(routine.asyncCall(StreamsCompat.join(channel1, channel2).build())
                           .afterMax(seconds(10))
                           .all()).containsExactly('s', '2');
         channel1 = builder.buildChannel();
@@ -746,7 +746,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
         channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
         assertThat(routine.asyncCall(
-                StreamsCompat.join(Arrays.<OutputChannel<?>>asList(channel1, channel2)))
+                StreamsCompat.join(Arrays.<OutputChannel<?>>asList(channel1, channel2)).build())
                           .afterMax(seconds(10))
                           .all()).containsExactly('s', '2');
         channel1 = builder.buildChannel();
@@ -758,7 +758,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                 .pass("test3")
                 .close();
         channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
-        assertThat(routine.asyncCall(StreamsCompat.join(channel1, channel2))
+        assertThat(routine.asyncCall(StreamsCompat.join(channel1, channel2).build())
                           .afterMax(seconds(10))
                           .all()).containsExactly('s', '2');
     }
@@ -779,7 +779,9 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
         try {
 
-            routine.asyncCall(StreamsCompat.join(channel1, channel2)).afterMax(seconds(1)).all();
+            routine.asyncCall(StreamsCompat.join(channel1, channel2).build())
+                   .afterMax(seconds(1))
+                   .all();
 
             fail();
 
@@ -795,7 +797,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         try {
 
             routine.asyncCall(
-                    StreamsCompat.join(Arrays.<OutputChannel<?>>asList(channel1, channel2)))
+                    StreamsCompat.join(Arrays.<OutputChannel<?>>asList(channel1, channel2)).build())
                    .afterMax(seconds(1))
                    .all();
 
@@ -862,7 +864,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         channel2 = builder.buildChannel();
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
         channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
-        assertThat(routine.asyncCall(StreamsCompat.join(new Object(), channel1, channel2))
+        assertThat(routine.asyncCall(StreamsCompat.join(new Object(), channel1, channel2).build())
                           .afterMax(seconds(10))
                           .all()).containsExactly('s', '2');
         channel1 = builder.buildChannel();
@@ -870,9 +872,8 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
         channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
         assertThat(routine.asyncCall(
-                StreamsCompat.join(null, Arrays.<OutputChannel<?>>asList(channel1, channel2)))
-                          .afterMax(seconds(10))
-                          .all()).containsExactly('s', '2');
+                StreamsCompat.join(null, Arrays.<OutputChannel<?>>asList(channel1, channel2))
+                             .build()).afterMax(seconds(10)).all()).containsExactly('s', '2');
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         channel1.orderByCall()
@@ -885,7 +886,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
         try {
 
-            routine.asyncCall(StreamsCompat.join(new Object(), channel1, channel2))
+            routine.asyncCall(StreamsCompat.join(new Object(), channel1, channel2).build())
                    .afterMax(seconds(10))
                    .all();
 
@@ -912,7 +913,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
         try {
 
-            routine.asyncCall(StreamsCompat.join((Object) null, channel1, channel2))
+            routine.asyncCall(StreamsCompat.join((Object) null, channel1, channel2).build())
                    .afterMax(seconds(1))
                    .all();
 
@@ -931,7 +932,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
             routine.asyncCall(StreamsCompat.join(new Object(),
                                                  Arrays.<OutputChannel<?>>asList(channel1,
-                                                                                 channel2)))
+                                                                                 channel2)).build())
                    .afterMax(seconds(1))
                    .all();
 
@@ -1158,7 +1159,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         final IOChannel<Integer> channel2 = builder.buildChannel();
 
         final OutputChannel<? extends ParcelableSelectable<Object>> channel =
-                StreamsCompat.merge(Arrays.<OutputChannel<?>>asList(channel1, channel2));
+                StreamsCompat.merge(Arrays.<OutputChannel<?>>asList(channel1, channel2)).build();
         final OutputChannel<ParcelableSelectable<Object>> output =
                 JRoutineCompat.with(loaderFrom(getActivity()))
                               .on(factoryFrom(JRoutineCompat.on(new Sort()).buildRoutine(), 1,
@@ -1202,7 +1203,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         OutputChannel<? extends ParcelableSelectable<?>> outputChannel;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        outputChannel = StreamsCompat.<Object>merge(-7, channel1, channel2);
+        outputChannel = StreamsCompat.merge(-7, channel1, channel2).build();
         channel1.pass("test1").close();
         channel2.pass(13).close();
         assertThat(outputChannel.afterMax(seconds(1)).all()).containsOnly(
@@ -1210,8 +1211,8 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                 new ParcelableSelectable<Integer>(13, -6));
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        outputChannel = StreamsCompat.<Object>merge(11, Arrays.<OutputChannel<?>>asList(channel1,
-                                                                                        channel2));
+        outputChannel = StreamsCompat.merge(11, Arrays.<OutputChannel<?>>asList(channel1, channel2))
+                                     .build();
         channel2.pass(13).close();
         channel1.pass("test1").close();
         assertThat(outputChannel.afterMax(seconds(1)).all()).containsOnly(
@@ -1219,7 +1220,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                 new ParcelableSelectable<Integer>(13, 12));
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        outputChannel = StreamsCompat.<Object>merge(channel1, channel2);
+        outputChannel = StreamsCompat.merge(channel1, channel2).build();
         channel1.pass("test2").close();
         channel2.pass(-17).close();
         assertThat(outputChannel.afterMax(seconds(1)).all()).containsOnly(
@@ -1228,7 +1229,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         outputChannel =
-                StreamsCompat.<Object>merge(Arrays.<OutputChannel<?>>asList(channel1, channel2));
+                StreamsCompat.merge(Arrays.<OutputChannel<?>>asList(channel1, channel2)).build();
         channel1.pass("test2").close();
         channel2.pass(-17).close();
         assertThat(outputChannel.afterMax(seconds(1)).all()).containsOnly(
@@ -1240,7 +1241,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                 new SparseArrayCompat<OutputChannel<?>>(2);
         channelMap.put(7, channel1);
         channelMap.put(-3, channel2);
-        outputChannel = StreamsCompat.<Object>merge(channelMap);
+        outputChannel = StreamsCompat.merge(channelMap).build();
         channel1.pass("test3").close();
         channel2.pass(111).close();
         assertThat(outputChannel.afterMax(seconds(1)).all()).containsOnly(
@@ -1265,7 +1266,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                                                     .buildRoutine(), 1, DelegationType.SYNC))
                               .buildRoutine();
         final OutputChannel<String> outputChannel = routine.asyncCall(
-                StreamsCompat.merge(Arrays.asList(channel1, channel2, channel3, channel4)));
+                StreamsCompat.merge(Arrays.asList(channel1, channel2, channel3, channel4)).build());
 
         for (int i = 0; i < 4; i++) {
 
@@ -1293,7 +1294,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         OutputChannel<? extends ParcelableSelectable<?>> outputChannel;
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        outputChannel = StreamsCompat.<Object>merge(-7, channel1, channel2);
+        outputChannel = StreamsCompat.merge(-7, channel1, channel2).build();
         channel1.pass("test1").close();
         channel2.abort();
 
@@ -1309,8 +1310,8 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        outputChannel = StreamsCompat.<Object>merge(11, Arrays.<OutputChannel<?>>asList(channel1,
-                                                                                        channel2));
+        outputChannel = StreamsCompat.merge(11, Arrays.<OutputChannel<?>>asList(channel1, channel2))
+                                     .build();
         channel2.abort();
         channel1.pass("test1").close();
 
@@ -1326,7 +1327,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
-        outputChannel = StreamsCompat.<Object>merge(channel1, channel2);
+        outputChannel = StreamsCompat.merge(channel1, channel2).build();
         channel1.abort();
         channel2.pass(-17).close();
 
@@ -1343,7 +1344,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         outputChannel =
-                StreamsCompat.<Object>merge(Arrays.<OutputChannel<?>>asList(channel1, channel2));
+                StreamsCompat.merge(Arrays.<OutputChannel<?>>asList(channel1, channel2)).build();
         channel1.pass("test2").close();
         channel2.abort();
 
@@ -1363,7 +1364,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                 new SparseArrayCompat<OutputChannel<?>>(2);
         channelMap.append(7, channel1);
         channelMap.append(-3, channel2);
-        outputChannel = StreamsCompat.<Object>merge(channelMap);
+        outputChannel = StreamsCompat.merge(channelMap).build();
         channel1.abort();
         channel2.pass(111).close();
 
@@ -1511,7 +1512,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
     public void testRepeat() {
 
         final IOChannel<Object> ioChannel = JRoutineCompat.io().buildChannel();
-        final OutputChannel<Object> channel = StreamsCompat.repeat(ioChannel);
+        final OutputChannel<Object> channel = StreamsCompat.repeat(ioChannel).build();
         ioChannel.pass("test1", "test2");
         final IOChannel<Object> output1 = JRoutineCompat.io().buildChannel();
         channel.passTo(output1).close();
@@ -1526,7 +1527,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
     public void testRepeatAbort() {
 
         final IOChannel<Object> ioChannel = JRoutineCompat.io().buildChannel();
-        final OutputChannel<Object> channel = StreamsCompat.repeat(ioChannel);
+        final OutputChannel<Object> channel = StreamsCompat.repeat(ioChannel).build();
         ioChannel.pass("test1", "test2");
         final IOChannel<Object> output1 = JRoutineCompat.io().buildChannel();
         channel.passTo(output1).close();

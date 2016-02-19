@@ -139,6 +139,54 @@ public final class ChannelConfiguration {
                 : new Builder<ChannelConfiguration>(sDefaultConfigurable, initialConfiguration);
     }
 
+    @NotNull
+    public static Builder<ChannelConfiguration> fromInputChannelConfiguration(
+            @Nullable final InvocationConfiguration initialConfiguration) {
+
+        if (initialConfiguration == null) {
+            return builder();
+        }
+
+        final Builder<ChannelConfiguration> builder =
+                fromInvocationConfiguration(initialConfiguration);
+        return builder.withChannelOrder(initialConfiguration.getInputOrderTypeOr(null))
+                      .withChannelLimit(
+                              initialConfiguration.getInputLimitOr(ChannelConfiguration.DEFAULT))
+                      .withChannelMaxDelay(initialConfiguration.getInputMaxDelayOr(null))
+                      .withChannelMaxSize(
+                              initialConfiguration.getInputMaxSizeOr(ChannelConfiguration.DEFAULT));
+    }
+
+    @NotNull
+    public static Builder<ChannelConfiguration> fromInvocationConfiguration(
+            @Nullable final InvocationConfiguration initialConfiguration) {
+
+        return (initialConfiguration == null) ? builder()
+                : builder().withRunner(initialConfiguration.getRunnerOr(null))
+                           .withReadTimeout(initialConfiguration.getReadTimeoutOr(null))
+                           .withReadTimeoutAction(initialConfiguration.getReadTimeoutActionOr(null))
+                           .withLog(initialConfiguration.getLogOr(null))
+                           .withLogLevel(initialConfiguration.getLogLevelOr(null));
+    }
+
+    @NotNull
+    public static Builder<ChannelConfiguration> fromOutputChannelConfiguration(
+            @Nullable final InvocationConfiguration initialConfiguration) {
+
+        if (initialConfiguration == null) {
+            return builder();
+        }
+
+        final Builder<ChannelConfiguration> builder =
+                fromInvocationConfiguration(initialConfiguration);
+        return builder.withChannelOrder(initialConfiguration.getOutputOrderTypeOr(null))
+                      .withChannelLimit(
+                              initialConfiguration.getOutputLimitOr(ChannelConfiguration.DEFAULT))
+                      .withChannelMaxDelay(initialConfiguration.getOutputMaxDelayOr(null))
+                      .withChannelMaxSize(initialConfiguration.getOutputMaxSizeOr(
+                              ChannelConfiguration.DEFAULT));
+    }
+
     /**
      * Returns a channel configuration builder initialized with this configuration.
      *

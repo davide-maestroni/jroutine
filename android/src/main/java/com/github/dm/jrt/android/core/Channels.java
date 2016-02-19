@@ -19,6 +19,7 @@ package com.github.dm.jrt.android.core;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.github.dm.jrt.builder.ChannelConfiguration;
 import com.github.dm.jrt.channel.Channel.InputChannel;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
@@ -28,7 +29,9 @@ import com.github.dm.jrt.core.JRoutine;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Utility class for handling routine channels.
@@ -45,96 +48,100 @@ public class Channels extends com.github.dm.jrt.core.Channels {
     }
 
     /**
-     * Merges the specified channels into a selectable one. The selectable indexes will start from
-     * the specified one.<br/>
-     * Note that the passed channels will be bound as a result of the call.
+     * Returns a builder of output channels merging the specified channels into a selectable one.
+     * The selectable indexes will start from the specified one.<br/>
+     * Note that the builder will successfully create only one output channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      *
      * @param startIndex the selectable start index.
-     * @param channels   the list of channels.
+     * @param channels   the collection of channels.
      * @param <OUT>      the output data type.
-     * @return the selectable output channel.
-     * @throws java.lang.IllegalArgumentException if the specified list is empty.
-     * @see com.github.dm.jrt.core.Channels#merge(int, List)
+     * @return the selectable output channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @see com.github.dm.jrt.core.Channels#merge(int, Collection)
      */
     @NotNull
-    public static <OUT> OutputChannel<? extends ParcelableSelectable<OUT>> merge(
+    public static <OUT> Builder<? extends OutputChannel<? extends ParcelableSelectable<OUT>>> merge(
             final int startIndex,
-            @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
+            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
 
         if (channels.isEmpty()) {
-            throw new IllegalArgumentException("the list of channels must not be empty");
+            throw new IllegalArgumentException("the collection of channels must not be empty");
         }
 
-        final IOChannel<ParcelableSelectable<OUT>> ioChannel = JRoutine.io().buildChannel();
-        int i = startIndex;
-        for (final OutputChannel<? extends OUT> channel : channels) {
-            ioChannel.pass(toSelectable(channel, i++));
+        if (channels.contains(null)) {
+            throw new NullPointerException(
+                    "the collection of channels must not contain null objects");
         }
 
-        return ioChannel.close();
+        return new MergeBuilder<OUT>(startIndex,
+                                     new ArrayList<OutputChannel<? extends OUT>>(channels));
     }
 
     /**
-     * Merges the specified channels into a selectable one. The selectable indexes will start from
-     * the specified one.<br/>
-     * Note that the passed channels will be bound as a result of the call.
+     * Returns a builder of output channels merging the specified channels into a selectable one.
+     * The selectable indexes will start from the specified one.<br/>
+     * Note that the builder will successfully create only one output channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      *
      * @param startIndex the selectable start index.
      * @param channels   the array of channels.
      * @param <OUT>      the output data type.
-     * @return the selectable output channel.
+     * @return the selectable output channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @see com.github.dm.jrt.core.Channels#merge(int, OutputChannel[])
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <OUT> OutputChannel<? extends ParcelableSelectable<OUT>> merge(
+    public static <OUT> Builder<? extends OutputChannel<? extends ParcelableSelectable<OUT>>> merge(
             final int startIndex, @NotNull final OutputChannel<?>... channels) {
 
         if (channels.length == 0) {
             throw new IllegalArgumentException("the array of channels must not be empty");
         }
 
-        final IOChannel<ParcelableSelectable<OUT>> ioChannel = JRoutine.io().buildChannel();
-        int i = startIndex;
-        for (final OutputChannel<?> channel : channels) {
-            ioChannel.pass(toSelectable((OutputChannel<? extends OUT>) channel, i++));
+        final ArrayList<OutputChannel<?>> outputChannels = new ArrayList<OutputChannel<?>>();
+        Collections.addAll(outputChannels, channels);
+        if (outputChannels.contains(null)) {
+            throw new NullPointerException("the array of channels must not contain null objects");
         }
 
-        return ioChannel.close();
+        return (MergeBuilder<OUT>) new MergeBuilder<Object>(startIndex, outputChannels);
     }
 
     /**
-     * Merges the specified channels into a selectable one. The selectable indexes will be the same
-     * as the list ones.<br/>
-     * Note that the passed channels will be bound as a result of the call.
+     * Returns a builder of output channels merging the specified channels into a selectable one.
+     * The selectable indexes will be the position in the collection.<br/>
+     * Note that the builder will successfully create only one output channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      *
      * @param channels the channels to merge.
      * @param <OUT>    the output data type.
-     * @return the selectable output channel.
-     * @throws java.lang.IllegalArgumentException if the specified list is empty.
-     * @see com.github.dm.jrt.core.Channels#merge(List)
+     * @return the selectable output channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @see com.github.dm.jrt.core.Channels#merge(Collection)
      */
     @NotNull
-    public static <OUT> OutputChannel<? extends ParcelableSelectable<OUT>> merge(
-            @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
+    public static <OUT> Builder<? extends OutputChannel<? extends ParcelableSelectable<OUT>>> merge(
+            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
 
         return merge(0, channels);
     }
 
     /**
-     * Merges the specified channels into a selectable one. The selectable indexes will be the same
-     * as the array ones.<br/>
-     * Note that the passed channels will be bound as a result of the call.
+     * Returns a builder of output channels merging the specified channels into a selectable one.
+     * The selectable indexes will be the position in the array.<br/>
+     * Note that the builder will successfully create only one output channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      *
      * @param channels the channels to merge.
      * @param <OUT>    the output data type.
-     * @return the selectable output channel.
+     * @return the selectable output channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @see com.github.dm.jrt.core.Channels#merge(OutputChannel[])
      */
     @NotNull
-    public static <OUT> OutputChannel<? extends ParcelableSelectable<OUT>> merge(
+    public static <OUT> Builder<? extends OutputChannel<? extends ParcelableSelectable<OUT>>> merge(
             @NotNull final OutputChannel<?>... channels) {
 
         return merge(0, channels);
@@ -239,6 +246,48 @@ public class Channels extends com.github.dm.jrt.core.Channels {
 
             dest.writeValue(data);
             dest.writeInt(index);
+        }
+    }
+
+    /**
+     * Builder implementation merging data from a set of output channels into selectable objects.
+     *
+     * @param <OUT> the output data type.
+     */
+    private static class MergeBuilder<OUT>
+            extends AbstractBuilder<OutputChannel<? extends ParcelableSelectable<OUT>>> {
+
+        private final ArrayList<OutputChannel<? extends OUT>> mChannels;
+
+        private final int mStartIndex;
+
+        /**
+         * Constructor.
+         *
+         * @param startIndex the selectable start index.
+         * @param channels   the input channels to merge.
+         */
+        private MergeBuilder(final int startIndex,
+                @NotNull final ArrayList<OutputChannel<? extends OUT>> channels) {
+
+            mStartIndex = startIndex;
+            mChannels = channels;
+        }
+
+        @NotNull
+        @Override
+        @SuppressWarnings("unchecked")
+        protected OutputChannel<? extends ParcelableSelectable<OUT>> build(
+                @NotNull final ChannelConfiguration configuration) {
+
+            final IOChannel<ParcelableSelectable<OUT>> ioChannel =
+                    JRoutine.io().withChannels().with(configuration).configured().buildChannel();
+            int i = mStartIndex;
+            for (final OutputChannel<? extends OUT> channel : mChannels) {
+                ioChannel.pass(toSelectable(channel, i++));
+            }
+
+            return ioChannel.close();
         }
     }
 

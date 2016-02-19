@@ -62,7 +62,7 @@ public class StreamsCompat extends Streams {
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
-     * @param channels the list of channels.
+     * @param channels the collection of channels.
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
@@ -100,7 +100,7 @@ public class StreamsCompat extends Streams {
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
-     * @param channels the list of channels.
+     * @param channels the collection of channels.
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
@@ -157,84 +157,88 @@ public class StreamsCompat extends Streams {
     }
 
     /**
-     * Returns a loader stream joining the data coming from the specified list of channels.<br/>
+     * Returns a builder of loader streams joining the data coming from the specified channels.<br/>
      * An output will be generated only when at least one result is available for each channel.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Note that the builder will successfully create only one stream channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      *
-     * @param channels the list of channels.
+     * @param channels the collection of channels.
      * @param <OUT>    the output data type.
-     * @return the output channel.
-     * @throws java.lang.IllegalArgumentException if the specified list is empty.
-     * @see com.github.dm.jrt.android.v4.core.ChannelsCompat#join(List)
+     * @return the stream channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @see com.github.dm.jrt.android.v4.core.ChannelsCompat#join(Collection)
      */
     @NotNull
-    public static <OUT> LoaderStreamChannelCompat<List<? extends OUT>> join(
-            @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
+    public static <OUT> Builder<? extends LoaderStreamChannelCompat<List<? extends OUT>>> join(
+            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
 
-        return streamOf(ChannelsCompat.join(channels));
+        return new BuilderWrapper<List<? extends OUT>>(ChannelsCompat.join(channels));
     }
 
     /**
-     * Returns a loader stream joining the data coming from the specified list of channels.<br/>
+     * Returns a builder of loader streams joining the data coming from the specified channels.<br/>
      * An output will be generated only when at least one result is available for each channel.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Note that the builder will successfully create only one stream channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      *
      * @param channels the array of channels.
      * @param <OUT>    the output data type.
-     * @return the stream channel.
+     * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @see com.github.dm.jrt.android.v4.core.ChannelsCompat#join(OutputChannel[])
      */
     @NotNull
-    public static <OUT> LoaderStreamChannelCompat<List<? extends OUT>> join(
+    public static <OUT> Builder<? extends LoaderStreamChannelCompat<List<? extends OUT>>> join(
             @NotNull final OutputChannel<?>... channels) {
 
-        return streamOf(ChannelsCompat.<OUT>join(channels));
+        return new BuilderWrapper<List<? extends OUT>>(ChannelsCompat.<OUT>join(channels));
     }
 
     /**
-     * Returns a loader stream joining the data coming from the specified list of channels.<br/>
+     * Returns a builder of loader streams joining the data coming from the specified channels.<br/>
      * An output will be generated only when at least one result is available for each channel.
      * Moreover, when all the output channels complete, the remaining outputs will be returned by
      * filling the gaps with the specified placeholder instance, so that the generated list of data
      * will always have the same size of the channel list.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Note that the builder will successfully create only one stream channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      *
      * @param placeholder the placeholder instance.
-     * @param channels    the list of channels.
+     * @param channels    the collection of channels.
      * @param <OUT>       the output data type.
-     * @return the stream channel.
-     * @throws java.lang.IllegalArgumentException if the specified list is empty.
-     * @see com.github.dm.jrt.android.v4.core.ChannelsCompat#join(Object, List)
+     * @return the stream channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @see com.github.dm.jrt.android.v4.core.ChannelsCompat#join(Object, Collection)
      */
     @NotNull
-    public static <OUT> LoaderStreamChannelCompat<List<? extends OUT>> join(
+    public static <OUT> Builder<? extends LoaderStreamChannelCompat<List<? extends OUT>>> join(
             @Nullable final OUT placeholder,
-            @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
+            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
 
-        return streamOf(ChannelsCompat.join(placeholder, channels));
+        return new BuilderWrapper<List<? extends OUT>>(ChannelsCompat.join(placeholder, channels));
     }
 
     /**
-     * Returns a loader stream joining the data coming from the specified list of channels.<br/>
+     * Returns a builder of loader streams joining the data coming from the specified channels.<br/>
      * An output will be generated only when at least one result is available for each channel.
      * Moreover, when all the output channels complete, the remaining outputs will be returned by
      * filling the gaps with the specified placeholder instance, so that the generated list of data
      * will always have the same size of the channel list.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Note that the builder will successfully create only one stream channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      *
      * @param placeholder the placeholder instance.
      * @param channels    the array of channels.
      * @param <OUT>       the output data type.
-     * @return the stream channel.
+     * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @see com.github.dm.jrt.android.v4.core.ChannelsCompat#join(Object, OutputChannel[])
      */
     @NotNull
-    public static <OUT> LoaderStreamChannelCompat<List<? extends OUT>> join(
-            @Nullable final Object placeholder, @NotNull final OutputChannel<?>... channels) {
+    public static <OUT> Builder<? extends LoaderStreamChannelCompat<List<? extends OUT>>> join(
+            @Nullable final OUT placeholder, @NotNull final OutputChannel<?>... channels) {
 
-        return streamOf(ChannelsCompat.<OUT>join(placeholder, channels));
+        return new BuilderWrapper<List<? extends OUT>>(ChannelsCompat.join(placeholder, channels));
     }
 
     /**
@@ -324,93 +328,101 @@ public class StreamsCompat extends Streams {
     }
 
     /**
-     * Merges the specified channels into a selectable loader stream.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Returns a builder of loader stream merging the specified channels into a selectable one.<br/>
+     * Note that the builder will successfully create only one stream channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      *
      * @param startIndex the selectable start index.
-     * @param channels   the list of channels.
+     * @param channels   the collection of channels.
      * @param <OUT>      the output data type.
-     * @return the selectable stream channel.
-     * @throws java.lang.IllegalArgumentException if the specified list is empty.
-     * @see com.github.dm.jrt.android.v4.core.ChannelsCompat#merge(int, List)
+     * @return the selectable stream channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @see com.github.dm.jrt.android.v4.core.ChannelsCompat#merge(int, Collection)
      */
     @NotNull
-    public static <OUT> LoaderStreamChannelCompat<? extends ParcelableSelectable<OUT>> merge(
-            final int startIndex,
-            @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
+    public static <OUT> Builder<? extends LoaderStreamChannelCompat<? extends
+            ParcelableSelectable<OUT>>> merge(final int startIndex,
+            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
 
-        return streamOf(ChannelsCompat.merge(startIndex, channels));
+        return new BuilderWrapper<ParcelableSelectable<OUT>>(
+                ChannelsCompat.merge(startIndex, channels));
     }
 
     /**
-     * Merges the specified channels into a selectable loader stream.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Returns a builder of loader stream merging the specified channels into a selectable one.<br/>
+     * Note that the builder will successfully create only one stream channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      *
      * @param startIndex the selectable start index.
      * @param channels   the array of channels.
      * @param <OUT>      the output data type.
-     * @return the selectable stream channel.
+     * @return the selectable stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @see com.github.dm.jrt.android.v4.core.ChannelsCompat#merge(int, OutputChannel[])
      */
     @NotNull
-    public static <OUT> LoaderStreamChannelCompat<? extends ParcelableSelectable<OUT>> merge(
-            final int startIndex, @NotNull final OutputChannel<?>... channels) {
+    public static <OUT> Builder<? extends LoaderStreamChannelCompat<? extends
+            ParcelableSelectable<OUT>>> merge(final int startIndex,
+            @NotNull final OutputChannel<?>... channels) {
 
-        return streamOf(ChannelsCompat.<OUT>merge(startIndex, channels));
+        return new BuilderWrapper<ParcelableSelectable<OUT>>(
+                ChannelsCompat.<OUT>merge(startIndex, channels));
     }
 
     /**
-     * Merges the specified channels into a selectable loader stream. The selectable indexes will be
-     * the same as the list ones.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Returns a builder of loader stream merging the specified channels into a selectable one.<br/>
+     * Note that the builder will successfully create only one stream channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      *
      * @param channels the channels to merge.
      * @param <OUT>    the output data type.
-     * @return the selectable stream channel.
-     * @throws java.lang.IllegalArgumentException if the specified list is empty.
-     * @see com.github.dm.jrt.android.v4.core.ChannelsCompat#merge(List)
+     * @return the selectable stream channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @see com.github.dm.jrt.android.v4.core.ChannelsCompat#merge(Collection)
      */
     @NotNull
-    public static <OUT> LoaderStreamChannelCompat<? extends ParcelableSelectable<OUT>> merge(
-            @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
+    public static <OUT> Builder<? extends LoaderStreamChannelCompat<? extends
+            ParcelableSelectable<OUT>>> merge(
+            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
 
-        return streamOf(ChannelsCompat.merge(channels));
+        return new BuilderWrapper<ParcelableSelectable<OUT>>(ChannelsCompat.merge(channels));
     }
 
     /**
-     * Merges the specified channels into a selectable loader stream. The selectable indexes will be
-     * the same as the array ones.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Returns a builder of loader stream merging the specified channels into a selectable one.<br/>
+     * Note that the builder will successfully create only one stream channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      *
      * @param channels the channels to merge.
      * @param <OUT>    the output data type.
-     * @return the selectable stream channel.
+     * @return the selectable stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @see com.github.dm.jrt.android.v4.core.ChannelsCompat#merge(OutputChannel[])
      */
     @NotNull
-    public static <OUT> LoaderStreamChannelCompat<? extends ParcelableSelectable<OUT>> merge(
-            @NotNull final OutputChannel<?>... channels) {
+    public static <OUT> Builder<? extends LoaderStreamChannelCompat<? extends
+            ParcelableSelectable<OUT>>> merge(@NotNull final OutputChannel<?>... channels) {
 
-        return streamOf(ChannelsCompat.<OUT>merge(channels));
+        return new BuilderWrapper<ParcelableSelectable<OUT>>(ChannelsCompat.<OUT>merge(channels));
     }
 
     /**
-     * Merges the specified channels into a selectable loader stream.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Returns a builder of loader stream merging the specified channels into a selectable one.<br/>
+     * Note that the builder will successfully create only one stream channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      *
-     * @param channelMap the map of indexes and output channels.
-     * @param <OUT>      the output data type.
-     * @return the selectable stream channel.
+     * @param channels the map of indexes and output channels.
+     * @param <OUT>    the output data type.
+     * @return the selectable stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
      * @see com.github.dm.jrt.android.v4.core.ChannelsCompat#merge(SparseArrayCompat)
      */
     @NotNull
-    public static <OUT> LoaderStreamChannelCompat<? extends ParcelableSelectable<OUT>> merge(
-            @NotNull final SparseArrayCompat<? extends OutputChannel<? extends OUT>> channelMap) {
+    public static <OUT> Builder<? extends LoaderStreamChannelCompat<? extends
+            ParcelableSelectable<OUT>>> merge(
+            @NotNull final SparseArrayCompat<? extends OutputChannel<? extends OUT>> channels) {
 
-        return streamOf(ChannelsCompat.merge(channelMap));
+        return new BuilderWrapper<ParcelableSelectable<OUT>>(ChannelsCompat.merge(channels));
     }
 
     /**
@@ -468,20 +480,21 @@ public class StreamsCompat extends Streams {
     }
 
     /**
-     * Returns a new loader stream repeating the output data to any newly bound channel or consumer,
-     * thus effectively supporting binding of several output consumers.<br/>
-     * Note that the passed channels will be bound as a result of the call.
+     * Returns a builder of streams repeating the output data to any newly bound channel or
+     * consumer, thus effectively supporting binding of several output consumers.<br/>
+     * Note that the builder will successfully create only one stream channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      *
      * @param channel the output channel.
      * @param <OUT>   the output data type.
-     * @return the repeating stream channel.
+     * @return the repeating stream channel builder.
      * @see com.github.dm.jrt.android.v4.core.ChannelsCompat#repeat(OutputChannel)
      */
     @NotNull
-    public static <OUT> LoaderStreamChannelCompat<OUT> repeat(
+    public static <OUT> Builder<? extends LoaderStreamChannelCompat<OUT>> repeat(
             @NotNull final OutputChannel<OUT> channel) {
 
-        return streamOf(ChannelsCompat.repeat(channel));
+        return new BuilderWrapper<OUT>(ChannelsCompat.repeat(channel));
     }
 
     /**
@@ -574,19 +587,21 @@ public class StreamsCompat extends Streams {
     private static class BuilderWrapper<OUT> implements Builder<LoaderStreamChannelCompat<OUT>>,
             Configurable<Builder<LoaderStreamChannelCompat<OUT>>> {
 
-        private final Builder<? extends OutputChannel<OUT>> mBuilder;
+        private final Builder<? extends OutputChannel<? extends OUT>> mBuilder;
 
         private ChannelConfiguration mConfiguration = ChannelConfiguration.DEFAULT_CONFIGURATION;
 
-        private BuilderWrapper(@NotNull final Builder<? extends OutputChannel<OUT>> wrapped) {
+        private BuilderWrapper(
+                @NotNull final Builder<? extends OutputChannel<? extends OUT>> wrapped) {
 
             mBuilder = wrapped;
         }
 
         @NotNull
+        @SuppressWarnings("unchecked")
         public LoaderStreamChannelCompat<OUT> build() {
 
-            return streamOf(mBuilder.build());
+            return (LoaderStreamChannelCompat<OUT>) streamOf(mBuilder.build());
         }
 
         @NotNull

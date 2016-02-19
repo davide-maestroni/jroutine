@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.stream;
 
+import com.github.dm.jrt.builder.ChannelConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.Builder;
 import com.github.dm.jrt.builder.InvocationConfiguration.Configurable;
@@ -363,8 +364,13 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public StreamChannel<OUT> repeat() {
 
-        return newChannel(Channels.repeat(this), getStreamConfiguration(), mDelegationType,
-                          mBinder);
+        final ChannelConfiguration configuration =
+                ChannelConfiguration.fromOutputChannelConfiguration(
+                        getStreamConfiguration().builderFrom().with(mConfiguration).configured())
+                                    .configured();
+        return newChannel(
+                Channels.repeat(this).withChannels().with(configuration).configured().build(),
+                getStreamConfiguration(), mDelegationType, mBinder);
     }
 
     @NotNull

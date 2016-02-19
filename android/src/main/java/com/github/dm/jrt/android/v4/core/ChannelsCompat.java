@@ -67,6 +67,10 @@ public class ChannelsCompat extends Channels {
             throw new IllegalArgumentException("the map of channels must not be empty");
         }
 
+        if (channels.indexOfValue(null) >= 0) {
+            throw new NullPointerException("the map of channels must not contain null objects");
+        }
+
         final SparseArrayCompat<? extends InputChannel<? extends IN>> channelMap = channels.clone();
         return new AbstractBuilder<IOChannel<Selectable<? extends IN>>>() {
 
@@ -95,31 +99,51 @@ public class ChannelsCompat extends Channels {
     }
 
     /**
-     * Merges the specified channels into a selectable one. The selectable indexes will be the
-     * keys of the specified sparse array.<br/>
-     * Note that the passed channels will be bound as a result of the call.
+     * Returns a builder of output channels merging the specified channels into a selectable one.
+     * The selectable indexes will be the keys of the specified sparse array.<br/>
+     * Note that the builder will successfully create only one output channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      *
-     * @param channelMap the map of indexes and output channels.
-     * @param <OUT>      the output data type.
-     * @return the selectable output channel.
+     * @param channels the map of indexes and output channels.
+     * @param <OUT>    the output data type.
+     * @return the selectable output channel builder.
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
      * @see com.github.dm.jrt.core.Channels#merge(Map)
      */
     @NotNull
-    public static <OUT> OutputChannel<? extends ParcelableSelectable<OUT>> merge(
-            @NotNull final SparseArrayCompat<? extends OutputChannel<? extends OUT>> channelMap) {
+    public static <OUT> Builder<? extends OutputChannel<? extends ParcelableSelectable<OUT>>> merge(
+            @NotNull final SparseArrayCompat<? extends OutputChannel<? extends OUT>> channels) {
 
-        final int size = channelMap.size();
+        final int size = channels.size();
         if (size == 0) {
             throw new IllegalArgumentException("the map of channels must not be empty");
         }
 
-        final IOChannel<ParcelableSelectable<OUT>> ioChannel = JRoutineCompat.io().buildChannel();
-        for (int i = 0; i < size; ++i) {
-            ioChannel.pass(toSelectable(channelMap.valueAt(i), channelMap.keyAt(i)));
+        if (channels.indexOfValue(null) >= 0) {
+            throw new NullPointerException("the map of channels must not contain null objects");
         }
 
-        return ioChannel.close();
+        final SparseArrayCompat<? extends OutputChannel<? extends OUT>> channelMap =
+                channels.clone();
+        return new AbstractBuilder<OutputChannel<ParcelableSelectable<OUT>>>() {
+
+            @NotNull
+            @Override
+            protected OutputChannel<ParcelableSelectable<OUT>> build(
+                    @NotNull final ChannelConfiguration configuration) {
+
+                final IOChannel<ParcelableSelectable<OUT>> ioChannel = JRoutineCompat.io()
+                                                                                     .withChannels()
+                                                                                     .with(configuration)
+                                                                                     .configured()
+                                                                                     .buildChannel();
+                for (int i = 0; i < size; ++i) {
+                    ioChannel.pass(toSelectable(channelMap.valueAt(i), channelMap.keyAt(i)));
+                }
+
+                return ioChannel.close();
+            }
+        };
     }
 
     /**

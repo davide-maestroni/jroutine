@@ -78,7 +78,7 @@ public class Streams extends Functions {
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
-     * @param channels the list of channels.
+     * @param channels the collection of channels.
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
@@ -116,7 +116,7 @@ public class Streams extends Functions {
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
-     * @param channels the list of channels.
+     * @param channels the collection of channels.
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
@@ -222,83 +222,88 @@ public class Streams extends Functions {
     }
 
     /**
-     * Returns a stream joining the data coming from the specified list of channels.<br/>
+     * Returns a builder of stream channels joining the data coming from the specified ones.<br/>
      * An output will be generated only when at least one result is available for each channel.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Note that the builder will successfully create only one stream channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      *
-     * @param channels the list of channels.
+     * @param channels the collection of channels.
      * @param <OUT>    the output data type.
-     * @return the stream channel.
-     * @throws java.lang.IllegalArgumentException if the specified list is empty.
-     * @see com.github.dm.jrt.core.Channels#join(List)
+     * @return the stream channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @see com.github.dm.jrt.core.Channels#join(Collection)
      */
     @NotNull
-    public static <OUT> StreamChannel<List<? extends OUT>> join(
-            @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
+    public static <OUT> Builder<? extends StreamChannel<List<? extends OUT>>> join(
+            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
 
-        return streamOf(Channels.join(channels));
+        return new BuilderWrapper<List<? extends OUT>>(Channels.join(channels));
     }
 
     /**
-     * Returns a stream joining the data coming from the specified list of channels.<br/>
+     * Returns a builder of stream channels joining the data coming from the specified ones.<br/>
      * An output will be generated only when at least one result is available for each channel.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Note that the builder will successfully create only one stream channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      *
      * @param channels the array of channels.
      * @param <OUT>    the output data type.
-     * @return the stream channel.
+     * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @see com.github.dm.jrt.core.Channels#join(OutputChannel[])
      */
     @NotNull
-    public static <OUT> StreamChannel<List<? extends OUT>> join(
+    public static <OUT> Builder<? extends StreamChannel<List<? extends OUT>>> join(
             @NotNull final OutputChannel<?>... channels) {
 
-        return streamOf(Channels.<OUT>join(channels));
+        return new BuilderWrapper<List<? extends OUT>>(Channels.<OUT>join(channels));
     }
 
     /**
-     * Returns a stream joining the data coming from the specified list of channels.<br/>
+     * Returns a builder of stream channels joining the data coming from the specified ones.<br/>
      * An output will be generated only when at least one result is available for each channel.
      * Moreover, when all the output channels complete, the remaining outputs will be returned by
      * filling the gaps with the specified placeholder instance, so that the generated list of data
      * will always have the same size of the channel list.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Note that the builder will successfully create only one stream channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      *
      * @param placeholder the placeholder instance.
-     * @param channels    the list of channels.
+     * @param channels    the collection of channels.
      * @param <OUT>       the output data type.
-     * @return the stream channel.
-     * @throws java.lang.IllegalArgumentException if the specified list is empty.
-     * @see com.github.dm.jrt.core.Channels#join(Object, List)
+     * @return the stream channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @see com.github.dm.jrt.core.Channels#join(Object, Collection)
      */
     @NotNull
-    public static <OUT> StreamChannel<List<? extends OUT>> join(@Nullable final OUT placeholder,
-            @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
+    public static <OUT> Builder<? extends StreamChannel<List<? extends OUT>>> join(
+            @Nullable final OUT placeholder,
+            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
 
-        return streamOf(Channels.join(placeholder, channels));
+        return new BuilderWrapper<List<? extends OUT>>(Channels.join(placeholder, channels));
     }
 
     /**
-     * Returns a stream joining the data coming from the specified list of channels.<br/>
+     * Returns a builder of stream channels joining the data coming from the specified ones.<br/>
      * An output will be generated only when at least one result is available for each channel.
      * Moreover, when all the output channels complete, the remaining outputs will be returned by
      * filling the gaps with the specified placeholder instance, so that the generated list of data
      * will always have the same size of the channel list.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Note that the builder will successfully create only one stream channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      *
      * @param placeholder the placeholder instance.
      * @param channels    the array of channels.
      * @param <OUT>       the output data type.
-     * @return the stream channel.
+     * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @see com.github.dm.jrt.core.Channels#join(Object, OutputChannel[])
      */
     @NotNull
-    public static <OUT> StreamChannel<List<? extends OUT>> join(@Nullable final Object placeholder,
-            @NotNull final OutputChannel<?>... channels) {
+    public static <OUT> Builder<? extends StreamChannel<List<? extends OUT>>> join(
+            @Nullable final OUT placeholder, @NotNull final OutputChannel<?>... channels) {
 
-        return streamOf(Channels.<OUT>join(placeholder, channels));
+        return new BuilderWrapper<List<? extends OUT>>(Channels.join(placeholder, channels));
     }
 
     /**
@@ -409,92 +414,96 @@ public class Streams extends Functions {
     }
 
     /**
-     * Merges the specified channels into a selectable stream.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Returns a builder merging the specified channels into a selectable stream.<br/>
+     * Note that the builder will successfully create only one stream channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      *
      * @param startIndex the selectable start index.
-     * @param channels   the list of channels.
+     * @param channels   the collection of channels.
      * @param <OUT>      the output data type.
-     * @return the selectable stream channel.
-     * @throws java.lang.IllegalArgumentException if the specified list is empty.
-     * @see com.github.dm.jrt.core.Channels#merge(int, List)
+     * @return the selectable stream channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @see com.github.dm.jrt.core.Channels#merge(int, Collection)
      */
     @NotNull
-    public static <OUT> StreamChannel<? extends Selectable<OUT>> merge(final int startIndex,
-            @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
+    public static <OUT> Builder<? extends StreamChannel<? extends Selectable<OUT>>> merge(
+            final int startIndex,
+            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
 
-        return streamOf(Channels.merge(startIndex, channels));
+        return new BuilderWrapper<Selectable<OUT>>(Channels.merge(startIndex, channels));
     }
 
     /**
-     * Merges the specified channels into a selectable stream.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Returns a builder merging the specified channels into a selectable stream.<br/>
+     * Note that the builder will successfully create only one stream channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      *
      * @param startIndex the selectable start index.
      * @param channels   the array of channels.
      * @param <OUT>      the output data type.
-     * @return the selectable stream channel.
+     * @return the selectable stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @see com.github.dm.jrt.core.Channels#merge(int, OutputChannel[])
      */
     @NotNull
-    public static <OUT> StreamChannel<? extends Selectable<OUT>> merge(final int startIndex,
-            @NotNull final OutputChannel<?>... channels) {
+    public static <OUT> Builder<? extends StreamChannel<? extends Selectable<OUT>>> merge(
+            final int startIndex, @NotNull final OutputChannel<?>... channels) {
 
-        return streamOf(Channels.<OUT>merge(startIndex, channels));
+        return new BuilderWrapper<Selectable<OUT>>(Channels.<OUT>merge(startIndex, channels));
     }
 
     /**
-     * Merges the specified channels into a selectable stream. The selectable indexes will be the
-     * same as the list ones.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Returns a builder merging the specified channels into a selectable stream.<br/>
+     * Note that the builder will successfully create only one stream channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      *
      * @param channels the channels to merge.
      * @param <OUT>    the output data type.
-     * @return the selectable stream channel.
-     * @throws java.lang.IllegalArgumentException if the specified list is empty.
-     * @see com.github.dm.jrt.core.Channels#merge(List)
+     * @return the selectable stream channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @see com.github.dm.jrt.core.Channels#merge(Collection)
      */
     @NotNull
-    public static <OUT> StreamChannel<? extends Selectable<OUT>> merge(
-            @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
+    public static <OUT> Builder<? extends StreamChannel<? extends Selectable<OUT>>> merge(
+            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
 
-        return streamOf(Channels.merge(channels));
+        return new BuilderWrapper<Selectable<OUT>>(Channels.merge(channels));
     }
 
     /**
-     * Merges the specified channels into a selectable stream.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Returns a builder merging the specified channels into a selectable stream.<br/>
+     * Note that the builder will successfully create only one stream channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      *
-     * @param channelMap the map of indexes and output channels.
-     * @param <OUT>      the output data type.
-     * @return the selectable stream channel.
+     * @param channels the map of indexes and output channels.
+     * @param <OUT>    the output data type.
+     * @return the selectable stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
      * @see com.github.dm.jrt.core.Channels#merge(Map)
      */
     @NotNull
-    public static <OUT> StreamChannel<? extends Selectable<OUT>> merge(
-            @NotNull final Map<Integer, ? extends OutputChannel<? extends OUT>> channelMap) {
+    public static <OUT> Builder<? extends StreamChannel<? extends Selectable<OUT>>> merge(
+            @NotNull final Map<Integer, ? extends OutputChannel<? extends OUT>> channels) {
 
-        return streamOf(Channels.merge(channelMap));
+        return new BuilderWrapper<Selectable<OUT>>(Channels.merge(channels));
     }
 
     /**
-     * Merges the specified channels into a selectable stream. The selectable indexes will be the
-     * same as the array ones.<br/>
-     * Note that the channels will be bound as a result of the call.
+     * Returns a builder merging the specified channels into a selectable stream.<br/>
+     * Note that the builder will successfully create only one stream channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      *
      * @param channels the channels to merge.
      * @param <OUT>    the output data type.
-     * @return the selectable stream channel.
+     * @return the selectable stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @see com.github.dm.jrt.core.Channels#merge(OutputChannel[])
      */
     @NotNull
-    public static <OUT> StreamChannel<? extends Selectable<OUT>> merge(
+    public static <OUT> Builder<? extends StreamChannel<? extends Selectable<OUT>>> merge(
             @NotNull final OutputChannel<?>... channels) {
 
-        return streamOf(Channels.<OUT>merge(channels));
+        return new BuilderWrapper<Selectable<OUT>>(Channels.<OUT>merge(channels));
     }
 
     /**
@@ -572,19 +581,21 @@ public class Streams extends Functions {
     }
 
     /**
-     * Returns a new stream repeating the output data to any newly bound channel or consumer, thus
-     * effectively supporting binding of several output consumers.<br/>
-     * Note that the passed channels will be bound as a result of the call.
+     * Returns a builder of streams repeating the output data to any newly bound channel or
+     * consumer, thus effectively supporting binding of several output consumers.<br/>
+     * Note that the builder will successfully create only one stream channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      *
      * @param channel the output channel.
      * @param <OUT>   the output data type.
-     * @return the repeating stream channel.
+     * @return the repeating stream channel builder.
      * @see com.github.dm.jrt.core.Channels#repeat(OutputChannel)
      */
     @NotNull
-    public static <OUT> StreamChannel<OUT> repeat(@NotNull final OutputChannel<OUT> channel) {
+    public static <OUT> Builder<? extends StreamChannel<OUT>> repeat(
+            @NotNull final OutputChannel<OUT> channel) {
 
-        return streamOf(Channels.repeat(channel));
+        return new BuilderWrapper<OUT>(Channels.repeat(channel));
     }
 
     /**
@@ -889,19 +900,21 @@ public class Streams extends Functions {
     private static class BuilderWrapper<OUT>
             implements Builder<StreamChannel<OUT>>, Configurable<Builder<StreamChannel<OUT>>> {
 
-        private final Builder<? extends OutputChannel<OUT>> mBuilder;
+        private final Builder<? extends OutputChannel<? extends OUT>> mBuilder;
 
         private ChannelConfiguration mConfiguration = ChannelConfiguration.DEFAULT_CONFIGURATION;
 
-        private BuilderWrapper(@NotNull final Builder<? extends OutputChannel<OUT>> wrapped) {
+        private BuilderWrapper(
+                @NotNull final Builder<? extends OutputChannel<? extends OUT>> wrapped) {
 
             mBuilder = wrapped;
         }
 
         @NotNull
+        @SuppressWarnings("unchecked")
         public StreamChannel<OUT> build() {
 
-            return streamOf(mBuilder.build());
+            return (StreamChannel<OUT>) streamOf(mBuilder.build());
         }
 
         @NotNull

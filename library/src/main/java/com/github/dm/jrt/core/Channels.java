@@ -38,7 +38,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -51,6 +50,18 @@ import java.util.Map.Entry;
  * Created by davide-maestroni on 03/15/2015.
  */
 public class Channels {
+
+    private static final WeakIdentityHashMap<InputChannel<?>, HashMap<SelectInfo, Map<Integer,
+            IOChannel<?>>>>
+            sInputChannels =
+            new WeakIdentityHashMap<InputChannel<?>, HashMap<SelectInfo, Map<Integer,
+                    IOChannel<?>>>>();
+
+    private static final WeakIdentityHashMap<OutputChannel<?>, HashMap<SelectInfo, Map<Integer,
+            OutputChannel<?>>>>
+            sOutputChannels =
+            new WeakIdentityHashMap<OutputChannel<?>, HashMap<SelectInfo, Map<Integer,
+                    OutputChannel<?>>>>();
 
     private static final WeakIdentityHashMap<OutputChannel<?>, DefaultSelectableChannels<?>>
             sSelectableChannels =
@@ -77,7 +88,7 @@ public class Channels {
      *     </code>
      * </pre>
      *
-     * @param channels the list of channels.
+     * @param channels the collection of channels.
      * @param <OUT>    the output data type.
      * @return the output channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
@@ -95,7 +106,7 @@ public class Channels {
                     "the collection of channels must not contain null objects");
         }
 
-        return new BlendBuilder<OUT>(new HashSet<OutputChannel<? extends OUT>>(channels));
+        return new BlendBuilder<OUT>(new ArrayList<OutputChannel<? extends OUT>>(channels));
     }
 
     /**
@@ -127,7 +138,7 @@ public class Channels {
             throw new IllegalArgumentException("the array of channels must not be empty");
         }
 
-        final HashSet<OutputChannel<?>> outputChannels = new HashSet<OutputChannel<?>>();
+        final ArrayList<OutputChannel<?>> outputChannels = new ArrayList<OutputChannel<?>>();
         Collections.addAll(outputChannels, channels);
         if (outputChannels.contains(null)) {
             throw new NullPointerException("the array of channels must not contain null objects");
@@ -138,9 +149,9 @@ public class Channels {
 
     /**
      * Returns a builder of input channels combining the specified channels into a selectable one.
-     * The selectable indexes will be the same as the array ones.<br/>
-     * Note that the builder will successfully create only one input channel instance, and that the
-     * returned channel <b>must be explicitly closed</b> in order to ensure the completion of the
+     * The selectable indexes will be the position in the collection.<br/>
+     * Note that the builder will successfully create several input channel instances, and that the
+     * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
      * invocation lifecycle.
      * <p/>
      * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
@@ -167,9 +178,9 @@ public class Channels {
 
     /**
      * Returns a builder of input channels combining the specified channels into a selectable one.
-     * The selectable indexes will be the same as the array ones.<br/>
-     * Note that the builder will successfully create only one input channel instance, and that the
-     * returned channel <b>must be explicitly closed</b> in order to ensure the completion of the
+     * The selectable indexes will be the position in the array.<br/>
+     * Note that the builder will successfully create several input channel instances, and that the
+     * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
      * invocation lifecycle.
      * <p/>
      * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
@@ -198,7 +209,7 @@ public class Channels {
             throw new IllegalArgumentException("the array of channels must not be empty");
         }
 
-        final LinkedHashSet<InputChannel<?>> inputChannels = new LinkedHashSet<InputChannel<?>>();
+        final ArrayList<InputChannel<?>> inputChannels = new ArrayList<InputChannel<?>>();
         Collections.addAll(inputChannels, channels);
         if (inputChannels.contains(null)) {
             throw new NullPointerException("the array of channels must not contain null objects");
@@ -209,9 +220,9 @@ public class Channels {
 
     /**
      * Returns a builder of input channels combining the specified channels into a selectable one.
-     * The selectable indexes will be the same as the array ones.<br/>
-     * Note that the builder will successfully create only one input channel instance, and that the
-     * returned channel <b>must be explicitly closed</b> in order to ensure the completion of the
+     * The selectable indexes will be the position in the collection.<br/>
+     * Note that the builder will successfully create several input channel instances, and that the
+     * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
      * invocation lifecycle.
      * <p/>
      * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
@@ -225,7 +236,7 @@ public class Channels {
      * </pre>
      *
      * @param startIndex the selectable start index.
-     * @param channels   the list of input channels.
+     * @param channels   the collection of input channels.
      * @param <IN>       the input data type.
      * @return the selectable I/O channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
@@ -246,14 +257,14 @@ public class Channels {
         }
 
         return new CombineBuilder<IN>(startIndex,
-                                      new LinkedHashSet<InputChannel<? extends IN>>(channels));
+                                      new ArrayList<InputChannel<? extends IN>>(channels));
     }
 
     /**
      * Returns a builder of input channels combining the specified channels into a selectable one.
-     * The selectable indexes will be the same as the array ones.<br/>
-     * Note that the builder will successfully create only one input channel instance, and that the
-     * returned channel <b>must be explicitly closed</b> in order to ensure the completion of the
+     * The selectable indexes will be the position in the array.<br/>
+     * Note that the builder will successfully create several input channel instances, and that the
+     * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
      * invocation lifecycle.
      * <p/>
      * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
@@ -266,7 +277,7 @@ public class Channels {
      *     </code>
      * </pre>
      *
-     * @param channels the list of input channels.
+     * @param channels the collection of input channels.
      * @param <IN>     the input data type.
      * @return the selectable I/O channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
@@ -281,8 +292,8 @@ public class Channels {
     /**
      * Returns a builder of input channels combining the specified channels into a selectable one.
      * The selectable indexes will be the keys of the specified map.<br/>
-     * Note that the builder will successfully create only one input channel instance, and that the
-     * returned channel <b>must be explicitly closed</b> in order to ensure the completion of the
+     * Note that the builder will successfully create several input channel instances, and that the
+     * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
      * invocation lifecycle.
      * <p/>
      * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
@@ -311,6 +322,10 @@ public class Channels {
 
         final HashMap<Integer, InputChannel<? extends IN>> channelMap =
                 new HashMap<Integer, InputChannel<? extends IN>>(channels);
+        if (channelMap.containsValue(null)) {
+            throw new NullPointerException("the map of channels must not contain null objects");
+        }
+
         return new AbstractBuilder<IOChannel<Selectable<? extends IN>>>() {
 
             @NotNull
@@ -353,7 +368,7 @@ public class Channels {
      *     </code>
      * </pre>
      *
-     * @param channels the list of channels.
+     * @param channels the collection of channels.
      * @param <OUT>    the output data type.
      * @return the output channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
@@ -371,7 +386,7 @@ public class Channels {
                     "the collection of channels must not contain null objects");
         }
 
-        return new ConcatBuilder<OUT>(new LinkedHashSet<OutputChannel<? extends OUT>>(channels));
+        return new ConcatBuilder<OUT>(new ArrayList<OutputChannel<? extends OUT>>(channels));
     }
 
     /**
@@ -404,8 +419,7 @@ public class Channels {
             throw new IllegalArgumentException("the array of channels must not be empty");
         }
 
-        final LinkedHashSet<OutputChannel<?>> outputChannels =
-                new LinkedHashSet<OutputChannel<?>>();
+        final ArrayList<OutputChannel<?>> outputChannels = new ArrayList<OutputChannel<?>>();
         Collections.addAll(outputChannels, channels);
         if (outputChannels.contains(null)) {
             throw new NullPointerException("the array of channels must not contain null objects");
@@ -415,10 +429,11 @@ public class Channels {
     }
 
     /**
-     * Returns a new channel distributing the input data among the specified channels. If the list
-     * of data exceeds the number of channels, the invocation will be aborted.<br/>
-     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
-     * completion of the invocation lifecycle.
+     * Returns a builder of channels distributing the input data among the specified channels. If
+     * the list of data exceeds the number of channels, the invocation will be aborted.<br/>
+     * Note that the builder will successfully create several input channel instances, and that the
+     * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
+     * invocation lifecycle.
      * <p/>
      * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
      * <pre>
@@ -431,80 +446,54 @@ public class Channels {
      * </pre>
      *
      * @param channels the array of channels.
-     * @return the I/O channel.
-     * @throws java.lang.IllegalArgumentException if the specified array is empty.
-     */
-    @NotNull
-    public static IOChannel<List<?>> distribute(@NotNull final InputChannel<?>... channels) {
-
-        return distribute(false, null, channels);
-    }
-
-    /**
-     * Returns a new channel distributing the input data among the specified channels. If the list
-     * of data exceeds the number of channels, the invocation will be aborted.<br/>
-     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
-     * completion of the invocation lifecycle.
-     * <p/>
-     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
-     * <pre>
-     *     <code>
-     *
-     *         A - [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
-     *         B - [list(1), list(1), list(1), ..., list(1), ..., list(1)]
-     *         C - [list(2), list(2), list(2), ..., list(2)]
-     *     </code>
-     * </pre>
-     *
-     * @param channels the list of channels.
      * @param <IN>     the input data type.
-     * @return the I/O channel.
-     * @throws java.lang.IllegalArgumentException if the specified list is empty.
-     */
-    @NotNull
-    public static <IN> IOChannel<List<? extends IN>> distribute(
-            @NotNull final List<? extends InputChannel<? extends IN>> channels) {
-
-        return distribute(false, null, channels);
-    }
-
-    /**
-     * Returns a new channel distributing the input data among the specified channels. If the list
-     * of data is smaller than the specified number of channels, the remaining ones will be fed with
-     * the specified placeholder instance. While, if the list of data exceeds the number of
-     * channels, the invocation will be aborted.<br/>
-     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
-     * completion of the invocation lifecycle.
-     * <p/>
-     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
-     * <pre>
-     *     <code>
-     *
-     *         A - [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
-     *         B - [list(1), list(1), list(1), ..., list(1), ..., list(1), PH, ...]
-     *         C - [list(2), list(2), list(2), ..., list(2), PH, ...]
-     *     </code>
-     * </pre>
-     *
-     * @param placeholder the placeholder instance.
-     * @param channels    the array of channels.
-     * @return the I/O channel.
+     * @return the I/O channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static IOChannel<List<?>> distribute(@Nullable final Object placeholder,
+    public static <IN> Builder<? extends IOChannel<List<? extends IN>>> distribute(
             @NotNull final InputChannel<?>... channels) {
 
-        return distribute(true, placeholder, channels);
+        return distribute(false, null, channels);
     }
 
     /**
-     * Returns a new channel distributing the input data among the specified channels. If the list
-     * of data is smaller than the specified number of channels, the remaining ones will be fed with
-     * the specified placeholder instance. While, if the list of data exceeds the number of
+     * Returns a builder of channels distributing the input data among the specified channels. If
+     * the list of data exceeds the number of channels, the invocation will be aborted.<br/>
+     * Note that the builder will successfully create several input channel instances, and that the
+     * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
+     * invocation lifecycle.
+     * <p/>
+     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+     * <pre>
+     *     <code>
+     *
+     *         A - [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
+     *         B - [list(1), list(1), list(1), ..., list(1), ..., list(1)]
+     *         C - [list(2), list(2), list(2), ..., list(2)]
+     *     </code>
+     * </pre>
+     *
+     * @param channels the collection of channels.
+     * @param <IN>     the input data type.
+     * @return the I/O channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified list is empty.
+     */
+    @NotNull
+    public static <IN> Builder<? extends IOChannel<List<? extends IN>>> distribute(
+            @NotNull final Collection<? extends InputChannel<? extends IN>> channels) {
+
+        return distribute(false, null, channels);
+    }
+
+    /**
+     * Returns a builder of channels distributing the input data among the specified channels. If
+     * the list of data is smaller than the specified number of channels, the remaining ones will be
+     * fed with the specified placeholder instance. While, if the list of data exceeds the number of
      * channels, the invocation will be aborted.<br/>
-     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
-     * completion of the invocation lifecycle.
+     * Note that the builder will successfully create several input channel instances, and that the
+     * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
+     * invocation lifecycle.
      * <p/>
      * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
      * <pre>
@@ -517,22 +506,57 @@ public class Channels {
      * </pre>
      *
      * @param placeholder the placeholder instance.
-     * @param channels    the list of channels.
+     * @param channels    the array of channels.
      * @param <IN>        the input data type.
-     * @return the I/O channel.
-     * @throws java.lang.IllegalArgumentException if the specified list is empty.
+     * @return the I/O channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static <IN> IOChannel<List<? extends IN>> distribute(@Nullable final IN placeholder,
-            @NotNull final List<? extends InputChannel<? extends IN>> channels) {
+    public static <IN> Builder<? extends IOChannel<List<? extends IN>>> distribute(
+            @Nullable final IN placeholder, @NotNull final InputChannel<?>... channels) {
 
         return distribute(true, placeholder, channels);
     }
 
     /**
-     * Returns an output channel joining the data coming from the specified list of channels.<br/>
+     * Returns a builder of channels distributing the input data among the specified channels. If
+     * the list of data is smaller than the specified number of channels, the remaining ones will be
+     * fed with the specified placeholder instance. While, if the list of data exceeds the number of
+     * channels, the invocation will be aborted.<br/>
+     * Note that the builder will successfully create several input channel instances, and that the
+     * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
+     * invocation lifecycle.
+     * <p/>
+     * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
+     * <pre>
+     *     <code>
+     *
+     *         A - [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
+     *         B - [list(1), list(1), list(1), ..., list(1), ..., list(1), PH, ...]
+     *         C - [list(2), list(2), list(2), ..., list(2), PH, ...]
+     *     </code>
+     * </pre>
+     *
+     * @param placeholder the placeholder instance.
+     * @param channels    the collection of channels.
+     * @param <IN>        the input data type.
+     * @return the I/O channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified list is empty.
+     */
+    @NotNull
+    public static <IN> Builder<? extends IOChannel<List<? extends IN>>> distribute(
+            @Nullable final IN placeholder,
+            @NotNull final Collection<? extends InputChannel<? extends IN>> channels) {
+
+        return distribute(true, placeholder, channels);
+    }
+
+    /**
+     * Returns a builder of output channels joining the data coming from the specified channels.
+     * <br/>
      * An output will be generated only when at least one result is available for each channel.<br/>
-     * Note that the passed channels will be bound as a result of the call.
+     * Note that the builder will successfully create only one output channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      * <p/>
      * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
      * <pre>
@@ -542,22 +566,24 @@ public class Channels {
      *     </code>
      * </pre>
      *
-     * @param channels the list of channels.
+     * @param channels the collection of channels.
      * @param <OUT>    the output data type.
-     * @return the output channel.
+     * @return the output channel builder.
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @NotNull
-    public static <OUT> OutputChannel<List<? extends OUT>> join(
-            @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
+    public static <OUT> Builder<? extends OutputChannel<List<? extends OUT>>> join(
+            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
 
         return join(false, null, channels);
     }
 
     /**
-     * Returns an output channel joining the data coming from the specified list of channels.<br/>
+     * Returns a builder of output channels joining the data coming from the specified channels.
+     * <br/>
      * An output will be generated only when at least one result is available for each channel.<br/>
-     * Note that the passed channels will be bound as a result of the call.
+     * Note that the builder will successfully create only one output channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      * <p/>
      * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
      * <pre>
@@ -569,23 +595,25 @@ public class Channels {
      *
      * @param channels the array of channels.
      * @param <OUT>    the output data type.
-     * @return the output channel.
+     * @return the output channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static <OUT> OutputChannel<List<? extends OUT>> join(
+    public static <OUT> Builder<? extends OutputChannel<List<? extends OUT>>> join(
             @NotNull final OutputChannel<?>... channels) {
 
         return join(false, null, channels);
     }
 
     /**
-     * Returns an output channel joining the data coming from the specified list of channels.<br/>
+     * Returns a builder of output channels joining the data coming from the specified channels.
+     * <br/>
      * An output will be generated only when at least one result is available for each channel.
      * Moreover, when all the output channels complete, the remaining outputs will be returned by
      * filling the gaps with the specified placeholder instance, so that the generated list of data
      * will always have the same size as the channel list.<br/>
-     * Note that the passed channels will be bound as a result of the call.
+     * Note that the builder will successfully create only one output channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      * <p/>
      * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
      * <pre>
@@ -596,25 +624,28 @@ public class Channels {
      * </pre>
      *
      * @param placeholder the placeholder instance.
-     * @param channels    the list of channels.
+     * @param channels    the collection of channels.
      * @param <OUT>       the output data type.
-     * @return the output channel.
-     * @throws java.lang.IllegalArgumentException if the specified list is empty.
+     * @return the output channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
      */
     @NotNull
-    public static <OUT> OutputChannel<List<? extends OUT>> join(@Nullable final OUT placeholder,
-            @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
+    public static <OUT> Builder<? extends OutputChannel<List<? extends OUT>>> join(
+            @Nullable final OUT placeholder,
+            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
 
         return join(true, placeholder, channels);
     }
 
     /**
-     * Returns an output channel joining the data coming from the specified list of channels.<br/>
+     * Returns a builder of output channels joining the data coming from the specified channels.
+     * <br/>
      * An output will be generated only when at least one result is available for each channel.
      * Moreover, when all the output channels complete, the remaining outputs will be returned by
      * filling the gaps with the specified placeholder instance, so that the generated list of data
      * will always have the same size as the channel list.<br/>
-     * Note that the passed channels will be bound as a result of the call.
+     * Note that the builder will successfully create only one output channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      * <p/>
      * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
      * <pre>
@@ -627,20 +658,21 @@ public class Channels {
      * @param placeholder the placeholder instance.
      * @param channels    the array of channels.
      * @param <OUT>       the output data type.
-     * @return the output channel.
+     * @return the output channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static <OUT> OutputChannel<List<? extends OUT>> join(@Nullable final Object placeholder,
-            @NotNull final OutputChannel<?>... channels) {
+    public static <OUT> Builder<? extends OutputChannel<List<? extends OUT>>> join(
+            @Nullable final OUT placeholder, @NotNull final OutputChannel<?>... channels) {
 
         return join(true, placeholder, channels);
     }
 
     /**
-     * Merges the specified channels into a selectable one. The selectable indexes will start from
-     * the specified one.<br/>
-     * Note that the passed channels will be bound as a result of the call.
+     * Returns a builder of output channels merging the specified channels into a selectable one.
+     * The selectable indexes will start from the specified one.<br/>
+     * Note that the builder will successfully create only one output channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      * <p/>
      * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
      * <pre>
@@ -651,32 +683,34 @@ public class Channels {
      * </pre>
      *
      * @param startIndex the selectable start index.
-     * @param channels   the list of channels.
+     * @param channels   the collection of channels.
      * @param <OUT>      the output data type.
-     * @return the selectable output channel.
+     * @return the selectable output channel builder.
      * @throws java.lang.IllegalArgumentException if the specified list is empty.
      */
     @NotNull
-    public static <OUT> OutputChannel<? extends Selectable<OUT>> merge(final int startIndex,
-            @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
+    public static <OUT> Builder<? extends OutputChannel<? extends Selectable<OUT>>> merge(
+            final int startIndex,
+            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
 
         if (channels.isEmpty()) {
-            throw new IllegalArgumentException("the list of channels must not be empty");
+            throw new IllegalArgumentException("the collection of channels must not be empty");
         }
 
-        final IOChannel<Selectable<OUT>> ioChannel = JRoutine.io().buildChannel();
-        int i = startIndex;
-        for (final OutputChannel<? extends OUT> channel : channels) {
-            ioChannel.pass(toSelectable(channel, i++));
+        if (channels.contains(null)) {
+            throw new NullPointerException(
+                    "the collection of channels must not contain null objects");
         }
 
-        return ioChannel.close();
+        return new MergeBuilder<OUT>(startIndex,
+                                     new ArrayList<OutputChannel<? extends OUT>>(channels));
     }
 
     /**
-     * Merges the specified channels into a selectable one. The selectable indexes will start from
-     * the specified one.<br/>
-     * Note that the passed channels will be bound as a result of the call.
+     * Returns a builder of output channels merging the specified channels into a selectable one.
+     * The selectable indexes will start from the specified one.<br/>
+     * Note that the builder will successfully create only one output channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      * <p/>
      * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
      * <pre>
@@ -689,31 +723,32 @@ public class Channels {
      * @param startIndex the selectable start index.
      * @param channels   the array of channels.
      * @param <OUT>      the output data type.
-     * @return the selectable output channel.
+     * @return the selectable output channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <OUT> OutputChannel<? extends Selectable<OUT>> merge(final int startIndex,
-            @NotNull final OutputChannel<?>... channels) {
+    public static <OUT> Builder<? extends OutputChannel<? extends Selectable<OUT>>> merge(
+            final int startIndex, @NotNull final OutputChannel<?>... channels) {
 
         if (channels.length == 0) {
             throw new IllegalArgumentException("the array of channels must not be empty");
         }
 
-        final IOChannel<Selectable<OUT>> ioChannel = JRoutine.io().buildChannel();
-        int i = startIndex;
-        for (final OutputChannel<?> channel : channels) {
-            ioChannel.pass(toSelectable((OutputChannel<? extends OUT>) channel, i++));
+        final ArrayList<OutputChannel<?>> outputChannels = new ArrayList<OutputChannel<?>>();
+        Collections.addAll(outputChannels, channels);
+        if (outputChannels.contains(null)) {
+            throw new NullPointerException("the array of channels must not contain null objects");
         }
 
-        return ioChannel.close();
+        return (MergeBuilder<OUT>) new MergeBuilder<Object>(startIndex, outputChannels);
     }
 
     /**
-     * Merges the specified channels into a selectable one. The selectable indexes will be the same
-     * as the list ones.<br/>
-     * Note that the passed channels will be bound as a result of the call.
+     * Returns a builder of output channels merging the specified channels into a selectable one.
+     * The selectable indexes will be the position in the collection.<br/>
+     * Note that the builder will successfully create only one output channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      * <p/>
      * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
      * <pre>
@@ -725,20 +760,21 @@ public class Channels {
      *
      * @param channels the channels to merge.
      * @param <OUT>    the output data type.
-     * @return the selectable output channel.
-     * @throws java.lang.IllegalArgumentException if the specified list is empty.
+     * @return the selectable output channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
      */
     @NotNull
-    public static <OUT> OutputChannel<? extends Selectable<OUT>> merge(
-            @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
+    public static <OUT> Builder<? extends OutputChannel<? extends Selectable<OUT>>> merge(
+            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
 
         return merge(0, channels);
     }
 
     /**
-     * Merges the specified channels into a selectable one. The selectable indexes will be the keys
-     * of the specified map.<br/>
-     * Note that the passed channels will be bound as a result of the call.
+     * Returns a builder of output channels merging the specified channels into a selectable one.
+     * The selectable indexes will be the keys of the specified map.<br/>
+     * Note that the builder will successfully create only one output channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      * <p/>
      * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
      * <pre>
@@ -748,32 +784,52 @@ public class Channels {
      *     </code>
      * </pre>
      *
-     * @param channelMap the map of indexes and output channels.
-     * @param <OUT>      the output data type.
-     * @return the selectable output channel.
+     * @param channels the map of indexes and output channels.
+     * @param <OUT>    the output data type.
+     * @return the selectable output channel builder.
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
      */
     @NotNull
-    public static <OUT> OutputChannel<? extends Selectable<OUT>> merge(
-            @NotNull final Map<Integer, ? extends OutputChannel<? extends OUT>> channelMap) {
+    public static <OUT> Builder<? extends OutputChannel<? extends Selectable<OUT>>> merge(
+            @NotNull final Map<Integer, ? extends OutputChannel<? extends OUT>> channels) {
 
-        if (channelMap.isEmpty()) {
+        if (channels.isEmpty()) {
             throw new IllegalArgumentException("the map of channels must not be empty");
         }
 
-        final IOChannel<Selectable<OUT>> ioChannel = JRoutine.io().buildChannel();
-        for (final Entry<Integer, ? extends OutputChannel<? extends OUT>> entry : channelMap
-                .entrySet()) {
-            ioChannel.pass(toSelectable(entry.getValue(), entry.getKey()));
+        final HashMap<Integer, OutputChannel<? extends OUT>> channelMap =
+                new HashMap<Integer, OutputChannel<? extends OUT>>(channels);
+        if (channelMap.containsValue(null)) {
+            throw new NullPointerException("the map of channels must not contain null objects");
         }
 
-        return ioChannel.close();
+        return new AbstractBuilder<OutputChannel<? extends Selectable<OUT>>>() {
+
+            @NotNull
+            @Override
+            protected OutputChannel<? extends Selectable<OUT>> build(
+                    @NotNull final ChannelConfiguration configuration) {
+
+                final IOChannel<Selectable<OUT>> ioChannel = JRoutine.io()
+                                                                     .withChannels()
+                                                                     .with(configuration)
+                                                                     .configured()
+                                                                     .buildChannel();
+                for (final Entry<Integer, ? extends OutputChannel<? extends OUT>> entry : channelMap
+                        .entrySet()) {
+                    ioChannel.pass(toSelectable(entry.getValue(), entry.getKey()));
+                }
+
+                return ioChannel.close();
+            }
+        };
     }
 
     /**
-     * Merges the specified channels into a selectable one. The selectable indexes will be the same
-     * as the array ones.<br/>
-     * Note that the passed channels will be bound as a result of the call.
+     * Returns a builder of output channels merging the specified channels into a selectable one.
+     * The selectable indexes will be the position in the array.<br/>
+     * Note that the builder will successfully create only one output channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      * <p/>
      * Given channels {@code A}, {@code B} and {@code C}, the final output will be:
      * <pre>
@@ -785,20 +841,21 @@ public class Channels {
      *
      * @param channels the channels to merge.
      * @param <OUT>    the output data type.
-     * @return the selectable output channel.
+     * @return the selectable output channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      */
     @NotNull
-    public static <OUT> OutputChannel<? extends Selectable<OUT>> merge(
+    public static <OUT> Builder<? extends OutputChannel<? extends Selectable<OUT>>> merge(
             @NotNull final OutputChannel<?>... channels) {
 
         return merge(0, channels);
     }
 
     /**
-     * Returns a new channel repeating the output data to any newly bound channel or consumer, thus
-     * effectively supporting multiple binding.<br/>
-     * Note that the passed channels will be bound as a result of the call.
+     * Returns a builder of output channels repeating the output data to any newly bound channel or
+     * consumer, thus effectively supporting multiple bindings.<br/>
+     * Note that the builder will successfully create only one output channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      * <p/>
      * Given channels {@code A}, the final output will be:
      * <pre>
@@ -810,21 +867,36 @@ public class Channels {
      *
      * @param channel the output channel.
      * @param <OUT>   the output data type.
-     * @return the repeating channel.
+     * @return the repeating channel builder.
      */
     @NotNull
-    public static <OUT> OutputChannel<OUT> repeat(@NotNull final OutputChannel<OUT> channel) {
+    @SuppressWarnings("ConstantConditions")
+    public static <OUT> Builder<? extends OutputChannel<OUT>> repeat(
+            @NotNull final OutputChannel<OUT> channel) {
 
-        // TODO: 2/15/16 configuration??
-        final RepeatedChannel<OUT> repeatedChannel =
-                new RepeatedChannel<OUT>(ChannelConfiguration.DEFAULT_CONFIGURATION);
-        channel.passTo((OutputConsumer<OUT>) repeatedChannel);
-        return repeatedChannel.close();
+        if (channel == null) {
+            throw new NullPointerException("the output channel must not be null");
+        }
+
+        return new AbstractBuilder<OutputChannel<OUT>>() {
+
+            @NotNull
+            @Override
+            protected OutputChannel<OUT> build(@NotNull final ChannelConfiguration configuration) {
+
+                final RepeatedChannel<OUT> repeatedChannel =
+                        new RepeatedChannel<OUT>(configuration);
+                channel.passTo((OutputConsumer<OUT>) repeatedChannel);
+                return repeatedChannel.close();
+            }
+        };
     }
 
     /**
-     * Returns a new channel transforming the input data into selectable ones.<br/>
-     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
+     * Returns a builder of channels transforming the input data into selectable ones.<br/>
+     * Note that the builder will successfully create several input channel instances, and that the
+     * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
+     * invocation lifecycle.
      * completion of the invocation lifecycle.
      * <p/>
      * Given channels {@code A}, the final output will be:
@@ -839,16 +911,29 @@ public class Channels {
      * @param index   the channel index.
      * @param <DATA>  the channel data type.
      * @param <IN>    the input data type.
-     * @return the I/O channel.
+     * @return the I/O channel builder.
      */
     @NotNull
-    public static <DATA, IN extends DATA> IOChannel<IN> select(
+    public static <DATA, IN extends DATA> Builder<? extends IOChannel<IN>> select(
             @NotNull final InputChannel<? super Selectable<DATA>> channel, final int index) {
 
-        final IOChannel<IN> inputChannel = JRoutine.io().buildChannel();
-        final IOChannel<Selectable<DATA>> ioChannel = JRoutine.io().buildChannel();
-        ioChannel.passTo(channel);
-        return inputChannel.passTo(new SelectableOutputConsumer<DATA, IN>(ioChannel, index));
+        return new AbstractBuilder<IOChannel<IN>>() {
+
+            @NotNull
+            @Override
+            protected IOChannel<IN> build(@NotNull final ChannelConfiguration configuration) {
+
+                final IOChannel<IN> inputChannel = JRoutine.io()
+                                                           .withChannels()
+                                                           .with(configuration)
+                                                           .configured()
+                                                           .buildChannel();
+                final IOChannel<Selectable<DATA>> ioChannel = JRoutine.io().buildChannel();
+                ioChannel.passTo(channel);
+                return inputChannel.passTo(
+                        new SelectableOutputConsumer<DATA, IN>(ioChannel, index));
+            }
+        };
     }
 
     /**
@@ -879,7 +964,7 @@ public class Channels {
 
         final HashMap<Integer, IOChannel<IN>> channelMap = new HashMap<Integer, IOChannel<IN>>();
         for (final Integer index : indexes) {
-            channelMap.put(index, Channels.<DATA, IN>select(channel, index));
+            channelMap.put(index, Channels.<DATA, IN>select(channel, index).build());
         }
 
         return channelMap;
@@ -915,7 +1000,7 @@ public class Channels {
         final HashMap<Integer, IOChannel<IN>> channelMap =
                 new HashMap<Integer, IOChannel<IN>>(size);
         for (final int index : indexes) {
-            channelMap.put(index, Channels.<DATA, IN>select(channel, index));
+            channelMap.put(index, Channels.<DATA, IN>select(channel, index).build());
         }
 
         return channelMap;
@@ -955,7 +1040,7 @@ public class Channels {
         final HashMap<Integer, IOChannel<IN>> channelMap =
                 new HashMap<Integer, IOChannel<IN>>(rangeSize);
         for (int index = startIndex; index < rangeSize; index++) {
-            channelMap.put(index, Channels.<DATA, IN>select(channel, index));
+            channelMap.put(index, Channels.<DATA, IN>select(channel, index).build());
         }
 
         return channelMap;
@@ -1185,78 +1270,80 @@ public class Channels {
 
     @NotNull
     @SuppressWarnings("unchecked")
-    private static IOChannel<List<?>> distribute(final boolean isFlush,
-            @Nullable final Object placeholder, @NotNull final InputChannel<?>... channels) {
+    private static <IN> Builder<? extends IOChannel<List<? extends IN>>> distribute(
+            final boolean isFlush, @Nullable final IN placeholder,
+            @NotNull final InputChannel<?>... channels) {
 
         final int length = channels.length;
         if (length == 0) {
             throw new IllegalArgumentException("the array of channels must not be empty");
         }
 
-        final ArrayList<IOChannel<?>> channelList = new ArrayList<IOChannel<?>>(length);
-        for (final InputChannel<?> channel : channels) {
-            final IOChannel<?> ioChannel = JRoutine.io().buildChannel();
-            ioChannel.passTo(((InputChannel<Object>) channel));
-            channelList.add(ioChannel);
+        final ArrayList<InputChannel<?>> inputChannels = new ArrayList<InputChannel<?>>();
+        Collections.addAll(inputChannels, channels);
+        if (inputChannels.contains(null)) {
+            throw new NullPointerException("the array of channels must not contain null objects");
         }
 
-        final IOChannel<List<?>> ioChannel = JRoutine.io().buildChannel();
-        return ioChannel.passTo(new DistributeOutputConsumer(isFlush, placeholder, channelList));
+        return (DistributeBuilder<IN>) new DistributeBuilder<Object>(isFlush, placeholder,
+                                                                     inputChannels);
     }
 
     @NotNull
-    @SuppressWarnings("unchecked")
-    private static <IN> IOChannel<List<? extends IN>> distribute(final boolean isFlush,
-            @Nullable final IN placeholder,
-            @NotNull final List<? extends InputChannel<? extends IN>> channels) {
+    private static <IN> Builder<? extends IOChannel<List<? extends IN>>> distribute(
+            final boolean isFlush, @Nullable final IN placeholder,
+            @NotNull final Collection<? extends InputChannel<? extends IN>> channels) {
 
         if (channels.isEmpty()) {
-            throw new IllegalArgumentException("the list of channels must not be empty");
+            throw new IllegalArgumentException("the collection of channels must not be empty");
         }
 
-        final ArrayList<IOChannel<?>> channelList = new ArrayList<IOChannel<?>>(channels.size());
-        for (final InputChannel<?> channel : channels) {
-            final IOChannel<?> ioChannel = JRoutine.io().buildChannel();
-            ioChannel.passTo(((InputChannel<Object>) channel));
-            channelList.add(ioChannel);
+        if (channels.contains(null)) {
+            throw new NullPointerException(
+                    "the collection of channels must not contain null objects");
         }
 
-        final IOChannel<List<? extends IN>> ioChannel = JRoutine.io().buildChannel();
-        return ioChannel.passTo(new DistributeOutputConsumer(isFlush, placeholder, channelList));
+        return new DistributeBuilder<IN>(isFlush, placeholder, new ArrayList<InputChannel<?
+                extends IN>>(channels));
     }
 
     @NotNull
-    private static <OUT> OutputChannel<List<? extends OUT>> join(final boolean isFlush,
-            @Nullable final OUT placeholder,
-            @NotNull final List<? extends OutputChannel<? extends OUT>> channels) {
+    private static <OUT> Builder<? extends OutputChannel<List<? extends OUT>>> join(
+            final boolean isFlush, @Nullable final OUT placeholder,
+            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
 
         final int size = channels.size();
         if (size == 0) {
-            throw new IllegalArgumentException("the list of channels must not be empty");
+            throw new IllegalArgumentException("the collection of channels must not be empty");
         }
 
-        final IOChannel<List<? extends OUT>> ioChannel = JRoutine.io().buildChannel();
-        final JoinOutputConsumer<OUT> consumer =
-                new JoinOutputConsumer<OUT>(isFlush, size, placeholder, ioChannel);
-        merge(channels).passTo(consumer);
-        return ioChannel;
+        if (channels.contains(null)) {
+            throw new NullPointerException(
+                    "the collection of channels must not contain null objects");
+        }
+
+        return new JoinBuilder<OUT>(isFlush, placeholder, new ArrayList<OutputChannel<? extends
+                OUT>>(channels));
     }
 
     @NotNull
     @SuppressWarnings("unchecked")
-    private static <OUT> OutputChannel<List<? extends OUT>> join(final boolean isFlush,
-            @Nullable final Object placeholder, @NotNull final OutputChannel<?>... channels) {
+    private static <OUT> Builder<? extends OutputChannel<List<? extends OUT>>> join(
+            final boolean isFlush, @Nullable final OUT placeholder,
+            @NotNull final OutputChannel<?>... channels) {
 
         final int length = channels.length;
         if (length == 0) {
             throw new IllegalArgumentException("the array of channels must not be empty");
         }
 
-        final IOChannel<List<? extends OUT>> ioChannel = JRoutine.io().buildChannel();
-        final JoinOutputConsumer consumer =
-                new JoinOutputConsumer(isFlush, length, placeholder, ioChannel);
-        merge(channels).passTo(consumer);
-        return ioChannel;
+        final ArrayList<OutputChannel<?>> outputChannels = new ArrayList<OutputChannel<?>>();
+        Collections.addAll(outputChannels, channels);
+        if (outputChannels.contains(null)) {
+            throw new NullPointerException("the array of channels must not contain null objects");
+        }
+
+        return (JoinBuilder<OUT>) new JoinBuilder<Object>(isFlush, placeholder, outputChannels);
     }
 
     /**
@@ -1420,12 +1507,21 @@ public class Channels {
         protected abstract TYPE build(@NotNull ChannelConfiguration configuration);
     }
 
-    // TODO: 18/02/16 javadoc
+    /**
+     * Builder implementation blending data from a set of output channels.
+     *
+     * @param <OUT> the output data type.
+     */
     private static class BlendBuilder<OUT> extends AbstractBuilder<OutputChannel<OUT>> {
 
-        private final HashSet<OutputChannel<? extends OUT>> mChannels;
+        private final ArrayList<OutputChannel<? extends OUT>> mChannels;
 
-        private BlendBuilder(@NotNull final HashSet<OutputChannel<? extends OUT>> channels) {
+        /**
+         * Constructor.
+         *
+         * @param channels the output channels to blend.
+         */
+        private BlendBuilder(@NotNull final ArrayList<OutputChannel<? extends OUT>> channels) {
 
             mChannels = channels;
         }
@@ -1444,15 +1540,26 @@ public class Channels {
         }
     }
 
+    /**
+     * Builder implementation combining data from a set of input channels.
+     *
+     * @param <IN> the input data type.
+     */
     private static class CombineBuilder<IN>
             extends AbstractBuilder<IOChannel<Selectable<? extends IN>>> {
 
-        private final LinkedHashSet<InputChannel<? extends IN>> mChannels;
+        private final ArrayList<InputChannel<? extends IN>> mChannels;
 
         private final int mStartIndex;
 
+        /**
+         * Constructor.
+         *
+         * @param startIndex the selectable start index.
+         * @param channels   the input channels to combine.
+         */
         private CombineBuilder(final int startIndex,
-                @NotNull final LinkedHashSet<InputChannel<? extends IN>> channels) {
+                @NotNull final ArrayList<InputChannel<? extends IN>> channels) {
 
             mStartIndex = startIndex;
             mChannels = channels;
@@ -1464,7 +1571,7 @@ public class Channels {
         protected IOChannel<Selectable<? extends IN>> build(
                 @NotNull final ChannelConfiguration configuration) {
 
-            final HashSet<InputChannel<? extends IN>> channels = mChannels;
+            final ArrayList<InputChannel<? extends IN>> channels = mChannels;
             final ArrayList<IOChannel<?>> channelList =
                     new ArrayList<IOChannel<?>>(channels.size());
             for (final InputChannel<?> channel : channels) {
@@ -1480,12 +1587,21 @@ public class Channels {
         }
     }
 
-    // TODO: 18/02/16 javadoc
+    /**
+     * Builder implementation concatenating data from a set of output channels.
+     *
+     * @param <OUT> the output data type.
+     */
     private static class ConcatBuilder<OUT> extends AbstractBuilder<OutputChannel<OUT>> {
 
-        private final LinkedHashSet<OutputChannel<? extends OUT>> mChannels;
+        private final ArrayList<OutputChannel<? extends OUT>> mChannels;
 
-        private ConcatBuilder(@NotNull final LinkedHashSet<OutputChannel<? extends OUT>> channels) {
+        /**
+         * Constructor.
+         *
+         * @param channels the output channels to concat.
+         */
+        private ConcatBuilder(@NotNull final ArrayList<OutputChannel<? extends OUT>> channels) {
 
             mChannels = channels;
         }
@@ -1582,15 +1698,69 @@ public class Channels {
     }
 
     /**
-     * Output consumer distributing list of data among a list of channels.
+     * Builder implementation distributing data into a set of input channels.
+     *
+     * @param <IN> the input data type.
      */
-    private static class DistributeOutputConsumer implements OutputConsumer<List<?>> {
+    private static class DistributeBuilder<IN>
+            extends AbstractBuilder<IOChannel<List<? extends IN>>> {
 
-        private final ArrayList<IOChannel<?>> mChannels;
+        private final ArrayList<InputChannel<? extends IN>> mChannels;
 
         private final boolean mIsFlush;
 
-        private final Object mPlaceholder;
+        private final IN mPlaceholder;
+
+        /**
+         * Constructor.
+         *
+         * @param isFlush     whether to flush data.
+         * @param placeholder the placeholder instance.
+         * @param channels    the list of channels.
+         */
+        private DistributeBuilder(final boolean isFlush, @Nullable final IN placeholder,
+                @NotNull final ArrayList<InputChannel<? extends IN>> channels) {
+
+            mIsFlush = isFlush;
+            mPlaceholder = placeholder;
+            mChannels = channels;
+        }
+
+        @NotNull
+        @Override
+        @SuppressWarnings("unchecked")
+        protected IOChannel<List<? extends IN>> build(
+                @NotNull final ChannelConfiguration configuration) {
+
+            final ArrayList<InputChannel<? extends IN>> channels = mChannels;
+            final ArrayList<IOChannel<?>> channelList =
+                    new ArrayList<IOChannel<?>>(channels.size());
+            for (final InputChannel<?> channel : channels) {
+                final IOChannel<?> ioChannel = JRoutine.io().buildChannel();
+                ioChannel.passTo(((InputChannel<Object>) channel));
+                channelList.add(ioChannel);
+            }
+
+            final IOChannel<List<? extends IN>> ioChannel =
+                    JRoutine.io().withChannels().with(configuration).configured().buildChannel();
+            return ioChannel.passTo(
+                    new DistributeOutputConsumer(mIsFlush, mPlaceholder, channelList));
+        }
+    }
+
+    /**
+     * Output consumer distributing list of data among a list of channels.
+     *
+     * @param <IN> the input data type.
+     */
+    private static class DistributeOutputConsumer<IN>
+            implements OutputConsumer<List<? extends IN>> {
+
+        private final ArrayList<IOChannel<? extends IN>> mChannels;
+
+        private final boolean mIsFlush;
+
+        private final IN mPlaceholder;
 
         /**
          * Constructor.
@@ -1599,8 +1769,8 @@ public class Channels {
          * @param placeholder the placeholder instance.
          * @param channels    the list of channels.
          */
-        private DistributeOutputConsumer(final boolean isFlush, @Nullable final Object placeholder,
-                @NotNull final ArrayList<IOChannel<?>> channels) {
+        private DistributeOutputConsumer(final boolean isFlush, @Nullable final IN placeholder,
+                @NotNull final ArrayList<IOChannel<? extends IN>> channels) {
 
             mIsFlush = isFlush;
             mChannels = channels;
@@ -1609,32 +1779,32 @@ public class Channels {
 
         public void onComplete() {
 
-            for (final IOChannel<?> channel : mChannels) {
+            for (final IOChannel<? extends IN> channel : mChannels) {
                 channel.close();
             }
         }
 
         public void onError(@NotNull final RoutineException error) {
 
-            for (final IOChannel<?> channel : mChannels) {
+            for (final IOChannel<? extends IN> channel : mChannels) {
                 channel.abort(error);
             }
         }
 
         @SuppressWarnings("unchecked")
-        public void onOutput(final List<?> inputs) {
+        public void onOutput(final List<? extends IN> inputs) {
 
             final int inputSize = inputs.size();
-            final ArrayList<IOChannel<?>> channels = mChannels;
+            final ArrayList<IOChannel<? extends IN>> channels = mChannels;
             final int size = channels.size();
             if (inputSize > size) {
                 throw new IllegalArgumentException();
             }
 
-            final Object placeholder = mPlaceholder;
+            final IN placeholder = mPlaceholder;
             final boolean isFlush = mIsFlush;
             for (int i = 0; i < size; ++i) {
-                final IOChannel<Object> channel = (IOChannel<Object>) channels.get(i);
+                final IOChannel<IN> channel = (IOChannel<IN>) channels.get(i);
                 if (i < inputSize) {
                     channel.pass(inputs.get(i));
 
@@ -1684,6 +1854,51 @@ public class Channels {
             if (selectable.index == mIndex) {
                 mChannel.pass(selectable.data);
             }
+        }
+    }
+
+    /**
+     * Builder implementation joining data from a set of output channels.
+     *
+     * @param <OUT> the output data type.
+     */
+    private static class JoinBuilder<OUT>
+            extends AbstractBuilder<OutputChannel<List<? extends OUT>>> {
+
+        private final ArrayList<OutputChannel<? extends OUT>> mChannels;
+
+        private final boolean mIsFlush;
+
+        private final OUT mPlaceholder;
+
+        /**
+         * Constructor.
+         *
+         * @param isFlush     whether to flush data.
+         * @param placeholder the placeholder instance.
+         * @param channels    the input channels to join.
+         */
+        private JoinBuilder(final boolean isFlush, @Nullable final OUT placeholder,
+                @NotNull final ArrayList<OutputChannel<? extends OUT>> channels) {
+
+            mIsFlush = isFlush;
+            mPlaceholder = placeholder;
+            mChannels = channels;
+        }
+
+        @NotNull
+        @Override
+        @SuppressWarnings("unchecked")
+        protected OutputChannel<List<? extends OUT>> build(
+                @NotNull final ChannelConfiguration configuration) {
+
+            final ArrayList<OutputChannel<? extends OUT>> channels = mChannels;
+            final IOChannel<List<? extends OUT>> ioChannel =
+                    JRoutine.io().withChannels().with(configuration).configured().buildChannel();
+            final JoinOutputConsumer<OUT> consumer =
+                    new JoinOutputConsumer<OUT>(mIsFlush, channels.size(), mPlaceholder, ioChannel);
+            merge(channels).build().passTo(consumer);
+            return ioChannel;
         }
     }
 
@@ -1792,6 +2007,48 @@ public class Channels {
 
                 mChannel.pass(outputs);
             }
+        }
+    }
+
+    /**
+     * Builder implementation merging data from a set of output channels into selectable objects.
+     *
+     * @param <OUT> the output data type.
+     */
+    private static class MergeBuilder<OUT>
+            extends AbstractBuilder<OutputChannel<? extends Selectable<OUT>>> {
+
+        private final ArrayList<OutputChannel<? extends OUT>> mChannels;
+
+        private final int mStartIndex;
+
+        /**
+         * Constructor.
+         *
+         * @param startIndex the selectable start index.
+         * @param channels   the input channels to merge.
+         */
+        private MergeBuilder(final int startIndex,
+                @NotNull final ArrayList<OutputChannel<? extends OUT>> channels) {
+
+            mStartIndex = startIndex;
+            mChannels = channels;
+        }
+
+        @NotNull
+        @Override
+        @SuppressWarnings("unchecked")
+        protected OutputChannel<? extends Selectable<OUT>> build(
+                @NotNull final ChannelConfiguration configuration) {
+
+            final IOChannel<Selectable<OUT>> ioChannel =
+                    JRoutine.io().withChannels().with(configuration).configured().buildChannel();
+            int i = mStartIndex;
+            for (final OutputChannel<? extends OUT> channel : mChannels) {
+                ioChannel.pass(toSelectable(channel, i++));
+            }
+
+            return ioChannel.close();
         }
     }
 
@@ -1955,6 +2212,48 @@ public class Channels {
             for (final OutputConsumer<? super DATA> consumer : boundConsumers) {
                 consumer.onOutput(output);
             }
+        }
+    }
+
+    // TODO: 2/19/16 channelMap, list, builder
+
+    // TODO: 2/19/16 javadoc
+    private static class SelectInfo {
+
+        private final ChannelConfiguration mConfiguration;
+
+        private final HashSet<Integer> mIndexes;
+
+        private SelectInfo(@NotNull final ChannelConfiguration configuration,
+                @NotNull final HashSet<Integer> indexes) {
+
+            mConfiguration = configuration;
+            mIndexes = indexes;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+
+            // AUTO-GENERATED CODE
+            if (this == o) {
+                return true;
+            }
+
+            if (!(o instanceof SelectInfo)) {
+                return false;
+            }
+
+            final SelectInfo that = (SelectInfo) o;
+            return mConfiguration.equals(that.mConfiguration) && mIndexes.equals(that.mIndexes);
+        }
+
+        @Override
+        public int hashCode() {
+
+            // AUTO-GENERATED CODE
+            int result = mConfiguration.hashCode();
+            result = 31 * result + mIndexes.hashCode();
+            return result;
         }
     }
 

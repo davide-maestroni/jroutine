@@ -319,7 +319,6 @@ public class StreamsCompat extends Streams {
             @NotNull final OutputChannel<OUT> output) {
 
         if (output == null) {
-
             throw new NullPointerException("the output channel instance must not be null");
         }
 

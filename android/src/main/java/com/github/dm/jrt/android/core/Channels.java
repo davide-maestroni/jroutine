@@ -276,7 +276,6 @@ public class Channels extends com.github.dm.jrt.core.Channels {
 
         @NotNull
         @Override
-        @SuppressWarnings("unchecked")
         protected OutputChannel<? extends ParcelableSelectable<OUT>> build(
                 @NotNull final ChannelConfiguration configuration) {
 

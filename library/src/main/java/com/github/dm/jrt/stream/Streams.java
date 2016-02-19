@@ -381,7 +381,6 @@ public class Streams extends Functions {
     public static <OUT> StreamChannel<OUT> lazyStreamOf(@NotNull final OutputChannel<OUT> output) {
 
         if (output == null) {
-
             throw new NullPointerException("the output channel instance must not be null");
         }
 

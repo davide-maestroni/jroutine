@@ -242,7 +242,6 @@ public class Channels {
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
      */
     @NotNull
-    @SuppressWarnings("unchecked")
     public static <IN> Builder<? extends IOChannel<Selectable<? extends IN>>> combine(
             final int startIndex,
             @NotNull final Collection<? extends InputChannel<? extends IN>> channels) {
@@ -1888,7 +1887,6 @@ public class Channels {
 
         @NotNull
         @Override
-        @SuppressWarnings("unchecked")
         protected OutputChannel<List<? extends OUT>> build(
                 @NotNull final ChannelConfiguration configuration) {
 
@@ -1984,7 +1982,6 @@ public class Channels {
             mChannel.abort(error);
         }
 
-        @SuppressWarnings("unchecked")
         public void onOutput(final Selectable<OUT> selectable) {
 
             final int index = selectable.index;
@@ -2037,7 +2034,6 @@ public class Channels {
 
         @NotNull
         @Override
-        @SuppressWarnings("unchecked")
         protected OutputChannel<? extends Selectable<OUT>> build(
                 @NotNull final ChannelConfiguration configuration) {
 

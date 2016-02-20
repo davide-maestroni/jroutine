@@ -684,7 +684,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
                                                    .withChannels()
                                                    .withLog(logger.getLog())
                                                    .withLogLevel(logger.getLogLevel())
-                                                   .configured()
+                                                   .getConfigured()
                                                    .buildChannel();
             channels.add(channel);
             internalLoader.setInvocationCount(Math.max(channels.size() + mAbortedChannels.size(),
@@ -695,7 +695,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
                                .withRunner(Runners.looperRunner(looper))
                                .withLog(logger.getLog())
                                .withLogLevel(logger.getLogLevel())
-                               .configured()
+                               .getConfigured()
                                .asyncCall(channel);
             }
 

@@ -611,7 +611,7 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
             }
 
             mConfiguration = configuration;
-            mBuilder.withChannels().with(null).with(configuration).configured();
+            mBuilder.withChannels().with(null).with(configuration).getConfigured();
             return this;
         }
 

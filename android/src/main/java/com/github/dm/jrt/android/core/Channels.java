@@ -174,7 +174,7 @@ public class Channels extends com.github.dm.jrt.core.Channels {
                 final IOChannel<IN> inputChannel = JRoutine.io()
                                                            .withChannels()
                                                            .with(configuration)
-                                                           .configured()
+                                                           .getConfigured()
                                                            .buildChannel();
                 final IOChannel<ParcelableSelectable<DATA>> ioChannel =
                         JRoutine.io().buildChannel();
@@ -212,7 +212,7 @@ public class Channels extends com.github.dm.jrt.core.Channels {
                 final IOChannel<ParcelableSelectable<OUT>> ioChannel = JRoutine.io()
                                                                                .withChannels()
                                                                                .with(configuration)
-                                                                               .configured()
+                                                                               .getConfigured()
                                                                                .buildChannel();
                 channel.passTo(new SelectableOutputConsumer<OUT, OUT>(ioChannel, index));
                 return ioChannel;
@@ -310,7 +310,7 @@ public class Channels extends com.github.dm.jrt.core.Channels {
                 @NotNull final ChannelConfiguration configuration) {
 
             final IOChannel<ParcelableSelectable<OUT>> ioChannel =
-                    JRoutine.io().withChannels().with(configuration).configured().buildChannel();
+                    JRoutine.io().withChannels().with(configuration).getConfigured().buildChannel();
             int i = mStartIndex;
             for (final OutputChannel<? extends OUT> channel : mChannels) {
                 ioChannel.pass(toSelectable(channel, i++).build());

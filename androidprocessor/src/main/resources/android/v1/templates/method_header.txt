@@ -51,10 +51,10 @@
                                            .withInvocations()
                                            .with(invocationConfiguration)
                                            ${routineBuilderOptions}
-                                           .configured()
+                                           .getConfigured()
                                            .withLoaders()
                                            .with(loaderConfiguration)
                                            ${invocationBuilderOptions}
-                                           .configured()
+                                           .getConfigured()
                                            .buildRoutine();
     }

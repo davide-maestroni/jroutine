@@ -1129,7 +1129,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                      .with(context)
                      .withLoaders()
                      .withLoaderId(21)
-                     .configured()
+                     .getConfigured()
                      .async()
                      .map(toUpperCase());
         assertThat(JRoutineCompat.with(context)
@@ -1141,7 +1141,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                      .with(context)
                      .withStreamLoaders()
                      .withLoaderId(31)
-                     .configured()
+                     .getConfigured()
                      .async()
                      .map(toUpperCase());
         assertThat(JRoutineCompat.with(context)
@@ -1153,8 +1153,10 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
     public void testMap() {
 
-        final IOChannelBuilder builder =
-                JRoutineCompat.io().withChannels().withChannelOrder(OrderType.BY_CALL).configured();
+        final IOChannelBuilder builder = JRoutineCompat.io()
+                                                       .withChannels()
+                                                       .withChannelOrder(OrderType.BY_CALL)
+                                                       .getConfigured();
         final IOChannel<String> channel1 = builder.buildChannel();
         final IOChannel<Integer> channel2 = builder.buildChannel();
 
@@ -1166,7 +1168,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                                               DelegationType.SYNC))
                               .withInvocations()
                               .withInputOrder(OrderType.BY_CALL)
-                              .configured()
+                              .getConfigured()
                               .asyncCall(channel);
         final SparseArrayCompat<OutputChannel<Object>> channelMap =
                 ChannelsCompat.selectParcelable(output, Sort.INTEGER, Sort.STRING).build();
@@ -1196,8 +1198,10 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
     public void testMerge() {
 
-        final IOChannelBuilder builder =
-                JRoutineCompat.io().withChannels().withChannelOrder(OrderType.BY_CALL).configured();
+        final IOChannelBuilder builder = JRoutineCompat.io()
+                                                       .withChannels()
+                                                       .withChannelOrder(OrderType.BY_CALL)
+                                                       .getConfigured();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
         OutputChannel<? extends ParcelableSelectable<?>> outputChannel;
@@ -1252,8 +1256,10 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
     @SuppressWarnings("unchecked")
     public void testMerge4() {
 
-        final IOChannelBuilder builder =
-                JRoutineCompat.io().withChannels().withChannelOrder(OrderType.BY_CALL).configured();
+        final IOChannelBuilder builder = JRoutineCompat.io()
+                                                       .withChannels()
+                                                       .withChannelOrder(OrderType.BY_CALL)
+                                                       .getConfigured();
         final IOChannel<String> channel1 = builder.buildChannel();
         final IOChannel<String> channel2 = builder.buildChannel();
         final IOChannel<String> channel3 = builder.buildChannel();
@@ -1287,8 +1293,10 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
     public void testMergeAbort() {
 
-        final IOChannelBuilder builder =
-                JRoutineCompat.io().withChannels().withChannelOrder(OrderType.BY_CALL).configured();
+        final IOChannelBuilder builder = JRoutineCompat.io()
+                                                       .withChannels()
+                                                       .withChannelOrder(OrderType.BY_CALL)
+                                                       .getConfigured();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
         OutputChannel<? extends ParcelableSelectable<?>> outputChannel;
@@ -1571,7 +1579,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                                 .with(context)
                                 .withLoaders()
                                 .withRoutineId(11)
-                                .configured()
+                                .getConfigured()
                                 .async()
                                 .map(toUpperCase())
                                 .afterMax(seconds(10))

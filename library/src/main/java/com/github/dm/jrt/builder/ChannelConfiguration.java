@@ -411,7 +411,7 @@ public final class ChannelConfiguration {
                                           .withInputMaxDelay(getChannelMaxDelayOr(null))
                                           .withInputMaxSize(getChannelMaxSizeOr(
                                                   InvocationConfiguration.DEFAULT))
-                                          .configured();
+                                          .getConfigured();
     }
 
     /**
@@ -428,7 +428,7 @@ public final class ChannelConfiguration {
                                       .withReadTimeoutAction(getReadTimeoutActionOr(null))
                                       .withLog(getLogOr(null))
                                       .withLogLevel(getLogLevelOr(null))
-                                      .configured();
+                                      .getConfigured();
     }
 
     /**
@@ -447,7 +447,7 @@ public final class ChannelConfiguration {
                                           .withOutputMaxDelay(getChannelMaxDelayOr(null))
                                           .withOutputMaxSize(getChannelMaxSizeOr(
                                                   InvocationConfiguration.DEFAULT))
-                                          .configured();
+                                          .getConfigured();
     }
 
     /**
@@ -534,7 +534,7 @@ public final class ChannelConfiguration {
          * @return the configured object.
          */
         @NotNull
-        public TYPE configured() {
+        public TYPE getConfigured() {
 
             return mConfigurable.setConfiguration(buildConfiguration());
         }

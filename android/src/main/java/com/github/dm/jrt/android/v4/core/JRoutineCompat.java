@@ -247,7 +247,7 @@ public class JRoutineCompat extends JRoutine {
 
             return new DefaultLoaderChannelBuilder(mContext).withLoaders()
                                                             .withLoaderId(loaderId)
-                                                            .configured();
+                                                            .getConfigured();
         }
     }
 }

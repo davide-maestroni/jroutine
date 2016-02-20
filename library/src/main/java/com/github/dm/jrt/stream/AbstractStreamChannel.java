@@ -259,7 +259,7 @@ public abstract class AbstractStreamChannel<OUT>
         return withInvocations().withRunner(runner)
                                 .withInputLimit(maxInputs)
                                 .withInputMaxDelay(maxDelay)
-                                .configured();
+                                .getConfigured();
     }
 
     @NotNull
@@ -346,13 +346,13 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public StreamChannel<OUT> maxParallelInvocations(final int maxInvocations) {
 
-        return withInvocations().withMaxInstances(maxInvocations).configured();
+        return withInvocations().withMaxInstances(maxInvocations).getConfigured();
     }
 
     @NotNull
     public StreamChannel<OUT> ordered(@Nullable final OrderType orderType) {
 
-        return withStreamInvocations().withOutputOrder(orderType).configured();
+        return withStreamInvocations().withOutputOrder(orderType).getConfigured();
     }
 
     @NotNull
@@ -367,7 +367,7 @@ public abstract class AbstractStreamChannel<OUT>
 
         final ChannelConfiguration configuration = buildChannelConfiguration();
         return newChannel(
-                Channels.repeat(this).withChannels().with(configuration).configured().build(),
+                Channels.repeat(this).withChannels().with(configuration).getConfigured().build(),
                 getStreamConfiguration(), mDelegationType, mBinder);
     }
 
@@ -376,7 +376,7 @@ public abstract class AbstractStreamChannel<OUT>
 
         final DelegationType delegationType = mDelegationType;
         final StreamChannel<OUT> channel = withStreamInvocations().withRunner(runner)
-                                                                  .configured()
+                                                                  .getConfigured()
                                                                   .async()
                                                                   .map(PassingInvocation
                                                                                .<OUT>factoryOf());
@@ -501,7 +501,7 @@ public abstract class AbstractStreamChannel<OUT>
         return newChannel(Channels.toSelectable(this, index)
                                   .withChannels()
                                   .with(configuration)
-                                  .configured()
+                                  .getConfigured()
                                   .build(), getStreamConfiguration(), mDelegationType, mBinder);
     }
 
@@ -706,13 +706,13 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     private ChannelConfiguration buildChannelConfiguration() {
 
-        return fromOutputChannelConfiguration(buildConfiguration()).configured();
+        return fromOutputChannelConfiguration(buildConfiguration()).getConfigured();
     }
 
     @NotNull
     private InvocationConfiguration buildConfiguration() {
 
-        return getStreamConfiguration().builderFrom().with(getConfiguration()).configured();
+        return getStreamConfiguration().builderFrom().with(getConfiguration()).getConfigured();
     }
 
     @NotNull

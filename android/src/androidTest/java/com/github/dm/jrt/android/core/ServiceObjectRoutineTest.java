@@ -91,7 +91,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                                                                 TimeoutActionType.EXIT)
                                                         .withLogLevel(Level.DEBUG)
                                                         .withLog(new NullLog())
-                                                        .configured()
+                                                        .getConfigured()
                                                         .aliasMethod(TestClass.GET);
         assertThat(routine.syncCall().afterMax(timeout).all()).containsExactly(-77L);
     }
@@ -113,7 +113,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                                         .on(instanceOf(Sum.class))
                                         .withInvocations()
                                         .withReadTimeout(timeout)
-                                        .configured()
+                                        .getConfigured()
                                         .buildProxy(ClassToken.tokenOf(SumItf.class));
         final IOChannel<Integer> channel3 = JRoutine.io().buildChannel();
         channel3.pass(7).close();
@@ -143,7 +143,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                                             .on(instanceOf(Count.class))
                                             .withInvocations()
                                             .withReadTimeout(timeout)
-                                            .configured()
+                                            .getConfigured()
                                             .buildProxy(CountItf.class);
         assertThat(countAsync.count(3).all()).containsExactly(0, 1, 2);
         assertThat(countAsync.count1(3).all()).containsExactly(new int[]{0, 1, 2});
@@ -358,7 +358,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                     .on(instanceOf(TestClass.class))
                     .withInvocations()
                     .withReadTimeout(INFINITY)
-                    .configured()
+                    .getConfigured()
                     .buildProxy(TestItf.class)
                     .throwException(null);
 
@@ -374,7 +374,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                     .on(instanceOf(TestClass.class))
                     .withInvocations()
                     .withReadTimeout(INFINITY)
-                    .configured()
+                    .getConfigured()
                     .buildProxy(TestItf.class)
                     .throwException1(null);
 
@@ -390,7 +390,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                     .on(instanceOf(TestClass.class))
                     .withInvocations()
                     .withReadTimeout(INFINITY)
-                    .configured()
+                    .getConfigured()
                     .buildProxy(TestItf.class)
                     .throwException2(null);
 
@@ -464,10 +464,10 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                                                          .withInvocations()
                                                          .withRunner(Runners.poolRunner())
                                                          .withMaxInstances(1)
-                                                         .configured()
+                                                         .getConfigured()
                                                          .withProxies()
                                                          .withSharedFields("test")
-                                                         .configured()
+                                                         .getConfigured()
                                                          .method(TestClass.class.getMethod(
                                                                  "getLong"));
 
@@ -481,7 +481,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                                                          .on(instanceOf(TestClass.class))
                                                          .withInvocations()
                                                          .withRunner(Runners.poolRunner())
-                                                         .configured()
+                                                         .getConfigured()
                                                          .method("getLong");
 
         assertThat(routine1.syncCall().afterMax(timeout).all()).containsExactly(-77L);
@@ -576,7 +576,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                                 .on(instanceOf(Impl.class))
                                 .withInvocations()
                                 .withReadTimeout(INFINITY)
-                                .configured()
+                                .getConfigured()
                                 .buildProxy(Itf.class);
 
         assertThat(itf.add0('c')).isEqualTo((int) 'c');
@@ -813,18 +813,18 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                         .on(instanceOf(TestClass2.class))
                         .withInvocations()
                         .withReadTimeout(seconds(10))
-                        .configured();
+                        .getConfigured();
 
         long startTime = System.currentTimeMillis();
 
         OutputChannel<Object> getOne = builder.withProxies()
                                               .withSharedFields("1")
-                                              .configured()
+                                              .getConfigured()
                                               .method("getOne")
                                               .asyncCall();
         OutputChannel<Object> getTwo = builder.withProxies()
                                               .withSharedFields("2")
-                                              .configured()
+                                              .getConfigured()
                                               .method("getTwo")
                                               .asyncCall();
 
@@ -848,7 +848,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                            .on(instanceOf(TestTimeout.class))
                            .withInvocations()
                            .withReadTimeout(seconds(10))
-                           .configured()
+                           .getConfigured()
                            .aliasMethod("test")
                            .asyncCall()
                            .next()).isEqualTo(31);
@@ -859,7 +859,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                     .on(instanceOf(TestTimeout.class))
                     .withInvocations()
                     .withReadTimeoutAction(TimeoutActionType.THROW)
-                    .configured()
+                    .getConfigured()
                     .aliasMethod("test")
                     .asyncCall()
                     .next();
@@ -874,7 +874,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                            .on(instanceOf(TestTimeout.class))
                            .withInvocations()
                            .withReadTimeout(seconds(10))
-                           .configured()
+                           .getConfigured()
                            .method("getInt")
                            .asyncCall()
                            .next()).isEqualTo(31);
@@ -885,7 +885,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                     .on(instanceOf(TestTimeout.class))
                     .withInvocations()
                     .withReadTimeoutAction(TimeoutActionType.THROW)
-                    .configured()
+                    .getConfigured()
                     .method("getInt")
                     .asyncCall()
                     .next();
@@ -900,7 +900,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                            .on(instanceOf(TestTimeout.class))
                            .withInvocations()
                            .withReadTimeout(seconds(10))
-                           .configured()
+                           .getConfigured()
                            .method(TestTimeout.class.getMethod("getInt"))
                            .asyncCall()
                            .next()).isEqualTo(31);
@@ -911,7 +911,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                     .on(instanceOf(TestTimeout.class))
                     .withInvocations()
                     .withReadTimeoutAction(TimeoutActionType.THROW)
-                    .configured()
+                    .getConfigured()
                     .method(TestTimeout.class.getMethod("getInt"))
                     .asyncCall()
                     .next();
@@ -926,7 +926,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                            .on(instanceOf(TestTimeout.class))
                            .withInvocations()
                            .withReadTimeout(seconds(10))
-                           .configured()
+                           .getConfigured()
                            .buildProxy(TestTimeoutItf.class)
                            .getInt()).isEqualTo(31);
 
@@ -936,7 +936,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                     .on(instanceOf(TestTimeout.class))
                     .withInvocations()
                     .withReadTimeoutAction(TimeoutActionType.THROW)
-                    .configured()
+                    .getConfigured()
                     .buildProxy(TestTimeoutItf.class)
                     .getInt();
 

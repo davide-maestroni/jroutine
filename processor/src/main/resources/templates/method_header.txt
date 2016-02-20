@@ -50,6 +50,6 @@
                                            .withInvocations()
                                            .with(invocationConfiguration)
                                            ${routineBuilderOptions}
-                                           .configured()
+                                           .getConfigured()
                                            .buildRoutine();
     }

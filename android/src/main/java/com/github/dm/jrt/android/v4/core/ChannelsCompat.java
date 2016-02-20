@@ -99,7 +99,7 @@ public class ChannelsCompat extends Channels {
                 final IOChannel<Selectable<? extends IN>> ioChannel = JRoutineCompat.io()
                                                                                     .withChannels()
                                                                                     .with(configuration)
-                                                                                    .configured()
+                                                                                    .getConfigured()
                                                                                     .buildChannel();
                 ioChannel.passTo(new SortingMapOutputConsumer(ioChannelMap));
                 return ioChannel;
@@ -144,7 +144,7 @@ public class ChannelsCompat extends Channels {
                 final IOChannel<ParcelableSelectable<OUT>> ioChannel = JRoutineCompat.io()
                                                                                      .withChannels()
                                                                                      .with(configuration)
-                                                                                     .configured()
+                                                                                     .getConfigured()
                                                                                      .buildChannel();
                 for (int i = 0; i < size; ++i) {
                     ioChannel.pass(
@@ -378,7 +378,7 @@ public class ChannelsCompat extends Channels {
                         ChannelsCompat.<DATA, IN>selectParcelable(channel, index)
                                       .withChannels()
                                       .with(configuration)
-                                      .configured()
+                                      .getConfigured()
                                       .build();
                 channelMap.put(index, ioChannel);
             }
@@ -442,7 +442,7 @@ public class ChannelsCompat extends Channels {
                         final IOChannel<OUT> ioChannel = JRoutineCompat.io()
                                                                        .withChannels()
                                                                        .with(configuration)
-                                                                       .configured()
+                                                                       .getConfigured()
                                                                        .buildChannel();
                         inputMap.append(index, ioChannel);
                         channelMap.append(index, ioChannel);

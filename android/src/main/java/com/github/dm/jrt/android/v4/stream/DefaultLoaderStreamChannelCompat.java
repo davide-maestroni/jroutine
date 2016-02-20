@@ -513,7 +513,7 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
         return newChannel(ChannelsCompat.toSelectable(this, index)
                                         .withChannels()
                                         .with(configuration)
-                                        .configured()
+                                        .getConfigured()
                                         .build(), getStreamConfiguration(), getDelegationType(),
                           getBinder());
     }
@@ -581,39 +581,39 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
 
         return newRoutine(configuration,
-                          mStreamConfiguration.builderFrom().with(mConfiguration).configured(),
+                          mStreamConfiguration.builderFrom().with(mConfiguration).getConfigured(),
                           factory);
     }
 
     @NotNull
     public LoaderStreamChannelCompat<OUT> cache(@Nullable final CacheStrategyType strategyType) {
 
-        return withLoaders().withCacheStrategy(strategyType).configured();
+        return withLoaders().withCacheStrategy(strategyType).getConfigured();
     }
 
     @NotNull
     public LoaderStreamChannelCompat<OUT> loaderId(final int loaderId) {
 
-        return withLoaders().withLoaderId(loaderId).configured();
+        return withLoaders().withLoaderId(loaderId).getConfigured();
     }
 
     @NotNull
     public LoaderStreamChannelCompat<OUT> routineId(final int routineId) {
 
-        return withLoaders().withRoutineId(routineId).configured();
+        return withLoaders().withRoutineId(routineId).getConfigured();
     }
 
     @NotNull
     public LoaderStreamChannelCompat<OUT> staleAfter(final long time,
             @NotNull final TimeUnit timeUnit) {
 
-        return withLoaders().withResultStaleTime(time, timeUnit).configured();
+        return withLoaders().withResultStaleTime(time, timeUnit).getConfigured();
     }
 
     @NotNull
     public LoaderStreamChannelCompat<OUT> staleAfter(@Nullable final TimeDuration staleTime) {
 
-        return withLoaders().withResultStaleTime(staleTime).configured();
+        return withLoaders().withResultStaleTime(staleTime).getConfigured();
     }
 
     @NotNull
@@ -642,13 +642,13 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
     @NotNull
     private ChannelConfiguration buildChannelConfiguration() {
 
-        return fromOutputChannelConfiguration(buildConfiguration()).configured();
+        return fromOutputChannelConfiguration(buildConfiguration()).getConfigured();
     }
 
     @NotNull
     private InvocationConfiguration buildConfiguration() {
 
-        return getStreamConfiguration().builderFrom().with(getConfiguration()).configured();
+        return getStreamConfiguration().builderFrom().with(getConfiguration()).getConfigured();
     }
 
     @NotNull
@@ -675,7 +675,7 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
             return JRoutine.on(factory)
                            .withInvocations()
                            .with(invocationConfiguration)
-                           .configured()
+                           .getConfigured()
                            .buildRoutine();
         }
 
@@ -685,10 +685,10 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
         return contextBuilder.on(invocationFactory)
                              .withInvocations()
                              .with(invocationConfiguration)
-                             .configured()
+                             .getConfigured()
                              .withLoaders()
                              .with(loaderConfiguration)
-                             .configured()
+                             .getConfigured()
                              .buildRoutine();
     }
 

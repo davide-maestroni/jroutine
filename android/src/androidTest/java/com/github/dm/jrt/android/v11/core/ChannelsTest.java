@@ -460,7 +460,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         }
 
         final IOChannelBuilder builder =
-                JRoutine.io().withChannels().withChannelOrder(OrderType.BY_CALL).configured();
+                JRoutine.io().withChannels().withChannelOrder(OrderType.BY_CALL).getConfigured();
         final IOChannel<String> channel1 = builder.buildChannel();
         final IOChannel<Integer> channel2 = builder.buildChannel();
 
@@ -471,7 +471,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
                         .on(factoryOf(Sort.class))
                         .withInvocations()
                         .withInputOrder(OrderType.BY_CALL)
-                        .configured()
+                        .getConfigured()
                         .asyncCall(channel);
         final SparseArray<OutputChannel<Object>> channelMap =
                 Channels.selectParcelable(output, Sort.INTEGER, Sort.STRING).build();
@@ -503,7 +503,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         }
 
         final IOChannelBuilder builder =
-                JRoutine.io().withChannels().withChannelOrder(OrderType.BY_CALL).configured();
+                JRoutine.io().withChannels().withChannelOrder(OrderType.BY_CALL).getConfigured();
         final IOChannel<String> channel1 = builder.buildChannel();
         final IOChannel<Integer> channel2 = builder.buildChannel();
         final SparseArray<OutputChannel<?>> channelMap = new SparseArray<OutputChannel<?>>(2);
@@ -527,7 +527,7 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
         }
 
         final IOChannelBuilder builder =
-                JRoutine.io().withChannels().withChannelOrder(OrderType.BY_CALL).configured();
+                JRoutine.io().withChannels().withChannelOrder(OrderType.BY_CALL).getConfigured();
         final IOChannel<String> channel1 = builder.buildChannel();
         final IOChannel<Integer> channel2 = builder.buildChannel();
         final SparseArray<OutputChannel<?>> channelMap = new SparseArray<OutputChannel<?>>(2);

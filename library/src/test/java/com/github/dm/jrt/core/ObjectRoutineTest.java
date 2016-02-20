@@ -97,7 +97,7 @@ public class ObjectRoutineTest {
         final PriorityPass priorityPass = JRoutine.on(instance(pass))
                                                   .withInvocations()
                                                   .withRunner(runner)
-                                                  .configured()
+                                                  .getConfigured()
                                                   .buildProxy(PriorityPass.class);
         final OutputChannel<String> output1 = priorityPass.passNormal("test1").eventuallyExit();
 
@@ -129,7 +129,7 @@ public class ObjectRoutineTest {
                                                                 TimeoutActionType.EXIT)
                                                         .withLogLevel(Level.DEBUG)
                                                         .withLog(new NullLog())
-                                                        .configured()
+                                                        .getConfigured()
                                                         .aliasMethod(TestClass.GET);
 
         assertThat(routine.syncCall().afterMax(timeout).all()).containsExactly(-77L);
@@ -144,7 +144,7 @@ public class ObjectRoutineTest {
                                                         .withRunner(Runners.poolRunner())
                                                         .withLogLevel(Level.DEBUG)
                                                         .withLog(new NullLog())
-                                                        .configured()
+                                                        .getConfigured()
                                                         .aliasMethod(TestStatic.GET);
 
         assertThat(routine.syncCall().afterMax(timeout).all()).containsExactly(-77L);
@@ -187,7 +187,7 @@ public class ObjectRoutineTest {
         final SumItf sumAsync = JRoutine.on(instance(sum))
                                         .withInvocations()
                                         .withReadTimeout(timeout)
-                                        .configured()
+                                        .getConfigured()
                                         .buildProxy(SumItf.class);
         final IOChannel<Integer> channel3 = JRoutine.io().buildChannel();
         channel3.pass(7).close();
@@ -220,7 +220,7 @@ public class ObjectRoutineTest {
         final CountItf countAsync = JRoutine.on(instance(count))
                                             .withInvocations()
                                             .withReadTimeout(timeout)
-                                            .configured()
+                                            .getConfigured()
                                             .buildProxy(CountItf.class);
         assertThat(countAsync.count(3).all()).containsExactly(0, 1, 2);
         assertThat(countAsync.count1(3).all()).containsExactly(new int[]{0, 1, 2});
@@ -249,7 +249,7 @@ public class ObjectRoutineTest {
                          .withPriority(41)
                          .withReadTimeout(1111, TimeUnit.MICROSECONDS)
                          .withReadTimeoutAction(TimeoutActionType.ABORT)
-                         .configured());
+                         .getConfigured());
     }
 
     @Test
@@ -532,7 +532,7 @@ public class ObjectRoutineTest {
             JRoutine.on(instance(test))
                     .withInvocations()
                     .withReadTimeout(INFINITY)
-                    .configured()
+                    .getConfigured()
                     .buildProxy(TestItf.class)
                     .throwException(null);
 
@@ -547,7 +547,7 @@ public class ObjectRoutineTest {
             JRoutine.on(instance(test))
                     .withInvocations()
                     .withReadTimeout(INFINITY)
-                    .configured()
+                    .getConfigured()
                     .buildProxy(TestItf.class)
                     .throwException1(null);
 
@@ -633,10 +633,10 @@ public class ObjectRoutineTest {
                                                          .withInvocations()
                                                          .withRunner(Runners.poolRunner())
                                                          .withMaxInstances(1)
-                                                         .configured()
+                                                         .getConfigured()
                                                          .withProxies()
                                                          .withSharedFields("test")
-                                                         .configured()
+                                                         .getConfigured()
                                                          .method(TestClass.class.getMethod(
                                                                  "getLong"));
 
@@ -651,7 +651,7 @@ public class ObjectRoutineTest {
         final Routine<Object, Object> routine1 = JRoutine.on(instance(test))
                                                          .withInvocations()
                                                          .withRunner(Runners.poolRunner())
-                                                         .configured()
+                                                         .getConfigured()
                                                          .method("getLong");
 
         assertThat(routine1.syncCall().afterMax(timeout).all()).containsExactly(-77L);
@@ -761,7 +761,7 @@ public class ObjectRoutineTest {
                                                         .withRunner(Runners.poolRunner())
                                                         .withLogLevel(Level.DEBUG)
                                                         .withLog(new NullLog())
-                                                        .configured()
+                                                        .getConfigured()
                                                         .aliasMethod(TestStatic.GET);
 
         assertThat(routine.syncCall().afterMax(timeout).all()).containsExactly(-77L);
@@ -775,7 +775,7 @@ public class ObjectRoutineTest {
         final Itf itf = JRoutine.on(instance(impl))
                                 .withInvocations()
                                 .withReadTimeout(seconds(10))
-                                .configured()
+                                .getConfigured()
                                 .buildProxy(Itf.class);
 
         assertThat(itf.add0('c')).isEqualTo((int) 'c');
@@ -1016,7 +1016,7 @@ public class ObjectRoutineTest {
                                                          .withCoreInstances(16)
                                                          .withLogLevel(Level.DEBUG)
                                                          .withLog(nullLog)
-                                                         .configured()
+                                                         .getConfigured()
                                                          .aliasMethod(TestClass.GET);
 
         assertThat(routine1.syncCall().all()).containsExactly(-77L);
@@ -1027,7 +1027,7 @@ public class ObjectRoutineTest {
                                                          .withCoreInstances(16)
                                                          .withLogLevel(Level.DEBUG)
                                                          .withLog(nullLog)
-                                                         .configured()
+                                                         .getConfigured()
                                                          .aliasMethod(TestClass.GET);
 
         assertThat(routine2.syncCall().all()).containsExactly(-77L);
@@ -1039,7 +1039,7 @@ public class ObjectRoutineTest {
                                                          .withCoreInstances(32)
                                                          .withLogLevel(Level.DEBUG)
                                                          .withLog(nullLog)
-                                                         .configured()
+                                                         .getConfigured()
                                                          .aliasMethod(TestClass.GET);
 
         assertThat(routine3.syncCall().all()).containsExactly(-77L);
@@ -1052,7 +1052,7 @@ public class ObjectRoutineTest {
                                                          .withCoreInstances(32)
                                                          .withLogLevel(Level.WARNING)
                                                          .withLog(nullLog)
-                                                         .configured()
+                                                         .getConfigured()
                                                          .aliasMethod(TestClass.GET);
 
         assertThat(routine4.syncCall().all()).containsExactly(-77L);
@@ -1064,7 +1064,7 @@ public class ObjectRoutineTest {
                                                          .withCoreInstances(32)
                                                          .withLogLevel(Level.WARNING)
                                                          .withLog(new NullLog())
-                                                         .configured()
+                                                         .getConfigured()
                                                          .aliasMethod(TestClass.GET);
 
         assertThat(routine5.syncCall().all()).containsExactly(-77L);
@@ -1081,7 +1081,7 @@ public class ObjectRoutineTest {
                                                          .withCoreInstances(16)
                                                          .withLogLevel(Level.DEBUG)
                                                          .withLog(nullLog)
-                                                         .configured()
+                                                         .getConfigured()
                                                          .aliasMethod(TestStatic.GET);
 
         assertThat(routine1.syncCall().all()).containsExactly(-77L);
@@ -1092,7 +1092,7 @@ public class ObjectRoutineTest {
                                                          .withCoreInstances(16)
                                                          .withLogLevel(Level.DEBUG)
                                                          .withLog(nullLog)
-                                                         .configured()
+                                                         .getConfigured()
                                                          .aliasMethod(TestStatic.GET);
 
         assertThat(routine2.syncCall().all()).containsExactly(-77L);
@@ -1104,7 +1104,7 @@ public class ObjectRoutineTest {
                                                          .withCoreInstances(32)
                                                          .withLogLevel(Level.DEBUG)
                                                          .withLog(nullLog)
-                                                         .configured()
+                                                         .getConfigured()
                                                          .aliasMethod(TestStatic.GET);
 
         assertThat(routine3.syncCall().all()).containsExactly(-77L);
@@ -1117,7 +1117,7 @@ public class ObjectRoutineTest {
                                                          .withCoreInstances(32)
                                                          .withLogLevel(Level.WARNING)
                                                          .withLog(nullLog)
-                                                         .configured()
+                                                         .getConfigured()
                                                          .aliasMethod(TestStatic.GET);
 
         assertThat(routine4.syncCall().all()).containsExactly(-77L);
@@ -1129,7 +1129,7 @@ public class ObjectRoutineTest {
                                                          .withCoreInstances(32)
                                                          .withLogLevel(Level.WARNING)
                                                          .withLog(new NullLog())
-                                                         .configured()
+                                                         .getConfigured()
                                                          .aliasMethod(TestStatic.GET);
 
         assertThat(routine5.syncCall().all()).containsExactly(-77L);
@@ -1143,13 +1143,19 @@ public class ObjectRoutineTest {
         final ObjectRoutineBuilder builder = JRoutine.on(instance(test2))
                                                      .withInvocations()
                                                      .withReadTimeout(seconds(2))
-                                                     .configured();
+                                                     .getConfigured();
         long startTime = System.currentTimeMillis();
 
-        OutputChannel<Object> getOne =
-                builder.withProxies().withSharedFields().configured().method("getOne").asyncCall();
-        OutputChannel<Object> getTwo =
-                builder.withProxies().withSharedFields().configured().method("getTwo").asyncCall();
+        OutputChannel<Object> getOne = builder.withProxies()
+                                              .withSharedFields()
+                                              .getConfigured()
+                                              .method("getOne")
+                                              .asyncCall();
+        OutputChannel<Object> getTwo = builder.withProxies()
+                                              .withSharedFields()
+                                              .getConfigured()
+                                              .method("getTwo")
+                                              .asyncCall();
 
         assertThat(getOne.hasCompleted()).isTrue();
         assertThat(getTwo.hasCompleted()).isTrue();
@@ -1159,12 +1165,12 @@ public class ObjectRoutineTest {
 
         getOne = builder.withProxies()
                         .withSharedFields("1")
-                        .configured()
+                        .getConfigured()
                         .method("getOne")
                         .asyncCall();
         getTwo = builder.withProxies()
                         .withSharedFields("2")
-                        .configured()
+                        .getConfigured()
                         .method("getTwo")
                         .asyncCall();
 
@@ -1189,12 +1195,15 @@ public class ObjectRoutineTest {
         final ObjectRoutineBuilder builder = JRoutine.on(instance(test2))
                                                      .withInvocations()
                                                      .withReadTimeout(seconds(2))
-                                                     .configured();
+                                                     .getConfigured();
         long startTime = System.currentTimeMillis();
 
         OutputChannel<Object> getOne = builder.method("getOne").asyncCall();
-        OutputChannel<Object> getTwo =
-                builder.withProxies().withSharedFields().configured().method("getTwo").asyncCall();
+        OutputChannel<Object> getTwo = builder.withProxies()
+                                              .withSharedFields()
+                                              .getConfigured()
+                                              .method("getTwo")
+                                              .asyncCall();
 
         assertThat(getOne.hasCompleted()).isTrue();
         assertThat(getTwo.hasCompleted()).isTrue();
@@ -1204,10 +1213,14 @@ public class ObjectRoutineTest {
 
         getOne = builder.withProxies()
                         .withSharedFields("1", "2")
-                        .configured()
+                        .getConfigured()
                         .method("getOne")
                         .asyncCall();
-        getTwo = builder.withProxies().withSharedFields().configured().method("getTwo").asyncCall();
+        getTwo = builder.withProxies()
+                        .withSharedFields()
+                        .getConfigured()
+                        .method("getTwo")
+                        .asyncCall();
 
         assertThat(getOne.hasCompleted()).isTrue();
         assertThat(getTwo.hasCompleted()).isTrue();
@@ -1217,7 +1230,7 @@ public class ObjectRoutineTest {
 
         getOne = builder.withProxies()
                         .withSharedFields("1", "2")
-                        .configured()
+                        .getConfigured()
                         .method("getOne")
                         .asyncCall();
         getTwo = builder.method("getTwo").asyncCall();
@@ -1230,12 +1243,12 @@ public class ObjectRoutineTest {
 
         getOne = builder.withProxies()
                         .withSharedFields("1", "2")
-                        .configured()
+                        .getConfigured()
                         .method("getOne")
                         .asyncCall();
         getTwo = builder.withProxies()
                         .withSharedFields("2")
-                        .configured()
+                        .getConfigured()
                         .method("getTwo")
                         .asyncCall();
 
@@ -1250,13 +1263,19 @@ public class ObjectRoutineTest {
         final ObjectRoutineBuilder builder = JRoutine.on(classOfType(TestStatic2.class))
                                                      .withInvocations()
                                                      .withReadTimeout(seconds(2))
-                                                     .configured();
+                                                     .getConfigured();
         long startTime = System.currentTimeMillis();
 
-        OutputChannel<Object> getOne =
-                builder.withProxies().withSharedFields().configured().method("getOne").asyncCall();
-        OutputChannel<Object> getTwo =
-                builder.withProxies().withSharedFields().configured().method("getTwo").asyncCall();
+        OutputChannel<Object> getOne = builder.withProxies()
+                                              .withSharedFields()
+                                              .getConfigured()
+                                              .method("getOne")
+                                              .asyncCall();
+        OutputChannel<Object> getTwo = builder.withProxies()
+                                              .withSharedFields()
+                                              .getConfigured()
+                                              .method("getTwo")
+                                              .asyncCall();
 
         assertThat(getOne.hasCompleted()).isTrue();
         assertThat(getTwo.hasCompleted()).isTrue();
@@ -1266,12 +1285,12 @@ public class ObjectRoutineTest {
 
         getOne = builder.withProxies()
                         .withSharedFields("1")
-                        .configured()
+                        .getConfigured()
                         .method("getOne")
                         .asyncCall();
         getTwo = builder.withProxies()
                         .withSharedFields("2")
-                        .configured()
+                        .getConfigured()
                         .method("getTwo")
                         .asyncCall();
 
@@ -1295,12 +1314,15 @@ public class ObjectRoutineTest {
         final ObjectRoutineBuilder builder = JRoutine.on(classOfType(TestStatic2.class))
                                                      .withInvocations()
                                                      .withReadTimeout(seconds(2))
-                                                     .configured();
+                                                     .getConfigured();
         long startTime = System.currentTimeMillis();
 
         OutputChannel<Object> getOne = builder.method("getOne").asyncCall();
-        OutputChannel<Object> getTwo =
-                builder.withProxies().withSharedFields().configured().method("getTwo").asyncCall();
+        OutputChannel<Object> getTwo = builder.withProxies()
+                                              .withSharedFields()
+                                              .getConfigured()
+                                              .method("getTwo")
+                                              .asyncCall();
 
         assertThat(getOne.hasCompleted()).isTrue();
         assertThat(getTwo.hasCompleted()).isTrue();
@@ -1310,10 +1332,14 @@ public class ObjectRoutineTest {
 
         getOne = builder.withProxies()
                         .withSharedFields("1", "2")
-                        .configured()
+                        .getConfigured()
                         .method("getOne")
                         .asyncCall();
-        getTwo = builder.withProxies().withSharedFields().configured().method("getTwo").asyncCall();
+        getTwo = builder.withProxies()
+                        .withSharedFields()
+                        .getConfigured()
+                        .method("getTwo")
+                        .asyncCall();
 
         assertThat(getOne.hasCompleted()).isTrue();
         assertThat(getTwo.hasCompleted()).isTrue();
@@ -1323,7 +1349,7 @@ public class ObjectRoutineTest {
 
         getOne = builder.withProxies()
                         .withSharedFields("1", "2")
-                        .configured()
+                        .getConfigured()
                         .method("getOne")
                         .asyncCall();
         getTwo = builder.method("getTwo").asyncCall();
@@ -1336,12 +1362,12 @@ public class ObjectRoutineTest {
 
         getOne = builder.withProxies()
                         .withSharedFields("1", "2")
-                        .configured()
+                        .getConfigured()
                         .method("getOne")
                         .asyncCall();
         getTwo = builder.withProxies()
                         .withSharedFields("2")
-                        .configured()
+                        .getConfigured()
                         .method("getTwo")
                         .asyncCall();
 
@@ -1359,10 +1385,10 @@ public class ObjectRoutineTest {
                                                          .withRunner(Runners.poolRunner())
                                                          .withMaxInstances(1)
                                                          .withCoreInstances(0)
-                                                         .configured()
+                                                         .getConfigured()
                                                          .withProxies()
                                                          .withSharedFields("test")
-                                                         .configured()
+                                                         .getConfigured()
                                                          .method(TestStatic.class.getMethod(
                                                                  "getLong"));
 
@@ -1377,7 +1403,7 @@ public class ObjectRoutineTest {
                                                          .withInvocations()
                                                          .withRunner(Runners.poolRunner())
                                                          .withMaxInstances(1)
-                                                         .configured()
+                                                         .getConfigured()
                                                          .method("getLong");
 
         assertThat(routine1.syncCall().afterMax(timeout).all()).containsExactly(-77L);
@@ -1405,7 +1431,7 @@ public class ObjectRoutineTest {
         assertThat(JRoutine.on(instance(testTimeout))
                            .withInvocations()
                            .withReadTimeout(seconds(1))
-                           .configured()
+                           .getConfigured()
                            .aliasMethod("test")
                            .asyncCall()
                            .next()).isEqualTo(31);
@@ -1415,7 +1441,7 @@ public class ObjectRoutineTest {
             JRoutine.on(instance(testTimeout))
                     .withInvocations()
                     .withReadTimeoutAction(TimeoutActionType.THROW)
-                    .configured()
+                    .getConfigured()
                     .aliasMethod("test")
                     .asyncCall()
                     .next();
@@ -1429,7 +1455,7 @@ public class ObjectRoutineTest {
         assertThat(JRoutine.on(instance(testTimeout))
                            .withInvocations()
                            .withReadTimeout(seconds(1))
-                           .configured()
+                           .getConfigured()
                            .method("getInt")
                            .asyncCall()
                            .next()).isEqualTo(31);
@@ -1439,7 +1465,7 @@ public class ObjectRoutineTest {
             JRoutine.on(instance(testTimeout))
                     .withInvocations()
                     .withReadTimeoutAction(TimeoutActionType.THROW)
-                    .configured()
+                    .getConfigured()
                     .method("getInt")
                     .asyncCall()
                     .next();
@@ -1453,7 +1479,7 @@ public class ObjectRoutineTest {
         assertThat(JRoutine.on(instance(testTimeout))
                            .withInvocations()
                            .withReadTimeout(seconds(1))
-                           .configured()
+                           .getConfigured()
                            .method(TestTimeout.class.getMethod("getInt"))
                            .asyncCall()
                            .next()).isEqualTo(31);
@@ -1463,7 +1489,7 @@ public class ObjectRoutineTest {
             JRoutine.on(instance(testTimeout))
                     .withInvocations()
                     .withReadTimeoutAction(TimeoutActionType.THROW)
-                    .configured()
+                    .getConfigured()
                     .method(TestTimeout.class.getMethod("getInt"))
                     .asyncCall()
                     .next();
@@ -1477,7 +1503,7 @@ public class ObjectRoutineTest {
         assertThat(JRoutine.on(instance(testTimeout))
                            .withInvocations()
                            .withReadTimeout(seconds(1))
-                           .configured()
+                           .getConfigured()
                            .buildProxy(TestTimeoutItf.class)
                            .getInt()).isEqualTo(31);
 
@@ -1486,7 +1512,7 @@ public class ObjectRoutineTest {
             JRoutine.on(instance(testTimeout))
                     .withInvocations()
                     .withReadTimeoutAction(TimeoutActionType.THROW)
-                    .configured()
+                    .getConfigured()
                     .buildProxy(TestTimeoutItf.class)
                     .getInt();
 

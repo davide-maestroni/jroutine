@@ -68,7 +68,7 @@ public class Builders extends com.github.dm.jrt.core.Builders {
         final LoaderConfiguration.Builder<LoaderConfiguration> builder =
                 LoaderConfiguration.builderFrom(configuration);
         if (annotations == null) {
-            return builder.configured();
+            return builder.getConfigured();
         }
 
         for (final Annotation annotation : annotations) {
@@ -94,7 +94,7 @@ public class Builders extends com.github.dm.jrt.core.Builders {
             }
         }
 
-        return builder.configured();
+        return builder.getConfigured();
     }
 
     /**

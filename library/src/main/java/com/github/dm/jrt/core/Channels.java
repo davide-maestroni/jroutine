@@ -334,7 +334,7 @@ public class Channels {
                 final IOChannel<Selectable<? extends IN>> ioChannel = JRoutine.io()
                                                                               .withChannels()
                                                                               .with(configuration)
-                                                                              .configured()
+                                                                              .getConfigured()
                                                                               .buildChannel();
                 ioChannel.passTo(new SortingMapOutputConsumer(ioChannelMap));
                 return ioChannel;
@@ -802,7 +802,7 @@ public class Channels {
                 final IOChannel<Selectable<OUT>> ioChannel = JRoutine.io()
                                                                      .withChannels()
                                                                      .with(configuration)
-                                                                     .configured()
+                                                                     .getConfigured()
                                                                      .buildChannel();
                 for (final Entry<Integer, ? extends OutputChannel<? extends OUT>> entry : channelMap
                         .entrySet()) {
@@ -914,7 +914,7 @@ public class Channels {
                 final IOChannel<IN> inputChannel = JRoutine.io()
                                                            .withChannels()
                                                            .with(configuration)
-                                                           .configured()
+                                                           .getConfigured()
                                                            .buildChannel();
                 final IOChannel<Selectable<DATA>> ioChannel = JRoutine.io().buildChannel();
                 ioChannel.passTo(channel);
@@ -1200,7 +1200,7 @@ public class Channels {
                 final IOChannel<Selectable<IN>> inputChannel = JRoutine.io()
                                                                        .withChannels()
                                                                        .with(configuration)
-                                                                       .configured()
+                                                                       .getConfigured()
                                                                        .buildChannel();
                 final IOChannel<IN> ioChannel = JRoutine.io().buildChannel();
                 ioChannel.passTo(channel);
@@ -1242,7 +1242,7 @@ public class Channels {
                 final IOChannel<Selectable<OUT>> ioChannel = JRoutine.io()
                                                                      .withChannels()
                                                                      .with(configuration)
-                                                                     .configured()
+                                                                     .getConfigured()
                                                                      .buildChannel();
                 channel.passTo(new SelectableOutputConsumer<OUT, OUT>(ioChannel, index));
                 return ioChannel;
@@ -1490,7 +1490,7 @@ public class Channels {
         protected OutputChannel<OUT> build(@NotNull final ChannelConfiguration configuration) {
 
             final IOChannel<OUT> ioChannel =
-                    JRoutine.io().withChannels().with(configuration).configured().buildChannel();
+                    JRoutine.io().withChannels().with(configuration).getConfigured().buildChannel();
             for (final OutputChannel<? extends OUT> channel : mChannels) {
                 channel.passTo(ioChannel);
             }
@@ -1540,7 +1540,7 @@ public class Channels {
             }
 
             final IOChannel<Selectable<? extends IN>> ioChannel =
-                    JRoutine.io().withChannels().with(configuration).configured().buildChannel();
+                    JRoutine.io().withChannels().with(configuration).getConfigured().buildChannel();
             ioChannel.passTo(new SortingArrayOutputConsumer(mStartIndex, channelList));
             return ioChannel;
         }
@@ -1573,7 +1573,7 @@ public class Channels {
                                                      .withChannels()
                                                      .with(configuration)
                                                      .withChannelOrder(OrderType.BY_CALL)
-                                                     .configured()
+                                                     .getConfigured()
                                                      .buildChannel();
             for (final OutputChannel<? extends OUT> channel : mChannels) {
                 channel.passTo(ioChannel);
@@ -1628,7 +1628,7 @@ public class Channels {
             }
 
             final IOChannel<List<? extends IN>> ioChannel =
-                    JRoutine.io().withChannels().with(configuration).configured().buildChannel();
+                    JRoutine.io().withChannels().with(configuration).getConfigured().buildChannel();
             return ioChannel.passTo(
                     new DistributeOutputConsumer(mIsFlush, mPlaceholder, channelList));
         }
@@ -1772,7 +1772,7 @@ public class Channels {
                 final IOChannel<IN> ioChannel = Channels.<DATA, IN>select(channel, index)
                                                         .withChannels()
                                                         .with(configuration)
-                                                        .configured()
+                                                        .getConfigured()
                                                         .build();
                 channelMap.put(index, ioChannel);
             }
@@ -1817,7 +1817,7 @@ public class Channels {
 
             final ArrayList<OutputChannel<? extends OUT>> channels = mChannels;
             final IOChannel<List<? extends OUT>> ioChannel =
-                    JRoutine.io().withChannels().with(configuration).configured().buildChannel();
+                    JRoutine.io().withChannels().with(configuration).getConfigured().buildChannel();
             final JoinOutputConsumer<OUT> consumer =
                     new JoinOutputConsumer<OUT>(mIsFlush, channels.size(), mPlaceholder, ioChannel);
             merge(channels).build().passTo(consumer);
@@ -1963,7 +1963,7 @@ public class Channels {
                 @NotNull final ChannelConfiguration configuration) {
 
             final IOChannel<Selectable<OUT>> ioChannel =
-                    JRoutine.io().withChannels().with(configuration).configured().buildChannel();
+                    JRoutine.io().withChannels().with(configuration).getConfigured().buildChannel();
             int i = mStartIndex;
             for (final OutputChannel<? extends OUT> channel : mChannels) {
                 ioChannel.pass(toSelectable(channel, i++).build());
@@ -2026,7 +2026,7 @@ public class Channels {
                         final IOChannel<OUT> ioChannel = JRoutine.io()
                                                                  .withChannels()
                                                                  .with(configuration)
-                                                                 .configured()
+                                                                 .getConfigured()
                                                                  .buildChannel();
                         inputMap.put(index, ioChannel);
                         channelMap.put(index, ioChannel);

@@ -122,10 +122,10 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 new DefaultLoaderRoutineBuilder<IN, OUT>(mContext, factory);
         return builder.withInvocations()
                       .with(invocationConfiguration)
-                      .configured()
+                      .getConfigured()
                       .withLoaders()
                       .with(loaderConfiguration)
-                      .configured()
+                      .getConfigured()
                       .buildRoutine();
     }
 
@@ -172,10 +172,10 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 new DefaultLoaderRoutineBuilder<IN, OUT>(mContext, factory);
         return builder.withInvocations()
                       .with(invocationConfiguration)
-                      .configured()
+                      .getConfigured()
                       .withLoaders()
                       .with(loaderConfiguration)
-                      .configured()
+                      .getConfigured()
                       .buildRoutine();
     }
 
@@ -284,7 +284,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 mRoutine = JRoutine.on(target)
                                    .withProxies()
                                    .with(mProxyConfiguration)
-                                   .configured()
+                                   .getConfigured()
                                    .aliasMethod(mAliasName);
 
             } catch (final Throwable t) {
@@ -402,7 +402,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 mRoutine = JRoutine.on(target)
                                    .withProxies()
                                    .with(mProxyConfiguration)
-                                   .configured()
+                                   .getConfigured()
                                    .method(mMethod);
 
             } catch (final Throwable t) {
@@ -618,10 +618,10 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                     new DefaultLoaderRoutineBuilder<Object, Object>(mContext, factory);
             final LoaderRoutine<Object, Object> routine = builder.withInvocations()
                                                                  .with(invocationConfiguration)
-                                                                 .configured()
+                                                                 .getConfigured()
                                                                  .withLoaders()
                                                                  .with(loaderConfiguration)
-                                                                 .configured()
+                                                                 .getConfigured()
                                                                  .buildRoutine();
             return invokeRoutine(routine, method, asArgs(args), methodInfo.invocationMode,
                                  inputMode, outputMode);

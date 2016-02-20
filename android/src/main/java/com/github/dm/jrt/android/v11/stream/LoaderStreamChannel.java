@@ -336,7 +336,7 @@ public interface LoaderStreamChannel<OUT>
     InvocationConfiguration.Builder<? extends LoaderStreamChannel<OUT>> withStreamInvocations();
 
     /**
-     * Short for {@code withLoaders().withCacheStrategy(strategyType).configured()}.
+     * Short for {@code withLoaders().withCacheStrategy(strategyType).getConfigured()}.
      *
      * @param strategyType the cache strategy type.
      * @return the configured stream.
@@ -345,7 +345,7 @@ public interface LoaderStreamChannel<OUT>
     LoaderStreamChannel<OUT> cache(@Nullable CacheStrategyType strategyType);
 
     /**
-     * Short for {@code withLoaders().withLoaderId(loaderId).configured()}.<br/>
+     * Short for {@code withLoaders().withLoaderId(loaderId).getConfigured()}.<br/>
      * This method is useful to easily apply a configuration to the next routine concatenated to the
      * stream, which will force the routine loader ID.
      *
@@ -356,7 +356,7 @@ public interface LoaderStreamChannel<OUT>
     LoaderStreamChannel<OUT> loaderId(int loaderId);
 
     /**
-     * Short for {@code withLoaders().withRoutineId(routineId).configured()}.<br/>
+     * Short for {@code withLoaders().withRoutineId(routineId).getConfigured()}.<br/>
      * This method is useful to easily apply a configuration to the next routine concatenated to the
      * stream, which will force the routine ID.
      *
@@ -367,7 +367,7 @@ public interface LoaderStreamChannel<OUT>
     LoaderStreamChannel<OUT> routineId(int routineId);
 
     /**
-     * Short for {@code withLoaders().withResultStaleTime(time, timeUnit).configured()}.
+     * Short for {@code withLoaders().withResultStaleTime(time, timeUnit).getConfigured()}.
      *
      * @param time     the time.
      * @param timeUnit the time unit.
@@ -377,7 +377,7 @@ public interface LoaderStreamChannel<OUT>
     LoaderStreamChannel<OUT> staleAfter(long time, @NotNull TimeUnit timeUnit);
 
     /**
-     * Short for {@code withLoaders().withResultStaleTime(staleTime).configured()}.
+     * Short for {@code withLoaders().withResultStaleTime(staleTime).getConfigured()}.
      *
      * @param staleTime the stale time.
      * @return the configured stream.

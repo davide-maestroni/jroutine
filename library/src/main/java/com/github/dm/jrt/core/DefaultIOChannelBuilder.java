@@ -55,7 +55,7 @@ class DefaultIOChannelBuilder implements IOChannelBuilder, Configurable<IOChanne
         final ChannelConfiguration configuration = mConfiguration;
         final IORunner runner = new IORunner(configuration.getRunnerOr(Runners.sharedRunner()));
         return new DefaultIOChannel<DATA>(
-                configuration.builderFrom().withRunner(runner).configured());
+                configuration.builderFrom().withRunner(runner).getConfigured());
     }
 
     @NotNull

@@ -176,7 +176,7 @@ public class RunnerTest extends AndroidTestCase {
                                                       .withInvocations()
                                                       .withRunner(Runners.handlerRunner(
                                                               new HandlerThread("test")))
-                                                      .configured()
+                                                      .getConfigured()
                                                       .asyncCall();
 
         assertThat(JRoutine.on(new LooperInvocationFactory())

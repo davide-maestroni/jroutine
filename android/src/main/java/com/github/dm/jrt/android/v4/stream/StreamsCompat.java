@@ -616,7 +616,7 @@ public class StreamsCompat extends Streams {
             }
 
             mConfiguration = configuration;
-            mBuilder.withChannels().with(null).with(configuration).configured();
+            mBuilder.withChannels().with(null).with(configuration).getConfigured();
             return this;
         }
 

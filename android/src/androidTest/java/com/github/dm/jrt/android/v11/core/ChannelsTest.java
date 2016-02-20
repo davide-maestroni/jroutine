@@ -284,6 +284,11 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
     public void testCombineError() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         try {
 
             Channels.combine();
@@ -495,6 +500,11 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     @SuppressWarnings("unchecked")
     public void testMerge() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final IOChannelBuilder builder =
                 JRoutine.io().withChannels().withChannelOrder(OrderType.BY_CALL).configured();
         final IOChannel<String> channel1 = builder.buildChannel();
@@ -513,6 +523,11 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
 
     @SuppressWarnings("unchecked")
     public void testMergeAbort() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final IOChannelBuilder builder =
                 JRoutine.io().withChannels().withChannelOrder(OrderType.BY_CALL).configured();
@@ -538,6 +553,11 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     }
 
     public void testMergeError() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         try {
 
@@ -726,6 +746,11 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     @SuppressWarnings("unchecked")
     public void testOutputSelect() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final IOChannel<ParcelableSelectable<String>> channel = JRoutine.io().buildChannel();
         final OutputChannel<String> outputChannel =
                 Channels.selectParcelable(channel.asOutput(), 33).get(33);
@@ -738,6 +763,11 @@ public class ChannelsTest extends ActivityInstrumentationTestCase2<TestActivity>
     }
 
     public void testOutputSelectAbort() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final IOChannel<ParcelableSelectable<String>> channel = JRoutine.io().buildChannel();
         final OutputChannel<String> outputChannel =

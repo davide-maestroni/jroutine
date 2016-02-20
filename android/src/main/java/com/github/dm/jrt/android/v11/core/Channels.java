@@ -40,12 +40,6 @@ import java.util.Map;
  */
 public class Channels extends com.github.dm.jrt.android.core.Channels {
 
-    private static final WeakIdentityHashMap<InputChannel<?>, HashMap<SelectInfo,
-            SparseArray<IOChannel<?>>>>
-            sInputChannels =
-            new WeakIdentityHashMap<InputChannel<?>, HashMap<SelectInfo,
-                    SparseArray<IOChannel<?>>>>();
-
     private static final WeakIdentityHashMap<OutputChannel<?>, HashMap<SelectInfo,
             SparseArray<OutputChannel<?>>>>
             sOutputChannels =
@@ -163,9 +157,9 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
     /**
      * Returns a builder of maps of input channels accepting the data identified by the specified
      * indexes.<br/>
-     * Note that the builder will return the same map for the same inputs and equal configuration,
-     * and that the returned channels <b>must be explicitly closed</b> in order to ensure the
-     * completion of the invocation lifecycle.
+     * Note that the builder will successfully create several input channel map instances, and that
+     * the returned channels <b>must be explicitly closed</b> in order to ensure the completion of
+     * the invocation lifecycle.
      *
      * @param channel the selectable channel.
      * @param indexes the array of indexes.
@@ -191,9 +185,9 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
     /**
      * Returns a builder of maps of input channels accepting the data identified by the specified
      * indexes.<br/>
-     * Note that the builder will return the same map for the same inputs and equal configuration,
-     * and that the returned channels <b>must be explicitly closed</b> in order to ensure the
-     * completion of the invocation lifecycle.
+     * Note that the builder will successfully create several input channel map instances, and that
+     * the returned channels <b>must be explicitly closed</b> in order to ensure the completion of
+     * the invocation lifecycle.
      *
      * @param channel the selectable channel.
      * @param indexes the iterable returning the channel indexes.
@@ -224,9 +218,9 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
     /**
      * Returns a builder of maps of input channels accepting the data identified by the specified
      * indexes.<br/>
-     * Note that the builder will return the same map for the same inputs and equal configuration,
-     * and that the returned channels <b>must be explicitly closed</b> in order to ensure the
-     * completion of the invocation lifecycle.
+     * Note that the builder will successfully create several input channel map instances, and that
+     * the returned channels <b>must be explicitly closed</b> in order to ensure the completion of
+     * the invocation lifecycle.
      *
      * @param startIndex the selectable start index.
      * @param rangeSize  the size of the range of indexes (must be positive).
@@ -375,45 +369,18 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
 
             final HashSet<Integer> indexes = mIndexes;
             final InputChannel<? super ParcelableSelectable<DATA>> channel = mChannel;
-            synchronized (sInputChannels) {
-                final WeakIdentityHashMap<InputChannel<?>, HashMap<SelectInfo,
-                        SparseArray<IOChannel<?>>>>
-                        inputChannels = sInputChannels;
-                HashMap<SelectInfo, SparseArray<IOChannel<?>>> channelMaps =
-                        inputChannels.get(channel);
-                if (channelMaps == null) {
-                    channelMaps = new HashMap<SelectInfo, SparseArray<IOChannel<?>>>();
-                    inputChannels.put(channel, channelMaps);
-                }
-
-                final int size = indexes.size();
-                final SelectInfo selectInfo = new SelectInfo(configuration, indexes);
-                final SparseArray<IOChannel<IN>> channelMap = new SparseArray<IOChannel<IN>>(size);
-                SparseArray<IOChannel<?>> channels = channelMaps.get(selectInfo);
-                if (channels != null) {
-                    final int channelSize = channels.size();
-                    for (int i = 0; i < channelSize; i++) {
-                        channelMap.append(channels.keyAt(i), (IOChannel<IN>) channels.valueAt(i));
-                    }
-
-                } else {
-                    channels = new SparseArray<IOChannel<?>>(size);
-                    for (final Integer index : indexes) {
-                        final IOChannel<IN> ioChannel =
-                                Channels.<DATA, IN>selectParcelable(channel, index)
-                                        .withChannels()
-                                        .with(configuration)
-                                        .configured()
-                                        .build();
-                        channelMap.append(index, ioChannel);
-                        channels.append(index, ioChannel);
-                    }
-
-                    channelMaps.put(selectInfo, channels);
-                }
-
-                return channelMap;
+            final SparseArray<IOChannel<IN>> channelMap =
+                    new SparseArray<IOChannel<IN>>(indexes.size());
+            for (final Integer index : indexes) {
+                final IOChannel<IN> ioChannel = Channels.<DATA, IN>selectParcelable(channel, index)
+                                                        .withChannels()
+                                                        .with(configuration)
+                                                        .configured()
+                                                        .build();
+                channelMap.append(index, ioChannel);
             }
+
+            return channelMap;
         }
     }
 

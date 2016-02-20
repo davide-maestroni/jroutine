@@ -40,12 +40,6 @@ import java.util.Map;
  */
 public class ChannelsCompat extends Channels {
 
-    private static final WeakIdentityHashMap<InputChannel<?>, HashMap<SelectInfo,
-            SparseArrayCompat<IOChannel<?>>>>
-            sInputChannels =
-            new WeakIdentityHashMap<InputChannel<?>, HashMap<SelectInfo,
-                    SparseArrayCompat<IOChannel<?>>>>();
-
     private static final WeakIdentityHashMap<OutputChannel<?>, HashMap<SelectInfo,
             SparseArrayCompat<OutputChannel<?>>>>
             sOutputChannels =
@@ -165,9 +159,9 @@ public class ChannelsCompat extends Channels {
     /**
      * Returns a builder of maps of input channels accepting the data identified by the specified
      * indexes.<br/>
-     * Note that the builder will return the same map for the same inputs and equal configuration,
-     * and that the returned channels <b>must be explicitly closed</b> in order to ensure the
-     * completion of the invocation lifecycle.
+     * Note that the builder will successfully create several input channel map instances, and that
+     * the returned channels <b>must be explicitly closed</b> in order to ensure the completion of
+     * the invocation lifecycle.
      *
      * @param channel the selectable channel.
      * @param indexes the array of indexes.
@@ -193,9 +187,9 @@ public class ChannelsCompat extends Channels {
     /**
      * Returns a builder of maps of input channels accepting the data identified by the specified
      * indexes.<br/>
-     * Note that the builder will return the same map for the same inputs and equal configuration,
-     * and that the returned channels <b>must be explicitly closed</b> in order to ensure the
-     * completion of the invocation lifecycle.
+     * Note that the builder will successfully create several input channel map instances, and that
+     * the returned channels <b>must be explicitly closed</b> in order to ensure the completion of
+     * the invocation lifecycle.
      *
      * @param channel the selectable channel.
      * @param indexes the iterable returning the channel indexes.
@@ -226,9 +220,9 @@ public class ChannelsCompat extends Channels {
     /**
      * Returns a builder of maps of input channels accepting the data identified by the specified
      * indexes.<br/>
-     * Note that the builder will return the same map for the same inputs and equal configuration,
-     * and that the returned channels <b>must be explicitly closed</b> in order to ensure the
-     * completion of the invocation lifecycle.
+     * Note that the builder will successfully create several input channel map instances, and that
+     * the returned channels <b>must be explicitly closed</b> in order to ensure the completion of
+     * the invocation lifecycle.
      *
      * @param startIndex the selectable start index.
      * @param rangeSize  the size of the range of indexes (must be positive).
@@ -377,46 +371,19 @@ public class ChannelsCompat extends Channels {
 
             final HashSet<Integer> indexes = mIndexes;
             final InputChannel<? super ParcelableSelectable<DATA>> channel = mChannel;
-            synchronized (sInputChannels) {
-                final WeakIdentityHashMap<InputChannel<?>, HashMap<SelectInfo,
-                        SparseArrayCompat<IOChannel<?>>>>
-                        inputChannels = sInputChannels;
-                HashMap<SelectInfo, SparseArrayCompat<IOChannel<?>>> channelMaps =
-                        inputChannels.get(channel);
-                if (channelMaps == null) {
-                    channelMaps = new HashMap<SelectInfo, SparseArrayCompat<IOChannel<?>>>();
-                    inputChannels.put(channel, channelMaps);
-                }
-
-                final int size = indexes.size();
-                final SelectInfo selectInfo = new SelectInfo(configuration, indexes);
-                final SparseArrayCompat<IOChannel<IN>> channelMap =
-                        new SparseArrayCompat<IOChannel<IN>>(size);
-                SparseArrayCompat<IOChannel<?>> channels = channelMaps.get(selectInfo);
-                if (channels != null) {
-                    final int channelSize = channels.size();
-                    for (int i = 0; i < channelSize; i++) {
-                        channelMap.append(channels.keyAt(i), (IOChannel<IN>) channels.valueAt(i));
-                    }
-
-                } else {
-                    channels = new SparseArrayCompat<IOChannel<?>>(size);
-                    for (final Integer index : indexes) {
-                        final IOChannel<IN> ioChannel =
-                                ChannelsCompat.<DATA, IN>selectParcelable(channel, index)
-                                              .withChannels()
-                                              .with(configuration)
-                                              .configured()
-                                              .build();
-                        channelMap.put(index, ioChannel);
-                        channels.put(index, ioChannel);
-                    }
-
-                    channelMaps.put(selectInfo, channels);
-                }
-
-                return channelMap;
+            final SparseArrayCompat<IOChannel<IN>> channelMap =
+                    new SparseArrayCompat<IOChannel<IN>>(indexes.size());
+            for (final Integer index : indexes) {
+                final IOChannel<IN> ioChannel =
+                        ChannelsCompat.<DATA, IN>selectParcelable(channel, index)
+                                      .withChannels()
+                                      .with(configuration)
+                                      .configured()
+                                      .build();
+                channelMap.put(index, ioChannel);
             }
+
+            return channelMap;
         }
     }
 

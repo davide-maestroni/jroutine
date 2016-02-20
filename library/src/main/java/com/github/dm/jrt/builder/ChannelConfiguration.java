@@ -139,6 +139,7 @@ public final class ChannelConfiguration {
                 : new Builder<ChannelConfiguration>(sDefaultConfigurable, initialConfiguration);
     }
 
+    // TODO: 20/02/16 javadoc + unit tests
     @NotNull
     public static Builder<ChannelConfiguration> fromInputChannelConfiguration(
             @Nullable final InvocationConfiguration initialConfiguration) {

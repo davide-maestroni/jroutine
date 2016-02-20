@@ -806,8 +806,9 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         channel1.orderByCall().after(millis(100)).pass("testtest").pass("test2").close();
         channel2.orderByCall().after(millis(110)).pass(6).pass(4).close();
         assertThat(routine.asyncCall(
-                           Streams.join(Arrays.<OutputChannel<?>>asList(channel1, channel2))
-                                  .build()).afterMax(seconds(10)).all()).containsExactly('s', '2');
+                Streams.join(Arrays.<OutputChannel<?>>asList(channel1, channel2)).build())
+                          .afterMax(seconds(10))
+                          .all()).containsExactly('s', '2');
         channel1 = builder.buildChannel();
         channel2 = builder.buildChannel();
         channel1.orderByCall()
@@ -1887,12 +1888,14 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
                 case INTEGER:
                     Channels.<Object, Integer>selectParcelable(result, INTEGER)
+                            .build()
                             .pass(selectable.<Integer>data())
                             .close();
                     break;
 
                 case STRING:
                     Channels.<Object, String>selectParcelable(result, STRING)
+                            .build()
                             .pass(selectable.<String>data())
                             .close();
                     break;

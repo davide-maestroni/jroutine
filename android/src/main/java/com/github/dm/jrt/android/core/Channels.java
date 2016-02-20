@@ -148,26 +148,41 @@ public class Channels extends com.github.dm.jrt.core.Channels {
     }
 
     /**
-     * Returns a new channel transforming the input data into selectable ones.<br/>
-     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
-     * completion of the invocation lifecycle.
+     * Returns a builder of channels transforming the input data into selectable ones.<br/>
+     * Note that the builder will successfully create several input channel instances, and that the
+     * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
+     * invocation lifecycle.
      *
      * @param channel the selectable channel.
      * @param index   the channel index.
      * @param <DATA>  the channel data type.
      * @param <IN>    the input data type.
-     * @return the I/O channel.
+     * @return the I/O channel builder.
      * @see com.github.dm.jrt.core.Channels#select(InputChannel, int)
      */
     @NotNull
-    public static <DATA, IN extends DATA> IOChannel<IN> selectParcelable(
+    public static <DATA, IN extends DATA> Builder<? extends IOChannel<IN>> selectParcelable(
             @NotNull final InputChannel<? super ParcelableSelectable<DATA>> channel,
             final int index) {
 
-        final IOChannel<IN> inputChannel = JRoutine.io().buildChannel();
-        final IOChannel<ParcelableSelectable<DATA>> ioChannel = JRoutine.io().buildChannel();
-        ioChannel.passTo(channel);
-        return inputChannel.passTo(new SelectableOutputConsumer<DATA, IN>(ioChannel, index));
+        return new AbstractBuilder<IOChannel<IN>>() {
+
+            @NotNull
+            @Override
+            protected IOChannel<IN> build(@NotNull final ChannelConfiguration configuration) {
+
+                final IOChannel<IN> inputChannel = JRoutine.io()
+                                                           .withChannels()
+                                                           .with(configuration)
+                                                           .configured()
+                                                           .buildChannel();
+                final IOChannel<ParcelableSelectable<DATA>> ioChannel =
+                        JRoutine.io().buildChannel();
+                ioChannel.passTo(channel);
+                return inputChannel.passTo(
+                        new SelectableOutputConsumer<DATA, IN>(ioChannel, index));
+            }
+        };
     }
 
     /**

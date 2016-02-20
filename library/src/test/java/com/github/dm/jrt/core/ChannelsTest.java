@@ -878,17 +878,17 @@ public class ChannelsTest {
         Map<Integer, IOChannel<Object>> channelMap;
         InvocationChannel<Selectable<Object>, Selectable<Object>> channel;
         channel = routine.asyncInvoke();
-        channelMap = Channels.select(channel, Arrays.asList(Sort.INTEGER, Sort.STRING));
+        channelMap = Channels.select(channel, Arrays.asList(Sort.INTEGER, Sort.STRING)).build();
         channelMap.get(Sort.INTEGER).pass(-11).close();
         channelMap.get(Sort.STRING).pass("test21").close();
         assertThat(channel.result().afterMax(seconds(10)).all()).containsOnlyElementsOf(outputs);
         channel = routine.asyncInvoke();
-        channelMap = Channels.select(channel, Sort.INTEGER, Sort.STRING);
+        channelMap = Channels.select(channel, Sort.INTEGER, Sort.STRING).build();
         channelMap.get(Sort.INTEGER).pass(-11).close();
         channelMap.get(Sort.STRING).pass("test21").close();
         assertThat(channel.result().afterMax(seconds(10)).all()).containsOnlyElementsOf(outputs);
         channel = routine.asyncInvoke();
-        channelMap = Channels.select(Math.min(Sort.INTEGER, Sort.STRING), 2, channel);
+        channelMap = Channels.select(Math.min(Sort.INTEGER, Sort.STRING), 2, channel).build();
         channelMap.get(Sort.INTEGER).pass(-11).close();
         channelMap.get(Sort.STRING).pass("test21").close();
         assertThat(channel.result().afterMax(seconds(10)).all()).containsOnlyElementsOf(outputs);
@@ -902,7 +902,7 @@ public class ChannelsTest {
         Map<Integer, IOChannel<Object>> channelMap;
         InvocationChannel<Selectable<Object>, Selectable<Object>> channel;
         channel = routine.asyncInvoke();
-        channelMap = Channels.select(channel, Arrays.asList(Sort.INTEGER, Sort.STRING));
+        channelMap = Channels.select(channel, Arrays.asList(Sort.INTEGER, Sort.STRING)).build();
         channelMap.get(Sort.INTEGER).pass(-11).close();
         channelMap.get(Sort.STRING).abort();
 
@@ -917,7 +917,7 @@ public class ChannelsTest {
         }
 
         channel = routine.asyncInvoke();
-        channelMap = Channels.select(channel, Sort.INTEGER, Sort.STRING);
+        channelMap = Channels.select(channel, Sort.INTEGER, Sort.STRING).build();
         channelMap.get(Sort.INTEGER).abort();
         channelMap.get(Sort.STRING).pass("test21").close();
 
@@ -932,7 +932,7 @@ public class ChannelsTest {
         }
 
         channel = routine.asyncInvoke();
-        channelMap = Channels.select(Math.min(Sort.INTEGER, Sort.STRING), 2, channel);
+        channelMap = Channels.select(Math.min(Sort.INTEGER, Sort.STRING), 2, channel).build();
         channelMap.get(Sort.INTEGER).abort();
         channelMap.get(Sort.STRING).abort();
 

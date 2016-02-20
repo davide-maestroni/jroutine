@@ -51,16 +51,16 @@ import java.util.Map.Entry;
  */
 public class Channels {
 
-    private static final WeakIdentityHashMap<InputChannel<?>, HashMap<SelectInfo, Map<Integer,
-            IOChannel<?>>>>
+    private static final WeakIdentityHashMap<InputChannel<?>, HashMap<SelectInfo,
+            HashMap<Integer, IOChannel<?>>>>
             sInputChannels =
-            new WeakIdentityHashMap<InputChannel<?>, HashMap<SelectInfo, Map<Integer,
+            new WeakIdentityHashMap<InputChannel<?>, HashMap<SelectInfo, HashMap<Integer,
                     IOChannel<?>>>>();
 
-    private static final WeakIdentityHashMap<OutputChannel<?>, HashMap<SelectInfo, Map<Integer,
-            OutputChannel<?>>>>
+    private static final WeakIdentityHashMap<OutputChannel<?>, HashMap<SelectInfo,
+            HashMap<Integer, OutputChannel<?>>>>
             sOutputChannels =
-            new WeakIdentityHashMap<OutputChannel<?>, HashMap<SelectInfo, Map<Integer,
+            new WeakIdentityHashMap<OutputChannel<?>, HashMap<SelectInfo, HashMap<Integer,
                     OutputChannel<?>>>>();
 
     private static final WeakIdentityHashMap<OutputChannel<?>, DefaultSelectableChannels<?>>
@@ -896,7 +896,6 @@ public class Channels {
      * Note that the builder will successfully create several input channel instances, and that the
      * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
      * invocation lifecycle.
-     * completion of the invocation lifecycle.
      * <p/>
      * Given channels {@code A}, the final output will be:
      * <pre>
@@ -936,9 +935,10 @@ public class Channels {
     }
 
     /**
-     * Returns a map of input channels accepting the input data identified by the specified indexes.
-     * <br/>
-     * Note that the returned channels <b>must be explicitly closed</b> in order to ensure the
+     * Returns a builder of maps of input channels accepting the data identified by the specified
+     * indexes.<br/>
+     * Note that the builder will return the same map for the same inputs and equal configuration,
+     * and that the returned channels <b>must be explicitly closed</b> in order to ensure the
      * completion of the invocation lifecycle.
      * <p/>
      * Given channels {@code A}, {@code B} and {@code C}, in the returned map, the final output will
@@ -954,25 +954,31 @@ public class Channels {
      * @param indexes the iterable returning the channel indexes.
      * @param <DATA>  the channel data type.
      * @param <IN>    the input data type.
-     * @return the map of indexes and I/O channels.
+     * @return the map of indexes and I/O channels builder.
      */
     @NotNull
-    public static <DATA, IN extends DATA> Map<Integer, IOChannel<IN>> select(
+    public static <DATA, IN extends DATA> Builder<? extends Map<Integer, IOChannel<IN>>> select(
             @NotNull final InputChannel<? super Selectable<DATA>> channel,
             @NotNull final Iterable<Integer> indexes) {
 
-        final HashMap<Integer, IOChannel<IN>> channelMap = new HashMap<Integer, IOChannel<IN>>();
+        final HashSet<Integer> indexSet = new HashSet<Integer>();
         for (final Integer index : indexes) {
-            channelMap.put(index, Channels.<DATA, IN>select(channel, index).build());
+            if (index == null) {
+                throw new NullPointerException(
+                        "the iterable of indexes must not return a null object");
+            }
+
+            indexSet.add(index);
         }
 
-        return channelMap;
+        return new InputMapBuilder<DATA, IN>(channel, indexSet);
     }
 
     /**
-     * Returns a map of input channels accepting the input data identified by the specified indexes.
-     * <br/>
-     * Note that the returned channels <b>must be explicitly closed</b> in order to ensure the
+     * Returns a builder of maps of input channels accepting the data identified by the specified
+     * indexes.<br/>
+     * Note that the builder will return the same map for the same inputs and equal configuration,
+     * and that the returned channels <b>must be explicitly closed</b> in order to ensure the
      * completion of the invocation lifecycle.
      * <p/>
      * Given channels {@code A}, {@code B} and {@code C}, in the returned map, the final output will
@@ -988,27 +994,26 @@ public class Channels {
      * @param indexes the array of indexes.
      * @param <DATA>  the channel data type.
      * @param <IN>    the input data type.
-     * @return the map of indexes and I/O channels.
+     * @return the map of indexes and I/O channels builder.
      */
     @NotNull
-    public static <DATA, IN extends DATA> Map<Integer, IOChannel<IN>> select(
+    public static <DATA, IN extends DATA> Builder<? extends Map<Integer, IOChannel<IN>>> select(
             @NotNull final InputChannel<? super Selectable<DATA>> channel,
             @NotNull final int... indexes) {
 
-        final int size = indexes.length;
-        final HashMap<Integer, IOChannel<IN>> channelMap =
-                new HashMap<Integer, IOChannel<IN>>(size);
+        final HashSet<Integer> indexSet = new HashSet<Integer>();
         for (final int index : indexes) {
-            channelMap.put(index, Channels.<DATA, IN>select(channel, index).build());
+            indexSet.add(index);
         }
 
-        return channelMap;
+        return new InputMapBuilder<DATA, IN>(channel, indexSet);
     }
 
     /**
-     * Returns a map of input channels accepting the input data identified by the specified indexes.
-     * <br/>
-     * Note that the returned channels <b>must be explicitly closed</b> in order to ensure the
+     * Returns a builder of maps of input channels accepting the data identified by the specified
+     * indexes.<br/>
+     * Note that the builder will return the same map for the same inputs and equal configuration,
+     * and that the returned channels <b>must be explicitly closed</b> in order to ensure the
      * completion of the invocation lifecycle.
      * <p/>
      * Given channels {@code A}, {@code B} and {@code C}, in the returned map, the final output will
@@ -1025,24 +1030,29 @@ public class Channels {
      * @param channel    the selectable channel.
      * @param <DATA>     the channel data type.
      * @param <IN>       the input data type.
-     * @return the map of indexes and I/O channels.
+     * @return the map of indexes and I/O channels builder.
      * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
      */
     @NotNull
-    public static <DATA, IN extends DATA> Map<Integer, IOChannel<IN>> select(final int startIndex,
-            final int rangeSize, @NotNull final InputChannel<? super Selectable<DATA>> channel) {
+    public static <DATA, IN extends DATA> Builder<? extends Map<Integer, IOChannel<IN>>> select(
+            final int startIndex, final int rangeSize,
+            @NotNull final InputChannel<? super Selectable<DATA>> channel) {
 
         if (rangeSize <= 0) {
             throw new IllegalArgumentException("invalid range size: " + rangeSize);
         }
 
-        final HashMap<Integer, IOChannel<IN>> channelMap =
-                new HashMap<Integer, IOChannel<IN>>(rangeSize);
-        for (int index = startIndex; index < rangeSize; index++) {
-            channelMap.put(index, Channels.<DATA, IN>select(channel, index).build());
+        final HashSet<Integer> indexSet = new HashSet<Integer>();
+        final int endIndex = startIndex + rangeSize;
+        if (endIndex <= 0) {
+            throw new IllegalArgumentException("range overflow: " + startIndex + "..." + endIndex);
         }
 
-        return channelMap;
+        for (int i = startIndex; i < endIndex; i++) {
+            indexSet.add(i);
+        }
+
+        return new InputMapBuilder<DATA, IN>(channel, indexSet);
     }
 
     /**
@@ -1852,6 +1862,69 @@ public class Channels {
 
             if (selectable.index == mIndex) {
                 mChannel.pass(selectable.data);
+            }
+        }
+    }
+
+    // TODO: 20/02/16 javadoc
+    private static class InputMapBuilder<DATA, IN extends DATA>
+            extends AbstractBuilder<Map<Integer, IOChannel<IN>>> {
+
+        private final InputChannel<? super Selectable<DATA>> mChannel;
+
+        private final HashSet<Integer> mIndexes;
+
+        private InputMapBuilder(@NotNull final InputChannel<? super Selectable<DATA>> channel,
+                @NotNull final HashSet<Integer> indexes) {
+
+            mChannel = channel;
+            mIndexes = indexes;
+        }
+
+        @NotNull
+        @Override
+        @SuppressWarnings("unchecked")
+        protected Map<Integer, IOChannel<IN>> build(
+                @NotNull final ChannelConfiguration configuration) {
+
+            final HashSet<Integer> indexes = mIndexes;
+            final InputChannel<? super Selectable<DATA>> channel = mChannel;
+            synchronized (sInputChannels) {
+                final WeakIdentityHashMap<InputChannel<?>, HashMap<SelectInfo, HashMap<Integer,
+                        IOChannel<?>>>>
+                        inputChannels = sInputChannels;
+                HashMap<SelectInfo, HashMap<Integer, IOChannel<?>>> channelMaps =
+                        inputChannels.get(channel);
+                if (channelMaps == null) {
+                    channelMaps = new HashMap<SelectInfo, HashMap<Integer, IOChannel<?>>>();
+                    inputChannels.put(channel, channelMaps);
+                }
+
+                final SelectInfo selectInfo = new SelectInfo(configuration, indexes);
+                final HashMap<Integer, IOChannel<IN>> channelMap =
+                        new HashMap<Integer, IOChannel<IN>>(indexes.size());
+                HashMap<Integer, IOChannel<?>> channels = channelMaps.get(selectInfo);
+                if (channels != null) {
+                    for (final Entry<Integer, IOChannel<?>> entry : channels.entrySet()) {
+                        channelMap.put(entry.getKey(), (IOChannel<IN>) entry.getValue());
+                    }
+
+                } else {
+                    channels = new HashMap<Integer, IOChannel<?>>(indexes.size());
+                    for (final Integer index : indexes) {
+                        final IOChannel<IN> ioChannel = Channels.<DATA, IN>select(channel, index)
+                                                                .withChannels()
+                                                                .with(configuration)
+                                                                .configured()
+                                                                .build();
+                        channelMap.put(index, ioChannel);
+                        channels.put(index, ioChannel);
+                    }
+
+                    channelMaps.put(selectInfo, channels);
+                }
+
+                return channelMap;
             }
         }
     }

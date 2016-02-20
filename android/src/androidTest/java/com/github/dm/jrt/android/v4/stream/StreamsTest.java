@@ -1756,12 +1756,14 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
                 case INTEGER:
                     ChannelsCompat.<Object, Integer>selectParcelable(result, INTEGER)
+                                  .build()
                                   .pass(selectable.<Integer>data())
                                   .close();
                     break;
 
                 case STRING:
                     ChannelsCompat.<Object, String>selectParcelable(result, STRING)
+                                  .build()
                                   .pass(selectable.<String>data())
                                   .close();
                     break;

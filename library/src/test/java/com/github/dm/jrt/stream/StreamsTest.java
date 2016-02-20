@@ -909,7 +909,7 @@ public class StreamsTest {
                                                                  .configured()
                                                                  .asyncCall(channel);
         final Map<Integer, OutputChannel<Object>> channelMap =
-                Channels.select(output, Sort.INTEGER, Sort.STRING);
+                Channels.select(output, Sort.INTEGER, Sort.STRING).build();
 
         for (int i = 0; i < 4; i++) {
 
@@ -1219,6 +1219,7 @@ public class StreamsTest {
         final IOChannel<String> channel = JRoutine.io().buildChannel();
         channel.pass("test1", "test2", "test3").close();
         assertThat(Streams.toSelectable(channel.asOutput(), 33)
+                          .build()
                           .afterMax(seconds(1))
                           .all()).containsExactly(new Selectable<String>("test1", 33),
                                                   new Selectable<String>("test2", 33),
@@ -1232,7 +1233,7 @@ public class StreamsTest {
         channel.pass("test1", "test2", "test3").abort();
 
         try {
-            Streams.toSelectable(channel.asOutput(), 33).afterMax(seconds(1)).all();
+            Streams.toSelectable(channel.asOutput(), 33).build().afterMax(seconds(1)).all();
             fail();
 
         } catch (final AbortException ignored) {

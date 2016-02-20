@@ -27,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
  * <p/>
  * Created by davide-maestroni on 03/07/2015.
  */
-public interface IOChannelBuilder extends ConfigurableChannelBuilder<IOChannelBuilder> {
+public interface IOChannelBuilder extends ChannelConfigurableBuilder<IOChannelBuilder> {
 
     /**
      * Builds and returns the I/O channel instance.

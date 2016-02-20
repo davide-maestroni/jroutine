@@ -25,6 +25,7 @@ import com.github.dm.jrt.android.v11.core.Channels;
 import com.github.dm.jrt.android.v11.core.JRoutine;
 import com.github.dm.jrt.android.v11.core.JRoutine.ContextBuilder;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
+import com.github.dm.jrt.builder.ChannelConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.channel.IOChannel;
@@ -54,6 +55,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.android.core.DelegatingContextInvocation.factoryFrom;
+import static com.github.dm.jrt.builder.ChannelConfiguration.fromOutputChannelConfiguration;
 import static com.github.dm.jrt.function.Functions.wrap;
 
 /**
@@ -491,8 +493,14 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
     @Override
     public LoaderStreamChannel<? extends ParcelableSelectable<OUT>> toSelectable(final int index) {
 
-        return newChannel(Channels.toSelectable(this, index), getStreamConfiguration(),
-                          getDelegationType(), getBinder());
+        // TODO: 20/02/16 fix this
+        final ChannelConfiguration configuration = buildChannelConfiguration();
+        return newChannel(Channels.toSelectable(this, index)
+                                  .withChannels()
+                                  .with(configuration)
+                                  .configured()
+                                  .build(), getStreamConfiguration(), getDelegationType(),
+                          getBinder());
     }
 
     @NotNull
@@ -611,6 +619,18 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
         final LoaderConfiguration configuration = mStreamConfiguration;
         return new LoaderConfiguration.Builder<LoaderStreamChannel<OUT>>(mStreamConfigurable,
                                                                          configuration);
+    }
+
+    @NotNull
+    private ChannelConfiguration buildChannelConfiguration() {
+
+        return fromOutputChannelConfiguration(buildConfiguration()).configured();
+    }
+
+    @NotNull
+    private InvocationConfiguration buildConfiguration() {
+
+        return getStreamConfiguration().builderFrom().with(getConfiguration()).configured();
     }
 
     private void checkStatic(@NotNull final Wrapper wrapper, @NotNull final Object function) {

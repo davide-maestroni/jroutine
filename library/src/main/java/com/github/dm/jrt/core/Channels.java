@@ -16,9 +16,9 @@
 
 package com.github.dm.jrt.core;
 
+import com.github.dm.jrt.builder.ChannelConfigurableBuilder;
 import com.github.dm.jrt.builder.ChannelConfiguration;
 import com.github.dm.jrt.builder.ChannelConfiguration.Configurable;
-import com.github.dm.jrt.builder.ConfigurableChannelBuilder;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.channel.AbortException;
 import com.github.dm.jrt.channel.Channel.InputChannel;
@@ -62,10 +62,6 @@ public class Channels {
             sOutputChannels =
             new WeakIdentityHashMap<OutputChannel<?>, HashMap<SelectInfo, HashMap<Integer,
                     OutputChannel<?>>>>();
-
-    private static final WeakIdentityHashMap<OutputChannel<?>, DefaultSelectableChannels<?>>
-            sSelectableChannels =
-            new WeakIdentityHashMap<OutputChannel<?>, DefaultSelectableChannels<?>>();
 
     /**
      * Avoid direct instantiation.
@@ -816,7 +812,7 @@ public class Channels {
                                                                      .buildChannel();
                 for (final Entry<Integer, ? extends OutputChannel<? extends OUT>> entry : channelMap
                         .entrySet()) {
-                    ioChannel.pass(toSelectable(entry.getValue(), entry.getKey()));
+                    ioChannel.pass(toSelectable(entry.getValue(), entry.getKey()).build());
                 }
 
                 return ioChannel.close();
@@ -1056,9 +1052,10 @@ public class Channels {
     }
 
     /**
-     * Returns a map of output channels returning the output data filtered by the specified indexes.
-     * <br/>
-     * Note that the passed channel will be bound as a result of the call.
+     * Returns a builder of maps of output channels returning the output data filtered by the
+     * specified indexes.<br/>
+     * Note that the builder will return the same map for the same inputs and equal configuration,
+     * and that the passed channels will be bound as a result of the creation.
      * <p/>
      * Given channels {@code A}, {@code B} and {@code C}, in the returned map, the final output will
      * be:
@@ -1075,76 +1072,36 @@ public class Channels {
      * @param rangeSize  the size of the range of indexes (must be positive).
      * @param channel    the selectable channel.
      * @param <OUT>      the output data type.
-     * @return the map of indexes and output channels.
+     * @return the map of indexes and output channels builder.
      * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
      */
     @NotNull
-    public static <OUT> Map<Integer, OutputChannel<OUT>> select(final int startIndex,
-            final int rangeSize,
+    public static <OUT> Builder<? extends Map<Integer, OutputChannel<OUT>>> select(
+            final int startIndex, final int rangeSize,
             @NotNull final OutputChannel<? extends Selectable<? extends OUT>> channel) {
 
         if (rangeSize <= 0) {
             throw new IllegalArgumentException("invalid range size: " + rangeSize);
         }
 
-        final HashMap<Integer, IOChannel<OUT>> inputMap =
-                new HashMap<Integer, IOChannel<OUT>>(rangeSize);
-        final HashMap<Integer, OutputChannel<OUT>> outputMap =
-                new HashMap<Integer, OutputChannel<OUT>>(rangeSize);
-        for (int index = startIndex; index < rangeSize; index++) {
-            final Integer integer = index;
-            final IOChannel<OUT> ioChannel = JRoutine.io().buildChannel();
-            inputMap.put(integer, ioChannel);
-            outputMap.put(integer, ioChannel);
+        final HashSet<Integer> indexSet = new HashSet<Integer>();
+        final int endIndex = startIndex + rangeSize;
+        if (endIndex <= 0) {
+            throw new IllegalArgumentException("range overflow: " + startIndex + "..." + endIndex);
         }
 
-        channel.passTo(new SortingMapOutputConsumer<OUT>(inputMap));
-        return outputMap;
+        for (int i = startIndex; i < endIndex; i++) {
+            indexSet.add(i);
+        }
+
+        return new OutputMapBuilder<OUT>(channel, indexSet);
     }
 
     /**
-     * Returns a selectable collection filtering the data coming from the specified channel.<br/>
-     * Note that the passed channel will be bound as a result of the call.
-     * <p/>
-     * Given channels {@code A}, {@code B} and {@code C}, in the returned channel, the final output
-     * will be:
-     * <pre>
-     *     <code>
-     *
-     *         A - [Select(?, key(A)).data, Select(?, key(A)).data, Select(?, key(A)).data, ...]
-     *         B - [Select(?, key(B)).data, Select(?, key(B)).data, Select(?, key(B)).data, ...]
-     *         C - [Select(?, key(C)).data, Select(?, key(C)).data, Select(?, key(C)).data, ...]
-     *     </code>
-     * </pre>
-     *
-     * @param channel the selectable output channel.
-     * @param <OUT>   the output data type.
-     * @return the selectable collection of channels.
-     */
-    @NotNull
-    @SuppressWarnings("unchecked")
-    public static <OUT> SelectableChannels<OUT> select(
-            @NotNull final OutputChannel<? extends Selectable<? extends OUT>> channel) {
-
-        synchronized (sSelectableChannels) {
-            final WeakIdentityHashMap<OutputChannel<?>, DefaultSelectableChannels<?>>
-                    selectableOutputs = sSelectableChannels;
-            DefaultSelectableChannels<?> selectableOutput = selectableOutputs.get(channel);
-            if (selectableOutput == null) {
-                final DefaultSelectableChannels<OUT> output = new DefaultSelectableChannels<OUT>();
-                channel.passTo(output);
-                selectableOutputs.put(channel, output);
-                return output;
-            }
-
-            return (SelectableChannels<OUT>) selectableOutput;
-        }
-    }
-
-    /**
-     * Returns a map of output channels returning the outputs filtered by the specified indexes.
-     * <br/>
-     * Note that the passed channel will be bound as a result of the call.
+     * Returns a builder of maps of output channels returning the output data filtered by the
+     * specified indexes.<br/>
+     * Note that the builder will return the same map for the same inputs and equal configuration,
+     * and that the passed channels will be bound as a result of the creation.
      * <p/>
      * Given channels {@code A}, {@code B} and {@code C}, in the returned map, the final output will
      * be:
@@ -1160,32 +1117,26 @@ public class Channels {
      * @param channel the selectable output channel.
      * @param indexes the list of indexes.
      * @param <OUT>   the output data type.
-     * @return the map of indexes and output channels.
+     * @return the map of indexes and output channels builder.
      */
     @NotNull
-    public static <OUT> Map<Integer, OutputChannel<OUT>> select(
+    public static <OUT> Builder<? extends Map<Integer, OutputChannel<OUT>>> select(
             @NotNull final OutputChannel<? extends Selectable<? extends OUT>> channel,
             @NotNull final int... indexes) {
 
-        final int size = indexes.length;
-        final HashMap<Integer, IOChannel<OUT>> inputMap =
-                new HashMap<Integer, IOChannel<OUT>>(size);
-        final HashMap<Integer, OutputChannel<OUT>> outputMap =
-                new HashMap<Integer, OutputChannel<OUT>>(size);
-        for (final Integer index : indexes) {
-            final IOChannel<OUT> ioChannel = JRoutine.io().buildChannel();
-            inputMap.put(index, ioChannel);
-            outputMap.put(index, ioChannel);
+        final HashSet<Integer> indexSet = new HashSet<Integer>();
+        for (final int index : indexes) {
+            indexSet.add(index);
         }
 
-        channel.passTo(new SortingMapOutputConsumer<OUT>(inputMap));
-        return outputMap;
+        return new OutputMapBuilder<OUT>(channel, indexSet);
     }
 
     /**
-     * Returns a map of output channels returning the output data filtered by the specified indexes.
-     * <br/>
-     * Note that the passed channel will be bound as a result of the call.
+     * Returns a builder of maps of output channels returning the output data filtered by the
+     * specified indexes.<br/>
+     * Note that the builder will return the same map for the same inputs and equal configuration,
+     * and that the passed channels will be bound as a result of the creation.
      * <p/>
      * Given channels {@code A}, {@code B} and {@code C}, in the returned map, the final output will
      * be:
@@ -1201,30 +1152,31 @@ public class Channels {
      * @param channel the selectable output channel.
      * @param indexes the iterable returning the channel indexes.
      * @param <OUT>   the output data type.
-     * @return the map of indexes and output channels.
+     * @return the map of indexes and output channels builder.
      */
     @NotNull
-    public static <OUT> Map<Integer, OutputChannel<OUT>> select(
+    public static <OUT> Builder<? extends Map<Integer, OutputChannel<OUT>>> select(
             @NotNull final OutputChannel<? extends Selectable<? extends OUT>> channel,
             @NotNull final Iterable<Integer> indexes) {
 
-        final HashMap<Integer, IOChannel<OUT>> inputMap = new HashMap<Integer, IOChannel<OUT>>();
-        final HashMap<Integer, OutputChannel<OUT>> outputMap =
-                new HashMap<Integer, OutputChannel<OUT>>();
+        final HashSet<Integer> indexSet = new HashSet<Integer>();
         for (final Integer index : indexes) {
-            final IOChannel<OUT> ioChannel = JRoutine.io().buildChannel();
-            inputMap.put(index, ioChannel);
-            outputMap.put(index, ioChannel);
+            if (index == null) {
+                throw new NullPointerException(
+                        "the iterable of indexes must not return a null object");
+            }
+
+            indexSet.add(index);
         }
 
-        channel.passTo(new SortingMapOutputConsumer<OUT>(inputMap));
-        return outputMap;
+        return new OutputMapBuilder<OUT>(channel, indexSet);
     }
 
     /**
-     * Returns a new selectable channel feeding the specified one.<br/>
+     * Returns a builder of selectable channels feeding the specified one.<br/>
      * Each output will be filtered based on the specified index.<br/>
-     * Note that the returned channel <b>must be explicitly closed</b> in order to ensure the
+     * Note that the builder will return the same map for the same inputs and equal configuration,
+     * and that the returned channels <b>must be explicitly closed</b> in order to ensure the
      * completion of the invocation lifecycle.
      * <p/>
      * Given channel {@code A}, the final output will be:
@@ -1238,22 +1190,36 @@ public class Channels {
      * @param channel the channel to make selectable.
      * @param index   the channel index.
      * @param <IN>    the input data type.
-     * @return the selectable I/O channel.
+     * @return the selectable I/O channel builder.
      */
     @NotNull
-    public static <IN> IOChannel<Selectable<IN>> toSelectable(
+    public static <IN> Builder<? extends IOChannel<Selectable<IN>>> toSelectable(
             @NotNull final InputChannel<? super IN> channel, final int index) {
 
-        final IOChannel<Selectable<IN>> inputChannel = JRoutine.io().buildChannel();
-        final IOChannel<IN> ioChannel = JRoutine.io().buildChannel();
-        ioChannel.passTo(channel);
-        return inputChannel.passTo(new FilterOutputConsumer<IN>(ioChannel, index));
+        return new AbstractBuilder<IOChannel<Selectable<IN>>>() {
+
+            @NotNull
+            @Override
+            protected IOChannel<Selectable<IN>> build(
+                    @NotNull final ChannelConfiguration configuration) {
+
+                final IOChannel<Selectable<IN>> inputChannel = JRoutine.io()
+                                                                       .withChannels()
+                                                                       .with(configuration)
+                                                                       .configured()
+                                                                       .buildChannel();
+                final IOChannel<IN> ioChannel = JRoutine.io().buildChannel();
+                ioChannel.passTo(channel);
+                return inputChannel.passTo(new FilterOutputConsumer<IN>(ioChannel, index));
+            }
+        };
     }
 
     /**
-     * Returns a new channel making the specified one selectable.<br/>
+     * Returns a builder of channels making the specified one selectable.<br/>
      * Each output will be passed along unchanged.<br/>
-     * Note that the passed channel will be bound as a result of the call.
+     * Note that the builder will successfully create only one output channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      * <p/>
      * Given channel {@code A}, the final output will be:
      * <pre>
@@ -1266,15 +1232,28 @@ public class Channels {
      * @param channel the channel to make selectable.
      * @param index   the channel index.
      * @param <OUT>   the output data type.
-     * @return the selectable output channel.
+     * @return the selectable output channel builder.
      */
     @NotNull
-    public static <OUT> OutputChannel<? extends Selectable<OUT>> toSelectable(
+    public static <OUT> Builder<? extends OutputChannel<? extends Selectable<OUT>>> toSelectable(
             @NotNull final OutputChannel<? extends OUT> channel, final int index) {
 
-        final IOChannel<Selectable<OUT>> ioChannel = JRoutine.io().buildChannel();
-        channel.passTo(new SelectableOutputConsumer<OUT, OUT>(ioChannel, index));
-        return ioChannel;
+        return new AbstractBuilder<OutputChannel<? extends Selectable<OUT>>>() {
+
+            @NotNull
+            @Override
+            protected OutputChannel<? extends Selectable<OUT>> build(
+                    @NotNull final ChannelConfiguration configuration) {
+
+                final IOChannel<Selectable<OUT>> ioChannel = JRoutine.io()
+                                                                     .withChannels()
+                                                                     .with(configuration)
+                                                                     .configured()
+                                                                     .buildChannel();
+                channel.passTo(new SelectableOutputConsumer<OUT, OUT>(ioChannel, index));
+                return ioChannel;
+            }
+        };
     }
 
     @NotNull
@@ -1360,7 +1339,7 @@ public class Channels {
      *
      * @param <TYPE> the built object type.
      */
-    public interface Builder<TYPE> extends ConfigurableChannelBuilder<Builder<TYPE>> {
+    public interface Builder<TYPE> extends ChannelConfigurableBuilder<Builder<TYPE>> {
 
         /**
          * Builds and returns an object instance.
@@ -1369,29 +1348,6 @@ public class Channels {
          */
         @NotNull
         TYPE build();
-    }
-
-    /**
-     * Interface defining a collection of selectable output channels, that is an object filtering
-     * selectable data and dispatching them to a specific output channel based on their index.
-     *
-     * @param <OUT> the output data type.
-     */
-    public interface SelectableChannels<OUT> {
-
-        /**
-         * Returns an output channel returning selectable data matching the specify index.<br/>
-         * New output channels can be bound until data start coming After that, any attempt to bound
-         * a channel to a new index will cause an exception to be thrown.<br/>
-         * Note that the returned channel will employ a synchronous runner to transfer data.
-         *
-         * @param index the channel index.
-         * @return the output channel.
-         * @throws java.lang.IllegalStateException if no more output channels can be bound to the
-         *                                         output.
-         */
-        @NotNull
-        OutputChannel<OUT> index(int index);
     }
 
     /**
@@ -1634,79 +1590,6 @@ public class Channels {
     }
 
     /**
-     * Default implementation of a selectable channel collection.
-     *
-     * @param <OUT> the output data type.
-     */
-    private static class DefaultSelectableChannels<OUT>
-            implements SelectableChannels<OUT>, OutputConsumer<Selectable<? extends OUT>> {
-
-        private final HashMap<Integer, IOChannel<OUT>> mChannels =
-                new HashMap<Integer, IOChannel<OUT>>();
-
-        private final Object mMutex = new Object();
-
-        private boolean mIsOutput;
-
-        @NotNull
-        public OutputChannel<OUT> index(final int index) {
-
-            IOChannel<OUT> channel;
-            synchronized (mMutex) {
-                final HashMap<Integer, IOChannel<OUT>> channels = mChannels;
-                channel = channels.get(index);
-                if (channel == null) {
-                    if (mIsOutput) {
-                        throw new IllegalStateException();
-                    }
-
-                    channel = JRoutine.io().buildChannel();
-                    channels.put(index, channel);
-                }
-            }
-
-            return channel;
-        }
-
-        public void onComplete() {
-
-            synchronized (mMutex) {
-                mIsOutput = true;
-            }
-
-            final HashMap<Integer, IOChannel<OUT>> channels = mChannels;
-            for (final IOChannel<OUT> channel : channels.values()) {
-                channel.close();
-            }
-        }
-
-        public void onOutput(final Selectable<? extends OUT> selectable) {
-
-            synchronized (mMutex) {
-                mIsOutput = true;
-            }
-
-            final HashMap<Integer, IOChannel<OUT>> channels = mChannels;
-            final IOChannel<OUT> channel = channels.get(selectable.index);
-            if (channel != null) {
-                channel.pass(selectable.data);
-            }
-        }
-
-        public void onError(@NotNull final RoutineException error) {
-
-            synchronized (mMutex) {
-                mIsOutput = true;
-            }
-
-            final HashMap<Integer, IOChannel<OUT>> channels = mChannels;
-            for (final IOChannel<OUT> channel : channels.values()) {
-                channel.abort(error);
-            }
-        }
-    }
-
-    /**
      * Builder implementation distributing data into a set of input channels.
      *
      * @param <IN> the input data type.
@@ -1900,9 +1783,10 @@ public class Channels {
                     inputChannels.put(channel, channelMaps);
                 }
 
+                final int size = indexes.size();
                 final SelectInfo selectInfo = new SelectInfo(configuration, indexes);
                 final HashMap<Integer, IOChannel<IN>> channelMap =
-                        new HashMap<Integer, IOChannel<IN>>(indexes.size());
+                        new HashMap<Integer, IOChannel<IN>>(size);
                 HashMap<Integer, IOChannel<?>> channels = channelMaps.get(selectInfo);
                 if (channels != null) {
                     for (final Entry<Integer, IOChannel<?>> entry : channels.entrySet()) {
@@ -1910,7 +1794,7 @@ public class Channels {
                     }
 
                 } else {
-                    channels = new HashMap<Integer, IOChannel<?>>(indexes.size());
+                    channels = new HashMap<Integer, IOChannel<?>>(size);
                     for (final Integer index : indexes) {
                         final IOChannel<IN> ioChannel = Channels.<DATA, IN>select(channel, index)
                                                                 .withChannels()
@@ -2114,10 +1998,79 @@ public class Channels {
                     JRoutine.io().withChannels().with(configuration).configured().buildChannel();
             int i = mStartIndex;
             for (final OutputChannel<? extends OUT> channel : mChannels) {
-                ioChannel.pass(toSelectable(channel, i++));
+                ioChannel.pass(toSelectable(channel, i++).build());
             }
 
             return ioChannel.close();
+        }
+    }
+
+    // TODO: 20/02/16 javadoc
+    private static class OutputMapBuilder<OUT>
+            extends AbstractBuilder<Map<Integer, OutputChannel<OUT>>> {
+
+        private final OutputChannel<? extends Selectable<? extends OUT>> mChannel;
+
+        private final HashSet<Integer> mIndexes;
+
+        private OutputMapBuilder(
+                @NotNull final OutputChannel<? extends Selectable<? extends OUT>> channel,
+                @NotNull final HashSet<Integer> indexes) {
+
+            mChannel = channel;
+            mIndexes = indexes;
+        }
+
+        @NotNull
+        @Override
+        @SuppressWarnings("unchecked")
+        protected Map<Integer, OutputChannel<OUT>> build(
+                @NotNull final ChannelConfiguration configuration) {
+
+            final HashSet<Integer> indexes = mIndexes;
+            final OutputChannel<? extends Selectable<? extends OUT>> channel = mChannel;
+            synchronized (sOutputChannels) {
+                final WeakIdentityHashMap<OutputChannel<?>, HashMap<SelectInfo, HashMap<Integer,
+                        OutputChannel<?>>>>
+                        outputChannels = sOutputChannels;
+                HashMap<SelectInfo, HashMap<Integer, OutputChannel<?>>> channelMaps =
+                        outputChannels.get(channel);
+                if (channelMaps == null) {
+                    channelMaps = new HashMap<SelectInfo, HashMap<Integer, OutputChannel<?>>>();
+                    outputChannels.put(channel, channelMaps);
+                }
+
+                final int size = indexes.size();
+                final SelectInfo selectInfo = new SelectInfo(configuration, indexes);
+                final HashMap<Integer, OutputChannel<OUT>> channelMap =
+                        new HashMap<Integer, OutputChannel<OUT>>(size);
+                HashMap<Integer, OutputChannel<?>> channels = channelMaps.get(selectInfo);
+                if (channels != null) {
+                    for (final Entry<Integer, OutputChannel<?>> entry : channels.entrySet()) {
+                        channelMap.put(entry.getKey(), (OutputChannel<OUT>) entry.getValue());
+                    }
+
+                } else {
+                    final HashMap<Integer, IOChannel<OUT>> inputMap =
+                            new HashMap<Integer, IOChannel<OUT>>(size);
+                    channels = new HashMap<Integer, OutputChannel<?>>(size);
+                    for (final Integer index : indexes) {
+                        final IOChannel<OUT> ioChannel = JRoutine.io()
+                                                                 .withChannels()
+                                                                 .with(configuration)
+                                                                 .configured()
+                                                                 .buildChannel();
+                        inputMap.put(index, ioChannel);
+                        channelMap.put(index, ioChannel);
+                        channels.put(index, ioChannel);
+                    }
+
+                    channel.passTo(new SortingMapOutputConsumer<OUT>(inputMap));
+                    channelMaps.put(selectInfo, channels);
+                }
+
+                return channelMap;
+            }
         }
     }
 

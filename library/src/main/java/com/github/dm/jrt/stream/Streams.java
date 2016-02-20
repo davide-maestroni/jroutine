@@ -687,21 +687,22 @@ public class Streams extends Functions {
     }
 
     /**
-     * Returns a new channel making the specified one selectable.<br/>
+     * Returns a builder of channels making the specified one selectable.<br/>
      * Each output will be passed along unchanged.<br/>
-     * Note that the passed channel will be bound as a result of the call.
+     * Note that the builder will successfully create only one stream channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      *
      * @param channel the channel to make selectable.
      * @param index   the channel index.
      * @param <OUT>   the output data type.
-     * @return the selectable stream.
+     * @return the selectable stream builder.
      * @see com.github.dm.jrt.core.Channels#toSelectable(OutputChannel, int)
      */
     @NotNull
-    public static <OUT> StreamChannel<? extends Selectable<OUT>> toSelectable(
+    public static <OUT> Builder<? extends StreamChannel<? extends Selectable<OUT>>> toSelectable(
             @NotNull final OutputChannel<? extends OUT> channel, final int index) {
 
-        return streamOf(Channels.toSelectable(channel, index));
+        return new BuilderWrapper<Selectable<OUT>>(Channels.toSelectable(channel, index));
     }
 
     /**

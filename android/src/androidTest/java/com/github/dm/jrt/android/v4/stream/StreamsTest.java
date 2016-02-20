@@ -1169,7 +1169,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                               .configured()
                               .asyncCall(channel);
         final SparseArrayCompat<OutputChannel<Object>> channelMap =
-                ChannelsCompat.selectParcelable(output, Sort.INTEGER, Sort.STRING);
+                ChannelsCompat.selectParcelable(output, Sort.INTEGER, Sort.STRING).build();
 
         for (int i = 0; i < 4; i++) {
 
@@ -1488,6 +1488,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         final IOChannel<String> channel = JRoutineCompat.io().buildChannel();
         channel.pass("test1", "test2", "test3").close();
         assertThat(StreamsCompat.toSelectable(channel.asOutput(), 33)
+                                .build()
                                 .afterMax(seconds(1))
                                 .all()).containsExactly(
                 new ParcelableSelectable<String>("test1", 33),
@@ -1501,7 +1502,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         channel.pass("test1", "test2", "test3").abort();
 
         try {
-            StreamsCompat.toSelectable(channel.asOutput(), 33).afterMax(seconds(1)).all();
+            StreamsCompat.toSelectable(channel.asOutput(), 33).build().afterMax(seconds(1)).all();
             fail();
 
         } catch (final AbortException ignored) {

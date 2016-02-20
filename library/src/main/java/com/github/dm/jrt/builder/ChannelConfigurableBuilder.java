@@ -27,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <TYPE> the builder type.
  */
-public interface ConfigurableChannelBuilder<TYPE> {
+public interface ChannelConfigurableBuilder<TYPE> {
 
     /**
      * Gets the channel configuration builder related to the channel builder instance.

@@ -26,6 +26,7 @@ import com.github.dm.jrt.android.v4.core.ChannelsCompat;
 import com.github.dm.jrt.android.v4.core.JRoutineCompat;
 import com.github.dm.jrt.android.v4.core.JRoutineCompat.ContextBuilderCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
+import com.github.dm.jrt.builder.ChannelConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.channel.IOChannel;
@@ -55,6 +56,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.android.core.DelegatingContextInvocation.factoryFrom;
+import static com.github.dm.jrt.builder.ChannelConfiguration.fromOutputChannelConfiguration;
 import static com.github.dm.jrt.function.Functions.wrap;
 
 /**
@@ -507,8 +509,13 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
     public LoaderStreamChannelCompat<? extends ParcelableSelectable<OUT>> toSelectable(
             final int index) {
 
-        return newChannel(ChannelsCompat.toSelectable(this, index), getStreamConfiguration(),
-                          getDelegationType(), getBinder());
+        final ChannelConfiguration configuration = buildChannelConfiguration();
+        return newChannel(ChannelsCompat.toSelectable(this, index)
+                                        .withChannels()
+                                        .with(configuration)
+                                        .configured()
+                                        .build(), getStreamConfiguration(), getDelegationType(),
+                          getBinder());
     }
 
     @NotNull
@@ -630,6 +637,18 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
         final LoaderConfiguration configuration = mStreamConfiguration;
         return new LoaderConfiguration.Builder<LoaderStreamChannelCompat<OUT>>(mStreamConfigurable,
                                                                                configuration);
+    }
+
+    @NotNull
+    private ChannelConfiguration buildChannelConfiguration() {
+
+        return fromOutputChannelConfiguration(buildConfiguration()).configured();
+    }
+
+    @NotNull
+    private InvocationConfiguration buildConfiguration() {
+
+        return getStreamConfiguration().builderFrom().with(getConfiguration()).configured();
     }
 
     @NotNull

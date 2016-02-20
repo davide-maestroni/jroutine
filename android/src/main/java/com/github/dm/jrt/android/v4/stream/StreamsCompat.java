@@ -565,21 +565,24 @@ public class StreamsCompat extends Streams {
     }
 
     /**
-     * Returns a new channel making the specified one selectable.<br/>
+     * Returns a builder of channels making the specified one selectable.<br/>
      * Each output will be passed along unchanged.<br/>
-     * Note that the passed channel will be bound as a result of the call.
+     * Note that the builder will successfully create only one stream channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      *
      * @param channel the channel to make selectable.
      * @param index   the channel index.
      * @param <OUT>   the output data type.
-     * @return the selectable loader stream.
+     * @return the selectable loader stream builder.
      * @see com.github.dm.jrt.android.v4.core.ChannelsCompat#toSelectable(OutputChannel, int)
      */
     @NotNull
-    public static <OUT> LoaderStreamChannelCompat<? extends ParcelableSelectable<OUT>> toSelectable(
+    public static <OUT> Builder<? extends LoaderStreamChannelCompat<? extends
+            ParcelableSelectable<OUT>>> toSelectable(
             @NotNull final OutputChannel<? extends OUT> channel, final int index) {
 
-        return streamOf(ChannelsCompat.toSelectable(channel, index));
+        return new BuilderWrapper<ParcelableSelectable<OUT>>(
+                ChannelsCompat.toSelectable(channel, index));
     }
 
     // TODO: 18/02/16 javadoc

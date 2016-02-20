@@ -46,6 +46,12 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
             new WeakIdentityHashMap<InputChannel<?>, HashMap<SelectInfo,
                     SparseArray<IOChannel<?>>>>();
 
+    private static final WeakIdentityHashMap<OutputChannel<?>, HashMap<SelectInfo,
+            SparseArray<OutputChannel<?>>>>
+            sOutputChannels =
+            new WeakIdentityHashMap<OutputChannel<?>, HashMap<SelectInfo,
+                    SparseArray<OutputChannel<?>>>>();
+
     /**
      * Avoid direct instantiation.
      */
@@ -145,7 +151,8 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
                                                                                      .configured()
                                                                                      .buildChannel();
                 for (int i = 0; i < size; ++i) {
-                    ioChannel.pass(toSelectable(channelMap.valueAt(i), channelMap.keyAt(i)));
+                    ioChannel.pass(
+                            toSelectable(channelMap.valueAt(i), channelMap.keyAt(i)).build());
                 }
 
                 return ioChannel.close();
@@ -254,96 +261,94 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
     }
 
     /**
-     * Returns a map of output channels returning the output data filtered by the specified indexes.
-     * <br/>
-     * Note that the passed channel will be bound as a result of the call.
+     * Returns a builder of maps of output channels returning the output data filtered by the
+     * specified indexes.<br/>
+     * Note that the builder will return the same map for the same inputs and equal configuration,
+     * and that the passed channels will be bound as a result of the creation.
      *
      * @param startIndex the selectable start index.
      * @param rangeSize  the size of the range of indexes (must be positive).
      * @param channel    the selectable channel.
      * @param <OUT>      the output data type.
-     * @return the map of indexes and output channels.
+     * @return the map of indexes and output channels builder.
      * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
      * @see com.github.dm.jrt.core.Channels#select(int, int, OutputChannel)
      */
     @NotNull
-    public static <OUT> SparseArray<OutputChannel<OUT>> selectParcelable(final int startIndex,
-            final int rangeSize,
+    public static <OUT> Builder<? extends SparseArray<OutputChannel<OUT>>> selectParcelable(
+            final int startIndex, final int rangeSize,
             @NotNull final OutputChannel<? extends ParcelableSelectable<? extends OUT>> channel) {
 
         if (rangeSize <= 0) {
             throw new IllegalArgumentException("invalid range size: " + rangeSize);
         }
 
-        final SparseArray<IOChannel<OUT>> inputMap = new SparseArray<IOChannel<OUT>>(rangeSize);
-        final SparseArray<OutputChannel<OUT>> outputMap =
-                new SparseArray<OutputChannel<OUT>>(rangeSize);
-        for (int index = startIndex; index < rangeSize; index++) {
-            final Integer integer = index;
-            final IOChannel<OUT> ioChannel = JRoutine.io().buildChannel();
-            inputMap.put(integer, ioChannel);
-            outputMap.put(integer, ioChannel);
+        final HashSet<Integer> indexSet = new HashSet<Integer>();
+        final int endIndex = startIndex + rangeSize;
+        if (endIndex <= 0) {
+            throw new IllegalArgumentException("range overflow: " + startIndex + "..." + endIndex);
         }
 
-        channel.passTo(new SortingMapOutputConsumer<OUT>(inputMap));
-        return outputMap;
+        for (int i = startIndex; i < endIndex; i++) {
+            indexSet.add(i);
+        }
+
+        return new OutputMapBuilder<OUT>(channel, indexSet);
     }
 
     /**
-     * Returns a map of output channels returning the outputs filtered by the specified indexes.
-     * <br/>
-     * Note that the passed channel will be bound as a result of the call.
+     * Returns a builder of maps of output channels returning the output data filtered by the
+     * specified indexes.<br/>
+     * Note that the builder will return the same map for the same inputs and equal configuration,
+     * and that the passed channels will be bound as a result of the creation.
      *
      * @param channel the selectable output channel.
      * @param indexes the list of indexes.
      * @param <OUT>   the output data type.
-     * @return the map of indexes and output channels.
+     * @return the map of indexes and output channels builder.
      * @see com.github.dm.jrt.core.Channels#select(OutputChannel, int...)
      */
     @NotNull
-    public static <OUT> SparseArray<OutputChannel<OUT>> selectParcelable(
+    public static <OUT> Builder<? extends SparseArray<OutputChannel<OUT>>> selectParcelable(
             @NotNull final OutputChannel<? extends ParcelableSelectable<? extends OUT>> channel,
             @NotNull final int... indexes) {
 
-        final int size = indexes.length;
-        final SparseArray<IOChannel<OUT>> inputMap = new SparseArray<IOChannel<OUT>>(size);
-        final SparseArray<OutputChannel<OUT>> outputMap = new SparseArray<OutputChannel<OUT>>(size);
-        for (final Integer index : indexes) {
-            final IOChannel<OUT> ioChannel = JRoutine.io().buildChannel();
-            inputMap.put(index, ioChannel);
-            outputMap.put(index, ioChannel);
+        final HashSet<Integer> indexSet = new HashSet<Integer>();
+        for (final int index : indexes) {
+            indexSet.add(index);
         }
 
-        channel.passTo(new SortingMapOutputConsumer<OUT>(inputMap));
-        return outputMap;
+        return new OutputMapBuilder<OUT>(channel, indexSet);
     }
 
     /**
-     * Returns a map of output channels returning the output data filtered by the specified indexes.
-     * <br/>
-     * Note that the passed channel will be bound as a result of the call.
+     * Returns a builder of maps of output channels returning the output data filtered by the
+     * specified indexes.<br/>
+     * Note that the builder will return the same map for the same inputs and equal configuration,
+     * and that the passed channels will be bound as a result of the creation.
      *
      * @param channel the selectable output channel.
      * @param indexes the iterable returning the channel indexes.
      * @param <OUT>   the output data type.
-     * @return the map of indexes and output channels.
+     * @return the map of indexes and output channels builder.
      * @see com.github.dm.jrt.core.Channels#select(OutputChannel, Iterable)
      */
     @NotNull
-    public static <OUT> SparseArray<OutputChannel<OUT>> selectParcelable(
+    public static <OUT> Builder<? extends SparseArray<OutputChannel<OUT>>> selectParcelable(
             @NotNull final OutputChannel<? extends ParcelableSelectable<? extends OUT>> channel,
             @NotNull final Iterable<Integer> indexes) {
 
-        final SparseArray<IOChannel<OUT>> inputMap = new SparseArray<IOChannel<OUT>>();
-        final SparseArray<OutputChannel<OUT>> outputMap = new SparseArray<OutputChannel<OUT>>();
+        final HashSet<Integer> indexSet = new HashSet<Integer>();
         for (final Integer index : indexes) {
-            final IOChannel<OUT> ioChannel = JRoutine.io().buildChannel();
-            inputMap.put(index, ioChannel);
-            outputMap.put(index, ioChannel);
+            if (index == null) {
+                throw new NullPointerException(
+                        "the iterable of indexes must not return a null object");
+            }
+
+            indexSet.add(index);
         }
 
-        channel.passTo(new SortingMapOutputConsumer<OUT>(inputMap));
-        return outputMap;
+        return new OutputMapBuilder<OUT>(channel, indexSet);
     }
 
     // TODO: 20/02/16 javadoc
@@ -381,18 +386,18 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
                     inputChannels.put(channel, channelMaps);
                 }
 
+                final int size = indexes.size();
                 final SelectInfo selectInfo = new SelectInfo(configuration, indexes);
-                final SparseArray<IOChannel<IN>> channelMap =
-                        new SparseArray<IOChannel<IN>>(indexes.size());
+                final SparseArray<IOChannel<IN>> channelMap = new SparseArray<IOChannel<IN>>(size);
                 SparseArray<IOChannel<?>> channels = channelMaps.get(selectInfo);
                 if (channels != null) {
-                    final int size = channels.size();
-                    for (int i = 0; i < size; i++) {
+                    final int channelSize = channels.size();
+                    for (int i = 0; i < channelSize; i++) {
                         channelMap.append(channels.keyAt(i), (IOChannel<IN>) channels.valueAt(i));
                     }
 
                 } else {
-                    channels = new SparseArray<IOChannel<?>>(indexes.size());
+                    channels = new SparseArray<IOChannel<?>>(size);
                     for (final Integer index : indexes) {
                         final IOChannel<IN> ioChannel =
                                 Channels.<DATA, IN>selectParcelable(channel, index)
@@ -400,10 +405,81 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
                                         .with(configuration)
                                         .configured()
                                         .build();
-                        channelMap.put(index, ioChannel);
-                        channels.put(index, ioChannel);
+                        channelMap.append(index, ioChannel);
+                        channels.append(index, ioChannel);
                     }
 
+                    channelMaps.put(selectInfo, channels);
+                }
+
+                return channelMap;
+            }
+        }
+    }
+
+    // TODO: 20/02/16 javadoc
+    private static class OutputMapBuilder<OUT>
+            extends AbstractBuilder<SparseArray<OutputChannel<OUT>>> {
+
+        private final OutputChannel<? extends ParcelableSelectable<? extends OUT>> mChannel;
+
+        private final HashSet<Integer> mIndexes;
+
+        private OutputMapBuilder(
+                @NotNull final OutputChannel<? extends ParcelableSelectable<? extends OUT>> channel,
+                @NotNull final HashSet<Integer> indexes) {
+
+            mChannel = channel;
+            mIndexes = indexes;
+        }
+
+        @NotNull
+        @Override
+        @SuppressWarnings("unchecked")
+        protected SparseArray<OutputChannel<OUT>> build(
+                @NotNull final ChannelConfiguration configuration) {
+
+            final HashSet<Integer> indexes = mIndexes;
+            final OutputChannel<? extends ParcelableSelectable<? extends OUT>> channel = mChannel;
+            synchronized (sOutputChannels) {
+                final WeakIdentityHashMap<OutputChannel<?>, HashMap<SelectInfo,
+                        SparseArray<OutputChannel<?>>>>
+                        outputChannels = sOutputChannels;
+                HashMap<SelectInfo, SparseArray<OutputChannel<?>>> channelMaps =
+                        outputChannels.get(channel);
+                if (channelMaps == null) {
+                    channelMaps = new HashMap<SelectInfo, SparseArray<OutputChannel<?>>>();
+                    outputChannels.put(channel, channelMaps);
+                }
+
+                final int size = indexes.size();
+                final SelectInfo selectInfo = new SelectInfo(configuration, indexes);
+                final SparseArray<OutputChannel<OUT>> channelMap =
+                        new SparseArray<OutputChannel<OUT>>(size);
+                SparseArray<OutputChannel<?>> channels = channelMaps.get(selectInfo);
+                if (channels != null) {
+                    final int channelSize = channels.size();
+                    for (int i = 0; i < channelSize; i++) {
+                        channelMap.append(channels.keyAt(i),
+                                          (OutputChannel<OUT>) channels.valueAt(i));
+                    }
+
+                } else {
+                    final SparseArray<IOChannel<OUT>> inputMap =
+                            new SparseArray<IOChannel<OUT>>(size);
+                    channels = new SparseArray<OutputChannel<?>>(size);
+                    for (final Integer index : indexes) {
+                        final IOChannel<OUT> ioChannel = JRoutine.io()
+                                                                 .withChannels()
+                                                                 .with(configuration)
+                                                                 .configured()
+                                                                 .buildChannel();
+                        inputMap.append(index, ioChannel);
+                        channelMap.append(index, ioChannel);
+                        channels.append(index, ioChannel);
+                    }
+
+                    channel.passTo(new SortingMapOutputConsumer<OUT>(inputMap));
                     channelMaps.put(selectInfo, channels);
                 }
 

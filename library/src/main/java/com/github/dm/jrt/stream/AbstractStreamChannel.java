@@ -59,6 +59,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static com.github.dm.jrt.builder.ChannelConfiguration.fromOutputChannelConfiguration;
 import static com.github.dm.jrt.function.Functions.consumerFactory;
 import static com.github.dm.jrt.function.Functions.consumerFilter;
 import static com.github.dm.jrt.function.Functions.functionFactory;
@@ -364,10 +365,7 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public StreamChannel<OUT> repeat() {
 
-        final ChannelConfiguration configuration =
-                ChannelConfiguration.fromOutputChannelConfiguration(
-                        getStreamConfiguration().builderFrom().with(mConfiguration).configured())
-                                    .configured();
+        final ChannelConfiguration configuration = buildChannelConfiguration();
         return newChannel(
                 Channels.repeat(this).withChannels().with(configuration).configured().build(),
                 getStreamConfiguration(), mDelegationType, mBinder);
@@ -499,8 +497,12 @@ public abstract class AbstractStreamChannel<OUT>
     @SuppressWarnings("unchecked")
     public StreamChannel<? extends Selectable<OUT>> toSelectable(final int index) {
 
-        return newChannel(Channels.toSelectable(this, index), getStreamConfiguration(),
-                          mDelegationType, mBinder);
+        final ChannelConfiguration configuration = buildChannelConfiguration();
+        return newChannel(Channels.toSelectable(this, index)
+                                  .withChannels()
+                                  .with(configuration)
+                                  .configured()
+                                  .build(), getStreamConfiguration(), mDelegationType, mBinder);
     }
 
     @NotNull
@@ -702,11 +704,22 @@ public abstract class AbstractStreamChannel<OUT>
             @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
 
     @NotNull
+    private ChannelConfiguration buildChannelConfiguration() {
+
+        return fromOutputChannelConfiguration(buildConfiguration()).configured();
+    }
+
+    @NotNull
+    private InvocationConfiguration buildConfiguration() {
+
+        return getStreamConfiguration().builderFrom().with(getConfiguration()).configured();
+    }
+
+    @NotNull
     private <AFTER> Routine<? super OUT, ? extends AFTER> buildRoutine(
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
 
-        return newRoutine(getStreamConfiguration().builderFrom().with(mConfiguration).configured(),
-                          factory);
+        return newRoutine(buildConfiguration(), factory);
     }
 
     @NotNull

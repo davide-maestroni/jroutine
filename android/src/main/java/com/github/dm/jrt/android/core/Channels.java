@@ -186,23 +186,38 @@ public class Channels extends com.github.dm.jrt.core.Channels {
     }
 
     /**
-     * Returns a new channel making the specified one selectable.<br/>
+     * Returns a builder of channels making the specified one selectable.<br/>
      * Each output will be passed along unchanged.<br/>
-     * Note that the passed channel will be bound as a result of the call.
+     * Note that the builder will successfully create only one output channel instance, and that the
+     * passed channels will be bound as a result of the creation.
      *
      * @param channel the channel to make selectable.
      * @param index   the channel index.
      * @param <OUT>   the output data type.
-     * @return the selectable output channel.
+     * @return the selectable output channel builder.
      * @see com.github.dm.jrt.core.Channels#toSelectable(OutputChannel, int)
      */
     @NotNull
-    public static <OUT> OutputChannel<? extends ParcelableSelectable<OUT>> toSelectable(
+    public static <OUT> Builder<? extends OutputChannel<? extends ParcelableSelectable<OUT>>>
+    toSelectable(
             @NotNull final OutputChannel<? extends OUT> channel, final int index) {
 
-        final IOChannel<ParcelableSelectable<OUT>> ioChannel = JRoutine.io().buildChannel();
-        channel.passTo(new SelectableOutputConsumer<OUT, OUT>(ioChannel, index));
-        return ioChannel;
+        return new AbstractBuilder<OutputChannel<? extends ParcelableSelectable<OUT>>>() {
+
+            @NotNull
+            @Override
+            protected OutputChannel<? extends ParcelableSelectable<OUT>> build(
+                    @NotNull final ChannelConfiguration configuration) {
+
+                final IOChannel<ParcelableSelectable<OUT>> ioChannel = JRoutine.io()
+                                                                               .withChannels()
+                                                                               .with(configuration)
+                                                                               .configured()
+                                                                               .buildChannel();
+                channel.passTo(new SelectableOutputConsumer<OUT, OUT>(ioChannel, index));
+                return ioChannel;
+            }
+        };
     }
 
     /**
@@ -298,7 +313,7 @@ public class Channels extends com.github.dm.jrt.core.Channels {
                     JRoutine.io().withChannels().with(configuration).configured().buildChannel();
             int i = mStartIndex;
             for (final OutputChannel<? extends OUT> channel : mChannels) {
-                ioChannel.pass(toSelectable(channel, i++));
+                ioChannel.pass(toSelectable(channel, i++).build());
             }
 
             return ioChannel.close();

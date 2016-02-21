@@ -195,14 +195,8 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT>, Wrapper {
     @Override
     public int hashCode() {
 
-        int result = 0;
-        for (final Function<?, ?> function : mFunctions) {
-            final Class<? extends Function> functionClass = function.getClass();
-            result += result * 31 + (functionClass.isAnonymousClass() ? functionClass.hashCode()
-                    : function.hashCode());
-        }
-
-        return result;
+        // AUTO-GENERATED CODE
+        return mFunctions.hashCode();
     }
 
     /**
@@ -233,12 +227,14 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT>, Wrapper {
         @Override
         public int hashCode() {
 
+            // AUTO-GENERATED CODE
             return mType.hashCode();
         }
 
         @Override
         public boolean equals(final Object o) {
 
+            // AUTO-GENERATED CODE
             if (this == o) {
                 return true;
             }
@@ -255,6 +251,7 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT>, Wrapper {
     @Override
     public boolean equals(final Object o) {
 
+        // AUTO-GENERATED CODE
         if (this == o) {
             return true;
         }

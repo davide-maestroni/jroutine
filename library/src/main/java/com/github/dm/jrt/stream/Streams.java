@@ -936,6 +936,7 @@ public class Streams extends Functions {
         @Override
         public int hashCode() {
 
+            // AUTO-GENERATED CODE
             int result = mEnd.hashCode();
             result = 31 * result + mIncrement.hashCode();
             result = 31 * result + mStart.hashCode();
@@ -946,6 +947,7 @@ public class Streams extends Functions {
         @SuppressWarnings("EqualsBetweenInconvertibleTypes")
         public boolean equals(final Object o) {
 
+            // AUTO-GENERATED CODE
             if (this == o) {
                 return true;
             }
@@ -1424,12 +1426,14 @@ public class Streams extends Functions {
         @Override
         public int hashCode() {
 
+            // AUTO-GENERATED CODE
             return mIncValue.hashCode();
         }
 
         @Override
         public boolean equals(final Object o) {
 
+            // AUTO-GENERATED CODE
             if (this == o) {
                 return true;
             }

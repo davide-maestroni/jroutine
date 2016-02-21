@@ -124,12 +124,14 @@ public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2>, Wrappe
     @Override
     public int hashCode() {
 
+        // AUTO-GENERATED CODE
         return mConsumers.hashCode();
     }
 
     @Override
     public boolean equals(final Object o) {
 
+        // AUTO-GENERATED CODE
         if (this == o) {
             return true;
         }

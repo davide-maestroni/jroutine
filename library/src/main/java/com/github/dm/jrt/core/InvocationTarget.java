@@ -131,6 +131,7 @@ public abstract class InvocationTarget<TYPE> {
         @Override
         public int hashCode() {
 
+            // AUTO-GENERATED CODE
             return mTargetClass.hashCode();
         }
 
@@ -143,6 +144,7 @@ public abstract class InvocationTarget<TYPE> {
         @Override
         public boolean equals(final Object o) {
 
+            // AUTO-GENERATED CODE
             if (this == o) {
                 return true;
             }

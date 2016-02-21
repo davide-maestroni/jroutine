@@ -260,6 +260,7 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
     @Override
     public int hashCode() {
 
+        // AUTO-GENERATED CODE
         int result = mBiFunction.hashCode();
         result = 31 * result + mFunction.hashCode();
         return result;
@@ -292,6 +293,7 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
         @Override
         public boolean equals(final Object o) {
 
+            // AUTO-GENERATED CODE
             if (this == o) {
                 return true;
             }
@@ -307,6 +309,7 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
         @Override
         public int hashCode() {
 
+            // AUTO-GENERATED CODE
             return mComparator.hashCode();
         }
     }
@@ -338,6 +341,7 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
         @Override
         public boolean equals(final Object o) {
 
+            // AUTO-GENERATED CODE
             if (this == o) {
                 return true;
             }
@@ -353,6 +357,7 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
         @Override
         public int hashCode() {
 
+            // AUTO-GENERATED CODE
             return mComparator.hashCode();
         }
     }
@@ -360,6 +365,7 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
     @Override
     public boolean equals(final Object o) {
 
+        // AUTO-GENERATED CODE
         if (this == o) {
             return true;
         }

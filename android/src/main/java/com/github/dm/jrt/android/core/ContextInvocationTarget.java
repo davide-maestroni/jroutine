@@ -179,6 +179,7 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
         @Override
         public boolean equals(final Object o) {
 
+            // AUTO-GENERATED CODE
             if (this == o) {
                 return true;
             }
@@ -201,6 +202,7 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
         @Override
         public int hashCode() {
 
+            // AUTO-GENERATED CODE
             return mTargetClass.hashCode();
         }
 

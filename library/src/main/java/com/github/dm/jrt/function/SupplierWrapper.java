@@ -103,6 +103,7 @@ public class SupplierWrapper<OUT> implements Supplier<OUT>, Wrapper {
     @Override
     public int hashCode() {
 
+        // AUTO-GENERATED CODE
         int result = mFunction.hashCode();
         result = 31 * result + mSupplier.hashCode();
         return result;
@@ -135,12 +136,14 @@ public class SupplierWrapper<OUT> implements Supplier<OUT>, Wrapper {
         @Override
         public int hashCode() {
 
+            // AUTO-GENERATED CODE
             return mResult != null ? mResult.hashCode() : 0;
         }
 
         @Override
         public boolean equals(final Object o) {
 
+            // AUTO-GENERATED CODE
             if (this == o) {
                 return true;
             }
@@ -157,6 +160,7 @@ public class SupplierWrapper<OUT> implements Supplier<OUT>, Wrapper {
     @Override
     public boolean equals(final Object o) {
 
+        // AUTO-GENERATED CODE
         if (this == o) {
             return true;
         }

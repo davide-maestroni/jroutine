@@ -254,6 +254,7 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
     @Override
     public int hashCode() {
 
+        // AUTO-GENERATED CODE
         return mPredicates.hashCode();
     }
 
@@ -394,6 +395,7 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
         @Override
         public int hashCode() {
 
+            // AUTO-GENERATED CODE
             return mOther.hashCode();
         }
 
@@ -405,6 +407,7 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
         @Override
         public boolean equals(final Object o) {
 
+            // AUTO-GENERATED CODE
             if (this == o) {
                 return true;
             }
@@ -440,6 +443,7 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
         @Override
         public int hashCode() {
 
+            // AUTO-GENERATED CODE
             return mType.hashCode();
         }
 
@@ -451,6 +455,7 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
         @Override
         public boolean equals(final Object o) {
 
+            // AUTO-GENERATED CODE
             if (this == o) {
                 return true;
             }
@@ -557,12 +562,14 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
         @Override
         public int hashCode() {
 
+            // AUTO-GENERATED CODE
             return mOther.hashCode();
         }
 
         @Override
         public boolean equals(final Object o) {
 
+            // AUTO-GENERATED CODE
             if (this == o) {
                 return true;
             }
@@ -579,6 +586,7 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
     @Override
     public boolean equals(final Object o) {
 
+        // AUTO-GENERATED CODE
         if (this == o) {
             return true;
         }

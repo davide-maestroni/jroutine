@@ -23,7 +23,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
-import java.util.Arrays;
+
+import static com.github.dm.jrt.util.Reflection.asArgs;
 
 /**
  * Utility class for creating invocation factory objects.
@@ -172,7 +173,8 @@ public class Invocations {
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class DefaultInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
+    private static class DefaultInvocationFactory<IN, OUT>
+            extends ComparableInvocationFactory<IN, OUT> {
 
         private final Object[] mArgs;
 
@@ -191,32 +193,10 @@ public class Invocations {
                 @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass,
                 @Nullable final Object[] args) {
 
+            super(asArgs(invocationClass, (args != null) ? args : Reflection.NO_ARGS));
             final Object[] invocationArgs =
                     (mArgs = (args != null) ? args.clone() : Reflection.NO_ARGS);
             mConstructor = Reflection.findConstructor(invocationClass, invocationArgs);
-        }
-
-        @Override
-        public int hashCode() {
-
-            int result = Arrays.deepHashCode(mArgs);
-            result = 31 * result + mConstructor.hashCode();
-            return result;
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof DefaultInvocationFactory)) {
-                return false;
-            }
-
-            final DefaultInvocationFactory<?, ?> that = (DefaultInvocationFactory<?, ?>) o;
-            return Arrays.deepEquals(mArgs, that.mArgs) && mConstructor.equals(that.mConstructor);
         }
 
         @NotNull

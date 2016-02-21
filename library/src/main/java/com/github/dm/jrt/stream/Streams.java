@@ -618,7 +618,7 @@ public class Streams extends Functions {
             final int startIndex, final int rangeSize,
             @NotNull final OutputChannel<? extends Selectable<? extends OUT>> channel) {
 
-        return new BuilderMapWrapper<OUT>(Channels.select(startIndex, rangeSize, channel));
+        return new MapBuilderWrapper<OUT>(Channels.select(startIndex, rangeSize, channel));
     }
 
     /**
@@ -638,7 +638,7 @@ public class Streams extends Functions {
             @NotNull final OutputChannel<? extends Selectable<? extends OUT>> channel,
             @NotNull final int... indexes) {
 
-        return new BuilderMapWrapper<OUT>(Channels.select(channel, indexes));
+        return new MapBuilderWrapper<OUT>(Channels.select(channel, indexes));
     }
 
     /**
@@ -658,7 +658,7 @@ public class Streams extends Functions {
             @NotNull final OutputChannel<? extends Selectable<? extends OUT>> channel,
             @NotNull final Iterable<Integer> indexes) {
 
-        return new BuilderMapWrapper<OUT>(Channels.select(channel, indexes));
+        return new MapBuilderWrapper<OUT>(Channels.select(channel, indexes));
     }
 
     /**
@@ -960,60 +960,11 @@ public class Streams extends Functions {
         }
     }
 
-    // TODO: 18/02/16 javadoc
-    private static class BuilderMapWrapper<OUT>
-            implements Builder<Map<Integer, StreamChannel<OUT>>>,
-            Configurable<Builder<Map<Integer, StreamChannel<OUT>>>> {
-
-        private final Builder<? extends Map<Integer, OutputChannel<OUT>>> mBuilder;
-
-        private ChannelConfiguration mConfiguration = ChannelConfiguration.DEFAULT_CONFIGURATION;
-
-        private BuilderMapWrapper(
-                @NotNull final Builder<? extends Map<Integer, OutputChannel<OUT>>> wrapped) {
-
-            mBuilder = wrapped;
-        }
-
-        @NotNull
-        @SuppressWarnings("unchecked")
-        public Map<Integer, StreamChannel<OUT>> build() {
-
-            final Map<Integer, OutputChannel<OUT>> channels = mBuilder.build();
-            final HashMap<Integer, StreamChannel<OUT>> channelMap =
-                    new HashMap<Integer, StreamChannel<OUT>>(channels.size());
-            for (final Entry<Integer, OutputChannel<OUT>> entry : channels.entrySet()) {
-                channelMap.put(entry.getKey(), streamOf(entry.getValue()));
-            }
-
-            return channelMap;
-        }
-
-        @NotNull
-        @SuppressWarnings("ConstantConditions")
-        public Builder<Map<Integer, StreamChannel<OUT>>> setConfiguration(
-                @NotNull final ChannelConfiguration configuration) {
-
-            if (configuration == null) {
-                throw new NullPointerException("the invocation configuration must not be null");
-            }
-
-            mConfiguration = configuration;
-            mBuilder.withChannels().with(null).with(configuration).getConfigured();
-            return this;
-        }
-
-        @NotNull
-        public ChannelConfiguration.Builder<? extends Builder<Map<Integer, StreamChannel<OUT>>>>
-        withChannels() {
-
-            final ChannelConfiguration config = mConfiguration;
-            return new ChannelConfiguration.Builder<Builder<Map<Integer, StreamChannel<OUT>>>>(this,
-                                                                                               config);
-        }
-    }
-
-    // TODO: 18/02/16 javadoc
+    /**
+     * Builder implementation wrapping a builder of output channels.
+     *
+     * @param <OUT> the output data type.
+     */
     private static class BuilderWrapper<OUT>
             implements Builder<StreamChannel<OUT>>, Configurable<Builder<StreamChannel<OUT>>> {
 
@@ -1021,6 +972,11 @@ public class Streams extends Functions {
 
         private ChannelConfiguration mConfiguration = ChannelConfiguration.DEFAULT_CONFIGURATION;
 
+        /**
+         * Constructor.
+         *
+         * @param wrapped the wrapped instance.
+         */
         private BuilderWrapper(
                 @NotNull final Builder<? extends OutputChannel<? extends OUT>> wrapped) {
 
@@ -1383,6 +1339,67 @@ public class Streams extends Functions {
         public Long apply(final Long aLong) {
 
             return aLong + mIncValue;
+        }
+    }
+
+    /**
+     * Builder implementation wrapping a builder of maps of output channels.
+     *
+     * @param <OUT> the output data type.
+     */
+    private static class MapBuilderWrapper<OUT>
+            implements Builder<Map<Integer, StreamChannel<OUT>>>,
+            Configurable<Builder<Map<Integer, StreamChannel<OUT>>>> {
+
+        private final Builder<? extends Map<Integer, OutputChannel<OUT>>> mBuilder;
+
+        private ChannelConfiguration mConfiguration = ChannelConfiguration.DEFAULT_CONFIGURATION;
+
+        /**
+         * Constructor.
+         *
+         * @param wrapped the wrapped instance.
+         */
+        private MapBuilderWrapper(
+                @NotNull final Builder<? extends Map<Integer, OutputChannel<OUT>>> wrapped) {
+
+            mBuilder = wrapped;
+        }
+
+        @NotNull
+        public Map<Integer, StreamChannel<OUT>> build() {
+
+            final Map<Integer, OutputChannel<OUT>> channels = mBuilder.build();
+            final HashMap<Integer, StreamChannel<OUT>> channelMap =
+                    new HashMap<Integer, StreamChannel<OUT>>(channels.size());
+            for (final Entry<Integer, OutputChannel<OUT>> entry : channels.entrySet()) {
+                channelMap.put(entry.getKey(), streamOf(entry.getValue()));
+            }
+
+            return channelMap;
+        }
+
+        @NotNull
+        @SuppressWarnings("ConstantConditions")
+        public Builder<Map<Integer, StreamChannel<OUT>>> setConfiguration(
+                @NotNull final ChannelConfiguration configuration) {
+
+            if (configuration == null) {
+                throw new NullPointerException("the invocation configuration must not be null");
+            }
+
+            mConfiguration = configuration;
+            mBuilder.withChannels().with(null).with(configuration).getConfigured();
+            return this;
+        }
+
+        @NotNull
+        public ChannelConfiguration.Builder<? extends Builder<Map<Integer, StreamChannel<OUT>>>>
+        withChannels() {
+
+            final ChannelConfiguration config = mConfiguration;
+            return new ChannelConfiguration.Builder<Builder<Map<Integer, StreamChannel<OUT>>>>(this,
+                                                                                               config);
         }
     }
 

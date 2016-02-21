@@ -99,7 +99,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     }
 
     @NotNull
-    @SuppressWarnings("unchecked")
     public <IN, OUT> LoaderRoutine<IN, OUT> aliasMethod(@NotNull final String name) {
 
         final ContextInvocationTarget<?> target = mTarget;
@@ -156,7 +155,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     }
 
     @NotNull
-    @SuppressWarnings("unchecked")
     public <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull final Method method) {
 
         final ProxyConfiguration proxyConfiguration =
@@ -265,7 +263,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
          * @param target             the invocation target.
          * @param name               the alias name.
          */
-        @SuppressWarnings("unchecked")
         private AliasContextInvocation(@NotNull final ProxyConfiguration proxyConfiguration,
                 @NotNull final ContextInvocationTarget<?> target, @NotNull final String name) {
 
@@ -371,7 +368,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
          * @param target             the invocation target.
          * @param method             the method.
          */
-        @SuppressWarnings("unchecked")
         private MethodContextInvocation(@NotNull final ProxyConfiguration proxyConfiguration,
                 @NotNull final ContextInvocationTarget<?> target, @NotNull final Method method) {
 

@@ -300,7 +300,6 @@ public abstract class LoaderContext {
          * @throws java.lang.IllegalArgumentException if the class of the specified context has not
          *                                            a static scope.
          */
-        @SuppressWarnings("ConstantConditions")
         private WrappedActivityContext(@NotNull final Activity activity,
                 @NotNull final Context context) {
 
@@ -366,7 +365,6 @@ public abstract class LoaderContext {
          * @throws java.lang.IllegalArgumentException if the class of the specified context has not
          *                                            a static scope.
          */
-        @SuppressWarnings("ConstantConditions")
         private WrappedFragmentContext(@NotNull final Fragment fragment,
                 @NotNull final Context context) {
 

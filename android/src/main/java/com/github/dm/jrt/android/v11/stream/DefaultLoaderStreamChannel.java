@@ -492,7 +492,6 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
     @Override
     public LoaderStreamChannel<? extends ParcelableSelectable<OUT>> toSelectable(final int index) {
 
-        // TODO: 20/02/16 fix this
         final ChannelConfiguration configuration = buildChannelConfiguration();
         return newChannel(Channels.toSelectable(this, index)
                                   .withChannels()

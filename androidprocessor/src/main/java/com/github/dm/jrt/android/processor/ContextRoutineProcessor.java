@@ -218,7 +218,6 @@ public class ContextRoutineProcessor extends RoutineProcessor {
     }
 
     @NotNull
-    @SuppressWarnings("unchecked")
     private String buildInvocationOptions(@NotNull final ExecutableElement methodElement) {
 
         // We need to avoid explicit dependency on the android module...

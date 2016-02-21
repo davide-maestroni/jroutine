@@ -161,7 +161,6 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
          *
          * @param targetClass the target class.
          */
-        @SuppressWarnings("ConstantConditions")
         private ClassContextInvocationTarget(@NotNull final Class<TYPE> targetClass) {
 
             if (targetClass.isPrimitive()) {
@@ -267,7 +266,6 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
          * @param targetClass the target class.
          * @param factoryArgs the object factory arguments.
          */
-        @SuppressWarnings("ConstantConditions")
         private ObjectContextInvocationTarget(@NotNull final Class<TYPE> targetClass,
                 @Nullable final Object[] factoryArgs) {
 

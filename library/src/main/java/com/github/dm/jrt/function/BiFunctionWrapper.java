@@ -55,7 +55,6 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
             new BiFunctionWrapper<Comparable<Object>, Comparable<Object>, Comparable<Object>>(
                     new BiFunction<Comparable<Object>, Comparable<Object>, Comparable<Object>>() {
 
-                        @SuppressWarnings("unchecked")
                         public Comparable<Object> apply(final Comparable<Object> in1,
                                 final Comparable<Object> in2) {
 
@@ -69,7 +68,6 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
             new BiFunctionWrapper<Comparable<Object>, Comparable<Object>, Comparable<Object>>(
                     new BiFunction<Comparable<Object>, Comparable<Object>, Comparable<Object>>() {
 
-                        @SuppressWarnings("unchecked")
                         public Comparable<Object> apply(final Comparable<Object> in1,
                                 final Comparable<Object> in2) {
 

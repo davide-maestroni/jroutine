@@ -512,7 +512,7 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
             final int startIndex, final int rangeSize,
             @NotNull final OutputChannel<? extends ParcelableSelectable<? extends OUT>> channel) {
 
-        return new BuilderMapWrapper<OUT>(
+        return new MapBuilderWrapper<OUT>(
                 Channels.selectParcelable(startIndex, rangeSize, channel));
     }
 
@@ -533,7 +533,7 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
             @NotNull final OutputChannel<? extends ParcelableSelectable<? extends OUT>> channel,
             @NotNull final int... indexes) {
 
-        return new BuilderMapWrapper<OUT>(Channels.selectParcelable(channel, indexes));
+        return new MapBuilderWrapper<OUT>(Channels.selectParcelable(channel, indexes));
     }
 
     /**
@@ -553,7 +553,7 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
             @NotNull final OutputChannel<? extends ParcelableSelectable<? extends OUT>> channel,
             @NotNull final Iterable<Integer> indexes) {
 
-        return new BuilderMapWrapper<OUT>(Channels.selectParcelable(channel, indexes));
+        return new MapBuilderWrapper<OUT>(Channels.selectParcelable(channel, indexes));
     }
 
     /**
@@ -643,61 +643,11 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
         return new BuilderWrapper<ParcelableSelectable<OUT>>(Channels.toSelectable(channel, index));
     }
 
-    // TODO: 18/02/16 javadoc
-    private static class BuilderMapWrapper<OUT>
-            implements Builder<SparseArray<LoaderStreamChannel<OUT>>>,
-            Configurable<Builder<SparseArray<LoaderStreamChannel<OUT>>>> {
-
-        private final Builder<? extends SparseArray<OutputChannel<OUT>>> mBuilder;
-
-        private ChannelConfiguration mConfiguration = ChannelConfiguration.DEFAULT_CONFIGURATION;
-
-        private BuilderMapWrapper(
-                @NotNull final Builder<? extends SparseArray<OutputChannel<OUT>>> wrapped) {
-
-            mBuilder = wrapped;
-        }
-
-        @NotNull
-        @SuppressWarnings("unchecked")
-        public SparseArray<LoaderStreamChannel<OUT>> build() {
-
-            final SparseArray<OutputChannel<OUT>> channels = mBuilder.build();
-            final int size = channels.size();
-            final SparseArray<LoaderStreamChannel<OUT>> channelMap =
-                    new SparseArray<LoaderStreamChannel<OUT>>(size);
-            for (int i = 0; i < size; i++) {
-                channelMap.append(channels.keyAt(i), streamOf(channels.valueAt(i)));
-            }
-
-            return channelMap;
-        }
-
-        @NotNull
-        @SuppressWarnings("ConstantConditions")
-        public Builder<SparseArray<LoaderStreamChannel<OUT>>> setConfiguration(
-                @NotNull final ChannelConfiguration configuration) {
-
-            if (configuration == null) {
-                throw new NullPointerException("the invocation configuration must not be null");
-            }
-
-            mConfiguration = configuration;
-            mBuilder.withChannels().with(null).with(configuration).getConfigured();
-            return this;
-        }
-
-        @NotNull
-        public ChannelConfiguration.Builder<? extends
-                Builder<SparseArray<LoaderStreamChannel<OUT>>>> withChannels() {
-
-            final ChannelConfiguration config = mConfiguration;
-            return new ChannelConfiguration.Builder<Builder<SparseArray<LoaderStreamChannel<OUT>>>>(
-                    this, config);
-        }
-    }
-
-    // TODO: 18/02/16 javadoc
+    /**
+     * Builder implementation wrapping a builder of output channels.
+     *
+     * @param <OUT> the output data type.
+     */
     private static class BuilderWrapper<OUT> implements Builder<LoaderStreamChannel<OUT>>,
             Configurable<Builder<LoaderStreamChannel<OUT>>> {
 
@@ -705,6 +655,11 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
 
         private ChannelConfiguration mConfiguration = ChannelConfiguration.DEFAULT_CONFIGURATION;
 
+        /**
+         * Constructor.
+         *
+         * @param wrapped the wrapped instance.
+         */
         private BuilderWrapper(
                 @NotNull final Builder<? extends OutputChannel<? extends OUT>> wrapped) {
 
@@ -739,6 +694,68 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
             final ChannelConfiguration config = mConfiguration;
             return new ChannelConfiguration.Builder<Builder<LoaderStreamChannel<OUT>>>(this,
                                                                                        config);
+        }
+    }
+
+    /**
+     * Builder implementation wrapping a builder of maps of output channels.
+     *
+     * @param <OUT> the output data type.
+     */
+    private static class MapBuilderWrapper<OUT>
+            implements Builder<SparseArray<LoaderStreamChannel<OUT>>>,
+            Configurable<Builder<SparseArray<LoaderStreamChannel<OUT>>>> {
+
+        private final Builder<? extends SparseArray<OutputChannel<OUT>>> mBuilder;
+
+        private ChannelConfiguration mConfiguration = ChannelConfiguration.DEFAULT_CONFIGURATION;
+
+        /**
+         * Constructor.
+         *
+         * @param wrapped the wrapped instance.
+         */
+        private MapBuilderWrapper(
+                @NotNull final Builder<? extends SparseArray<OutputChannel<OUT>>> wrapped) {
+
+            mBuilder = wrapped;
+        }
+
+        @NotNull
+        public SparseArray<LoaderStreamChannel<OUT>> build() {
+
+            final SparseArray<OutputChannel<OUT>> channels = mBuilder.build();
+            final int size = channels.size();
+            final SparseArray<LoaderStreamChannel<OUT>> channelMap =
+                    new SparseArray<LoaderStreamChannel<OUT>>(size);
+            for (int i = 0; i < size; i++) {
+                channelMap.append(channels.keyAt(i), streamOf(channels.valueAt(i)));
+            }
+
+            return channelMap;
+        }
+
+        @NotNull
+        @SuppressWarnings("ConstantConditions")
+        public Builder<SparseArray<LoaderStreamChannel<OUT>>> setConfiguration(
+                @NotNull final ChannelConfiguration configuration) {
+
+            if (configuration == null) {
+                throw new NullPointerException("the invocation configuration must not be null");
+            }
+
+            mConfiguration = configuration;
+            mBuilder.withChannels().with(null).with(configuration).getConfigured();
+            return this;
+        }
+
+        @NotNull
+        public ChannelConfiguration.Builder<? extends
+                Builder<SparseArray<LoaderStreamChannel<OUT>>>> withChannels() {
+
+            final ChannelConfiguration config = mConfiguration;
+            return new ChannelConfiguration.Builder<Builder<SparseArray<LoaderStreamChannel<OUT>>>>(
+                    this, config);
         }
     }
 }

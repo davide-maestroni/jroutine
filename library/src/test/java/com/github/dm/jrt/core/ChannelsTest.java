@@ -1882,58 +1882,6 @@ public class ChannelsTest {
     }
 
     @Test
-    public void testRepeatException() {
-
-        IOChannel<Object> ioChannel = JRoutine.io().buildChannel();
-        OutputChannel<Object> channel = Channels.repeat(ioChannel).build();
-        channel.passTo(new TemplateOutputConsumer<Object>() {
-
-            @Override
-            public void onComplete() throws Exception {
-
-                throw new UnsupportedOperationException();
-            }
-        });
-        ioChannel.pass("test").close().throwError();
-        ioChannel = JRoutine.io().buildChannel();
-        channel = Channels.repeat(ioChannel).build();
-        channel.passTo(new TemplateOutputConsumer<Object>() {
-
-            @Override
-            public void onComplete() throws Exception {
-
-                throw new RoutineException();
-            }
-        });
-        ioChannel.pass("test").close().throwError();
-
-        ioChannel = JRoutine.io().buildChannel();
-        channel = Channels.repeat(ioChannel).build();
-        ioChannel.pass("test").close();
-        channel.passTo(new TemplateOutputConsumer<Object>() {
-
-            @Override
-            public void onComplete() throws Exception {
-
-                throw new UnsupportedOperationException();
-            }
-        });
-        channel.throwError();
-        ioChannel = JRoutine.io().buildChannel();
-        channel = Channels.repeat(ioChannel).build();
-        ioChannel.pass("test").close();
-        channel.passTo(new TemplateOutputConsumer<Object>() {
-
-            @Override
-            public void onComplete() throws Exception {
-
-                throw new RoutineException();
-            }
-        });
-        channel.throwError();
-    }
-
-    @Test
     @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
     public void testRepeatAbort() {
 
@@ -2043,6 +1991,58 @@ public class ChannelsTest {
         } catch (final NullPointerException ignored) {
 
         }
+    }
+
+    @Test
+    public void testRepeatException() {
+
+        IOChannel<Object> ioChannel = JRoutine.io().buildChannel();
+        OutputChannel<Object> channel = Channels.repeat(ioChannel).build();
+        channel.passTo(new TemplateOutputConsumer<Object>() {
+
+            @Override
+            public void onComplete() throws Exception {
+
+                throw new UnsupportedOperationException();
+            }
+        });
+        ioChannel.pass("test").close().throwError();
+        ioChannel = JRoutine.io().buildChannel();
+        channel = Channels.repeat(ioChannel).build();
+        channel.passTo(new TemplateOutputConsumer<Object>() {
+
+            @Override
+            public void onComplete() throws Exception {
+
+                throw new RoutineException();
+            }
+        });
+        ioChannel.pass("test").close().throwError();
+
+        ioChannel = JRoutine.io().buildChannel();
+        channel = Channels.repeat(ioChannel).build();
+        ioChannel.pass("test").close();
+        channel.passTo(new TemplateOutputConsumer<Object>() {
+
+            @Override
+            public void onComplete() throws Exception {
+
+                throw new UnsupportedOperationException();
+            }
+        });
+        channel.throwError();
+        ioChannel = JRoutine.io().buildChannel();
+        channel = Channels.repeat(ioChannel).build();
+        ioChannel.pass("test").close();
+        channel.passTo(new TemplateOutputConsumer<Object>() {
+
+            @Override
+            public void onComplete() throws Exception {
+
+                throw new RoutineException();
+            }
+        });
+        channel.throwError();
     }
 
     @Test

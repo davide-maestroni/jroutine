@@ -1467,7 +1467,7 @@ public class Channels {
     }
 
     /**
-     * Builder implementation blending data from a set of output channels.
+     * Builder implementation returning a channel blending data from a set of output channels.
      *
      * @param <OUT> the output data type.
      */
@@ -1500,7 +1500,7 @@ public class Channels {
     }
 
     /**
-     * Builder implementation combining data from a set of input channels.
+     * Builder implementation returning a channel combining data from a set of input channels.
      *
      * @param <IN> the input data type.
      */
@@ -1547,7 +1547,7 @@ public class Channels {
     }
 
     /**
-     * Builder implementation concatenating data from a set of output channels.
+     * Builder implementation returning a channel concatenating data from a set of output channels.
      *
      * @param <OUT> the output data type.
      */
@@ -1584,7 +1584,7 @@ public class Channels {
     }
 
     /**
-     * Builder implementation distributing data into a set of input channels.
+     * Builder implementation returning a channel distributing data into a set of input channels.
      *
      * @param <IN> the input data type.
      */
@@ -1743,7 +1743,12 @@ public class Channels {
         }
     }
 
-    // TODO: 20/02/16 javadoc
+    /**
+     * Builder implementation returning a map of input channels accepting selectable data.
+     *
+     * @param <DATA> the channel data type.
+     * @param <IN>   the input data type.
+     */
     private static class InputMapBuilder<DATA, IN extends DATA>
             extends AbstractBuilder<Map<Integer, IOChannel<IN>>> {
 
@@ -1751,6 +1756,12 @@ public class Channels {
 
         private final HashSet<Integer> mIndexes;
 
+        /**
+         * Constructor.
+         *
+         * @param channel the selectable channel.
+         * @param indexes the set of indexes.
+         */
         private InputMapBuilder(@NotNull final InputChannel<? super Selectable<DATA>> channel,
                 @NotNull final HashSet<Integer> indexes) {
 
@@ -1760,7 +1771,6 @@ public class Channels {
 
         @NotNull
         @Override
-        @SuppressWarnings("unchecked")
         protected Map<Integer, IOChannel<IN>> build(
                 @NotNull final ChannelConfiguration configuration) {
 
@@ -1973,7 +1983,11 @@ public class Channels {
         }
     }
 
-    // TODO: 20/02/16 javadoc
+    /**
+     * Builder implementation returning a map of output channels returning selectable output data.
+     *
+     * @param <OUT> the output data type.
+     */
     private static class OutputMapBuilder<OUT>
             extends AbstractBuilder<Map<Integer, OutputChannel<OUT>>> {
 
@@ -1981,6 +1995,12 @@ public class Channels {
 
         private final HashSet<Integer> mIndexes;
 
+        /**
+         * Constructor.
+         *
+         * @param channel the selectable channel.
+         * @param indexes the set of indexes.
+         */
         private OutputMapBuilder(
                 @NotNull final OutputChannel<? extends Selectable<? extends OUT>> channel,
                 @NotNull final HashSet<Integer> indexes) {
@@ -2206,15 +2226,21 @@ public class Channels {
         }
     }
 
-    // TODO: 2/19/16 channelMap, list, builder
-
-    // TODO: 2/19/16 javadoc
+    /**
+     * Class used as key to identify a specific map of output channels.
+     */
     private static class SelectInfo {
 
         private final ChannelConfiguration mConfiguration;
 
         private final HashSet<Integer> mIndexes;
 
+        /**
+         * Constructor.
+         *
+         * @param configuration the channel configuration.
+         * @param indexes       the set of indexes,
+         */
         private SelectInfo(@NotNull final ChannelConfiguration configuration,
                 @NotNull final HashSet<Integer> indexes) {
 

@@ -92,7 +92,6 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
      *
      * @param configuration the invocation configuration.
      */
-    @SuppressWarnings("ConstantConditions")
     protected AbstractRoutine(@NotNull final InvocationConfiguration configuration) {
 
         mConfiguration = configuration;

@@ -345,7 +345,12 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
         return new OutputMapBuilder<OUT>(channel, indexSet);
     }
 
-    // TODO: 20/02/16 javadoc
+    /**
+     * Builder implementation returning a map of input channels accepting selectable data.
+     *
+     * @param <DATA> the channel data type.
+     * @param <IN>   the input data type.
+     */
     private static class InputMapBuilder<DATA, IN extends DATA>
             extends AbstractBuilder<SparseArray<IOChannel<IN>>> {
 
@@ -353,6 +358,12 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
 
         private final HashSet<Integer> mIndexes;
 
+        /**
+         * Constructor.
+         *
+         * @param channel the selectable channel.
+         * @param indexes the set of indexes.
+         */
         private InputMapBuilder(
                 @NotNull final InputChannel<? super ParcelableSelectable<DATA>> channel,
                 @NotNull final HashSet<Integer> indexes) {
@@ -363,7 +374,6 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
 
         @NotNull
         @Override
-        @SuppressWarnings("unchecked")
         protected SparseArray<IOChannel<IN>> build(
                 @NotNull final ChannelConfiguration configuration) {
 
@@ -384,7 +394,11 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
         }
     }
 
-    // TODO: 20/02/16 javadoc
+    /**
+     * Builder implementation returning a map of output channels returning selectable output data.
+     *
+     * @param <OUT> the output data type.
+     */
     private static class OutputMapBuilder<OUT>
             extends AbstractBuilder<SparseArray<OutputChannel<OUT>>> {
 
@@ -392,6 +406,12 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
 
         private final HashSet<Integer> mIndexes;
 
+        /**
+         * Constructor.
+         *
+         * @param channel the selectable channel.
+         * @param indexes the set of indexes.
+         */
         private OutputMapBuilder(
                 @NotNull final OutputChannel<? extends ParcelableSelectable<? extends OUT>> channel,
                 @NotNull final HashSet<Integer> indexes) {
@@ -455,13 +475,21 @@ public class Channels extends com.github.dm.jrt.android.core.Channels {
         }
     }
 
-    // TODO: 2/19/16 javadoc
+    /**
+     * Class used as key to identify a specific map of output channels.
+     */
     private static class SelectInfo {
 
         private final ChannelConfiguration mConfiguration;
 
         private final HashSet<Integer> mIndexes;
 
+        /**
+         * Constructor.
+         *
+         * @param configuration the channel configuration.
+         * @param indexes       the set of indexes,
+         */
         private SelectInfo(@NotNull final ChannelConfiguration configuration,
                 @NotNull final HashSet<Integer> indexes) {
 

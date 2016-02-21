@@ -225,7 +225,6 @@ public class RoutineProcessor extends AbstractProcessor {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public boolean process(final Set<? extends TypeElement> typeElements,
             final RoundEnvironment roundEnvironment) {
 

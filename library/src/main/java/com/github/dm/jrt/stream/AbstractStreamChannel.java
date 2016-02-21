@@ -495,7 +495,6 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
-    @SuppressWarnings("unchecked")
     public StreamChannel<? extends Selectable<OUT>> toSelectable(final int index) {
 
         final ChannelConfiguration configuration = buildChannelConfiguration();

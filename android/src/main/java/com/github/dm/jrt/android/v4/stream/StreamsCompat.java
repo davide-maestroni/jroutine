@@ -516,7 +516,7 @@ public class StreamsCompat extends Streams {
             final int startIndex, final int rangeSize,
             @NotNull final OutputChannel<? extends ParcelableSelectable<? extends OUT>> channel) {
 
-        return new BuilderMapWrapper<OUT>(
+        return new MapBuilderWrapper<OUT>(
                 ChannelsCompat.selectParcelable(startIndex, rangeSize, channel));
     }
 
@@ -538,7 +538,7 @@ public class StreamsCompat extends Streams {
             @NotNull final OutputChannel<? extends ParcelableSelectable<? extends OUT>> channel,
             @NotNull final int... indexes) {
 
-        return new BuilderMapWrapper<OUT>(ChannelsCompat.selectParcelable(channel, indexes));
+        return new MapBuilderWrapper<OUT>(ChannelsCompat.selectParcelable(channel, indexes));
     }
 
     /**
@@ -559,7 +559,7 @@ public class StreamsCompat extends Streams {
             @NotNull final OutputChannel<? extends ParcelableSelectable<? extends OUT>> channel,
             @NotNull final Iterable<Integer> indexes) {
 
-        return new BuilderMapWrapper<OUT>(ChannelsCompat.selectParcelable(channel, indexes));
+        return new MapBuilderWrapper<OUT>(ChannelsCompat.selectParcelable(channel, indexes));
     }
 
     /**
@@ -651,8 +651,66 @@ public class StreamsCompat extends Streams {
                 ChannelsCompat.toSelectable(channel, index));
     }
 
-    // TODO: 18/02/16 javadoc
-    private static class BuilderMapWrapper<OUT>
+    /**
+     * Builder implementation wrapping a builder of output channels.
+     *
+     * @param <OUT> the output data type.
+     */
+    private static class BuilderWrapper<OUT> implements Builder<LoaderStreamChannelCompat<OUT>>,
+            Configurable<Builder<LoaderStreamChannelCompat<OUT>>> {
+
+        private final Builder<? extends OutputChannel<? extends OUT>> mBuilder;
+
+        private ChannelConfiguration mConfiguration = ChannelConfiguration.DEFAULT_CONFIGURATION;
+
+        /**
+         * Constructor.
+         *
+         * @param wrapped the wrapped instance.
+         */
+        private BuilderWrapper(
+                @NotNull final Builder<? extends OutputChannel<? extends OUT>> wrapped) {
+
+            mBuilder = wrapped;
+        }
+
+        @NotNull
+        @SuppressWarnings("unchecked")
+        public LoaderStreamChannelCompat<OUT> build() {
+
+            return (LoaderStreamChannelCompat<OUT>) streamOf(mBuilder.build());
+        }
+
+        @NotNull
+        @SuppressWarnings("ConstantConditions")
+        public Builder<LoaderStreamChannelCompat<OUT>> setConfiguration(
+                @NotNull final ChannelConfiguration configuration) {
+
+            if (configuration == null) {
+                throw new NullPointerException("the invocation configuration must not be null");
+            }
+
+            mConfiguration = configuration;
+            mBuilder.withChannels().with(null).with(configuration).getConfigured();
+            return this;
+        }
+
+        @NotNull
+        public ChannelConfiguration.Builder<? extends Builder<LoaderStreamChannelCompat<OUT>>>
+        withChannels() {
+
+            final ChannelConfiguration config = mConfiguration;
+            return new ChannelConfiguration.Builder<Builder<LoaderStreamChannelCompat<OUT>>>(this,
+                                                                                             config);
+        }
+    }
+
+    /**
+     * Builder implementation wrapping a builder of maps of output channels.
+     *
+     * @param <OUT> the output data type.
+     */
+    private static class MapBuilderWrapper<OUT>
             implements Builder<SparseArrayCompat<LoaderStreamChannelCompat<OUT>>>,
             Configurable<Builder<SparseArrayCompat<LoaderStreamChannelCompat<OUT>>>> {
 
@@ -660,14 +718,18 @@ public class StreamsCompat extends Streams {
 
         private ChannelConfiguration mConfiguration = ChannelConfiguration.DEFAULT_CONFIGURATION;
 
-        private BuilderMapWrapper(
+        /**
+         * Constructor.
+         *
+         * @param wrapped the wrapped instance.
+         */
+        private MapBuilderWrapper(
                 @NotNull final Builder<? extends SparseArrayCompat<OutputChannel<OUT>>> wrapped) {
 
             mBuilder = wrapped;
         }
 
         @NotNull
-        @SuppressWarnings("unchecked")
         public SparseArrayCompat<LoaderStreamChannelCompat<OUT>> build() {
 
             final SparseArrayCompat<OutputChannel<OUT>> channels = mBuilder.build();
@@ -703,51 +765,6 @@ public class StreamsCompat extends Streams {
             return new ChannelConfiguration
                     .Builder<Builder<SparseArrayCompat<LoaderStreamChannelCompat<OUT>>>>(
                     this, config);
-        }
-    }
-
-    // TODO: 18/02/16 javadoc
-    private static class BuilderWrapper<OUT> implements Builder<LoaderStreamChannelCompat<OUT>>,
-            Configurable<Builder<LoaderStreamChannelCompat<OUT>>> {
-
-        private final Builder<? extends OutputChannel<? extends OUT>> mBuilder;
-
-        private ChannelConfiguration mConfiguration = ChannelConfiguration.DEFAULT_CONFIGURATION;
-
-        private BuilderWrapper(
-                @NotNull final Builder<? extends OutputChannel<? extends OUT>> wrapped) {
-
-            mBuilder = wrapped;
-        }
-
-        @NotNull
-        @SuppressWarnings("unchecked")
-        public LoaderStreamChannelCompat<OUT> build() {
-
-            return (LoaderStreamChannelCompat<OUT>) streamOf(mBuilder.build());
-        }
-
-        @NotNull
-        @SuppressWarnings("ConstantConditions")
-        public Builder<LoaderStreamChannelCompat<OUT>> setConfiguration(
-                @NotNull final ChannelConfiguration configuration) {
-
-            if (configuration == null) {
-                throw new NullPointerException("the invocation configuration must not be null");
-            }
-
-            mConfiguration = configuration;
-            mBuilder.withChannels().with(null).with(configuration).getConfigured();
-            return this;
-        }
-
-        @NotNull
-        public ChannelConfiguration.Builder<? extends Builder<LoaderStreamChannelCompat<OUT>>>
-        withChannels() {
-
-            final ChannelConfiguration config = mConfiguration;
-            return new ChannelConfiguration.Builder<Builder<LoaderStreamChannelCompat<OUT>>>(this,
-                                                                                             config);
         }
     }
 }

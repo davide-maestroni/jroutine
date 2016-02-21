@@ -46,6 +46,7 @@ import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.invocation.TemplateInvocation;
+import com.github.dm.jrt.log.Log.Level;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.stream.StreamChannel;
 import com.github.dm.jrt.util.ClassToken;
@@ -1592,6 +1593,160 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
                                 .then(increment(count))
                                 .afterMax(seconds(10))
                                 .next()).isEqualTo(1);
+    }
+
+    @SuppressWarnings("unchecked")
+    public void testSelectMap() {
+
+        final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine =
+                JRoutineCompat.on(new Sort()).buildRoutine();
+        final IOChannel<ParcelableSelectable<Object>> inputChannel =
+                JRoutineCompat.io().buildChannel();
+        final OutputChannel<ParcelableSelectable<Object>> outputChannel =
+                routine.asyncCall(inputChannel);
+        final StreamChannel<Object> intChannel =
+                StreamsCompat.selectParcelable(outputChannel, Sort.INTEGER, Sort.STRING)
+                             .withChannels()
+                             .withLogLevel(Level.WARNING)
+                             .getConfigured()
+                             .build()
+                             .get(Sort.INTEGER);
+        final StreamChannel<Object> strChannel = StreamsCompat.selectParcelable(outputChannel,
+                                                                                Arrays.asList(
+                                                                                        Sort.STRING,
+                                                                                        Sort.INTEGER))
+                                                              .withChannels()
+                                                              .withLogLevel(Level.WARNING)
+                                                              .getConfigured()
+                                                              .build()
+                                                              .get(Sort.STRING);
+        inputChannel.pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
+                          new ParcelableSelectable<Object>(-11, Sort.INTEGER));
+        assertThat(intChannel.afterMax(seconds(10)).next()).isEqualTo(-11);
+        assertThat(strChannel.afterMax(seconds(10)).next()).isEqualTo("test21");
+        inputChannel.pass(new ParcelableSelectable<Object>(-11, Sort.INTEGER),
+                          new ParcelableSelectable<Object>("test21", Sort.STRING));
+        assertThat(intChannel.afterMax(seconds(10)).next()).isEqualTo(-11);
+        assertThat(strChannel.afterMax(seconds(10)).next()).isEqualTo("test21");
+        inputChannel.pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
+                          new ParcelableSelectable<Object>(-11, Sort.INTEGER));
+        assertThat(intChannel.afterMax(seconds(10)).next()).isEqualTo(-11);
+        assertThat(strChannel.afterMax(seconds(10)).next()).isEqualTo("test21");
+    }
+
+    @SuppressWarnings("unchecked")
+    public void testSelectMapAbort() {
+
+        final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine =
+                JRoutineCompat.on(new Sort()).buildRoutine();
+        IOChannel<ParcelableSelectable<Object>> inputChannel = JRoutineCompat.io().buildChannel();
+        OutputChannel<ParcelableSelectable<Object>> outputChannel = routine.asyncCall(inputChannel);
+        StreamsCompat.selectParcelable(Sort.STRING, 2, outputChannel).build();
+        inputChannel.after(millis(100))
+                    .pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
+                          new ParcelableSelectable<Object>(-11, Sort.INTEGER))
+                    .abort();
+
+        try {
+
+            StreamsCompat.selectParcelable(outputChannel, Sort.STRING, Sort.INTEGER)
+                         .build()
+                         .get(Sort.STRING)
+                         .afterMax(seconds(1))
+                         .all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            StreamsCompat.selectParcelable(outputChannel, Sort.INTEGER, Sort.STRING)
+                         .build()
+                         .get(Sort.INTEGER)
+                         .afterMax(seconds(1))
+                         .all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        inputChannel = JRoutineCompat.io().buildChannel();
+        outputChannel = routine.asyncCall(inputChannel);
+        StreamsCompat.selectParcelable(outputChannel, Sort.INTEGER, Sort.STRING).build();
+        inputChannel.after(millis(100))
+                    .pass(new ParcelableSelectable<Object>(-11, Sort.INTEGER),
+                          new ParcelableSelectable<Object>("test21", Sort.STRING))
+                    .abort();
+
+        try {
+
+            StreamsCompat.selectParcelable(outputChannel, Sort.STRING, Sort.INTEGER)
+                         .build()
+                         .get(Sort.STRING)
+                         .afterMax(seconds(1))
+                         .all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            StreamsCompat.selectParcelable(outputChannel, Sort.STRING, Sort.INTEGER)
+                         .build()
+                         .get(Sort.INTEGER)
+                         .afterMax(seconds(1))
+                         .all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        inputChannel = JRoutineCompat.io().buildChannel();
+        outputChannel = routine.asyncCall(inputChannel);
+        StreamsCompat.selectParcelable(outputChannel, Arrays.asList(Sort.STRING, Sort.INTEGER))
+                     .build();
+        inputChannel.after(millis(100))
+                    .pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
+                          new ParcelableSelectable<Object>(-11, Sort.INTEGER))
+                    .abort();
+
+        try {
+
+            StreamsCompat.selectParcelable(outputChannel, Sort.INTEGER, Sort.STRING)
+                         .build()
+                         .get(Sort.STRING)
+                         .afterMax(seconds(1))
+                         .all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            StreamsCompat.selectParcelable(outputChannel, Sort.INTEGER, Sort.STRING)
+                         .build()
+                         .get(Sort.INTEGER)
+                         .afterMax(seconds(1))
+                         .all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
     }
 
     public void testSkip() {

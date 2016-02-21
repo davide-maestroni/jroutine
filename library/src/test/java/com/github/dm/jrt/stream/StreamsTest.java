@@ -35,6 +35,7 @@ import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.invocation.PassingInvocation;
 import com.github.dm.jrt.invocation.TemplateInvocation;
+import com.github.dm.jrt.log.Log.Level;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.stream.Streams.RangeConsumer;
 import com.github.dm.jrt.util.ClassToken;
@@ -1671,6 +1672,157 @@ public class StreamsTest {
 
         try {
             output2.all();
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testSelectMap() {
+
+        final Routine<Selectable<Object>, Selectable<Object>> routine =
+                JRoutine.on(new Sort()).buildRoutine();
+        final IOChannel<Selectable<Object>> inputChannel = JRoutine.io().buildChannel();
+        final OutputChannel<Selectable<Object>> outputChannel = routine.asyncCall(inputChannel);
+        final StreamChannel<Object> intChannel =
+                Streams.select(outputChannel, Sort.INTEGER, Sort.STRING)
+                       .withChannels()
+                       .withLogLevel(Level.WARNING)
+                       .getConfigured()
+                       .build()
+                       .get(Sort.INTEGER);
+        final StreamChannel<Object> strChannel =
+                Streams.select(outputChannel, Arrays.asList(Sort.STRING, Sort.INTEGER))
+                       .withChannels()
+                       .withLogLevel(Level.WARNING)
+                       .getConfigured()
+                       .build()
+                       .get(Sort.STRING);
+        inputChannel.pass(new Selectable<Object>("test21", Sort.STRING),
+                          new Selectable<Object>(-11, Sort.INTEGER));
+        assertThat(intChannel.afterMax(seconds(10)).next()).isEqualTo(-11);
+        assertThat(strChannel.afterMax(seconds(10)).next()).isEqualTo("test21");
+        inputChannel.pass(new Selectable<Object>(-11, Sort.INTEGER),
+                          new Selectable<Object>("test21", Sort.STRING));
+        assertThat(intChannel.afterMax(seconds(10)).next()).isEqualTo(-11);
+        assertThat(strChannel.afterMax(seconds(10)).next()).isEqualTo("test21");
+        inputChannel.pass(new Selectable<Object>("test21", Sort.STRING),
+                          new Selectable<Object>(-11, Sort.INTEGER));
+        assertThat(intChannel.afterMax(seconds(10)).next()).isEqualTo(-11);
+        assertThat(strChannel.afterMax(seconds(10)).next()).isEqualTo("test21");
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testSelectMapAbort() {
+
+        final Routine<Selectable<Object>, Selectable<Object>> routine =
+                JRoutine.on(new Sort()).buildRoutine();
+        IOChannel<Selectable<Object>> inputChannel = JRoutine.io().buildChannel();
+        OutputChannel<Selectable<Object>> outputChannel = routine.asyncCall(inputChannel);
+        Streams.select(Sort.STRING, 2, outputChannel).build();
+        inputChannel.after(millis(100))
+                    .pass(new Selectable<Object>("test21", Sort.STRING),
+                          new Selectable<Object>(-11, Sort.INTEGER))
+                    .abort();
+
+        try {
+
+            Streams.select(outputChannel, Sort.STRING, Sort.INTEGER)
+                   .build()
+                   .get(Sort.STRING)
+                   .afterMax(seconds(1))
+                   .all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            Streams.select(outputChannel, Sort.INTEGER, Sort.STRING)
+                   .build()
+                   .get(Sort.INTEGER)
+                   .afterMax(seconds(1))
+                   .all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        inputChannel = JRoutine.io().buildChannel();
+        outputChannel = routine.asyncCall(inputChannel);
+        Streams.select(outputChannel, Sort.INTEGER, Sort.STRING).build();
+        inputChannel.after(millis(100))
+                    .pass(new Selectable<Object>(-11, Sort.INTEGER),
+                          new Selectable<Object>("test21", Sort.STRING))
+                    .abort();
+
+        try {
+
+            Streams.select(outputChannel, Sort.STRING, Sort.INTEGER)
+                   .build()
+                   .get(Sort.STRING)
+                   .afterMax(seconds(1))
+                   .all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            Streams.select(outputChannel, Sort.STRING, Sort.INTEGER)
+                   .build()
+                   .get(Sort.INTEGER)
+                   .afterMax(seconds(1))
+                   .all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        inputChannel = JRoutine.io().buildChannel();
+        outputChannel = routine.asyncCall(inputChannel);
+        Streams.select(outputChannel, Arrays.asList(Sort.STRING, Sort.INTEGER)).build();
+        inputChannel.after(millis(100))
+                    .pass(new Selectable<Object>("test21", Sort.STRING),
+                          new Selectable<Object>(-11, Sort.INTEGER))
+                    .abort();
+
+        try {
+
+            Streams.select(outputChannel, Sort.INTEGER, Sort.STRING)
+                   .build()
+                   .get(Sort.STRING)
+                   .afterMax(seconds(1))
+                   .all();
+
+            fail();
+
+        } catch (final AbortException ignored) {
+
+        }
+
+        try {
+
+            Streams.select(outputChannel, Sort.INTEGER, Sort.STRING)
+                   .build()
+                   .get(Sort.INTEGER)
+                   .afterMax(seconds(1))
+                   .all();
+
             fail();
 
         } catch (final AbortException ignored) {

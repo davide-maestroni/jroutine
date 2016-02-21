@@ -632,6 +632,28 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     /**
+     * Builds a channel configuration from the stream one.
+     *
+     * @return the channel configuration.
+     */
+    @NotNull
+    protected ChannelConfiguration buildChannelConfiguration() {
+
+        return fromOutputChannelConfiguration(buildConfiguration()).getConfigured();
+    }
+
+    /**
+     * Builds an invocation configuration from the stream one.
+     *
+     * @return the invocation configuration.
+     */
+    @NotNull
+    protected InvocationConfiguration buildConfiguration() {
+
+        return getStreamConfiguration().builderFrom().with(getConfiguration()).getConfigured();
+    }
+
+    /**
      * Returns the binder instance.
      *
      * @return the binder.
@@ -702,18 +724,6 @@ public abstract class AbstractStreamChannel<OUT>
     protected abstract <AFTER> Routine<? super OUT, ? extends AFTER> newRoutine(
             @NotNull InvocationConfiguration configuration,
             @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
-
-    @NotNull
-    private ChannelConfiguration buildChannelConfiguration() {
-
-        return fromOutputChannelConfiguration(buildConfiguration()).getConfigured();
-    }
-
-    @NotNull
-    private InvocationConfiguration buildConfiguration() {
-
-        return getStreamConfiguration().builderFrom().with(getConfiguration()).getConfigured();
-    }
 
     @NotNull
     private <AFTER> Routine<? super OUT, ? extends AFTER> buildRoutine(

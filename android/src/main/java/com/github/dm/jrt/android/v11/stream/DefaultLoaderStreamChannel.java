@@ -55,7 +55,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.android.core.DelegatingContextInvocation.factoryFrom;
-import static com.github.dm.jrt.builder.ChannelConfiguration.fromOutputChannelConfiguration;
 import static com.github.dm.jrt.function.Functions.wrap;
 
 /**
@@ -619,18 +618,6 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
         final LoaderConfiguration configuration = mStreamConfiguration;
         return new LoaderConfiguration.Builder<LoaderStreamChannel<OUT>>(mStreamConfigurable,
                                                                          configuration);
-    }
-
-    @NotNull
-    private ChannelConfiguration buildChannelConfiguration() {
-
-        return fromOutputChannelConfiguration(buildConfiguration()).getConfigured();
-    }
-
-    @NotNull
-    private InvocationConfiguration buildConfiguration() {
-
-        return getStreamConfiguration().builderFrom().with(getConfiguration()).getConfigured();
     }
 
     private void checkStatic(@NotNull final Wrapper wrapper, @NotNull final Object function) {

@@ -497,6 +497,72 @@ public class StreamsCompat extends Streams {
     }
 
     /**
+     * Returns a builder of maps of loader stream channels returning the output data filtered by the
+     * specified indexes.<br/>
+     * Note that the builder will return the same map for the same inputs and equal configuration,
+     * and that the passed channels will be bound as a result of the creation.
+     *
+     * @param startIndex the selectable start index.
+     * @param rangeSize  the size of the range of indexes (must be positive).
+     * @param channel    the selectable channel.
+     * @param <OUT>      the output data type.
+     * @return the map of indexes and output channels builder.
+     * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
+     * @see com.github.dm.jrt.core.Channels#select(int, int, OutputChannel)
+     */
+    @NotNull
+    public static <OUT> Builder<? extends SparseArrayCompat<LoaderStreamChannelCompat<OUT>>>
+    selectParcelable(
+            final int startIndex, final int rangeSize,
+            @NotNull final OutputChannel<? extends ParcelableSelectable<? extends OUT>> channel) {
+
+        return new BuilderMapWrapper<OUT>(
+                ChannelsCompat.selectParcelable(startIndex, rangeSize, channel));
+    }
+
+    /**
+     * Returns a builder of maps of loader stream channels returning the output data filtered by the
+     * specified indexes.<br/>
+     * Note that the builder will return the same map for the same inputs and equal configuration,
+     * and that the passed channels will be bound as a result of the creation.
+     *
+     * @param channel the selectable output channel.
+     * @param indexes the list of indexes.
+     * @param <OUT>   the output data type.
+     * @return the map of indexes and output channels builder.
+     * @see com.github.dm.jrt.core.Channels#select(OutputChannel, int...)
+     */
+    @NotNull
+    public static <OUT> Builder<? extends SparseArrayCompat<LoaderStreamChannelCompat<OUT>>>
+    selectParcelable(
+            @NotNull final OutputChannel<? extends ParcelableSelectable<? extends OUT>> channel,
+            @NotNull final int... indexes) {
+
+        return new BuilderMapWrapper<OUT>(ChannelsCompat.selectParcelable(channel, indexes));
+    }
+
+    /**
+     * Returns a builder of maps of loader stream channels returning the output data filtered by the
+     * specified indexes.<br/>
+     * Note that the builder will return the same map for the same inputs and equal configuration,
+     * and that the passed channels will be bound as a result of the creation.
+     *
+     * @param channel the selectable output channel.
+     * @param indexes the iterable returning the channel indexes.
+     * @param <OUT>   the output data type.
+     * @return the map of indexes and output channels builder.
+     * @see com.github.dm.jrt.core.Channels#select(OutputChannel, Iterable)
+     */
+    @NotNull
+    public static <OUT> Builder<? extends SparseArrayCompat<LoaderStreamChannelCompat<OUT>>>
+    selectParcelable(
+            @NotNull final OutputChannel<? extends ParcelableSelectable<? extends OUT>> channel,
+            @NotNull final Iterable<Integer> indexes) {
+
+        return new BuilderMapWrapper<OUT>(ChannelsCompat.selectParcelable(channel, indexes));
+    }
+
+    /**
      * Builds and returns a new loader stream channel.
      *
      * @param <OUT> the output data type.
@@ -583,6 +649,61 @@ public class StreamsCompat extends Streams {
 
         return new BuilderWrapper<ParcelableSelectable<OUT>>(
                 ChannelsCompat.toSelectable(channel, index));
+    }
+
+    // TODO: 18/02/16 javadoc
+    private static class BuilderMapWrapper<OUT>
+            implements Builder<SparseArrayCompat<LoaderStreamChannelCompat<OUT>>>,
+            Configurable<Builder<SparseArrayCompat<LoaderStreamChannelCompat<OUT>>>> {
+
+        private final Builder<? extends SparseArrayCompat<OutputChannel<OUT>>> mBuilder;
+
+        private ChannelConfiguration mConfiguration = ChannelConfiguration.DEFAULT_CONFIGURATION;
+
+        private BuilderMapWrapper(
+                @NotNull final Builder<? extends SparseArrayCompat<OutputChannel<OUT>>> wrapped) {
+
+            mBuilder = wrapped;
+        }
+
+        @NotNull
+        @SuppressWarnings("unchecked")
+        public SparseArrayCompat<LoaderStreamChannelCompat<OUT>> build() {
+
+            final SparseArrayCompat<OutputChannel<OUT>> channels = mBuilder.build();
+            final int size = channels.size();
+            final SparseArrayCompat<LoaderStreamChannelCompat<OUT>> channelMap =
+                    new SparseArrayCompat<LoaderStreamChannelCompat<OUT>>(size);
+            for (int i = 0; i < size; i++) {
+                channelMap.append(channels.keyAt(i), streamOf(channels.valueAt(i)));
+            }
+
+            return channelMap;
+        }
+
+        @NotNull
+        @SuppressWarnings("ConstantConditions")
+        public Builder<SparseArrayCompat<LoaderStreamChannelCompat<OUT>>> setConfiguration(
+                @NotNull final ChannelConfiguration configuration) {
+
+            if (configuration == null) {
+                throw new NullPointerException("the invocation configuration must not be null");
+            }
+
+            mConfiguration = configuration;
+            mBuilder.withChannels().with(null).with(configuration).getConfigured();
+            return this;
+        }
+
+        @NotNull
+        public ChannelConfiguration.Builder<? extends
+                Builder<SparseArrayCompat<LoaderStreamChannelCompat<OUT>>>> withChannels() {
+
+            final ChannelConfiguration config = mConfiguration;
+            return new ChannelConfiguration
+                    .Builder<Builder<SparseArrayCompat<LoaderStreamChannelCompat<OUT>>>>(
+                    this, config);
+        }
     }
 
     // TODO: 18/02/16 javadoc

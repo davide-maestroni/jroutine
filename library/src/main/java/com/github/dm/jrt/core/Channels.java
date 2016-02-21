@@ -2123,7 +2123,8 @@ public class Channels {
                     } catch (final Throwable t) {
                         InvocationInterruptedException.throwIfInterrupt(t);
                         mAbortException = AbortException.wrapIfNeeded(t);
-                        abort(t);
+                        // Channel is already closed, and it cannot be aborted
+                        logger.err(t, "ignoring consumer exception (%s)", consumer);
                     }
                 }
             }

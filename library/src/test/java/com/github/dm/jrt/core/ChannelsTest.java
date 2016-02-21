@@ -24,6 +24,8 @@ import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.ResultChannel;
+import com.github.dm.jrt.channel.TemplateOutputConsumer;
+import com.github.dm.jrt.common.RoutineException;
 import com.github.dm.jrt.core.Channels.Selectable;
 import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.invocation.InvocationException;
@@ -446,6 +448,16 @@ public class ChannelsTest {
         try {
 
             Channels.combine(0, Collections.<InvocationChannel<?, ?>>singletonList(null));
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Channels.combine(Collections.<Integer, InputChannel<?>>singletonMap(0, null));
 
             fail();
 
@@ -950,9 +962,15 @@ public class ChannelsTest {
     public void testInputMapError() {
 
         try {
-
             Channels.select(0, 0, JRoutine.on(new Sort()).asyncInvoke());
+            fail();
 
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+            Channels.select(Integer.MAX_VALUE, 10, JRoutine.on(new Sort()).asyncInvoke());
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -984,6 +1002,37 @@ public class ChannelsTest {
             fail();
 
         } catch (final AbortException ignored) {
+
+        }
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testInputSelectError() {
+
+        final IOChannel<Selectable<String>> channel = JRoutine.io().buildChannel();
+
+        try {
+            Channels.select(channel.asInput(), (int[]) null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+            Channels.select(channel.asInput(), (List<Integer>) null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+            Channels.select(channel.asInput(), Collections.<Integer>singletonList(null));
+            fail();
+
+        } catch (final NullPointerException ignored) {
 
         }
     }
@@ -1708,9 +1757,15 @@ public class ChannelsTest {
     public void testOutputMapError() {
 
         try {
-
             Channels.select(0, 0, JRoutine.on(new Sort()).asyncCall());
+            fail();
 
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+            Channels.select(Integer.MAX_VALUE, 10, JRoutine.on(new Sort()).asyncCall());
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -1746,6 +1801,37 @@ public class ChannelsTest {
             fail();
 
         } catch (final AbortException ignored) {
+
+        }
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testOutputSelectError() {
+
+        final IOChannel<Selectable<String>> channel = JRoutine.io().buildChannel();
+
+        try {
+            Channels.select(channel.asOutput(), (int[]) null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+            Channels.select(channel.asOutput(), (List<Integer>) null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+            Channels.select(channel.asOutput(), Collections.<Integer>singletonList(null));
+            fail();
+
+        } catch (final NullPointerException ignored) {
 
         }
     }
@@ -1796,10 +1882,63 @@ public class ChannelsTest {
     }
 
     @Test
+    public void testRepeatException() {
+
+        IOChannel<Object> ioChannel = JRoutine.io().buildChannel();
+        OutputChannel<Object> channel = Channels.repeat(ioChannel).build();
+        channel.passTo(new TemplateOutputConsumer<Object>() {
+
+            @Override
+            public void onComplete() throws Exception {
+
+                throw new UnsupportedOperationException();
+            }
+        });
+        ioChannel.pass("test").close().throwError();
+        ioChannel = JRoutine.io().buildChannel();
+        channel = Channels.repeat(ioChannel).build();
+        channel.passTo(new TemplateOutputConsumer<Object>() {
+
+            @Override
+            public void onComplete() throws Exception {
+
+                throw new RoutineException();
+            }
+        });
+        ioChannel.pass("test").close().throwError();
+
+        ioChannel = JRoutine.io().buildChannel();
+        channel = Channels.repeat(ioChannel).build();
+        ioChannel.pass("test").close();
+        channel.passTo(new TemplateOutputConsumer<Object>() {
+
+            @Override
+            public void onComplete() throws Exception {
+
+                throw new UnsupportedOperationException();
+            }
+        });
+        channel.throwError();
+        ioChannel = JRoutine.io().buildChannel();
+        channel = Channels.repeat(ioChannel).build();
+        ioChannel.pass("test").close();
+        channel.passTo(new TemplateOutputConsumer<Object>() {
+
+            @Override
+            public void onComplete() throws Exception {
+
+                throw new RoutineException();
+            }
+        });
+        channel.throwError();
+    }
+
+    @Test
+    @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
     public void testRepeatAbort() {
 
-        final IOChannel<Object> ioChannel = JRoutine.io().buildChannel();
-        final OutputChannel<Object> channel = Channels.repeat(ioChannel).build();
+        IOChannel<Object> ioChannel = JRoutine.io().buildChannel();
+        OutputChannel<Object> channel = Channels.repeat(ioChannel).build();
         ioChannel.pass("test1", "test2");
         final IOChannel<Object> output1 = JRoutine.io().buildChannel();
         channel.passTo(output1).close();
@@ -1823,6 +1962,74 @@ public class ChannelsTest {
         } catch (final AbortException ignored) {
 
         }
+
+        ioChannel = JRoutine.io().buildChannel();
+        channel = Channels.repeat(ioChannel).build();
+        ioChannel.pass("test").close();
+        channel.passTo(new TemplateOutputConsumer<Object>() {
+
+            @Override
+            public void onOutput(final Object output) throws Exception {
+
+                throw new IllegalAccessError();
+            }
+        });
+        assertThat(channel.getError()).isNull();
+    }
+
+    @Test
+    @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
+    public void testRepeatAbortException() {
+
+        IOChannel<Object> ioChannel = JRoutine.io().buildChannel();
+        OutputChannel<Object> channel = Channels.repeat(ioChannel).build();
+        channel.passTo(new TemplateOutputConsumer<Object>() {
+
+            @Override
+            public void onError(@NotNull final RoutineException error) throws Exception {
+
+                throw new UnsupportedOperationException();
+            }
+        });
+        ioChannel.abort();
+        assertThat(channel.getError()).isNull();
+        ioChannel = JRoutine.io().buildChannel();
+        channel = Channels.repeat(ioChannel).build();
+        channel.passTo(new TemplateOutputConsumer<Object>() {
+
+            @Override
+            public void onError(@NotNull final RoutineException error) throws Exception {
+
+                throw new RoutineException();
+            }
+        });
+        ioChannel.abort();
+        assertThat(channel.getError()).isNull();
+
+        ioChannel = JRoutine.io().buildChannel();
+        channel = Channels.repeat(ioChannel).build();
+        ioChannel.abort();
+        channel.passTo(new TemplateOutputConsumer<Object>() {
+
+            @Override
+            public void onError(@NotNull final RoutineException error) throws Exception {
+
+                throw new UnsupportedOperationException();
+            }
+        });
+        assertThat(channel.getError()).isNull();
+        ioChannel = JRoutine.io().buildChannel();
+        channel = Channels.repeat(ioChannel).build();
+        ioChannel.abort();
+        channel.passTo(new TemplateOutputConsumer<Object>() {
+
+            @Override
+            public void onError(@NotNull final RoutineException error) throws Exception {
+
+                throw new RoutineException();
+            }
+        });
+        assertThat(channel.getError()).isNull();
     }
 
     @Test

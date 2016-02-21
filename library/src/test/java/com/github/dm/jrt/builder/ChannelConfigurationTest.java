@@ -31,6 +31,9 @@ import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.builder.ChannelConfiguration.builder;
 import static com.github.dm.jrt.builder.ChannelConfiguration.builderFrom;
+import static com.github.dm.jrt.builder.ChannelConfiguration.builderFromInputChannel;
+import static com.github.dm.jrt.builder.ChannelConfiguration.builderFromInvocation;
+import static com.github.dm.jrt.builder.ChannelConfiguration.builderFromOutputChannel;
 import static com.github.dm.jrt.util.TimeDuration.millis;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -216,6 +219,95 @@ public class ChannelConfigurationTest {
         } catch (final IllegalArgumentException ignored) {
 
         }
+    }
+
+    @Test
+    public void testFromInputChannelConfiguration() {
+
+        final InvocationConfiguration.Builder<InvocationConfiguration> builder =
+                InvocationConfiguration.builder();
+        final InvocationConfiguration invocationConfiguration =
+                builder.withRunner(Runners.syncRunner())
+                       .withReadTimeout(millis(100))
+                       .withReadTimeoutAction(TimeoutActionType.ABORT)
+                       .withLog(Logs.nullLog())
+                       .withLogLevel(Level.SILENT)
+                       .withInputOrder(OrderType.BY_CALL)
+                       .withInputLimit(10)
+                       .withInputMaxDelay(millis(33))
+                       .withInputMaxSize(100)
+                       .getConfigured();
+        final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
+                                                            .withChannelLimit(10)
+                                                            .withChannelMaxDelay(millis(33))
+                                                            .withChannelMaxSize(100)
+                                                            .withRunner(Runners.syncRunner())
+                                                            .withReadTimeout(millis(100))
+                                                            .withReadTimeoutAction(
+                                                                    TimeoutActionType.ABORT)
+                                                            .withLog(Logs.nullLog())
+                                                            .withLogLevel(Level.SILENT)
+                                                            .getConfigured();
+        assertThat(builderFromInputChannel(invocationConfiguration).getConfigured()).isEqualTo(
+                configuration);
+    }
+
+    @Test
+    public void testFromInvocationConfiguration() {
+
+        final InvocationConfiguration.Builder<InvocationConfiguration> builder =
+                InvocationConfiguration.builder();
+        final InvocationConfiguration invocationConfiguration =
+                builder.withRunner(Runners.syncRunner())
+                       .withReadTimeout(millis(100))
+                       .withReadTimeoutAction(TimeoutActionType.ABORT)
+                       .withLog(Logs.nullLog())
+                       .withLogLevel(Level.SILENT)
+                       .withInputOrder(OrderType.BY_CALL)
+                       .withInputLimit(10)
+                       .withInputMaxDelay(millis(33))
+                       .withInputMaxSize(100)
+                       .getConfigured();
+        final ChannelConfiguration configuration = builder().withRunner(Runners.syncRunner())
+                                                            .withReadTimeout(millis(100))
+                                                            .withReadTimeoutAction(
+                                                                    TimeoutActionType.ABORT)
+                                                            .withLog(Logs.nullLog())
+                                                            .withLogLevel(Level.SILENT)
+                                                            .getConfigured();
+        assertThat(builderFromInvocation(invocationConfiguration).getConfigured()).isEqualTo(
+                configuration);
+    }
+
+    @Test
+    public void testFromOutputChannelConfiguration() {
+
+        final InvocationConfiguration.Builder<InvocationConfiguration> builder =
+                InvocationConfiguration.builder();
+        final InvocationConfiguration invocationConfiguration =
+                builder.withRunner(Runners.syncRunner())
+                       .withReadTimeout(millis(100))
+                       .withReadTimeoutAction(TimeoutActionType.ABORT)
+                       .withLog(Logs.nullLog())
+                       .withLogLevel(Level.SILENT)
+                       .withOutputOrder(OrderType.BY_CALL)
+                       .withOutputLimit(10)
+                       .withOutputMaxDelay(millis(33))
+                       .withOutputMaxSize(100)
+                       .getConfigured();
+        final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
+                                                            .withChannelLimit(10)
+                                                            .withChannelMaxDelay(millis(33))
+                                                            .withChannelMaxSize(100)
+                                                            .withRunner(Runners.syncRunner())
+                                                            .withReadTimeout(millis(100))
+                                                            .withReadTimeoutAction(
+                                                                    TimeoutActionType.ABORT)
+                                                            .withLog(Logs.nullLog())
+                                                            .withLogLevel(Level.SILENT)
+                                                            .getConfigured();
+        assertThat(builderFromOutputChannel(invocationConfiguration).getConfigured()).isEqualTo(
+                configuration);
     }
 
     @Test

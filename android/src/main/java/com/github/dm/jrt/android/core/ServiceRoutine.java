@@ -421,7 +421,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
          */
         private class ConnectionOutputConsumer implements OutputConsumer<IN> {
 
-            public void onComplete() {
+            public void onComplete() throws Exception {
 
                 final Message message = Message.obtain(null, InvocationService.MSG_COMPLETE);
                 putInvocationId(message.getData(), mUUID);
@@ -431,11 +431,11 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
 
                 } catch (final RemoteException e) {
                     unbindService();
-                    throw new InvocationException(e);
+                    throw e;
                 }
             }
 
-            public void onError(@NotNull final RoutineException error) {
+            public void onError(@NotNull final RoutineException error) throws Exception {
 
                 final Message message = Message.obtain(null, InvocationService.MSG_ABORT);
                 putError(message.getData(), mUUID, error);
@@ -445,21 +445,16 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
 
                 } catch (final RemoteException e) {
                     unbindService();
-                    throw new InvocationException(e);
+                    throw e;
                 }
             }
 
-            public void onOutput(final IN input) {
+            public void onOutput(final IN input) throws Exception {
 
                 final Message message = Message.obtain(null, InvocationService.MSG_DATA);
                 putValue(message.getData(), mUUID, input);
                 message.replyTo = mInMessenger;
-                try {
-                    mOutMessenger.send(message);
-
-                } catch (final RemoteException e) {
-                    throw new InvocationException(e);
-                }
+                mOutMessenger.send(message);
             }
         }
 

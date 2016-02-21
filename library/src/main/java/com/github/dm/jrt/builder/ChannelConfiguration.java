@@ -139,17 +139,22 @@ public final class ChannelConfiguration {
                 : new Builder<ChannelConfiguration>(sDefaultConfigurable, initialConfiguration);
     }
 
-    // TODO: 20/02/16 javadoc + unit tests
+    /**
+     * Returns a channel configuration builder initialized with a channel configuration converted
+     * from the specified one by applying the matching options from the invocation input channel.
+     *
+     * @param initialConfiguration the initial configuration.
+     * @return the builder.
+     */
     @NotNull
-    public static Builder<ChannelConfiguration> fromInputChannelConfiguration(
+    public static Builder<ChannelConfiguration> builderFromInputChannel(
             @Nullable final InvocationConfiguration initialConfiguration) {
 
         if (initialConfiguration == null) {
             return builder();
         }
 
-        final Builder<ChannelConfiguration> builder =
-                fromInvocationConfiguration(initialConfiguration);
+        final Builder<ChannelConfiguration> builder = builderFromInvocation(initialConfiguration);
         return builder.withChannelOrder(initialConfiguration.getInputOrderTypeOr(null))
                       .withChannelLimit(
                               initialConfiguration.getInputLimitOr(ChannelConfiguration.DEFAULT))
@@ -158,8 +163,15 @@ public final class ChannelConfiguration {
                               initialConfiguration.getInputMaxSizeOr(ChannelConfiguration.DEFAULT));
     }
 
+    /**
+     * Returns a channel configuration builder initialized with a channel configuration converted
+     * from the specified one by applying the matching options.
+     *
+     * @param initialConfiguration the initial configuration.
+     * @return the builder.
+     */
     @NotNull
-    public static Builder<ChannelConfiguration> fromInvocationConfiguration(
+    public static Builder<ChannelConfiguration> builderFromInvocation(
             @Nullable final InvocationConfiguration initialConfiguration) {
 
         return (initialConfiguration == null) ? builder()
@@ -170,16 +182,22 @@ public final class ChannelConfiguration {
                            .withLogLevel(initialConfiguration.getLogLevelOr(null));
     }
 
+    /**
+     * Returns a channel configuration builder initialized with a channel configuration converted
+     * from the specified one by applying the matching options from the invocation output channel.
+     *
+     * @param initialConfiguration the initial configuration.
+     * @return the builder.
+     */
     @NotNull
-    public static Builder<ChannelConfiguration> fromOutputChannelConfiguration(
+    public static Builder<ChannelConfiguration> builderFromOutputChannel(
             @Nullable final InvocationConfiguration initialConfiguration) {
 
         if (initialConfiguration == null) {
             return builder();
         }
 
-        final Builder<ChannelConfiguration> builder =
-                fromInvocationConfiguration(initialConfiguration);
+        final Builder<ChannelConfiguration> builder = builderFromInvocation(initialConfiguration);
         return builder.withChannelOrder(initialConfiguration.getOutputOrderTypeOr(null))
                       .withChannelLimit(
                               initialConfiguration.getOutputLimitOr(ChannelConfiguration.DEFAULT))

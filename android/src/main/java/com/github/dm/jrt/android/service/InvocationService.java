@@ -24,7 +24,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
-import android.os.RemoteException;
 
 import com.github.dm.jrt.android.invocation.ContextInvocation;
 import com.github.dm.jrt.android.invocation.ContextInvocationFactory;
@@ -38,7 +37,6 @@ import com.github.dm.jrt.common.RoutineException;
 import com.github.dm.jrt.core.AbstractRoutine;
 import com.github.dm.jrt.core.JRoutine;
 import com.github.dm.jrt.invocation.Invocation;
-import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.log.Log;
 import com.github.dm.jrt.log.Log.Level;
 import com.github.dm.jrt.log.Logger;
@@ -748,40 +746,25 @@ public class InvocationService extends Service {
             mOutMessenger = messenger;
         }
 
-        public void onComplete() {
+        public void onComplete() throws Exception {
 
             mInvocation.recycle();
-            try {
-                mOutMessenger.send(Message.obtain(null, MSG_COMPLETE));
-
-            } catch (final RemoteException e) {
-                throw new InvocationException(e);
-            }
+            mOutMessenger.send(Message.obtain(null, MSG_COMPLETE));
         }
 
-        public void onError(@NotNull final RoutineException error) {
+        public void onError(@NotNull final RoutineException error) throws Exception {
 
             mInvocation.recycle();
             final Message message = Message.obtain(null, MSG_ABORT);
             putError(message.getData(), error);
-            try {
-                mOutMessenger.send(message);
-
-            } catch (final RemoteException e) {
-                throw new InvocationException(e);
-            }
+            mOutMessenger.send(message);
         }
 
-        public void onOutput(final Object o) {
+        public void onOutput(final Object o) throws Exception {
 
             final Message message = Message.obtain(null, MSG_DATA);
             putValue(message.getData(), o);
-            try {
-                mOutMessenger.send(message);
-
-            } catch (final RemoteException e) {
-                throw new InvocationException(e);
-            }
+            mOutMessenger.send(message);
         }
     }
 

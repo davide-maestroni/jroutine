@@ -43,6 +43,7 @@ import com.github.dm.jrt.invocation.ComparableFilterInvocation;
 import com.github.dm.jrt.invocation.ComparableInvocationFactory;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationFactory;
+import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.invocation.PassingInvocation;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.runner.Runner;
@@ -59,7 +60,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.github.dm.jrt.builder.ChannelConfiguration.fromOutputChannelConfiguration;
+import static com.github.dm.jrt.builder.ChannelConfiguration.builderFromOutputChannel;
 import static com.github.dm.jrt.function.Functions.consumerFactory;
 import static com.github.dm.jrt.function.Functions.consumerFilter;
 import static com.github.dm.jrt.function.Functions.functionFactory;
@@ -639,7 +640,7 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     protected ChannelConfiguration buildChannelConfiguration() {
 
-        return fromOutputChannelConfiguration(buildConfiguration()).getConfigured();
+        return builderFromOutputChannel(buildConfiguration()).getConfigured();
     }
 
     /**
@@ -1145,6 +1146,7 @@ public abstract class AbstractStreamChannel<OUT>
                 channel.close();
 
             } catch (final Throwable t) {
+                InvocationInterruptedException.throwIfInterrupt(t);
                 channel.abort(t);
             }
         }

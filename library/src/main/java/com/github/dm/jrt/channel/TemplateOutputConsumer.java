@@ -31,15 +31,15 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class TemplateOutputConsumer<OUT> implements OutputConsumer<OUT> {
 
-    public void onComplete() {
+    public void onComplete() throws Exception {
 
     }
 
-    public void onError(@NotNull final RoutineException error) {
+    public void onError(@NotNull final RoutineException error) throws Exception {
 
     }
 
-    public void onOutput(final OUT output) {
+    public void onOutput(final OUT output) throws Exception {
 
     }
 }

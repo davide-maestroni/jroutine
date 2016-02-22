@@ -33,7 +33,7 @@ import java.lang.annotation.Target;
  * routines as well.
  * <p/>
  * Finally, be aware that a method might need to be made accessible in order to be called. That
- * means that, in case a {@link SecurityManager} is installed, a security exception might
+ * means that, in case a {@link java.lang.SecurityManager} is installed, a security exception might
  * be raised based on the specific policy implemented.
  * <p/>
  * Remember also that, in order for the annotation to properly work at run time, you will need to

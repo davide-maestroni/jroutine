@@ -1,1 +1,1 @@
-include ':library', ':processor', ':proxy', ':android', ':androidprocessor', ':androidproxy', ':sample'
+include ':library', ':processor', ':proxy', ':android', ':androidprocessor', ':androidproxy', ':sample', ':core', ':function', ':object'

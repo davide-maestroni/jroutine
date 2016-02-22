@@ -1,0 +1,193 @@
+<!--
+  ~ Copyright 2016 Davide Maestroni
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<html>
+<head>
+    <title>jroutine</title>
+</head>
+<body>
+<a href="https://github.com/davide-maestroni/jroutine" target="_blank">Parallel programming on the go.</a>
+<h2>Usage examples</h2>
+<p>
+    The code below shows how it is possible to implement the computation of the root mean square of some input data, by distributing it in a number of background threads.
+</p>
+<b>Example 1:</b> via invocation implementations.
+<p>
+    This is actually the most efficient way, since there is full control on how data are passed to the specific invocations.<br/>
+    In fact, the parsing, the square and the mean computation all happen in parallel background threads.
+</p>
+<pre>
+    <code>
+        public class Main {
+
+            public static void main(final String[] args) {
+
+                final Routine&lt;String, Integer&gt; parseRoutine =
+                        JRoutine.on(factoryOf(Parse.class)).buildRoutine();
+                final Routine&lt;Integer, Integer&gt; squareRoutine =
+                        JRoutine.on(factoryOf(Square.class)).buildRoutine();
+                final Routine&lt;Integer, Double&gt; meanRoutine =
+                        JRoutine.on(factoryOf(SquareRootMean.class)).buildRoutine();
+                final Double rms =
+                        meanRoutine.asyncCall(squareRoutine.parallelCall(parseRoutine.parallelCall(args)))
+                                   .afterMax(seconds(3))
+                                   .next();
+                System.out.println(rms);
+                System.exit(0);
+            }
+
+            private static class Parse extends TemplateInvocation&lt;String, Integer&gt; {
+
+                &commat;Override
+                public void onInput(final String s, &commat;NotNull final ResultChannel&lt;Integer&gt; result) {
+
+                    result.pass(Integer.parseInt(s));
+                }
+            }
+
+            private static class Square extends TemplateInvocation&lt;Integer, Integer&gt; {
+
+                &commat;Override
+                public void onInput(final Integer integer, &commat;NotNull final ResultChannel&lt;Integer&gt; result) {
+
+                    final int input = integer;
+                    result.pass(input * input);
+                }
+            }
+
+            private static class SquareRootMean extends TemplateInvocation&lt;Integer, Double&gt; {
+
+                private int mCount;
+
+                private int mSum;
+
+                &commat;Override
+                public void onInitialize() {
+
+                    mCount = 0;
+                    mSum = 0;
+                }
+
+                &commat;Override
+                public void onInput(final Integer integer, &commat;NotNull final ResultChannel&lt;Double&gt; result) {
+
+                    ++mCount;
+                    mSum += integer;
+                }
+
+                &commat;Override
+                public void onResult(&commat;NotNull final ResultChannel&lt;Double&gt; result) {
+
+                    if (mCount > 0) {
+
+                        result.pass(Math.sqrt((double) mSum / mCount));
+
+                    } else {
+
+                        result.pass(0d);
+                    }
+                }
+            }
+        }
+    </code>
+</pre>
+<b>Example 2:</b> via invocation implementations (again).
+<p>
+    It is possible to completely avoid the use of reflection by slightly modifying the example above.
+</p>
+<pre>
+    <code>
+        public class Main {
+
+            public static void main(final String[] args) {
+
+                final Routine&lt;String, Integer&gt; parseRoutine = JRoutine.on(new Parse()).buildRoutine();
+                final Routine&lt;Integer, Integer&gt; squareRoutine = JRoutine.on(new Square()).buildRoutine();
+                final Routine&lt;Integer, Double&gt; meanRoutine =
+                        JRoutine.on(new SquareRootMeanFactory()).buildRoutine();
+
+                final Double rms =
+                        meanRoutine.asyncCall(squareRoutine.parallelCall(parseRoutine.parallelCall(args)))
+                                   .afterMax(seconds(3))
+                                   .next();
+                System.out.println(rms);
+                System.exit(0);
+            }
+
+            private static class Parse extends FilterInvocation&lt;String, Integer&gt; {
+
+                public void onInput(final String s, &commat;NotNull final ResultChannel&lt;Integer&gt; result) {
+
+                    result.pass(Integer.parseInt(s));
+                }
+            }
+
+            private static class Square extends FilterInvocation&lt;Integer, Integer&gt; {
+
+                public void onInput(final Integer integer, &commat;NotNull final ResultChannel&lt;Integer&gt; result) {
+
+                    final int input = integer;
+                    result.pass(input * input);
+                }
+            }
+
+            private static class SquareRootMean extends TemplateInvocation&lt;Integer, Double&gt; {
+
+                private int mCount;
+
+                private int mSum;
+
+                &commat;Override
+                public void onInitialize() {
+
+                    mCount = 0;
+                    mSum = 0;
+                }
+
+                &commat;Override
+                public void onInput(final Integer integer, &commat;NotNull final ResultChannel&lt;Double&gt; result) {
+
+                    ++mCount;
+                    mSum += integer;
+                }
+
+                &commat;Override
+                public void onResult(&commat;NotNull final ResultChannel&lt;Double&gt; result) {
+
+                    if (mCount > 0) {
+
+                        result.pass(Math.sqrt((double) mSum / mCount));
+
+                    } else {
+
+                        result.pass(0d);
+                    }
+                }
+            }
+
+            private static class SquareRootMeanFactory extends InvocationFactory&lt;Integer, Double&gt; {
+
+                &commat;NotNull
+                public Invocation&lt;Integer, Double&gt; newInvocation() {
+
+                   return new SquareRootMean();
+                }
+            }
+        }
+    </code>
+</pre>
+</body>
+</html>

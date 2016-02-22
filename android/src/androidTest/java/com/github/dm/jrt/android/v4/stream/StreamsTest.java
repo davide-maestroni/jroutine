@@ -1828,7 +1828,6 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
     public void testStaleTime() throws InterruptedException {
 
-
         final LoaderContextCompat context = loaderFrom(getActivity());
         final AtomicInteger count = new AtomicInteger();
         final Function<String, String> function = stringIncrement(count);

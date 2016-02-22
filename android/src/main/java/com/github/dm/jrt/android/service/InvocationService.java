@@ -825,8 +825,8 @@ public class InvocationService extends Service {
          * Passes the specified input to the invocation channel.
          *
          * @param input the input.
-         * @throws RoutineException                if the execution has been aborted.
-         * @throws java.lang.IllegalStateException if the channel is already closed.
+         * @throws com.github.dm.jrt.common.RoutineException if the execution has been aborted.
+         * @throws java.lang.IllegalStateException           if the channel is already closed.
          */
         void pass(@Nullable final Object input) {
 
@@ -836,9 +836,9 @@ public class InvocationService extends Service {
         /**
          * Binds the specified consumer to the output channel.
          *
-         * @throws RoutineException                if the execution has been aborted.
-         * @throws java.lang.IllegalStateException if the channel is already closed or
-         *                                         already bound to a consumer.
+         * @throws com.github.dm.jrt.common.RoutineException if the execution has been aborted.
+         * @throws java.lang.IllegalStateException           if the channel is already closed or
+         *                                                   already bound to a consumer.
          */
         void passTo(@NotNull final OutputConsumer<Object> consumer) {
 

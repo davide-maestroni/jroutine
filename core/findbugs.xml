@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FindBugsFilter>
+    <Match>
+        <Class name="com.github.dm.jrt.core.DefaultResultChannel$DefaultIterator"/>
+        <Method name="next"/>
+        <Bug pattern="IT_NO_SUCH_ELEMENT"/>
+    </Match>
+    <Match>
+        <Class name="com.github.dm.jrt.core.DefaultResultChannel$DefaultOutputChannel"/>
+        <Method name="next"/>
+        <Bug pattern="IT_NO_SUCH_ELEMENT"/>
+    </Match>
+    <Match>
+        <Class name="com.github.dm.jrt.util.TimeDuration"/>
+        <Or>
+            <Method name="wait"/>
+            <Method name="waitSinceMillis"/>
+            <Method name="waitSinceNanos"/>
+        </Or>
+        <Bug pattern="WA_NOT_IN_LOOP"/>
+    </Match>
+</FindBugsFilter>

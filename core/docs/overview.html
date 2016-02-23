@@ -16,7 +16,7 @@
 
 <html>
 <head>
-    <title>jroutine</title>
+    <title>jroutine-core</title>
 </head>
 <body>
 <a href="https://github.com/davide-maestroni/jroutine" target="_blank">Parallel programming on the go.</a>
@@ -92,11 +92,9 @@
                 public void onResult(&commat;NotNull final ResultChannel&lt;Double&gt; result) {
 
                     if (mCount > 0) {
-
                         result.pass(Math.sqrt((double) mSum / mCount));
 
                     } else {
-
                         result.pass(0d);
                     }
                 }
@@ -168,11 +166,9 @@
                 public void onResult(&commat;NotNull final ResultChannel&lt;Double&gt; result) {
 
                     if (mCount > 0) {
-
                         result.pass(Math.sqrt((double) mSum / mCount));
 
                     } else {
-
                         result.pass(0d);
                     }
                 }

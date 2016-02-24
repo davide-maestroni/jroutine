@@ -1,0 +1,80 @@
+/*
+ * Copyright 2016 Davide Maestroni
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.github.dm.jrt.channel.util;
+
+import com.github.dm.jrt.builder.ChannelConfiguration;
+import com.github.dm.jrt.channel.Channel.InputChannel;
+import com.github.dm.jrt.channel.IOChannel;
+import com.github.dm.jrt.core.JRoutine;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
+/**
+ * Builder implementation returning a channel combining data from a map of input channels.
+ *
+ * @param <IN> the input data type.
+ */
+class CombineMapBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<? extends IN>>> {
+
+    private final HashMap<Integer, InputChannel<? extends IN>> mChannelMap;
+
+    /**
+     * Constructor.
+     *
+     * @param channels the map of channels to combine.
+     * @throws java.lang.IllegalArgumentException if the specified map is empty.
+     */
+    CombineMapBuilder(@NotNull final Map<Integer, ? extends InputChannel<? extends IN>> channels) {
+
+        if (channels.isEmpty()) {
+            throw new IllegalArgumentException("the map of channels must not be empty");
+        }
+
+        final HashMap<Integer, InputChannel<? extends IN>> channelMap =
+                new HashMap<Integer, InputChannel<? extends IN>>(channels);
+        if (channelMap.containsValue(null)) {
+            throw new NullPointerException("the map of channels must not contain null objects");
+        }
+
+        mChannelMap = channelMap;
+    }
+
+    @NotNull
+    @Override
+    @SuppressWarnings("unchecked")
+    protected IOChannel<Selectable<? extends IN>> build(
+            @NotNull final ChannelConfiguration configuration) {
+
+        final HashMap<Integer, InputChannel<? extends IN>> channelMap = mChannelMap;
+        final HashMap<Integer, IOChannel<IN>> ioChannelMap =
+                new HashMap<Integer, IOChannel<IN>>(channelMap.size());
+        for (final Entry<Integer, InputChannel<? extends IN>> entry : channelMap.entrySet()) {
+            final IOChannel<IN> ioChannel = JRoutine.io().buildChannel();
+            ioChannel.passTo((InputChannel<IN>) entry.getValue());
+            ioChannelMap.put(entry.getKey(), ioChannel);
+        }
+
+        final IOChannel<Selectable<? extends IN>> ioChannel =
+                JRoutine.io().withChannels().with(configuration).getConfigured().buildChannel();
+        ioChannel.passTo(new SortingMapOutputConsumer<IN>(ioChannelMap));
+        return ioChannel;
+    }
+}

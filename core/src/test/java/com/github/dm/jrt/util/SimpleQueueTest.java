@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.core;
+package com.github.dm.jrt.util;
 
 import org.junit.Test;
 
@@ -100,7 +100,7 @@ public class SimpleQueueTest {
     }
 
     @Test
-    public void testMove() {
+    public void testDrain() {
 
         final SimpleQueue<Integer> queue = new SimpleQueue<Integer>();
 

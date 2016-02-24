@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.core;
+package com.github.dm.jrt.util;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -31,7 +31,7 @@ import java.util.NoSuchElementException;
  *
  * @param <E> the element type.
  */
-class SimpleQueue<E> {
+public class SimpleQueue<E> {
 
     private int mFirst;
 

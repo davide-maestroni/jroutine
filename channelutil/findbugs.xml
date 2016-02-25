@@ -30,4 +30,9 @@
         <Method name="flush"/>
         <Bug pattern="UC_USELESS_OBJECT"/>
     </Match>
+    <Match>
+        <Class name="com.github.dm.jrt.channel.util.RepeatedChannel"/>
+        <Method name="next"/>
+        <Bug pattern="IT_NO_SUCH_ELEMENT"/>
+    </Match>
 </FindBugsFilter>

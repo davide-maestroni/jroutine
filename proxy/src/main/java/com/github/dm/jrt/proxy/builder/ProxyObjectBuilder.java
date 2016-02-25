@@ -17,7 +17,7 @@
 package com.github.dm.jrt.proxy.builder;
 
 import com.github.dm.jrt.builder.ConfigurableBuilder;
-import com.github.dm.jrt.builder.ProxyConfigurableBuilder;
+import com.github.dm.jrt.object.builder.ProxyConfigurableBuilder;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -42,7 +42,7 @@ public interface ProxyObjectBuilder<TYPE> extends ConfigurableBuilder<ProxyObjec
      * {@link com.github.dm.jrt.proxy.annotation.Proxy Proxy}.
      *
      * @return the proxy object.
-     * @see com.github.dm.jrt.annotation Annotations
+     * @see com.github.dm.jrt.object.annotation Annotations
      */
     @NotNull
     TYPE buildProxy();

@@ -27,7 +27,7 @@
                 array[i++] = (${boxedType}) object;
             }
 
-            final com.github.dm.jrt.common.Mutex mutex = mMutex;
+            final com.github.dm.jrt.object.common.Mutex mutex = mMutex;
             mutex.acquire();
             try {
                 result.orderByCall();

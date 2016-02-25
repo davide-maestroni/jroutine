@@ -98,7 +98,7 @@ import java.lang.annotation.Target;
  * <p/>
  * Created by davide-maestroni on 11/03/2014.
  *
- * @see com.github.dm.jrt.annotation Annotations
+ * @see com.github.dm.jrt.object.annotation Annotations
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

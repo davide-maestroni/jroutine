@@ -23,11 +23,18 @@ apply from: '../extra.gradle'
 group = project.getProperty('groupName')
 version = project.getProperty('releaseVersion')
 archivesBaseName = "${project.parent.name}-${project.name}"
-javaCompatibility = JavaVersion.VERSION_1_6
+javaCompatibility = JavaVersion.VERSION_1_5
+
+dependencies {
+    compile 'com.intellij:annotations:12.0'
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.assertj:assertj-core:1.7.1'
+}
 
 conditionalDependencies {
     compile name: 'core', artifact: { "${it.parent.name}-${it.name}" }
-    compile name: 'object', artifact: { "${it.parent.name}-${it.name}" }
+    compile name: 'function', artifact: { "${it.parent.name}-${it.name}" }
+    compile name: 'channelext', artifact: { "${it.parent.name}-${it.name}" }
 }
 
 jacocoTestReport {
@@ -45,7 +52,8 @@ javadoc {
     options.overview("${project.projectDir}/docs/overview.html")
     options.links('http://docs.oracle.com/javase/7/docs/api/',
             'http://davide-maestroni.github.io/jroutine/javadoc/core/',
-            'http://davide-maestroni.github.io/jroutine/javadoc/object/')
+            'http://davide-maestroni.github.io/jroutine/javadoc/function/',
+            'http://davide-maestroni.github.io/jroutine/javadoc/channelext/')
 }
 
 tasks.withType(FindBugs) {

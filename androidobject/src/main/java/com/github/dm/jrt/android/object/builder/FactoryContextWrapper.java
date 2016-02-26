@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android.core;
+package com.github.dm.jrt.android.object.builder;
 
 import android.content.Context;
 import android.content.ContextWrapper;
-
-import com.github.dm.jrt.android.builder.FactoryContext;
 
 import org.jetbrains.annotations.NotNull;
 

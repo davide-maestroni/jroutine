@@ -457,7 +457,6 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         }
 
-        // TODO: 26/02/16 move code to object tests
         try {
 
             JRoutineCompat.with((LoaderContextCompat) null);
@@ -1046,7 +1045,6 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         }
 
-        // TODO: 26/02/16 move code to object tests
         try {
 
             JRoutineCompat.with((LoaderContextCompat) null);

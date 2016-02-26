@@ -178,7 +178,7 @@ public class JRoutine extends com.github.dm.jrt.android.core.JRoutine {
          * @param context the loader context.
          */
         @SuppressWarnings("ConstantConditions")
-        private ContextBuilder(@NotNull final LoaderContext context) {
+        protected ContextBuilder(@NotNull final LoaderContext context) {
 
             if (context == null) {
                 throw new NullPointerException("the loader context must not be null");

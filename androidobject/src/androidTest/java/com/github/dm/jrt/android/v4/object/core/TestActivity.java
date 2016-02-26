@@ -14,16 +14,26 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android.app;
+package com.github.dm.jrt.android.v4.object.core;
 
-import android.app.Application;
+import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.view.WindowManager.LayoutParams;
+
+import com.github.dm.jrt.android.object.R;
 
 /**
- * Test application.
+ * Test activity.
  * <p/>
- * Created by davide-maestroni on 04/06/2015.
+ * Created by davide-maestroni on 12/16/2014.
  */
-@SuppressWarnings("unused")
-public class TestApp extends Application {
+public class TestActivity extends FragmentActivity {
 
+    @Override
+    protected void onCreate(final Bundle savedInstanceState) {
+
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.test_v4_layout);
+        getWindow().addFlags(LayoutParams.FLAG_KEEP_SCREEN_ON);
+    }
 }

@@ -14,16 +14,27 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android.app;
+package com.github.dm.jrt.android.v4.object.core;
 
-import android.app.Application;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 /**
- * Test application.
+ * Test fragment.
  * <p/>
- * Created by davide-maestroni on 04/06/2015.
+ * Created by davide-maestroni on 12/16/2014.
  */
-@SuppressWarnings("unused")
-public class TestApp extends Application {
+public class TestFragment extends Fragment {
 
+    @Nullable
+    @Override
+    public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
+            final Bundle savedInstanceState) {
+
+        return new View(getActivity());
+    }
 }

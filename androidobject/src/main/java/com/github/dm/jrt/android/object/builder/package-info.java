@@ -14,16 +14,9 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android.app;
-
-import android.app.Application;
-
 /**
- * Test application.
+ * Android routine builder definitions.
  * <p/>
- * Created by davide-maestroni on 04/06/2015.
+ * Created by davide-maestroni on 10/10/2014.
  */
-@SuppressWarnings("unused")
-public class TestApp extends Application {
-
-}
+package com.github.dm.jrt.android.object.builder;

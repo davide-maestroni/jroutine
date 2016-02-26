@@ -14,16 +14,9 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android.app;
-
-import android.app.Application;
-
 /**
- * Test application.
+ * Routine interfaces and implementations specific to the Android platform.
  * <p/>
- * Created by davide-maestroni on 04/06/2015.
+ * Created by davide-maestroni on 09/25/2014.
  */
-@SuppressWarnings("unused")
-public class TestApp extends Application {
-
-}
+package com.github.dm.jrt.android.v11.object.core;

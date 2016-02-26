@@ -14,16 +14,9 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android.app;
-
-import android.app.Application;
-
 /**
- * Test application.
+ * Android platform specific annotation definitions.
  * <p/>
- * Created by davide-maestroni on 04/06/2015.
+ * Created by davide-maestroni on 04/09/2015.
  */
-@SuppressWarnings("unused")
-public class TestApp extends Application {
-
-}
+package com.github.dm.jrt.android.object.annotation;

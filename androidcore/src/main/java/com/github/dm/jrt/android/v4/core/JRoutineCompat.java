@@ -173,7 +173,7 @@ public class JRoutineCompat extends JRoutine {
          * @param context the loader context.
          */
         @SuppressWarnings("ConstantConditions")
-        private ContextBuilderCompat(@NotNull final LoaderContextCompat context) {
+        protected ContextBuilderCompat(@NotNull final LoaderContextCompat context) {
 
             if (context == null) {
                 throw new NullPointerException("the loader context must not be null");

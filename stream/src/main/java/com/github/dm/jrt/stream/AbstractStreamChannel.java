@@ -876,8 +876,8 @@ public abstract class AbstractStreamChannel<OUT>
          * Constructor.
          *
          * @param consumer the consumer instance.
-         * @throws IllegalArgumentException if the specified count number is 0 or
-         *                                  negative.
+         * @throws java.lang.IllegalArgumentException if the specified count number is 0 or
+         *                                            negative.
          */
         private GenerateConsumerInvocation(
                 @NotNull final ConsumerWrapper<? super ResultChannel<OUT>> consumer) {
@@ -978,8 +978,8 @@ public abstract class AbstractStreamChannel<OUT>
          * Constructor.
          *
          * @param supplier the supplier instance.
-         * @throws IllegalArgumentException if the specified count number is 0 or
-         *                                  negative.
+         * @throws java.lang.IllegalArgumentException if the specified count number is 0 or
+         *                                            negative.
          */
         private GenerateSupplierInvocation(@NotNull final SupplierWrapper<? extends OUT> supplier) {
 

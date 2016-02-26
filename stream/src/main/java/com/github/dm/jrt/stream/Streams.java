@@ -70,7 +70,7 @@ public class Streams extends Functions {
      * @param channels the collection of channels.
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
-     * @throws IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
      * @see com.github.dm.jrt.ext.channel.Channels#blend(Collection)
      */
     @NotNull
@@ -88,7 +88,7 @@ public class Streams extends Functions {
      * @param channels the array of channels.
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
-     * @throws IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @see com.github.dm.jrt.ext.channel.Channels#blend(OutputChannel[])
      */
     @NotNull
@@ -108,7 +108,7 @@ public class Streams extends Functions {
      * @param channels the collection of channels.
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
-     * @throws IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
      * @see com.github.dm.jrt.ext.channel.Channels#concat(Collection)
      */
     @NotNull
@@ -128,7 +128,7 @@ public class Streams extends Functions {
      * @param channels the array of channels.
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
-     * @throws IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @see com.github.dm.jrt.ext.channel.Channels#concat(OutputChannel[])
      */
     @NotNull
@@ -173,7 +173,7 @@ public class Streams extends Functions {
      * @param size   the group size.
      * @param <DATA> the data type.
      * @return the invocation factory.
-     * @throws IllegalArgumentException if the size is not positive.
+     * @throws java.lang.IllegalArgumentException if the size is not positive.
      */
     @NotNull
     public static <DATA> InvocationFactory<DATA, List<DATA>> groupBy(final int size) {
@@ -201,7 +201,7 @@ public class Streams extends Functions {
      *                    the group size.
      * @param <DATA>      the data type.
      * @return the invocation factory.
-     * @throws IllegalArgumentException if the size is not positive.
+     * @throws java.lang.IllegalArgumentException if the size is not positive.
      */
     @NotNull
     public static <DATA> InvocationFactory<DATA, List<DATA>> groupBy(final int size,
@@ -219,7 +219,7 @@ public class Streams extends Functions {
      * @param channels the collection of channels.
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
-     * @throws IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
      * @see com.github.dm.jrt.ext.channel.Channels#join(Collection)
      */
     @NotNull
@@ -238,7 +238,7 @@ public class Streams extends Functions {
      * @param channels the array of channels.
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
-     * @throws IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @see com.github.dm.jrt.ext.channel.Channels#join(OutputChannel[])
      */
     @NotNull
@@ -261,7 +261,7 @@ public class Streams extends Functions {
      * @param channels    the collection of channels.
      * @param <OUT>       the output data type.
      * @return the stream channel builder.
-     * @throws IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
      * @see com.github.dm.jrt.ext.channel.Channels#join(Object, Collection)
      */
     @NotNull
@@ -285,7 +285,7 @@ public class Streams extends Functions {
      * @param channels    the array of channels.
      * @param <OUT>       the output data type.
      * @return the stream channel builder.
-     * @throws IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @see com.github.dm.jrt.ext.channel.Channels#join(Object, OutputChannel[])
      */
     @NotNull
@@ -393,7 +393,7 @@ public class Streams extends Functions {
      * @param count  the maximum number of data to pass.
      * @param <DATA> the data type.
      * @return the invocation factory.
-     * @throws IllegalArgumentException if the count is negative.
+     * @throws java.lang.IllegalArgumentException if the count is negative.
      */
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> limit(final int count) {
@@ -410,7 +410,7 @@ public class Streams extends Functions {
      * @param channels   the collection of channels.
      * @param <OUT>      the output data type.
      * @return the selectable stream channel builder.
-     * @throws IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
      * @see com.github.dm.jrt.ext.channel.Channels#merge(int, Collection)
      */
     @NotNull
@@ -430,7 +430,7 @@ public class Streams extends Functions {
      * @param channels   the array of channels.
      * @param <OUT>      the output data type.
      * @return the selectable stream channel builder.
-     * @throws IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @see com.github.dm.jrt.ext.channel.Channels#merge(int, OutputChannel[])
      */
     @NotNull
@@ -448,7 +448,7 @@ public class Streams extends Functions {
      * @param channels the channels to merge.
      * @param <OUT>    the output data type.
      * @return the selectable stream channel builder.
-     * @throws IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
      * @see com.github.dm.jrt.ext.channel.Channels#merge(Collection)
      */
     @NotNull
@@ -466,7 +466,7 @@ public class Streams extends Functions {
      * @param channels the map of indexes and output channels.
      * @param <OUT>    the output data type.
      * @return the selectable stream channel builder.
-     * @throws IllegalArgumentException if the specified map is empty.
+     * @throws java.lang.IllegalArgumentException if the specified map is empty.
      * @see com.github.dm.jrt.ext.channel.Channels#merge(Map)
      */
     @NotNull
@@ -484,7 +484,7 @@ public class Streams extends Functions {
      * @param channels the channels to merge.
      * @param <OUT>    the output data type.
      * @return the selectable stream channel builder.
-     * @throws IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @see com.github.dm.jrt.ext.channel.Channels#merge(OutputChannel[])
      */
     @NotNull
@@ -597,7 +597,7 @@ public class Streams extends Functions {
      * @param channel    the selectable channel.
      * @param <OUT>      the output data type.
      * @return the map of indexes and output channels builder.
-     * @throws IllegalArgumentException if the specified range size is negative or 0.
+     * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
      * @see com.github.dm.jrt.ext.channel.Channels#select(int, int, OutputChannel)
      */
     @NotNull
@@ -663,7 +663,7 @@ public class Streams extends Functions {
      * @param count  the number of data to skip.
      * @param <DATA> the data type.
      * @return the invocation factory.
-     * @throws IllegalArgumentException if the count is negative.
+     * @throws java.lang.IllegalArgumentException if the count is negative.
      */
     @NotNull
     public static <DATA> InvocationFactory<DATA, DATA> skip(final int count) {

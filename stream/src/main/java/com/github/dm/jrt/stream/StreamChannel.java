@@ -437,7 +437,7 @@ public interface StreamChannel<OUT>
      * @param consumer the consumer instance.
      * @param <AFTER>  the concatenation output type.
      * @return the concatenated stream.
-     * @throws IllegalArgumentException if the specified count number is 0 or negative.
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
     <AFTER> StreamChannel<AFTER> then(long count,
@@ -469,7 +469,7 @@ public interface StreamChannel<OUT>
      * @param supplier the supplier instance.
      * @param <AFTER>  the concatenation output type.
      * @return the concatenated stream.
-     * @throws IllegalArgumentException if the specified count number is 0 or negative..
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
     <AFTER> StreamChannel<AFTER> then(long count, @NotNull Supplier<? extends AFTER> supplier);

@@ -38,7 +38,7 @@ class SkipInvocationFactory<DATA> extends ComparableInvocationFactory<DATA, DATA
      * Constructor.
      *
      * @param count the number of data to skip.
-     * @throws IllegalArgumentException if the count is negative.
+     * @throws java.lang.IllegalArgumentException if the count is negative.
      */
     SkipInvocationFactory(final int count) {
 

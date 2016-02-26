@@ -38,7 +38,7 @@ class LimitInvocationFactory<DATA> extends ComparableInvocationFactory<DATA, DAT
      * Constructor.
      *
      * @param count the number of data to pass.
-     * @throws IllegalArgumentException if the count is negative.
+     * @throws java.lang.IllegalArgumentException if the count is negative.
      */
     LimitInvocationFactory(final int count) {
 

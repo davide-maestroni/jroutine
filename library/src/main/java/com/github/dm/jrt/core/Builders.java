@@ -496,7 +496,7 @@ public class Builders {
     /**
      * Returns the cached mutex associated with the specified target and shared fields.<br/>
      * If the cache was empty, it is filled with a new object automatically created.<br/>
-     * If the target is null {@link Mutex#NO_MUTEX} will be returned.
+     * If the target is null {@link com.github.dm.jrt.common.Mutex#NO_MUTEX} will be returned.
      *
      * @param target       the target object instance.
      * @param sharedFields the shared field names.

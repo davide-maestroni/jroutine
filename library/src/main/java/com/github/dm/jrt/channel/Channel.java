@@ -521,7 +521,7 @@ public interface Channel {
         /**
          * Binds this channel to the specified one. After the call, all the output will be passed
          * only to the specified input channel. Attempting to read through the dedicated methods
-         * will cause an {@link IllegalStateException} to be thrown.
+         * will cause an {@link java.lang.IllegalStateException} to be thrown.
          *
          * @param channel   the input channel
          * @param <CHANNEL> the input channel type.
@@ -534,7 +534,7 @@ public interface Channel {
         /**
          * Binds this channel to the specified consumer. After the call, all the output will be
          * passed only to the consumer. Attempting to read through the dedicated methods will cause
-         * an {@link IllegalStateException} to be thrown.<br/>
+         * an {@link java.lang.IllegalStateException} to be thrown.<br/>
          * Note that the consumer methods may be called on the runner thread.
          *
          * @param consumer the consumer instance.

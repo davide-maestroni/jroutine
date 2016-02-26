@@ -1712,8 +1712,6 @@ public class FunctionsTest {
             mIsCalled = true;
             return in2;
         }
-
-
     }
 
     private static class TestConsumer implements Consumer<Object> {

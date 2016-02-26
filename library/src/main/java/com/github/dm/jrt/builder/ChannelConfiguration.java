@@ -623,7 +623,7 @@ public final class ChannelConfiguration {
 
         /**
          * Sets the limit of data that the channel can retain before starting to slow down the
-         * feeding thread. A {@link InvocationConfiguration#DEFAULT DEFAULT} value means that it is
+         * feeding thread. A {@link ChannelConfiguration#DEFAULT DEFAULT} value means that it is
          * up to the specific implementation to choose a default one.
          * <p/>
          * This configuration option is useful when the data coming from the invocation execution

@@ -90,7 +90,7 @@ import org.jetbrains.annotations.NotNull;
  * might return one or more output for each input, or no output at all.
  * <p/>
  * Any exception escaping the invocation methods, unless it extends the base
- * {@link RoutineException RoutineException}, will be wrapped as the cause
+ * {@link com.github.dm.jrt.common.RoutineException RoutineException}, will be wrapped as the cause
  * of an {@link com.github.dm.jrt.invocation.InvocationException InvocationException} instance.
  * <p/>
  * The class {@link com.github.dm.jrt.invocation.TemplateInvocation TemplateInvocation} provides

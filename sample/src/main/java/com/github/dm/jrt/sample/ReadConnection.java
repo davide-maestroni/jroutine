@@ -17,9 +17,9 @@
 package com.github.dm.jrt.sample;
 
 import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.core.ByteChannel;
-import com.github.dm.jrt.core.ByteChannel.BufferOutputStream;
-import com.github.dm.jrt.core.ByteChannel.ByteBuffer;
+import com.github.dm.jrt.ext.channel.ByteChannel;
+import com.github.dm.jrt.ext.channel.ByteChannel.BufferOutputStream;
+import com.github.dm.jrt.ext.channel.ByteChannel.ByteBuffer;
 import com.github.dm.jrt.invocation.FilterInvocation;
 
 import org.jetbrains.annotations.NotNull;

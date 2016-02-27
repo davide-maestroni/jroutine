@@ -56,6 +56,10 @@ android {
     dexOptions {
         preDexLibraries false
     }
+
+    packagingOptions {
+        exclude 'META-INF/services/javax.annotation.processing.Processor'
+    }
 }
 
 dependencies {
@@ -64,14 +68,15 @@ dependencies {
 }
 conditionalDependencies {
     compile name: 'library', artifact: { it.parent.name }
+    compile name: 'androidcore', artifact: { "${it.parent.name}-${it.name}" }
+    compile name: 'androidobject', artifact: { "${it.parent.name}-${it.name}" }
+    compile name: 'androidproxy', artifact: { "${it.parent.name}-${it.name}" }
+    compile name: 'androidchannelext', artifact: { "${it.parent.name}-${it.name}" }
+    compile name: 'androidstream', artifact: { "${it.parent.name}-${it.name}" }
 }
 
 findbugs {
     toolVersion '3.0.1'
-}
-
-tasks.withType(FindBugs) {
-    excludeFilter = file('findbugs.xml')
 }
 
 tasks.withType(Javadoc) {

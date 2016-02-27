@@ -21,8 +21,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.WindowManager.LayoutParams;
 
-import com.github.dm.jrt.android.R;
-
 /**
  * Test activity.
  * <p/>

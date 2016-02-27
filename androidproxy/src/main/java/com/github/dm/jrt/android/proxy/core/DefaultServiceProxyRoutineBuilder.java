@@ -19,13 +19,13 @@ package com.github.dm.jrt.android.proxy.core;
 import android.content.Context;
 
 import com.github.dm.jrt.android.builder.ServiceConfiguration;
-import com.github.dm.jrt.android.core.ContextInvocationTarget;
 import com.github.dm.jrt.android.core.ServiceContext;
+import com.github.dm.jrt.android.object.core.ContextInvocationTarget;
 import com.github.dm.jrt.android.proxy.annotation.ServiceProxy;
 import com.github.dm.jrt.android.proxy.builder.AbstractServiceProxyObjectBuilder;
 import com.github.dm.jrt.android.proxy.builder.ServiceProxyRoutineBuilder;
 import com.github.dm.jrt.builder.InvocationConfiguration;
-import com.github.dm.jrt.builder.ProxyConfiguration;
+import com.github.dm.jrt.object.builder.ProxyConfiguration;
 import com.github.dm.jrt.proxy.annotation.Proxy;
 import com.github.dm.jrt.util.ClassToken;
 

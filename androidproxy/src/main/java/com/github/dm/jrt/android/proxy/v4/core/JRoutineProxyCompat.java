@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.android.proxy.v4.core;
 
-import com.github.dm.jrt.android.core.ContextInvocationTarget;
+import com.github.dm.jrt.android.object.core.ContextInvocationTarget;
 import com.github.dm.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
 import com.github.dm.jrt.android.proxy.core.JRoutineProxy;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
@@ -36,9 +36,9 @@ import java.util.WeakHashMap;
  * <p/>
  * Created by davide-maestroni on 05/06/2015.
  *
- * @see com.github.dm.jrt.android.annotation Android Annotations
+ * @see com.github.dm.jrt.android.object.annotation Android Annotations
  * @see com.github.dm.jrt.android.proxy.annotation.LoaderProxyCompat LoaderProxyCompat
- * @see com.github.dm.jrt.annotation Annotations
+ * @see com.github.dm.jrt.object.annotation Annotations
  */
 public class JRoutineProxyCompat extends JRoutineProxy {
 
@@ -99,7 +99,7 @@ public class JRoutineProxyCompat extends JRoutineProxy {
          * Returns a builder of routines bound to the builder context, wrapping the specified target
          * object.<br/>
          * In order to customize the object creation, the caller must employ an implementation of a
-         * {@link com.github.dm.jrt.android.builder.FactoryContext FactoryContext} as the
+         * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
          * application context.
          * <p/>
          * Note that it is responsibility of the caller to retain a strong reference to the target

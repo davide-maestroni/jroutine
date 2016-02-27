@@ -16,8 +16,8 @@
 
 package com.github.dm.jrt.android.proxy.core;
 
-import com.github.dm.jrt.android.core.ContextInvocationTarget;
 import com.github.dm.jrt.android.core.ServiceContext;
+import com.github.dm.jrt.android.object.core.ContextInvocationTarget;
 import com.github.dm.jrt.android.proxy.builder.ServiceProxyRoutineBuilder;
 
 import org.jetbrains.annotations.NotNull;
@@ -34,7 +34,7 @@ import org.jetbrains.annotations.NotNull;
  * Created by davide-maestroni on 05/13/2015.
  *
  * @see com.github.dm.jrt.android.proxy.annotation.ServiceProxy ServiceProxy
- * @see com.github.dm.jrt.annotation Annotations
+ * @see com.github.dm.jrt.object.annotation Annotations
  */
 public class JRoutineProxy extends com.github.dm.jrt.proxy.core.JRoutineProxy {
 
@@ -83,8 +83,8 @@ public class JRoutineProxy extends com.github.dm.jrt.proxy.core.JRoutineProxy {
          * Returns a builder of routines, wrapping the specified object instance, running in a
          * service based on the builder context.<br/>
          * In order to customize the object creation, the caller must employ an implementation of a
-         * {@link com.github.dm.jrt.android.builder.FactoryContext FactoryContext} as the invocation
-         * service.
+         * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
+         * invocation service.
          * <p/>
          * Note that the built routine results will be dispatched into the configured looper, thus,
          * waiting for the outputs on the very same looper thread, immediately after its invocation,

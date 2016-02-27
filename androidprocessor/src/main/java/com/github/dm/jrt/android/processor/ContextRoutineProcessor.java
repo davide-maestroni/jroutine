@@ -86,17 +86,18 @@ public class ContextRoutineProcessor extends RoutineProcessor {
     public synchronized void init(final ProcessingEnvironment processingEnv) {
 
         super.init(processingEnv);
-        mIdAnnotationType = getMirrorFromName("com.github.dm.jrt.android.annotation.LoaderId");
+        mIdAnnotationType =
+                getMirrorFromName("com.github.dm.jrt.android.object.annotation.LoaderId");
         mRoutineIdAnnotationType =
-                getMirrorFromName("com.github.dm.jrt.android.annotation.RoutineId");
+                getMirrorFromName("com.github.dm.jrt.android.object.annotation.RoutineId");
         mClashAnnotationType =
-                getMirrorFromName("com.github.dm.jrt.android.annotation.ClashResolution");
-        mInputClashAnnotationType =
-                getMirrorFromName("com.github.dm.jrt.android.annotation.InputClashResolution");
+                getMirrorFromName("com.github.dm.jrt.android.object.annotation.ClashResolution");
+        mInputClashAnnotationType = getMirrorFromName(
+                "com.github.dm.jrt.android.object.annotation.InputClashResolution");
         mCacheAnnotationType =
-                getMirrorFromName("com.github.dm.jrt.android.annotation.CacheStrategy");
+                getMirrorFromName("com.github.dm.jrt.android.object.annotation.CacheStrategy");
         mStaleTimeAnnotationType =
-                getMirrorFromName("com.github.dm.jrt.android.annotation.ResultStaleTime");
+                getMirrorFromName("com.github.dm.jrt.android.object.annotation.ResultStaleTime");
         final Types typeUtils = processingEnv.getTypeUtils();
         mServiceProxyElement = (TypeElement) typeUtils.asElement(
                 getMirrorFromName("com.github.dm.jrt.android.proxy.annotation.ServiceProxy"));

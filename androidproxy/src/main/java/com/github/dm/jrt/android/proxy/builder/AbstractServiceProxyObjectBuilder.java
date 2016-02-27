@@ -20,7 +20,7 @@ import android.content.Context;
 
 import com.github.dm.jrt.android.builder.ServiceConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration;
-import com.github.dm.jrt.builder.ProxyConfiguration;
+import com.github.dm.jrt.object.builder.ProxyConfiguration;
 import com.github.dm.jrt.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;

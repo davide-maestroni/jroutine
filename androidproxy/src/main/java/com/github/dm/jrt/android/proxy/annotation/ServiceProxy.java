@@ -30,7 +30,8 @@ import java.lang.annotation.Target;
  * interface will be generated according to the specific annotation attributes.
  * <p/>
  * The routines used for calling the methods will honor the attributes specified in any optional
- * <i>{@code com.github.dm.jrt.annotation.*}</i> annotations defined for each interface method.
+ * <i>{@code com.github.dm.jrt.object.annotation.*}</i> annotations defined for each interface
+ * method.
  * <p/>
  * Remember also that, in order for the annotation to properly work at run time, you will need to
  * add the following rules to your Proguard file (if employing it for shrinking or obfuscation):
@@ -56,7 +57,7 @@ import java.lang.annotation.Target;
  * <p/>
  * Created by davide-maestroni on 05/13/2015.
  *
- * @see com.github.dm.jrt.annotation Annotations
+ * @see com.github.dm.jrt.object.annotation Annotations
  * @see com.github.dm.jrt.proxy.annotation.Proxy Proxy
  */
 @Target(ElementType.TYPE)

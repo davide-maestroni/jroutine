@@ -18,7 +18,7 @@ package com.github.dm.jrt.android.proxy.builder;
 
 import com.github.dm.jrt.android.builder.LoaderConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration;
-import com.github.dm.jrt.builder.ProxyConfiguration;
+import com.github.dm.jrt.object.builder.ProxyConfiguration;
 import com.github.dm.jrt.runner.Runner;
 import com.github.dm.jrt.util.WeakIdentityHashMap;
 

@@ -24,8 +24,4 @@
         <Class name="com.github.dm.jrt.android.v11.ext.channel.Channels"/>
         <Bug pattern="NM_SAME_SIMPLE_NAME_AS_SUPERCLASS"/>
     </Match>
-    <Match>
-        <Class name="com.github.dm.jrt.android.v4.ext.channel.Channels"/>
-        <Bug pattern="NM_SAME_SIMPLE_NAME_AS_SUPERCLASS"/>
-    </Match>
 </FindBugsFilter>

@@ -22,10 +22,10 @@ import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
-import com.github.dm.jrt.android.R;
 import com.github.dm.jrt.android.builder.LoaderConfiguration;
 import com.github.dm.jrt.android.builder.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.builder.LoaderConfiguration.ClashResolutionType;
+import com.github.dm.jrt.android.core.R;
 import com.github.dm.jrt.android.invocation.FunctionContextInvocation;
 import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
 import com.github.dm.jrt.android.invocation.InvocationClashException;

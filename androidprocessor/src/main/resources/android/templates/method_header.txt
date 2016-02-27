@@ -21,9 +21,9 @@
     @org.jetbrains.annotations.NotNull
     @SuppressWarnings("unchecked")
     private com.github.dm.jrt.routine.Routine<?, ${resultClassName}> initRoutine${methodCount}(
-            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.ContextInvocationTarget<?> target,
+            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.object.core.ContextInvocationTarget<?> target,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.builder.InvocationConfiguration invocationConfiguration,
-            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.builder.ProxyConfiguration proxyConfiguration,
+            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.builder.ProxyConfiguration proxyConfiguration,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.builder.ServiceConfiguration serviceConfiguration) {
 
         final java.util.List<String> sharedFields = ${sharedFields};

@@ -22,10 +22,10 @@
 
         private final java.util.List<String> mSharedFields;
 
-        private final com.github.dm.jrt.android.core.ContextInvocationTarget<?> mTarget;
+        private final com.github.dm.jrt.android.object.core.ContextInvocationTarget<?> mTarget;
 
         private ContextInvocationFactory${methodCount}(@org.jetbrains.annotations.Nullable final java.util.List<String> sharedFields,
-                @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.ContextInvocationTarget<?> target) {
+                @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.object.core.ContextInvocationTarget<?> target) {
 
             super(new Object[]{sharedFields, target});
             mSharedFields = sharedFields;
@@ -42,9 +42,9 @@
 
     @org.jetbrains.annotations.NotNull
     private com.github.dm.jrt.routine.Routine<?, ${resultClassName}> initRoutine${methodCount}(
-            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.ContextInvocationTarget<?> target,
+            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.object.core.ContextInvocationTarget<?> target,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.builder.InvocationConfiguration invocationConfiguration,
-            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.builder.ProxyConfiguration proxyConfiguration,
+            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.builder.ProxyConfiguration proxyConfiguration,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.builder.LoaderConfiguration loaderConfiguration) {
 
         return getBuilder(mContext, new ContextInvocationFactory${methodCount}${genericTypes}(${sharedFields}, target))

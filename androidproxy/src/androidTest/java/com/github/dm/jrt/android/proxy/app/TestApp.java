@@ -18,7 +18,7 @@ package com.github.dm.jrt.android.proxy.app;
 
 import android.app.Application;
 
-import com.github.dm.jrt.android.builder.FactoryContext;
+import com.github.dm.jrt.android.object.builder.FactoryContext;
 import com.github.dm.jrt.invocation.InvocationException;
 
 import org.jetbrains.annotations.NotNull;

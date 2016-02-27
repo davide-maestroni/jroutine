@@ -17,13 +17,13 @@
 package com.github.dm.jrt.android.proxy.v4.core;
 
 import com.github.dm.jrt.android.builder.LoaderConfiguration;
-import com.github.dm.jrt.android.core.ContextInvocationTarget;
+import com.github.dm.jrt.android.object.core.ContextInvocationTarget;
 import com.github.dm.jrt.android.proxy.annotation.LoaderProxyCompat;
 import com.github.dm.jrt.android.proxy.builder.AbstractLoaderProxyObjectBuilder;
 import com.github.dm.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.builder.InvocationConfiguration;
-import com.github.dm.jrt.builder.ProxyConfiguration;
+import com.github.dm.jrt.object.builder.ProxyConfiguration;
 import com.github.dm.jrt.proxy.annotation.Proxy;
 import com.github.dm.jrt.util.ClassToken;
 

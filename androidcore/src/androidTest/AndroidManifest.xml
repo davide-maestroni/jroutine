@@ -16,10 +16,10 @@
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.github.dm.jrt.android">
+    package="com.github.dm.jrt.android.core">
 
     <application
-        android:name=".app.TestApp"
+        android:name="com.github.dm.jrt.android.core.TestApp"
         android:label="jroutine-androidcore">
         <activity
             android:name="com.github.dm.jrt.android.core.TestActivity"

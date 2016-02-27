@@ -18,7 +18,7 @@ package com.github.dm.jrt.android.proxy.builder;
 
 import com.github.dm.jrt.android.builder.ServiceConfigurableBuilder;
 import com.github.dm.jrt.builder.InvocationConfiguration;
-import com.github.dm.jrt.builder.ProxyConfiguration;
+import com.github.dm.jrt.object.builder.ProxyConfiguration;
 import com.github.dm.jrt.proxy.builder.ProxyRoutineBuilder;
 import com.github.dm.jrt.util.ClassToken;
 
@@ -37,7 +37,7 @@ public interface ServiceProxyRoutineBuilder
      * Returns a proxy object enabling asynchronous call of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any optional
-     * <i>{@code com.github.dm.jrt.annotation.*}</i> annotations.<br/>
+     * <i>{@code com.github.dm.jrt.object.annotation.*}</i> annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * The proxy object is created through code generation based on the interfaces annotated with
@@ -53,7 +53,7 @@ public interface ServiceProxyRoutineBuilder
      * @return the proxy object.
      * @throws java.lang.IllegalArgumentException if the specified class does not represent an
      *                                            interface.
-     * @see com.github.dm.jrt.annotation Annotations
+     * @see com.github.dm.jrt.object.annotation Annotations
      */
     @NotNull
     <TYPE> TYPE buildProxy(@NotNull Class<TYPE> itf);
@@ -62,7 +62,7 @@ public interface ServiceProxyRoutineBuilder
      * Returns a proxy object enabling asynchronous call of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any optional
-     * <i>{@code com.github.dm.jrt.annotation.*}</i> annotations.<br/>
+     * <i>{@code com.github.dm.jrt.object.annotation.*}</i> annotations.<br/>
      * Note that such annotations will override any configuration set through the builder.
      * <p/>
      * The proxy object is created through code generation based on the interfaces annotated with
@@ -78,7 +78,7 @@ public interface ServiceProxyRoutineBuilder
      * @return the proxy object.
      * @throws java.lang.IllegalArgumentException if the specified class does not represent an
      *                                            interface.
-     * @see com.github.dm.jrt.annotation Annotations
+     * @see com.github.dm.jrt.object.annotation Annotations
      */
     @NotNull
     <TYPE> TYPE buildProxy(@NotNull ClassToken<TYPE> itf);

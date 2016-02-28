@@ -60,7 +60,7 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
      * Constructor.
      *
      * @param map the initial content.
-     * @see java.util.HashMap#HashMap(Map)
+     * @see HashMap#HashMap(Map)
      */
     public WeakIdentityHashMap(@NotNull final Map<? extends K, ? extends V> map) {
 
@@ -72,7 +72,7 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
      * Constructor.
      *
      * @param initialCapacity the initial capacity.
-     * @see java.util.HashMap#HashMap(int)
+     * @see HashMap#HashMap(int)
      */
     public WeakIdentityHashMap(final int initialCapacity) {
 
@@ -84,7 +84,7 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
      *
      * @param initialCapacity the initial capacity.
      * @param loadFactor      the load factor.
-     * @see java.util.HashMap#HashMap(int, float)
+     * @see HashMap#HashMap(int, float)
      */
     public WeakIdentityHashMap(final int initialCapacity, final float loadFactor) {
 

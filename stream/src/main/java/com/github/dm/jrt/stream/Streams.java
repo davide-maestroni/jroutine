@@ -71,7 +71,7 @@ public class Streams extends Functions {
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @see com.github.dm.jrt.ext.channel.Channels#blend(Collection)
+     * @see Channels#blend(Collection)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<OUT>> blend(
@@ -89,7 +89,7 @@ public class Streams extends Functions {
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
-     * @see com.github.dm.jrt.ext.channel.Channels#blend(OutputChannel[])
+     * @see Channels#blend(com.github.dm.jrt.channel.Channel.OutputChannel[])
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<OUT>> blend(
@@ -109,7 +109,7 @@ public class Streams extends Functions {
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @see com.github.dm.jrt.ext.channel.Channels#concat(Collection)
+     * @see Channels#concat(Collection)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<OUT>> concat(
@@ -129,7 +129,7 @@ public class Streams extends Functions {
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
-     * @see com.github.dm.jrt.ext.channel.Channels#concat(OutputChannel[])
+     * @see Channels#concat(com.github.dm.jrt.channel.Channel.OutputChannel[])
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<OUT>> concat(
@@ -220,7 +220,7 @@ public class Streams extends Functions {
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @see com.github.dm.jrt.ext.channel.Channels#join(Collection)
+     * @see Channels#join(Collection)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<List<? extends OUT>>> join(
@@ -239,7 +239,7 @@ public class Streams extends Functions {
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
-     * @see com.github.dm.jrt.ext.channel.Channels#join(OutputChannel[])
+     * @see Channels#join(com.github.dm.jrt.channel.Channel.OutputChannel[])
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<List<? extends OUT>>> join(
@@ -262,7 +262,7 @@ public class Streams extends Functions {
      * @param <OUT>       the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @see com.github.dm.jrt.ext.channel.Channels#join(Object, Collection)
+     * @see Channels#join(Object, Collection)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<List<? extends OUT>>> join(
@@ -286,7 +286,7 @@ public class Streams extends Functions {
      * @param <OUT>       the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
-     * @see com.github.dm.jrt.ext.channel.Channels#join(Object, OutputChannel[])
+     * @see Channels#join(Object, com.github.dm.jrt.channel.Channel.OutputChannel[])
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<List<? extends OUT>>> join(
@@ -411,7 +411,7 @@ public class Streams extends Functions {
      * @param <OUT>      the output data type.
      * @return the selectable stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @see com.github.dm.jrt.ext.channel.Channels#merge(int, Collection)
+     * @see Channels#merge(int, Collection)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<? extends Selectable<OUT>>> merge(
@@ -431,7 +431,7 @@ public class Streams extends Functions {
      * @param <OUT>      the output data type.
      * @return the selectable stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
-     * @see com.github.dm.jrt.ext.channel.Channels#merge(int, OutputChannel[])
+     * @see Channels#merge(int, com.github.dm.jrt.channel.Channel.OutputChannel[])
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<? extends Selectable<OUT>>> merge(
@@ -449,7 +449,7 @@ public class Streams extends Functions {
      * @param <OUT>    the output data type.
      * @return the selectable stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @see com.github.dm.jrt.ext.channel.Channels#merge(Collection)
+     * @see Channels#merge(Collection)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<? extends Selectable<OUT>>> merge(
@@ -467,7 +467,7 @@ public class Streams extends Functions {
      * @param <OUT>    the output data type.
      * @return the selectable stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
-     * @see com.github.dm.jrt.ext.channel.Channels#merge(Map)
+     * @see Channels#merge(Map)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<? extends Selectable<OUT>>> merge(
@@ -485,7 +485,7 @@ public class Streams extends Functions {
      * @param <OUT>    the output data type.
      * @return the selectable stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
-     * @see com.github.dm.jrt.ext.channel.Channels#merge(OutputChannel[])
+     * @see Channels#merge(com.github.dm.jrt.channel.Channel.OutputChannel[])
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<? extends Selectable<OUT>>> merge(
@@ -577,7 +577,7 @@ public class Streams extends Functions {
      * @param channel the output channel.
      * @param <OUT>   the output data type.
      * @return the repeating stream channel builder.
-     * @see com.github.dm.jrt.ext.channel.Channels#repeat(OutputChannel)
+     * @see Channels#repeat(com.github.dm.jrt.channel.Channel.OutputChannel)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<OUT>> repeat(
@@ -598,7 +598,7 @@ public class Streams extends Functions {
      * @param <OUT>      the output data type.
      * @return the map of indexes and output channels builder.
      * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
-     * @see com.github.dm.jrt.ext.channel.Channels#select(int, int, OutputChannel)
+     * @see Channels#select(int, int, com.github.dm.jrt.channel.Channel.OutputChannel)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends Map<Integer, StreamChannel<OUT>>> select(
@@ -618,7 +618,7 @@ public class Streams extends Functions {
      * @param indexes the list of indexes.
      * @param <OUT>   the output data type.
      * @return the map of indexes and output channels builder.
-     * @see com.github.dm.jrt.ext.channel.Channels#select(OutputChannel, int...)
+     * @see Channels#select(com.github.dm.jrt.channel.Channel.OutputChannel, int...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends Map<Integer, StreamChannel<OUT>>> select(
@@ -638,7 +638,7 @@ public class Streams extends Functions {
      * @param indexes the iterable returning the channel indexes.
      * @param <OUT>   the output data type.
      * @return the map of indexes and output channels builder.
-     * @see com.github.dm.jrt.ext.channel.Channels#select(OutputChannel, Iterable)
+     * @see Channels#select(com.github.dm.jrt.channel.Channel.OutputChannel, Iterable)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends Map<Integer, StreamChannel<OUT>>> select(
@@ -747,7 +747,7 @@ public class Streams extends Functions {
      * @param index   the channel index.
      * @param <OUT>   the output data type.
      * @return the selectable stream builder.
-     * @see com.github.dm.jrt.ext.channel.Channels#toSelectable(OutputChannel, int)
+     * @see Channels#toSelectable(com.github.dm.jrt.channel.Channel.OutputChannel, int)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<? extends Selectable<OUT>>>

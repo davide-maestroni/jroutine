@@ -82,10 +82,10 @@ tasks.withType(FindBugs) {
 tasks.withType(Javadoc) {
     options.overview("${project.projectDir}/docs/overview.html")
     options.links('http://docs.oracle.com/javase/7/docs/api/',
-            'http://davide-maestroni.github.io/jroutine/javadoc/core/',
-            'http://davide-maestroni.github.io/jroutine/javadoc/function/',
-            'http://davide-maestroni.github.io/jroutine/javadoc/channelext/',
-            'http://davide-maestroni.github.io/jroutine/javadoc/stream/',
-            'http://davide-maestroni.github.io/jroutine/javadoc/androidcore/',
-            'http://davide-maestroni.github.io/jroutine/javadoc/androidchannelext/')
+            'http://davide-maestroni.github.io/jroutine/javadoc/v6/core/',
+            'http://davide-maestroni.github.io/jroutine/javadoc/v6/function/',
+            'http://davide-maestroni.github.io/jroutine/javadoc/v6/channelext/',
+            'http://davide-maestroni.github.io/jroutine/javadoc/v6/stream/',
+            'http://davide-maestroni.github.io/jroutine/javadoc/v6/androidcore/',
+            'http://davide-maestroni.github.io/jroutine/javadoc/v6/androidchannelext/')
 }

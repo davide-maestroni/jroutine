@@ -339,7 +339,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
      * Aborts immediately the execution.
      *
      * @param reason the reason of the abortion.
-     * @see com.github.dm.jrt.channel.Channel#abort(Throwable) abort(Throwable)
+     * @see com.github.dm.jrt.channel.Channel#abort(Throwable) Channel.abort(Throwable)
      */
     void abortImmediately(@Nullable final Throwable reason) {
 

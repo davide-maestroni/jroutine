@@ -188,7 +188,7 @@ public class TimeDuration extends Time {
      *
      * @param milliTime the system time in milliseconds.
      * @return the time duration instance.
-     * @see java.lang.System#currentTimeMillis()
+     * @see System#currentTimeMillis()
      */
     @NotNull
     public static TimeDuration timeSinceMillis(final long milliTime) {
@@ -204,7 +204,7 @@ public class TimeDuration extends Time {
      *
      * @param nanoTime the high precision system time in nanoseconds.
      * @return the time duration instance.
-     * @see java.lang.System#nanoTime()
+     * @see System#nanoTime()
      */
     @NotNull
     public static TimeDuration timeSinceNanos(final long nanoTime) {
@@ -220,7 +220,7 @@ public class TimeDuration extends Time {
      *
      * @param milliTime the system time in milliseconds.
      * @return the time duration instance.
-     * @see java.lang.System#currentTimeMillis()
+     * @see System#currentTimeMillis()
      */
     @NotNull
     public static TimeDuration timeUntilMillis(final long milliTime) {
@@ -236,7 +236,7 @@ public class TimeDuration extends Time {
      *
      * @param nanoTime the high precision system time in nanoseconds.
      * @return the time duration instance.
-     * @see java.lang.System#nanoTime()
+     * @see System#nanoTime()
      */
     @NotNull
     public static TimeDuration timeUntilNanos(final long nanoTime) {
@@ -435,7 +435,7 @@ public class TimeDuration extends Time {
      * @return whether the sleep happened at all.
      * @throws java.lang.IllegalStateException if this duration overflows the maximum sleep time.
      * @throws java.lang.InterruptedException  if the current thread is interrupted.
-     * @see java.lang.System#currentTimeMillis()
+     * @see System#currentTimeMillis()
      */
     public boolean sleepSinceMillis(final long milliTime) throws InterruptedException {
 
@@ -465,7 +465,7 @@ public class TimeDuration extends Time {
      * @return whether the sleep happened at all.
      * @throws java.lang.IllegalStateException if this duration overflows the maximum sleep time.
      * @throws java.lang.InterruptedException  if the current thread is interrupted.
-     * @see java.lang.System#nanoTime()
+     * @see System#nanoTime()
      */
     public boolean sleepSinceNanos(final long nanoTime) throws InterruptedException {
 
@@ -515,7 +515,7 @@ public class TimeDuration extends Time {
      * @param milliTime the starting system time in milliseconds.
      * @return whether the wait happened at all.
      * @throws java.lang.InterruptedException if the current thread is interrupted.
-     * @see java.lang.System#currentTimeMillis()
+     * @see System#currentTimeMillis()
      */
     public boolean waitSinceMillis(@NotNull final Object target, final long milliTime) throws
             InterruptedException {
@@ -546,7 +546,7 @@ public class TimeDuration extends Time {
      * @param nanoTime the starting system time in nanoseconds.
      * @return whether the wait happened at all.
      * @throws java.lang.InterruptedException if the current thread is interrupted.
-     * @see java.lang.System#nanoTime()
+     * @see System#nanoTime()
      */
     public boolean waitSinceNanos(@NotNull final Object target, final long nanoTime) throws
             InterruptedException {

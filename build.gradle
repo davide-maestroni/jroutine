@@ -12,6 +12,9 @@ buildscript {
     }
 }
 
+apply plugin: 'com.github.kt3k.coveralls'
+apply plugin: 'jacoco'
+
 allprojects {
     repositories {
         jcenter()
@@ -21,4 +24,28 @@ allprojects {
 
 task wrapper(type: Wrapper) {
     gradleVersion = '2.10'
+}
+
+coveralls {
+    sourceDirs = files(subprojects.findAll({ it.plugins.hasPlugin('java') }).sourceSets.main.allSource.srcDirs).files.absolutePath
+}
+
+task jacocoRootReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
+    dependsOn = subprojects.findAll({ it.plugins.hasPlugin('java') }).test
+    sourceDirectories = files(subprojects.findAll({ it.plugins.hasPlugin('java') }).sourceSets.main.allSource.srcDirs)
+    classDirectories =  files(subprojects.findAll({ it.plugins.hasPlugin('java') }).sourceSets.main.output)
+    executionData = files(subprojects.findAll({ it.plugins.hasPlugin('java') }).jacocoTestReport.executionData)
+    reports {
+        html.enabled = true
+        xml.enabled = true
+        csv.enabled = false
+        xml.destination = "build/reports/jacoco/test/jacocoTestReport.xml"
+    }
+}
+
+task jacocoMerge(type: JacocoMerge) {
+    subprojects.each { subproject ->
+        if (subproject.plugins.hasPlugin('java'))
+        executionData subproject.tasks.withType(Test)
+    }
 }

@@ -51,7 +51,7 @@ public class Channels extends com.github.dm.jrt.ext.channel.Channels {
      * @param <OUT>      the output data type.
      * @return the selectable output channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @see com.github.dm.jrt.ext.channel.Channels#merge(int, Collection)
+     * @see Channels#merge(int, Collection)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends OutputChannel<? extends
@@ -72,7 +72,7 @@ public class Channels extends com.github.dm.jrt.ext.channel.Channels {
      * @param <OUT>      the output data type.
      * @return the selectable output channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
-     * @see com.github.dm.jrt.ext.channel.Channels#merge(int, OutputChannel[])
+     * @see Channels#merge(int, com.github.dm.jrt.channel.Channel.OutputChannel[])
      */
     @NotNull
     @SuppressWarnings("unchecked")
@@ -93,7 +93,7 @@ public class Channels extends com.github.dm.jrt.ext.channel.Channels {
      * @param <OUT>    the output data type.
      * @return the selectable output channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @see com.github.dm.jrt.ext.channel.Channels#merge(Collection)
+     * @see Channels#merge(Collection)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends OutputChannel<? extends
@@ -113,7 +113,7 @@ public class Channels extends com.github.dm.jrt.ext.channel.Channels {
      * @param <OUT>    the output data type.
      * @return the selectable output channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
-     * @see com.github.dm.jrt.ext.channel.Channels#merge(OutputChannel[])
+     * @see Channels#merge(com.github.dm.jrt.channel.Channel.OutputChannel[])
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends OutputChannel<? extends
@@ -133,7 +133,7 @@ public class Channels extends com.github.dm.jrt.ext.channel.Channels {
      * @param <DATA>  the channel data type.
      * @param <IN>    the input data type.
      * @return the I/O channel builder.
-     * @see com.github.dm.jrt.ext.channel.Channels#select(InputChannel, int)
+     * @see Channels#select(com.github.dm.jrt.channel.Channel.InputChannel, int)
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends IOChannel<IN>> selectParcelable(
@@ -153,7 +153,7 @@ public class Channels extends com.github.dm.jrt.ext.channel.Channels {
      * @param index   the channel index.
      * @param <OUT>   the output data type.
      * @return the selectable output channel builder.
-     * @see com.github.dm.jrt.ext.channel.Channels#toSelectable(OutputChannel, int)
+     * @see Channels#toSelectable(com.github.dm.jrt.channel.Channel.OutputChannel, int)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends OutputChannel<? extends

@@ -55,7 +55,7 @@ public class Channels extends com.github.dm.jrt.android.ext.channel.Channels {
      * @param <IN>     the input data type.
      * @return the selectable I/O channel builder.
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
-     * @see com.github.dm.jrt.ext.channel.Channels#combine(Map)
+     * @see Channels#combine(Map)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
@@ -74,7 +74,7 @@ public class Channels extends com.github.dm.jrt.android.ext.channel.Channels {
      * @param <OUT>    the output data type.
      * @return the selectable output channel builder.
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
-     * @see com.github.dm.jrt.ext.channel.Channels#merge(Map)
+     * @see Channels#merge(Map)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends OutputChannel<? extends
@@ -96,7 +96,7 @@ public class Channels extends com.github.dm.jrt.android.ext.channel.Channels {
      * @param <DATA>  the channel data type.
      * @param <IN>    the input data type.
      * @return the map of indexes and I/O channels builder.
-     * @see com.github.dm.jrt.ext.channel.Channels#select(InputChannel, int...)
+     * @see Channels#select(com.github.dm.jrt.channel.Channel.InputChannel, int...)
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends SparseArray<IOChannel<IN>>>
@@ -124,7 +124,7 @@ public class Channels extends com.github.dm.jrt.android.ext.channel.Channels {
      * @param <DATA>  the channel data type.
      * @param <IN>    the input data type.
      * @return the map of indexes and I/O channels builder.
-     * @see com.github.dm.jrt.ext.channel.Channels#select(InputChannel, Iterable)
+     * @see Channels#select(com.github.dm.jrt.channel.Channel.InputChannel, Iterable)
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends SparseArray<IOChannel<IN>>>
@@ -154,7 +154,7 @@ public class Channels extends com.github.dm.jrt.android.ext.channel.Channels {
      * @param <IN>       the input data type.
      * @return the map of indexes and I/O channels builder.
      * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
-     * @see com.github.dm.jrt.ext.channel.Channels#select(int, int, InputChannel)
+     * @see Channels#select(int, int, com.github.dm.jrt.channel.Channel.InputChannel)
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends SparseArray<IOChannel<IN>>>
@@ -187,7 +187,7 @@ public class Channels extends com.github.dm.jrt.android.ext.channel.Channels {
      * @param <OUT>      the output data type.
      * @return the map of indexes and output channels builder.
      * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
-     * @see com.github.dm.jrt.ext.channel.Channels#select(int, int, OutputChannel)
+     * @see Channels#select(int, int, com.github.dm.jrt.channel.Channel.OutputChannel)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends SparseArray<OutputChannel<OUT>>> selectParcelable(
@@ -217,7 +217,7 @@ public class Channels extends com.github.dm.jrt.android.ext.channel.Channels {
      * @param indexes the list of indexes.
      * @param <OUT>   the output data type.
      * @return the map of indexes and output channels builder.
-     * @see com.github.dm.jrt.ext.channel.Channels#select(OutputChannel, int...)
+     * @see Channels#select(com.github.dm.jrt.channel.Channel.OutputChannel, int...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends SparseArray<OutputChannel<OUT>>> selectParcelable(
@@ -242,7 +242,7 @@ public class Channels extends com.github.dm.jrt.android.ext.channel.Channels {
      * @param indexes the iterable returning the channel indexes.
      * @param <OUT>   the output data type.
      * @return the map of indexes and output channels builder.
-     * @see com.github.dm.jrt.ext.channel.Channels#select(OutputChannel, Iterable)
+     * @see Channels#select(com.github.dm.jrt.channel.Channel.OutputChannel, Iterable)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends SparseArray<OutputChannel<OUT>>> selectParcelable(

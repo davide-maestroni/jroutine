@@ -35,7 +35,7 @@ import java.lang.annotation.Target;
  * interface method.
  * <p/>
  * See {@link com.github.dm.jrt.android.proxy.annotation.LoaderProxyCompat LoaderProxyCompat} for
- * support of API levels less than {@link android.os.Build.VERSION_CODES#HONEYCOMB 11}.
+ * support of API levels lower than {@link android.os.Build.VERSION_CODES#HONEYCOMB 11}.
  * <p/>
  * Remember also that, in order for the annotation to properly work at run time, you will need to
  * add the following rules to your Proguard file (if employing it for shrinking or obfuscation):

@@ -75,12 +75,12 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         final TimeDuration timeout = seconds(10);
         final Data data = new Data();
-        final OutputChannel<Data> channel = JRoutine.with(serviceFrom(getActivity()))
-                                                    .on(factoryOf(Delay.class))
-                                                    .withService()
-                                                    .withRunnerClass(MainRunner.class)
-                                                    .getConfigured()
-                                                    .asyncCall(data);
+        final OutputChannel<Data> channel = JRoutineService.with(serviceFrom(getActivity()))
+                                                           .on(factoryOf(Delay.class))
+                                                           .withService()
+                                                           .withRunnerClass(MainRunner.class)
+                                                           .getConfigured()
+                                                           .asyncCall(data);
         assertThat(channel.abort(new IllegalArgumentException("test"))).isTrue();
 
         try {
@@ -96,11 +96,11 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         try {
 
-            JRoutine.with(serviceFrom(getActivity()))
-                    .on(factoryOf(Abort.class))
-                    .asyncCall()
-                    .afterMax(timeout)
-                    .next();
+            JRoutineService.with(serviceFrom(getActivity()))
+                           .on(factoryOf(Abort.class))
+                           .asyncCall()
+                           .afterMax(timeout)
+                           .next();
 
             fail();
 
@@ -119,7 +119,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         try {
 
-            JRoutine.with(context).on(factoryOf(classToken));
+            JRoutineService.with(context).on(factoryOf(classToken));
 
             fail();
 
@@ -129,7 +129,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         try {
 
-            JRoutine.with(serviceFrom(getActivity())).on(null);
+            JRoutineService.with(serviceFrom(getActivity())).on(null);
 
             fail();
 
@@ -139,8 +139,8 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         try {
 
-            JRoutine.with(serviceFrom(getActivity()))
-                    .on(factoryOf((ClassToken<PassingContextInvocation<String>>) null));
+            JRoutineService.with(serviceFrom(getActivity()))
+                           .on(factoryOf((ClassToken<PassingContextInvocation<String>>) null));
 
             fail();
 
@@ -183,43 +183,44 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         final TimeDuration timeout = seconds(10);
         final TargetInvocationFactory<String, String> targetFactory =
                 factoryOf(new PassingWrapper<String>());
-        final Routine<String, String> routine = JRoutine.with(serviceFrom(getActivity()))
-                                                        .on(targetFactory)
-                                                        .withInvocations()
-                                                        .withInputOrder(OrderType.BY_DELAY)
-                                                        .withLogLevel(Level.DEBUG)
-                                                        .getConfigured()
-                                                        .withService()
-                                                        .withLogClass(AndroidLog.class)
-                                                        .getConfigured()
-                                                        .buildRoutine();
+        final Routine<String, String> routine = JRoutineService.with(serviceFrom(getActivity()))
+                                                               .on(targetFactory)
+                                                               .withInvocations()
+                                                               .withInputOrder(OrderType.BY_DELAY)
+                                                               .withLogLevel(Level.DEBUG)
+                                                               .getConfigured()
+                                                               .withService()
+                                                               .withLogClass(AndroidLog.class)
+                                                               .getConfigured()
+                                                               .buildRoutine();
         assertThat(routine.syncCall("1", "2", "3", "4", "5").afterMax(timeout).all()).containsOnly(
                 "1", "2", "3", "4", "5");
     }
 
     public void testExecutionTimeout() {
 
-        final OutputChannel<String> channel = JRoutine.with(serviceFrom(getActivity()))
-                                                      .on(factoryOf(StringDelay.class))
-                                                      .withInvocations()
-                                                      .withReadTimeout(millis(10))
-                                                      .withReadTimeoutAction(TimeoutActionType.EXIT)
-                                                      .getConfigured()
-                                                      .asyncCall("test1");
+        final OutputChannel<String> channel = JRoutineService.with(serviceFrom(getActivity()))
+                                                             .on(factoryOf(StringDelay.class))
+                                                             .withInvocations()
+                                                             .withReadTimeout(millis(10))
+                                                             .withReadTimeoutAction(
+                                                                     TimeoutActionType.EXIT)
+                                                             .getConfigured()
+                                                             .asyncCall("test1");
         assertThat(channel.all()).isEmpty();
         assertThat(channel.afterMax(seconds(10)).hasCompleted()).isTrue();
     }
 
     public void testExecutionTimeout2() {
 
-        final OutputChannel<String> channel = JRoutine.with(serviceFrom(getActivity()))
-                                                      .on(factoryOf(StringDelay.class))
-                                                      .withInvocations()
-                                                      .withReadTimeout(millis(10))
-                                                      .withReadTimeoutAction(
-                                                              TimeoutActionType.ABORT)
-                                                      .getConfigured()
-                                                      .asyncCall("test2");
+        final OutputChannel<String> channel = JRoutineService.with(serviceFrom(getActivity()))
+                                                             .on(factoryOf(StringDelay.class))
+                                                             .withInvocations()
+                                                             .withReadTimeout(millis(10))
+                                                             .withReadTimeoutAction(
+                                                                     TimeoutActionType.ABORT)
+                                                             .getConfigured()
+                                                             .asyncCall("test2");
 
         try {
 
@@ -236,14 +237,14 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
     public void testExecutionTimeout3() {
 
-        final OutputChannel<String> channel = JRoutine.with(serviceFrom(getActivity()))
-                                                      .on(factoryOf(StringDelay.class))
-                                                      .withInvocations()
-                                                      .withReadTimeout(millis(10))
-                                                      .withReadTimeoutAction(
-                                                              TimeoutActionType.THROW)
-                                                      .getConfigured()
-                                                      .asyncCall("test3");
+        final OutputChannel<String> channel = JRoutineService.with(serviceFrom(getActivity()))
+                                                             .on(factoryOf(StringDelay.class))
+                                                             .withInvocations()
+                                                             .withReadTimeout(millis(10))
+                                                             .withReadTimeoutAction(
+                                                                     TimeoutActionType.THROW)
+                                                             .getConfigured()
+                                                             .asyncCall("test3");
 
         try {
 
@@ -263,16 +264,16 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         final TimeDuration timeout = seconds(10);
         final TargetInvocationFactory<String, String> targetFactory =
                 factoryOf(StringPassingInvocation.class);
-        final Routine<String, String> routine1 = JRoutine.with(serviceFrom(getActivity()))
-                                                         .on(targetFactory)
-                                                         .withInvocations()
-                                                         .withInputOrder(OrderType.BY_DELAY)
-                                                         .withLogLevel(Level.DEBUG)
-                                                         .getConfigured()
-                                                         .withService()
-                                                         .withLogClass(AndroidLog.class)
-                                                         .getConfigured()
-                                                         .buildRoutine();
+        final Routine<String, String> routine1 = JRoutineService.with(serviceFrom(getActivity()))
+                                                                .on(targetFactory)
+                                                                .withInvocations()
+                                                                .withInputOrder(OrderType.BY_DELAY)
+                                                                .withLogLevel(Level.DEBUG)
+                                                                .getConfigured()
+                                                                .withService()
+                                                                .withLogClass(AndroidLog.class)
+                                                                .getConfigured()
+                                                                .buildRoutine();
         assertThat(routine1.syncCall("1", "2", "3", "4", "5").afterMax(timeout).all()).containsOnly(
                 "1", "2", "3", "4", "5");
         assertThat(
@@ -287,16 +288,16 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         final TimeDuration timeout = seconds(10);
         final ClassToken<StringFunctionInvocation> token = tokenOf(StringFunctionInvocation.class);
-        final Routine<String, String> routine2 = JRoutine.with(serviceFrom(getActivity()))
-                                                         .on(factoryOf(token))
-                                                         .withInvocations()
-                                                         .withOutputOrder(OrderType.BY_DELAY)
-                                                         .withLogLevel(Level.DEBUG)
-                                                         .getConfigured()
-                                                         .withService()
-                                                         .withLogClass(AndroidLog.class)
-                                                         .getConfigured()
-                                                         .buildRoutine();
+        final Routine<String, String> routine2 = JRoutineService.with(serviceFrom(getActivity()))
+                                                                .on(factoryOf(token))
+                                                                .withInvocations()
+                                                                .withOutputOrder(OrderType.BY_DELAY)
+                                                                .withLogLevel(Level.DEBUG)
+                                                                .getConfigured()
+                                                                .withService()
+                                                                .withLogClass(AndroidLog.class)
+                                                                .getConfigured()
+                                                                .buildRoutine();
         assertThat(
                 routine2.syncCall("1", "2", "3", "4", "5").afterMax(timeout).all()).containsExactly(
                 "1", "2", "3", "4", "5");
@@ -313,13 +314,13 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         final TimeDuration timeout = seconds(10);
         final TargetInvocationFactory<String, String> targetFactory =
                 factoryOf(StringFunctionInvocation.class);
-        final Routine<String, String> routine3 = JRoutine.with(serviceFrom(getActivity()))
-                                                         .on(targetFactory)
-                                                         .withInvocations()
-                                                         .withInputOrder(OrderType.BY_CALL)
-                                                         .withOutputOrder(OrderType.BY_CALL)
-                                                         .getConfigured()
-                                                         .buildRoutine();
+        final Routine<String, String> routine3 = JRoutineService.with(serviceFrom(getActivity()))
+                                                                .on(targetFactory)
+                                                                .withInvocations()
+                                                                .withInputOrder(OrderType.BY_CALL)
+                                                                .withOutputOrder(OrderType.BY_CALL)
+                                                                .getConfigured()
+                                                                .buildRoutine();
         assertThat(
                 routine3.syncCall("1", "2", "3", "4", "5").afterMax(timeout).all()).containsExactly(
                 "1", "2", "3", "4", "5");
@@ -336,13 +337,13 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         final TimeDuration timeout = seconds(10);
         final TargetInvocationFactory<String, String> targetFactory =
                 factoryOf(StringFunctionInvocation.class);
-        final Routine<String, String> routine4 = JRoutine.with(serviceFrom(getActivity()))
-                                                         .on(targetFactory)
-                                                         .withInvocations()
-                                                         .withCoreInstances(0)
-                                                         .withMaxInstances(2)
-                                                         .getConfigured()
-                                                         .buildRoutine();
+        final Routine<String, String> routine4 = JRoutineService.with(serviceFrom(getActivity()))
+                                                                .on(targetFactory)
+                                                                .withInvocations()
+                                                                .withCoreInstances(0)
+                                                                .withMaxInstances(2)
+                                                                .getConfigured()
+                                                                .buildRoutine();
         assertThat(routine4.syncCall("1", "2", "3", "4", "5").afterMax(timeout).all()).containsOnly(
                 "1", "2", "3", "4", "5");
         assertThat(
@@ -358,13 +359,13 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         final TimeDuration timeout = seconds(10);
         final TargetInvocationFactory<Void, String> targetFactory =
                 factoryOf(TextCommandInvocation.class);
-        final Routine<Void, String> routine4 = JRoutine.with(serviceFrom(getActivity()))
-                                                       .on(targetFactory)
-                                                       .withInvocations()
-                                                       .withCoreInstances(0)
-                                                       .withMaxInstances(2)
-                                                       .getConfigured()
-                                                       .buildRoutine();
+        final Routine<Void, String> routine4 = JRoutineService.with(serviceFrom(getActivity()))
+                                                              .on(targetFactory)
+                                                              .withInvocations()
+                                                              .withCoreInstances(0)
+                                                              .withMaxInstances(2)
+                                                              .getConfigured()
+                                                              .buildRoutine();
         assertThat(routine4.syncCall().afterMax(timeout).all()).containsOnly("test1", "test2",
                                                                              "test3");
         assertThat(routine4.asyncCall().afterMax(timeout).all()).containsOnly("test1", "test2",
@@ -377,20 +378,20 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         final TimeDuration timeout = seconds(10);
         final MyParcelable p = new MyParcelable(33, -17);
-        assertThat(JRoutine.with(serviceFrom(getActivity()))
-                           .on(factoryOf(MyParcelableInvocation.class))
-                           .asyncCall(p)
-                           .afterMax(timeout)
-                           .next()).isEqualTo(p);
+        assertThat(JRoutineService.with(serviceFrom(getActivity()))
+                                  .on(factoryOf(MyParcelableInvocation.class))
+                                  .asyncCall(p)
+                                  .afterMax(timeout)
+                                  .next()).isEqualTo(p);
     }
 
     public void testService() {
 
         final TimeDuration timeout = seconds(10);
         final Routine<String, String> routine =
-                JRoutine.with(serviceFrom(getActivity(), TestService.class))
-                        .on(factoryOf(StringPassingInvocation.class))
-                        .buildRoutine();
+                JRoutineService.with(serviceFrom(getActivity(), TestService.class))
+                               .on(factoryOf(StringPassingInvocation.class))
+                               .buildRoutine();
         assertThat(routine.syncCall("1", "2", "3", "4", "5").afterMax(timeout).all()).containsOnly(
                 "1", "2", "3", "4", "5");
         assertThat(routine.asyncCall("1", "2", "3", "4", "5").afterMax(timeout).all()).containsOnly(

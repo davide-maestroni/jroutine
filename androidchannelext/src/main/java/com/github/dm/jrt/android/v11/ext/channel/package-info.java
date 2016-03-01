@@ -15,7 +15,7 @@
  */
 
 /**
- * Routine interfaces and implementations specific to the Android platform.
+ * Utility classes handling routine channels with support for Android sparse array collections.
  * <p/>
  * Created by davide-maestroni on 09/25/2014.
  */

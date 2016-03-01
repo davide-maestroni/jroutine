@@ -19,6 +19,7 @@ package com.github.dm.jrt.android.ext.channel;
 import com.github.dm.jrt.channel.Channel.InputChannel;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
+import com.github.dm.jrt.ext.channel.Channels;
 import com.github.dm.jrt.ext.channel.ChannelsBuilder;
 
 import org.jetbrains.annotations.NotNull;
@@ -31,12 +32,12 @@ import java.util.Collection;
  * <p/>
  * Created by davide-maestroni on 06/18/2015.
  */
-public class Channels extends com.github.dm.jrt.ext.channel.Channels {
+public class AndroidChannels extends Channels {
 
     /**
      * Avoid direct instantiation.
      */
-    protected Channels() {
+    protected AndroidChannels() {
 
     }
 

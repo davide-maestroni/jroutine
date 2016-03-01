@@ -21,13 +21,14 @@ import android.support.v4.util.SparseArrayCompat;
 import com.github.dm.jrt.android.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.ext.channel.ParcelableSelectable;
 import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
-import com.github.dm.jrt.android.v4.core.JRoutineCompat;
+import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
-import com.github.dm.jrt.android.v4.ext.channel.ChannelsCompat;
+import com.github.dm.jrt.android.v4.ext.channel.SparseChannelsCompat;
 import com.github.dm.jrt.builder.RoutineBuilder;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
+import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.ext.channel.ChannelsBuilder;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.stream.StreamChannel;
@@ -46,12 +47,12 @@ import static com.github.dm.jrt.android.core.DelegatingContextInvocation.factory
  * <p/>
  * Created by davide-maestroni on 01/04/2016.
  */
-public class StreamsCompat extends Streams {
+public class LoaderStreamsCompat extends Streams {
 
     /**
      * Avoid direct instantiation.
      */
-    protected StreamsCompat() {
+    protected LoaderStreamsCompat() {
 
     }
 
@@ -64,13 +65,13 @@ public class StreamsCompat extends Streams {
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @see ChannelsCompat#blend(Collection)
+     * @see SparseChannelsCompat#blend(Collection)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<OUT>> blend(
             @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
 
-        return new BuilderWrapper<OUT>(ChannelsCompat.blend(channels));
+        return new BuilderWrapper<OUT>(SparseChannelsCompat.blend(channels));
     }
 
     /**
@@ -82,13 +83,13 @@ public class StreamsCompat extends Streams {
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
-     * @see ChannelsCompat#blend(com.github.dm.jrt.channel.Channel.OutputChannel[])
+     * @see SparseChannelsCompat#blend(com.github.dm.jrt.channel.Channel.OutputChannel[])
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<OUT>> blend(
             @NotNull final OutputChannel<?>... channels) {
 
-        return new BuilderWrapper<OUT>(ChannelsCompat.<OUT>blend(channels));
+        return new BuilderWrapper<OUT>(SparseChannelsCompat.<OUT>blend(channels));
     }
 
     /**
@@ -102,13 +103,13 @@ public class StreamsCompat extends Streams {
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @see ChannelsCompat#concat(Collection)
+     * @see SparseChannelsCompat#concat(Collection)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<OUT>> concat(
             @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
 
-        return new BuilderWrapper<OUT>(ChannelsCompat.concat(channels));
+        return new BuilderWrapper<OUT>(SparseChannelsCompat.concat(channels));
     }
 
     /**
@@ -122,13 +123,13 @@ public class StreamsCompat extends Streams {
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
-     * @see ChannelsCompat#concat(com.github.dm.jrt.channel.Channel.OutputChannel[])
+     * @see SparseChannelsCompat#concat(com.github.dm.jrt.channel.Channel.OutputChannel[])
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<OUT>> concat(
             @NotNull final OutputChannel<?>... channels) {
 
-        return new BuilderWrapper<OUT>(ChannelsCompat.<OUT>concat(channels));
+        return new BuilderWrapper<OUT>(SparseChannelsCompat.<OUT>concat(channels));
     }
 
     /**
@@ -164,14 +165,14 @@ public class StreamsCompat extends Streams {
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @see ChannelsCompat#join(Collection)
+     * @see SparseChannelsCompat#join(Collection)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<List<? extends OUT>>>
     join(
             @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
 
-        return new BuilderWrapper<List<? extends OUT>>(ChannelsCompat.join(channels));
+        return new BuilderWrapper<List<? extends OUT>>(SparseChannelsCompat.join(channels));
     }
 
     /**
@@ -184,14 +185,14 @@ public class StreamsCompat extends Streams {
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
-     * @see ChannelsCompat#join(com.github.dm.jrt.channel.Channel.OutputChannel[])
+     * @see SparseChannelsCompat#join(com.github.dm.jrt.channel.Channel.OutputChannel[])
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<List<? extends OUT>>>
     join(
             @NotNull final OutputChannel<?>... channels) {
 
-        return new BuilderWrapper<List<? extends OUT>>(ChannelsCompat.<OUT>join(channels));
+        return new BuilderWrapper<List<? extends OUT>>(SparseChannelsCompat.<OUT>join(channels));
     }
 
     /**
@@ -208,7 +209,7 @@ public class StreamsCompat extends Streams {
      * @param <OUT>       the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @see ChannelsCompat#join(Object, Collection)
+     * @see SparseChannelsCompat#join(Object, Collection)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<List<? extends OUT>>>
@@ -216,7 +217,8 @@ public class StreamsCompat extends Streams {
             @Nullable final OUT placeholder,
             @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
 
-        return new BuilderWrapper<List<? extends OUT>>(ChannelsCompat.join(placeholder, channels));
+        return new BuilderWrapper<List<? extends OUT>>(
+                SparseChannelsCompat.join(placeholder, channels));
     }
 
     /**
@@ -233,14 +235,15 @@ public class StreamsCompat extends Streams {
      * @param <OUT>       the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
-     * @see ChannelsCompat#join(Object, com.github.dm.jrt.channel.Channel.OutputChannel[])
+     * @see SparseChannelsCompat#join(Object, com.github.dm.jrt.channel.Channel.OutputChannel[])
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<List<? extends OUT>>>
     join(
             @Nullable final OUT placeholder, @NotNull final OutputChannel<?>... channels) {
 
-        return new BuilderWrapper<List<? extends OUT>>(ChannelsCompat.join(placeholder, channels));
+        return new BuilderWrapper<List<? extends OUT>>(
+                SparseChannelsCompat.join(placeholder, channels));
     }
 
     /**
@@ -254,7 +257,7 @@ public class StreamsCompat extends Streams {
     @NotNull
     public static <OUT> LoaderStreamChannelCompat<OUT> lazyStreamOf() {
 
-        return lazyStreamOf(JRoutineCompat.io().<OUT>buildChannel().close());
+        return lazyStreamOf(JRoutineCore.io().<OUT>buildChannel().close());
     }
 
     /**
@@ -270,7 +273,7 @@ public class StreamsCompat extends Streams {
     public static <OUT> LoaderStreamChannelCompat<OUT> lazyStreamOf(
             @Nullable final Iterable<OUT> outputs) {
 
-        return lazyStreamOf(JRoutineCompat.io().of(outputs));
+        return lazyStreamOf(JRoutineCore.io().of(outputs));
     }
 
     /**
@@ -285,7 +288,7 @@ public class StreamsCompat extends Streams {
     @NotNull
     public static <OUT> LoaderStreamChannelCompat<OUT> lazyStreamOf(@Nullable final OUT output) {
 
-        return lazyStreamOf(JRoutineCompat.io().of(output));
+        return lazyStreamOf(JRoutineCore.io().of(output));
     }
 
     /**
@@ -301,7 +304,7 @@ public class StreamsCompat extends Streams {
     public static <OUT> LoaderStreamChannelCompat<OUT> lazyStreamOf(
             @Nullable final OUT... outputs) {
 
-        return lazyStreamOf(JRoutineCompat.io().of(outputs));
+        return lazyStreamOf(JRoutineCore.io().of(outputs));
     }
 
     /**
@@ -324,7 +327,7 @@ public class StreamsCompat extends Streams {
             throw new NullPointerException("the output channel instance must not be null");
         }
 
-        final IOChannel<OUT> ioChannel = JRoutineCompat.io().buildChannel();
+        final IOChannel<OUT> ioChannel = JRoutineCore.io().buildChannel();
         return new DefaultLoaderStreamChannelCompat<OUT>(null, output, ioChannel);
     }
 
@@ -338,7 +341,7 @@ public class StreamsCompat extends Streams {
      * @param <OUT>      the output data type.
      * @return the selectable stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @see ChannelsCompat#merge(int, Collection)
+     * @see SparseChannelsCompat#merge(int, Collection)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<? extends
@@ -346,7 +349,7 @@ public class StreamsCompat extends Streams {
             @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
 
         return new BuilderWrapper<ParcelableSelectable<OUT>>(
-                ChannelsCompat.merge(startIndex, channels));
+                SparseChannelsCompat.merge(startIndex, channels));
     }
 
     /**
@@ -359,7 +362,7 @@ public class StreamsCompat extends Streams {
      * @param <OUT>      the output data type.
      * @return the selectable stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
-     * @see ChannelsCompat#merge(int, com.github.dm.jrt.channel.Channel.OutputChannel[])
+     * @see SparseChannelsCompat#merge(int, com.github.dm.jrt.channel.Channel.OutputChannel[])
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<? extends
@@ -367,7 +370,7 @@ public class StreamsCompat extends Streams {
             @NotNull final OutputChannel<?>... channels) {
 
         return new BuilderWrapper<ParcelableSelectable<OUT>>(
-                ChannelsCompat.<OUT>merge(startIndex, channels));
+                SparseChannelsCompat.<OUT>merge(startIndex, channels));
     }
 
     /**
@@ -379,14 +382,14 @@ public class StreamsCompat extends Streams {
      * @param <OUT>    the output data type.
      * @return the selectable stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @see ChannelsCompat#merge(Collection)
+     * @see SparseChannelsCompat#merge(Collection)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<? extends
             ParcelableSelectable<OUT>>> merge(
             @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
 
-        return new BuilderWrapper<ParcelableSelectable<OUT>>(ChannelsCompat.merge(channels));
+        return new BuilderWrapper<ParcelableSelectable<OUT>>(SparseChannelsCompat.merge(channels));
     }
 
     /**
@@ -398,13 +401,14 @@ public class StreamsCompat extends Streams {
      * @param <OUT>    the output data type.
      * @return the selectable stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
-     * @see ChannelsCompat#merge(com.github.dm.jrt.channel.Channel.OutputChannel[])
+     * @see SparseChannelsCompat#merge(com.github.dm.jrt.channel.Channel.OutputChannel[])
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<? extends
             ParcelableSelectable<OUT>>> merge(@NotNull final OutputChannel<?>... channels) {
 
-        return new BuilderWrapper<ParcelableSelectable<OUT>>(ChannelsCompat.<OUT>merge(channels));
+        return new BuilderWrapper<ParcelableSelectable<OUT>>(
+                SparseChannelsCompat.<OUT>merge(channels));
     }
 
     /**
@@ -416,14 +420,14 @@ public class StreamsCompat extends Streams {
      * @param <OUT>    the output data type.
      * @return the selectable stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
-     * @see ChannelsCompat#merge(SparseArrayCompat)
+     * @see SparseChannelsCompat#merge(SparseArrayCompat)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<? extends
             ParcelableSelectable<OUT>>> merge(
             @NotNull final SparseArrayCompat<? extends OutputChannel<? extends OUT>> channels) {
 
-        return new BuilderWrapper<ParcelableSelectable<OUT>>(ChannelsCompat.merge(channels));
+        return new BuilderWrapper<ParcelableSelectable<OUT>>(SparseChannelsCompat.merge(channels));
     }
 
     /**
@@ -477,7 +481,7 @@ public class StreamsCompat extends Streams {
             @NotNull final Function<? super StreamChannel<IN>, ? extends
                     StreamChannel<? extends OUT>> function) {
 
-        return JRoutineCompat.with(context).on(contextFactory(function));
+        return JRoutineLoaderCompat.with(context).on(contextFactory(function));
     }
 
     /**
@@ -489,13 +493,13 @@ public class StreamsCompat extends Streams {
      * @param channel the output channel.
      * @param <OUT>   the output data type.
      * @return the repeating stream channel builder.
-     * @see ChannelsCompat#repeat(com.github.dm.jrt.channel.Channel.OutputChannel)
+     * @see SparseChannelsCompat#repeat(com.github.dm.jrt.channel.Channel.OutputChannel)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<OUT>> repeat(
             @NotNull final OutputChannel<OUT> channel) {
 
-        return new BuilderWrapper<OUT>(ChannelsCompat.repeat(channel));
+        return new BuilderWrapper<OUT>(SparseChannelsCompat.repeat(channel));
     }
 
     /**
@@ -510,7 +514,7 @@ public class StreamsCompat extends Streams {
      * @param <OUT>      the output data type.
      * @return the map of indexes and output channels builder.
      * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
-     * @see ChannelsCompat#select(int, int, com.github.dm.jrt.channel.Channel.OutputChannel)
+     * @see SparseChannelsCompat#select(int, int, com.github.dm.jrt.channel.Channel.OutputChannel)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends
@@ -519,7 +523,7 @@ public class StreamsCompat extends Streams {
             @NotNull final OutputChannel<? extends ParcelableSelectable<? extends OUT>> channel) {
 
         return new MapBuilderWrapper<OUT>(
-                ChannelsCompat.selectParcelable(startIndex, rangeSize, channel));
+                SparseChannelsCompat.selectParcelable(startIndex, rangeSize, channel));
     }
 
     /**
@@ -532,7 +536,7 @@ public class StreamsCompat extends Streams {
      * @param indexes the list of indexes.
      * @param <OUT>   the output data type.
      * @return the map of indexes and output channels builder.
-     * @see ChannelsCompat#select(com.github.dm.jrt.channel.Channel.OutputChannel, int...)
+     * @see SparseChannelsCompat#select(com.github.dm.jrt.channel.Channel.OutputChannel, int...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends
@@ -540,7 +544,7 @@ public class StreamsCompat extends Streams {
             @NotNull final OutputChannel<? extends ParcelableSelectable<? extends OUT>> channel,
             @NotNull final int... indexes) {
 
-        return new MapBuilderWrapper<OUT>(ChannelsCompat.selectParcelable(channel, indexes));
+        return new MapBuilderWrapper<OUT>(SparseChannelsCompat.selectParcelable(channel, indexes));
     }
 
     /**
@@ -553,7 +557,7 @@ public class StreamsCompat extends Streams {
      * @param indexes the iterable returning the channel indexes.
      * @param <OUT>   the output data type.
      * @return the map of indexes and output channels builder.
-     * @see ChannelsCompat#select(com.github.dm.jrt.channel.Channel.OutputChannel, Iterable)
+     * @see SparseChannelsCompat#select(com.github.dm.jrt.channel.Channel.OutputChannel, Iterable)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends
@@ -561,7 +565,7 @@ public class StreamsCompat extends Streams {
             @NotNull final OutputChannel<? extends ParcelableSelectable<? extends OUT>> channel,
             @NotNull final Iterable<Integer> indexes) {
 
-        return new MapBuilderWrapper<OUT>(ChannelsCompat.selectParcelable(channel, indexes));
+        return new MapBuilderWrapper<OUT>(SparseChannelsCompat.selectParcelable(channel, indexes));
     }
 
     /**
@@ -573,7 +577,7 @@ public class StreamsCompat extends Streams {
     @NotNull
     public static <OUT> LoaderStreamChannelCompat<OUT> streamOf() {
 
-        return streamOf(JRoutineCompat.io().<OUT>buildChannel().close());
+        return streamOf(JRoutineCore.io().<OUT>buildChannel().close());
     }
 
     /**
@@ -587,7 +591,7 @@ public class StreamsCompat extends Streams {
     public static <OUT> LoaderStreamChannelCompat<OUT> streamOf(
             @Nullable final Iterable<OUT> outputs) {
 
-        return streamOf(JRoutineCompat.io().of(outputs));
+        return streamOf(JRoutineCore.io().of(outputs));
     }
 
     /**
@@ -600,7 +604,7 @@ public class StreamsCompat extends Streams {
     @NotNull
     public static <OUT> LoaderStreamChannelCompat<OUT> streamOf(@Nullable final OUT output) {
 
-        return streamOf(JRoutineCompat.io().of(output));
+        return streamOf(JRoutineCore.io().of(output));
     }
 
     /**
@@ -613,7 +617,7 @@ public class StreamsCompat extends Streams {
     @NotNull
     public static <OUT> LoaderStreamChannelCompat<OUT> streamOf(@Nullable final OUT... outputs) {
 
-        return streamOf(JRoutineCompat.io().of(outputs));
+        return streamOf(JRoutineCore.io().of(outputs));
     }
 
     /**
@@ -642,7 +646,7 @@ public class StreamsCompat extends Streams {
      * @param index   the channel index.
      * @param <OUT>   the output data type.
      * @return the selectable loader stream builder.
-     * @see ChannelsCompat#toSelectable(com.github.dm.jrt.channel.Channel.OutputChannel, int)
+     * @see SparseChannelsCompat#toSelectable(com.github.dm.jrt.channel.Channel.OutputChannel, int)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<? extends
@@ -650,6 +654,6 @@ public class StreamsCompat extends Streams {
             @NotNull final OutputChannel<? extends OUT> channel, final int index) {
 
         return new BuilderWrapper<ParcelableSelectable<OUT>>(
-                ChannelsCompat.toSelectable(channel, index));
+                SparseChannelsCompat.toSelectable(channel, index));
     }
 }

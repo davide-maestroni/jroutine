@@ -46,27 +46,28 @@
                 try {
 
                     final ImageView imageView = (ImageView) findViewById(R.id.image);
-                    JRoutine.with(loaderFrom(this))
-                            .on(factoryOf(LoadBitmap.class))
-                            .withLoaders()
-                            .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
-                            .getConfigured()
-                            .asyncCall(new URI(IMAGE_URI))
-                            .passTo(new TemplateOutputConsumer&lt;Bitmap&gt;() {
+                    JRoutineLoader.with(loaderFrom(this))
+                                  .on(factoryOf(LoadBitmap.class))
+                                  .withLoaders()
+                                  .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
+                                  .getConfigured()
+                                  .asyncCall(new URI(IMAGE_URI))
+                                  .passTo(new TemplateOutputConsumer&lt;Bitmap&gt;() {
 
-                                &commat;Override
-                                public void onError(&commat;NotNull final RoutineException error) {
+                                      &commat;Override
+                                      public void onError(&commat;NotNull final RoutineException error) {
 
-                                    Toast.makeText(MainTestActivity.this, (error != null) ? error.getMessage()
-                                            : "Cannot load image", Toast.LENGTH_LONG).show();
-                                }
+                                          Toast.makeText(MainTestActivity.this, (error != null) ?
+                                                  error.getMessage() : "Cannot load image",
+                                                  Toast.LENGTH_LONG).show();
+                                      }
 
-                                &commat;Override
-                                public void onOutput(final Bitmap bitmap) {
+                                      &commat;Override
+                                      public void onOutput(final Bitmap bitmap) {
 
-                                    imageView.setImageBitmap(bitmap);
-                                }
-                            });
+                                          imageView.setImageBitmap(bitmap);
+                                      }
+                                  });
 
                 } catch (final URISyntaxException ignored) {
 
@@ -122,27 +123,28 @@
                 try {
 
                     final ImageView imageView = (ImageView) findViewById(R.id.image);
-                    JRoutine.with(loaderFrom(this))
-                            .on(factoryOf(LoadBitmapFromService.class))
-                            .withLoaders()
-                            .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
-                            .getConfigured()
-                            .asyncCall(new URI(IMAGE_URI))
-                            .passTo(new TemplateOutputConsumer&lt;Bitmap&gt;() {
+                    JRoutineLoader.with(loaderFrom(this))
+                                  .on(factoryOf(LoadBitmapFromService.class))
+                                  .withLoaders()
+                                  .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
+                                  .getConfigured()
+                                  .asyncCall(new URI(IMAGE_URI))
+                                  .passTo(new TemplateOutputConsumer&lt;Bitmap&gt;() {
 
-                                &commat;Override
-                                public void onError(&commat;NotNull final RoutineException error) {
+                                      &commat;Override
+                                      public void onError(&commat;NotNull final RoutineException error) {
 
-                                    Toast.makeText(MainTestActivity.this, (error != null) ? error.getMessage()
-                                            : "Cannot load image", Toast.LENGTH_LONG).show();
-                                }
+                                          Toast.makeText(MainTestActivity.this, (error != null) ?
+                                                  error.getMessage() : "Cannot load image",
+                                                  Toast.LENGTH_LONG).show();
+                                      }
 
-                                &commat;Override
-                                public void onOutput(final Bitmap bitmap) {
+                                      &commat;Override
+                                      public void onOutput(final Bitmap bitmap) {
 
-                                    imageView.setImageBitmap(bitmap);
-                                }
-                            });
+                                          imageView.setImageBitmap(bitmap);
+                                      }
+                                  });
 
                 } catch (final URISyntaxException ignored) {
 
@@ -184,9 +186,9 @@
                 public void onContext(&commat;NotNull final Context context) {
 
                     super.onContext(context);
-                    mRoutine = JRoutine.with(serviceFrom(context))
-                                       .on(factoryOf(LoadBitmap.class))
-                                       .buildRoutine();
+                    mRoutine = JRoutineService.with(serviceFrom(context))
+                                              .on(factoryOf(LoadBitmap.class))
+                                              .buildRoutine();
                 }
 
                 &commat;Override

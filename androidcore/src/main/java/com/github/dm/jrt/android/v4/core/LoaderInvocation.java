@@ -33,13 +33,13 @@ import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
 import com.github.dm.jrt.android.invocation.InvocationClashException;
 import com.github.dm.jrt.android.invocation.InvocationTypeException;
 import com.github.dm.jrt.android.invocation.StaleResultException;
-import com.github.dm.jrt.android.runner.Runners;
+import com.github.dm.jrt.android.runner.AndroidRunners;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.common.RoutineException;
-import com.github.dm.jrt.core.JRoutine;
+import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.invocation.FunctionInvocation;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.invocation.PassingInvocation;
@@ -55,7 +55,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.github.dm.jrt.android.invocation.ContextInvocations.fromFactory;
+import static com.github.dm.jrt.android.invocation.ContextInvocationFactories.fromFactory;
 
 /**
  * Invocation implementation employing loaders to perform background operations.
@@ -351,8 +351,8 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
         final LoaderContextInvocationFactory<IN, OUT> factory =
                 new LoaderContextInvocationFactory<IN, OUT>(this, mLoaderId);
         final Routine<IN, OUT> routine =
-                JRoutine.on(fromFactory(loaderContext.getApplicationContext(), factory))
-                        .buildRoutine();
+                JRoutineCore.on(fromFactory(loaderContext.getApplicationContext(), factory))
+                            .buildRoutine();
         routine.syncInvoke().abort(reason);
         routine.purge();
     }
@@ -682,23 +682,23 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
             logger.dbg("creating new result channel");
             final InvocationLoader<?, OUT> internalLoader = mLoader;
             final ArrayList<IOChannel<OUT>> channels = mNewChannels;
-            final IOChannel<OUT> channel = JRoutine.io()
-                                                   .withChannels()
-                                                   .withLog(logger.getLog())
-                                                   .withLogLevel(logger.getLogLevel())
-                                                   .getConfigured()
-                                                   .buildChannel();
+            final IOChannel<OUT> channel = JRoutineCore.io()
+                                                       .withChannels()
+                                                       .withLog(logger.getLog())
+                                                       .withLogLevel(logger.getLogLevel())
+                                                       .getConfigured()
+                                                       .buildChannel();
             channels.add(channel);
             internalLoader.setInvocationCount(Math.max(channels.size() + mAbortedChannels.size(),
                                                        internalLoader.getInvocationCount()));
             if ((looper != null) && (looper != Looper.getMainLooper())) {
-                return JRoutine.on(PassingInvocation.<OUT>factoryOf())
-                               .withInvocations()
-                               .withRunner(Runners.looperRunner(looper))
-                               .withLog(logger.getLog())
-                               .withLogLevel(logger.getLogLevel())
-                               .getConfigured()
-                               .asyncCall(channel);
+                return JRoutineCore.on(PassingInvocation.<OUT>factoryOf())
+                                   .withInvocations()
+                                   .withRunner(AndroidRunners.looperRunner(looper))
+                                   .withLog(logger.getLog())
+                                   .withLogLevel(logger.getLogLevel())
+                                   .getConfigured()
+                                   .asyncCall(channel);
             }
 
             return channel;

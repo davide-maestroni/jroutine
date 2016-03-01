@@ -65,7 +65,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.v11.core.LoaderContext context,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory<Object, OUT> factory) {
 
-        return com.github.dm.jrt.android.v11.core.JRoutine.with(context).on(factory);
+        return com.github.dm.jrt.android.v11.core.JRoutineLoader.with(context).on(factory);
     }
 
     public static class ContextBuilder {

@@ -37,12 +37,12 @@ import java.lang.reflect.Method;
  * <p/>
  * Created by davide-maestroni on 01/29/2016.
  */
-public class Builders extends com.github.dm.jrt.object.core.Builders {
+public class AndroidBuilders {
 
     /**
      * Avoid direct instantiation.
      */
-    protected Builders() {
+    protected AndroidBuilders() {
 
     }
 

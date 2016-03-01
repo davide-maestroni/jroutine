@@ -18,18 +18,20 @@ package com.github.dm.jrt.android.v11.ext.channel;
 
 import android.util.SparseArray;
 
-import com.github.dm.jrt.android.ext.channel.Channels;
+import com.github.dm.jrt.android.ext.channel.AndroidChannels;
 import com.github.dm.jrt.android.ext.channel.ParcelableSelectable;
-import com.github.dm.jrt.android.v4.core.JRoutineCompat;
 import com.github.dm.jrt.builder.ChannelConfiguration;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
+import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.ext.channel.AbstractBuilder;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Builder implementation returning a channel merging data from a map of output channels.
+ * <p/>
+ * Created by davide-maestroni on 02/26/2016.
  *
  * @param <OUT> the output data type.
  */
@@ -64,15 +66,12 @@ class MergeMapBuilder<OUT>
             @NotNull final ChannelConfiguration configuration) {
 
         final SparseArray<? extends OutputChannel<? extends OUT>> channelMap = mChannelMap;
-        final IOChannel<ParcelableSelectable<OUT>> ioChannel = JRoutineCompat.io()
-                                                                             .withChannels()
-                                                                             .with(configuration)
-                                                                             .getConfigured()
-                                                                             .buildChannel();
+        final IOChannel<ParcelableSelectable<OUT>> ioChannel =
+                JRoutineCore.io().withChannels().with(configuration).getConfigured().buildChannel();
         final int size = channelMap.size();
         for (int i = 0; i < size; ++i) {
-            ioChannel.pass(
-                    Channels.toSelectable(channelMap.valueAt(i), channelMap.keyAt(i)).build());
+            ioChannel.pass(AndroidChannels.toSelectable(channelMap.valueAt(i), channelMap.keyAt(i))
+                                          .build());
         }
 
         return ioChannel.close();

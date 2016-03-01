@@ -64,9 +64,9 @@ import java.util.WeakHashMap;
  * <p/>
  * Created by davide-maestroni on 12/08/2014.
  *
- * @see com.github.dm.jrt.object.core.JRoutine JRoutine
+ * @see com.github.dm.jrt.object.core.JRoutineObject JRoutineObject
  */
-public class JRoutineCompat extends com.github.dm.jrt.android.v4.core.JRoutineCompat {
+public class JRoutineLoaderObjectCompat {
 
     private static final WeakHashMap<LoaderContextCompat, ContextBuilderCompat> sBuilders =
             new WeakHashMap<LoaderContextCompat, ContextBuilderCompat>();
@@ -95,8 +95,7 @@ public class JRoutineCompat extends com.github.dm.jrt.android.v4.core.JRoutineCo
     /**
      * Context based builder of loader routine builders.
      */
-    public static class ContextBuilderCompat
-            extends com.github.dm.jrt.android.v4.core.JRoutineCompat.ContextBuilderCompat {
+    public static class ContextBuilderCompat {
 
         private final LoaderContextCompat mContext;
 
@@ -105,9 +104,13 @@ public class JRoutineCompat extends com.github.dm.jrt.android.v4.core.JRoutineCo
          *
          * @param context the loader context.
          */
+        @SuppressWarnings("ConstantConditions")
         private ContextBuilderCompat(@NotNull final LoaderContextCompat context) {
 
-            super(context);
+            if (context == null) {
+                throw new NullPointerException("the loader context must not be null");
+            }
+
             mContext = context;
         }
 

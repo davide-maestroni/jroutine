@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android.v11.core;
+package com.github.dm.jrt.android.v4.core;
 
 import com.github.dm.jrt.android.builder.LoaderChannelBuilder;
 import com.github.dm.jrt.android.builder.LoaderRoutineBuilder;
@@ -63,20 +63,17 @@ import java.util.WeakHashMap;
  *             setContentView(R.layout.my_activity_layout);
  *
  *             if (savedInstanceState != null) {
- *
  *                 mResource = savedInstanceState.getParcelable(RESOURCE_KEY);
  *             }
  *
  *             if (mResource != null) {
- *
  *                 displayResource(mResource);
  *
  *             } else {
- *
  *                 final Routine&lt;URI, MyResource&gt; routine =
- *                         JRoutine.with(loaderFrom(this))
- *                                 .on(factoryOf(LoadResource.class))
- *                                 .buildRoutine();
+ *                         JRoutineLoaderCompat.with(loaderFrom(this))
+ *                                             .on(factoryOf(LoadResource.class))
+ *                                             .buildRoutine();
  *                 routine.asyncCall(RESOURCE_URI)
  *                        .passTo(new TemplateOutputConsumer&lt;MyResource&gt;() {
  *
@@ -111,7 +108,7 @@ import java.util.WeakHashMap;
  * <pre>
  *     <code>
  *
- *         public class LoadResource extends FunctionContextInvocation&lt;URI, MyResource&gt; {
+ *         public class LoadResource extends TemplateContextInvocation&lt;URI, MyResource&gt; {
  *
  *             private Routine&lt;URI, MyResource&gt; mRoutine;
  *
@@ -119,9 +116,9 @@ import java.util.WeakHashMap;
  *             public void onContext(&#64;Nonnull final Context context) {
  *
  *                 super.onContext(context);
- *                 mRoutine = JRoutine.with(serviceFrom(context))
- *                                    .on(factoryOf(LoadResourceUri.class))
- *                                    .buildRoutine();
+ *                 mRoutine = JRoutineService.with(serviceFrom(context))
+ *                                           .on(factoryOf(LoadResourceUri.class))
+ *                                           .buildRoutine();
  *             }
  *
  *             &#64;Override
@@ -134,15 +131,12 @@ import java.util.WeakHashMap;
  *     </code>
  * </pre>
  * <p/>
- * See {@link com.github.dm.jrt.android.v4.core.JRoutineCompat JRoutineCompat} for support of API
- * levels less than {@value android.os.Build.VERSION_CODES#HONEYCOMB}.
- * <p/>
  * Created by davide-maestroni on 12/08/2014.
  */
-public class JRoutine extends com.github.dm.jrt.android.core.JRoutine {
+public class JRoutineLoaderCompat {
 
-    private static final WeakHashMap<LoaderContext, ContextBuilder> sBuilders =
-            new WeakHashMap<LoaderContext, ContextBuilder>();
+    private static final WeakHashMap<LoaderContextCompat, ContextBuilderCompat> sBuilders =
+            new WeakHashMap<LoaderContextCompat, ContextBuilderCompat>();
 
     /**
      * Returns a context based builder of loader routine builders.
@@ -151,13 +145,13 @@ public class JRoutine extends com.github.dm.jrt.android.core.JRoutine {
      * @return the context builder.
      */
     @NotNull
-    public static ContextBuilder with(@NotNull final LoaderContext context) {
+    public static ContextBuilderCompat with(@NotNull final LoaderContextCompat context) {
 
         synchronized (sBuilders) {
-            final WeakHashMap<LoaderContext, ContextBuilder> builders = sBuilders;
-            ContextBuilder contextBuilder = builders.get(context);
+            final WeakHashMap<LoaderContextCompat, ContextBuilderCompat> builders = sBuilders;
+            ContextBuilderCompat contextBuilder = builders.get(context);
             if (contextBuilder == null) {
-                contextBuilder = new ContextBuilder(context);
+                contextBuilder = new ContextBuilderCompat(context);
                 builders.put(context, contextBuilder);
             }
 
@@ -168,9 +162,9 @@ public class JRoutine extends com.github.dm.jrt.android.core.JRoutine {
     /**
      * Context based builder of loader routine builders.
      */
-    public static class ContextBuilder {
+    public static class ContextBuilderCompat {
 
-        private final LoaderContext mContext;
+        private final LoaderContextCompat mContext;
 
         /**
          * Constructor.
@@ -178,7 +172,7 @@ public class JRoutine extends com.github.dm.jrt.android.core.JRoutine {
          * @param context the loader context.
          */
         @SuppressWarnings("ConstantConditions")
-        protected ContextBuilder(@NotNull final LoaderContext context) {
+        private ContextBuilderCompat(@NotNull final LoaderContextCompat context) {
 
             if (context == null) {
                 throw new NullPointerException("the loader context must not be null");

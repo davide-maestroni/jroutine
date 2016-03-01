@@ -19,7 +19,7 @@ package com.github.dm.jrt.android.ext.channel;
 import com.github.dm.jrt.builder.ChannelConfiguration;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
-import com.github.dm.jrt.core.JRoutine;
+import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.ext.channel.AbstractBuilder;
 
 import org.jetbrains.annotations.NotNull;
@@ -29,6 +29,8 @@ import java.util.Collection;
 
 /**
  * Builder implementation merging data from a set of output channels into selectable objects.
+ * <p/>
+ * Created by davide-maestroni on 02/26/2016.
  *
  * @param <OUT> the output data type.
  */
@@ -70,10 +72,10 @@ class MergeBuilder<OUT>
             @NotNull final ChannelConfiguration configuration) {
 
         final IOChannel<ParcelableSelectable<OUT>> ioChannel =
-                JRoutine.io().withChannels().with(configuration).getConfigured().buildChannel();
+                JRoutineCore.io().withChannels().with(configuration).getConfigured().buildChannel();
         int i = mStartIndex;
         for (final OutputChannel<? extends OUT> channel : mChannels) {
-            ioChannel.pass(Channels.toSelectable(channel, i++).build());
+            ioChannel.pass(AndroidChannels.toSelectable(channel, i++).build());
         }
 
         return ioChannel.close();

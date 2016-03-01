@@ -21,16 +21,18 @@ import android.util.SparseArray;
 import com.github.dm.jrt.android.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.ext.channel.ParcelableSelectable;
 import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
-import com.github.dm.jrt.android.v11.core.JRoutine;
+import com.github.dm.jrt.android.v11.core.JRoutineLoader;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
-import com.github.dm.jrt.android.v11.ext.channel.Channels;
+import com.github.dm.jrt.android.v11.ext.channel.SparseChannels;
 import com.github.dm.jrt.builder.RoutineBuilder;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
+import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.ext.channel.ChannelsBuilder;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.stream.StreamChannel;
+import com.github.dm.jrt.stream.Streams;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,12 +47,12 @@ import static com.github.dm.jrt.android.core.DelegatingContextInvocation.factory
  * <p/>
  * Created by davide-maestroni on 01/02/2016.
  */
-public class Streams extends com.github.dm.jrt.stream.Streams {
+public class LoaderStreams extends Streams {
 
     /**
      * Avoid direct instantiation.
      */
-    protected Streams() {
+    protected LoaderStreams() {
 
     }
 
@@ -63,13 +65,13 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @see Channels#blend(Collection)
+     * @see SparseChannels#blend(Collection)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<OUT>> blend(
             @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
 
-        return new BuilderWrapper<OUT>(Channels.blend(channels));
+        return new BuilderWrapper<OUT>(SparseChannels.blend(channels));
     }
 
     /**
@@ -81,13 +83,13 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
-     * @see Channels#blend(com.github.dm.jrt.channel.Channel.OutputChannel[])
+     * @see SparseChannels#blend(com.github.dm.jrt.channel.Channel.OutputChannel[])
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<OUT>> blend(
             @NotNull final OutputChannel<?>... channels) {
 
-        return new BuilderWrapper<OUT>(Channels.<OUT>blend(channels));
+        return new BuilderWrapper<OUT>(SparseChannels.<OUT>blend(channels));
     }
 
     /**
@@ -101,13 +103,13 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @see Channels#concat(Collection)
+     * @see SparseChannels#concat(Collection)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<OUT>> concat(
             @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
 
-        return new BuilderWrapper<OUT>(Channels.concat(channels));
+        return new BuilderWrapper<OUT>(SparseChannels.concat(channels));
     }
 
     /**
@@ -121,13 +123,13 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
-     * @see Channels#concat(com.github.dm.jrt.channel.Channel.OutputChannel[])
+     * @see SparseChannels#concat(com.github.dm.jrt.channel.Channel.OutputChannel[])
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<OUT>> concat(
             @NotNull final OutputChannel<?>... channels) {
 
-        return new BuilderWrapper<OUT>(Channels.<OUT>concat(channels));
+        return new BuilderWrapper<OUT>(SparseChannels.<OUT>concat(channels));
     }
 
     /**
@@ -163,13 +165,13 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @see Channels#join(Collection)
+     * @see SparseChannels#join(Collection)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<List<? extends OUT>>> join(
             @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
 
-        return new BuilderWrapper<List<? extends OUT>>(Channels.join(channels));
+        return new BuilderWrapper<List<? extends OUT>>(SparseChannels.join(channels));
     }
 
     /**
@@ -182,13 +184,13 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
-     * @see Channels#join(com.github.dm.jrt.channel.Channel.OutputChannel[])
+     * @see SparseChannels#join(com.github.dm.jrt.channel.Channel.OutputChannel[])
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<List<? extends OUT>>> join(
             @NotNull final OutputChannel<?>... channels) {
 
-        return new BuilderWrapper<List<? extends OUT>>(Channels.<OUT>join(channels));
+        return new BuilderWrapper<List<? extends OUT>>(SparseChannels.<OUT>join(channels));
     }
 
     /**
@@ -205,14 +207,14 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
      * @param <OUT>       the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @see Channels#join(Object, Collection)
+     * @see SparseChannels#join(Object, Collection)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<List<? extends OUT>>> join(
             @Nullable final OUT placeholder,
             @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
 
-        return new BuilderWrapper<List<? extends OUT>>(Channels.join(placeholder, channels));
+        return new BuilderWrapper<List<? extends OUT>>(SparseChannels.join(placeholder, channels));
     }
 
     /**
@@ -229,13 +231,13 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
      * @param <OUT>       the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
-     * @see Channels#join(Object, com.github.dm.jrt.channel.Channel.OutputChannel[])
+     * @see SparseChannels#join(Object, com.github.dm.jrt.channel.Channel.OutputChannel[])
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<List<? extends OUT>>> join(
             @Nullable final OUT placeholder, @NotNull final OutputChannel<?>... channels) {
 
-        return new BuilderWrapper<List<? extends OUT>>(Channels.join(placeholder, channels));
+        return new BuilderWrapper<List<? extends OUT>>(SparseChannels.join(placeholder, channels));
     }
 
     /**
@@ -249,7 +251,7 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
     @NotNull
     public static <OUT> LoaderStreamChannel<OUT> lazyStreamOf() {
 
-        return lazyStreamOf(JRoutine.io().<OUT>buildChannel().close());
+        return lazyStreamOf(JRoutineCore.io().<OUT>buildChannel().close());
     }
 
     /**
@@ -265,7 +267,7 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
     public static <OUT> LoaderStreamChannel<OUT> lazyStreamOf(
             @Nullable final Iterable<OUT> outputs) {
 
-        return lazyStreamOf(JRoutine.io().of(outputs));
+        return lazyStreamOf(JRoutineCore.io().of(outputs));
     }
 
     /**
@@ -280,7 +282,7 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
     @NotNull
     public static <OUT> LoaderStreamChannel<OUT> lazyStreamOf(@Nullable final OUT output) {
 
-        return lazyStreamOf(JRoutine.io().of(output));
+        return lazyStreamOf(JRoutineCore.io().of(output));
     }
 
     /**
@@ -295,7 +297,7 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
     @NotNull
     public static <OUT> LoaderStreamChannel<OUT> lazyStreamOf(@Nullable final OUT... outputs) {
 
-        return lazyStreamOf(JRoutine.io().of(outputs));
+        return lazyStreamOf(JRoutineCore.io().of(outputs));
     }
 
     /**
@@ -318,7 +320,7 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
             throw new NullPointerException("the output channel instance must not be null");
         }
 
-        final IOChannel<OUT> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<OUT> ioChannel = JRoutineCore.io().buildChannel();
         return new DefaultLoaderStreamChannel<OUT>(null, output, ioChannel);
     }
 
@@ -332,14 +334,15 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
      * @param <OUT>      the output data type.
      * @return the selectable stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @see Channels#merge(int, Collection)
+     * @see SparseChannels#merge(int, Collection)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<? extends
             ParcelableSelectable<OUT>>> merge(final int startIndex,
             @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
 
-        return new BuilderWrapper<ParcelableSelectable<OUT>>(Channels.merge(startIndex, channels));
+        return new BuilderWrapper<ParcelableSelectable<OUT>>(
+                SparseChannels.merge(startIndex, channels));
     }
 
     /**
@@ -352,7 +355,7 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
      * @param <OUT>      the output data type.
      * @return the selectable stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
-     * @see Channels#merge(int, com.github.dm.jrt.channel.Channel.OutputChannel[])
+     * @see SparseChannels#merge(int, com.github.dm.jrt.channel.Channel.OutputChannel[])
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<? extends
@@ -360,7 +363,7 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
             @NotNull final OutputChannel<?>... channels) {
 
         return new BuilderWrapper<ParcelableSelectable<OUT>>(
-                Channels.<OUT>merge(startIndex, channels));
+                SparseChannels.<OUT>merge(startIndex, channels));
     }
 
     /**
@@ -372,14 +375,14 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
      * @param <OUT>    the output data type.
      * @return the selectable stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @see Channels#merge(Collection)
+     * @see SparseChannels#merge(Collection)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<? extends
             ParcelableSelectable<OUT>>> merge(
             @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
 
-        return new BuilderWrapper<ParcelableSelectable<OUT>>(Channels.merge(channels));
+        return new BuilderWrapper<ParcelableSelectable<OUT>>(SparseChannels.merge(channels));
     }
 
     /**
@@ -391,13 +394,13 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
      * @param <OUT>    the output data type.
      * @return the selectable stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
-     * @see Channels#merge(com.github.dm.jrt.channel.Channel.OutputChannel[])
+     * @see SparseChannels#merge(com.github.dm.jrt.channel.Channel.OutputChannel[])
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<? extends
             ParcelableSelectable<OUT>>> merge(@NotNull final OutputChannel<?>... channels) {
 
-        return new BuilderWrapper<ParcelableSelectable<OUT>>(Channels.<OUT>merge(channels));
+        return new BuilderWrapper<ParcelableSelectable<OUT>>(SparseChannels.<OUT>merge(channels));
     }
 
     /**
@@ -409,14 +412,14 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
      * @param <OUT>    the output data type.
      * @return the selectable stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
-     * @see Channels#merge(SparseArray)
+     * @see SparseChannels#merge(SparseArray)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<? extends
             ParcelableSelectable<OUT>>> merge(
             @NotNull final SparseArray<? extends OutputChannel<? extends OUT>> channels) {
 
-        return new BuilderWrapper<ParcelableSelectable<OUT>>(Channels.merge(channels));
+        return new BuilderWrapper<ParcelableSelectable<OUT>>(SparseChannels.merge(channels));
     }
 
     /**
@@ -470,7 +473,7 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
             @NotNull final Function<? super StreamChannel<IN>, ? extends
                     StreamChannel<? extends OUT>> function) {
 
-        return JRoutine.with(context).on(contextFactory(function));
+        return JRoutineLoader.with(context).on(contextFactory(function));
     }
 
     /**
@@ -482,13 +485,13 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
      * @param channel the output channel.
      * @param <OUT>   the output data type.
      * @return the repeating stream channel builder.
-     * @see Channels#repeat(com.github.dm.jrt.channel.Channel.OutputChannel)
+     * @see SparseChannels#repeat(com.github.dm.jrt.channel.Channel.OutputChannel)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<OUT>> repeat(
             @NotNull final OutputChannel<OUT> channel) {
 
-        return new BuilderWrapper<OUT>(Channels.repeat(channel));
+        return new BuilderWrapper<OUT>(SparseChannels.repeat(channel));
     }
 
     /**
@@ -503,7 +506,7 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
      * @param <OUT>      the output data type.
      * @return the map of indexes and output channels builder.
      * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
-     * @see Channels#select(int, int, com.github.dm.jrt.channel.Channel.OutputChannel)
+     * @see SparseChannels#select(int, int, com.github.dm.jrt.channel.Channel.OutputChannel)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends SparseArray<LoaderStreamChannel<OUT>>>
@@ -512,7 +515,7 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
             @NotNull final OutputChannel<? extends ParcelableSelectable<? extends OUT>> channel) {
 
         return new MapBuilderWrapper<OUT>(
-                Channels.selectParcelable(startIndex, rangeSize, channel));
+                SparseChannels.selectParcelable(startIndex, rangeSize, channel));
     }
 
     /**
@@ -525,7 +528,7 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
      * @param indexes the list of indexes.
      * @param <OUT>   the output data type.
      * @return the map of indexes and output channels builder.
-     * @see Channels#select(com.github.dm.jrt.channel.Channel.OutputChannel, int...)
+     * @see SparseChannels#select(com.github.dm.jrt.channel.Channel.OutputChannel, int...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends SparseArray<LoaderStreamChannel<OUT>>>
@@ -533,7 +536,7 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
             @NotNull final OutputChannel<? extends ParcelableSelectable<? extends OUT>> channel,
             @NotNull final int... indexes) {
 
-        return new MapBuilderWrapper<OUT>(Channels.selectParcelable(channel, indexes));
+        return new MapBuilderWrapper<OUT>(SparseChannels.selectParcelable(channel, indexes));
     }
 
     /**
@@ -546,7 +549,7 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
      * @param indexes the iterable returning the channel indexes.
      * @param <OUT>   the output data type.
      * @return the map of indexes and output channels builder.
-     * @see Channels#select(com.github.dm.jrt.channel.Channel.OutputChannel, Iterable)
+     * @see SparseChannels#select(com.github.dm.jrt.channel.Channel.OutputChannel, Iterable)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends SparseArray<LoaderStreamChannel<OUT>>>
@@ -554,7 +557,7 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
             @NotNull final OutputChannel<? extends ParcelableSelectable<? extends OUT>> channel,
             @NotNull final Iterable<Integer> indexes) {
 
-        return new MapBuilderWrapper<OUT>(Channels.selectParcelable(channel, indexes));
+        return new MapBuilderWrapper<OUT>(SparseChannels.selectParcelable(channel, indexes));
     }
 
     /**
@@ -566,7 +569,7 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
     @NotNull
     public static <OUT> LoaderStreamChannel<OUT> streamOf() {
 
-        return streamOf(JRoutine.io().<OUT>buildChannel().close());
+        return streamOf(JRoutineCore.io().<OUT>buildChannel().close());
     }
 
     /**
@@ -579,7 +582,7 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
     @NotNull
     public static <OUT> LoaderStreamChannel<OUT> streamOf(@Nullable final Iterable<OUT> outputs) {
 
-        return streamOf(JRoutine.io().of(outputs));
+        return streamOf(JRoutineCore.io().of(outputs));
     }
 
     /**
@@ -592,7 +595,7 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
     @NotNull
     public static <OUT> LoaderStreamChannel<OUT> streamOf(@Nullable final OUT output) {
 
-        return streamOf(JRoutine.io().of(output));
+        return streamOf(JRoutineCore.io().of(output));
     }
 
     /**
@@ -605,7 +608,7 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
     @NotNull
     public static <OUT> LoaderStreamChannel<OUT> streamOf(@Nullable final OUT... outputs) {
 
-        return streamOf(JRoutine.io().of(outputs));
+        return streamOf(JRoutineCore.io().of(outputs));
     }
 
     /**
@@ -634,13 +637,14 @@ public class Streams extends com.github.dm.jrt.stream.Streams {
      * @param index   the channel index.
      * @param <OUT>   the output data type.
      * @return the selectable loader stream builder.
-     * @see Channels#toSelectable(com.github.dm.jrt.channel.Channel.OutputChannel, int)
+     * @see SparseChannels#toSelectable(com.github.dm.jrt.channel.Channel.OutputChannel, int)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<? extends
             ParcelableSelectable<OUT>>> toSelectable(
             @NotNull final OutputChannel<? extends OUT> channel, final int index) {
 
-        return new BuilderWrapper<ParcelableSelectable<OUT>>(Channels.toSelectable(channel, index));
+        return new BuilderWrapper<ParcelableSelectable<OUT>>(
+                SparseChannels.toSelectable(channel, index));
     }
 }

@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
  * <p/>
  * Created by davide-maestroni on 12/22/2014.
  */
-public class Logs extends com.github.dm.jrt.log.Logs {
+public class AndroidLogs {
 
     private static final AndroidLog sAndroidLog = new AndroidLog();
 

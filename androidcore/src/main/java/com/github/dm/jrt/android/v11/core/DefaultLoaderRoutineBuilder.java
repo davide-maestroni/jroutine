@@ -20,7 +20,7 @@ import com.github.dm.jrt.android.builder.LoaderConfiguration;
 import com.github.dm.jrt.android.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
 import com.github.dm.jrt.android.routine.LoaderRoutine;
-import com.github.dm.jrt.android.runner.Runners;
+import com.github.dm.jrt.android.runner.AndroidRunners;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.TemplateRoutineBuilder;
 import com.github.dm.jrt.runner.Runner;
@@ -89,7 +89,7 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
     public LoaderRoutine<IN, OUT> buildRoutine() {
 
         final InvocationConfiguration configuration = getConfiguration();
-        final Runner mainRunner = Runners.mainRunner();
+        final Runner mainRunner = AndroidRunners.mainRunner();
         final Runner asyncRunner = configuration.getRunnerOr(mainRunner);
         if (asyncRunner != mainRunner) {
             configuration.newLogger(this)

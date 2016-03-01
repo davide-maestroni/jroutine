@@ -33,8 +33,9 @@ import java.util.WeakHashMap;
  * The pre-processing is automatically triggered just by including the artifact of this class
  * module.
  * <p/>
- * See {@link com.github.dm.jrt.android.proxy.v4.core.JRoutineProxyCompat JRoutineProxyCompat} for
- * support of API levels less than {@link android.os.Build.VERSION_CODES#HONEYCOMB 11}.
+ * See {@link com.github.dm.jrt.android.proxy.v4.core.JRoutineLoaderProxyCompat
+ * JRoutineLoaderProxyCompat} for support of API levels lower than
+ * {@link android.os.Build.VERSION_CODES#HONEYCOMB 11}.
  * <p/>
  * Created by davide-maestroni on 05/06/2015.
  *
@@ -42,7 +43,7 @@ import java.util.WeakHashMap;
  * @see com.github.dm.jrt.android.proxy.annotation.LoaderProxy LoaderProxy
  * @see com.github.dm.jrt.object.annotation Annotations
  */
-public class JRoutineProxy extends com.github.dm.jrt.android.proxy.core.JRoutineProxy {
+public class JRoutineLoaderProxy {
 
     private static final WeakHashMap<LoaderContext, ProxyContextBuilder> sBuilders =
             new WeakHashMap<LoaderContext, ProxyContextBuilder>();
@@ -50,7 +51,7 @@ public class JRoutineProxy extends com.github.dm.jrt.android.proxy.core.JRoutine
     /**
      * Avoid direct instantiation.
      */
-    protected JRoutineProxy() {
+    protected JRoutineLoaderProxy() {
 
     }
 

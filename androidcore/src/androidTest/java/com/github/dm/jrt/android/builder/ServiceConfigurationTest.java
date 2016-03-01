@@ -21,11 +21,12 @@ import android.test.AndroidTestCase;
 
 import com.github.dm.jrt.android.builder.ServiceConfiguration.Builder;
 import com.github.dm.jrt.android.log.AndroidLog;
+import com.github.dm.jrt.android.runner.AndroidRunners;
 import com.github.dm.jrt.android.runner.MainRunner;
-import com.github.dm.jrt.android.runner.Runners;
 import com.github.dm.jrt.log.NullLog;
 import com.github.dm.jrt.log.SystemLog;
 import com.github.dm.jrt.runner.RunnerDecorator;
+import com.github.dm.jrt.runner.Runners;
 
 import static com.github.dm.jrt.android.builder.ServiceConfiguration.builder;
 import static com.github.dm.jrt.android.builder.ServiceConfiguration.builderFrom;
@@ -92,7 +93,8 @@ public class ServiceConfigurationTest extends AndroidTestCase {
 
         try {
 
-            builder().withRunnerClass(Runners.looperRunner(Looper.getMainLooper()).getClass());
+            builder().withRunnerClass(
+                    AndroidRunners.looperRunner(Looper.getMainLooper()).getClass());
 
             fail();
 

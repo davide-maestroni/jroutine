@@ -21,10 +21,10 @@ import com.github.dm.jrt.android.builder.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.builder.LoaderConfiguration.Configurable;
 import com.github.dm.jrt.android.ext.channel.ParcelableSelectable;
 import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
-import com.github.dm.jrt.android.v11.core.JRoutine;
-import com.github.dm.jrt.android.v11.core.JRoutine.ContextBuilder;
+import com.github.dm.jrt.android.v11.core.JRoutineLoader;
+import com.github.dm.jrt.android.v11.core.JRoutineLoader.ContextBuilder;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
-import com.github.dm.jrt.android.v11.ext.channel.Channels;
+import com.github.dm.jrt.android.v11.ext.channel.SparseChannels;
 import com.github.dm.jrt.builder.ChannelConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
@@ -33,6 +33,7 @@ import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.common.RoutineException;
 import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
+import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Consumer;
@@ -493,11 +494,11 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
     public LoaderStreamChannel<? extends ParcelableSelectable<OUT>> toSelectable(final int index) {
 
         final ChannelConfiguration configuration = buildChannelConfiguration();
-        return newChannel(Channels.toSelectable(this, index)
-                                  .withChannels()
-                                  .with(configuration)
-                                  .getConfigured()
-                                  .build(), getStreamConfiguration(), getDelegationType(),
+        return newChannel(SparseChannels.toSelectable(this, index)
+                                        .withChannels()
+                                        .with(configuration)
+                                        .getConfigured()
+                                        .build(), getStreamConfiguration(), getDelegationType(),
                           getBinder());
     }
 
@@ -600,7 +601,7 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
     @NotNull
     public LoaderStreamChannel<OUT> with(@Nullable final LoaderContext context) {
 
-        mContextBuilder = (context != null) ? JRoutine.with(context) : null;
+        mContextBuilder = (context != null) ? JRoutineLoader.with(context) : null;
         return this;
     }
 
@@ -648,15 +649,15 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
 
         final ContextBuilder contextBuilder = mContextBuilder;
         if (contextBuilder == null) {
-            return JRoutine.on(factory)
-                           .withInvocations()
-                           .with(invocationConfiguration)
-                           .getConfigured()
-                           .buildRoutine();
+            return JRoutineCore.on(factory)
+                               .withInvocations()
+                               .with(invocationConfiguration)
+                               .getConfigured()
+                               .buildRoutine();
         }
 
         final FunctionContextInvocationFactory<? super OUT, ? extends AFTER> invocationFactory =
-                factoryFrom(JRoutine.on(factory).buildRoutine(), factory.hashCode(),
+                factoryFrom(JRoutineCore.on(factory).buildRoutine(), factory.hashCode(),
                             DelegationType.SYNC);
         return contextBuilder.on(invocationFactory)
                              .withInvocations()

@@ -19,7 +19,7 @@ package com.github.dm.jrt.android.v11.ext.channel;
 import android.util.SparseArray;
 
 import com.github.dm.jrt.android.ext.channel.ParcelableSelectable;
-import com.github.dm.jrt.android.v4.ext.channel.ChannelsCompat;
+import com.github.dm.jrt.android.v4.ext.channel.SparseChannelsCompat;
 import com.github.dm.jrt.builder.ChannelConfiguration;
 import com.github.dm.jrt.channel.Channel.InputChannel;
 import com.github.dm.jrt.channel.IOChannel;
@@ -31,6 +31,8 @@ import java.util.HashSet;
 
 /**
  * Builder implementation returning a map of input channels accepting selectable data.
+ * <p/>
+ * Created by davide-maestroni on 02/26/2016.
  *
  * @param <DATA> the channel data type.
  * @param <IN>   the input data type.
@@ -78,11 +80,11 @@ class InputMapBuilder<DATA, IN extends DATA> extends AbstractBuilder<SparseArray
                 new SparseArray<IOChannel<IN>>(indexes.size());
         for (final Integer index : indexes) {
             final IOChannel<IN> ioChannel =
-                    ChannelsCompat.<DATA, IN>selectParcelable(channel, index)
-                                  .withChannels()
-                                  .with(configuration)
-                                  .getConfigured()
-                                  .build();
+                    SparseChannelsCompat.<DATA, IN>selectParcelable(channel, index)
+                                        .withChannels()
+                                        .with(configuration)
+                                        .getConfigured()
+                                        .build();
             channelMap.put(index, ioChannel);
         }
 

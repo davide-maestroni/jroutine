@@ -20,7 +20,7 @@ import android.annotation.TargetApi;
 import android.content.Loader;
 import android.os.Build.VERSION_CODES;
 
-import com.github.dm.jrt.android.runner.Runners;
+import com.github.dm.jrt.android.runner.AndroidRunners;
 import com.github.dm.jrt.channel.AbortException;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.TemplateOutputConsumer;
@@ -47,7 +47,7 @@ import java.util.concurrent.TimeUnit;
 @TargetApi(VERSION_CODES.HONEYCOMB)
 class InvocationOutputConsumer<OUT> extends TemplateOutputConsumer<OUT> {
 
-    private static final Runner sMainRunner = Runners.mainRunner();
+    private static final Runner sMainRunner = AndroidRunners.mainRunner();
 
     private final ArrayList<OUT> mCachedResults = new ArrayList<OUT>();
 

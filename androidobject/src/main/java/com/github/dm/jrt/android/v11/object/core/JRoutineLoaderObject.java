@@ -62,14 +62,14 @@ import java.util.WeakHashMap;
  * possible to pass along the actual instance, but just the information needed to get or instantiate
  * it inside the loader instance.
  * <p/>
- * See {@link com.github.dm.jrt.android.v4.core.JRoutineCompat JRoutineCompat} for support of API
- * levels less than {@value android.os.Build.VERSION_CODES#HONEYCOMB}.
+ * See {@link com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat JRoutineLoaderCompat} for
+ * support of API levels lower than {@value android.os.Build.VERSION_CODES#HONEYCOMB}.
  * <p/>
  * Created by davide-maestroni on 12/08/2014.
  *
- * @see com.github.dm.jrt.object.core.JRoutine JRoutine
+ * @see com.github.dm.jrt.object.core.JRoutineObject JRoutineObject
  */
-public class JRoutine extends com.github.dm.jrt.android.v11.core.JRoutine {
+public class JRoutineLoaderObject {
 
     private static final WeakHashMap<LoaderContext, ContextBuilder> sBuilders =
             new WeakHashMap<LoaderContext, ContextBuilder>();
@@ -98,8 +98,7 @@ public class JRoutine extends com.github.dm.jrt.android.v11.core.JRoutine {
     /**
      * Context based builder of loader routine builders.
      */
-    public static class ContextBuilder
-            extends com.github.dm.jrt.android.v11.core.JRoutine.ContextBuilder {
+    public static class ContextBuilder {
 
         private final LoaderContext mContext;
 
@@ -108,9 +107,13 @@ public class JRoutine extends com.github.dm.jrt.android.v11.core.JRoutine {
          *
          * @param context the loader context.
          */
+        @SuppressWarnings("ConstantConditions")
         private ContextBuilder(@NotNull final LoaderContext context) {
 
-            super(context);
+            if (context == null) {
+                throw new NullPointerException("the loader context must not be null");
+            }
+
             mContext = context;
         }
 

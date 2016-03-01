@@ -26,8 +26,8 @@ import android.os.Message;
 import android.os.Messenger;
 
 import com.github.dm.jrt.android.invocation.ContextInvocation;
+import com.github.dm.jrt.android.invocation.ContextInvocationFactories;
 import com.github.dm.jrt.android.invocation.ContextInvocationFactory;
-import com.github.dm.jrt.android.invocation.ContextInvocations;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.channel.IOChannel;
@@ -35,7 +35,7 @@ import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.common.RoutineException;
 import com.github.dm.jrt.core.AbstractRoutine;
-import com.github.dm.jrt.core.JRoutine;
+import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.log.Log;
 import com.github.dm.jrt.log.Log.Level;
@@ -304,7 +304,7 @@ public class InvocationService extends Service {
             @NotNull final Class<? extends ContextInvocation<?, ?>> targetClass,
             @Nullable final Object... args) throws Exception {
 
-        return ContextInvocations.factoryOf(
+        return ContextInvocationFactories.factoryOf(
                 (Class<? extends ContextInvocation<Object, Object>>) targetClass, args);
     }
 
@@ -799,7 +799,7 @@ public class InvocationService extends Service {
             mChannel = channel;
             mRoutineInfo = info;
             mRoutineState = state;
-            final IOChannel<Object> ioChannel = (mIoChannel = JRoutine.io().buildChannel());
+            final IOChannel<Object> ioChannel = (mIoChannel = JRoutineCore.io().buildChannel());
             channel.pass(ioChannel);
         }
 

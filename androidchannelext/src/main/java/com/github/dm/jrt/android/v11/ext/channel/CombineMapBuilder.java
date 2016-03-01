@@ -18,10 +18,10 @@ package com.github.dm.jrt.android.v11.ext.channel;
 
 import android.util.SparseArray;
 
-import com.github.dm.jrt.android.v4.core.JRoutineCompat;
 import com.github.dm.jrt.builder.ChannelConfiguration;
 import com.github.dm.jrt.channel.Channel.InputChannel;
 import com.github.dm.jrt.channel.IOChannel;
+import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.ext.channel.AbstractBuilder;
 import com.github.dm.jrt.ext.channel.Selectable;
 
@@ -29,6 +29,8 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Builder implementation returning a channel combining data from a map of input channels.
+ * <p/>
+ * Created by davide-maestroni on 02/26/2016.
  *
  * @param <IN> the input data type.
  */
@@ -66,16 +68,13 @@ class CombineMapBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<? exten
         final int size = channelMap.size();
         final SparseArray<IOChannel<IN>> ioChannelMap = new SparseArray<IOChannel<IN>>(size);
         for (int i = 0; i < size; ++i) {
-            final IOChannel<IN> ioChannel = JRoutineCompat.io().buildChannel();
+            final IOChannel<IN> ioChannel = JRoutineCore.io().buildChannel();
             ioChannel.passTo(((InputChannel<IN>) channelMap.valueAt(i)));
             ioChannelMap.put(channelMap.keyAt(i), ioChannel);
         }
 
-        final IOChannel<Selectable<? extends IN>> ioChannel = JRoutineCompat.io()
-                                                                            .withChannels()
-                                                                            .with(configuration)
-                                                                            .getConfigured()
-                                                                            .buildChannel();
+        final IOChannel<Selectable<? extends IN>> ioChannel =
+                JRoutineCore.io().withChannels().with(configuration).getConfigured().buildChannel();
         ioChannel.passTo(new SortingMapOutputConsumer<IN>(ioChannelMap));
         return ioChannel;
     }

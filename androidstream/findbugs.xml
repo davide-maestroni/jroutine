@@ -20,8 +20,4 @@
         <!-- Too many false positives... -->
         <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT"/>
     </Match>
-    <Match>
-        <Class name="com.github.dm.jrt.android.v11.stream.Streams"/>
-        <Bug pattern="NM_SAME_SIMPLE_NAME_AS_SUPERCLASS"/>
-    </Match>
 </FindBugsFilter>

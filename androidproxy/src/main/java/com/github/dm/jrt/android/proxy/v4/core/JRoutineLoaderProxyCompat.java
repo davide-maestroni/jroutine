@@ -14,63 +14,78 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android.proxy.core;
+package com.github.dm.jrt.android.proxy.v4.core;
 
-import com.github.dm.jrt.android.core.ServiceContext;
 import com.github.dm.jrt.android.object.core.ContextInvocationTarget;
-import com.github.dm.jrt.android.proxy.builder.ServiceProxyRoutineBuilder;
+import com.github.dm.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
+import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.WeakHashMap;
+
 /**
  * Utility class used to create builders of objects wrapping target ones, so to enable asynchronous
- * calls of their methods in a dedicated service.
+ * calls of their methods, bound to a context lifecycle.
  * <p/>
  * The builders returned by this class are based on compile time code generation, enabled by
  * pre-processing of Java annotations.<br/>
  * The pre-processing is automatically triggered just by including the artifact of this class
  * module.
  * <p/>
- * Created by davide-maestroni on 05/13/2015.
+ * Created by davide-maestroni on 05/06/2015.
  *
- * @see com.github.dm.jrt.android.proxy.annotation.ServiceProxy ServiceProxy
+ * @see com.github.dm.jrt.android.object.annotation Android Annotations
+ * @see com.github.dm.jrt.android.proxy.annotation.LoaderProxyCompat LoaderProxyCompat
  * @see com.github.dm.jrt.object.annotation Annotations
  */
-public class JRoutineProxy extends com.github.dm.jrt.proxy.core.JRoutineProxy {
+public class JRoutineLoaderProxyCompat {
+
+    private static final WeakHashMap<LoaderContextCompat, ProxyContextBuilderCompat> sBuilders =
+            new WeakHashMap<LoaderContextCompat, ProxyContextBuilderCompat>();
 
     /**
      * Avoid direct instantiation.
      */
-    protected JRoutineProxy() {
+    protected JRoutineLoaderProxyCompat() {
 
     }
 
     /**
-     * Returns a context based builder of service proxy routine builders.
+     * Returns a context based builder of loader proxy routine builders.
      *
      * @param context the service context.
      * @return the context builder.
      */
     @NotNull
-    public static ContextBuilder with(@NotNull final ServiceContext context) {
+    public static ProxyContextBuilderCompat with(@NotNull final LoaderContextCompat context) {
 
-        return new ContextBuilder(context);
+        synchronized (sBuilders) {
+            final WeakHashMap<LoaderContextCompat, ProxyContextBuilderCompat> builders = sBuilders;
+            ProxyContextBuilderCompat contextBuilder = builders.get(context);
+            if (contextBuilder == null) {
+                contextBuilder = new ProxyContextBuilderCompat(context);
+                builders.put(context, contextBuilder);
+            }
+
+            return contextBuilder;
+        }
     }
 
     /**
-     * Context based builder of service routine builders.
+     * Context based builder of loader proxy routine builders.
      */
-    public static class ContextBuilder {
+    public static class ProxyContextBuilderCompat {
 
-        private final ServiceContext mContext;
+        private final LoaderContextCompat mContext;
 
         /**
          * Constructor.
          *
-         * @param context the service context.
+         * @param context the loader context.
          */
         @SuppressWarnings("ConstantConditions")
-        private ContextBuilder(@NotNull final ServiceContext context) {
+        private ProxyContextBuilderCompat(@NotNull final LoaderContextCompat context) {
 
             if (context == null) {
                 throw new NullPointerException("the context must not be null");
@@ -80,16 +95,14 @@ public class JRoutineProxy extends com.github.dm.jrt.proxy.core.JRoutineProxy {
         }
 
         /**
-         * Returns a builder of routines, wrapping the specified object instance, running in a
-         * service based on the builder context.<br/>
+         * Returns a builder of routines bound to the builder context, wrapping the specified target
+         * object.<br/>
          * In order to customize the object creation, the caller must employ an implementation of a
          * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
-         * invocation service.
+         * application context.
          * <p/>
-         * Note that the built routine results will be dispatched into the configured looper, thus,
-         * waiting for the outputs on the very same looper thread, immediately after its invocation,
-         * will result in a deadlock. By default, output results are dispatched in the main looper.
-         * <br/>
+         * Note that it is responsibility of the caller to retain a strong reference to the target
+         * instance to prevent it from being garbage collected.<br/>
          * Note also that the invocation input data will be cached, and the results will be produced
          * only after the invocation channel is closed, so be sure to avoid streaming inputs in
          * order to prevent starvation or out of memory errors.
@@ -98,9 +111,9 @@ public class JRoutineProxy extends com.github.dm.jrt.proxy.core.JRoutineProxy {
          * @return the routine builder instance.
          */
         @NotNull
-        public ServiceProxyRoutineBuilder on(@NotNull final ContextInvocationTarget<?> target) {
+        public LoaderProxyRoutineBuilder on(@NotNull final ContextInvocationTarget<?> target) {
 
-            return new DefaultServiceProxyRoutineBuilder(mContext, target);
+            return new DefaultLoaderProxyRoutineBuilder(mContext, target);
         }
     }
 }

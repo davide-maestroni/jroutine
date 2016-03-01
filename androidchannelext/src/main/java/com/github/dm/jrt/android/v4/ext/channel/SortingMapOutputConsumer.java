@@ -27,6 +27,8 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Output consumer sorting the output data among a map of channels.
+ * <p/>
+ * Created by davide-maestroni on 02/26/2016.
  *
  * @param <OUT> the output data type.
  */

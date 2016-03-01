@@ -20,12 +20,12 @@ import com.github.dm.jrt.android.builder.LoaderChannelBuilder;
 import com.github.dm.jrt.android.builder.LoaderConfiguration;
 import com.github.dm.jrt.android.builder.LoaderConfiguration.ClashResolutionType;
 import com.github.dm.jrt.android.invocation.MissingInvocationException;
-import com.github.dm.jrt.android.runner.Runners;
+import com.github.dm.jrt.android.runner.AndroidRunners;
 import com.github.dm.jrt.builder.ChannelConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
-import com.github.dm.jrt.core.JRoutine;
+import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.runner.TemplateExecution;
 import com.github.dm.jrt.util.TimeDuration;
@@ -80,7 +80,7 @@ class DefaultLoaderChannelBuilder
         final LoaderContextCompat context = mContext;
         final Object component = context.getComponent();
         if (component == null) {
-            final IOChannel<OUT> ioChannel = JRoutine.io().buildChannel();
+            final IOChannel<OUT> ioChannel = JRoutineCore.io().buildChannel();
             ioChannel.abort(new MissingInvocationException(loaderId));
             return ioChannel.close();
         }
@@ -137,9 +137,9 @@ class DefaultLoaderChannelBuilder
                 }
             }
 
-            Runners.mainRunner()
-                   .run(new PurgeInputsExecution(context, mLoaderConfiguration.getLoaderIdOr(
-                           LoaderConfiguration.AUTO), inputList), 0, TimeUnit.MILLISECONDS);
+            AndroidRunners.mainRunner()
+                          .run(new PurgeInputsExecution(context, mLoaderConfiguration.getLoaderIdOr(
+                                  LoaderConfiguration.AUTO), inputList), 0, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -147,9 +147,9 @@ class DefaultLoaderChannelBuilder
 
         final LoaderContextCompat context = mContext;
         if (context.getComponent() != null) {
-            Runners.mainRunner()
-                   .run(new PurgeExecution(context, mLoaderConfiguration.getLoaderIdOr(
-                           LoaderConfiguration.AUTO)), 0, TimeUnit.MILLISECONDS);
+            AndroidRunners.mainRunner()
+                          .run(new PurgeExecution(context, mLoaderConfiguration.getLoaderIdOr(
+                                  LoaderConfiguration.AUTO)), 0, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -158,9 +158,9 @@ class DefaultLoaderChannelBuilder
         final LoaderContextCompat context = mContext;
         if (context.getComponent() != null) {
             final List<Object> inputList = Collections.singletonList(input);
-            Runners.mainRunner()
-                   .run(new PurgeInputsExecution(context, mLoaderConfiguration.getLoaderIdOr(
-                           LoaderConfiguration.AUTO), inputList), 0, TimeUnit.MILLISECONDS);
+            AndroidRunners.mainRunner()
+                          .run(new PurgeInputsExecution(context, mLoaderConfiguration.getLoaderIdOr(
+                                  LoaderConfiguration.AUTO), inputList), 0, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -177,9 +177,9 @@ class DefaultLoaderChannelBuilder
                 Collections.addAll(inputList, inputs);
             }
 
-            Runners.mainRunner()
-                   .run(new PurgeInputsExecution(context, mLoaderConfiguration.getLoaderIdOr(
-                           LoaderConfiguration.AUTO), inputList), 0, TimeUnit.MILLISECONDS);
+            AndroidRunners.mainRunner()
+                          .run(new PurgeInputsExecution(context, mLoaderConfiguration.getLoaderIdOr(
+                                  LoaderConfiguration.AUTO), inputList), 0, TimeUnit.MILLISECONDS);
         }
     }
 

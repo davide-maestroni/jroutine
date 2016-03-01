@@ -20,6 +20,7 @@ import android.os.HandlerThread;
 import android.os.Looper;
 
 import com.github.dm.jrt.runner.Runner;
+import com.github.dm.jrt.runner.Runners;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -31,7 +32,7 @@ import java.util.concurrent.Executor;
  * <p/>
  * Created by davide-maestroni on 09/28/2014.
  */
-public class Runners extends com.github.dm.jrt.runner.Runners {
+public class AndroidRunners {
 
     private static final Runner sMainRunner = new MainRunner();
 
@@ -48,7 +49,7 @@ public class Runners extends com.github.dm.jrt.runner.Runners {
             thread.start();
         }
 
-        return looperRunner(thread.getLooper(), syncRunner());
+        return looperRunner(thread.getLooper(), Runners.syncRunner());
     }
 
     /**
@@ -107,7 +108,7 @@ public class Runners extends com.github.dm.jrt.runner.Runners {
     @SuppressWarnings("ConstantConditions")
     public static Runner myRunner() {
 
-        return looperRunner(Looper.myLooper(), syncRunner());
+        return looperRunner(Looper.myLooper(), Runners.syncRunner());
     }
 
     /**
@@ -132,7 +133,7 @@ public class Runners extends com.github.dm.jrt.runner.Runners {
      * <a href="http://developer.android.com/reference/android/os/AsyncTask.html">AsyncTask<a/>s
      * especially on some platform versions.
      * <p/>
-     * Note also that the executor instance will be ignored on platforms with API level less than
+     * Note also that the executor instance will be ignored on platforms with API level lower than
      * {@value android.os.Build.VERSION_CODES#HONEYCOMB}.
      *
      * @param executor the executor.

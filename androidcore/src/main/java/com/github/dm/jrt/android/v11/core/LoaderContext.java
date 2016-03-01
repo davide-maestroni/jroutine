@@ -60,8 +60,8 @@ public abstract class LoaderContext {
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
             throw new UnsupportedOperationException(
                     "this method is supported only for API level >= " + VERSION_CODES.HONEYCOMB
-                            + ": use com.github.dm.jrt.android.v4.routine.JRoutineCompat class "
-                            + "instead");
+                            + ": use com.github.dm.jrt.android.v4.routine.JRoutineLoaderCompat "
+                            + "class instead");
         }
 
         return new ActivityContext(activity);
@@ -85,8 +85,8 @@ public abstract class LoaderContext {
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
             throw new UnsupportedOperationException(
                     "this method is supported only for API level >= " + VERSION_CODES.HONEYCOMB
-                            + ": use com.github.dm.jrt.android.v4.routine.JRoutineCompat class "
-                            + "instead");
+                            + ": use com.github.dm.jrt.android.v4.routine.JRoutineLoaderCompat "
+                            + "class instead");
         }
 
         return new WrappedActivityContext(activity, context);

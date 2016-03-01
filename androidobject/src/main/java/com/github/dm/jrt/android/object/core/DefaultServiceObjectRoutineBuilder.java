@@ -20,7 +20,7 @@ import android.content.Context;
 
 import com.github.dm.jrt.android.builder.ServiceConfiguration;
 import com.github.dm.jrt.android.builder.ServiceRoutineBuilder;
-import com.github.dm.jrt.android.core.JRoutine;
+import com.github.dm.jrt.android.core.JRoutineService;
 import com.github.dm.jrt.android.core.ServiceContext;
 import com.github.dm.jrt.android.core.TargetInvocationFactory;
 import com.github.dm.jrt.android.invocation.FunctionContextInvocation;
@@ -35,6 +35,7 @@ import com.github.dm.jrt.object.builder.ProxyConfiguration;
 import com.github.dm.jrt.object.common.Mutex;
 import com.github.dm.jrt.object.core.Builders.MethodInfo;
 import com.github.dm.jrt.object.core.InvocationTarget;
+import com.github.dm.jrt.object.core.JRoutineObject;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.util.ClassToken;
 
@@ -167,7 +168,8 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         final Object[] args = asArgs(sharedFields, target, name);
         final TargetInvocationFactory<Object, Object> factory =
                 factoryOf(MethodAliasInvocation.class, args);
-        final ServiceRoutineBuilder<Object, Object> builder = JRoutine.with(mContext).on(factory);
+        final ServiceRoutineBuilder<Object, Object> builder =
+                JRoutineService.with(mContext).on(factory);
         return (Routine<IN, OUT>) builder.withInvocations()
                                          .with(configurationWithAnnotations(
                                                  mInvocationConfiguration, targetMethod))
@@ -209,7 +211,8 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         final Object[] args = asArgs(sharedFields, target, name, toNames(parameterTypes));
         final TargetInvocationFactory<Object, Object> factory =
                 factoryOf(MethodSignatureInvocation.class, args);
-        final ServiceRoutineBuilder<Object, Object> builder = JRoutine.with(mContext).on(factory);
+        final ServiceRoutineBuilder<Object, Object> builder =
+                JRoutineService.with(mContext).on(factory);
         return (Routine<IN, OUT>) builder.withInvocations()
                                          .with(configurationWithAnnotations(
                                                  mInvocationConfiguration, targetMethod))
@@ -324,11 +327,11 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             try {
                 final InvocationTarget target = mTarget.getInvocationTarget(context);
                 mInstance = target.getTarget();
-                mRoutine = com.github.dm.jrt.object.core.JRoutine.on(target)
-                                                                 .withProxies()
-                                                                 .withSharedFields(mSharedFields)
-                                                                 .getConfigured()
-                                                                 .aliasMethod(mAliasName);
+                mRoutine = JRoutineObject.on(target)
+                                         .withProxies()
+                                         .withSharedFields(mSharedFields)
+                                         .getConfigured()
+                                         .aliasMethod(mAliasName);
 
             } catch (final Throwable t) {
                 throw InvocationException.wrapIfNeeded(t);
@@ -404,12 +407,11 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             try {
                 final InvocationTarget target = mTarget.getInvocationTarget(context);
                 mInstance = target.getTarget();
-                mRoutine = com.github.dm.jrt.object.core.JRoutine.on(target)
-                                                                 .withProxies()
-                                                                 .withSharedFields(mSharedFields)
-                                                                 .getConfigured()
-                                                                 .method(mMethodName,
-                                                                         mParameterTypes);
+                mRoutine = JRoutineObject.on(target)
+                                         .withProxies()
+                                         .withSharedFields(mSharedFields)
+                                         .getConfigured()
+                                         .method(mMethodName, mParameterTypes);
 
             } catch (final Throwable t) {
                 throw InvocationException.wrapIfNeeded(t);
@@ -542,7 +544,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             final InvocationConfiguration invocationConfiguration =
                     configurationWithAnnotations(mInvocationConfiguration, method);
             final ServiceRoutineBuilder<Object, Object> builder =
-                    JRoutine.with(mContext).on(factory);
+                    JRoutineService.with(mContext).on(factory);
             final Routine<Object, Object> routine = builder.withInvocations()
                                                            .with(invocationConfiguration)
                                                            .getConfigured()

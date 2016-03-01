@@ -49,9 +49,9 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
     public void testInvocationDecoratorAbort() {
 
         final Routine<String, String> routine =
-                JRoutine.with(serviceFrom(getActivity(), DecoratingService.class))
-                        .on(factoryOf(PassingStringInvocation.class))
-                        .buildRoutine();
+                JRoutineService.with(serviceFrom(getActivity(), DecoratingService.class))
+                               .on(factoryOf(PassingStringInvocation.class))
+                               .buildRoutine();
         assertThat(routine.asyncInvoke().after(millis(100)).pass("test").result().abort()).isTrue();
         routine.purge();
     }
@@ -59,9 +59,9 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
     public void testInvocationDecoratorLifecycle() {
 
         final Routine<String, String> routine =
-                JRoutine.with(serviceFrom(getActivity(), DecoratingService.class))
-                        .on(factoryOf(PassingStringInvocation.class))
-                        .buildRoutine();
+                JRoutineService.with(serviceFrom(getActivity(), DecoratingService.class))
+                               .on(factoryOf(PassingStringInvocation.class))
+                               .buildRoutine();
         assertThat(routine.asyncCall("test").afterMax(seconds(10)).all()).containsExactly("test");
         routine.purge();
     }

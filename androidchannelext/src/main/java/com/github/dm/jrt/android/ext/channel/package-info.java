@@ -15,9 +15,8 @@
  */
 
 /**
- * Loader based routine interfaces and implementations with support for Android compatibility
- * library.
+ * Utility classes handling routine channels specific to the Android platform.
  * <p/>
- * Created by davide-maestroni on 09/25/2014.
+ * Created by davide-maestroni on 03/01/2016.
  */
-package com.github.dm.jrt.android.v4.core;
+package com.github.dm.jrt.android.ext.channel;

@@ -15,7 +15,7 @@
  */
 
 /**
- * Core classes and interfaces specific to the Android platform.
+ * Core routine classes and interfaces specific to the Android platform.
  * <p/>
  * Created by davide-maestroni on 04/06/2015.
  */

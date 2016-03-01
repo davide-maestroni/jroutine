@@ -23,7 +23,7 @@ import com.github.dm.jrt.android.invocation.ContextInvocation;
 import com.github.dm.jrt.android.invocation.FunctionContextInvocation;
 import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
 import com.github.dm.jrt.android.routine.LoaderRoutine;
-import com.github.dm.jrt.android.runner.Runners;
+import com.github.dm.jrt.android.runner.AndroidRunners;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.AbstractRoutine;
@@ -102,8 +102,9 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
         super.purge();
         final LoaderContext context = mContext;
         if (context.getComponent() != null) {
-            Runners.mainRunner()
-                   .run(new PurgeExecution(context, mFactory, mLoaderId), 0, TimeUnit.MILLISECONDS);
+            AndroidRunners.mainRunner()
+                          .run(new PurgeExecution(context, mFactory, mLoaderId), 0,
+                               TimeUnit.MILLISECONDS);
         }
     }
 
@@ -153,7 +154,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
             final List<IN> inputList = Collections.singletonList(input);
             final PurgeInputsExecution<IN> execution =
                     new PurgeInputsExecution<IN>(context, mFactory, mLoaderId, inputList);
-            Runners.mainRunner().run(execution, 0, TimeUnit.MILLISECONDS);
+            AndroidRunners.mainRunner().run(execution, 0, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -172,7 +173,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
 
             final PurgeInputsExecution<IN> execution =
                     new PurgeInputsExecution<IN>(context, mFactory, mLoaderId, inputList);
-            Runners.mainRunner().run(execution, 0, TimeUnit.MILLISECONDS);
+            AndroidRunners.mainRunner().run(execution, 0, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -193,7 +194,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
 
             final PurgeInputsExecution<IN> execution =
                     new PurgeInputsExecution<IN>(context, mFactory, mLoaderId, inputList);
-            Runners.mainRunner().run(execution, 0, TimeUnit.MILLISECONDS);
+            AndroidRunners.mainRunner().run(execution, 0, TimeUnit.MILLISECONDS);
         }
     }
 

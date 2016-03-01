@@ -23,7 +23,7 @@ import com.github.dm.jrt.android.invocation.ContextInvocation;
 import com.github.dm.jrt.android.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
-import com.github.dm.jrt.core.JRoutine;
+import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.log.Logger;
 
@@ -32,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import static com.github.dm.jrt.android.invocation.ContextInvocations.fromFactory;
+import static com.github.dm.jrt.android.invocation.ContextInvocationFactories.fromFactory;
 
 /**
  * Loader implementation performing the routine invocation.
@@ -154,14 +154,14 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
                 new InvocationOutputConsumer<OUT>(this, logger);
         final LoaderContextInvocationFactory<IN, OUT> factory =
                 new LoaderContextInvocationFactory<IN, OUT>(mInvocation);
-        JRoutine.on(fromFactory(getContext(), factory))
-                .withInvocations()
-                .withOutputOrder(mOrderType)
-                .withLog(logger.getLog())
-                .withLogLevel(logger.getLogLevel())
-                .getConfigured()
-                .syncCall(mInputs)
-                .passTo(consumer);
+        JRoutineCore.on(fromFactory(getContext(), factory))
+                    .withInvocations()
+                    .withOutputOrder(mOrderType)
+                    .withLog(logger.getLog())
+                    .withLogLevel(logger.getLogLevel())
+                    .getConfigured()
+                    .syncCall(mInputs)
+                    .passTo(consumer);
         return consumer.createResult();
     }
 

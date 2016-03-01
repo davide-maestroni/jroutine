@@ -18,7 +18,7 @@ package com.github.dm.jrt.android.v4.core;
 
 import android.support.v4.content.Loader;
 
-import com.github.dm.jrt.android.runner.Runners;
+import com.github.dm.jrt.android.runner.AndroidRunners;
 import com.github.dm.jrt.channel.AbortException;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.TemplateOutputConsumer;
@@ -44,7 +44,7 @@ import java.util.concurrent.TimeUnit;
  */
 class InvocationOutputConsumer<OUT> extends TemplateOutputConsumer<OUT> {
 
-    private static final Runner sMainRunner = Runners.mainRunner();
+    private static final Runner sMainRunner = AndroidRunners.mainRunner();
 
     private final ArrayList<OUT> mCachedResults = new ArrayList<OUT>();
 

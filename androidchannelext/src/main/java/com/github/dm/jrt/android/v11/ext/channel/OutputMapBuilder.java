@@ -19,10 +19,10 @@ package com.github.dm.jrt.android.v11.ext.channel;
 import android.util.SparseArray;
 
 import com.github.dm.jrt.android.ext.channel.ParcelableSelectable;
-import com.github.dm.jrt.android.v4.core.JRoutineCompat;
 import com.github.dm.jrt.builder.ChannelConfiguration;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
+import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.ext.channel.AbstractBuilder;
 import com.github.dm.jrt.util.WeakIdentityHashMap;
 
@@ -34,6 +34,8 @@ import java.util.Set;
 
 /**
  * Builder implementation returning a map of output channels returning selectable output data.
+ * <p/>
+ * Created by davide-maestroni on 02/26/2016.
  *
  * @param <OUT> the output data type.
  */
@@ -111,11 +113,11 @@ class OutputMapBuilder<OUT> extends AbstractBuilder<SparseArray<OutputChannel<OU
                 final SparseArray<IOChannel<OUT>> inputMap = new SparseArray<IOChannel<OUT>>(size);
                 channels = new SparseArray<OutputChannel<?>>(size);
                 for (final Integer index : indexes) {
-                    final IOChannel<OUT> ioChannel = JRoutineCompat.io()
-                                                                   .withChannels()
-                                                                   .with(configuration)
-                                                                   .getConfigured()
-                                                                   .buildChannel();
+                    final IOChannel<OUT> ioChannel = JRoutineCore.io()
+                                                                 .withChannels()
+                                                                 .with(configuration)
+                                                                 .getConfigured()
+                                                                 .buildChannel();
                     inputMap.append(index, ioChannel);
                     channelMap.append(index, ioChannel);
                     channels.append(index, ioChannel);

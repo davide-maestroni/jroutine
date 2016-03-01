@@ -27,7 +27,7 @@ import com.github.dm.jrt.android.invocation.FunctionContextInvocation;
 import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
 import com.github.dm.jrt.android.object.builder.FactoryContextWrapper;
 import com.github.dm.jrt.android.object.builder.LoaderObjectRoutineBuilder;
-import com.github.dm.jrt.android.object.core.ContextInvocationTarget;
+import com.github.dm.jrt.android.v11.core.JRoutineLoader;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
@@ -37,6 +37,7 @@ import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.ResultChannel;
+import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.log.Log;
 import com.github.dm.jrt.log.Log.Level;
@@ -69,7 +70,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.dm.jrt.android.invocation.FunctionContextInvocations.factoryOf;
+import static com.github.dm.jrt.android.invocation.FunctionContextInvocationFactories.factoryOf;
 import static com.github.dm.jrt.android.object.core.ContextInvocationTarget.classOfType;
 import static com.github.dm.jrt.android.object.core.ContextInvocationTarget.instanceOf;
 import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
@@ -102,7 +103,7 @@ public class LoaderObjectRoutineActivityTest
 
         try {
 
-            JRoutine.with((LoaderContext) null).on(factoryOf(TestInvocation.class));
+            JRoutineLoader.with((LoaderContext) null).on(factoryOf(TestInvocation.class));
 
             fail();
 
@@ -112,8 +113,8 @@ public class LoaderObjectRoutineActivityTest
 
         try {
 
-            JRoutine.with(loaderFrom(getActivity()))
-                    .on((FunctionContextInvocationFactory<?, ?>) null);
+            JRoutineLoader.with(loaderFrom(getActivity()))
+                          .on((FunctionContextInvocationFactory<?, ?>) null);
 
             fail();
 
@@ -123,7 +124,7 @@ public class LoaderObjectRoutineActivityTest
 
         try {
 
-            JRoutine.with((LoaderContext) null).on(classOfType(TestInvocation.class));
+            JRoutineLoaderObject.with((LoaderContext) null).on(classOfType(TestInvocation.class));
 
             fail();
 
@@ -133,8 +134,8 @@ public class LoaderObjectRoutineActivityTest
 
         try {
 
-            JRoutine.with((LoaderContext) null)
-                    .on(instanceOf(TestInvocation.class, Reflection.NO_ARGS));
+            JRoutineLoaderObject.with((LoaderContext) null)
+                                .on(instanceOf(TestInvocation.class, Reflection.NO_ARGS));
 
             fail();
 
@@ -144,7 +145,7 @@ public class LoaderObjectRoutineActivityTest
 
         try {
 
-            JRoutine.with(loaderFrom(getActivity())).on(classOfType((Class<?>) null));
+            JRoutineLoaderObject.with(loaderFrom(getActivity())).on(classOfType((Class<?>) null));
 
             fail();
 
@@ -154,7 +155,8 @@ public class LoaderObjectRoutineActivityTest
 
         try {
 
-            JRoutine.with(loaderFrom(getActivity())).on(instanceOf(null, Reflection.NO_ARGS));
+            JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                .on(instanceOf(null, Reflection.NO_ARGS));
 
             fail();
 
@@ -164,7 +166,7 @@ public class LoaderObjectRoutineActivityTest
 
         try {
 
-            JRoutine.with((LoaderContext) null);
+            JRoutineLoaderObject.with((LoaderContext) null);
 
             fail();
 
@@ -181,18 +183,19 @@ public class LoaderObjectRoutineActivityTest
         }
 
         final TimeDuration timeout = seconds(10);
-        final Routine<Object, Object> routine = JRoutine.with(loaderFrom(getActivity()))
-                                                        .on(instanceOf(TestClass.class))
-                                                        .withInvocations()
-                                                        .withRunner(Runners.poolRunner())
-                                                        .withMaxInstances(1)
-                                                        .withCoreInstances(1)
-                                                        .withReadTimeoutAction(
-                                                                TimeoutActionType.EXIT)
-                                                        .withLogLevel(Level.DEBUG)
-                                                        .withLog(new NullLog())
-                                                        .getConfigured()
-                                                        .aliasMethod(TestClass.GET);
+        final Routine<Object, Object> routine = JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                                                    .on(instanceOf(TestClass.class))
+                                                                    .withInvocations()
+                                                                    .withRunner(
+                                                                            Runners.poolRunner())
+                                                                    .withMaxInstances(1)
+                                                                    .withCoreInstances(1)
+                                                                    .withReadTimeoutAction(
+                                                                            TimeoutActionType.EXIT)
+                                                                    .withLogLevel(Level.DEBUG)
+                                                                    .withLog(new NullLog())
+                                                                    .getConfigured()
+                                                                    .aliasMethod(TestClass.GET);
 
         assertThat(routine.syncCall().afterMax(timeout).all()).containsExactly(-77L);
     }
@@ -204,12 +207,12 @@ public class LoaderObjectRoutineActivityTest
             return;
         }
 
-        assertThat(JRoutine.with(loaderFrom(getActivity()))
-                           .on(instanceOf(TestArgs.class, 17))
-                           .method("getId")
-                           .asyncCall()
-                           .afterMax(seconds(10))
-                           .next()).isEqualTo(17);
+        assertThat(JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                       .on(instanceOf(TestArgs.class, 17))
+                                       .method("getId")
+                                       .asyncCall()
+                                       .afterMax(seconds(10))
+                                       .next()).isEqualTo(17);
     }
 
     public void testAsyncInputProxyRoutine() {
@@ -220,29 +223,29 @@ public class LoaderObjectRoutineActivityTest
         }
 
         final TimeDuration timeout = seconds(10);
-        final SumItf sumAsync = JRoutine.with(loaderFrom(getActivity()))
-                                        .on(instanceOf(Sum.class))
-                                        .withInvocations()
-                                        .withReadTimeout(timeout)
-                                        .getConfigured()
-                                        .buildProxy(SumItf.class);
-        final IOChannel<Integer> channel3 = JRoutine.io().buildChannel();
+        final SumItf sumAsync = JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                                    .on(instanceOf(Sum.class))
+                                                    .withInvocations()
+                                                    .withReadTimeout(timeout)
+                                                    .getConfigured()
+                                                    .buildProxy(SumItf.class);
+        final IOChannel<Integer> channel3 = JRoutineCore.io().buildChannel();
         channel3.pass(7).close();
         assertThat(sumAsync.compute(3, channel3)).isEqualTo(10);
 
-        final IOChannel<Integer> channel4 = JRoutine.io().buildChannel();
+        final IOChannel<Integer> channel4 = JRoutineCore.io().buildChannel();
         channel4.pass(1, 2, 3, 4).close();
         assertThat(sumAsync.compute(channel4)).isEqualTo(10);
 
-        final IOChannel<int[]> channel5 = JRoutine.io().buildChannel();
+        final IOChannel<int[]> channel5 = JRoutineCore.io().buildChannel();
         channel5.pass(new int[]{1, 2, 3, 4}).close();
         assertThat(sumAsync.compute1(channel5)).isEqualTo(10);
 
-        final IOChannel<Integer> channel6 = JRoutine.io().buildChannel();
+        final IOChannel<Integer> channel6 = JRoutineCore.io().buildChannel();
         channel6.pass(1, 2, 3, 4).close();
         assertThat(sumAsync.computeList(channel6)).isEqualTo(10);
 
-        final IOChannel<Integer> channel7 = JRoutine.io().buildChannel();
+        final IOChannel<Integer> channel7 = JRoutineCore.io().buildChannel();
         channel7.pass(1, 2, 3, 4).close();
         assertThat(sumAsync.computeList1(channel7)).isEqualTo(10);
     }
@@ -255,12 +258,12 @@ public class LoaderObjectRoutineActivityTest
         }
 
         final TimeDuration timeout = seconds(10);
-        final CountItf countAsync = JRoutine.with(loaderFrom(getActivity()))
-                                            .on(instanceOf(Count.class))
-                                            .withInvocations()
-                                            .withReadTimeout(timeout)
-                                            .getConfigured()
-                                            .buildProxy(CountItf.class);
+        final CountItf countAsync = JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                                        .on(instanceOf(Count.class))
+                                                        .withInvocations()
+                                                        .withReadTimeout(timeout)
+                                                        .getConfigured()
+                                                        .buildProxy(CountItf.class);
         assertThat(countAsync.count(3).all()).containsExactly(0, 1, 2);
         assertThat(countAsync.count1(3).all()).containsExactly(new int[]{0, 1, 2});
         assertThat(countAsync.count2(2).all()).containsExactly(0, 1);
@@ -333,27 +336,27 @@ public class LoaderObjectRoutineActivityTest
                                                                .withLogLevel(Level.DEBUG)
                                                                .withLog(countLog)
                                                                .getConfigured();
-        JRoutine.with(loaderFrom(getActivity()))
-                .on(instanceOf(TestClass.class))
-                .withInvocations()
-                .with(configuration)
-                .getConfigured()
-                .withProxies()
-                .withSharedFields("test")
-                .getConfigured()
-                .aliasMethod(TestClass.GET);
+        JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                            .on(instanceOf(TestClass.class))
+                            .withInvocations()
+                            .with(configuration)
+                            .getConfigured()
+                            .withProxies()
+                            .withSharedFields("test")
+                            .getConfigured()
+                            .aliasMethod(TestClass.GET);
         assertThat(countLog.getWrnCount()).isEqualTo(1);
 
-        JRoutine.with(loaderFrom(getActivity()))
-                .on(instanceOf(Square.class))
-                .withInvocations()
-                .with(configuration)
-                .getConfigured()
-                .withProxies()
-                .withSharedFields("test")
-                .getConfigured()
-                .buildProxy(SquareItf.class)
-                .compute(3);
+        JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                            .on(instanceOf(Square.class))
+                            .withInvocations()
+                            .with(configuration)
+                            .getConfigured()
+                            .withProxies()
+                            .withSharedFields("test")
+                            .getConfigured()
+                            .buildProxy(SquareItf.class)
+                            .compute(3);
         assertThat(countLog.getWrnCount()).isEqualTo(2);
     }
 
@@ -366,12 +369,12 @@ public class LoaderObjectRoutineActivityTest
 
         final TestActivity activity = getActivity();
         final StringContext contextWrapper = new StringContext(activity);
-        assertThat(JRoutine.with(loaderFrom(activity, contextWrapper))
-                           .on(instanceOf(String.class))
-                           .method("toString")
-                           .asyncCall()
-                           .afterMax(seconds(10))
-                           .next()).isEqualTo("test1");
+        assertThat(JRoutineLoaderObject.with(loaderFrom(activity, contextWrapper))
+                                       .on(instanceOf(String.class))
+                                       .method("toString")
+                                       .asyncCall()
+                                       .afterMax(seconds(10))
+                                       .next()).isEqualTo("test1");
     }
 
     public void testDuplicateAnnotationError() {
@@ -383,9 +386,9 @@ public class LoaderObjectRoutineActivityTest
 
         try {
 
-            JRoutine.with(loaderFrom(getActivity()))
-                    .on(instanceOf(DuplicateAnnotation.class))
-                    .aliasMethod(DuplicateAnnotation.GET);
+            JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                .on(instanceOf(DuplicateAnnotation.class))
+                                .aliasMethod(DuplicateAnnotation.GET);
 
             fail();
 
@@ -402,9 +405,10 @@ public class LoaderObjectRoutineActivityTest
         }
 
         final TimeDuration timeout = seconds(10);
-        final Routine<Object, Object> routine3 = JRoutine.with(loaderFrom(getActivity()))
-                                                         .on(instanceOf(TestClass.class))
-                                                         .aliasMethod(TestClass.THROW);
+        final Routine<Object, Object> routine3 =
+                JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                    .on(instanceOf(TestClass.class))
+                                    .aliasMethod(TestClass.THROW);
 
         try {
 
@@ -428,9 +432,9 @@ public class LoaderObjectRoutineActivityTest
 
         try {
 
-            JRoutine.with(loaderFrom(getActivity()))
-                    .on(instanceOf(TestClass.class))
-                    .buildProxy(TestClass.class);
+            JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                .on(instanceOf(TestClass.class))
+                                .buildProxy(TestClass.class);
 
             fail();
 
@@ -440,9 +444,9 @@ public class LoaderObjectRoutineActivityTest
 
         try {
 
-            JRoutine.with(loaderFrom(getActivity()))
-                    .on(instanceOf(TestClass.class))
-                    .buildProxy(ClassToken.tokenOf(TestClass.class));
+            JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                .on(instanceOf(TestClass.class))
+                                .buildProxy(ClassToken.tokenOf(TestClass.class));
 
             fail();
 
@@ -460,10 +464,10 @@ public class LoaderObjectRoutineActivityTest
 
         try {
 
-            JRoutine.with(loaderFrom(getActivity()))
-                    .on(instanceOf(Sum.class))
-                    .buildProxy(SumError.class)
-                    .compute(1, new int[0]);
+            JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                .on(instanceOf(Sum.class))
+                                .buildProxy(SumError.class)
+                                .compute(1, new int[0]);
 
             fail();
 
@@ -473,10 +477,10 @@ public class LoaderObjectRoutineActivityTest
 
         try {
 
-            JRoutine.with(loaderFrom(getActivity()))
-                    .on(instanceOf(Sum.class))
-                    .buildProxy(SumError.class)
-                    .compute(new String[0]);
+            JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                .on(instanceOf(Sum.class))
+                                .buildProxy(SumError.class)
+                                .compute(new String[0]);
 
             fail();
 
@@ -486,10 +490,10 @@ public class LoaderObjectRoutineActivityTest
 
         try {
 
-            JRoutine.with(loaderFrom(getActivity()))
-                    .on(instanceOf(Sum.class))
-                    .buildProxy(SumError.class)
-                    .compute(new int[0]);
+            JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                .on(instanceOf(Sum.class))
+                                .buildProxy(SumError.class)
+                                .compute(new int[0]);
 
             fail();
 
@@ -499,10 +503,10 @@ public class LoaderObjectRoutineActivityTest
 
         try {
 
-            JRoutine.with(loaderFrom(getActivity()))
-                    .on(instanceOf(Sum.class))
-                    .buildProxy(SumError.class)
-                    .compute(Collections.<Integer>emptyList());
+            JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                .on(instanceOf(Sum.class))
+                                .buildProxy(SumError.class)
+                                .compute(Collections.<Integer>emptyList());
 
             fail();
 
@@ -510,27 +514,14 @@ public class LoaderObjectRoutineActivityTest
 
         }
 
-        final IOChannel<Integer> channel = JRoutine.io().buildChannel();
+        final IOChannel<Integer> channel = JRoutineCore.io().buildChannel();
 
         try {
 
-            JRoutine.with(loaderFrom(getActivity()))
-                    .on(instanceOf(Sum.class))
-                    .buildProxy(SumError.class)
-                    .compute(channel);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            JRoutine.with(loaderFrom(getActivity()))
-                    .on(instanceOf(Sum.class))
-                    .buildProxy(SumError.class)
-                    .compute(1, channel);
+            JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                .on(instanceOf(Sum.class))
+                                .buildProxy(SumError.class)
+                                .compute(channel);
 
             fail();
 
@@ -540,10 +531,23 @@ public class LoaderObjectRoutineActivityTest
 
         try {
 
-            JRoutine.with(loaderFrom(getActivity()))
-                    .on(instanceOf(Sum.class))
-                    .buildProxy(SumError.class)
-                    .compute("test", channel);
+            JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                .on(instanceOf(Sum.class))
+                                .buildProxy(SumError.class)
+                                .compute(1, channel);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                .on(instanceOf(Sum.class))
+                                .buildProxy(SumError.class)
+                                .compute("test", channel);
 
             fail();
 
@@ -561,13 +565,13 @@ public class LoaderObjectRoutineActivityTest
 
         try {
 
-            JRoutine.with(loaderFrom(getActivity()))
-                    .on(instanceOf(TestClass.class))
-                    .withInvocations()
-                    .withReadTimeout(INFINITY)
-                    .getConfigured()
-                    .buildProxy(TestItf.class)
-                    .throwException(null);
+            JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                .on(instanceOf(TestClass.class))
+                                .withInvocations()
+                                .withReadTimeout(INFINITY)
+                                .getConfigured()
+                                .buildProxy(TestItf.class)
+                                .throwException(null);
 
             fail();
 
@@ -577,13 +581,13 @@ public class LoaderObjectRoutineActivityTest
 
         try {
 
-            JRoutine.with(loaderFrom(getActivity()))
-                    .on(instanceOf(TestClass.class))
-                    .withInvocations()
-                    .withReadTimeout(INFINITY)
-                    .getConfigured()
-                    .buildProxy(TestItf.class)
-                    .throwException1(null);
+            JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                .on(instanceOf(TestClass.class))
+                                .withInvocations()
+                                .withReadTimeout(INFINITY)
+                                .getConfigured()
+                                .buildProxy(TestItf.class)
+                                .throwException1(null);
 
             fail();
 
@@ -593,13 +597,13 @@ public class LoaderObjectRoutineActivityTest
 
         try {
 
-            JRoutine.with(loaderFrom(getActivity()))
-                    .on(instanceOf(TestClass.class))
-                    .withInvocations()
-                    .withReadTimeout(INFINITY)
-                    .getConfigured()
-                    .buildProxy(TestItf.class)
-                    .throwException2(null);
+            JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                .on(instanceOf(TestClass.class))
+                                .withInvocations()
+                                .withReadTimeout(INFINITY)
+                                .getConfigured()
+                                .buildProxy(TestItf.class)
+                                .throwException2(null);
 
             fail();
 
@@ -617,10 +621,10 @@ public class LoaderObjectRoutineActivityTest
 
         try {
 
-            JRoutine.with(loaderFrom(getActivity()))
-                    .on(instanceOf(Count.class))
-                    .buildProxy(CountError.class)
-                    .count(3);
+            JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                .on(instanceOf(Count.class))
+                                .buildProxy(CountError.class)
+                                .count(3);
 
             fail();
 
@@ -630,10 +634,10 @@ public class LoaderObjectRoutineActivityTest
 
         try {
 
-            JRoutine.with(loaderFrom(getActivity()))
-                    .on(instanceOf(Count.class))
-                    .buildProxy(CountError.class)
-                    .count1(3);
+            JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                .on(instanceOf(Count.class))
+                                .buildProxy(CountError.class)
+                                .count1(3);
 
             fail();
 
@@ -643,10 +647,10 @@ public class LoaderObjectRoutineActivityTest
 
         try {
 
-            JRoutine.with(loaderFrom(getActivity()))
-                    .on(instanceOf(Count.class))
-                    .buildProxy(CountError.class)
-                    .countList(3);
+            JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                .on(instanceOf(Count.class))
+                                .buildProxy(CountError.class)
+                                .countList(3);
 
             fail();
 
@@ -656,10 +660,10 @@ public class LoaderObjectRoutineActivityTest
 
         try {
 
-            JRoutine.with(loaderFrom(getActivity()))
-                    .on(instanceOf(Count.class))
-                    .buildProxy(CountError.class)
-                    .countList1(3);
+            JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                .on(instanceOf(Count.class))
+                                .buildProxy(CountError.class)
+                                .countList1(3);
 
             fail();
 
@@ -676,17 +680,17 @@ public class LoaderObjectRoutineActivityTest
         }
 
         final TimeDuration timeout = seconds(10);
-        final Routine<Object, Object> routine2 = JRoutine.with(loaderFrom(getActivity()))
-                                                         .on(instanceOf(TestClass.class))
-                                                         .withInvocations()
-                                                         .withRunner(Runners.poolRunner())
-                                                         .withMaxInstances(1)
-                                                         .getConfigured()
-                                                         .withProxies()
-                                                         .withSharedFields("test")
-                                                         .getConfigured()
-                                                         .method(TestClass.class.getMethod(
-                                                                 "getLong"));
+        final Routine<Object, Object> routine2 =
+                JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                    .on(instanceOf(TestClass.class))
+                                    .withInvocations()
+                                    .withRunner(Runners.poolRunner())
+                                    .withMaxInstances(1)
+                                    .getConfigured()
+                                    .withProxies()
+                                    .withSharedFields("test")
+                                    .getConfigured()
+                                    .method(TestClass.class.getMethod("getLong"));
 
         assertThat(routine2.syncCall().afterMax(timeout).all()).containsExactly(-77L);
 
@@ -700,12 +704,13 @@ public class LoaderObjectRoutineActivityTest
         }
 
         final TimeDuration timeout = seconds(10);
-        final Routine<Object, Object> routine1 = JRoutine.with(loaderFrom(getActivity()))
-                                                         .on(instanceOf(TestClass.class))
-                                                         .withInvocations()
-                                                         .withRunner(Runners.poolRunner())
-                                                         .getConfigured()
-                                                         .method("getLong");
+        final Routine<Object, Object> routine1 =
+                JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                    .on(instanceOf(TestClass.class))
+                                    .withInvocations()
+                                    .withRunner(Runners.poolRunner())
+                                    .getConfigured()
+                                    .method("getLong");
 
         assertThat(routine1.syncCall().afterMax(timeout).all()).containsExactly(-77L);
     }
@@ -719,9 +724,9 @@ public class LoaderObjectRoutineActivityTest
 
         try {
 
-            JRoutine.with(loaderFrom(getActivity()))
-                    .on(instanceOf(TestClass.class))
-                    .aliasMethod("test");
+            JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                .on(instanceOf(TestClass.class))
+                                .aliasMethod("test");
 
             fail();
 
@@ -739,7 +744,9 @@ public class LoaderObjectRoutineActivityTest
 
         try {
 
-            JRoutine.with(loaderFrom(getActivity())).on(instanceOf(TestClass.class)).method("test");
+            JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                .on(instanceOf(TestClass.class))
+                                .method("test");
 
             fail();
 
@@ -758,7 +765,7 @@ public class LoaderObjectRoutineActivityTest
 
         try {
 
-            JRoutine.with(loaderFrom(getActivity())).on((ContextInvocationTarget) null);
+            JRoutineLoaderObject.with(loaderFrom(getActivity())).on(null);
 
             fail();
 
@@ -768,7 +775,7 @@ public class LoaderObjectRoutineActivityTest
 
         try {
 
-            JRoutine.with(loaderFrom(getActivity())).on(instanceOf(null));
+            JRoutineLoaderObject.with(loaderFrom(getActivity())).on(instanceOf(null));
 
             fail();
 
@@ -787,9 +794,9 @@ public class LoaderObjectRoutineActivityTest
 
         try {
 
-            JRoutine.with(loaderFrom(getActivity()))
-                    .on(instanceOf(TestClass.class))
-                    .buildProxy((Class<?>) null);
+            JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                .on(instanceOf(TestClass.class))
+                                .buildProxy((Class<?>) null);
 
             fail();
 
@@ -799,9 +806,9 @@ public class LoaderObjectRoutineActivityTest
 
         try {
 
-            JRoutine.with(loaderFrom(getActivity()))
-                    .on(instanceOf(TestClass.class))
-                    .buildProxy((ClassToken<?>) null);
+            JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                .on(instanceOf(TestClass.class))
+                                .buildProxy((ClassToken<?>) null);
 
             fail();
 
@@ -818,25 +825,25 @@ public class LoaderObjectRoutineActivityTest
             return;
         }
 
-        final Itf itf = JRoutine.with(loaderFrom(getActivity()))
-                                .on(instanceOf(Impl.class))
-                                .withInvocations()
-                                .withReadTimeout(seconds(10))
-                                .getConfigured()
-                                .buildProxy(Itf.class);
+        final Itf itf = JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                            .on(instanceOf(Impl.class))
+                                            .withInvocations()
+                                            .withReadTimeout(seconds(10))
+                                            .getConfigured()
+                                            .buildProxy(Itf.class);
 
         assertThat(itf.add0('c')).isEqualTo((int) 'c');
-        final IOChannel<Character> channel1 = JRoutine.io().buildChannel();
+        final IOChannel<Character> channel1 = JRoutineCore.io().buildChannel();
         channel1.pass('a').close();
         assertThat(itf.add1(channel1)).isEqualTo((int) 'a');
-        final IOChannel<Character> channel2 = JRoutine.io().buildChannel();
+        final IOChannel<Character> channel2 = JRoutineCore.io().buildChannel();
         channel2.pass('d', 'e', 'f').close();
         assertThat(itf.add2(channel2)).isIn((int) 'd', (int) 'e', (int) 'f');
         assertThat(itf.add3('c').all()).containsExactly((int) 'c');
-        final IOChannel<Character> channel3 = JRoutine.io().buildChannel();
+        final IOChannel<Character> channel3 = JRoutineCore.io().buildChannel();
         channel3.pass('a').close();
         assertThat(itf.add4(channel3).all()).containsExactly((int) 'a');
-        final IOChannel<Character> channel4 = JRoutine.io().buildChannel();
+        final IOChannel<Character> channel4 = JRoutineCore.io().buildChannel();
         channel4.pass('d', 'e', 'f').close();
         assertThat(itf.add5(channel4).all()).containsOnly((int) 'd', (int) 'e', (int) 'f');
         assertThat(itf.add6().pass('d').result().all()).containsOnly((int) 'd');
@@ -846,36 +853,36 @@ public class LoaderObjectRoutineActivityTest
         assertThat(itf.add11().parallelCall('d', 'e', 'f').all()).containsOnly((int) 'd', (int) 'e',
                                                                                (int) 'f');
         assertThat(itf.addA00(new char[]{'c', 'z'})).isEqualTo(new int[]{'c', 'z'});
-        final IOChannel<char[]> channel5 = JRoutine.io().buildChannel();
+        final IOChannel<char[]> channel5 = JRoutineCore.io().buildChannel();
         channel5.pass(new char[]{'a', 'z'}).close();
         assertThat(itf.addA01(channel5)).isEqualTo(new int[]{'a', 'z'});
-        final IOChannel<Character> channel6 = JRoutine.io().buildChannel();
+        final IOChannel<Character> channel6 = JRoutineCore.io().buildChannel();
         channel6.pass('d', 'e', 'f').close();
         assertThat(itf.addA02(channel6)).isEqualTo(new int[]{'d', 'e', 'f'});
-        final IOChannel<char[]> channel7 = JRoutine.io().buildChannel();
+        final IOChannel<char[]> channel7 = JRoutineCore.io().buildChannel();
         channel7.pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'}).close();
         assertThat(itf.addA03(channel7)).isIn(new int[]{'d', 'z'}, new int[]{'e', 'z'},
                                               new int[]{'f', 'z'});
         assertThat(itf.addA04(new char[]{'c', 'z'}).all()).containsExactly(new int[]{'c', 'z'});
-        final IOChannel<char[]> channel8 = JRoutine.io().buildChannel();
+        final IOChannel<char[]> channel8 = JRoutineCore.io().buildChannel();
         channel8.pass(new char[]{'a', 'z'}).close();
         assertThat(itf.addA05(channel8).all()).containsExactly(new int[]{'a', 'z'});
-        final IOChannel<Character> channel9 = JRoutine.io().buildChannel();
+        final IOChannel<Character> channel9 = JRoutineCore.io().buildChannel();
         channel9.pass('d', 'e', 'f').close();
         assertThat(itf.addA06(channel9).all()).containsExactly(new int[]{'d', 'e', 'f'});
-        final IOChannel<char[]> channel10 = JRoutine.io().buildChannel();
+        final IOChannel<char[]> channel10 = JRoutineCore.io().buildChannel();
         channel10.pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'}).close();
         assertThat(itf.addA07(channel10).all()).containsOnly(new int[]{'d', 'z'},
                                                              new int[]{'e', 'z'},
                                                              new int[]{'f', 'z'});
         assertThat(itf.addA08(new char[]{'c', 'z'}).all()).containsExactly((int) 'c', (int) 'z');
-        final IOChannel<char[]> channel11 = JRoutine.io().buildChannel();
+        final IOChannel<char[]> channel11 = JRoutineCore.io().buildChannel();
         channel11.pass(new char[]{'a', 'z'}).close();
         assertThat(itf.addA09(channel11).all()).containsExactly((int) 'a', (int) 'z');
-        final IOChannel<Character> channel12 = JRoutine.io().buildChannel();
+        final IOChannel<Character> channel12 = JRoutineCore.io().buildChannel();
         channel12.pass('d', 'e', 'f').close();
         assertThat(itf.addA10(channel12).all()).containsExactly((int) 'd', (int) 'e', (int) 'f');
-        final IOChannel<char[]> channel13 = JRoutine.io().buildChannel();
+        final IOChannel<char[]> channel13 = JRoutineCore.io().buildChannel();
         channel13.pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'}).close();
         assertThat(itf.addA11(channel13).all()).containsOnly((int) 'd', (int) 'e', (int) 'f',
                                                              (int) 'z');
@@ -909,13 +916,13 @@ public class LoaderObjectRoutineActivityTest
                                            (int) 'z');
         assertThat(itf.addL00(Arrays.asList('c', 'z'))).isEqualTo(
                 Arrays.asList((int) 'c', (int) 'z'));
-        final IOChannel<List<Character>> channel20 = JRoutine.io().buildChannel();
+        final IOChannel<List<Character>> channel20 = JRoutineCore.io().buildChannel();
         channel20.pass(Arrays.asList('a', 'z')).close();
         assertThat(itf.addL01(channel20)).isEqualTo(Arrays.asList((int) 'a', (int) 'z'));
-        final IOChannel<Character> channel21 = JRoutine.io().buildChannel();
+        final IOChannel<Character> channel21 = JRoutineCore.io().buildChannel();
         channel21.pass('d', 'e', 'f').close();
         assertThat(itf.addL02(channel21)).isEqualTo(Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
-        final IOChannel<List<Character>> channel22 = JRoutine.io().buildChannel();
+        final IOChannel<List<Character>> channel22 = JRoutineCore.io().buildChannel();
         channel22.pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
                  .close();
         assertThat(itf.addL03(channel22)).isIn(Arrays.asList((int) 'd', (int) 'z'),
@@ -923,28 +930,28 @@ public class LoaderObjectRoutineActivityTest
                                                Arrays.asList((int) 'f', (int) 'z'));
         assertThat(itf.addL04(Arrays.asList('c', 'z')).all()).containsExactly(
                 Arrays.asList((int) 'c', (int) 'z'));
-        final IOChannel<List<Character>> channel23 = JRoutine.io().buildChannel();
+        final IOChannel<List<Character>> channel23 = JRoutineCore.io().buildChannel();
         channel23.pass(Arrays.asList('a', 'z')).close();
         assertThat(itf.addL05(channel23).all()).containsExactly(
                 Arrays.asList((int) 'a', (int) 'z'));
-        final IOChannel<Character> channel24 = JRoutine.io().buildChannel();
+        final IOChannel<Character> channel24 = JRoutineCore.io().buildChannel();
         channel24.pass('d', 'e', 'f').close();
         assertThat(itf.addL06(channel24).all()).containsExactly(
                 Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
-        final IOChannel<List<Character>> channel25 = JRoutine.io().buildChannel();
+        final IOChannel<List<Character>> channel25 = JRoutineCore.io().buildChannel();
         channel25.pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
                  .close();
         assertThat(itf.addL07(channel25).all()).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
                                                              Arrays.asList((int) 'e', (int) 'z'),
                                                              Arrays.asList((int) 'f', (int) 'z'));
         assertThat(itf.addL08(Arrays.asList('c', 'z')).all()).containsExactly((int) 'c', (int) 'z');
-        final IOChannel<List<Character>> channel26 = JRoutine.io().buildChannel();
+        final IOChannel<List<Character>> channel26 = JRoutineCore.io().buildChannel();
         channel26.pass(Arrays.asList('a', 'z')).close();
         assertThat(itf.addL09(channel26).all()).containsExactly((int) 'a', (int) 'z');
-        final IOChannel<Character> channel27 = JRoutine.io().buildChannel();
+        final IOChannel<Character> channel27 = JRoutineCore.io().buildChannel();
         channel27.pass('d', 'e', 'f').close();
         assertThat(itf.addL10(channel27).all()).containsExactly((int) 'd', (int) 'e', (int) 'f');
-        final IOChannel<List<Character>> channel28 = JRoutine.io().buildChannel();
+        final IOChannel<List<Character>> channel28 = JRoutineCore.io().buildChannel();
         channel28.pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
                  .close();
         assertThat(itf.addL11(channel28).all()).containsOnly((int) 'd', (int) 'e', (int) 'f',
@@ -998,34 +1005,34 @@ public class LoaderObjectRoutineActivityTest
         assertThat(itf.getL4().result().all()).containsExactly(1, 2, 3);
         assertThat(itf.getL5().asyncCall().all()).containsExactly(1, 2, 3);
         itf.set0(-17);
-        final IOChannel<Integer> channel35 = JRoutine.io().buildChannel();
+        final IOChannel<Integer> channel35 = JRoutineCore.io().buildChannel();
         channel35.pass(-17).close();
         itf.set1(channel35);
-        final IOChannel<Integer> channel36 = JRoutine.io().buildChannel();
+        final IOChannel<Integer> channel36 = JRoutineCore.io().buildChannel();
         channel36.pass(-17).close();
         itf.set2(channel36);
         itf.set3().pass(-17).result().hasCompleted();
         itf.set5().asyncCall(-17).hasCompleted();
         itf.setA0(new int[]{1, 2, 3});
-        final IOChannel<int[]> channel37 = JRoutine.io().buildChannel();
+        final IOChannel<int[]> channel37 = JRoutineCore.io().buildChannel();
         channel37.pass(new int[]{1, 2, 3}).close();
         itf.setA1(channel37);
-        final IOChannel<Integer> channel38 = JRoutine.io().buildChannel();
+        final IOChannel<Integer> channel38 = JRoutineCore.io().buildChannel();
         channel38.pass(1, 2, 3).close();
         itf.setA2(channel38);
-        final IOChannel<int[]> channel39 = JRoutine.io().buildChannel();
+        final IOChannel<int[]> channel39 = JRoutineCore.io().buildChannel();
         channel39.pass(new int[]{1, 2, 3}).close();
         itf.setA3(channel39);
         itf.setA4().pass(new int[]{1, 2, 3}).result().hasCompleted();
         itf.setA6().asyncCall(new int[]{1, 2, 3}).hasCompleted();
         itf.setL0(Arrays.asList(1, 2, 3));
-        final IOChannel<List<Integer>> channel40 = JRoutine.io().buildChannel();
+        final IOChannel<List<Integer>> channel40 = JRoutineCore.io().buildChannel();
         channel40.pass(Arrays.asList(1, 2, 3)).close();
         itf.setL1(channel40);
-        final IOChannel<Integer> channel41 = JRoutine.io().buildChannel();
+        final IOChannel<Integer> channel41 = JRoutineCore.io().buildChannel();
         channel41.pass(1, 2, 3).close();
         itf.setL2(channel41);
-        final IOChannel<List<Integer>> channel42 = JRoutine.io().buildChannel();
+        final IOChannel<List<Integer>> channel42 = JRoutineCore.io().buildChannel();
         channel42.pass(Arrays.asList(1, 2, 3)).close();
         itf.setL3(channel42);
         itf.setL4().pass(Arrays.asList(1, 2, 3)).result().hasCompleted();
@@ -1041,17 +1048,17 @@ public class LoaderObjectRoutineActivityTest
         }
 
         final TimeDuration timeout = seconds(10);
-        final SquareItf squareAsync = JRoutine.with(loaderFrom(getActivity()))
-                                              .on(instanceOf(Square.class))
-                                              .buildProxy(SquareItf.class);
+        final SquareItf squareAsync = JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                                          .on(instanceOf(Square.class))
+                                                          .buildProxy(SquareItf.class);
 
         assertThat(squareAsync.compute(3)).isEqualTo(9);
 
-        final IOChannel<Integer> channel1 = JRoutine.io().buildChannel();
+        final IOChannel<Integer> channel1 = JRoutineCore.io().buildChannel();
         channel1.pass(4).close();
         assertThat(squareAsync.computeAsync(channel1)).isEqualTo(16);
 
-        final IOChannel<Integer> channel2 = JRoutine.io().buildChannel();
+        final IOChannel<Integer> channel2 = JRoutineCore.io().buildChannel();
         channel2.pass(1, 2, 3).close();
         assertThat(squareAsync.computeParallel(channel2).afterMax(timeout).all()).containsOnly(1, 4,
                                                                                                9);
@@ -1064,11 +1071,12 @@ public class LoaderObjectRoutineActivityTest
             return;
         }
 
-        final LoaderObjectRoutineBuilder builder = JRoutine.with(loaderFrom(getActivity()))
-                                                           .on(instanceOf(TestClass2.class))
-                                                           .withInvocations()
-                                                           .withReadTimeout(seconds(10))
-                                                           .getConfigured();
+        final LoaderObjectRoutineBuilder builder =
+                JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                    .on(instanceOf(TestClass2.class))
+                                    .withInvocations()
+                                    .withReadTimeout(seconds(10))
+                                    .getConfigured();
 
         long startTime = System.currentTimeMillis();
 
@@ -1104,31 +1112,31 @@ public class LoaderObjectRoutineActivityTest
             return;
         }
 
-        assertThat(JRoutine.with(loaderFrom(getActivity()))
-                           .on(instanceOf(TestTimeout.class))
-                           .withInvocations()
-                           .withReadTimeout(seconds(10))
-                           .getConfigured()
-                           .withLoaders()
-                           .withLoaderId(0)
-                           .getConfigured()
-                           .aliasMethod("test")
-                           .asyncCall()
-                           .next()).isEqualTo(31);
+        assertThat(JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                       .on(instanceOf(TestTimeout.class))
+                                       .withInvocations()
+                                       .withReadTimeout(seconds(10))
+                                       .getConfigured()
+                                       .withLoaders()
+                                       .withLoaderId(0)
+                                       .getConfigured()
+                                       .aliasMethod("test")
+                                       .asyncCall()
+                                       .next()).isEqualTo(31);
 
         try {
 
-            JRoutine.with(loaderFrom(getActivity()))
-                    .on(instanceOf(TestTimeout.class))
-                    .withInvocations()
-                    .withReadTimeoutAction(TimeoutActionType.THROW)
-                    .getConfigured()
-                    .withLoaders()
-                    .withLoaderId(1)
-                    .getConfigured()
-                    .aliasMethod("test")
-                    .asyncCall()
-                    .next();
+            JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                .on(instanceOf(TestTimeout.class))
+                                .withInvocations()
+                                .withReadTimeoutAction(TimeoutActionType.THROW)
+                                .getConfigured()
+                                .withLoaders()
+                                .withLoaderId(1)
+                                .getConfigured()
+                                .aliasMethod("test")
+                                .asyncCall()
+                                .next();
 
             fail();
 
@@ -1136,31 +1144,31 @@ public class LoaderObjectRoutineActivityTest
 
         }
 
-        assertThat(JRoutine.with(loaderFrom(getActivity()))
-                           .on(instanceOf(TestTimeout.class))
-                           .withInvocations()
-                           .withReadTimeout(seconds(10))
-                           .getConfigured()
-                           .withLoaders()
-                           .withLoaderId(2)
-                           .getConfigured()
-                           .method("getInt")
-                           .asyncCall()
-                           .next()).isEqualTo(31);
+        assertThat(JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                       .on(instanceOf(TestTimeout.class))
+                                       .withInvocations()
+                                       .withReadTimeout(seconds(10))
+                                       .getConfigured()
+                                       .withLoaders()
+                                       .withLoaderId(2)
+                                       .getConfigured()
+                                       .method("getInt")
+                                       .asyncCall()
+                                       .next()).isEqualTo(31);
 
         try {
 
-            JRoutine.with(loaderFrom(getActivity()))
-                    .on(instanceOf(TestTimeout.class))
-                    .withInvocations()
-                    .withReadTimeoutAction(TimeoutActionType.THROW)
-                    .getConfigured()
-                    .withLoaders()
-                    .withLoaderId(3)
-                    .getConfigured()
-                    .method("getInt")
-                    .asyncCall()
-                    .next();
+            JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                .on(instanceOf(TestTimeout.class))
+                                .withInvocations()
+                                .withReadTimeoutAction(TimeoutActionType.THROW)
+                                .getConfigured()
+                                .withLoaders()
+                                .withLoaderId(3)
+                                .getConfigured()
+                                .method("getInt")
+                                .asyncCall()
+                                .next();
 
             fail();
 
@@ -1168,31 +1176,31 @@ public class LoaderObjectRoutineActivityTest
 
         }
 
-        assertThat(JRoutine.with(loaderFrom(getActivity()))
-                           .on(instanceOf(TestTimeout.class))
-                           .withInvocations()
-                           .withReadTimeout(seconds(10))
-                           .getConfigured()
-                           .withLoaders()
-                           .withLoaderId(4)
-                           .getConfigured()
-                           .method(TestTimeout.class.getMethod("getInt"))
-                           .asyncCall()
-                           .next()).isEqualTo(31);
+        assertThat(JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                       .on(instanceOf(TestTimeout.class))
+                                       .withInvocations()
+                                       .withReadTimeout(seconds(10))
+                                       .getConfigured()
+                                       .withLoaders()
+                                       .withLoaderId(4)
+                                       .getConfigured()
+                                       .method(TestTimeout.class.getMethod("getInt"))
+                                       .asyncCall()
+                                       .next()).isEqualTo(31);
 
         try {
 
-            JRoutine.with(loaderFrom(getActivity()))
-                    .on(instanceOf(TestTimeout.class))
-                    .withInvocations()
-                    .withReadTimeoutAction(TimeoutActionType.THROW)
-                    .getConfigured()
-                    .withLoaders()
-                    .withLoaderId(5)
-                    .getConfigured()
-                    .method(TestTimeout.class.getMethod("getInt"))
-                    .asyncCall()
-                    .next();
+            JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                .on(instanceOf(TestTimeout.class))
+                                .withInvocations()
+                                .withReadTimeoutAction(TimeoutActionType.THROW)
+                                .getConfigured()
+                                .withLoaders()
+                                .withLoaderId(5)
+                                .getConfigured()
+                                .method(TestTimeout.class.getMethod("getInt"))
+                                .asyncCall()
+                                .next();
 
             fail();
 
@@ -1200,29 +1208,29 @@ public class LoaderObjectRoutineActivityTest
 
         }
 
-        assertThat(JRoutine.with(loaderFrom(getActivity()))
-                           .on(instanceOf(TestTimeout.class))
-                           .withInvocations()
-                           .withReadTimeout(seconds(10))
-                           .getConfigured()
-                           .withLoaders()
-                           .withLoaderId(6)
-                           .getConfigured()
-                           .buildProxy(TestTimeoutItf.class)
-                           .getInt()).isEqualTo(31);
+        assertThat(JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                       .on(instanceOf(TestTimeout.class))
+                                       .withInvocations()
+                                       .withReadTimeout(seconds(10))
+                                       .getConfigured()
+                                       .withLoaders()
+                                       .withLoaderId(6)
+                                       .getConfigured()
+                                       .buildProxy(TestTimeoutItf.class)
+                                       .getInt()).isEqualTo(31);
 
         try {
 
-            JRoutine.with(loaderFrom(getActivity()))
-                    .on(instanceOf(TestTimeout.class))
-                    .withInvocations()
-                    .withReadTimeoutAction(TimeoutActionType.THROW)
-                    .getConfigured()
-                    .withLoaders()
-                    .withLoaderId(7)
-                    .getConfigured()
-                    .buildProxy(TestTimeoutItf.class)
-                    .getInt();
+            JRoutineLoaderObject.with(loaderFrom(getActivity()))
+                                .on(instanceOf(TestTimeout.class))
+                                .withInvocations()
+                                .withReadTimeoutAction(TimeoutActionType.THROW)
+                                .getConfigured()
+                                .withLoaders()
+                                .withLoaderId(7)
+                                .getConfigured()
+                                .buildProxy(TestTimeoutItf.class)
+                                .getInt();
 
             fail();
 

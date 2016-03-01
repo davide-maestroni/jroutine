@@ -30,7 +30,7 @@ import android.os.RemoteException;
 import com.github.dm.jrt.android.builder.ServiceConfiguration;
 import com.github.dm.jrt.android.invocation.ContextInvocation;
 import com.github.dm.jrt.android.invocation.ContextInvocationFactory;
-import com.github.dm.jrt.android.runner.Runners;
+import com.github.dm.jrt.android.runner.AndroidRunners;
 import com.github.dm.jrt.android.service.InvocationService;
 import com.github.dm.jrt.android.service.ServiceDisconnectedException;
 import com.github.dm.jrt.builder.ChannelConfiguration;
@@ -41,7 +41,7 @@ import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.common.RoutineException;
-import com.github.dm.jrt.core.JRoutine;
+import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.log.Log;
@@ -50,6 +50,7 @@ import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.routine.TemplateRoutine;
 import com.github.dm.jrt.runner.Runner;
+import com.github.dm.jrt.runner.Runners;
 import com.github.dm.jrt.runner.TemplateExecution;
 import com.github.dm.jrt.util.TimeDuration;
 
@@ -58,8 +59,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.github.dm.jrt.android.invocation.ContextInvocations.factoryOf;
-import static com.github.dm.jrt.android.invocation.ContextInvocations.fromFactory;
+import static com.github.dm.jrt.android.invocation.ContextInvocationFactories.factoryOf;
+import static com.github.dm.jrt.android.invocation.ContextInvocationFactories.fromFactory;
 import static com.github.dm.jrt.android.service.InvocationService.getAbortError;
 import static com.github.dm.jrt.android.service.InvocationService.getValue;
 import static com.github.dm.jrt.android.service.InvocationService.putAsyncInvocation;
@@ -119,11 +120,11 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
                 target.getInvocationClass();
         final ContextInvocationFactory<IN, OUT> factory =
                 factoryOf(invocationClass, target.getFactoryArgs());
-        mRoutine = JRoutine.on(fromFactory(serviceContext.getApplicationContext(), factory))
-                           .withInvocations()
-                           .with(invocationConfiguration)
-                           .getConfigured()
-                           .buildRoutine();
+        mRoutine = JRoutineCore.on(fromFactory(serviceContext.getApplicationContext(), factory))
+                               .withInvocations()
+                               .with(invocationConfiguration)
+                               .getConfigured()
+                               .buildRoutine();
         final Logger logger = mLogger;
         logger.dbg("building service routine on invocation %s with configurations: %s - %s",
                    invocationClass.getName(), invocationConfiguration, serviceConfiguration);
@@ -228,17 +229,17 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
             final TimeDuration inputMaxDelay = invocationConfiguration.getInputMaxDelayOr(null);
             final int inputMaxSize =
                     invocationConfiguration.getInputMaxSizeOr(ChannelConfiguration.DEFAULT);
-            mInput = JRoutine.io()
-                             .withChannels()
-                             .withRunner(runner)
-                             .withChannelOrder(inputOrderType)
-                             .withChannelLimit(inputLimit)
-                             .withChannelMaxDelay(inputMaxDelay)
-                             .withChannelMaxSize(inputMaxSize)
-                             .withLog(log)
-                             .withLogLevel(logLevel)
-                             .getConfigured()
-                             .buildChannel();
+            mInput = JRoutineCore.io()
+                                 .withChannels()
+                                 .withRunner(runner)
+                                 .withChannelOrder(inputOrderType)
+                                 .withChannelLimit(inputLimit)
+                                 .withChannelMaxDelay(inputMaxDelay)
+                                 .withChannelMaxSize(inputMaxSize)
+                                 .withLog(log)
+                                 .withLogLevel(logLevel)
+                                 .getConfigured()
+                                 .buildChannel();
             final int outputLimit =
                     invocationConfiguration.getOutputLimitOr(ChannelConfiguration.DEFAULT);
             final TimeDuration outputMaxDelay = invocationConfiguration.getOutputMaxDelayOr(null);
@@ -247,18 +248,18 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
             final TimeDuration executionTimeout = invocationConfiguration.getReadTimeoutOr(null);
             final TimeoutActionType timeoutActionType =
                     invocationConfiguration.getReadTimeoutActionOr(null);
-            mOutput = JRoutine.io()
-                              .withChannels()
-                              .withRunner(Runners.looperRunner(looper))
-                              .withChannelLimit(outputLimit)
-                              .withChannelMaxDelay(outputMaxDelay)
-                              .withChannelMaxSize(outputMaxSize)
-                              .withReadTimeout(executionTimeout)
-                              .withReadTimeoutAction(timeoutActionType)
-                              .withLog(log)
-                              .withLogLevel(logLevel)
-                              .getConfigured()
-                              .buildChannel();
+            mOutput = JRoutineCore.io()
+                                  .withChannels()
+                                  .withRunner(AndroidRunners.looperRunner(looper))
+                                  .withChannelLimit(outputLimit)
+                                  .withChannelMaxDelay(outputMaxDelay)
+                                  .withChannelMaxSize(outputMaxSize)
+                                  .withReadTimeout(executionTimeout)
+                                  .withReadTimeoutAction(timeoutActionType)
+                                  .withLog(log)
+                                  .withLogLevel(logLevel)
+                                  .getConfigured()
+                                  .buildChannel();
         }
 
         public boolean abort() {
@@ -397,7 +398,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
             }
 
             // Unbind on main thread to avoid crashing the IPC
-            Runners.mainRunner().run(new TemplateExecution() {
+            AndroidRunners.mainRunner().run(new TemplateExecution() {
 
                 public void run() {
 

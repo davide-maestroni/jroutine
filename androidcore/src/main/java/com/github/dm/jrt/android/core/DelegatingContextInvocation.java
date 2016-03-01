@@ -61,8 +61,8 @@ public class DelegatingContextInvocation<IN, OUT> extends FunctionContextInvocat
     /**
      * Returns a factory of delegating invocations.<br/>
      * Note that the specified identifier will be used to detect clashing of invocations (see
-     * {@link com.github.dm.jrt.android.v11.core.JRoutine} and
-     * {@link com.github.dm.jrt.android.v4.core.JRoutineCompat}).
+     * {@link com.github.dm.jrt.android.v11.core.JRoutineLoader} and
+     * {@link com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat}).
      *
      * @param routine    the routine used to execute this invocation.
      * @param routineId  the routine identifier.

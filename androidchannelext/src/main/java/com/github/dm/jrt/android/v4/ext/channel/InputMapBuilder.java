@@ -30,6 +30,8 @@ import java.util.HashSet;
 
 /**
  * Builder implementation returning a map of input channels accepting selectable data.
+ * <p/>
+ * Created by davide-maestroni on 02/26/2016.
  *
  * @param <DATA> the channel data type.
  * @param <IN>   the input data type.
@@ -79,11 +81,11 @@ class InputMapBuilder<DATA, IN extends DATA>
                 new SparseArrayCompat<IOChannel<IN>>(indexes.size());
         for (final Integer index : indexes) {
             final IOChannel<IN> ioChannel =
-                    ChannelsCompat.<DATA, IN>selectParcelable(channel, index)
-                                  .withChannels()
-                                  .with(configuration)
-                                  .getConfigured()
-                                  .build();
+                    SparseChannelsCompat.<DATA, IN>selectParcelable(channel, index)
+                                        .withChannels()
+                                        .with(configuration)
+                                        .getConfigured()
+                                        .build();
             channelMap.put(index, ioChannel);
         }
 

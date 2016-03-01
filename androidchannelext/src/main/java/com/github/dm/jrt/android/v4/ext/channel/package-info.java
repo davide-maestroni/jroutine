@@ -15,7 +15,8 @@
  */
 
 /**
- * Routine interfaces and implementations with support for Android compatibility library.
+ * Utility classes handling routine channels with support for Android sparse array collections
+ * included in the compatibility library.
  * <p/>
  * Created by davide-maestroni on 09/25/2014.
  */

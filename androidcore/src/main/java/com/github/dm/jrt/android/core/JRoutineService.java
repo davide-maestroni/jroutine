@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android.object.core;
+package com.github.dm.jrt.android.core;
 
-import com.github.dm.jrt.android.core.ServiceContext;
-import com.github.dm.jrt.android.object.builder.ServiceObjectRoutineBuilder;
+import com.github.dm.jrt.android.builder.ServiceRoutineBuilder;
+import com.github.dm.jrt.android.log.AndroidLogs;
+import com.github.dm.jrt.log.Logger;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -47,21 +48,42 @@ import java.util.WeakHashMap;
  * when employing {@link java.io.Serializable} objects on some OS versions, so, it is advisable to
  * use {@link android.os.Parcelable} objects instead.
  * <p/>
- * The class provides an additional way to build a routine, based on the asynchronous invocation of
- * a method of an existing class or object via reflection.<br/>
- * It is possible to annotate selected methods to be asynchronously invoked, or to simply select
- * a method through its signature. It is also possible to build a proxy object whose methods will
- * in turn asynchronously invoke the target object ones.
- * <p/>
- * Note however that, since the method might be invoked in a different process, it is not possible
- * to pass along the actual instance, but just the information needed to get or instantiate it
- * inside the target service.
+ * For example, in order to get a resource from the network, needed to fill an activity UI:
+ * <pre>
+ *     <code>
+ *
+ *         &#64;Override
+ *         protected void onCreate(final Bundle savedInstanceState) {
+ *
+ *             super.onCreate(savedInstanceState);
+ *             setContentView(R.layout.my_activity_layout);
+ *
+ *             final Routine&lt;URI, MyResource&gt; routine =
+ *                     JRoutineService.with(serviceFrom(this))
+ *                                    .on(factoryOf(LoadResourceUri.class))
+ *                                    .buildRoutine();
+ *             routine.asyncCall(RESOURCE_URI)
+ *                    .passTo(new TemplateOutputConsumer&lt;MyResource&gt;() {
+ *
+ *                        &#64;Override
+ *                        public void onError(&#64;NotNull final RoutineException error) {
+ *
+ *                            displayError(error);
+ *                        }
+ *
+ *                        &#64;Override
+ *                        public void onOutput(final MyResource resource) {
+ *
+ *                            displayResource(resource);
+ *                        }
+ *                    });
+ *         }
+ *     </code>
+ * </pre>
  * <p/>
  * Created by davide-maestroni on 01/08/2015.
- *
- * @see com.github.dm.jrt.object.core.JRoutine JRoutine
  */
-public class JRoutine extends com.github.dm.jrt.android.core.JRoutine {
+public class JRoutineService {
 
     private static final WeakHashMap<ServiceContext, ServiceContextBuilder> sBuilders =
             new WeakHashMap<ServiceContext, ServiceContextBuilder>();
@@ -90,8 +112,7 @@ public class JRoutine extends com.github.dm.jrt.android.core.JRoutine {
     /**
      * Context based builder of service proxy routine builders.
      */
-    public static class ServiceContextBuilder
-            extends com.github.dm.jrt.android.core.JRoutine.ServiceContextBuilder {
+    public static class ServiceContextBuilder {
 
         private final ServiceContext mContext;
 
@@ -100,34 +121,41 @@ public class JRoutine extends com.github.dm.jrt.android.core.JRoutine {
          *
          * @param context the service context.
          */
+        @SuppressWarnings("ConstantConditions")
         private ServiceContextBuilder(@NotNull final ServiceContext context) {
 
-            super(context);
+            if (context == null) {
+                throw new NullPointerException("the context must not be null");
+            }
+
             mContext = context;
         }
 
         /**
-         * Returns a builder of routines running in a service based on the builder context, wrapping
-         * the specified target object.<br/>
-         * In order to customize the object creation, the caller must employ an implementation of a
-         * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
-         * invocation service.
+         * Returns a builder of routines running in a service based on the builder context.<br/>
+         * In order to customize the invocation creation, the caller must override the method
+         * {@link com.github.dm.jrt.android.service.InvocationService#getInvocationFactory(Class,
+         * Object...) getInvocationFactory(Class, Object...)} of the routine service.
          * <p/>
          * Note that the built routine results will be dispatched into the configured looper, thus,
          * waiting for the outputs on the very same looper thread, immediately after its invocation,
          * will result in a deadlock. By default output results are dispatched in the main looper.
-         * <br/>
-         * Note also that the invocation input data will be cached, and the results will be produced
-         * only after the invocation channel is closed, so be sure to avoid streaming inputs in
-         * order to prevent starvation or out of memory errors.
          *
          * @param target the invocation target.
+         * @param <IN>   the input data type.
+         * @param <OUT>  the output data type.
          * @return the routine builder instance.
          */
         @NotNull
-        public ServiceObjectRoutineBuilder on(@NotNull final ContextInvocationTarget<?> target) {
+        public <IN, OUT> ServiceRoutineBuilder<IN, OUT> on(
+                @NotNull final TargetInvocationFactory<IN, OUT> target) {
 
-            return new DefaultServiceObjectRoutineBuilder(mContext, target);
+            return new DefaultServiceRoutineBuilder<IN, OUT>(mContext, target);
         }
+    }
+
+    static {
+        // Sets the Android log as default
+        Logger.setDefaultLog(AndroidLogs.androidLog());
     }
 }

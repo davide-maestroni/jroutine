@@ -28,6 +28,8 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Builder implementation wrapping a builder of maps of output channels.
+ * <p/>
+ * Created by davide-maestroni on 02/27/2016.
  *
  * @param <OUT> the output data type.
  */

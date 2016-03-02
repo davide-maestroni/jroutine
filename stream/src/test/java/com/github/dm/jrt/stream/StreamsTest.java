@@ -24,7 +24,7 @@ import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
 import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.core.JRoutine;
+import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.ext.channel.Channels;
 import com.github.dm.jrt.ext.channel.Selectable;
 import com.github.dm.jrt.function.BiConsumerWrapper;
@@ -50,7 +50,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.github.dm.jrt.function.Functions.wrap;
-import static com.github.dm.jrt.invocation.Invocations.factoryOf;
+import static com.github.dm.jrt.invocation.InvocationFactories.factoryOf;
 import static com.github.dm.jrt.stream.Streams.range;
 import static com.github.dm.jrt.util.TimeDuration.millis;
 import static com.github.dm.jrt.util.TimeDuration.seconds;
@@ -84,9 +84,9 @@ public class StreamsTest {
     @Test
     public void testBlendAbort() {
 
-        final IOChannelBuilder builder = JRoutine.io();
+        final IOChannelBuilder builder = JRoutineCore.io();
         final Routine<Object, Object> routine =
-                JRoutine.on(PassingInvocation.factoryOf()).buildRoutine();
+                JRoutineCore.on(PassingInvocation.factoryOf()).buildRoutine();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
         channel1 = builder.buildChannel();
@@ -210,9 +210,9 @@ public class StreamsTest {
     @Test
     public void testConcatAbort() {
 
-        final IOChannelBuilder builder = JRoutine.io();
+        final IOChannelBuilder builder = JRoutineCore.io();
         final Routine<Object, Object> routine =
-                JRoutine.on(PassingInvocation.factoryOf()).buildRoutine();
+                JRoutineCore.on(PassingInvocation.factoryOf()).buildRoutine();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
         channel1 = builder.buildChannel();
@@ -334,14 +334,15 @@ public class StreamsTest {
                         });
                     }
                 });
-        assertThat(JRoutine.on(factory)
-                           .asyncCall("test1", "test2", "test3")
-                           .afterMax(seconds(3))
-                           .all()).containsExactly("TEST1", "TEST2", "TEST3");
+        assertThat(JRoutineCore.on(factory)
+                               .asyncCall("test1", "test2", "test3")
+                               .afterMax(seconds(3))
+                               .all()).containsExactly("TEST1", "TEST2", "TEST3");
 
         try {
 
-            final InvocationChannel<String, String> channel = JRoutine.on(factory).asyncInvoke();
+            final InvocationChannel<String, String> channel =
+                    JRoutineCore.on(factory).asyncInvoke();
             channel.abort(new IllegalArgumentException());
             channel.result().afterMax(seconds(3)).next();
 
@@ -586,8 +587,8 @@ public class StreamsTest {
     @Test
     public void testJoin() {
 
-        final IOChannelBuilder builder = JRoutine.io();
-        final Routine<List<?>, Character> routine = JRoutine.on(new CharAt()).buildRoutine();
+        final IOChannelBuilder builder = JRoutineCore.io();
+        final Routine<List<?>, Character> routine = JRoutineCore.on(new CharAt()).buildRoutine();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
         channel1 = builder.buildChannel();
@@ -622,8 +623,8 @@ public class StreamsTest {
     @Test
     public void testJoinAbort() {
 
-        final IOChannelBuilder builder = JRoutine.io();
-        final Routine<List<?>, Character> routine = JRoutine.on(new CharAt()).buildRoutine();
+        final IOChannelBuilder builder = JRoutineCore.io();
+        final Routine<List<?>, Character> routine = JRoutineCore.on(new CharAt()).buildRoutine();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
         channel1 = builder.buildChannel();
@@ -707,8 +708,8 @@ public class StreamsTest {
     @Test
     public void testJoinPlaceholder() {
 
-        final IOChannelBuilder builder = JRoutine.io();
-        final Routine<List<?>, Character> routine = JRoutine.on(new CharAt()).buildRoutine();
+        final IOChannelBuilder builder = JRoutineCore.io();
+        final Routine<List<?>, Character> routine = JRoutineCore.on(new CharAt()).buildRoutine();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
         channel1 = builder.buildChannel();
@@ -752,8 +753,8 @@ public class StreamsTest {
     @Test
     public void testJoinPlaceholderAbort() {
 
-        final IOChannelBuilder builder = JRoutine.io();
-        final Routine<List<?>, Character> routine = JRoutine.on(new CharAt()).buildRoutine();
+        final IOChannelBuilder builder = JRoutineCore.io();
+        final Routine<List<?>, Character> routine = JRoutineCore.on(new CharAt()).buildRoutine();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
         channel1 = builder.buildChannel();
@@ -897,18 +898,21 @@ public class StreamsTest {
     @Test
     public void testMap() {
 
-        final IOChannelBuilder builder =
-                JRoutine.io().withChannels().withChannelOrder(OrderType.BY_CALL).getConfigured();
+        final IOChannelBuilder builder = JRoutineCore.io()
+                                                     .withChannels()
+                                                     .withChannelOrder(OrderType.BY_CALL)
+                                                     .getConfigured();
         final IOChannel<String> channel1 = builder.buildChannel();
         final IOChannel<Integer> channel2 = builder.buildChannel();
 
         final OutputChannel<? extends Selectable<Object>> channel =
                 Streams.merge(Arrays.<OutputChannel<?>>asList(channel1, channel2)).build();
-        final OutputChannel<Selectable<Object>> output = JRoutine.on(new Sort())
-                                                                 .withInvocations()
-                                                                 .withInputOrder(OrderType.BY_CALL)
-                                                                 .getConfigured()
-                                                                 .asyncCall(channel);
+        final OutputChannel<Selectable<Object>> output = JRoutineCore.on(new Sort())
+                                                                     .withInvocations()
+                                                                     .withInputOrder(
+                                                                             OrderType.BY_CALL)
+                                                                     .getConfigured()
+                                                                     .asyncCall(channel);
         final Map<Integer, OutputChannel<Object>> channelMap =
                 Channels.select(output, Sort.INTEGER, Sort.STRING).build();
 
@@ -935,8 +939,10 @@ public class StreamsTest {
     @Test
     public void testMerge() {
 
-        final IOChannelBuilder builder =
-                JRoutine.io().withChannels().withChannelOrder(OrderType.BY_CALL).getConfigured();
+        final IOChannelBuilder builder = JRoutineCore.io()
+                                                     .withChannels()
+                                                     .withChannelOrder(OrderType.BY_CALL)
+                                                     .getConfigured();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
         OutputChannel<? extends Selectable<?>> outputChannel;
@@ -986,15 +992,17 @@ public class StreamsTest {
     @SuppressWarnings("unchecked")
     public void testMerge4() {
 
-        final IOChannelBuilder builder =
-                JRoutine.io().withChannels().withChannelOrder(OrderType.BY_CALL).getConfigured();
+        final IOChannelBuilder builder = JRoutineCore.io()
+                                                     .withChannels()
+                                                     .withChannelOrder(OrderType.BY_CALL)
+                                                     .getConfigured();
         final IOChannel<String> channel1 = builder.buildChannel();
         final IOChannel<String> channel2 = builder.buildChannel();
         final IOChannel<String> channel3 = builder.buildChannel();
         final IOChannel<String> channel4 = builder.buildChannel();
 
         final Routine<Selectable<String>, String> routine =
-                JRoutine.on(factoryOf(new ClassToken<Amb<String>>() {})).buildRoutine();
+                JRoutineCore.on(factoryOf(new ClassToken<Amb<String>>() {})).buildRoutine();
         final OutputChannel<String> outputChannel = routine.asyncCall(
                 Streams.merge(Arrays.asList(channel1, channel2, channel3, channel4)).build());
 
@@ -1018,8 +1026,10 @@ public class StreamsTest {
     @Test
     public void testMergeAbort() {
 
-        final IOChannelBuilder builder =
-                JRoutine.io().withChannels().withChannelOrder(OrderType.BY_CALL).getConfigured();
+        final IOChannelBuilder builder = JRoutineCore.io()
+                                                     .withChannels()
+                                                     .withChannelOrder(OrderType.BY_CALL)
+                                                     .getConfigured();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
         OutputChannel<? extends Selectable<?>> outputChannel;
@@ -1217,7 +1227,7 @@ public class StreamsTest {
     @SuppressWarnings("unchecked")
     public void testOutputToSelectable() {
 
-        final IOChannel<String> channel = JRoutine.io().buildChannel();
+        final IOChannel<String> channel = JRoutineCore.io().buildChannel();
         channel.pass("test1", "test2", "test3").close();
         assertThat(Streams.toSelectable(channel.asOutput(), 33)
                           .build()
@@ -1230,7 +1240,7 @@ public class StreamsTest {
     @Test
     public void testOutputToSelectableAbort() {
 
-        final IOChannel<String> channel = JRoutine.io().buildChannel();
+        final IOChannel<String> channel = JRoutineCore.io().buildChannel();
         channel.pass("test1", "test2", "test3").abort();
 
         try {
@@ -1636,13 +1646,13 @@ public class StreamsTest {
     @Test
     public void testRepeat() {
 
-        final IOChannel<Object> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
         final OutputChannel<Object> channel = Streams.repeat(ioChannel).build();
         ioChannel.pass("test1", "test2");
-        final IOChannel<Object> output1 = JRoutine.io().buildChannel();
+        final IOChannel<Object> output1 = JRoutineCore.io().buildChannel();
         channel.passTo(output1).close();
         assertThat(output1.next()).isEqualTo("test1");
-        final IOChannel<Object> output2 = JRoutine.io().buildChannel();
+        final IOChannel<Object> output2 = JRoutineCore.io().buildChannel();
         channel.passTo(output2).close();
         ioChannel.pass("test3").close();
         assertThat(output2.all()).containsExactly("test1", "test2", "test3");
@@ -1652,13 +1662,13 @@ public class StreamsTest {
     @Test
     public void testRepeatAbort() {
 
-        final IOChannel<Object> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
         final OutputChannel<Object> channel = Streams.repeat(ioChannel).build();
         ioChannel.pass("test1", "test2");
-        final IOChannel<Object> output1 = JRoutine.io().buildChannel();
+        final IOChannel<Object> output1 = JRoutineCore.io().buildChannel();
         channel.passTo(output1).close();
         assertThat(output1.next()).isEqualTo("test1");
-        final IOChannel<Object> output2 = JRoutine.io().buildChannel();
+        final IOChannel<Object> output2 = JRoutineCore.io().buildChannel();
         channel.passTo(output2).close();
         ioChannel.abort();
 
@@ -1684,8 +1694,8 @@ public class StreamsTest {
     public void testSelectMap() {
 
         final Routine<Selectable<Object>, Selectable<Object>> routine =
-                JRoutine.on(new Sort()).buildRoutine();
-        final IOChannel<Selectable<Object>> inputChannel = JRoutine.io().buildChannel();
+                JRoutineCore.on(new Sort()).buildRoutine();
+        final IOChannel<Selectable<Object>> inputChannel = JRoutineCore.io().buildChannel();
         final OutputChannel<Selectable<Object>> outputChannel = routine.asyncCall(inputChannel);
         final StreamChannel<Object> intChannel =
                 Streams.select(outputChannel, Sort.INTEGER, Sort.STRING)
@@ -1720,8 +1730,8 @@ public class StreamsTest {
     public void testSelectMapAbort() {
 
         final Routine<Selectable<Object>, Selectable<Object>> routine =
-                JRoutine.on(new Sort()).buildRoutine();
-        IOChannel<Selectable<Object>> inputChannel = JRoutine.io().buildChannel();
+                JRoutineCore.on(new Sort()).buildRoutine();
+        IOChannel<Selectable<Object>> inputChannel = JRoutineCore.io().buildChannel();
         OutputChannel<Selectable<Object>> outputChannel = routine.asyncCall(inputChannel);
         Streams.select(Sort.STRING, 2, outputChannel).build();
         inputChannel.after(millis(100))
@@ -1757,7 +1767,7 @@ public class StreamsTest {
 
         }
 
-        inputChannel = JRoutine.io().buildChannel();
+        inputChannel = JRoutineCore.io().buildChannel();
         outputChannel = routine.asyncCall(inputChannel);
         Streams.select(outputChannel, Sort.INTEGER, Sort.STRING).build();
         inputChannel.after(millis(100))
@@ -1793,7 +1803,7 @@ public class StreamsTest {
 
         }
 
-        inputChannel = JRoutine.io().buildChannel();
+        inputChannel = JRoutineCore.io().buildChannel();
         outputChannel = routine.asyncCall(inputChannel);
         Streams.select(outputChannel, Arrays.asList(Sort.STRING, Sort.INTEGER)).build();
         inputChannel.after(millis(100))

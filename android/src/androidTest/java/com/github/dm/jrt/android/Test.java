@@ -14,26 +14,16 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.ext.channel;
+package com.github.dm.jrt.android;
 
-import com.github.dm.jrt.builder.ChannelConfigurableBuilder;
-
-import org.jetbrains.annotations.NotNull;
+import android.test.AndroidTestCase;
 
 /**
- * Interface defining a generic configurable builder.
- * <p/>
- * Created by davide-maestroni on 02/26/2016.
- *
- * @param <TYPE> the built object type.
+ * Created by davide-maestroni on 02/29/2016.
  */
-public interface ChannelsBuilder<TYPE> extends ChannelConfigurableBuilder<ChannelsBuilder<TYPE>> {
+public class Test extends AndroidTestCase {
 
-    /**
-     * Builds and returns an object instance.
-     *
-     * @return the object instance.
-     */
-    @NotNull
-    TYPE build();
+    public void test() {
+
+    }
 }

@@ -38,14 +38,14 @@
             public static void main(final String[] args) {
 
                 final Routine&lt;String, Integer&gt; parseRoutine =
-                        JRoutine.on(functionFilter(Integer::parseInt)).buildRoutine();
+                        JRoutineCore.on(functionFilter(Integer::parseInt)).buildRoutine();
                 final Routine&lt;Integer, Integer&gt; squareRoutine =
-                        JRoutine.on(functionFilter(integer -> {
+                        JRoutineCore.on(functionFilter(integer -> {
                                 final input = integer;
                                 return (input * input);
                         })).buildRoutine();
                 final Routine&lt;Integer, Double&gt; meanRoutine =
-                        JRoutine.on(functionFactory(integers -> {
+                        JRoutineCore.on(functionFactory(integers -> {
                                 int sum = 0;
                                 for (final Integer integer : integers) {
                                     sum += integer;

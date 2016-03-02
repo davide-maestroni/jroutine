@@ -21,7 +21,7 @@ import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.common.RoutineException;
-import com.github.dm.jrt.core.JRoutine;
+import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.util.SimpleQueue;
 
 import org.jetbrains.annotations.NotNull;
@@ -33,6 +33,8 @@ import java.util.List;
 
 /**
  * Builder implementation joining data from a set of output channels.
+ * <p/>
+ * Created by davide-maestroni on 02/26/2016.
  *
  * @param <OUT> the output data type.
  */
@@ -78,7 +80,7 @@ class JoinBuilder<OUT> extends AbstractBuilder<OutputChannel<List<? extends OUT>
 
         final ArrayList<OutputChannel<? extends OUT>> channels = mChannels;
         final IOChannel<List<? extends OUT>> ioChannel =
-                JRoutine.io().withChannels().with(configuration).getConfigured().buildChannel();
+                JRoutineCore.io().withChannels().with(configuration).getConfigured().buildChannel();
         final JoinOutputConsumer<OUT> consumer =
                 new JoinOutputConsumer<OUT>(mIsFlush, channels.size(), mPlaceholder, ioChannel);
         Channels.merge(channels).build().passTo(consumer);

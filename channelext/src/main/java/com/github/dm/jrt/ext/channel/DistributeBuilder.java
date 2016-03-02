@@ -21,7 +21,7 @@ import com.github.dm.jrt.channel.Channel.InputChannel;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.common.RoutineException;
-import com.github.dm.jrt.core.JRoutine;
+import com.github.dm.jrt.core.JRoutineCore;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,6 +32,8 @@ import java.util.List;
 
 /**
  * Builder implementation returning a channel distributing data into a set of input channels.
+ * <p/>
+ * Created by davide-maestroni on 02/26/2016.
  *
  * @param <IN> the input data type.
  */
@@ -79,13 +81,13 @@ class DistributeBuilder<IN> extends AbstractBuilder<IOChannel<List<? extends IN>
         final ArrayList<InputChannel<? extends IN>> channels = mChannels;
         final ArrayList<IOChannel<?>> channelList = new ArrayList<IOChannel<?>>(channels.size());
         for (final InputChannel<?> channel : channels) {
-            final IOChannel<?> ioChannel = JRoutine.io().buildChannel();
+            final IOChannel<?> ioChannel = JRoutineCore.io().buildChannel();
             ioChannel.passTo(((InputChannel<Object>) channel));
             channelList.add(ioChannel);
         }
 
         final IOChannel<List<? extends IN>> ioChannel =
-                JRoutine.io().withChannels().with(configuration).getConfigured().buildChannel();
+                JRoutineCore.io().withChannels().with(configuration).getConfigured().buildChannel();
         return ioChannel.passTo(new DistributeOutputConsumer(mIsFlush, mPlaceholder, channelList));
     }
 

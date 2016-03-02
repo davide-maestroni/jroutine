@@ -23,6 +23,8 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Builder implementation returning a repeating channel.
+ * <p/>
+ * Created by davide-maestroni on 02/26/2016.
  *
  * @param <OUT> the output data type.
  */

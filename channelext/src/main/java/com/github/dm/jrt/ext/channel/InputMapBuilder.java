@@ -29,6 +29,8 @@ import java.util.Set;
 
 /**
  * Builder implementation returning a map of input channels accepting selectable data.
+ * <p/>
+ * Created by davide-maestroni on 02/26/2016.
  *
  * @param <DATA> the channel data type.
  * @param <IN>   the input data type.

@@ -21,7 +21,7 @@ import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.common.RoutineException;
-import com.github.dm.jrt.core.JRoutine;
+import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.util.TimeDuration;
 
 import org.jetbrains.annotations.NotNull;
@@ -41,6 +41,8 @@ import java.util.concurrent.TimeUnit;
  * The channel behaves like a bound one, in fact the {@link #isBound()} method will always return
  * true, even if the bound methods will never fail. Note, however, that the implementation will
  * silently prevent the same consumer or channel instance to be bound twice.
+ * <p/>
+ * Created by davide-maestroni on 02/26/2016.
  *
  * @param <OUT> the output data type.
  */
@@ -72,10 +74,11 @@ class RepeatedChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
      * @param configuration the channel configuration.
      * @param channel       the channel to repeat.
      */
-    RepeatedChannel(@NotNull final ChannelConfiguration configuration,
+    RepeatedChannel(@Nullable final ChannelConfiguration configuration,
             @NotNull final OutputChannel<OUT> channel) {
 
-        mConfiguration = configuration;
+        mConfiguration = (configuration != null) ? configuration
+                : ChannelConfiguration.DEFAULT_CONFIGURATION;
         mOutputChannel = createOutputChannel();
         mChannel = channel;
         channel.passTo(this);
@@ -360,6 +363,6 @@ class RepeatedChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
     @NotNull
     private IOChannel<OUT> createOutputChannel() {
 
-        return JRoutine.io().withChannels().with(mConfiguration).getConfigured().buildChannel();
+        return JRoutineCore.io().withChannels().with(mConfiguration).getConfigured().buildChannel();
     }
 }

@@ -31,7 +31,7 @@ coveralls {
 }
 
 task jacocoRootReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
-    dependsOn = subprojects.findAll({ it.plugins.hasPlugin('java') }).test
+    dependsOn = subprojects.findAll({ it.plugins.hasPlugin('java') }).jacocoTest
     sourceDirectories = files(subprojects.findAll({ it.plugins.hasPlugin('java') }).sourceSets.main.allSource.srcDirs)
     classDirectories =  files(subprojects.findAll({ it.plugins.hasPlugin('java') }).sourceSets.main.output)
     executionData = files(subprojects.findAll({ it.plugins.hasPlugin('java') }).jacocoTestReport.executionData)

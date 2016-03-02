@@ -46,10 +46,10 @@
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.builder.InvocationConfiguration invocationConfiguration,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.builder.ProxyConfiguration proxyConfiguration) {
 
-        return com.github.dm.jrt.core.JRoutine.on(new InvocationFactory${methodCount}${genericTypes}(proxyConfiguration, target))
-                                           .withInvocations()
-                                           .with(invocationConfiguration)
-                                           ${routineBuilderOptions}
-                                           .getConfigured()
-                                           .buildRoutine();
+        return com.github.dm.jrt.core.JRoutineCore.on(new InvocationFactory${methodCount}${genericTypes}(proxyConfiguration, target))
+                                                  .withInvocations()
+                                                  .with(invocationConfiguration)
+                                                  ${routineBuilderOptions}
+                                                  .getConfigured()
+                                                  .buildRoutine();
     }

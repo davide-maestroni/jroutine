@@ -25,6 +25,7 @@ import com.github.dm.jrt.channel.Channel.InputChannel;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.InvocationChannel;
+import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.log.Log;
 import com.github.dm.jrt.log.Log.Level;
@@ -94,11 +95,11 @@ public class ObjectRoutineTest {
 
         final Pass pass = new Pass();
         final TestRunner runner = new TestRunner();
-        final PriorityPass priorityPass = JRoutine.on(instance(pass))
-                                                  .withInvocations()
-                                                  .withRunner(runner)
-                                                  .getConfigured()
-                                                  .buildProxy(PriorityPass.class);
+        final PriorityPass priorityPass = JRoutineObject.on(instance(pass))
+                                                        .withInvocations()
+                                                        .withRunner(runner)
+                                                        .getConfigured()
+                                                        .buildProxy(PriorityPass.class);
         final OutputChannel<String> output1 = priorityPass.passNormal("test1").eventuallyExit();
 
         for (int i = 0; i < AgingPriority.HIGH_PRIORITY - 1; i++) {
@@ -120,17 +121,17 @@ public class ObjectRoutineTest {
 
         final TimeDuration timeout = seconds(1);
         final TestClass test = new TestClass();
-        final Routine<Object, Object> routine = JRoutine.on(instance(test))
-                                                        .withInvocations()
-                                                        .withRunner(Runners.poolRunner())
-                                                        .withMaxInstances(1)
-                                                        .withCoreInstances(1)
-                                                        .withReadTimeoutAction(
-                                                                TimeoutActionType.EXIT)
-                                                        .withLogLevel(Level.DEBUG)
-                                                        .withLog(new NullLog())
-                                                        .getConfigured()
-                                                        .aliasMethod(TestClass.GET);
+        final Routine<Object, Object> routine = JRoutineObject.on(instance(test))
+                                                              .withInvocations()
+                                                              .withRunner(Runners.poolRunner())
+                                                              .withMaxInstances(1)
+                                                              .withCoreInstances(1)
+                                                              .withReadTimeoutAction(
+                                                                      TimeoutActionType.EXIT)
+                                                              .withLogLevel(Level.DEBUG)
+                                                              .withLog(new NullLog())
+                                                              .getConfigured()
+                                                              .aliasMethod(TestClass.GET);
 
         assertThat(routine.syncCall().afterMax(timeout).all()).containsExactly(-77L);
     }
@@ -139,13 +140,13 @@ public class ObjectRoutineTest {
     public void testAliasStaticMethod() throws NoSuchMethodException {
 
         final TimeDuration timeout = seconds(1);
-        final Routine<Object, Object> routine = JRoutine.on(classOfType(TestStatic.class))
-                                                        .withInvocations()
-                                                        .withRunner(Runners.poolRunner())
-                                                        .withLogLevel(Level.DEBUG)
-                                                        .withLog(new NullLog())
-                                                        .getConfigured()
-                                                        .aliasMethod(TestStatic.GET);
+        final Routine<Object, Object> routine = JRoutineObject.on(classOfType(TestStatic.class))
+                                                              .withInvocations()
+                                                              .withRunner(Runners.poolRunner())
+                                                              .withLogLevel(Level.DEBUG)
+                                                              .withLog(new NullLog())
+                                                              .getConfigured()
+                                                              .aliasMethod(TestStatic.GET);
 
         assertThat(routine.syncCall().afterMax(timeout).all()).containsExactly(-77L);
     }
@@ -155,7 +156,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(classOfType(TestStatic.class)).aliasMethod("test");
+            JRoutineObject.on(classOfType(TestStatic.class)).aliasMethod("test");
 
             fail();
 
@@ -168,7 +169,7 @@ public class ObjectRoutineTest {
     public void testAnnotationGenerics() {
 
         final Size size = new Size();
-        final SizeItf proxy = JRoutine.on(instance(size)).buildProxy(SizeItf.class);
+        final SizeItf proxy = JRoutineObject.on(instance(size)).buildProxy(SizeItf.class);
         assertThat(
                 proxy.getSize(Arrays.asList("test1", "test2", "test3")).afterMax(seconds(3)).next())
                 .isEqualTo(3);
@@ -184,30 +185,30 @@ public class ObjectRoutineTest {
 
         final TimeDuration timeout = seconds(1);
         final Sum sum = new Sum();
-        final SumItf sumAsync = JRoutine.on(instance(sum))
-                                        .withInvocations()
-                                        .withReadTimeout(timeout)
-                                        .getConfigured()
-                                        .buildProxy(SumItf.class);
-        final IOChannel<Integer> channel3 = JRoutine.io().buildChannel();
+        final SumItf sumAsync = JRoutineObject.on(instance(sum))
+                                              .withInvocations()
+                                              .withReadTimeout(timeout)
+                                              .getConfigured()
+                                              .buildProxy(SumItf.class);
+        final IOChannel<Integer> channel3 = JRoutineCore.io().buildChannel();
         channel3.pass(7).close();
         assertThat(sumAsync.compute(3, channel3)).isEqualTo(10);
 
-        final IOChannel<Integer> channel4 = JRoutine.io().buildChannel();
+        final IOChannel<Integer> channel4 = JRoutineCore.io().buildChannel();
         channel4.pass(1, 2, 3, 4).close();
         assertThat(sumAsync.compute(channel4)).isEqualTo(10);
 
-        final IOChannel<int[]> channel5 = JRoutine.io().buildChannel();
+        final IOChannel<int[]> channel5 = JRoutineCore.io().buildChannel();
         channel5.pass(new int[]{1, 2, 3, 4}).close();
         assertThat(sumAsync.compute1(channel5)).isEqualTo(10);
         assertThat(sumAsync.compute2().pass(new int[]{1, 2, 3, 4}).result().next()).isEqualTo(10);
         assertThat(sumAsync.compute3().pass(17).result().next()).isEqualTo(17);
 
-        final IOChannel<Integer> channel6 = JRoutine.io().buildChannel();
+        final IOChannel<Integer> channel6 = JRoutineCore.io().buildChannel();
         channel6.pass(1, 2, 3, 4).close();
         assertThat(sumAsync.computeList(channel6)).isEqualTo(10);
 
-        final IOChannel<Integer> channel7 = JRoutine.io().buildChannel();
+        final IOChannel<Integer> channel7 = JRoutineCore.io().buildChannel();
         channel7.pass(1, 2, 3, 4).close();
         assertThat(sumAsync.computeList1(channel7)).isEqualTo(10);
     }
@@ -217,11 +218,11 @@ public class ObjectRoutineTest {
 
         final TimeDuration timeout = seconds(1);
         final Count count = new Count();
-        final CountItf countAsync = JRoutine.on(instance(count))
-                                            .withInvocations()
-                                            .withReadTimeout(timeout)
-                                            .getConfigured()
-                                            .buildProxy(CountItf.class);
+        final CountItf countAsync = JRoutineObject.on(instance(count))
+                                                  .withInvocations()
+                                                  .withReadTimeout(timeout)
+                                                  .getConfigured()
+                                                  .buildProxy(CountItf.class);
         assertThat(countAsync.count(3).all()).containsExactly(0, 1, 2);
         assertThat(countAsync.count1(3).all()).containsExactly(new int[]{0, 1, 2});
         assertThat(countAsync.count2(2).all()).containsExactly(0, 1);
@@ -284,7 +285,8 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(instance(new DuplicateAnnotation())).aliasMethod(DuplicateAnnotation.GET);
+            JRoutineObject.on(instance(new DuplicateAnnotation()))
+                          .aliasMethod(DuplicateAnnotation.GET);
 
             fail();
 
@@ -294,8 +296,8 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(classOfType(DuplicateAnnotationStatic.class))
-                    .aliasMethod(DuplicateAnnotationStatic.GET);
+            JRoutineObject.on(classOfType(DuplicateAnnotationStatic.class))
+                          .aliasMethod(DuplicateAnnotationStatic.GET);
 
             fail();
 
@@ -310,7 +312,7 @@ public class ObjectRoutineTest {
         final TimeDuration timeout = seconds(1);
         final TestClass test = new TestClass();
         final Routine<Object, Object> routine3 =
-                JRoutine.on(instance(test)).aliasMethod(TestClass.THROW);
+                JRoutineObject.on(instance(test)).aliasMethod(TestClass.THROW);
 
         try {
 
@@ -331,7 +333,7 @@ public class ObjectRoutineTest {
         final TimeDuration timeout = seconds(1);
 
         final Routine<Object, Object> routine3 =
-                JRoutine.on(classOfType(TestStatic.class)).aliasMethod(TestStatic.THROW);
+                JRoutineObject.on(classOfType(TestStatic.class)).aliasMethod(TestStatic.THROW);
 
         try {
 
@@ -351,7 +353,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(classOfType(TestItf.class));
+            JRoutineObject.on(classOfType(TestItf.class));
 
             fail();
 
@@ -367,7 +369,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(instance(sum)).buildProxy(SumError2.class).compute1();
+            JRoutineObject.on(instance(sum)).buildProxy(SumError2.class).compute1();
 
             fail();
 
@@ -377,7 +379,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(instance(sum)).buildProxy(SumError2.class).compute2();
+            JRoutineObject.on(instance(sum)).buildProxy(SumError2.class).compute2();
 
             fail();
 
@@ -387,7 +389,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(instance(sum)).buildProxy(SumError2.class).compute3();
+            JRoutineObject.on(instance(sum)).buildProxy(SumError2.class).compute3();
 
             fail();
 
@@ -397,7 +399,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(instance(sum)).buildProxy(SumError2.class).compute4();
+            JRoutineObject.on(instance(sum)).buildProxy(SumError2.class).compute4();
 
             fail();
 
@@ -407,7 +409,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(instance(sum)).buildProxy(SumError2.class).compute5(7);
+            JRoutineObject.on(instance(sum)).buildProxy(SumError2.class).compute5(7);
 
             fail();
 
@@ -423,7 +425,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(instance(test)).buildProxy(TestClass.class);
+            JRoutineObject.on(instance(test)).buildProxy(TestClass.class);
 
             fail();
 
@@ -433,7 +435,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(instance(test)).buildProxy(ClassToken.tokenOf(TestClass.class));
+            JRoutineObject.on(instance(test)).buildProxy(ClassToken.tokenOf(TestClass.class));
 
             fail();
 
@@ -449,7 +451,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(instance(sum)).buildProxy(SumError.class).compute(1, new int[0]);
+            JRoutineObject.on(instance(sum)).buildProxy(SumError.class).compute(1, new int[0]);
 
             fail();
 
@@ -459,7 +461,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(instance(sum)).buildProxy(SumError.class).compute(new String[0]);
+            JRoutineObject.on(instance(sum)).buildProxy(SumError.class).compute(new String[0]);
 
             fail();
 
@@ -469,7 +471,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(instance(sum)).buildProxy(SumError.class).compute(new int[0]);
+            JRoutineObject.on(instance(sum)).buildProxy(SumError.class).compute(new int[0]);
 
             fail();
 
@@ -479,9 +481,9 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(instance(sum))
-                    .buildProxy(SumError.class)
-                    .compute(Collections.<Integer>emptyList());
+            JRoutineObject.on(instance(sum))
+                          .buildProxy(SumError.class)
+                          .compute(Collections.<Integer>emptyList());
 
             fail();
 
@@ -489,21 +491,11 @@ public class ObjectRoutineTest {
 
         }
 
-        final IOChannel<Integer> channel = JRoutine.io().buildChannel();
+        final IOChannel<Integer> channel = JRoutineCore.io().buildChannel();
 
         try {
 
-            JRoutine.on(instance(sum)).buildProxy(SumError.class).compute(channel);
-
-            fail();
-
-        } catch (final IllegalArgumentException ignored) {
-
-        }
-
-        try {
-
-            JRoutine.on(instance(sum)).buildProxy(SumError.class).compute(1, channel);
+            JRoutineObject.on(instance(sum)).buildProxy(SumError.class).compute(channel);
 
             fail();
 
@@ -513,7 +505,17 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(instance(sum)).buildProxy(SumError.class).compute("test", channel);
+            JRoutineObject.on(instance(sum)).buildProxy(SumError.class).compute(1, channel);
+
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+
+            JRoutineObject.on(instance(sum)).buildProxy(SumError.class).compute("test", channel);
 
             fail();
 
@@ -529,12 +531,12 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(instance(test))
-                    .withInvocations()
-                    .withReadTimeout(INFINITY)
-                    .getConfigured()
-                    .buildProxy(TestItf.class)
-                    .throwException(null);
+            JRoutineObject.on(instance(test))
+                          .withInvocations()
+                          .withReadTimeout(INFINITY)
+                          .getConfigured()
+                          .buildProxy(TestItf.class)
+                          .throwException(null);
 
             fail();
 
@@ -544,12 +546,12 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(instance(test))
-                    .withInvocations()
-                    .withReadTimeout(INFINITY)
-                    .getConfigured()
-                    .buildProxy(TestItf.class)
-                    .throwException1(null);
+            JRoutineObject.on(instance(test))
+                          .withInvocations()
+                          .withReadTimeout(INFINITY)
+                          .getConfigured()
+                          .buildProxy(TestItf.class)
+                          .throwException1(null);
 
             fail();
 
@@ -559,7 +561,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(instance(test)).buildProxy(TestItf.class).throwException2(null);
+            JRoutineObject.on(instance(test)).buildProxy(TestItf.class).throwException2(null);
 
             fail();
 
@@ -575,7 +577,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(instance(count)).buildProxy(CountError.class).count(3);
+            JRoutineObject.on(instance(count)).buildProxy(CountError.class).count(3);
 
             fail();
 
@@ -585,7 +587,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(instance(count)).buildProxy(CountError.class).count1(3);
+            JRoutineObject.on(instance(count)).buildProxy(CountError.class).count1(3);
 
             fail();
 
@@ -595,7 +597,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(instance(count)).buildProxy(CountError.class).count2();
+            JRoutineObject.on(instance(count)).buildProxy(CountError.class).count2();
 
             fail();
 
@@ -605,7 +607,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(instance(count)).buildProxy(CountError.class).countList(3);
+            JRoutineObject.on(instance(count)).buildProxy(CountError.class).countList(3);
 
             fail();
 
@@ -615,7 +617,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(instance(count)).buildProxy(CountError.class).countList1(3);
+            JRoutineObject.on(instance(count)).buildProxy(CountError.class).countList1(3);
 
             fail();
 
@@ -629,16 +631,16 @@ public class ObjectRoutineTest {
 
         final TimeDuration timeout = seconds(1);
         final TestClass test = new TestClass();
-        final Routine<Object, Object> routine2 = JRoutine.on(instance(test))
-                                                         .withInvocations()
-                                                         .withRunner(Runners.poolRunner())
-                                                         .withMaxInstances(1)
-                                                         .getConfigured()
-                                                         .withProxies()
-                                                         .withSharedFields("test")
-                                                         .getConfigured()
-                                                         .method(TestClass.class.getMethod(
-                                                                 "getLong"));
+        final Routine<Object, Object> routine2 = JRoutineObject.on(instance(test))
+                                                               .withInvocations()
+                                                               .withRunner(Runners.poolRunner())
+                                                               .withMaxInstances(1)
+                                                               .getConfigured()
+                                                               .withProxies()
+                                                               .withSharedFields("test")
+                                                               .getConfigured()
+                                                               .method(TestClass.class.getMethod(
+                                                                       "getLong"));
 
         assertThat(routine2.syncCall().afterMax(timeout).all()).containsExactly(-77L);
     }
@@ -648,11 +650,11 @@ public class ObjectRoutineTest {
 
         final TimeDuration timeout = seconds(1);
         final TestClass test = new TestClass();
-        final Routine<Object, Object> routine1 = JRoutine.on(instance(test))
-                                                         .withInvocations()
-                                                         .withRunner(Runners.poolRunner())
-                                                         .getConfigured()
-                                                         .method("getLong");
+        final Routine<Object, Object> routine1 = JRoutineObject.on(instance(test))
+                                                               .withInvocations()
+                                                               .withRunner(Runners.poolRunner())
+                                                               .getConfigured()
+                                                               .method("getLong");
 
         assertThat(routine1.syncCall().afterMax(timeout).all()).containsExactly(-77L);
     }
@@ -662,47 +664,48 @@ public class ObjectRoutineTest {
 
         final TimeDuration timeout = seconds(1);
         final TestClassImpl test = new TestClassImpl();
-        assertThat(JRoutine.on(instance(test))
-                           .method(TestClassImpl.class.getMethod("getOne"))
-                           .syncCall()
-                           .afterMax(timeout)
-                           .all()).containsExactly(1);
-        assertThat(JRoutine.on(instance(test))
-                           .method("getOne")
-                           .syncCall()
-                           .afterMax(timeout)
-                           .all()).containsExactly(1);
-        assertThat(JRoutine.on(instance(test))
-                           .aliasMethod(TestClassImpl.GET)
-                           .syncCall()
-                           .afterMax(timeout)
-                           .all()).containsExactly(1);
-        assertThat(JRoutine.on(classOfType(TestClassImpl.class))
-                           .aliasMethod(TestClassImpl.STATIC_GET)
-                           .syncCall(3)
-                           .afterMax(timeout)
-                           .all()).containsExactly(3);
-        assertThat(JRoutine.on(classOfType(TestClassImpl.class))
-                           .aliasMethod("sget")
-                           .asyncCall(-3)
-                           .afterMax(timeout)
-                           .all()).containsExactly(-3);
-        assertThat(JRoutine.on(classOfType(TestClassImpl.class))
-                           .method("get", int.class)
-                           .parallelCall(17)
-                           .afterMax(timeout)
-                           .all()).containsExactly(17);
+        assertThat(JRoutineObject.on(instance(test))
+                                 .method(TestClassImpl.class.getMethod("getOne"))
+                                 .syncCall()
+                                 .afterMax(timeout)
+                                 .all()).containsExactly(1);
+        assertThat(JRoutineObject.on(instance(test))
+                                 .method("getOne")
+                                 .syncCall()
+                                 .afterMax(timeout)
+                                 .all()).containsExactly(1);
+        assertThat(JRoutineObject.on(instance(test))
+                                 .aliasMethod(TestClassImpl.GET)
+                                 .syncCall()
+                                 .afterMax(timeout)
+                                 .all()).containsExactly(1);
+        assertThat(JRoutineObject.on(classOfType(TestClassImpl.class))
+                                 .aliasMethod(TestClassImpl.STATIC_GET)
+                                 .syncCall(3)
+                                 .afterMax(timeout)
+                                 .all()).containsExactly(3);
+        assertThat(JRoutineObject.on(classOfType(TestClassImpl.class))
+                                 .aliasMethod("sget")
+                                 .asyncCall(-3)
+                                 .afterMax(timeout)
+                                 .all()).containsExactly(-3);
+        assertThat(JRoutineObject.on(classOfType(TestClassImpl.class))
+                                 .method("get", int.class)
+                                 .parallelCall(17)
+                                 .afterMax(timeout)
+                                 .all()).containsExactly(17);
 
-        assertThat(JRoutine.on(instance(test)).buildProxy(TestInterface.class).getInt(2)).isEqualTo(
-                2);
+        assertThat(JRoutineObject.on(instance(test))
+                                 .buildProxy(TestInterface.class)
+                                 .getInt(2)).isEqualTo(2);
 
         try {
 
-            JRoutine.on(classOfType(TestClassImpl.class))
-                    .aliasMethod("sget")
-                    .asyncCall()
-                    .afterMax(timeout)
-                    .all();
+            JRoutineObject.on(classOfType(TestClassImpl.class))
+                          .aliasMethod("sget")
+                          .asyncCall()
+                          .afterMax(timeout)
+                          .all();
 
             fail();
 
@@ -712,7 +715,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(classOfType(TestClassImpl.class)).aliasMethod("take");
+            JRoutineObject.on(classOfType(TestClassImpl.class)).aliasMethod("take");
 
             fail();
 
@@ -720,23 +723,26 @@ public class ObjectRoutineTest {
 
         }
 
-        assertThat(JRoutine.on(instance(test))
-                           .withInvocations()
-                           .withReadTimeout(timeout)
-                           .getConfigured()
-                           .buildProxy(TestInterfaceAsync.class)
-                           .take(77)).isEqualTo(77);
-        assertThat(JRoutine.on(instance(test))
-                           .buildProxy(TestInterfaceAsync.class)
-                           .getOne()
-                           .afterMax(timeout)
-                           .next()).isEqualTo(1);
+        assertThat(JRoutineObject.on(instance(test))
+                                 .withInvocations()
+                                 .withReadTimeout(timeout)
+                                 .getConfigured()
+                                 .buildProxy(TestInterfaceAsync.class)
+                                 .take(77)).isEqualTo(77);
+        assertThat(JRoutineObject.on(instance(test))
+                                 .buildProxy(TestInterfaceAsync.class)
+                                 .getOne()
+                                 .afterMax(timeout)
+                                 .next()).isEqualTo(1);
 
-        final TestInterfaceAsync testInterfaceAsync = JRoutine.on(instance(test))
-                                                              .withInvocations()
-                                                              .withReadTimeout(1, TimeUnit.SECONDS)
-                                                              .getConfigured()
-                                                              .buildProxy(TestInterfaceAsync.class);
+        final TestInterfaceAsync testInterfaceAsync = JRoutineObject.on(instance(test))
+                                                                    .withInvocations()
+                                                                    .withReadTimeout(1,
+                                                                                     TimeUnit.SECONDS)
+                                                                    .getConfigured()
+                                                                    .buildProxy(
+                                                                            TestInterfaceAsync
+                                                                                    .class);
         assertThat(testInterfaceAsync.getInt(testInterfaceAsync.getOne())).isEqualTo(1);
     }
 
@@ -747,7 +753,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(instance(test)).aliasMethod("test");
+            JRoutineObject.on(instance(test)).aliasMethod("test");
 
             fail();
 
@@ -763,7 +769,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(instance(test)).method("test");
+            JRoutineObject.on(instance(test)).method("test");
 
             fail();
 
@@ -778,7 +784,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on((InvocationTarget<?>) null);
+            JRoutineObject.on(null);
 
             fail();
 
@@ -788,7 +794,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(instance(null));
+            JRoutineObject.on(instance(null));
 
             fail();
 
@@ -798,7 +804,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(classOfType(null));
+            JRoutineObject.on(classOfType(null));
 
             fail();
 
@@ -815,7 +821,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(instance(test)).buildProxy((Class<?>) null);
+            JRoutineObject.on(instance(test)).buildProxy((Class<?>) null);
 
             fail();
 
@@ -825,7 +831,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(instance(test)).buildProxy((ClassToken<?>) null);
+            JRoutineObject.on(instance(test)).buildProxy((ClassToken<?>) null);
 
             fail();
 
@@ -839,13 +845,13 @@ public class ObjectRoutineTest {
 
         final TimeDuration timeout = seconds(1);
         final TestStatic test = new TestStatic();
-        final Routine<Object, Object> routine = JRoutine.on(instance(test))
-                                                        .withInvocations()
-                                                        .withRunner(Runners.poolRunner())
-                                                        .withLogLevel(Level.DEBUG)
-                                                        .withLog(new NullLog())
-                                                        .getConfigured()
-                                                        .aliasMethod(TestStatic.GET);
+        final Routine<Object, Object> routine = JRoutineObject.on(instance(test))
+                                                              .withInvocations()
+                                                              .withRunner(Runners.poolRunner())
+                                                              .withLogLevel(Level.DEBUG)
+                                                              .withLog(new NullLog())
+                                                              .getConfigured()
+                                                              .aliasMethod(TestStatic.GET);
 
         assertThat(routine.syncCall().afterMax(timeout).all()).containsExactly(-77L);
     }
@@ -855,24 +861,24 @@ public class ObjectRoutineTest {
     public void testProxyAnnotations() {
 
         final Impl impl = new Impl();
-        final Itf itf = JRoutine.on(instance(impl))
-                                .withInvocations()
-                                .withReadTimeout(seconds(10))
-                                .getConfigured()
-                                .buildProxy(Itf.class);
+        final Itf itf = JRoutineObject.on(instance(impl))
+                                      .withInvocations()
+                                      .withReadTimeout(seconds(10))
+                                      .getConfigured()
+                                      .buildProxy(Itf.class);
 
         assertThat(itf.add0('c')).isEqualTo((int) 'c');
-        final IOChannel<Character> channel1 = JRoutine.io().buildChannel();
+        final IOChannel<Character> channel1 = JRoutineCore.io().buildChannel();
         channel1.pass('a').close();
         assertThat(itf.add1(channel1)).isEqualTo((int) 'a');
-        final IOChannel<Character> channel2 = JRoutine.io().buildChannel();
+        final IOChannel<Character> channel2 = JRoutineCore.io().buildChannel();
         channel2.pass('d', 'e', 'f').close();
         assertThat(itf.add2(channel2)).isIn((int) 'd', (int) 'e', (int) 'f');
         assertThat(itf.add3('c').all()).containsExactly((int) 'c');
-        final IOChannel<Character> channel3 = JRoutine.io().buildChannel();
+        final IOChannel<Character> channel3 = JRoutineCore.io().buildChannel();
         channel3.pass('a').close();
         assertThat(itf.add4(channel3).all()).containsExactly((int) 'a');
-        final IOChannel<Character> channel4 = JRoutine.io().buildChannel();
+        final IOChannel<Character> channel4 = JRoutineCore.io().buildChannel();
         channel4.pass('d', 'e', 'f').close();
         assertThat(itf.add5(channel4).all()).containsOnly((int) 'd', (int) 'e', (int) 'f');
         assertThat(itf.add6().pass('d').result().all()).containsOnly((int) 'd');
@@ -882,36 +888,36 @@ public class ObjectRoutineTest {
         assertThat(itf.add11().parallelCall('d', 'e', 'f').all()).containsOnly((int) 'd', (int) 'e',
                                                                                (int) 'f');
         assertThat(itf.addA00(new char[]{'c', 'z'})).isEqualTo(new int[]{'c', 'z'});
-        final IOChannel<char[]> channel5 = JRoutine.io().buildChannel();
+        final IOChannel<char[]> channel5 = JRoutineCore.io().buildChannel();
         channel5.pass(new char[]{'a', 'z'}).close();
         assertThat(itf.addA01(channel5)).isEqualTo(new int[]{'a', 'z'});
-        final IOChannel<Character> channel6 = JRoutine.io().buildChannel();
+        final IOChannel<Character> channel6 = JRoutineCore.io().buildChannel();
         channel6.pass('d', 'e', 'f').close();
         assertThat(itf.addA02(channel6)).isEqualTo(new int[]{'d', 'e', 'f'});
-        final IOChannel<char[]> channel7 = JRoutine.io().buildChannel();
+        final IOChannel<char[]> channel7 = JRoutineCore.io().buildChannel();
         channel7.pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'}).close();
         assertThat(itf.addA03(channel7)).isIn(new int[]{'d', 'z'}, new int[]{'e', 'z'},
                                               new int[]{'f', 'z'});
         assertThat(itf.addA04(new char[]{'c', 'z'}).all()).containsExactly(new int[]{'c', 'z'});
-        final IOChannel<char[]> channel8 = JRoutine.io().buildChannel();
+        final IOChannel<char[]> channel8 = JRoutineCore.io().buildChannel();
         channel8.pass(new char[]{'a', 'z'}).close();
         assertThat(itf.addA05(channel8).all()).containsExactly(new int[]{'a', 'z'});
-        final IOChannel<Character> channel9 = JRoutine.io().buildChannel();
+        final IOChannel<Character> channel9 = JRoutineCore.io().buildChannel();
         channel9.pass('d', 'e', 'f').close();
         assertThat(itf.addA06(channel9).all()).containsExactly(new int[]{'d', 'e', 'f'});
-        final IOChannel<char[]> channel10 = JRoutine.io().buildChannel();
+        final IOChannel<char[]> channel10 = JRoutineCore.io().buildChannel();
         channel10.pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'}).close();
         assertThat(itf.addA07(channel10).all()).containsOnly(new int[]{'d', 'z'},
                                                              new int[]{'e', 'z'},
                                                              new int[]{'f', 'z'});
         assertThat(itf.addA08(new char[]{'c', 'z'}).all()).containsExactly((int) 'c', (int) 'z');
-        final IOChannel<char[]> channel11 = JRoutine.io().buildChannel();
+        final IOChannel<char[]> channel11 = JRoutineCore.io().buildChannel();
         channel11.pass(new char[]{'a', 'z'}).close();
         assertThat(itf.addA09(channel11).all()).containsExactly((int) 'a', (int) 'z');
-        final IOChannel<Character> channel12 = JRoutine.io().buildChannel();
+        final IOChannel<Character> channel12 = JRoutineCore.io().buildChannel();
         channel12.pass('d', 'e', 'f').close();
         assertThat(itf.addA10(channel12).all()).containsExactly((int) 'd', (int) 'e', (int) 'f');
-        final IOChannel<char[]> channel13 = JRoutine.io().buildChannel();
+        final IOChannel<char[]> channel13 = JRoutineCore.io().buildChannel();
         channel13.pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'}).close();
         assertThat(itf.addA11(channel13).all()).containsOnly((int) 'd', (int) 'e', (int) 'f',
                                                              (int) 'z');
@@ -945,13 +951,13 @@ public class ObjectRoutineTest {
                                            (int) 'z');
         assertThat(itf.addL00(Arrays.asList('c', 'z'))).isEqualTo(
                 Arrays.asList((int) 'c', (int) 'z'));
-        final IOChannel<List<Character>> channel20 = JRoutine.io().buildChannel();
+        final IOChannel<List<Character>> channel20 = JRoutineCore.io().buildChannel();
         channel20.pass(Arrays.asList('a', 'z')).close();
         assertThat(itf.addL01(channel20)).isEqualTo(Arrays.asList((int) 'a', (int) 'z'));
-        final IOChannel<Character> channel21 = JRoutine.io().buildChannel();
+        final IOChannel<Character> channel21 = JRoutineCore.io().buildChannel();
         channel21.pass('d', 'e', 'f').close();
         assertThat(itf.addL02(channel21)).isEqualTo(Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
-        final IOChannel<List<Character>> channel22 = JRoutine.io().buildChannel();
+        final IOChannel<List<Character>> channel22 = JRoutineCore.io().buildChannel();
         channel22.pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
                  .close();
         assertThat(itf.addL03(channel22)).isIn(Arrays.asList((int) 'd', (int) 'z'),
@@ -959,28 +965,28 @@ public class ObjectRoutineTest {
                                                Arrays.asList((int) 'f', (int) 'z'));
         assertThat(itf.addL04(Arrays.asList('c', 'z')).all()).containsExactly(
                 Arrays.asList((int) 'c', (int) 'z'));
-        final IOChannel<List<Character>> channel23 = JRoutine.io().buildChannel();
+        final IOChannel<List<Character>> channel23 = JRoutineCore.io().buildChannel();
         channel23.pass(Arrays.asList('a', 'z')).close();
         assertThat(itf.addL05(channel23).all()).containsExactly(
                 Arrays.asList((int) 'a', (int) 'z'));
-        final IOChannel<Character> channel24 = JRoutine.io().buildChannel();
+        final IOChannel<Character> channel24 = JRoutineCore.io().buildChannel();
         channel24.pass('d', 'e', 'f').close();
         assertThat(itf.addL06(channel24).all()).containsExactly(
                 Arrays.asList((int) 'd', (int) 'e', (int) 'f'));
-        final IOChannel<List<Character>> channel25 = JRoutine.io().buildChannel();
+        final IOChannel<List<Character>> channel25 = JRoutineCore.io().buildChannel();
         channel25.pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
                  .close();
         assertThat(itf.addL07(channel25).all()).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
                                                              Arrays.asList((int) 'e', (int) 'z'),
                                                              Arrays.asList((int) 'f', (int) 'z'));
         assertThat(itf.addL08(Arrays.asList('c', 'z')).all()).containsExactly((int) 'c', (int) 'z');
-        final IOChannel<List<Character>> channel26 = JRoutine.io().buildChannel();
+        final IOChannel<List<Character>> channel26 = JRoutineCore.io().buildChannel();
         channel26.pass(Arrays.asList('a', 'z')).close();
         assertThat(itf.addL09(channel26).all()).containsExactly((int) 'a', (int) 'z');
-        final IOChannel<Character> channel27 = JRoutine.io().buildChannel();
+        final IOChannel<Character> channel27 = JRoutineCore.io().buildChannel();
         channel27.pass('d', 'e', 'f').close();
         assertThat(itf.addL10(channel27).all()).containsExactly((int) 'd', (int) 'e', (int) 'f');
-        final IOChannel<List<Character>> channel28 = JRoutine.io().buildChannel();
+        final IOChannel<List<Character>> channel28 = JRoutineCore.io().buildChannel();
         channel28.pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
                  .close();
         assertThat(itf.addL11(channel28).all()).containsOnly((int) 'd', (int) 'e', (int) 'f',
@@ -1034,34 +1040,34 @@ public class ObjectRoutineTest {
         assertThat(itf.getL4().result().all()).containsExactly(1, 2, 3);
         assertThat(itf.getL5().asyncCall().all()).containsExactly(1, 2, 3);
         itf.set0(-17);
-        final IOChannel<Integer> channel35 = JRoutine.io().buildChannel();
+        final IOChannel<Integer> channel35 = JRoutineCore.io().buildChannel();
         channel35.pass(-17).close();
         itf.set1(channel35);
-        final IOChannel<Integer> channel36 = JRoutine.io().buildChannel();
+        final IOChannel<Integer> channel36 = JRoutineCore.io().buildChannel();
         channel36.pass(-17).close();
         itf.set2(channel36);
         itf.set3().pass(-17).result().hasCompleted();
         itf.set5().asyncCall(-17).hasCompleted();
         itf.setA0(new int[]{1, 2, 3});
-        final IOChannel<int[]> channel37 = JRoutine.io().buildChannel();
+        final IOChannel<int[]> channel37 = JRoutineCore.io().buildChannel();
         channel37.pass(new int[]{1, 2, 3}).close();
         itf.setA1(channel37);
-        final IOChannel<Integer> channel38 = JRoutine.io().buildChannel();
+        final IOChannel<Integer> channel38 = JRoutineCore.io().buildChannel();
         channel38.pass(1, 2, 3).close();
         itf.setA2(channel38);
-        final IOChannel<int[]> channel39 = JRoutine.io().buildChannel();
+        final IOChannel<int[]> channel39 = JRoutineCore.io().buildChannel();
         channel39.pass(new int[]{1, 2, 3}).close();
         itf.setA3(channel39);
         itf.setA4().pass(new int[]{1, 2, 3}).result().hasCompleted();
         itf.setA6().asyncCall(new int[]{1, 2, 3}).hasCompleted();
         itf.setL0(Arrays.asList(1, 2, 3));
-        final IOChannel<List<Integer>> channel40 = JRoutine.io().buildChannel();
+        final IOChannel<List<Integer>> channel40 = JRoutineCore.io().buildChannel();
         channel40.pass(Arrays.asList(1, 2, 3)).close();
         itf.setL1(channel40);
-        final IOChannel<Integer> channel41 = JRoutine.io().buildChannel();
+        final IOChannel<Integer> channel41 = JRoutineCore.io().buildChannel();
         channel41.pass(1, 2, 3).close();
         itf.setL2(channel41);
-        final IOChannel<List<Integer>> channel42 = JRoutine.io().buildChannel();
+        final IOChannel<List<Integer>> channel42 = JRoutineCore.io().buildChannel();
         channel42.pass(Arrays.asList(1, 2, 3)).close();
         itf.setL3(channel42);
         itf.setL4().pass(Arrays.asList(1, 2, 3)).result().hasCompleted();
@@ -1074,15 +1080,16 @@ public class ObjectRoutineTest {
 
         final TimeDuration timeout = seconds(1);
         final Square square = new Square();
-        final SquareItf squareAsync = JRoutine.on(instance(square)).buildProxy(SquareItf.class);
+        final SquareItf squareAsync =
+                JRoutineObject.on(instance(square)).buildProxy(SquareItf.class);
 
         assertThat(squareAsync.compute(3)).isEqualTo(9);
 
-        final IOChannel<Integer> channel1 = JRoutine.io().buildChannel();
+        final IOChannel<Integer> channel1 = JRoutineCore.io().buildChannel();
         channel1.pass(4).close();
         assertThat(squareAsync.computeAsync(channel1)).isEqualTo(16);
 
-        final IOChannel<Integer> channel2 = JRoutine.io().buildChannel();
+        final IOChannel<Integer> channel2 = JRoutineCore.io().buildChannel();
         channel2.pass(1, 2, 3).close();
         assertThat(squareAsync.computeParallel(channel2).afterMax(timeout).all()).containsOnly(1, 4,
                                                                                                9);
@@ -1093,62 +1100,62 @@ public class ObjectRoutineTest {
 
         final TestClass test = new TestClass();
         final NullLog nullLog = new NullLog();
-        final Routine<Object, Object> routine1 = JRoutine.on(instance(test))
-                                                         .withInvocations()
-                                                         .withRunner(Runners.sharedRunner())
-                                                         .withCoreInstances(16)
-                                                         .withLogLevel(Level.DEBUG)
-                                                         .withLog(nullLog)
-                                                         .getConfigured()
-                                                         .aliasMethod(TestClass.GET);
+        final Routine<Object, Object> routine1 = JRoutineObject.on(instance(test))
+                                                               .withInvocations()
+                                                               .withRunner(Runners.sharedRunner())
+                                                               .withCoreInstances(16)
+                                                               .withLogLevel(Level.DEBUG)
+                                                               .withLog(nullLog)
+                                                               .getConfigured()
+                                                               .aliasMethod(TestClass.GET);
 
         assertThat(routine1.syncCall().all()).containsExactly(-77L);
 
-        final Routine<Object, Object> routine2 = JRoutine.on(instance(test))
-                                                         .withInvocations()
-                                                         .withRunner(Runners.sharedRunner())
-                                                         .withCoreInstances(16)
-                                                         .withLogLevel(Level.DEBUG)
-                                                         .withLog(nullLog)
-                                                         .getConfigured()
-                                                         .aliasMethod(TestClass.GET);
+        final Routine<Object, Object> routine2 = JRoutineObject.on(instance(test))
+                                                               .withInvocations()
+                                                               .withRunner(Runners.sharedRunner())
+                                                               .withCoreInstances(16)
+                                                               .withLogLevel(Level.DEBUG)
+                                                               .withLog(nullLog)
+                                                               .getConfigured()
+                                                               .aliasMethod(TestClass.GET);
 
         assertThat(routine2.syncCall().all()).containsExactly(-77L);
         assertThat(routine1).isEqualTo(routine2);
 
-        final Routine<Object, Object> routine3 = JRoutine.on(instance(test))
-                                                         .withInvocations()
-                                                         .withRunner(Runners.sharedRunner())
-                                                         .withCoreInstances(32)
-                                                         .withLogLevel(Level.DEBUG)
-                                                         .withLog(nullLog)
-                                                         .getConfigured()
-                                                         .aliasMethod(TestClass.GET);
+        final Routine<Object, Object> routine3 = JRoutineObject.on(instance(test))
+                                                               .withInvocations()
+                                                               .withRunner(Runners.sharedRunner())
+                                                               .withCoreInstances(32)
+                                                               .withLogLevel(Level.DEBUG)
+                                                               .withLog(nullLog)
+                                                               .getConfigured()
+                                                               .aliasMethod(TestClass.GET);
 
         assertThat(routine3.syncCall().all()).containsExactly(-77L);
         assertThat(routine1).isNotEqualTo(routine3);
         assertThat(routine2).isNotEqualTo(routine3);
 
-        final Routine<Object, Object> routine4 = JRoutine.on(instance(test))
-                                                         .withInvocations()
-                                                         .withRunner(Runners.sharedRunner())
-                                                         .withCoreInstances(32)
-                                                         .withLogLevel(Level.WARNING)
-                                                         .withLog(nullLog)
-                                                         .getConfigured()
-                                                         .aliasMethod(TestClass.GET);
+        final Routine<Object, Object> routine4 = JRoutineObject.on(instance(test))
+                                                               .withInvocations()
+                                                               .withRunner(Runners.sharedRunner())
+                                                               .withCoreInstances(32)
+                                                               .withLogLevel(Level.WARNING)
+                                                               .withLog(nullLog)
+                                                               .getConfigured()
+                                                               .aliasMethod(TestClass.GET);
 
         assertThat(routine4.syncCall().all()).containsExactly(-77L);
         assertThat(routine3).isNotEqualTo(routine4);
 
-        final Routine<Object, Object> routine5 = JRoutine.on(instance(test))
-                                                         .withInvocations()
-                                                         .withRunner(Runners.sharedRunner())
-                                                         .withCoreInstances(32)
-                                                         .withLogLevel(Level.WARNING)
-                                                         .withLog(new NullLog())
-                                                         .getConfigured()
-                                                         .aliasMethod(TestClass.GET);
+        final Routine<Object, Object> routine5 = JRoutineObject.on(instance(test))
+                                                               .withInvocations()
+                                                               .withRunner(Runners.sharedRunner())
+                                                               .withCoreInstances(32)
+                                                               .withLogLevel(Level.WARNING)
+                                                               .withLog(new NullLog())
+                                                               .getConfigured()
+                                                               .aliasMethod(TestClass.GET);
 
         assertThat(routine5.syncCall().all()).containsExactly(-77L);
         assertThat(routine4).isNotEqualTo(routine5);
@@ -1158,62 +1165,62 @@ public class ObjectRoutineTest {
     public void testRoutineCache2() {
 
         final NullLog nullLog = new NullLog();
-        final Routine<Object, Object> routine1 = JRoutine.on(classOfType(TestStatic.class))
-                                                         .withInvocations()
-                                                         .withRunner(Runners.sharedRunner())
-                                                         .withCoreInstances(16)
-                                                         .withLogLevel(Level.DEBUG)
-                                                         .withLog(nullLog)
-                                                         .getConfigured()
-                                                         .aliasMethod(TestStatic.GET);
+        final Routine<Object, Object> routine1 = JRoutineObject.on(classOfType(TestStatic.class))
+                                                               .withInvocations()
+                                                               .withRunner(Runners.sharedRunner())
+                                                               .withCoreInstances(16)
+                                                               .withLogLevel(Level.DEBUG)
+                                                               .withLog(nullLog)
+                                                               .getConfigured()
+                                                               .aliasMethod(TestStatic.GET);
 
         assertThat(routine1.syncCall().all()).containsExactly(-77L);
 
-        final Routine<Object, Object> routine2 = JRoutine.on(classOfType(TestStatic.class))
-                                                         .withInvocations()
-                                                         .withRunner(Runners.sharedRunner())
-                                                         .withCoreInstances(16)
-                                                         .withLogLevel(Level.DEBUG)
-                                                         .withLog(nullLog)
-                                                         .getConfigured()
-                                                         .aliasMethod(TestStatic.GET);
+        final Routine<Object, Object> routine2 = JRoutineObject.on(classOfType(TestStatic.class))
+                                                               .withInvocations()
+                                                               .withRunner(Runners.sharedRunner())
+                                                               .withCoreInstances(16)
+                                                               .withLogLevel(Level.DEBUG)
+                                                               .withLog(nullLog)
+                                                               .getConfigured()
+                                                               .aliasMethod(TestStatic.GET);
 
         assertThat(routine2.syncCall().all()).containsExactly(-77L);
         assertThat(routine1).isEqualTo(routine2);
 
-        final Routine<Object, Object> routine3 = JRoutine.on(classOfType(TestStatic.class))
-                                                         .withInvocations()
-                                                         .withRunner(Runners.sharedRunner())
-                                                         .withCoreInstances(32)
-                                                         .withLogLevel(Level.DEBUG)
-                                                         .withLog(nullLog)
-                                                         .getConfigured()
-                                                         .aliasMethod(TestStatic.GET);
+        final Routine<Object, Object> routine3 = JRoutineObject.on(classOfType(TestStatic.class))
+                                                               .withInvocations()
+                                                               .withRunner(Runners.sharedRunner())
+                                                               .withCoreInstances(32)
+                                                               .withLogLevel(Level.DEBUG)
+                                                               .withLog(nullLog)
+                                                               .getConfigured()
+                                                               .aliasMethod(TestStatic.GET);
 
         assertThat(routine3.syncCall().all()).containsExactly(-77L);
         assertThat(routine1).isNotEqualTo(routine3);
         assertThat(routine2).isNotEqualTo(routine3);
 
-        final Routine<Object, Object> routine4 = JRoutine.on(classOfType(TestStatic.class))
-                                                         .withInvocations()
-                                                         .withRunner(Runners.sharedRunner())
-                                                         .withCoreInstances(32)
-                                                         .withLogLevel(Level.WARNING)
-                                                         .withLog(nullLog)
-                                                         .getConfigured()
-                                                         .aliasMethod(TestStatic.GET);
+        final Routine<Object, Object> routine4 = JRoutineObject.on(classOfType(TestStatic.class))
+                                                               .withInvocations()
+                                                               .withRunner(Runners.sharedRunner())
+                                                               .withCoreInstances(32)
+                                                               .withLogLevel(Level.WARNING)
+                                                               .withLog(nullLog)
+                                                               .getConfigured()
+                                                               .aliasMethod(TestStatic.GET);
 
         assertThat(routine4.syncCall().all()).containsExactly(-77L);
         assertThat(routine3).isNotEqualTo(routine4);
 
-        final Routine<Object, Object> routine5 = JRoutine.on(classOfType(TestStatic.class))
-                                                         .withInvocations()
-                                                         .withRunner(Runners.sharedRunner())
-                                                         .withCoreInstances(32)
-                                                         .withLogLevel(Level.WARNING)
-                                                         .withLog(new NullLog())
-                                                         .getConfigured()
-                                                         .aliasMethod(TestStatic.GET);
+        final Routine<Object, Object> routine5 = JRoutineObject.on(classOfType(TestStatic.class))
+                                                               .withInvocations()
+                                                               .withRunner(Runners.sharedRunner())
+                                                               .withCoreInstances(32)
+                                                               .withLogLevel(Level.WARNING)
+                                                               .withLog(new NullLog())
+                                                               .getConfigured()
+                                                               .aliasMethod(TestStatic.GET);
 
         assertThat(routine5.syncCall().all()).containsExactly(-77L);
         assertThat(routine4).isNotEqualTo(routine5);
@@ -1223,10 +1230,10 @@ public class ObjectRoutineTest {
     public void testSharedFields() throws NoSuchMethodException {
 
         final TestClass2 test2 = new TestClass2();
-        final ObjectRoutineBuilder builder = JRoutine.on(instance(test2))
-                                                     .withInvocations()
-                                                     .withReadTimeout(seconds(2))
-                                                     .getConfigured();
+        final ObjectRoutineBuilder builder = JRoutineObject.on(instance(test2))
+                                                           .withInvocations()
+                                                           .withReadTimeout(seconds(2))
+                                                           .getConfigured();
         long startTime = System.currentTimeMillis();
 
         OutputChannel<Object> getOne = builder.withProxies()
@@ -1275,10 +1282,10 @@ public class ObjectRoutineTest {
     public void testSharedFields2() throws NoSuchMethodException {
 
         final TestClass2 test2 = new TestClass2();
-        final ObjectRoutineBuilder builder = JRoutine.on(instance(test2))
-                                                     .withInvocations()
-                                                     .withReadTimeout(seconds(2))
-                                                     .getConfigured();
+        final ObjectRoutineBuilder builder = JRoutineObject.on(instance(test2))
+                                                           .withInvocations()
+                                                           .withReadTimeout(seconds(2))
+                                                           .getConfigured();
         long startTime = System.currentTimeMillis();
 
         OutputChannel<Object> getOne = builder.method("getOne").asyncCall();
@@ -1343,10 +1350,10 @@ public class ObjectRoutineTest {
     @Test
     public void testSharedFieldsStatic() throws NoSuchMethodException {
 
-        final ObjectRoutineBuilder builder = JRoutine.on(classOfType(TestStatic2.class))
-                                                     .withInvocations()
-                                                     .withReadTimeout(seconds(2))
-                                                     .getConfigured();
+        final ObjectRoutineBuilder builder = JRoutineObject.on(classOfType(TestStatic2.class))
+                                                           .withInvocations()
+                                                           .withReadTimeout(seconds(2))
+                                                           .getConfigured();
         long startTime = System.currentTimeMillis();
 
         OutputChannel<Object> getOne = builder.withProxies()
@@ -1394,10 +1401,10 @@ public class ObjectRoutineTest {
     @Test
     public void testSharedFieldsStatic2() throws NoSuchMethodException {
 
-        final ObjectRoutineBuilder builder = JRoutine.on(classOfType(TestStatic2.class))
-                                                     .withInvocations()
-                                                     .withReadTimeout(seconds(2))
-                                                     .getConfigured();
+        final ObjectRoutineBuilder builder = JRoutineObject.on(classOfType(TestStatic2.class))
+                                                           .withInvocations()
+                                                           .withReadTimeout(seconds(2))
+                                                           .getConfigured();
         long startTime = System.currentTimeMillis();
 
         OutputChannel<Object> getOne = builder.method("getOne").asyncCall();
@@ -1463,17 +1470,17 @@ public class ObjectRoutineTest {
     public void testStaticMethod() throws NoSuchMethodException {
 
         final TimeDuration timeout = seconds(1);
-        final Routine<Object, Object> routine2 = JRoutine.on(classOfType(TestStatic.class))
-                                                         .withInvocations()
-                                                         .withRunner(Runners.poolRunner())
-                                                         .withMaxInstances(1)
-                                                         .withCoreInstances(0)
-                                                         .getConfigured()
-                                                         .withProxies()
-                                                         .withSharedFields("test")
-                                                         .getConfigured()
-                                                         .method(TestStatic.class.getMethod(
-                                                                 "getLong"));
+        final Routine<Object, Object> routine2 = JRoutineObject.on(classOfType(TestStatic.class))
+                                                               .withInvocations()
+                                                               .withRunner(Runners.poolRunner())
+                                                               .withMaxInstances(1)
+                                                               .withCoreInstances(0)
+                                                               .getConfigured()
+                                                               .withProxies()
+                                                               .withSharedFields("test")
+                                                               .getConfigured()
+                                                               .method(TestStatic.class.getMethod(
+                                                                       "getLong"));
 
         assertThat(routine2.syncCall().afterMax(timeout).all()).containsExactly(-77L);
     }
@@ -1482,12 +1489,12 @@ public class ObjectRoutineTest {
     public void testStaticMethodBySignature() throws NoSuchMethodException {
 
         final TimeDuration timeout = seconds(1);
-        final Routine<Object, Object> routine1 = JRoutine.on(classOfType(TestStatic.class))
-                                                         .withInvocations()
-                                                         .withRunner(Runners.poolRunner())
-                                                         .withMaxInstances(1)
-                                                         .getConfigured()
-                                                         .method("getLong");
+        final Routine<Object, Object> routine1 = JRoutineObject.on(classOfType(TestStatic.class))
+                                                               .withInvocations()
+                                                               .withRunner(Runners.poolRunner())
+                                                               .withMaxInstances(1)
+                                                               .getConfigured()
+                                                               .method("getLong");
 
         assertThat(routine1.syncCall().afterMax(timeout).all()).containsExactly(-77L);
 
@@ -1498,7 +1505,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutine.on(classOfType(TestStatic.class)).method("test");
+            JRoutineObject.on(classOfType(TestStatic.class)).method("test");
 
             fail();
 
@@ -1511,23 +1518,23 @@ public class ObjectRoutineTest {
     public void testTimeoutActionAnnotation() throws NoSuchMethodException {
 
         final TestTimeout testTimeout = new TestTimeout();
-        assertThat(JRoutine.on(instance(testTimeout))
-                           .withInvocations()
-                           .withReadTimeout(seconds(1))
-                           .getConfigured()
-                           .aliasMethod("test")
-                           .asyncCall()
-                           .next()).isEqualTo(31);
+        assertThat(JRoutineObject.on(instance(testTimeout))
+                                 .withInvocations()
+                                 .withReadTimeout(seconds(1))
+                                 .getConfigured()
+                                 .aliasMethod("test")
+                                 .asyncCall()
+                                 .next()).isEqualTo(31);
 
         try {
 
-            JRoutine.on(instance(testTimeout))
-                    .withInvocations()
-                    .withReadTimeoutAction(TimeoutActionType.THROW)
-                    .getConfigured()
-                    .aliasMethod("test")
-                    .asyncCall()
-                    .next();
+            JRoutineObject.on(instance(testTimeout))
+                          .withInvocations()
+                          .withReadTimeoutAction(TimeoutActionType.THROW)
+                          .getConfigured()
+                          .aliasMethod("test")
+                          .asyncCall()
+                          .next();
 
             fail();
 
@@ -1535,23 +1542,23 @@ public class ObjectRoutineTest {
 
         }
 
-        assertThat(JRoutine.on(instance(testTimeout))
-                           .withInvocations()
-                           .withReadTimeout(seconds(1))
-                           .getConfigured()
-                           .method("getInt")
-                           .asyncCall()
-                           .next()).isEqualTo(31);
+        assertThat(JRoutineObject.on(instance(testTimeout))
+                                 .withInvocations()
+                                 .withReadTimeout(seconds(1))
+                                 .getConfigured()
+                                 .method("getInt")
+                                 .asyncCall()
+                                 .next()).isEqualTo(31);
 
         try {
 
-            JRoutine.on(instance(testTimeout))
-                    .withInvocations()
-                    .withReadTimeoutAction(TimeoutActionType.THROW)
-                    .getConfigured()
-                    .method("getInt")
-                    .asyncCall()
-                    .next();
+            JRoutineObject.on(instance(testTimeout))
+                          .withInvocations()
+                          .withReadTimeoutAction(TimeoutActionType.THROW)
+                          .getConfigured()
+                          .method("getInt")
+                          .asyncCall()
+                          .next();
 
             fail();
 
@@ -1559,23 +1566,23 @@ public class ObjectRoutineTest {
 
         }
 
-        assertThat(JRoutine.on(instance(testTimeout))
-                           .withInvocations()
-                           .withReadTimeout(seconds(1))
-                           .getConfigured()
-                           .method(TestTimeout.class.getMethod("getInt"))
-                           .asyncCall()
-                           .next()).isEqualTo(31);
+        assertThat(JRoutineObject.on(instance(testTimeout))
+                                 .withInvocations()
+                                 .withReadTimeout(seconds(1))
+                                 .getConfigured()
+                                 .method(TestTimeout.class.getMethod("getInt"))
+                                 .asyncCall()
+                                 .next()).isEqualTo(31);
 
         try {
 
-            JRoutine.on(instance(testTimeout))
-                    .withInvocations()
-                    .withReadTimeoutAction(TimeoutActionType.THROW)
-                    .getConfigured()
-                    .method(TestTimeout.class.getMethod("getInt"))
-                    .asyncCall()
-                    .next();
+            JRoutineObject.on(instance(testTimeout))
+                          .withInvocations()
+                          .withReadTimeoutAction(TimeoutActionType.THROW)
+                          .getConfigured()
+                          .method(TestTimeout.class.getMethod("getInt"))
+                          .asyncCall()
+                          .next();
 
             fail();
 
@@ -1583,21 +1590,21 @@ public class ObjectRoutineTest {
 
         }
 
-        assertThat(JRoutine.on(instance(testTimeout))
-                           .withInvocations()
-                           .withReadTimeout(seconds(1))
-                           .getConfigured()
-                           .buildProxy(TestTimeoutItf.class)
-                           .getInt()).isEqualTo(31);
+        assertThat(JRoutineObject.on(instance(testTimeout))
+                                 .withInvocations()
+                                 .withReadTimeout(seconds(1))
+                                 .getConfigured()
+                                 .buildProxy(TestTimeoutItf.class)
+                                 .getInt()).isEqualTo(31);
 
         try {
 
-            JRoutine.on(instance(testTimeout))
-                    .withInvocations()
-                    .withReadTimeoutAction(TimeoutActionType.THROW)
-                    .getConfigured()
-                    .buildProxy(TestTimeoutItf.class)
-                    .getInt();
+            JRoutineObject.on(instance(testTimeout))
+                          .withInvocations()
+                          .withReadTimeoutAction(TimeoutActionType.THROW)
+                          .getConfigured()
+                          .buildProxy(TestTimeoutItf.class)
+                          .getInt();
 
             fail();
 

@@ -19,7 +19,7 @@ package com.github.dm.jrt.ext.channel;
 import com.github.dm.jrt.builder.ChannelConfiguration;
 import com.github.dm.jrt.channel.Channel.InputChannel;
 import com.github.dm.jrt.channel.IOChannel;
-import com.github.dm.jrt.core.JRoutine;
+import com.github.dm.jrt.core.JRoutineCore;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -29,6 +29,8 @@ import java.util.Map.Entry;
 
 /**
  * Builder implementation returning a channel combining data from a map of input channels.
+ * <p/>
+ * Created by davide-maestroni on 02/26/2016.
  *
  * @param <IN> the input data type.
  */
@@ -67,13 +69,13 @@ class CombineMapBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<? exten
         final HashMap<Integer, IOChannel<IN>> ioChannelMap =
                 new HashMap<Integer, IOChannel<IN>>(channelMap.size());
         for (final Entry<Integer, InputChannel<? extends IN>> entry : channelMap.entrySet()) {
-            final IOChannel<IN> ioChannel = JRoutine.io().buildChannel();
+            final IOChannel<IN> ioChannel = JRoutineCore.io().buildChannel();
             ioChannel.passTo((InputChannel<IN>) entry.getValue());
             ioChannelMap.put(entry.getKey(), ioChannel);
         }
 
         final IOChannel<Selectable<? extends IN>> ioChannel =
-                JRoutine.io().withChannels().with(configuration).getConfigured().buildChannel();
+                JRoutineCore.io().withChannels().with(configuration).getConfigured().buildChannel();
         ioChannel.passTo(new SortingMapOutputConsumer<IN>(ioChannelMap));
         return ioChannel;
     }

@@ -27,7 +27,7 @@ import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.common.RoutineException;
 import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
-import com.github.dm.jrt.core.JRoutine;
+import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.ext.channel.Channels;
 import com.github.dm.jrt.ext.channel.Selectable;
 import com.github.dm.jrt.function.BiConsumer;
@@ -515,7 +515,7 @@ public abstract class AbstractStreamChannel<OUT>
             throw new NullPointerException("the consumer instance must not be null");
         }
 
-        final IOChannel<OUT> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<OUT> ioChannel = JRoutineCore.io().buildChannel();
         mChannel.passTo(new TryCatchOutputConsumer<OUT>(consumer, ioChannel));
         return newChannel(ioChannel, getStreamConfiguration(), mDelegationType, mBinder);
     }

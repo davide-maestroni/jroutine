@@ -21,8 +21,8 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Abstract class defining an invocation factory.
  * <p/>
- * The class {@link com.github.dm.jrt.invocation.Invocations Invocations} provides a few methods
- * building invocation factories from invocation classes.
+ * The class {@link com.github.dm.jrt.invocation.InvocationFactories InvocationFactories} provides a
+ * few methods building invocation factories from invocation classes.
  * <p/>
  * Created by davide-maestroni on 02/12/2015.
  *

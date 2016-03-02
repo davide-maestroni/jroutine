@@ -29,7 +29,7 @@ import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.common.RoutineException;
 import com.github.dm.jrt.common.TimeoutException;
 import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
-import com.github.dm.jrt.core.JRoutine;
+import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.ext.channel.Selectable;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
@@ -38,8 +38,8 @@ import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.invocation.FilterInvocation;
+import com.github.dm.jrt.invocation.InvocationFactories;
 import com.github.dm.jrt.invocation.InvocationFactory;
-import com.github.dm.jrt.invocation.Invocations;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.runner.Runner;
 import com.github.dm.jrt.runner.Runners;
@@ -77,7 +77,7 @@ public class StreamChannelTest {
     @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
     public void testAbort() {
 
-        final IOChannel<Object> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
         final StreamChannel<Object> streamChannel = Streams.streamOf(ioChannel);
         ioChannel.abort(new IllegalArgumentException());
         try {
@@ -102,7 +102,7 @@ public class StreamChannelTest {
         assertThat(Streams.streamOf(Arrays.asList("test1", "test2", "test3"))
                           .afterMax(seconds(1))
                           .all()).containsExactly("test1", "test2", "test3");
-        assertThat(Streams.streamOf(JRoutine.io().of("test1", "test2", "test3"))
+        assertThat(Streams.streamOf(JRoutineCore.io().of("test1", "test2", "test3"))
                           .afterMax(seconds(1))
                           .all()).containsExactly("test1", "test2", "test3");
     }
@@ -166,7 +166,7 @@ public class StreamChannelTest {
 
         }
 
-        final IOChannel<String> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<String> ioChannel = JRoutineCore.io().buildChannel();
         channel = Streams.streamOf(ioChannel.after(1, TimeUnit.DAYS).pass("test"));
 
         try {
@@ -484,7 +484,7 @@ public class StreamChannelTest {
     @Test
     public void testConstructor() {
 
-        final IOChannel<Object> channel = JRoutine.io().buildChannel();
+        final IOChannel<Object> channel = JRoutineCore.io().buildChannel();
         final TestStreamChannel streamChannel =
                 new TestStreamChannel(channel, InvocationConfiguration.DEFAULT_CONFIGURATION,
                                       DelegationType.ASYNC, null);
@@ -507,7 +507,7 @@ public class StreamChannelTest {
 
         }
 
-        final IOChannel<Object> channel = JRoutine.io().buildChannel();
+        final IOChannel<Object> channel = JRoutineCore.io().buildChannel();
         try {
             new TestStreamChannel(channel, null, DelegationType.ASYNC, null);
             fail();
@@ -733,7 +733,7 @@ public class StreamChannelTest {
         assertThat(Streams.lazyStreamOf(Arrays.asList("test1", "test2", "test3"))
                           .afterMax(seconds(1))
                           .all()).containsExactly("test1", "test2", "test3");
-        assertThat(Streams.lazyStreamOf(JRoutine.io().of("test1", "test2", "test3"))
+        assertThat(Streams.lazyStreamOf(JRoutineCore.io().of("test1", "test2", "test3"))
                           .afterMax(seconds(1))
                           .all()).containsExactly("test1", "test2", "test3");
     }
@@ -866,7 +866,8 @@ public class StreamChannelTest {
     @Test
     public void testMapFactory() {
 
-        final InvocationFactory<String, String> factory = Invocations.factoryOf(UpperCase.class);
+        final InvocationFactory<String, String> factory =
+                InvocationFactories.factoryOf(UpperCase.class);
         assertThat(Streams.streamOf("test1", "test2")
                           .async()
                           .map(factory)
@@ -1041,11 +1042,11 @@ public class StreamChannelTest {
     @Test
     public void testMapRoutine() {
 
-        final Routine<String, String> routine = JRoutine.on(new UpperCase())
-                                                        .withInvocations()
-                                                        .withOutputOrder(OrderType.BY_CALL)
-                                                        .getConfigured()
-                                                        .buildRoutine();
+        final Routine<String, String> routine = JRoutineCore.on(new UpperCase())
+                                                            .withInvocations()
+                                                            .withOutputOrder(OrderType.BY_CALL)
+                                                            .getConfigured()
+                                                            .buildRoutine();
         assertThat(Streams.streamOf("test1", "test2")
                           .async()
                           .map(routine)
@@ -1256,7 +1257,7 @@ public class StreamChannelTest {
     @SuppressWarnings("unchecked")
     public void testOutputToSelectable() {
 
-        final IOChannel<String> channel = JRoutine.io().buildChannel();
+        final IOChannel<String> channel = JRoutineCore.io().buildChannel();
         channel.pass("test1", "test2", "test3").close();
         assertThat(Streams.streamOf(channel)
                           .toSelectable(33)
@@ -1269,7 +1270,7 @@ public class StreamChannelTest {
     @Test
     public void testOutputToSelectableAbort() {
 
-        final IOChannel<String> channel = JRoutine.io().buildChannel();
+        final IOChannel<String> channel = JRoutineCore.io().buildChannel();
         channel.pass("test1", "test2", "test3").abort();
 
         try {
@@ -1284,13 +1285,13 @@ public class StreamChannelTest {
     @Test
     public void testRepeat() {
 
-        final IOChannel<Object> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
         final OutputChannel<Object> channel = Streams.streamOf(ioChannel).repeat();
         ioChannel.pass("test1", "test2");
-        final IOChannel<Object> output1 = JRoutine.io().buildChannel();
+        final IOChannel<Object> output1 = JRoutineCore.io().buildChannel();
         channel.passTo(output1).close();
         assertThat(output1.next()).isEqualTo("test1");
-        final IOChannel<Object> output2 = JRoutine.io().buildChannel();
+        final IOChannel<Object> output2 = JRoutineCore.io().buildChannel();
         channel.passTo(output2).close();
         ioChannel.pass("test3").close();
         assertThat(output2.all()).containsExactly("test1", "test2", "test3");
@@ -1300,13 +1301,13 @@ public class StreamChannelTest {
     @Test
     public void testRepeatAbort() {
 
-        final IOChannel<Object> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
         final OutputChannel<Object> channel = Streams.streamOf(ioChannel).repeat();
         ioChannel.pass("test1", "test2");
-        final IOChannel<Object> output1 = JRoutine.io().buildChannel();
+        final IOChannel<Object> output1 = JRoutineCore.io().buildChannel();
         channel.passTo(output1).close();
         assertThat(output1.next()).isEqualTo("test1");
-        final IOChannel<Object> output2 = JRoutine.io().buildChannel();
+        final IOChannel<Object> output2 = JRoutineCore.io().buildChannel();
         channel.passTo(output2).close();
         ioChannel.abort();
 
@@ -1331,7 +1332,7 @@ public class StreamChannelTest {
     public void testRetry() {
 
         final Routine<Object, String> routine =
-                JRoutine.on(functionFilter(new Function<Object, String>() {
+                JRoutineCore.on(functionFilter(new Function<Object, String>() {
 
                     public String apply(final Object o) {
 

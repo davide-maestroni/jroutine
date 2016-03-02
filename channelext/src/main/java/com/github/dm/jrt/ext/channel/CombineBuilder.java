@@ -21,7 +21,7 @@ import com.github.dm.jrt.channel.Channel.InputChannel;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.common.RoutineException;
-import com.github.dm.jrt.core.JRoutine;
+import com.github.dm.jrt.core.JRoutineCore;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -30,6 +30,8 @@ import java.util.Collection;
 
 /**
  * Builder implementation returning a channel combining data from a collection of input channels.
+ * <p/>
+ * Created by davide-maestroni on 02/26/2016.
  *
  * @param <IN> the input data type.
  */
@@ -74,13 +76,13 @@ class CombineBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<? extends 
         final ArrayList<IOChannel<? extends IN>> channelList =
                 new ArrayList<IOChannel<? extends IN>>(channels.size());
         for (final InputChannel<?> channel : channels) {
-            final IOChannel<? extends IN> ioChannel = JRoutine.io().buildChannel();
+            final IOChannel<? extends IN> ioChannel = JRoutineCore.io().buildChannel();
             ioChannel.passTo(((InputChannel<IN>) channel));
             channelList.add(ioChannel);
         }
 
         final IOChannel<Selectable<? extends IN>> ioChannel =
-                JRoutine.io().withChannels().with(configuration).getConfigured().buildChannel();
+                JRoutineCore.io().withChannels().with(configuration).getConfigured().buildChannel();
         ioChannel.passTo(new SortingArrayOutputConsumer(mStartIndex, channelList));
         return ioChannel;
     }

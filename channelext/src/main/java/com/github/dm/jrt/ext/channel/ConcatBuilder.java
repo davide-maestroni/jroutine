@@ -20,7 +20,7 @@ import com.github.dm.jrt.builder.ChannelConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
-import com.github.dm.jrt.core.JRoutine;
+import com.github.dm.jrt.core.JRoutineCore;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -29,6 +29,8 @@ import java.util.Collection;
 
 /**
  * Builder implementation returning a channel concatenating data from a set of output channels.
+ * <p/>
+ * Created by davide-maestroni on 02/26/2016.
  *
  * @param <OUT> the output data type.
  */
@@ -61,12 +63,12 @@ class ConcatBuilder<OUT> extends AbstractBuilder<OutputChannel<OUT>> {
     @Override
     protected OutputChannel<OUT> build(@NotNull final ChannelConfiguration configuration) {
 
-        final IOChannel<OUT> ioChannel = JRoutine.io()
-                                                 .withChannels()
-                                                 .with(configuration)
-                                                 .withChannelOrder(OrderType.BY_CALL)
-                                                 .getConfigured()
-                                                 .buildChannel();
+        final IOChannel<OUT> ioChannel = JRoutineCore.io()
+                                                     .withChannels()
+                                                     .with(configuration)
+                                                     .withChannelOrder(OrderType.BY_CALL)
+                                                     .getConfigured()
+                                                     .buildChannel();
         for (final OutputChannel<? extends OUT> channel : mChannels) {
             channel.passTo(ioChannel);
         }

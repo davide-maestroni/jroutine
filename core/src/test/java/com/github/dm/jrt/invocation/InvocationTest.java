@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
-import static com.github.dm.jrt.invocation.Invocations.factoryOf;
+import static com.github.dm.jrt.invocation.InvocationFactories.factoryOf;
 import static com.github.dm.jrt.util.Reflection.asArgs;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;

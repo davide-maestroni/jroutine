@@ -19,6 +19,7 @@ package com.github.dm.jrt.object.core;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.Configurable;
 import com.github.dm.jrt.channel.ResultChannel;
+import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.invocation.FunctionInvocation;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationFactory;
@@ -203,11 +204,11 @@ class DefaultObjectRoutineBuilder
                 final MethodInvocationFactory factory =
                         new MethodInvocationFactory(proxyConfiguration, target, method, inputMode,
                                                     outputMode);
-                routine = JRoutine.on(factory)
-                                  .withInvocations()
-                                  .with(invocationConfiguration)
-                                  .getConfigured()
-                                  .buildRoutine();
+                routine = JRoutineCore.on(factory)
+                                      .withInvocations()
+                                      .with(invocationConfiguration)
+                                      .getConfigured()
+                                      .buildRoutine();
                 routineMap.put(routineInfo, routine);
             }
 

@@ -39,7 +39,7 @@ import org.jetbrains.annotations.NotNull;
  * <pre>
  *     <code>
  *
- *         final IOChannel&lt;Result, Result&gt; channel = JRoutine.io().buildChannel();
+ *         final IOChannel&lt;Result, Result&gt; channel = JRoutineCore.io().buildChannel();
  *         channel.pass(doSomething1.asyncCall())
  *                .pass(doSomething2.asyncCall())
  *                .close();
@@ -72,7 +72,7 @@ import org.jetbrains.annotations.NotNull;
  * <pre>
  *     <code>
  *
- *         final IOChannel&lt;Result, Result&gt; channel = JRoutine.io().buildChannel();
+ *         final IOChannel&lt;Result, Result&gt; channel = JRoutineCore.io().buildChannel();
  *
  *         new Thread() {
  *
@@ -85,20 +85,20 @@ import org.jetbrains.annotations.NotNull;
  *         }.start();
  *
  *         final Routine&lt;Result, Result&gt; routine =
- *                  JRoutine.&lt;Result&gt;on(PassingInvocation.&lt;Result&gt;factoryOf())
- *                          .buildRoutine();
+ *                  JRoutineCore.&lt;Result&gt;on(PassingInvocation.&lt;Result&gt;factoryOf())
+ *                              .buildRoutine();
  *         routine.asyncCall(channel).afterMax(seconds(20)).allInto(results);
  *     </code>
  * </pre>
  * <p/>
  * Created by davide-maestroni on 09/07/2014.
  */
-public class JRoutine {
+public class JRoutineCore {
 
     /**
      * Avoid direct instantiation.
      */
-    protected JRoutine() {
+    protected JRoutineCore() {
 
     }
 

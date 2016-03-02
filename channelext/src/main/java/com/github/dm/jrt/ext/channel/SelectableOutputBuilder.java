@@ -19,12 +19,14 @@ package com.github.dm.jrt.ext.channel;
 import com.github.dm.jrt.builder.ChannelConfiguration;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
-import com.github.dm.jrt.core.JRoutine;
+import com.github.dm.jrt.core.JRoutineCore;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Builder implementation returning a channel making an output one selectable.
+ * <p/>
+ * Created by davide-maestroni on 02/26/2016.
  *
  * @param <OUT> the output data type.
  */
@@ -58,7 +60,7 @@ class SelectableOutputBuilder<OUT>
             @NotNull final ChannelConfiguration configuration) {
 
         final IOChannel<Selectable<OUT>> ioChannel =
-                JRoutine.io().withChannels().with(configuration).getConfigured().buildChannel();
+                JRoutineCore.io().withChannels().with(configuration).getConfigured().buildChannel();
         mChannel.passTo(new SelectableOutputConsumer<OUT, OUT>(ioChannel, mIndex));
         return ioChannel;
     }

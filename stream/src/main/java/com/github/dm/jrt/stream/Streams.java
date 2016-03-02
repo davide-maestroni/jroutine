@@ -21,7 +21,7 @@ import com.github.dm.jrt.channel.Channel.InputChannel;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.core.JRoutine;
+import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.ext.channel.Channels;
 import com.github.dm.jrt.ext.channel.ChannelsBuilder;
 import com.github.dm.jrt.ext.channel.Selectable;
@@ -306,7 +306,7 @@ public class Streams extends Functions {
     @NotNull
     public static <OUT> StreamChannel<OUT> lazyStreamOf() {
 
-        return lazyStreamOf(JRoutine.io().<OUT>buildChannel().close());
+        return lazyStreamOf(JRoutineCore.io().<OUT>buildChannel().close());
     }
 
     /**
@@ -321,7 +321,7 @@ public class Streams extends Functions {
     @NotNull
     public static <OUT> StreamChannel<OUT> lazyStreamOf(@Nullable final Iterable<OUT> outputs) {
 
-        return lazyStreamOf(JRoutine.io().of(outputs));
+        return lazyStreamOf(JRoutineCore.io().of(outputs));
     }
 
     /**
@@ -336,7 +336,7 @@ public class Streams extends Functions {
     @NotNull
     public static <OUT> StreamChannel<OUT> lazyStreamOf(@Nullable final OUT output) {
 
-        return lazyStreamOf(JRoutine.io().of(output));
+        return lazyStreamOf(JRoutineCore.io().of(output));
     }
 
     /**
@@ -351,7 +351,7 @@ public class Streams extends Functions {
     @NotNull
     public static <OUT> StreamChannel<OUT> lazyStreamOf(@Nullable final OUT... outputs) {
 
-        return lazyStreamOf(JRoutine.io().of(outputs));
+        return lazyStreamOf(JRoutineCore.io().of(outputs));
     }
 
     /**
@@ -373,7 +373,7 @@ public class Streams extends Functions {
             throw new NullPointerException("the output channel instance must not be null");
         }
 
-        final IOChannel<OUT> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<OUT> ioChannel = JRoutineCore.io().buildChannel();
         return new DefaultStreamChannel<OUT>(output, ioChannel);
     }
 
@@ -510,7 +510,7 @@ public class Streams extends Functions {
             @NotNull final Function<? super StreamChannel<IN>, ? extends
                     StreamChannel<? extends OUT>> function) {
 
-        return JRoutine.on(factory(function));
+        return JRoutineCore.on(factory(function));
     }
 
     /**
@@ -680,7 +680,7 @@ public class Streams extends Functions {
     @NotNull
     public static <OUT> StreamChannel<OUT> streamOf() {
 
-        return streamOf(JRoutine.io().<OUT>buildChannel().close());
+        return streamOf(JRoutineCore.io().<OUT>buildChannel().close());
     }
 
     /**
@@ -693,7 +693,7 @@ public class Streams extends Functions {
     @NotNull
     public static <OUT> StreamChannel<OUT> streamOf(@Nullable final Iterable<OUT> outputs) {
 
-        return streamOf(JRoutine.io().of(outputs));
+        return streamOf(JRoutineCore.io().of(outputs));
     }
 
     /**
@@ -706,7 +706,7 @@ public class Streams extends Functions {
     @NotNull
     public static <OUT> StreamChannel<OUT> streamOf(@Nullable final OUT output) {
 
-        return streamOf(JRoutine.io().of(output));
+        return streamOf(JRoutineCore.io().of(output));
     }
 
     /**
@@ -719,7 +719,7 @@ public class Streams extends Functions {
     @NotNull
     public static <OUT> StreamChannel<OUT> streamOf(@Nullable final OUT... outputs) {
 
-        return streamOf(JRoutine.io().of(outputs));
+        return streamOf(JRoutineCore.io().of(outputs));
     }
 
     /**

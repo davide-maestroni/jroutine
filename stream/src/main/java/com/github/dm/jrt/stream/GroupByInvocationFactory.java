@@ -32,6 +32,8 @@ import static com.github.dm.jrt.util.Reflection.asArgs;
 
 /**
  * Factory of grouping invocation.
+ * <p/>
+ * Created by davide-maestroni on 02/26/2016.
  *
  * @param <DATA> the data type.
  */

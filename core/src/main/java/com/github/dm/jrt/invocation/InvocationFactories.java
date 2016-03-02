@@ -31,12 +31,12 @@ import static com.github.dm.jrt.util.Reflection.asArgs;
  * <p/>
  * Created by davide-maestroni on 02/12/2015.
  */
-public class Invocations {
+public class InvocationFactories {
 
     /**
      * Avoid direct instantiation.
      */
-    protected Invocations() {
+    protected InvocationFactories() {
 
     }
 

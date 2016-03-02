@@ -19,7 +19,7 @@ package com.github.dm.jrt.ext.channel;
 import com.github.dm.jrt.builder.ChannelConfiguration;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
-import com.github.dm.jrt.core.JRoutine;
+import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
@@ -32,6 +32,8 @@ import java.util.Set;
 
 /**
  * Builder implementation returning a map of output channels returning selectable output data.
+ * <p/>
+ * Created by davide-maestroni on 02/26/2016.
  *
  * @param <OUT> the output data type.
  */
@@ -108,11 +110,11 @@ class OutputMapBuilder<OUT> extends AbstractBuilder<Map<Integer, OutputChannel<O
                         new HashMap<Integer, IOChannel<OUT>>(size);
                 channels = new HashMap<Integer, OutputChannel<?>>(size);
                 for (final Integer index : indexes) {
-                    final IOChannel<OUT> ioChannel = JRoutine.io()
-                                                             .withChannels()
-                                                             .with(configuration)
-                                                             .getConfigured()
-                                                             .buildChannel();
+                    final IOChannel<OUT> ioChannel = JRoutineCore.io()
+                                                                 .withChannels()
+                                                                 .with(configuration)
+                                                                 .getConfigured()
+                                                                 .buildChannel();
                     inputMap.put(index, ioChannel);
                     channelMap.put(index, ioChannel);
                     channels.put(index, ioChannel);

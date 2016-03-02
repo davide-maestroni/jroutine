@@ -17,7 +17,7 @@
 package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.core.JRoutine;
+import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.invocation.CommandInvocation;
 import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.invocation.Invocation;
@@ -500,14 +500,14 @@ public class FunctionsTest {
     @Test
     public void testCommand() {
 
-        final Routine<Void, String> routine = JRoutine.on(createCommand()).buildRoutine();
+        final Routine<Void, String> routine = JRoutineCore.on(createCommand()).buildRoutine();
         assertThat(routine.asyncCall().afterMax(seconds(1)).all()).containsOnly("test");
     }
 
     @Test
     public void testCommand2() {
 
-        final Routine<Void, String> routine = JRoutine.on(createCommand2()).buildRoutine();
+        final Routine<Void, String> routine = JRoutineCore.on(createCommand2()).buildRoutine();
         assertThat(routine.asyncCall().afterMax(seconds(1)).all()).containsOnly("test");
     }
 
@@ -716,7 +716,7 @@ public class FunctionsTest {
     @Test
     public void testFactory() {
 
-        final Routine<Object, String> routine = JRoutine.on(createFactory()).buildRoutine();
+        final Routine<Object, String> routine = JRoutineCore.on(createFactory()).buildRoutine();
         assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
                                                                                          "1");
     }
@@ -755,7 +755,7 @@ public class FunctionsTest {
     @Test
     public void testFilter() {
 
-        final Routine<Object, String> routine = JRoutine.on(createFilter()).buildRoutine();
+        final Routine<Object, String> routine = JRoutineCore.on(createFilter()).buildRoutine();
         assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
                                                                                          "1");
     }
@@ -763,7 +763,7 @@ public class FunctionsTest {
     @Test
     public void testFilter2() {
 
-        final Routine<Object, String> routine = JRoutine.on(createFilter2()).buildRoutine();
+        final Routine<Object, String> routine = JRoutineCore.on(createFilter2()).buildRoutine();
         assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
                                                                                          "1");
     }
@@ -801,7 +801,7 @@ public class FunctionsTest {
     @Test
     public void testFilter3() {
 
-        final Routine<String, String> routine = JRoutine.on(createFilter3()).buildRoutine();
+        final Routine<String, String> routine = JRoutineCore.on(createFilter3()).buildRoutine();
         assertThat(routine.asyncCall("test", "").afterMax(seconds(1)).all()).containsOnly("test");
     }
 
@@ -1021,7 +1021,7 @@ public class FunctionsTest {
     @Test
     public void testFunctionFactory() {
 
-        final Routine<Object, String> routine = JRoutine.on(createFunction()).buildRoutine();
+        final Routine<Object, String> routine = JRoutineCore.on(createFunction()).buildRoutine();
         assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
                                                                                          "1");
     }
@@ -1029,7 +1029,7 @@ public class FunctionsTest {
     @Test
     public void testFunctionFactory2() {
 
-        final Routine<Object, String> routine = JRoutine.on(createFunction2()).buildRoutine();
+        final Routine<Object, String> routine = JRoutineCore.on(createFunction2()).buildRoutine();
         assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test1");
     }
 

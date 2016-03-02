@@ -21,12 +21,14 @@ import com.github.dm.jrt.channel.Channel.InputChannel;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.common.RoutineException;
-import com.github.dm.jrt.core.JRoutine;
+import com.github.dm.jrt.core.JRoutineCore;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Builder implementation returning a channel making an input one selectable.
+ * <p/>
+ * Created by davide-maestroni on 02/26/2016.
  *
  * @param <IN> the input data type.
  */
@@ -58,8 +60,8 @@ class InputFilterBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<IN>>> 
     protected IOChannel<Selectable<IN>> build(@NotNull final ChannelConfiguration configuration) {
 
         final IOChannel<Selectable<IN>> inputChannel =
-                JRoutine.io().withChannels().with(configuration).getConfigured().buildChannel();
-        final IOChannel<IN> ioChannel = JRoutine.io().buildChannel();
+                JRoutineCore.io().withChannels().with(configuration).getConfigured().buildChannel();
+        final IOChannel<IN> ioChannel = JRoutineCore.io().buildChannel();
         ioChannel.passTo(mChannel);
         return inputChannel.passTo(new FilterOutputConsumer<IN>(ioChannel, mIndex));
     }

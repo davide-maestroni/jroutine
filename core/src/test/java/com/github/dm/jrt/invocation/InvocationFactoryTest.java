@@ -16,13 +16,13 @@
 
 package com.github.dm.jrt.invocation;
 
-import com.github.dm.jrt.core.JRoutine;
+import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import static com.github.dm.jrt.invocation.Invocations.factoryOf;
+import static com.github.dm.jrt.invocation.InvocationFactories.factoryOf;
 import static com.github.dm.jrt.util.TimeDuration.millis;
 import static com.github.dm.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -80,7 +80,7 @@ public class InvocationFactoryTest {
 
         final InvocationFactory<String, String> factory = PassingInvocation.factoryOf();
         final TestInvocationFactory decoratedFactory = new TestInvocationFactory(factory);
-        final Routine<String, String> routine = JRoutine.on(decoratedFactory).buildRoutine();
+        final Routine<String, String> routine = JRoutineCore.on(decoratedFactory).buildRoutine();
         assertThat(routine.asyncInvoke().after(millis(100)).pass("test").result().abort()).isTrue();
         routine.purge();
     }
@@ -90,7 +90,7 @@ public class InvocationFactoryTest {
 
         final InvocationFactory<String, String> factory = PassingInvocation.factoryOf();
         final TestInvocationFactory decoratedFactory = new TestInvocationFactory(factory);
-        final Routine<String, String> routine = JRoutine.on(decoratedFactory).buildRoutine();
+        final Routine<String, String> routine = JRoutineCore.on(decoratedFactory).buildRoutine();
         assertThat(routine.asyncCall("test").afterMax(seconds(1)).all()).containsExactly("test");
         routine.purge();
     }

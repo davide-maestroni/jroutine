@@ -53,8 +53,8 @@ import org.jetbrains.annotations.NotNull;
  *                  &#64;AsyncIn(Result.class) OutputChannel&lt;Result&gt; result2);
  *         }
  *
- *         final AsyncCallback callback = JRoutine.on(instance(myCallback))
- *                                                .buildProxy(AsyncCallback.class);
+ *         final AsyncCallback callback = JRoutineObject.on(instance(myCallback))
+ *                                                      .buildProxy(AsyncCallback.class);
  *         callback.onResults(doSomething1.asyncCall(), doSomething2.asyncCall());
  *     </code>
  * </pre>
@@ -66,12 +66,12 @@ import org.jetbrains.annotations.NotNull;
  * @see <a href='{@docRoot}/com/github/dm/jrt/object/annotation/package-summary.html'>
  * Annotations</a>
  */
-public class JRoutine extends com.github.dm.jrt.core.JRoutine {
+public class JRoutineObject {
 
     /**
      * Avoid direct instantiation.
      */
-    protected JRoutine() {
+    protected JRoutineObject() {
 
     }
 

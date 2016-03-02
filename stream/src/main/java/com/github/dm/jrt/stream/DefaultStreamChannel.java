@@ -19,7 +19,7 @@ package com.github.dm.jrt.stream;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
-import com.github.dm.jrt.core.JRoutine;
+import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.routine.Routine;
 
@@ -101,10 +101,10 @@ class DefaultStreamChannel<OUT> extends AbstractStreamChannel<OUT> {
             @NotNull final InvocationConfiguration configuration,
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
 
-        return JRoutine.on(factory)
-                       .withInvocations()
-                       .with(configuration)
-                       .getConfigured()
-                       .buildRoutine();
+        return JRoutineCore.on(factory)
+                           .withInvocations()
+                           .with(configuration)
+                           .getConfigured()
+                           .buildRoutine();
     }
 }

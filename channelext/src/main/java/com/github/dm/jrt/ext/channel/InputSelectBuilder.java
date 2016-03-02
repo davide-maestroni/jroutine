@@ -19,12 +19,14 @@ package com.github.dm.jrt.ext.channel;
 import com.github.dm.jrt.builder.ChannelConfiguration;
 import com.github.dm.jrt.channel.Channel.InputChannel;
 import com.github.dm.jrt.channel.IOChannel;
-import com.github.dm.jrt.core.JRoutine;
+import com.github.dm.jrt.core.JRoutineCore;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Builder implementation returning a channel passing selectable data to an input channel.
+ * <p/>
+ * Created by davide-maestroni on 02/26/2016.
  *
  * @param <DATA> the channel data type.
  * @param <IN>   the input data type.
@@ -58,8 +60,8 @@ class InputSelectBuilder<DATA, IN extends DATA> extends AbstractBuilder<IOChanne
     protected IOChannel<IN> build(@NotNull final ChannelConfiguration configuration) {
 
         final IOChannel<IN> inputChannel =
-                JRoutine.io().withChannels().with(configuration).getConfigured().buildChannel();
-        final IOChannel<Selectable<DATA>> ioChannel = JRoutine.io().buildChannel();
+                JRoutineCore.io().withChannels().with(configuration).getConfigured().buildChannel();
+        final IOChannel<Selectable<DATA>> ioChannel = JRoutineCore.io().buildChannel();
         ioChannel.passTo(mChannel);
         return inputChannel.passTo(new SelectableOutputConsumer<DATA, IN>(ioChannel, mIndex));
     }

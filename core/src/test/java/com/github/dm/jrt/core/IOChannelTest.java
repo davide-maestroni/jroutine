@@ -58,7 +58,7 @@ public class IOChannelTest {
     public void testAbort() {
 
         final TimeDuration timeout = seconds(1);
-        final IOChannel<String> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<String> ioChannel = JRoutineCore.io().buildChannel();
         ioChannel.abort(new IllegalStateException());
 
         try {
@@ -77,7 +77,7 @@ public class IOChannelTest {
     @Test
     public void testAbortDelay() {
 
-        final IOChannel<String> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<String> ioChannel = JRoutineCore.io().buildChannel();
         ioChannel.after(seconds(3)).pass("test");
 
         assertThat(ioChannel.immediately().eventuallyExit().all()).isEmpty();
@@ -104,7 +104,7 @@ public class IOChannelTest {
     @Test
     public void testAllIntoTimeout() {
 
-        final IOChannel<String> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<String> ioChannel = JRoutineCore.io().buildChannel();
         ioChannel.after(seconds(3)).pass("test").close();
 
         assertThat(ioChannel.immediately().eventuallyExit().all()).isEmpty();
@@ -127,7 +127,7 @@ public class IOChannelTest {
     @Test
     public void testAllIntoTimeout2() {
 
-        final IOChannel<String> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<String> ioChannel = JRoutineCore.io().buildChannel();
         ioChannel.after(seconds(3)).pass("test").close();
 
         assertThat(ioChannel.immediately().eventuallyExit().all()).isEmpty();
@@ -150,7 +150,7 @@ public class IOChannelTest {
     @Test
     public void testAllTimeout() {
 
-        final IOChannel<String> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<String> ioChannel = JRoutineCore.io().buildChannel();
         ioChannel.after(seconds(3)).pass("test").close();
 
         assertThat(ioChannel.immediately().eventuallyExit().all()).isEmpty();
@@ -173,7 +173,7 @@ public class IOChannelTest {
     @Test
     public void testAllTimeout2() {
 
-        final IOChannel<String> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<String> ioChannel = JRoutineCore.io().buildChannel();
         ioChannel.after(seconds(3)).pass("test").close();
 
         assertThat(ioChannel.immediately().eventuallyExit().all()).isEmpty();
@@ -197,7 +197,7 @@ public class IOChannelTest {
     public void testAsynchronousInput() {
 
         final TimeDuration timeout = seconds(1);
-        final IOChannel<String> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<String> ioChannel = JRoutineCore.io().buildChannel();
 
         new Thread() {
 
@@ -218,7 +218,7 @@ public class IOChannelTest {
         }.start();
 
         final OutputChannel<String> outputChannel =
-                JRoutine.on(PassingInvocation.<String>factoryOf()).asyncCall(ioChannel);
+                JRoutineCore.on(PassingInvocation.<String>factoryOf()).asyncCall(ioChannel);
         assertThat(outputChannel.afterMax(timeout).next()).isEqualTo("test");
         assertThat(outputChannel.hasCompleted()).isTrue();
     }
@@ -227,11 +227,11 @@ public class IOChannelTest {
     public void testAsynchronousInput2() {
 
         final TimeDuration timeout = seconds(1);
-        final IOChannel<String> ioChannel1 = JRoutine.io()
-                                                     .withChannels()
-                                                     .withChannelOrder(OrderType.BY_CALL)
-                                                     .getConfigured()
-                                                     .buildChannel();
+        final IOChannel<String> ioChannel1 = JRoutineCore.io()
+                                                         .withChannels()
+                                                         .withChannelOrder(OrderType.BY_CALL)
+                                                         .getConfigured()
+                                                         .buildChannel();
 
         new Thread() {
 
@@ -247,7 +247,7 @@ public class IOChannelTest {
         }.start();
 
         final OutputChannel<String> outputChannel1 =
-                JRoutine.on(PassingInvocation.<String>factoryOf()).asyncCall(ioChannel1);
+                JRoutineCore.on(PassingInvocation.<String>factoryOf()).asyncCall(ioChannel1);
         assertThat(outputChannel1.afterMax(timeout).all()).containsExactly("test1", "test2",
                                                                            "test3");
     }
@@ -270,7 +270,7 @@ public class IOChannelTest {
     @Test
     public void testEmpty() {
 
-        final IOChannel<String> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<String> ioChannel = JRoutineCore.io().buildChannel();
         assertThat(ioChannel.isEmpty()).isTrue();
         assertThat(ioChannel.pass("test").isEmpty()).isFalse();
         ioChannel.afterMax(seconds(1)).next();
@@ -283,7 +283,7 @@ public class IOChannelTest {
     @Test
     public void testEmptyAbort() {
 
-        final IOChannel<Object> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
         assertThat(ioChannel.isEmpty()).isTrue();
         assertThat(ioChannel.pass("test").isEmpty()).isFalse();
         assertThat(ioChannel.abort()).isTrue();
@@ -293,7 +293,7 @@ public class IOChannelTest {
     @Test
     public void testHasNextIteratorTimeout() {
 
-        final IOChannel<String> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<String> ioChannel = JRoutineCore.io().buildChannel();
         ioChannel.after(seconds(3)).pass("test").close();
 
         assertThat(ioChannel.immediately().eventuallyExit().all()).isEmpty();
@@ -316,7 +316,7 @@ public class IOChannelTest {
     @Test
     public void testHasNextIteratorTimeout2() {
 
-        final IOChannel<String> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<String> ioChannel = JRoutineCore.io().buildChannel();
         ioChannel.after(seconds(3)).pass("test").close();
 
         assertThat(ioChannel.immediately().eventuallyExit().all()).isEmpty();
@@ -339,7 +339,7 @@ public class IOChannelTest {
     @Test
     public void testNextIteratorTimeout() {
 
-        final IOChannel<String> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<String> ioChannel = JRoutineCore.io().buildChannel();
         ioChannel.after(seconds(3)).pass("test").close();
 
         assertThat(ioChannel.immediately().eventuallyExit().all()).isEmpty();
@@ -362,7 +362,7 @@ public class IOChannelTest {
     @Test
     public void testNextIteratorTimeout2() {
 
-        final IOChannel<String> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<String> ioChannel = JRoutineCore.io().buildChannel();
         ioChannel.after(seconds(3)).pass("test").close();
 
         assertThat(ioChannel.immediately().eventuallyExit().all()).isEmpty();
@@ -385,29 +385,29 @@ public class IOChannelTest {
     @Test
     public void testNextList() {
 
-        assertThat(JRoutine.io()
-                           .buildChannel()
-                           .pass("test1", "test2", "test3", "test4")
-                           .close()
-                           .afterMax(seconds(1))
-                           .next(2)).containsExactly("test1", "test2");
+        assertThat(JRoutineCore.io()
+                               .buildChannel()
+                               .pass("test1", "test2", "test3", "test4")
+                               .close()
+                               .afterMax(seconds(1))
+                               .next(2)).containsExactly("test1", "test2");
 
-        assertThat(JRoutine.io()
-                           .buildChannel()
-                           .pass("test1")
-                           .close()
-                           .eventuallyExit()
-                           .afterMax(seconds(1))
-                           .next(2)).containsExactly("test1");
+        assertThat(JRoutineCore.io()
+                               .buildChannel()
+                               .pass("test1")
+                               .close()
+                               .eventuallyExit()
+                               .afterMax(seconds(1))
+                               .next(2)).containsExactly("test1");
 
         try {
 
-            JRoutine.io()
-                    .buildChannel()
-                    .pass("test1")
-                    .eventuallyAbort()
-                    .afterMax(seconds(1))
-                    .next(2);
+            JRoutineCore.io()
+                        .buildChannel()
+                        .pass("test1")
+                        .eventuallyAbort()
+                        .afterMax(seconds(1))
+                        .next(2);
 
             fail();
 
@@ -417,12 +417,12 @@ public class IOChannelTest {
 
         try {
 
-            JRoutine.io()
-                    .buildChannel()
-                    .pass("test1")
-                    .eventuallyAbort(new IllegalStateException())
-                    .afterMax(seconds(1))
-                    .next(2);
+            JRoutineCore.io()
+                        .buildChannel()
+                        .pass("test1")
+                        .eventuallyAbort(new IllegalStateException())
+                        .afterMax(seconds(1))
+                        .next(2);
 
             fail();
 
@@ -433,12 +433,12 @@ public class IOChannelTest {
 
         try {
 
-            JRoutine.io()
-                    .buildChannel()
-                    .pass("test1")
-                    .eventuallyThrow()
-                    .afterMax(seconds(1))
-                    .next(2);
+            JRoutineCore.io()
+                        .buildChannel()
+                        .pass("test1")
+                        .eventuallyThrow()
+                        .afterMax(seconds(1))
+                        .next(2);
 
             fail();
 
@@ -450,21 +450,22 @@ public class IOChannelTest {
     @Test
     public void testNextOr() {
 
-        assertThat(JRoutine.io()
-                           .buildChannel()
-                           .pass("test1")
-                           .afterMax(seconds(1))
-                           .nextOr(2)).isEqualTo("test1");
+        assertThat(JRoutineCore.io()
+                               .buildChannel()
+                               .pass("test1")
+                               .afterMax(seconds(1))
+                               .nextOr(2)).isEqualTo("test1");
 
-        assertThat(JRoutine.io()
-                           .buildChannel()
-                           .eventuallyExit()
-                           .afterMax(seconds(1))
-                           .nextOr(2)).isEqualTo(2);
+        assertThat(JRoutineCore.io().buildChannel().eventuallyExit().afterMax(seconds(1)).nextOr(2))
+                .isEqualTo(2);
 
         try {
 
-            JRoutine.io().buildChannel().eventuallyAbort().afterMax(millis(100)).nextOr("test2");
+            JRoutineCore.io()
+                        .buildChannel()
+                        .eventuallyAbort()
+                        .afterMax(millis(100))
+                        .nextOr("test2");
 
             fail();
 
@@ -474,11 +475,11 @@ public class IOChannelTest {
 
         try {
 
-            JRoutine.io()
-                    .buildChannel()
-                    .eventuallyAbort(new IllegalStateException())
-                    .afterMax(millis(100))
-                    .nextOr("test2");
+            JRoutineCore.io()
+                        .buildChannel()
+                        .eventuallyAbort(new IllegalStateException())
+                        .afterMax(millis(100))
+                        .nextOr("test2");
 
             fail();
 
@@ -489,7 +490,11 @@ public class IOChannelTest {
 
         try {
 
-            JRoutine.io().buildChannel().eventuallyThrow().afterMax(millis(100)).nextOr("test2");
+            JRoutineCore.io()
+                        .buildChannel()
+                        .eventuallyThrow()
+                        .afterMax(millis(100))
+                        .nextOr("test2");
 
             fail();
 
@@ -501,7 +506,7 @@ public class IOChannelTest {
     @Test
     public void testNextTimeout() {
 
-        final IOChannel<String> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<String> ioChannel = JRoutineCore.io().buildChannel();
         ioChannel.after(seconds(3)).pass("test").close();
 
         assertThat(ioChannel.immediately().eventuallyExit().all()).isEmpty();
@@ -524,7 +529,7 @@ public class IOChannelTest {
     @Test
     public void testNextTimeout2() {
 
-        final IOChannel<String> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<String> ioChannel = JRoutineCore.io().buildChannel();
         ioChannel.after(seconds(3)).pass("test").close();
 
         assertThat(ioChannel.immediately().eventuallyExit().all()).isEmpty();
@@ -547,39 +552,40 @@ public class IOChannelTest {
     @Test
     public void testOf() {
 
-        final IOChannel<Integer> channel = JRoutine.io().of(2);
+        final IOChannel<Integer> channel = JRoutineCore.io().of(2);
         assertThat(channel.isOpen()).isFalse();
         assertThat(channel.afterMax(seconds(1)).all()).containsExactly(2);
-        assertThat(JRoutine.io().of(-11, 73).afterMax(seconds(1)).all()).containsExactly(-11, 73);
-        assertThat(JRoutine.io()
-                           .of(Arrays.asList(3, 12, -7))
-                           .afterMax(seconds(1))
-                           .all()).containsExactly(3, 12, -7);
+        assertThat(JRoutineCore.io().of(-11, 73).afterMax(seconds(1)).all()).containsExactly(-11,
+                                                                                             73);
+        assertThat(JRoutineCore.io()
+                               .of(Arrays.asList(3, 12, -7))
+                               .afterMax(seconds(1))
+                               .all()).containsExactly(3, 12, -7);
     }
 
     @Test
     public void testOrderType() {
 
         final TimeDuration timeout = seconds(1);
-        final IOChannel<Object> channel = JRoutine.io()
-                                                  .withChannels()
-                                                  .withChannelOrder(OrderType.BY_CALL)
-                                                  .withRunner(Runners.sharedRunner())
-                                                  .withChannelMaxSize(1)
-                                                  .withChannelMaxDelay(1, TimeUnit.MILLISECONDS)
-                                                  .withChannelMaxDelay(seconds(1))
-                                                  .withLogLevel(Level.DEBUG)
-                                                  .withLog(new NullLog())
-                                                  .getConfigured()
-                                                  .buildChannel();
+        final IOChannel<Object> channel = JRoutineCore.io()
+                                                      .withChannels()
+                                                      .withChannelOrder(OrderType.BY_CALL)
+                                                      .withRunner(Runners.sharedRunner())
+                                                      .withChannelMaxSize(1)
+                                                      .withChannelMaxDelay(1, TimeUnit.MILLISECONDS)
+                                                      .withChannelMaxDelay(seconds(1))
+                                                      .withLogLevel(Level.DEBUG)
+                                                      .withLog(new NullLog())
+                                                      .getConfigured()
+                                                      .buildChannel();
         channel.pass(-77L);
         assertThat(channel.afterMax(timeout).next()).isEqualTo(-77L);
 
-        final IOChannel<Object> ioChannel1 = JRoutine.io().buildChannel();
+        final IOChannel<Object> ioChannel1 = JRoutineCore.io().buildChannel();
         ioChannel1.after(millis(200)).pass(23).now().pass(-77L).close();
         assertThat(ioChannel1.afterMax(timeout).all()).containsOnly(23, -77L);
 
-        final IOChannel<Object> ioChannel2 = JRoutine.io().buildChannel();
+        final IOChannel<Object> ioChannel2 = JRoutineCore.io().buildChannel();
         ioChannel2.orderByDelay().orderByCall();
         ioChannel2.after(millis(200)).pass(23).now().pass(-77L).close();
         assertThat(ioChannel2.afterMax(timeout).all()).containsExactly(23, -77L);
@@ -588,7 +594,7 @@ public class IOChannelTest {
     @Test
     public void testPartialOut() {
 
-        final IOChannel<String> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<String> ioChannel = JRoutineCore.io().buildChannel();
 
         new Thread() {
 
@@ -602,9 +608,9 @@ public class IOChannelTest {
         final long startTime = System.currentTimeMillis();
 
         final OutputChannel<String> outputChannel =
-                JRoutine.on(PassingInvocation.<String>factoryOf())
-                        .asyncCall(ioChannel)
-                        .eventuallyExit();
+                JRoutineCore.on(PassingInvocation.<String>factoryOf())
+                            .asyncCall(ioChannel)
+                            .eventuallyExit();
         assertThat(outputChannel.afterMax(millis(500)).all()).containsExactly("test");
 
         assertThat(System.currentTimeMillis() - startTime).isLessThan(2000);
@@ -618,12 +624,13 @@ public class IOChannelTest {
     @Test
     public void testPassTimeout() {
 
-        final IOChannel<Object> channel1 = JRoutine.io()
-                                                   .withChannels()
-                                                   .withReadTimeout(millis(10))
-                                                   .withReadTimeoutAction(TimeoutActionType.EXIT)
-                                                   .getConfigured()
-                                                   .buildChannel();
+        final IOChannel<Object> channel1 = JRoutineCore.io()
+                                                       .withChannels()
+                                                       .withReadTimeout(millis(10))
+                                                       .withReadTimeoutAction(
+                                                               TimeoutActionType.EXIT)
+                                                       .getConfigured()
+                                                       .buildChannel();
 
         assertThat(channel1.all()).isEmpty();
     }
@@ -631,12 +638,13 @@ public class IOChannelTest {
     @Test
     public void testPassTimeout2() {
 
-        final IOChannel<Object> channel2 = JRoutine.io()
-                                                   .withChannels()
-                                                   .withReadTimeout(millis(10))
-                                                   .withReadTimeoutAction(TimeoutActionType.ABORT)
-                                                   .getConfigured()
-                                                   .buildChannel();
+        final IOChannel<Object> channel2 = JRoutineCore.io()
+                                                       .withChannels()
+                                                       .withReadTimeout(millis(10))
+                                                       .withReadTimeoutAction(
+                                                               TimeoutActionType.ABORT)
+                                                       .getConfigured()
+                                                       .buildChannel();
 
         try {
 
@@ -652,12 +660,13 @@ public class IOChannelTest {
     @Test
     public void testPassTimeout3() {
 
-        final IOChannel<Object> channel3 = JRoutine.io()
-                                                   .withChannels()
-                                                   .withReadTimeout(millis(10))
-                                                   .withReadTimeoutAction(TimeoutActionType.THROW)
-                                                   .getConfigured()
-                                                   .buildChannel();
+        final IOChannel<Object> channel3 = JRoutineCore.io()
+                                                       .withChannels()
+                                                       .withReadTimeout(millis(10))
+                                                       .withReadTimeoutAction(
+                                                               TimeoutActionType.THROW)
+                                                       .getConfigured()
+                                                       .buildChannel();
 
         try {
 
@@ -673,13 +682,13 @@ public class IOChannelTest {
     @Test
     public void testPendingInputs() throws InterruptedException {
 
-        final IOChannel<Object> channel = JRoutine.io().buildChannel();
+        final IOChannel<Object> channel = JRoutineCore.io().buildChannel();
         assertThat(channel.isOpen()).isTrue();
         channel.pass("test");
         assertThat(channel.isOpen()).isTrue();
         channel.after(millis(500)).pass("test");
         assertThat(channel.isOpen()).isTrue();
-        final IOChannel<Object> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
         channel.pass(ioChannel);
         assertThat(channel.isOpen()).isTrue();
         channel.close();
@@ -691,13 +700,13 @@ public class IOChannelTest {
     @Test
     public void testPendingInputsAbort() throws InterruptedException {
 
-        final IOChannel<Object> channel = JRoutine.io().buildChannel();
+        final IOChannel<Object> channel = JRoutineCore.io().buildChannel();
         assertThat(channel.isOpen()).isTrue();
         channel.pass("test");
         assertThat(channel.isOpen()).isTrue();
         channel.after(millis(500)).pass("test");
         assertThat(channel.isOpen()).isTrue();
-        final IOChannel<Object> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
         channel.pass(ioChannel);
         assertThat(channel.isOpen()).isTrue();
         channel.now().abort();
@@ -708,44 +717,44 @@ public class IOChannelTest {
     public void testReadFirst() throws InterruptedException {
 
         final TimeDuration timeout = seconds(1);
-        final IOChannel<String> ioChannel = JRoutine.io().buildChannel();
+        final IOChannel<String> ioChannel = JRoutineCore.io().buildChannel();
 
         new WeakThread(ioChannel).start();
 
         final OutputChannel<String> outputChannel =
-                JRoutine.on(PassingInvocation.<String>factoryOf()).asyncCall(ioChannel);
+                JRoutineCore.on(PassingInvocation.<String>factoryOf()).asyncCall(ioChannel);
         assertThat(outputChannel.afterMax(timeout).next()).isEqualTo("test");
     }
 
     @Test
     public void testSkip() {
 
-        assertThat(JRoutine.io()
-                           .buildChannel()
-                           .pass("test1", "test2", "test3", "test4")
-                           .close()
-                           .afterMax(seconds(1))
-                           .skip(2)
-                           .all()).containsExactly("test3", "test4");
+        assertThat(JRoutineCore.io()
+                               .buildChannel()
+                               .pass("test1", "test2", "test3", "test4")
+                               .close()
+                               .afterMax(seconds(1))
+                               .skip(2)
+                               .all()).containsExactly("test3", "test4");
 
-        assertThat(JRoutine.io()
-                           .buildChannel()
-                           .pass("test1")
-                           .close()
-                           .eventuallyExit()
-                           .afterMax(seconds(1))
-                           .skip(2)
-                           .all()).isEmpty();
+        assertThat(JRoutineCore.io()
+                               .buildChannel()
+                               .pass("test1")
+                               .close()
+                               .eventuallyExit()
+                               .afterMax(seconds(1))
+                               .skip(2)
+                               .all()).isEmpty();
 
         try {
 
-            JRoutine.io()
-                    .buildChannel()
-                    .pass("test1")
-                    .close()
-                    .eventuallyAbort()
-                    .afterMax(seconds(1))
-                    .skip(2);
+            JRoutineCore.io()
+                        .buildChannel()
+                        .pass("test1")
+                        .close()
+                        .eventuallyAbort()
+                        .afterMax(seconds(1))
+                        .skip(2);
 
             fail();
 
@@ -755,13 +764,13 @@ public class IOChannelTest {
 
         try {
 
-            JRoutine.io()
-                    .buildChannel()
-                    .pass("test1")
-                    .close()
-                    .eventuallyAbort(new IllegalStateException())
-                    .afterMax(seconds(1))
-                    .skip(2);
+            JRoutineCore.io()
+                        .buildChannel()
+                        .pass("test1")
+                        .close()
+                        .eventuallyAbort(new IllegalStateException())
+                        .afterMax(seconds(1))
+                        .skip(2);
 
             fail();
 
@@ -772,13 +781,13 @@ public class IOChannelTest {
 
         try {
 
-            JRoutine.io()
-                    .buildChannel()
-                    .pass("test1")
-                    .close()
-                    .eventuallyThrow()
-                    .afterMax(seconds(1))
-                    .skip(2);
+            JRoutineCore.io()
+                        .buildChannel()
+                        .pass("test1")
+                        .close()
+                        .eventuallyThrow()
+                        .afterMax(seconds(1))
+                        .skip(2);
 
             fail();
 

@@ -19,7 +19,7 @@ package com.github.dm.jrt.stream;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.common.RoutineException;
-import com.github.dm.jrt.core.JRoutine;
+import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.FunctionWrapper;
 import com.github.dm.jrt.invocation.ComparableInvocationFactory;
@@ -31,6 +31,8 @@ import static com.github.dm.jrt.util.Reflection.asArgs;
 
 /**
  * Implementation of a factory creating invocations wrapping a stream output channel.
+ * <p/>
+ * Created by davide-maestroni on 02/26/2016.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
@@ -101,7 +103,7 @@ class StreamInvocationFactory<IN, OUT> extends ComparableInvocationFactory<IN, O
 
         public void onInitialize() {
 
-            final IOChannel<IN> ioChannel = JRoutine.io().buildChannel();
+            final IOChannel<IN> ioChannel = JRoutineCore.io().buildChannel();
             mOutputChannel = mFunction.apply(Streams.streamOf(ioChannel));
             mInputChannel = ioChannel;
         }

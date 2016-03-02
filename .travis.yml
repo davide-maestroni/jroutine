@@ -41,4 +41,4 @@ script: ./gradlew build connectedCheck
 after_failure: find . -name TEST-\*.xml -print -exec cat {} \;
 
 # Code coverage
-after_success: ./gradlew jacocoTestReport coveralls
+after_success: ./gradlew jacocoRootReport coveralls

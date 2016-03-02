@@ -12,9 +12,6 @@ buildscript {
     }
 }
 
-apply plugin: 'com.github.kt3k.coveralls'
-apply plugin: 'jacoco'
-
 allprojects {
     repositories {
         jcenter()
@@ -26,26 +23,40 @@ task wrapper(type: Wrapper) {
     gradleVersion = '2.10'
 }
 
-coveralls {
-    sourceDirs = files(subprojects.findAll({ it.plugins.hasPlugin('java') }).sourceSets.main.allSource.srcDirs).files.absolutePath
-}
+gradle.projectsEvaluated {
 
-task jacocoRootReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
-    dependsOn = subprojects.findAll({ it.plugins.hasPlugin('java') }).jacocoTest
-    sourceDirectories = files(subprojects.findAll({ it.plugins.hasPlugin('java') }).sourceSets.main.allSource.srcDirs)
-    classDirectories =  files(subprojects.findAll({ it.plugins.hasPlugin('java') }).sourceSets.main.output)
-    executionData = files(subprojects.findAll({ it.plugins.hasPlugin('java') }).jacocoTestReport.executionData)
-    reports {
-        html.enabled = true
-        xml.enabled = true
-        csv.enabled = false
-        xml.destination = "build/reports/jacoco/test/jacocoTestReport.xml"
+    apply plugin: 'com.github.kt3k.coveralls'
+    apply plugin: 'jacoco'
+
+    def publishedProjects = subprojects.findAll {
+        it.plugins.hasPlugin('java') && it.plugins.hasPlugin('jacoco')
     }
-}
 
-task jacocoMerge(type: JacocoMerge) {
-    subprojects.each { subproject ->
-        if (subproject.plugins.hasPlugin('java'))
-        executionData subproject.tasks.withType(Test)
+    coveralls {
+        sourceDirs = publishedProjects.sourceSets.main.allSource.srcDirs.flatten()
+        jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
+    }
+
+    task jacocoRootReport(type: JacocoReport, group: 'Coverage reports') {
+        description = 'Generates an aggregate report from all subprojects'
+        dependsOn(publishedProjects.test)
+
+        additionalSourceDirs = files(publishedProjects.sourceSets.main.allJava.srcDirs)
+        sourceDirectories = files(publishedProjects.sourceSets.main.allSource.srcDirs)
+        classDirectories = files(publishedProjects.sourceSets.main.output)
+        executionData = files(publishedProjects.jacocoTestReport.executionData)
+
+        reports {
+            html.enabled = true // human readable
+            xml.enabled = true // required by coveralls
+        }
+
+        onlyIf = {
+            true
+        }
+
+        doFirst {
+            executionData = files(executionData.findAll { it.exists() })
+        }
     }
 }

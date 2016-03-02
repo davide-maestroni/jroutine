@@ -15,7 +15,6 @@
  */
 
 apply plugin: 'java'
-apply plugin: 'jacoco'
 apply plugin: 'findbugs'
 apply plugin: 'com.github.ben-manes.versions'
 apply from: '../extra.gradle'
@@ -28,13 +27,6 @@ javaCompatibility = JavaVersion.VERSION_1_6
 conditionalDependencies {
     compile name: 'core', artifact: { "${it.parent.name}-${it.name}" }
     compile name: 'object', artifact: { "${it.parent.name}-${it.name}" }
-}
-
-jacocoTestReport {
-    reports {
-        xml.enabled = true // Coveralls plugin depends on xml format report
-        html.enabled = true
-    }
 }
 
 findbugs {

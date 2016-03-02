@@ -699,10 +699,10 @@ public class Channels {
      * Returns a builder of output channels repeating the output data to any newly bound channel or
      * consumer, thus effectively supporting multiple bindings.
      * <p/>
-     * The returned channel behaves like a bound one, in fact the
-     * {@link com.github.dm.jrt.channel.Channel.OutputChannel#isBound()} method will always return
-     * true, even if the bound methods will never fail. Note, however, that the implementation will
-     * silently prevent the same consumer or channel instance to be bound twice.
+     * The {@link com.github.dm.jrt.channel.Channel.OutputChannel#isBound()} method will always
+     * return false and the bound methods will never fail.<br/>
+     * Note, however, that the implementation will silently prevent the same consumer or channel
+     * instance to be bound twice.
      * <p/>
      * Note that the builder will successfully create only one output channel instance, and that the
      * passed channels will be bound as a result of the creation.

@@ -38,9 +38,10 @@ import java.util.concurrent.TimeUnit;
  * I/O channel caching the output data and passing them to newly bound consumer, thus
  * effectively supporting binding of several output consumers.
  * <p/>
- * The channel behaves like a bound one, in fact the {@link #isBound()} method will always return
- * true, even if the bound methods will never fail. Note, however, that the implementation will
- * silently prevent the same consumer or channel instance to be bound twice.
+ * The {@link #isBound()} method will always return false and the bound methods will never fail.
+ * <br/>
+ * Note, however, that the implementation will silently prevent the same consumer or channel
+ * instance to be bound twice.
  * <p/>
  * Created by davide-maestroni on 02/26/2016.
  *
@@ -82,12 +83,6 @@ class RepeatedChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
         mOutputChannel = createOutputChannel();
         mChannel = channel;
         channel.passTo(this);
-    }
-
-    @NotNull
-    private static IllegalStateException exception() {
-
-        return new IllegalStateException("the channel is already bound");
     }
 
     public boolean abort() {
@@ -139,13 +134,14 @@ class RepeatedChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
     @NotNull
     public List<OUT> all() {
 
-        throw exception();
+        return mOutputChannel.all();
     }
 
     @NotNull
     public OutputChannel<OUT> allInto(@NotNull final Collection<? super OUT> results) {
 
-        throw exception();
+        mOutputChannel.allInto(results);
+        return this;
     }
 
     @NotNull
@@ -211,12 +207,12 @@ class RepeatedChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
 
     public boolean hasNext() {
 
-        throw exception();
+        return mOutputChannel.hasNext();
     }
 
     public OUT next() {
 
-        throw exception();
+        return mOutputChannel.next();
     }
 
     @NotNull
@@ -228,18 +224,18 @@ class RepeatedChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
 
     public boolean isBound() {
 
-        return true;
+        return false;
     }
 
     @NotNull
     public List<OUT> next(final int count) {
 
-        throw exception();
+        return mOutputChannel.next(count);
     }
 
     public OUT nextOr(final OUT output) {
 
-        throw exception();
+        return mOutputChannel.nextOr(output);
     }
 
     @NotNull
@@ -293,7 +289,8 @@ class RepeatedChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
     @NotNull
     public OutputChannel<OUT> skip(final int count) {
 
-        throw exception();
+        mOutputChannel.skip(count);
+        return this;
     }
 
     public void throwError() {
@@ -308,7 +305,7 @@ class RepeatedChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
 
     public Iterator<OUT> iterator() {
 
-        throw exception();
+        return mOutputChannel.iterator();
     }
 
     public void onComplete() throws Exception {

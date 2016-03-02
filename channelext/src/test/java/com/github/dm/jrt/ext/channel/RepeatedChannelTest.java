@@ -45,7 +45,7 @@ public class RepeatedChannelTest {
 
         final IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
         final OutputChannel<Object> channel = Channels.repeat(ioChannel).build();
-        assertThat(channel.isBound()).isTrue();
+        assertThat(channel.isBound()).isFalse();
         assertThat(channel.isEmpty()).isTrue();
         ioChannel.pass("test1", "test2");
         final IOChannel<Object> output1 = JRoutineCore.io().buildChannel();
@@ -167,7 +167,7 @@ public class RepeatedChannelTest {
 
         final IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
         final OutputChannel<Object> channel = Channels.repeat(ioChannel).build();
-        assertThat(channel.isBound()).isTrue();
+        assertThat(channel.isBound()).isFalse();
         assertThat(channel.isEmpty()).isTrue();
         ioChannel.pass("test1", "test2");
         final ArrayList<Object> outputs = new ArrayList<Object>();
@@ -196,83 +196,59 @@ public class RepeatedChannelTest {
         final OutputChannel<Object> channel = Channels.repeat(ioChannel).build();
         channel.eventuallyExit();
         try {
-            channel.all();
+            channel.remove();
             fail();
 
-        } catch (final IllegalStateException ignored) {
+        } catch (final UnsupportedOperationException ignored) {
 
         }
 
         channel.eventuallyAbort();
         try {
-            channel.allInto(new ArrayList<Object>());
+            channel.remove();
             fail();
 
-        } catch (final IllegalStateException ignored) {
+        } catch (final UnsupportedOperationException ignored) {
 
         }
 
         channel.eventuallyAbort(new NullPointerException());
         try {
-            channel.hasNext();
+            channel.remove();
             fail();
 
-        } catch (final IllegalStateException ignored) {
+        } catch (final UnsupportedOperationException ignored) {
 
         }
 
         channel.eventuallyThrow();
         try {
-            channel.next();
+            channel.remove();
             fail();
 
-        } catch (final IllegalStateException ignored) {
+        } catch (final UnsupportedOperationException ignored) {
 
         }
 
         channel.immediately();
         try {
-            channel.next();
+            channel.remove();
             fail();
 
-        } catch (final IllegalStateException ignored) {
+        } catch (final UnsupportedOperationException ignored) {
 
         }
 
         channel.afterMax(seconds(3));
         try {
-            channel.next(3);
+            channel.remove();
             fail();
 
-        } catch (final IllegalStateException ignored) {
+        } catch (final UnsupportedOperationException ignored) {
 
         }
 
         channel.afterMax(3, TimeUnit.SECONDS);
-        try {
-            channel.nextOr(null);
-            fail();
-
-        } catch (final IllegalStateException ignored) {
-
-        }
-
-        try {
-            channel.skip(1);
-            fail();
-
-        } catch (final IllegalStateException ignored) {
-
-        }
-
-        try {
-            channel.iterator();
-            fail();
-
-        } catch (final IllegalStateException ignored) {
-
-        }
-
         try {
             channel.remove();
             fail();

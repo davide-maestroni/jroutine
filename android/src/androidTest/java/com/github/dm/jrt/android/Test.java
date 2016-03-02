@@ -23,7 +23,7 @@ import android.test.AndroidTestCase;
  */
 public class Test extends AndroidTestCase {
 
-    public void test() {
+    public void testDummy() {
 
     }
 }

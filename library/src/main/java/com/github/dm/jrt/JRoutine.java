@@ -30,6 +30,8 @@ import com.github.dm.jrt.proxy.core.JRoutineProxy;
 import org.jetbrains.annotations.NotNull;
 
 /**
+ * Class aggregating the library features.
+ * <p/>
  * Created by davide-maestroni on 02/29/2016.
  */
 public class JRoutine extends Channels {
@@ -105,10 +107,22 @@ public class JRoutine extends Channels {
         return JRoutineProxy.on(target.mTarget);
     }
 
-    private static class ProxyTarget<TYPE> {
+    // TODO: 02/03/16 functions 
+
+    /**
+     * Class representing a proxy invocation target.
+     *
+     * @param <TYPE> the target object type.
+     */
+    public static class ProxyTarget<TYPE> {
 
         private final InvocationTarget<TYPE> mTarget;
 
+        /**
+         * Constructor.
+         *
+         * @param target the wrapped invocation target.
+         */
         private ProxyTarget(@NotNull final InvocationTarget<TYPE> target) {
 
             mTarget = target;

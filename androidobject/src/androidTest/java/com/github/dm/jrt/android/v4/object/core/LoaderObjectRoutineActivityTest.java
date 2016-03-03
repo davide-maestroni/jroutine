@@ -186,7 +186,7 @@ public class LoaderObjectRoutineActivityTest
                                           .withLogLevel(Level.DEBUG)
                                           .withLog(new NullLog())
                                           .getConfigured()
-                                          .aliasMethod(TestClass.GET);
+                                          .alias(TestClass.GET);
 
         assertThat(routine.syncCall().afterMax(timeout).all()).containsExactly(-77L);
     }
@@ -310,7 +310,7 @@ public class LoaderObjectRoutineActivityTest
                                   .withProxies()
                                   .withSharedFields("test")
                                   .getConfigured()
-                                  .aliasMethod(TestClass.GET);
+                                  .alias(TestClass.GET);
         assertThat(countLog.getWrnCount()).isEqualTo(1);
 
         JRoutineLoaderObjectCompat.with(loaderFrom(getActivity()))
@@ -344,7 +344,7 @@ public class LoaderObjectRoutineActivityTest
 
             JRoutineLoaderObjectCompat.with(loaderFrom(getActivity()))
                                       .on(instanceOf(DuplicateAnnotation.class))
-                                      .aliasMethod(DuplicateAnnotation.GET);
+                                      .alias(DuplicateAnnotation.GET);
 
             fail();
 
@@ -359,7 +359,7 @@ public class LoaderObjectRoutineActivityTest
         final Routine<Object, Object> routine3 =
                 JRoutineLoaderObjectCompat.with(loaderFrom(getActivity()))
                                           .on(instanceOf(TestClass.class))
-                                          .aliasMethod(TestClass.THROW);
+                                          .alias(TestClass.THROW);
 
         try {
 
@@ -642,7 +642,7 @@ public class LoaderObjectRoutineActivityTest
 
             JRoutineLoaderObjectCompat.with(loaderFrom(getActivity()))
                                       .on(instanceOf(TestClass.class))
-                                      .aliasMethod("test");
+                                      .alias("test");
 
             fail();
 
@@ -1001,7 +1001,7 @@ public class LoaderObjectRoutineActivityTest
                                              .withLoaders()
                                              .withLoaderId(0)
                                              .getConfigured()
-                                             .aliasMethod("test")
+                                             .alias("test")
                                              .asyncCall()
                                              .next()).isEqualTo(31);
 
@@ -1015,7 +1015,7 @@ public class LoaderObjectRoutineActivityTest
                                       .withLoaders()
                                       .withLoaderId(1)
                                       .getConfigured()
-                                      .aliasMethod("test")
+                                      .alias("test")
                                       .asyncCall()
                                       .next();
 

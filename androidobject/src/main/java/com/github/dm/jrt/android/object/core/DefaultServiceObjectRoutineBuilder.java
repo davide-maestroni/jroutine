@@ -154,7 +154,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
     @NotNull
     @SuppressWarnings("unchecked")
-    public <IN, OUT> Routine<IN, OUT> aliasMethod(@NotNull final String name) {
+    public <IN, OUT> Routine<IN, OUT> alias(@NotNull final String name) {
 
         final ContextInvocationTarget<?> target = mTarget;
         final Method targetMethod = getAnnotatedMethod(target.getTargetClass(), name);
@@ -181,12 +181,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     @NotNull
-    public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
-
-        return buildProxy(itf.getRawClass());
-    }
-
-    @NotNull
     public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
 
         if (!itf.isInterface()) {
@@ -197,6 +191,12 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         final Object proxy = Proxy.newProxyInstance(itf.getClassLoader(), new Class[]{itf},
                                                     new ProxyInvocationHandler(this));
         return itf.cast(proxy);
+    }
+
+    @NotNull
+    public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
+
+        return buildProxy(itf.getRawClass());
     }
 
     @NotNull
@@ -331,7 +331,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                                          .withProxies()
                                          .withSharedFields(mSharedFields)
                                          .getConfigured()
-                                         .aliasMethod(mAliasName);
+                                         .alias(mAliasName);
 
             } catch (final Throwable t) {
                 throw InvocationException.wrapIfNeeded(t);

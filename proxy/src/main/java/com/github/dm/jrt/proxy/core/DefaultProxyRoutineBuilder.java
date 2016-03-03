@@ -51,12 +51,15 @@ class DefaultProxyRoutineBuilder
      * Constructor.
      *
      * @param target the invocation target.
+     * @throws java.lang.IllegalArgumentException if the class of specified target represents an
+     *                                            interface.
      */
-    @SuppressWarnings("ConstantConditions")
     DefaultProxyRoutineBuilder(@NotNull final InvocationTarget<?> target) {
 
-        if (target == null) {
-            throw new NullPointerException("the invocation target must not be null");
+        final Class<?> targetClass = target.getTargetClass();
+        if (targetClass.isInterface()) {
+            throw new IllegalArgumentException(
+                    "the target class must not be an interface: " + targetClass.getName());
         }
 
         mTarget = target;

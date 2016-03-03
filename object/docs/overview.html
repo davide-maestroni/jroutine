@@ -51,9 +51,9 @@
                                                                    .withInvocations()
                                                                    .withReadTimeout(seconds(3))
                                                                    .getConfigured();
-                final Routine&lt;String, Integer&gt; parseRoutine = builder.aliasMethod(PARSE);
-                final Routine&lt;Integer, Integer&gt; squareRoutine = builder.aliasMethod(SQUARE);
-                final Routine&lt;List&lt;Integer&gt;, Double&gt; meanRoutine = builder.aliasMethod(MEAN);
+                final Routine&lt;String, Integer&gt; parseRoutine = builder.alias(PARSE);
+                final Routine&lt;Integer, Integer&gt; squareRoutine = builder.alias(SQUARE);
+                final Routine&lt;List&lt;Integer&gt;, Double&gt; meanRoutine = builder.alias(MEAN);
                 final Double rms = meanRoutine.asyncCall(
                         squareRoutine.parallelCall(parseRoutine.parallelCall(args)).all()).next();
                 System.out.println(rms);

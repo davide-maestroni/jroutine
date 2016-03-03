@@ -16,7 +16,6 @@
 
 package com.github.dm.jrt;
 
-import com.github.dm.jrt.JRoutine.ProxyTarget;
 import com.github.dm.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
@@ -43,6 +42,7 @@ import java.util.List;
 
 import static com.github.dm.jrt.function.Functions.functionFilter;
 import static com.github.dm.jrt.invocation.InvocationFactories.factoryOf;
+import static com.github.dm.jrt.object.core.InvocationTarget.classOfType;
 import static com.github.dm.jrt.object.core.InvocationTarget.instance;
 import static com.github.dm.jrt.util.TimeDuration.millis;
 import static com.github.dm.jrt.util.TimeDuration.seconds;
@@ -71,7 +71,7 @@ public class JRoutineTest {
                                                         .withLogLevel(Level.DEBUG)
                                                         .withLog(new NullLog())
                                                         .getConfigured()
-                                                        .aliasMethod(TestClass.GET);
+                                                        .alias(TestClass.GET);
 
         assertThat(routine.syncCall().afterMax(timeout).all()).containsExactly(-77L);
     }
@@ -126,7 +126,7 @@ public class JRoutineTest {
     @Test
     public void testClassStaticMethod() {
 
-        final TestStatic testStatic = JRoutine.on(ProxyTarget.classOfType(TestClass.class))
+        final TestStatic testStatic = JRoutine.onProxied(classOfType(TestClass.class))
                                               .withInvocations()
                                               .withRunner(Runners.poolRunner())
                                               .withLogLevel(Level.DEBUG)
@@ -151,7 +151,7 @@ public class JRoutineTest {
     public void testObjectStaticMethod() {
 
         final TestClass test = new TestClass();
-        final TestStatic testStatic = JRoutine.on(ProxyTarget.instance(test))
+        final TestStatic testStatic = JRoutine.onProxied(instance(test))
                                               .withInvocations()
                                               .withRunner(Runners.poolRunner())
                                               .withLogLevel(Level.DEBUG)

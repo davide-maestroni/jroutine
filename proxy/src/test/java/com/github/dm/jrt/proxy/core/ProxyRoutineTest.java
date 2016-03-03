@@ -239,8 +239,8 @@ public class ProxyRoutineTest {
         assertThat(testProxy.getOne().next()).isEqualTo(1);
         assertThat(testProxy.getStringParallel1(JRoutineCore.io().of(1, 2, 3))).isIn("1", "2", "3");
         assertThat(testProxy.getStringParallel2(
-                JRoutineCore.io().of(new HashSet<Integer>(Arrays.asList(1, 2, 3)))).all()).containsOnly(
-                "1", "2", "3");
+                JRoutineCore.io().of(new HashSet<Integer>(Arrays.asList(1, 2, 3))))
+                            .all()).containsOnly("1", "2", "3");
 
         final ArrayList<String> list = new ArrayList<String>();
         assertThat((Iterable<?>) testProxy.getList(JRoutineCore.io().<List<String>>of(list))
@@ -266,8 +266,8 @@ public class ProxyRoutineTest {
         assertThat(testProxy.getOne().next()).isEqualTo(1);
         assertThat(testProxy.getStringParallel1(JRoutineCore.io().of(1, 2, 3))).isIn("1", "2", "3");
         assertThat(testProxy.getStringParallel2(
-                JRoutineCore.io().of(new HashSet<Integer>(Arrays.asList(1, 2, 3)))).all()).containsOnly(
-                "1", "2", "3");
+                JRoutineCore.io().of(new HashSet<Integer>(Arrays.asList(1, 2, 3))))
+                            .all()).containsOnly("1", "2", "3");
 
         final ArrayList<String> list = new ArrayList<String>();
         assertThat((Iterable<?>) testProxy.getList(JRoutineCore.io().<List<String>>of(list))

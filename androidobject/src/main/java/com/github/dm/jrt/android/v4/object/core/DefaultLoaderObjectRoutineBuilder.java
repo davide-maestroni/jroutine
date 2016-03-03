@@ -98,7 +98,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     }
 
     @NotNull
-    public <IN, OUT> LoaderRoutine<IN, OUT> aliasMethod(@NotNull final String name) {
+    public <IN, OUT> LoaderRoutine<IN, OUT> alias(@NotNull final String name) {
 
         final ContextInvocationTarget<?> target = mTarget;
         final Method targetMethod = Builders.getAnnotatedMethod(target.getTargetClass(), name);
@@ -128,12 +128,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     }
 
     @NotNull
-    public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
-
-        return buildProxy(itf.getRawClass());
-    }
-
-    @NotNull
     public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
 
         if (!itf.isInterface()) {
@@ -144,6 +138,12 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         final Object proxy = Proxy.newProxyInstance(itf.getClassLoader(), new Class[]{itf},
                                                     new ProxyInvocationHandler(this));
         return itf.cast(proxy);
+    }
+
+    @NotNull
+    public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
+
+        return buildProxy(itf.getRawClass());
     }
 
     @NotNull
@@ -281,7 +281,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                                          .withProxies()
                                          .with(mProxyConfiguration)
                                          .getConfigured()
-                                         .aliasMethod(mAliasName);
+                                         .alias(mAliasName);
 
             } catch (final Throwable t) {
                 throw InvocationException.wrapIfNeeded(t);

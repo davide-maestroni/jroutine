@@ -90,7 +90,7 @@ class DefaultObjectRoutineBuilder
     }
 
     @NotNull
-    public <IN, OUT> Routine<IN, OUT> aliasMethod(@NotNull final String name) {
+    public <IN, OUT> Routine<IN, OUT> alias(@NotNull final String name) {
 
         final Method method = getAnnotatedMethod(mTarget.getTargetClass(), name);
         if (method == null) {
@@ -99,12 +99,6 @@ class DefaultObjectRoutineBuilder
         }
 
         return method(method);
-    }
-
-    @NotNull
-    public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
-
-        return itf.cast(buildProxy(itf.getRawClass()));
     }
 
     @NotNull
@@ -118,6 +112,12 @@ class DefaultObjectRoutineBuilder
         final Object proxy = Proxy.newProxyInstance(itf.getClassLoader(), new Class[]{itf},
                                                     new ProxyInvocationHandler());
         return itf.cast(proxy);
+    }
+
+    @NotNull
+    public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
+
+        return itf.cast(buildProxy(itf.getRawClass()));
     }
 
     @NotNull

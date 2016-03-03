@@ -57,27 +57,7 @@ public interface LoaderObjectRoutineBuilder
      * @see com.github.dm.jrt.object.annotation Annotations
      */
     @NotNull
-    <IN, OUT> LoaderRoutine<IN, OUT> aliasMethod(@NotNull String name);
-
-    /**
-     * Returns a proxy object enabling asynchronous call of the target instance methods.
-     * <p/>
-     * The routines used for calling the methods will honor the attributes specified in any optional
-     * <i>{@code com.github.dm.jrt.object.annotation.*}</i> as well as
-     * <i>{@code com.github.dm.jrt.android.object.annotation.*}</i> annotations.<br/>
-     * Note that such annotations will override any configuration set through the builder.
-     *
-     * @param itf    the token of the interface implemented by the return object.
-     * @param <TYPE> the interface type.
-     * @return the proxy object.
-     * @throws java.lang.IllegalArgumentException if the specified class token does not represent an
-     *                                            interface.
-     * @see <a href='{@docRoot}/com/github/dm/jrt/android/object/annotation/package-summary.html'>
-     * Android Annotations</a>
-     * @see com.github.dm.jrt.object.annotation Annotations
-     */
-    @NotNull
-    <TYPE> TYPE buildProxy(@NotNull ClassToken<TYPE> itf);
+    <IN, OUT> LoaderRoutine<IN, OUT> alias(@NotNull String name);
 
     /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.
@@ -98,6 +78,26 @@ public interface LoaderObjectRoutineBuilder
      */
     @NotNull
     <TYPE> TYPE buildProxy(@NotNull Class<TYPE> itf);
+
+    /**
+     * Returns a proxy object enabling asynchronous call of the target instance methods.
+     * <p/>
+     * The routines used for calling the methods will honor the attributes specified in any optional
+     * <i>{@code com.github.dm.jrt.object.annotation.*}</i> as well as
+     * <i>{@code com.github.dm.jrt.android.object.annotation.*}</i> annotations.<br/>
+     * Note that such annotations will override any configuration set through the builder.
+     *
+     * @param itf    the token of the interface implemented by the return object.
+     * @param <TYPE> the interface type.
+     * @return the proxy object.
+     * @throws java.lang.IllegalArgumentException if the specified class token does not represent an
+     *                                            interface.
+     * @see <a href='{@docRoot}/com/github/dm/jrt/android/object/annotation/package-summary.html'>
+     * Android Annotations</a>
+     * @see com.github.dm.jrt.object.annotation Annotations
+     */
+    @NotNull
+    <TYPE> TYPE buildProxy(@NotNull ClassToken<TYPE> itf);
 
     /**
      * Returns a routine used to call the specified method.

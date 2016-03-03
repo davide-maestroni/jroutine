@@ -51,34 +51,7 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
      * Annotations</a>
      */
     @NotNull
-    <IN, OUT> Routine<IN, OUT> aliasMethod(@NotNull String name);
-
-    /**
-     * Returns a proxy object enabling asynchronous call of the target instance methods.
-     * <p/>
-     * The routines used for calling the methods will honor the attributes specified in any optional
-     * <i>{@code com.github.dm.jrt.object.annotation.*}</i> annotations.<br/>
-     * Note that such annotations will override any configuration set through the builder.
-     * <p/>
-     * In case the wrapped object does not implement the specified interface, the alias annotation
-     * value will be used to bind the interface method with the instance ones. If no annotation is
-     * present, the method name will be used instead.<br/>
-     * The interface will be interpreted as a proxy of the target object methods, and the optional
-     * {@link com.github.dm.jrt.object.annotation.AsyncIn AsyncIn},
-     * {@link com.github.dm.jrt.object.annotation.AsyncMethod AsyncMethod},
-     * {@link com.github.dm.jrt.object.annotation.AsyncOut AsyncOut} and
-     * {@link com.github.dm.jrt.object.annotation.Invoke Invoke} annotations will be honored.
-     *
-     * @param itf    the token of the interface implemented by the returned object.
-     * @param <TYPE> the interface type.
-     * @return the proxy object.
-     * @throws java.lang.IllegalArgumentException if the specified class token does not represent an
-     *                                            interface.
-     * @see <a href='{@docRoot}/com/github/dm/jrt/object/annotation/package-summary.html'>
-     * Annotations</a>
-     */
-    @NotNull
-    <TYPE> TYPE buildProxy(@NotNull ClassToken<TYPE> itf);
+    <IN, OUT> Routine<IN, OUT> alias(@NotNull String name);
 
     /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.
@@ -106,6 +79,33 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
      */
     @NotNull
     <TYPE> TYPE buildProxy(@NotNull Class<TYPE> itf);
+
+    /**
+     * Returns a proxy object enabling asynchronous call of the target instance methods.
+     * <p/>
+     * The routines used for calling the methods will honor the attributes specified in any optional
+     * <i>{@code com.github.dm.jrt.object.annotation.*}</i> annotations.<br/>
+     * Note that such annotations will override any configuration set through the builder.
+     * <p/>
+     * In case the wrapped object does not implement the specified interface, the alias annotation
+     * value will be used to bind the interface method with the instance ones. If no annotation is
+     * present, the method name will be used instead.<br/>
+     * The interface will be interpreted as a proxy of the target object methods, and the optional
+     * {@link com.github.dm.jrt.object.annotation.AsyncIn AsyncIn},
+     * {@link com.github.dm.jrt.object.annotation.AsyncMethod AsyncMethod},
+     * {@link com.github.dm.jrt.object.annotation.AsyncOut AsyncOut} and
+     * {@link com.github.dm.jrt.object.annotation.Invoke Invoke} annotations will be honored.
+     *
+     * @param itf    the token of the interface implemented by the returned object.
+     * @param <TYPE> the interface type.
+     * @return the proxy object.
+     * @throws java.lang.IllegalArgumentException if the specified class token does not represent an
+     *                                            interface.
+     * @see <a href='{@docRoot}/com/github/dm/jrt/object/annotation/package-summary.html'>
+     * Annotations</a>
+     */
+    @NotNull
+    <TYPE> TYPE buildProxy(@NotNull ClassToken<TYPE> itf);
 
     /**
      * Returns a routine used to call the specified method.

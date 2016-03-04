@@ -99,7 +99,7 @@ public class DelegatingInvocation<IN, OUT> implements Invocation<IN, OUT> {
 
         final OutputChannel<OUT> outputChannel = mOutputChannel;
         if (!outputChannel.isBound()) {
-            outputChannel.passTo(result);
+            outputChannel.bindTo(result);
         }
 
         mInputChannel.pass(input);
@@ -109,7 +109,7 @@ public class DelegatingInvocation<IN, OUT> implements Invocation<IN, OUT> {
 
         final OutputChannel<OUT> outputChannel = mOutputChannel;
         if (!outputChannel.isBound()) {
-            outputChannel.passTo(result);
+            outputChannel.bindTo(result);
         }
 
         mInputChannel.close();

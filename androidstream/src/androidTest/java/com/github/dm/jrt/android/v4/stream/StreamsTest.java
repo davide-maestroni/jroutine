@@ -1542,10 +1542,10 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         final OutputChannel<Object> channel = LoaderStreamsCompat.repeat(ioChannel).build();
         ioChannel.pass("test1", "test2");
         final IOChannel<Object> output1 = JRoutineCore.io().buildChannel();
-        channel.passTo(output1).close();
+        channel.bindTo(output1).close();
         assertThat(output1.next()).isEqualTo("test1");
         final IOChannel<Object> output2 = JRoutineCore.io().buildChannel();
-        channel.passTo(output2).close();
+        channel.bindTo(output2).close();
         ioChannel.pass("test3").close();
         assertThat(output2.all()).containsExactly("test1", "test2", "test3");
         assertThat(output1.all()).containsExactly("test2", "test3");
@@ -1557,10 +1557,10 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         final OutputChannel<Object> channel = LoaderStreamsCompat.repeat(ioChannel).build();
         ioChannel.pass("test1", "test2");
         final IOChannel<Object> output1 = JRoutineCore.io().buildChannel();
-        channel.passTo(output1).close();
+        channel.bindTo(output1).close();
         assertThat(output1.next()).isEqualTo("test1");
         final IOChannel<Object> output2 = JRoutineCore.io().buildChannel();
-        channel.passTo(output2).close();
+        channel.bindTo(output2).close();
         ioChannel.abort();
 
         try {

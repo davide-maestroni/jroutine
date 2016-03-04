@@ -189,6 +189,14 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
+    public StreamChannel<OUT> bindTo(@NotNull final OutputConsumer<? super OUT> consumer) {
+
+        mBinder.bind();
+        mChannel.bindTo(consumer);
+        return this;
+    }
+
+    @NotNull
     public StreamChannel<OUT> eventuallyAbort() {
 
         mChannel.eventuallyAbort();
@@ -220,14 +228,6 @@ public abstract class AbstractStreamChannel<OUT>
     public StreamChannel<OUT> immediately() {
 
         mChannel.immediately();
-        return this;
-    }
-
-    @NotNull
-    public StreamChannel<OUT> passTo(@NotNull final OutputConsumer<? super OUT> consumer) {
-
-        mBinder.bind();
-        mChannel.passTo(consumer);
         return this;
     }
 
@@ -516,7 +516,7 @@ public abstract class AbstractStreamChannel<OUT>
         }
 
         final IOChannel<OUT> ioChannel = JRoutineCore.io().buildChannel();
-        mChannel.passTo(new TryCatchOutputConsumer<OUT>(consumer, ioChannel));
+        mChannel.bindTo(new TryCatchOutputConsumer<OUT>(consumer, ioChannel));
         return newChannel(ioChannel, getStreamConfiguration(), mDelegationType, mBinder);
     }
 
@@ -562,6 +562,14 @@ public abstract class AbstractStreamChannel<OUT>
         return mChannel.all();
     }
 
+    @NotNull
+    public <CHANNEL extends InputChannel<? super OUT>> CHANNEL bindTo(
+            @NotNull final CHANNEL channel) {
+
+        mBinder.bind();
+        return mChannel.bindTo(channel);
+    }
+
     @Nullable
     public RoutineException getError() {
 
@@ -603,14 +611,6 @@ public abstract class AbstractStreamChannel<OUT>
 
         mBinder.bind();
         return mChannel.nextOr(output);
-    }
-
-    @NotNull
-    public <CHANNEL extends InputChannel<? super OUT>> CHANNEL passTo(
-            @NotNull final CHANNEL channel) {
-
-        mBinder.bind();
-        return mChannel.passTo(channel);
     }
 
     public void throwError() {
@@ -737,7 +737,7 @@ public abstract class AbstractStreamChannel<OUT>
     private <AFTER> StreamChannel<AFTER> concatRoutine(
             @NotNull final InvocationChannel<? super OUT, ? extends AFTER> channel) {
 
-        return newChannel((OutputChannel<AFTER>) mChannel.passTo(channel).result(),
+        return newChannel((OutputChannel<AFTER>) mChannel.bindTo(channel).result(),
                           getStreamConfiguration(), mDelegationType, mBinder);
     }
 
@@ -830,7 +830,7 @@ public abstract class AbstractStreamChannel<OUT>
             public void bind() {
 
                 if (!mIsBound.getAndSet(true)) {
-                    mInput.passTo(mOutput).close();
+                    mInput.bindTo(mOutput).close();
                 }
             }
         }
@@ -1047,7 +1047,7 @@ public abstract class AbstractStreamChannel<OUT>
 
             final OutputChannel<? extends OUT> channel = mFunction.apply(input);
             if (channel != null) {
-                channel.passTo(result);
+                channel.bindTo(result);
             }
         }
     }

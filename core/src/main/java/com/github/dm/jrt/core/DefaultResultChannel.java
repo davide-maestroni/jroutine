@@ -251,7 +251,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
 
         if ((consumer != null) && (channel != null)) {
-            channel.passTo(consumer);
+            channel.bindTo(consumer);
         }
 
         return this;
@@ -1117,6 +1117,34 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
 
         @NotNull
+        public <IN extends InputChannel<? super OUT>> IN bindTo(@NotNull final IN channel) {
+
+            channel.pass(this);
+            return channel;
+        }
+
+        @NotNull
+        @SuppressWarnings("ConstantConditions")
+        public OutputChannel<OUT> bindTo(@NotNull final OutputConsumer<? super OUT> consumer) {
+
+            final boolean forceClose;
+            synchronized (mMutex) {
+                verifyBound();
+                if (consumer == null) {
+                    mSubLogger.err("invalid null consumer");
+                    throw new NullPointerException("the output consumer must not be null");
+                }
+
+                forceClose = mState.isDone();
+                mOutputConsumer = consumer;
+                mConsumerMutex = getMutex(consumer);
+            }
+
+            executeFlush(forceClose);
+            return this;
+        }
+
+        @NotNull
         public OutputChannel<OUT> eventuallyAbort() {
 
             synchronized (mMutex) {
@@ -1329,34 +1357,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             }
 
             return output;
-        }
-
-        @NotNull
-        public <IN extends InputChannel<? super OUT>> IN passTo(@NotNull final IN channel) {
-
-            channel.pass(this);
-            return channel;
-        }
-
-        @NotNull
-        @SuppressWarnings("ConstantConditions")
-        public OutputChannel<OUT> passTo(@NotNull final OutputConsumer<? super OUT> consumer) {
-
-            final boolean forceClose;
-            synchronized (mMutex) {
-                verifyBound();
-                if (consumer == null) {
-                    mSubLogger.err("invalid null consumer");
-                    throw new NullPointerException("the output consumer must not be null");
-                }
-
-                forceClose = mState.isDone();
-                mOutputConsumer = consumer;
-                mConsumerMutex = getMutex(consumer);
-            }
-
-            executeFlush(forceClose);
-            return this;
         }
 
         @NotNull

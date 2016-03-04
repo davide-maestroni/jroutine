@@ -112,7 +112,7 @@ class StreamInvocationFactory<IN, OUT> extends ComparableInvocationFactory<IN, O
 
             final StreamChannel<? extends OUT> outputChannel = mOutputChannel;
             if (!outputChannel.isBound()) {
-                outputChannel.passTo(result);
+                outputChannel.bindTo(result);
             }
 
             mInputChannel.pass(input);
@@ -122,7 +122,7 @@ class StreamInvocationFactory<IN, OUT> extends ComparableInvocationFactory<IN, O
 
             final StreamChannel<? extends OUT> outputChannel = mOutputChannel;
             if (!outputChannel.isBound()) {
-                outputChannel.passTo(result);
+                outputChannel.bindTo(result);
             }
 
             mInputChannel.close();

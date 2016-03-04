@@ -552,7 +552,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
                 try {
                     mOutMessenger.send(message);
                     mConsumer = new ConnectionOutputConsumer();
-                    mInput.passTo(mConsumer);
+                    mInput.bindTo(mConsumer);
 
                 } catch (final RemoteException e) {
                     logger.err(e, "error while sending service invocation message");

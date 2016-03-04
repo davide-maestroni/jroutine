@@ -318,14 +318,14 @@ public class RoutineTest {
                                                            .pass("test1")
                                                            .result();
 
-        channel1.passTo(consumer);
+        channel1.bindTo(consumer);
         assertThat(channel1.isBound()).isTrue();
         assertThat(consumer.isOutput()).isFalse();
 
         final OutputChannel<Object> channel2 =
                 JRoutineCore.on(PassingInvocation.factoryOf()).syncInvoke().pass("test2").result();
 
-        channel2.passTo(consumer);
+        channel2.bindTo(consumer);
         assertThat(channel1.isBound()).isTrue();
         assertThat(channel2.isBound()).isTrue();
         assertThat(consumer.isOutput()).isTrue();
@@ -519,7 +519,7 @@ public class RoutineTest {
                     public void onInput(final Integer integer,
                             @NotNull final ResultChannel<Integer> result) {
 
-                        squareRoutine.asyncCall(integer).passTo(mChannel);
+                        squareRoutine.asyncCall(integer).bindTo(mChannel);
                     }
 
                     @Override
@@ -2251,7 +2251,7 @@ public class RoutineTest {
 
         try {
 
-            channel.passTo((InputChannel<String>) null);
+            channel.bindTo((InputChannel<String>) null);
 
             fail();
 
@@ -2261,7 +2261,7 @@ public class RoutineTest {
 
         try {
 
-            channel.passTo((OutputConsumer<String>) null);
+            channel.bindTo((OutputConsumer<String>) null);
 
             fail();
 
@@ -2283,7 +2283,7 @@ public class RoutineTest {
 
         try {
 
-            channel.passTo(consumer).passTo(consumer);
+            channel.bindTo(consumer).bindTo(consumer);
 
             fail();
 
@@ -3169,31 +3169,31 @@ public class RoutineTest {
                             .buildRoutine();
 
         assertThat(
-                routine.syncCall(input).passTo(consumer).afterMax(timeout).hasCompleted()).isTrue();
+                routine.syncCall(input).bindTo(consumer).afterMax(timeout).hasCompleted()).isTrue();
         assertThat(routine.asyncCall(input)
-                          .passTo(consumer)
+                          .bindTo(consumer)
                           .afterMax(timeout)
                           .hasCompleted()).isTrue();
         assertThat(routine.parallelCall(input)
-                          .passTo(consumer)
+                          .bindTo(consumer)
                           .afterMax(timeout)
                           .hasCompleted()).isTrue();
         assertThat(routine.syncInvoke()
                           .pass(input)
                           .result()
-                          .passTo(consumer)
+                          .bindTo(consumer)
                           .afterMax(timeout)
                           .hasCompleted()).isTrue();
         assertThat(routine.asyncInvoke()
                           .pass(input)
                           .result()
-                          .passTo(consumer)
+                          .bindTo(consumer)
                           .afterMax(timeout)
                           .hasCompleted()).isTrue();
         assertThat(routine.parallelInvoke()
                           .pass(input)
                           .result()
-                          .passTo(consumer)
+                          .bindTo(consumer)
                           .afterMax(timeout)
                           .hasCompleted()).isTrue();
     }

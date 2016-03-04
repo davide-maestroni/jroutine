@@ -842,7 +842,7 @@ public class InvocationService extends Service {
          */
         void passTo(@NotNull final OutputConsumer<Object> consumer) {
 
-            mChannel.result().passTo(consumer);
+            mChannel.result().bindTo(consumer);
         }
 
         /**

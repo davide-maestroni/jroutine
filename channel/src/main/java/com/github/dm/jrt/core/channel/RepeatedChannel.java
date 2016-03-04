@@ -82,7 +82,7 @@ class RepeatedChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
                 : ChannelConfiguration.DEFAULT_CONFIGURATION;
         mOutputChannel = createOutputChannel();
         mChannel = channel;
-        channel.passTo(this);
+        channel.bindTo(this);
     }
 
     public boolean abort() {
@@ -141,6 +141,54 @@ class RepeatedChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
     public OutputChannel<OUT> allInto(@NotNull final Collection<? super OUT> results) {
 
         mOutputChannel.allInto(results);
+        return this;
+    }
+
+    @NotNull
+    public <IN extends InputChannel<? super OUT>> IN bindTo(@NotNull final IN channel) {
+
+        synchronized (mMutex) {
+            final IdentityHashMap<InputChannel<? super OUT>, Void> channels = mChannels;
+            if (channels.containsKey(channel)) {
+                return channel;
+            }
+
+            channels.put(channel, null);
+        }
+
+        channel.pass(this);
+        return channel;
+    }
+
+    @NotNull
+    public OutputChannel<OUT> bindTo(@NotNull final OutputConsumer<? super OUT> consumer) {
+
+        final boolean isComplete;
+        final IOChannel<OUT> channel;
+        final RoutineException abortException;
+        synchronized (mMutex) {
+            final IdentityHashMap<OutputConsumer<? super OUT>, IOChannel<OUT>> consumers =
+                    mConsumers;
+            if (consumers.containsKey(consumer)) {
+                return this;
+            }
+
+            isComplete = mIsComplete;
+            abortException = mAbortException;
+            final IOChannel<OUT> outputChannel = mOutputChannel;
+            consumers.put(consumer, outputChannel);
+            outputChannel.bindTo(consumer);
+            channel = createOutputChannel().pass(mCached);
+            if (abortException != null) {
+                channel.abort(abortException);
+
+            } else if (isComplete) {
+                channel.close();
+            }
+
+            mOutputChannel = channel;
+        }
+
         return this;
     }
 
@@ -236,54 +284,6 @@ class RepeatedChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
     public OUT nextOr(final OUT output) {
 
         return mOutputChannel.nextOr(output);
-    }
-
-    @NotNull
-    public <IN extends InputChannel<? super OUT>> IN passTo(@NotNull final IN channel) {
-
-        synchronized (mMutex) {
-            final IdentityHashMap<InputChannel<? super OUT>, Void> channels = mChannels;
-            if (channels.containsKey(channel)) {
-                return channel;
-            }
-
-            channels.put(channel, null);
-        }
-
-        channel.pass(this);
-        return channel;
-    }
-
-    @NotNull
-    public OutputChannel<OUT> passTo(@NotNull final OutputConsumer<? super OUT> consumer) {
-
-        final boolean isComplete;
-        final IOChannel<OUT> channel;
-        final RoutineException abortException;
-        synchronized (mMutex) {
-            final IdentityHashMap<OutputConsumer<? super OUT>, IOChannel<OUT>> consumers =
-                    mConsumers;
-            if (consumers.containsKey(consumer)) {
-                return this;
-            }
-
-            isComplete = mIsComplete;
-            abortException = mAbortException;
-            final IOChannel<OUT> outputChannel = mOutputChannel;
-            consumers.put(consumer, outputChannel);
-            outputChannel.passTo(consumer);
-            channel = createOutputChannel().pass(mCached);
-            if (abortException != null) {
-                channel.abort(abortException);
-
-            } else if (isComplete) {
-                channel.close();
-            }
-
-            mOutputChannel = channel;
-        }
-
-        return this;
     }
 
     @NotNull

@@ -80,6 +80,12 @@ public interface StreamChannel<OUT>
      * {@inheritDoc}
      */
     @NotNull
+    StreamChannel<OUT> bindTo(@NotNull OutputConsumer<? super OUT> consumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
     StreamChannel<OUT> eventuallyAbort();
 
     /**
@@ -105,12 +111,6 @@ public interface StreamChannel<OUT>
      */
     @NotNull
     StreamChannel<OUT> immediately();
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    StreamChannel<OUT> passTo(@NotNull OutputConsumer<? super OUT> consumer);
 
     /**
      * {@inheritDoc}

@@ -241,7 +241,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         }
 
         if ((consumer != null) && (channel != null)) {
-            channel.passTo(consumer);
+            channel.bindTo(consumer);
         }
 
         return this;

@@ -40,7 +40,7 @@ import java.util.List;
  *         public void onInput(final IN in, final ResultChannel&lt;ByteBuffer&gt; result) {
  *
  *             ...
- *             final BufferOutputStream outputStream = ByteChannel.byteChannel().passTo(result);
+ *             final BufferOutputStream outputStream = ByteChannel.byteChannel().bindTo(result);
  *             ...
  *         }
  *     </code>

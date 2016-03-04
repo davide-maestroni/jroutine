@@ -205,6 +205,14 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
 
     @NotNull
     @Override
+    public LoaderStreamChannel<OUT> bindTo(@NotNull final OutputConsumer<? super OUT> consumer) {
+
+        super.bindTo(consumer);
+        return this;
+    }
+
+    @NotNull
+    @Override
     public LoaderStreamChannel<OUT> eventuallyAbort() {
 
         super.eventuallyAbort();
@@ -240,14 +248,6 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
     public LoaderStreamChannel<OUT> immediately() {
 
         super.immediately();
-        return this;
-    }
-
-    @NotNull
-    @Override
-    public LoaderStreamChannel<OUT> passTo(@NotNull final OutputConsumer<? super OUT> consumer) {
-
-        super.passTo(consumer);
         return this;
     }
 

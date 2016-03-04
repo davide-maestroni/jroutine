@@ -292,6 +292,32 @@ public interface Channel {
         OutputChannel<OUT> allInto(@NotNull Collection<? super OUT> results);
 
         /**
+         * Binds this channel to the specified one. After the call, all the output will be passed
+         * only to the specified input channel. Attempting to read through the dedicated methods
+         * will cause an {@link java.lang.IllegalStateException} to be thrown.
+         *
+         * @param channel   the input channel
+         * @param <CHANNEL> the input channel type.
+         * @return the passed channel.
+         * @throws java.lang.IllegalStateException if this channel is already bound.
+         */
+        @NotNull
+        <CHANNEL extends InputChannel<? super OUT>> CHANNEL bindTo(@NotNull CHANNEL channel);
+
+        /**
+         * Binds this channel to the specified consumer. After the call, all the output will be
+         * passed only to the consumer. Attempting to read through the dedicated methods will cause
+         * an {@link java.lang.IllegalStateException} to be thrown.<br/>
+         * Note that the consumer methods may be called on the runner thread.
+         *
+         * @param consumer the consumer instance.
+         * @return this channel.
+         * @throws java.lang.IllegalStateException if this channel is already bound.
+         */
+        @NotNull
+        OutputChannel<OUT> bindTo(@NotNull OutputConsumer<? super OUT> consumer);
+
+        /**
          * Tells the channel to abort the invocation execution in case no result is available before
          * the timeout has elapsed.
          * <p/>
@@ -456,8 +482,8 @@ public interface Channel {
          * Checks if this channel is bound to a consumer or another channel.
          *
          * @return whether the channel is bound.
-         * @see #passTo passTo(InputChannel)
-         * @see #passTo(OutputConsumer)
+         * @see #bindTo bindTo(InputChannel)
+         * @see #bindTo(OutputConsumer)
          */
         boolean isBound();
 
@@ -517,32 +543,6 @@ public interface Channel {
          * @see #eventuallyThrow()
          */
         OUT nextOr(OUT output);
-
-        /**
-         * Binds this channel to the specified one. After the call, all the output will be passed
-         * only to the specified input channel. Attempting to read through the dedicated methods
-         * will cause an {@link java.lang.IllegalStateException} to be thrown.
-         *
-         * @param channel   the input channel
-         * @param <CHANNEL> the input channel type.
-         * @return the passed channel.
-         * @throws java.lang.IllegalStateException if this channel is already bound.
-         */
-        @NotNull
-        <CHANNEL extends InputChannel<? super OUT>> CHANNEL passTo(@NotNull CHANNEL channel);
-
-        /**
-         * Binds this channel to the specified consumer. After the call, all the output will be
-         * passed only to the consumer. Attempting to read through the dedicated methods will cause
-         * an {@link java.lang.IllegalStateException} to be thrown.<br/>
-         * Note that the consumer methods may be called on the runner thread.
-         *
-         * @param consumer the consumer instance.
-         * @return this channel.
-         * @throws java.lang.IllegalStateException if this channel is already bound.
-         */
-        @NotNull
-        OutputChannel<OUT> passTo(@NotNull OutputConsumer<? super OUT> consumer);
 
         /**
          * Skips the first {@code count} available results by waiting at the maximum for the set

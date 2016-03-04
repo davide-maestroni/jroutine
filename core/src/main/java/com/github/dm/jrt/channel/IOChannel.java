@@ -118,6 +118,12 @@ public interface IOChannel<DATA> extends InputChannel<DATA>, OutputChannel<DATA>
      * {@inheritDoc}
      */
     @NotNull
+    IOChannel<DATA> bindTo(@NotNull OutputConsumer<? super DATA> consumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
     IOChannel<DATA> eventuallyAbort();
 
     /**
@@ -143,12 +149,6 @@ public interface IOChannel<DATA> extends InputChannel<DATA>, OutputChannel<DATA>
      */
     @NotNull
     IOChannel<DATA> immediately();
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    IOChannel<DATA> passTo(@NotNull OutputConsumer<? super DATA> consumer);
 
     /**
      * {@inheritDoc}

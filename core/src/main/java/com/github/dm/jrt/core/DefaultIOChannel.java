@@ -173,6 +173,13 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA> {
     }
 
     @NotNull
+    public IOChannel<DATA> bindTo(@NotNull final OutputConsumer<? super DATA> consumer) {
+
+        mOutputChannel.bindTo(consumer);
+        return this;
+    }
+
+    @NotNull
     public IOChannel<DATA> eventuallyAbort() {
 
         mOutputChannel.eventuallyAbort();
@@ -208,13 +215,6 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA> {
     }
 
     @NotNull
-    public IOChannel<DATA> passTo(@NotNull final OutputConsumer<? super DATA> consumer) {
-
-        mOutputChannel.passTo(consumer);
-        return this;
-    }
-
-    @NotNull
     public IOChannel<DATA> skip(final int count) {
 
         mOutputChannel.skip(count);
@@ -244,6 +244,12 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA> {
     public List<DATA> all() {
 
         return mOutputChannel.all();
+    }
+
+    @NotNull
+    public <IN extends InputChannel<? super DATA>> IN bindTo(@NotNull final IN channel) {
+
+        return mOutputChannel.bindTo(channel);
     }
 
     @Nullable
@@ -281,12 +287,6 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA> {
     public DATA nextOr(final DATA output) {
 
         return mOutputChannel.nextOr(output);
-    }
-
-    @NotNull
-    public <IN extends InputChannel<? super DATA>> IN passTo(@NotNull final IN channel) {
-
-        return mOutputChannel.passTo(channel);
     }
 
     public void throwError() {

@@ -62,7 +62,7 @@ class SelectableOutputBuilder<OUT>
 
         final IOChannel<ParcelableSelectable<OUT>> ioChannel =
                 JRoutineCore.io().withChannels().with(configuration).getConfigured().buildChannel();
-        mChannel.passTo(new SelectableOutputConsumer<OUT, OUT>(ioChannel, mIndex));
+        mChannel.bindTo(new SelectableOutputConsumer<OUT, OUT>(ioChannel, mIndex));
         return ioChannel;
     }
 }

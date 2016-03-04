@@ -85,6 +85,12 @@ public interface LoaderStreamChannelCompat<OUT>
      * {@inheritDoc}
      */
     @NotNull
+    LoaderStreamChannelCompat<OUT> bindTo(@NotNull OutputConsumer<? super OUT> consumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
     LoaderStreamChannelCompat<OUT> eventuallyAbort();
 
     /**
@@ -110,12 +116,6 @@ public interface LoaderStreamChannelCompat<OUT>
      */
     @NotNull
     LoaderStreamChannelCompat<OUT> immediately();
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    LoaderStreamChannelCompat<OUT> passTo(@NotNull OutputConsumer<? super OUT> consumer);
 
     /**
      * {@inheritDoc}

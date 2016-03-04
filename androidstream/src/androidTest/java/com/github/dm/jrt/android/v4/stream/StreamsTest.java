@@ -22,13 +22,13 @@ import android.support.v4.util.SparseArrayCompat;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.builder.LoaderConfiguration.CacheStrategyType;
-import com.github.dm.jrt.android.ext.channel.ParcelableSelectable;
+import com.github.dm.jrt.android.core.channel.ParcelableSelectable;
 import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
 import com.github.dm.jrt.android.invocation.MissingInvocationException;
 import com.github.dm.jrt.android.invocation.PassingFunctionContextInvocation;
 import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
-import com.github.dm.jrt.android.v4.ext.channel.SparseChannelsCompat;
+import com.github.dm.jrt.android.v4.core.channel.SparseChannelsCompat;
 import com.github.dm.jrt.builder.IOChannelBuilder;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.channel.AbortException;

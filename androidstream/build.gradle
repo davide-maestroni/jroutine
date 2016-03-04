@@ -67,7 +67,7 @@ conditionalDependencies {
     compile name: 'channel', artifact: { "${it.parent.name}-${it.name}" }
     compile name: 'stream', artifact: { "${it.parent.name}-${it.name}" }
     compile name: 'androidcore', artifact: { "${it.parent.name}-${it.name}" }
-    compile name: 'androidchannelext', artifact: { "${it.parent.name}-${it.name}" }
+    compile name: 'androidchannel', artifact: { "${it.parent.name}-${it.name}" }
 }
 
 findbugs {
@@ -86,5 +86,5 @@ tasks.withType(Javadoc) {
             'http://davide-maestroni.github.io/jroutine/javadoc/v6/channel/',
             'http://davide-maestroni.github.io/jroutine/javadoc/v6/stream/',
             'http://davide-maestroni.github.io/jroutine/javadoc/v6/androidcore/',
-            'http://davide-maestroni.github.io/jroutine/javadoc/v6/androidchannelext/')
+            'http://davide-maestroni.github.io/jroutine/javadoc/v6/androidchannel/')
 }

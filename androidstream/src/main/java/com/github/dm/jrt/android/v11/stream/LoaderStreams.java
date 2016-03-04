@@ -19,11 +19,11 @@ package com.github.dm.jrt.android.v11.stream;
 import android.util.SparseArray;
 
 import com.github.dm.jrt.android.builder.LoaderRoutineBuilder;
-import com.github.dm.jrt.android.ext.channel.ParcelableSelectable;
+import com.github.dm.jrt.android.core.channel.ParcelableSelectable;
 import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
 import com.github.dm.jrt.android.v11.core.JRoutineLoader;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
-import com.github.dm.jrt.android.v11.ext.channel.SparseChannels;
+import com.github.dm.jrt.android.v11.core.channel.SparseChannels;
 import com.github.dm.jrt.builder.RoutineBuilder;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;

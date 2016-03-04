@@ -19,7 +19,7 @@ package com.github.dm.jrt.android.v4.stream;
 import com.github.dm.jrt.android.builder.LoaderConfigurableBuilder;
 import com.github.dm.jrt.android.builder.LoaderConfiguration.Builder;
 import com.github.dm.jrt.android.builder.LoaderConfiguration.CacheStrategyType;
-import com.github.dm.jrt.android.ext.channel.ParcelableSelectable;
+import com.github.dm.jrt.android.core.channel.ParcelableSelectable;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;

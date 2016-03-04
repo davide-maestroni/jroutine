@@ -58,16 +58,16 @@ import static com.github.dm.jrt.object.core.InvocationTarget.classOfType;
 import static com.github.dm.jrt.object.core.InvocationTarget.instance;
 
 /**
- * Class aggregating the library features.
+ * Class acting as a façade of all the JRoutine library features.
  * <p/>
  * Created by davide-maestroni on 02/29/2016.
  */
-public class JRoutine extends Channels {
+public class JRoutineFacade extends Channels {
 
     /**
      * Avoid direct instantiation.
      */
-    protected JRoutine() {
+    protected JRoutineFacade() {
 
     }
 

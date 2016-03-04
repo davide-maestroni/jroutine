@@ -36,7 +36,7 @@ conditionalDependencies {
     compile name: 'object', artifact: { "${it.parent.name}-${it.name}" }
     compile name: 'proxy', artifact: { "${it.parent.name}-${it.name}" }
     compile name: 'function', artifact: { "${it.parent.name}-${it.name}" }
-    compile name: 'channelext', artifact: { "${it.parent.name}-${it.name}" }
+    compile name: 'channel', artifact: { "${it.parent.name}-${it.name}" }
     compile name: 'stream', artifact: { "${it.parent.name}-${it.name}" }
 }
 

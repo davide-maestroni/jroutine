@@ -63,7 +63,7 @@ dependencies {
 }
 conditionalDependencies {
     compile name: 'core', artifact: { "${it.parent.name}-${it.name}" }
-    compile name: 'channelext', artifact: { "${it.parent.name}-${it.name}" }
+    compile name: 'channel', artifact: { "${it.parent.name}-${it.name}" }
     compile name: 'androidcore', artifact: { "${it.parent.name}-${it.name}" }
 }
 

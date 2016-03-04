@@ -61,7 +61,7 @@ gradle.projectsEvaluated {
                 execs += files(it.jacocoTestReport.executionData)
             } else {
                 sources += files(it.android.sourceSets.main.java.srcDirs)
-                classes += fileTree(dir: "${it.buildDir}/intermediates/classes/debug", exclude: '**/R*.class')
+                classes += fileTree(dir: "${it.buildDir}/intermediates/classes/debug", exclude: ['**/R*.class', '**/BuildConfig.class'])
                 execs += fileTree("${it.buildDir}/outputs/code-coverage/connected")
             }
         }

@@ -20,7 +20,7 @@ import com.github.dm.jrt.builder.ChannelConfiguration;
 import com.github.dm.jrt.channel.Channel.InputChannel;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.ext.channel.AbstractBuilder;
+import com.github.dm.jrt.core.channel.AbstractBuilder;
 
 import org.jetbrains.annotations.NotNull;
 

@@ -19,4 +19,4 @@
  * <p/>
  * Created by davide-maestroni on 02/24/2016.
  */
-package com.github.dm.jrt.ext.channel;
+package com.github.dm.jrt.core.channel;

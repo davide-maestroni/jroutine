@@ -53,7 +53,7 @@ javadoc {
     options.links('http://docs.oracle.com/javase/7/docs/api/',
             'http://davide-maestroni.github.io/jroutine/javadoc/v6/core/',
             'http://davide-maestroni.github.io/jroutine/javadoc/v6/function/',
-            'http://davide-maestroni.github.io/jroutine/javadoc/v6/channelext/')
+            'http://davide-maestroni.github.io/jroutine/javadoc/v6/channel/')
 }
 
 tasks.withType(FindBugs) {

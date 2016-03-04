@@ -22,8 +22,8 @@ import com.github.dm.jrt.builder.ChannelConfiguration;
 import com.github.dm.jrt.channel.Channel.InputChannel;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.ext.channel.AbstractBuilder;
-import com.github.dm.jrt.ext.channel.Selectable;
+import com.github.dm.jrt.core.channel.AbstractBuilder;
+import com.github.dm.jrt.core.channel.Selectable;
 
 import org.jetbrains.annotations.NotNull;
 

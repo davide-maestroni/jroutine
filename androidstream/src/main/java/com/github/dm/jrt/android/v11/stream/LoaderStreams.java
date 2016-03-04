@@ -29,7 +29,7 @@ import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.ext.channel.ChannelsBuilder;
+import com.github.dm.jrt.core.channel.ChannelsBuilder;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.stream.StreamChannel;
 import com.github.dm.jrt.stream.Streams;

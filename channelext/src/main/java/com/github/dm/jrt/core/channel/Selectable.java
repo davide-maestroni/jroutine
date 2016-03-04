@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.ext.channel;
+package com.github.dm.jrt.core.channel;
 
 /**
  * Data class storing information about the origin of the data.

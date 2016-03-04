@@ -21,7 +21,7 @@ import com.github.dm.jrt.builder.RoutineBuilder;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.common.RoutineException;
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.ext.channel.Channels;
+import com.github.dm.jrt.core.channel.Channels;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;

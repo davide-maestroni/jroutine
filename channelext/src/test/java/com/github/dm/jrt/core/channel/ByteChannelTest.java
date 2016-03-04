@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.ext.channel;
+package com.github.dm.jrt.core.channel;
 
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.ext.channel.ByteChannel.BufferInputStream;
-import com.github.dm.jrt.ext.channel.ByteChannel.BufferOutputStream;
-import com.github.dm.jrt.ext.channel.ByteChannel.ByteBuffer;
+import com.github.dm.jrt.core.channel.ByteChannel.BufferInputStream;
+import com.github.dm.jrt.core.channel.ByteChannel.BufferOutputStream;
+import com.github.dm.jrt.core.channel.ByteChannel.ByteBuffer;
 
 import org.junit.Test;
 

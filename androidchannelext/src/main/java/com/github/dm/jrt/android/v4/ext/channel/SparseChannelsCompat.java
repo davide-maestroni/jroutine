@@ -23,8 +23,8 @@ import com.github.dm.jrt.android.ext.channel.ParcelableSelectable;
 import com.github.dm.jrt.channel.Channel.InputChannel;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
-import com.github.dm.jrt.ext.channel.ChannelsBuilder;
-import com.github.dm.jrt.ext.channel.Selectable;
+import com.github.dm.jrt.core.channel.ChannelsBuilder;
+import com.github.dm.jrt.core.channel.Selectable;
 
 import org.jetbrains.annotations.NotNull;
 

@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.ext.channel;
+package com.github.dm.jrt.core.channel;
 
 import com.github.dm.jrt.builder.ChannelConfiguration;
+import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.core.JRoutineCore;
@@ -27,23 +28,22 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * Builder implementation returning a channel blending data from a set of output channels.
+ * Builder implementation returning a channel concatenating data from a set of output channels.
  * <p/>
  * Created by davide-maestroni on 02/26/2016.
  *
  * @param <OUT> the output data type.
  */
-class BlendBuilder<OUT> extends AbstractBuilder<OutputChannel<OUT>> {
+class ConcatBuilder<OUT> extends AbstractBuilder<OutputChannel<OUT>> {
 
     private final ArrayList<OutputChannel<? extends OUT>> mChannels;
 
     /**
      * Constructor.
      *
-     * @param channels the output channels to blend.
-     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @param channels the output channels to concat.
      */
-    BlendBuilder(@NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
+    ConcatBuilder(@NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
 
         if (channels.isEmpty()) {
             throw new IllegalArgumentException("the collection of channels must not be empty");
@@ -63,8 +63,12 @@ class BlendBuilder<OUT> extends AbstractBuilder<OutputChannel<OUT>> {
     @Override
     protected OutputChannel<OUT> build(@NotNull final ChannelConfiguration configuration) {
 
-        final IOChannel<OUT> ioChannel =
-                JRoutineCore.io().withChannels().with(configuration).getConfigured().buildChannel();
+        final IOChannel<OUT> ioChannel = JRoutineCore.io()
+                                                     .withChannels()
+                                                     .with(configuration)
+                                                     .withChannelOrder(OrderType.BY_CALL)
+                                                     .getConfigured()
+                                                     .buildChannel();
         for (final OutputChannel<? extends OUT> channel : mChannels) {
             channel.passTo(ioChannel);
         }

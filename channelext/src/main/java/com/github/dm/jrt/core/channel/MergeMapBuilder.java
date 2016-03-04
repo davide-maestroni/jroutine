@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.ext.channel;
+package com.github.dm.jrt.core.channel;
 
 import com.github.dm.jrt.builder.ChannelConfiguration;
 import com.github.dm.jrt.channel.Channel.OutputChannel;
@@ -23,45 +23,40 @@ import com.github.dm.jrt.core.JRoutineCore;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
- * Builder implementation merging data from a set of output channels into selectable objects.
+ * Builder implementation returning a channel merging data from a map of output channels.
  * <p/>
  * Created by davide-maestroni on 02/26/2016.
  *
  * @param <OUT> the output data type.
  */
-class MergeBuilder<OUT> extends AbstractBuilder<OutputChannel<? extends Selectable<OUT>>> {
+class MergeMapBuilder<OUT> extends AbstractBuilder<OutputChannel<? extends Selectable<OUT>>> {
 
-    private final ArrayList<OutputChannel<? extends OUT>> mChannels;
-
-    private final int mStartIndex;
+    private final HashMap<Integer, OutputChannel<? extends OUT>> mChannelMap;
 
     /**
      * Constructor.
      *
-     * @param startIndex the selectable start index.
-     * @param channels   the input channels to merge.
-     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @param channels the map of channels to merge.
+     * @throws java.lang.IllegalArgumentException if the specified map is empty.
      */
-    MergeBuilder(final int startIndex,
-            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
+    MergeMapBuilder(@NotNull final Map<Integer, ? extends OutputChannel<? extends OUT>> channels) {
 
         if (channels.isEmpty()) {
-            throw new IllegalArgumentException("the collection of channels must not be empty");
+            throw new IllegalArgumentException("the map of channels must not be empty");
         }
 
-        final ArrayList<OutputChannel<? extends OUT>> channelList =
-                new ArrayList<OutputChannel<? extends OUT>>(channels);
-        if (channelList.contains(null)) {
-            throw new NullPointerException(
-                    "the collection of channels must not contain null objects");
+        final HashMap<Integer, OutputChannel<? extends OUT>> channelMap =
+                new HashMap<Integer, OutputChannel<? extends OUT>>(channels);
+        if (channelMap.containsValue(null)) {
+            throw new NullPointerException("the map of channels must not contain null objects");
         }
 
-        mStartIndex = startIndex;
-        mChannels = channelList;
+        mChannelMap = channelMap;
     }
 
     @NotNull
@@ -71,9 +66,9 @@ class MergeBuilder<OUT> extends AbstractBuilder<OutputChannel<? extends Selectab
 
         final IOChannel<Selectable<OUT>> ioChannel =
                 JRoutineCore.io().withChannels().with(configuration).getConfigured().buildChannel();
-        int i = mStartIndex;
-        for (final OutputChannel<? extends OUT> channel : mChannels) {
-            ioChannel.pass(Channels.toSelectable(channel, i++).build());
+        for (final Entry<Integer, ? extends OutputChannel<? extends OUT>> entry : mChannelMap
+                .entrySet()) {
+            ioChannel.pass(Channels.toSelectable(entry.getValue(), entry.getKey()).build());
         }
 
         return ioChannel.close();

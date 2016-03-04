@@ -23,7 +23,7 @@ import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.common.RoutineException;
-import com.github.dm.jrt.ext.channel.Selectable;
+import com.github.dm.jrt.core.channel.Selectable;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Consumer;

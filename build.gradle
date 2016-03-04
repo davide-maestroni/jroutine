@@ -29,11 +29,19 @@ gradle.projectsEvaluated {
     apply plugin: 'jacoco'
 
     def publishedProjects = subprojects.findAll {
-        it.plugins.hasPlugin('java') && it.plugins.hasPlugin('jacoco')
+        it.plugins.hasPlugin('jacoco')
     }
 
     coveralls {
-        sourceDirs = publishedProjects.sourceSets.main.allSource.srcDirs.flatten()
+        def sources = files()
+        publishedProjects.each {
+            if (it.plugins.hasPlugin('java')) {
+                sources += files(it.sourceSets.main.allSource.srcDirs)
+            } else {
+                sources += files(it.android.sourceSets.main.java.srcDirs)
+            }
+        }
+        sourceDirs = sources.flatten()
         jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
     }
 
@@ -41,10 +49,27 @@ gradle.projectsEvaluated {
         description = 'Generates an aggregate report from all subprojects'
         dependsOn(publishedProjects.test)
 
-        additionalSourceDirs = files(publishedProjects.sourceSets.main.allJava.srcDirs)
-        sourceDirectories = files(publishedProjects.sourceSets.main.allSource.srcDirs)
-        classDirectories = files(publishedProjects.sourceSets.main.output)
-        executionData = files(publishedProjects.jacocoTestReport.executionData)
+        def additionalSources = files()
+        def sources = files()
+        def classes = files()
+        def execs = files()
+        publishedProjects.each {
+            if (it.plugins.hasPlugin('java')) {
+                additionalSources += files(it.sourceSets.main.allJava.srcDirs)
+                sources += files(it.sourceSets.main.allSource.srcDirs)
+                classes += files(it.sourceSets.main.output)
+                execs += files(it.jacocoTestReport.executionData)
+            } else {
+                sources += files(it.android.sourceSets.main.java.srcDirs)
+                classes += fileTree(dir: "${it.buildDir}/intermediates/classes/debug", exclude: '**/R*.class')
+                execs += fileTree("${it.buildDir}/outputs/code-coverage/connected")
+            }
+        }
+
+        additionalSourceDirs = additionalSources
+        sourceDirectories = sources
+        classDirectories = classes
+        executionData = execs
 
         reports {
             html.enabled = true // human readable

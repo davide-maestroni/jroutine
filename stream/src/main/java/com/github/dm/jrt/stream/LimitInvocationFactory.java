@@ -23,7 +23,7 @@ import com.github.dm.jrt.invocation.TemplateInvocation;
 
 import org.jetbrains.annotations.NotNull;
 
-import static com.github.dm.jrt.util.Reflection.asArgs;
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
  * Factory of limiting data invocations.

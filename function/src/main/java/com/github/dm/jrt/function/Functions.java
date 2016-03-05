@@ -18,6 +18,7 @@ package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.invocation.CommandInvocation;
 import com.github.dm.jrt.invocation.ComparableCommandInvocation;
 import com.github.dm.jrt.invocation.ComparableFilterInvocation;
@@ -26,7 +27,6 @@ import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.invocation.FunctionInvocation;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationFactory;
-import com.github.dm.jrt.util.ClassToken;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import static com.github.dm.jrt.util.Reflection.asArgs;
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
  * Utility class back-porting functional programming.

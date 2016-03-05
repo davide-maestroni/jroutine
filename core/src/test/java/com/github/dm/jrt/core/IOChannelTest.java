@@ -23,12 +23,12 @@ import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.ExecutionTimeoutException;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.common.TimeoutException;
+import com.github.dm.jrt.core.util.TimeDuration;
 import com.github.dm.jrt.invocation.PassingInvocation;
 import com.github.dm.jrt.log.Log;
 import com.github.dm.jrt.log.Log.Level;
 import com.github.dm.jrt.log.NullLog;
 import com.github.dm.jrt.runner.Runners;
-import com.github.dm.jrt.util.TimeDuration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -41,8 +41,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.dm.jrt.util.TimeDuration.millis;
-import static com.github.dm.jrt.util.TimeDuration.seconds;
+import static com.github.dm.jrt.core.util.TimeDuration.millis;
+import static com.github.dm.jrt.core.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 

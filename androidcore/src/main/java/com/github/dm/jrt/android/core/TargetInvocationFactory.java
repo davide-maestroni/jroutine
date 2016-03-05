@@ -20,15 +20,15 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.github.dm.jrt.android.invocation.ContextInvocation;
-import com.github.dm.jrt.util.ClassToken;
-import com.github.dm.jrt.util.Reflection;
+import com.github.dm.jrt.core.util.ClassToken;
+import com.github.dm.jrt.core.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 
-import static com.github.dm.jrt.util.ClassToken.tokenOf;
+import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 
 /**
  * Class representing a context invocation factory target.

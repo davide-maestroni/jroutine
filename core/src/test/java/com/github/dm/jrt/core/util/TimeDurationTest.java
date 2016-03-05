@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.util;
+package com.github.dm.jrt.core.util;
 
+import com.github.dm.jrt.core.util.TimeDuration.Condition;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
-import com.github.dm.jrt.util.TimeDuration.Condition;
 
 import org.junit.Test;
 

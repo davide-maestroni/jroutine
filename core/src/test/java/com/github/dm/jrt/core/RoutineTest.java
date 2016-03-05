@@ -37,6 +37,8 @@ import com.github.dm.jrt.core.channel.TemplateOutputConsumer;
 import com.github.dm.jrt.core.common.DeadlockException;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.common.TimeoutException;
+import com.github.dm.jrt.core.util.ClassToken;
+import com.github.dm.jrt.core.util.TimeDuration;
 import com.github.dm.jrt.invocation.CommandInvocation;
 import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.invocation.FunctionInvocation;
@@ -54,8 +56,6 @@ import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.runner.Execution;
 import com.github.dm.jrt.runner.Runner;
 import com.github.dm.jrt.runner.Runners;
-import com.github.dm.jrt.util.ClassToken;
-import com.github.dm.jrt.util.TimeDuration;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -73,11 +73,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.github.dm.jrt.builder.InvocationConfiguration.builder;
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
+import static com.github.dm.jrt.core.util.TimeDuration.INFINITY;
+import static com.github.dm.jrt.core.util.TimeDuration.millis;
+import static com.github.dm.jrt.core.util.TimeDuration.seconds;
 import static com.github.dm.jrt.invocation.InvocationFactories.factoryOf;
-import static com.github.dm.jrt.util.Reflection.asArgs;
-import static com.github.dm.jrt.util.TimeDuration.INFINITY;
-import static com.github.dm.jrt.util.TimeDuration.millis;
-import static com.github.dm.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.util;
+package com.github.dm.jrt.core.util;
 
 import org.assertj.core.data.MapEntry;
 import org.junit.Test;

@@ -25,15 +25,15 @@ import com.github.dm.jrt.core.channel.InputDeadlockException;
 import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.util.SimpleQueue;
+import com.github.dm.jrt.core.util.TimeDuration;
+import com.github.dm.jrt.core.util.TimeDuration.Condition;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.runner.Execution;
 import com.github.dm.jrt.runner.Runner;
 import com.github.dm.jrt.runner.TemplateExecution;
-import com.github.dm.jrt.util.SimpleQueue;
-import com.github.dm.jrt.util.TimeDuration;
-import com.github.dm.jrt.util.TimeDuration.Condition;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,8 +43,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.dm.jrt.util.TimeDuration.ZERO;
-import static com.github.dm.jrt.util.TimeDuration.fromUnit;
+import static com.github.dm.jrt.core.util.TimeDuration.ZERO;
+import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
 
 /**
  * Default implementation of a invocation input channel.

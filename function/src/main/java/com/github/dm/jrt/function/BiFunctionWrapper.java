@@ -16,8 +16,8 @@
 
 package com.github.dm.jrt.function;
 
-import com.github.dm.jrt.util.Reflection;
-import com.github.dm.jrt.util.WeakIdentityHashMap;
+import com.github.dm.jrt.core.util.Reflection;
+import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
 

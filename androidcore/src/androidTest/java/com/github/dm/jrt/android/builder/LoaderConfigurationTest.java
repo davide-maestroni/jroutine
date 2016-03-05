@@ -23,7 +23,7 @@ import android.test.AndroidTestCase;
 import com.github.dm.jrt.android.builder.LoaderConfiguration.Builder;
 import com.github.dm.jrt.android.builder.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.builder.LoaderConfiguration.ClashResolutionType;
-import com.github.dm.jrt.util.TimeDuration;
+import com.github.dm.jrt.core.util.TimeDuration;
 
 import java.util.concurrent.TimeUnit;
 

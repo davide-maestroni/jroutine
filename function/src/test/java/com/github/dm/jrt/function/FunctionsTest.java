@@ -18,13 +18,13 @@ package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.invocation.CommandInvocation;
 import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.invocation.PassingInvocation;
 import com.github.dm.jrt.routine.Routine;
-import com.github.dm.jrt.util.ClassToken;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -35,6 +35,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static com.github.dm.jrt.core.util.TimeDuration.seconds;
 import static com.github.dm.jrt.function.Functions.biSink;
 import static com.github.dm.jrt.function.Functions.castTo;
 import static com.github.dm.jrt.function.Functions.constant;
@@ -60,7 +61,6 @@ import static com.github.dm.jrt.function.Functions.sink;
 import static com.github.dm.jrt.function.Functions.supplierCommand;
 import static com.github.dm.jrt.function.Functions.supplierFactory;
 import static com.github.dm.jrt.function.Functions.wrap;
-import static com.github.dm.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 

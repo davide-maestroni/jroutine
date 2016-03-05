@@ -16,18 +16,18 @@
 
 package com.github.dm.jrt.builder;
 
+import com.github.dm.jrt.core.util.TimeDuration;
 import com.github.dm.jrt.log.Log;
 import com.github.dm.jrt.log.Log.Level;
 import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.runner.Runner;
-import com.github.dm.jrt.util.TimeDuration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.github.dm.jrt.util.TimeDuration.fromUnit;
+import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
 
 /**
  * Class storing the invocation configuration.

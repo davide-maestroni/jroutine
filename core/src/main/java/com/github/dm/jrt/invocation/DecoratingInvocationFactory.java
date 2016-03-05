@@ -18,7 +18,7 @@ package com.github.dm.jrt.invocation;
 
 import org.jetbrains.annotations.NotNull;
 
-import static com.github.dm.jrt.util.Reflection.asArgs;
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
  * Class decorating the invocations produced by an invocation factory.

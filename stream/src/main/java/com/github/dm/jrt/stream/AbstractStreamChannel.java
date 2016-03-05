@@ -30,6 +30,7 @@ import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.channel.Selectable;
 import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.util.TimeDuration;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Consumer;
@@ -47,7 +48,6 @@ import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.invocation.PassingInvocation;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.runner.Runner;
-import com.github.dm.jrt.util.TimeDuration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -61,14 +61,14 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.github.dm.jrt.builder.ChannelConfiguration.builderFromOutputChannel;
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
+import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
 import static com.github.dm.jrt.function.Functions.consumerFactory;
 import static com.github.dm.jrt.function.Functions.consumerFilter;
 import static com.github.dm.jrt.function.Functions.functionFactory;
 import static com.github.dm.jrt.function.Functions.functionFilter;
 import static com.github.dm.jrt.function.Functions.predicateFilter;
 import static com.github.dm.jrt.function.Functions.wrap;
-import static com.github.dm.jrt.util.Reflection.asArgs;
-import static com.github.dm.jrt.util.TimeDuration.fromUnit;
 
 /**
  * Abstract implementation of a stream output channel.

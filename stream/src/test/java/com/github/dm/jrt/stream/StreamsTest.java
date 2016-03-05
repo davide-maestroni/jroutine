@@ -27,6 +27,7 @@ import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.channel.Selectable;
+import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.function.BiConsumerWrapper;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Functions;
@@ -38,7 +39,6 @@ import com.github.dm.jrt.invocation.TemplateInvocation;
 import com.github.dm.jrt.log.Log.Level;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.stream.Streams.RangeConsumer;
-import com.github.dm.jrt.util.ClassToken;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -49,11 +49,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.github.dm.jrt.core.util.TimeDuration.millis;
+import static com.github.dm.jrt.core.util.TimeDuration.seconds;
 import static com.github.dm.jrt.function.Functions.wrap;
 import static com.github.dm.jrt.invocation.InvocationFactories.factoryOf;
 import static com.github.dm.jrt.stream.Streams.range;
-import static com.github.dm.jrt.util.TimeDuration.millis;
-import static com.github.dm.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 

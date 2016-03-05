@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.runner;
 
-import com.github.dm.jrt.util.WeakIdentityHashMap;
+import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
 

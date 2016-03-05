@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static com.github.dm.jrt.util.Reflection.asArgs;
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
  * Utility class used for logging messages.

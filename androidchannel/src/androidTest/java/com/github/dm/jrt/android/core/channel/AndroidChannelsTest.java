@@ -32,10 +32,10 @@ import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.invocation.InvocationFactories;
 import com.github.dm.jrt.routine.Routine;
-import com.github.dm.jrt.util.ClassToken;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -47,8 +47,8 @@ import java.util.Map;
 
 import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
 import static com.github.dm.jrt.android.core.TargetInvocationFactory.factoryOf;
-import static com.github.dm.jrt.util.TimeDuration.millis;
-import static com.github.dm.jrt.util.TimeDuration.seconds;
+import static com.github.dm.jrt.core.util.TimeDuration.millis;
+import static com.github.dm.jrt.core.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

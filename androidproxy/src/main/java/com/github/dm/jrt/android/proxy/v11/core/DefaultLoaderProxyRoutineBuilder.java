@@ -23,16 +23,16 @@ import com.github.dm.jrt.android.proxy.builder.AbstractLoaderProxyObjectBuilder;
 import com.github.dm.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
 import com.github.dm.jrt.builder.InvocationConfiguration;
+import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.object.builder.ProxyConfiguration;
 import com.github.dm.jrt.proxy.annotation.Proxy;
-import com.github.dm.jrt.util.ClassToken;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 
-import static com.github.dm.jrt.util.Reflection.findConstructor;
+import static com.github.dm.jrt.core.util.Reflection.findConstructor;
 
 /**
  * Default implementation of a context proxy builder.

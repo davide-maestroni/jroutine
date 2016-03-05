@@ -17,8 +17,8 @@
 package com.github.dm.jrt.proxy.builder;
 
 import com.github.dm.jrt.builder.ConfigurableBuilder;
+import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.object.builder.ProxyConfigurableBuilder;
-import com.github.dm.jrt.util.ClassToken;
 
 import org.jetbrains.annotations.NotNull;
 

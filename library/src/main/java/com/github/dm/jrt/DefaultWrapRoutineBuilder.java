@@ -17,6 +17,7 @@
 package com.github.dm.jrt;
 
 import com.github.dm.jrt.builder.InvocationConfiguration;
+import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.object.builder.ObjectRoutineBuilder;
 import com.github.dm.jrt.object.builder.ProxyConfiguration;
 import com.github.dm.jrt.object.core.InvocationTarget;
@@ -25,7 +26,6 @@ import com.github.dm.jrt.proxy.annotation.Proxy;
 import com.github.dm.jrt.proxy.builder.ProxyRoutineBuilder;
 import com.github.dm.jrt.proxy.core.JRoutineProxy;
 import com.github.dm.jrt.routine.Routine;
-import com.github.dm.jrt.util.ClassToken;
 
 import org.jetbrains.annotations.NotNull;
 

@@ -19,6 +19,7 @@ package com.github.dm.jrt.core;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.util.SimpleQueue;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationDeadlockException;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
@@ -29,7 +30,6 @@ import com.github.dm.jrt.routine.TemplateRoutine;
 import com.github.dm.jrt.runner.Runner;
 import com.github.dm.jrt.runner.Runners;
 import com.github.dm.jrt.runner.TemplateExecution;
-import com.github.dm.jrt.util.SimpleQueue;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

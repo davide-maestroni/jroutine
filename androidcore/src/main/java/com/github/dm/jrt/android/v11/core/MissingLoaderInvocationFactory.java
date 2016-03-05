@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-import static com.github.dm.jrt.util.Reflection.asArgs;
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
  * Invocation factory used to know whether a loader with a specific ID is present or not.

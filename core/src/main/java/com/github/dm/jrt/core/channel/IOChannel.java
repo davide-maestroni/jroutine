@@ -18,7 +18,7 @@ package com.github.dm.jrt.core.channel;
 
 import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
-import com.github.dm.jrt.util.TimeDuration;
+import com.github.dm.jrt.core.util.TimeDuration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

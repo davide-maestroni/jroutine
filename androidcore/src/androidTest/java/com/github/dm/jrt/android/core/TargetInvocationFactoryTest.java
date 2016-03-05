@@ -29,8 +29,8 @@ import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
 import static com.github.dm.jrt.android.core.TargetInvocationFactory.factoryOf;
-import static com.github.dm.jrt.util.TimeDuration.millis;
-import static com.github.dm.jrt.util.TimeDuration.seconds;
+import static com.github.dm.jrt.core.util.TimeDuration.millis;
+import static com.github.dm.jrt.core.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

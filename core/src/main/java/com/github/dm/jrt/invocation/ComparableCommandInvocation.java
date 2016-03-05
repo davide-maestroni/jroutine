@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.invocation;
 
-import com.github.dm.jrt.util.Reflection;
+import com.github.dm.jrt.core.util.Reflection;
 
 import org.jetbrains.annotations.Nullable;
 

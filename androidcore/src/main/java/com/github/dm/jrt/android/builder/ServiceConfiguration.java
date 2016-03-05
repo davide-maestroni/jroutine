@@ -18,9 +18,9 @@ package com.github.dm.jrt.android.builder;
 
 import android.os.Looper;
 
+import com.github.dm.jrt.core.util.Reflection;
 import com.github.dm.jrt.log.Log;
 import com.github.dm.jrt.runner.Runner;
-import com.github.dm.jrt.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

@@ -20,6 +20,8 @@ import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.util.Reflection;
+import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.object.annotation.Alias;
 import com.github.dm.jrt.object.annotation.AsyncIn;
@@ -47,8 +49,6 @@ import com.github.dm.jrt.object.annotation.SharedFields;
 import com.github.dm.jrt.object.builder.ProxyConfiguration;
 import com.github.dm.jrt.object.common.Mutex;
 import com.github.dm.jrt.routine.Routine;
-import com.github.dm.jrt.util.Reflection;
-import com.github.dm.jrt.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -64,7 +64,7 @@ import java.util.Map.Entry;
 import java.util.TreeSet;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static com.github.dm.jrt.util.Reflection.asArgs;
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
  * Utility class providing helper methods used to implement a builder of routines.<br/>

@@ -20,6 +20,9 @@ import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.Configurable;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.util.ClassToken;
+import com.github.dm.jrt.core.util.Reflection;
+import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 import com.github.dm.jrt.invocation.FunctionInvocation;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationFactory;
@@ -30,9 +33,6 @@ import com.github.dm.jrt.object.builder.ProxyConfiguration;
 import com.github.dm.jrt.object.common.Mutex;
 import com.github.dm.jrt.object.core.Builders.MethodInfo;
 import com.github.dm.jrt.routine.Routine;
-import com.github.dm.jrt.util.ClassToken;
-import com.github.dm.jrt.util.Reflection;
-import com.github.dm.jrt.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -44,13 +44,13 @@ import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.object.core.Builders.callFromInvocation;
 import static com.github.dm.jrt.object.core.Builders.configurationWithAnnotations;
 import static com.github.dm.jrt.object.core.Builders.getAnnotatedMethod;
 import static com.github.dm.jrt.object.core.Builders.getSharedMutex;
 import static com.github.dm.jrt.object.core.Builders.getTargetMethodInfo;
 import static com.github.dm.jrt.object.core.Builders.invokeRoutine;
-import static com.github.dm.jrt.util.Reflection.asArgs;
 
 /**
  * Class implementing a builder of routines wrapping an object methods.

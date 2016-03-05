@@ -19,11 +19,11 @@ package com.github.dm.jrt.builder;
 import com.github.dm.jrt.builder.InvocationConfiguration.Builder;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.builder.InvocationConfiguration.TimeoutActionType;
+import com.github.dm.jrt.core.util.TimeDuration;
 import com.github.dm.jrt.log.Log.Level;
 import com.github.dm.jrt.log.Logs;
 import com.github.dm.jrt.log.NullLog;
 import com.github.dm.jrt.runner.Runners;
-import com.github.dm.jrt.util.TimeDuration;
 
 import org.junit.Test;
 

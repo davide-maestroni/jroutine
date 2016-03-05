@@ -44,12 +44,12 @@ import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.util.ClassToken;
+import com.github.dm.jrt.core.util.TimeDuration;
 import com.github.dm.jrt.log.Log;
 import com.github.dm.jrt.log.Log.Level;
 import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.routine.Routine;
-import com.github.dm.jrt.util.ClassToken;
-import com.github.dm.jrt.util.TimeDuration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -63,7 +63,7 @@ import static com.github.dm.jrt.android.core.DelegatingContextInvocation.factory
 import static com.github.dm.jrt.android.invocation.FunctionContextInvocationFactories.factoryOf;
 import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
 import static com.github.dm.jrt.builder.InvocationConfiguration.builder;
-import static com.github.dm.jrt.util.TimeDuration.seconds;
+import static com.github.dm.jrt.core.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

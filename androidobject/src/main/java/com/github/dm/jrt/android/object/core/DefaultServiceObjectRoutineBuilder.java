@@ -27,6 +27,7 @@ import com.github.dm.jrt.android.invocation.FunctionContextInvocation;
 import com.github.dm.jrt.android.object.builder.ServiceObjectRoutineBuilder;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.object.annotation.AsyncIn.InputMode;
 import com.github.dm.jrt.object.annotation.AsyncOut.OutputMode;
@@ -37,7 +38,6 @@ import com.github.dm.jrt.object.core.Builders.MethodInfo;
 import com.github.dm.jrt.object.core.InvocationTarget;
 import com.github.dm.jrt.object.core.JRoutineObject;
 import com.github.dm.jrt.routine.Routine;
-import com.github.dm.jrt.util.ClassToken;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -51,14 +51,14 @@ import java.util.HashMap;
 import java.util.List;
 
 import static com.github.dm.jrt.android.core.TargetInvocationFactory.factoryOf;
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
+import static com.github.dm.jrt.core.util.Reflection.findMethod;
 import static com.github.dm.jrt.object.core.Builders.callFromInvocation;
 import static com.github.dm.jrt.object.core.Builders.configurationWithAnnotations;
 import static com.github.dm.jrt.object.core.Builders.getAnnotatedMethod;
 import static com.github.dm.jrt.object.core.Builders.getSharedMutex;
 import static com.github.dm.jrt.object.core.Builders.getTargetMethodInfo;
 import static com.github.dm.jrt.object.core.Builders.invokeRoutine;
-import static com.github.dm.jrt.util.Reflection.asArgs;
-import static com.github.dm.jrt.util.Reflection.findMethod;
 
 /**
  * Class implementing a builder of routines wrapping an object methods.

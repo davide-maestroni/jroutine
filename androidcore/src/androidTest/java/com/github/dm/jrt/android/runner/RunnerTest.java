@@ -23,6 +23,7 @@ import android.test.AndroidTestCase;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.util.TimeDuration;
 import com.github.dm.jrt.invocation.FunctionInvocation;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationFactory;
@@ -32,7 +33,6 @@ import com.github.dm.jrt.runner.Runner;
 import com.github.dm.jrt.runner.RunnerDecorator;
 import com.github.dm.jrt.runner.Runners;
 import com.github.dm.jrt.runner.TemplateExecution;
-import com.github.dm.jrt.util.TimeDuration;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -42,12 +42,12 @@ import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 
+import static com.github.dm.jrt.core.util.TimeDuration.ZERO;
+import static com.github.dm.jrt.core.util.TimeDuration.micros;
+import static com.github.dm.jrt.core.util.TimeDuration.millis;
+import static com.github.dm.jrt.core.util.TimeDuration.nanos;
+import static com.github.dm.jrt.core.util.TimeDuration.seconds;
 import static com.github.dm.jrt.invocation.InvocationFactories.factoryOf;
-import static com.github.dm.jrt.util.TimeDuration.ZERO;
-import static com.github.dm.jrt.util.TimeDuration.micros;
-import static com.github.dm.jrt.util.TimeDuration.millis;
-import static com.github.dm.jrt.util.TimeDuration.nanos;
-import static com.github.dm.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

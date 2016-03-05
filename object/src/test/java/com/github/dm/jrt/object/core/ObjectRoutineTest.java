@@ -26,6 +26,8 @@ import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.InvocationChannel;
+import com.github.dm.jrt.core.util.ClassToken;
+import com.github.dm.jrt.core.util.TimeDuration;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.log.Log;
 import com.github.dm.jrt.log.Log.Level;
@@ -59,8 +61,6 @@ import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.runner.Execution;
 import com.github.dm.jrt.runner.Runner;
 import com.github.dm.jrt.runner.Runners;
-import com.github.dm.jrt.util.ClassToken;
-import com.github.dm.jrt.util.TimeDuration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -75,11 +75,11 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.builder.InvocationConfiguration.builder;
+import static com.github.dm.jrt.core.util.TimeDuration.INFINITY;
+import static com.github.dm.jrt.core.util.TimeDuration.seconds;
 import static com.github.dm.jrt.object.core.Builders.configurationWithAnnotations;
 import static com.github.dm.jrt.object.core.InvocationTarget.classOfType;
 import static com.github.dm.jrt.object.core.InvocationTarget.instance;
-import static com.github.dm.jrt.util.TimeDuration.INFINITY;
-import static com.github.dm.jrt.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 

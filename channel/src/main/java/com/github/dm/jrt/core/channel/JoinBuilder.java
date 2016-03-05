@@ -20,7 +20,7 @@ import com.github.dm.jrt.builder.ChannelConfiguration;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.common.RoutineException;
-import com.github.dm.jrt.util.SimpleQueue;
+import com.github.dm.jrt.core.util.SimpleQueue;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

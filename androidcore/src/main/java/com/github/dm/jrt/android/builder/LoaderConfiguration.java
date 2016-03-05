@@ -18,14 +18,14 @@ package com.github.dm.jrt.android.builder;
 
 import android.os.Looper;
 
-import com.github.dm.jrt.util.TimeDuration;
+import com.github.dm.jrt.core.util.TimeDuration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.github.dm.jrt.util.TimeDuration.fromUnit;
+import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
 
 /**
  * Class storing the invocation loader configuration.

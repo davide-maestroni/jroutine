@@ -16,15 +16,15 @@
 
 package com.github.dm.jrt.invocation;
 
-import com.github.dm.jrt.util.ClassToken;
-import com.github.dm.jrt.util.Reflection;
+import com.github.dm.jrt.core.util.ClassToken;
+import com.github.dm.jrt.core.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 
-import static com.github.dm.jrt.util.Reflection.asArgs;
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
  * Utility class for creating invocation factory objects.

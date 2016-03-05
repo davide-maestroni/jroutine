@@ -19,11 +19,11 @@ package com.github.dm.jrt.builder;
 import com.github.dm.jrt.builder.ChannelConfiguration.Builder;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.builder.InvocationConfiguration.TimeoutActionType;
+import com.github.dm.jrt.core.util.TimeDuration;
 import com.github.dm.jrt.log.Log.Level;
 import com.github.dm.jrt.log.Logs;
 import com.github.dm.jrt.log.NullLog;
 import com.github.dm.jrt.runner.Runners;
-import com.github.dm.jrt.util.TimeDuration;
 
 import org.junit.Test;
 
@@ -34,7 +34,7 @@ import static com.github.dm.jrt.builder.ChannelConfiguration.builderFrom;
 import static com.github.dm.jrt.builder.ChannelConfiguration.builderFromInputChannel;
 import static com.github.dm.jrt.builder.ChannelConfiguration.builderFromInvocation;
 import static com.github.dm.jrt.builder.ChannelConfiguration.builderFromOutputChannel;
-import static com.github.dm.jrt.util.TimeDuration.millis;
+import static com.github.dm.jrt.core.util.TimeDuration.millis;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 

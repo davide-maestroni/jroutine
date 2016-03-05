@@ -26,8 +26,8 @@ import com.github.dm.jrt.invocation.TemplateInvocation;
 
 import org.jetbrains.annotations.NotNull;
 
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.function.Functions.wrap;
-import static com.github.dm.jrt.util.Reflection.asArgs;
 
 /**
  * Invocation implementation accumulating the result returned by a bi-function instance.

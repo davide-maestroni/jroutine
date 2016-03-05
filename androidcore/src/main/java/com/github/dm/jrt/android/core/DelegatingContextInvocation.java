@@ -29,7 +29,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-import static com.github.dm.jrt.util.Reflection.asArgs;
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
  * Function invocation implementation delegating the execution to another routine.

@@ -27,7 +27,7 @@ import com.github.dm.jrt.invocation.Invocation;
 
 import org.jetbrains.annotations.NotNull;
 
-import static com.github.dm.jrt.util.Reflection.asArgs;
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
  * Implementation of a factory creating invocations wrapping a stream output channel.

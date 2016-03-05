@@ -18,8 +18,8 @@ package com.github.dm.jrt.runner;
 
 import com.github.dm.jrt.builder.InvocationConfiguration.AgingPriority;
 import com.github.dm.jrt.builder.InvocationConfiguration.NotAgingPriority;
-import com.github.dm.jrt.util.Time;
-import com.github.dm.jrt.util.TimeDuration;
+import com.github.dm.jrt.core.util.Time;
+import com.github.dm.jrt.core.util.TimeDuration;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -30,12 +30,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.dm.jrt.util.Time.current;
-import static com.github.dm.jrt.util.TimeDuration.ZERO;
-import static com.github.dm.jrt.util.TimeDuration.micros;
-import static com.github.dm.jrt.util.TimeDuration.millis;
-import static com.github.dm.jrt.util.TimeDuration.nanos;
-import static com.github.dm.jrt.util.TimeDuration.seconds;
+import static com.github.dm.jrt.core.util.Time.current;
+import static com.github.dm.jrt.core.util.TimeDuration.ZERO;
+import static com.github.dm.jrt.core.util.TimeDuration.micros;
+import static com.github.dm.jrt.core.util.TimeDuration.millis;
+import static com.github.dm.jrt.core.util.TimeDuration.nanos;
+import static com.github.dm.jrt.core.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 

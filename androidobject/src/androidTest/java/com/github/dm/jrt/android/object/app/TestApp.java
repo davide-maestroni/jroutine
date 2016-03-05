@@ -27,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import static com.github.dm.jrt.util.Reflection.findConstructor;
+import static com.github.dm.jrt.core.util.Reflection.findConstructor;
 
 /**
  * Test application.

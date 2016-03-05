@@ -19,7 +19,7 @@ package com.github.dm.jrt.core.channel;
 import com.github.dm.jrt.builder.ChannelConfiguration;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
-import com.github.dm.jrt.util.WeakIdentityHashMap;
+import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
 

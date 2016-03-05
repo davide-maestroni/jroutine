@@ -69,13 +69,13 @@ class CombineMapBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<? exten
         final SparseArray<IOChannel<IN>> ioChannelMap = new SparseArray<IOChannel<IN>>(size);
         for (int i = 0; i < size; ++i) {
             final IOChannel<IN> ioChannel = JRoutineCore.io().buildChannel();
-            ioChannel.bindTo(((InputChannel<IN>) channelMap.valueAt(i)));
+            ioChannel.bind(((InputChannel<IN>) channelMap.valueAt(i)));
             ioChannelMap.put(channelMap.keyAt(i), ioChannel);
         }
 
         final IOChannel<Selectable<? extends IN>> ioChannel =
                 JRoutineCore.io().withChannels().with(configuration).getConfigured().buildChannel();
-        ioChannel.bindTo(new SortingMapOutputConsumer<IN>(ioChannelMap));
+        ioChannel.bind(new SortingMapOutputConsumer<IN>(ioChannelMap));
         return ioChannel;
     }
 }

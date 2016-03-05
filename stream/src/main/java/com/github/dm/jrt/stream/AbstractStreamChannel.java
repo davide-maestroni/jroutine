@@ -189,10 +189,10 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
-    public StreamChannel<OUT> bindTo(@NotNull final OutputConsumer<? super OUT> consumer) {
+    public StreamChannel<OUT> bind(@NotNull final OutputConsumer<? super OUT> consumer) {
 
         mBinder.bind();
-        mChannel.bindTo(consumer);
+        mChannel.bind(consumer);
         return this;
     }
 
@@ -516,7 +516,7 @@ public abstract class AbstractStreamChannel<OUT>
         }
 
         final IOChannel<OUT> ioChannel = JRoutineCore.io().buildChannel();
-        mChannel.bindTo(new TryCatchOutputConsumer<OUT>(consumer, ioChannel));
+        mChannel.bind(new TryCatchOutputConsumer<OUT>(consumer, ioChannel));
         return newChannel(ioChannel, getStreamConfiguration(), mDelegationType, mBinder);
     }
 
@@ -563,11 +563,11 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
-    public <CHANNEL extends InputChannel<? super OUT>> CHANNEL bindTo(
-            @NotNull final CHANNEL channel) {
+    public <CHANNEL extends InputChannel<? super OUT>> CHANNEL bind(@NotNull final CHANNEL
+            channel) {
 
         mBinder.bind();
-        return mChannel.bindTo(channel);
+        return mChannel.bind(channel);
     }
 
     @Nullable
@@ -737,7 +737,7 @@ public abstract class AbstractStreamChannel<OUT>
     private <AFTER> StreamChannel<AFTER> concatRoutine(
             @NotNull final InvocationChannel<? super OUT, ? extends AFTER> channel) {
 
-        return newChannel((OutputChannel<AFTER>) mChannel.bindTo(channel).result(),
+        return newChannel((OutputChannel<AFTER>) mChannel.bind(channel).result(),
                           getStreamConfiguration(), mDelegationType, mBinder);
     }
 
@@ -830,7 +830,7 @@ public abstract class AbstractStreamChannel<OUT>
             public void bind() {
 
                 if (!mIsBound.getAndSet(true)) {
-                    mInput.bindTo(mOutput).close();
+                    mInput.bind(mOutput).close();
                 }
             }
         }
@@ -1047,7 +1047,7 @@ public abstract class AbstractStreamChannel<OUT>
 
             final OutputChannel<? extends OUT> channel = mFunction.apply(input);
             if (channel != null) {
-                channel.bindTo(result);
+                channel.bind(result);
             }
         }
     }

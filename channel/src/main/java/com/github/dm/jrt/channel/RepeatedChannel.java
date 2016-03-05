@@ -82,7 +82,7 @@ class RepeatedChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
                 : ChannelConfiguration.DEFAULT_CONFIGURATION;
         mOutputChannel = createOutputChannel();
         mChannel = channel;
-        channel.bindTo(this);
+        channel.bind(this);
     }
 
     public boolean abort() {
@@ -145,7 +145,7 @@ class RepeatedChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
     }
 
     @NotNull
-    public <IN extends InputChannel<? super OUT>> IN bindTo(@NotNull final IN channel) {
+    public <IN extends InputChannel<? super OUT>> IN bind(@NotNull final IN channel) {
 
         synchronized (mMutex) {
             final IdentityHashMap<InputChannel<? super OUT>, Void> channels = mChannels;
@@ -161,7 +161,7 @@ class RepeatedChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
     }
 
     @NotNull
-    public OutputChannel<OUT> bindTo(@NotNull final OutputConsumer<? super OUT> consumer) {
+    public OutputChannel<OUT> bind(@NotNull final OutputConsumer<? super OUT> consumer) {
 
         final boolean isComplete;
         final IOChannel<OUT> channel;
@@ -177,7 +177,7 @@ class RepeatedChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
             abortException = mAbortException;
             final IOChannel<OUT> outputChannel = mOutputChannel;
             consumers.put(consumer, outputChannel);
-            outputChannel.bindTo(consumer);
+            outputChannel.bind(consumer);
             channel = createOutputChannel().pass(mCached);
             if (abortException != null) {
                 channel.abort(abortException);

@@ -77,13 +77,13 @@ class CombineBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<? extends 
                 new ArrayList<IOChannel<? extends IN>>(channels.size());
         for (final InputChannel<?> channel : channels) {
             final IOChannel<? extends IN> ioChannel = JRoutineCore.io().buildChannel();
-            ioChannel.bindTo(((InputChannel<IN>) channel));
+            ioChannel.bind(((InputChannel<IN>) channel));
             channelList.add(ioChannel);
         }
 
         final IOChannel<Selectable<? extends IN>> ioChannel =
                 JRoutineCore.io().withChannels().with(configuration).getConfigured().buildChannel();
-        ioChannel.bindTo(new SortingArrayOutputConsumer(mStartIndex, channelList));
+        ioChannel.bind(new SortingArrayOutputConsumer(mStartIndex, channelList));
         return ioChannel;
     }
 

@@ -251,7 +251,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
 
         if ((consumer != null) && (channel != null)) {
-            channel.bindTo(consumer);
+            channel.bind(consumer);
         }
 
         return this;
@@ -1117,7 +1117,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
 
         @NotNull
-        public <IN extends InputChannel<? super OUT>> IN bindTo(@NotNull final IN channel) {
+        public <IN extends InputChannel<? super OUT>> IN bind(@NotNull final IN channel) {
 
             channel.pass(this);
             return channel;
@@ -1125,7 +1125,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         @NotNull
         @SuppressWarnings("ConstantConditions")
-        public OutputChannel<OUT> bindTo(@NotNull final OutputConsumer<? super OUT> consumer) {
+        public OutputChannel<OUT> bind(@NotNull final OutputConsumer<? super OUT> consumer) {
 
             final boolean forceClose;
             synchronized (mMutex) {

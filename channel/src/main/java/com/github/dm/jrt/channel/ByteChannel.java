@@ -40,7 +40,7 @@ import java.util.List;
  *         public void onInput(final IN in, final ResultChannel&lt;ByteBuffer&gt; result) {
  *
  *             ...
- *             final BufferOutputStream outputStream = ByteChannel.byteChannel().bindTo(result);
+ *             final BufferOutputStream outputStream = ByteChannel.byteChannel().bind(result);
  *             ...
  *         }
  *     </code>
@@ -203,7 +203,7 @@ public class ByteChannel {
      * @return the output stream.
      */
     @NotNull
-    public BufferOutputStream passTo(@NotNull final InputChannel<? super ByteBuffer> channel) {
+    public BufferOutputStream bind(@NotNull final InputChannel<? super ByteBuffer> channel) {
 
         BufferOutputStream stream;
         synchronized (mStreams) {
@@ -228,9 +228,9 @@ public class ByteChannel {
      * @return the output stream.
      */
     @NotNull
-    public BufferOutputStream passTo(@NotNull final IOChannel<? super ByteBuffer> channel) {
+    public BufferOutputStream bind(@NotNull final IOChannel<? super ByteBuffer> channel) {
 
-        return new IOBufferOutputStream(passTo(channel.asInput()), channel);
+        return new IOBufferOutputStream(bind(channel.asInput()), channel);
     }
 
     @NotNull

@@ -173,9 +173,9 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA> {
     }
 
     @NotNull
-    public IOChannel<DATA> bindTo(@NotNull final OutputConsumer<? super DATA> consumer) {
+    public IOChannel<DATA> bind(@NotNull final OutputConsumer<? super DATA> consumer) {
 
-        mOutputChannel.bindTo(consumer);
+        mOutputChannel.bind(consumer);
         return this;
     }
 
@@ -247,9 +247,9 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA> {
     }
 
     @NotNull
-    public <IN extends InputChannel<? super DATA>> IN bindTo(@NotNull final IN channel) {
+    public <IN extends InputChannel<? super DATA>> IN bind(@NotNull final IN channel) {
 
-        return mOutputChannel.bindTo(channel);
+        return mOutputChannel.bind(channel);
     }
 
     @Nullable

@@ -62,8 +62,8 @@ class InputFilterBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<IN>>> 
         final IOChannel<Selectable<IN>> inputChannel =
                 JRoutineCore.io().withChannels().with(configuration).getConfigured().buildChannel();
         final IOChannel<IN> ioChannel = JRoutineCore.io().buildChannel();
-        ioChannel.bindTo(mChannel);
-        return inputChannel.bindTo(new FilterOutputConsumer<IN>(ioChannel, mIndex));
+        ioChannel.bind(mChannel);
+        return inputChannel.bind(new FilterOutputConsumer<IN>(ioChannel, mIndex));
     }
 
     /**

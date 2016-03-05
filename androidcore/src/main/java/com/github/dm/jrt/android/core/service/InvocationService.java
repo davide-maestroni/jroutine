@@ -822,7 +822,7 @@ public class InvocationService extends Service {
          */
         void bindTo(@NotNull final OutputConsumer<Object> consumer) {
 
-            mChannel.result().bindTo(consumer);
+            mChannel.result().bind(consumer);
         }
 
         /**

@@ -85,7 +85,7 @@ public interface LoaderStreamChannel<OUT>
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannel<OUT> bindTo(@NotNull OutputConsumer<? super OUT> consumer);
+    LoaderStreamChannel<OUT> bind(@NotNull OutputConsumer<? super OUT> consumer);
 
     /**
      * {@inheritDoc}

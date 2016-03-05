@@ -83,7 +83,7 @@ class JoinBuilder<OUT> extends AbstractBuilder<OutputChannel<List<? extends OUT>
                 JRoutineCore.io().withChannels().with(configuration).getConfigured().buildChannel();
         final JoinOutputConsumer<OUT> consumer =
                 new JoinOutputConsumer<OUT>(mIsFlush, channels.size(), mPlaceholder, ioChannel);
-        Channels.merge(channels).build().bindTo(consumer);
+        Channels.merge(channels).build().bind(consumer);
         return ioChannel;
     }
 

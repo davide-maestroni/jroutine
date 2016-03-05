@@ -57,7 +57,7 @@ public class ReadConnection extends FilterInvocation<URI, ByteBuffer> {
             // We employ the utility class dedicated to the optimized transfer of bytes through a
             // routine channel
             final BufferOutputStream outputStream =
-                    ByteChannel.byteChannel(MAX_CHUNK_SIZE).passTo(result);
+                    ByteChannel.byteChannel(MAX_CHUNK_SIZE).bind(result);
             try {
                 outputStream.writeAll(inputStream);
 

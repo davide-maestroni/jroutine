@@ -118,7 +118,7 @@ public interface IOChannel<DATA> extends InputChannel<DATA>, OutputChannel<DATA>
      * {@inheritDoc}
      */
     @NotNull
-    IOChannel<DATA> bindTo(@NotNull OutputConsumer<? super DATA> consumer);
+    IOChannel<DATA> bind(@NotNull OutputConsumer<? super DATA> consumer);
 
     /**
      * {@inheritDoc}

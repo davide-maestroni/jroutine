@@ -52,7 +52,7 @@
                                   .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
                                   .getConfigured()
                                   .asyncCall(new URI(IMAGE_URI))
-                                  .passTo(new TemplateOutputConsumer&lt;Bitmap&gt;() {
+                                  .bind(new TemplateOutputConsumer&lt;Bitmap&gt;() {
 
                                       &commat;Override
                                       public void onError(&commat;NotNull final RoutineException error) {
@@ -129,7 +129,7 @@
                                   .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
                                   .getConfigured()
                                   .asyncCall(new URI(IMAGE_URI))
-                                  .passTo(new TemplateOutputConsumer&lt;Bitmap&gt;() {
+                                  .bind(new TemplateOutputConsumer&lt;Bitmap&gt;() {
 
                                       &commat;Override
                                       public void onError(&commat;NotNull final RoutineException error) {

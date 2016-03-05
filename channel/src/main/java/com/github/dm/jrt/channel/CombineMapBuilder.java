@@ -70,13 +70,13 @@ class CombineMapBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<? exten
                 new HashMap<Integer, IOChannel<IN>>(channelMap.size());
         for (final Entry<Integer, InputChannel<? extends IN>> entry : channelMap.entrySet()) {
             final IOChannel<IN> ioChannel = JRoutineCore.io().buildChannel();
-            ioChannel.bindTo((InputChannel<IN>) entry.getValue());
+            ioChannel.bind((InputChannel<IN>) entry.getValue());
             ioChannelMap.put(entry.getKey(), ioChannel);
         }
 
         final IOChannel<Selectable<? extends IN>> ioChannel =
                 JRoutineCore.io().withChannels().with(configuration).getConfigured().buildChannel();
-        ioChannel.bindTo(new SortingMapOutputConsumer<IN>(ioChannelMap));
+        ioChannel.bind(new SortingMapOutputConsumer<IN>(ioChannelMap));
         return ioChannel;
     }
 }

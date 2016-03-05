@@ -218,10 +218,10 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> bindTo(
-            @NotNull final OutputConsumer<? super OUT> consumer) {
+    public LoaderStreamChannelCompat<OUT> bind(@NotNull final OutputConsumer<? super OUT>
+            consumer) {
 
-        super.bindTo(consumer);
+        super.bind(consumer);
         return this;
     }
 

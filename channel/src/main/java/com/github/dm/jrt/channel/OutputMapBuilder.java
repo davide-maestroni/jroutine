@@ -120,7 +120,7 @@ class OutputMapBuilder<OUT> extends AbstractBuilder<Map<Integer, OutputChannel<O
                     channels.put(index, ioChannel);
                 }
 
-                channel.bindTo(new SortingMapOutputConsumer<OUT>(inputMap));
+                channel.bind(new SortingMapOutputConsumer<OUT>(inputMap));
                 channelMaps.put(selectInfo, channels);
             }
 

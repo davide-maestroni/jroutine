@@ -80,7 +80,7 @@ public interface StreamChannel<OUT>
      * {@inheritDoc}
      */
     @NotNull
-    StreamChannel<OUT> bindTo(@NotNull OutputConsumer<? super OUT> consumer);
+    StreamChannel<OUT> bind(@NotNull OutputConsumer<? super OUT> consumer);
 
     /**
      * {@inheritDoc}

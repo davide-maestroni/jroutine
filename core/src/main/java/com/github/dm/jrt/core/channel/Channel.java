@@ -306,7 +306,7 @@ public interface Channel {
          * @throws java.lang.IllegalStateException if this channel is already bound.
          */
         @NotNull
-        <CHANNEL extends InputChannel<? super OUT>> CHANNEL bindTo(@NotNull CHANNEL channel);
+        <CHANNEL extends InputChannel<? super OUT>> CHANNEL bind(@NotNull CHANNEL channel);
 
         /**
          * Binds this channel to the specified consumer. After the call, all the output will be
@@ -319,7 +319,7 @@ public interface Channel {
          * @throws java.lang.IllegalStateException if this channel is already bound.
          */
         @NotNull
-        OutputChannel<OUT> bindTo(@NotNull OutputConsumer<? super OUT> consumer);
+        OutputChannel<OUT> bind(@NotNull OutputConsumer<? super OUT> consumer);
 
         /**
          * Tells the channel to abort the invocation execution in case no result is available before
@@ -490,8 +490,8 @@ public interface Channel {
          * Checks if this channel is bound to a consumer or another channel.
          *
          * @return whether the channel is bound.
-         * @see #bindTo bindTo(InputChannel)
-         * @see #bindTo(OutputConsumer)
+         * @see #bind bind(InputChannel)
+         * @see #bind(OutputConsumer)
          */
         boolean isBound();
 

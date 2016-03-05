@@ -21,7 +21,7 @@ import com.github.dm.jrt.core.channel.ByteChannel.BufferInputStream;
 import com.github.dm.jrt.core.channel.ByteChannel.ByteBuffer;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.common.RoutineException;
-import com.github.dm.jrt.invocation.TemplateInvocation;
+import com.github.dm.jrt.core.invocation.TemplateInvocation;
 
 import org.jetbrains.annotations.NotNull;
 

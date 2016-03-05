@@ -18,15 +18,15 @@ package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.invocation.CommandInvocation;
+import com.github.dm.jrt.core.invocation.ComparableCommandInvocation;
+import com.github.dm.jrt.core.invocation.ComparableFilterInvocation;
+import com.github.dm.jrt.core.invocation.ComparableInvocationFactory;
+import com.github.dm.jrt.core.invocation.FilterInvocation;
+import com.github.dm.jrt.core.invocation.FunctionInvocation;
+import com.github.dm.jrt.core.invocation.Invocation;
+import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.util.ClassToken;
-import com.github.dm.jrt.invocation.CommandInvocation;
-import com.github.dm.jrt.invocation.ComparableCommandInvocation;
-import com.github.dm.jrt.invocation.ComparableFilterInvocation;
-import com.github.dm.jrt.invocation.ComparableInvocationFactory;
-import com.github.dm.jrt.invocation.FilterInvocation;
-import com.github.dm.jrt.invocation.FunctionInvocation;
-import com.github.dm.jrt.invocation.Invocation;
-import com.github.dm.jrt.invocation.InvocationFactory;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

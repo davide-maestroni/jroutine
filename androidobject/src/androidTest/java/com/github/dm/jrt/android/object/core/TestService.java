@@ -19,7 +19,7 @@ package com.github.dm.jrt.android.object.core;
 import com.github.dm.jrt.android.object.builder.FactoryContext;
 import com.github.dm.jrt.android.service.InvocationService;
 import com.github.dm.jrt.core.common.RoutineException;
-import com.github.dm.jrt.invocation.InvocationException;
+import com.github.dm.jrt.core.invocation.InvocationException;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

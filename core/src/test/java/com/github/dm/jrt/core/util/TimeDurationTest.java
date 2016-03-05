@@ -16,8 +16,8 @@
 
 package com.github.dm.jrt.core.util;
 
+import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.util.TimeDuration.Condition;
-import com.github.dm.jrt.invocation.InvocationInterruptedException;
 
 import org.junit.Test;
 

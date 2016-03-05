@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.invocation;
+package com.github.dm.jrt.core.invocation;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.routine.Routine;
@@ -22,9 +22,9 @@ import com.github.dm.jrt.routine.Routine;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
+import static com.github.dm.jrt.core.invocation.InvocationFactories.factoryOf;
 import static com.github.dm.jrt.core.util.TimeDuration.millis;
 import static com.github.dm.jrt.core.util.TimeDuration.seconds;
-import static com.github.dm.jrt.invocation.InvocationFactories.factoryOf;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 

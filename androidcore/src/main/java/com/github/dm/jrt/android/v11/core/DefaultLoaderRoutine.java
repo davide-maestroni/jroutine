@@ -27,8 +27,8 @@ import com.github.dm.jrt.android.runner.AndroidRunners;
 import com.github.dm.jrt.core.AbstractRoutine;
 import com.github.dm.jrt.core.builder.InvocationConfiguration;
 import com.github.dm.jrt.core.builder.InvocationConfiguration.OrderType;
-import com.github.dm.jrt.invocation.Invocation;
-import com.github.dm.jrt.invocation.InvocationInterruptedException;
+import com.github.dm.jrt.core.invocation.Invocation;
+import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.runner.TemplateExecution;
 

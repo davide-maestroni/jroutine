@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.invocation;
+package com.github.dm.jrt.core.invocation;
 
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.common.RoutineException;
@@ -91,10 +91,10 @@ import org.jetbrains.annotations.NotNull;
  * <p/>
  * Any exception escaping the invocation methods, unless it extends the base
  * {@link com.github.dm.jrt.core.common.RoutineException RoutineException}, will be wrapped as the
- * cause of an {@link com.github.dm.jrt.invocation.InvocationException InvocationException}
+ * cause of an {@link com.github.dm.jrt.core.invocation.InvocationException InvocationException}
  * instance.
  * <p/>
- * The class {@link com.github.dm.jrt.invocation.TemplateInvocation TemplateInvocation} provides
+ * The class {@link com.github.dm.jrt.core.invocation.TemplateInvocation TemplateInvocation} provides
  * an abstract empty implementation of the invocation interface.
  * <p/>
  * Created by davide-maestroni on 09/07/2014.

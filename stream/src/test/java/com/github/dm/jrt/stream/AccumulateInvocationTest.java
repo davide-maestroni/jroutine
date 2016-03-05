@@ -17,8 +17,8 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.function.BiFunction;
-import com.github.dm.jrt.invocation.InvocationFactory;
 
 import org.junit.Test;
 

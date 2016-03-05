@@ -18,7 +18,7 @@ package com.github.dm.jrt.android.invocation;
 
 import android.content.Context;
 
-import com.github.dm.jrt.invocation.Invocation;
+import com.github.dm.jrt.core.invocation.Invocation;
 
 import org.jetbrains.annotations.NotNull;
 

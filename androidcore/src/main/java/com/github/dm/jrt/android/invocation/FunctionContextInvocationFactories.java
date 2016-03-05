@@ -16,11 +16,11 @@
 
 package com.github.dm.jrt.android.invocation;
 
+import com.github.dm.jrt.core.invocation.Invocation;
+import com.github.dm.jrt.core.invocation.InvocationFactories;
+import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.Reflection;
-import com.github.dm.jrt.invocation.Invocation;
-import com.github.dm.jrt.invocation.InvocationFactories;
-import com.github.dm.jrt.invocation.InvocationFactory;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

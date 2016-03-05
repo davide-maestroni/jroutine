@@ -18,7 +18,7 @@
 
     private final com.github.dm.jrt.routine.Routine<?, ${resultClassName}> mRoutine${methodCount};
 
-    private static class InvocationFactory${methodCount}${genericTypes} extends com.github.dm.jrt.invocation.InvocationFactory<Object, ${resultClassName}> {
+    private static class InvocationFactory${methodCount}${genericTypes} extends com.github.dm.jrt.core.invocation.InvocationFactory<Object, ${resultClassName}> {
 
         private final com.github.dm.jrt.object.builder.ProxyConfiguration mProxyConfiguration;
 
@@ -34,7 +34,7 @@
 
         @org.jetbrains.annotations.NotNull
         @Override
-        public com.github.dm.jrt.invocation.Invocation<Object, ${resultClassName}> newInvocation() {
+        public com.github.dm.jrt.core.invocation.Invocation<Object, ${resultClassName}> newInvocation() {
 
             return new Invocation${methodCount}${genericTypes}(mProxyConfiguration, mTarget);
         }

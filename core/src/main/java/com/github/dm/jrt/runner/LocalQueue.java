@@ -16,8 +16,8 @@
 
 package com.github.dm.jrt.runner;
 
+import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.util.TimeDuration;
-import com.github.dm.jrt.invocation.InvocationInterruptedException;
 
 import org.jetbrains.annotations.NotNull;
 

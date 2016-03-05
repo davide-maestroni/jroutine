@@ -20,7 +20,7 @@ import com.github.dm.jrt.core.channel.ByteChannel;
 import com.github.dm.jrt.core.channel.ByteChannel.BufferOutputStream;
 import com.github.dm.jrt.core.channel.ByteChannel.ByteBuffer;
 import com.github.dm.jrt.core.channel.ResultChannel;
-import com.github.dm.jrt.invocation.FilterInvocation;
+import com.github.dm.jrt.core.invocation.FilterInvocation;
 
 import org.jetbrains.annotations.NotNull;
 

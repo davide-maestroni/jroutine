@@ -17,12 +17,12 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.invocation.ComparableInvocationFactory;
+import com.github.dm.jrt.core.invocation.Invocation;
+import com.github.dm.jrt.core.invocation.InvocationFactory;
+import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.BiFunctionWrapper;
-import com.github.dm.jrt.invocation.ComparableInvocationFactory;
-import com.github.dm.jrt.invocation.Invocation;
-import com.github.dm.jrt.invocation.InvocationFactory;
-import com.github.dm.jrt.invocation.TemplateInvocation;
 
 import org.jetbrains.annotations.NotNull;
 

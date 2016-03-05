@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.invocation;
+package com.github.dm.jrt.core.invocation;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Abstract class defining an invocation factory.
  * <p/>
- * The class {@link com.github.dm.jrt.invocation.InvocationFactories InvocationFactories} provides a
+ * The class {@link com.github.dm.jrt.core.invocation.InvocationFactories InvocationFactories} provides a
  * few methods building invocation factories from invocation classes.
  * <p/>
  * Created by davide-maestroni on 02/12/2015.

@@ -19,8 +19,8 @@ package com.github.dm.jrt.sample;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.ByteChannel.ByteBuffer;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.util.TimeDuration;
-import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.runner.Runner;
 import com.github.dm.jrt.runner.Runners;
@@ -32,8 +32,8 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import static com.github.dm.jrt.core.invocation.InvocationFactories.factoryOf;
 import static com.github.dm.jrt.core.util.TimeDuration.seconds;
-import static com.github.dm.jrt.invocation.InvocationFactories.factoryOf;
 
 /**
  * The downloader implementation.

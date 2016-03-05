@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.core;
 
-import com.github.dm.jrt.invocation.Invocation;
+import com.github.dm.jrt.core.invocation.Invocation;
 
 import org.jetbrains.annotations.NotNull;
 

@@ -25,11 +25,11 @@ import com.github.dm.jrt.core.channel.ChannelsBuilder;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.channel.Selectable;
+import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Functions;
-import com.github.dm.jrt.invocation.InvocationFactory;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

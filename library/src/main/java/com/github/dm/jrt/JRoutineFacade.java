@@ -22,6 +22,10 @@ import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.Channels;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.invocation.CommandInvocation;
+import com.github.dm.jrt.core.invocation.FilterInvocation;
+import com.github.dm.jrt.core.invocation.Invocation;
+import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.Consumer;
@@ -30,10 +34,6 @@ import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.function.OutputConsumerBuilder;
 import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
-import com.github.dm.jrt.invocation.CommandInvocation;
-import com.github.dm.jrt.invocation.FilterInvocation;
-import com.github.dm.jrt.invocation.Invocation;
-import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.object.builder.ObjectRoutineBuilder;
 import com.github.dm.jrt.object.core.InvocationTarget;
 import com.github.dm.jrt.object.core.JRoutineObject;
@@ -45,6 +45,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+import static com.github.dm.jrt.core.invocation.InvocationFactories.factoryOf;
 import static com.github.dm.jrt.function.Functions.consumerCommand;
 import static com.github.dm.jrt.function.Functions.consumerFactory;
 import static com.github.dm.jrt.function.Functions.consumerFilter;
@@ -53,7 +54,6 @@ import static com.github.dm.jrt.function.Functions.functionFilter;
 import static com.github.dm.jrt.function.Functions.predicateFilter;
 import static com.github.dm.jrt.function.Functions.supplierCommand;
 import static com.github.dm.jrt.function.Functions.supplierFactory;
-import static com.github.dm.jrt.invocation.InvocationFactories.factoryOf;
 import static com.github.dm.jrt.object.core.InvocationTarget.classOfType;
 import static com.github.dm.jrt.object.core.InvocationTarget.instance;
 

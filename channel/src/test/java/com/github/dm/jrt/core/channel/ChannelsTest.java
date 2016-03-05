@@ -21,11 +21,11 @@ import com.github.dm.jrt.core.builder.IOChannelBuilder;
 import com.github.dm.jrt.core.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.invocation.FilterInvocation;
+import com.github.dm.jrt.core.invocation.InvocationException;
+import com.github.dm.jrt.core.invocation.PassingInvocation;
+import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.util.ClassToken;
-import com.github.dm.jrt.invocation.FilterInvocation;
-import com.github.dm.jrt.invocation.InvocationException;
-import com.github.dm.jrt.invocation.PassingInvocation;
-import com.github.dm.jrt.invocation.TemplateInvocation;
 import com.github.dm.jrt.log.Log.Level;
 import com.github.dm.jrt.routine.Routine;
 
@@ -39,9 +39,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.github.dm.jrt.core.invocation.InvocationFactories.factoryOf;
 import static com.github.dm.jrt.core.util.TimeDuration.millis;
 import static com.github.dm.jrt.core.util.TimeDuration.seconds;
-import static com.github.dm.jrt.invocation.InvocationFactories.factoryOf;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 

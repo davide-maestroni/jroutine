@@ -17,9 +17,9 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.channel.ResultChannel;
-import com.github.dm.jrt.invocation.ComparableInvocationFactory;
-import com.github.dm.jrt.invocation.Invocation;
-import com.github.dm.jrt.invocation.TemplateInvocation;
+import com.github.dm.jrt.core.invocation.ComparableInvocationFactory;
+import com.github.dm.jrt.core.invocation.Invocation;
+import com.github.dm.jrt.core.invocation.TemplateInvocation;
 
 import org.jetbrains.annotations.NotNull;
 

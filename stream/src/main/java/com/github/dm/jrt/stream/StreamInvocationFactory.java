@@ -20,10 +20,10 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.invocation.ComparableInvocationFactory;
+import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.FunctionWrapper;
-import com.github.dm.jrt.invocation.ComparableInvocationFactory;
-import com.github.dm.jrt.invocation.Invocation;
 
 import org.jetbrains.annotations.NotNull;
 

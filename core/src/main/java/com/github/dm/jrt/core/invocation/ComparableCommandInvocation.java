@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.invocation;
+package com.github.dm.jrt.core.invocation;
 
 import com.github.dm.jrt.core.util.Reflection;
 
@@ -23,14 +23,13 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 
 /**
- * Invocation factory implementing {@code equals()} and {@code hashCode()}.
+ * Command invocation implementing {@code equals()} and {@code hashCode()}.
  * <p/>
  * Created by davide-maestroni on 02/10/2016.
  *
- * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public abstract class ComparableInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
+public abstract class ComparableCommandInvocation<OUT> extends CommandInvocation<OUT> {
 
     private final Object[] mArgs;
 
@@ -39,7 +38,7 @@ public abstract class ComparableInvocationFactory<IN, OUT> extends InvocationFac
      *
      * @param args the constructor arguments.
      */
-    protected ComparableInvocationFactory(@Nullable final Object[] args) {
+    protected ComparableCommandInvocation(@Nullable final Object[] args) {
 
         mArgs = (args != null) ? args.clone() : Reflection.NO_ARGS;
     }
@@ -61,7 +60,7 @@ public abstract class ComparableInvocationFactory<IN, OUT> extends InvocationFac
             return false;
         }
 
-        final ComparableInvocationFactory<?, ?> that = (ComparableInvocationFactory<?, ?>) o;
+        final ComparableCommandInvocation<?> that = (ComparableCommandInvocation<?>) o;
         return Arrays.deepEquals(mArgs, that.mArgs);
     }
 }

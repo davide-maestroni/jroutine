@@ -17,8 +17,8 @@
 package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.core.builder.InvocationConfiguration;
-import com.github.dm.jrt.invocation.Invocation;
-import com.github.dm.jrt.invocation.InvocationFactory;
+import com.github.dm.jrt.core.invocation.Invocation;
+import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.log.Logger;
 
 import org.jetbrains.annotations.NotNull;

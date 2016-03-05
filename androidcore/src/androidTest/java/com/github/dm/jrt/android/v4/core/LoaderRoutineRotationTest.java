@@ -23,7 +23,7 @@ import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.builder.LoaderConfiguration.ClashResolutionType;
 import com.github.dm.jrt.android.invocation.FunctionContextInvocation;
-import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
+import com.github.dm.jrt.core.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.util.TimeDuration;

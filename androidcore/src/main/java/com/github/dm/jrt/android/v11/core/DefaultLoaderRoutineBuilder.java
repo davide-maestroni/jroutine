@@ -21,8 +21,8 @@ import com.github.dm.jrt.android.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
 import com.github.dm.jrt.android.routine.LoaderRoutine;
 import com.github.dm.jrt.android.runner.AndroidRunners;
-import com.github.dm.jrt.builder.InvocationConfiguration;
-import com.github.dm.jrt.builder.TemplateRoutineBuilder;
+import com.github.dm.jrt.core.builder.InvocationConfiguration;
+import com.github.dm.jrt.core.builder.TemplateRoutineBuilder;
 import com.github.dm.jrt.core.util.Reflection;
 import com.github.dm.jrt.runner.Runner;
 

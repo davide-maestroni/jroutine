@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.object.builder;
 
-import com.github.dm.jrt.builder.ConfigurableBuilder;
+import com.github.dm.jrt.core.builder.ConfigurableBuilder;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.routine.Routine;
 

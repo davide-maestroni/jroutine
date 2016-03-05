@@ -14,31 +14,28 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.builder;
+package com.github.dm.jrt.core.builder;
 
-import com.github.dm.jrt.routine.Routine;
+import com.github.dm.jrt.core.builder.ChannelConfiguration.Builder;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Interface defining a builder of routine objects.
+ * Interface defining a configurable builder of routines.
  * <p/>
- * Note that when the invocation is started directly from the builder, a new routine instance is
- * implicitly created.
- * <p/>
- * Created by davide-maestroni on 11/11/2014.
+ * Created by davide-maestroni on 08/18/2015.
  *
- * @param <IN>  the input data type.
- * @param <OUT> the output data type.
+ * @param <TYPE> the builder type.
  */
-public interface RoutineBuilder<IN, OUT>
-        extends ConfigurableBuilder<RoutineBuilder<IN, OUT>>, Routine<IN, OUT> {
+public interface ChannelConfigurableBuilder<TYPE> {
 
     /**
-     * Builds and returns the routine.
+     * Gets the channel configuration builder related to the channel builder instance.
+     * <p/>
+     * Note that the configuration builder will be initialized with the current configuration.
      *
-     * @return the newly created routine instance.
+     * @return the invocation configuration builder.
      */
     @NotNull
-    Routine<IN, OUT> buildRoutine();
+    Builder<? extends TYPE> withChannels();
 }

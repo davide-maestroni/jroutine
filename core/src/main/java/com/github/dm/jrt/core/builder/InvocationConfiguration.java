@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.builder;
+package com.github.dm.jrt.core.builder;
 
 import com.github.dm.jrt.core.util.TimeDuration;
 import com.github.dm.jrt.log.Log;

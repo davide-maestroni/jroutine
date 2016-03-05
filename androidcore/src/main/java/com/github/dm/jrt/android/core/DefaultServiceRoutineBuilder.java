@@ -18,8 +18,8 @@ package com.github.dm.jrt.android.core;
 
 import com.github.dm.jrt.android.builder.ServiceConfiguration;
 import com.github.dm.jrt.android.builder.ServiceRoutineBuilder;
-import com.github.dm.jrt.builder.InvocationConfiguration;
-import com.github.dm.jrt.builder.TemplateRoutineBuilder;
+import com.github.dm.jrt.core.builder.InvocationConfiguration;
+import com.github.dm.jrt.core.builder.TemplateRoutineBuilder;
 import com.github.dm.jrt.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;

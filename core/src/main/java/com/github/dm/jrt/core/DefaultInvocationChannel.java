@@ -16,10 +16,10 @@
 
 package com.github.dm.jrt.core;
 
-import com.github.dm.jrt.builder.InvocationConfiguration;
-import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.DefaultResultChannel.AbortHandler;
 import com.github.dm.jrt.core.InvocationExecution.InputIterator;
+import com.github.dm.jrt.core.builder.InvocationConfiguration;
+import com.github.dm.jrt.core.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.InputDeadlockException;
 import com.github.dm.jrt.core.channel.InvocationChannel;

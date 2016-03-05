@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.proxy.core;
 
-import com.github.dm.jrt.builder.InvocationConfiguration;
+import com.github.dm.jrt.core.builder.InvocationConfiguration;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.object.builder.ProxyConfiguration;
 import com.github.dm.jrt.object.core.InvocationTarget;

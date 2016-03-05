@@ -19,4 +19,4 @@
  * <p/>
  * Created by davide-maestroni on 09/19/2014.
  */
-package com.github.dm.jrt.builder;
+package com.github.dm.jrt.core.builder;

@@ -16,8 +16,8 @@
 
 package com.github.dm.jrt.stream;
 
-import com.github.dm.jrt.builder.RoutineBuilder;
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.Channels;

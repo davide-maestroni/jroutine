@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.builder;
+package com.github.dm.jrt.core.builder;
 
-import com.github.dm.jrt.builder.ChannelConfiguration.Builder;
-import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
-import com.github.dm.jrt.builder.InvocationConfiguration.TimeoutActionType;
+import com.github.dm.jrt.core.builder.ChannelConfiguration.Builder;
+import com.github.dm.jrt.core.builder.InvocationConfiguration.OrderType;
+import com.github.dm.jrt.core.builder.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.util.TimeDuration;
 import com.github.dm.jrt.log.Log.Level;
 import com.github.dm.jrt.log.Logs;
@@ -29,11 +29,11 @@ import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.github.dm.jrt.builder.ChannelConfiguration.builder;
-import static com.github.dm.jrt.builder.ChannelConfiguration.builderFrom;
-import static com.github.dm.jrt.builder.ChannelConfiguration.builderFromInputChannel;
-import static com.github.dm.jrt.builder.ChannelConfiguration.builderFromInvocation;
-import static com.github.dm.jrt.builder.ChannelConfiguration.builderFromOutputChannel;
+import static com.github.dm.jrt.core.builder.ChannelConfiguration.builder;
+import static com.github.dm.jrt.core.builder.ChannelConfiguration.builderFrom;
+import static com.github.dm.jrt.core.builder.ChannelConfiguration.builderFromInputChannel;
+import static com.github.dm.jrt.core.builder.ChannelConfiguration.builderFromInvocation;
+import static com.github.dm.jrt.core.builder.ChannelConfiguration.builderFromOutputChannel;
 import static com.github.dm.jrt.core.util.TimeDuration.millis;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;

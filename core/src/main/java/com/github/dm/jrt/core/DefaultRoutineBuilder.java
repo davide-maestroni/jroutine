@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.core;
 
-import com.github.dm.jrt.builder.TemplateRoutineBuilder;
+import com.github.dm.jrt.core.builder.TemplateRoutineBuilder;
 import com.github.dm.jrt.invocation.InvocationFactory;
 import com.github.dm.jrt.routine.Routine;
 

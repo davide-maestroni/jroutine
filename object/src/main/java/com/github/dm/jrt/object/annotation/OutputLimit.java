@@ -50,7 +50,7 @@ import java.lang.annotation.Target;
  * <p/>
  * Created by davide-maestroni on 01/08/2016.
  *
- * @see com.github.dm.jrt.builder.InvocationConfiguration InvocationConfiguration
+ * @see com.github.dm.jrt.core.builder.InvocationConfiguration InvocationConfiguration
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

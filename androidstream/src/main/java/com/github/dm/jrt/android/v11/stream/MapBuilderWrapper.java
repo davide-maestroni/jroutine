@@ -18,9 +18,9 @@ package com.github.dm.jrt.android.v11.stream;
 
 import android.util.SparseArray;
 
-import com.github.dm.jrt.builder.ChannelConfiguration;
-import com.github.dm.jrt.builder.ChannelConfiguration.Builder;
-import com.github.dm.jrt.builder.ChannelConfiguration.Configurable;
+import com.github.dm.jrt.core.builder.ChannelConfiguration;
+import com.github.dm.jrt.core.builder.ChannelConfiguration.Builder;
+import com.github.dm.jrt.core.builder.ChannelConfiguration.Configurable;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.ChannelsBuilder;
 

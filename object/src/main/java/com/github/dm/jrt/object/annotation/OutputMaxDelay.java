@@ -51,7 +51,7 @@ import java.util.concurrent.TimeUnit;
  * <p/>
  * Created by davide-maestroni on 10/05/2015.
  *
- * @see com.github.dm.jrt.builder.InvocationConfiguration InvocationConfiguration
+ * @see com.github.dm.jrt.core.builder.InvocationConfiguration InvocationConfiguration
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

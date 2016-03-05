@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.builder;
+package com.github.dm.jrt.core.builder;
 
-import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
-import com.github.dm.jrt.builder.InvocationConfiguration.TimeoutActionType;
+import com.github.dm.jrt.core.builder.InvocationConfiguration.OrderType;
+import com.github.dm.jrt.core.builder.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.util.TimeDuration;
 import com.github.dm.jrt.log.Log;
 import com.github.dm.jrt.log.Log.Level;

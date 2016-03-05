@@ -16,13 +16,13 @@
 
 package com.github.dm.jrt.core;
 
-import com.github.dm.jrt.builder.InvocationConfiguration;
-import com.github.dm.jrt.builder.InvocationConfiguration.AgingPriority;
-import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
-import com.github.dm.jrt.builder.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.DefaultResultChannel.AbortHandler;
 import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.core.InvocationExecution.InputIterator;
+import com.github.dm.jrt.core.builder.InvocationConfiguration;
+import com.github.dm.jrt.core.builder.InvocationConfiguration.AgingPriority;
+import com.github.dm.jrt.core.builder.InvocationConfiguration.OrderType;
+import com.github.dm.jrt.core.builder.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
@@ -72,7 +72,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static com.github.dm.jrt.builder.InvocationConfiguration.builder;
+import static com.github.dm.jrt.core.builder.InvocationConfiguration.builder;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.TimeDuration.INFINITY;
 import static com.github.dm.jrt.core.util.TimeDuration.millis;

@@ -16,13 +16,13 @@
 
 package com.github.dm.jrt.stream;
 
-import com.github.dm.jrt.builder.ChannelConfiguration;
-import com.github.dm.jrt.builder.InvocationConfiguration;
-import com.github.dm.jrt.builder.InvocationConfiguration.Builder;
-import com.github.dm.jrt.builder.InvocationConfiguration.Configurable;
-import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.builder.ChannelConfiguration;
+import com.github.dm.jrt.core.builder.InvocationConfiguration;
+import com.github.dm.jrt.core.builder.InvocationConfiguration.Builder;
+import com.github.dm.jrt.core.builder.InvocationConfiguration.Configurable;
+import com.github.dm.jrt.core.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.channel.Channels;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.InvocationChannel;
@@ -60,7 +60,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.github.dm.jrt.builder.ChannelConfiguration.builderFromOutputChannel;
+import static com.github.dm.jrt.core.builder.ChannelConfiguration.builderFromOutputChannel;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
 import static com.github.dm.jrt.function.Functions.consumerFactory;

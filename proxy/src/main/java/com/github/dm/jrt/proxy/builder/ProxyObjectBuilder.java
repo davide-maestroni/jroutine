@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.proxy.builder;
 
-import com.github.dm.jrt.builder.ConfigurableBuilder;
+import com.github.dm.jrt.core.builder.ConfigurableBuilder;
 import com.github.dm.jrt.object.builder.ProxyConfigurableBuilder;
 
 import org.jetbrains.annotations.NotNull;

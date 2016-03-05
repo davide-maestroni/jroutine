@@ -22,7 +22,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
     @SuppressWarnings("ConstantConditions")
     public ${generatedClassName}(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.core.InvocationTarget<?> target,
-            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.builder.InvocationConfiguration invocationConfiguration,
+            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.builder.InvocationConfiguration invocationConfiguration,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.builder.ProxyConfiguration proxyConfiguration) {
 
         if (!target.isOfType(${classErasure}.class)) {
@@ -79,7 +79,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
         @Override
         @org.jetbrains.annotations.NotNull
         protected ${interfaceFullName} newProxy(
-                @org.jetbrains.annotations.NotNull final com.github.dm.jrt.builder.InvocationConfiguration invocationConfiguration,
+                @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.builder.InvocationConfiguration invocationConfiguration,
                 @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.builder.ProxyConfiguration proxyConfiguration) {
 
             return new ${generatedClassName}${genericTypes}(mTarget, invocationConfiguration, proxyConfiguration);

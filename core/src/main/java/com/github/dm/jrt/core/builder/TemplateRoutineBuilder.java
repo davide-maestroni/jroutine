@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.builder;
+package com.github.dm.jrt.core.builder;
 
-import com.github.dm.jrt.builder.InvocationConfiguration.Builder;
-import com.github.dm.jrt.builder.InvocationConfiguration.Configurable;
+import com.github.dm.jrt.core.builder.InvocationConfiguration.Builder;
+import com.github.dm.jrt.core.builder.InvocationConfiguration.Configurable;
 import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.routine.TemplateRoutine;
 

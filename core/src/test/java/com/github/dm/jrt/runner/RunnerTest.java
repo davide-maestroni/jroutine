@@ -16,8 +16,8 @@
 
 package com.github.dm.jrt.runner;
 
-import com.github.dm.jrt.builder.InvocationConfiguration.AgingPriority;
-import com.github.dm.jrt.builder.InvocationConfiguration.NotAgingPriority;
+import com.github.dm.jrt.core.builder.InvocationConfiguration.AgingPriority;
+import com.github.dm.jrt.core.builder.InvocationConfiguration.NotAgingPriority;
 import com.github.dm.jrt.core.util.Time;
 import com.github.dm.jrt.core.util.TimeDuration;
 

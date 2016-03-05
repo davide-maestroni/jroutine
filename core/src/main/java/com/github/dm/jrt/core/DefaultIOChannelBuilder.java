@@ -16,10 +16,10 @@
 
 package com.github.dm.jrt.core;
 
-import com.github.dm.jrt.builder.ChannelConfiguration;
-import com.github.dm.jrt.builder.ChannelConfiguration.Builder;
-import com.github.dm.jrt.builder.ChannelConfiguration.Configurable;
-import com.github.dm.jrt.builder.IOChannelBuilder;
+import com.github.dm.jrt.core.builder.ChannelConfiguration;
+import com.github.dm.jrt.core.builder.ChannelConfiguration.Builder;
+import com.github.dm.jrt.core.builder.ChannelConfiguration.Configurable;
+import com.github.dm.jrt.core.builder.IOChannelBuilder;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.runner.Execution;
 import com.github.dm.jrt.runner.Runner;

@@ -16,9 +16,9 @@
 
 package com.github.dm.jrt.stream;
 
-import com.github.dm.jrt.builder.ConfigurableBuilder;
-import com.github.dm.jrt.builder.InvocationConfiguration.Builder;
-import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
+import com.github.dm.jrt.core.builder.ConfigurableBuilder;
+import com.github.dm.jrt.core.builder.InvocationConfiguration.Builder;
+import com.github.dm.jrt.core.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.channel.ResultChannel;

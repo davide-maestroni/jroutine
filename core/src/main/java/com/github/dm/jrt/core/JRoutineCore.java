@@ -16,8 +16,8 @@
 
 package com.github.dm.jrt.core;
 
-import com.github.dm.jrt.builder.IOChannelBuilder;
-import com.github.dm.jrt.builder.RoutineBuilder;
+import com.github.dm.jrt.core.builder.IOChannelBuilder;
+import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.invocation.InvocationFactory;
 
 import org.jetbrains.annotations.NotNull;

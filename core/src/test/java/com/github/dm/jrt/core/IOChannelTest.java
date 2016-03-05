@@ -18,11 +18,11 @@ package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.builder.InvocationConfiguration.TimeoutActionType;
-import com.github.dm.jrt.common.TimeoutException;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.ExecutionTimeoutException;
 import com.github.dm.jrt.core.channel.IOChannel;
+import com.github.dm.jrt.core.common.TimeoutException;
 import com.github.dm.jrt.invocation.PassingInvocation;
 import com.github.dm.jrt.log.Log;
 import com.github.dm.jrt.log.Log.Level;

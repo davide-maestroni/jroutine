@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.common;
+package com.github.dm.jrt.core.common;
 
 import org.jetbrains.annotations.Nullable;
 

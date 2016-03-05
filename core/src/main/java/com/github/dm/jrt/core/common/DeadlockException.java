@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.common;
+package com.github.dm.jrt.core.common;
 
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Exception indicating that a timeout occurred.
+ * Exception indicating a possible deadlock.
  * <p/>
- * Created by davide-maestroni on 11/25/2014.
+ * Created by davide-maestroni on 06/18/2015.
  */
-public class TimeoutException extends RoutineException {
+public class DeadlockException extends RoutineException {
 
     /**
      * Constructor.
      *
      * @param message the error message.
      */
-    public TimeoutException(@Nullable final String message) {
+    public DeadlockException(@Nullable final String message) {
 
         super(message);
     }

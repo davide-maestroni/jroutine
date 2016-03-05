@@ -655,7 +655,7 @@ public class Builders {
      * @param inputMode      the input transfer mode.
      * @param outputMode     the output transfer mode.
      * @return the invocation output.
-     * @throws com.github.dm.jrt.common.RoutineException in case of errors.
+     * @throws com.github.dm.jrt.core.common.RoutineException in case of errors.
      */
     @Nullable
     @SuppressWarnings("unchecked")

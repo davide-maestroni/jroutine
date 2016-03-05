@@ -16,8 +16,8 @@
 
 package com.github.dm.jrt.function;
 
-import com.github.dm.jrt.common.RoutineException;
 import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.invocation.CommandInvocation;
 import com.github.dm.jrt.invocation.ComparableCommandInvocation;
 import com.github.dm.jrt.invocation.ComparableFilterInvocation;

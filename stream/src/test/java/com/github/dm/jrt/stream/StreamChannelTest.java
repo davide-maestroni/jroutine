@@ -18,8 +18,6 @@ package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
-import com.github.dm.jrt.common.RoutineException;
-import com.github.dm.jrt.common.TimeoutException;
 import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
@@ -31,6 +29,8 @@ import com.github.dm.jrt.core.channel.InputDeadlockException;
 import com.github.dm.jrt.core.channel.OutputDeadlockException;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.channel.Selectable;
+import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.common.TimeoutException;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Consumer;

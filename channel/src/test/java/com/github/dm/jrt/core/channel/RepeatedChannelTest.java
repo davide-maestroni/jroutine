@@ -16,9 +16,9 @@
 
 package com.github.dm.jrt.core.channel;
 
-import com.github.dm.jrt.common.RoutineException;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.common.RoutineException;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;

@@ -30,12 +30,12 @@ import com.github.dm.jrt.android.invocation.ContextInvocationFactories;
 import com.github.dm.jrt.android.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
-import com.github.dm.jrt.common.RoutineException;
 import com.github.dm.jrt.core.AbstractRoutine;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
+import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.log.Log;
 import com.github.dm.jrt.log.Log.Level;
@@ -454,7 +454,7 @@ public class InvocationService extends Service {
                     (isParallel) ? routineState.parallelInvoke() : routineState.asyncInvoke();
             final RoutineInvocation routineInvocation =
                     new RoutineInvocation(invocationId, channel, routineInfo, routineState);
-            routineInvocation.passTo(new ServiceOutputConsumer(routineInvocation, message.replyTo));
+            routineInvocation.bindTo(new ServiceOutputConsumer(routineInvocation, message.replyTo));
             invocations.put(invocationId, routineInvocation);
         }
     }
@@ -814,6 +814,18 @@ public class InvocationService extends Service {
         }
 
         /**
+         * Binds the specified consumer to the output channel.
+         *
+         * @throws com.github.dm.jrt.core.common.RoutineException if the execution has been aborted.
+         * @throws java.lang.IllegalStateException                if the channel is already closed
+         *                                                        or already bound to a consumer.
+         */
+        void bindTo(@NotNull final OutputConsumer<Object> consumer) {
+
+            mChannel.result().bindTo(consumer);
+        }
+
+        /**
          * Closes the channel.
          */
         void close() {
@@ -825,24 +837,12 @@ public class InvocationService extends Service {
          * Passes the specified input to the invocation channel.
          *
          * @param input the input.
-         * @throws com.github.dm.jrt.common.RoutineException if the execution has been aborted.
-         * @throws java.lang.IllegalStateException           if the channel is already closed.
+         * @throws com.github.dm.jrt.core.common.RoutineException if the execution has been aborted.
+         * @throws java.lang.IllegalStateException                if the channel is already closed.
          */
         void pass(@Nullable final Object input) {
 
             mIoChannel.pass(input);
-        }
-
-        /**
-         * Binds the specified consumer to the output channel.
-         *
-         * @throws com.github.dm.jrt.common.RoutineException if the execution has been aborted.
-         * @throws java.lang.IllegalStateException           if the channel is already closed or
-         *                                                   already bound to a consumer.
-         */
-        void passTo(@NotNull final OutputConsumer<Object> consumer) {
-
-            mChannel.result().bindTo(consumer);
         }
 
         /**

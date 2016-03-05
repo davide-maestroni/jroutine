@@ -18,10 +18,10 @@ package com.github.dm.jrt;
 
 import com.github.dm.jrt.builder.IOChannelBuilder;
 import com.github.dm.jrt.builder.RoutineBuilder;
-import com.github.dm.jrt.common.RoutineException;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channels;
 import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;

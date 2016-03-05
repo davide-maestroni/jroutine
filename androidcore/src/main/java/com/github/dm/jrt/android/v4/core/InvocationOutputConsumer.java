@@ -19,10 +19,10 @@ package com.github.dm.jrt.android.v4.core;
 import android.support.v4.content.Loader;
 
 import com.github.dm.jrt.android.runner.AndroidRunners;
-import com.github.dm.jrt.common.RoutineException;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.TemplateOutputConsumer;
+import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.runner.Runner;

@@ -14,9 +14,34 @@
  * limitations under the License.
  */
 
+package com.github.dm.jrt.core.common;
+
+import org.junit.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
 /**
- * Common classes and interfaces.
+ * Exception unit tests.
  * <p/>
  * Created by davide-maestroni on 01/30/2016.
  */
-package com.github.dm.jrt.common;
+public class ExceptionTest {
+
+    @Test
+    public void testDeadlockException() {
+
+        assertThat(new DeadlockException("")).hasNoCause();
+    }
+
+    @Test
+    public void testRoutineException() {
+
+        assertThat(new RoutineException()).hasNoCause();
+    }
+
+    @Test
+    public void testTimeoutException() {
+
+        assertThat(new TimeoutException("")).hasNoCause();
+    }
+}

@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.invocation;
 
-import com.github.dm.jrt.common.RoutineException;
+import com.github.dm.jrt.core.common.RoutineException;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -40,7 +40,7 @@ public class InvocationException extends RoutineException {
 
     /**
      * Wraps the specified throwable only if it is not an instance of
-     * {@link com.github.dm.jrt.common.RoutineException RoutineException}.
+     * {@link com.github.dm.jrt.core.common.RoutineException RoutineException}.
      *
      * @param cause the throwable to wrap.
      * @return the throwable or an invocation exception wrapping it.

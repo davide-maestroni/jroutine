@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.core;
 
-import com.github.dm.jrt.common.RoutineException;
+import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.runner.Execution;

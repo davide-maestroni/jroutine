@@ -18,10 +18,10 @@ package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.builder.ChannelConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration;
-import com.github.dm.jrt.common.RoutineException;
 import com.github.dm.jrt.core.DefaultResultChannel.AbortHandler;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
+import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.runner.Runners;
 import com.github.dm.jrt.util.TimeDuration;

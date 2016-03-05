@@ -18,7 +18,7 @@ package com.github.dm.jrt.android.service;
 
 import android.content.ComponentName;
 
-import com.github.dm.jrt.common.RoutineException;
+import com.github.dm.jrt.core.common.RoutineException;
 
 import org.jetbrains.annotations.Nullable;
 

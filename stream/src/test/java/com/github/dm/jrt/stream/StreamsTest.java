@@ -32,12 +32,12 @@ import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.PassingInvocation;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
+import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.function.BiConsumerWrapper;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Functions;
-import com.github.dm.jrt.log.Log.Level;
 import com.github.dm.jrt.stream.Streams.RangeConsumer;
 
 import org.jetbrains.annotations.NotNull;

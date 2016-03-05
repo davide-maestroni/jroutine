@@ -18,7 +18,7 @@ package com.github.dm.jrt.android.core;
 
 import com.github.dm.jrt.android.builder.ServiceRoutineBuilder;
 import com.github.dm.jrt.android.log.AndroidLogs;
-import com.github.dm.jrt.log.Logger;
+import com.github.dm.jrt.core.log.Logger;
 
 import org.jetbrains.annotations.NotNull;
 

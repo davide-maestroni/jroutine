@@ -26,7 +26,7 @@ import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.TemplateOutputConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
-import com.github.dm.jrt.log.Logger;
+import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.runner.Runner;
 import com.github.dm.jrt.runner.TemplateExecution;
 

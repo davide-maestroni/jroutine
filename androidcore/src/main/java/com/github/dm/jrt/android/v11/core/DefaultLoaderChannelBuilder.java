@@ -26,8 +26,8 @@ import com.github.dm.jrt.core.builder.ChannelConfiguration;
 import com.github.dm.jrt.core.builder.InvocationConfiguration;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
+import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.util.TimeDuration;
-import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.runner.TemplateExecution;
 
 import org.jetbrains.annotations.NotNull;

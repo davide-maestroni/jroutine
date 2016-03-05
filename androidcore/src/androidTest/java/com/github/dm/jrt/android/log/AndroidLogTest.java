@@ -18,8 +18,8 @@ package com.github.dm.jrt.android.log;
 
 import android.test.AndroidTestCase;
 
-import com.github.dm.jrt.log.Log.Level;
-import com.github.dm.jrt.log.Logger;
+import com.github.dm.jrt.core.log.Log.Level;
+import com.github.dm.jrt.core.log.Logger;
 
 /**
  * Android log unit tests.

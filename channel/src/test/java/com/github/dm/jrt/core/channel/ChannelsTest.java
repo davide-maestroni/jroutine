@@ -25,9 +25,9 @@ import com.github.dm.jrt.core.invocation.FilterInvocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.PassingInvocation;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
+import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
-import com.github.dm.jrt.log.Log.Level;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;

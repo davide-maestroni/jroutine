@@ -14,9 +14,23 @@
  * limitations under the License.
  */
 
+package com.github.dm.jrt.core.log;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+
 /**
- * Log related classes and definitions.
+ * Log implementation simply discarding all messages.
  * <p/>
  * Created by davide-maestroni on 10/04/2014.
  */
-package com.github.dm.jrt.log;
+public class NullLog extends TemplateLog {
+
+    @Override
+    protected void log(@NotNull final Level level, @NotNull final List<Object> contexts,
+            @Nullable final String message, @Nullable final Throwable throwable) {
+
+    }
+}

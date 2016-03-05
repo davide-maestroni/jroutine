@@ -29,7 +29,7 @@ import com.github.dm.jrt.core.builder.InvocationConfiguration;
 import com.github.dm.jrt.core.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
-import com.github.dm.jrt.log.Logger;
+import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.runner.TemplateExecution;
 
 import org.jetbrains.annotations.NotNull;

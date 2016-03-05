@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.log;
+package com.github.dm.jrt.core.log;
 
-import com.github.dm.jrt.log.Log.Level;
+import com.github.dm.jrt.core.log.Log.Level;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;

@@ -40,11 +40,11 @@ import com.github.dm.jrt.core.channel.ExecutionTimeoutException;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.invocation.PassingInvocation;
+import com.github.dm.jrt.core.log.Log;
+import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.TimeDuration;
-import com.github.dm.jrt.log.Log;
-import com.github.dm.jrt.log.Log.Level;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

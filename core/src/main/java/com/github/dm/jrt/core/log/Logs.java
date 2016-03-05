@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.log;
+package com.github.dm.jrt.core.log;
 
 import org.jetbrains.annotations.NotNull;
 

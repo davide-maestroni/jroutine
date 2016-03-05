@@ -28,7 +28,7 @@ import java.util.List;
  * <p/>
  * Created by davide-maestroni on 10/07/2014.
  */
-public class AndroidLog implements com.github.dm.jrt.log.Log {
+public class AndroidLog implements com.github.dm.jrt.core.log.Log {
 
     public void dbg(@NotNull final List<Object> contexts, @Nullable final String message,
             @Nullable final Throwable throwable) {

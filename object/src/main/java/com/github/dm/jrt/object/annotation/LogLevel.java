@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.object.annotation;
 
-import com.github.dm.jrt.log.Log.Level;
+import com.github.dm.jrt.core.log.Log.Level;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

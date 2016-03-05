@@ -16,10 +16,10 @@
 
 package com.github.dm.jrt.core.builder;
 
+import com.github.dm.jrt.core.log.Log;
+import com.github.dm.jrt.core.log.Log.Level;
+import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.util.TimeDuration;
-import com.github.dm.jrt.log.Log;
-import com.github.dm.jrt.log.Log.Level;
-import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.runner.Runner;
 
 import org.jetbrains.annotations.NotNull;

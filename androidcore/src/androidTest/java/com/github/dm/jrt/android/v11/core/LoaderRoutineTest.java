@@ -44,12 +44,12 @@ import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.log.Log;
+import com.github.dm.jrt.core.log.Log.Level;
+import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.TimeDuration;
-import com.github.dm.jrt.log.Log;
-import com.github.dm.jrt.log.Log.Level;
-import com.github.dm.jrt.log.Logger;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

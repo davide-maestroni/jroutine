@@ -24,10 +24,10 @@ import com.github.dm.jrt.core.channel.ExecutionTimeoutException;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.common.TimeoutException;
 import com.github.dm.jrt.core.invocation.PassingInvocation;
+import com.github.dm.jrt.core.log.Log;
+import com.github.dm.jrt.core.log.Log.Level;
+import com.github.dm.jrt.core.log.NullLog;
 import com.github.dm.jrt.core.util.TimeDuration;
-import com.github.dm.jrt.log.Log;
-import com.github.dm.jrt.log.Log.Level;
-import com.github.dm.jrt.log.NullLog;
 import com.github.dm.jrt.runner.Runners;
 
 import org.jetbrains.annotations.NotNull;

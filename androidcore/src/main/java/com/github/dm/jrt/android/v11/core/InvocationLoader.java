@@ -27,7 +27,7 @@ import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
-import com.github.dm.jrt.log.Logger;
+import com.github.dm.jrt.core.log.Logger;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

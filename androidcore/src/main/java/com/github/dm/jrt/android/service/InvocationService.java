@@ -37,10 +37,10 @@ import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.invocation.Invocation;
+import com.github.dm.jrt.core.log.Log;
+import com.github.dm.jrt.core.log.Log.Level;
+import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.util.Reflection;
-import com.github.dm.jrt.log.Log;
-import com.github.dm.jrt.log.Log.Level;
-import com.github.dm.jrt.log.Logger;
 import com.github.dm.jrt.runner.Runner;
 
 import org.jetbrains.annotations.NotNull;

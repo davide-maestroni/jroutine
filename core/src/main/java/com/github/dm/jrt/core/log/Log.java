@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.log;
+package com.github.dm.jrt.core.log;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -38,7 +38,7 @@ import java.util.List;
  * <pre>
  *     <code>
  *
- *         -assumenosideeffects class com.github.dm.jrt.log.Logger {
+ *         -assumenosideeffects class com.github.dm.jrt.core.log.Logger {
  *             public void dbg(...);
  *         }
  *     </code>
@@ -46,7 +46,7 @@ import java.util.List;
  * <p/>
  * Created by davide-maestroni on 10/03/2014.
  *
- * @see com.github.dm.jrt.log.Logger Logger
+ * @see com.github.dm.jrt.core.log.Logger Logger
  */
 public interface Log {
 

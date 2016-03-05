@@ -37,8 +37,8 @@ import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.object.InvocationTarget;
 import com.github.dm.jrt.object.JRoutineObject;
 import com.github.dm.jrt.object.builder.ObjectRoutineBuilder;
+import com.github.dm.jrt.proxy.JRoutineProxy;
 import com.github.dm.jrt.proxy.builder.ProxyRoutineBuilder;
-import com.github.dm.jrt.proxy.core.JRoutineProxy;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

@@ -19,4 +19,4 @@
  * <p/>
  * Created by davide-maestroni on 03/24/2014.
  */
-package com.github.dm.jrt.proxy.core;
+package com.github.dm.jrt.proxy;

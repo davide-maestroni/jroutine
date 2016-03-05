@@ -18,8 +18,8 @@ package com.github.dm.jrt.processor;
 
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.builder.InvocationConfiguration.TimeoutActionType;
-import com.github.dm.jrt.channel.Channel.OutputChannel;
-import com.github.dm.jrt.channel.InvocationChannel;
+import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.log.Log.Level;
 import com.github.dm.jrt.object.annotation.Alias;
 import com.github.dm.jrt.object.annotation.AsyncIn;

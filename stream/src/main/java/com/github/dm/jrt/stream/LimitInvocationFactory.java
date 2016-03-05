@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.stream;
 
-import com.github.dm.jrt.channel.ResultChannel;
+import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.invocation.ComparableInvocationFactory;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.TemplateInvocation;

@@ -17,8 +17,7 @@
 package com.github.dm.jrt.core.channel;
 
 import com.github.dm.jrt.builder.ChannelConfiguration;
-import com.github.dm.jrt.channel.Channel.InputChannel;
-import com.github.dm.jrt.channel.IOChannel;
+import com.github.dm.jrt.core.channel.Channel.InputChannel;
 
 import org.jetbrains.annotations.NotNull;
 

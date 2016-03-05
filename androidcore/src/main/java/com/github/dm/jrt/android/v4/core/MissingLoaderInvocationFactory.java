@@ -19,7 +19,7 @@ package com.github.dm.jrt.android.v4.core;
 import com.github.dm.jrt.android.invocation.FunctionContextInvocation;
 import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
 import com.github.dm.jrt.android.invocation.MissingInvocationException;
-import com.github.dm.jrt.channel.ResultChannel;
+import com.github.dm.jrt.core.channel.ResultChannel;
 
 import org.jetbrains.annotations.NotNull;
 

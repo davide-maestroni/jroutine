@@ -18,9 +18,9 @@ package com.github.dm.jrt.android.v11.core.channel;
 
 import android.util.SparseArray;
 
-import com.github.dm.jrt.channel.IOChannel;
-import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.common.RoutineException;
+import com.github.dm.jrt.core.channel.IOChannel;
+import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.channel.Selectable;
 
 import org.jetbrains.annotations.NotNull;

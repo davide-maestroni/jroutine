@@ -18,13 +18,9 @@ package com.github.dm.jrt.core.channel;
 
 import com.github.dm.jrt.builder.IOChannelBuilder;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
-import com.github.dm.jrt.channel.AbortException;
-import com.github.dm.jrt.channel.Channel.InputChannel;
-import com.github.dm.jrt.channel.Channel.OutputChannel;
-import com.github.dm.jrt.channel.IOChannel;
-import com.github.dm.jrt.channel.InvocationChannel;
-import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.channel.Channel.InputChannel;
+import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.invocation.FilterInvocation;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.invocation.PassingInvocation;

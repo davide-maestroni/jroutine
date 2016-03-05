@@ -19,13 +19,13 @@ package com.github.dm.jrt.core;
 import com.github.dm.jrt.builder.InvocationConfiguration;
 import com.github.dm.jrt.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.builder.InvocationConfiguration.TimeoutActionType;
-import com.github.dm.jrt.channel.AbortException;
-import com.github.dm.jrt.channel.ExecutionDeadlockException;
-import com.github.dm.jrt.channel.ExecutionTimeoutException;
-import com.github.dm.jrt.channel.OutputConsumer;
-import com.github.dm.jrt.channel.OutputDeadlockException;
-import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.common.RoutineException;
+import com.github.dm.jrt.core.channel.AbortException;
+import com.github.dm.jrt.core.channel.ExecutionDeadlockException;
+import com.github.dm.jrt.core.channel.ExecutionTimeoutException;
+import com.github.dm.jrt.core.channel.OutputConsumer;
+import com.github.dm.jrt.core.channel.OutputDeadlockException;
+import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.invocation.InvocationDeadlockException;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.invocation.InvocationInterruptedException;
@@ -339,7 +339,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
      * Aborts immediately the execution.
      *
      * @param reason the reason of the abortion.
-     * @see com.github.dm.jrt.channel.Channel#abort(Throwable) Channel.abort(Throwable)
+     * @see com.github.dm.jrt.core.channel.Channel#abort(Throwable) Channel.abort(Throwable)
      */
     void abortImmediately(@Nullable final Throwable reason) {
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.channel;
+package com.github.dm.jrt.core.channel;
 
 import com.github.dm.jrt.common.TimeoutException;
 

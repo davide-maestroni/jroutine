@@ -16,11 +16,11 @@
 
 package com.github.dm.jrt.android.core.channel;
 
-import com.github.dm.jrt.channel.Channel.InputChannel;
-import com.github.dm.jrt.channel.Channel.OutputChannel;
-import com.github.dm.jrt.channel.IOChannel;
+import com.github.dm.jrt.core.channel.Channel.InputChannel;
+import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.Channels;
 import com.github.dm.jrt.core.channel.ChannelsBuilder;
+import com.github.dm.jrt.core.channel.IOChannel;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -73,7 +73,7 @@ public class AndroidChannels extends Channels {
      * @param <OUT>      the output data type.
      * @return the selectable output channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
-     * @see Channels#merge(int, com.github.dm.jrt.channel.Channel.OutputChannel[])
+     * @see Channels#merge(int, com.github.dm.jrt.core.channel.Channel.OutputChannel[])
      */
     @NotNull
     @SuppressWarnings("unchecked")
@@ -114,7 +114,7 @@ public class AndroidChannels extends Channels {
      * @param <OUT>    the output data type.
      * @return the selectable output channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
-     * @see Channels#merge(com.github.dm.jrt.channel.Channel.OutputChannel[])
+     * @see Channels#merge(com.github.dm.jrt.core.channel.Channel.OutputChannel[])
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends OutputChannel<? extends
@@ -134,7 +134,7 @@ public class AndroidChannels extends Channels {
      * @param <DATA>  the channel data type.
      * @param <IN>    the input data type.
      * @return the I/O channel builder.
-     * @see Channels#select(com.github.dm.jrt.channel.Channel.InputChannel, int)
+     * @see Channels#select(com.github.dm.jrt.core.channel.Channel.InputChannel, int)
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends IOChannel<IN>> selectParcelable(
@@ -154,7 +154,7 @@ public class AndroidChannels extends Channels {
      * @param index   the channel index.
      * @param <OUT>   the output data type.
      * @return the selectable output channel builder.
-     * @see Channels#toSelectable(com.github.dm.jrt.channel.Channel.OutputChannel, int)
+     * @see Channels#toSelectable(com.github.dm.jrt.core.channel.Channel.OutputChannel, int)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends OutputChannel<? extends

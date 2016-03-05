@@ -16,9 +16,8 @@
 
 package com.github.dm.jrt.core.channel;
 
-import com.github.dm.jrt.channel.Channel.InputChannel;
-import com.github.dm.jrt.channel.Channel.OutputChannel;
-import com.github.dm.jrt.channel.IOChannel;
+import com.github.dm.jrt.core.channel.Channel.InputChannel;
+import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -699,7 +698,7 @@ public class Channels {
      * Returns a builder of output channels repeating the output data to any newly bound channel or
      * consumer, thus effectively supporting multiple bindings.
      * <p/>
-     * The {@link com.github.dm.jrt.channel.Channel.OutputChannel#isBound()} method will always
+     * The {@link com.github.dm.jrt.core.channel.Channel.OutputChannel#isBound()} method will always
      * return false and the bound methods will never fail.<br/>
      * Note, however, that the implementation will silently prevent the same consumer or channel
      * instance to be bound twice.

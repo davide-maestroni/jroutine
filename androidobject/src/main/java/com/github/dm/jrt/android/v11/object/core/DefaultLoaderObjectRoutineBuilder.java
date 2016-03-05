@@ -29,7 +29,7 @@ import com.github.dm.jrt.android.routine.LoaderRoutine;
 import com.github.dm.jrt.android.v11.core.JRoutineLoader;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
 import com.github.dm.jrt.builder.InvocationConfiguration;
-import com.github.dm.jrt.channel.ResultChannel;
+import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.object.annotation.AsyncIn.InputMode;
 import com.github.dm.jrt.object.annotation.AsyncOut.OutputMode;

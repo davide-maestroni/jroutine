@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.stream;
 
-import com.github.dm.jrt.channel.ResultChannel;
+import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.BiFunctionWrapper;
 import com.github.dm.jrt.invocation.ComparableInvocationFactory;

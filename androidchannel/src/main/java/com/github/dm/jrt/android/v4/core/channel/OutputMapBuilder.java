@@ -20,10 +20,10 @@ import android.support.v4.util.SparseArrayCompat;
 
 import com.github.dm.jrt.android.core.channel.ParcelableSelectable;
 import com.github.dm.jrt.builder.ChannelConfiguration;
-import com.github.dm.jrt.channel.Channel.OutputChannel;
-import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbstractBuilder;
+import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;

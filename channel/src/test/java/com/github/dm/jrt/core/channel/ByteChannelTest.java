@@ -16,7 +16,6 @@
 
 package com.github.dm.jrt.core.channel;
 
-import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.ByteChannel.BufferInputStream;
 import com.github.dm.jrt.core.channel.ByteChannel.BufferOutputStream;

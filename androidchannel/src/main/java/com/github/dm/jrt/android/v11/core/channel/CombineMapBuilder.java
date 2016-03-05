@@ -19,10 +19,10 @@ package com.github.dm.jrt.android.v11.core.channel;
 import android.util.SparseArray;
 
 import com.github.dm.jrt.builder.ChannelConfiguration;
-import com.github.dm.jrt.channel.Channel.InputChannel;
-import com.github.dm.jrt.channel.IOChannel;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbstractBuilder;
+import com.github.dm.jrt.core.channel.Channel.InputChannel;
+import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.Selectable;
 
 import org.jetbrains.annotations.NotNull;

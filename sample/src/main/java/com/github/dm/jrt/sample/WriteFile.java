@@ -16,11 +16,11 @@
 
 package com.github.dm.jrt.sample;
 
-import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.common.RoutineException;
 import com.github.dm.jrt.core.channel.ByteChannel;
 import com.github.dm.jrt.core.channel.ByteChannel.BufferInputStream;
 import com.github.dm.jrt.core.channel.ByteChannel.ByteBuffer;
+import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.invocation.TemplateInvocation;
 
 import org.jetbrains.annotations.NotNull;

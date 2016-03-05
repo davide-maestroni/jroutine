@@ -20,7 +20,7 @@ import com.github.dm.jrt.builder.ChannelConfiguration;
 import com.github.dm.jrt.builder.ChannelConfiguration.Builder;
 import com.github.dm.jrt.builder.ChannelConfiguration.Configurable;
 import com.github.dm.jrt.builder.IOChannelBuilder;
-import com.github.dm.jrt.channel.IOChannel;
+import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.runner.Execution;
 import com.github.dm.jrt.runner.Runner;
 import com.github.dm.jrt.runner.RunnerDecorator;

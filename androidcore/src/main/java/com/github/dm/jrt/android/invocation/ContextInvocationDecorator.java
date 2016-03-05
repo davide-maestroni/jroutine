@@ -18,8 +18,8 @@ package com.github.dm.jrt.android.invocation;
 
 import android.content.Context;
 
-import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.common.RoutineException;
+import com.github.dm.jrt.core.channel.ResultChannel;
 
 import org.jetbrains.annotations.NotNull;
 

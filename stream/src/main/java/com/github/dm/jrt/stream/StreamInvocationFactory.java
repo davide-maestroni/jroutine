@@ -16,10 +16,10 @@
 
 package com.github.dm.jrt.stream;
 
-import com.github.dm.jrt.channel.IOChannel;
-import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.common.RoutineException;
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.channel.IOChannel;
+import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.FunctionWrapper;
 import com.github.dm.jrt.invocation.ComparableInvocationFactory;

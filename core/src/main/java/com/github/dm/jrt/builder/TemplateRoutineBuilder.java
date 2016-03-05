@@ -18,7 +18,7 @@ package com.github.dm.jrt.builder;
 
 import com.github.dm.jrt.builder.InvocationConfiguration.Builder;
 import com.github.dm.jrt.builder.InvocationConfiguration.Configurable;
-import com.github.dm.jrt.channel.InvocationChannel;
+import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.routine.TemplateRoutine;
 
 import org.jetbrains.annotations.NotNull;

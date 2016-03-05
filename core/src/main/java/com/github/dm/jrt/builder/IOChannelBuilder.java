@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.builder;
 
-import com.github.dm.jrt.channel.IOChannel;
+import com.github.dm.jrt.core.channel.IOChannel;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

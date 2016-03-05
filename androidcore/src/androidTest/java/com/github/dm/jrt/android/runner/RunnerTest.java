@@ -20,9 +20,9 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.test.AndroidTestCase;
 
-import com.github.dm.jrt.channel.Channel.OutputChannel;
-import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.invocation.FunctionInvocation;
 import com.github.dm.jrt.invocation.Invocation;
 import com.github.dm.jrt.invocation.InvocationFactory;

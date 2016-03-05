@@ -53,8 +53,8 @@ import static com.github.dm.jrt.util.TimeDuration.fromUnit;
  * <p/>
  * The maximum time of execution can also be set so that, if no result is produced before the
  * timeout elapses, an action will be taken choosing between throwing an
- * {@link com.github.dm.jrt.channel.ExecutionTimeoutException ExecutionTimeoutException}, aborting
- * the invocation, or continuing with the execution.
+ * {@link com.github.dm.jrt.core.channel.ExecutionTimeoutException ExecutionTimeoutException},
+ * aborting the invocation, or continuing with the execution.
  * <p/>
  * Finally, the number of input and output data buffered in the corresponding channel can be
  * limited in order to avoid excessive memory consumption. In case the limit is reached when passing
@@ -570,7 +570,8 @@ public final class InvocationConfiguration {
         /**
          * Throw.<br/>
          * If no result is available after the specified timeout, the called method will throw an
-         * {@link com.github.dm.jrt.channel.ExecutionTimeoutException ExecutionTimeoutException}.
+         * {@link com.github.dm.jrt.core.channel.ExecutionTimeoutException
+         * ExecutionTimeoutException}.
          */
         THROW,
         /**
@@ -875,7 +876,7 @@ public final class InvocationConfiguration {
          * consumed. A {@link InvocationConfiguration#DEFAULT DEFAULT} value means that it is up
          * to the specific implementation to choose a default one.<br/>
          * When the maximum capacity is reached, the invocation will be aborted with an
-         * {@link com.github.dm.jrt.channel.InputDeadlockException InputDeadlockException}.
+         * {@link com.github.dm.jrt.core.channel.InputDeadlockException InputDeadlockException}.
          *
          * @param inputMaxSize the maximum size.
          * @return this builder.
@@ -1028,7 +1029,7 @@ public final class InvocationConfiguration {
          * consumed. A {@link InvocationConfiguration#DEFAULT DEFAULT} value means that it is up
          * to the specific implementation to choose a default one.<br/>
          * When the maximum capacity is reached, the invocation will be aborted with an
-         * {@link com.github.dm.jrt.channel.InputDeadlockException InputDeadlockException}.
+         * {@link com.github.dm.jrt.core.channel.InputDeadlockException InputDeadlockException}.
          *
          * @param outputMaxSize the maximum size.
          * @return this builder.

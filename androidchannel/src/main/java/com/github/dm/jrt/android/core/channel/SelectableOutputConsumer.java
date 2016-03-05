@@ -16,9 +16,9 @@
 
 package com.github.dm.jrt.android.core.channel;
 
-import com.github.dm.jrt.channel.IOChannel;
-import com.github.dm.jrt.channel.OutputConsumer;
 import com.github.dm.jrt.common.RoutineException;
+import com.github.dm.jrt.core.channel.IOChannel;
+import com.github.dm.jrt.core.channel.OutputConsumer;
 
 import org.jetbrains.annotations.NotNull;
 

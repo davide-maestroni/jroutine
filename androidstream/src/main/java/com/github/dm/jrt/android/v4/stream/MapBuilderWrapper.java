@@ -21,7 +21,7 @@ import android.support.v4.util.SparseArrayCompat;
 import com.github.dm.jrt.builder.ChannelConfiguration;
 import com.github.dm.jrt.builder.ChannelConfiguration.Builder;
 import com.github.dm.jrt.builder.ChannelConfiguration.Configurable;
-import com.github.dm.jrt.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.ChannelsBuilder;
 
 import org.jetbrains.annotations.NotNull;

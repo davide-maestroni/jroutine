@@ -16,8 +16,8 @@
 
 package com.github.dm.jrt.invocation;
 
-import com.github.dm.jrt.channel.ResultChannel;
 import com.github.dm.jrt.common.RoutineException;
+import com.github.dm.jrt.core.channel.ResultChannel;
 
 import org.jetbrains.annotations.NotNull;
 

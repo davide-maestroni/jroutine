@@ -16,9 +16,9 @@
 
 package com.github.dm.jrt.sample;
 
-import com.github.dm.jrt.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.ByteChannel.ByteBuffer;
+import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.invocation.InvocationException;
 import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.runner.Runner;

@@ -14,26 +14,9 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.channel;
-
-import com.github.dm.jrt.common.DeadlockException;
-
-import org.jetbrains.annotations.Nullable;
-
 /**
- * Exception indicating a possible deadlock while waiting for room in the output channel buffer.
+ * Classes and interfaces related to routine channels.
  * <p/>
- * Created by davide-maestroni on 07/19/2015.
+ * Created by davide-maestroni on 09/19/2014.
  */
-public class OutputDeadlockException extends DeadlockException {
-
-    /**
-     * Constructor.
-     *
-     * @param message the error message.
-     */
-    public OutputDeadlockException(@Nullable final String message) {
-
-        super(message);
-    }
-}
+package com.github.dm.jrt.core.channel;

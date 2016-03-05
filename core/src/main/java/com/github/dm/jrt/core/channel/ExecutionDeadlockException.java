@@ -14,9 +14,26 @@
  * limitations under the License.
  */
 
+package com.github.dm.jrt.core.channel;
+
+import com.github.dm.jrt.common.DeadlockException;
+
+import org.jetbrains.annotations.Nullable;
+
 /**
- * Classes and interfaces related to routine channels.
+ * Exception indicating a possible deadlock while waiting for results to become available.
  * <p/>
- * Created by davide-maestroni on 09/19/2014.
+ * Created by davide-maestroni on 07/19/2015.
  */
-package com.github.dm.jrt.channel;
+public class ExecutionDeadlockException extends DeadlockException {
+
+    /**
+     * Constructor.
+     *
+     * @param message the error message.
+     */
+    public ExecutionDeadlockException(@Nullable final String message) {
+
+        super(message);
+    }
+}

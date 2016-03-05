@@ -56,8 +56,8 @@ import static com.github.dm.jrt.core.util.TimeDuration.millis;
 import static com.github.dm.jrt.core.util.TimeDuration.seconds;
 import static com.github.dm.jrt.function.Functions.functionFilter;
 import static com.github.dm.jrt.function.Functions.wrap;
-import static com.github.dm.jrt.object.core.InvocationTarget.classOfType;
-import static com.github.dm.jrt.object.core.InvocationTarget.instance;
+import static com.github.dm.jrt.object.InvocationTarget.classOfType;
+import static com.github.dm.jrt.object.InvocationTarget.instance;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 

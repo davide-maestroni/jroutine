@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.object.core;
+package com.github.dm.jrt.object;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.InvocationConfiguration;
@@ -77,9 +77,9 @@ import java.util.concurrent.TimeUnit;
 import static com.github.dm.jrt.core.builder.InvocationConfiguration.builder;
 import static com.github.dm.jrt.core.util.TimeDuration.INFINITY;
 import static com.github.dm.jrt.core.util.TimeDuration.seconds;
-import static com.github.dm.jrt.object.core.Builders.configurationWithAnnotations;
-import static com.github.dm.jrt.object.core.InvocationTarget.classOfType;
-import static com.github.dm.jrt.object.core.InvocationTarget.instance;
+import static com.github.dm.jrt.object.Builders.configurationWithAnnotations;
+import static com.github.dm.jrt.object.InvocationTarget.classOfType;
+import static com.github.dm.jrt.object.InvocationTarget.instance;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 

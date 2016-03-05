@@ -34,9 +34,9 @@ import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.function.OutputConsumerBuilder;
 import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
+import com.github.dm.jrt.object.InvocationTarget;
+import com.github.dm.jrt.object.JRoutineObject;
 import com.github.dm.jrt.object.builder.ObjectRoutineBuilder;
-import com.github.dm.jrt.object.core.InvocationTarget;
-import com.github.dm.jrt.object.core.JRoutineObject;
 import com.github.dm.jrt.proxy.builder.ProxyRoutineBuilder;
 import com.github.dm.jrt.proxy.core.JRoutineProxy;
 
@@ -54,8 +54,8 @@ import static com.github.dm.jrt.function.Functions.functionFilter;
 import static com.github.dm.jrt.function.Functions.predicateFilter;
 import static com.github.dm.jrt.function.Functions.supplierCommand;
 import static com.github.dm.jrt.function.Functions.supplierFactory;
-import static com.github.dm.jrt.object.core.InvocationTarget.classOfType;
-import static com.github.dm.jrt.object.core.InvocationTarget.instance;
+import static com.github.dm.jrt.object.InvocationTarget.classOfType;
+import static com.github.dm.jrt.object.InvocationTarget.instance;
 
 /**
  * Class acting as a façade of all the JRoutine library features.

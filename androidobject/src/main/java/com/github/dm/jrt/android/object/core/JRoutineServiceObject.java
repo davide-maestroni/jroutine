@@ -59,7 +59,7 @@ import java.util.WeakHashMap;
  * <p/>
  * Created by davide-maestroni on 01/08/2015.
  *
- * @see com.github.dm.jrt.object.core.JRoutineObject JRoutineObject
+ * @see com.github.dm.jrt.object.JRoutineObject JRoutineObject
  */
 public class JRoutineServiceObject {
 

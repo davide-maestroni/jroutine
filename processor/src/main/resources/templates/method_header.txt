@@ -22,11 +22,11 @@
 
         private final com.github.dm.jrt.object.builder.ProxyConfiguration mProxyConfiguration;
 
-        private final com.github.dm.jrt.object.core.InvocationTarget<?> mTarget;
+        private final com.github.dm.jrt.object.InvocationTarget<?> mTarget;
 
         private InvocationFactory${methodCount}(
                 @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.builder.ProxyConfiguration proxyConfiguration,
-                @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.core.InvocationTarget<?> target) {
+                @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.InvocationTarget<?> target) {
 
             mProxyConfiguration = proxyConfiguration;
             mTarget = target;
@@ -42,7 +42,7 @@
 
     @org.jetbrains.annotations.NotNull
     private com.github.dm.jrt.core.routine.Routine<?, ${resultClassName}> initRoutine${methodCount}(
-            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.core.InvocationTarget<?> target,
+            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.InvocationTarget<?> target,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.builder.InvocationConfiguration invocationConfiguration,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.builder.ProxyConfiguration proxyConfiguration) {
 

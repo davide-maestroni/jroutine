@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.proxy.core;
 
-import com.github.dm.jrt.object.core.InvocationTarget;
+import com.github.dm.jrt.object.InvocationTarget;
 import com.github.dm.jrt.proxy.builder.ProxyRoutineBuilder;
 
 import org.jetbrains.annotations.NotNull;

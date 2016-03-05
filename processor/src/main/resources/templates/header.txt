@@ -21,7 +21,7 @@ ${generatedPackage}
 public final class ${generatedClassName}${genericTypes} implements ${interfaceFullName} {
 
     @SuppressWarnings("ConstantConditions")
-    public ${generatedClassName}(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.core.InvocationTarget<?> target,
+    public ${generatedClassName}(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.InvocationTarget<?> target,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.builder.InvocationConfiguration invocationConfiguration,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.builder.ProxyConfiguration proxyConfiguration) {
 
@@ -42,7 +42,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
     }
 
     @org.jetbrains.annotations.NotNull
-    public static ${genericTypes} com.github.dm.jrt.proxy.builder.ProxyObjectBuilder<${interfaceFullName}> on(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.core.InvocationTarget.InstanceInvocationTarget<? extends ${classFullName}> target) {
+    public static ${genericTypes} com.github.dm.jrt.proxy.builder.ProxyObjectBuilder<${interfaceFullName}> on(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.InvocationTarget.InstanceInvocationTarget<? extends ${classFullName}> target) {
 
         return new ProxyObjectBuilder${genericTypes}(target);
     }
@@ -50,14 +50,14 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
     @org.jetbrains.annotations.NotNull
     public static ${genericTypes} com.github.dm.jrt.proxy.builder.ProxyObjectBuilder<${interfaceFullName}> onClass() {
 
-        return new ProxyObjectBuilder${genericTypes}(com.github.dm.jrt.object.core.InvocationTarget.classOfType(${classErasure}.class));
+        return new ProxyObjectBuilder${genericTypes}(com.github.dm.jrt.object.InvocationTarget.classOfType(${classErasure}.class));
     }
 
     private static class ProxyObjectBuilder${genericTypes} extends com.github.dm.jrt.proxy.builder.AbstractProxyObjectBuilder<${interfaceFullName}> {
 
-        private final com.github.dm.jrt.object.core.InvocationTarget<?> mTarget;
+        private final com.github.dm.jrt.object.InvocationTarget<?> mTarget;
 
-        private ProxyObjectBuilder(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.core.InvocationTarget<?> target) {
+        private ProxyObjectBuilder(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.InvocationTarget<?> target) {
 
             mTarget = target;
         }

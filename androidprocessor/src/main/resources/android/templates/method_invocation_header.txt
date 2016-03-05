@@ -28,7 +28,7 @@
         private com.github.dm.jrt.object.common.Mutex mMutex = com.github.dm.jrt.object.common.Mutex.NO_MUTEX;
 
         @SuppressWarnings("unused")
-        private com.github.dm.jrt.object.core.InvocationTarget mTarget;
+        private com.github.dm.jrt.object.InvocationTarget mTarget;
 
         private ContextInvocation${methodCount}(@org.jetbrains.annotations.Nullable final java.util.List<String> sharedFields,
                 @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.object.core.ContextInvocationTarget<?> target) {
@@ -42,8 +42,8 @@
         public void onContext(@org.jetbrains.annotations.NotNull final android.content.Context context) throws Exception {
 
             super.onContext(context);
-            final com.github.dm.jrt.object.core.InvocationTarget<?> target = mContextTarget.getInvocationTarget(context);
-            mMutex = com.github.dm.jrt.object.core.Builders.getSharedMutex(${mutexTarget}, mSharedFields);
+            final com.github.dm.jrt.object.InvocationTarget<?> target = mContextTarget.getInvocationTarget(context);
+            mMutex = com.github.dm.jrt.object.Builders.getSharedMutex(${mutexTarget}, mSharedFields);
             mTarget = target;
             mInstance = target.getTarget();
         }

@@ -24,7 +24,7 @@ import com.github.dm.jrt.android.object.builder.FactoryContext;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.util.Reflection;
-import com.github.dm.jrt.object.core.InvocationTarget;
+import com.github.dm.jrt.object.InvocationTarget;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

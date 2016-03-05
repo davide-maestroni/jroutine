@@ -33,14 +33,14 @@ import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
+import com.github.dm.jrt.object.Builders;
+import com.github.dm.jrt.object.Builders.MethodInfo;
+import com.github.dm.jrt.object.InvocationTarget;
+import com.github.dm.jrt.object.JRoutineObject;
 import com.github.dm.jrt.object.annotation.AsyncIn.InputMode;
 import com.github.dm.jrt.object.annotation.AsyncOut.OutputMode;
 import com.github.dm.jrt.object.builder.ProxyConfiguration;
 import com.github.dm.jrt.object.common.Mutex;
-import com.github.dm.jrt.object.core.Builders;
-import com.github.dm.jrt.object.core.Builders.MethodInfo;
-import com.github.dm.jrt.object.core.InvocationTarget;
-import com.github.dm.jrt.object.core.JRoutineObject;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

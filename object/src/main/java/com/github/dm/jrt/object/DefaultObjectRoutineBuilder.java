@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.object.core;
+package com.github.dm.jrt.object;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.InvocationConfiguration;
@@ -27,12 +27,12 @@ import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.Reflection;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
+import com.github.dm.jrt.object.Builders.MethodInfo;
 import com.github.dm.jrt.object.annotation.AsyncIn.InputMode;
 import com.github.dm.jrt.object.annotation.AsyncOut.OutputMode;
 import com.github.dm.jrt.object.builder.ObjectRoutineBuilder;
 import com.github.dm.jrt.object.builder.ProxyConfiguration;
 import com.github.dm.jrt.object.common.Mutex;
-import com.github.dm.jrt.object.core.Builders.MethodInfo;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,12 +45,12 @@ import java.util.HashMap;
 import java.util.List;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
-import static com.github.dm.jrt.object.core.Builders.callFromInvocation;
-import static com.github.dm.jrt.object.core.Builders.configurationWithAnnotations;
-import static com.github.dm.jrt.object.core.Builders.getAnnotatedMethod;
-import static com.github.dm.jrt.object.core.Builders.getSharedMutex;
-import static com.github.dm.jrt.object.core.Builders.getTargetMethodInfo;
-import static com.github.dm.jrt.object.core.Builders.invokeRoutine;
+import static com.github.dm.jrt.object.Builders.callFromInvocation;
+import static com.github.dm.jrt.object.Builders.configurationWithAnnotations;
+import static com.github.dm.jrt.object.Builders.getAnnotatedMethod;
+import static com.github.dm.jrt.object.Builders.getSharedMutex;
+import static com.github.dm.jrt.object.Builders.getTargetMethodInfo;
+import static com.github.dm.jrt.object.Builders.invokeRoutine;
 
 /**
  * Class implementing a builder of routines wrapping an object methods.

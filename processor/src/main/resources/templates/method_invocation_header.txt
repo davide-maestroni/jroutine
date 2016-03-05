@@ -21,12 +21,12 @@
         private final com.github.dm.jrt.object.common.Mutex mMutex;
 
         @SuppressWarnings("unused")
-        private final com.github.dm.jrt.object.core.InvocationTarget<?> mTarget;
+        private final com.github.dm.jrt.object.InvocationTarget<?> mTarget;
 
         @SuppressWarnings("ConstantConditions")
         private Invocation${methodCount}(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.builder.ProxyConfiguration proxyConfiguration,
-                 @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.core.InvocationTarget<?> target) {
+                 @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.InvocationTarget<?> target) {
 
-            mMutex = com.github.dm.jrt.object.core.Builders.getSharedMutex(${mutexTarget}, ${sharedFields});
+            mMutex = com.github.dm.jrt.object.Builders.getSharedMutex(${mutexTarget}, ${sharedFields});
             mTarget = target;
         }

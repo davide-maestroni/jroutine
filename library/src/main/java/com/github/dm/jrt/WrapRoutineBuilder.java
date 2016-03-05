@@ -21,11 +21,15 @@ import com.github.dm.jrt.object.builder.ObjectRoutineBuilder;
 import com.github.dm.jrt.object.builder.ProxyConfiguration;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Created by davide-maestroni on 03/03/2016.
  */
 public interface WrapRoutineBuilder extends ObjectRoutineBuilder {
+
+    @NotNull
+    WrapRoutineBuilder withBuilder(@Nullable ProxyBuilderType builderType);
 
     /**
      * {@inheritDoc}
@@ -38,4 +42,9 @@ public interface WrapRoutineBuilder extends ObjectRoutineBuilder {
      */
     @NotNull
     ProxyConfiguration.Builder<? extends WrapRoutineBuilder> withProxies();
+
+    enum ProxyBuilderType {
+        REFLECTION,
+        PROCESSOR
+    }
 }

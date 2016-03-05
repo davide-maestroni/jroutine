@@ -18,7 +18,7 @@
 
     private static class ContextInvocation${methodCount}${genericTypes} extends com.github.dm.jrt.android.core.invocation.FunctionContextInvocation<Object, ${resultClassName}> {
 
-        private final  com.github.dm.jrt.android.object.core.ContextInvocationTarget<?> mContextTarget;
+        private final  com.github.dm.jrt.android.object.ContextInvocationTarget<?> mContextTarget;
 
         private final java.util.List<String> mSharedFields;
 
@@ -31,7 +31,7 @@
         private com.github.dm.jrt.object.InvocationTarget mTarget;
 
         private ContextInvocation${methodCount}(@org.jetbrains.annotations.Nullable final java.util.List<String> sharedFields,
-                @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.object.core.ContextInvocationTarget<?> target) {
+                @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.object.ContextInvocationTarget<?> target) {
 
             mSharedFields = sharedFields;
             mContextTarget = target;

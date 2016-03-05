@@ -24,7 +24,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
     @SuppressWarnings("ConstantConditions")
     public ${generatedClassName}(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.ServiceContext context,
-            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.object.core.ContextInvocationTarget<?> target,
+            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.object.ContextInvocationTarget<?> target,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.builder.InvocationConfiguration invocationConfiguration,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.builder.ProxyConfiguration proxyConfiguration,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.builder.ServiceConfiguration serviceConfiguration) {
@@ -88,7 +88,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
         }
 
         @org.jetbrains.annotations.NotNull
-        public ${genericTypes} com.github.dm.jrt.android.proxy.builder.ServiceProxyObjectBuilder<${interfaceFullName}> on(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.object.core.ContextInvocationTarget.ObjectContextInvocationTarget<? extends ${classFullName}> target) {
+        public ${genericTypes} com.github.dm.jrt.android.proxy.builder.ServiceProxyObjectBuilder<${interfaceFullName}> on(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.object.ContextInvocationTarget.ObjectContextInvocationTarget<? extends ${classFullName}> target) {
 
             return new ServiceProxyObjectBuilder${genericTypes}(mContext, target);
         }
@@ -96,7 +96,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
         @org.jetbrains.annotations.NotNull
         public ${genericTypes} com.github.dm.jrt.android.proxy.builder.ServiceProxyObjectBuilder<${interfaceFullName}> onClass() {
 
-            return new ServiceProxyObjectBuilder${genericTypes}(mContext, com.github.dm.jrt.android.object.core.ContextInvocationTarget.classOfType(${classErasure}.class));
+            return new ServiceProxyObjectBuilder${genericTypes}(mContext, com.github.dm.jrt.android.object.ContextInvocationTarget.classOfType(${classErasure}.class));
         }
     }
 
@@ -104,11 +104,11 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
         private final com.github.dm.jrt.android.core.ServiceContext mContext;
 
-        private final com.github.dm.jrt.android.object.core.ContextInvocationTarget<?> mTarget;
+        private final com.github.dm.jrt.android.object.ContextInvocationTarget<?> mTarget;
 
         @SuppressWarnings("ConstantConditions")
         private ServiceProxyObjectBuilder(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.ServiceContext context,
-                @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.object.core.ContextInvocationTarget<?> target) {
+                @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.object.ContextInvocationTarget<?> target) {
 
             if (context == null) {
                 throw new NullPointerException("the service context must not be null");

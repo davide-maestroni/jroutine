@@ -35,10 +35,6 @@ import com.github.dm.jrt.function.OutputConsumerBuilder;
 import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.object.InvocationTarget;
-import com.github.dm.jrt.object.JRoutineObject;
-import com.github.dm.jrt.object.builder.ObjectRoutineBuilder;
-import com.github.dm.jrt.proxy.JRoutineProxy;
-import com.github.dm.jrt.proxy.builder.ProxyRoutineBuilder;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -276,9 +272,9 @@ public class JRoutineFacade extends Channels {
      *                                            interface.
      */
     @NotNull
-    public static ObjectRoutineBuilder on(@NotNull final InvocationTarget<?> target) {
+    public static WrapRoutineBuilder on(@NotNull final InvocationTarget<?> target) {
 
-        return JRoutineObject.on(target);
+        return new DefaultWrapRoutineBuilder(target);
     }
 
     @NotNull
@@ -368,24 +364,5 @@ public class JRoutineFacade extends Channels {
     public static <OUT> OutputConsumerBuilder<OUT> onOutput(@NotNull final Consumer<OUT> consumer) {
 
         return Functions.onOutput(consumer);
-    }
-
-    /**
-     * Returns a routine builder wrapping the specified target object.<br/>
-     * Note that it is responsibility of the caller to retain a strong reference to the target
-     * instance to prevent it from being garbage collected.<br/>
-     * Note also that the invocation input data will be cached, and the results will be produced
-     * only after the invocation channel is closed, so be sure to avoid streaming inputs in order to
-     * prevent starvation or out of memory errors.
-     *
-     * @param target the invocation target.
-     * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if the specified object class represents an
-     *                                            interface.
-     */
-    @NotNull
-    public static ProxyRoutineBuilder onProxied(@NotNull final InvocationTarget<?> target) {
-
-        return JRoutineProxy.on(target);
     }
 }

@@ -22,15 +22,15 @@
         android:name=".app.TestApp"
         android:label="jroutine-androidobject">
         <activity
-            android:name="com.github.dm.jrt.android.object.core.TestActivity"
+            android:name="com.github.dm.jrt.android.object.TestActivity"
             android:label="test">
         </activity>
         <activity
-            android:name="com.github.dm.jrt.android.v11.object.core.TestActivity"
+            android:name="com.github.dm.jrt.android.v11.object.TestActivity"
             android:label="test">
         </activity>
         <activity
-            android:name="com.github.dm.jrt.android.v4.object.core.TestActivity"
+            android:name="com.github.dm.jrt.android.v4.object.TestActivity"
             android:label="test">
         </activity>
 
@@ -38,7 +38,7 @@
             android:name="com.github.dm.jrt.android.core.service.InvocationService"
             android:process=":remote"/>
         <service
-            android:name="com.github.dm.jrt.android.object.core.TestService"
+            android:name="com.github.dm.jrt.android.object.TestService"
             android:process=":remote"/>
     </application>
 

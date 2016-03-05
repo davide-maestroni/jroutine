@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt;
 
+import com.github.dm.jrt.WrapRoutineBuilder.ProxyBuilderType;
 import com.github.dm.jrt.core.builder.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
@@ -135,7 +136,7 @@ public class JRoutineFacadeTest {
     @Test
     public void testClassStaticMethod() {
 
-        final TestStatic testStatic = JRoutineFacade.onProxied(classOfType(TestClass.class))
+        final TestStatic testStatic = JRoutineFacade.on(classOfType(TestClass.class))
                                                     .withInvocations()
                                                     .withRunner(Runners.poolRunner())
                                                     .withLogLevel(Level.DEBUG)
@@ -308,7 +309,8 @@ public class JRoutineFacadeTest {
     public void testObjectStaticMethod() {
 
         final TestClass test = new TestClass();
-        final TestStatic testStatic = JRoutineFacade.onProxied(instance(test))
+        final TestStatic testStatic = JRoutineFacade.on(instance(test))
+                                                    .withBuilder(ProxyBuilderType.REFLECTION)
                                                     .withInvocations()
                                                     .withRunner(Runners.poolRunner())
                                                     .withLogLevel(Level.DEBUG)
@@ -338,6 +340,7 @@ public class JRoutineFacadeTest {
 
         final TestClass test = new TestClass();
         final TestStatic proxy = JRoutineFacade.on(test)
+                                               .withBuilder(ProxyBuilderType.PROCESSOR)
                                                .withInvocations()
                                                .withRunner(Runners.poolRunner())
                                                .withLogLevel(Level.DEBUG)

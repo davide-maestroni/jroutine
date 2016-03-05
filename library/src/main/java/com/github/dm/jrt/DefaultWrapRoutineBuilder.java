@@ -28,6 +28,7 @@ import com.github.dm.jrt.proxy.annotation.Proxy;
 import com.github.dm.jrt.proxy.builder.ProxyRoutineBuilder;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Method;
 
@@ -37,6 +38,8 @@ import java.lang.reflect.Method;
 class DefaultWrapRoutineBuilder implements WrapRoutineBuilder {
 
     private final InvocationTarget<?> mTarget;
+
+    private ProxyBuilderType mBuilderType;
 
     private InvocationConfiguration mInvocationConfiguration =
             InvocationConfiguration.DEFAULT_CONFIGURATION;
@@ -88,7 +91,16 @@ class DefaultWrapRoutineBuilder implements WrapRoutineBuilder {
     @NotNull
     public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
 
-        if (itf.isAnnotationPresent(Proxy.class)) {
+        final ProxyBuilderType builderType = mBuilderType;
+        if (builderType == null) {
+            final Proxy proxyAnnotation = itf.getAnnotation(Proxy.class);
+            if ((proxyAnnotation != null) && mTarget.isAssignableTo(proxyAnnotation.value())) {
+                return newProxyBuilder().buildProxy(itf);
+            }
+
+            return newObjectBuilder().buildProxy(itf);
+
+        } else if (builderType == ProxyBuilderType.PROCESSOR) {
             return newProxyBuilder().buildProxy(itf);
         }
 
@@ -98,11 +110,7 @@ class DefaultWrapRoutineBuilder implements WrapRoutineBuilder {
     @NotNull
     public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
 
-        if (itf.getRawClass().isAnnotationPresent(Proxy.class)) {
-            return newProxyBuilder().buildProxy(itf);
-        }
-
-        return newObjectBuilder().buildProxy(itf);
+        return buildProxy(itf.getRawClass());
     }
 
     @NotNull
@@ -116,6 +124,13 @@ class DefaultWrapRoutineBuilder implements WrapRoutineBuilder {
     public <IN, OUT> Routine<IN, OUT> method(@NotNull final Method method) {
 
         return newObjectBuilder().method(method);
+    }
+
+    @NotNull
+    public WrapRoutineBuilder withBuilder(@Nullable final ProxyBuilderType builderType) {
+
+        mBuilderType = builderType;
+        return this;
     }
 
     @NotNull

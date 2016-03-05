@@ -23,7 +23,7 @@ import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
 import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
-import com.github.dm.jrt.routine.Routine;
+import com.github.dm.jrt.core.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
 

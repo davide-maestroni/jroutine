@@ -21,7 +21,7 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.InvocationConfiguration;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
-import com.github.dm.jrt.routine.Routine;
+import com.github.dm.jrt.core.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

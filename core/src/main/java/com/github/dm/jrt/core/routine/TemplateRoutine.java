@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.routine;
+package com.github.dm.jrt.core.routine;
 
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 

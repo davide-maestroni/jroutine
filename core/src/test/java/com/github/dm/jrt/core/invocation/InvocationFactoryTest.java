@@ -17,7 +17,7 @@
 package com.github.dm.jrt.core.invocation;
 
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.routine.Routine;
+import com.github.dm.jrt.core.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;

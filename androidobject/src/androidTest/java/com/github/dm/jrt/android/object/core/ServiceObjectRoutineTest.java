@@ -30,6 +30,7 @@ import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.invocation.InvocationException;
+import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.TimeDuration;
 import com.github.dm.jrt.log.Log;
@@ -47,7 +48,6 @@ import com.github.dm.jrt.object.annotation.ReadTimeout;
 import com.github.dm.jrt.object.annotation.ReadTimeoutAction;
 import com.github.dm.jrt.object.annotation.SharedFields;
 import com.github.dm.jrt.object.builder.ProxyConfiguration;
-import com.github.dm.jrt.routine.Routine;
 import com.github.dm.jrt.runner.Runners;
 
 import org.jetbrains.annotations.NotNull;

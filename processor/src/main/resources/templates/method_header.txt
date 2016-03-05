@@ -16,7 +16,7 @@
 
 // GENERATED CODE - PLEASE DO NOT EDIT
 
-    private final com.github.dm.jrt.routine.Routine<?, ${resultClassName}> mRoutine${methodCount};
+    private final com.github.dm.jrt.core.routine.Routine<?, ${resultClassName}> mRoutine${methodCount};
 
     private static class InvocationFactory${methodCount}${genericTypes} extends com.github.dm.jrt.core.invocation.InvocationFactory<Object, ${resultClassName}> {
 
@@ -41,7 +41,7 @@
     }
 
     @org.jetbrains.annotations.NotNull
-    private com.github.dm.jrt.routine.Routine<?, ${resultClassName}> initRoutine${methodCount}(
+    private com.github.dm.jrt.core.routine.Routine<?, ${resultClassName}> initRoutine${methodCount}(
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.core.InvocationTarget<?> target,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.builder.InvocationConfiguration invocationConfiguration,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.builder.ProxyConfiguration proxyConfiguration) {

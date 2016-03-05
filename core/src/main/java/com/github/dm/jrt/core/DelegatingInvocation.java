@@ -22,7 +22,7 @@ import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
-import com.github.dm.jrt.routine.Routine;
+import com.github.dm.jrt.core.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
 

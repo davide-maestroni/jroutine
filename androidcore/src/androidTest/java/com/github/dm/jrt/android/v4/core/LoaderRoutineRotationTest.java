@@ -26,8 +26,8 @@ import com.github.dm.jrt.android.invocation.FunctionContextInvocation;
 import com.github.dm.jrt.core.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.TimeDuration;
-import com.github.dm.jrt.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import static com.github.dm.jrt.android.invocation.FunctionContextInvocationFactories.factoryOf;
-import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

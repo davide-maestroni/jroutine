@@ -28,6 +28,7 @@ import com.github.dm.jrt.android.object.builder.ServiceObjectRoutineBuilder;
 import com.github.dm.jrt.core.builder.InvocationConfiguration;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.invocation.InvocationException;
+import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.object.annotation.AsyncIn.InputMode;
 import com.github.dm.jrt.object.annotation.AsyncOut.OutputMode;
@@ -37,7 +38,6 @@ import com.github.dm.jrt.object.common.Mutex;
 import com.github.dm.jrt.object.core.Builders.MethodInfo;
 import com.github.dm.jrt.object.core.InvocationTarget;
 import com.github.dm.jrt.object.core.JRoutineObject;
-import com.github.dm.jrt.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

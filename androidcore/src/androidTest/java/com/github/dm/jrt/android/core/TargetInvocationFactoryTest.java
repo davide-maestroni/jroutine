@@ -23,7 +23,7 @@ import android.test.ActivityInstrumentationTestCase2;
 import com.github.dm.jrt.android.core.DecoratingService.StringInvocation;
 import com.github.dm.jrt.android.invocation.FilterContextInvocation;
 import com.github.dm.jrt.core.channel.ResultChannel;
-import com.github.dm.jrt.routine.Routine;
+import com.github.dm.jrt.core.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;
 

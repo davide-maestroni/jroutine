@@ -20,8 +20,8 @@ import android.util.SparseArray;
 
 import com.github.dm.jrt.android.core.channel.ParcelableSelectable;
 import com.github.dm.jrt.android.v4.core.channel.SparseChannelsCompat;
+import com.github.dm.jrt.channel.AbstractBuilder;
 import com.github.dm.jrt.core.builder.ChannelConfiguration;
-import com.github.dm.jrt.core.channel.AbstractBuilder;
 import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
 

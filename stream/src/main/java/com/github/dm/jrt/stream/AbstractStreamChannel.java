@@ -16,6 +16,8 @@
 
 package com.github.dm.jrt.stream;
 
+import com.github.dm.jrt.channel.Channels;
+import com.github.dm.jrt.channel.Selectable;
 import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.ChannelConfiguration;
@@ -23,12 +25,10 @@ import com.github.dm.jrt.core.builder.InvocationConfiguration;
 import com.github.dm.jrt.core.builder.InvocationConfiguration.Builder;
 import com.github.dm.jrt.core.builder.InvocationConfiguration.Configurable;
 import com.github.dm.jrt.core.builder.InvocationConfiguration.OrderType;
-import com.github.dm.jrt.core.channel.Channels;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.channel.ResultChannel;
-import com.github.dm.jrt.core.channel.Selectable;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.invocation.ComparableFilterInvocation;
 import com.github.dm.jrt.core.invocation.ComparableInvocationFactory;

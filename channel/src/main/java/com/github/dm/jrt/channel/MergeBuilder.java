@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.core.channel;
+package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.ChannelConfiguration;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.IOChannel;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -26,23 +27,27 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * Builder implementation returning a channel blending data from a set of output channels.
+ * Builder implementation merging data from a set of output channels into selectable objects.
  * <p/>
  * Created by davide-maestroni on 02/26/2016.
  *
  * @param <OUT> the output data type.
  */
-class BlendBuilder<OUT> extends AbstractBuilder<OutputChannel<OUT>> {
+class MergeBuilder<OUT> extends AbstractBuilder<OutputChannel<? extends Selectable<OUT>>> {
 
     private final ArrayList<OutputChannel<? extends OUT>> mChannels;
+
+    private final int mStartIndex;
 
     /**
      * Constructor.
      *
-     * @param channels the output channels to blend.
+     * @param startIndex the selectable start index.
+     * @param channels   the input channels to merge.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
      */
-    BlendBuilder(@NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
+    MergeBuilder(final int startIndex,
+            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
 
         if (channels.isEmpty()) {
             throw new IllegalArgumentException("the collection of channels must not be empty");
@@ -55,17 +60,20 @@ class BlendBuilder<OUT> extends AbstractBuilder<OutputChannel<OUT>> {
                     "the collection of channels must not contain null objects");
         }
 
+        mStartIndex = startIndex;
         mChannels = channelList;
     }
 
     @NotNull
     @Override
-    protected OutputChannel<OUT> build(@NotNull final ChannelConfiguration configuration) {
+    protected OutputChannel<? extends Selectable<OUT>> build(
+            @NotNull final ChannelConfiguration configuration) {
 
-        final IOChannel<OUT> ioChannel =
+        final IOChannel<Selectable<OUT>> ioChannel =
                 JRoutineCore.io().withChannels().with(configuration).getConfigured().buildChannel();
+        int i = mStartIndex;
         for (final OutputChannel<? extends OUT> channel : mChannels) {
-            channel.bindTo(ioChannel);
+            ioChannel.pass(Channels.toSelectable(channel, i++).build());
         }
 
         return ioChannel.close();

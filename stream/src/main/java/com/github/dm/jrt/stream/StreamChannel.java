@@ -16,13 +16,13 @@
 
 package com.github.dm.jrt.stream;
 
+import com.github.dm.jrt.channel.Selectable;
 import com.github.dm.jrt.core.builder.ConfigurableBuilder;
 import com.github.dm.jrt.core.builder.InvocationConfiguration.Builder;
 import com.github.dm.jrt.core.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.channel.ResultChannel;
-import com.github.dm.jrt.core.channel.Selectable;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.Routine;

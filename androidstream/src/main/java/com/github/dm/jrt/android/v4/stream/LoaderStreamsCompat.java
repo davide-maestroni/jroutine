@@ -24,11 +24,11 @@ import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
 import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.android.v4.core.channel.SparseChannelsCompat;
+import com.github.dm.jrt.channel.ChannelsBuilder;
 import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
-import com.github.dm.jrt.core.channel.ChannelsBuilder;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.stream.StreamChannel;
@@ -235,7 +235,8 @@ public class LoaderStreamsCompat extends Streams {
      * @param <OUT>       the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
-     * @see SparseChannelsCompat#join(Object, com.github.dm.jrt.core.channel.Channel.OutputChannel[])
+     * @see SparseChannelsCompat#join(Object, com.github.dm.jrt.core.channel.Channel
+     * .OutputChannel[])
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<List<? extends OUT>>>
@@ -514,7 +515,8 @@ public class LoaderStreamsCompat extends Streams {
      * @param <OUT>      the output data type.
      * @return the map of indexes and output channels builder.
      * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
-     * @see SparseChannelsCompat#select(int, int, com.github.dm.jrt.core.channel.Channel.OutputChannel)
+     * @see SparseChannelsCompat#select(int, int, com.github.dm.jrt.core.channel.Channel
+     * .OutputChannel)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends
@@ -536,7 +538,8 @@ public class LoaderStreamsCompat extends Streams {
      * @param indexes the list of indexes.
      * @param <OUT>   the output data type.
      * @return the map of indexes and output channels builder.
-     * @see SparseChannelsCompat#select(com.github.dm.jrt.core.channel.Channel.OutputChannel, int...)
+     * @see SparseChannelsCompat#select(com.github.dm.jrt.core.channel.Channel.OutputChannel,
+     * int...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends
@@ -557,7 +560,8 @@ public class LoaderStreamsCompat extends Streams {
      * @param indexes the iterable returning the channel indexes.
      * @param <OUT>   the output data type.
      * @return the map of indexes and output channels builder.
-     * @see SparseChannelsCompat#select(com.github.dm.jrt.core.channel.Channel.OutputChannel, Iterable)
+     * @see SparseChannelsCompat#select(com.github.dm.jrt.core.channel.Channel.OutputChannel,
+     * Iterable)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends
@@ -646,7 +650,8 @@ public class LoaderStreamsCompat extends Streams {
      * @param index   the channel index.
      * @param <OUT>   the output data type.
      * @return the selectable loader stream builder.
-     * @see SparseChannelsCompat#toSelectable(com.github.dm.jrt.core.channel.Channel.OutputChannel, int)
+     * @see SparseChannelsCompat#toSelectable(com.github.dm.jrt.core.channel.Channel
+     * .OutputChannel, int)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<? extends

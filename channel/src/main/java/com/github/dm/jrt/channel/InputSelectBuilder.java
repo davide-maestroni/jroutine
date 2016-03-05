@@ -14,39 +14,41 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.core.channel;
+package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.ChannelConfiguration;
-import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.channel.Channel.InputChannel;
+import com.github.dm.jrt.core.channel.IOChannel;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Builder implementation returning a channel making an output one selectable.
+ * Builder implementation returning a channel passing selectable data to an input channel.
  * <p/>
  * Created by davide-maestroni on 02/26/2016.
  *
- * @param <OUT> the output data type.
+ * @param <DATA> the channel data type.
+ * @param <IN>   the input data type.
  */
-class SelectableOutputBuilder<OUT>
-        extends AbstractBuilder<OutputChannel<? extends Selectable<OUT>>> {
+class InputSelectBuilder<DATA, IN extends DATA> extends AbstractBuilder<IOChannel<IN>> {
 
-    private final OutputChannel<? extends OUT> mChannel;
+    private final InputChannel<? super Selectable<DATA>> mChannel;
 
     private final int mIndex;
 
     /**
      * Constructor.
      *
-     * @param channel the output channel.
+     * @param channel the input channel.
      * @param index   the selectable index.
      */
     @SuppressWarnings("ConstantConditions")
-    SelectableOutputBuilder(@NotNull final OutputChannel<? extends OUT> channel, final int index) {
+    InputSelectBuilder(@NotNull final InputChannel<? super Selectable<DATA>> channel,
+            final int index) {
 
         if (channel == null) {
-            throw new NullPointerException("the output channel must not be null");
+            throw new NullPointerException("the input channel must not be null");
         }
 
         mChannel = channel;
@@ -55,12 +57,12 @@ class SelectableOutputBuilder<OUT>
 
     @NotNull
     @Override
-    protected OutputChannel<? extends Selectable<OUT>> build(
-            @NotNull final ChannelConfiguration configuration) {
+    protected IOChannel<IN> build(@NotNull final ChannelConfiguration configuration) {
 
-        final IOChannel<Selectable<OUT>> ioChannel =
+        final IOChannel<IN> inputChannel =
                 JRoutineCore.io().withChannels().with(configuration).getConfigured().buildChannel();
-        mChannel.bindTo(new SelectableOutputConsumer<OUT, OUT>(ioChannel, mIndex));
-        return ioChannel;
+        final IOChannel<Selectable<DATA>> ioChannel = JRoutineCore.io().buildChannel();
+        ioChannel.bindTo(mChannel);
+        return inputChannel.bindTo(new SelectableOutputConsumer<DATA, IN>(ioChannel, mIndex));
     }
 }

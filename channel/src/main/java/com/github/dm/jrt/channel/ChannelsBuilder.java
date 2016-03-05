@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.core.channel;
+package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.core.builder.ChannelConfigurableBuilder;
 

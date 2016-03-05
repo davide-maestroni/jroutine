@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import static com.github.dm.jrt.android.invocation.FunctionContextInvocationFactories.factoryOf;
+import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

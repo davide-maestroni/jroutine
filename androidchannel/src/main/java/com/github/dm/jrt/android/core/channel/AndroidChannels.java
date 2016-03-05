@@ -16,10 +16,10 @@
 
 package com.github.dm.jrt.android.core.channel;
 
+import com.github.dm.jrt.channel.Channels;
+import com.github.dm.jrt.channel.ChannelsBuilder;
 import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
-import com.github.dm.jrt.core.channel.Channels;
-import com.github.dm.jrt.core.channel.ChannelsBuilder;
 import com.github.dm.jrt.core.channel.IOChannel;
 
 import org.jetbrains.annotations.NotNull;

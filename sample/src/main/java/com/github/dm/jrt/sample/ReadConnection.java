@@ -16,9 +16,9 @@
 
 package com.github.dm.jrt.sample;
 
-import com.github.dm.jrt.core.channel.ByteChannel;
-import com.github.dm.jrt.core.channel.ByteChannel.BufferOutputStream;
-import com.github.dm.jrt.core.channel.ByteChannel.ByteBuffer;
+import com.github.dm.jrt.channel.ByteChannel;
+import com.github.dm.jrt.channel.ByteChannel.BufferOutputStream;
+import com.github.dm.jrt.channel.ByteChannel.ByteBuffer;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.invocation.FilterInvocation;
 

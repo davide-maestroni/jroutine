@@ -19,7 +19,7 @@ package com.github.dm.jrt.android.core.channel;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.github.dm.jrt.core.channel.Selectable;
+import com.github.dm.jrt.channel.Selectable;
 
 import org.jetbrains.annotations.NotNull;
 

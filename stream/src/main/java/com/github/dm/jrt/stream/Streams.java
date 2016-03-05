@@ -16,15 +16,15 @@
 
 package com.github.dm.jrt.stream;
 
+import com.github.dm.jrt.channel.Channels;
+import com.github.dm.jrt.channel.ChannelsBuilder;
+import com.github.dm.jrt.channel.Selectable;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
-import com.github.dm.jrt.core.channel.Channels;
-import com.github.dm.jrt.core.channel.ChannelsBuilder;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
-import com.github.dm.jrt.core.channel.Selectable;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.Consumer;

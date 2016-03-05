@@ -22,8 +22,8 @@ import com.github.dm.jrt.core.builder.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.Logs;
 import com.github.dm.jrt.core.log.NullLog;
+import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.TimeDuration;
-import com.github.dm.jrt.runner.Runners;
 
 import org.junit.Test;
 

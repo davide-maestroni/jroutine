@@ -25,8 +25,8 @@ import com.github.dm.jrt.android.runner.AndroidRunners;
 import com.github.dm.jrt.android.runner.MainRunner;
 import com.github.dm.jrt.core.log.NullLog;
 import com.github.dm.jrt.core.log.SystemLog;
-import com.github.dm.jrt.runner.RunnerDecorator;
-import com.github.dm.jrt.runner.Runners;
+import com.github.dm.jrt.core.runner.RunnerDecorator;
+import com.github.dm.jrt.core.runner.Runners;
 
 import static com.github.dm.jrt.android.builder.ServiceConfiguration.builder;
 import static com.github.dm.jrt.android.builder.ServiceConfiguration.builderFrom;

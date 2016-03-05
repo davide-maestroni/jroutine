@@ -51,11 +51,11 @@ import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.log.NullLog;
 import com.github.dm.jrt.core.routine.Routine;
+import com.github.dm.jrt.core.runner.Execution;
+import com.github.dm.jrt.core.runner.Runner;
+import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.TimeDuration;
-import com.github.dm.jrt.runner.Execution;
-import com.github.dm.jrt.runner.Runner;
-import com.github.dm.jrt.runner.Runners;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;

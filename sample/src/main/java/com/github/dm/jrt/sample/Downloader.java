@@ -21,9 +21,9 @@ import com.github.dm.jrt.core.channel.ByteChannel.ByteBuffer;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.routine.Routine;
+import com.github.dm.jrt.core.runner.Runner;
+import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.TimeDuration;
-import com.github.dm.jrt.runner.Runner;
-import com.github.dm.jrt.runner.Runners;
 
 import java.io.File;
 import java.io.IOException;

@@ -28,11 +28,11 @@ import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
+import com.github.dm.jrt.core.runner.Runner;
+import com.github.dm.jrt.core.runner.RunnerDecorator;
+import com.github.dm.jrt.core.runner.Runners;
+import com.github.dm.jrt.core.runner.TemplateExecution;
 import com.github.dm.jrt.core.util.TimeDuration;
-import com.github.dm.jrt.runner.Runner;
-import com.github.dm.jrt.runner.RunnerDecorator;
-import com.github.dm.jrt.runner.Runners;
-import com.github.dm.jrt.runner.TemplateExecution;
 
 import org.jetbrains.annotations.NotNull;
 

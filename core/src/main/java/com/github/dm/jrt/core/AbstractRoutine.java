@@ -26,10 +26,10 @@ import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.routine.TemplateRoutine;
+import com.github.dm.jrt.core.runner.Runner;
+import com.github.dm.jrt.core.runner.Runners;
+import com.github.dm.jrt.core.runner.TemplateExecution;
 import com.github.dm.jrt.core.util.SimpleQueue;
-import com.github.dm.jrt.runner.Runner;
-import com.github.dm.jrt.runner.Runners;
-import com.github.dm.jrt.runner.TemplateExecution;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

@@ -28,12 +28,12 @@ import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.log.Logger;
+import com.github.dm.jrt.core.runner.Execution;
+import com.github.dm.jrt.core.runner.Runner;
+import com.github.dm.jrt.core.runner.TemplateExecution;
 import com.github.dm.jrt.core.util.SimpleQueue;
 import com.github.dm.jrt.core.util.TimeDuration;
 import com.github.dm.jrt.core.util.TimeDuration.Condition;
-import com.github.dm.jrt.runner.Execution;
-import com.github.dm.jrt.runner.Runner;
-import com.github.dm.jrt.runner.TemplateExecution;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

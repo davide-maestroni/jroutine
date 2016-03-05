@@ -23,8 +23,8 @@ import com.github.dm.jrt.android.routine.LoaderRoutine;
 import com.github.dm.jrt.android.runner.AndroidRunners;
 import com.github.dm.jrt.core.builder.InvocationConfiguration;
 import com.github.dm.jrt.core.builder.TemplateRoutineBuilder;
+import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.Reflection;
-import com.github.dm.jrt.runner.Runner;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

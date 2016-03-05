@@ -21,10 +21,10 @@ import com.github.dm.jrt.core.builder.ChannelConfiguration.Builder;
 import com.github.dm.jrt.core.builder.ChannelConfiguration.Configurable;
 import com.github.dm.jrt.core.builder.IOChannelBuilder;
 import com.github.dm.jrt.core.channel.IOChannel;
-import com.github.dm.jrt.runner.Execution;
-import com.github.dm.jrt.runner.Runner;
-import com.github.dm.jrt.runner.RunnerDecorator;
-import com.github.dm.jrt.runner.Runners;
+import com.github.dm.jrt.core.runner.Execution;
+import com.github.dm.jrt.core.runner.Runner;
+import com.github.dm.jrt.core.runner.RunnerDecorator;
+import com.github.dm.jrt.core.runner.Runners;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

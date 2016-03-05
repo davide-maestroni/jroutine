@@ -32,6 +32,7 @@ import com.github.dm.jrt.core.invocation.PassingInvocation;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.NullLog;
 import com.github.dm.jrt.core.routine.Routine;
+import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.TimeDuration;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.Consumer;
@@ -43,7 +44,6 @@ import com.github.dm.jrt.object.annotation.Alias;
 import com.github.dm.jrt.object.annotation.AsyncOut;
 import com.github.dm.jrt.object.annotation.ReadTimeout;
 import com.github.dm.jrt.proxy.annotation.Proxy;
-import com.github.dm.jrt.runner.Runners;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.runner;
+package com.github.dm.jrt.core.runner;
 
 import org.jetbrains.annotations.NotNull;
 

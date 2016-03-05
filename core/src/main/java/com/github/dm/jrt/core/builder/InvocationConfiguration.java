@@ -19,8 +19,8 @@ package com.github.dm.jrt.core.builder;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.Logger;
+import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.TimeDuration;
-import com.github.dm.jrt.runner.Runner;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -1069,7 +1069,7 @@ public final class InvocationConfiguration {
          *
          * @param priority the priority.
          * @return this builder.
-         * @see com.github.dm.jrt.runner.PriorityRunner PriorityRunner
+         * @see com.github.dm.jrt.core.runner.PriorityRunner PriorityRunner
          */
         @NotNull
         public Builder<TYPE> withPriority(final int priority) {

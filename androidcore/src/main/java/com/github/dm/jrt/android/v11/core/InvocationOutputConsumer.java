@@ -27,8 +27,8 @@ import com.github.dm.jrt.core.channel.TemplateOutputConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.log.Logger;
-import com.github.dm.jrt.runner.Runner;
-import com.github.dm.jrt.runner.TemplateExecution;
+import com.github.dm.jrt.core.runner.Runner;
+import com.github.dm.jrt.core.runner.TemplateExecution;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

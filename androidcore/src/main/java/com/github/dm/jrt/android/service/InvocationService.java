@@ -40,8 +40,8 @@ import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.Logger;
+import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.Reflection;
-import com.github.dm.jrt.runner.Runner;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

@@ -19,9 +19,9 @@ package com.github.dm.jrt.android.runner;
 import android.os.Handler;
 import android.os.Looper;
 
-import com.github.dm.jrt.runner.Execution;
-import com.github.dm.jrt.runner.Runner;
-import com.github.dm.jrt.runner.Runners;
+import com.github.dm.jrt.core.runner.Execution;
+import com.github.dm.jrt.core.runner.Runner;
+import com.github.dm.jrt.core.runner.Runners;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

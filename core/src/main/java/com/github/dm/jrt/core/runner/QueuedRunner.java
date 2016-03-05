@@ -14,49 +14,35 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.runner;
+package com.github.dm.jrt.core.runner;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
 
 /**
- * Implementation of a decorator of a runner object.
+ * Class implementing a queued synchronous runner.
  * <p/>
- * Created by davide-maestroni on 09/22/2014.
+ * The runner maintains an internal buffer of executions that are consumed only when the last one
+ * completes, thus avoiding overflowing the call stack because of nested calls to other routines.
+ * <p/>
+ * Created by davide-maestroni on 09/18/2014.
  */
-public class RunnerDecorator implements Runner {
-
-    private final Runner mRunner;
-
-    /**
-     * Constructor.
-     *
-     * @param wrapped the wrapped instance.
-     */
-    @SuppressWarnings("ConstantConditions")
-    public RunnerDecorator(@NotNull final Runner wrapped) {
-
-        if (wrapped == null) {
-            throw new NullPointerException("the wrapped runner must not be null");
-        }
-
-        mRunner = wrapped;
-    }
+class QueuedRunner implements Runner {
 
     public void cancel(@NotNull final Execution execution) {
 
-        mRunner.cancel(execution);
+        LocalQueue.cancel(execution);
     }
 
     public boolean isExecutionThread() {
 
-        return mRunner.isExecutionThread();
+        return true;
     }
 
     public void run(@NotNull final Execution execution, final long delay,
             @NotNull final TimeUnit timeUnit) {
 
-        mRunner.run(execution, delay, timeUnit);
+        LocalQueue.run(execution, delay, timeUnit);
     }
 }

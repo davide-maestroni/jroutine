@@ -27,7 +27,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.object.core.ContextInvocationTarget<?> target,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.builder.InvocationConfiguration invocationConfiguration,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.builder.ProxyConfiguration proxyConfiguration,
-            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.builder.ServiceConfiguration serviceConfiguration) {
+            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.builder.ServiceConfiguration serviceConfiguration) {
 
         if (context == null) {
             throw new NullPointerException("the service context must not be null");
@@ -66,7 +66,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
     }
 
     @org.jetbrains.annotations.NotNull
-    private static <OUT> com.github.dm.jrt.android.builder.ServiceRoutineBuilder<Object, OUT> getBuilder(
+    private static <OUT> com.github.dm.jrt.android.core.builder.ServiceRoutineBuilder<Object, OUT> getBuilder(
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.ServiceContext context,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.TargetInvocationFactory<Object, OUT> target) {
 
@@ -149,7 +149,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
         protected ${interfaceFullName} newProxy(
                 @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.builder.InvocationConfiguration invocationConfiguration,
                 @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.builder.ProxyConfiguration proxyConfiguration,
-                @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.builder.ServiceConfiguration serviceConfiguration) {
+                @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.builder.ServiceConfiguration serviceConfiguration) {
 
             return new ${generatedClassName}${genericTypes}(mContext, mTarget, invocationConfiguration, proxyConfiguration, serviceConfiguration);
         }

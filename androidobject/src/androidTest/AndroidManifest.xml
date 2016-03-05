@@ -35,7 +35,7 @@
         </activity>
 
         <service
-            android:name="com.github.dm.jrt.android.service.InvocationService"
+            android:name="com.github.dm.jrt.android.core.service.InvocationService"
             android:process=":remote"/>
         <service
             android:name="com.github.dm.jrt.android.object.core.TestService"

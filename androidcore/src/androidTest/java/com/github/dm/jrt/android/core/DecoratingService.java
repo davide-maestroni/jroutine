@@ -16,11 +16,11 @@
 
 package com.github.dm.jrt.android.core;
 
-import com.github.dm.jrt.android.invocation.ContextInvocation;
-import com.github.dm.jrt.android.invocation.ContextInvocationDecorator;
-import com.github.dm.jrt.android.invocation.ContextInvocationFactory;
-import com.github.dm.jrt.android.invocation.DecoratingContextInvocationFactory;
-import com.github.dm.jrt.android.service.InvocationService;
+import com.github.dm.jrt.android.core.invocation.ContextInvocation;
+import com.github.dm.jrt.android.core.invocation.ContextInvocationDecorator;
+import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
+import com.github.dm.jrt.android.core.invocation.DecoratingContextInvocationFactory;
+import com.github.dm.jrt.android.core.service.InvocationService;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

@@ -16,8 +16,8 @@
 
 package com.github.dm.jrt.android.proxy.core;
 
+import com.github.dm.jrt.android.core.service.InvocationService;
 import com.github.dm.jrt.android.object.builder.FactoryContext;
-import com.github.dm.jrt.android.service.InvocationService;
 import com.github.dm.jrt.core.invocation.InvocationException;
 
 import org.jetbrains.annotations.NotNull;

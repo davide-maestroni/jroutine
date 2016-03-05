@@ -21,8 +21,8 @@ import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
-import com.github.dm.jrt.android.builder.LoaderConfiguration.ClashResolutionType;
-import com.github.dm.jrt.android.invocation.FunctionContextInvocation;
+import com.github.dm.jrt.android.core.builder.LoaderConfiguration.ClashResolutionType;
+import com.github.dm.jrt.android.core.invocation.FunctionContextInvocation;
 import com.github.dm.jrt.core.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
@@ -34,7 +34,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
-import static com.github.dm.jrt.android.invocation.FunctionContextInvocationFactories.factoryOf;
+import static com.github.dm.jrt.android.core.invocation.FunctionContextInvocationFactories.factoryOf;
 import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
 import static org.assertj.core.api.Assertions.assertThat;
 

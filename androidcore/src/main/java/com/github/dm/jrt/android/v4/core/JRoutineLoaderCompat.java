@@ -16,9 +16,9 @@
 
 package com.github.dm.jrt.android.v4.core;
 
-import com.github.dm.jrt.android.builder.LoaderChannelBuilder;
-import com.github.dm.jrt.android.builder.LoaderRoutineBuilder;
-import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
+import com.github.dm.jrt.android.core.builder.LoaderChannelBuilder;
+import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
+import com.github.dm.jrt.android.core.invocation.FunctionContextInvocationFactory;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -49,7 +49,8 @@ import java.util.WeakHashMap;
  * an already running loader with the same ID exists at the time the new invocation is executed,
  * the clash is resolved based on the strategy specified through the builder. When a clash cannot be
  * resolved, for example when invocations with different implementations share the same ID, the new
- * invocation is aborted with a {@link com.github.dm.jrt.android.invocation.InvocationTypeException
+ * invocation is aborted with a
+ * {@link com.github.dm.jrt.android.core.invocation.InvocationTypeException
  * InvocationTypeException}.
  * <p/>
  * For example, in order to get a resource from the network, needed to fill an activity UI:
@@ -208,7 +209,7 @@ public class JRoutineLoaderCompat {
          * <br/>
          * If no invocation with the specified ID is running at the time of the channel creation,
          * the output will be aborted with a
-         * {@link com.github.dm.jrt.android.invocation.MissingInvocationException
+         * {@link com.github.dm.jrt.android.core.invocation.MissingInvocationException
          * MissingInvocationException}.<br/>
          * Note that the built routine results will be always dispatched on the configured looper
          * thread, thus waiting for the outputs immediately after its invocation may result in a

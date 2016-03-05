@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.android.core;
 
-import com.github.dm.jrt.android.service.InvocationService;
+import com.github.dm.jrt.android.core.service.InvocationService;
 
 /**
  * Test service.

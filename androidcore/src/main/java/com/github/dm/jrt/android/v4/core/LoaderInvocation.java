@@ -24,16 +24,16 @@ import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.support.v4.util.SparseArrayCompat;
 
-import com.github.dm.jrt.android.builder.LoaderConfiguration;
-import com.github.dm.jrt.android.builder.LoaderConfiguration.CacheStrategyType;
-import com.github.dm.jrt.android.builder.LoaderConfiguration.ClashResolutionType;
-import com.github.dm.jrt.android.invocation.ContextInvocation;
-import com.github.dm.jrt.android.invocation.ContextInvocationFactory;
-import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
-import com.github.dm.jrt.android.invocation.InvocationClashException;
-import com.github.dm.jrt.android.invocation.InvocationTypeException;
-import com.github.dm.jrt.android.invocation.StaleResultException;
-import com.github.dm.jrt.android.runner.AndroidRunners;
+import com.github.dm.jrt.android.core.builder.LoaderConfiguration;
+import com.github.dm.jrt.android.core.builder.LoaderConfiguration.CacheStrategyType;
+import com.github.dm.jrt.android.core.builder.LoaderConfiguration.ClashResolutionType;
+import com.github.dm.jrt.android.core.invocation.ContextInvocation;
+import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
+import com.github.dm.jrt.android.core.invocation.FunctionContextInvocationFactory;
+import com.github.dm.jrt.android.core.invocation.InvocationClashException;
+import com.github.dm.jrt.android.core.invocation.InvocationTypeException;
+import com.github.dm.jrt.android.core.invocation.StaleResultException;
+import com.github.dm.jrt.android.core.runner.AndroidRunners;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
@@ -55,7 +55,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.github.dm.jrt.android.invocation.ContextInvocationFactories.fromFactory;
+import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactories.fromFactory;
 
 /**
  * Invocation implementation employing loaders to perform background operations.

@@ -21,9 +21,9 @@ import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.os.Build.VERSION_CODES;
 
-import com.github.dm.jrt.android.invocation.ContextInvocation;
-import com.github.dm.jrt.android.invocation.ContextInvocationFactory;
-import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
+import com.github.dm.jrt.android.core.invocation.ContextInvocation;
+import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
+import com.github.dm.jrt.android.core.invocation.FunctionContextInvocationFactory;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
@@ -34,7 +34,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import static com.github.dm.jrt.android.invocation.ContextInvocationFactories.fromFactory;
+import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactories.fromFactory;
 
 /**
  * Loader implementation performing the routine invocation.

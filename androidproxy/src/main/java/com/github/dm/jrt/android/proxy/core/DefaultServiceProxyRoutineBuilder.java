@@ -18,8 +18,8 @@ package com.github.dm.jrt.android.proxy.core;
 
 import android.content.Context;
 
-import com.github.dm.jrt.android.builder.ServiceConfiguration;
 import com.github.dm.jrt.android.core.ServiceContext;
+import com.github.dm.jrt.android.core.builder.ServiceConfiguration;
 import com.github.dm.jrt.android.object.core.ContextInvocationTarget;
 import com.github.dm.jrt.android.proxy.annotation.ServiceProxy;
 import com.github.dm.jrt.android.proxy.builder.AbstractServiceProxyObjectBuilder;

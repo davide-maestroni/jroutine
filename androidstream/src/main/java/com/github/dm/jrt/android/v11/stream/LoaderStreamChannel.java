@@ -16,9 +16,9 @@
 
 package com.github.dm.jrt.android.v11.stream;
 
-import com.github.dm.jrt.android.builder.LoaderConfigurableBuilder;
-import com.github.dm.jrt.android.builder.LoaderConfiguration.Builder;
-import com.github.dm.jrt.android.builder.LoaderConfiguration.CacheStrategyType;
+import com.github.dm.jrt.android.core.builder.LoaderConfigurableBuilder;
+import com.github.dm.jrt.android.core.builder.LoaderConfiguration.Builder;
+import com.github.dm.jrt.android.core.builder.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.core.channel.ParcelableSelectable;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
 import com.github.dm.jrt.core.builder.InvocationConfiguration;

@@ -19,7 +19,7 @@ package com.github.dm.jrt.android.core;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.github.dm.jrt.android.invocation.ContextInvocation;
+import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.Reflection;
 

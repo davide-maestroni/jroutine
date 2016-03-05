@@ -51,7 +51,7 @@ import java.util.concurrent.TimeUnit;
  * <p/>
  * Created by davide-maestroni on 08/05/2015.
  *
- * @see com.github.dm.jrt.android.builder.LoaderConfiguration LoaderConfiguration
+ * @see com.github.dm.jrt.android.core.builder.LoaderConfiguration LoaderConfiguration
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

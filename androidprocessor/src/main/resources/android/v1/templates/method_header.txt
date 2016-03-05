@@ -18,7 +18,7 @@
 
     private final com.github.dm.jrt.core.routine.Routine<?, ${resultClassName}> mRoutine${methodCount};
 
-    private static class ContextInvocationFactory${methodCount}${genericTypes} extends com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory<Object, ${resultClassName}> {
+    private static class ContextInvocationFactory${methodCount}${genericTypes} extends com.github.dm.jrt.android.core.invocation.FunctionContextInvocationFactory<Object, ${resultClassName}> {
 
         private final java.util.List<String> mSharedFields;
 
@@ -34,7 +34,7 @@
 
         @org.jetbrains.annotations.NotNull
         @Override
-        public com.github.dm.jrt.android.invocation.FunctionContextInvocation<Object, ${resultClassName}> newInvocation() {
+        public com.github.dm.jrt.android.core.invocation.FunctionContextInvocation<Object, ${resultClassName}> newInvocation() {
 
             return new ContextInvocation${methodCount}${genericTypes}(mSharedFields, mTarget);
         }
@@ -45,7 +45,7 @@
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.object.core.ContextInvocationTarget<?> target,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.builder.InvocationConfiguration invocationConfiguration,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.builder.ProxyConfiguration proxyConfiguration,
-            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.builder.LoaderConfiguration loaderConfiguration) {
+            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.builder.LoaderConfiguration loaderConfiguration) {
 
         return getBuilder(mContext, new ContextInvocationFactory${methodCount}${genericTypes}(${sharedFields}, target))
                                            .withInvocations()

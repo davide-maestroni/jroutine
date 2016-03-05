@@ -27,12 +27,12 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 
-import com.github.dm.jrt.android.builder.ServiceConfiguration;
-import com.github.dm.jrt.android.invocation.ContextInvocation;
-import com.github.dm.jrt.android.invocation.ContextInvocationFactory;
-import com.github.dm.jrt.android.runner.AndroidRunners;
-import com.github.dm.jrt.android.service.InvocationService;
-import com.github.dm.jrt.android.service.ServiceDisconnectedException;
+import com.github.dm.jrt.android.core.builder.ServiceConfiguration;
+import com.github.dm.jrt.android.core.invocation.ContextInvocation;
+import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
+import com.github.dm.jrt.android.core.runner.AndroidRunners;
+import com.github.dm.jrt.android.core.service.InvocationService;
+import com.github.dm.jrt.android.core.service.ServiceDisconnectedException;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.ChannelConfiguration;
 import com.github.dm.jrt.core.builder.InvocationConfiguration;
@@ -59,15 +59,15 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.github.dm.jrt.android.invocation.ContextInvocationFactories.factoryOf;
-import static com.github.dm.jrt.android.invocation.ContextInvocationFactories.fromFactory;
-import static com.github.dm.jrt.android.service.InvocationService.getAbortError;
-import static com.github.dm.jrt.android.service.InvocationService.getValue;
-import static com.github.dm.jrt.android.service.InvocationService.putAsyncInvocation;
-import static com.github.dm.jrt.android.service.InvocationService.putError;
-import static com.github.dm.jrt.android.service.InvocationService.putInvocationId;
-import static com.github.dm.jrt.android.service.InvocationService.putParallelInvocation;
-import static com.github.dm.jrt.android.service.InvocationService.putValue;
+import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactories.factoryOf;
+import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactories.fromFactory;
+import static com.github.dm.jrt.android.core.service.InvocationService.getAbortError;
+import static com.github.dm.jrt.android.core.service.InvocationService.getValue;
+import static com.github.dm.jrt.android.core.service.InvocationService.putAsyncInvocation;
+import static com.github.dm.jrt.android.core.service.InvocationService.putError;
+import static com.github.dm.jrt.android.core.service.InvocationService.putInvocationId;
+import static com.github.dm.jrt.android.core.service.InvocationService.putParallelInvocation;
+import static com.github.dm.jrt.android.core.service.InvocationService.putValue;
 import static java.util.UUID.randomUUID;
 
 /**

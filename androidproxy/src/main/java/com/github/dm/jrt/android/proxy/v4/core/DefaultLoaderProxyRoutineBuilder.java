@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.android.proxy.v4.core;
 
-import com.github.dm.jrt.android.builder.LoaderConfiguration;
+import com.github.dm.jrt.android.core.builder.LoaderConfiguration;
 import com.github.dm.jrt.android.object.core.ContextInvocationTarget;
 import com.github.dm.jrt.android.proxy.annotation.LoaderProxyCompat;
 import com.github.dm.jrt.android.proxy.builder.AbstractLoaderProxyObjectBuilder;

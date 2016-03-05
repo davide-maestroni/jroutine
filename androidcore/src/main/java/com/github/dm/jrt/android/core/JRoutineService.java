@@ -16,8 +16,8 @@
 
 package com.github.dm.jrt.android.core;
 
-import com.github.dm.jrt.android.builder.ServiceRoutineBuilder;
-import com.github.dm.jrt.android.log.AndroidLogs;
+import com.github.dm.jrt.android.core.builder.ServiceRoutineBuilder;
+import com.github.dm.jrt.android.core.log.AndroidLogs;
 import com.github.dm.jrt.core.log.Logger;
 
 import org.jetbrains.annotations.NotNull;
@@ -134,8 +134,8 @@ public class JRoutineService {
         /**
          * Returns a builder of routines running in a service based on the builder context.<br/>
          * In order to customize the invocation creation, the caller must override the method
-         * {@link com.github.dm.jrt.android.service.InvocationService#getInvocationFactory(Class,
-         * Object...) getInvocationFactory(Class, Object...)} of the routine service.
+         * {@link com.github.dm.jrt.android.core.service.InvocationService#getInvocationFactory(
+         * Class, Object...) getInvocationFactory(Class, Object...)} of the routine service.
          * <p/>
          * Note that the built routine results will be dispatched into the configured looper, thus,
          * waiting for the outputs on the very same looper thread, immediately after its invocation,

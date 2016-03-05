@@ -19,7 +19,7 @@ package com.github.dm.jrt.android.core;
 import android.content.Context;
 import android.content.Intent;
 
-import com.github.dm.jrt.android.service.InvocationService;
+import com.github.dm.jrt.android.core.service.InvocationService;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,8 +45,8 @@ public abstract class ServiceContext {
 
     /**
      * Returns a context based on the specified instance.<br/>
-     * The default {@link com.github.dm.jrt.android.service.InvocationService InvocationService}
-     * class will be employed.
+     * The default {@link com.github.dm.jrt.android.core.service.InvocationService
+     * InvocationService} class will be employed.
      *
      * @param context the context.
      * @return the service context.

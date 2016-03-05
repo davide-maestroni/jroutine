@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.android.object.core;
 
-import com.github.dm.jrt.android.builder.LoaderConfiguration;
+import com.github.dm.jrt.android.core.builder.LoaderConfiguration;
 import com.github.dm.jrt.android.object.annotation.CacheStrategy;
 import com.github.dm.jrt.android.object.annotation.ClashResolution;
 import com.github.dm.jrt.android.object.annotation.InputClashResolution;

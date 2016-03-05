@@ -18,14 +18,14 @@ package com.github.dm.jrt.android.v4.object.core;
 
 import android.content.Context;
 
-import com.github.dm.jrt.android.builder.LoaderConfiguration;
-import com.github.dm.jrt.android.builder.LoaderRoutineBuilder;
-import com.github.dm.jrt.android.invocation.FunctionContextInvocation;
-import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
+import com.github.dm.jrt.android.core.builder.LoaderConfiguration;
+import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
+import com.github.dm.jrt.android.core.invocation.FunctionContextInvocation;
+import com.github.dm.jrt.android.core.invocation.FunctionContextInvocationFactory;
+import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.android.object.builder.LoaderObjectRoutineBuilder;
 import com.github.dm.jrt.android.object.core.AndroidBuilders;
 import com.github.dm.jrt.android.object.core.ContextInvocationTarget;
-import com.github.dm.jrt.android.routine.LoaderRoutine;
 import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.core.builder.InvocationConfiguration;

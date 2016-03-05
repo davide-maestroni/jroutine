@@ -16,11 +16,11 @@
 
 package com.github.dm.jrt.android.v4.core;
 
-import com.github.dm.jrt.android.builder.LoaderChannelBuilder;
-import com.github.dm.jrt.android.builder.LoaderConfiguration;
-import com.github.dm.jrt.android.builder.LoaderConfiguration.ClashResolutionType;
-import com.github.dm.jrt.android.invocation.MissingInvocationException;
-import com.github.dm.jrt.android.runner.AndroidRunners;
+import com.github.dm.jrt.android.core.builder.LoaderChannelBuilder;
+import com.github.dm.jrt.android.core.builder.LoaderConfiguration;
+import com.github.dm.jrt.android.core.builder.LoaderConfiguration.ClashResolutionType;
+import com.github.dm.jrt.android.core.invocation.MissingInvocationException;
+import com.github.dm.jrt.android.core.runner.AndroidRunners;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.ChannelConfiguration;
 import com.github.dm.jrt.core.builder.InvocationConfiguration;

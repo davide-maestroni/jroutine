@@ -18,12 +18,12 @@ package com.github.dm.jrt.android.object.core;
 
 import android.content.Context;
 
-import com.github.dm.jrt.android.builder.ServiceConfiguration;
-import com.github.dm.jrt.android.builder.ServiceRoutineBuilder;
 import com.github.dm.jrt.android.core.JRoutineService;
 import com.github.dm.jrt.android.core.ServiceContext;
 import com.github.dm.jrt.android.core.TargetInvocationFactory;
-import com.github.dm.jrt.android.invocation.FunctionContextInvocation;
+import com.github.dm.jrt.android.core.builder.ServiceConfiguration;
+import com.github.dm.jrt.android.core.builder.ServiceRoutineBuilder;
+import com.github.dm.jrt.android.core.invocation.FunctionContextInvocation;
 import com.github.dm.jrt.android.object.builder.ServiceObjectRoutineBuilder;
 import com.github.dm.jrt.core.builder.InvocationConfiguration;
 import com.github.dm.jrt.core.channel.ResultChannel;

@@ -21,8 +21,8 @@ import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.core.JRoutineService;
-import com.github.dm.jrt.android.invocation.FilterContextInvocation;
-import com.github.dm.jrt.android.invocation.TemplateContextInvocation;
+import com.github.dm.jrt.android.core.invocation.FilterContextInvocation;
+import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.IOChannelBuilder;
 import com.github.dm.jrt.core.builder.InvocationConfiguration.OrderType;

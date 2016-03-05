@@ -18,9 +18,9 @@ package com.github.dm.jrt.android.v4.stream;
 
 import android.support.v4.util.SparseArrayCompat;
 
-import com.github.dm.jrt.android.builder.LoaderRoutineBuilder;
+import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.core.channel.ParcelableSelectable;
-import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
+import com.github.dm.jrt.android.core.invocation.FunctionContextInvocationFactory;
 import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.android.v4.core.channel.SparseChannelsCompat;

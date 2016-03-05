@@ -18,7 +18,7 @@ package com.github.dm.jrt.android.v4.core;
 
 import android.support.v4.content.Loader;
 
-import com.github.dm.jrt.android.runner.AndroidRunners;
+import com.github.dm.jrt.android.core.runner.AndroidRunners;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.TemplateOutputConsumer;

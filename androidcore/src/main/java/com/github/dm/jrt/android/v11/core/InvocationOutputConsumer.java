@@ -20,7 +20,7 @@ import android.annotation.TargetApi;
 import android.content.Loader;
 import android.os.Build.VERSION_CODES;
 
-import com.github.dm.jrt.android.runner.AndroidRunners;
+import com.github.dm.jrt.android.core.runner.AndroidRunners;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.TemplateOutputConsumer;

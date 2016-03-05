@@ -50,7 +50,7 @@ import java.lang.annotation.Target;
  * <p/>
  * Created by davide-maestroni on 01/24/2016.
  *
- * @see com.github.dm.jrt.android.builder.LoaderConfiguration LoaderConfiguration
+ * @see com.github.dm.jrt.android.core.builder.LoaderConfiguration LoaderConfiguration
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

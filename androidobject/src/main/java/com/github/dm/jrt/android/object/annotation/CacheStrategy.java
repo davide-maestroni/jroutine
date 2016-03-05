@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.android.object.annotation;
 
-import com.github.dm.jrt.android.builder.LoaderConfiguration.CacheStrategyType;
+import com.github.dm.jrt.android.core.builder.LoaderConfiguration.CacheStrategyType;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -52,7 +52,7 @@ import java.lang.annotation.Target;
  * <p/>
  * Created by davide-maestroni on 04/09/2015.
  *
- * @see com.github.dm.jrt.android.builder.LoaderConfiguration LoaderConfiguration
+ * @see com.github.dm.jrt.android.core.builder.LoaderConfiguration LoaderConfiguration
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

@@ -21,9 +21,9 @@ import android.content.Context;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
-import com.github.dm.jrt.android.builder.LoaderConfiguration;
-import com.github.dm.jrt.android.invocation.FunctionContextInvocation;
-import com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory;
+import com.github.dm.jrt.android.core.builder.LoaderConfiguration;
+import com.github.dm.jrt.android.core.invocation.FunctionContextInvocation;
+import com.github.dm.jrt.android.core.invocation.FunctionContextInvocationFactory;
 import com.github.dm.jrt.android.object.R;
 import com.github.dm.jrt.android.object.builder.FactoryContextWrapper;
 import com.github.dm.jrt.android.object.builder.LoaderObjectRoutineBuilder;
@@ -70,7 +70,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.dm.jrt.android.invocation.FunctionContextInvocationFactories.factoryOf;
+import static com.github.dm.jrt.android.core.invocation.FunctionContextInvocationFactories.factoryOf;
 import static com.github.dm.jrt.android.object.core.ContextInvocationTarget.classOfType;
 import static com.github.dm.jrt.android.object.core.ContextInvocationTarget.instanceOf;
 import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;

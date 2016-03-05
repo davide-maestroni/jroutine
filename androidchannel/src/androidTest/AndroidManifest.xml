@@ -16,21 +16,21 @@
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.github.dm.jrt.android.core.channel">
+    package="com.github.dm.jrt.android.channel">
 
     <application
         android:name=".app.TestApp"
         android:label="jroutine-androidchannel">
         <activity
-            android:name="com.github.dm.jrt.android.core.channel.TestActivity"
+            android:name="com.github.dm.jrt.android.channel.TestActivity"
             android:label="test">
         </activity>
         <activity
-            android:name="com.github.dm.jrt.android.v11.core.channel.TestActivity"
+            android:name="com.github.dm.jrt.android.v11.channel.TestActivity"
             android:label="test">
         </activity>
         <activity
-            android:name="com.github.dm.jrt.android.v4.core.channel.TestActivity"
+            android:name="com.github.dm.jrt.android.v4.channel.TestActivity"
             android:label="test">
         </activity>
 
@@ -38,7 +38,7 @@
             android:name="com.github.dm.jrt.android.core.service.InvocationService"
             android:process=":remote"/>
         <service
-            android:name="com.github.dm.jrt.android.core.channel.TestService"
+            android:name="com.github.dm.jrt.android.channel.TestService"
             android:process=":remote"/>
     </application>
 

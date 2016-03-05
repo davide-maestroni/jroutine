@@ -15,4 +15,4 @@
   ~ limitations under the License.
   -->
 
-<manifest package="com.github.dm.jrt.android.core.channel"/>
+<manifest package="com.github.dm.jrt.android.channel"/>

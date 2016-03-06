@@ -32,7 +32,7 @@ import java.util.List;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public abstract class FunctionInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
+public abstract class CallInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
 
     private ArrayList<IN> mInputs;
 

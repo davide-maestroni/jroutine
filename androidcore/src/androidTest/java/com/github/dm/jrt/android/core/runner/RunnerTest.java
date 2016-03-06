@@ -23,7 +23,7 @@ import android.test.AndroidTestCase;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
-import com.github.dm.jrt.core.invocation.FunctionInvocation;
+import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
@@ -217,7 +217,7 @@ public class RunnerTest extends AndroidTestCase {
         @Override
         public Invocation<Object, Object> newInvocation() {
 
-            return new FunctionInvocation<Object, Object>() {
+            return new CallInvocation<Object, Object>() {
 
                 @Override
                 protected void onCall(@NotNull final List<?> objects,

@@ -74,7 +74,7 @@
                 }
             }
 
-            private static class LoadBitmap extends FunctionContextInvocation&lt;URI, Bitmap&gt; {
+            private static class LoadBitmap extends CallContextInvocation&lt;URI, Bitmap&gt; {
 
                 &commat;Override
                 protected void onCall(final List&lt;? extends URI&gt; uris,
@@ -151,7 +151,7 @@
                 }
             }
 
-            private static class LoadBitmap extends FunctionContextInvocation&lt;URI, Bitmap&gt; {
+            private static class LoadBitmap extends CallContextInvocation&lt;URI, Bitmap&gt; {
 
                 &commat;Override
                 protected void onCall(final List&lt;? extends URI&gt; uris,
@@ -178,7 +178,7 @@
                 }
             }
 
-            private static class LoadBitmapFromService extends FunctionContextInvocation&lt;URI, Bitmap&gt; {
+            private static class LoadBitmapFromService extends CallContextInvocation&lt;URI, Bitmap&gt; {
 
                 private Routine&lt;URI, Bitmap&gt; mRoutine;
 

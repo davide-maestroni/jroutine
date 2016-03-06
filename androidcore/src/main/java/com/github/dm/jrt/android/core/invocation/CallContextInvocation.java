@@ -18,7 +18,7 @@ package com.github.dm.jrt.android.core.invocation;
 
 import android.content.Context;
 
-import com.github.dm.jrt.core.invocation.FunctionInvocation;
+import com.github.dm.jrt.core.invocation.CallInvocation;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -31,7 +31,7 @@ import org.jetbrains.annotations.NotNull;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public abstract class FunctionContextInvocation<IN, OUT> extends FunctionInvocation<IN, OUT>
+public abstract class CallContextInvocation<IN, OUT> extends CallInvocation<IN, OUT>
         implements ContextInvocation<IN, OUT> {
 
     private Context mContext;

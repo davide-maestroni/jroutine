@@ -23,8 +23,8 @@ import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.core.builder.LoaderConfiguration;
-import com.github.dm.jrt.android.core.invocation.FunctionContextInvocation;
-import com.github.dm.jrt.android.core.invocation.FunctionContextInvocationFactory;
+import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
+import com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory;
 import com.github.dm.jrt.android.object.builder.FactoryContextWrapper;
 import com.github.dm.jrt.android.object.builder.LoaderObjectRoutineBuilder;
 import com.github.dm.jrt.android.v11.core.JRoutineLoader;
@@ -70,8 +70,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.dm.jrt.android.core.invocation.FunctionContextInvocationFactories
-        .factoryOf;
+import static com.github.dm.jrt.android.core.invocation.CallContextInvocationFactories.factoryOf;
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.classOfType;
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceOf;
 import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
@@ -115,7 +114,7 @@ public class LoaderObjectRoutineActivityTest
         try {
 
             JRoutineLoader.with(loaderFrom(getActivity()))
-                          .on((FunctionContextInvocationFactory<?, ?>) null);
+                          .on((CallContextInvocationFactory<?, ?>) null);
 
             fail();
 
@@ -1782,7 +1781,7 @@ public class LoaderObjectRoutineActivityTest
         }
     }
 
-    public static class TestInvocation extends FunctionContextInvocation<Object, Object> {
+    public static class TestInvocation extends CallContextInvocation<Object, Object> {
 
         @Override
         protected void onCall(@NotNull final List<?> inputs,

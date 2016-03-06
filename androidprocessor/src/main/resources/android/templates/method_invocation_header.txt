@@ -16,7 +16,7 @@
 
 // GENERATED CODE - PLEASE DO NOT EDIT
 
-    private static class ContextInvocation${methodCount}${genericTypes} extends com.github.dm.jrt.android.core.invocation.FunctionContextInvocation<Object, ${resultClassName}> {
+    private static class ContextInvocation${methodCount}${genericTypes} extends com.github.dm.jrt.android.core.invocation.CallContextInvocation<Object, ${resultClassName}> {
 
         private final  com.github.dm.jrt.android.object.ContextInvocationTarget<?> mContextTarget;
 

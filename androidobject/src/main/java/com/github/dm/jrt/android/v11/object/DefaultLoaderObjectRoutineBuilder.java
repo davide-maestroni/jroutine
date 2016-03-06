@@ -20,8 +20,8 @@ import android.content.Context;
 
 import com.github.dm.jrt.android.core.builder.LoaderConfiguration;
 import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
-import com.github.dm.jrt.android.core.invocation.FunctionContextInvocation;
-import com.github.dm.jrt.android.core.invocation.FunctionContextInvocationFactory;
+import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
+import com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory;
 import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.android.object.AndroidBuilders;
 import com.github.dm.jrt.android.object.ContextInvocationTarget;
@@ -241,7 +241,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      * @param <OUT> the output data type.
      */
     private static class AliasContextInvocation<IN, OUT>
-            extends FunctionContextInvocation<IN, OUT> {
+            extends CallContextInvocation<IN, OUT> {
 
         private final String mAliasName;
 
@@ -306,7 +306,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      * @param <OUT> the output data type.
      */
     private static class AliasContextInvocationFactory<IN, OUT>
-            extends FunctionContextInvocationFactory<IN, OUT> {
+            extends CallContextInvocationFactory<IN, OUT> {
 
         private final String mName;
 
@@ -333,7 +333,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         }
 
         @NotNull
-        public FunctionContextInvocation<IN, OUT> newInvocation() {
+        public CallContextInvocation<IN, OUT> newInvocation() {
 
             return new AliasContextInvocation<IN, OUT>(mProxyConfiguration, mTarget, mName);
         }
@@ -346,7 +346,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      * @param <OUT> the output data type.
      */
     private static class MethodContextInvocation<IN, OUT>
-            extends FunctionContextInvocation<IN, OUT> {
+            extends CallContextInvocation<IN, OUT> {
 
         private final Method mMethod;
 
@@ -411,7 +411,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      * @param <OUT> the output data type.
      */
     private static class MethodContextInvocationFactory<IN, OUT>
-            extends FunctionContextInvocationFactory<IN, OUT> {
+            extends CallContextInvocationFactory<IN, OUT> {
 
         private final Method mMethod;
 
@@ -438,7 +438,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         }
 
         @NotNull
-        public FunctionContextInvocation<IN, OUT> newInvocation() {
+        public CallContextInvocation<IN, OUT> newInvocation() {
 
             return new MethodContextInvocation<IN, OUT>(mProxyConfiguration, mTarget, mMethod);
         }
@@ -447,7 +447,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     /**
      * Proxy method invocation.
      */
-    private static class ProxyInvocation extends FunctionContextInvocation<Object, Object> {
+    private static class ProxyInvocation extends CallContextInvocation<Object, Object> {
 
         private final InputMode mInputMode;
 
@@ -520,7 +520,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      * Factory of {@link ProxyInvocation}s.
      */
     private static class ProxyInvocationFactory
-            extends FunctionContextInvocationFactory<Object, Object> {
+            extends CallContextInvocationFactory<Object, Object> {
 
         private final InputMode mInputMode;
 
@@ -555,7 +555,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         }
 
         @NotNull
-        public FunctionContextInvocation<Object, Object> newInvocation() {
+        public CallContextInvocation<Object, Object> newInvocation() {
 
             return new ProxyInvocation(mTargetMethod, mProxyConfiguration, mTarget, mInputMode,
                                        mOutputMode);

@@ -20,7 +20,7 @@ import com.github.dm.jrt.android.channel.ParcelableSelectable;
 import com.github.dm.jrt.android.core.builder.LoaderConfiguration;
 import com.github.dm.jrt.android.core.builder.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.core.builder.LoaderConfiguration.Configurable;
-import com.github.dm.jrt.android.core.invocation.FunctionContextInvocationFactory;
+import com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory;
 import com.github.dm.jrt.android.v11.channel.SparseChannels;
 import com.github.dm.jrt.android.v11.core.JRoutineLoader;
 import com.github.dm.jrt.android.v11.core.JRoutineLoader.ContextBuilder;
@@ -656,7 +656,7 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
                                .buildRoutine();
         }
 
-        final FunctionContextInvocationFactory<? super OUT, ? extends AFTER> invocationFactory =
+        final CallContextInvocationFactory<? super OUT, ? extends AFTER> invocationFactory =
                 factoryFrom(JRoutineCore.on(factory).buildRoutine(), factory.hashCode(),
                             DelegationType.SYNC);
         return contextBuilder.on(invocationFactory)

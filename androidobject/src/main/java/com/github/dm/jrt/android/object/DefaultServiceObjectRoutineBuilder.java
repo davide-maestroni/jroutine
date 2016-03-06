@@ -23,7 +23,7 @@ import com.github.dm.jrt.android.core.ServiceContext;
 import com.github.dm.jrt.android.core.TargetInvocationFactory;
 import com.github.dm.jrt.android.core.builder.ServiceConfiguration;
 import com.github.dm.jrt.android.core.builder.ServiceRoutineBuilder;
-import com.github.dm.jrt.android.core.invocation.FunctionContextInvocation;
+import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
 import com.github.dm.jrt.android.object.builder.ServiceObjectRoutineBuilder;
 import com.github.dm.jrt.core.builder.InvocationConfiguration;
 import com.github.dm.jrt.core.channel.ResultChannel;
@@ -293,7 +293,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     /**
      * Alias method invocation.
      */
-    private static class MethodAliasInvocation extends FunctionContextInvocation<Object, Object> {
+    private static class MethodAliasInvocation extends CallContextInvocation<Object, Object> {
 
         private final String mAliasName;
 
@@ -355,7 +355,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
      * Invocation based on method signature.
      */
     private static class MethodSignatureInvocation
-            extends FunctionContextInvocation<Object, Object> {
+            extends CallContextInvocation<Object, Object> {
 
         private final String mMethodName;
 
@@ -422,7 +422,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     /**
      * Proxy method invocation.
      */
-    private static class ProxyInvocation extends FunctionContextInvocation<Object, Object> {
+    private static class ProxyInvocation extends CallContextInvocation<Object, Object> {
 
         private final InputMode mInputMode;
 

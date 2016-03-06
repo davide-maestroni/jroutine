@@ -27,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public abstract class FunctionContextInvocationFactory<IN, OUT>
+public abstract class CallContextInvocationFactory<IN, OUT>
         extends ContextInvocationFactory<IN, OUT> {
 
     /**
@@ -35,12 +35,12 @@ public abstract class FunctionContextInvocationFactory<IN, OUT>
      *
      * @param args the constructor arguments.
      */
-    protected FunctionContextInvocationFactory(@Nullable final Object[] args) {
+    protected CallContextInvocationFactory(@Nullable final Object[] args) {
 
         super(args);
     }
 
     @NotNull
     @Override
-    public abstract FunctionContextInvocation<IN, OUT> newInvocation() throws Exception;
+    public abstract CallContextInvocation<IN, OUT> newInvocation() throws Exception;
 }

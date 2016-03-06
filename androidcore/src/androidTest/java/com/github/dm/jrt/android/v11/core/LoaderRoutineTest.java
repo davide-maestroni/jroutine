@@ -26,12 +26,12 @@ import com.github.dm.jrt.android.core.R;
 import com.github.dm.jrt.android.core.builder.LoaderConfiguration;
 import com.github.dm.jrt.android.core.builder.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.core.builder.LoaderConfiguration.ClashResolutionType;
-import com.github.dm.jrt.android.core.invocation.FunctionContextInvocation;
-import com.github.dm.jrt.android.core.invocation.FunctionContextInvocationFactory;
+import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
+import com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.InvocationClashException;
 import com.github.dm.jrt.android.core.invocation.InvocationTypeException;
 import com.github.dm.jrt.android.core.invocation.MissingInvocationException;
-import com.github.dm.jrt.android.core.invocation.PassingFunctionContextInvocation;
+import com.github.dm.jrt.android.core.invocation.PassingCallContextInvocation;
 import com.github.dm.jrt.android.core.log.AndroidLogs;
 import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.android.core.runner.AndroidRunners;
@@ -60,8 +60,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.android.core.DelegatingContextInvocation.factoryFrom;
-import static com.github.dm.jrt.android.core.invocation.FunctionContextInvocationFactories
-        .factoryOf;
+import static com.github.dm.jrt.android.core.invocation.CallContextInvocationFactories.factoryOf;
 import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
 import static com.github.dm.jrt.core.builder.InvocationConfiguration.builder;
 import static com.github.dm.jrt.core.util.TimeDuration.seconds;
@@ -374,7 +373,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         final TimeDuration timeout = seconds(10);
         final Routine<Object, Object> routine1 = JRoutineLoader.with(loaderFrom(getActivity()))
-                                                               .on(PassingFunctionContextInvocation.factoryOf())
+                                                               .on(PassingCallContextInvocation.factoryOf())
                                                                .buildRoutine();
         final Routine<Object, Object> routine2 = JRoutineLoader.with(loaderFrom(getActivity()))
                                                                .on(factoryFrom(routine1,
@@ -521,7 +520,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         try {
 
             JRoutineLoader.with(loaderFrom(getActivity()))
-                          .on((FunctionContextInvocationFactory<?, ?>) null);
+                          .on((CallContextInvocationFactory<?, ?>) null);
 
             fail();
 
@@ -863,8 +862,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
             return;
         }
 
-        final FunctionContextInvocationFactory<Object, Object> factory =
-                PassingFunctionContextInvocation.factoryOf();
+        final CallContextInvocationFactory<Object, Object> factory =
+                PassingCallContextInvocation.factoryOf();
 
         try {
 
@@ -1047,7 +1046,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<Object, Object> routine1 = JRoutineLoader.with(loaderFrom(fragment))
-                                                               .on(PassingFunctionContextInvocation.factoryOf())
+                                                               .on(PassingCallContextInvocation.factoryOf())
                                                                .buildRoutine();
         final Routine<Object, Object> routine2 = JRoutineLoader.with(loaderFrom(fragment))
                                                                .on(factoryFrom(routine1,
@@ -1209,7 +1208,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         try {
 
             JRoutineLoader.with(loaderFrom(fragment))
-                          .on((FunctionContextInvocationFactory<?, ?>) null);
+                          .on((CallContextInvocationFactory<?, ?>) null);
 
             fail();
 
@@ -1408,7 +1407,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         final TimeDuration timeout = seconds(10);
         final Routine<String, String> routine1 = JRoutineLoader.with(loaderFrom(getActivity()))
-                                                               .on(PassingFunctionContextInvocation.<String>factoryOf())
+                                                               .on(PassingCallContextInvocation.<String>factoryOf())
                                                                .withInvocations()
                                                                .withLog(AndroidLogs.androidLog())
                                                                .withLogLevel(Level.WARNING)
@@ -1423,8 +1422,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                            .afterMax(timeout)
                            .all()).containsOnly("1", "2", "3", "4", "5");
 
-        final ClassToken<StringFunctionInvocation> token2 =
-                ClassToken.tokenOf(StringFunctionInvocation.class);
+        final ClassToken<StringCallInvocation> token2 =
+                ClassToken.tokenOf(StringCallInvocation.class);
         final Routine<String, String> routine2 = JRoutineLoader.with(loaderFrom(getActivity()))
                                                                .on(factoryOf(token2))
                                                                .withInvocations()
@@ -1604,7 +1603,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         }
     }
 
-    private static class Abort extends FunctionContextInvocation<Data, Data> {
+    private static class Abort extends CallContextInvocation<Data, Data> {
 
         @Override
         protected void onCall(@NotNull final List<? extends Data> inputs,
@@ -1662,7 +1661,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
     }
 
-    private static class Delay extends FunctionContextInvocation<Data, Data> {
+    private static class Delay extends CallContextInvocation<Data, Data> {
 
         @Override
         protected void onCall(@NotNull final List<? extends Data> inputs,
@@ -1673,7 +1672,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
     }
 
     @SuppressWarnings("unused")
-    private static class ErrorInvocation extends FunctionContextInvocation<String, String> {
+    private static class ErrorInvocation extends CallContextInvocation<String, String> {
 
         private ErrorInvocation(final int ignored) {
 
@@ -1687,7 +1686,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
     }
 
     private static class GetContextInvocation<DATA>
-            extends FunctionContextInvocation<DATA, Context> {
+            extends CallContextInvocation<DATA, Context> {
 
         @Override
         protected void onCall(@NotNull final List<? extends DATA> inputs,
@@ -1697,7 +1696,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         }
     }
 
-    private static class PurgeContextInvocation extends FunctionContextInvocation<String, String> {
+    private static class PurgeContextInvocation extends CallContextInvocation<String, String> {
 
         private static final Semaphore sSemaphore = new Semaphore(0);
 
@@ -1722,8 +1721,8 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         }
     }
 
-    private static class StringFunctionInvocation
-            extends FunctionContextInvocation<String, String> {
+    private static class StringCallInvocation
+            extends CallContextInvocation<String, String> {
 
         @Override
         protected void onCall(@NotNull final List<? extends String> strings,
@@ -1733,7 +1732,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         }
     }
 
-    private static class ToUpperCase extends FunctionContextInvocation<String, String> {
+    private static class ToUpperCase extends CallContextInvocation<String, String> {
 
         @Override
         protected void onCall(@NotNull final List<? extends String> inputs,

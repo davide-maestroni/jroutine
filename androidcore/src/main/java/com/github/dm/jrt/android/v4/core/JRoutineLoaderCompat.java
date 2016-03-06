@@ -18,7 +18,7 @@ package com.github.dm.jrt.android.v4.core;
 
 import com.github.dm.jrt.android.core.builder.LoaderChannelBuilder;
 import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
-import com.github.dm.jrt.android.core.invocation.FunctionContextInvocationFactory;
+import com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -199,7 +199,7 @@ public class JRoutineLoaderCompat {
          */
         @NotNull
         public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
-                @NotNull final FunctionContextInvocationFactory<IN, OUT> factory) {
+                @NotNull final CallContextInvocationFactory<IN, OUT> factory) {
 
             return new DefaultLoaderRoutineBuilder<IN, OUT>(mContext, factory);
         }

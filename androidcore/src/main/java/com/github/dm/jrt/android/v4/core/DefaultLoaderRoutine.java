@@ -19,9 +19,9 @@ package com.github.dm.jrt.android.v4.core;
 import android.content.Context;
 
 import com.github.dm.jrt.android.core.builder.LoaderConfiguration;
+import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
+import com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
-import com.github.dm.jrt.android.core.invocation.FunctionContextInvocation;
-import com.github.dm.jrt.android.core.invocation.FunctionContextInvocationFactory;
 import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.android.core.runner.AndroidRunners;
 import com.github.dm.jrt.core.AbstractRoutine;
@@ -57,7 +57,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
 
     private final LoaderContextCompat mContext;
 
-    private final FunctionContextInvocationFactory<IN, OUT> mFactory;
+    private final CallContextInvocationFactory<IN, OUT> mFactory;
 
     private final int mLoaderId;
 
@@ -73,7 +73,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
      */
     @SuppressWarnings("ConstantConditions")
     DefaultLoaderRoutine(@NotNull final LoaderContextCompat context,
-            @NotNull final FunctionContextInvocationFactory<IN, OUT> factory,
+            @NotNull final CallContextInvocationFactory<IN, OUT> factory,
             @NotNull final InvocationConfiguration invocationConfiguration,
             @NotNull final LoaderConfiguration loaderConfiguration) {
 
@@ -140,7 +140,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
             throw new IllegalStateException("the routine context has been destroyed");
         }
 
-        final FunctionContextInvocationFactory<IN, OUT> factory = mFactory;
+        final CallContextInvocationFactory<IN, OUT> factory = mFactory;
         logger.dbg("creating a new invocation instance");
         final ContextInvocation<IN, OUT> invocation = factory.newInvocation();
         invocation.onContext(loaderContext.getApplicationContext());
@@ -205,9 +205,9 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class FactoryWrapper<IN, OUT> extends FunctionContextInvocationFactory<IN, OUT> {
+    private static class FactoryWrapper<IN, OUT> extends CallContextInvocationFactory<IN, OUT> {
 
-        private final FunctionContextInvocationFactory<IN, OUT> mFactory;
+        private final CallContextInvocationFactory<IN, OUT> mFactory;
 
         /**
          * Constructor.
@@ -215,7 +215,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
          * @param factory   the wrapped factory.
          * @param routineId the routine ID.
          */
-        protected FactoryWrapper(@NotNull final FunctionContextInvocationFactory<IN, OUT> factory,
+        protected FactoryWrapper(@NotNull final CallContextInvocationFactory<IN, OUT> factory,
                 final int routineId) {
 
             super(asArgs(routineId));
@@ -224,7 +224,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
 
         @NotNull
         @Override
-        public FunctionContextInvocation<IN, OUT> newInvocation() throws Exception {
+        public CallContextInvocation<IN, OUT> newInvocation() throws Exception {
 
             return mFactory.newInvocation();
         }
@@ -237,7 +237,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
 
         private final LoaderContextCompat mContext;
 
-        private final FunctionContextInvocationFactory<?, ?> mFactory;
+        private final CallContextInvocationFactory<?, ?> mFactory;
 
         private final int mLoaderId;
 
@@ -249,7 +249,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
          * @param loaderId the loader ID.
          */
         private PurgeExecution(@NotNull final LoaderContextCompat context,
-                @NotNull final FunctionContextInvocationFactory<?, ?> factory, final int loaderId) {
+                @NotNull final CallContextInvocationFactory<?, ?> factory, final int loaderId) {
 
             mContext = context;
             mFactory = factory;
@@ -271,7 +271,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
 
         private final LoaderContextCompat mContext;
 
-        private final FunctionContextInvocationFactory<?, ?> mFactory;
+        private final CallContextInvocationFactory<?, ?> mFactory;
 
         private final List<IN> mInputs;
 
@@ -286,7 +286,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
          * @param inputs   the list of inputs.
          */
         private PurgeInputsExecution(@NotNull final LoaderContextCompat context,
-                @NotNull final FunctionContextInvocationFactory<?, ?> factory, final int loaderId,
+                @NotNull final CallContextInvocationFactory<?, ?> factory, final int loaderId,
                 @NotNull final List<IN> inputs) {
 
             mContext = context;

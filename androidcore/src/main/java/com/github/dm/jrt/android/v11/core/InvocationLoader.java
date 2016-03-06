@@ -21,9 +21,9 @@ import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.os.Build.VERSION_CODES;
 
+import com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
-import com.github.dm.jrt.android.core.invocation.FunctionContextInvocationFactory;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
@@ -51,7 +51,7 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
 
     private final ContextInvocation<IN, OUT> mInvocation;
 
-    private final FunctionContextInvocationFactory<IN, OUT> mInvocationFactory;
+    private final CallContextInvocationFactory<IN, OUT> mInvocationFactory;
 
     private final Logger mLogger;
 
@@ -74,7 +74,7 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
     @SuppressWarnings("ConstantConditions")
     InvocationLoader(@NotNull final Context context,
             @NotNull final ContextInvocation<IN, OUT> invocation,
-            @NotNull final FunctionContextInvocationFactory<IN, OUT> invocationFactory,
+            @NotNull final CallContextInvocationFactory<IN, OUT> invocationFactory,
             @NotNull final List<? extends IN> inputs, @Nullable final OrderType order,
             @NotNull final Logger logger) {
 
@@ -194,7 +194,7 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
      * @return the factory.
      */
     @NotNull
-    FunctionContextInvocationFactory<IN, OUT> getInvocationFactory() {
+    CallContextInvocationFactory<IN, OUT> getInvocationFactory() {
 
         return mInvocationFactory;
     }

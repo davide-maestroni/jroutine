@@ -29,23 +29,23 @@ import java.util.List;
  *
  * @param <DATA> the data type.
  */
-public class PassingFunctionContextInvocation<DATA> extends FunctionContextInvocation<DATA, DATA> {
+public class PassingCallContextInvocation<DATA> extends CallContextInvocation<DATA, DATA> {
 
-    private static final FunctionContextInvocationFactory<Object, Object> sFactory =
-            new FunctionContextInvocationFactory<Object, Object>(null) {
+    private static final CallContextInvocationFactory<Object, Object> sFactory =
+            new CallContextInvocationFactory<Object, Object>(null) {
 
                 @NotNull
                 @Override
-                public FunctionContextInvocation<Object, Object> newInvocation() {
+                public CallContextInvocation<Object, Object> newInvocation() {
 
-                    return new PassingFunctionContextInvocation<Object>();
+                    return new PassingCallContextInvocation<Object>();
                 }
             };
 
     /**
      * Avoid instantiation.
      */
-    private PassingFunctionContextInvocation() {
+    private PassingCallContextInvocation() {
 
     }
 
@@ -57,9 +57,9 @@ public class PassingFunctionContextInvocation<DATA> extends FunctionContextInvoc
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <DATA> FunctionContextInvocationFactory<DATA, DATA> factoryOf() {
+    public static <DATA> CallContextInvocationFactory<DATA, DATA> factoryOf() {
 
-        return (FunctionContextInvocationFactory<DATA, DATA>) sFactory;
+        return (CallContextInvocationFactory<DATA, DATA>) sFactory;
     }
 
     @Override

@@ -22,7 +22,7 @@ import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.core.builder.LoaderConfiguration.ClashResolutionType;
-import com.github.dm.jrt.android.core.invocation.FunctionContextInvocation;
+import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
 import com.github.dm.jrt.core.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
@@ -34,7 +34,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
-import static com.github.dm.jrt.android.core.invocation.FunctionContextInvocationFactories.factoryOf;
+import static com.github.dm.jrt.android.core.invocation.CallContextInvocationFactories.factoryOf;
 import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -202,7 +202,7 @@ public class LoaderRoutineRotationTest
 
     }
 
-    private static class Delay extends FunctionContextInvocation<Data, Data> {
+    private static class Delay extends CallContextInvocation<Data, Data> {
 
         @Override
         protected void onCall(@NotNull final List<? extends Data> inputs,
@@ -212,7 +212,7 @@ public class LoaderRoutineRotationTest
         }
     }
 
-    private static class ToUpperCase extends FunctionContextInvocation<String, String> {
+    private static class ToUpperCase extends CallContextInvocation<String, String> {
 
         @Override
         protected void onCall(@NotNull final List<? extends String> inputs,

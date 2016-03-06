@@ -18,12 +18,12 @@ package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
 import com.github.dm.jrt.core.invocation.ComparableCommandInvocation;
 import com.github.dm.jrt.core.invocation.ComparableFilterInvocation;
 import com.github.dm.jrt.core.invocation.ComparableInvocationFactory;
 import com.github.dm.jrt.core.invocation.FilterInvocation;
-import com.github.dm.jrt.core.invocation.FunctionInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.util.ClassToken;
@@ -207,7 +207,7 @@ public class Functions {
     public static <IN, OUT> InvocationFactory<IN, OUT> functionFactory(
             @NotNull final Function<? super List<IN>, ? extends OUT> function) {
 
-        return new FunctionInvocationFactory<IN, OUT>(wrap(function));
+        return new CallInvocationFactory<IN, OUT>(wrap(function));
     }
 
     /**
@@ -741,7 +741,7 @@ public class Functions {
     private static class ConsumerInvocationFactory<IN, OUT>
             extends ComparableInvocationFactory<IN, OUT> {
 
-        private final FunctionInvocation<IN, OUT> mInvocation;
+        private final CallInvocation<IN, OUT> mInvocation;
 
         /**
          * Constructor.
@@ -752,7 +752,7 @@ public class Functions {
                 ResultChannel<OUT>> consumer) {
 
             super(asArgs(consumer));
-            mInvocation = new FunctionInvocation<IN, OUT>() {
+            mInvocation = new CallInvocation<IN, OUT>() {
 
                 @Override
                 protected void onCall(@NotNull final List<? extends IN> inputs,
@@ -806,21 +806,21 @@ public class Functions {
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class FunctionInvocationFactory<IN, OUT>
+    private static class CallInvocationFactory<IN, OUT>
             extends ComparableInvocationFactory<IN, OUT> {
 
-        private final FunctionInvocation<IN, OUT> mInvocation;
+        private final CallInvocation<IN, OUT> mInvocation;
 
         /**
          * Constructor.
          *
          * @param function the function instance.
          */
-        private FunctionInvocationFactory(
+        private CallInvocationFactory(
                 @NotNull final FunctionWrapper<? super List<IN>, ? extends OUT> function) {
 
             super(asArgs(function));
-            mInvocation = new FunctionInvocation<IN, OUT>() {
+            mInvocation = new CallInvocation<IN, OUT>() {
 
                 @Override
                 protected void onCall(@NotNull final List<? extends IN> inputs,

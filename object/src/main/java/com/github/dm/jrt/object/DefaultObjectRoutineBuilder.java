@@ -20,7 +20,7 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.InvocationConfiguration;
 import com.github.dm.jrt.core.builder.InvocationConfiguration.Configurable;
 import com.github.dm.jrt.core.channel.ResultChannel;
-import com.github.dm.jrt.core.invocation.FunctionInvocation;
+import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.Routine;
@@ -219,7 +219,7 @@ class DefaultObjectRoutineBuilder
     /**
      * Implementation of a simple invocation wrapping the target method.
      */
-    private static class MethodFunctionInvocation extends FunctionInvocation<Object, Object> {
+    private static class MethodCallInvocation extends CallInvocation<Object, Object> {
 
         private final InputMode mInputMode;
 
@@ -240,7 +240,7 @@ class DefaultObjectRoutineBuilder
          * @param inputMode          the input transfer mode.
          * @param outputMode         the output transfer mode.
          */
-        private MethodFunctionInvocation(@NotNull final ProxyConfiguration proxyConfiguration,
+        private MethodCallInvocation(@NotNull final ProxyConfiguration proxyConfiguration,
                 @NotNull final InvocationTarget<?> target, @NotNull final Method method,
                 @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
@@ -306,7 +306,7 @@ class DefaultObjectRoutineBuilder
         @Override
         public Invocation<Object, Object> newInvocation() {
 
-            return new MethodFunctionInvocation(mProxyConfiguration, mTarget, mMethod, mInputMode,
+            return new MethodCallInvocation(mProxyConfiguration, mTarget, mMethod, mInputMode,
                                                 mOutputMode);
         }
     }

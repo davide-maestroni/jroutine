@@ -24,9 +24,9 @@ import android.util.SparseArray;
 
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
 import com.github.dm.jrt.android.core.builder.LoaderConfiguration.CacheStrategyType;
-import com.github.dm.jrt.android.core.invocation.FunctionContextInvocationFactory;
+import com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.MissingInvocationException;
-import com.github.dm.jrt.android.core.invocation.PassingFunctionContextInvocation;
+import com.github.dm.jrt.android.core.invocation.PassingCallContextInvocation;
 import com.github.dm.jrt.android.v11.channel.SparseChannels;
 import com.github.dm.jrt.android.v11.core.JRoutineLoader;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
@@ -193,7 +193,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
         final IOChannelBuilder builder = JRoutineCore.io();
         final Routine<Object, Object> routine = JRoutineLoader.with(loaderFrom(getActivity()))
-                                                              .on(PassingFunctionContextInvocation.factoryOf())
+                                                              .on(PassingCallContextInvocation.factoryOf())
                                                               .buildRoutine();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
@@ -380,7 +380,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
         final IOChannelBuilder builder = JRoutineCore.io();
         final Routine<Object, Object> routine = JRoutineLoader.with(loaderFrom(getActivity()))
-                                                              .on(PassingFunctionContextInvocation.factoryOf())
+                                                              .on(PassingCallContextInvocation.factoryOf())
                                                               .buildRoutine();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
@@ -513,7 +513,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
             return;
         }
 
-        final FunctionContextInvocationFactory<String, String> factory =
+        final CallContextInvocationFactory<String, String> factory =
                 LoaderStreams.contextFactory(toUpperCaseChannel());
         assertThat(JRoutineLoader.with(loaderFrom(getActivity()))
                                  .on(factory)
@@ -558,7 +558,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
         final Function<StreamChannel<String>, StreamChannel<String>> function =
                 toUpperCaseChannel();
-        final FunctionContextInvocationFactory<String, String> factory =
+        final CallContextInvocationFactory<String, String> factory =
                 LoaderStreams.contextFactory(function);
         assertThat(factory).isEqualTo(factory);
         assertThat(factory).isNotEqualTo(null);

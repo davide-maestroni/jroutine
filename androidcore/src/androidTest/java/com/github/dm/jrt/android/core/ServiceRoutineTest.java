@@ -23,10 +23,10 @@ import android.os.Parcelable;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.core.builder.ServiceConfiguration;
+import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
 import com.github.dm.jrt.android.core.invocation.CommandContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationWrapper;
 import com.github.dm.jrt.android.core.invocation.FilterContextInvocation;
-import com.github.dm.jrt.android.core.invocation.FunctionContextInvocation;
 import com.github.dm.jrt.android.core.invocation.PassingContextInvocation;
 import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
 import com.github.dm.jrt.android.core.log.AndroidLog;
@@ -287,7 +287,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
     public void testInvocations2() throws InterruptedException {
 
         final TimeDuration timeout = seconds(10);
-        final ClassToken<StringFunctionInvocation> token = tokenOf(StringFunctionInvocation.class);
+        final ClassToken<StringCallInvocation> token = tokenOf(StringCallInvocation.class);
         final Routine<String, String> routine2 = JRoutineService.with(serviceFrom(getActivity()))
                                                                 .on(factoryOf(token))
                                                                 .withInvocations()
@@ -313,7 +313,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         final TimeDuration timeout = seconds(10);
         final TargetInvocationFactory<String, String> targetFactory =
-                factoryOf(StringFunctionInvocation.class);
+                factoryOf(StringCallInvocation.class);
         final Routine<String, String> routine3 = JRoutineService.with(serviceFrom(getActivity()))
                                                                 .on(targetFactory)
                                                                 .withInvocations()
@@ -336,7 +336,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         final TimeDuration timeout = seconds(10);
         final TargetInvocationFactory<String, String> targetFactory =
-                factoryOf(StringFunctionInvocation.class);
+                factoryOf(StringCallInvocation.class);
         final Routine<String, String> routine4 = JRoutineService.with(serviceFrom(getActivity()))
                                                                 .on(targetFactory)
                                                                 .withInvocations()
@@ -593,8 +593,8 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         }
     }
 
-    private static class StringFunctionInvocation
-            extends FunctionContextInvocation<String, String> {
+    private static class StringCallInvocation
+            extends CallContextInvocation<String, String> {
 
         @Override
         protected void onCall(@NotNull final List<? extends String> strings,

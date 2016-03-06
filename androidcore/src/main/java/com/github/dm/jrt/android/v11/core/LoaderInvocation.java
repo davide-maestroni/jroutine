@@ -29,9 +29,9 @@ import android.util.SparseArray;
 import com.github.dm.jrt.android.core.builder.LoaderConfiguration;
 import com.github.dm.jrt.android.core.builder.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.core.builder.LoaderConfiguration.ClashResolutionType;
+import com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
-import com.github.dm.jrt.android.core.invocation.FunctionContextInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.InvocationClashException;
 import com.github.dm.jrt.android.core.invocation.InvocationTypeException;
 import com.github.dm.jrt.android.core.invocation.StaleResultException;
@@ -42,7 +42,7 @@ import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.common.RoutineException;
-import com.github.dm.jrt.core.invocation.FunctionInvocation;
+import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.PassingInvocation;
 import com.github.dm.jrt.core.log.Logger;
@@ -68,7 +68,7 @@ import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactori
  * @param <OUT> the output data type.
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)
-class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
+class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
 
     private static final WeakIdentityHashMap<Object,
             SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
@@ -82,7 +82,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
 
     private final LoaderContext mContext;
 
-    private final FunctionContextInvocationFactory<IN, OUT> mFactory;
+    private final CallContextInvocationFactory<IN, OUT> mFactory;
 
     private final ClashResolutionType mInputClashResolutionType;
 
@@ -107,7 +107,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
      */
     @SuppressWarnings("ConstantConditions")
     LoaderInvocation(@NotNull final LoaderContext context,
-            @NotNull final FunctionContextInvocationFactory<IN, OUT> factory,
+            @NotNull final CallContextInvocationFactory<IN, OUT> factory,
             @NotNull final LoaderConfiguration configuration, @Nullable final OrderType order,
             @NotNull final Logger logger) {
 
@@ -189,7 +189,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
      */
     @SuppressWarnings("unchecked")
     static void purgeLoader(@NotNull final LoaderContext context, final int loaderId,
-            @NotNull final FunctionContextInvocationFactory<?, ?> factory,
+            @NotNull final CallContextInvocationFactory<?, ?> factory,
             @NotNull final List<?> inputs) {
 
         final Object component = context.getComponent();
@@ -293,7 +293,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
      * @param factory  the invocation factory.
      */
     static void purgeLoaders(@NotNull final LoaderContext context, final int loaderId,
-            @NotNull final FunctionContextInvocationFactory<?, ?> factory) {
+            @NotNull final CallContextInvocationFactory<?, ?> factory) {
 
         final Object component = context.getComponent();
         final WeakIdentityHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
@@ -461,7 +461,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
     private ContextInvocation<IN, OUT> createInvocation(final int loaderId) {
 
         final Logger logger = mLogger;
-        final FunctionContextInvocationFactory<IN, OUT> factory = mFactory;
+        final CallContextInvocationFactory<IN, OUT> factory = mFactory;
         final ContextInvocation<IN, OUT> invocation;
         try {
             logger.dbg("creating a new invocation instance [%d]", loaderId);
@@ -489,7 +489,7 @@ class LoaderInvocation<IN, OUT> extends FunctionInvocation<IN, OUT> {
             throw new InvocationTypeException(loaderId);
         }
 
-        final FunctionContextInvocationFactory<IN, OUT> factory = mFactory;
+        final CallContextInvocationFactory<IN, OUT> factory = mFactory;
         final InvocationLoader<IN, OUT> invocationLoader = (InvocationLoader<IN, OUT>) loader;
         if (!(factory instanceof MissingLoaderInvocationFactory)
                 && !invocationLoader.getInvocationFactory().equals(factory)) {

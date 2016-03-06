@@ -37,9 +37,9 @@ import com.github.dm.jrt.core.channel.TemplateOutputConsumer;
 import com.github.dm.jrt.core.common.DeadlockException;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.common.TimeoutException;
+import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
 import com.github.dm.jrt.core.invocation.FilterInvocation;
-import com.github.dm.jrt.core.invocation.FunctionInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationDeadlockException;
 import com.github.dm.jrt.core.invocation.InvocationException;
@@ -435,8 +435,8 @@ public class RoutineTest {
     public void testChainedRoutine() {
 
         final TimeDuration timeout = seconds(1);
-        final FunctionInvocation<Integer, Integer> execSum =
-                new FunctionInvocation<Integer, Integer>() {
+        final CallInvocation<Integer, Integer> execSum =
+                new CallInvocation<Integer, Integer>() {
 
                     @Override
                     protected void onCall(@NotNull final List<? extends Integer> integers,
@@ -475,8 +475,8 @@ public class RoutineTest {
     public void testComposedRoutine() {
 
         final TimeDuration timeout = seconds(1);
-        final FunctionInvocation<Integer, Integer> execSum =
-                new FunctionInvocation<Integer, Integer>() {
+        final CallInvocation<Integer, Integer> execSum =
+                new CallInvocation<Integer, Integer>() {
 
                     @Override
                     protected void onCall(@NotNull final List<? extends Integer> integers,
@@ -1950,7 +1950,7 @@ public class RoutineTest {
     public void testOutputDeadlock() {
 
         final Routine<String, String> routine1 =
-                JRoutineCore.on(factoryOf(new FunctionInvocation<String, String>() {
+                JRoutineCore.on(factoryOf(new CallInvocation<String, String>() {
 
                     @Override
                     protected void onCall(@NotNull final List<? extends String> strings,
@@ -1971,7 +1971,7 @@ public class RoutineTest {
         }
 
         final Routine<String, String> routine2 =
-                JRoutineCore.on(factoryOf(new FunctionInvocation<String, String>() {
+                JRoutineCore.on(factoryOf(new CallInvocation<String, String>() {
 
                     @Override
                     protected void onCall(@NotNull final List<? extends String> strings,
@@ -2493,8 +2493,8 @@ public class RoutineTest {
     public void testRoutineFunction() {
 
         final TimeDuration timeout = seconds(1);
-        final FunctionInvocation<Integer, Integer> execSum =
-                new FunctionInvocation<Integer, Integer>() {
+        final CallInvocation<Integer, Integer> execSum =
+                new CallInvocation<Integer, Integer>() {
 
                     @Override
                     protected void onCall(@NotNull final List<? extends Integer> integers,

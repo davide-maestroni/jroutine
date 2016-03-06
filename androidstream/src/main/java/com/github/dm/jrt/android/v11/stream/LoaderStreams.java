@@ -20,7 +20,7 @@ import android.util.SparseArray;
 
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
 import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
-import com.github.dm.jrt.android.core.invocation.FunctionContextInvocationFactory;
+import com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory;
 import com.github.dm.jrt.android.v11.channel.SparseChannels;
 import com.github.dm.jrt.android.v11.core.JRoutineLoader;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
@@ -148,7 +148,7 @@ public class LoaderStreams extends Streams {
      *                                            static scope.
      */
     @NotNull
-    public static <IN, OUT> FunctionContextInvocationFactory<IN, OUT> contextFactory(
+    public static <IN, OUT> CallContextInvocationFactory<IN, OUT> contextFactory(
             @NotNull final Function<? super StreamChannel<IN>, ? extends
                     StreamChannel<? extends OUT>> function) {
 

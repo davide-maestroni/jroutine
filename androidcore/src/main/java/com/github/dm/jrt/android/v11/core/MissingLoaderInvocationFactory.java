@@ -16,8 +16,8 @@
 
 package com.github.dm.jrt.android.v11.core;
 
-import com.github.dm.jrt.android.core.invocation.FunctionContextInvocation;
-import com.github.dm.jrt.android.core.invocation.FunctionContextInvocationFactory;
+import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
+import com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.MissingInvocationException;
 import com.github.dm.jrt.core.channel.ResultChannel;
 
@@ -35,7 +35,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * @param <OUT> the output data type.
  */
 final class MissingLoaderInvocationFactory<OUT>
-        extends FunctionContextInvocationFactory<Void, OUT> {
+        extends CallContextInvocationFactory<Void, OUT> {
 
     private final int mId;
 
@@ -52,7 +52,7 @@ final class MissingLoaderInvocationFactory<OUT>
 
     @NotNull
     @Override
-    public FunctionContextInvocation<Void, OUT> newInvocation() {
+    public CallContextInvocation<Void, OUT> newInvocation() {
 
         return new MissingLoaderInvocation<OUT>(mId);
     }
@@ -62,7 +62,7 @@ final class MissingLoaderInvocationFactory<OUT>
      *
      * @param <OUT> the output data type.
      */
-    private static class MissingLoaderInvocation<OUT> extends FunctionContextInvocation<Void, OUT> {
+    private static class MissingLoaderInvocation<OUT> extends CallContextInvocation<Void, OUT> {
 
         private final int mId;
 

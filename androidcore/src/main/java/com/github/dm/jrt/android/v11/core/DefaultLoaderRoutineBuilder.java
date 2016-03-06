@@ -18,7 +18,7 @@ package com.github.dm.jrt.android.v11.core;
 
 import com.github.dm.jrt.android.core.builder.LoaderConfiguration;
 import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
-import com.github.dm.jrt.android.core.invocation.FunctionContextInvocationFactory;
+import com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory;
 import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.android.core.runner.AndroidRunners;
 import com.github.dm.jrt.core.builder.InvocationConfiguration;
@@ -43,7 +43,7 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
 
     private final LoaderContext mContext;
 
-    private final FunctionContextInvocationFactory<IN, OUT> mFactory;
+    private final CallContextInvocationFactory<IN, OUT> mFactory;
 
     private final InvocationConfiguration.Configurable<LoaderRoutineBuilder<IN, OUT>>
             mRoutineConfigurable =
@@ -69,13 +69,13 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
      */
     @SuppressWarnings("ConstantConditions")
     DefaultLoaderRoutineBuilder(@NotNull final LoaderContext context,
-            @NotNull final FunctionContextInvocationFactory<IN, OUT> factory) {
+            @NotNull final CallContextInvocationFactory<IN, OUT> factory) {
 
         if (context == null) {
             throw new NullPointerException("the routine context must not be null");
         }
 
-        final Class<? extends FunctionContextInvocationFactory> factoryClass = factory.getClass();
+        final Class<? extends CallContextInvocationFactory> factoryClass = factory.getClass();
         if (!Reflection.hasStaticScope(factoryClass)) {
             throw new IllegalArgumentException(
                     "the factory class must have a static scope: " + factoryClass.getName());

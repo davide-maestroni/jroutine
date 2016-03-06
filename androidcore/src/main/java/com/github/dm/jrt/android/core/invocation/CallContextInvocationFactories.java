@@ -32,12 +32,12 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * <p/>
  * Created by davide-maestroni on 10/06/2015.
  */
-public class FunctionContextInvocationFactories {
+public class CallContextInvocationFactories {
 
     /**
      * Avoid direct instantiation.
      */
-    protected FunctionContextInvocationFactories() {
+    protected CallContextInvocationFactories() {
 
     }
 
@@ -57,8 +57,8 @@ public class FunctionContextInvocationFactories {
      * @return the invocation factory.
      */
     @NotNull
-    public static <IN, OUT> FunctionContextInvocationFactory<IN, OUT> factoryOf(
-            @NotNull final Class<? extends FunctionContextInvocation<IN, OUT>> invocationClass) {
+    public static <IN, OUT> CallContextInvocationFactory<IN, OUT> factoryOf(
+            @NotNull final Class<? extends CallContextInvocation<IN, OUT>> invocationClass) {
 
         return factoryOf(invocationClass, (Object[]) null);
     }
@@ -80,8 +80,8 @@ public class FunctionContextInvocationFactories {
      * @return the invocation factory.
      */
     @NotNull
-    public static <IN, OUT> FunctionContextInvocationFactory<IN, OUT> factoryOf(
-            @NotNull final Class<? extends FunctionContextInvocation<IN, OUT>> invocationClass,
+    public static <IN, OUT> CallContextInvocationFactory<IN, OUT> factoryOf(
+            @NotNull final Class<? extends CallContextInvocation<IN, OUT>> invocationClass,
             @Nullable final Object... args) {
 
         return new DefaultContextInvocationFactory<IN, OUT>(invocationClass, args);
@@ -103,8 +103,8 @@ public class FunctionContextInvocationFactories {
      * @return the invocation factory.
      */
     @NotNull
-    public static <IN, OUT> FunctionContextInvocationFactory<IN, OUT> factoryOf(
-            @NotNull final ClassToken<? extends FunctionContextInvocation<IN, OUT>>
+    public static <IN, OUT> CallContextInvocationFactory<IN, OUT> factoryOf(
+            @NotNull final ClassToken<? extends CallContextInvocation<IN, OUT>>
                     invocationToken) {
 
         return factoryOf(invocationToken.getRawClass());
@@ -127,8 +127,8 @@ public class FunctionContextInvocationFactories {
      * @return the invocation factory.
      */
     @NotNull
-    public static <IN, OUT> FunctionContextInvocationFactory<IN, OUT> factoryOf(
-            @NotNull final ClassToken<? extends FunctionContextInvocation<IN, OUT>> invocationToken,
+    public static <IN, OUT> CallContextInvocationFactory<IN, OUT> factoryOf(
+            @NotNull final ClassToken<? extends CallContextInvocation<IN, OUT>> invocationToken,
             @Nullable final Object... args) {
 
         return factoryOf(invocationToken.getRawClass(), args);
@@ -141,7 +141,7 @@ public class FunctionContextInvocationFactories {
      * @param <OUT> the output data type.
      */
     private static class DefaultContextInvocationFactory<IN, OUT>
-            extends FunctionContextInvocationFactory<IN, OUT> {
+            extends CallContextInvocationFactory<IN, OUT> {
 
         private final InvocationFactory<IN, OUT> mFactory;
 
@@ -152,7 +152,7 @@ public class FunctionContextInvocationFactories {
          * @param args            the invocation constructor arguments.
          */
         private DefaultContextInvocationFactory(
-                @NotNull final Class<? extends FunctionContextInvocation<IN, OUT>> invocationClass,
+                @NotNull final Class<? extends CallContextInvocation<IN, OUT>> invocationClass,
                 @Nullable final Object[] args) {
 
             super(asArgs(invocationClass, (args != null) ? args.clone() : Reflection.NO_ARGS));
@@ -161,9 +161,9 @@ public class FunctionContextInvocationFactories {
         }
 
         @NotNull
-        public FunctionContextInvocation<IN, OUT> newInvocation() throws Exception {
+        public CallContextInvocation<IN, OUT> newInvocation() throws Exception {
 
-            return (FunctionContextInvocation<IN, OUT>) mFactory.newInvocation();
+            return (CallContextInvocation<IN, OUT>) mFactory.newInvocation();
         }
     }
 }

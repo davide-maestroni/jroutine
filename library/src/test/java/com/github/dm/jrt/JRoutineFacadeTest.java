@@ -23,9 +23,9 @@ import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
 import com.github.dm.jrt.core.invocation.FilterInvocation;
-import com.github.dm.jrt.core.invocation.FunctionInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
@@ -92,8 +92,8 @@ public class JRoutineFacadeTest {
     public void testChainedRoutine() {
 
         final TimeDuration timeout = seconds(1);
-        final FunctionInvocation<Integer, Integer> execSum =
-                new FunctionInvocation<Integer, Integer>() {
+        final CallInvocation<Integer, Integer> execSum =
+                new CallInvocation<Integer, Integer>() {
 
                     @Override
                     protected void onCall(@NotNull final List<? extends Integer> integers,

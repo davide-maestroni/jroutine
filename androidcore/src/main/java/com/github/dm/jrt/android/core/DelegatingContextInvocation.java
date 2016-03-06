@@ -18,8 +18,8 @@ package com.github.dm.jrt.android.core;
 
 import android.content.Context;
 
-import com.github.dm.jrt.android.core.invocation.FunctionContextInvocation;
-import com.github.dm.jrt.android.core.invocation.FunctionContextInvocationFactory;
+import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
+import com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory;
 import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
@@ -39,7 +39,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public class DelegatingContextInvocation<IN, OUT> extends FunctionContextInvocation<IN, OUT> {
+public class DelegatingContextInvocation<IN, OUT> extends CallContextInvocation<IN, OUT> {
 
     private final DelegationType mDelegationType;
 
@@ -72,11 +72,11 @@ public class DelegatingContextInvocation<IN, OUT> extends FunctionContextInvocat
      * @return the factory.
      */
     @NotNull
-    public static <IN, OUT> FunctionContextInvocationFactory<IN, OUT> factoryFrom(
+    public static <IN, OUT> CallContextInvocationFactory<IN, OUT> factoryFrom(
             @NotNull final Routine<IN, OUT> routine, final int routineId,
             @NotNull final DelegationType delegation) {
 
-        return new DelegatingFunctionContextInvocationFactory<IN, OUT>(routine, routineId,
+        return new DelegatingCallContextInvocationFactory<IN, OUT>(routine, routineId,
                                                                        delegation);
     }
 
@@ -102,8 +102,8 @@ public class DelegatingContextInvocation<IN, OUT> extends FunctionContextInvocat
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class DelegatingFunctionContextInvocationFactory<IN, OUT>
-            extends FunctionContextInvocationFactory<IN, OUT> {
+    private static class DelegatingCallContextInvocationFactory<IN, OUT>
+            extends CallContextInvocationFactory<IN, OUT> {
 
         private final DelegationType mDelegationType;
 
@@ -117,7 +117,7 @@ public class DelegatingContextInvocation<IN, OUT> extends FunctionContextInvocat
          * @param delegation the type of routine invocation.
          */
         @SuppressWarnings("ConstantConditions")
-        private DelegatingFunctionContextInvocationFactory(@NotNull final Routine<IN, OUT> routine,
+        private DelegatingCallContextInvocationFactory(@NotNull final Routine<IN, OUT> routine,
                 final int routineId, @NotNull final DelegationType delegation) {
 
             super(asArgs(routineId, delegation));
@@ -134,7 +134,7 @@ public class DelegatingContextInvocation<IN, OUT> extends FunctionContextInvocat
         }
 
         @NotNull
-        public FunctionContextInvocation<IN, OUT> newInvocation() {
+        public CallContextInvocation<IN, OUT> newInvocation() {
 
             return new DelegatingContextInvocation<IN, OUT>(mRoutine, mDelegationType);
         }

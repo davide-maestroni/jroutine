@@ -18,6 +18,7 @@ package com.github.dm.jrt.android.v4.stream;
 
 import android.support.v4.util.SparseArrayCompat;
 
+import com.github.dm.jrt.android.channel.AndroidChannels;
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
 import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory;
@@ -65,7 +66,7 @@ public class LoaderStreamsCompat extends Streams {
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @see SparseChannelsCompat#blend(Collection)
+     * @see AndroidChannels#blend(Collection)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<OUT>> blend(
@@ -83,7 +84,7 @@ public class LoaderStreamsCompat extends Streams {
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
-     * @see SparseChannelsCompat#blend(com.github.dm.jrt.core.channel.Channel.OutputChannel[])
+     * @see AndroidChannels#blend(com.github.dm.jrt.core.channel.Channel.OutputChannel[])
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<OUT>> blend(
@@ -103,7 +104,7 @@ public class LoaderStreamsCompat extends Streams {
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @see SparseChannelsCompat#concat(Collection)
+     * @see AndroidChannels#concat(Collection)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<OUT>> concat(
@@ -123,7 +124,7 @@ public class LoaderStreamsCompat extends Streams {
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
-     * @see SparseChannelsCompat#concat(com.github.dm.jrt.core.channel.Channel.OutputChannel[])
+     * @see AndroidChannels#concat(com.github.dm.jrt.core.channel.Channel.OutputChannel[])
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<OUT>> concat(
@@ -165,7 +166,7 @@ public class LoaderStreamsCompat extends Streams {
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @see SparseChannelsCompat#join(Collection)
+     * @see AndroidChannels#join(Collection)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<List<? extends OUT>>>
@@ -185,7 +186,7 @@ public class LoaderStreamsCompat extends Streams {
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
-     * @see SparseChannelsCompat#join(com.github.dm.jrt.core.channel.Channel.OutputChannel[])
+     * @see AndroidChannels#join(com.github.dm.jrt.core.channel.Channel.OutputChannel[])
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<List<? extends OUT>>>
@@ -209,7 +210,7 @@ public class LoaderStreamsCompat extends Streams {
      * @param <OUT>       the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @see SparseChannelsCompat#join(Object, Collection)
+     * @see AndroidChannels#join(Object, Collection)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<List<? extends OUT>>>
@@ -235,8 +236,7 @@ public class LoaderStreamsCompat extends Streams {
      * @param <OUT>       the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
-     * @see SparseChannelsCompat#join(Object, com.github.dm.jrt.core.channel.Channel
-     * .OutputChannel[])
+     * @see AndroidChannels#join(Object, com.github.dm.jrt.core.channel.Channel.OutputChannel[])
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<List<? extends OUT>>>
@@ -342,7 +342,7 @@ public class LoaderStreamsCompat extends Streams {
      * @param <OUT>      the output data type.
      * @return the selectable stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @see SparseChannelsCompat#merge(int, Collection)
+     * @see AndroidChannels#merge(int, Collection)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<? extends
@@ -363,7 +363,7 @@ public class LoaderStreamsCompat extends Streams {
      * @param <OUT>      the output data type.
      * @return the selectable stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
-     * @see SparseChannelsCompat#merge(int, com.github.dm.jrt.core.channel.Channel.OutputChannel[])
+     * @see AndroidChannels#merge(int, com.github.dm.jrt.core.channel.Channel.OutputChannel[])
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<? extends
@@ -383,7 +383,7 @@ public class LoaderStreamsCompat extends Streams {
      * @param <OUT>    the output data type.
      * @return the selectable stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @see SparseChannelsCompat#merge(Collection)
+     * @see AndroidChannels#merge(Collection)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<? extends
@@ -402,7 +402,7 @@ public class LoaderStreamsCompat extends Streams {
      * @param <OUT>    the output data type.
      * @return the selectable stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
-     * @see SparseChannelsCompat#merge(com.github.dm.jrt.core.channel.Channel.OutputChannel[])
+     * @see AndroidChannels#merge(com.github.dm.jrt.core.channel.Channel.OutputChannel[])
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<? extends
@@ -494,7 +494,7 @@ public class LoaderStreamsCompat extends Streams {
      * @param channel the output channel.
      * @param <OUT>   the output data type.
      * @return the repeating stream channel builder.
-     * @see SparseChannelsCompat#repeat(com.github.dm.jrt.core.channel.Channel.OutputChannel)
+     * @see AndroidChannels#repeat(com.github.dm.jrt.core.channel.Channel.OutputChannel)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<OUT>> repeat(
@@ -515,8 +515,7 @@ public class LoaderStreamsCompat extends Streams {
      * @param <OUT>      the output data type.
      * @return the map of indexes and output channels builder.
      * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
-     * @see SparseChannelsCompat#select(int, int, com.github.dm.jrt.core.channel.Channel
-     * .OutputChannel)
+     * @see AndroidChannels#select(int, int, com.github.dm.jrt.core.channel.Channel.OutputChannel)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends
@@ -538,8 +537,7 @@ public class LoaderStreamsCompat extends Streams {
      * @param indexes the list of indexes.
      * @param <OUT>   the output data type.
      * @return the map of indexes and output channels builder.
-     * @see SparseChannelsCompat#select(com.github.dm.jrt.core.channel.Channel.OutputChannel,
-     * int...)
+     * @see AndroidChannels#select(com.github.dm.jrt.core.channel.Channel.OutputChannel, int...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends
@@ -560,8 +558,7 @@ public class LoaderStreamsCompat extends Streams {
      * @param indexes the iterable returning the channel indexes.
      * @param <OUT>   the output data type.
      * @return the map of indexes and output channels builder.
-     * @see SparseChannelsCompat#select(com.github.dm.jrt.core.channel.Channel.OutputChannel,
-     * Iterable)
+     * @see AndroidChannels#select(com.github.dm.jrt.core.channel.Channel.OutputChannel, Iterable)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends
@@ -650,8 +647,7 @@ public class LoaderStreamsCompat extends Streams {
      * @param index   the channel index.
      * @param <OUT>   the output data type.
      * @return the selectable loader stream builder.
-     * @see SparseChannelsCompat#toSelectable(com.github.dm.jrt.core.channel.Channel
-     * .OutputChannel, int)
+     * @see AndroidChannels#toSelectable(com.github.dm.jrt.core.channel.Channel.OutputChannel, int)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<? extends

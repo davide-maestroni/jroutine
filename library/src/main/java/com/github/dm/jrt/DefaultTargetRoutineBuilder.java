@@ -35,43 +35,43 @@ import java.lang.reflect.Method;
 /**
  * Created by davide-maestroni on 03/03/2016.
  */
-class DefaultWrapRoutineBuilder implements WrapRoutineBuilder {
+class DefaultTargetRoutineBuilder implements TargetRoutineBuilder {
 
     private final InvocationTarget<?> mTarget;
 
-    private ProxyBuilderType mBuilderType;
+    private BuilderType mBuilderType;
 
     private InvocationConfiguration mInvocationConfiguration =
             InvocationConfiguration.DEFAULT_CONFIGURATION;
 
-    private final InvocationConfiguration.Configurable<DefaultWrapRoutineBuilder>
+    private final InvocationConfiguration.Configurable<DefaultTargetRoutineBuilder>
             mInvocationConfigurable =
-            new InvocationConfiguration.Configurable<DefaultWrapRoutineBuilder>() {
+            new InvocationConfiguration.Configurable<DefaultTargetRoutineBuilder>() {
 
                 @NotNull
-                public DefaultWrapRoutineBuilder setConfiguration(
+                public DefaultTargetRoutineBuilder setConfiguration(
                         @NotNull final InvocationConfiguration configuration) {
 
                     mInvocationConfiguration = configuration;
-                    return DefaultWrapRoutineBuilder.this;
+                    return DefaultTargetRoutineBuilder.this;
                 }
             };
 
     private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.DEFAULT_CONFIGURATION;
 
-    private final ProxyConfiguration.Configurable<DefaultWrapRoutineBuilder> mProxyConfigurable =
-            new ProxyConfiguration.Configurable<DefaultWrapRoutineBuilder>() {
+    private final ProxyConfiguration.Configurable<DefaultTargetRoutineBuilder> mProxyConfigurable =
+            new ProxyConfiguration.Configurable<DefaultTargetRoutineBuilder>() {
 
                 @NotNull
-                public DefaultWrapRoutineBuilder setConfiguration(
+                public DefaultTargetRoutineBuilder setConfiguration(
                         @NotNull final ProxyConfiguration configuration) {
 
                     mProxyConfiguration = configuration;
-                    return DefaultWrapRoutineBuilder.this;
+                    return DefaultTargetRoutineBuilder.this;
                 }
             };
 
-    DefaultWrapRoutineBuilder(@NotNull final InvocationTarget<?> target) {
+    DefaultTargetRoutineBuilder(@NotNull final InvocationTarget<?> target) {
 
         final Class<?> targetClass = target.getTargetClass();
         if (targetClass.isInterface()) {
@@ -91,7 +91,7 @@ class DefaultWrapRoutineBuilder implements WrapRoutineBuilder {
     @NotNull
     public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
 
-        final ProxyBuilderType builderType = mBuilderType;
+        final BuilderType builderType = mBuilderType;
         if (builderType == null) {
             final Proxy proxyAnnotation = itf.getAnnotation(Proxy.class);
             if ((proxyAnnotation != null) && mTarget.isAssignableTo(proxyAnnotation.value())) {
@@ -100,7 +100,7 @@ class DefaultWrapRoutineBuilder implements WrapRoutineBuilder {
 
             return newObjectBuilder().buildProxy(itf);
 
-        } else if (builderType == ProxyBuilderType.PROCESSOR) {
+        } else if (builderType == BuilderType.PROXY) {
             return newProxyBuilder().buildProxy(itf);
         }
 
@@ -127,23 +127,23 @@ class DefaultWrapRoutineBuilder implements WrapRoutineBuilder {
     }
 
     @NotNull
-    public WrapRoutineBuilder withBuilder(@Nullable final ProxyBuilderType builderType) {
+    public TargetRoutineBuilder withBuilder(@Nullable final BuilderType builderType) {
 
         mBuilderType = builderType;
         return this;
     }
 
     @NotNull
-    public InvocationConfiguration.Builder<? extends WrapRoutineBuilder> withInvocations() {
+    public InvocationConfiguration.Builder<? extends TargetRoutineBuilder> withInvocations() {
 
-        return new InvocationConfiguration.Builder<DefaultWrapRoutineBuilder>(
+        return new InvocationConfiguration.Builder<DefaultTargetRoutineBuilder>(
                 mInvocationConfigurable, mInvocationConfiguration);
     }
 
     @NotNull
-    public ProxyConfiguration.Builder<? extends WrapRoutineBuilder> withProxies() {
+    public ProxyConfiguration.Builder<? extends TargetRoutineBuilder> withProxies() {
 
-        return new ProxyConfiguration.Builder<DefaultWrapRoutineBuilder>(mProxyConfigurable,
+        return new ProxyConfiguration.Builder<DefaultTargetRoutineBuilder>(mProxyConfigurable,
                                                                          mProxyConfiguration);
     }
 

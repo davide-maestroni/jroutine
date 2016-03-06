@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt;
 
-import com.github.dm.jrt.WrapRoutineBuilder.ProxyBuilderType;
+import com.github.dm.jrt.TargetRoutineBuilder.BuilderType;
 import com.github.dm.jrt.core.builder.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
@@ -92,21 +92,20 @@ public class JRoutineFacadeTest {
     public void testChainedRoutine() {
 
         final TimeDuration timeout = seconds(1);
-        final CallInvocation<Integer, Integer> execSum =
-                new CallInvocation<Integer, Integer>() {
+        final CallInvocation<Integer, Integer> execSum = new CallInvocation<Integer, Integer>() {
 
-                    @Override
-                    protected void onCall(@NotNull final List<? extends Integer> integers,
-                            @NotNull final ResultChannel<Integer> result) {
+            @Override
+            protected void onCall(@NotNull final List<? extends Integer> integers,
+                    @NotNull final ResultChannel<Integer> result) {
 
-                        int sum = 0;
-                        for (final Integer integer : integers) {
-                            sum += integer;
-                        }
+                int sum = 0;
+                for (final Integer integer : integers) {
+                    sum += integer;
+                }
 
-                        result.pass(sum);
-                    }
-                };
+                result.pass(sum);
+            }
+        };
 
         final Routine<Integer, Integer> sumRoutine =
                 JRoutineFacade.on(factoryOf(execSum, this)).buildRoutine();
@@ -310,7 +309,7 @@ public class JRoutineFacadeTest {
 
         final TestClass test = new TestClass();
         final TestStatic testStatic = JRoutineFacade.on(instance(test))
-                                                    .withBuilder(ProxyBuilderType.REFLECTION)
+                                                    .withBuilder(BuilderType.OBJECT)
                                                     .withInvocations()
                                                     .withRunner(Runners.poolRunner())
                                                     .withLogLevel(Level.DEBUG)
@@ -340,7 +339,7 @@ public class JRoutineFacadeTest {
 
         final TestClass test = new TestClass();
         final TestStatic proxy = JRoutineFacade.on(test)
-                                               .withBuilder(ProxyBuilderType.PROCESSOR)
+                                               .withBuilder(BuilderType.PROXY)
                                                .withInvocations()
                                                .withRunner(Runners.poolRunner())
                                                .withLogLevel(Level.DEBUG)

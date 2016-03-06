@@ -47,12 +47,6 @@ public class ContextInvocationFactories {
     /**
      * Builds and returns a new context invocation factory creating instances of the specified
      * class.
-     * <p/>
-     * Note that inner and anonymous classes can be passed as well. Remember however that Java
-     * creates synthetic constructors for such classes, so be sure to specify the correct arguments
-     * to guarantee proper instantiation. In fact, inner classes always have the outer instance as
-     * first constructor parameter, and anonymous classes has both the outer instance and all the
-     * variables captured in the closure.
      *
      * @param invocationClass the invocation class.
      * @param <IN>            the input data type.
@@ -93,12 +87,6 @@ public class ContextInvocationFactories {
     /**
      * Builds and returns a new context invocation factory creating instances of the specified class
      * token.
-     * <p/>
-     * Note that class tokens of inner and anonymous classes can be passed as well. Remember however
-     * that Java creates synthetic constructors for such classes, so be sure to specify the correct
-     * arguments to guarantee proper instantiation. In fact, inner classes always have the outer
-     * instance as first constructor parameter, and anonymous classes has both the outer instance
-     * and all the variables captured in the closure.
      *
      * @param invocationToken the invocation class token.
      * @param <IN>            the input data type.

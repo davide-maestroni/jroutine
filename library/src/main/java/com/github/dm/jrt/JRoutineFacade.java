@@ -259,7 +259,7 @@ public class JRoutineFacade extends Channels {
     }
 
     /**
-     * Returns a routine builder wrapping the specified target object.<br/>
+     * Returns a routine builder wrapping the specified target.<br/>
      * Note that it is responsibility of the caller to retain a strong reference to the target
      * instance to prevent it from being garbage collected.<br/>
      * Note also that the invocation input data will be cached, and the results will be produced
@@ -272,13 +272,13 @@ public class JRoutineFacade extends Channels {
      *                                            interface.
      */
     @NotNull
-    public static WrapRoutineBuilder on(@NotNull final InvocationTarget<?> target) {
+    public static TargetRoutineBuilder on(@NotNull final InvocationTarget<?> target) {
 
-        return new DefaultWrapRoutineBuilder(target);
+        return new DefaultTargetRoutineBuilder(target);
     }
 
     @NotNull
-    public static WrapRoutineBuilder on(@NotNull final Object object) {
+    public static TargetRoutineBuilder on(@NotNull final Object object) {
 
         final InvocationTarget<?> target;
         if (object instanceof Class) {
@@ -288,7 +288,7 @@ public class JRoutineFacade extends Channels {
             target = instance(object);
         }
 
-        return new DefaultWrapRoutineBuilder(target);
+        return new DefaultTargetRoutineBuilder(target);
     }
 
     @NotNull

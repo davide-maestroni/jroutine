@@ -26,25 +26,25 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Created by davide-maestroni on 03/03/2016.
  */
-public interface WrapRoutineBuilder extends ObjectRoutineBuilder {
+public interface TargetRoutineBuilder extends ObjectRoutineBuilder {
 
     @NotNull
-    WrapRoutineBuilder withBuilder(@Nullable ProxyBuilderType builderType);
+    TargetRoutineBuilder withBuilder(@Nullable BuilderType builderType);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    InvocationConfiguration.Builder<? extends WrapRoutineBuilder> withInvocations();
+    InvocationConfiguration.Builder<? extends TargetRoutineBuilder> withInvocations();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    ProxyConfiguration.Builder<? extends WrapRoutineBuilder> withProxies();
+    ProxyConfiguration.Builder<? extends TargetRoutineBuilder> withProxies();
 
-    enum ProxyBuilderType {
-        REFLECTION,
-        PROCESSOR
+    enum BuilderType {
+        OBJECT,
+        PROXY
     }
 }

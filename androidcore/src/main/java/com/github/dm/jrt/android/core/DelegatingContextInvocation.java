@@ -32,7 +32,7 @@ import java.util.List;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Function invocation implementation delegating the execution to another routine.
+ * Call invocation implementation delegating the execution to another routine.
  * <p/>
  * Created by davide-maestroni on 10/07/2015.
  *

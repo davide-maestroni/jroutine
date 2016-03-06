@@ -112,6 +112,28 @@ public class Functions {
     }
 
     /**
+     * Builds and returns a new call invocation factory based on the specified bi-consumer instance.
+     * <br/>
+     * It's up to the caller to prevent undesired leaks.
+     * <p/>
+     * Note that the passed object is expected to behave like a function, that is, it must not
+     * retain a mutable internal state.<br/>
+     * Note also that any external object used inside the function must be synchronized in order to
+     * avoid concurrency issues.
+     *
+     * @param consumer the bi-consumer instance.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the invocation factory.
+     */
+    @NotNull
+    public static <IN, OUT> InvocationFactory<IN, OUT> consumerCall(
+            @NotNull final BiConsumer<? super List<IN>, ? super ResultChannel<OUT>> consumer) {
+
+        return new ConsumerInvocationFactory<IN, OUT>(wrap(consumer));
+    }
+
+    /**
      * Builds and returns a new command invocation based on the specified consumer instance.<br/>
      * It's up to the caller to prevent undesired leaks.
      * <p/>
@@ -129,28 +151,6 @@ public class Functions {
             @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
 
         return new ConsumerCommandInvocation<OUT>(wrap(consumer));
-    }
-
-    /**
-     * Builds and returns a new function invocation factory based on the specified bi-consumer
-     * instance.<br/>
-     * It's up to the caller to prevent undesired leaks.
-     * <p/>
-     * Note that the passed object is expected to behave like a function, that is, it must not
-     * retain a mutable internal state.<br/>
-     * Note also that any external object used inside the function must be synchronized in order to
-     * avoid concurrency issues.
-     *
-     * @param consumer the bi-consumer instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the invocation factory.
-     */
-    @NotNull
-    public static <IN, OUT> InvocationFactory<IN, OUT> consumerFactory(
-            @NotNull final BiConsumer<? super List<IN>, ? super ResultChannel<OUT>> consumer) {
-
-        return new ConsumerInvocationFactory<IN, OUT>(wrap(consumer));
     }
 
     /**
@@ -189,8 +189,8 @@ public class Functions {
     }
 
     /**
-     * Builds and returns a new function invocation factory based on the specified function
-     * instance.<br/>
+     * Builds and returns a new call invocation factory based on the specified function instance.
+     * <br/>
      * It's up to the caller to prevent undesired leaks.
      * <p/>
      * Note that the passed object is expected to behave like a function, that is, it must not
@@ -204,10 +204,10 @@ public class Functions {
      * @return the invocation factory.
      */
     @NotNull
-    public static <IN, OUT> InvocationFactory<IN, OUT> functionFactory(
+    public static <IN, OUT> InvocationFactory<IN, OUT> functionCall(
             @NotNull final Function<? super List<IN>, ? extends OUT> function) {
 
-        return new CallInvocationFactory<IN, OUT>(wrap(function));
+        return new FunctionInvocationFactory<IN, OUT>(wrap(function));
     }
 
     /**
@@ -733,7 +733,7 @@ public class Functions {
     }
 
     /**
-     * Factory of function invocations based on a bi-consumer instance.
+     * Factory of call invocations based on a bi-consumer instance.
      *
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
@@ -801,12 +801,12 @@ public class Functions {
     }
 
     /**
-     * Factory of function invocations based on a function instance.
+     * Factory of call invocations based on a function instance.
      *
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class CallInvocationFactory<IN, OUT>
+    private static class FunctionInvocationFactory<IN, OUT>
             extends ComparableInvocationFactory<IN, OUT> {
 
         private final CallInvocation<IN, OUT> mInvocation;
@@ -816,7 +816,7 @@ public class Functions {
          *
          * @param function the function instance.
          */
-        private CallInvocationFactory(
+        private FunctionInvocationFactory(
                 @NotNull final FunctionWrapper<? super List<IN>, ? extends OUT> function) {
 
             super(asArgs(function));

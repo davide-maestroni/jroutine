@@ -194,7 +194,7 @@ public class JRoutineFacadeTest {
     public void testConsumerFunction() {
 
         final Routine<String, String> routine =
-                JRoutineFacade.onFunction(new BiConsumer<List<String>, ResultChannel<String>>() {
+                JRoutineFacade.onCall(new BiConsumer<List<String>, ResultChannel<String>>() {
 
                     public void accept(final List<String> strings,
                             final ResultChannel<String> result) {
@@ -235,7 +235,7 @@ public class JRoutineFacadeTest {
     public void testFunctionFunction() {
 
         final Routine<String, String> routine =
-                JRoutineFacade.onFunction(new Function<List<String>, String>() {
+                JRoutineFacade.onCall(new Function<List<String>, String>() {
 
                     public String apply(final List<String> strings) {
 

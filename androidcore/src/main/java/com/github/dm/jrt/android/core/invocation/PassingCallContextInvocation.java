@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 /**
- * Implementation of a function invocation simply passing on the input data.
+ * Implementation of a call invocation simply passing on the input data.
  * <p/>
  * Created by davide-maestroni on 10/06/2015.
  *

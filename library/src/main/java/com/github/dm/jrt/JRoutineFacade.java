@@ -42,10 +42,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 import static com.github.dm.jrt.core.invocation.InvocationFactories.factoryOf;
+import static com.github.dm.jrt.function.Functions.consumerCall;
 import static com.github.dm.jrt.function.Functions.consumerCommand;
-import static com.github.dm.jrt.function.Functions.consumerFactory;
 import static com.github.dm.jrt.function.Functions.consumerFilter;
-import static com.github.dm.jrt.function.Functions.functionFactory;
+import static com.github.dm.jrt.function.Functions.functionCall;
 import static com.github.dm.jrt.function.Functions.functionFilter;
 import static com.github.dm.jrt.function.Functions.predicateFilter;
 import static com.github.dm.jrt.function.Functions.supplierCommand;
@@ -304,6 +304,20 @@ public class JRoutineFacade extends Channels {
         return JRoutineCore.on(supplierCommand(supplier));
     }
 
+    @NotNull
+    public static <IN, OUT> RoutineBuilder<IN, OUT> onCall(
+            @NotNull final BiConsumer<? super List<IN>, ? super ResultChannel<OUT>> consumer) {
+
+        return JRoutineCore.on(consumerCall(consumer));
+    }
+
+    @NotNull
+    public static <IN, OUT> RoutineBuilder<IN, OUT> onCall(
+            @NotNull final Function<? super List<IN>, ? extends OUT> function) {
+
+        return JRoutineCore.on(functionCall(function));
+    }
+
     /**
      * Returns an output consumer builder employing the specified consumer function to handle the
      * invocation completion.
@@ -336,20 +350,6 @@ public class JRoutineFacade extends Channels {
             @NotNull final Supplier<? extends Invocation<? super IN, ? extends OUT>> supplier) {
 
         return JRoutineCore.on(supplierFactory(supplier));
-    }
-
-    @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> onFunction(
-            @NotNull final BiConsumer<? super List<IN>, ? super ResultChannel<OUT>> consumer) {
-
-        return JRoutineCore.on(consumerFactory(consumer));
-    }
-
-    @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> onFunction(
-            @NotNull final Function<? super List<IN>, ? extends OUT> function) {
-
-        return JRoutineCore.on(functionFactory(function));
     }
 
     /**

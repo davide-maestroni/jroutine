@@ -39,10 +39,10 @@ import static com.github.dm.jrt.core.util.TimeDuration.seconds;
 import static com.github.dm.jrt.function.Functions.biSink;
 import static com.github.dm.jrt.function.Functions.castTo;
 import static com.github.dm.jrt.function.Functions.constant;
+import static com.github.dm.jrt.function.Functions.consumerCall;
 import static com.github.dm.jrt.function.Functions.consumerCommand;
-import static com.github.dm.jrt.function.Functions.consumerFactory;
 import static com.github.dm.jrt.function.Functions.consumerFilter;
-import static com.github.dm.jrt.function.Functions.functionFactory;
+import static com.github.dm.jrt.function.Functions.functionCall;
 import static com.github.dm.jrt.function.Functions.functionFilter;
 import static com.github.dm.jrt.function.Functions.identity;
 import static com.github.dm.jrt.function.Functions.isEqual;
@@ -153,7 +153,7 @@ public class FunctionsTest {
     @NotNull
     private static InvocationFactory<Object, String> createFunction() {
 
-        return consumerFactory(new BiConsumer<List<?>, ResultChannel<String>>() {
+        return consumerCall(new BiConsumer<List<?>, ResultChannel<String>>() {
 
             public void accept(final List<?> objects, final ResultChannel<String> result) {
 
@@ -168,7 +168,7 @@ public class FunctionsTest {
     @NotNull
     private static InvocationFactory<Object, String> createFunction2() {
 
-        return functionFactory(new Function<List<?>, String>() {
+        return functionCall(new Function<List<?>, String>() {
 
             public String apply(final List<?> objects) {
 
@@ -1040,12 +1040,12 @@ public class FunctionsTest {
         final FunctionWrapper<List<?>, ? super List<?>> identity = identity();
         assertThat(factory).isEqualTo(factory);
         assertThat(factory).isNotEqualTo(createFunction2());
-        assertThat(factory).isNotEqualTo(functionFactory(identity));
+        assertThat(factory).isNotEqualTo(functionCall(identity));
         assertThat(factory).isNotEqualTo(createFactory());
         assertThat(factory).isNotEqualTo("");
-        assertThat(functionFactory(identity)).isEqualTo(functionFactory(identity));
-        assertThat(functionFactory(identity).hashCode()).isEqualTo(
-                functionFactory(identity).hashCode());
+        assertThat(functionCall(identity)).isEqualTo(functionCall(identity));
+        assertThat(functionCall(identity).hashCode()).isEqualTo(
+                functionCall(identity).hashCode());
     }
 
     @Test
@@ -1054,7 +1054,7 @@ public class FunctionsTest {
 
         try {
 
-            functionFactory(null);
+            functionCall(null);
 
             fail();
 
@@ -1070,11 +1070,11 @@ public class FunctionsTest {
         final BiConsumerWrapper<List<?>, ResultChannel<Object>> sink = biSink();
         assertThat(factory).isEqualTo(factory);
         assertThat(factory).isNotEqualTo(createFunction());
-        assertThat(factory).isNotEqualTo(consumerFactory(sink));
+        assertThat(factory).isNotEqualTo(consumerCall(sink));
         assertThat(factory).isNotEqualTo(createFactory());
         assertThat(factory).isNotEqualTo("");
-        assertThat(consumerFactory(sink)).isEqualTo(consumerFactory(sink));
-        assertThat(consumerFactory(sink).hashCode()).isEqualTo(consumerFactory(sink).hashCode());
+        assertThat(consumerCall(sink)).isEqualTo(consumerCall(sink));
+        assertThat(consumerCall(sink).hashCode()).isEqualTo(consumerCall(sink).hashCode());
     }
 
     @Test
@@ -1083,7 +1083,7 @@ public class FunctionsTest {
 
         try {
 
-            consumerFactory(null);
+            consumerCall(null);
 
             fail();
 

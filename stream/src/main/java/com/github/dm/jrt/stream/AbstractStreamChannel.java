@@ -63,9 +63,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static com.github.dm.jrt.core.builder.ChannelConfiguration.builderFromOutputChannel;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
-import static com.github.dm.jrt.function.Functions.consumerFactory;
+import static com.github.dm.jrt.function.Functions.consumerCall;
 import static com.github.dm.jrt.function.Functions.consumerFilter;
-import static com.github.dm.jrt.function.Functions.functionFactory;
+import static com.github.dm.jrt.function.Functions.functionCall;
 import static com.github.dm.jrt.function.Functions.functionFilter;
 import static com.github.dm.jrt.function.Functions.predicateFilter;
 import static com.github.dm.jrt.function.Functions.wrap;
@@ -267,7 +267,7 @@ public abstract class AbstractStreamChannel<OUT>
     public <AFTER> StreamChannel<AFTER> collect(
             @NotNull final BiConsumer<? super List<OUT>, ? super ResultChannel<AFTER>> consumer) {
 
-        return map(consumerFactory(consumer));
+        return map(consumerCall(consumer));
     }
 
     @NotNull
@@ -281,7 +281,7 @@ public abstract class AbstractStreamChannel<OUT>
     public <AFTER> StreamChannel<AFTER> collect(
             @NotNull final Function<? super List<OUT>, ? extends AFTER> function) {
 
-        return map(functionFactory(function));
+        return map(functionCall(function));
     }
 
     @NotNull

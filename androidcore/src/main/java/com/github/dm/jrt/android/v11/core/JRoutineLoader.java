@@ -142,8 +142,8 @@ import java.util.WeakHashMap;
  */
 public class JRoutineLoader {
 
-    private static final WeakHashMap<LoaderContext, ContextBuilder> sBuilders =
-            new WeakHashMap<LoaderContext, ContextBuilder>();
+    private static final WeakHashMap<LoaderContext, LoaderContextBuilder> sBuilders =
+            new WeakHashMap<LoaderContext, LoaderContextBuilder>();
 
     /**
      * Returns a context based builder of loader routine builders.
@@ -152,13 +152,13 @@ public class JRoutineLoader {
      * @return the context builder.
      */
     @NotNull
-    public static ContextBuilder with(@NotNull final LoaderContext context) {
+    public static LoaderContextBuilder with(@NotNull final LoaderContext context) {
 
         synchronized (sBuilders) {
-            final WeakHashMap<LoaderContext, ContextBuilder> builders = sBuilders;
-            ContextBuilder contextBuilder = builders.get(context);
+            final WeakHashMap<LoaderContext, LoaderContextBuilder> builders = sBuilders;
+            LoaderContextBuilder contextBuilder = builders.get(context);
             if (contextBuilder == null) {
-                contextBuilder = new ContextBuilder(context);
+                contextBuilder = new LoaderContextBuilder(context);
                 builders.put(context, contextBuilder);
             }
 
@@ -169,7 +169,7 @@ public class JRoutineLoader {
     /**
      * Context based builder of loader routine builders.
      */
-    public static class ContextBuilder {
+    public static class LoaderContextBuilder {
 
         private final LoaderContext mContext;
 
@@ -179,7 +179,7 @@ public class JRoutineLoader {
          * @param context the loader context.
          */
         @SuppressWarnings("ConstantConditions")
-        private ContextBuilder(@NotNull final LoaderContext context) {
+        private LoaderContextBuilder(@NotNull final LoaderContext context) {
 
             if (context == null) {
                 throw new NullPointerException("the loader context must not be null");

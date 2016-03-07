@@ -21,7 +21,6 @@ import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.core.JRoutineService;
-import com.github.dm.jrt.android.core.invocation.FilterContextInvocation;
 import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.IOChannelBuilder;
@@ -1364,12 +1363,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         }
     }
 
-    private static class CharAt extends FilterContextInvocation<List<?>, Character> {
-
-        private CharAt() {
-
-            super(null);
-        }
+    private static class CharAt extends TemplateContextInvocation<List<?>, Character> {
 
         public void onInput(final List<?> objects, @NotNull final ResultChannel<Character> result) {
 
@@ -1379,12 +1373,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         }
     }
 
-    private static class PassingInteger extends FilterContextInvocation<Integer, Integer> {
-
-        private PassingInteger() {
-
-            super(null);
-        }
+    private static class PassingInteger extends TemplateContextInvocation<Integer, Integer> {
 
         public void onInput(final Integer i, @NotNull final ResultChannel<Integer> result) {
 
@@ -1392,12 +1381,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         }
     }
 
-    private static class PassingString extends FilterContextInvocation<String, String> {
-
-        private PassingString() {
-
-            super(null);
-        }
+    private static class PassingString extends TemplateContextInvocation<String, String> {
 
         public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
@@ -1406,16 +1390,11 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     }
 
     private static class Sort extends
-            FilterContextInvocation<ParcelableSelectable<Object>, ParcelableSelectable<Object>> {
+            TemplateContextInvocation<ParcelableSelectable<Object>, ParcelableSelectable<Object>> {
 
         private static final int INTEGER = 1;
 
         private static final int STRING = 0;
-
-        private Sort() {
-
-            super(null);
-        }
 
         public void onInput(final ParcelableSelectable<Object> selectable,
                 @NotNull final ResultChannel<ParcelableSelectable<Object>> result) {

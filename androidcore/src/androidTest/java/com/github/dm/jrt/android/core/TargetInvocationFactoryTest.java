@@ -21,7 +21,7 @@ import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.core.DecoratingService.StringInvocation;
-import com.github.dm.jrt.android.core.invocation.FilterContextInvocation;
+import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.routine.Routine;
 
@@ -86,13 +86,8 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
         routine.purge();
     }
 
-    private static class PassingStringInvocation extends FilterContextInvocation<String, String>
+    private static class PassingStringInvocation extends TemplateContextInvocation<String, String>
             implements StringInvocation {
-
-        private PassingStringInvocation() {
-
-            super(null);
-        }
 
         public void onInput(final String input, @NotNull final ResultChannel<String> result) {
 

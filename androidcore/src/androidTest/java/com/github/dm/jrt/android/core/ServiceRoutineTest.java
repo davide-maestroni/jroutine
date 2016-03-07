@@ -24,10 +24,7 @@ import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.core.builder.ServiceConfiguration;
 import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
-import com.github.dm.jrt.android.core.invocation.CommandContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationWrapper;
-import com.github.dm.jrt.android.core.invocation.FilterContextInvocation;
-import com.github.dm.jrt.android.core.invocation.PassingContextInvocation;
 import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
 import com.github.dm.jrt.android.core.log.AndroidLog;
 import com.github.dm.jrt.android.core.runner.MainRunner;
@@ -113,8 +110,8 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
     @SuppressWarnings("ConstantConditions")
     public void testBuilderError() {
 
-        final ClassToken<PassingContextInvocation<String>> classToken =
-                new ClassToken<PassingContextInvocation<String>>() {};
+        final ClassToken<StringPassingInvocation> classToken =
+                new ClassToken<StringPassingInvocation>() {};
         final ServiceContext context = null;
 
         try {
@@ -140,7 +137,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         try {
 
             JRoutineService.with(serviceFrom(getActivity()))
-                           .on(factoryOf((ClassToken<PassingContextInvocation<String>>) null));
+                           .on(factoryOf((ClassToken<StringPassingInvocation>) null));
 
             fail();
 
@@ -152,12 +149,12 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
     @SuppressWarnings("ConstantConditions")
     public void testConfigurationErrors() {
 
-        final ClassToken<PassingContextInvocation<Object>> classToken =
-                new ClassToken<PassingContextInvocation<Object>>() {};
+        final ClassToken<StringPassingInvocation> classToken =
+                new ClassToken<StringPassingInvocation>() {};
 
         try {
 
-            new DefaultServiceRoutineBuilder<Object, Object>(serviceFrom(getActivity()), factoryOf(
+            new DefaultServiceRoutineBuilder<String, String>(serviceFrom(getActivity()), factoryOf(
                     classToken)).setConfiguration((InvocationConfiguration) null);
 
             fail();
@@ -168,7 +165,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         try {
 
-            new DefaultServiceRoutineBuilder<Object, Object>(serviceFrom(getActivity()), factoryOf(
+            new DefaultServiceRoutineBuilder<String, String>(serviceFrom(getActivity()), factoryOf(
                     classToken)).setConfiguration((ServiceConfiguration) null);
 
             fail();
@@ -562,12 +559,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
     }
 
     private static class MyParcelableInvocation
-            extends FilterContextInvocation<MyParcelable, MyParcelable> {
-
-        private MyParcelableInvocation() {
-
-            super(null);
-        }
+            extends TemplateContextInvocation<MyParcelable, MyParcelable> {
 
         public void onInput(final MyParcelable myParcelable,
                 @NotNull final ResultChannel<MyParcelable> result) {
@@ -603,12 +595,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         }
     }
 
-    private static class StringPassingInvocation extends FilterContextInvocation<String, String> {
-
-        private StringPassingInvocation() {
-
-            super(null);
-        }
+    private static class StringPassingInvocation extends TemplateContextInvocation<String, String> {
 
         public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
@@ -616,12 +603,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         }
     }
 
-    private static class TextCommandInvocation extends CommandContextInvocation<String> {
-
-        private TextCommandInvocation() {
-
-            super(null);
-        }
+    private static class TextCommandInvocation extends TemplateContextInvocation<Void, String> {
 
         public void onResult(@NotNull final ResultChannel<String> result) {
 

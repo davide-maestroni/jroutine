@@ -38,7 +38,7 @@ import java.lang.reflect.Method;
 /**
  * Created by davide-maestroni on 03/06/2016.
  */
-public class DefaultServiceTargetRoutineBuilder implements ServiceTargetRoutineBuilder {
+class DefaultServiceTargetRoutineBuilder implements ServiceTargetRoutineBuilder {
 
     private final ServiceContext mContext;
 

@@ -66,6 +66,26 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
         routine.purge();
     }
 
+    public void testRemoteInvocationDecoratorAbort() {
+
+        final Routine<String, String> routine =
+                JRoutineService.with(serviceFrom(getActivity(), RemoteDecoratingService.class))
+                               .on(factoryOf(PassingStringInvocation.class))
+                               .buildRoutine();
+        assertThat(routine.asyncInvoke().after(millis(100)).pass("test").result().abort()).isTrue();
+        routine.purge();
+    }
+
+    public void testRemoteInvocationDecoratorLifecycle() {
+
+        final Routine<String, String> routine =
+                JRoutineService.with(serviceFrom(getActivity(), RemoteDecoratingService.class))
+                               .on(factoryOf(PassingStringInvocation.class))
+                               .buildRoutine();
+        assertThat(routine.asyncCall("test").afterMax(seconds(10)).all()).containsExactly("test");
+        routine.purge();
+    }
+
     private static class PassingStringInvocation extends FilterContextInvocation<String, String>
             implements StringInvocation {
 

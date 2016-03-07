@@ -43,13 +43,20 @@
         </activity>
 
         <service
-            android:name="com.github.dm.jrt.android.core.service.InvocationService"
+            android:name="com.github.dm.jrt.android.core.service.InvocationService"/>
+        <service
+            android:name="com.github.dm.jrt.android.core.DecoratingService"/>
+        <service
+            android:name="com.github.dm.jrt.android.core.TestService"/>
+
+        <service
+            android:name="com.github.dm.jrt.android.core.RemoteInvocationService"
             android:process=":remote"/>
         <service
-            android:name="com.github.dm.jrt.android.core.DecoratingService"
+            android:name="com.github.dm.jrt.android.core.RemoteDecoratingService"
             android:process=":remote"/>
         <service
-            android:name="com.github.dm.jrt.android.core.TestService"
+            android:name="com.github.dm.jrt.android.core.RemoteTestService"
             android:process=":remote"/>
     </application>
 

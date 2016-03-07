@@ -16,10 +16,10 @@
 
 package com.github.dm.jrt.android;
 
-import android.app.Activity;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 
 import com.github.dm.jrt.android.core.ServiceContext;
 import com.github.dm.jrt.android.core.builder.LoaderChannelBuilder;
@@ -28,9 +28,9 @@ import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
 import com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory;
 import com.github.dm.jrt.android.core.service.InvocationService;
 import com.github.dm.jrt.android.object.ContextInvocationTarget;
-import com.github.dm.jrt.android.v11.channel.SparseChannels;
-import com.github.dm.jrt.android.v11.core.JRoutineLoader;
-import com.github.dm.jrt.android.v11.core.LoaderContext;
+import com.github.dm.jrt.android.v4.channel.SparseChannelsCompat;
+import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
+import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.core.util.ClassToken;
 
 import org.jetbrains.annotations.NotNull;
@@ -40,12 +40,12 @@ import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
 import static com.github.dm.jrt.android.core.invocation.CallContextInvocationFactories.factoryOf;
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.classOfType;
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceOf;
-import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
+import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
 
 /**
  * Created by davide-maestroni on 03/06/2016.
  */
-public class JRoutineAndroid extends SparseChannels {
+public class JRoutineAndroidCompat extends SparseChannelsCompat {
 
     /**
      * Returns a context based builder of service routine builders.
@@ -66,32 +66,32 @@ public class JRoutineAndroid extends SparseChannels {
      * @return the context builder.
      */
     @NotNull
-    public static LoaderContextBuilder with(@NotNull final LoaderContext context) {
+    public static LoaderContextBuilderCompat with(@NotNull final LoaderContextCompat context) {
 
-        return new LoaderContextBuilder(context);
+        return new LoaderContextBuilderCompat(context);
     }
 
     @NotNull
-    public static LoaderContextBuilder withLoader(@NotNull final Activity activity) {
+    public static LoaderContextBuilderCompat withLoader(@NotNull final FragmentActivity activity) {
 
         return with(loaderFrom(activity));
     }
 
     @NotNull
-    public static LoaderContextBuilder withLoader(@NotNull final Activity activity,
+    public static LoaderContextBuilderCompat withLoader(@NotNull final FragmentActivity activity,
             @NotNull final Context context) {
 
         return with(loaderFrom(activity, context));
     }
 
     @NotNull
-    public static LoaderContextBuilder withLoader(@NotNull final Fragment fragment) {
+    public static LoaderContextBuilderCompat withLoader(@NotNull final Fragment fragment) {
 
         return with(loaderFrom(fragment));
     }
 
     @NotNull
-    public static LoaderContextBuilder withLoader(@NotNull final Fragment fragment,
+    public static LoaderContextBuilderCompat withLoader(@NotNull final Fragment fragment,
             @NotNull final Context context) {
 
         return with(loaderFrom(fragment, context));
@@ -117,9 +117,9 @@ public class JRoutineAndroid extends SparseChannels {
         return with(serviceFrom(context));
     }
 
-    public static class LoaderContextBuilder {
+    public static class LoaderContextBuilderCompat {
 
-        private final LoaderContext mContext;
+        private final LoaderContextCompat mContext;
 
         /**
          * Constructor.
@@ -127,7 +127,7 @@ public class JRoutineAndroid extends SparseChannels {
          * @param context the loader context.
          */
         @SuppressWarnings("ConstantConditions")
-        private LoaderContextBuilder(@NotNull final LoaderContext context) {
+        private LoaderContextBuilderCompat(@NotNull final LoaderContextCompat context) {
 
             if (context == null) {
                 throw new NullPointerException("the loader context must not be null");
@@ -235,14 +235,14 @@ public class JRoutineAndroid extends SparseChannels {
          * @param <IN>    the input data type.
          * @param <OUT>   the output data type.
          * @return the routine builder instance.
-         * @throws java.lang.IllegalArgumentException if the class of the specified factory has not
-         *                                            a static scope.
+         * @throws IllegalArgumentException if the class of the specified factory has not
+         *                                  a static scope.
          */
         @NotNull
         public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
                 @NotNull final CallContextInvocationFactory<IN, OUT> factory) {
 
-            return JRoutineLoader.with(mContext).on(factory);
+            return JRoutineLoaderCompat.with(mContext).on(factory);
         }
 
         /**
@@ -261,7 +261,7 @@ public class JRoutineAndroid extends SparseChannels {
         @NotNull
         public LoaderTargetRoutineBuilder on(@NotNull final ContextInvocationTarget<?> target) {
 
-            return new DefaultLoaderTargetRoutineBuilder(mContext, target);
+            return new DefaultLoaderTargetRoutineBuilderCompat(mContext, target);
         }
 
         @NotNull
@@ -287,7 +287,7 @@ public class JRoutineAndroid extends SparseChannels {
         @NotNull
         public LoaderChannelBuilder onId(final int loaderId) {
 
-            return JRoutineLoader.with(mContext).onId(loaderId);
+            return JRoutineLoaderCompat.with(mContext).onId(loaderId);
         }
 
         @NotNull

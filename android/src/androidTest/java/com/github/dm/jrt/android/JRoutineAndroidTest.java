@@ -81,24 +81,18 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                                   .asyncCall()
                                   .afterMax(seconds(10))
                                   .all()).containsExactly("test");
-//        final Method method = Reflection.findMethod(TestClass.class, "getString");
-//        assertThat(JRoutineFacade.on(new TestClass())
-//                                 .method("getString")
-//                                 .syncCall()
-//                                 .afterMax(seconds(10))
-//                                 .all()).containsExactly("test");
-//        assertThat(JRoutineAndroid.withService(getActivity())
-//                                  .onInstance(TestClass.class)
-//                                  .method("getString")
-//                                  .asyncCall()
-//                                  .afterMax(seconds(10))
-//                                  .all()).containsExactly("test");
-//        assertThat(JRoutineAndroid.withService(getActivity())
-//                                  .onInstance(TestClass.class, "hello")
-//                                  .method(TestClass.class.getMethod("getString"))
-//                                  .asyncCall()
-//                                  .afterMax(seconds(10))
-//                                  .all()).containsExactly("hello");
+        assertThat(JRoutineAndroid.withService(getActivity())
+                                  .onInstance(TestClass.class)
+                                  .method("getStringLow")
+                                  .asyncCall()
+                                  .afterMax(seconds(10))
+                                  .all()).containsExactly("test");
+        assertThat(JRoutineAndroid.withService(getActivity())
+                                  .onInstance(TestClass.class, "hello")
+                                  .method(TestClass.class.getMethod("getStringLow"))
+                                  .asyncCall()
+                                  .afterMax(seconds(10))
+                                  .all()).containsExactly("hello");
     }
 
     public void testServiceInvocation() {
@@ -177,13 +171,13 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
             sText = text;
         }
 
-        public static String getString() {
+        public static String getStringUp() {
 
             return sText.toUpperCase();
         }
 
         @Alias("test")
-        public String getSring() {
+        public String getStringLow() {
 
             return sText.toLowerCase();
         }

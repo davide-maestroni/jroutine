@@ -15,23 +15,15 @@
   ~ limitations under the License.
   -->
 
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.github.dm.jrt.android">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-  <application
-      android:name=".app.TestApp"
-      android:label="jroutine-android">
-    <activity
-        android:name="com.github.dm.jrt.android.v11.TestActivity"
-        android:label="test">
-    </activity>
-    <activity
-        android:name="com.github.dm.jrt.android.v4.TestActivity"
-        android:label="test">
-    </activity>
+    <fragment
+        android:id="@+id/test_fragment"
+        class="com.github.dm.jrt.android.v11.TestFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
-    <service
-        android:name="com.github.dm.jrt.android.core.service.InvocationService"/>
-  </application>
-
-</manifest>
+</LinearLayout>

@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android.core;
+package com.github.dm.jrt.android.app;
 
 import android.app.Application;
 
 /**
  * Test application.
  * <p/>
- * Created by davide-maestroni on 04/06/2015.
+ * Created by davide-maestroni on 03/06/2016.
  */
-@SuppressWarnings("unused")
 public class TestApp extends Application {
 
 }

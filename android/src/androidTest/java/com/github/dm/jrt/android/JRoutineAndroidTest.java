@@ -32,6 +32,7 @@ import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
 import static com.github.dm.jrt.android.core.TargetInvocationFactory.factoryOf;
+import static com.github.dm.jrt.android.object.ContextInvocationTarget.classOfType;
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceOf;
 import static com.github.dm.jrt.core.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -73,11 +74,33 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                                   .all()).containsExactly("test");
     }
 
+    public void testServiceClass() throws NoSuchMethodException {
+
+        assertThat(JRoutineAndroid.withService(getActivity())
+                                  .onInstance(TestClass.class, "test")
+                                  .method("getStringUp")
+                                  .asyncCall()
+                                  .afterMax(seconds(10))
+                                  .all()).containsExactly("TEST");
+        assertThat(JRoutineAndroid.withService(getActivity())
+                                  .onInstance(TestClass.class)
+                                  .method(TestClass.class.getMethod("getStringUp"))
+                                  .asyncCall()
+                                  .afterMax(seconds(10))
+                                  .all()).containsExactly("TEST");
+        assertThat(JRoutineAndroid.withService(getActivity())
+                                  .on(classOfType(TestClass.class))
+                                  .alias("TEST")
+                                  .asyncCall()
+                                  .afterMax(seconds(10))
+                                  .all()).containsExactly("TEST");
+    }
+
     public void testServiceInstance() throws NoSuchMethodException {
 
         assertThat(JRoutineAndroid.withService(getActivity())
-                                  .on(instanceOf(TestClass.class))
-                                  .alias("test")
+                                  .onInstance(TestClass.class, "test")
+                                  .method(TestClass.class.getMethod("getStringLow"))
                                   .asyncCall()
                                   .afterMax(seconds(10))
                                   .all()).containsExactly("test");
@@ -88,11 +111,11 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                                   .afterMax(seconds(10))
                                   .all()).containsExactly("test");
         assertThat(JRoutineAndroid.withService(getActivity())
-                                  .onInstance(TestClass.class, "hello")
-                                  .method(TestClass.class.getMethod("getStringLow"))
+                                  .on(instanceOf(TestClass.class))
+                                  .alias("test")
                                   .asyncCall()
                                   .afterMax(seconds(10))
-                                  .all()).containsExactly("hello");
+                                  .all()).containsExactly("test");
     }
 
     public void testServiceInvocation() {
@@ -171,6 +194,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
             sText = text;
         }
 
+        @Alias("TEST")
         public static String getStringUp() {
 
             return sText.toUpperCase();

@@ -76,14 +76,15 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
 
     public void testServiceClass() throws NoSuchMethodException {
 
+        new TestClass("test");
         assertThat(JRoutineAndroid.withService(getActivity())
-                                  .onInstance(TestClass.class, "test")
+                                  .onClass(TestClass.class)
                                   .method("getStringUp")
                                   .asyncCall()
                                   .afterMax(seconds(10))
                                   .all()).containsExactly("TEST");
         assertThat(JRoutineAndroid.withService(getActivity())
-                                  .onInstance(TestClass.class)
+                                  .onClass(TestClass.class)
                                   .method(TestClass.class.getMethod("getStringUp"))
                                   .asyncCall()
                                   .afterMax(seconds(10))
@@ -99,7 +100,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     public void testServiceInstance() throws NoSuchMethodException {
 
         assertThat(JRoutineAndroid.withService(getActivity())
-                                  .onInstance(TestClass.class, "test")
+                                  .onInstance(TestClass.class, "TEST")
                                   .method(TestClass.class.getMethod("getStringLow"))
                                   .asyncCall()
                                   .afterMax(seconds(10))

@@ -181,7 +181,7 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
                                         .all()).containsExactly("test1,test2");
         assertThat(JRoutineAndroidCompat.with(loaderFrom(getActivity()))
                                         .on(JoinString.class, " ")
-                                        .asyncCall("test")
+                                        .asyncCall("test1", "test2")
                                         .afterMax(seconds(10))
                                         .all()).containsExactly("test1 test2");
     }

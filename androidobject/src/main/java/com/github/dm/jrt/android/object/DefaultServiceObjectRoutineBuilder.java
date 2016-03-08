@@ -27,7 +27,6 @@ import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
 import com.github.dm.jrt.android.object.builder.ServiceObjectRoutineBuilder;
 import com.github.dm.jrt.core.builder.InvocationConfiguration;
 import com.github.dm.jrt.core.channel.ResultChannel;
-import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.object.Builders.MethodInfo;
@@ -324,18 +323,13 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         public void onContext(@NotNull final Context context) throws Exception {
 
             super.onContext(context);
-            try {
-                final InvocationTarget target = mTarget.getInvocationTarget(context);
-                mInstance = target.getTarget();
-                mRoutine = JRoutineObject.on(target)
-                                         .withProxies()
-                                         .withSharedFields(mSharedFields)
-                                         .getConfigured()
-                                         .alias(mAliasName);
-
-            } catch (final Throwable t) {
-                throw InvocationException.wrapIfNeeded(t);
-            }
+            final InvocationTarget target = mTarget.getInvocationTarget(context);
+            mInstance = target.getTarget();
+            mRoutine = JRoutineObject.on(target)
+                                     .withProxies()
+                                     .withSharedFields(mSharedFields)
+                                     .getConfigured()
+                                     .alias(mAliasName);
         }
 
         @Override
@@ -354,8 +348,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     /**
      * Invocation based on method signature.
      */
-    private static class MethodSignatureInvocation
-            extends CallContextInvocation<Object, Object> {
+    private static class MethodSignatureInvocation extends CallContextInvocation<Object, Object> {
 
         private final String mMethodName;
 
@@ -404,18 +397,13 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         public void onContext(@NotNull final Context context) throws Exception {
 
             super.onContext(context);
-            try {
-                final InvocationTarget target = mTarget.getInvocationTarget(context);
-                mInstance = target.getTarget();
-                mRoutine = JRoutineObject.on(target)
-                                         .withProxies()
-                                         .withSharedFields(mSharedFields)
-                                         .getConfigured()
-                                         .method(mMethodName, mParameterTypes);
-
-            } catch (final Throwable t) {
-                throw InvocationException.wrapIfNeeded(t);
-            }
+            final InvocationTarget target = mTarget.getInvocationTarget(context);
+            mInstance = target.getTarget();
+            mRoutine = JRoutineObject.on(target)
+                                     .withProxies()
+                                     .withSharedFields(mSharedFields)
+                                     .getConfigured()
+                                     .method(mMethodName, mParameterTypes);
         }
     }
 
@@ -482,17 +470,12 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         public void onContext(@NotNull final Context context) throws Exception {
 
             super.onContext(context);
-            try {
-                final InvocationTarget target = mTarget.getInvocationTarget(context);
-                final Object mutexTarget =
-                        (Modifier.isStatic(mTargetMethod.getModifiers())) ? target.getTargetClass()
-                                : target.getTarget();
-                mMutex = getSharedMutex(mutexTarget, mSharedFields);
-                mInstance = target.getTarget();
-
-            } catch (final Throwable t) {
-                throw InvocationException.wrapIfNeeded(t);
-            }
+            final InvocationTarget target = mTarget.getInvocationTarget(context);
+            final Object mutexTarget =
+                    (Modifier.isStatic(mTargetMethod.getModifiers())) ? target.getTargetClass()
+                            : target.getTarget();
+            mMutex = getSharedMutex(mutexTarget, mSharedFields);
+            mInstance = target.getTarget();
         }
     }
 

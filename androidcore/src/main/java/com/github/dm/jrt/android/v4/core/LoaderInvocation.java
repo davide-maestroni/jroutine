@@ -41,7 +41,6 @@ import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.invocation.CallInvocation;
-import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.PassingInvocation;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.routine.Routine;
@@ -360,7 +359,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
     @Override
     @SuppressWarnings("unchecked")
     protected void onCall(@NotNull final List<? extends IN> inputs,
-            @NotNull final ResultChannel<OUT> result) {
+            @NotNull final ResultChannel<OUT> result) throws Exception {
 
         final LoaderContextCompat context = mContext;
         final Object component = context.getComponent();
@@ -451,7 +450,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
     private RoutineLoaderCallbacks<OUT> createCallbacks(@NotNull final Context loaderContext,
             @NotNull final LoaderManager loaderManager,
             @Nullable final InvocationLoader<IN, OUT> loader,
-            @NotNull final List<? extends IN> inputs, final int loaderId) {
+            @NotNull final List<? extends IN> inputs, final int loaderId) throws Exception {
 
         final Logger logger = mLogger;
         final InvocationLoader<IN, OUT> callbacksLoader = (loader != null) ? loader
@@ -461,7 +460,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
     }
 
     @NotNull
-    private ContextInvocation<IN, OUT> createInvocation(final int loaderId) {
+    private ContextInvocation<IN, OUT> createInvocation(final int loaderId) throws Exception {
 
         final Logger logger = mLogger;
         final CallContextInvocationFactory<IN, OUT> factory = mFactory;
@@ -470,9 +469,9 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
             logger.dbg("creating a new invocation instance [%d]", loaderId);
             invocation = factory.newInvocation();
 
-        } catch (final Throwable t) {
-            logger.err(t, "error creating the invocation instance [%d]", loaderId);
-            throw InvocationException.wrapIfNeeded(t);
+        } catch (final Exception e) {
+            logger.err(e, "error creating the invocation instance [%d]", loaderId);
+            throw e;
         }
 
         return invocation;
@@ -563,7 +562,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
 
         @NotNull
         @Override
-        public ContextInvocation<IN, OUT> newInvocation() {
+        public ContextInvocation<IN, OUT> newInvocation() throws Exception {
 
             return mInvocation.createInvocation(mLoaderId);
         }

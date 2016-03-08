@@ -19,7 +19,6 @@ package com.github.dm.jrt.android.object.app;
 import android.app.Application;
 
 import com.github.dm.jrt.android.object.builder.FactoryContext;
-import com.github.dm.jrt.core.invocation.InvocationException;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -42,19 +41,14 @@ public class TestApp extends Application implements FactoryContext {
     @Nullable
     @SuppressWarnings("unchecked")
     public <TYPE> TYPE geInstance(@NotNull final Class<? extends TYPE> type,
-            @NotNull final Object[] args) {
+            @NotNull final Object[] args) throws Exception {
 
         final HashMap<InstanceInfo, Object> instances = mInstances;
         final InstanceInfo instanceInfo = new InstanceInfo(type, args);
         Object instance = instances.get(instanceInfo);
         if (instance == null) {
-            try {
-                instance = findConstructor(type, args).newInstance(args);
-                instances.put(instanceInfo, instance);
-
-            } catch (final Throwable t) {
-                throw InvocationException.wrapIfNeeded(t);
-            }
+            instance = findConstructor(type, args).newInstance(args);
+            instances.put(instanceInfo, instance);
         }
 
         return (TYPE) instance;

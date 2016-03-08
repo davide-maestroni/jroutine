@@ -17,6 +17,8 @@
 package com.github.dm.jrt.android.object;
 
 import android.annotation.TargetApi;
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.os.Build.VERSION_CODES;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -24,7 +26,12 @@ import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.object.ContextInvocationTarget.ClassContextInvocationTarget;
 import com.github.dm.jrt.android.object.ContextInvocationTarget.ObjectContextInvocationTarget;
+import com.github.dm.jrt.android.object.builder.FactoryContext;
+import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.object.InvocationTarget;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.classOfType;
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceOf;
@@ -92,7 +99,7 @@ public class ContextInvocationTargetTest extends ActivityInstrumentationTestCase
         parcel.recycle();
     }
 
-    public void testInstance() {
+    public void testInstance() throws Exception {
 
         final ObjectContextInvocationTarget<TestClass> target = instanceOf(TestClass.class);
         assertThat(target.getTargetClass()).isEqualTo(TestClass.class);
@@ -100,8 +107,10 @@ public class ContextInvocationTargetTest extends ActivityInstrumentationTestCase
         assertThat(target.isAssignableTo(Object.class)).isTrue();
         assertThat(target.isOfType(TestClass.class)).isTrue();
         assertThat(target.isOfType(Object.class)).isTrue();
-        final InvocationTarget<TestClass> invocationTarget =
-                target.getInvocationTarget(getActivity());
+        InvocationTarget<TestClass> invocationTarget = target.getInvocationTarget(getActivity());
+        assertThat(invocationTarget.getTargetClass()).isEqualTo(TestClass.class);
+        assertThat(invocationTarget.getTarget()).isExactlyInstanceOf(TestClass.class);
+        invocationTarget = target.getInvocationTarget(new NullContext(getActivity()));
         assertThat(invocationTarget.getTargetClass()).isEqualTo(TestClass.class);
         assertThat(invocationTarget.getTarget()).isExactlyInstanceOf(TestClass.class);
     }
@@ -118,7 +127,7 @@ public class ContextInvocationTargetTest extends ActivityInstrumentationTestCase
     }
 
     @SuppressWarnings("ConstantConditions")
-    public void testInstanceError() {
+    public void testInstanceError() throws Exception {
 
         try {
             instanceOf(null);
@@ -133,6 +142,15 @@ public class ContextInvocationTargetTest extends ActivityInstrumentationTestCase
             fail();
 
         } catch (final NullPointerException ignored) {
+
+        }
+
+        final ObjectContextInvocationTarget<TestClass> target = instanceOf(TestClass.class);
+        try {
+            target.getInvocationTarget(new ObjectContext(getActivity()));
+            fail();
+
+        } catch (final RoutineException ignored) {
 
         }
     }
@@ -151,5 +169,36 @@ public class ContextInvocationTargetTest extends ActivityInstrumentationTestCase
 
     public static class TestClass {
 
+    }
+
+    private static class NullContext extends ContextWrapper implements FactoryContext {
+
+        public NullContext(final Context base) {
+
+            super(base);
+        }
+
+        @Nullable
+        public <TYPE> TYPE geInstance(@NotNull final Class<? extends TYPE> type,
+                @NotNull final Object... args) {
+
+            return null;
+        }
+    }
+
+    private static class ObjectContext extends ContextWrapper implements FactoryContext {
+
+        public ObjectContext(final Context base) {
+
+            super(base);
+        }
+
+        @Nullable
+        @SuppressWarnings("unchecked")
+        public <TYPE> TYPE geInstance(@NotNull final Class<? extends TYPE> type,
+                @NotNull final Object... args) {
+
+            return (TYPE) new Object();
+        }
     }
 }

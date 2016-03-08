@@ -22,7 +22,6 @@ import android.os.Parcelable;
 
 import com.github.dm.jrt.android.object.builder.FactoryContext;
 import com.github.dm.jrt.core.common.RoutineException;
-import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.util.Reflection;
 import com.github.dm.jrt.object.InvocationTarget;
 
@@ -100,9 +99,11 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
      *
      * @param context the target context.
      * @return the invocation target.
+     * @throws java.lang.Exception if an unexpected error occurs.
      */
     @NotNull
-    public abstract InvocationTarget<TYPE> getInvocationTarget(@NotNull Context context);
+    public abstract InvocationTarget<TYPE> getInvocationTarget(@NotNull Context context) throws
+            Exception;
 
     /**
      * Returns the target class.
@@ -307,7 +308,8 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
         @NotNull
         @Override
         @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
-        public InvocationTarget<TYPE> getInvocationTarget(@NotNull final Context context) {
+        public InvocationTarget<TYPE> getInvocationTarget(@NotNull final Context context) throws
+                Exception {
 
             TYPE target = null;
             final Class<TYPE> targetClass = mTargetClass;
@@ -320,12 +322,7 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
             }
 
             if (target == null) {
-                try {
-                    target = findConstructor(targetClass, factoryArgs).newInstance(factoryArgs);
-
-                } catch (final Throwable t) {
-                    throw InvocationException.wrapIfNeeded(t);
-                }
+                target = findConstructor(targetClass, factoryArgs).newInstance(factoryArgs);
 
             } else if (!targetClass.isInstance(target)) {
                 throw new RoutineException(

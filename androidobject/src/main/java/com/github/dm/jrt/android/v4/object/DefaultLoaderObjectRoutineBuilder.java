@@ -30,7 +30,6 @@ import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.core.builder.InvocationConfiguration;
 import com.github.dm.jrt.core.channel.ResultChannel;
-import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.object.Builders;
@@ -242,8 +241,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class AliasContextInvocation<IN, OUT>
-            extends CallContextInvocation<IN, OUT> {
+    private static class AliasContextInvocation<IN, OUT> extends CallContextInvocation<IN, OUT> {
 
         private final String mAliasName;
 
@@ -274,18 +272,13 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         public void onContext(@NotNull final Context context) throws Exception {
 
             super.onContext(context);
-            try {
-                final InvocationTarget<?> target = mTarget.getInvocationTarget(context);
-                mInstance = target.getTarget();
-                mRoutine = JRoutineObject.on(target)
-                                         .withProxies()
-                                         .with(mProxyConfiguration)
-                                         .getConfigured()
-                                         .alias(mAliasName);
-
-            } catch (final Throwable t) {
-                throw InvocationException.wrapIfNeeded(t);
-            }
+            final InvocationTarget<?> target = mTarget.getInvocationTarget(context);
+            mInstance = target.getTarget();
+            mRoutine = JRoutineObject.on(target)
+                                     .withProxies()
+                                     .with(mProxyConfiguration)
+                                     .getConfigured()
+                                     .alias(mAliasName);
         }
 
         @Override
@@ -347,8 +340,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class MethodContextInvocation<IN, OUT>
-            extends CallContextInvocation<IN, OUT> {
+    private static class MethodContextInvocation<IN, OUT> extends CallContextInvocation<IN, OUT> {
 
         private final Method mMethod;
 
@@ -391,18 +383,13 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         public void onContext(@NotNull final Context context) throws Exception {
 
             super.onContext(context);
-            try {
-                final InvocationTarget<?> target = mTarget.getInvocationTarget(context);
-                mInstance = target.getTarget();
-                mRoutine = JRoutineObject.on(target)
-                                         .withProxies()
-                                         .with(mProxyConfiguration)
-                                         .getConfigured()
-                                         .method(mMethod);
-
-            } catch (final Throwable t) {
-                throw InvocationException.wrapIfNeeded(t);
-            }
+            final InvocationTarget<?> target = mTarget.getInvocationTarget(context);
+            mInstance = target.getTarget();
+            mRoutine = JRoutineObject.on(target)
+                                     .withProxies()
+                                     .with(mProxyConfiguration)
+                                     .getConfigured()
+                                     .method(mMethod);
         }
     }
 
@@ -503,18 +490,13 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         public void onContext(@NotNull final Context context) throws Exception {
 
             super.onContext(context);
-            try {
-                final InvocationTarget<?> target = mTarget.getInvocationTarget(context);
-                final Object mutexTarget =
-                        (Modifier.isStatic(mTargetMethod.getModifiers())) ? target.getTargetClass()
-                                : target.getTarget();
-                mMutex = Builders.getSharedMutex(mutexTarget,
-                                                 mProxyConfiguration.getSharedFieldsOr(null));
-                mInstance = target.getTarget();
-
-            } catch (final Throwable t) {
-                throw InvocationException.wrapIfNeeded(t);
-            }
+            final InvocationTarget<?> target = mTarget.getInvocationTarget(context);
+            final Object mutexTarget =
+                    (Modifier.isStatic(mTargetMethod.getModifiers())) ? target.getTargetClass()
+                            : target.getTarget();
+            mMutex = Builders.getSharedMutex(mutexTarget,
+                                             mProxyConfiguration.getSharedFieldsOr(null));
+            mInstance = target.getTarget();
         }
     }
 

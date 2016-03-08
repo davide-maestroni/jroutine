@@ -36,7 +36,9 @@ public interface FactoryContext {
      * @param args   the custom arguments.
      * @param <TYPE> the target object type.
      * @return the object instance.
+     * @throws java.lang.Exception if an unexpected error occurs.
      */
     @Nullable
-    <TYPE> TYPE geInstance(@NotNull Class<? extends TYPE> type, @NotNull Object... args);
+    <TYPE> TYPE geInstance(@NotNull Class<? extends TYPE> type, @NotNull Object... args) throws
+            Exception;
 }

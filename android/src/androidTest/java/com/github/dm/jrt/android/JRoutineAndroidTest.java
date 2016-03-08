@@ -18,20 +18,27 @@ package com.github.dm.jrt.android;
 
 import android.annotation.TargetApi;
 import android.content.Intent;
+import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
+import com.github.dm.jrt.android.core.TargetInvocationFactory;
+import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
+import com.github.dm.jrt.android.core.invocation.CallContextInvocationFactories;
 import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
 import com.github.dm.jrt.android.core.service.InvocationService;
 import com.github.dm.jrt.android.v11.TestActivity;
+import com.github.dm.jrt.android.v11.TestFragment;
+import com.github.dm.jrt.android.v11.core.LoaderContext;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.object.annotation.Alias;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
-import static com.github.dm.jrt.android.core.TargetInvocationFactory.factoryOf;
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.classOfType;
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceOf;
 import static com.github.dm.jrt.core.util.TimeDuration.seconds;
@@ -48,33 +55,136 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         super(TestActivity.class);
     }
 
+    public void testLoader() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final ClassToken<Join<String>> token = new ClassToken<Join<String>>() {};
+        assertThat(JRoutineAndroid.with(LoaderContext.loaderFrom(getActivity()))
+                                  .on(CallContextInvocationFactories.factoryOf(token))
+                                  .asyncCall("test")
+                                  .afterMax(seconds(10))
+                                  .all()).containsExactly("test");
+        assertThat(JRoutineAndroid.withLoader(getActivity())
+                                  .on(CallContextInvocationFactories.factoryOf(token))
+                                  .asyncCall("test")
+                                  .afterMax(seconds(10))
+                                  .all()).containsExactly("test");
+        assertThat(JRoutineAndroid.withLoader(getActivity(), getActivity())
+                                  .on(CallContextInvocationFactories.factoryOf(token))
+                                  .asyncCall("test")
+                                  .afterMax(seconds(10))
+                                  .all()).containsExactly("test");
+        final TestFragment fragment = (TestFragment) getActivity().getFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        assertThat(JRoutineAndroid.withLoader(fragment)
+                                  .on(CallContextInvocationFactories.factoryOf(token))
+                                  .asyncCall("test")
+                                  .afterMax(seconds(10))
+                                  .all()).containsExactly("test");
+        assertThat(JRoutineAndroid.withLoader(fragment, getActivity())
+                                  .on(CallContextInvocationFactories.factoryOf(token))
+                                  .asyncCall("test")
+                                  .afterMax(seconds(10))
+                                  .all()).containsExactly("test");
+    }
+
+    public void testLoaderClass() throws NoSuchMethodException {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        new TestClass("test");
+        assertThat(JRoutineAndroid.withLoader(getActivity())
+                                  .onClass(TestClass.class)
+                                  .method("getStringUp")
+                                  .asyncCall()
+                                  .afterMax(seconds(10))
+                                  .all()).containsExactly("TEST");
+        assertThat(JRoutineAndroid.withLoader(getActivity())
+                                  .onClass(TestClass.class)
+                                  .method(TestClass.class.getMethod("getStringUp"))
+                                  .asyncCall()
+                                  .afterMax(seconds(10))
+                                  .all()).containsExactly("TEST");
+        assertThat(JRoutineAndroid.withLoader(getActivity())
+                                  .on(classOfType(TestClass.class))
+                                  .alias("TEST")
+                                  .asyncCall()
+                                  .afterMax(seconds(10))
+                                  .all()).containsExactly("TEST");
+    }
+
+    public void testLoaderInstance() throws NoSuchMethodException {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        assertThat(JRoutineAndroid.withLoader(getActivity())
+                                  .onInstance(TestClass.class, "TEST")
+                                  .method(TestClass.class.getMethod("getStringLow"))
+                                  .asyncCall()
+                                  .afterMax(seconds(10))
+                                  .all()).containsExactly("test");
+        assertThat(JRoutineAndroid.withLoader(getActivity())
+                                  .onInstance(TestClass.class)
+                                  .method("getStringLow")
+                                  .asyncCall()
+                                  .afterMax(seconds(10))
+                                  .all()).containsExactly("test");
+        assertThat(JRoutineAndroid.withLoader(getActivity())
+                                  .on(instanceOf(TestClass.class))
+                                  .alias("test")
+                                  .asyncCall()
+                                  .afterMax(seconds(10))
+                                  .all()).containsExactly("test");
+    }
+
     public void testService() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         final ClassToken<Pass<String>> token = new ClassToken<Pass<String>>() {};
         assertThat(JRoutineAndroid.with(serviceFrom(getActivity()))
-                                  .on(factoryOf(token))
+                                  .on(TargetInvocationFactory.factoryOf(token))
                                   .asyncCall("test")
                                   .afterMax(seconds(10))
                                   .all()).containsExactly("test");
         assertThat(JRoutineAndroid.withService(getActivity())
-                                  .on(factoryOf(token))
+                                  .on(TargetInvocationFactory.factoryOf(token))
                                   .asyncCall("test")
                                   .afterMax(seconds(10))
                                   .all()).containsExactly("test");
         assertThat(JRoutineAndroid.withService(getActivity(), InvocationService.class)
-                                  .on(factoryOf(token))
+                                  .on(TargetInvocationFactory.factoryOf(token))
                                   .asyncCall("test")
                                   .afterMax(seconds(10))
                                   .all()).containsExactly("test");
         assertThat(JRoutineAndroid.withService(getActivity(),
                                                new Intent(getActivity(), InvocationService.class))
-                                  .on(factoryOf(token))
+                                  .on(TargetInvocationFactory.factoryOf(token))
                                   .asyncCall("test")
                                   .afterMax(seconds(10))
                                   .all()).containsExactly("test");
     }
 
     public void testServiceClass() throws NoSuchMethodException {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
 
         new TestClass("test");
         assertThat(JRoutineAndroid.withService(getActivity())
@@ -99,6 +209,11 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
 
     public void testServiceInstance() throws NoSuchMethodException {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         assertThat(JRoutineAndroid.withService(getActivity())
                                   .onInstance(TestClass.class, "TEST")
                                   .method(TestClass.class.getMethod("getStringLow"))
@@ -121,6 +236,11 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
 
     public void testServiceInvocation() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
         final ClassToken<Pass<String>> token = new ClassToken<Pass<String>>() {};
         assertThat(JRoutineAndroid.with(serviceFrom(getActivity()))
                                   .on(token)
@@ -142,6 +262,50 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                                   .asyncCall("test")
                                   .afterMax(seconds(10))
                                   .all()).containsExactly("test", "test", "test");
+    }
+
+    public static class Join<DATA> extends CallContextInvocation<DATA, String> {
+
+        private final String mSeparator;
+
+        public Join() {
+
+            this(",");
+        }
+
+        public Join(final String separator) {
+
+            mSeparator = separator;
+        }
+
+        @Override
+        protected void onCall(@NotNull final List<? extends DATA> inputs,
+                @NotNull final ResultChannel<String> result) throws Exception {
+
+            final String separator = mSeparator;
+            final StringBuilder builder = new StringBuilder();
+            for (final DATA input : inputs) {
+                if (builder.length() > 0) {
+                    builder.append(separator);
+                }
+
+                builder.append(input.toString());
+            }
+
+            result.pass(builder.toString());
+        }
+    }
+
+    public static class JoinString extends Join<String> {
+
+        public JoinString() {
+
+        }
+
+        public JoinString(final String separator) {
+
+            super(separator);
+        }
     }
 
     public static class Pass<DATA> extends TemplateContextInvocation<DATA, DATA> {

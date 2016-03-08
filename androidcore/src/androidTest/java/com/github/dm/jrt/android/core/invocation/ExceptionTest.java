@@ -52,8 +52,8 @@ public class ExceptionTest extends ActivityInstrumentationTestCase2<TestActivity
         assertThat(new InvocationClashException(13).getId()).isEqualTo(13);
         assertThat(new InvocationTypeException().getId()).isEqualTo(-1);
         assertThat(new InvocationTypeException(13).getId()).isEqualTo(13);
-        assertThat(new MissingInvocationException().getId()).isEqualTo(-1);
-        assertThat(new MissingInvocationException(13).getId()).isEqualTo(13);
+        assertThat(new MissingLoaderException().getId()).isEqualTo(-1);
+        assertThat(new MissingLoaderException(13).getId()).isEqualTo(13);
         assertThat(new StaleResultException().getId()).isEqualTo(-1);
         assertThat(new StaleResultException(13).getId()).isEqualTo(13);
     }
@@ -79,11 +79,11 @@ public class ExceptionTest extends ActivityInstrumentationTestCase2<TestActivity
         assertThat(object).isExactlyInstanceOf(InvocationTypeException.class);
         assertThat(((InvocationTypeException) object).getId()).isEqualTo(17);
         outputStream = new ByteArrayOutputStream();
-        new ObjectOutputStream(outputStream).writeObject(new MissingInvocationException(17));
+        new ObjectOutputStream(outputStream).writeObject(new MissingLoaderException(17));
         object = new ObjectInputStream(
                 new ByteArrayInputStream(outputStream.toByteArray())).readObject();
-        assertThat(object).isExactlyInstanceOf(MissingInvocationException.class);
-        assertThat(((MissingInvocationException) object).getId()).isEqualTo(17);
+        assertThat(object).isExactlyInstanceOf(MissingLoaderException.class);
+        assertThat(((MissingLoaderException) object).getId()).isEqualTo(17);
         outputStream = new ByteArrayOutputStream();
         new ObjectOutputStream(outputStream).writeObject(new StaleResultException(17));
         object = new ObjectInputStream(

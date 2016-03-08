@@ -209,8 +209,8 @@ public class JRoutineLoaderCompat {
          * <br/>
          * If no invocation with the specified ID is running at the time of the channel creation,
          * the output will be aborted with a
-         * {@link com.github.dm.jrt.android.core.invocation.MissingInvocationException
-         * MissingInvocationException}.<br/>
+         * {@link com.github.dm.jrt.android.core.invocation.MissingLoaderException
+         * MissingLoaderException}.<br/>
          * Note that the built routine results will be always dispatched on the configured looper
          * thread, thus waiting for the outputs immediately after its invocation may result in a
          * deadlock.

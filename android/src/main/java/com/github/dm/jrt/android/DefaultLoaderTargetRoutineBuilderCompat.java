@@ -6,8 +6,10 @@ import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.android.object.ContextInvocationTarget;
 import com.github.dm.jrt.android.object.builder.LoaderObjectRoutineBuilder;
 import com.github.dm.jrt.android.proxy.annotation.LoaderProxyCompat;
+import com.github.dm.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.android.v4.object.JRoutineLoaderObjectCompat;
+import com.github.dm.jrt.android.v4.proxy.JRoutineLoaderProxyCompat;
 import com.github.dm.jrt.core.builder.InvocationConfiguration;
 import com.github.dm.jrt.core.builder.InvocationConfiguration.Builder;
 import com.github.dm.jrt.core.util.ClassToken;
@@ -179,19 +181,25 @@ class DefaultLoaderTargetRoutineBuilderCompat implements LoaderTargetRoutineBuil
                                          .getConfigured()
                                          .withProxies()
                                          .with(mProxyConfiguration)
+                                         .getConfigured()
+                                         .withLoaders()
+                                         .with(mLoaderConfiguration)
                                          .getConfigured();
     }
 
     @NotNull
-    private LoaderObjectRoutineBuilder newProxyBuilder() {
+    private LoaderProxyRoutineBuilder newProxyBuilder() {
 
-        return JRoutineLoaderObjectCompat.with(mContext)
-                                         .on(mTarget)
-                                         .withInvocations()
-                                         .with(mInvocationConfiguration)
-                                         .getConfigured()
-                                         .withProxies()
-                                         .with(mProxyConfiguration)
-                                         .getConfigured();
+        return JRoutineLoaderProxyCompat.with(mContext)
+                                        .on(mTarget)
+                                        .withInvocations()
+                                        .with(mInvocationConfiguration)
+                                        .getConfigured()
+                                        .withProxies()
+                                        .with(mProxyConfiguration)
+                                        .getConfigured()
+                                        .withLoaders()
+                                        .with(mLoaderConfiguration)
+                                        .getConfigured();
     }
 }

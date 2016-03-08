@@ -17,16 +17,17 @@
 package com.github.dm.jrt.android.core.invocation;
 
 /**
- * Exception indicating that a routine invocation with a specified ID is not running.
+ * Exception indicating that the loader with the specified ID, running a routine invocation, is not
+ * present.
  * <p/>
  * Created by davide-maestroni on 01/14/2015.
  */
-public class MissingInvocationException extends LoaderInvocationException {
+public class MissingLoaderException extends LoaderInvocationException {
 
     /**
      * Constructor.
      */
-    public MissingInvocationException() {
+    public MissingLoaderException() {
 
     }
 
@@ -35,7 +36,7 @@ public class MissingInvocationException extends LoaderInvocationException {
      *
      * @param id the loader ID.
      */
-    public MissingInvocationException(final int id) {
+    public MissingLoaderException(final int id) {
 
         super(id);
     }

@@ -18,7 +18,7 @@ package com.github.dm.jrt.android.v11.core;
 
 import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
 import com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory;
-import com.github.dm.jrt.android.core.invocation.MissingInvocationException;
+import com.github.dm.jrt.android.core.invocation.MissingLoaderException;
 import com.github.dm.jrt.core.channel.ResultChannel;
 
 import org.jetbrains.annotations.NotNull;
@@ -80,7 +80,7 @@ final class MissingLoaderInvocationFactory<OUT>
         protected void onCall(@NotNull final List<? extends Void> inputs,
                 @NotNull final ResultChannel<OUT> result) {
 
-            result.abort(new MissingInvocationException(mId));
+            result.abort(new MissingLoaderException(mId));
         }
     }
 }

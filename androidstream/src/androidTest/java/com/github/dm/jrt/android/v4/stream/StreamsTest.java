@@ -24,7 +24,7 @@ import android.test.ActivityInstrumentationTestCase2;
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
 import com.github.dm.jrt.android.core.builder.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory;
-import com.github.dm.jrt.android.core.invocation.MissingInvocationException;
+import com.github.dm.jrt.android.core.invocation.MissingLoaderException;
 import com.github.dm.jrt.android.core.invocation.PassingCallContextInvocation;
 import com.github.dm.jrt.android.v4.channel.SparseChannelsCompat;
 import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
@@ -1593,7 +1593,7 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
             JRoutineLoaderCompat.with(context).onId(11).buildChannel().afterMax(seconds(10)).next();
             fail();
 
-        } catch (final MissingInvocationException ignored) {
+        } catch (final MissingLoaderException ignored) {
 
         }
 

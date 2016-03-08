@@ -19,7 +19,7 @@ package com.github.dm.jrt.android.v4.core;
 import com.github.dm.jrt.android.core.builder.LoaderChannelBuilder;
 import com.github.dm.jrt.android.core.builder.LoaderConfiguration;
 import com.github.dm.jrt.android.core.builder.LoaderConfiguration.ClashResolutionType;
-import com.github.dm.jrt.android.core.invocation.MissingInvocationException;
+import com.github.dm.jrt.android.core.invocation.MissingLoaderException;
 import com.github.dm.jrt.android.core.runner.AndroidRunners;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.ChannelConfiguration;
@@ -81,7 +81,7 @@ class DefaultLoaderChannelBuilder
         final Object component = context.getComponent();
         if (component == null) {
             final IOChannel<OUT> ioChannel = JRoutineCore.io().buildChannel();
-            ioChannel.abort(new MissingInvocationException(loaderId));
+            ioChannel.abort(new MissingLoaderException(loaderId));
             return ioChannel.close();
         }
 

@@ -30,7 +30,7 @@ import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
 import com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.InvocationClashException;
 import com.github.dm.jrt.android.core.invocation.InvocationTypeException;
-import com.github.dm.jrt.android.core.invocation.MissingInvocationException;
+import com.github.dm.jrt.android.core.invocation.MissingLoaderException;
 import com.github.dm.jrt.android.core.invocation.PassingCallContextInvocation;
 import com.github.dm.jrt.android.core.log.AndroidLogs;
 import com.github.dm.jrt.android.core.routine.LoaderRoutine;
@@ -494,7 +494,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
             fail();
 
-        } catch (final MissingInvocationException ignored) {
+        } catch (final MissingLoaderException ignored) {
 
         }
     }
@@ -1178,7 +1178,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
             fail();
 
-        } catch (final MissingInvocationException ignored) {
+        } catch (final MissingLoaderException ignored) {
 
         }
     }

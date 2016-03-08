@@ -22,25 +22,34 @@ import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.test.ActivityInstrumentationTestCase2;
 
+import com.github.dm.jrt.TargetRoutineBuilder.BuilderType;
 import com.github.dm.jrt.android.core.TargetInvocationFactory;
+import com.github.dm.jrt.android.core.builder.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
 import com.github.dm.jrt.android.core.invocation.CallContextInvocationFactories;
 import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
 import com.github.dm.jrt.android.core.service.InvocationService;
+import com.github.dm.jrt.android.proxy.annotation.LoaderProxy;
+import com.github.dm.jrt.android.proxy.annotation.ServiceProxy;
 import com.github.dm.jrt.android.v11.TestActivity;
 import com.github.dm.jrt.android.v11.TestFragment;
-import com.github.dm.jrt.android.v11.core.LoaderContext;
+import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.object.annotation.Alias;
+import com.github.dm.jrt.object.annotation.AsyncOut;
+import com.github.dm.jrt.object.annotation.ReadTimeout;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.classOfType;
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceOf;
+import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
+import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.core.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -63,7 +72,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         }
 
         final ClassToken<Join<String>> token = new ClassToken<Join<String>>() {};
-        assertThat(JRoutineAndroid.with(LoaderContext.loaderFrom(getActivity()))
+        assertThat(JRoutineAndroid.with(loaderFrom(getActivity()))
                                   .on(CallContextInvocationFactories.factoryOf(token))
                                   .asyncCall("test")
                                   .afterMax(seconds(10))
@@ -121,6 +130,31 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                                   .all()).containsExactly("TEST");
     }
 
+    public void testLoaderId() throws NoSuchMethodException {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        new TestClass("test");
+        assertThat(JRoutineAndroid.withLoader(getActivity())
+                                  .onInstance(TestClass.class)
+                                  .withLoaders()
+                                  .withLoaderId(33)
+                                  .withCacheStrategy(CacheStrategyType.CACHE)
+                                  .getConfigured()
+                                  .method("getStringLow")
+                                  .asyncCall()
+                                  .afterMax(seconds(10))
+                                  .all()).containsExactly("test");
+        assertThat(JRoutineAndroid.withLoader(getActivity())
+                                  .onId(33)
+                                  .buildChannel()
+                                  .afterMax(seconds(10))
+                                  .all()).containsExactly("test");
+    }
+
     public void testLoaderInstance() throws NoSuchMethodException {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
@@ -145,6 +179,80 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                                   .alias("test")
                                   .asyncCall()
                                   .afterMax(seconds(10))
+                                  .all()).containsExactly("test");
+    }
+
+    public void testLoaderInvocation() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final ClassToken<JoinString> token = new ClassToken<JoinString>() {};
+        assertThat(JRoutineAndroid.with(loaderFrom(getActivity()))
+                                  .on(token)
+                                  .asyncCall("test1", "test2")
+                                  .afterMax(seconds(10))
+                                  .all()).containsExactly("test1,test2");
+        assertThat(JRoutineAndroid.with(loaderFrom(getActivity()))
+                                  .on(token, ";")
+                                  .asyncCall("test1", "test2")
+                                  .afterMax(seconds(10))
+                                  .all()).containsExactly("test1;test2");
+        assertThat(JRoutineAndroid.with(loaderFrom(getActivity()))
+                                  .on(JoinString.class)
+                                  .asyncCall("test1", "test2")
+                                  .afterMax(seconds(10))
+                                  .all()).containsExactly("test1,test2");
+        assertThat(JRoutineAndroid.with(loaderFrom(getActivity()))
+                                  .on(JoinString.class, " ")
+                                  .asyncCall("test")
+                                  .afterMax(seconds(10))
+                                  .all()).containsExactly("test1 test2");
+    }
+
+    public void testLoaderProxy() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        new TestClass("TEST");
+        assertThat(JRoutineAndroid.withLoader(getActivity())
+                                  .onInstance(TestClass.class)
+                                  .buildProxy(TestAnnotatedProxy.class)
+                                  .getStringLow()
+                                  .all()).containsExactly("test");
+        assertThat(JRoutineAndroid.withLoader(getActivity())
+                                  .onInstance(TestClass.class)
+                                  .buildProxy(tokenOf(TestAnnotatedProxy.class))
+                                  .getStringLow()
+                                  .all()).containsExactly("test");
+        assertThat(JRoutineAndroid.withLoader(getActivity())
+                                  .onInstance(TestClass.class)
+                                  .withBuilder(BuilderType.OBJECT)
+                                  .buildProxy(TestProxy.class)
+                                  .getStringLow()
+                                  .all()).containsExactly("test");
+        assertThat(JRoutineAndroid.withLoader(getActivity())
+                                  .onInstance(TestClass.class)
+                                  .withBuilder(BuilderType.OBJECT)
+                                  .buildProxy(tokenOf(TestProxy.class))
+                                  .getStringLow()
+                                  .all()).containsExactly("test");
+        assertThat(JRoutineAndroid.withLoader(getActivity())
+                                  .onInstance(TestClass.class)
+                                  .withBuilder(BuilderType.PROXY)
+                                  .buildProxy(TestAnnotatedProxy.class)
+                                  .getStringLow()
+                                  .all()).containsExactly("test");
+        assertThat(JRoutineAndroid.withLoader(getActivity())
+                                  .onInstance(TestClass.class)
+                                  .withBuilder(BuilderType.PROXY)
+                                  .buildProxy(tokenOf(TestAnnotatedProxy.class))
+                                  .getStringLow()
                                   .all()).containsExactly("test");
     }
 
@@ -264,6 +372,63 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                                   .all()).containsExactly("test", "test", "test");
     }
 
+    public void testServiceProxy() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        new TestClass("TEST");
+        assertThat(JRoutineAndroid.withService(getActivity())
+                                  .onInstance(TestClass.class)
+                                  .buildProxy(TestAnnotatedProxy.class)
+                                  .getStringLow()
+                                  .all()).containsExactly("test");
+        assertThat(JRoutineAndroid.withService(getActivity())
+                                  .onInstance(TestClass.class)
+                                  .buildProxy(tokenOf(TestAnnotatedProxy.class))
+                                  .getStringLow()
+                                  .all()).containsExactly("test");
+        assertThat(JRoutineAndroid.withService(getActivity())
+                                  .onInstance(TestClass.class)
+                                  .withBuilder(BuilderType.OBJECT)
+                                  .buildProxy(TestProxy.class)
+                                  .getStringLow()
+                                  .all()).containsExactly("test");
+        assertThat(JRoutineAndroid.withService(getActivity())
+                                  .onInstance(TestClass.class)
+                                  .withBuilder(BuilderType.OBJECT)
+                                  .buildProxy(tokenOf(TestProxy.class))
+                                  .getStringLow()
+                                  .all()).containsExactly("test");
+        assertThat(JRoutineAndroid.withService(getActivity())
+                                  .onInstance(TestClass.class)
+                                  .withBuilder(BuilderType.PROXY)
+                                  .buildProxy(TestAnnotatedProxy.class)
+                                  .getStringLow()
+                                  .all()).containsExactly("test");
+        assertThat(JRoutineAndroid.withService(getActivity())
+                                  .onInstance(TestClass.class)
+                                  .withBuilder(BuilderType.PROXY)
+                                  .buildProxy(tokenOf(TestAnnotatedProxy.class))
+                                  .getStringLow()
+                                  .all()).containsExactly("test");
+    }
+
+    @ServiceProxy(TestClass.class)
+    @LoaderProxy(TestClass.class)
+    public interface TestAnnotatedProxy extends TestProxy {
+
+    }
+
+    public interface TestProxy {
+
+        @AsyncOut
+        @ReadTimeout(value = 10, unit = TimeUnit.SECONDS)
+        OutputChannel<String> getStringLow();
+    }
+
     public static class Join<DATA> extends CallContextInvocation<DATA, String> {
 
         private final String mSeparator;
@@ -296,6 +461,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         }
     }
 
+    @SuppressWarnings("unused")
     public static class JoinString extends Join<String> {
 
         public JoinString() {
@@ -333,6 +499,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         }
     }
 
+    @SuppressWarnings("unused")
     public static class PassString extends Pass<String> {
 
         public PassString() {
@@ -345,6 +512,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         }
     }
 
+    @SuppressWarnings("unused")
     public static class TestClass {
 
         private static String sText;

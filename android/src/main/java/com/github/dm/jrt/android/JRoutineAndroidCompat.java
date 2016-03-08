@@ -48,18 +48,6 @@ import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
 public class JRoutineAndroidCompat extends SparseChannelsCompat {
 
     /**
-     * Returns a context based builder of service routine builders.
-     *
-     * @param context the service context.
-     * @return the context builder.
-     */
-    @NotNull
-    public static ServiceContextBuilder with(@NotNull final ServiceContext context) {
-
-        return new ServiceContextBuilder(context);
-    }
-
-    /**
      * Returns a context based builder of loader routine builders.
      *
      * @param context the loader context.
@@ -69,6 +57,18 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
     public static LoaderContextBuilderCompat with(@NotNull final LoaderContextCompat context) {
 
         return new LoaderContextBuilderCompat(context);
+    }
+
+    /**
+     * Returns a context based builder of service routine builders.
+     *
+     * @param context the service context.
+     * @return the context builder.
+     */
+    @NotNull
+    public static ServiceContextBuilder with(@NotNull final ServiceContext context) {
+
+        return new ServiceContextBuilder(context);
     }
 
     @NotNull
@@ -98,6 +98,12 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
     }
 
     @NotNull
+    public static ServiceContextBuilder withService(@NotNull final Context context) {
+
+        return with(serviceFrom(context));
+    }
+
+    @NotNull
     public static ServiceContextBuilder withService(@NotNull final Context context,
             @NotNull final Class<? extends InvocationService> serviceClass) {
 
@@ -109,12 +115,6 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
             @NotNull final Intent service) {
 
         return with(serviceFrom(context, service));
-    }
-
-    @NotNull
-    public static ServiceContextBuilder withService(@NotNull final Context context) {
-
-        return with(serviceFrom(context));
     }
 
     public static class LoaderContextBuilderCompat {

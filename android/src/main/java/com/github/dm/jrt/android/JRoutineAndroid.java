@@ -36,28 +36,14 @@ import com.github.dm.jrt.core.util.ClassToken;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
 import static com.github.dm.jrt.android.core.invocation.CallContextInvocationFactories.factoryOf;
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.classOfType;
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceOf;
-import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
 
 /**
  * Created by davide-maestroni on 03/06/2016.
  */
 public class JRoutineAndroid extends SparseChannels {
-
-    /**
-     * Returns a context based builder of service routine builders.
-     *
-     * @param context the service context.
-     * @return the context builder.
-     */
-    @NotNull
-    public static ServiceContextBuilder with(@NotNull final ServiceContext context) {
-
-        return new ServiceContextBuilder(context);
-    }
 
     /**
      * Returns a context based builder of loader routine builders.
@@ -71,50 +57,62 @@ public class JRoutineAndroid extends SparseChannels {
         return new LoaderContextBuilder(context);
     }
 
+    /**
+     * Returns a context based builder of service routine builders.
+     *
+     * @param context the service context.
+     * @return the context builder.
+     */
+    @NotNull
+    public static ServiceContextBuilder with(@NotNull final ServiceContext context) {
+
+        return new ServiceContextBuilder(context);
+    }
+
     @NotNull
     public static LoaderContextBuilder withLoader(@NotNull final Activity activity) {
 
-        return with(loaderFrom(activity));
+        return with(LoaderContext.loaderFrom(activity));
     }
 
     @NotNull
     public static LoaderContextBuilder withLoader(@NotNull final Activity activity,
             @NotNull final Context context) {
 
-        return with(loaderFrom(activity, context));
+        return with(LoaderContext.loaderFrom(activity, context));
     }
 
     @NotNull
     public static LoaderContextBuilder withLoader(@NotNull final Fragment fragment) {
 
-        return with(loaderFrom(fragment));
+        return with(LoaderContext.loaderFrom(fragment));
     }
 
     @NotNull
     public static LoaderContextBuilder withLoader(@NotNull final Fragment fragment,
             @NotNull final Context context) {
 
-        return with(loaderFrom(fragment, context));
+        return with(LoaderContext.loaderFrom(fragment, context));
+    }
+
+    @NotNull
+    public static ServiceContextBuilder withService(@NotNull final Context context) {
+
+        return with(ServiceContext.serviceFrom(context));
     }
 
     @NotNull
     public static ServiceContextBuilder withService(@NotNull final Context context,
             @NotNull final Class<? extends InvocationService> serviceClass) {
 
-        return with(serviceFrom(context, serviceClass));
+        return with(ServiceContext.serviceFrom(context, serviceClass));
     }
 
     @NotNull
     public static ServiceContextBuilder withService(@NotNull final Context context,
             @NotNull final Intent service) {
 
-        return with(serviceFrom(context, service));
-    }
-
-    @NotNull
-    public static ServiceContextBuilder withService(@NotNull final Context context) {
-
-        return with(serviceFrom(context));
+        return with(ServiceContext.serviceFrom(context, service));
     }
 
     public static class LoaderContextBuilder {

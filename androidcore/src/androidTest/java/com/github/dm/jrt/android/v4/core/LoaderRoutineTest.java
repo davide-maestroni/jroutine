@@ -18,7 +18,10 @@ package com.github.dm.jrt.android.v4.core;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.os.Build.VERSION_CODES;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.core.R;
@@ -328,6 +331,51 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                        .on(factoryOf(classToken))
                                        .syncCall()
                                        .next()).isSameAs(getActivity().getApplicationContext());
+        final ContextWrapper contextWrapper = new ContextWrapper(getActivity());
+        assertThat(JRoutineLoaderCompat.with(loaderFrom(getActivity(), contextWrapper))
+                                       .on(factoryOf(classToken))
+                                       .syncCall()
+                                       .next()).isSameAs(getActivity().getApplicationContext());
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public void testActivityContextError() {
+
+        final ClassToken<GetContextInvocation<String>> classToken =
+                new ClassToken<GetContextInvocation<String>>() {};
+        try {
+            assertThat(JRoutineLoaderCompat.with(loaderFrom((FragmentActivity) null))
+                                           .on(factoryOf(classToken))
+                                           .syncCall()
+                                           .next()).isSameAs(getActivity().getApplicationContext());
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+            assertThat(JRoutineLoaderCompat.with(loaderFrom(getActivity(), null))
+                                           .on(factoryOf(classToken))
+                                           .syncCall()
+                                           .next()).isSameAs(getActivity().getApplicationContext());
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        final ContextWrapper contextWrapper = new ContextWrapper(getActivity()) {};
+        try {
+            assertThat(JRoutineLoaderCompat.with(loaderFrom(getActivity(), contextWrapper))
+                                           .on(factoryOf(classToken))
+                                           .syncCall()
+                                           .next()).isSameAs(getActivity().getApplicationContext());
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
     }
 
     public void testActivityDelegation() {
@@ -896,6 +944,67 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         assertThat(channel1.afterMax(timeout).all()).containsExactly("TEST1", "TEST2");
         assertThat(channel2.afterMax(timeout).all()).containsExactly("TEST1", "TEST2");
+    }
+
+    public void testFragmentContext() {
+
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        final ClassToken<GetContextInvocation<String>> classToken =
+                new ClassToken<GetContextInvocation<String>>() {};
+        assertThat(JRoutineLoaderCompat.with(loaderFrom(fragment))
+                                       .on(factoryOf(classToken))
+                                       .syncCall()
+                                       .next()).isSameAs(getActivity().getApplicationContext());
+        final ContextWrapper contextWrapper = new ContextWrapper(getActivity());
+        assertThat(JRoutineLoaderCompat.with(loaderFrom(fragment, contextWrapper))
+                                       .on(factoryOf(classToken))
+                                       .syncCall()
+                                       .next()).isSameAs(getActivity().getApplicationContext());
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public void testFragmentContextError() {
+
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        final ClassToken<GetContextInvocation<String>> classToken =
+                new ClassToken<GetContextInvocation<String>>() {};
+        try {
+            assertThat(JRoutineLoaderCompat.with(loaderFrom((Fragment) null))
+                                           .on(factoryOf(classToken))
+                                           .syncCall()
+                                           .next()).isSameAs(getActivity().getApplicationContext());
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+            assertThat(JRoutineLoaderCompat.with(loaderFrom(fragment, null))
+                                           .on(factoryOf(classToken))
+                                           .syncCall()
+                                           .next()).isSameAs(getActivity().getApplicationContext());
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        final ContextWrapper contextWrapper = new ContextWrapper(getActivity()) {};
+        try {
+            assertThat(JRoutineLoaderCompat.with(loaderFrom(fragment, contextWrapper))
+                                           .on(factoryOf(classToken))
+                                           .syncCall()
+                                           .next()).isSameAs(getActivity().getApplicationContext());
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
     }
 
     public void testFragmentDelegation() {
@@ -1473,8 +1582,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         }
     }
 
-    private static class GetContextInvocation<DATA>
-            extends CallContextInvocation<DATA, Context> {
+    private static class GetContextInvocation<DATA> extends CallContextInvocation<DATA, Context> {
 
         @Override
         protected void onCall(@NotNull final List<? extends DATA> inputs,
@@ -1509,8 +1617,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         }
     }
 
-    private static class StringCallInvocation
-            extends CallContextInvocation<String, String> {
+    private static class StringCallInvocation extends CallContextInvocation<String, String> {
 
         @Override
         protected void onCall(@NotNull final List<? extends String> strings,

@@ -80,7 +80,7 @@ class ScheduledRunner implements Runner {
 
         final ScheduledFuture<?> future =
                 mService.schedule(new ExecutionWrapper(execution, mThreads), delay, timeUnit);
-        if (execution.mayBeCanceled()) {
+        if (execution.canBeCancelled()) {
             synchronized (mFutures) {
                 final WeakIdentityHashMap<Execution, WeakHashMap<ScheduledFuture<?>, Void>>
                         futures = mFutures;

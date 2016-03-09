@@ -54,7 +54,7 @@ public interface Runner {
      * <p/>
      * The implementation of this method is optional, still, it may greatly increase the performance
      * by avoiding to start invocations which are already aborted. The runner implementation can
-     * safely ignore all those executions whose method {@link Execution#mayBeCanceled()} returns
+     * safely ignore all those executions whose method {@link Execution#canBeCancelled()} returns
      * false.
      *
      * @param execution the execution.

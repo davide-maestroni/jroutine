@@ -107,7 +107,7 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
         }
     }
 
-    public boolean mayBeCanceled() {
+    public boolean canBeCancelled() {
 
         return true;
     }

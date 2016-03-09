@@ -165,9 +165,9 @@ public class PriorityRunner {
             mExecution = execution;
         }
 
-        public boolean mayBeCanceled() {
+        public boolean canBeCancelled() {
 
-            return mExecution.mayBeCanceled();
+            return mExecution.canBeCancelled();
         }
 
         public void run() {
@@ -208,9 +208,9 @@ public class PriorityRunner {
             mAge = age;
         }
 
-        public boolean mayBeCanceled() {
+        public boolean canBeCancelled() {
 
-            return mExecution.mayBeCanceled();
+            return mExecution.canBeCancelled();
         }
 
         public void run() {
@@ -283,7 +283,7 @@ public class PriorityRunner {
         public void run(@NotNull final Execution execution, final long delay,
                 @NotNull final TimeUnit timeUnit) {
 
-            final boolean mayBeCanceled = execution.mayBeCanceled();
+            final boolean mayBeCanceled = execution.canBeCancelled();
             final PriorityExecution priorityExecution =
                     new PriorityExecution(execution, mPriority, mAge.getAndDecrement());
             if (mayBeCanceled) {

@@ -126,7 +126,7 @@ class ThrottlingRunner implements Runner {
                 (executionReference != null) ? executionReference.get() : null;
         if (throttlingExecution == null) {
             throttlingExecution = new ThrottlingExecution(execution);
-            if (execution.mayBeCanceled()) {
+            if (execution.canBeCancelled()) {
                 mExecutions.put(execution,
                                 new WeakReference<ThrottlingExecution>(throttlingExecution));
             }
@@ -190,9 +190,9 @@ class ThrottlingRunner implements Runner {
             mExecution = execution;
         }
 
-        public boolean mayBeCanceled() {
+        public boolean canBeCancelled() {
 
-            return mExecution.mayBeCanceled();
+            return mExecution.canBeCancelled();
         }
 
         public void run() {

@@ -444,7 +444,7 @@ public class RunnerTest {
 
         private boolean mIsRun;
 
-        public boolean mayBeCanceled() {
+        public boolean canBeCancelled() {
 
             return mIsCancelable;
         }

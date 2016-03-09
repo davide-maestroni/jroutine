@@ -25,7 +25,7 @@ package com.github.dm.jrt.core.runner;
  */
 public abstract class TemplateExecution implements Execution {
 
-    public boolean mayBeCanceled() {
+    public boolean canBeCancelled() {
 
         return false;
     }

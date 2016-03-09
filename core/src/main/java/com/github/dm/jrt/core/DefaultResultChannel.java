@@ -1648,9 +1648,9 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             mExecution = execution;
         }
 
-        public boolean mayBeCanceled() {
+        public boolean canBeCancelled() {
 
-            return mExecution.mayBeCanceled();
+            return mExecution.canBeCancelled();
         }
 
         public void run() {
@@ -2395,9 +2395,9 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             mExecution = execution;
         }
 
-        public boolean mayBeCanceled() {
+        public boolean canBeCancelled() {
 
-            return mExecution.mayBeCanceled();
+            return mExecution.canBeCancelled();
         }
 
         public void run() {

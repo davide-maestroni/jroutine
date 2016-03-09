@@ -20,6 +20,7 @@ import android.annotation.TargetApi;
 import android.os.AsyncTask;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
+import android.os.Looper;
 
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
@@ -88,7 +89,7 @@ class AsyncTaskRunner extends MainRunner {
             @NotNull final TimeUnit timeUnit) {
 
         final ExecutionTask task = new ExecutionTask(execution, mExecutor, mThreads);
-        if (execution.mayBeCanceled()) {
+        if (execution.canBeCancelled()) {
             synchronized (mTasks) {
                 final WeakIdentityHashMap<Execution, WeakHashMap<ExecutionTask, Void>> tasks =
                         mTasks;
@@ -117,8 +118,6 @@ class AsyncTaskRunner extends MainRunner {
 
         private final Map<Thread, Void> mThreads;
 
-        private Thread mCurrentThread;
-
         /**
          * Constructor.
          *
@@ -134,17 +133,17 @@ class AsyncTaskRunner extends MainRunner {
             mThreads = threads;
         }
 
-        public boolean mayBeCanceled() {
+        public boolean canBeCancelled() {
 
-            return mExecution.mayBeCanceled();
+            return mExecution.canBeCancelled();
         }
 
         @TargetApi(VERSION_CODES.HONEYCOMB)
         public void run() {
 
-            mCurrentThread = Thread.currentThread();
-            if ((mExecutor != null) && (VERSION.SDK_INT >= VERSION_CODES.HONEYCOMB)) {
-                executeOnExecutor(mExecutor, NO_PARAMS);
+            final Executor executor = mExecutor;
+            if ((executor != null) && (VERSION.SDK_INT >= VERSION_CODES.HONEYCOMB)) {
+                executeOnExecutor(executor, NO_PARAMS);
 
             } else {
                 execute(NO_PARAMS);
@@ -155,7 +154,7 @@ class AsyncTaskRunner extends MainRunner {
         protected Void doInBackground(@NotNull final Void... voids) {
 
             final Thread currentThread = Thread.currentThread();
-            if (currentThread != mCurrentThread) {
+            if (currentThread != Looper.getMainLooper().getThread()) {
                 mThreads.put(currentThread, null);
             }
 

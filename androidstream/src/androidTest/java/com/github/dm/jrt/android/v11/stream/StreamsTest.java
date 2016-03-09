@@ -193,7 +193,8 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
         final IOChannelBuilder builder = JRoutineCore.io();
         final Routine<Object, Object> routine = JRoutineLoader.with(loaderFrom(getActivity()))
-                                                              .on(PassingCallContextInvocation.factoryOf())
+                                                              .on(PassingCallContextInvocation
+                                                                          .factoryOf())
                                                               .buildRoutine();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
@@ -380,7 +381,8 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
 
         final IOChannelBuilder builder = JRoutineCore.io();
         final Routine<Object, Object> routine = JRoutineLoader.with(loaderFrom(getActivity()))
-                                                              .on(PassingCallContextInvocation.factoryOf())
+                                                              .on(PassingCallContextInvocation
+                                                                          .factoryOf())
                                                               .buildRoutine();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
@@ -486,6 +488,22 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         } catch (final NullPointerException ignored) {
 
         }
+    }
+
+    public void testConfiguration() {
+
+        final LoaderStreamChannel<String> channel1 =
+                LoaderStreams.streamOf("test1", "test2", "test3");
+        final LoaderStreamChannel<String> channel2 =
+                LoaderStreams.streamOf("test4", "test5", "test6");
+        assertThat(LoaderStreams.blend(channel2, channel1)
+                                .withChannels()
+                                .withChannelOrder(OrderType.BY_CALL)
+                                .withReadTimeout(seconds(1))
+                                .getConfigured()
+                                .build()
+                                .all()).containsExactly("test4", "test5", "test6", "test1", "test2",
+                                                        "test3");
     }
 
     public void testFactory() {

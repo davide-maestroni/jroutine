@@ -18,6 +18,7 @@ package com.github.dm.jrt.android.core;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 
 import com.github.dm.jrt.android.core.service.InvocationService;
 
@@ -87,6 +88,64 @@ public abstract class ServiceContext {
         return new IntentServiceContext(context, service);
     }
 
+    private static boolean bundleEquals(@Nullable final Bundle bundle1,
+            @Nullable final Bundle bundle2) {
+
+        if (bundle1 == bundle2) {
+            return true;
+        }
+
+        if ((bundle1 == null) || (bundle2 == null)) {
+            return false;
+        }
+
+        if (bundle1.size() != bundle2.size()) {
+            return false;
+        }
+
+        for (final String key : bundle1.keySet()) {
+            final Object value1 = bundle1.get(key);
+            final Object value2 = bundle2.get(key);
+            if ((value1 instanceof Bundle) && (value2 instanceof Bundle) &&
+                    !bundleEquals((Bundle) value1, (Bundle) value2)) {
+                return false;
+
+            } else if (value1 == null) {
+                if ((value2 != null) || !bundle2.containsKey(key)) {
+                    return false;
+                }
+
+            } else if (!value1.equals(value2)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static int bundleHashCode(@Nullable final Bundle bundle) {
+
+        if (bundle == null) {
+            return 0;
+        }
+
+        int result = 0;
+        for (final String key : bundle.keySet()) {
+            final Object value = bundle.get(key);
+            if (value instanceof Bundle) {
+                result = 31 * result + bundleHashCode((Bundle) value);
+
+            } else if (value == null) {
+                result = 31 * result;
+
+            } else {
+                result = 31 * result + value.hashCode();
+            }
+        }
+
+        return result;
+    }
+
     /**
      * Returns the service context.
      *
@@ -147,8 +206,9 @@ public abstract class ServiceContext {
 
             final IntentServiceContext that = (IntentServiceContext) o;
             final Context referent = mContext.get();
-            return (referent != null) && referent.equals(that.mContext.get()) && mIntent.equals(
-                    that.mIntent);
+            return (referent != null) && referent.equals(that.mContext.get())
+                    && mIntent.filterEquals(that.mIntent) && bundleEquals(mIntent.getExtras(),
+                                                                          that.mIntent.getExtras());
         }
 
         @Override
@@ -156,7 +216,8 @@ public abstract class ServiceContext {
 
             final Context referent = mContext.get();
             int result = (referent != null) ? referent.hashCode() : 0;
-            result = 31 * result + mIntent.hashCode();
+            result = 31 * result + mIntent.filterHashCode();
+            result = 31 * result + bundleHashCode(mIntent.getExtras());
             return result;
         }
 

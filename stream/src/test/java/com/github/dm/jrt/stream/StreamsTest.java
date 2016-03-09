@@ -317,6 +317,21 @@ public class StreamsTest {
     }
 
     @Test
+    public void testConfiguration() {
+
+        final StreamChannel<String> channel1 = Streams.streamOf("test1", "test2", "test3");
+        final StreamChannel<String> channel2 = Streams.streamOf("test4", "test5", "test6");
+        assertThat(Streams.blend(channel2, channel1)
+                          .withChannels()
+                          .withChannelOrder(OrderType.BY_CALL)
+                          .withReadTimeout(seconds(1))
+                          .getConfigured()
+                          .build()
+                          .all()).containsExactly("test4", "test5", "test6", "test1", "test2",
+                                                  "test3");
+    }
+
+    @Test
     public void testFactory() {
 
         final InvocationFactory<String, String> factory = Streams.factory(

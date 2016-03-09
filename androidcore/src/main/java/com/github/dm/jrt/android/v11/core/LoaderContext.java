@@ -39,6 +39,7 @@ import java.lang.ref.WeakReference;
  * <p/>
  * Created by davide-maestroni on 07/08/2015.
  */
+@TargetApi(VERSION_CODES.HONEYCOMB)
 public abstract class LoaderContext {
 
     /**
@@ -57,14 +58,8 @@ public abstract class LoaderContext {
     @NotNull
     public static LoaderContext loaderFrom(@NotNull final Activity activity) {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-            throw new UnsupportedOperationException(
-                    "this method is supported only for API level >= " + VERSION_CODES.HONEYCOMB
-                            + ": use com.github.dm.jrt.android.v4.routine.JRoutineLoaderCompat "
-                            + "class instead");
-        }
-
-        return new ActivityContext(activity);
+        checkVersion();
+        return new ActivityContext(activity, activity);
     }
 
     /**
@@ -82,14 +77,8 @@ public abstract class LoaderContext {
     public static LoaderContext loaderFrom(@NotNull final Activity activity,
             @NotNull final Context context) {
 
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-            throw new UnsupportedOperationException(
-                    "this method is supported only for API level >= " + VERSION_CODES.HONEYCOMB
-                            + ": use com.github.dm.jrt.android.v4.routine.JRoutineLoaderCompat "
-                            + "class instead");
-        }
-
-        return new WrappedActivityContext(activity, context);
+        checkVersion();
+        return new ActivityContext(activity, context);
     }
 
     /**
@@ -101,7 +90,8 @@ public abstract class LoaderContext {
     @NotNull
     public static LoaderContext loaderFrom(@NotNull final Fragment fragment) {
 
-        return new FragmentContext(fragment);
+        checkVersion();
+        return new FragmentContext(fragment, fragment.getActivity());
     }
 
     /**
@@ -119,7 +109,18 @@ public abstract class LoaderContext {
     public static LoaderContext loaderFrom(@NotNull final Fragment fragment,
             @NotNull final Context context) {
 
-        return new WrappedFragmentContext(fragment, context);
+        checkVersion();
+        return new FragmentContext(fragment, context);
+    }
+
+    private static void checkVersion() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            throw new UnsupportedOperationException(
+                    "this method is supported only for API level >= " + VERSION_CODES.HONEYCOMB
+                            + ": use com.github.dm.jrt.android.v4.routine.JRoutineLoaderCompat "
+                            + "class instead");
+        }
     }
 
     /**
@@ -154,19 +155,31 @@ public abstract class LoaderContext {
 
         private final WeakReference<Activity> mActivity;
 
+        private final WeakReference<Context> mContext;
+
         /**
          * Constructor.
          *
          * @param activity the wrapped activity.
+         * @param context  the wrapped context.
+         * @throws java.lang.IllegalArgumentException if the class of the specified context has not
+         *                                            a static scope.
          */
         @SuppressWarnings("ConstantConditions")
-        private ActivityContext(@NotNull final Activity activity) {
+        private ActivityContext(@NotNull final Activity activity, @NotNull final Context context) {
 
             if (activity == null) {
                 throw new NullPointerException("the activity must not be null");
             }
 
+            final Class<? extends Context> contextClass = context.getClass();
+            if (!Reflection.hasStaticScope(contextClass)) {
+                throw new IllegalArgumentException(
+                        "the context class must have a static scope: " + contextClass.getName());
+            }
+
             mActivity = new WeakReference<Activity>(activity);
+            mContext = new WeakReference<Context>(context);
         }
 
         @Override
@@ -181,8 +194,13 @@ public abstract class LoaderContext {
             }
 
             final ActivityContext that = (ActivityContext) o;
-            final Activity referent = mActivity.get();
-            return (referent != null) && referent.equals(that.mActivity.get());
+            final Activity activity = mActivity.get();
+            if ((activity == null) || !activity.equals(that.mActivity.get())) {
+                return false;
+            }
+
+            final Context context = mContext.get();
+            return (context != null) && context.equals(that.mContext.get());
         }
 
         @Nullable
@@ -195,15 +213,18 @@ public abstract class LoaderContext {
         @Override
         public int hashCode() {
 
-            final Activity referent = mActivity.get();
-            return (referent != null) ? referent.hashCode() : 0;
+            final Activity activity = mActivity.get();
+            int result = (activity != null) ? activity.hashCode() : 0;
+            final Context context = mContext.get();
+            result = 31 * result + (context != null ? context.hashCode() : 0);
+            return result;
         }
 
         @Nullable
         @Override
         public Context getLoaderContext() {
 
-            return mActivity.get();
+            return mContext.get();
         }
 
         @Nullable
@@ -221,21 +242,33 @@ public abstract class LoaderContext {
     @TargetApi(VERSION_CODES.HONEYCOMB)
     private static class FragmentContext extends LoaderContext {
 
+        private final WeakReference<Context> mContext;
+
         private final WeakReference<Fragment> mFragment;
 
         /**
          * Constructor.
          *
          * @param fragment the wrapped fragment.
+         * @param context  the wrapped context.
+         * @throws java.lang.IllegalArgumentException if the class of the specified context has not
+         *                                            a static scope.
          */
         @SuppressWarnings("ConstantConditions")
-        private FragmentContext(@NotNull final Fragment fragment) {
+        private FragmentContext(@NotNull final Fragment fragment, @NotNull final Context context) {
 
             if (fragment == null) {
                 throw new NullPointerException("the fragment must not be null");
             }
 
+            final Class<? extends Context> contextClass = context.getClass();
+            if (!Reflection.hasStaticScope(contextClass)) {
+                throw new IllegalArgumentException(
+                        "the context class must have a static scope: " + contextClass.getName());
+            }
+
             mFragment = new WeakReference<Fragment>(fragment);
+            mContext = new WeakReference<Context>(context);
         }
 
         @Override
@@ -250,23 +283,30 @@ public abstract class LoaderContext {
             }
 
             final FragmentContext that = (FragmentContext) o;
-            final Fragment referent = mFragment.get();
-            return (referent != null) && referent.equals(that.mFragment.get());
+            final Fragment fragment = mFragment.get();
+            if ((fragment == null) || !fragment.equals(that.mFragment.get())) {
+                return false;
+            }
+
+            final Context context = mContext.get();
+            return (context != null) && context.equals(that.mContext.get());
         }
 
         @Override
         public int hashCode() {
 
-            final Fragment referent = mFragment.get();
-            return (referent != null) ? referent.hashCode() : 0;
+            final Fragment fragment = mFragment.get();
+            int result = (fragment != null) ? fragment.hashCode() : 0;
+            final Context context = mContext.get();
+            result = 31 * result + (context != null ? context.hashCode() : 0);
+            return result;
         }
 
         @Nullable
         @Override
         public Context getLoaderContext() {
 
-            final Fragment fragment = mFragment.get();
-            return (fragment != null) ? fragment.getActivity() : null;
+            return mContext.get();
         }
 
         @Nullable
@@ -282,136 +322,6 @@ public abstract class LoaderContext {
         public Object getComponent() {
 
             return mFragment.get();
-        }
-    }
-
-    /**
-     * Loader context wrapping an activity and its loader context.
-     */
-    private static class WrappedActivityContext extends ActivityContext {
-
-        private final WeakReference<Context> mContext;
-
-        /**
-         * Constructor.
-         *
-         * @param activity the wrapped activity.
-         * @param context  the wrapped context.
-         * @throws java.lang.IllegalArgumentException if the class of the specified context has not
-         *                                            a static scope.
-         */
-        private WrappedActivityContext(@NotNull final Activity activity,
-                @NotNull final Context context) {
-
-            super(activity);
-            final Class<? extends Context> contextClass = context.getClass();
-            if (!Reflection.hasStaticScope(contextClass)) {
-                throw new IllegalArgumentException(
-                        "the context class must have a static scope: " + contextClass.getName());
-            }
-
-            mContext = new WeakReference<Context>(context);
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof WrappedActivityContext)) {
-                return false;
-            }
-
-            if (!super.equals(o)) {
-                return false;
-            }
-
-            final WrappedActivityContext that = (WrappedActivityContext) o;
-            final Context referent = mContext.get();
-            return (referent != null) && referent.equals(that.mContext.get());
-        }
-
-        @Override
-        public int hashCode() {
-
-            int result = super.hashCode();
-            final Context referent = mContext.get();
-            result = 31 * result + (referent != null ? referent.hashCode() : 0);
-            return result;
-        }
-
-        @Nullable
-        @Override
-        public Context getLoaderContext() {
-
-            return mContext.get();
-        }
-    }
-
-    /**
-     * Loader context wrapping a fragment and its loader context.
-     */
-    private static class WrappedFragmentContext extends FragmentContext {
-
-        private final WeakReference<Context> mContext;
-
-        /**
-         * Constructor.
-         *
-         * @param fragment the wrapped fragment.
-         * @param context  the wrapped context.
-         * @throws java.lang.IllegalArgumentException if the class of the specified context has not
-         *                                            a static scope.
-         */
-        private WrappedFragmentContext(@NotNull final Fragment fragment,
-                @NotNull final Context context) {
-
-            super(fragment);
-            final Class<? extends Context> contextClass = context.getClass();
-            if (!Reflection.hasStaticScope(contextClass)) {
-                throw new IllegalArgumentException(
-                        "the context class must have a static scope: " + contextClass.getName());
-            }
-
-            mContext = new WeakReference<Context>(context);
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof WrappedFragmentContext)) {
-                return false;
-            }
-
-            if (!super.equals(o)) {
-                return false;
-            }
-
-            final WrappedFragmentContext that = (WrappedFragmentContext) o;
-            final Context referent = mContext.get();
-            return (referent != null) && referent.equals(that.mContext.get());
-        }
-
-        @Override
-        public int hashCode() {
-
-            int result = super.hashCode();
-            final Context referent = mContext.get();
-            result = 31 * result + (referent != null ? referent.hashCode() : 0);
-            return result;
-        }
-
-        @Nullable
-        @Override
-        public Context getLoaderContext() {
-
-            return mContext.get();
         }
     }
 }

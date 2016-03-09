@@ -324,7 +324,7 @@ public class InvocationService extends Service {
     }
 
     @Override
-    public IBinder onBind(@NotNull final Intent intent) {
+    public final IBinder onBind(@NotNull final Intent intent) {
 
         return mInMessenger.getBinder();
     }

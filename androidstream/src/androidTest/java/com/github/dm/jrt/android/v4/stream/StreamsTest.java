@@ -455,6 +455,22 @@ public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> 
         }
     }
 
+    public void testConfiguration() {
+
+        final LoaderStreamChannelCompat<String> channel1 =
+                LoaderStreamsCompat.streamOf("test1", "test2", "test3");
+        final LoaderStreamChannelCompat<String> channel2 =
+                LoaderStreamsCompat.streamOf("test4", "test5", "test6");
+        assertThat(LoaderStreamsCompat.blend(channel2, channel1)
+                                      .withChannels()
+                                      .withChannelOrder(OrderType.BY_CALL)
+                                      .withReadTimeout(seconds(1))
+                                      .getConfigured()
+                                      .build()
+                                      .all()).containsExactly("test4", "test5", "test6", "test1",
+                                                              "test2", "test3");
+    }
+
     public void testFactory() {
 
         assertThat(LoaderStreamsCompat.onStream(toUpperCaseChannel())

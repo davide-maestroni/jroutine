@@ -27,7 +27,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * Invocation writing the downloaded data into the output file.
@@ -52,21 +54,21 @@ public class WriteFile extends TemplateInvocation<ByteBuffer, Boolean> {
 
     @Override
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public void onAbort(@NotNull final RoutineException reason) throws Exception {
+    public void onAbort(@NotNull final RoutineException reason) throws IOException {
 
         closeStream();
         mFile.delete();
     }
 
     @Override
-    public void onInitialize() throws Exception {
+    public void onInitialize() throws FileNotFoundException {
 
         mOutputStream = new BufferedOutputStream(new FileOutputStream(mFile));
     }
 
     @Override
     public void onInput(final ByteBuffer buffer,
-            @NotNull final ResultChannel<Boolean> result) throws Exception {
+            @NotNull final ResultChannel<Boolean> result) throws IOException {
 
         final BufferInputStream inputStream = ByteChannel.inputStream(buffer);
         final BufferedOutputStream outputStream = mOutputStream;
@@ -79,13 +81,13 @@ public class WriteFile extends TemplateInvocation<ByteBuffer, Boolean> {
     }
 
     @Override
-    public void onResult(@NotNull final ResultChannel<Boolean> result) throws Exception {
+    public void onResult(@NotNull final ResultChannel<Boolean> result) throws IOException {
 
         closeStream();
         result.pass(true);
     }
 
-    private void closeStream() throws Exception {
+    private void closeStream() throws IOException {
 
         mOutputStream.close();
     }

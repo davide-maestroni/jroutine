@@ -182,27 +182,6 @@ public interface StreamChannel<OUT>
             @NotNull BiConsumer<? super List<OUT>, ? super ResultChannel<AFTER>> consumer);
 
     /**
-     * Concatenates a stream based on the specified accumulating function to this one.<br/>
-     * The output will be computed as follows:
-     * <pre>
-     *     <code>
-     *
-     *         acc = function.apply(acc, input);
-     *     </code>
-     * </pre>
-     * The accumulated value will be passed as result only when the outputs complete.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration.<br/>
-     * Note also that this stream will be bound as a result of the call.
-     *
-     * @param function the bi-function instance.
-     * @return the concatenated stream.
-     */
-    @NotNull
-    StreamChannel<OUT> collect(
-            @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
-
-    /**
      * Concatenates a stream based on the specified function to this one.<br/>
      * All the outputs are collected and then the function will be applied to them.
      * <p/>
@@ -341,6 +320,50 @@ public interface StreamChannel<OUT>
      */
     @NotNull
     StreamChannel<OUT> parallel();
+
+    /**
+     * Concatenates a stream based on the specified accumulating function to this one.<br/>
+     * The output will be computed as follows:
+     * <pre>
+     *     <code>
+     *
+     *         acc = function.apply(acc, input);
+     *     </code>
+     * </pre>
+     * The accumulated value will be passed as result only when the outputs complete.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration.<br/>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param function the bi-function instance.
+     * @return the concatenated stream.
+     */
+    @NotNull
+    StreamChannel<OUT> reduce(
+            @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
+
+    /**
+     * Concatenates a stream based on the specified accumulating function to this one.<br/>
+     * The output will be computed as follows, where the initial accumulated value will be the
+     * specified {@code seed}:
+     * <pre>
+     *     <code>
+     *
+     *         acc = function.apply(acc, input);
+     *     </code>
+     * </pre>
+     * The accumulated value will be passed as result only when the outputs complete.
+     * <p/>
+     * Note that the created routine will be initialized with the current configuration.<br/>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param function the bi-function instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream.
+     */
+    @NotNull
+    <AFTER> StreamChannel<AFTER> reduce(AFTER seed,
+            @NotNull BiFunction<? super AFTER, ? super OUT, ? extends AFTER> function);
 
     /**
      * Returns a new stream repeating the output data to any newly bound channel or consumer, thus

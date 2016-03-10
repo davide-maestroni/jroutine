@@ -154,13 +154,6 @@ public interface LoaderStreamChannel<OUT>
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannel<OUT> collect(
-            @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
     <AFTER> LoaderStreamChannel<AFTER> collect(
             @NotNull Function<? super List<OUT>, ? extends AFTER> function);
 
@@ -227,6 +220,20 @@ public interface LoaderStreamChannel<OUT>
      */
     @NotNull
     LoaderStreamChannel<OUT> parallel();
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    LoaderStreamChannel<OUT> reduce(
+            @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    <AFTER> LoaderStreamChannel<AFTER> reduce(AFTER seed,
+            @NotNull BiFunction<? super AFTER, ? super OUT, ? extends AFTER> function);
 
     /**
      * {@inheritDoc}

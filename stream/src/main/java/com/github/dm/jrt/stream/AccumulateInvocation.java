@@ -34,24 +34,31 @@ import static com.github.dm.jrt.function.Functions.wrap;
  * <p/>
  * Created by davide-maestroni on 10/18/2015.
  *
- * @param <IN> the input data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-class AccumulateInvocation<IN> extends TemplateInvocation<IN, IN> {
+class AccumulateInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
 
-    private final BiFunction<? super IN, ? super IN, ? extends IN> mFunction;
+    private static final Object NO_SEED = new Object();
 
-    private IN mAccumulated;
+    private final BiFunction<? super OUT, ? super IN, ? extends OUT> mFunction;
+
+    private final Object mSeed;
+
+    private OUT mAccumulated;
 
     private boolean mIsFirst;
 
     /**
      * Constructor.
      *
+     * @param seed     the accumulation seed.
      * @param function the bi-function instance.
      */
-    private AccumulateInvocation(
-            @NotNull final BiFunction<? super IN, ? super IN, ? extends IN> function) {
+    private AccumulateInvocation(Object seed,
+            @NotNull final BiFunction<? super OUT, ? super IN, ? extends OUT> function) {
 
+        mSeed = seed;
         mFunction = function;
     }
 
@@ -67,7 +74,14 @@ class AccumulateInvocation<IN> extends TemplateInvocation<IN, IN> {
     public static <IN> InvocationFactory<IN, IN> functionFactory(
             @NotNull final BiFunction<? super IN, ? super IN, ? extends IN> function) {
 
-        return new AccumulateInvocationFactory<IN>(wrap(function));
+        return new AccumulateInvocationFactory<IN, IN>(NO_SEED, wrap(function));
+    }
+
+    @NotNull
+    public static <IN, OUT> InvocationFactory<IN, OUT> functionFactory(OUT seed,
+            @NotNull final BiFunction<? super OUT, ? super IN, ? extends OUT> function) {
+
+        return new AccumulateInvocationFactory<IN, OUT>(seed, wrap(function));
     }
 
     @Override
@@ -77,11 +91,18 @@ class AccumulateInvocation<IN> extends TemplateInvocation<IN, IN> {
     }
 
     @Override
-    public void onInput(final IN input, @NotNull final ResultChannel<IN> result) {
+    @SuppressWarnings("unchecked")
+    public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
 
         if (mIsFirst) {
             mIsFirst = false;
-            mAccumulated = input;
+            final Object seed = mSeed;
+            if (seed == NO_SEED) {
+                mAccumulated = (OUT) input;
+
+            } else {
+                mAccumulated = mFunction.apply((OUT) seed, input);
+            }
 
         } else {
             mAccumulated = mFunction.apply(mAccumulated, input);
@@ -89,7 +110,7 @@ class AccumulateInvocation<IN> extends TemplateInvocation<IN, IN> {
     }
 
     @Override
-    public void onResult(@NotNull final ResultChannel<IN> result) {
+    public void onResult(@NotNull final ResultChannel<OUT> result) {
 
         result.pass(mAccumulated);
     }
@@ -103,30 +124,35 @@ class AccumulateInvocation<IN> extends TemplateInvocation<IN, IN> {
     /**
      * Class implementing an accumulating invocation factory.
      *
-     * @param <IN> the input data type.
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
      */
-    private static class AccumulateInvocationFactory<IN>
-            extends ComparableInvocationFactory<IN, IN> {
+    private static class AccumulateInvocationFactory<IN, OUT>
+            extends ComparableInvocationFactory<IN, OUT> {
 
-        private final BiFunctionWrapper<? super IN, ? super IN, ? extends IN> mFunction;
+        private final BiFunctionWrapper<? super OUT, ? super IN, ? extends OUT> mFunction;
+
+        private final Object mSeed;
 
         /**
          * Constructor.
          *
+         * @param seed     the accumulation seed.
          * @param function the bi-function instance.
          */
-        private AccumulateInvocationFactory(
-                @NotNull final BiFunctionWrapper<? super IN, ? super IN, ? extends IN> function) {
+        private AccumulateInvocationFactory(Object seed,
+                @NotNull final BiFunctionWrapper<? super OUT, ? super IN, ? extends OUT> function) {
 
-            super(asArgs(function));
+            super(asArgs(seed, function));
+            mSeed = seed;
             mFunction = function;
         }
 
         @NotNull
         @Override
-        public Invocation<IN, IN> newInvocation() {
+        public Invocation<IN, OUT> newInvocation() {
 
-            return new AccumulateInvocation<IN>(mFunction);
+            return new AccumulateInvocation<IN, OUT>(mSeed, mFunction);
         }
     }
 }

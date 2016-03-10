@@ -154,7 +154,7 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
             @NotNull final OutputChannel<OUT> channel, @Nullable final Binder binder) {
 
         this(builder, channel, InvocationConfiguration.DEFAULT_CONFIGURATION,
-             LoaderConfiguration.DEFAULT_CONFIGURATION, DelegationType.ASYNC, binder);
+                LoaderConfiguration.DEFAULT_CONFIGURATION, DelegationType.ASYNC, binder);
     }
 
     /**
@@ -300,15 +300,6 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
 
     @NotNull
     @Override
-    public LoaderStreamChannel<OUT> collect(
-            @NotNull final BiFunction<? super OUT, ? super OUT, ? extends OUT> function) {
-
-        checkStatic(wrap(function), function);
-        return (LoaderStreamChannel<OUT>) super.collect(function);
-    }
-
-    @NotNull
-    @Override
     public <AFTER> LoaderStreamChannel<AFTER> collect(
             @NotNull final Function<? super List<OUT>, ? extends AFTER> function) {
 
@@ -408,6 +399,24 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
 
     @NotNull
     @Override
+    public LoaderStreamChannel<OUT> reduce(
+            @NotNull final BiFunction<? super OUT, ? super OUT, ? extends OUT> function) {
+
+        checkStatic(wrap(function), function);
+        return (LoaderStreamChannel<OUT>) super.reduce(function);
+    }
+
+    @NotNull
+    @Override
+    public <AFTER> LoaderStreamChannel<AFTER> reduce(final AFTER seed,
+            @NotNull final BiFunction<? super AFTER, ? super OUT, ? extends AFTER> function) {
+
+        checkStatic(wrap(function), function);
+        return (LoaderStreamChannel<AFTER>) super.reduce(seed, function);
+    }
+
+    @NotNull
+    @Override
     public LoaderStreamChannel<OUT> repeat() {
 
         return (LoaderStreamChannel<OUT>) super.repeat();
@@ -503,7 +512,7 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
                                         .with(configuration)
                                         .getConfigured()
                                         .build(), getStreamConfiguration(), getDelegationType(),
-                          getBinder());
+                getBinder());
     }
 
     @NotNull
@@ -568,8 +577,7 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
 
         return newRoutine(configuration,
-                          mStreamConfiguration.builderFrom().with(mConfiguration).getConfigured(),
-                          factory);
+                mStreamConfiguration.builderFrom().with(mConfiguration).getConfigured(), factory);
     }
 
     @NotNull
@@ -621,7 +629,7 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
 
         final LoaderConfiguration configuration = mStreamConfiguration;
         return new LoaderConfiguration.Builder<LoaderStreamChannel<OUT>>(mStreamConfigurable,
-                                                                         configuration);
+                configuration);
     }
 
     private void checkStatic(@NotNull final Wrapper wrapper, @NotNull final Object function) {
@@ -641,8 +649,7 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
             @NotNull final DelegationType delegationType, @Nullable final Binder binder) {
 
         return new DefaultLoaderStreamChannel<AFTER>(mContextBuilder, channel,
-                                                     invocationConfiguration, loaderConfiguration,
-                                                     delegationType, binder);
+                invocationConfiguration, loaderConfiguration, delegationType, binder);
     }
 
     @NotNull
@@ -662,7 +669,7 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
 
         final CallContextInvocationFactory<? super OUT, ? extends AFTER> invocationFactory =
                 factoryFrom(JRoutineCore.on(factory).buildRoutine(), factory.hashCode(),
-                            DelegationType.SYNC);
+                        DelegationType.SYNC);
         return contextBuilder.on(invocationFactory)
                              .withInvocations()
                              .with(invocationConfiguration)

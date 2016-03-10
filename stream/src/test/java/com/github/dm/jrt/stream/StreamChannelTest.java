@@ -212,57 +212,6 @@ public class StreamChannelTest {
     }
 
     @Test
-    public void testCollectBiFunction() {
-
-        assertThat(Streams.streamOf("test1", "test2", "test3")
-                          .async()
-                          .collect(new BiFunction<String, String, String>() {
-
-                              public String apply(final String s, final String s2) {
-
-                                  return s + s2;
-                              }
-                          })
-                          .afterMax(seconds(3))
-                          .all()).containsExactly("test1test2test3");
-        assertThat(Streams.streamOf("test1", "test2", "test3")
-                          .sync()
-                          .collect(new BiFunction<String, String, String>() {
-
-                              public String apply(final String s, final String s2) {
-
-                                  return s + s2;
-                              }
-                          })
-                          .all()).containsExactly("test1test2test3");
-    }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testCollectBiFunctionNullPointerError() {
-
-        try {
-
-            Streams.streamOf().async().collect((BiFunction<Object, Object, Object>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.streamOf().sync().collect((BiFunction<Object, Object, Object>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-    }
-
-    @Test
     public void testCollectConsumer() {
 
         assertThat(Streams.streamOf("test1", "test2", "test3").async().collect(new BiConsumer<List<?
@@ -307,9 +256,7 @@ public class StreamChannelTest {
     public void testCollectConsumerNullPointerError() {
 
         try {
-
             Streams.streamOf().async().collect((BiConsumer<List<?>, ResultChannel<Object>>) null);
-
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -317,9 +264,7 @@ public class StreamChannelTest {
         }
 
         try {
-
             Streams.streamOf().sync().collect((BiConsumer<List<?>, ResultChannel<Object>>) null);
-
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -461,12 +406,12 @@ public class StreamChannelTest {
                                   return new SumData(aDouble, 1);
                               }
                           })
-                          .collect(new BiFunction<SumData, SumData, SumData>() {
+                          .reduce(new BiFunction<SumData, SumData, SumData>() {
 
                               public SumData apply(final SumData data1, final SumData data2) {
 
                                   return new SumData(data1.sum + data2.sum,
-                                                     data1.count + data2.count);
+                                          data1.count + data2.count);
                               }
                           })
                           .map(new Function<SumData, Double>() {
@@ -487,7 +432,7 @@ public class StreamChannelTest {
         final IOChannel<Object> channel = JRoutineCore.io().buildChannel();
         final TestStreamChannel streamChannel =
                 new TestStreamChannel(channel, InvocationConfiguration.DEFAULT_CONFIGURATION,
-                                      DelegationType.ASYNC, null);
+                        DelegationType.ASYNC, null);
         assertThat(streamChannel.getBinder()).isNotNull();
         assertThat(streamChannel.getConfiguration()).isNotNull();
         assertThat(streamChannel.getStreamConfiguration()).isNotNull();
@@ -500,7 +445,7 @@ public class StreamChannelTest {
 
         try {
             new TestStreamChannel(null, InvocationConfiguration.DEFAULT_CONFIGURATION,
-                                  DelegationType.ASYNC, null);
+                    DelegationType.ASYNC, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -518,7 +463,7 @@ public class StreamChannelTest {
 
         try {
             new TestStreamChannel(channel, InvocationConfiguration.DEFAULT_CONFIGURATION, null,
-                                  null);
+                    null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -527,7 +472,7 @@ public class StreamChannelTest {
 
         try {
             new TestStreamChannel(channel, InvocationConfiguration.DEFAULT_CONFIGURATION,
-                                  DelegationType.ASYNC, null).setConfiguration(null);
+                    DelegationType.ASYNC, null).setConfiguration(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -685,6 +630,41 @@ public class StreamChannelTest {
     }
 
     @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testFlatMapNullPointerError() {
+
+        try {
+
+            Streams.streamOf().sync().flatMap(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().async().flatMap(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.streamOf().parallel().flatMap(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
     public void testInvocationDeadlock() {
 
         try {
@@ -745,41 +725,6 @@ public class StreamChannelTest {
         try {
 
             Streams.lazyStreamOf((OutputChannel<?>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-    }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testFlatMapNullPointerError() {
-
-        try {
-
-            Streams.streamOf().sync().flatMap(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.streamOf().async().flatMap(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            Streams.streamOf().parallel().flatMap(null);
 
             fail();
 
@@ -1127,12 +1072,12 @@ public class StreamChannelTest {
                                       return new SumData(aDouble, 1);
                                   }
                               })
-                              .collect(new BiFunction<SumData, SumData, SumData>() {
+                              .reduce(new BiFunction<SumData, SumData, SumData>() {
 
                                   public SumData apply(final SumData data1, final SumData data2) {
 
                                       return new SumData(data1.sum + data2.sum,
-                                                         data1.count + data2.count);
+                                              data1.count + data2.count);
                                   }
                               })
                               .map(new Function<SumData, Double>() {
@@ -1178,12 +1123,12 @@ public class StreamChannelTest {
                                       return new SumData(aDouble, 1);
                                   }
                               })
-                              .collect(new BiFunction<SumData, SumData, SumData>() {
+                              .reduce(new BiFunction<SumData, SumData, SumData>() {
 
                                   public SumData apply(final SumData data1, final SumData data2) {
 
                                       return new SumData(data1.sum + data2.sum,
-                                                         data1.count + data2.count);
+                                              data1.count + data2.count);
                                   }
                               })
                               .map(new Function<SumData, Double>() {
@@ -1227,12 +1172,12 @@ public class StreamChannelTest {
                                       return new SumData(aDouble, 1);
                                   }
                               })
-                              .collect(new BiFunction<SumData, SumData, SumData>() {
+                              .reduce(new BiFunction<SumData, SumData, SumData>() {
 
                                   public SumData apply(final SumData data1, final SumData data2) {
 
                                       return new SumData(data1.sum + data2.sum,
-                                                         data1.count + data2.count);
+                                              data1.count + data2.count);
                                   }
                               })
                               .map(new Function<SumData, Double>() {
@@ -1263,8 +1208,7 @@ public class StreamChannelTest {
                           .toSelectable(33)
                           .afterMax(seconds(1))
                           .all()).containsExactly(new Selectable<String>("test1", 33),
-                                                  new Selectable<String>("test2", 33),
-                                                  new Selectable<String>("test3", 33));
+                new Selectable<String>("test2", 33), new Selectable<String>("test3", 33));
     }
 
     @Test
@@ -1278,6 +1222,118 @@ public class StreamChannelTest {
             fail();
 
         } catch (final AbortException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testReduce() {
+
+        assertThat(Streams.streamOf("test1", "test2", "test3")
+                          .async()
+                          .reduce(new BiFunction<String, String, String>() {
+
+                              public String apply(final String s, final String s2) {
+
+                                  return s + s2;
+                              }
+                          })
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1test2test3");
+        assertThat(Streams.streamOf("test1", "test2", "test3")
+                          .sync()
+                          .reduce(new BiFunction<String, String, String>() {
+
+                              public String apply(final String s, final String s2) {
+
+                                  return s + s2;
+                              }
+                          })
+                          .all()).containsExactly("test1test2test3");
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testReduceNullPointerError() {
+
+        try {
+            Streams.streamOf().async().reduce(null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+            Streams.streamOf().sync().reduce(null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testReduceSeed() {
+
+        assertThat(Streams.streamOf("test1", "test2", "test3")
+                          .async()
+                          .reduce(new StringBuilder(),
+                                  new BiFunction<StringBuilder, String, StringBuilder>() {
+
+                                      public StringBuilder apply(final StringBuilder b,
+                                              final String s) {
+
+                                          return b.append(s);
+                                      }
+                                  })
+                          .map(new Function<StringBuilder, String>() {
+
+                              public String apply(final StringBuilder builder) {
+
+                                  return builder.toString();
+                              }
+                          })
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1test2test3");
+        assertThat(Streams.streamOf("test1", "test2", "test3")
+                          .sync()
+                          .reduce(new StringBuilder(),
+                                  new BiFunction<StringBuilder, String, StringBuilder>() {
+
+                                      public StringBuilder apply(final StringBuilder b,
+                                              final String s) {
+
+                                          return b.append(s);
+                                      }
+                                  })
+                          .map(new Function<StringBuilder, String>() {
+
+                              public String apply(final StringBuilder builder) {
+
+                                  return builder.toString();
+                              }
+                          })
+                          .all()).containsExactly("test1test2test3");
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testReduceSeedNullPointerError() {
+
+        try {
+            Streams.streamOf().async().reduce(null, null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+            Streams.streamOf().sync().reduce(null, null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
 
         }
     }

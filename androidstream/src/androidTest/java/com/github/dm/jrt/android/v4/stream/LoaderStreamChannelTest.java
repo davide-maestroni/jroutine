@@ -82,33 +82,6 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         super(TestActivity.class);
     }
 
-    private static void testCollectBiFunction(@NotNull final FragmentActivity activity) {
-
-        assertThat(LoaderStreamsCompat.streamOf("test1", "test2", "test3")
-                                      .with(loaderFrom(activity))
-                                      .async()
-                                      .collect(new BiFunction<String, String, String>() {
-
-                                          public String apply(final String s, final String s2) {
-
-                                              return s + s2;
-                                          }
-                                      })
-                                      .afterMax(seconds(10))
-                                      .all()).containsExactly("test1test2test3");
-        assertThat(LoaderStreamsCompat.streamOf("test1", "test2", "test3")
-                                      .with(loaderFrom(activity))
-                                      .sync()
-                                      .collect(new BiFunction<String, String, String>() {
-
-                                          public String apply(final String s, final String s2) {
-
-                                              return s + s2;
-                                          }
-                                      })
-                                      .all()).containsExactly("test1test2test3");
-    }
-
     private static void testCollectConsumer(@NotNull final FragmentActivity activity) {
 
         assertThat(LoaderStreamsCompat.streamOf("test1", "test2", "test3")
@@ -266,13 +239,13 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                               return new SumData(aDouble, 1);
                                           }
                                       })
-                                      .collect(new BiFunction<SumData, SumData, SumData>() {
+                                      .reduce(new BiFunction<SumData, SumData, SumData>() {
 
                                           public SumData apply(final SumData data1,
                                                   final SumData data2) {
 
                                               return new SumData(data1.sum + data2.sum,
-                                                                 data1.count + data2.count);
+                                                      data1.count + data2.count);
                                           }
                                       })
                                       .map(new Function<SumData, Double>() {
@@ -331,7 +304,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                                                         .with(loaderFrom(activity))
                                                                         .sync()
                                                                         .filter(Functions
-                                                                                        .<String>notNull());
+                                                                                .<String>notNull());
                                           }
                                       })
                                       .all()).containsExactly("test1", "test2");
@@ -346,7 +319,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                                                         .with(loaderFrom(activity))
                                                                         .sync()
                                                                         .filter(Functions
-                                                                                        .<String>notNull());
+                                                                                .<String>notNull());
                                           }
                                       })
                                       .afterMax(seconds(10))
@@ -362,7 +335,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                                                         .with(loaderFrom(activity))
                                                                         .sync()
                                                                         .filter(Functions
-                                                                                        .<String>notNull());
+                                                                                .<String>notNull());
                                           }
                                       })
                                       .afterMax(seconds(10))
@@ -486,6 +459,80 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                           }
                                       })
                                       .all()).containsExactly("TEST1", "TEST2");
+    }
+
+    private static void testReduce(@NotNull final FragmentActivity activity) {
+
+        assertThat(LoaderStreamsCompat.streamOf("test1", "test2", "test3")
+                                      .with(loaderFrom(activity))
+                                      .async()
+                                      .reduce(new BiFunction<String, String, String>() {
+
+                                          public String apply(final String s, final String s2) {
+
+                                              return s + s2;
+                                          }
+                                      })
+                                      .afterMax(seconds(10))
+                                      .all()).containsExactly("test1test2test3");
+        assertThat(LoaderStreamsCompat.streamOf("test1", "test2", "test3")
+                                      .with(loaderFrom(activity))
+                                      .sync()
+                                      .reduce(new BiFunction<String, String, String>() {
+
+                                          public String apply(final String s, final String s2) {
+
+                                              return s + s2;
+                                          }
+                                      })
+                                      .all()).containsExactly("test1test2test3");
+    }
+
+    private static void testReduceSeed(@NotNull final FragmentActivity activity) {
+
+        assertThat(LoaderStreamsCompat.streamOf("test1", "test2", "test3")
+                                      .with(loaderFrom(activity))
+                                      .async()
+                                      .reduce(new StringBuilder(),
+                                              new BiFunction<StringBuilder, String,
+                                                      StringBuilder>() {
+
+                                                  public StringBuilder apply(final StringBuilder b,
+                                                          final String s) {
+
+                                                      return b.append(s);
+                                                  }
+                                              })
+                                      .map(new Function<StringBuilder, String>() {
+
+                                          public String apply(final StringBuilder builder) {
+
+                                              return builder.toString();
+                                          }
+                                      })
+                                      .afterMax(seconds(10))
+                                      .all()).containsExactly("test1test2test3");
+        assertThat(LoaderStreamsCompat.streamOf("test1", "test2", "test3")
+                                      .with(loaderFrom(activity))
+                                      .sync()
+                                      .reduce(new StringBuilder(),
+                                              new BiFunction<StringBuilder, String,
+                                                      StringBuilder>() {
+
+                                                  public StringBuilder apply(final StringBuilder b,
+                                                          final String s) {
+
+                                                      return b.append(s);
+                                                  }
+                                              })
+                                      .map(new Function<StringBuilder, String>() {
+
+                                          public String apply(final StringBuilder builder) {
+
+                                              return builder.toString();
+                                          }
+                                      })
+                                      .all()).containsExactly("test1test2test3");
     }
 
     private static void testThen(@NotNull final FragmentActivity activity) {
@@ -612,7 +659,6 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                                   }
                                               })
                                       .next()).isEqualTo("exception");
-
         assertThat(LoaderStreamsCompat.streamOf("test")
                                       .with(loaderFrom(activity))
                                       .sync()
@@ -824,39 +870,6 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
 
         } catch (final AbortException e) {
             assertThat(e.getCause()).isExactlyInstanceOf(IllegalArgumentException.class);
-        }
-    }
-
-    public void testCollectBiFunction() {
-
-        testCollectBiFunction(getActivity());
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    public void testCollectBiFunctionNullPointerError() {
-
-        try {
-            LoaderStreamsCompat.streamOf()
-                               .with(loaderFrom(getActivity()))
-                               .async()
-                               .collect((BiFunction<Object, Object, Object>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-            LoaderStreamsCompat.streamOf()
-                               .with(loaderFrom(getActivity()))
-                               .sync()
-                               .collect((BiFunction<Object, Object, Object>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
         }
     }
 
@@ -1374,6 +1387,62 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             fail();
 
         } catch (final AbortException ignored) {
+
+        }
+    }
+
+    public void testReduce() {
+
+        testReduce(getActivity());
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public void testReduceNullPointerError() {
+
+        try {
+            LoaderStreamsCompat.streamOf().with(loaderFrom(getActivity())).async().reduce(null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+            LoaderStreamsCompat.streamOf().with(loaderFrom(getActivity())).sync().reduce(null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    public void testReduceSeed() {
+
+        testReduceSeed(getActivity());
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public void testReduceSeedNullPointerError() {
+
+        try {
+            LoaderStreamsCompat.streamOf()
+                               .with(loaderFrom(getActivity()))
+                               .async()
+                               .reduce(null, null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+            LoaderStreamsCompat.streamOf()
+                               .with(loaderFrom(getActivity()))
+                               .sync()
+                               .reduce(null, null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
 
         }
     }

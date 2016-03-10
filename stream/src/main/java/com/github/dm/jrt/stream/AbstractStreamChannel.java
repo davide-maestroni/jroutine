@@ -271,13 +271,6 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
-    public StreamChannel<OUT> collect(
-            @NotNull final BiFunction<? super OUT, ? super OUT, ? extends OUT> function) {
-
-        return map(AccumulateInvocation.functionFactory(function));
-    }
-
-    @NotNull
     public <AFTER> StreamChannel<AFTER> collect(
             @NotNull final Function<? super List<OUT>, ? extends AFTER> function) {
 
@@ -364,6 +357,20 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
+    public StreamChannel<OUT> reduce(
+            @NotNull final BiFunction<? super OUT, ? super OUT, ? extends OUT> function) {
+
+        return map(AccumulateInvocation.functionFactory(function));
+    }
+
+    @NotNull
+    public <AFTER> StreamChannel<AFTER> reduce(final AFTER seed,
+            @NotNull final BiFunction<? super AFTER, ? super OUT, ? extends AFTER> function) {
+
+        return map(AccumulateInvocation.functionFactory(seed, function));
+    }
+
+    @NotNull
     public StreamChannel<OUT> repeat() {
 
         final ChannelConfiguration configuration = buildChannelConfiguration();
@@ -380,7 +387,7 @@ public abstract class AbstractStreamChannel<OUT>
                                                                   .getConfigured()
                                                                   .async()
                                                                   .map(PassingInvocation
-                                                                               .<OUT>factoryOf());
+                                                                          .<OUT>factoryOf());
         if (delegationType == DelegationType.ASYNC) {
             return channel.async();
         }
@@ -423,19 +430,7 @@ public abstract class AbstractStreamChannel<OUT>
             list = Collections.emptyList();
         }
 
-        final GenerateOutputInvocation<AFTER> factory = new GenerateOutputInvocation<AFTER>(list);
-        final DelegationType delegationType = mDelegationType;
-        if (delegationType == DelegationType.ASYNC) {
-            return sync().map(factory).async().map(PassingInvocation.<AFTER>factoryOf());
-
-        } else if (delegationType == DelegationType.PARALLEL) {
-            return async().map(factory)
-                          .async()
-                          .parallel()
-                          .map(PassingInvocation.<AFTER>factoryOf());
-        }
-
-        return map(factory);
+        return map(new GenerateOutputInvocation<AFTER>(list));
     }
 
     @NotNull
@@ -452,26 +447,15 @@ public abstract class AbstractStreamChannel<OUT>
             list = Collections.emptyList();
         }
 
-        final GenerateOutputInvocation<AFTER> factory = new GenerateOutputInvocation<AFTER>(list);
-        final DelegationType delegationType = mDelegationType;
-        if (delegationType == DelegationType.ASYNC) {
-            return sync().map(factory).async().map(PassingInvocation.<AFTER>factoryOf());
-
-        } else if (delegationType == DelegationType.PARALLEL) {
-            return async().map(factory)
-                          .async()
-                          .parallel()
-                          .map(PassingInvocation.<AFTER>factoryOf());
-        }
-
-        return map(factory);
+        return map(new GenerateOutputInvocation<AFTER>(list));
     }
 
     @NotNull
     public <AFTER> StreamChannel<AFTER> then(final long count,
             @NotNull final Consumer<? super ResultChannel<AFTER>> consumer) {
 
-        return then(count, new GenerateConsumerInvocation<AFTER>(wrap(consumer)));
+        return map(new LoopInvocation<AFTER>(count,
+                new GenerateConsumerInvocation<AFTER>(wrap(consumer))));
     }
 
     @NotNull
@@ -485,7 +469,8 @@ public abstract class AbstractStreamChannel<OUT>
     public <AFTER> StreamChannel<AFTER> then(final long count,
             @NotNull final Supplier<? extends AFTER> supplier) {
 
-        return then(count, new GenerateSupplierInvocation<AFTER>(wrap(supplier)));
+        return map(new LoopInvocation<AFTER>(count,
+                new GenerateSupplierInvocation<AFTER>(wrap(supplier))));
     }
 
     @NotNull
@@ -563,8 +548,8 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
-    public <CHANNEL extends InputChannel<? super OUT>> CHANNEL bind(@NotNull final CHANNEL
-            channel) {
+    public <CHANNEL extends InputChannel<? super OUT>> CHANNEL bind(
+            @NotNull final CHANNEL channel) {
 
         mBinder.bind();
         return mChannel.bind(channel);
@@ -738,26 +723,7 @@ public abstract class AbstractStreamChannel<OUT>
             @NotNull final InvocationChannel<? super OUT, ? extends AFTER> channel) {
 
         return newChannel((OutputChannel<AFTER>) mChannel.bind(channel).result(),
-                          getStreamConfiguration(), mDelegationType, mBinder);
-    }
-
-    @NotNull
-    private <AFTER> StreamChannel<AFTER> then(final long count,
-            @NotNull final InvocationFactory<Object, AFTER> factory) {
-
-        if (count <= 0) {
-            throw new IllegalArgumentException("the count number must be positive: " + count);
-        }
-
-        final DelegationType delegationType = mDelegationType;
-        if (delegationType == DelegationType.ASYNC) {
-            return sync().map(new LoopInvocation(count)).async().map(factory);
-
-        } else if (delegationType == DelegationType.PARALLEL) {
-            return async().map(new LoopInvocation(count)).parallel().map(factory);
-        }
-
-        return map(new LoopInvocation(count)).map(factory);
+                getStreamConfiguration(), mDelegationType, mBinder);
     }
 
     /**
@@ -867,8 +833,7 @@ public abstract class AbstractStreamChannel<OUT>
      *
      * @param <OUT> the output data type.
      */
-    private static class GenerateConsumerInvocation<OUT>
-            extends ComparableFilterInvocation<Object, OUT> {
+    private static class GenerateConsumerInvocation<OUT> extends GenerateInvocation<OUT> {
 
         private final ConsumerWrapper<? super ResultChannel<OUT>> mConsumer;
 
@@ -886,7 +851,7 @@ public abstract class AbstractStreamChannel<OUT>
             mConsumer = consumer;
         }
 
-        public void onInput(final Object input, @NotNull final ResultChannel<OUT> result) {
+        public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
 
             mConsumer.accept(result);
         }
@@ -969,8 +934,7 @@ public abstract class AbstractStreamChannel<OUT>
      *
      * @param <OUT> the output data type.
      */
-    private static class GenerateSupplierInvocation<OUT>
-            extends ComparableFilterInvocation<Object, OUT> {
+    private static class GenerateSupplierInvocation<OUT> extends GenerateInvocation<OUT> {
 
         private final SupplierWrapper<? extends OUT> mSupplier;
 
@@ -987,7 +951,7 @@ public abstract class AbstractStreamChannel<OUT>
             mSupplier = supplier;
         }
 
-        public void onInput(final Object input, @NotNull final ResultChannel<OUT> result) {
+        public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
 
             result.pass(mSupplier.get());
         }
@@ -996,26 +960,35 @@ public abstract class AbstractStreamChannel<OUT>
     /**
      * Invocation factory used to call another function a specific number of times.
      */
-    private static class LoopInvocation extends GenerateInvocation<Void> {
+    private static class LoopInvocation<OUT> extends GenerateInvocation<OUT> {
 
         private final long mCount;
+
+        private final GenerateInvocation<OUT> mInvocation;
 
         /**
          * Constructor.
          *
          * @param count the loop count.
          */
-        private LoopInvocation(final long count) {
+        private LoopInvocation(final long count,
+                @NotNull final GenerateInvocation<OUT> invocation) {
 
             super(asArgs(count));
+            if (count <= 0) {
+                throw new IllegalArgumentException("the count number must be positive: " + count);
+            }
+
             mCount = count;
+            mInvocation = invocation;
         }
 
-        public void onResult(@NotNull final ResultChannel<Void> result) {
+        public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
 
             final long count = mCount;
+            final GenerateInvocation<OUT> invocation = mInvocation;
             for (long i = 0; i < count; i++) {
-                result.pass((Void) null);
+                invocation.onResult(result);
             }
         }
     }

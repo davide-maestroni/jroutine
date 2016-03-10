@@ -76,10 +76,11 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
                 public LoaderStreamChannelCompat<OUT> setConfiguration(
                         @NotNull final InvocationConfiguration configuration) {
 
-                    final DefaultLoaderStreamChannelCompat<OUT> outer =
-                            DefaultLoaderStreamChannelCompat.this;
-                    outer.setConfiguration(configuration);
-                    return outer;
+                    DefaultLoaderStreamChannelCompat.super.withInvocations()
+                                                          .with(null)
+                                                          .with(configuration)
+                                                          .getConfigured();
+                    return DefaultLoaderStreamChannelCompat.this;
                 }
             };
 
@@ -91,10 +92,11 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
                 public LoaderStreamChannelCompat<OUT> setConfiguration(
                         @NotNull final InvocationConfiguration configuration) {
 
-                    final DefaultLoaderStreamChannelCompat<OUT> outer =
-                            DefaultLoaderStreamChannelCompat.this;
-                    outer.setConfiguration(configuration);
-                    return outer;
+                    DefaultLoaderStreamChannelCompat.super.withStreamInvocations()
+                                                          .with(null)
+                                                          .with(configuration)
+                                                          .getConfigured();
+                    return DefaultLoaderStreamChannelCompat.this;
                 }
             };
 
@@ -218,8 +220,8 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> bind(@NotNull final OutputConsumer<? super OUT>
-            consumer) {
+    public LoaderStreamChannelCompat<OUT> bind(
+            @NotNull final OutputConsumer<? super OUT> consumer) {
 
         super.bind(consumer);
         return this;

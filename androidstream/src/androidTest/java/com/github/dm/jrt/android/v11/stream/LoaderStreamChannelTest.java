@@ -238,11 +238,11 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                 .afterMax(seconds(10))
                                 .all()).containsExactly("test1", "test2");
         assertThat(LoaderStreams.streamOf()
-                                .with(loaderFrom(activity))
                                 .async()
                                 .then(range(1, 1000))
                                 .backPressureOn(sSingleThreadRunner, 2, 10, TimeUnit.SECONDS)
                                 .map(Functions.<Number>identity())
+                                .with(loaderFrom(activity))
                                 .map(new Function<Number, Double>() {
 
                                     public Double apply(final Number number) {

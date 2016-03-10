@@ -76,9 +76,11 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
                 public LoaderStreamChannel<OUT> setConfiguration(
                         @NotNull final InvocationConfiguration configuration) {
 
-                    final DefaultLoaderStreamChannel<OUT> outer = DefaultLoaderStreamChannel.this;
-                    outer.setConfiguration(configuration);
-                    return outer;
+                    DefaultLoaderStreamChannel.super.withInvocations()
+                                                    .with(null)
+                                                    .with(configuration)
+                                                    .getConfigured();
+                    return DefaultLoaderStreamChannel.this;
                 }
             };
 
@@ -90,9 +92,11 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
                 public LoaderStreamChannel<OUT> setConfiguration(
                         @NotNull final InvocationConfiguration configuration) {
 
-                    final DefaultLoaderStreamChannel<OUT> outer = DefaultLoaderStreamChannel.this;
-                    outer.setConfiguration(configuration);
-                    return outer;
+                    DefaultLoaderStreamChannel.super.withStreamInvocations()
+                                                    .with(null)
+                                                    .with(configuration)
+                                                    .getConfigured();
+                    return DefaultLoaderStreamChannel.this;
                 }
             };
 

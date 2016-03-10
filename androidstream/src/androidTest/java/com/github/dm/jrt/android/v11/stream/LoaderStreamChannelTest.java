@@ -20,9 +20,11 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
+import android.os.HandlerThread;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
+import com.github.dm.jrt.android.core.runner.AndroidRunners;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.channel.AbortException;
@@ -73,7 +75,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TargetApi(VERSION_CODES.FROYO)
 public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<TestActivity> {
 
-    private static final Runner sSingleThreadRunner = Runners.poolRunner(1);
+    private static final Runner sSingleThreadRunner = AndroidRunners.handlerRunner(
+            new HandlerThread(LoaderStreamChannelTest.class.getName()));
 
     public LoaderStreamChannelTest() {
 

@@ -74,9 +74,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Created by davide-maestroni on 01/04/2016.
  */
 @TargetApi(VERSION_CODES.FROYO)
-public class StreamsTest extends ActivityInstrumentationTestCase2<TestActivity> {
+public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActivity> {
 
-    public StreamsTest() {
+    public LoaderStreamsTest() {
 
         super(TestActivity.class);
     }

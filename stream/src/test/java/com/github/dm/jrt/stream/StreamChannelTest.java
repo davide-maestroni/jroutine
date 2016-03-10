@@ -755,7 +755,7 @@ public class StreamChannelTest {
 
     @Test
     @SuppressWarnings("ConstantConditions")
-    public void testLiftNullPointerError() {
+    public void testFlatMapNullPointerError() {
 
         try {
 

@@ -283,10 +283,10 @@ public class PriorityRunner {
         public void run(@NotNull final Execution execution, final long delay,
                 @NotNull final TimeUnit timeUnit) {
 
-            final boolean mayBeCanceled = execution.canBeCancelled();
+            final boolean canBeCancelled = execution.canBeCancelled();
             final PriorityExecution priorityExecution =
                     new PriorityExecution(execution, mPriority, mAge.getAndDecrement());
-            if (mayBeCanceled) {
+            if (canBeCancelled) {
                 synchronized (mExecutions) {
                     final WeakIdentityHashMap<Execution, WeakHashMap<PriorityExecution, Void>>
                             executions = mExecutions;
@@ -308,7 +308,7 @@ public class PriorityRunner {
             } else {
                 final DelayedExecution delayedExecution =
                         new DelayedExecution(mQueue, priorityExecution);
-                if (mayBeCanceled) {
+                if (canBeCancelled) {
                     mDelayedExecutions.put(priorityExecution, delayedExecution);
                 }
 

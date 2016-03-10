@@ -1033,7 +1033,7 @@ public abstract class AbstractStreamChannel<OUT>
         /**
          * Constructor.
          *
-         * @param function the lifting function.
+         * @param function the mapping function.
          */
         private MapInvocation(
                 @NotNull final FunctionWrapper<? super IN, ? extends OutputChannel<? extends

@@ -87,7 +87,7 @@ class LooperRunner implements Runner {
 
         private final LooperRunner mLooperRunner;
 
-        private final Runner mQueuedRunner = Runners.syncRunner();
+        private final Runner mSyncRunner = Runners.syncRunner();
 
         /**
          * Constructor.
@@ -101,7 +101,7 @@ class LooperRunner implements Runner {
 
         public void cancel(@NotNull final Execution execution) {
 
-            mQueuedRunner.cancel(execution);
+            mSyncRunner.cancel(execution);
             mLooperRunner.cancel(execution);
         }
 
@@ -114,7 +114,7 @@ class LooperRunner implements Runner {
                 @NotNull final TimeUnit timeUnit) {
 
             if (delay == 0) {
-                mQueuedRunner.run(execution, delay, timeUnit);
+                mSyncRunner.run(execution, delay, timeUnit);
 
             } else {
                 mLooperRunner.internalRun(execution, delay, timeUnit);

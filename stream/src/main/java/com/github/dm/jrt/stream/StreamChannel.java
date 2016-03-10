@@ -323,7 +323,8 @@ public interface StreamChannel<OUT>
 
     /**
      * Concatenates a stream based on the specified accumulating function to this one.<br/>
-     * The output will be computed as follows:
+     * The output will be computed as follows, where the initial accumulated value will be the
+     * the first input:
      * <pre>
      *     <code>
      *

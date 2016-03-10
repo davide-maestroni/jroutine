@@ -56,7 +56,7 @@ public abstract class ComparableCommandInvocation<OUT> extends CommandInvocation
             return true;
         }
 
-        if (!getClass().isInstance(o)) {
+        if ((o == null) || (getClass() != o.getClass())) {
             return false;
         }
 

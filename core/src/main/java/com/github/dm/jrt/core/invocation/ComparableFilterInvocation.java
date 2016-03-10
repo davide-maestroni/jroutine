@@ -57,7 +57,7 @@ public abstract class ComparableFilterInvocation<IN, OUT> extends FilterInvocati
             return true;
         }
 
-        if (!getClass().isInstance(o)) {
+        if ((o == null) || (getClass() != o.getClass())) {
             return false;
         }
 

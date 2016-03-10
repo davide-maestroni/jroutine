@@ -57,7 +57,7 @@ public abstract class ComparableInvocationFactory<IN, OUT> extends InvocationFac
             return true;
         }
 
-        if (!getClass().isInstance(o)) {
+        if ((o == null) || (getClass() != o.getClass())) {
             return false;
         }
 

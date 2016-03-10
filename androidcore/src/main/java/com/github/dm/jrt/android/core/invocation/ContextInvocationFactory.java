@@ -66,7 +66,7 @@ public abstract class ContextInvocationFactory<IN, OUT> {
             return true;
         }
 
-        if (!getClass().isInstance(o)) {
+        if ((o == null) || (getClass() != o.getClass())) {
             return false;
         }
 

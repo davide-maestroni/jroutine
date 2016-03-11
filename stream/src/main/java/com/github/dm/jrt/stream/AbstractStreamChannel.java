@@ -974,6 +974,7 @@ public abstract class AbstractStreamChannel<OUT>
          */
         private LoopInvocation(final long count,
                 @NotNull final GenerateInvocation<OUT> invocation) {
+            // TODO: 11/03/16 consumer
 
             super(asArgs(count));
             if (count <= 0) {

@@ -75,9 +75,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TargetApi(VERSION_CODES.FROYO)
 public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<TestActivity> {
 
-    private static final Runner sSingleThreadRunner = AndroidRunners.handlerRunner(
-            new HandlerThread(LoaderStreamChannelTest.class.getName()));
-
     public LoaderStreamChannelTest() {
 
         super(TestActivity.class);
@@ -213,10 +210,12 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                 })
                                 .afterMax(seconds(10))
                                 .all()).containsExactly("test1", "test2");
+        final Runner handlerRunner = AndroidRunners.handlerRunner(
+                new HandlerThread(LoaderStreamChannelTest.class.getName()));
         assertThat(LoaderStreams.streamOf()
                                 .async()
                                 .then(range(1, 1000))
-                                .backPressureOn(sSingleThreadRunner, 2, 10, TimeUnit.SECONDS)
+                                .backPressureOn(handlerRunner, 2, 10, TimeUnit.SECONDS)
                                 .map(Functions.<Number>identity())
                                 .with(loaderFrom(activity))
                                 .map(new Function<Number, Double>() {

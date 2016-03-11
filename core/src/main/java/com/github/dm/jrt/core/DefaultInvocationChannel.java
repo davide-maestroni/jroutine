@@ -387,7 +387,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         if (!delay.isZero() && mRunner.isExecutionThread()) {
             throw new InputDeadlockException(
                     "cannot wait on the invocation runner thread: " + Thread.currentThread()
-                            + "\nTry employing a different runner");
+                            + "\nTry employing a different runner than: " + mRunner);
         }
 
         try {

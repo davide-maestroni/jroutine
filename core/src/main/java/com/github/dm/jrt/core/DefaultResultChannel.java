@@ -467,7 +467,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         if (mRunner.isExecutionThread()) {
             throw new ExecutionDeadlockException(
                     "cannot wait on the channel runner thread: " + Thread.currentThread()
-                            + "\nTry binding the output channel or employing a different runner");
+                            + "\nTry binding the output channel or employing a different runner "
+                            + "than: " + mRunner);
         }
 
         if (mIsWaitingInvocation) {
@@ -1052,7 +1053,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                     if (!mState.isDone()) {
                         final TimeoutActionType timeoutAction = mTimeoutActionType;
                         logger.wrn("list output timeout: [%s] => [%s]", executionTimeout,
-                                   timeoutAction);
+                                timeoutAction);
 
                         if (timeoutAction == TimeoutActionType.THROW) {
                             throw new ExecutionTimeoutException(
@@ -1073,7 +1074,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                             while (!outputQueue.isEmpty()) {
                                 final OUT result = nextOutput(executionTimeout);
                                 logger.dbg("adding output to list: %s [%s]", result,
-                                           executionTimeout);
+                                        executionTimeout);
                                 results.add(result);
                             }
 
@@ -1839,7 +1840,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         boolean delayedOutputs(@NotNull final NestedQueue<Object> queue, final List<OUT> outputs) {
 
             mSubLogger.dbg("avoiding delayed output execution since channel is closed: %s",
-                           outputs);
+                    outputs);
             return false;
         }
 
@@ -2188,7 +2189,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             final int size = list.size();
             final TimeDuration delay = mResultDelay;
             mSubLogger.dbg("passing iterable [#%d+%d]: %s [%s]", mOutputCount, size, outputs,
-                           delay);
+                    delay);
             mOutputCount += size;
             checkMaxSize();
             if (delay.isZero()) {

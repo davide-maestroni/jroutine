@@ -501,6 +501,7 @@ public abstract class AbstractStreamChannel<OUT>
         }
 
         final IOChannel<OUT> ioChannel = JRoutineCore.io().buildChannel();
+        // TODO: 11/03/16 configuration
         mChannel.bind(new TryCatchOutputConsumer<OUT>(consumer, ioChannel));
         return newChannel(ioChannel, getStreamConfiguration(), mDelegationType, mBinder);
     }

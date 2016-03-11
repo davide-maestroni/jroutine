@@ -108,7 +108,7 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
     <TYPE> TYPE buildProxy(@NotNull ClassToken<TYPE> itf);
 
     /**
-     * Returns a routine used to call the specified method.
+     * Returns a routine used to call the specified method. TODO: getMethod()
      * <p/>
      * The method is searched via reflection ignoring a name specified in a
      * {@link com.github.dm.jrt.object.annotation.Alias Alias} annotation. Though, optional

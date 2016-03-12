@@ -21,7 +21,7 @@ import com.github.dm.jrt.core.config.ChannelConfiguration.Builder;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Interface defining a configurable builder of routines.
+ * Interface defining a configurable builder of channels.
  * <p/>
  * Created by davide-maestroni on 08/18/2015.
  *
@@ -34,7 +34,7 @@ public interface ChannelConfigurableBuilder<TYPE> {
      * <p/>
      * Note that the configuration builder will be initialized with the current configuration.
      *
-     * @return the invocation configuration builder.
+     * @return the channel configuration builder.
      */
     @NotNull
     Builder<? extends TYPE> withChannels();

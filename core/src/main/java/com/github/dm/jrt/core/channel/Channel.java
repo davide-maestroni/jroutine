@@ -43,7 +43,7 @@ public interface Channel {
      * An instance of {@link com.github.dm.jrt.core.channel.AbortException AbortException} will be
      * passed as the abortion reason.
      * <p/>
-     * Note that, in case the channel was already closed, the call to this method has no effect.
+     * Note that, in case the channel is already closed, the method invocation will have no effect.
      *
      * @return whether the channel status changed as a result of the call.
      */
@@ -57,7 +57,7 @@ public interface Channel {
      * the cause of an {@link com.github.dm.jrt.core.channel.AbortException AbortException}
      * instance.
      * <p/>
-     * Note that, in case the channel was already closed, the call to this method has no effect.
+     * Note that, in case the channel is already closed, the method invocation will have no effect.
      *
      * @param reason the throwable object identifying the reason of the invocation abortion.
      * @return whether the channel status changed as a result of the call.
@@ -65,7 +65,7 @@ public interface Channel {
     boolean abort(@Nullable Throwable reason);
 
     /**
-     * Checks if the channel is empty, that is, no data is stored in it.
+     * Checks if the channel is empty, that is, no data are stored in it.
      *
      * @return whether the channel is empty.
      */
@@ -90,7 +90,7 @@ public interface Channel {
         /**
          * Tells the channel to delay the transfer of data of the specified time duration.<br/>
          * Note that an abortion command will be delayed as well. Note, however, that a delayed
-         * abortion will not prevent the invocation from completing, as input data do.
+         * abortion will not prevent the invocation from completing, as pending input data do.
          *
          * @param delay the delay.
          * @return this channel.
@@ -103,7 +103,7 @@ public interface Channel {
         /**
          * Tells the channel to delay the transfer of data of the specified time duration.<br/>
          * Note that an abortion command will be delayed as well. Note, however, that a delayed
-         * abortion will not prevent the invocation from completing, as input data do.
+         * abortion will not prevent the invocation from completing, as pending input data do.
          *
          * @param delay    the delay value.
          * @param timeUnit the delay time unit.
@@ -141,12 +141,12 @@ public interface Channel {
         InputChannel<IN> orderByCall();
 
         /**
-         * Tells the channel to sort the passed input data based on the specific delay.<br/>
+         * Tells the channel to not sort the passed input data.<br/>
          * Note that only the inputs passed with a 0 delay will be delivered in the same order as
          * they are passed to the channel, while the others will be delivered as soon as the
          * dedicated runner handles the specific execution.
          * <p/>
-         * By default no particular order is applied.
+         * This is the default behavior.
          *
          * @return this channel.
          * @throws com.github.dm.jrt.core.common.RoutineException if the execution has been aborted.
@@ -322,8 +322,8 @@ public interface Channel {
         OutputChannel<OUT> bind(@NotNull OutputConsumer<? super OUT> consumer);
 
         /**
-         * Tells the channel to abort the invocation execution in case no result is available before
-         * the timeout has elapsed.
+         * Tells the channel to abort the invocation execution in case, after a read method is
+         * invoked, no result is available before the timeout has elapsed.
          * <p/>
          * By default an {@link com.github.dm.jrt.core.channel.ExecutionTimeoutException
          * ExecutionTimeoutException} exception will be thrown.
@@ -340,8 +340,8 @@ public interface Channel {
         OutputChannel<OUT> eventuallyAbort();
 
         /**
-         * Tells the channel to abort the invocation execution in case no result is available before
-         * the timeout has elapsed.
+         * Tells the channel to abort the invocation execution in case, after a read method is
+         * invoked, no result is available before the timeout has elapsed.
          * <p/>
          * By default an {@link com.github.dm.jrt.core.channel.ExecutionTimeoutException
          * ExecutionTimeoutException} exception will be thrown.
@@ -359,8 +359,8 @@ public interface Channel {
         OutputChannel<OUT> eventuallyAbort(@Nullable Throwable reason);
 
         /**
-         * Tells the channel to break execution in case no result is available before the timeout
-         * has elapsed.
+         * Tells the channel to break the invocation execution in case, after a read method is
+         * invoked, no result is available before the timeout has elapsed.
          * <p/>
          * By default an {@link com.github.dm.jrt.core.channel.ExecutionTimeoutException
          * ExecutionTimeoutException} exception will be thrown.
@@ -379,7 +379,8 @@ public interface Channel {
         /**
          * Tells the channel to throw an
          * {@link com.github.dm.jrt.core.channel.ExecutionTimeoutException
-         * ExecutionTimeoutException} in case no result is available before the timeout has elapsed.
+         * ExecutionTimeoutException} in case, after a read method is invoked, no result is
+         * available before the timeout has elapsed.
          * <p/>
          * This is the default behavior.
          *
@@ -524,8 +525,8 @@ public interface Channel {
 
         /**
          * Consumes the first available result by waiting at the maximum for the set timeout.<br/>
-         * If the timeout elapses and the channel is not configured to throw an exception, the
-         * specified alternative output is returned.<br/>
+         * If the timeout elapses and the channel is not configured to throw an exception or abort
+         * the invocation, the specified alternative output is returned.<br/>
          * Note that this method invocation will block the calling thread until a new output is
          * available, the routine invocation completes or the timeout elapses.
          *

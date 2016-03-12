@@ -39,7 +39,7 @@ public interface IOChannelBuilder extends ChannelConfigurableBuilder<IOChannelBu
     <DATA> IOChannel<DATA> buildChannel();
 
     /**
-     * Builds and returns a synchronous I/O channel returning the specified input.<br/>
+     * Builds and returns an I/O channel returning the specified input.<br/>
      * Note that the returned channel will be already closed.
      *
      * @param input  the input.
@@ -50,7 +50,7 @@ public interface IOChannelBuilder extends ChannelConfigurableBuilder<IOChannelBu
     <DATA> IOChannel<DATA> of(@Nullable DATA input);
 
     /**
-     * Builds and returns a synchronous I/O channel returning the specified inputs.<br/>
+     * Builds and returns an I/O channel returning the specified inputs.<br/>
      * Note that the returned channel will be already closed.
      *
      * @param inputs the input data.
@@ -61,7 +61,7 @@ public interface IOChannelBuilder extends ChannelConfigurableBuilder<IOChannelBu
     <DATA> IOChannel<DATA> of(@Nullable DATA... inputs);
 
     /**
-     * Builds and returns a synchronous I/O channel returning the specified inputs.<br/>
+     * Builds and returns an I/O channel returning the specified inputs.<br/>
      * Note that the returned channel will be already closed.
      *
      * @param inputs the iterable returning the input data.

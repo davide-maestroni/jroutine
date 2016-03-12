@@ -15,7 +15,7 @@
  */
 
 /**
- * Classes and interfaces related to routine builders.
+ * Classes and interfaces related to routine and channel builders.
  * <p/>
  * Created by davide-maestroni on 09/19/2014.
  */

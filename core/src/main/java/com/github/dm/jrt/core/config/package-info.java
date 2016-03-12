@@ -15,7 +15,7 @@
  */
 
 /**
- * Classes storing routine and channel configurations.
+ * Classes handling routine and channel configurations.
  * <p/>
  * Created by davide-maestroni on 03/12/2016.
  */

@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Interface defining a result channel, that is the channel used by the routine invocation to
- * publish the results into the output channel.
+ * publish the results.
  * <p/>
  * Created by davide-maestroni on 09/15/2014.
  *

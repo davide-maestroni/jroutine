@@ -62,7 +62,8 @@ import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
  * elapses. A maximum size can additionally be set so that, when the number of buffered data
  * exceeds it, a {@link com.github.dm.jrt.core.common.DeadlockException DeadlockException} will be
  * thrown.<br/>
- * By default the delay is set to 0.<br/>
+ * By default the delay is set to 0.
+ * <p/>
  * The order of input and output data is not guaranteed. Nevertheless, it is possible to force data
  * to be delivered in the same order as they are passed to the channels, at the cost of a slightly
  * increase in memory usage and computation time.
@@ -556,8 +557,7 @@ public final class InvocationConfiguration {
         BY_CALL,
         /**
          * Order by delay.<br/>
-         * Data are passed to the invocation or the output consumer in the same order as they are
-         * passed to the channel based on their delay.
+         * Data are passed to the invocation or the output consumer based on their delay.
          */
         BY_DELAY
     }
@@ -754,7 +754,7 @@ public final class InvocationConfiguration {
         }
 
         /**
-         * Sets the configuration and returns the configured object.
+         * Applies this configuration and returns the configured object.
          *
          * @return the configured object.
          */
@@ -766,8 +766,8 @@ public final class InvocationConfiguration {
 
         /**
          * Applies the specified configuration to this builder. A null value means that all the
-         * configuration options will be reset to their default, otherwise only the set options will
-         * be applied.
+         * configuration options will be reset to their default, otherwise only the non-default
+         * options will be applied.
          *
          * @param configuration the invocation configuration.
          * @return this builder.

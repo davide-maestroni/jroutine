@@ -201,7 +201,7 @@ public final class ProxyConfiguration {
         }
 
         /**
-         * Sets the configuration and returns the configured object.
+         * Applies this configuration and returns the configured object.
          *
          * @return the configured object.
          */
@@ -213,8 +213,8 @@ public final class ProxyConfiguration {
 
         /**
          * Applies the specified configuration to this builder. A null value means that all the
-         * configuration options will be reset to their default, otherwise only the set options will
-         * be applied.
+         * configuration options will be reset to their default, otherwise only the non-default
+         * options will be applied.
          *
          * @param configuration the proxy configuration.
          * @return this builder.

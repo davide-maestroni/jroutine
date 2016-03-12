@@ -38,9 +38,9 @@ import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
  * <p/>
  * The configuration has an asynchronous runner associated.<br/>
  * The number of input data buffered in the channel can be limited in order to avoid excessive
- * memory consumption. In case the maximum number is reached when passing an input, the call blocks
- * until enough data are consumed or the specified delay elapses. A maximum size can additionally be
- * set so that, when the number of buffered data exceeds it, a
+ * memory consumption. In case the maximum number is reached when passing an input, the call will
+ * block until enough data are consumed or the specified delay elapses.<br/>
+ * A maximum size can additionally be set so that, when the number of buffered data exceeds it, a
  * {@link com.github.dm.jrt.core.common.DeadlockException DeadlockException} will be thrown.<br/>
  * By default the timeout is set to 0.<br/>
  * The order of input data is not guaranteed. Nevertheless, it is possible to force data to be
@@ -141,7 +141,7 @@ public final class ChannelConfiguration {
 
     /**
      * Returns a channel configuration builder initialized with a channel configuration converted
-     * from the specified one by applying the matching options from the invocation input channel.
+     * from the specified one by applying the matching input channel options.
      *
      * @param initialConfiguration the initial configuration.
      * @return the builder.
@@ -184,7 +184,7 @@ public final class ChannelConfiguration {
 
     /**
      * Returns a channel configuration builder initialized with a channel configuration converted
-     * from the specified one by applying the matching options from the invocation output channel.
+     * from the specified one by applying the output channel matching options.
      *
      * @param initialConfiguration the initial configuration.
      * @return the builder.
@@ -547,7 +547,7 @@ public final class ChannelConfiguration {
         }
 
         /**
-         * Sets the configuration and returns the configured object.
+         * Applies this configuration and returns the configured object.
          *
          * @return the configured object.
          */
@@ -559,8 +559,8 @@ public final class ChannelConfiguration {
 
         /**
          * Applies the specified configuration to this builder. A null value means that all the
-         * configuration options will be reset to their default, otherwise only the set options will
-         * be applied.
+         * configuration options will be reset to their default, otherwise only the non-default
+         * options will be applied.
          *
          * @param configuration the channel configuration.
          * @return this builder.
@@ -751,7 +751,7 @@ public final class ChannelConfiguration {
         /**
          * Sets the timeout for the channel instance to produce a readable output.<br/>
          * Note that this is just the initial configuration, since the output timeout can be
-         * dynamically changed through the dedicated methods.
+         * dynamically changed through the dedicated channel methods.
          *
          * @param timeout  the timeout.
          * @param timeUnit the timeout time unit.
@@ -768,7 +768,7 @@ public final class ChannelConfiguration {
          * Sets the timeout for the channel instance to produce a readable output. A null value
          * means that it is up to the specific implementation to choose a default one.<br/>
          * Note that this is just the initial configuration, since the output timeout can be
-         * dynamically changed through the dedicated methods.
+         * dynamically changed through the dedicated channel methods.
          *
          * @param timeout the timeout.
          * @return this builder.
@@ -785,7 +785,7 @@ public final class ChannelConfiguration {
          * output channel. A null value means that it is up to the specific implementation to choose
          * a default one.<br/>
          * Note that this is just the initial configuration, since the output timeout action can be
-         * dynamically changed through the dedicated methods.
+         * dynamically changed through the dedicated channel methods.
          *
          * @param actionType the action type.
          * @return this builder.

@@ -62,7 +62,7 @@ public interface Runner {
     void cancel(@NotNull Execution execution);
 
     /**
-     * Checks if the calling thread belongs to the ones employed by the runner implementation.
+     * Checks if the calling thread belongs to the ones managed by the runner implementation.
      * <p/>
      * The implementation of this method is not strictly mandatory, even if, the classes always
      * returning false effectively prevent the correct detection of possible deadlocks.<br/>

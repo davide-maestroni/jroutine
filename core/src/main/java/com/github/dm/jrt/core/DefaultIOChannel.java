@@ -23,6 +23,9 @@ import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.log.Logger;
+import com.github.dm.jrt.core.runner.Execution;
+import com.github.dm.jrt.core.runner.Runner;
+import com.github.dm.jrt.core.runner.RunnerDecorator;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.TimeDuration;
 
@@ -43,6 +46,8 @@ import java.util.concurrent.TimeUnit;
  */
 class DefaultIOChannel<DATA> implements IOChannel<DATA> {
 
+    private static final Runner sSyncRunner = Runners.syncRunner();
+
     private final DefaultResultChannel<DATA> mInputChannel;
 
     private final OutputChannel<DATA> mOutputChannel;
@@ -58,9 +63,10 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA> {
                 configuration.toOutputChannelConfiguration();
         final Logger logger = invocationConfiguration.newLogger(this);
         final ChannelAbortHandler abortHandler = new ChannelAbortHandler();
+        final IORunner runner = new IORunner(configuration.getRunnerOr(Runners.sharedRunner()));
         final DefaultResultChannel<DATA> inputChannel =
-                new DefaultResultChannel<DATA>(invocationConfiguration, abortHandler,
-                        invocationConfiguration.getRunnerOr(Runners.sharedRunner()), logger);
+                new DefaultResultChannel<DATA>(invocationConfiguration, abortHandler, runner,
+                        logger);
         abortHandler.setChannel(inputChannel);
         mInputChannel = inputChannel;
         mOutputChannel = inputChannel.getOutput();
@@ -319,6 +325,34 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA> {
         private void setChannel(@NotNull final DefaultResultChannel<?> channel) {
 
             mChannel = channel;
+        }
+    }
+
+    /**
+     * Runner decorator which run executions synchronously if delay is 0.
+     */
+    private static class IORunner extends RunnerDecorator {
+
+        /**
+         * Constructor.
+         *
+         * @param wrapped the wrapped instance.
+         */
+        public IORunner(@NotNull final Runner wrapped) {
+
+            super(wrapped);
+        }
+
+        @Override
+        public void run(@NotNull final Execution execution, final long delay,
+                @NotNull final TimeUnit timeUnit) {
+
+            if (delay == 0) {
+                sSyncRunner.run(execution, delay, timeUnit);
+
+            } else {
+                super.run(execution, delay, timeUnit);
+            }
         }
     }
 }

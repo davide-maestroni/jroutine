@@ -44,9 +44,9 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
 
     private final ReferenceQueue<Object> mQueue = new ReferenceQueue<Object>();
 
-    private AbstractSet<Entry<K, V>> mEntrySet;
+    private volatile AbstractSet<Entry<K, V>> mEntrySet;
 
-    private AbstractSet<K> mKeySet;
+    private volatile AbstractSet<K> mKeySet;
 
     /**
      * Constructor.

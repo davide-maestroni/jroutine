@@ -21,15 +21,9 @@ import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.Builder;
 import com.github.dm.jrt.core.config.ChannelConfiguration.Configurable;
-import com.github.dm.jrt.core.runner.Execution;
-import com.github.dm.jrt.core.runner.Runner;
-import com.github.dm.jrt.core.runner.RunnerDecorator;
-import com.github.dm.jrt.core.runner.Runners;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * Class implementing a builder of I/O channel objects.
@@ -37,8 +31,6 @@ import java.util.concurrent.TimeUnit;
  * Created by davide-maestroni on 10/25/2014.
  */
 class DefaultIOChannelBuilder implements IOChannelBuilder, Configurable<IOChannelBuilder> {
-
-    private static final Runner sSyncRunner = Runners.syncRunner();
 
     private ChannelConfiguration mConfiguration = ChannelConfiguration.DEFAULT_CONFIGURATION;
 
@@ -52,10 +44,7 @@ class DefaultIOChannelBuilder implements IOChannelBuilder, Configurable<IOChanne
     @NotNull
     public <DATA> IOChannel<DATA> buildChannel() {
 
-        final ChannelConfiguration configuration = mConfiguration;
-        final IORunner runner = new IORunner(configuration.getRunnerOr(Runners.sharedRunner()));
-        return new DefaultIOChannel<DATA>(
-                configuration.builderFrom().withRunner(runner).getConfigured());
+        return new DefaultIOChannel<DATA>(mConfiguration);
     }
 
     @NotNull
@@ -92,33 +81,5 @@ class DefaultIOChannelBuilder implements IOChannelBuilder, Configurable<IOChanne
     public Builder<? extends IOChannelBuilder> withChannels() {
 
         return new Builder<IOChannelBuilder>(this, mConfiguration);
-    }
-
-    /**
-     * Runner decorator which run executions synchronously if delay is 0.
-     */
-    private static class IORunner extends RunnerDecorator {
-
-        /**
-         * Constructor.
-         *
-         * @param wrapped the wrapped instance.
-         */
-        public IORunner(@NotNull final Runner wrapped) {
-
-            super(wrapped);
-        }
-
-        @Override
-        public void run(@NotNull final Execution execution, final long delay,
-                @NotNull final TimeUnit timeUnit) {
-
-            if (delay == 0) {
-                sSyncRunner.run(execution, delay, timeUnit);
-
-            } else {
-                super.run(execution, delay, timeUnit);
-            }
-        }
     }
 }

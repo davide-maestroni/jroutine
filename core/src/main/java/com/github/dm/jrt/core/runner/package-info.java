@@ -15,7 +15,7 @@
  */
 
 /**
- * Classes and interfaces related to routine runners.
+ * Classes and interfaces related to invocation runners.
  * <p/>
  * Created by davide-maestroni on 09/25/2014.
  */

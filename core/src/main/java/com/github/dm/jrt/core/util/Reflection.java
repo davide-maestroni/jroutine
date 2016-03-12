@@ -83,7 +83,7 @@ public class Reflection {
      * Finds the constructor of the specified class best matching the passed arguments.
      * <p/>
      * Note that clashing of signature is automatically avoided, since constructors are not
-     * identified by their name. Hence the best match will be always unique in the class.
+     * identified by their name. Hence the best match will always be unique in the class.
      *
      * @param type   the target class.
      * @param args   the constructor arguments.

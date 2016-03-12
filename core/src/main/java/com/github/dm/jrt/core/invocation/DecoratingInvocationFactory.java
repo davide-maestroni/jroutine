@@ -61,7 +61,9 @@ public abstract class DecoratingInvocationFactory<IN, OUT>
      *
      * @param invocation the invocation instance to decorate.
      * @return the decorated invocation.
+     * @throws java.lang.Exception if an unexpected error occurs.
      */
     @NotNull
-    protected abstract Invocation<IN, OUT> decorate(@NotNull Invocation<IN, OUT> invocation);
+    protected abstract Invocation<IN, OUT> decorate(@NotNull Invocation<IN, OUT> invocation) throws
+            Exception;
 }

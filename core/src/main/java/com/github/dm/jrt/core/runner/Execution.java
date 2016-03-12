@@ -32,7 +32,7 @@ public interface Execution extends Runnable {
      * able to cancel the execution when requested. On the other side, the runner may be unable to
      * cancel the execution in any case, based on the internal status or specific implementation.
      *
-     * @return whether the execution should be cancelable.
+     * @return whether the execution should be cancellable.
      */
     boolean canBeCancelled();
 }

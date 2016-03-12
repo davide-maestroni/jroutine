@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Scheduled thread pool executor implementing a dynamic allocation of threads.<br/>
- * When the numbers of running threads reaches the maximum pool size, further commands are queued
+ * When the number of running threads reaches the maximum pool size, further commands are queued
  * for later execution.
  * <p/>
  * Created by davide-maestroni on 01/23/2015.

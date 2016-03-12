@@ -34,7 +34,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * Each class instance wraps a supporting runner and then provides different runner instances, each
  * one enqueuing executions with a specific priority.
  * <p/>
- * Each enqueued execution will age each time an higher priority one takes the precedence, so that
+ * Each enqueued execution will age every time an higher priority one takes the precedence, so that
  * older executions slowly increases their priority. Such mechanism has been implemented to avoid
  * starvation of low priority executions. Hence, when assigning priority to different runners, it is
  * important to keep in mind that the difference between two priorities corresponds to the maximum

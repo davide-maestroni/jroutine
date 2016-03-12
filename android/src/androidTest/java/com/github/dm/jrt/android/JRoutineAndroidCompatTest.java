@@ -27,7 +27,10 @@ import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyTy
 import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
 import com.github.dm.jrt.android.core.invocation.CallContextInvocationFactories;
 import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
+import com.github.dm.jrt.android.core.log.AndroidLog;
+import com.github.dm.jrt.android.core.log.AndroidLogs;
 import com.github.dm.jrt.android.core.service.InvocationService;
+import com.github.dm.jrt.android.object.ContextInvocationTarget;
 import com.github.dm.jrt.android.proxy.annotation.LoaderProxyCompat;
 import com.github.dm.jrt.android.proxy.annotation.ServiceProxy;
 import com.github.dm.jrt.android.v4.TestActivity;
@@ -227,6 +230,37 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
                                         .all()).containsExactly("test");
     }
 
+    public void testLoaderProxyConfiguration() {
+
+        new TestClass("TEST");
+        assertThat(JRoutineAndroidCompat.withLoader(getActivity())
+                                        .onInstance(TestClass.class)
+                                        .withInvocations()
+                                        .withLog(AndroidLogs.androidLog())
+                                        .getConfigured()
+                                        .withProxies()
+                                        .withSharedFields()
+                                        .getConfigured()
+                                        .withLoaders()
+                                        .withRoutineId(11)
+                                        .getConfigured()
+                                        .buildProxy(TestAnnotatedProxy.class)
+                                        .getStringLow()
+                                        .all()).containsExactly("test");
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public void testLoaderProxyError() {
+
+        try {
+            JRoutineAndroidCompat.withLoader(getActivity()).on((ContextInvocationTarget<?>) null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
     public void testService() {
 
         final ClassToken<Pass<String>> token = new ClassToken<Pass<String>>() {};
@@ -360,6 +394,37 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
                                         .buildProxy(tokenOf(TestAnnotatedProxy.class))
                                         .getStringLow()
                                         .all()).containsExactly("test");
+    }
+
+    public void testServiceProxyConfiguration() {
+
+        new TestClass("TEST");
+        assertThat(JRoutineAndroidCompat.withService(getActivity())
+                                        .onInstance(TestClass.class)
+                                        .withInvocations()
+                                        .withLog(AndroidLogs.androidLog())
+                                        .getConfigured()
+                                        .withProxies()
+                                        .withSharedFields()
+                                        .getConfigured()
+                                        .withService()
+                                        .withLogClass(AndroidLog.class)
+                                        .getConfigured()
+                                        .buildProxy(TestAnnotatedProxy.class)
+                                        .getStringLow()
+                                        .all()).containsExactly("test");
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public void testServiceProxyError() {
+
+        try {
+            JRoutineAndroidCompat.withService(getActivity()).on((ContextInvocationTarget<?>) null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
     }
 
     @ServiceProxy(TestClass.class)

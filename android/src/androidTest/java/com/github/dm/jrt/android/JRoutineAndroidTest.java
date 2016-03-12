@@ -28,7 +28,10 @@ import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyTy
 import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
 import com.github.dm.jrt.android.core.invocation.CallContextInvocationFactories;
 import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
+import com.github.dm.jrt.android.core.log.AndroidLog;
+import com.github.dm.jrt.android.core.log.AndroidLogs;
 import com.github.dm.jrt.android.core.service.InvocationService;
+import com.github.dm.jrt.android.object.ContextInvocationTarget;
 import com.github.dm.jrt.android.proxy.annotation.LoaderProxy;
 import com.github.dm.jrt.android.proxy.annotation.ServiceProxy;
 import com.github.dm.jrt.android.v11.TestActivity;
@@ -69,7 +72,6 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     public void testLoader() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
             return;
         }
 
@@ -107,7 +109,6 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     public void testLoaderClass() throws NoSuchMethodException {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
             return;
         }
 
@@ -135,7 +136,6 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     public void testLoaderId() throws NoSuchMethodException {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
             return;
         }
 
@@ -160,7 +160,6 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     public void testLoaderInstance() throws NoSuchMethodException {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
             return;
         }
 
@@ -187,7 +186,6 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     public void testLoaderInvocation() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
             return;
         }
 
@@ -217,7 +215,6 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     public void testLoaderProxy() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
             return;
         }
 
@@ -258,10 +255,48 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                                   .all()).containsExactly("test");
     }
 
+    public void testLoaderProxyConfiguration() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
+
+        new TestClass("TEST");
+        assertThat(JRoutineAndroid.withLoader(getActivity())
+                                  .onInstance(TestClass.class)
+                                  .withInvocations()
+                                  .withLog(AndroidLogs.androidLog())
+                                  .getConfigured()
+                                  .withProxies()
+                                  .withSharedFields()
+                                  .getConfigured()
+                                  .withLoaders()
+                                  .withRoutineId(11)
+                                  .getConfigured()
+                                  .buildProxy(TestAnnotatedProxy.class)
+                                  .getStringLow()
+                                  .all()).containsExactly("test");
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public void testLoaderProxyError() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
+
+        try {
+            JRoutineAndroid.withLoader(getActivity()).on((ContextInvocationTarget<?>) null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
     public void testService() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
             return;
         }
 
@@ -292,7 +327,6 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     public void testServiceClass() throws NoSuchMethodException {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
             return;
         }
 
@@ -320,7 +354,6 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     public void testServiceInstance() throws NoSuchMethodException {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
             return;
         }
 
@@ -347,7 +380,6 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     public void testServiceInvocation() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
             return;
         }
 
@@ -377,7 +409,6 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
     public void testServiceProxy() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
             return;
         }
 
@@ -416,6 +447,45 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                                   .buildProxy(tokenOf(TestAnnotatedProxy.class))
                                   .getStringLow()
                                   .all()).containsExactly("test");
+    }
+
+    public void testServiceProxyConfiguration() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
+
+        new TestClass("TEST");
+        assertThat(JRoutineAndroid.withService(getActivity())
+                                  .onInstance(TestClass.class)
+                                  .withInvocations()
+                                  .withLog(AndroidLogs.androidLog())
+                                  .getConfigured()
+                                  .withProxies()
+                                  .withSharedFields()
+                                  .getConfigured()
+                                  .withService()
+                                  .withLogClass(AndroidLog.class)
+                                  .getConfigured()
+                                  .buildProxy(TestAnnotatedProxy.class)
+                                  .getStringLow()
+                                  .all()).containsExactly("test");
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public void testServiceProxyError() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
+
+        try {
+            JRoutineAndroid.withService(getActivity()).on((ContextInvocationTarget<?>) null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
     }
 
     @ServiceProxy(TestClass.class)

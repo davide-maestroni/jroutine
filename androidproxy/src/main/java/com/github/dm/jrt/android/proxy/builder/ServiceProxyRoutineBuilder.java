@@ -19,7 +19,7 @@ package com.github.dm.jrt.android.proxy.builder;
 import com.github.dm.jrt.android.core.builder.ServiceConfigurableBuilder;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.util.ClassToken;
-import com.github.dm.jrt.object.builder.ProxyConfiguration;
+import com.github.dm.jrt.object.config.ProxyConfiguration;
 import com.github.dm.jrt.proxy.builder.ProxyRoutineBuilder;
 
 import org.jetbrains.annotations.NotNull;

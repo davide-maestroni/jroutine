@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.object.builder;
 
-import com.github.dm.jrt.object.builder.ProxyConfiguration.Builder;
+import com.github.dm.jrt.object.config.ProxyConfiguration.Builder;
 
 import org.jetbrains.annotations.NotNull;
 

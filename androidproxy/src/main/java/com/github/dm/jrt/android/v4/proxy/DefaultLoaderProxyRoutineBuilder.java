@@ -24,7 +24,7 @@ import com.github.dm.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.util.ClassToken;
-import com.github.dm.jrt.object.builder.ProxyConfiguration;
+import com.github.dm.jrt.object.config.ProxyConfiguration;
 import com.github.dm.jrt.proxy.annotation.Proxy;
 
 import org.jetbrains.annotations.NotNull;

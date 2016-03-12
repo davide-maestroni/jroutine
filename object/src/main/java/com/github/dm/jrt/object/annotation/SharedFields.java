@@ -56,7 +56,7 @@ import java.lang.annotation.Target;
  * <p/>
  * Created by davide-maestroni on 01/26/2015.
  *
- * @see com.github.dm.jrt.object.builder.ProxyConfiguration ProxyConfiguration
+ * @see com.github.dm.jrt.object.config.ProxyConfiguration ProxyConfiguration
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

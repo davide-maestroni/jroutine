@@ -16,12 +16,13 @@
 
 package com.github.dm.jrt.object.builder;
 
-import com.github.dm.jrt.object.builder.ProxyConfiguration.Builder;
+import com.github.dm.jrt.object.config.ProxyConfiguration;
+import com.github.dm.jrt.object.config.ProxyConfiguration.Builder;
 
 import org.junit.Test;
 
-import static com.github.dm.jrt.object.builder.ProxyConfiguration.builder;
-import static com.github.dm.jrt.object.builder.ProxyConfiguration.builderFrom;
+import static com.github.dm.jrt.object.config.ProxyConfiguration.builder;
+import static com.github.dm.jrt.object.config.ProxyConfiguration.builderFrom;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 

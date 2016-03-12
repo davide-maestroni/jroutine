@@ -70,7 +70,6 @@ import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
  * Created by davide-maestroni on 11/15/2014.
  */
 public final class InvocationConfiguration {
-    // TODO: 12/03/16 move to config package?
 
     /**
      * Constant indicating the default value of an integer attribute.

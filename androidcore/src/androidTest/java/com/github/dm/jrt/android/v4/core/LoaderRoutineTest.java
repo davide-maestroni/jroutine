@@ -164,6 +164,16 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         assertThat(channel4.hasCompleted());
         JRoutineLoaderCompat.with(loaderFrom(getActivity())).onId(0).purge();
         assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
+        final OutputChannel<String> channel5 = routine.asyncCall("test");
+        assertThat(channel5.next()).isEqualTo("test");
+        assertThat(channel5.hasCompleted());
+        JRoutineLoaderCompat.with(loaderFrom(getActivity()))
+                            .on(factoryOf(PurgeContextInvocation.class))
+                            .withLoaders()
+                            .withLoaderId(0)
+                            .getConfigured()
+                            .purge("test");
+        assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
     }
 
     public void testActivityBuilderPurgeInputs() throws InterruptedException {
@@ -202,6 +212,39 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         JRoutineLoaderCompat.with(loaderFrom(getActivity()))
                             .onId(0)
                             .purge(Arrays.asList((Object) "test1", "test2"));
+        assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
+
+        final OutputChannel<String> channel8 = routine.asyncCall("test");
+        assertThat(channel8.next()).isEqualTo("test");
+        assertThat(channel8.hasCompleted());
+        JRoutineLoaderCompat.with(loaderFrom(getActivity()))
+                            .on(factoryOf(PurgeContextInvocation.class))
+                            .withLoaders()
+                            .withLoaderId(0)
+                            .getConfigured()
+                            .purge("test");
+        assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
+
+        final OutputChannel<String> channel9 = routine.asyncCall("test1", "test2");
+        assertThat(channel9.all()).containsExactly("test1", "test2");
+        assertThat(channel9.hasCompleted());
+        JRoutineLoaderCompat.with(loaderFrom(getActivity()))
+                            .on(factoryOf(PurgeContextInvocation.class))
+                            .withLoaders()
+                            .withLoaderId(0)
+                            .getConfigured()
+                            .purge("test1", "test2");
+        assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
+
+        final OutputChannel<String> channel10 = routine.asyncCall("test1", "test2");
+        assertThat(channel10.all()).containsExactly("test1", "test2");
+        assertThat(channel10.hasCompleted());
+        JRoutineLoaderCompat.with(loaderFrom(getActivity()))
+                            .on(factoryOf(PurgeContextInvocation.class))
+                            .withLoaders()
+                            .withLoaderId(0)
+                            .getConfigured()
+                            .purge(Arrays.asList("test1", "test2"));
         assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
     }
 
@@ -878,6 +921,16 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         assertThat(channel4.hasCompleted());
         JRoutineLoaderCompat.with(loaderFrom(fragment)).onId(0).purge();
         assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
+        final OutputChannel<String> channel5 = routine.asyncCall("test");
+        assertThat(channel5.next()).isEqualTo("test");
+        assertThat(channel5.hasCompleted());
+        JRoutineLoaderCompat.with(loaderFrom(fragment))
+                            .on(factoryOf(PurgeContextInvocation.class))
+                            .withLoaders()
+                            .withLoaderId(0)
+                            .getConfigured()
+                            .purge();
+        assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
     }
 
     public void testFragmentBuilderPurgeInputs() throws InterruptedException {
@@ -916,6 +969,39 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         JRoutineLoaderCompat.with(loaderFrom(fragment))
                             .onId(0)
                             .purge(Arrays.asList((Object) "test1", "test2"));
+        assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
+
+        final OutputChannel<String> channel8 = routine.asyncCall("test");
+        assertThat(channel8.next()).isEqualTo("test");
+        assertThat(channel8.hasCompleted());
+        JRoutineLoaderCompat.with(loaderFrom(fragment))
+                            .on(factoryOf(PurgeContextInvocation.class))
+                            .withLoaders()
+                            .withLoaderId(0)
+                            .getConfigured()
+                            .purge("test");
+        assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
+
+        final OutputChannel<String> channel9 = routine.asyncCall("test1", "test2");
+        assertThat(channel9.all()).containsExactly("test1", "test2");
+        assertThat(channel9.hasCompleted());
+        JRoutineLoaderCompat.with(loaderFrom(fragment))
+                            .on(factoryOf(PurgeContextInvocation.class))
+                            .withLoaders()
+                            .withLoaderId(0)
+                            .getConfigured()
+                            .purge("test1", "test2");
+        assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
+
+        final OutputChannel<String> channel10 = routine.asyncCall("test1", "test2");
+        assertThat(channel10.all()).containsExactly("test1", "test2");
+        assertThat(channel10.hasCompleted());
+        JRoutineLoaderCompat.with(loaderFrom(fragment))
+                            .on(factoryOf(PurgeContextInvocation.class))
+                            .withLoaders()
+                            .withLoaderId(0)
+                            .getConfigured()
+                            .purge(Arrays.asList("test1", "test2"));
         assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
     }
 

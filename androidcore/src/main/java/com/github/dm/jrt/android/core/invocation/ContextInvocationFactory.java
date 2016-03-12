@@ -56,7 +56,7 @@ public abstract class ContextInvocationFactory<IN, OUT> {
     @SuppressWarnings("unused")
     private ContextInvocationFactory() {
 
-        mArgs = Reflection.NO_ARGS;
+        this(null);
     }
 
     @Override

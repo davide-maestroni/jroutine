@@ -239,14 +239,14 @@ public class ContextRoutineProcessor extends RoutineProcessor {
                 getAnnotationValue(methodElement, mClashAnnotationType, "value");
         if (resolutionType != null) {
             builder.append(
-                    ".withClashResolution(com.github.dm.jrt.android.core.builder.LoaderConfiguration"
+                    ".withClashResolution(com.github.dm.jrt.android.core.config.LoaderConfiguration"
                             + ".ClashResolutionType.").append(resolutionType).append(")");
         }
 
         final Object inputResolutionType =
                 getAnnotationValue(methodElement, mInputClashAnnotationType, "value");
         if (inputResolutionType != null) {
-            builder.append(".withInputClashResolution(com.github.dm.jrt.android.core.builder"
+            builder.append(".withInputClashResolution(com.github.dm.jrt.android.core.config"
                                    + ".LoaderConfiguration" + ".ClashResolutionType.")
                    .append(resolutionType)
                    .append(")");
@@ -256,7 +256,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
                 getAnnotationValue(methodElement, mCacheAnnotationType, "value");
         if (strategyType != null) {
             builder.append(
-                    ".withCacheStrategy(com.github.dm.jrt.android.core.builder.LoaderConfiguration"
+                    ".withCacheStrategy(com.github.dm.jrt.android.core.config.LoaderConfiguration"
                             + ".CacheStrategyType.").append(strategyType).append(")");
         }
 

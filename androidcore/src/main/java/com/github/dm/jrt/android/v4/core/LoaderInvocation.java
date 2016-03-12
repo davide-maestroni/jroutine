@@ -24,9 +24,9 @@ import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.support.v4.util.SparseArrayCompat;
 
-import com.github.dm.jrt.android.core.builder.LoaderConfiguration;
-import com.github.dm.jrt.android.core.builder.LoaderConfiguration.CacheStrategyType;
-import com.github.dm.jrt.android.core.builder.LoaderConfiguration.ClashResolutionType;
+import com.github.dm.jrt.android.core.config.LoaderConfiguration;
+import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
+import com.github.dm.jrt.android.core.config.LoaderConfiguration.ClashResolutionType;
 import com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;

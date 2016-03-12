@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.android.core.builder;
 
-import com.github.dm.jrt.android.core.builder.ServiceConfiguration.Builder;
+import com.github.dm.jrt.android.core.config.ServiceConfiguration.Builder;
 
 import org.jetbrains.annotations.NotNull;
 

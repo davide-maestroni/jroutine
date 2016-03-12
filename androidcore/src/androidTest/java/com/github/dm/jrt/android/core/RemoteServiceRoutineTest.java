@@ -22,7 +22,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.test.ActivityInstrumentationTestCase2;
 
-import com.github.dm.jrt.android.core.builder.ServiceConfiguration;
+import com.github.dm.jrt.android.core.config.ServiceConfiguration;
 import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationWrapper;
 import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;

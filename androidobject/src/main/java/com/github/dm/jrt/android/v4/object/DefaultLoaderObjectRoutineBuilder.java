@@ -18,7 +18,7 @@ package com.github.dm.jrt.android.v4.object;
 
 import android.content.Context;
 
-import com.github.dm.jrt.android.core.builder.LoaderConfiguration;
+import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
 import com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory;

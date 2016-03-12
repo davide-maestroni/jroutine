@@ -26,8 +26,8 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
     public ${generatedClassName}(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.v11.core.LoaderContext context,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.object.ContextInvocationTarget<?> target,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.config.InvocationConfiguration invocationConfiguration,
-            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.builder.ProxyConfiguration proxyConfiguration,
-            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.builder.LoaderConfiguration loaderConfiguration) {
+            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.config.ProxyConfiguration proxyConfiguration,
+            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.config.LoaderConfiguration loaderConfiguration) {
 
         if (context == null) {
             throw new NullPointerException("the routine context must not be null");
@@ -142,8 +142,8 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
         @org.jetbrains.annotations.NotNull
         protected ${interfaceFullName} newProxy(
                 @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.config.InvocationConfiguration invocationConfiguration,
-                @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.builder.ProxyConfiguration proxyConfiguration,
-                @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.builder.LoaderConfiguration loaderConfiguration) {
+                @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.config.ProxyConfiguration proxyConfiguration,
+                @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.config.LoaderConfiguration loaderConfiguration) {
 
             return new ${generatedClassName}${genericTypes}(mContext, mTarget, invocationConfiguration, proxyConfiguration, loaderConfiguration);
         }

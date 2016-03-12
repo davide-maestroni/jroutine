@@ -19,7 +19,8 @@ package com.github.dm.jrt.android.core.builder;
 import android.os.Looper;
 import android.test.AndroidTestCase;
 
-import com.github.dm.jrt.android.core.builder.ServiceConfiguration.Builder;
+import com.github.dm.jrt.android.core.config.ServiceConfiguration;
+import com.github.dm.jrt.android.core.config.ServiceConfiguration.Builder;
 import com.github.dm.jrt.android.core.log.AndroidLog;
 import com.github.dm.jrt.android.core.runner.AndroidRunners;
 import com.github.dm.jrt.android.core.runner.MainRunner;
@@ -28,8 +29,8 @@ import com.github.dm.jrt.core.log.SystemLog;
 import com.github.dm.jrt.core.runner.RunnerDecorator;
 import com.github.dm.jrt.core.runner.Runners;
 
-import static com.github.dm.jrt.android.core.builder.ServiceConfiguration.builder;
-import static com.github.dm.jrt.android.core.builder.ServiceConfiguration.builderFrom;
+import static com.github.dm.jrt.android.core.config.ServiceConfiguration.builder;
+import static com.github.dm.jrt.android.core.config.ServiceConfiguration.builderFrom;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

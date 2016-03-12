@@ -22,7 +22,7 @@ import android.support.v4.util.SparseArrayCompat;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
-import com.github.dm.jrt.android.core.builder.LoaderConfiguration.CacheStrategyType;
+import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.MissingLoaderException;
 import com.github.dm.jrt.android.core.invocation.PassingCallContextInvocation;

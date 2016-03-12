@@ -1,7 +1,7 @@
 package com.github.dm.jrt.android;
 
 import com.github.dm.jrt.TargetRoutineBuilder.BuilderType;
-import com.github.dm.jrt.android.core.builder.LoaderConfiguration;
+import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.android.object.ContextInvocationTarget;
 import com.github.dm.jrt.android.object.builder.LoaderObjectRoutineBuilder;

@@ -18,9 +18,9 @@ package com.github.dm.jrt.android.object;
 
 import android.test.AndroidTestCase;
 
-import com.github.dm.jrt.android.core.builder.LoaderConfiguration;
-import com.github.dm.jrt.android.core.builder.LoaderConfiguration.CacheStrategyType;
-import com.github.dm.jrt.android.core.builder.LoaderConfiguration.ClashResolutionType;
+import com.github.dm.jrt.android.core.config.LoaderConfiguration;
+import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
+import com.github.dm.jrt.android.core.config.LoaderConfiguration.ClashResolutionType;
 import com.github.dm.jrt.android.object.annotation.CacheStrategy;
 import com.github.dm.jrt.android.object.annotation.ClashResolution;
 import com.github.dm.jrt.android.object.annotation.InputClashResolution;
@@ -29,7 +29,7 @@ import com.github.dm.jrt.android.object.annotation.ResultStaleTime;
 import com.github.dm.jrt.android.object.annotation.RoutineId;
 import com.github.dm.jrt.core.util.TimeDuration;
 
-import static com.github.dm.jrt.android.core.builder.LoaderConfiguration.builder;
+import static com.github.dm.jrt.android.core.config.LoaderConfiguration.builder;
 import static com.github.dm.jrt.android.object.AndroidBuilders.configurationWithAnnotations;
 import static org.assertj.core.api.Assertions.assertThat;
 

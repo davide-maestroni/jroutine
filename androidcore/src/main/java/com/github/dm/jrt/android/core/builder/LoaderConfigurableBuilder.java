@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.android.core.builder;
 
-import com.github.dm.jrt.android.core.builder.LoaderConfiguration.Builder;
+import com.github.dm.jrt.android.core.config.LoaderConfiguration.Builder;
 
 import org.jetbrains.annotations.NotNull;
 

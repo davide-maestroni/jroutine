@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.android.core.builder;
 
-import com.github.dm.jrt.android.core.builder.LoaderConfiguration.Builder;
+import com.github.dm.jrt.android.core.config.LoaderConfiguration.Builder;
 import com.github.dm.jrt.core.builder.ChannelConfigurableBuilder;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 

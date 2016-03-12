@@ -17,7 +17,7 @@
 package com.github.dm.jrt.android;
 
 import com.github.dm.jrt.TargetRoutineBuilder.BuilderType;
-import com.github.dm.jrt.android.core.builder.ServiceConfiguration;
+import com.github.dm.jrt.android.core.config.ServiceConfiguration;
 import com.github.dm.jrt.android.object.builder.ServiceObjectRoutineBuilder;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.object.config.ProxyConfiguration;

@@ -20,15 +20,16 @@ import android.os.Handler;
 import android.os.Looper;
 import android.test.AndroidTestCase;
 
-import com.github.dm.jrt.android.core.builder.LoaderConfiguration.Builder;
-import com.github.dm.jrt.android.core.builder.LoaderConfiguration.CacheStrategyType;
-import com.github.dm.jrt.android.core.builder.LoaderConfiguration.ClashResolutionType;
+import com.github.dm.jrt.android.core.config.LoaderConfiguration;
+import com.github.dm.jrt.android.core.config.LoaderConfiguration.Builder;
+import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
+import com.github.dm.jrt.android.core.config.LoaderConfiguration.ClashResolutionType;
 import com.github.dm.jrt.core.util.TimeDuration;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.github.dm.jrt.android.core.builder.LoaderConfiguration.builder;
-import static com.github.dm.jrt.android.core.builder.LoaderConfiguration.builderFrom;
+import static com.github.dm.jrt.android.core.config.LoaderConfiguration.builder;
+import static com.github.dm.jrt.android.core.config.LoaderConfiguration.builderFrom;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

@@ -6,14 +6,14 @@ language: android
 android:
   components:
     # Platform tools
-    - platform-tools
     - tools
+    - platform-tools
 
     # The BuildTools version
-    - build-tools-22.0.1
+    - build-tools-23.0.2
 
     # The SDK version
-    - android-22
+    - android-23
 
     # Extras
     - extra-android-support

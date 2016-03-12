@@ -622,6 +622,35 @@ public class JRoutineFacadeTest {
     }
 
     @Test
+    public void testProxyConfiguration() {
+
+        final TestClass test = new TestClass();
+        final TestItf proxy = JRoutineFacade.on(test)
+                                            .withInvocations()
+                                            .withRunner(Runners.poolRunner())
+                                            .withLogLevel(Level.DEBUG)
+                                            .withLog(new NullLog())
+                                            .getConfigured()
+                                            .withProxies()
+                                            .withSharedFields()
+                                            .getConfigured()
+                                            .buildProxy(TestItf.class);
+        assertThat(proxy.getOne().all()).containsExactly(1);
+    }
+
+    @Test
+    public void testProxyError() {
+
+        try {
+            JRoutineFacade.on(TestItf.class);
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+    }
+
+    @Test
     public void testSupplierCommand() {
 
         final Routine<Void, String> routine = JRoutineFacade.on(new Supplier<String>() {

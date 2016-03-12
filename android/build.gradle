@@ -66,7 +66,7 @@ dependencies {
     compile 'com.android.support:support-v4:22.2.1'
 }
 conditionalDependencies {
-    compile name: 'library', artifact: { it.parent.name }
+    compile name: 'lib', artifact: { it.parent.name }
     compile name: 'androidcore', artifact: { "${it.parent.name}-${it.name}" }
     compile name: 'androidobject', artifact: { "${it.parent.name}-${it.name}" }
     compile name: 'androidproxy', artifact: { "${it.parent.name}-${it.name}" }

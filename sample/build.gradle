@@ -20,7 +20,7 @@ apply from: '../extra.gradle'
 javaCompatibility = JavaVersion.VERSION_1_5
 
 dependencies {
-    compile project(':library')
+    compile project(':lib')
     testCompile 'junit:junit:4.12'
     testCompile 'org.assertj:assertj-core:1.7.1'
 }

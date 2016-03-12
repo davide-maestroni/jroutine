@@ -1,1 +1,1 @@
-include ':library', ':core', ':object', ':processor', ':proxy', ':function', ':channel', ':stream', ':android', ':androidcore', ':androidobject', ':androidprocessor', ':androidproxy', ':androidchannel', ':androidstream', ':sample'
+include ':lib', ':core', ':object', ':processor', ':proxy', ':function', ':channel', ':stream', ':android', ':androidcore', ':androidobject', ':androidprocessor', ':androidproxy', ':androidchannel', ':androidstream', ':sample'

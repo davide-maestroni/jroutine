@@ -144,7 +144,7 @@ class DefaultTargetRoutineBuilder implements TargetRoutineBuilder {
     public ProxyConfiguration.Builder<? extends TargetRoutineBuilder> withProxies() {
 
         return new ProxyConfiguration.Builder<DefaultTargetRoutineBuilder>(mProxyConfigurable,
-                                                                         mProxyConfiguration);
+                mProxyConfiguration);
     }
 
     @NotNull

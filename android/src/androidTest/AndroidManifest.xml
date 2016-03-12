@@ -18,20 +18,20 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.github.dm.jrt.android">
 
-  <application
-      android:name=".app.TestApp"
-      android:label="jroutine-android">
-    <activity
-        android:name="com.github.dm.jrt.android.v11.TestActivity"
-        android:label="test">
-    </activity>
-    <activity
-        android:name="com.github.dm.jrt.android.v4.TestActivity"
-        android:label="test">
-    </activity>
+    <application
+        android:name=".app.TestApp"
+        android:label="jroutine-android">
+        <activity
+            android:name="com.github.dm.jrt.android.v11.TestActivity"
+            android:label="test">
+        </activity>
+        <activity
+            android:name="com.github.dm.jrt.android.v4.TestActivity"
+            android:label="test">
+        </activity>
 
-    <service
-        android:name="com.github.dm.jrt.android.core.service.InvocationService"/>
-  </application>
+        <service
+            android:name="com.github.dm.jrt.android.core.service.InvocationService"/>
+    </application>
 
 </manifest>

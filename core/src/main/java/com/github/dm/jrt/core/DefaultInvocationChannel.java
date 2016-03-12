@@ -150,7 +150,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         }, runner, logger);
         mExecution =
                 new InvocationExecution<IN, OUT>(manager, new DefaultInputIterator(), mResultChanel,
-                                                 logger);
+                        logger);
         mState = new InputChannelState();
     }
 
@@ -1373,7 +1373,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         public void onConsumeStart() {
 
             mSubLogger.wrn("avoiding consuming input since invocation is complete [#%d]",
-                           mPendingExecutionCount);
+                    mPendingExecutionCount);
         }
 
         @Nullable

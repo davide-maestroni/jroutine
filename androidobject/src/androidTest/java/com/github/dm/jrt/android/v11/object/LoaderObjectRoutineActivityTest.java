@@ -282,8 +282,7 @@ public class LoaderObjectRoutineActivityTest
         try {
 
             new DefaultLoaderObjectRoutineBuilder(loaderFrom(getActivity()),
-                                                  instanceOf(TestClass.class)).setConfiguration(
-                    (InvocationConfiguration) null);
+                    instanceOf(TestClass.class)).setConfiguration((InvocationConfiguration) null);
 
             fail();
 
@@ -294,8 +293,7 @@ public class LoaderObjectRoutineActivityTest
         try {
 
             new DefaultLoaderObjectRoutineBuilder(loaderFrom(getActivity()),
-                                                  instanceOf(TestClass.class)).setConfiguration(
-                    (ProxyConfiguration) null);
+                    instanceOf(TestClass.class)).setConfiguration((ProxyConfiguration) null);
 
             fail();
 
@@ -306,8 +304,7 @@ public class LoaderObjectRoutineActivityTest
         try {
 
             new DefaultLoaderObjectRoutineBuilder(loaderFrom(getActivity()),
-                                                  instanceOf(TestClass.class)).setConfiguration(
-                    (LoaderConfiguration) null);
+                    instanceOf(TestClass.class)).setConfiguration((LoaderConfiguration) null);
 
             fail();
 
@@ -848,10 +845,10 @@ public class LoaderObjectRoutineActivityTest
         assertThat(itf.add5(channel4).all()).containsOnly((int) 'd', (int) 'e', (int) 'f');
         assertThat(itf.add6().pass('d').result().all()).containsOnly((int) 'd');
         assertThat(itf.add7().pass('d', 'e', 'f').result().all()).containsOnly((int) 'd', (int) 'e',
-                                                                               (int) 'f');
+                (int) 'f');
         assertThat(itf.add10().asyncCall('d').all()).containsOnly((int) 'd');
         assertThat(itf.add11().parallelCall('d', 'e', 'f').all()).containsOnly((int) 'd', (int) 'e',
-                                                                               (int) 'f');
+                (int) 'f');
         assertThat(itf.addA00(new char[]{'c', 'z'})).isEqualTo(new int[]{'c', 'z'});
         final IOChannel<char[]> channel5 = JRoutineCore.io().buildChannel();
         channel5.pass(new char[]{'a', 'z'}).close();
@@ -862,7 +859,7 @@ public class LoaderObjectRoutineActivityTest
         final IOChannel<char[]> channel7 = JRoutineCore.io().buildChannel();
         channel7.pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'}).close();
         assertThat(itf.addA03(channel7)).isIn(new int[]{'d', 'z'}, new int[]{'e', 'z'},
-                                              new int[]{'f', 'z'});
+                new int[]{'f', 'z'});
         assertThat(itf.addA04(new char[]{'c', 'z'}).all()).containsExactly(new int[]{'c', 'z'});
         final IOChannel<char[]> channel8 = JRoutineCore.io().buildChannel();
         channel8.pass(new char[]{'a', 'z'}).close();
@@ -873,8 +870,7 @@ public class LoaderObjectRoutineActivityTest
         final IOChannel<char[]> channel10 = JRoutineCore.io().buildChannel();
         channel10.pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'}).close();
         assertThat(itf.addA07(channel10).all()).containsOnly(new int[]{'d', 'z'},
-                                                             new int[]{'e', 'z'},
-                                                             new int[]{'f', 'z'});
+                new int[]{'e', 'z'}, new int[]{'f', 'z'});
         assertThat(itf.addA08(new char[]{'c', 'z'}).all()).containsExactly((int) 'c', (int) 'z');
         final IOChannel<char[]> channel11 = JRoutineCore.io().buildChannel();
         channel11.pass(new char[]{'a', 'z'}).close();
@@ -885,35 +881,35 @@ public class LoaderObjectRoutineActivityTest
         final IOChannel<char[]> channel13 = JRoutineCore.io().buildChannel();
         channel13.pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'}).close();
         assertThat(itf.addA11(channel13).all()).containsOnly((int) 'd', (int) 'e', (int) 'f',
-                                                             (int) 'z');
+                (int) 'z');
         assertThat(itf.addA12().pass(new char[]{'c', 'z'}).result().all()).containsOnly(
                 new int[]{'c', 'z'});
         assertThat(itf.addA13()
                       .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
                       .result()
                       .all()).containsOnly(new int[]{'d', 'z'}, new int[]{'e', 'z'},
-                                           new int[]{'f', 'z'});
+                new int[]{'f', 'z'});
         assertThat(itf.addA14().asyncCall(new char[]{'c', 'z'}).all()).containsOnly(
                 new int[]{'c', 'z'});
         assertThat(itf.addA15()
                       .parallelCall(new char[]{'d', 'z'}, new char[]{'e', 'z'},
-                                    new char[]{'f', 'z'})
+                              new char[]{'f', 'z'})
                       .all()).containsOnly(new int[]{'d', 'z'}, new int[]{'e', 'z'},
-                                           new int[]{'f', 'z'});
+                new int[]{'f', 'z'});
         assertThat(itf.addA16().pass(new char[]{'c', 'z'}).result().all()).containsExactly(
                 (int) 'c', (int) 'z');
         assertThat(itf.addA17()
                       .pass(new char[]{'d', 'z'}, new char[]{'e', 'z'}, new char[]{'f', 'z'})
                       .result()
                       .all()).containsOnly((int) 'd', (int) 'z', (int) 'e', (int) 'z', (int) 'f',
-                                           (int) 'z');
+                (int) 'z');
         assertThat(itf.addA18().asyncCall(new char[]{'c', 'z'}).all()).containsExactly((int) 'c',
-                                                                                       (int) 'z');
+                (int) 'z');
         assertThat(itf.addA19()
                       .parallelCall(new char[]{'d', 'z'}, new char[]{'e', 'z'},
-                                    new char[]{'f', 'z'})
+                              new char[]{'f', 'z'})
                       .all()).containsOnly((int) 'd', (int) 'z', (int) 'e', (int) 'z', (int) 'f',
-                                           (int) 'z');
+                (int) 'z');
         assertThat(itf.addL00(Arrays.asList('c', 'z'))).isEqualTo(
                 Arrays.asList((int) 'c', (int) 'z'));
         final IOChannel<List<Character>> channel20 = JRoutineCore.io().buildChannel();
@@ -926,8 +922,7 @@ public class LoaderObjectRoutineActivityTest
         channel22.pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
                  .close();
         assertThat(itf.addL03(channel22)).isIn(Arrays.asList((int) 'd', (int) 'z'),
-                                               Arrays.asList((int) 'e', (int) 'z'),
-                                               Arrays.asList((int) 'f', (int) 'z'));
+                Arrays.asList((int) 'e', (int) 'z'), Arrays.asList((int) 'f', (int) 'z'));
         assertThat(itf.addL04(Arrays.asList('c', 'z')).all()).containsExactly(
                 Arrays.asList((int) 'c', (int) 'z'));
         final IOChannel<List<Character>> channel23 = JRoutineCore.io().buildChannel();
@@ -942,8 +937,7 @@ public class LoaderObjectRoutineActivityTest
         channel25.pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
                  .close();
         assertThat(itf.addL07(channel25).all()).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
-                                                             Arrays.asList((int) 'e', (int) 'z'),
-                                                             Arrays.asList((int) 'f', (int) 'z'));
+                Arrays.asList((int) 'e', (int) 'z'), Arrays.asList((int) 'f', (int) 'z'));
         assertThat(itf.addL08(Arrays.asList('c', 'z')).all()).containsExactly((int) 'c', (int) 'z');
         final IOChannel<List<Character>> channel26 = JRoutineCore.io().buildChannel();
         channel26.pass(Arrays.asList('a', 'z')).close();
@@ -955,39 +949,37 @@ public class LoaderObjectRoutineActivityTest
         channel28.pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'), Arrays.asList('f', 'z'))
                  .close();
         assertThat(itf.addL11(channel28).all()).containsOnly((int) 'd', (int) 'e', (int) 'f',
-                                                             (int) 'z');
+                (int) 'z');
         assertThat(itf.addL12().pass(Arrays.asList('c', 'z')).result().all()).containsOnly(
                 Arrays.asList((int) 'c', (int) 'z'));
         assertThat(itf.addL13()
                       .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'),
-                            Arrays.asList('f', 'z'))
+                              Arrays.asList('f', 'z'))
                       .result()
                       .all()).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
-                                           Arrays.asList((int) 'e', (int) 'z'),
-                                           Arrays.asList((int) 'f', (int) 'z'));
+                Arrays.asList((int) 'e', (int) 'z'), Arrays.asList((int) 'f', (int) 'z'));
         assertThat(itf.addL14().asyncCall(Arrays.asList('c', 'z')).all()).containsOnly(
                 Arrays.asList((int) 'c', (int) 'z'));
         assertThat(itf.addL15()
                       .parallelCall(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'),
-                                    Arrays.asList('f', 'z'))
+                              Arrays.asList('f', 'z'))
                       .all()).containsOnly(Arrays.asList((int) 'd', (int) 'z'),
-                                           Arrays.asList((int) 'e', (int) 'z'),
-                                           Arrays.asList((int) 'f', (int) 'z'));
+                Arrays.asList((int) 'e', (int) 'z'), Arrays.asList((int) 'f', (int) 'z'));
         assertThat(itf.addL16().pass(Arrays.asList('c', 'z')).result().all()).containsExactly(
                 (int) 'c', (int) 'z');
         assertThat(itf.addL17()
                       .pass(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'),
-                            Arrays.asList('f', 'z'))
+                              Arrays.asList('f', 'z'))
                       .result()
                       .all()).containsOnly((int) 'd', (int) 'z', (int) 'e', (int) 'z', (int) 'f',
-                                           (int) 'z');
+                (int) 'z');
         assertThat(itf.addL18().asyncCall(Arrays.asList('c', 'z')).all()).containsExactly((int) 'c',
-                                                                                          (int) 'z');
+                (int) 'z');
         assertThat(itf.addL19()
                       .parallelCall(Arrays.asList('d', 'z'), Arrays.asList('e', 'z'),
-                                    Arrays.asList('f', 'z'))
+                              Arrays.asList('f', 'z'))
                       .all()).containsOnly((int) 'd', (int) 'z', (int) 'e', (int) 'z', (int) 'f',
-                                           (int) 'z');
+                (int) 'z');
         assertThat(itf.get0()).isEqualTo(31);
         assertThat(itf.get1().all()).containsExactly(31);
         assertThat(itf.get2().result().all()).containsExactly(31);
@@ -1061,7 +1053,7 @@ public class LoaderObjectRoutineActivityTest
         final IOChannel<Integer> channel2 = JRoutineCore.io().buildChannel();
         channel2.pass(1, 2, 3).close();
         assertThat(squareAsync.computeParallel(channel2).afterMax(timeout).all()).containsOnly(1, 4,
-                                                                                               9);
+                9);
     }
 
     public void testSharedFields() throws NoSuchMethodException {

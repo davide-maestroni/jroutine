@@ -96,8 +96,7 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
                                  .on(factoryOf(PassingStringInvocation.class, 3))
                                  .buildRoutine();
         assertThat(routine.asyncCall("test").afterMax(seconds(10)).all()).containsExactly("test",
-                                                                                          "test",
-                                                                                          "test");
+                "test", "test");
         routine.purge();
         routine = JRoutineService.with(serviceFrom(getActivity()))
                                  .on(factoryOf(tokenOf(PassingStringInvocation.class)))
@@ -108,8 +107,7 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
                                  .on(factoryOf(tokenOf(PassingStringInvocation.class), 3))
                                  .buildRoutine();
         assertThat(routine.asyncCall("test").afterMax(seconds(10)).all()).containsExactly("test",
-                                                                                          "test",
-                                                                                          "test");
+                "test", "test");
         routine.purge();
     }
 

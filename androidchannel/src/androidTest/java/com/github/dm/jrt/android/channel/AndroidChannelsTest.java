@@ -105,8 +105,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
                        .pass(new ParcelableSelectable<Integer>(5, 17))
                        .close();
         assertThat(channel1.result().afterMax(seconds(10)).all()).containsExactly("test1", "test2",
-                                                                                  "test3", "test4",
-                                                                                  "test5");
+                "test3", "test4", "test5");
         assertThat(channel2.result().afterMax(seconds(10)).all()).containsExactly(1, 2, 3, 4, 5);
     }
 
@@ -351,10 +350,9 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
                        .pass(Collections.singletonList("test3-1"))
                        .close();
         assertThat(channel1.result().afterMax(seconds(10)).all()).containsExactly("test1-1",
-                                                                                  "test2-1",
-                                                                                  "test3-1");
+                "test2-1", "test3-1");
         assertThat(channel2.result().afterMax(seconds(10)).all()).containsExactly("test1-2",
-                                                                                  "test2-2");
+                "test2-2");
     }
 
     public void testDistributeAbort() {
@@ -485,7 +483,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
                        .close();
         final String placeholder = "placeholder";
         AndroidChannels.distribute((Object) placeholder,
-                                   Arrays.<InputChannel<?>>asList(channel1, channel2))
+                Arrays.<InputChannel<?>>asList(channel1, channel2))
                        .build()
                        .pass(Arrays.asList("test2-1", "test2-2"))
                        .close();
@@ -494,11 +492,9 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
                        .pass(Collections.singletonList("test3-1"))
                        .close();
         assertThat(channel1.result().afterMax(seconds(10)).all()).containsExactly("test1-1",
-                                                                                  "test2-1",
-                                                                                  "test3-1");
+                "test2-1", "test3-1");
         assertThat(channel2.result().afterMax(seconds(10)).all()).containsExactly("test1-2",
-                                                                                  "test2-2",
-                                                                                  placeholder);
+                "test2-2", placeholder);
     }
 
     public void testDistributePlaceholderAbort() {
@@ -653,9 +649,9 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         AndroidChannels.toSelectable(channel.asInput(), 33)
                        .build()
                        .pass(new ParcelableSelectable<String>("test1", 33),
-                             new ParcelableSelectable<String>("test2", -33),
-                             new ParcelableSelectable<String>("test3", 33),
-                             new ParcelableSelectable<String>("test4", 333))
+                               new ParcelableSelectable<String>("test2", -33),
+                               new ParcelableSelectable<String>("test3", 33),
+                               new ParcelableSelectable<String>("test4", 333))
                        .close();
         channel.close();
         assertThat(channel.afterMax(seconds(10)).all()).containsExactly("test1", "test3");
@@ -859,9 +855,9 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         try {
 
             routine.asyncCall(AndroidChannels.join(new Object(),
-                                                   Arrays.<OutputChannel<?>>asList(channel1,
-                                                                                   channel2))
-                                             .build()).afterMax(seconds(10)).all();
+                    Arrays.<OutputChannel<?>>asList(channel1, channel2)).build())
+                   .afterMax(seconds(10))
+                   .all();
 
             fail();
 
@@ -925,11 +921,9 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         channel2.close();
 
         assertThat(channelMap.get(Sort.STRING).afterMax(seconds(10)).all()).containsExactly("0",
-                                                                                            "1",
-                                                                                            "2",
-                                                                                            "3");
+                "1", "2", "3");
         assertThat(channelMap.get(Sort.INTEGER).afterMax(seconds(10)).all()).containsExactly(0, 1,
-                                                                                             2, 3);
+                2, 3);
     }
 
     @SuppressWarnings("unchecked")
@@ -1140,18 +1134,18 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         Map<Integer, OutputChannel<Object>> channelMap;
         OutputChannel<ParcelableSelectable<Object>> channel;
         channel = routine.asyncCall(new ParcelableSelectable<Object>("test21", Sort.STRING),
-                                    new ParcelableSelectable<Object>(-11, Sort.INTEGER));
+                new ParcelableSelectable<Object>(-11, Sort.INTEGER));
         channelMap =
                 AndroidChannels.select(channel, Arrays.asList(Sort.INTEGER, Sort.STRING)).build();
         assertThat(channelMap.get(Sort.INTEGER).afterMax(seconds(10)).all()).containsOnly(-11);
         assertThat(channelMap.get(Sort.STRING).afterMax(seconds(10)).all()).containsOnly("test21");
         channel = routine.asyncCall(new ParcelableSelectable<Object>(-11, Sort.INTEGER),
-                                    new ParcelableSelectable<Object>("test21", Sort.STRING));
+                new ParcelableSelectable<Object>("test21", Sort.STRING));
         channelMap = AndroidChannels.select(channel, Sort.INTEGER, Sort.STRING).build();
         assertThat(channelMap.get(Sort.INTEGER).afterMax(seconds(10)).all()).containsOnly(-11);
         assertThat(channelMap.get(Sort.STRING).afterMax(seconds(10)).all()).containsOnly("test21");
         channel = routine.asyncCall(new ParcelableSelectable<Object>("test21", Sort.STRING),
-                                    new ParcelableSelectable<Object>(-11, Sort.INTEGER));
+                new ParcelableSelectable<Object>(-11, Sort.INTEGER));
         channelMap =
                 AndroidChannels.select(Math.min(Sort.INTEGER, Sort.STRING), 2, channel).build();
         assertThat(channelMap.get(Sort.INTEGER).afterMax(seconds(10)).all()).containsOnly(-11);
@@ -1170,7 +1164,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         channel = routine.asyncInvoke()
                          .after(millis(100))
                          .pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
-                               new ParcelableSelectable<Object>(-11, Sort.INTEGER))
+                                 new ParcelableSelectable<Object>(-11, Sort.INTEGER))
                          .result();
         channelMap =
                 AndroidChannels.select(channel, Arrays.asList(Sort.INTEGER, Sort.STRING)).build();
@@ -1199,7 +1193,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         channel = routine.asyncInvoke()
                          .after(millis(100))
                          .pass(new ParcelableSelectable<Object>(-11, Sort.INTEGER),
-                               new ParcelableSelectable<Object>("test21", Sort.STRING))
+                                 new ParcelableSelectable<Object>("test21", Sort.STRING))
                          .result();
         channelMap = AndroidChannels.select(channel, Sort.INTEGER, Sort.STRING).build();
         channel.abort();
@@ -1227,7 +1221,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         channel = routine.asyncInvoke()
                          .after(millis(100))
                          .pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
-                               new ParcelableSelectable<Object>(-11, Sort.INTEGER))
+                                 new ParcelableSelectable<Object>(-11, Sort.INTEGER))
                          .result();
         channelMap =
                 AndroidChannels.select(Math.min(Sort.INTEGER, Sort.STRING), 2, channel).build();
@@ -1276,9 +1270,9 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         final OutputChannel<String> outputChannel =
                 AndroidChannels.select(channel, 33).build().get(33);
         channel.pass(new ParcelableSelectable<String>("test1", 33),
-                     new ParcelableSelectable<String>("test2", -33),
-                     new ParcelableSelectable<String>("test3", 33),
-                     new ParcelableSelectable<String>("test4", 333));
+                new ParcelableSelectable<String>("test2", -33),
+                new ParcelableSelectable<String>("test3", 33),
+                new ParcelableSelectable<String>("test4", 333));
         channel.close();
         assertThat(outputChannel.afterMax(seconds(10)).all()).containsExactly("test1", "test3");
     }

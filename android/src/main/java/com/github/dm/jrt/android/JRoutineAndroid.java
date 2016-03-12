@@ -142,7 +142,7 @@ public class JRoutineAndroid extends SparseChannels {
          * @param <IN>            the input data type.
          * @param <OUT>           the output data type.
          * @return the routine builder instance.
-         * @throws IllegalArgumentException if no default constructor was found.
+         * @throws java.lang.IllegalArgumentException if no default constructor was found.
          */
         @NotNull
         public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
@@ -166,8 +166,8 @@ public class JRoutineAndroid extends SparseChannels {
          * @param <IN>            the input data type.
          * @param <OUT>           the output data type.
          * @return the routine builder instance.
-         * @throws IllegalArgumentException if no constructor taking the specified objects
-         *                                  as parameters was found.
+         * @throws java.lang.IllegalArgumentException if no constructor taking the specified objects
+         *                                            as parameters was found.
          */
         @NotNull
         public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
@@ -185,7 +185,7 @@ public class JRoutineAndroid extends SparseChannels {
          * @param <IN>            the input data type.
          * @param <OUT>           the output data type.
          * @return the routine builder instance.
-         * @throws IllegalArgumentException if no default constructor was found.
+         * @throws java.lang.IllegalArgumentException if no default constructor was found.
          */
         @NotNull
         public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
@@ -210,8 +210,8 @@ public class JRoutineAndroid extends SparseChannels {
          * @param <IN>            the input data type.
          * @param <OUT>           the output data type.
          * @return the routine builder instance.
-         * @throws IllegalArgumentException if no constructor taking the specified objects
-         *                                  as parameters was found.
+         * @throws java.lang.IllegalArgumentException if no constructor taking the specified objects
+         *                                            as parameters was found.
          */
         @NotNull
         public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(

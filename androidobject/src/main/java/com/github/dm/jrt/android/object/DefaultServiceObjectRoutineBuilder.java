@@ -21,8 +21,8 @@ import android.content.Context;
 import com.github.dm.jrt.android.core.JRoutineService;
 import com.github.dm.jrt.android.core.ServiceContext;
 import com.github.dm.jrt.android.core.TargetInvocationFactory;
-import com.github.dm.jrt.android.core.config.ServiceConfiguration;
 import com.github.dm.jrt.android.core.builder.ServiceRoutineBuilder;
+import com.github.dm.jrt.android.core.config.ServiceConfiguration;
 import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
 import com.github.dm.jrt.android.object.builder.ServiceObjectRoutineBuilder;
 import com.github.dm.jrt.core.channel.ResultChannel;
@@ -188,7 +188,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         }
 
         final Object proxy = Proxy.newProxyInstance(itf.getClassLoader(), new Class[]{itf},
-                                                    new ProxyInvocationHandler(this));
+                new ProxyInvocationHandler(this));
         return itf.cast(proxy);
     }
 
@@ -463,7 +463,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             }
 
             callFromInvocation(mMutex, targetInstance, mTargetMethod, objects, result, mInputMode,
-                               mOutputMode);
+                    mOutputMode);
         }
 
         @Override
@@ -520,8 +520,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             final List<String> sharedFields =
                     fieldsWithShareAnnotation(mProxyConfiguration, method);
             final Object[] factoryArgs = asArgs(sharedFields, target, targetMethod.getName(),
-                                                toNames(targetParameterTypes), inputMode,
-                                                outputMode);
+                    toNames(targetParameterTypes), inputMode, outputMode);
             final TargetInvocationFactory<Object, Object> factory =
                     factoryOf(ProxyInvocation.class, factoryArgs);
             final InvocationConfiguration invocationConfiguration =
@@ -536,7 +535,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                                                            .getConfigured()
                                                            .buildRoutine();
             return invokeRoutine(routine, method, asArgs(args), methodInfo.invocationMode,
-                                 inputMode, outputMode);
+                    inputMode, outputMode);
         }
     }
 

@@ -102,7 +102,7 @@ class DefaultLoaderChannelBuilder
                 loaderConfiguration.getInputClashResolutionTypeOr(null);
         if (inputResolutionType != null) {
             logger.wrn("the specified input clash resolution type will be ignored: %s",
-                       inputResolutionType);
+                    inputResolutionType);
         }
 
         final TimeDuration resultStaleTime = loaderConfiguration.getResultStaleTimeOr(null);
@@ -138,8 +138,9 @@ class DefaultLoaderChannelBuilder
             }
 
             AndroidRunners.mainRunner()
-                          .run(new PurgeInputsExecution(context, mLoaderConfiguration.getLoaderIdOr(
-                                  LoaderConfiguration.AUTO), inputList), 0, TimeUnit.MILLISECONDS);
+                          .run(new PurgeInputsExecution(context,
+                                  mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO),
+                                  inputList), 0, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -148,8 +149,9 @@ class DefaultLoaderChannelBuilder
         final LoaderContext context = mContext;
         if (context.getComponent() != null) {
             AndroidRunners.mainRunner()
-                          .run(new PurgeExecution(context, mLoaderConfiguration.getLoaderIdOr(
-                                  LoaderConfiguration.AUTO)), 0, TimeUnit.MILLISECONDS);
+                          .run(new PurgeExecution(context,
+                                  mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO)), 0,
+                                  TimeUnit.MILLISECONDS);
         }
     }
 
@@ -159,8 +161,9 @@ class DefaultLoaderChannelBuilder
         if (context.getComponent() != null) {
             final List<Object> inputList = Collections.singletonList(input);
             AndroidRunners.mainRunner()
-                          .run(new PurgeInputsExecution(context, mLoaderConfiguration.getLoaderIdOr(
-                                  LoaderConfiguration.AUTO), inputList), 0, TimeUnit.MILLISECONDS);
+                          .run(new PurgeInputsExecution(context,
+                                  mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO),
+                                  inputList), 0, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -178,8 +181,9 @@ class DefaultLoaderChannelBuilder
             }
 
             AndroidRunners.mainRunner()
-                          .run(new PurgeInputsExecution(context, mLoaderConfiguration.getLoaderIdOr(
-                                  LoaderConfiguration.AUTO), inputList), 0, TimeUnit.MILLISECONDS);
+                          .run(new PurgeInputsExecution(context,
+                                  mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO),
+                                  inputList), 0, TimeUnit.MILLISECONDS);
         }
     }
 

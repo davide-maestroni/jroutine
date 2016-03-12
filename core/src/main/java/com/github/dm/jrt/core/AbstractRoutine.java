@@ -146,7 +146,7 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
             if (mParallelRoutine == null) {
                 mParallelRoutine =
                         new AbstractRoutine<IN, OUT>(mConfiguration, mSyncRunner, mAsyncRunner,
-                                                     mLogger) {
+                                mLogger) {
 
                             @NotNull
                             @Override
@@ -255,7 +255,7 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
         if (type == InvocationType.ASYNC) {
             if (mAsyncManager == null) {
                 mAsyncManager = new DefaultInvocationManager(type, mAsyncRunner, mAsyncInvocations,
-                                                             mSyncInvocations);
+                        mSyncInvocations);
             }
 
             return mAsyncManager;
@@ -263,7 +263,7 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
 
         if (mSyncManager == null) {
             mSyncManager = new DefaultInvocationManager(type, mSyncRunner, mSyncInvocations,
-                                                        mAsyncInvocations);
+                    mAsyncInvocations);
         }
 
         return mSyncManager;
@@ -276,7 +276,7 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
         logger.dbg("invoking routine: %s", type);
         final Runner runner = (type == InvocationType.ASYNC) ? mAsyncRunner : mSyncRunner;
         return new DefaultInvocationChannel<IN, OUT>(mConfiguration, getInvocationManager(type),
-                                                     runner, logger);
+                runner, logger);
     }
 
     /**
@@ -428,12 +428,12 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
                 final LinkedList<Invocation<IN, OUT>> fallbackInvocations = mFallbackInvocations;
                 if ((primaryInvocations.size() + fallbackInvocations.size()) < coreInvocations) {
                     logger.dbg("recycling %s invocation instance [%d/%d]: %s", mInvocationType,
-                               primaryInvocations.size() + 1, coreInvocations, invocation);
+                            primaryInvocations.size() + 1, coreInvocations, invocation);
                     primaryInvocations.add(invocation);
 
                 } else {
                     logger.wrn("discarding %s invocation instance [%d/%d]: %s", mInvocationType,
-                               coreInvocations, coreInvocations, invocation);
+                            coreInvocations, coreInvocations, invocation);
                     try {
                         invocation.onDestroy();
 
@@ -478,8 +478,8 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
                         if (!invocations.isEmpty()) {
                             invocation = invocations.removeFirst();
                             mLogger.dbg("reusing %s invocation instance [%d/%d]: %s",
-                                        invocationType, invocations.size() + 1, coreInvocations,
-                                        invocation);
+                                    invocationType, invocations.size() + 1, coreInvocations,
+                                    invocation);
 
                         } else {
                             final LinkedList<Invocation<IN, OUT>> fallbackInvocations =
@@ -488,13 +488,13 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
                                 final Invocation<IN, OUT> convertInvocation =
                                         fallbackInvocations.removeFirst();
                                 mLogger.dbg("converting %s invocation instance [%d/%d]: %s",
-                                            invocationType, invocations.size() + 1, coreInvocations,
-                                            convertInvocation);
+                                        invocationType, invocations.size() + 1, coreInvocations,
+                                        convertInvocation);
                                 invocation = convertInvocation(convertInvocation, invocationType);
 
                             } else {
                                 mLogger.dbg("creating %s invocation instance [1/%d]",
-                                            invocationType, coreInvocations);
+                                        invocationType, coreInvocations);
                                 invocation = newInvocation(invocationType);
                             }
                         }
@@ -518,8 +518,8 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
                     invocationObserver.onCreate(invocation);
 
                 } else {
-                    invocationObserver.onError((error != null) ? error : new NullPointerException(
-                            "null invocation returned"));
+                    invocationObserver.onError((error != null) ? error
+                            : new NullPointerException("null invocation returned"));
                 }
 
             } catch (final InvocationInterruptedException e) {
@@ -527,7 +527,7 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
 
             } catch (final Throwable t) {
                 mLogger.err(t, "error while creating a new invocation instance [%d]",
-                            mMaxInvocations);
+                        mMaxInvocations);
                 invocationObserver.onError(t);
             }
         }

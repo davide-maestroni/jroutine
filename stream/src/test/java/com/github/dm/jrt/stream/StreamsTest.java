@@ -78,7 +78,7 @@ public class StreamsTest {
                           .build()
                           .afterMax(seconds(1))
                           .all()).containsOnly("test1", "test2", "test3", "test4", "test5",
-                                               "test6");
+                "test6");
     }
 
     @Test
@@ -197,14 +197,14 @@ public class StreamsTest {
                           .build()
                           .afterMax(seconds(1))
                           .all()).containsExactly("test4", "test5", "test6", "test1", "test2",
-                                                  "test3");
+                "test3");
         channel1 = Streams.streamOf("test1", "test2", "test3");
         channel2 = Streams.streamOf("test4", "test5", "test6");
         assertThat(Streams.concat(Arrays.<StreamChannel<?>>asList(channel1, channel2))
                           .build()
                           .afterMax(seconds(1))
                           .all()).containsExactly("test1", "test2", "test3", "test4", "test5",
-                                                  "test6");
+                "test6");
     }
 
     @Test
@@ -328,7 +328,7 @@ public class StreamsTest {
                           .getConfigured()
                           .build()
                           .all()).containsExactly("test4", "test5", "test6", "test1", "test2",
-                                                  "test3");
+                "test3");
     }
 
     @Test
@@ -380,8 +380,7 @@ public class StreamsTest {
                 });
             }
         }).asyncCall("test1", "test2", "test3").afterMax(seconds(3)).all()).containsExactly("TEST1",
-                                                                                            "TEST2",
-                                                                                            "TEST3");
+                "TEST2", "TEST3");
 
         try {
 
@@ -471,9 +470,8 @@ public class StreamsTest {
                           .map(Streams.<Number>groupBy(3))
                           .afterMax(seconds(3))
                           .all()).containsExactly(Arrays.<Number>asList(1, 2, 3),
-                                                  Arrays.<Number>asList(4, 5, 6),
-                                                  Arrays.<Number>asList(7, 8, 9),
-                                                  Collections.<Number>singletonList(10));
+                Arrays.<Number>asList(4, 5, 6), Arrays.<Number>asList(7, 8, 9),
+                Collections.<Number>singletonList(10));
         assertThat(Streams.streamOf()
                           .sync()
                           .then(range(1, 10))
@@ -531,9 +529,8 @@ public class StreamsTest {
                           .map(Streams.<Number>groupBy(3, 0))
                           .afterMax(seconds(3))
                           .all()).containsExactly(Arrays.<Number>asList(1, 2, 3),
-                                                  Arrays.<Number>asList(4, 5, 6),
-                                                  Arrays.<Number>asList(7, 8, 9),
-                                                  Arrays.<Number>asList(10, 0, 0));
+                Arrays.<Number>asList(4, 5, 6), Arrays.<Number>asList(7, 8, 9),
+                Arrays.<Number>asList(10, 0, 0));
         assertThat(Streams.streamOf()
                           .sync()
                           .then(range(1, 10))
@@ -549,9 +546,8 @@ public class StreamsTest {
                           .map(Streams.<Number>groupBy(3, -31))
                           .afterMax(seconds(3))
                           .all()).containsExactly(Arrays.<Number>asList(1, 2, 3),
-                                                  Arrays.<Number>asList(4, 5, 6),
-                                                  Arrays.<Number>asList(7, 8, 9),
-                                                  Arrays.<Number>asList(10, -31, -31));
+                Arrays.<Number>asList(4, 5, 6), Arrays.<Number>asList(7, 8, 9),
+                Arrays.<Number>asList(10, -31, -31));
         assertThat(Streams.streamOf()
                           .sync()
                           .then(range(1, 10))
@@ -1248,8 +1244,7 @@ public class StreamsTest {
                           .build()
                           .afterMax(seconds(1))
                           .all()).containsExactly(new Selectable<String>("test1", 33),
-                                                  new Selectable<String>("test2", 33),
-                                                  new Selectable<String>("test3", 33));
+                new Selectable<String>("test2", 33), new Selectable<String>("test3", 33));
     }
 
     @Test
@@ -1727,15 +1722,15 @@ public class StreamsTest {
                        .build()
                        .get(Sort.STRING);
         inputChannel.pass(new Selectable<Object>("test21", Sort.STRING),
-                          new Selectable<Object>(-11, Sort.INTEGER));
+                new Selectable<Object>(-11, Sort.INTEGER));
         assertThat(intChannel.afterMax(seconds(10)).next()).isEqualTo(-11);
         assertThat(strChannel.afterMax(seconds(10)).next()).isEqualTo("test21");
         inputChannel.pass(new Selectable<Object>(-11, Sort.INTEGER),
-                          new Selectable<Object>("test21", Sort.STRING));
+                new Selectable<Object>("test21", Sort.STRING));
         assertThat(intChannel.afterMax(seconds(10)).next()).isEqualTo(-11);
         assertThat(strChannel.afterMax(seconds(10)).next()).isEqualTo("test21");
         inputChannel.pass(new Selectable<Object>("test21", Sort.STRING),
-                          new Selectable<Object>(-11, Sort.INTEGER));
+                new Selectable<Object>(-11, Sort.INTEGER));
         assertThat(intChannel.afterMax(seconds(10)).next()).isEqualTo(-11);
         assertThat(strChannel.afterMax(seconds(10)).next()).isEqualTo("test21");
     }
@@ -1751,7 +1746,7 @@ public class StreamsTest {
         Streams.select(Sort.STRING, 2, outputChannel).build();
         inputChannel.after(millis(100))
                     .pass(new Selectable<Object>("test21", Sort.STRING),
-                          new Selectable<Object>(-11, Sort.INTEGER))
+                            new Selectable<Object>(-11, Sort.INTEGER))
                     .abort();
 
         try {
@@ -1787,7 +1782,7 @@ public class StreamsTest {
         Streams.select(outputChannel, Sort.INTEGER, Sort.STRING).build();
         inputChannel.after(millis(100))
                     .pass(new Selectable<Object>(-11, Sort.INTEGER),
-                          new Selectable<Object>("test21", Sort.STRING))
+                            new Selectable<Object>("test21", Sort.STRING))
                     .abort();
 
         try {
@@ -1823,7 +1818,7 @@ public class StreamsTest {
         Streams.select(outputChannel, Arrays.asList(Sort.STRING, Sort.INTEGER)).build();
         inputChannel.after(millis(100))
                     .pass(new Selectable<Object>("test21", Sort.STRING),
-                          new Selectable<Object>(-11, Sort.INTEGER))
+                            new Selectable<Object>(-11, Sort.INTEGER))
                     .abort();
 
         try {

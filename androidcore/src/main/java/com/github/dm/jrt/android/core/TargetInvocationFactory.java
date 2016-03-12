@@ -198,7 +198,7 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
         private DefaultTargetInvocationFactory(@NotNull final Parcel source) {
 
             this((Class<? extends ContextInvocation<IN, OUT>>) source.readSerializable(),
-                 source.readArray(TargetInvocationFactory.class.getClassLoader()));
+                    source.readArray(TargetInvocationFactory.class.getClassLoader()));
         }
 
         /**

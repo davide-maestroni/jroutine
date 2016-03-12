@@ -1235,10 +1235,9 @@ public final class InvocationConfiguration {
         private InvocationConfiguration buildConfiguration() {
 
             return new InvocationConfiguration(mRunner, mPriority, mMaxInstances, mCoreInstances,
-                                               mReadTimeout, mTimeoutActionType, mInputOrderType,
-                                               mInputLimit, mInputMaxDelay, mInputMaxSize,
-                                               mOutputOrderType, mOutputLimit, mOutputMaxDelay,
-                                               mOutputMaxSize, mLog, mLogLevel);
+                    mReadTimeout, mTimeoutActionType, mInputOrderType, mInputLimit, mInputMaxDelay,
+                    mInputMaxSize, mOutputOrderType, mOutputLimit, mOutputMaxDelay, mOutputMaxSize,
+                    mLog, mLogLevel);
         }
 
         private void setConfiguration(@NotNull final InvocationConfiguration configuration) {

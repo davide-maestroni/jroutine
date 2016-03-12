@@ -108,8 +108,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
                       .pass(new ParcelableSelectable<Integer>(5, 17))
                       .close();
         assertThat(channel1.result().afterMax(seconds(10)).all()).containsExactly("test1", "test2",
-                                                                                  "test3", "test4",
-                                                                                  "test5");
+                "test3", "test4", "test5");
         assertThat(channel2.result().afterMax(seconds(10)).all()).containsExactly(1, 2, 3, 4, 5);
     }
 
@@ -497,11 +496,9 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
         channel2.close();
 
         assertThat(channelMap.get(Sort.STRING).afterMax(seconds(10)).all()).containsExactly("0",
-                                                                                            "1",
-                                                                                            "2",
-                                                                                            "3");
+                "1", "2", "3");
         assertThat(channelMap.get(Sort.INTEGER).afterMax(seconds(10)).all()).containsExactly(0, 1,
-                                                                                             2, 3);
+                2, 3);
     }
 
     @SuppressWarnings("unchecked")
@@ -596,19 +593,19 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
         SparseArray<OutputChannel<Object>> channelMap;
         OutputChannel<ParcelableSelectable<Object>> channel;
         channel = routine.asyncCall(new ParcelableSelectable<Object>("test21", Sort.STRING),
-                                    new ParcelableSelectable<Object>(-11, Sort.INTEGER));
+                new ParcelableSelectable<Object>(-11, Sort.INTEGER));
         channelMap =
                 SparseChannels.selectParcelable(channel, Arrays.asList(Sort.INTEGER, Sort.STRING))
                               .build();
         assertThat(channelMap.get(Sort.INTEGER).afterMax(seconds(10)).all()).containsOnly(-11);
         assertThat(channelMap.get(Sort.STRING).afterMax(seconds(10)).all()).containsOnly("test21");
         channel = routine.asyncCall(new ParcelableSelectable<Object>(-11, Sort.INTEGER),
-                                    new ParcelableSelectable<Object>("test21", Sort.STRING));
+                new ParcelableSelectable<Object>("test21", Sort.STRING));
         channelMap = SparseChannels.selectParcelable(channel, Sort.INTEGER, Sort.STRING).build();
         assertThat(channelMap.get(Sort.INTEGER).afterMax(seconds(10)).all()).containsOnly(-11);
         assertThat(channelMap.get(Sort.STRING).afterMax(seconds(10)).all()).containsOnly("test21");
         channel = routine.asyncCall(new ParcelableSelectable<Object>("test21", Sort.STRING),
-                                    new ParcelableSelectable<Object>(-11, Sort.INTEGER));
+                new ParcelableSelectable<Object>(-11, Sort.INTEGER));
         channelMap =
                 SparseChannels.selectParcelable(Math.min(Sort.INTEGER, Sort.STRING), 2, channel)
                               .build();
@@ -633,7 +630,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
         channel = routine.asyncInvoke()
                          .after(millis(100))
                          .pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
-                               new ParcelableSelectable<Object>(-11, Sort.INTEGER))
+                                 new ParcelableSelectable<Object>(-11, Sort.INTEGER))
                          .result();
         channelMap =
                 SparseChannels.selectParcelable(channel, Arrays.asList(Sort.INTEGER, Sort.STRING))
@@ -663,7 +660,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
         channel = routine.asyncInvoke()
                          .after(millis(100))
                          .pass(new ParcelableSelectable<Object>(-11, Sort.INTEGER),
-                               new ParcelableSelectable<Object>("test21", Sort.STRING))
+                                 new ParcelableSelectable<Object>("test21", Sort.STRING))
                          .result();
         channelMap = SparseChannels.selectParcelable(channel, Sort.INTEGER, Sort.STRING).build();
         channel.abort();
@@ -691,7 +688,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
         channel = routine.asyncInvoke()
                          .after(millis(100))
                          .pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
-                               new ParcelableSelectable<Object>(-11, Sort.INTEGER))
+                                 new ParcelableSelectable<Object>(-11, Sort.INTEGER))
                          .result();
         channelMap =
                 SparseChannels.selectParcelable(Math.min(Sort.INTEGER, Sort.STRING), 2, channel)
@@ -751,9 +748,9 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
         final OutputChannel<String> outputChannel =
                 SparseChannels.selectParcelable(channel.asOutput(), 33).build().get(33);
         channel.pass(new ParcelableSelectable<String>("test1", 33),
-                     new ParcelableSelectable<String>("test2", -33),
-                     new ParcelableSelectable<String>("test3", 33),
-                     new ParcelableSelectable<String>("test4", 333));
+                new ParcelableSelectable<String>("test2", -33),
+                new ParcelableSelectable<String>("test3", 33),
+                new ParcelableSelectable<String>("test4", 333));
         channel.close();
         assertThat(outputChannel.afterMax(seconds(10)).all()).containsExactly("test1", "test3");
     }

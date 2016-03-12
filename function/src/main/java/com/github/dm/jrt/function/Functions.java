@@ -395,7 +395,7 @@ public class Functions {
     public static OutputConsumerBuilder<Object> onComplete(@NotNull final Consumer<Void> consumer) {
 
         return new OutputConsumerBuilder<Object>(wrap(consumer), Functions.<RoutineException>sink(),
-                                                 Functions.sink());
+                Functions.sink());
     }
 
     /**
@@ -410,7 +410,7 @@ public class Functions {
             @NotNull final Consumer<RoutineException> consumer) {
 
         return new OutputConsumerBuilder<Object>(Functions.<Void>sink(), wrap(consumer),
-                                                 Functions.sink());
+                Functions.sink());
     }
 
     /**
@@ -425,7 +425,7 @@ public class Functions {
     public static <OUT> OutputConsumerBuilder<OUT> onOutput(@NotNull final Consumer<OUT> consumer) {
 
         return new OutputConsumerBuilder<OUT>(Functions.<Void>sink(),
-                                              Functions.<RoutineException>sink(), wrap(consumer));
+                Functions.<RoutineException>sink(), wrap(consumer));
     }
 
     /**

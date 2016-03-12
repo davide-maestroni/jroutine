@@ -60,8 +60,7 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA> {
         final ChannelAbortHandler abortHandler = new ChannelAbortHandler();
         final DefaultResultChannel<DATA> inputChannel =
                 new DefaultResultChannel<DATA>(invocationConfiguration, abortHandler,
-                                               invocationConfiguration.getRunnerOr(
-                                                       Runners.sharedRunner()), logger);
+                        invocationConfiguration.getRunnerOr(Runners.sharedRunner()), logger);
         abortHandler.setChannel(inputChannel);
         mInputChannel = inputChannel;
         mOutputChannel = inputChannel.getOutput();

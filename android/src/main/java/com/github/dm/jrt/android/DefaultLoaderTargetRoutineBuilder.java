@@ -161,14 +161,14 @@ class DefaultLoaderTargetRoutineBuilder implements LoaderTargetRoutineBuilder {
     public ProxyConfiguration.Builder<? extends LoaderTargetRoutineBuilder> withProxies() {
 
         return new ProxyConfiguration.Builder<LoaderTargetRoutineBuilder>(mProxyConfigurable,
-                                                                          mProxyConfiguration);
+                mProxyConfiguration);
     }
 
     @NotNull
     public LoaderConfiguration.Builder<? extends LoaderTargetRoutineBuilder> withLoaders() {
 
         return new LoaderConfiguration.Builder<LoaderTargetRoutineBuilder>(mLoaderConfigurable,
-                                                                           mLoaderConfiguration);
+                mLoaderConfiguration);
     }
 
     @NotNull

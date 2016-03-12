@@ -718,7 +718,7 @@ public class FunctionsTest {
 
         final Routine<Object, String> routine = JRoutineCore.on(createFactory()).buildRoutine();
         assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
-                                                                                         "1");
+                "1");
     }
 
     @Test
@@ -757,7 +757,7 @@ public class FunctionsTest {
 
         final Routine<Object, String> routine = JRoutineCore.on(createFilter()).buildRoutine();
         assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
-                                                                                         "1");
+                "1");
     }
 
     @Test
@@ -765,7 +765,7 @@ public class FunctionsTest {
 
         final Routine<Object, String> routine = JRoutineCore.on(createFilter2()).buildRoutine();
         assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
-                                                                                         "1");
+                "1");
     }
 
     @Test
@@ -1023,7 +1023,7 @@ public class FunctionsTest {
 
         final Routine<Object, String> routine = JRoutineCore.on(createFunction()).buildRoutine();
         assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
-                                                                                         "1");
+                "1");
     }
 
     @Test
@@ -1044,8 +1044,7 @@ public class FunctionsTest {
         assertThat(factory).isNotEqualTo(createFactory());
         assertThat(factory).isNotEqualTo("");
         assertThat(functionCall(identity)).isEqualTo(functionCall(identity));
-        assertThat(functionCall(identity).hashCode()).isEqualTo(
-                functionCall(identity).hashCode());
+        assertThat(functionCall(identity).hashCode()).isEqualTo(functionCall(identity).hashCode());
     }
 
     @Test

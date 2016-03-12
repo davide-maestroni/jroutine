@@ -18,8 +18,8 @@ package com.github.dm.jrt.android.v11.object;
 
 import android.content.Context;
 
-import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
+import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
 import com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory;
 import com.github.dm.jrt.android.core.routine.LoaderRoutine;
@@ -110,7 +110,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 Builders.configurationWithAnnotations(mProxyConfiguration, targetMethod);
         final AliasContextInvocationFactory<IN, OUT> factory =
                 new AliasContextInvocationFactory<IN, OUT>(targetMethod, proxyConfiguration, target,
-                                                           name);
+                        name);
         final InvocationConfiguration invocationConfiguration =
                 Builders.configurationWithAnnotations(mInvocationConfiguration, targetMethod);
         final LoaderConfiguration loaderConfiguration =
@@ -134,7 +134,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         }
 
         final Object proxy = Proxy.newProxyInstance(itf.getClassLoader(), new Class[]{itf},
-                                                    new ProxyInvocationHandler(this));
+                new ProxyInvocationHandler(this));
         return itf.cast(proxy);
     }
 
@@ -158,7 +158,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 Builders.configurationWithAnnotations(mProxyConfiguration, method);
         final MethodContextInvocationFactory<IN, OUT> factory =
                 new MethodContextInvocationFactory<IN, OUT>(method, proxyConfiguration, mTarget,
-                                                            method);
+                        method);
         final InvocationConfiguration invocationConfiguration =
                 Builders.configurationWithAnnotations(mInvocationConfiguration, method);
         final LoaderConfiguration loaderConfiguration =
@@ -481,7 +481,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             }
 
             Builders.callFromInvocation(mMutex, targetInstance, mTargetMethod, objects, result,
-                                        mInputMode, mOutputMode);
+                    mInputMode, mOutputMode);
         }
 
         @Override
@@ -493,7 +493,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                     (Modifier.isStatic(mTargetMethod.getModifiers())) ? target.getTargetClass()
                             : target.getTarget();
             mMutex = Builders.getSharedMutex(mutexTarget,
-                                             mProxyConfiguration.getSharedFieldsOr(null));
+                    mProxyConfiguration.getSharedFieldsOr(null));
             mInstance = target.getTarget();
         }
     }
@@ -540,7 +540,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         public CallContextInvocation<Object, Object> newInvocation() {
 
             return new ProxyInvocation(mTargetMethod, mProxyConfiguration, mTarget, mInputMode,
-                                       mOutputMode);
+                    mOutputMode);
         }
     }
 
@@ -590,7 +590,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                     AndroidBuilders.configurationWithAnnotations(mLoaderConfiguration, method);
             final ProxyInvocationFactory factory =
                     new ProxyInvocationFactory(targetMethod, proxyConfiguration, target, inputMode,
-                                               outputMode);
+                            outputMode);
             final LoaderRoutineBuilder<Object, Object> builder =
                     JRoutineLoader.with(mContext).on(factory);
             final LoaderRoutine<Object, Object> routine = builder.withInvocations()
@@ -601,7 +601,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                                                                  .getConfigured()
                                                                  .buildRoutine();
             return Builders.invokeRoutine(routine, method, asArgs(args), methodInfo.invocationMode,
-                                          inputMode, outputMode);
+                    inputMode, outputMode);
         }
     }
 }

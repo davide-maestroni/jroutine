@@ -315,7 +315,7 @@ public class TimeDurationTest {
 
         testConversions(TimeDuration.micros(sRandom.nextInt(MAX_DURATION)), true);
         testConversions(TimeDuration.fromUnit(sRandom.nextInt(MAX_DURATION), TimeUnit.MICROSECONDS),
-                        true);
+                true);
     }
 
     @Test
@@ -347,7 +347,7 @@ public class TimeDurationTest {
 
         testConversions(TimeDuration.millis(sRandom.nextInt(MAX_DURATION)), true);
         testConversions(TimeDuration.fromUnit(sRandom.nextInt(MAX_DURATION), TimeUnit.MILLISECONDS),
-                        true);
+                true);
     }
 
     @Test
@@ -461,7 +461,7 @@ public class TimeDurationTest {
 
         testConversions(TimeDuration.nanos(sRandom.nextInt(MAX_DURATION)), true);
         testConversions(TimeDuration.fromUnit(sRandom.nextInt(MAX_DURATION), TimeUnit.NANOSECONDS),
-                        true);
+                true);
     }
 
     @Test
@@ -509,7 +509,7 @@ public class TimeDurationTest {
 
         testConversions(TimeDuration.seconds(sRandom.nextInt(MAX_DURATION)), true);
         testConversions(TimeDuration.fromUnit(sRandom.nextInt(MAX_DURATION), TimeUnit.SECONDS),
-                        true);
+                true);
     }
 
     @Test

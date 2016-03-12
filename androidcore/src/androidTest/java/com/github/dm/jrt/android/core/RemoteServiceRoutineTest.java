@@ -374,11 +374,11 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
                                .getConfigured()
                                .buildRoutine();
         assertThat(routine4.syncCall().afterMax(timeout).all()).containsOnly("test1", "test2",
-                                                                             "test3");
+                "test3");
         assertThat(routine4.asyncCall().afterMax(timeout).all()).containsOnly("test1", "test2",
-                                                                              "test3");
+                "test3");
         assertThat(routine4.parallelCall().afterMax(timeout).all()).containsOnly("test1", "test2",
-                                                                                 "test3");
+                "test3");
     }
 
     public void testParcelable() {

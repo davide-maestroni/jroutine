@@ -174,14 +174,14 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                                 .build()
                                 .afterMax(seconds(1))
                                 .all()).containsOnly("test1", "test2", "test3", "test4", "test5",
-                                                     "test6");
+                "test6");
         channel1 = LoaderStreams.streamOf("test1", "test2", "test3").with(context).runOnShared();
         channel2 = LoaderStreams.streamOf("test4", "test5", "test6").with(context).runOnShared();
         assertThat(LoaderStreams.blend(Arrays.<StreamChannel<?>>asList(channel1, channel2))
                                 .build()
                                 .afterMax(seconds(1))
                                 .all()).containsOnly("test1", "test2", "test3", "test4", "test5",
-                                                     "test6");
+                "test6");
     }
 
     public void testBlendAbort() {
@@ -194,7 +194,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         final IOChannelBuilder builder = JRoutineCore.io();
         final Routine<Object, Object> routine = JRoutineLoader.with(loaderFrom(getActivity()))
                                                               .on(PassingCallContextInvocation
-                                                                          .factoryOf())
+                                                                      .factoryOf())
                                                               .buildRoutine();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
@@ -362,14 +362,14 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                                 .build()
                                 .afterMax(seconds(1))
                                 .all()).containsExactly("test4", "test5", "test6", "test1", "test2",
-                                                        "test3");
+                "test3");
         channel1 = LoaderStreams.streamOf("test1", "test2", "test3").with(context).runOnShared();
         channel2 = LoaderStreams.streamOf("test4", "test5", "test6").with(context).runOnShared();
         assertThat(LoaderStreams.concat(Arrays.<StreamChannel<?>>asList(channel1, channel2))
                                 .build()
                                 .afterMax(seconds(1))
                                 .all()).containsExactly("test1", "test2", "test3", "test4", "test5",
-                                                        "test6");
+                "test6");
     }
 
     public void testConcatAbort() {
@@ -382,7 +382,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         final IOChannelBuilder builder = JRoutineCore.io();
         final Routine<Object, Object> routine = JRoutineLoader.with(loaderFrom(getActivity()))
                                                               .on(PassingCallContextInvocation
-                                                                          .factoryOf())
+                                                                      .factoryOf())
                                                               .buildRoutine();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
@@ -503,7 +503,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                                 .getConfigured()
                                 .build()
                                 .all()).containsExactly("test4", "test5", "test6", "test1", "test2",
-                                                        "test3");
+                "test3");
     }
 
     public void testFactory() {
@@ -643,9 +643,8 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                                 .map(LoaderStreams.<Number>groupBy(3))
                                 .afterMax(seconds(3))
                                 .all()).containsExactly(Arrays.<Number>asList(1, 2, 3),
-                                                        Arrays.<Number>asList(4, 5, 6),
-                                                        Arrays.<Number>asList(7, 8, 9),
-                                                        Collections.<Number>singletonList(10));
+                Arrays.<Number>asList(4, 5, 6), Arrays.<Number>asList(7, 8, 9),
+                Collections.<Number>singletonList(10));
         assertThat(LoaderStreams.streamOf()
                                 .with(context)
                                 .sync()
@@ -663,9 +662,8 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                                 .map(LoaderStreams.<Number>groupBy(3))
                                 .afterMax(seconds(3))
                                 .all()).containsExactly(Arrays.<Number>asList(1, 2, 3),
-                                                        Arrays.<Number>asList(4, 5, 6),
-                                                        Arrays.<Number>asList(7, 8, 9),
-                                                        Collections.<Number>singletonList(10));
+                Arrays.<Number>asList(4, 5, 6), Arrays.<Number>asList(7, 8, 9),
+                Collections.<Number>singletonList(10));
         assertThat(LoaderStreams.streamOf()
                                 .sync()
                                 .then(range(1, 10))
@@ -728,9 +726,8 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                                 .map(LoaderStreams.<Number>groupBy(3, 0))
                                 .afterMax(seconds(3))
                                 .all()).containsExactly(Arrays.<Number>asList(1, 2, 3),
-                                                        Arrays.<Number>asList(4, 5, 6),
-                                                        Arrays.<Number>asList(7, 8, 9),
-                                                        Arrays.<Number>asList(10, 0, 0));
+                Arrays.<Number>asList(4, 5, 6), Arrays.<Number>asList(7, 8, 9),
+                Arrays.<Number>asList(10, 0, 0));
         assertThat(LoaderStreams.streamOf()
                                 .with(context)
                                 .sync()
@@ -748,9 +745,8 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                                 .map(LoaderStreams.<Number>groupBy(3, -31))
                                 .afterMax(seconds(3))
                                 .all()).containsExactly(Arrays.<Number>asList(1, 2, 3),
-                                                        Arrays.<Number>asList(4, 5, 6),
-                                                        Arrays.<Number>asList(7, 8, 9),
-                                                        Arrays.<Number>asList(10, -31, -31));
+                Arrays.<Number>asList(4, 5, 6), Arrays.<Number>asList(7, 8, 9),
+                Arrays.<Number>asList(10, -31, -31));
         assertThat(LoaderStreams.streamOf()
                                 .sync()
                                 .then(range(1, 10))
@@ -808,11 +804,9 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         final IOChannelBuilder builder = JRoutineCore.io();
         final Routine<List<?>, Character> routine = JRoutineLoader.with(loaderFrom(getActivity()))
                                                                   .on(factoryFrom(JRoutineCore.on(
-                                                                                          new CharAt())
+                                                                                  new CharAt())
                                                                                               .buildRoutine(),
-                                                                                  1,
-                                                                                  DelegationType
-                                                                                          .SYNC))
+                                                                          1, DelegationType.SYNC))
                                                                   .buildRoutine();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
@@ -855,11 +849,9 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         final IOChannelBuilder builder = JRoutineCore.io();
         final Routine<List<?>, Character> routine = JRoutineLoader.with(loaderFrom(getActivity()))
                                                                   .on(factoryFrom(JRoutineCore.on(
-                                                                                          new CharAt())
+                                                                                  new CharAt())
                                                                                               .buildRoutine(),
-                                                                                  1,
-                                                                                  DelegationType
-                                                                                          .SYNC))
+                                                                          1, DelegationType.SYNC))
                                                                   .buildRoutine();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
@@ -957,11 +949,9 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         final IOChannelBuilder builder = JRoutineCore.io();
         final Routine<List<?>, Character> routine = JRoutineLoader.with(loaderFrom(getActivity()))
                                                                   .on(factoryFrom(JRoutineCore.on(
-                                                                                          new CharAt())
+                                                                                  new CharAt())
                                                                                               .buildRoutine(),
-                                                                                  1,
-                                                                                  DelegationType
-                                                                                          .SYNC))
+                                                                          1, DelegationType.SYNC))
                                                                   .buildRoutine();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
@@ -1012,11 +1002,9 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         final IOChannelBuilder builder = JRoutineCore.io();
         final Routine<List<?>, Character> routine = JRoutineLoader.with(loaderFrom(getActivity()))
                                                                   .on(factoryFrom(JRoutineCore.on(
-                                                                                          new CharAt())
+                                                                                  new CharAt())
                                                                                               .buildRoutine(),
-                                                                                  1,
-                                                                                  DelegationType
-                                                                                          .SYNC))
+                                                                          1, DelegationType.SYNC))
                                                                   .buildRoutine();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
@@ -1045,8 +1033,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         try {
 
             routine.asyncCall(LoaderStreams.join(new Object(),
-                                                 Arrays.<OutputChannel<?>>asList(channel1,
-                                                                                 channel2)).build())
+                    Arrays.<OutputChannel<?>>asList(channel1, channel2)).build())
                    .afterMax(seconds(1))
                    .all();
 
@@ -1304,7 +1291,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         final OutputChannel<ParcelableSelectable<Object>> output =
                 JRoutineLoader.with(loaderFrom(getActivity()))
                               .on(factoryFrom(JRoutineCore.on(new Sort()).buildRoutine(), 1,
-                                              DelegationType.SYNC))
+                                      DelegationType.SYNC))
                               .withInvocations()
                               .withInputOrder(OrderType.BY_CALL)
                               .getConfigured()
@@ -1778,24 +1765,22 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                              .build()
                              .get(Sort.INTEGER);
         final StreamChannel<Object> strChannel = LoaderStreams.selectParcelable(outputChannel,
-                                                                                Arrays.asList(
-                                                                                        Sort.STRING,
-                                                                                        Sort.INTEGER))
+                Arrays.asList(Sort.STRING, Sort.INTEGER))
                                                               .withChannels()
                                                               .withLogLevel(Level.WARNING)
                                                               .getConfigured()
                                                               .build()
                                                               .get(Sort.STRING);
         inputChannel.pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
-                          new ParcelableSelectable<Object>(-11, Sort.INTEGER));
+                new ParcelableSelectable<Object>(-11, Sort.INTEGER));
         assertThat(intChannel.afterMax(seconds(10)).next()).isEqualTo(-11);
         assertThat(strChannel.afterMax(seconds(10)).next()).isEqualTo("test21");
         inputChannel.pass(new ParcelableSelectable<Object>(-11, Sort.INTEGER),
-                          new ParcelableSelectable<Object>("test21", Sort.STRING));
+                new ParcelableSelectable<Object>("test21", Sort.STRING));
         assertThat(intChannel.afterMax(seconds(10)).next()).isEqualTo(-11);
         assertThat(strChannel.afterMax(seconds(10)).next()).isEqualTo("test21");
         inputChannel.pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
-                          new ParcelableSelectable<Object>(-11, Sort.INTEGER));
+                new ParcelableSelectable<Object>(-11, Sort.INTEGER));
         assertThat(intChannel.afterMax(seconds(10)).next()).isEqualTo(-11);
         assertThat(strChannel.afterMax(seconds(10)).next()).isEqualTo("test21");
     }
@@ -1815,7 +1800,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         LoaderStreams.selectParcelable(Sort.STRING, 2, outputChannel).build();
         inputChannel.after(millis(100))
                     .pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
-                          new ParcelableSelectable<Object>(-11, Sort.INTEGER))
+                            new ParcelableSelectable<Object>(-11, Sort.INTEGER))
                     .abort();
 
         try {
@@ -1851,7 +1836,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         LoaderStreams.selectParcelable(outputChannel, Sort.INTEGER, Sort.STRING).build();
         inputChannel.after(millis(100))
                     .pass(new ParcelableSelectable<Object>(-11, Sort.INTEGER),
-                          new ParcelableSelectable<Object>("test21", Sort.STRING))
+                            new ParcelableSelectable<Object>("test21", Sort.STRING))
                     .abort();
 
         try {
@@ -1888,7 +1873,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                      .build();
         inputChannel.after(millis(100))
                     .pass(new ParcelableSelectable<Object>("test21", Sort.STRING),
-                          new ParcelableSelectable<Object>(-11, Sort.INTEGER))
+                            new ParcelableSelectable<Object>(-11, Sort.INTEGER))
                     .abort();
 
         try {

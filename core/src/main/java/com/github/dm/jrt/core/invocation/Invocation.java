@@ -94,7 +94,8 @@ import org.jetbrains.annotations.NotNull;
  * cause of an {@link com.github.dm.jrt.core.invocation.InvocationException InvocationException}
  * instance.
  * <p/>
- * The class {@link com.github.dm.jrt.core.invocation.TemplateInvocation TemplateInvocation} provides
+ * The class {@link com.github.dm.jrt.core.invocation.TemplateInvocation TemplateInvocation}
+ * provides
  * an abstract empty implementation of the invocation interface.
  * <p/>
  * Created by davide-maestroni on 09/07/2014.

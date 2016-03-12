@@ -332,11 +332,11 @@ public class ByteChannelTest {
         assertThat(inputStream.read(outputStream)).isEqualTo(1);
         assertThat(outputStream.size()).isEqualTo(4);
         assertThat(outputStream.toByteArray()).containsExactly((byte) 31, (byte) 17, (byte) 155,
-                                                               (byte) 13);
+                (byte) 13);
         assertThat(inputStream.read(outputStream)).isEqualTo(-1);
         assertThat(outputStream.size()).isEqualTo(4);
         assertThat(outputStream.toByteArray()).containsExactly((byte) 31, (byte) 17, (byte) 155,
-                                                               (byte) 13);
+                (byte) 13);
         assertThat(inputStream.read(outputStream)).isEqualTo(-1);
     }
 
@@ -515,11 +515,11 @@ public class ByteChannelTest {
         assertThat(inputStream.readAll(outputStream)).isEqualTo(4);
         assertThat(outputStream.size()).isEqualTo(4);
         assertThat(outputStream.toByteArray()).containsExactly((byte) 31, (byte) 17, (byte) 155,
-                                                               (byte) 13);
+                (byte) 13);
         assertThat(inputStream.read(outputStream)).isEqualTo(-1);
         assertThat(outputStream.size()).isEqualTo(4);
         assertThat(outputStream.toByteArray()).containsExactly((byte) 31, (byte) 17, (byte) 155,
-                                                               (byte) 13);
+                (byte) 13);
     }
 
     @Test
@@ -803,7 +803,7 @@ public class ByteChannelTest {
         final byte[] b = new byte[10];
         assertThat(ByteChannel.inputStream(inputStreams).read(b)).isEqualTo(10);
         assertThat(b).containsExactly((byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5, (byte) 6,
-                                      (byte) 7, (byte) 8, (byte) 9, (byte) 10);
+                (byte) 7, (byte) 8, (byte) 9, (byte) 10);
     }
 
     @Test

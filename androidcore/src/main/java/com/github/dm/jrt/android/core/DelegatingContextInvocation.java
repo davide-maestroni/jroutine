@@ -76,8 +76,7 @@ public class DelegatingContextInvocation<IN, OUT> extends CallContextInvocation<
             @NotNull final Routine<IN, OUT> routine, final int routineId,
             @NotNull final DelegationType delegation) {
 
-        return new DelegatingCallContextInvocationFactory<IN, OUT>(routine, routineId,
-                                                                       delegation);
+        return new DelegatingCallContextInvocationFactory<IN, OUT>(routine, routineId, delegation);
     }
 
     public void onContext(@NotNull final Context context) {

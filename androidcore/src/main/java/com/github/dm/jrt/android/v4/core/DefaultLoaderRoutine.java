@@ -104,7 +104,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
         if (context.getComponent() != null) {
             AndroidRunners.mainRunner()
                           .run(new PurgeExecution(context, mFactory, mLoaderId), 0,
-                               TimeUnit.MILLISECONDS);
+                                  TimeUnit.MILLISECONDS);
         }
     }
 
@@ -132,7 +132,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
         final Logger logger = getLogger();
         if (type == InvocationType.ASYNC) {
             return new LoaderInvocation<IN, OUT>(mContext, mFactory, mConfiguration, mOrderType,
-                                                 logger);
+                    logger);
         }
 
         final Context loaderContext = mContext.getLoaderContext();

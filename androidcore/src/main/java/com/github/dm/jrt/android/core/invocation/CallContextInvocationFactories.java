@@ -104,8 +104,7 @@ public class CallContextInvocationFactories {
      */
     @NotNull
     public static <IN, OUT> CallContextInvocationFactory<IN, OUT> factoryOf(
-            @NotNull final ClassToken<? extends CallContextInvocation<IN, OUT>>
-                    invocationToken) {
+            @NotNull final ClassToken<? extends CallContextInvocation<IN, OUT>> invocationToken) {
 
         return factoryOf(invocationToken.getRawClass());
     }

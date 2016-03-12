@@ -63,9 +63,8 @@ public abstract class TemplateLog implements Log {
             @Nullable final String message) {
 
         return String.format(LOG_FORMAT,
-                             new SimpleDateFormat(DATE_FORMAT, Locale.getDefault()).format(
-                                     new Date()), Thread.currentThread().getName(),
-                             contexts.toString(), level, message);
+                new SimpleDateFormat(DATE_FORMAT, Locale.getDefault()).format(new Date()),
+                Thread.currentThread().getName(), contexts.toString(), level, message);
     }
 
     public void dbg(@NotNull final List<Object> contexts, @Nullable final String message,

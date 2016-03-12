@@ -82,7 +82,7 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
             final LoaderConfiguration loaderConfiguration = mLoaderConfiguration;
             final ProxyInfo proxyInfo =
                     new ProxyInfo(getInterfaceClass(), invocationConfiguration, proxyConfiguration,
-                                  loaderConfiguration);
+                            loaderConfiguration);
             final Object instance = proxies.get(proxyInfo);
             if (instance != null) {
                 return (TYPE) instance;
@@ -92,7 +92,7 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
             if (asyncRunner != null) {
                 invocationConfiguration.newLogger(this)
                                        .wrn("the specified runner will be ignored: %s",
-                                            asyncRunner);
+                                               asyncRunner);
             }
 
             try {

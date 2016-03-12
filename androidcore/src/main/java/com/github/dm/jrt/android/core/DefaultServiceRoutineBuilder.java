@@ -16,8 +16,8 @@
 
 package com.github.dm.jrt.android.core;
 
-import com.github.dm.jrt.android.core.config.ServiceConfiguration;
 import com.github.dm.jrt.android.core.builder.ServiceRoutineBuilder;
+import com.github.dm.jrt.android.core.config.ServiceConfiguration;
 import com.github.dm.jrt.core.builder.TemplateRoutineBuilder;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.routine.Routine;
@@ -80,7 +80,7 @@ class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, O
     public Routine<IN, OUT> buildRoutine() {
 
         return new ServiceRoutine<IN, OUT>(mContext, mTargetFactory, getConfiguration(),
-                                           mServiceConfiguration);
+                mServiceConfiguration);
     }
 
     @NotNull
@@ -99,7 +99,7 @@ class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, O
 
         final InvocationConfiguration config = getConfiguration();
         return new InvocationConfiguration.Builder<ServiceRoutineBuilder<IN, OUT>>(mConfigurable,
-                                                                                   config);
+                config);
     }
 
     @NotNull

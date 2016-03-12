@@ -42,7 +42,7 @@ public class OutputConsumerBuilderTest {
         try {
 
             new OutputConsumerBuilder<Object>(Functions.<Void>sink(),
-                                              Functions.<RoutineException>sink(), null);
+                    Functions.<RoutineException>sink(), null);
 
             fail();
 

@@ -58,7 +58,7 @@ class BuilderWrapper<OUT> implements ChannelsBuilder<LoaderStreamChannelCompat<O
     public LoaderStreamChannelCompat<OUT> build() {
 
         return new DefaultLoaderStreamChannelCompat<OUT>(null,
-                                                         (OutputChannel<OUT>) mBuilder.build());
+                (OutputChannel<OUT>) mBuilder.build());
     }
 
     @NotNull

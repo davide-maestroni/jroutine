@@ -69,7 +69,7 @@ public class ParcelableSelectable<DATA> extends Selectable<DATA> implements Parc
     protected ParcelableSelectable(@NotNull final Parcel source) {
 
         super((DATA) source.readValue(ParcelableSelectable.class.getClassLoader()),
-              source.readInt());
+                source.readInt());
     }
 
     public int describeContents() {

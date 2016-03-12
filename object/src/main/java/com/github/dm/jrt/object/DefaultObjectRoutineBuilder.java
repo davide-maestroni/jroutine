@@ -110,7 +110,7 @@ class DefaultObjectRoutineBuilder
         }
 
         final Object proxy = Proxy.newProxyInstance(itf.getClassLoader(), new Class[]{itf},
-                                                    new ProxyInvocationHandler());
+                new ProxyInvocationHandler());
         return itf.cast(proxy);
     }
 
@@ -131,8 +131,7 @@ class DefaultObjectRoutineBuilder
     public <IN, OUT> Routine<IN, OUT> method(@NotNull final Method method) {
 
         return getRoutine(configurationWithAnnotations(mInvocationConfiguration, method),
-                          configurationWithAnnotations(mProxyConfiguration, method), method, null,
-                          null);
+                configurationWithAnnotations(mProxyConfiguration, method), method, null, null);
     }
 
     @NotNull
@@ -198,12 +197,12 @@ class DefaultObjectRoutineBuilder
 
             final RoutineInfo routineInfo =
                     new RoutineInfo(invocationConfiguration, proxyConfiguration, method, inputMode,
-                                    outputMode);
+                            outputMode);
             Routine<?, ?> routine = routineMap.get(routineInfo);
             if (routine == null) {
                 final MethodInvocationFactory factory =
                         new MethodInvocationFactory(proxyConfiguration, target, method, inputMode,
-                                                    outputMode);
+                                outputMode);
                 routine = JRoutineCore.on(factory)
                                       .withInvocations()
                                       .with(invocationConfiguration)
@@ -307,7 +306,7 @@ class DefaultObjectRoutineBuilder
         public Invocation<Object, Object> newInvocation() {
 
             return new MethodCallInvocation(mProxyConfiguration, mTarget, mMethod, mInputMode,
-                                                mOutputMode);
+                    mOutputMode);
         }
     }
 
@@ -404,10 +403,10 @@ class DefaultObjectRoutineBuilder
             final OutputMode outputMode = methodInfo.outputMode;
             final Routine<Object, Object> routine =
                     getRoutine(configurationWithAnnotations(mInvocationConfiguration, method),
-                               configurationWithAnnotations(mProxyConfiguration, method),
-                               methodInfo.method, inputMode, outputMode);
+                            configurationWithAnnotations(mProxyConfiguration, method),
+                            methodInfo.method, inputMode, outputMode);
             return invokeRoutine(routine, method, asArgs(args), methodInfo.invocationMode,
-                                 inputMode, outputMode);
+                    inputMode, outputMode);
         }
     }
 }

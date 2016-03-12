@@ -65,14 +65,14 @@ public class ChannelsTest {
                            .build()
                            .afterMax(seconds(1))
                            .all()).containsOnly("test1", "test2", "test3", "test4", "test5",
-                                                "test6");
+                "test6");
         ioChannel1 = JRoutineCore.io().of("test1", "test2", "test3");
         ioChannel2 = JRoutineCore.io().of("test4", "test5", "test6");
         assertThat(Channels.blend(Arrays.<OutputChannel<?>>asList(ioChannel1, ioChannel2))
                            .build()
                            .afterMax(seconds(1))
                            .all()).containsOnly("test1", "test2", "test3", "test4", "test5",
-                                                "test6");
+                "test6");
     }
 
     @Test
@@ -221,8 +221,7 @@ public class ChannelsTest {
                 .pass(new Selectable<Integer>(5, 17))
                 .close();
         assertThat(channel1.result().afterMax(seconds(1)).all()).containsExactly("test1", "test2",
-                                                                                 "test3", "test4",
-                                                                                 "test5");
+                "test3", "test4", "test5");
         assertThat(channel2.result().afterMax(seconds(1)).all()).containsExactly(1, 2, 3, 4, 5);
     }
 
@@ -483,14 +482,14 @@ public class ChannelsTest {
                            .build()
                            .afterMax(seconds(1))
                            .all()).containsExactly("test4", "test5", "test6", "test1", "test2",
-                                                   "test3");
+                "test3");
         ioChannel1 = JRoutineCore.io().of("test1", "test2", "test3");
         ioChannel2 = JRoutineCore.io().of("test4", "test5", "test6");
         assertThat(Channels.concat(Arrays.<OutputChannel<?>>asList(ioChannel1, ioChannel2))
                            .build()
                            .afterMax(seconds(1))
                            .all()).containsExactly("test1", "test2", "test3", "test4", "test5",
-                                                   "test6");
+                "test6");
     }
 
     @Test
@@ -622,10 +621,9 @@ public class ChannelsTest {
                 .pass(Collections.singletonList("test3-1"))
                 .close();
         assertThat(channel1.result().afterMax(seconds(1)).all()).containsExactly("test1-1",
-                                                                                 "test2-1",
-                                                                                 "test3-1");
+                "test2-1", "test3-1");
         assertThat(channel2.result().afterMax(seconds(1)).all()).containsExactly("test1-2",
-                                                                                 "test2-2");
+                "test2-2");
     }
 
     @Test
@@ -818,7 +816,7 @@ public class ChannelsTest {
                 .close();
         final String placeholder = "placeholder";
         Channels.distribute((Object) placeholder,
-                            Arrays.<InputChannel<?>>asList(channel1, channel2))
+                Arrays.<InputChannel<?>>asList(channel1, channel2))
                 .build()
                 .pass(Arrays.asList("test2-1", "test2-2"))
                 .close();
@@ -827,11 +825,9 @@ public class ChannelsTest {
                 .pass(Collections.singletonList("test3-1"))
                 .close();
         assertThat(channel1.result().afterMax(seconds(1)).all()).containsExactly("test1-1",
-                                                                                 "test2-1",
-                                                                                 "test3-1");
+                "test2-1", "test3-1");
         assertThat(channel2.result().afterMax(seconds(1)).all()).containsExactly("test1-2",
-                                                                                 "test2-2",
-                                                                                 placeholder);
+                "test2-2", placeholder);
     }
 
     @Test
@@ -1053,7 +1049,7 @@ public class ChannelsTest {
         Channels.toSelectable(channel.asInput(), 33)
                 .build()
                 .pass(new Selectable<String>("test1", 33), new Selectable<String>("test2", -33),
-                      new Selectable<String>("test3", 33), new Selectable<String>("test4", 333))
+                        new Selectable<String>("test3", 33), new Selectable<String>("test4", 333))
                 .close();
         assertThat(channel.close().afterMax(seconds(1)).all()).containsExactly("test1", "test3");
     }
@@ -1359,10 +1355,9 @@ public class ChannelsTest {
         channel2.close();
 
         assertThat(channelMap.get(Sort.STRING).afterMax(seconds(1)).all()).containsExactly("0", "1",
-                                                                                           "2",
-                                                                                           "3");
+                "2", "3");
         assertThat(channelMap.get(Sort.INTEGER).afterMax(seconds(1)).all()).containsExactly(0, 1, 2,
-                                                                                            3);
+                3);
     }
 
     @Test
@@ -1661,17 +1656,17 @@ public class ChannelsTest {
         Map<Integer, OutputChannel<Object>> channelMap;
         OutputChannel<Selectable<Object>> channel;
         channel = routine.asyncCall(new Selectable<Object>("test21", Sort.STRING),
-                                    new Selectable<Object>(-11, Sort.INTEGER));
+                new Selectable<Object>(-11, Sort.INTEGER));
         channelMap = Channels.select(channel, Arrays.asList(Sort.INTEGER, Sort.STRING)).build();
         assertThat(channelMap.get(Sort.INTEGER).afterMax(seconds(1)).all()).containsOnly(-11);
         assertThat(channelMap.get(Sort.STRING).afterMax(seconds(1)).all()).containsOnly("test21");
         channel = routine.asyncCall(new Selectable<Object>(-11, Sort.INTEGER),
-                                    new Selectable<Object>("test21", Sort.STRING));
+                new Selectable<Object>("test21", Sort.STRING));
         channelMap = Channels.select(channel, Sort.INTEGER, Sort.STRING).build();
         assertThat(channelMap.get(Sort.INTEGER).afterMax(seconds(1)).all()).containsOnly(-11);
         assertThat(channelMap.get(Sort.STRING).afterMax(seconds(1)).all()).containsOnly("test21");
         channel = routine.asyncCall(new Selectable<Object>("test21", Sort.STRING),
-                                    new Selectable<Object>(-11, Sort.INTEGER));
+                new Selectable<Object>(-11, Sort.INTEGER));
         channelMap = Channels.select(Math.min(Sort.INTEGER, Sort.STRING), 2, channel).build();
         assertThat(channelMap.get(Sort.INTEGER).afterMax(seconds(1)).all()).containsOnly(-11);
         assertThat(channelMap.get(Sort.STRING).afterMax(seconds(1)).all()).containsOnly("test21");
@@ -1688,7 +1683,7 @@ public class ChannelsTest {
         channel = routine.asyncInvoke()
                          .after(millis(100))
                          .pass(new Selectable<Object>("test21", Sort.STRING),
-                               new Selectable<Object>(-11, Sort.INTEGER))
+                                 new Selectable<Object>(-11, Sort.INTEGER))
                          .result();
         channelMap = Channels.select(channel, Arrays.asList(Sort.INTEGER, Sort.STRING)).build();
         channel.abort();
@@ -1716,7 +1711,7 @@ public class ChannelsTest {
         channel = routine.asyncInvoke()
                          .after(millis(100))
                          .pass(new Selectable<Object>(-11, Sort.INTEGER),
-                               new Selectable<Object>("test21", Sort.STRING))
+                                 new Selectable<Object>("test21", Sort.STRING))
                          .result();
         channelMap = Channels.select(channel, Sort.INTEGER, Sort.STRING).build();
         channel.abort();
@@ -1744,7 +1739,7 @@ public class ChannelsTest {
         channel = routine.asyncInvoke()
                          .after(millis(100))
                          .pass(new Selectable<Object>("test21", Sort.STRING),
-                               new Selectable<Object>(-11, Sort.INTEGER))
+                                 new Selectable<Object>(-11, Sort.INTEGER))
                          .result();
         channelMap = Channels.select(Math.min(Sort.INTEGER, Sort.STRING), 2, channel).build();
         channel.abort();
@@ -1790,7 +1785,7 @@ public class ChannelsTest {
         final OutputChannel<String> outputChannel =
                 Channels.select(channel.asOutput(), 33).build().get(33);
         channel.pass(new Selectable<String>("test1", 33), new Selectable<String>("test2", -33),
-                     new Selectable<String>("test3", 33), new Selectable<String>("test4", 333));
+                new Selectable<String>("test3", 33), new Selectable<String>("test4", 333));
         channel.close();
         assertThat(outputChannel.afterMax(seconds(1)).all()).containsExactly("test1", "test3");
     }
@@ -1853,8 +1848,7 @@ public class ChannelsTest {
         channel.pass("test1", "test2", "test3").close();
         assertThat(Channels.toSelectable(channel.asOutput(), 33).build().afterMax(seconds(1)).all())
                 .containsExactly(new Selectable<String>("test1", 33),
-                                 new Selectable<String>("test2", 33),
-                                 new Selectable<String>("test3", 33));
+                        new Selectable<String>("test2", 33), new Selectable<String>("test3", 33));
     }
 
     @Test
@@ -1910,15 +1904,15 @@ public class ChannelsTest {
                         .build()
                         .get(Sort.STRING);
         inputChannel.pass(new Selectable<Object>("test21", Sort.STRING),
-                          new Selectable<Object>(-11, Sort.INTEGER));
+                new Selectable<Object>(-11, Sort.INTEGER));
         assertThat(intChannel.afterMax(seconds(10)).next()).isEqualTo(-11);
         assertThat(strChannel.afterMax(seconds(10)).next()).isEqualTo("test21");
         inputChannel.pass(new Selectable<Object>(-11, Sort.INTEGER),
-                          new Selectable<Object>("test21", Sort.STRING));
+                new Selectable<Object>("test21", Sort.STRING));
         assertThat(intChannel.afterMax(seconds(10)).next()).isEqualTo(-11);
         assertThat(strChannel.afterMax(seconds(10)).next()).isEqualTo("test21");
         inputChannel.pass(new Selectable<Object>("test21", Sort.STRING),
-                          new Selectable<Object>(-11, Sort.INTEGER));
+                new Selectable<Object>(-11, Sort.INTEGER));
         assertThat(intChannel.afterMax(seconds(10)).next()).isEqualTo(-11);
         assertThat(strChannel.afterMax(seconds(10)).next()).isEqualTo("test21");
     }
@@ -1934,7 +1928,7 @@ public class ChannelsTest {
         Channels.select(outputChannel, Sort.INTEGER, Sort.STRING).build();
         inputChannel.after(millis(100))
                     .pass(new Selectable<Object>("test21", Sort.STRING),
-                          new Selectable<Object>(-11, Sort.INTEGER))
+                            new Selectable<Object>(-11, Sort.INTEGER))
                     .abort();
 
         try {
@@ -1970,7 +1964,7 @@ public class ChannelsTest {
         Channels.select(outputChannel, Sort.INTEGER, Sort.STRING).build();
         inputChannel.after(millis(100))
                     .pass(new Selectable<Object>(-11, Sort.INTEGER),
-                          new Selectable<Object>("test21", Sort.STRING))
+                            new Selectable<Object>("test21", Sort.STRING))
                     .abort();
 
         try {
@@ -2006,7 +2000,7 @@ public class ChannelsTest {
         Channels.select(outputChannel, Sort.STRING, Sort.INTEGER).build();
         inputChannel.after(millis(100))
                     .pass(new Selectable<Object>("test21", Sort.STRING),
-                          new Selectable<Object>(-11, Sort.INTEGER))
+                            new Selectable<Object>(-11, Sort.INTEGER))
                     .abort();
 
         try {

@@ -815,8 +815,8 @@ public final class ChannelConfiguration {
         private ChannelConfiguration buildConfiguration() {
 
             return new ChannelConfiguration(mRunner, mReadTimeout, mTimeoutActionType,
-                                            mChannelOrderType, mChannelLimit, mChannelMaxDelay,
-                                            mChannelMaxSize, mLog, mLogLevel);
+                    mChannelOrderType, mChannelLimit, mChannelMaxDelay, mChannelMaxSize, mLog,
+                    mLogLevel);
         }
 
         private void setConfiguration(@NotNull final ChannelConfiguration configuration) {

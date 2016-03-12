@@ -84,7 +84,7 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
             final ServiceConfiguration serviceConfiguration = mServiceConfiguration;
             final ProxyInfo proxyInfo =
                     new ProxyInfo(getInterfaceClass(), invocationConfiguration, proxyConfiguration,
-                                  serviceConfiguration);
+                            serviceConfiguration);
             final Object instance = proxies.get(proxyInfo);
             if (instance != null) {
                 return (TYPE) instance;

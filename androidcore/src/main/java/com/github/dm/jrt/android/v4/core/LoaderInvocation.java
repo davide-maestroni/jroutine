@@ -420,12 +420,12 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
 
             final RoutineLoaderCallbacks<OUT> newCallbacks =
                     createCallbacks(loaderContext, loaderManager, invocationLoader, inputs,
-                                    loaderId);
+                            loaderId);
             if (callbacks != null) {
                 logger.dbg("resetting existing callbacks [%d]", loaderId);
                 callbacks.reset(((clashType == ClashType.ABORT_THAT) || !isStaleResult)
-                                        ? new InvocationClashException(loaderId)
-                                        : new StaleResultException(loaderId));
+                        ? new InvocationClashException(loaderId)
+                        : new StaleResultException(loaderId));
             }
 
             callbackArray.put(loaderId, new WeakReference<RoutineLoaderCallbacks<?>>(newCallbacks));
@@ -455,7 +455,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         final Logger logger = mLogger;
         final InvocationLoader<IN, OUT> callbacksLoader = (loader != null) ? loader
                 : new InvocationLoader<IN, OUT>(loaderContext, createInvocation(loaderId), mFactory,
-                                                inputs, mOrderType, logger);
+                        inputs, mOrderType, logger);
         return new RoutineLoaderCallbacks<OUT>(loaderManager, callbacksLoader, logger);
     }
 
@@ -496,7 +496,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         if (!(factory instanceof MissingLoaderInvocationFactory)
                 && !invocationLoader.getInvocationFactory().equals(factory)) {
             logger.wrn("clashing loader ID [%d]: %s", loaderId,
-                       invocationLoader.getInvocationFactory());
+                    invocationLoader.getInvocationFactory());
             throw new InvocationTypeException(loaderId);
         }
 
@@ -689,7 +689,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
                                                        .buildChannel();
             channels.add(channel);
             internalLoader.setInvocationCount(Math.max(channels.size() + mAbortedChannels.size(),
-                                                       internalLoader.getInvocationCount()));
+                    internalLoader.getInvocationCount()));
             if ((looper != null) && (looper != Looper.getMainLooper())) {
                 return JRoutineCore.on(PassingInvocation.<OUT>factoryOf())
                                    .withInvocations()

@@ -186,7 +186,7 @@ public class JRoutineFacadeTest {
                     }
                 }).buildRoutine();
         assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
-                                                                                         "1");
+                "1");
     }
 
     @Test
@@ -227,7 +227,7 @@ public class JRoutineFacadeTest {
             }
         }).buildRoutine();
         assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
-                                                                                         "1");
+                "1");
     }
 
     @Test

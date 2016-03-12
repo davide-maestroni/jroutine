@@ -127,22 +127,21 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
                                .buildRoutine();
         final Logger logger = mLogger;
         logger.dbg("building service routine on invocation %s with configurations: %s - %s",
-                   invocationClass.getName(), invocationConfiguration, serviceConfiguration);
+                invocationClass.getName(), invocationConfiguration, serviceConfiguration);
     }
 
     @NotNull
     public InvocationChannel<IN, OUT> asyncInvoke() {
 
         return new ServiceChannel<IN, OUT>(false, mContext, mTargetFactory,
-                                           mInvocationConfiguration, mServiceConfiguration,
-                                           mLogger);
+                mInvocationConfiguration, mServiceConfiguration, mLogger);
     }
 
     @NotNull
     public InvocationChannel<IN, OUT> parallelInvoke() {
 
         return new ServiceChannel<IN, OUT>(true, mContext, mTargetFactory, mInvocationConfiguration,
-                                           mServiceConfiguration, mLogger);
+                mServiceConfiguration, mLogger);
     }
 
     @NotNull
@@ -380,9 +379,8 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
                         serviceContext.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
                 if (!mIsBound) {
                     throw new RoutineException("failed to bind to service: " + intent
-                                                       + ", remember to add the service "
-                                                       + "declaration to the Android manifest "
-                                                       + "file!");
+                            + ", remember to add the service "
+                            + "declaration to the Android manifest " + "file!");
                 }
             }
         }
@@ -535,17 +533,16 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
                 if (mIsParallel) {
                     logger.dbg("sending parallel invocation message");
                     putParallelInvocation(message.getData(), mUUID,
-                                          targetFactory.getInvocationClass(),
-                                          targetFactory.getFactoryArgs(), mInvocationConfiguration,
-                                          serviceConfiguration.getRunnerClassOr(null),
-                                          serviceConfiguration.getLogClassOr(null));
+                            targetFactory.getInvocationClass(), targetFactory.getFactoryArgs(),
+                            mInvocationConfiguration, serviceConfiguration.getRunnerClassOr(null),
+                            serviceConfiguration.getLogClassOr(null));
 
                 } else {
                     logger.dbg("sending async invocation message");
                     putAsyncInvocation(message.getData(), mUUID, targetFactory.getInvocationClass(),
-                                       targetFactory.getFactoryArgs(), mInvocationConfiguration,
-                                       serviceConfiguration.getRunnerClassOr(null),
-                                       serviceConfiguration.getLogClassOr(null));
+                            targetFactory.getFactoryArgs(), mInvocationConfiguration,
+                            serviceConfiguration.getRunnerClassOr(null),
+                            serviceConfiguration.getLogClassOr(null));
                 }
 
                 message.replyTo = mInMessenger;

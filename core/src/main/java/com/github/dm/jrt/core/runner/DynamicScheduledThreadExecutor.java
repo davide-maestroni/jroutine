@@ -56,7 +56,7 @@ class DynamicScheduledThreadExecutor extends ScheduledThreadPoolExecutor {
                 new QueueRejectedExecutionHandler(internalQueue);
         mExecutor =
                 new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, keepAliveUnit,
-                                       internalQueue, rejectedExecutionHandler);
+                        internalQueue, rejectedExecutionHandler);
     }
 
     @NotNull

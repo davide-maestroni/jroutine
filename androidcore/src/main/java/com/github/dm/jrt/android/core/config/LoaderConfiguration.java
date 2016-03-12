@@ -613,7 +613,7 @@ public final class LoaderConfiguration {
         private LoaderConfiguration buildConfiguration() {
 
             return new LoaderConfiguration(mLooper, mLoaderId, mRoutineId, mResolutionType,
-                                           mInputResolutionType, mStrategyType, mStaleTime);
+                    mInputResolutionType, mStrategyType, mStaleTime);
         }
 
         private void setConfiguration(@NotNull final LoaderConfiguration configuration) {

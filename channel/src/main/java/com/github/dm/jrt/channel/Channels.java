@@ -1046,7 +1046,7 @@ public class Channels {
         }
 
         return (DistributeBuilder<IN>) new DistributeBuilder<Object>(isFlush, placeholder,
-                                                                     Arrays.asList(channels));
+                Arrays.asList(channels));
     }
 
     @NotNull
@@ -1077,6 +1077,6 @@ public class Channels {
         }
 
         return (JoinBuilder<OUT>) new JoinBuilder<Object>(isFlush, placeholder,
-                                                          Arrays.asList(channels));
+                Arrays.asList(channels));
     }
 }

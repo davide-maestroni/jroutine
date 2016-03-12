@@ -91,7 +91,7 @@ public class TimeTest {
 
         final long systemTimeNs = System.nanoTime();
         assertThat(Time.currentNano().toNanos()).isBetween(systemTimeNs - 50000000,
-                                                           systemTimeNs + 50000000);
+                systemTimeNs + 50000000);
     }
 
     @Test

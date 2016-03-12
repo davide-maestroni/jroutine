@@ -243,9 +243,8 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
                                         .asyncCall("test")
                                         .afterMax(seconds(10))
                                         .all()).containsExactly("test");
-        assertThat(JRoutineAndroidCompat.withService(getActivity(), new Intent(getActivity(),
-                                                                               InvocationService
-                                                                                       .class))
+        assertThat(JRoutineAndroidCompat.withService(getActivity(),
+                new Intent(getActivity(), InvocationService.class))
                                         .on(TargetInvocationFactory.factoryOf(token))
                                         .asyncCall("test")
                                         .afterMax(seconds(10))

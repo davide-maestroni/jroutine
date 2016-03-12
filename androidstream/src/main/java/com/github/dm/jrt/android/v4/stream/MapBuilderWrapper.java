@@ -94,6 +94,6 @@ class MapBuilderWrapper<OUT>
 
         final ChannelConfiguration config = mConfiguration;
         return new Builder<ChannelsBuilder<SparseArrayCompat<LoaderStreamChannelCompat<OUT>>>>(this,
-                                                                                               config);
+                config);
     }
 }

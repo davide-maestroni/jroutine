@@ -181,7 +181,7 @@ public class InvocationService extends Service {
             @Nullable final Class<? extends Log> logClass) {
 
         putInvocation(bundle, invocationId, targetClass, factoryArgs, invocationConfiguration,
-                      runnerClass, logClass, false);
+                runnerClass, logClass, false);
     }
 
     /**
@@ -230,7 +230,7 @@ public class InvocationService extends Service {
             @Nullable final Class<? extends Log> logClass) {
 
         putInvocation(bundle, invocationId, targetClass, factoryArgs, invocationConfiguration,
-                      runnerClass, logClass, true);
+                runnerClass, logClass, true);
     }
 
     /**
@@ -272,13 +272,13 @@ public class InvocationService extends Service {
         bundle.putString(KEY_INVOCATION_ID, invocationId);
         bundle.putSerializable(KEY_TARGET_INVOCATION, targetClass);
         bundle.putParcelable(KEY_FACTORY_ARGS,
-                             (factoryArgs != null) ? new ParcelableValue(factoryArgs) : null);
+                (factoryArgs != null) ? new ParcelableValue(factoryArgs) : null);
         bundle.putInt(KEY_CORE_INVOCATIONS,
-                      invocationConfiguration.getCoreInstancesOr(InvocationConfiguration.DEFAULT));
+                invocationConfiguration.getCoreInstancesOr(InvocationConfiguration.DEFAULT));
         bundle.putInt(KEY_MAX_INVOCATIONS,
-                      invocationConfiguration.getMaxInstancesOr(InvocationConfiguration.DEFAULT));
+                invocationConfiguration.getMaxInstancesOr(InvocationConfiguration.DEFAULT));
         bundle.putSerializable(KEY_OUTPUT_ORDER,
-                               invocationConfiguration.getOutputOrderTypeOr(null));
+                invocationConfiguration.getOutputOrderTypeOr(null));
         bundle.putSerializable(KEY_LOG_LEVEL, invocationConfiguration.getLogLevelOr(null));
         bundle.putSerializable(KEY_RUNNER_CLASS, runnerClass);
         bundle.putSerializable(KEY_LOG_CLASS, logClass);
@@ -411,7 +411,7 @@ public class InvocationService extends Service {
                     (Class<? extends Log>) data.getSerializable(KEY_LOG_CLASS);
             final RoutineInfo routineInfo =
                     new RoutineInfo(targetClass, args, outputOrderType, runnerClass, logClass,
-                                    logLevel);
+                            logLevel);
             final HashMap<RoutineInfo, RoutineState> routines = mRoutines;
             RoutineState routineState = routines.get(routineInfo);
             if (routineState == null) {

@@ -34,8 +34,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  *
  * @param <OUT> the output data type.
  */
-final class MissingLoaderInvocationFactory<OUT>
-        extends CallContextInvocationFactory<Void, OUT> {
+final class MissingLoaderInvocationFactory<OUT> extends CallContextInvocationFactory<Void, OUT> {
 
     private final int mId;
 

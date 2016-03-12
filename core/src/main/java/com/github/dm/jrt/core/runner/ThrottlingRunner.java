@@ -128,7 +128,7 @@ class ThrottlingRunner implements Runner {
             throttlingExecution = new ThrottlingExecution(execution);
             if (execution.canBeCancelled()) {
                 mExecutions.put(execution,
-                                new WeakReference<ThrottlingExecution>(throttlingExecution));
+                        new WeakReference<ThrottlingExecution>(throttlingExecution));
             }
         }
 

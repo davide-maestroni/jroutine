@@ -839,7 +839,7 @@ public class ByteChannel {
 
             synchronized (mMutex) {
                 changeState(BufferState.TRANSFER, BufferState.READ,
-                            "attempting to get buffer stream while in illegal state");
+                        "attempting to get buffer stream while in illegal state");
                 return mStream;
             }
         }
@@ -849,7 +849,7 @@ public class ByteChannel {
 
             synchronized (mMutex) {
                 changeState(BufferState.WRITE, BufferState.TRANSFER,
-                            "attempting to write to output while in illegal state");
+                        "attempting to write to output while in illegal state");
                 mSize = size;
             }
 
@@ -874,7 +874,7 @@ public class ByteChannel {
 
             synchronized (mMutex) {
                 changeState(BufferState.READ, BufferState.RECYCLED,
-                            "attempting to read from buffer while in illegal state");
+                        "attempting to read from buffer while in illegal state");
                 mSize = 0;
             }
 

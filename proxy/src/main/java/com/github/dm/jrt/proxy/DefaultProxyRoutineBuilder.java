@@ -205,9 +205,9 @@ class DefaultProxyRoutineBuilder
                     packageName + annotation.classPrefix() + className + annotation.classSuffix();
             final Constructor<?> constructor =
                     findConstructor(Class.forName(fullClassName), target, invocationConfiguration,
-                                    proxyConfiguration);
+                            proxyConfiguration);
             return (TYPE) constructor.newInstance(target, invocationConfiguration,
-                                                  proxyConfiguration);
+                    proxyConfiguration);
         }
     }
 }

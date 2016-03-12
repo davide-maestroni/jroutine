@@ -249,7 +249,7 @@ public class IOChannelTest {
         final OutputChannel<String> outputChannel1 =
                 JRoutineCore.on(PassingInvocation.<String>factoryOf()).asyncCall(ioChannel1);
         assertThat(outputChannel1.afterMax(timeout).all()).containsExactly("test1", "test2",
-                                                                           "test3");
+                "test3");
     }
 
     @Test
@@ -556,7 +556,7 @@ public class IOChannelTest {
         assertThat(channel.isOpen()).isFalse();
         assertThat(channel.afterMax(seconds(1)).all()).containsExactly(2);
         assertThat(JRoutineCore.io().of(-11, 73).afterMax(seconds(1)).all()).containsExactly(-11,
-                                                                                             73);
+                73);
         assertThat(JRoutineCore.io()
                                .of(Arrays.asList(3, 12, -7))
                                .afterMax(seconds(1))

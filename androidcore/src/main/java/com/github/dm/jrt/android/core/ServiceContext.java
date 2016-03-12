@@ -208,7 +208,7 @@ public abstract class ServiceContext {
             final Context referent = mContext.get();
             return (referent != null) && referent.equals(that.mContext.get())
                     && mIntent.filterEquals(that.mIntent) && bundleEquals(mIntent.getExtras(),
-                                                                          that.mIntent.getExtras());
+                    that.mIntent.getExtras());
         }
 
         @Override

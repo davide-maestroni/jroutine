@@ -16,8 +16,8 @@
 
 package com.github.dm.jrt.android.v11.core;
 
-import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
+import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory;
 import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.android.core.runner.AndroidRunners;
@@ -99,7 +99,7 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
         final InvocationConfiguration.Builder<InvocationConfiguration> builder =
                 configuration.builderFrom().withRunner(mainRunner);
         return new DefaultLoaderRoutine<IN, OUT>(mContext, mFactory, builder.getConfigured(),
-                                                 mLoaderConfiguration);
+                mLoaderConfiguration);
     }
 
     @Override

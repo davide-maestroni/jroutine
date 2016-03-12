@@ -306,7 +306,7 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
         final Predicate<? super IN> predicate = mPredicate;
         if (predicate instanceof NegatePredicate) {
             return new PredicateWrapper<IN>(((NegatePredicate<? super IN>) predicate).mPredicate,
-                                            newPredicates);
+                    newPredicates);
         }
 
         return new PredicateWrapper<IN>(new NegatePredicate<IN>(predicate), newPredicates);

@@ -258,10 +258,9 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
                     packageName + annotation.classPrefix() + className + annotation.classSuffix();
             final Constructor<?> constructor =
                     findConstructor(Class.forName(fullClassName), context, target,
-                                    invocationConfiguration, proxyConfiguration,
-                                    serviceConfiguration);
+                            invocationConfiguration, proxyConfiguration, serviceConfiguration);
             return (TYPE) constructor.newInstance(context, target, invocationConfiguration,
-                                                  proxyConfiguration, serviceConfiguration);
+                    proxyConfiguration, serviceConfiguration);
         }
     }
 }

@@ -280,7 +280,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                                   .afterMax(seconds(10))
                                   .all()).containsExactly("test");
         assertThat(JRoutineAndroid.withService(getActivity(),
-                                               new Intent(getActivity(), InvocationService.class))
+                new Intent(getActivity(), InvocationService.class))
                                   .on(TargetInvocationFactory.factoryOf(token))
                                   .asyncCall("test")
                                   .afterMax(seconds(10))

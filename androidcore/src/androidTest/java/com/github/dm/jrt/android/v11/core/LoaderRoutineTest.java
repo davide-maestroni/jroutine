@@ -427,12 +427,12 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final TimeDuration timeout = seconds(10);
         final Routine<Object, Object> routine1 = JRoutineLoader.with(loaderFrom(getActivity()))
                                                                .on(PassingCallContextInvocation
-                                                                           .factoryOf())
+                                                                       .factoryOf())
                                                                .buildRoutine();
         final Routine<Object, Object> routine2 = JRoutineLoader.with(loaderFrom(getActivity()))
                                                                .on(factoryFrom(routine1,
-                                                                               TEST_ROUTINE_ID,
-                                                                               DelegationType.SYNC))
+                                                                       TEST_ROUTINE_ID,
+                                                                       DelegationType.SYNC))
                                                                .buildRoutine();
 
         assertThat(routine2.asyncCall("test1").afterMax(timeout).all()).containsExactly("test1");
@@ -922,8 +922,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         try {
 
             new DefaultLoaderRoutineBuilder<Object, Object>(loaderFrom(getActivity()),
-                                                            factory).setConfiguration(
-                    (InvocationConfiguration) null);
+                    factory).setConfiguration((InvocationConfiguration) null);
 
             fail();
 
@@ -934,8 +933,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         try {
 
             new DefaultLoaderRoutineBuilder<Object, Object>(loaderFrom(getActivity()),
-                                                            factory).setConfiguration(
-                    (LoaderConfiguration) null);
+                    factory).setConfiguration((LoaderConfiguration) null);
 
             fail();
 
@@ -1172,13 +1170,12 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                           R.id.test_fragment);
         final Routine<Object, Object> routine1 = JRoutineLoader.with(loaderFrom(fragment))
                                                                .on(PassingCallContextInvocation
-                                                                           .factoryOf())
+                                                                       .factoryOf())
                                                                .buildRoutine();
         final Routine<Object, Object> routine2 = JRoutineLoader.with(loaderFrom(fragment))
                                                                .on(factoryFrom(routine1,
-                                                                               TEST_ROUTINE_ID,
-                                                                               DelegationType
-                                                                                       .ASYNC))
+                                                                       TEST_ROUTINE_ID,
+                                                                       DelegationType.ASYNC))
                                                                .buildRoutine();
 
         assertThat(routine2.asyncCall("test1").afterMax(timeout).all()).containsExactly("test1");
@@ -1533,7 +1530,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final TimeDuration timeout = seconds(10);
         final Routine<String, String> routine1 = JRoutineLoader.with(loaderFrom(getActivity()))
                                                                .on(PassingCallContextInvocation
-                                                                           .<String>factoryOf())
+                                                                       .<String>factoryOf())
                                                                .withInvocations()
                                                                .withLog(AndroidLogs.androidLog())
                                                                .withLogLevel(Level.WARNING)
@@ -1582,7 +1579,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         try {
 
             new LoaderInvocation<String, String>(null, factoryOf(ToUpperCase.class), configuration,
-                                                 null, logger);
+                    null, logger);
 
             fail();
 
@@ -1603,7 +1600,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         try {
 
             new LoaderInvocation<String, String>(context, factoryOf(ToUpperCase.class), null, null,
-                                                 logger);
+                    logger);
 
             fail();
 
@@ -1614,7 +1611,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         try {
 
             new LoaderInvocation<String, String>(context, factoryOf(ToUpperCase.class),
-                                                 configuration, null, null);
+                    configuration, null, null);
 
             fail();
 
@@ -1684,8 +1681,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         try {
 
             new DefaultLoaderRoutine<String, String>(null, factoryOf(ToUpperCase.class),
-                                                     InvocationConfiguration.DEFAULT_CONFIGURATION,
-                                                     configuration);
+                    InvocationConfiguration.DEFAULT_CONFIGURATION, configuration);
 
             fail();
 
@@ -1696,8 +1692,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         try {
 
             new DefaultLoaderRoutine<String, String>(context, null,
-                                                     InvocationConfiguration.DEFAULT_CONFIGURATION,
-                                                     configuration);
+                    InvocationConfiguration.DEFAULT_CONFIGURATION, configuration);
 
             fail();
 
@@ -1708,7 +1703,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         try {
 
             new DefaultLoaderRoutine<String, String>(context, factoryOf(ToUpperCase.class), null,
-                                                     configuration);
+                    configuration);
 
             fail();
 
@@ -1719,8 +1714,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         try {
 
             new DefaultLoaderRoutine<String, String>(context, factoryOf(ToUpperCase.class),
-                                                     InvocationConfiguration.DEFAULT_CONFIGURATION,
-                                                     null);
+                    InvocationConfiguration.DEFAULT_CONFIGURATION, null);
 
             fail();
 

@@ -62,7 +62,7 @@ public class Runners {
 
         return scheduledRunner(
                 new DynamicScheduledThreadExecutor(corePoolSize, maximumPoolSize, keepAliveTime,
-                                                   keepAliveUnit));
+                        keepAliveUnit));
     }
 
     /**
@@ -125,7 +125,7 @@ public class Runners {
             if (sSharedRunner == null) {
                 final int processors = Runtime.getRuntime().availableProcessors();
                 sSharedRunner = dynamicPoolRunner((processors <= 2) ? processors : processors - 1,
-                                                  (processors << 3) - 1, 3L, TimeUnit.SECONDS);
+                        (processors << 3) - 1, 3L, TimeUnit.SECONDS);
             }
 
             return sSharedRunner;

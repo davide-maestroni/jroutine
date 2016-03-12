@@ -56,7 +56,7 @@ public class WeakIdentityHashMapTest {
 
         assertThat(map).hasSize(4);
         assertThat(map).contains(MapEntry.entry(key0, "test0"), MapEntry.entry(key1, "test1"),
-                                 MapEntry.entry(key2, "test2"), MapEntry.entry(key3, "test3"));
+                MapEntry.entry(key2, "test2"), MapEntry.entry(key3, "test3"));
 
         map.clear();
 
@@ -130,7 +130,7 @@ public class WeakIdentityHashMapTest {
 
         assertThat(map).hasSize(4);
         assertThat(map).contains(MapEntry.entry(key0, "test0"), MapEntry.entry(key1, "test1"),
-                                 MapEntry.entry(key2, "test2"), MapEntry.entry(key3, "test3"));
+                MapEntry.entry(key2, "test2"), MapEntry.entry(key3, "test3"));
 
         assertThat(map).isEqualTo(entries);
         assertThat(map.keySet()).isEqualTo(entries.keySet());
@@ -249,7 +249,7 @@ public class WeakIdentityHashMapTest {
 
         assertThat(map).hasSize(4);
         assertThat(map).contains(MapEntry.entry(key0, "test0"), MapEntry.entry(key1, "test1"),
-                                 MapEntry.entry(key2, "test2"), MapEntry.entry(key3, "test3"));
+                MapEntry.entry(key2, "test2"), MapEntry.entry(key3, "test3"));
     }
 
     @Test
@@ -270,7 +270,7 @@ public class WeakIdentityHashMapTest {
 
         assertThat(map).hasSize(4);
         assertThat(map).contains(MapEntry.entry(key0, "test0"), MapEntry.entry(key1, "test1"),
-                                 MapEntry.entry(key2, "test2"), MapEntry.entry(key3, "test3"));
+                MapEntry.entry(key2, "test2"), MapEntry.entry(key3, "test3"));
 
         assertThat(map.get(key2)).isEqualTo("test2");
 
@@ -278,7 +278,7 @@ public class WeakIdentityHashMapTest {
 
         assertThat(map).hasSize(3);
         assertThat(map).contains(MapEntry.entry(key0, "test0"), MapEntry.entry(key1, "test1"),
-                                 MapEntry.entry(key3, "test3"));
+                MapEntry.entry(key3, "test3"));
     }
 
     @Test

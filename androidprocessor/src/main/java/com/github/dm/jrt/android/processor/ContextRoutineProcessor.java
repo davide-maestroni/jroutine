@@ -119,11 +119,11 @@ public class ContextRoutineProcessor extends RoutineProcessor {
             builder.append("mRoutine").append(i).append(" = ").append("initRoutine").append(i);
             if (annotationElement == serviceProxyElement) {
                 builder.append("(target, invocationConfiguration, proxyConfiguration, "
-                                       + "serviceConfiguration);");
+                        + "serviceConfiguration);");
 
             } else {
                 builder.append("(target, invocationConfiguration, proxyConfiguration, "
-                                       + "loaderConfiguration);");
+                        + "loaderConfiguration);");
             }
 
             builder.append(NEW_LINE);
@@ -180,7 +180,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
             }
 
             return mMethodHeaderV1.replace("${invocationBuilderOptions}",
-                                           buildInvocationOptions(methodElement));
+                    buildInvocationOptions(methodElement));
         }
 
         if (mMethodHeader == null) {
@@ -247,7 +247,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
                 getAnnotationValue(methodElement, mInputClashAnnotationType, "value");
         if (inputResolutionType != null) {
             builder.append(".withInputClashResolution(com.github.dm.jrt.android.core.config"
-                                   + ".LoaderConfiguration" + ".ClashResolutionType.")
+                    + ".LoaderConfiguration" + ".ClashResolutionType.")
                    .append(resolutionType)
                    .append(")");
         }

@@ -435,23 +435,22 @@ public class RoutineTest {
     public void testChainedRoutine() {
 
         final TimeDuration timeout = seconds(1);
-        final CallInvocation<Integer, Integer> execSum =
-                new CallInvocation<Integer, Integer>() {
+        final CallInvocation<Integer, Integer> execSum = new CallInvocation<Integer, Integer>() {
 
-                    @Override
-                    protected void onCall(@NotNull final List<? extends Integer> integers,
-                            @NotNull final ResultChannel<Integer> result) {
+            @Override
+            protected void onCall(@NotNull final List<? extends Integer> integers,
+                    @NotNull final ResultChannel<Integer> result) {
 
-                        int sum = 0;
+                int sum = 0;
 
-                        for (final Integer integer : integers) {
+                for (final Integer integer : integers) {
 
-                            sum += integer;
-                        }
+                    sum += integer;
+                }
 
-                        result.pass(sum);
-                    }
-                };
+                result.pass(sum);
+            }
+        };
 
         final Routine<Integer, Integer> sumRoutine =
                 JRoutineCore.on(factoryOf(execSum, this)).buildRoutine();
@@ -475,23 +474,22 @@ public class RoutineTest {
     public void testComposedRoutine() {
 
         final TimeDuration timeout = seconds(1);
-        final CallInvocation<Integer, Integer> execSum =
-                new CallInvocation<Integer, Integer>() {
+        final CallInvocation<Integer, Integer> execSum = new CallInvocation<Integer, Integer>() {
 
-                    @Override
-                    protected void onCall(@NotNull final List<? extends Integer> integers,
-                            @NotNull final ResultChannel<Integer> result) {
+            @Override
+            protected void onCall(@NotNull final List<? extends Integer> integers,
+                    @NotNull final ResultChannel<Integer> result) {
 
-                        int sum = 0;
+                int sum = 0;
 
-                        for (final Integer integer : integers) {
+                for (final Integer integer : integers) {
 
-                            sum += integer;
-                        }
+                    sum += integer;
+                }
 
-                        result.pass(sum);
-                    }
-                };
+                result.pass(sum);
+            }
+        };
 
         final Routine<Integer, Integer> sumRoutine =
                 JRoutineCore.on(factoryOf(execSum, this)).buildRoutine();
@@ -637,9 +635,7 @@ public class RoutineTest {
         channel.after(millis(10)).pass((String[]) null);
         channel.now().pass((List<String>) null).pass((OutputChannel<String>) null);
         assertThat(channel.result().afterMax(3, TimeUnit.SECONDS).all()).containsOnly("test1",
-                                                                                      "test2",
-                                                                                      "test3",
-                                                                                      "test4");
+                "test2", "test3", "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(110);
 
         startTime = System.currentTimeMillis();
@@ -657,9 +653,7 @@ public class RoutineTest {
         channel1.after(millis(10)).pass((String[]) null);
         channel1.now().pass((List<String>) null).pass((OutputChannel<String>) null);
         assertThat(channel1.result().afterMax(seconds(7000)).all()).containsExactly("test1",
-                                                                                    "test2",
-                                                                                    "test3",
-                                                                                    "test4");
+                "test2", "test3", "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(110);
 
         startTime = System.currentTimeMillis();
@@ -673,9 +667,7 @@ public class RoutineTest {
         channel2.after(millis(10)).pass((String[]) null);
         channel2.now().pass((List<String>) null).pass((OutputChannel<String>) null);
         assertThat(channel2.result().afterMax(3, TimeUnit.SECONDS).all()).containsOnly("test1",
-                                                                                       "test2",
-                                                                                       "test3",
-                                                                                       "test4");
+                "test2", "test3", "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(110);
 
         startTime = System.currentTimeMillis();
@@ -695,9 +687,7 @@ public class RoutineTest {
         channel3.after(millis(10)).pass((String[]) null);
         channel3.now().pass((List<String>) null).pass((OutputChannel<String>) null);
         assertThat(channel3.result().afterMax(3, TimeUnit.SECONDS).all()).containsExactly("test1",
-                                                                                          "test2",
-                                                                                          "test3",
-                                                                                          "test4");
+                "test2", "test3", "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(110);
 
         startTime = System.currentTimeMillis();
@@ -711,9 +701,7 @@ public class RoutineTest {
         channel4.after(millis(10)).pass((String[]) null);
         channel4.now().pass((List<String>) null).pass((OutputChannel<String>) null);
         assertThat(channel4.result().afterMax(3, TimeUnit.SECONDS).all()).containsOnly("test1",
-                                                                                       "test2",
-                                                                                       "test3",
-                                                                                       "test4");
+                "test2", "test3", "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
 
         startTime = System.currentTimeMillis();
@@ -730,9 +718,7 @@ public class RoutineTest {
         channel5.after(millis(10)).pass((String[]) null);
         channel5.now().pass((List<String>) null).pass((OutputChannel<String>) null);
         assertThat(channel5.result().afterMax(3, TimeUnit.SECONDS).all()).containsExactly("test1",
-                                                                                          "test2",
-                                                                                          "test3",
-                                                                                          "test4");
+                "test2", "test3", "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
 
         startTime = System.currentTimeMillis();
@@ -746,9 +732,7 @@ public class RoutineTest {
         channel6.after(millis(10)).pass((String[]) null);
         channel6.now().pass((List<String>) null).pass((OutputChannel<String>) null);
         assertThat(channel6.result().afterMax(3, TimeUnit.SECONDS).all()).containsOnly("test1",
-                                                                                       "test2",
-                                                                                       "test3",
-                                                                                       "test4");
+                "test2", "test3", "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(110);
 
         startTime = System.currentTimeMillis();
@@ -765,9 +749,7 @@ public class RoutineTest {
         channel7.after(millis(10)).pass((String[]) null);
         channel7.now().pass((List<String>) null).pass((OutputChannel<String>) null);
         assertThat(channel7.result().afterMax(3, TimeUnit.SECONDS).all()).containsExactly("test1",
-                                                                                          "test2",
-                                                                                          "test3",
-                                                                                          "test4");
+                "test2", "test3", "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(110);
 
         startTime = System.currentTimeMillis();
@@ -781,9 +763,7 @@ public class RoutineTest {
         channel8.after(millis(10)).pass((String[]) null);
         channel8.now().pass((List<String>) null).pass((OutputChannel<String>) null);
         assertThat(channel8.result().afterMax(3, TimeUnit.SECONDS).all()).containsOnly("test1",
-                                                                                       "test2",
-                                                                                       "test3",
-                                                                                       "test4");
+                "test2", "test3", "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
 
         startTime = System.currentTimeMillis();
@@ -800,9 +780,7 @@ public class RoutineTest {
         channel9.after(millis(10)).pass((String[]) null);
         channel9.now().pass((List<String>) null).pass((OutputChannel<String>) null);
         assertThat(channel9.result().afterMax(3, TimeUnit.SECONDS).all()).containsExactly("test1",
-                                                                                          "test2",
-                                                                                          "test3",
-                                                                                          "test4");
+                "test2", "test3", "test4");
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
     }
 
@@ -1225,8 +1203,7 @@ public class RoutineTest {
 
             final DefaultResultChannel<Object> channel =
                     new DefaultResultChannel<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
-                                                     new TestAbortHandler(), Runners.syncRunner(),
-                                                     logger);
+                            new TestAbortHandler(), Runners.syncRunner(), logger);
 
             new InvocationExecution<Object, Object>(null, new TestInputIterator(), channel, logger);
 
@@ -1240,11 +1217,10 @@ public class RoutineTest {
 
             final DefaultResultChannel<Object> channel =
                     new DefaultResultChannel<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
-                                                     new TestAbortHandler(), Runners.syncRunner(),
-                                                     logger);
+                            new TestAbortHandler(), Runners.syncRunner(), logger);
 
             new InvocationExecution<Object, Object>(new TestInvocationManager(), null, channel,
-                                                    logger);
+                    logger);
 
             fail();
 
@@ -1255,7 +1231,7 @@ public class RoutineTest {
         try {
 
             new InvocationExecution<Object, Object>(new TestInvocationManager(),
-                                                    new TestInputIterator(), null, logger);
+                    new TestInputIterator(), null, logger);
 
             fail();
 
@@ -1267,11 +1243,10 @@ public class RoutineTest {
 
             final DefaultResultChannel<Object> channel =
                     new DefaultResultChannel<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
-                                                     new TestAbortHandler(), Runners.syncRunner(),
-                                                     logger);
+                            new TestAbortHandler(), Runners.syncRunner(), logger);
 
             new InvocationExecution<Object, Object>(new TestInvocationManager(),
-                                                    new TestInputIterator(), channel, null);
+                    new TestInputIterator(), channel, null);
 
             fail();
 
@@ -1687,7 +1662,7 @@ public class RoutineTest {
         try {
 
             new DefaultInvocationChannel<Object, Object>(null, new TestInvocationManager(),
-                                                         Runners.sharedRunner(), logger);
+                    Runners.sharedRunner(), logger);
 
             fail();
 
@@ -2143,7 +2118,7 @@ public class RoutineTest {
         try {
 
             new DefaultResultChannel<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION, null,
-                                             Runners.sharedRunner(), logger);
+                    Runners.sharedRunner(), logger);
 
             fail();
 
@@ -2154,7 +2129,7 @@ public class RoutineTest {
         try {
 
             new DefaultResultChannel<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
-                                             new TestAbortHandler(), null, logger);
+                    new TestAbortHandler(), null, logger);
 
             fail();
 
@@ -2165,7 +2140,7 @@ public class RoutineTest {
         try {
 
             new DefaultResultChannel<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
-                                             new TestAbortHandler(), Runners.sharedRunner(), null);
+                    new TestAbortHandler(), Runners.sharedRunner(), null);
 
             fail();
 
@@ -2176,8 +2151,7 @@ public class RoutineTest {
         try {
 
             new DefaultResultChannel<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
-                                             new TestAbortHandler(), Runners.sharedRunner(), logger)
-                    .after(null);
+                    new TestAbortHandler(), Runners.sharedRunner(), logger).after(null);
 
             fail();
 
@@ -2188,8 +2162,7 @@ public class RoutineTest {
         try {
 
             new DefaultResultChannel<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
-                                             new TestAbortHandler(), Runners.sharedRunner(), logger)
-                    .after(0, null);
+                    new TestAbortHandler(), Runners.sharedRunner(), logger).after(0, null);
 
             fail();
 
@@ -2201,8 +2174,7 @@ public class RoutineTest {
 
             final DefaultResultChannel<Object> channel =
                     new DefaultResultChannel<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
-                                                     new TestAbortHandler(), Runners.sharedRunner(),
-                                                     logger);
+                            new TestAbortHandler(), Runners.sharedRunner(), logger);
 
             channel.after(-1, TimeUnit.MILLISECONDS);
 
@@ -2426,16 +2398,11 @@ public class RoutineTest {
                 JRoutineCore.on(factoryOf(execSquare, this)).buildRoutine();
 
         assertThat(squareRoutine.syncCall(1, 2, 3, 4).afterMax(timeout).all()).containsExactly(1, 4,
-                                                                                               9,
-                                                                                               16);
+                9, 16);
         assertThat(squareRoutine.asyncCall(1, 2, 3, 4).afterMax(timeout).all()).containsExactly(1,
-                                                                                                4,
-                                                                                                9,
-                                                                                                16);
+                4, 9, 16);
         assertThat(squareRoutine.parallelCall(1, 2, 3, 4).afterMax(timeout).all()).containsOnly(1,
-                                                                                                4,
-                                                                                                9,
-                                                                                                16);
+                4, 9, 16);
     }
 
     @Test
@@ -2493,23 +2460,22 @@ public class RoutineTest {
     public void testRoutineFunction() {
 
         final TimeDuration timeout = seconds(1);
-        final CallInvocation<Integer, Integer> execSum =
-                new CallInvocation<Integer, Integer>() {
+        final CallInvocation<Integer, Integer> execSum = new CallInvocation<Integer, Integer>() {
 
-                    @Override
-                    protected void onCall(@NotNull final List<? extends Integer> integers,
-                            @NotNull final ResultChannel<Integer> result) {
+            @Override
+            protected void onCall(@NotNull final List<? extends Integer> integers,
+                    @NotNull final ResultChannel<Integer> result) {
 
-                        int sum = 0;
+                int sum = 0;
 
-                        for (final Integer integer : integers) {
+                for (final Integer integer : integers) {
 
-                            sum += integer;
-                        }
+                    sum += integer;
+                }
 
-                        result.pass(sum);
-                    }
-                };
+                result.pass(sum);
+            }
+        };
 
         final Routine<Integer, Integer> sumRoutine =
                 JRoutineCore.on(factoryOf(execSum, this)).buildRoutine();
@@ -3170,10 +3136,8 @@ public class RoutineTest {
 
         assertThat(
                 routine.syncCall(input).bind(consumer).afterMax(timeout).hasCompleted()).isTrue();
-        assertThat(routine.asyncCall(input)
-                          .bind(consumer)
-                          .afterMax(timeout)
-                          .hasCompleted()).isTrue();
+        assertThat(
+                routine.asyncCall(input).bind(consumer).afterMax(timeout).hasCompleted()).isTrue();
         assertThat(routine.parallelCall(input)
                           .bind(consumer)
                           .afterMax(timeout)

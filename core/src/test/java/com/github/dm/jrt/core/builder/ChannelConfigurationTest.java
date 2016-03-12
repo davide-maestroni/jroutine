@@ -16,9 +16,10 @@
 
 package com.github.dm.jrt.core.builder;
 
-import com.github.dm.jrt.core.builder.ChannelConfiguration.Builder;
-import com.github.dm.jrt.core.builder.InvocationConfiguration.OrderType;
-import com.github.dm.jrt.core.builder.InvocationConfiguration.TimeoutActionType;
+import com.github.dm.jrt.core.config.ChannelConfiguration;
+import com.github.dm.jrt.core.config.ChannelConfiguration.Builder;
+import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
+import com.github.dm.jrt.core.config.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.Logs;
 import com.github.dm.jrt.core.log.NullLog;
@@ -29,11 +30,11 @@ import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.github.dm.jrt.core.builder.ChannelConfiguration.builder;
-import static com.github.dm.jrt.core.builder.ChannelConfiguration.builderFrom;
-import static com.github.dm.jrt.core.builder.ChannelConfiguration.builderFromInputChannel;
-import static com.github.dm.jrt.core.builder.ChannelConfiguration.builderFromInvocation;
-import static com.github.dm.jrt.core.builder.ChannelConfiguration.builderFromOutputChannel;
+import static com.github.dm.jrt.core.config.ChannelConfiguration.builder;
+import static com.github.dm.jrt.core.config.ChannelConfiguration.builderFrom;
+import static com.github.dm.jrt.core.config.ChannelConfiguration.builderFromInputChannel;
+import static com.github.dm.jrt.core.config.ChannelConfiguration.builderFromInvocation;
+import static com.github.dm.jrt.core.config.ChannelConfiguration.builderFromOutputChannel;
 import static com.github.dm.jrt.core.util.TimeDuration.millis;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -48,7 +49,7 @@ public class ChannelConfigurationTest {
     @Test
     public void testBuildFrom() {
 
-        final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
+        final com.github.dm.jrt.core.config.ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
                                                             .withRunner(Runners.syncRunner())
                                                             .withLog(new NullLog())
                                                             .withChannelMaxSize(100)
@@ -57,9 +58,9 @@ public class ChannelConfigurationTest {
                 configuration.hashCode());
         assertThat(builderFrom(configuration).getConfigured()).isEqualTo(configuration);
         assertThat(builderFrom(null).getConfigured().hashCode()).isEqualTo(
-                ChannelConfiguration.DEFAULT_CONFIGURATION.hashCode());
+                com.github.dm.jrt.core.config.ChannelConfiguration.DEFAULT_CONFIGURATION.hashCode());
         assertThat(builderFrom(null).getConfigured()).isEqualTo(
-                ChannelConfiguration.DEFAULT_CONFIGURATION);
+                com.github.dm.jrt.core.config.ChannelConfiguration.DEFAULT_CONFIGURATION);
     }
 
     @Test
@@ -78,7 +79,7 @@ public class ChannelConfigurationTest {
 
         try {
 
-            new Builder<Object>(null, ChannelConfiguration.DEFAULT_CONFIGURATION);
+            new Builder<Object>(null, com.github.dm.jrt.core.config.ChannelConfiguration.DEFAULT_CONFIGURATION);
 
             fail();
 
@@ -90,7 +91,7 @@ public class ChannelConfigurationTest {
     @Test
     public void testBuilderFromEquals() {
 
-        final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
+        final com.github.dm.jrt.core.config.ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
                                                             .withRunner(Runners.syncRunner())
                                                             .withLog(new NullLog())
                                                             .withChannelMaxSize(100)
@@ -105,13 +106,13 @@ public class ChannelConfigurationTest {
         assertThat(builder().with(configuration).getConfigured()).isEqualTo(configuration);
         assertThat(configuration.builderFrom().getConfigured()).isEqualTo(configuration);
         assertThat(configuration.builderFrom().with(null).getConfigured()).isEqualTo(
-                ChannelConfiguration.DEFAULT_CONFIGURATION);
+                com.github.dm.jrt.core.config.ChannelConfiguration.DEFAULT_CONFIGURATION);
     }
 
     @Test
     public void testChannelLimitEquals() {
 
-        final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
+        final com.github.dm.jrt.core.config.ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
                                                             .withRunner(Runners.syncRunner())
                                                             .withLog(new NullLog())
                                                             .withChannelLimit(100)
@@ -138,7 +139,7 @@ public class ChannelConfigurationTest {
     @Test
     public void testChannelMaxDelayEquals() {
 
-        final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
+        final com.github.dm.jrt.core.config.ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
                                                             .withRunner(Runners.syncRunner())
                                                             .withLog(new NullLog())
                                                             .withChannelMaxSize(100)
@@ -181,7 +182,7 @@ public class ChannelConfigurationTest {
     @Test
     public void testChannelOrderEquals() {
 
-        final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
+        final com.github.dm.jrt.core.config.ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
                                                             .withRunner(Runners.syncRunner())
                                                             .withLog(new NullLog())
                                                             .withChannelMaxSize(100)
@@ -197,7 +198,7 @@ public class ChannelConfigurationTest {
     @Test
     public void testChannelSizeEquals() {
 
-        final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
+        final com.github.dm.jrt.core.config.ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
                                                             .withRunner(Runners.syncRunner())
                                                             .withLog(new NullLog())
                                                             .withChannelMaxSize(100)
@@ -224,9 +225,9 @@ public class ChannelConfigurationTest {
     @Test
     public void testFromInputChannelConfiguration() {
 
-        final InvocationConfiguration.Builder<InvocationConfiguration> builder =
-                InvocationConfiguration.builder();
-        final InvocationConfiguration invocationConfiguration =
+        final com.github.dm.jrt.core.config.InvocationConfiguration.Builder<com.github.dm.jrt.core.config.InvocationConfiguration> builder =
+                com.github.dm.jrt.core.config.InvocationConfiguration.builder();
+        final com.github.dm.jrt.core.config.InvocationConfiguration invocationConfiguration =
                 builder.withRunner(Runners.syncRunner())
                        .withReadTimeout(millis(100))
                        .withReadTimeoutAction(TimeoutActionType.ABORT)
@@ -237,7 +238,7 @@ public class ChannelConfigurationTest {
                        .withInputMaxDelay(millis(33))
                        .withInputMaxSize(100)
                        .getConfigured();
-        final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
+        final com.github.dm.jrt.core.config.ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
                                                             .withChannelLimit(10)
                                                             .withChannelMaxDelay(millis(33))
                                                             .withChannelMaxSize(100)
@@ -255,9 +256,9 @@ public class ChannelConfigurationTest {
     @Test
     public void testFromInvocationConfiguration() {
 
-        final InvocationConfiguration.Builder<InvocationConfiguration> builder =
-                InvocationConfiguration.builder();
-        final InvocationConfiguration invocationConfiguration =
+        final com.github.dm.jrt.core.config.InvocationConfiguration.Builder<com.github.dm.jrt.core.config.InvocationConfiguration> builder =
+                com.github.dm.jrt.core.config.InvocationConfiguration.builder();
+        final com.github.dm.jrt.core.config.InvocationConfiguration invocationConfiguration =
                 builder.withRunner(Runners.syncRunner())
                        .withReadTimeout(millis(100))
                        .withReadTimeoutAction(TimeoutActionType.ABORT)
@@ -268,7 +269,7 @@ public class ChannelConfigurationTest {
                        .withInputMaxDelay(millis(33))
                        .withInputMaxSize(100)
                        .getConfigured();
-        final ChannelConfiguration configuration = builder().withRunner(Runners.syncRunner())
+        final com.github.dm.jrt.core.config.ChannelConfiguration configuration = builder().withRunner(Runners.syncRunner())
                                                             .withReadTimeout(millis(100))
                                                             .withReadTimeoutAction(
                                                                     TimeoutActionType.ABORT)
@@ -282,9 +283,9 @@ public class ChannelConfigurationTest {
     @Test
     public void testFromOutputChannelConfiguration() {
 
-        final InvocationConfiguration.Builder<InvocationConfiguration> builder =
-                InvocationConfiguration.builder();
-        final InvocationConfiguration invocationConfiguration =
+        final com.github.dm.jrt.core.config.InvocationConfiguration.Builder<com.github.dm.jrt.core.config.InvocationConfiguration> builder =
+                com.github.dm.jrt.core.config.InvocationConfiguration.builder();
+        final com.github.dm.jrt.core.config.InvocationConfiguration invocationConfiguration =
                 builder.withRunner(Runners.syncRunner())
                        .withReadTimeout(millis(100))
                        .withReadTimeoutAction(TimeoutActionType.ABORT)
@@ -295,7 +296,7 @@ public class ChannelConfigurationTest {
                        .withOutputMaxDelay(millis(33))
                        .withOutputMaxSize(100)
                        .getConfigured();
-        final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
+        final com.github.dm.jrt.core.config.ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
                                                             .withChannelLimit(10)
                                                             .withChannelMaxDelay(millis(33))
                                                             .withChannelMaxSize(100)
@@ -313,7 +314,7 @@ public class ChannelConfigurationTest {
     @Test
     public void testLogEquals() {
 
-        final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
+        final com.github.dm.jrt.core.config.ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
                                                             .withRunner(Runners.syncRunner())
                                                             .withLog(new NullLog())
                                                             .withChannelMaxSize(100)
@@ -327,7 +328,7 @@ public class ChannelConfigurationTest {
     @Test
     public void testLogLevelEquals() {
 
-        final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
+        final com.github.dm.jrt.core.config.ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
                                                             .withRunner(Runners.syncRunner())
                                                             .withLog(new NullLog())
                                                             .withChannelMaxSize(100)
@@ -342,7 +343,7 @@ public class ChannelConfigurationTest {
     @Test
     public void testReadTimeoutActionEquals() {
 
-        final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
+        final com.github.dm.jrt.core.config.ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
                                                             .withRunner(Runners.syncRunner())
                                                             .withLog(new NullLog())
                                                             .withChannelMaxSize(100)
@@ -360,7 +361,7 @@ public class ChannelConfigurationTest {
     @Test
     public void testReadTimeoutEquals() {
 
-        final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
+        final com.github.dm.jrt.core.config.ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
                                                             .withRunner(Runners.syncRunner())
                                                             .withLog(new NullLog())
                                                             .withChannelMaxSize(100)
@@ -378,7 +379,7 @@ public class ChannelConfigurationTest {
     @Test
     public void testRunnerEquals() {
 
-        final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
+        final com.github.dm.jrt.core.config.ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
                                                             .withRunner(Runners.syncRunner())
                                                             .withLog(new NullLog())
                                                             .withChannelMaxSize(100)
@@ -394,7 +395,7 @@ public class ChannelConfigurationTest {
     @Test
     public void testToInputChannelConfiguration() {
 
-        final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
+        final com.github.dm.jrt.core.config.ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
                                                             .withChannelLimit(10)
                                                             .withChannelMaxDelay(millis(33))
                                                             .withChannelMaxSize(100)
@@ -405,9 +406,9 @@ public class ChannelConfigurationTest {
                                                             .withLog(Logs.nullLog())
                                                             .withLogLevel(Level.SILENT)
                                                             .getConfigured();
-        final InvocationConfiguration.Builder<InvocationConfiguration> builder =
-                InvocationConfiguration.builder();
-        final InvocationConfiguration invocationConfiguration =
+        final com.github.dm.jrt.core.config.InvocationConfiguration.Builder<com.github.dm.jrt.core.config.InvocationConfiguration> builder =
+                com.github.dm.jrt.core.config.InvocationConfiguration.builder();
+        final com.github.dm.jrt.core.config.InvocationConfiguration invocationConfiguration =
                 builder.withRunner(Runners.syncRunner())
                        .withReadTimeout(millis(100))
                        .withReadTimeoutAction(TimeoutActionType.ABORT)
@@ -424,7 +425,7 @@ public class ChannelConfigurationTest {
     @Test
     public void testToInvocationConfiguration() {
 
-        final ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
+        final com.github.dm.jrt.core.config.ChannelConfiguration configuration = builder().withChannelOrder(OrderType.BY_CALL)
                                                             .withChannelLimit(10)
                                                             .withChannelMaxDelay(millis(33))
                                                             .withChannelMaxSize(100)
@@ -435,9 +436,9 @@ public class ChannelConfigurationTest {
                                                             .withLog(Logs.nullLog())
                                                             .withLogLevel(Level.SILENT)
                                                             .getConfigured();
-        final InvocationConfiguration.Builder<InvocationConfiguration> builder =
-                InvocationConfiguration.builder();
-        final InvocationConfiguration invocationConfiguration =
+        final com.github.dm.jrt.core.config.InvocationConfiguration.Builder<com.github.dm.jrt.core.config.InvocationConfiguration> builder =
+                com.github.dm.jrt.core.config.InvocationConfiguration.builder();
+        final com.github.dm.jrt.core.config.InvocationConfiguration invocationConfiguration =
                 builder.withRunner(Runners.syncRunner())
                        .withReadTimeout(millis(100))
                        .withReadTimeoutAction(TimeoutActionType.ABORT)
@@ -461,9 +462,9 @@ public class ChannelConfigurationTest {
                                                             .withLog(Logs.nullLog())
                                                             .withLogLevel(Level.SILENT)
                                                             .getConfigured();
-        final InvocationConfiguration.Builder<InvocationConfiguration> builder =
-                InvocationConfiguration.builder();
-        final InvocationConfiguration invocationConfiguration =
+        final com.github.dm.jrt.core.config.InvocationConfiguration.Builder<com.github.dm.jrt.core.config.InvocationConfiguration> builder =
+                com.github.dm.jrt.core.config.InvocationConfiguration.builder();
+        final com.github.dm.jrt.core.config.InvocationConfiguration invocationConfiguration =
                 builder.withRunner(Runners.syncRunner())
                        .withReadTimeout(millis(100))
                        .withReadTimeoutAction(TimeoutActionType.ABORT)

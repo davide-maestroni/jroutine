@@ -24,12 +24,12 @@ import com.github.dm.jrt.android.proxy.annotation.LoaderProxyCompat;
 import com.github.dm.jrt.android.proxy.builder.LoaderProxyObjectBuilder;
 import com.github.dm.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.builder.InvocationConfiguration;
-import com.github.dm.jrt.core.builder.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.InvocationChannel;
+import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.config.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
@@ -60,8 +60,7 @@ import java.util.List;
 
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.classOfType;
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceOf;
-import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
-import static com.github.dm.jrt.core.builder.InvocationConfiguration.builder;
+import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
 import static com.github.dm.jrt.core.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 

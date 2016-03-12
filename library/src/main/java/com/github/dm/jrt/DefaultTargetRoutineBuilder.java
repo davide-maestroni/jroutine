@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt;
 
-import com.github.dm.jrt.core.builder.InvocationConfiguration;
+import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.object.InvocationTarget;

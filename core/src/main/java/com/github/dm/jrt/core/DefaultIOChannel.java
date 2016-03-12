@@ -17,11 +17,11 @@
 package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.core.DefaultResultChannel.AbortHandler;
-import com.github.dm.jrt.core.builder.ChannelConfiguration;
-import com.github.dm.jrt.core.builder.InvocationConfiguration;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.config.ChannelConfiguration;
+import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.TimeDuration;

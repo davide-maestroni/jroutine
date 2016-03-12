@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.core;
 
-import com.github.dm.jrt.core.builder.InvocationConfiguration;
+import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.log.Logger;

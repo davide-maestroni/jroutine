@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.core.builder;
 
-import com.github.dm.jrt.core.builder.InvocationConfiguration.Builder;
+import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 
 import org.jetbrains.annotations.NotNull;
 

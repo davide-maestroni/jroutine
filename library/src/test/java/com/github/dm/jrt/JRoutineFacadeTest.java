@@ -17,12 +17,12 @@
 package com.github.dm.jrt;
 
 import com.github.dm.jrt.TargetRoutineBuilder.BuilderType;
-import com.github.dm.jrt.core.builder.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.config.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
 import com.github.dm.jrt.core.invocation.FilterInvocation;

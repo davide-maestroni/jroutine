@@ -16,9 +16,6 @@
 
 package com.github.dm.jrt.core;
 
-import com.github.dm.jrt.core.builder.InvocationConfiguration;
-import com.github.dm.jrt.core.builder.InvocationConfiguration.OrderType;
-import com.github.dm.jrt.core.builder.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.ExecutionDeadlockException;
 import com.github.dm.jrt.core.channel.ExecutionTimeoutException;
@@ -26,6 +23,9 @@ import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.channel.OutputDeadlockException;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
+import com.github.dm.jrt.core.config.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.invocation.InvocationDeadlockException;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;

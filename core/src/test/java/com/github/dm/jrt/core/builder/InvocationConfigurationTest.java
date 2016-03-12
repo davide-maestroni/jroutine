@@ -16,9 +16,9 @@
 
 package com.github.dm.jrt.core.builder;
 
-import com.github.dm.jrt.core.builder.InvocationConfiguration.Builder;
-import com.github.dm.jrt.core.builder.InvocationConfiguration.OrderType;
-import com.github.dm.jrt.core.builder.InvocationConfiguration.TimeoutActionType;
+import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
+import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
+import com.github.dm.jrt.core.config.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.Logs;
 import com.github.dm.jrt.core.log.NullLog;
@@ -29,8 +29,8 @@ import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.github.dm.jrt.core.builder.InvocationConfiguration.builder;
-import static com.github.dm.jrt.core.builder.InvocationConfiguration.builderFrom;
+import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
+import static com.github.dm.jrt.core.config.InvocationConfiguration.builderFrom;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -44,7 +44,7 @@ public class InvocationConfigurationTest {
     @Test
     public void testBuildFrom() {
 
-        final InvocationConfiguration configuration = builder().withPriority(11)
+        final com.github.dm.jrt.core.config.InvocationConfiguration configuration = builder().withPriority(11)
                                                                .withInputOrder(OrderType.BY_CALL)
                                                                .withRunner(Runners.syncRunner())
                                                                .withLog(new NullLog())
@@ -54,9 +54,9 @@ public class InvocationConfigurationTest {
                 configuration.hashCode());
         assertThat(builderFrom(configuration).getConfigured()).isEqualTo(configuration);
         assertThat(builderFrom(null).getConfigured().hashCode()).isEqualTo(
-                InvocationConfiguration.DEFAULT_CONFIGURATION.hashCode());
+                com.github.dm.jrt.core.config.InvocationConfiguration.DEFAULT_CONFIGURATION.hashCode());
         assertThat(builderFrom(null).getConfigured()).isEqualTo(
-                InvocationConfiguration.DEFAULT_CONFIGURATION);
+                com.github.dm.jrt.core.config.InvocationConfiguration.DEFAULT_CONFIGURATION);
     }
 
     @Test
@@ -75,7 +75,7 @@ public class InvocationConfigurationTest {
 
         try {
 
-            new Builder<Object>(null, InvocationConfiguration.DEFAULT_CONFIGURATION);
+            new Builder<Object>(null, com.github.dm.jrt.core.config.InvocationConfiguration.DEFAULT_CONFIGURATION);
 
             fail();
 
@@ -87,7 +87,7 @@ public class InvocationConfigurationTest {
     @Test
     public void testBuilderFromEquals() {
 
-        final InvocationConfiguration configuration = builder().withPriority(11)
+        final com.github.dm.jrt.core.config.InvocationConfiguration configuration = builder().withPriority(11)
                                                                .withInputOrder(OrderType.BY_CALL)
                                                                .withRunner(Runners.syncRunner())
                                                                .withLog(new NullLog())
@@ -96,13 +96,13 @@ public class InvocationConfigurationTest {
         assertThat(builder().with(configuration).getConfigured()).isEqualTo(configuration);
         assertThat(configuration.builderFrom().getConfigured()).isEqualTo(configuration);
         assertThat(configuration.builderFrom().with(null).getConfigured()).isEqualTo(
-                InvocationConfiguration.DEFAULT_CONFIGURATION);
+                com.github.dm.jrt.core.config.InvocationConfiguration.DEFAULT_CONFIGURATION);
     }
 
     @Test
     public void testCoreInvocationsEquals() {
 
-        final InvocationConfiguration configuration = builder().withCoreInstances(27)
+        final com.github.dm.jrt.core.config.InvocationConfiguration configuration = builder().withCoreInstances(27)
                                                                .withInputOrder(OrderType.BY_CALL)
                                                                .withRunner(Runners.syncRunner())
                                                                .withLog(new NullLog())
@@ -131,7 +131,7 @@ public class InvocationConfigurationTest {
     @Test
     public void testExecutionTimeoutActionEquals() {
 
-        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+        final com.github.dm.jrt.core.config.InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
                                                                .withRunner(Runners.syncRunner())
                                                                .withLog(new NullLog())
                                                                .withOutputMaxSize(100)
@@ -149,7 +149,7 @@ public class InvocationConfigurationTest {
     @Test
     public void testExecutionTimeoutEquals() {
 
-        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+        final com.github.dm.jrt.core.config.InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
                                                                .withRunner(Runners.syncRunner())
                                                                .withLog(new NullLog())
                                                                .withOutputMaxSize(100)
@@ -166,7 +166,7 @@ public class InvocationConfigurationTest {
     @Test
     public void testInputLimitEquals() {
 
-        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+        final com.github.dm.jrt.core.config.InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
                                                                .withRunner(Runners.syncRunner())
                                                                .withLog(new NullLog())
                                                                .withOutputMaxSize(100)
@@ -194,7 +194,7 @@ public class InvocationConfigurationTest {
     @Test
     public void testInputMaxDelayEquals() {
 
-        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+        final com.github.dm.jrt.core.config.InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
                                                                .withRunner(Runners.syncRunner())
                                                                .withLog(new NullLog())
                                                                .withOutputMaxSize(100)
@@ -237,7 +237,7 @@ public class InvocationConfigurationTest {
     @Test
     public void testInputOrderEquals() {
 
-        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+        final com.github.dm.jrt.core.config.InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
                                                                .withRunner(Runners.syncRunner())
                                                                .withLog(new NullLog())
                                                                .withOutputMaxSize(100)
@@ -253,7 +253,7 @@ public class InvocationConfigurationTest {
     @Test
     public void testInputSizeEquals() {
 
-        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+        final com.github.dm.jrt.core.config.InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
                                                                .withRunner(Runners.syncRunner())
                                                                .withLog(new NullLog())
                                                                .withOutputMaxSize(100)
@@ -281,7 +281,7 @@ public class InvocationConfigurationTest {
     @Test
     public void testLogEquals() {
 
-        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+        final com.github.dm.jrt.core.config.InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
                                                                .withRunner(Runners.syncRunner())
                                                                .withLog(new NullLog())
                                                                .withOutputMaxSize(100)
@@ -295,7 +295,7 @@ public class InvocationConfigurationTest {
     @Test
     public void testLogLevelEquals() {
 
-        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+        final com.github.dm.jrt.core.config.InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
                                                                .withRunner(Runners.syncRunner())
                                                                .withLog(new NullLog())
                                                                .withOutputMaxSize(100)
@@ -310,7 +310,7 @@ public class InvocationConfigurationTest {
     @Test
     public void testMaxInvocationsEquals() {
 
-        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+        final com.github.dm.jrt.core.config.InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
                                                                .withRunner(Runners.syncRunner())
                                                                .withLog(new NullLog())
                                                                .withOutputMaxSize(100)
@@ -338,7 +338,7 @@ public class InvocationConfigurationTest {
     @Test
     public void testOutputLimitEquals() {
 
-        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+        final com.github.dm.jrt.core.config.InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
                                                                .withRunner(Runners.syncRunner())
                                                                .withLog(new NullLog())
                                                                .withOutputMaxSize(100)
@@ -366,7 +366,7 @@ public class InvocationConfigurationTest {
     @Test
     public void testOutputMaxDelayEquals() {
 
-        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+        final com.github.dm.jrt.core.config.InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
                                                                .withRunner(Runners.syncRunner())
                                                                .withLog(new NullLog())
                                                                .withOutputMaxSize(100)
@@ -409,7 +409,7 @@ public class InvocationConfigurationTest {
     @Test
     public void testOutputOrderEquals() {
 
-        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+        final com.github.dm.jrt.core.config.InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
                                                                .withRunner(Runners.syncRunner())
                                                                .withLog(new NullLog())
                                                                .withOutputMaxSize(100)
@@ -425,7 +425,7 @@ public class InvocationConfigurationTest {
     @Test
     public void testOutputSizeEquals() {
 
-        final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
+        final com.github.dm.jrt.core.config.InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
                                                                .withRunner(Runners.syncRunner())
                                                                .withLog(new NullLog())
                                                                .withOutputMaxSize(100)
@@ -453,7 +453,7 @@ public class InvocationConfigurationTest {
     @Test
     public void testPriorityEquals() {
 
-        final InvocationConfiguration configuration = builder().withPriority(17)
+        final com.github.dm.jrt.core.config.InvocationConfiguration configuration = builder().withPriority(17)
                                                                .withCoreInstances(27)
                                                                .withInputOrder(OrderType.BY_CALL)
                                                                .withRunner(Runners.syncRunner())
@@ -468,7 +468,7 @@ public class InvocationConfigurationTest {
     @Test
     public void testRunnerEquals() {
 
-        final InvocationConfiguration configuration = builder().withPriority(11)
+        final com.github.dm.jrt.core.config.InvocationConfiguration configuration = builder().withPriority(11)
                                                                .withInputOrder(OrderType.BY_CALL)
                                                                .withRunner(Runners.syncRunner())
                                                                .withLog(new NullLog())

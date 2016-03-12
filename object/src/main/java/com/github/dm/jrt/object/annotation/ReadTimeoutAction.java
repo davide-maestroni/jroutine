@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.object.annotation;
 
-import com.github.dm.jrt.core.builder.InvocationConfiguration.TimeoutActionType;
+import com.github.dm.jrt.core.config.InvocationConfiguration.TimeoutActionType;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -52,7 +52,7 @@ import java.lang.annotation.Target;
  * <p/>
  * Created by davide-maestroni on 04/08/2015.
  *
- * @see com.github.dm.jrt.core.builder.InvocationConfiguration InvocationConfiguration
+ * @see com.github.dm.jrt.core.config.InvocationConfiguration InvocationConfiguration
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

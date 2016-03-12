@@ -21,9 +21,9 @@ import android.support.v4.util.SparseArrayCompat;
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
 import com.github.dm.jrt.channel.AbstractBuilder;
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.builder.ChannelConfiguration;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
+import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;

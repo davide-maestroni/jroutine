@@ -22,10 +22,10 @@ import com.github.dm.jrt.android.core.builder.LoaderConfiguration.ClashResolutio
 import com.github.dm.jrt.android.core.invocation.MissingLoaderException;
 import com.github.dm.jrt.android.core.runner.AndroidRunners;
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.builder.ChannelConfiguration;
-import com.github.dm.jrt.core.builder.InvocationConfiguration;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
+import com.github.dm.jrt.core.config.ChannelConfiguration;
+import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.TemplateExecution;
 import com.github.dm.jrt.core.util.TimeDuration;

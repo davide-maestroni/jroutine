@@ -23,7 +23,7 @@ import com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.builder.InvocationConfiguration.OrderType;
+import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.log.Logger;
 

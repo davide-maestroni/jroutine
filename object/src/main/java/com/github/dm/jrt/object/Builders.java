@@ -16,10 +16,10 @@
 
 package com.github.dm.jrt.object;
 
-import com.github.dm.jrt.core.builder.InvocationConfiguration;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.Reflection;

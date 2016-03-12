@@ -18,7 +18,7 @@ package com.github.dm.jrt.android.object.builder;
 
 import com.github.dm.jrt.android.core.builder.LoaderConfigurableBuilder;
 import com.github.dm.jrt.android.core.routine.LoaderRoutine;
-import com.github.dm.jrt.core.builder.InvocationConfiguration;
+import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.object.builder.ObjectRoutineBuilder;
 import com.github.dm.jrt.object.builder.ProxyConfiguration;

@@ -18,13 +18,13 @@ package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.core.DefaultResultChannel.AbortHandler;
 import com.github.dm.jrt.core.InvocationExecution.InputIterator;
-import com.github.dm.jrt.core.builder.InvocationConfiguration;
-import com.github.dm.jrt.core.builder.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.InputDeadlockException;
 import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.log.Logger;

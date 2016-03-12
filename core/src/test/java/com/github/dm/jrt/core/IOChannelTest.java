@@ -16,13 +16,13 @@
 
 package com.github.dm.jrt.core;
 
-import com.github.dm.jrt.core.builder.InvocationConfiguration.OrderType;
-import com.github.dm.jrt.core.builder.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.ExecutionTimeoutException;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.common.TimeoutException;
+import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
+import com.github.dm.jrt.core.config.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.invocation.PassingInvocation;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;

@@ -16,9 +16,9 @@
 
 package com.github.dm.jrt.core.builder;
 
-import com.github.dm.jrt.core.builder.InvocationConfiguration.Builder;
-import com.github.dm.jrt.core.builder.InvocationConfiguration.Configurable;
 import com.github.dm.jrt.core.channel.InvocationChannel;
+import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
+import com.github.dm.jrt.core.config.InvocationConfiguration.Configurable;
 import com.github.dm.jrt.core.routine.TemplateRoutine;
 
 import org.jetbrains.annotations.NotNull;
@@ -37,7 +37,8 @@ import org.jetbrains.annotations.NotNull;
 public abstract class TemplateRoutineBuilder<IN, OUT> extends TemplateRoutine<IN, OUT>
         implements RoutineBuilder<IN, OUT>, Configurable<RoutineBuilder<IN, OUT>> {
 
-    private InvocationConfiguration mConfiguration = InvocationConfiguration.DEFAULT_CONFIGURATION;
+    private com.github.dm.jrt.core.config.InvocationConfiguration
+            mConfiguration = com.github.dm.jrt.core.config.InvocationConfiguration.DEFAULT_CONFIGURATION;
 
     @NotNull
     public InvocationChannel<IN, OUT> asyncInvoke() {
@@ -60,7 +61,7 @@ public abstract class TemplateRoutineBuilder<IN, OUT> extends TemplateRoutine<IN
     @NotNull
     @SuppressWarnings("ConstantConditions")
     public RoutineBuilder<IN, OUT> setConfiguration(
-            @NotNull final InvocationConfiguration configuration) {
+            @NotNull final com.github.dm.jrt.core.config.InvocationConfiguration configuration) {
 
         if (configuration == null) {
             throw new NullPointerException("the invocation configuration must not be null");
@@ -82,7 +83,7 @@ public abstract class TemplateRoutineBuilder<IN, OUT> extends TemplateRoutine<IN
      * @return the invocation configuration.
      */
     @NotNull
-    protected InvocationConfiguration getConfiguration() {
+    protected com.github.dm.jrt.core.config.InvocationConfiguration getConfiguration() {
 
         return mConfiguration;
     }

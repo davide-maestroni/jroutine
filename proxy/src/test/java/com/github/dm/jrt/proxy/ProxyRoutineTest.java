@@ -17,13 +17,13 @@
 package com.github.dm.jrt.proxy;
 
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.builder.InvocationConfiguration;
-import com.github.dm.jrt.core.builder.InvocationConfiguration.AgingPriority;
-import com.github.dm.jrt.core.builder.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.InvocationChannel;
+import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.config.InvocationConfiguration.AgingPriority;
+import com.github.dm.jrt.core.config.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
@@ -61,7 +61,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.dm.jrt.core.builder.InvocationConfiguration.builder;
+import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.core.util.TimeDuration.seconds;
 import static com.github.dm.jrt.object.InvocationTarget.classOfType;

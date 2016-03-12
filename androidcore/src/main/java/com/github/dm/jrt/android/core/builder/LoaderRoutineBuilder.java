@@ -17,8 +17,8 @@
 package com.github.dm.jrt.android.core.builder;
 
 import com.github.dm.jrt.android.core.routine.LoaderRoutine;
-import com.github.dm.jrt.core.builder.InvocationConfiguration.Builder;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
+import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 
 import org.jetbrains.annotations.NotNull;
 

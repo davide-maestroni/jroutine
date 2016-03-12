@@ -16,9 +16,9 @@
 
 package com.github.dm.jrt.channel;
 
-import com.github.dm.jrt.core.builder.ChannelConfiguration;
-import com.github.dm.jrt.core.builder.ChannelConfiguration.Builder;
-import com.github.dm.jrt.core.builder.ChannelConfiguration.Configurable;
+import com.github.dm.jrt.core.config.ChannelConfiguration;
+import com.github.dm.jrt.core.config.ChannelConfiguration.Builder;
+import com.github.dm.jrt.core.config.ChannelConfiguration.Configurable;
 
 import org.jetbrains.annotations.NotNull;
 

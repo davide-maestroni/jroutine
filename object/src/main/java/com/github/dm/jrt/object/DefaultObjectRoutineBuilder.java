@@ -17,9 +17,9 @@
 package com.github.dm.jrt.object;
 
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.builder.InvocationConfiguration;
-import com.github.dm.jrt.core.builder.InvocationConfiguration.Configurable;
 import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.config.InvocationConfiguration.Configurable;
 import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;

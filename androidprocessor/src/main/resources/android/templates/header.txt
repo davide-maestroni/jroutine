@@ -25,7 +25,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
     @SuppressWarnings("ConstantConditions")
     public ${generatedClassName}(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.ServiceContext context,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.object.ContextInvocationTarget<?> target,
-            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.builder.InvocationConfiguration invocationConfiguration,
+            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.config.InvocationConfiguration invocationConfiguration,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.builder.ProxyConfiguration proxyConfiguration,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.builder.ServiceConfiguration serviceConfiguration) {
 
@@ -147,7 +147,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
         @Override
         @org.jetbrains.annotations.NotNull
         protected ${interfaceFullName} newProxy(
-                @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.builder.InvocationConfiguration invocationConfiguration,
+                @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.config.InvocationConfiguration invocationConfiguration,
                 @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.builder.ProxyConfiguration proxyConfiguration,
                 @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.builder.ServiceConfiguration serviceConfiguration) {
 

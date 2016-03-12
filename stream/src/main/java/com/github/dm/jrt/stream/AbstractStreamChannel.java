@@ -454,8 +454,7 @@ public abstract class AbstractStreamChannel<OUT>
     public <AFTER> StreamChannel<AFTER> then(final long count,
             @NotNull final Consumer<? super ResultChannel<AFTER>> consumer) {
 
-        return map(new LoopInvocation<AFTER>(count,
-                new GenerateConsumerInvocation<AFTER>(wrap(consumer))));
+        return map(new LoopConsumerInvocation<AFTER>(count, wrap(consumer)));
     }
 
     @NotNull
@@ -469,8 +468,7 @@ public abstract class AbstractStreamChannel<OUT>
     public <AFTER> StreamChannel<AFTER> then(final long count,
             @NotNull final Supplier<? extends AFTER> supplier) {
 
-        return map(new LoopInvocation<AFTER>(count,
-                new GenerateSupplierInvocation<AFTER>(wrap(supplier))));
+        return map(new LoopSupplierInvocation<AFTER>(count, wrap(supplier)));
     }
 
     @NotNull
@@ -500,8 +498,11 @@ public abstract class AbstractStreamChannel<OUT>
             throw new NullPointerException("the consumer instance must not be null");
         }
 
-        final IOChannel<OUT> ioChannel = JRoutineCore.io().buildChannel();
-        // TODO: 11/03/16 configuration
+        final IOChannel<OUT> ioChannel = JRoutineCore.io()
+                                                     .withChannels()
+                                                     .with(buildChannelConfiguration())
+                                                     .getConfigured()
+                                                     .buildChannel();
         mChannel.bind(new TryCatchOutputConsumer<OUT>(consumer, ioChannel));
         return newChannel(ioChannel, getStreamConfiguration(), mDelegationType, mBinder);
     }
@@ -830,35 +831,6 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     /**
-     * Invocation implementation wrapping a consumer instance.
-     *
-     * @param <OUT> the output data type.
-     */
-    private static class GenerateConsumerInvocation<OUT> extends GenerateInvocation<OUT> {
-
-        private final ConsumerWrapper<? super ResultChannel<OUT>> mConsumer;
-
-        /**
-         * Constructor.
-         *
-         * @param consumer the consumer instance.
-         * @throws java.lang.IllegalArgumentException if the specified count number is 0 or
-         *                                            negative.
-         */
-        private GenerateConsumerInvocation(
-                @NotNull final ConsumerWrapper<? super ResultChannel<OUT>> consumer) {
-
-            super(asArgs(consumer));
-            mConsumer = consumer;
-        }
-
-        public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
-
-            mConsumer.accept(result);
-        }
-    }
-
-    /**
      * Base abstract implementation of an invocation generating output data.
      *
      * @param <OUT> the output data type.
@@ -931,66 +903,79 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     /**
-     * Invocation implementation wrapping a supplier instance.
+     * Generate invocation used to call a consumer a specific number of times.
      *
      * @param <OUT> the output data type.
      */
-    private static class GenerateSupplierInvocation<OUT> extends GenerateInvocation<OUT> {
+    private static class LoopConsumerInvocation<OUT> extends GenerateInvocation<OUT> {
+
+        private final ConsumerWrapper<? super ResultChannel<OUT>> mConsumer;
+
+        private final long mCount;
+
+        /**
+         * Constructor.
+         *
+         * @param count    the loop count.
+         * @param consumer the consumer instance.
+         */
+        private LoopConsumerInvocation(final long count,
+                @NotNull final ConsumerWrapper<? super ResultChannel<OUT>> consumer) {
+
+            super(asArgs(count, consumer));
+            if (count <= 0) {
+                throw new IllegalArgumentException("the count number must be positive: " + count);
+            }
+
+            mCount = count;
+            mConsumer = consumer;
+        }
+
+        public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
+
+            final long count = mCount;
+            final ConsumerWrapper<? super ResultChannel<OUT>> consumer = mConsumer;
+            for (long i = 0; i < count; i++) {
+                consumer.accept(result);
+            }
+        }
+    }
+
+    /**
+     * Generate invocation used to call a supplier a specific number of times.
+     *
+     * @param <OUT> the output data type.
+     */
+    private static class LoopSupplierInvocation<OUT> extends GenerateInvocation<OUT> {
+
+        private final long mCount;
 
         private final SupplierWrapper<? extends OUT> mSupplier;
 
         /**
          * Constructor.
          *
+         * @param count    the loop count.
          * @param supplier the supplier instance.
-         * @throws java.lang.IllegalArgumentException if the specified count number is 0 or
-         *                                            negative.
          */
-        private GenerateSupplierInvocation(@NotNull final SupplierWrapper<? extends OUT> supplier) {
+        private LoopSupplierInvocation(final long count,
+                @NotNull final SupplierWrapper<? extends OUT> supplier) {
 
-            super(asArgs(supplier));
-            mSupplier = supplier;
-        }
-
-        public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
-
-            result.pass(mSupplier.get());
-        }
-    }
-
-    /**
-     * Invocation factory used to call another function a specific number of times.
-     */
-    private static class LoopInvocation<OUT> extends GenerateInvocation<OUT> {
-
-        private final long mCount;
-
-        private final GenerateInvocation<OUT> mInvocation;
-
-        /**
-         * Constructor.
-         *
-         * @param count the loop count.
-         */
-        private LoopInvocation(final long count,
-                @NotNull final GenerateInvocation<OUT> invocation) {
-            // TODO: 11/03/16 consumer
-
-            super(asArgs(count));
+            super(asArgs(count, supplier));
             if (count <= 0) {
                 throw new IllegalArgumentException("the count number must be positive: " + count);
             }
 
             mCount = count;
-            mInvocation = invocation;
+            mSupplier = supplier;
         }
 
         public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
 
             final long count = mCount;
-            final GenerateInvocation<OUT> invocation = mInvocation;
+            final SupplierWrapper<? extends OUT> supplier = mSupplier;
             for (long i = 0; i < count; i++) {
-                invocation.onResult(result);
+                result.pass(supplier.get());
             }
         }
     }

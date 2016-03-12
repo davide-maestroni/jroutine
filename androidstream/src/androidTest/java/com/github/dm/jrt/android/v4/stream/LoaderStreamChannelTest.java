@@ -216,7 +216,6 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                       .all()).containsExactly("test1", "test2");
         final Runner handlerRunner = AndroidRunners.handlerRunner(
                 new HandlerThread(LoaderStreamChannelTest.class.getName()));
-        handlerRunner.isExecutionThread();
         assertThat(LoaderStreamsCompat.streamOf()
                                       .async()
                                       .then(range(1, 1000))

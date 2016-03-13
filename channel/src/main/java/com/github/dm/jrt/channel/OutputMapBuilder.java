@@ -54,6 +54,8 @@ class OutputMapBuilder<OUT> extends AbstractBuilder<Map<Integer, OutputChannel<O
      *
      * @param channel the selectable channel.
      * @param indexes the set of indexes.
+     * @throws java.lang.NullPointerException if the specified set of indexes is null or contains a
+     *                                        null object.
      */
     @SuppressWarnings("ConstantConditions")
     OutputMapBuilder(@NotNull final OutputChannel<? extends Selectable<? extends OUT>> channel,

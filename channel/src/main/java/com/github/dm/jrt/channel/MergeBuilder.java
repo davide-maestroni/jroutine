@@ -45,6 +45,8 @@ class MergeBuilder<OUT> extends AbstractBuilder<OutputChannel<? extends Selectab
      * @param startIndex the selectable start index.
      * @param channels   the input channels to merge.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
      */
     MergeBuilder(final int startIndex,
             @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {

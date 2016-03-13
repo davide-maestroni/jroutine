@@ -16,7 +16,6 @@
 
 package com.github.dm.jrt.android;
 
-import com.github.dm.jrt.TargetRoutineBuilder.BuilderType;
 import com.github.dm.jrt.android.core.ServiceContext;
 import com.github.dm.jrt.android.core.config.ServiceConfiguration;
 import com.github.dm.jrt.android.object.ContextInvocationTarget;

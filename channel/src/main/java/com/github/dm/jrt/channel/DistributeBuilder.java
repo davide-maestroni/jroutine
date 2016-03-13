@@ -52,6 +52,8 @@ class DistributeBuilder<IN> extends AbstractBuilder<IOChannel<List<? extends IN>
      * @param placeholder the placeholder instance.
      * @param channels    the list of channels.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
      */
     DistributeBuilder(final boolean isFlush, @Nullable final IN placeholder,
             @NotNull final Collection<? extends InputChannel<? extends IN>> channels) {

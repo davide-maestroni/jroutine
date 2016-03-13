@@ -47,6 +47,8 @@ class CombineBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<? extends 
      * @param startIndex the selectable start index.
      * @param channels   the input channels to combine.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
      */
     CombineBuilder(final int startIndex,
             @NotNull final Collection<? extends InputChannel<? extends IN>> channels) {

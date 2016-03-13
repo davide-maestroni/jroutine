@@ -40,6 +40,8 @@ class SortingMapOutputConsumer<OUT> implements OutputConsumer<Selectable<? exten
      * Constructor.
      *
      * @param channels the map of indexes and I/O channels.
+     * @throws java.lang.NullPointerException if the specified map is null or contains a null
+     *                                        object.
      */
     @SuppressWarnings("ConstantConditions")
     SortingMapOutputConsumer(@NotNull final Map<Integer, IOChannel<OUT>> channels) {

@@ -138,10 +138,10 @@ public class ByteChannel {
      *
      * @param dataBufferSize the size of the data buffer used to transfer the bytes through the
      *                       routine channels.
-     * @param corePoolSize   the maximum number of data retained in the pool. Additional data
+     * @param corePoolSize   the maximum number of buffers retained in the pool. Additional buffers
      *                       created to fulfill the bytes requirement will be discarded.
      * @return the byte channel.
-     * @throws java.lang.IllegalArgumentException if the specified size is 0 or negative.
+     * @throws java.lang.IllegalArgumentException if the specified size is not positive.
      */
     @NotNull
     public static ByteChannel byteChannel(final int dataBufferSize, final int corePoolSize) {

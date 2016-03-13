@@ -42,6 +42,9 @@ class ConcatBuilder<OUT> extends AbstractBuilder<OutputChannel<OUT>> {
      * Constructor.
      *
      * @param channels the output channels to concat.
+     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
      */
     ConcatBuilder(@NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
 

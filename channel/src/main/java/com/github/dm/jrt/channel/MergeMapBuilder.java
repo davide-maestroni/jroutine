@@ -43,6 +43,8 @@ class MergeMapBuilder<OUT> extends AbstractBuilder<OutputChannel<? extends Selec
      *
      * @param channels the map of channels to merge.
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
+     * @throws java.lang.NullPointerException     if the specified map is null or contains a null
+     *                                            object.
      */
     MergeMapBuilder(@NotNull final Map<Integer, ? extends OutputChannel<? extends OUT>> channels) {
 

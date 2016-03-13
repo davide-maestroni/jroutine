@@ -35,8 +35,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
- * I/O channel caching the output data and passing them to newly bound consumer, thus
- * effectively supporting binding of several output consumers.
+ * I/O channel caching the output data and passing them to newly bound consumer, thus effectively
+ * supporting binding of several output consumers.
  * <p/>
  * The {@link #isBound()} method will always return false and the bound methods will never fail.
  * <br/>

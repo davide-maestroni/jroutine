@@ -23,5 +23,24 @@
 <p>
     Channel utility classes based on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/v6/core" target="_blank">jroutine-core</a> library.
 </p>
+<h2>Usage examples</h2>
+<b>Example 1:</b> blending the output of two channels.
+<pre>
+    <code>
+      final OutputChannel&lt;Object&gt; channel = Channels.blend(channel1, channel2).build();
+    </code>
+</pre>
+<b>Example 2:</b> concatenating the output of two channels.
+<pre>
+    <code>
+      final OutputChannel&lt;Object&gt; channel = Channels.concat(channel1, channel2).build();
+    </code>
+</pre>
+<b>Example 3:</b> joining the output of two channels.
+<pre>
+    <code>
+      final OutputChannel&lt;List&lt;Object&gt;&gt; channel = Channels.join(channel1, channel2).build();
+    </code>
+</pre>
 </body>
 </html>

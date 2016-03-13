@@ -53,6 +53,8 @@ class JoinBuilder<OUT> extends AbstractBuilder<OutputChannel<List<? extends OUT>
      * @param placeholder the placeholder instance.
      * @param channels    the input channels to join.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
      */
     JoinBuilder(final boolean isFlush, @Nullable final OUT placeholder,
             @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {

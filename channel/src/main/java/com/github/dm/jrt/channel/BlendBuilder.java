@@ -42,6 +42,8 @@ class BlendBuilder<OUT> extends AbstractBuilder<OutputChannel<OUT>> {
      *
      * @param channels the output channels to blend.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
      */
     BlendBuilder(@NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
 

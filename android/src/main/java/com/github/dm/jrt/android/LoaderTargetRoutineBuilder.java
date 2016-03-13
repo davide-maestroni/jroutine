@@ -16,7 +16,6 @@
 
 package com.github.dm.jrt.android;
 
-import com.github.dm.jrt.TargetRoutineBuilder.BuilderType;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.object.builder.LoaderObjectRoutineBuilder;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
@@ -50,4 +49,9 @@ public interface LoaderTargetRoutineBuilder extends LoaderObjectRoutineBuilder {
      */
     @NotNull
     LoaderConfiguration.Builder<? extends LoaderTargetRoutineBuilder> withLoaders();
+
+    enum BuilderType {
+        OBJECT,
+        PROXY
+    }
 }

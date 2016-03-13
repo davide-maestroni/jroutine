@@ -63,6 +63,8 @@ public class Channels {
      * @param <OUT>    the output data type.
      * @return the output channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends OutputChannel<OUT>> blend(
@@ -89,6 +91,8 @@ public class Channels {
      * @param <OUT>    the output data type.
      * @return the output channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.NullPointerException     if the specified array is null or contains a null
+     *                                            object.
      */
     @NotNull
     @SuppressWarnings("unchecked")
@@ -105,7 +109,7 @@ public class Channels {
 
     /**
      * Returns a builder of input channels combining the specified channels into a selectable one.
-     * The selectable indexes will be the position in the collection.<br/>
+     * The selectable indexes will be the position in the array.<br/>
      * Note that the builder will successfully create several input channel instances, and that the
      * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
      * invocation lifecycle.
@@ -124,6 +128,8 @@ public class Channels {
      * @param <IN>     the input data type.
      * @return the selectable I/O channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
@@ -134,7 +140,7 @@ public class Channels {
 
     /**
      * Returns a builder of input channels combining the specified channels into a selectable one.
-     * The selectable indexes will be the position in the array.<br/>
+     * The selectable indexes will start from the specified one.<br/>
      * Note that the builder will successfully create several input channel instances, and that the
      * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
      * invocation lifecycle.
@@ -154,6 +160,8 @@ public class Channels {
      * @param <IN>       the input data type.
      * @return the selectable I/O channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.NullPointerException     if the specified array is null or contains a null
+     *                                            object.
      */
     @NotNull
     @SuppressWarnings("unchecked")
@@ -170,7 +178,7 @@ public class Channels {
 
     /**
      * Returns a builder of input channels combining the specified channels into a selectable one.
-     * The selectable indexes will be the position in the collection.<br/>
+     * The selectable indexes will start from the specified one.<br/>
      * Note that the builder will successfully create several input channel instances, and that the
      * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
      * invocation lifecycle.
@@ -190,6 +198,8 @@ public class Channels {
      * @param <IN>       the input data type.
      * @return the selectable I/O channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
@@ -201,7 +211,7 @@ public class Channels {
 
     /**
      * Returns a builder of input channels combining the specified channels into a selectable one.
-     * The selectable indexes will be the position in the array.<br/>
+     * The selectable indexes will be the position in the collection.<br/>
      * Note that the builder will successfully create several input channel instances, and that the
      * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
      * invocation lifecycle.
@@ -220,6 +230,8 @@ public class Channels {
      * @param <IN>     the input data type.
      * @return the selectable I/O channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
@@ -249,6 +261,8 @@ public class Channels {
      * @param <IN>     the input data type.
      * @return the selectable I/O channel builder.
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
+     * @throws java.lang.NullPointerException     if the specified map is null or contains a null
+     *                                            object.
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
@@ -276,6 +290,8 @@ public class Channels {
      * @param <OUT>    the output data type.
      * @return the output channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends OutputChannel<OUT>> concat(
@@ -303,6 +319,8 @@ public class Channels {
      * @param <OUT>    the output data type.
      * @return the output channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.NullPointerException     if the specified array is null or contains a null
+     *                                            object.
      */
     @NotNull
     @SuppressWarnings("unchecked")
@@ -338,6 +356,8 @@ public class Channels {
      * @param <IN>     the input data type.
      * @return the I/O channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.NullPointerException     if the specified array is null or contains a null
+     *                                            object.
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<List<? extends IN>>> distribute(
@@ -366,7 +386,9 @@ public class Channels {
      * @param channels the collection of channels.
      * @param <IN>     the input data type.
      * @return the I/O channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified list is empty.
+     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<List<? extends IN>>> distribute(
@@ -389,8 +411,8 @@ public class Channels {
      *     <code>
      *
      *         A - [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
-     *         B - [list(1), list(1), list(1), ..., list(1), ..., list(1), PH, ...]
-     *         C - [list(2), list(2), list(2), ..., list(2), PH, ...]
+     *         B - [list(1), list(1), list(1), ..., list(1), ..., list(1), PH, PH, ...]
+     *         C - [list(2), list(2), list(2), ..., list(2), PH, PH, ...]
      *     </code>
      * </pre>
      *
@@ -399,6 +421,8 @@ public class Channels {
      * @param <IN>        the input data type.
      * @return the I/O channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.NullPointerException     if the specified array is null or contains a null
+     *                                            object.
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<List<? extends IN>>> distribute(
@@ -421,8 +445,8 @@ public class Channels {
      *     <code>
      *
      *         A - [list(0), list(0), list(0), ..., list(0), ..., list(0), ...]
-     *         B - [list(1), list(1), list(1), ..., list(1), ..., list(1), PH, ...]
-     *         C - [list(2), list(2), list(2), ..., list(2), PH, ...]
+     *         B - [list(1), list(1), list(1), ..., list(1), ..., list(1), PH, PH, ...]
+     *         C - [list(2), list(2), list(2), ..., list(2), PH, PH, ...]
      *     </code>
      * </pre>
      *
@@ -430,7 +454,9 @@ public class Channels {
      * @param channels    the collection of channels.
      * @param <IN>        the input data type.
      * @return the I/O channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified list is empty.
+     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<List<? extends IN>>> distribute(
@@ -458,7 +484,9 @@ public class Channels {
      * @param channels the collection of channels.
      * @param <OUT>    the output data type.
      * @return the output channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified list is empty.
+     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends OutputChannel<List<? extends OUT>>> join(
@@ -486,6 +514,8 @@ public class Channels {
      * @param <OUT>    the output data type.
      * @return the output channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.NullPointerException     if the specified array is null or contains a null
+     *                                            object.
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends OutputChannel<List<? extends OUT>>> join(
@@ -517,6 +547,8 @@ public class Channels {
      * @param <OUT>       the output data type.
      * @return the output channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends OutputChannel<List<? extends OUT>>> join(
@@ -549,6 +581,8 @@ public class Channels {
      * @param <OUT>       the output data type.
      * @return the output channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.NullPointerException     if the specified array is null or contains a null
+     *                                            object.
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends OutputChannel<List<? extends OUT>>> join(
@@ -575,7 +609,9 @@ public class Channels {
      * @param channels   the collection of channels.
      * @param <OUT>      the output data type.
      * @return the selectable output channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified list is empty.
+     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends OutputChannel<? extends Selectable<OUT>>> merge(
@@ -604,6 +640,8 @@ public class Channels {
      * @param <OUT>      the output data type.
      * @return the selectable output channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.NullPointerException     if the specified array is null or contains a null
+     *                                            object.
      */
     @NotNull
     @SuppressWarnings("unchecked")
@@ -635,6 +673,8 @@ public class Channels {
      * @param <OUT>    the output data type.
      * @return the selectable output channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends OutputChannel<? extends Selectable<OUT>>> merge(
@@ -661,6 +701,8 @@ public class Channels {
      * @param <OUT>    the output data type.
      * @return the selectable output channel builder.
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
+     * @throws java.lang.NullPointerException     if the specified map is null or contains a null
+     *                                            object.
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends OutputChannel<? extends Selectable<OUT>>> merge(
@@ -687,6 +729,8 @@ public class Channels {
      * @param <OUT>    the output data type.
      * @return the selectable output channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.NullPointerException     if the specified array is null or contains a null
+     *                                            object.
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends OutputChannel<? extends Selectable<OUT>>> merge(
@@ -774,6 +818,8 @@ public class Channels {
      * @param <DATA>  the channel data type.
      * @param <IN>    the input data type.
      * @return the map of indexes and I/O channels builder.
+     * @throws java.lang.NullPointerException if the specified iterable is null or returns a null
+     *                                        object.
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends Map<Integer, IOChannel<IN>>>
@@ -810,6 +856,8 @@ public class Channels {
      * @param <DATA>  the channel data type.
      * @param <IN>    the input data type.
      * @return the map of indexes and I/O channels builder.
+     * @throws java.lang.NullPointerException if the specified array is null or contains a null
+     *                                        object.
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends Map<Integer, IOChannel<IN>>>
@@ -847,7 +895,7 @@ public class Channels {
      * @param <DATA>     the channel data type.
      * @param <IN>       the input data type.
      * @return the map of indexes and I/O channels builder.
-     * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
+     * @throws java.lang.IllegalArgumentException if the specified range size is not positive.
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends Map<Integer, IOChannel<IN>>>
@@ -890,7 +938,7 @@ public class Channels {
      * @param channel    the selectable channel.
      * @param <OUT>      the output data type.
      * @return the map of indexes and output channels builder.
-     * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
+     * @throws java.lang.IllegalArgumentException if the specified range size is not positive.
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends Map<Integer, OutputChannel<OUT>>> select(
@@ -931,6 +979,8 @@ public class Channels {
      * @param indexes the list of indexes.
      * @param <OUT>   the output data type.
      * @return the map of indexes and output channels builder.
+     * @throws java.lang.NullPointerException if the specified array is null or contains a null
+     *                                        object.
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends Map<Integer, OutputChannel<OUT>>> select(
@@ -966,6 +1016,8 @@ public class Channels {
      * @param indexes the iterable returning the channel indexes.
      * @param <OUT>   the output data type.
      * @return the map of indexes and output channels builder.
+     * @throws java.lang.NullPointerException if the specified iterable is null or returns a null
+     *                                        object.
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends Map<Integer, OutputChannel<OUT>>> select(

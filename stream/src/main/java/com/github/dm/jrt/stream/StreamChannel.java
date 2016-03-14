@@ -365,7 +365,6 @@ public interface StreamChannel<OUT>
     @NotNull
     <AFTER> StreamChannel<AFTER> reduce(AFTER seed,
             @NotNull BiFunction<? super AFTER, ? super OUT, ? extends AFTER> function);
-    // TODO: 14/03/16 immutable
 
     /**
      * Returns a new stream repeating the output data to any newly bound channel or consumer, thus
@@ -514,7 +513,7 @@ public interface StreamChannel<OUT>
     <AFTER> StreamChannel<AFTER> then(@NotNull Supplier<? extends AFTER> supplier);
 
     /**
-     * Returns a new stream making the this one selectable.<br/>
+     * Returns a new stream making this one selectable.<br/>
      * Each output will be passed along unchanged.<br/>
      * Note that this stream will be bound as a result of the call.
      *
@@ -566,7 +565,7 @@ public interface StreamChannel<OUT>
      * Gets the invocation configuration builder related only to the next concatenated routine
      * instance. Any further addition to the chain will retain only the stream configuration.<br/>
      * Only the options set in this configuration (that is, the ones with a value different from the
-     * default) will override the stream one.
+     * default) will override the stream ones.
      * <p/>
      * Note that the configuration builder will be initialized with the current configuration for
      * the next routine.

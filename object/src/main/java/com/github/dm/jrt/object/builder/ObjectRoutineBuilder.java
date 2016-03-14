@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.Method;
 
 /**
- * Interface defining a builder of routines wrapping an object methods.
+ * Interface defining a builder of routines wrapping object methods.
  * <p/>
  * Created by davide-maestroni on 03/07/2015.
  */
@@ -108,7 +108,7 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
     <TYPE> TYPE buildProxy(@NotNull ClassToken<TYPE> itf);
 
     /**
-     * Returns a routine used to call the specified method. TODO: getMethod()
+     * Returns a routine used to call the specified method.
      * <p/>
      * The method is searched via reflection ignoring a name specified in a
      * {@link com.github.dm.jrt.object.annotation.Alias Alias} annotation. Though, optional

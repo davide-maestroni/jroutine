@@ -15,7 +15,7 @@
  */
 
 /**
- * Annotation pre-processor implementation.
+ * Annotation pre-processor classes.
  * <p/>
  * Created by davide-maestroni on 10/14/2014.
  */

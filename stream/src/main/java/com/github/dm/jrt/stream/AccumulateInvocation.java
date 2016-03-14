@@ -55,7 +55,7 @@ class AccumulateInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
      * @param seed     the accumulation seed.
      * @param function the bi-function instance.
      */
-    private AccumulateInvocation(Object seed,
+    private AccumulateInvocation(final Object seed,
             @NotNull final BiFunction<? super OUT, ? super IN, ? extends OUT> function) {
 
         mSeed = seed;
@@ -77,6 +77,16 @@ class AccumulateInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
         return new AccumulateInvocationFactory<IN, IN>(NO_SEED, wrap(function));
     }
 
+    /**
+     * Builds and returns a new accumulating invocation factory backed by the specified bi-function
+     * instance.
+     *
+     * @param seed     the initial accumulated value.
+     * @param function the bi-function instance.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the invocation factory.
+     */
     @NotNull
     public static <IN, OUT> InvocationFactory<IN, OUT> functionFactory(OUT seed,
             @NotNull final BiFunction<? super OUT, ? super IN, ? extends OUT> function) {

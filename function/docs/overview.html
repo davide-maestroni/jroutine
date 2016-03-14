@@ -41,11 +41,11 @@
                         JRoutineCore.on(functionFilter(Integer::parseInt)).buildRoutine();
                 final Routine&lt;Integer, Integer&gt; squareRoutine =
                         JRoutineCore.on(functionFilter(integer -> {
-                                final input = integer;
+                                final int input = integer;
                                 return (input * input);
                         })).buildRoutine();
                 final Routine&lt;Integer, Double&gt; meanRoutine =
-                        JRoutineCore.on(functionFactory(integers -> {
+                        JRoutineCore.on(functionCall(integers -> {
                                 int sum = 0;
                                 for (final Integer integer : integers) {
                                     sum += integer;

@@ -162,15 +162,15 @@ class DefaultObjectRoutineBuilder
     @NotNull
     public InvocationConfiguration.Builder<? extends ObjectRoutineBuilder> withInvocations() {
 
-        final InvocationConfiguration configuration = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<ObjectRoutineBuilder>(this, configuration);
+        final InvocationConfiguration config = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<ObjectRoutineBuilder>(this, config);
     }
 
     @NotNull
     public ProxyConfiguration.Builder<? extends ObjectRoutineBuilder> withProxies() {
 
-        final ProxyConfiguration configuration = mProxyConfiguration;
-        return new ProxyConfiguration.Builder<ObjectRoutineBuilder>(this, configuration);
+        final ProxyConfiguration config = mProxyConfiguration;
+        return new ProxyConfiguration.Builder<ObjectRoutineBuilder>(this, config);
     }
 
     @NotNull

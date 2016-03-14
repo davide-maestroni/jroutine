@@ -164,7 +164,7 @@ public class JRoutineFacadeTest {
     public void testConsumerCommand() {
 
         final Routine<Void, String> routine =
-                JRoutineFacade.on(new Consumer<ResultChannel<String>>() {
+                JRoutineFacade.command(new Consumer<ResultChannel<String>>() {
 
                     public void accept(final ResultChannel<String> result) {
 
@@ -178,7 +178,7 @@ public class JRoutineFacadeTest {
     public void testConsumerFilter() {
 
         final Routine<Object, String> routine =
-                JRoutineFacade.on(new BiConsumer<Object, ResultChannel<String>>() {
+                JRoutineFacade.filter(new BiConsumer<Object, ResultChannel<String>>() {
 
                     public void accept(final Object o, final ResultChannel<String> result) {
 
@@ -193,7 +193,7 @@ public class JRoutineFacadeTest {
     public void testConsumerFunction() {
 
         final Routine<String, String> routine =
-                JRoutineFacade.onCall(new BiConsumer<List<String>, ResultChannel<String>>() {
+                JRoutineFacade.call(new BiConsumer<List<String>, ResultChannel<String>>() {
 
                     public void accept(final List<String> strings,
                             final ResultChannel<String> result) {
@@ -219,13 +219,14 @@ public class JRoutineFacadeTest {
     @Test
     public void testFunctionFilter() {
 
-        final Routine<Object, String> routine = JRoutineFacade.on(new Function<Object, String>() {
+        final Routine<Object, String> routine =
+                JRoutineFacade.filter(new Function<Object, String>() {
 
-            public String apply(final Object o) {
+                            public String apply(final Object o) {
 
-                return o.toString();
-            }
-        }).buildRoutine();
+                                return o.toString();
+                            }
+                        }).buildRoutine();
         assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
                 "1");
     }
@@ -234,7 +235,7 @@ public class JRoutineFacadeTest {
     public void testFunctionFunction() {
 
         final Routine<String, String> routine =
-                JRoutineFacade.onCall(new Function<List<String>, String>() {
+                JRoutineFacade.call(new Function<List<String>, String>() {
 
                     public String apply(final List<String> strings) {
 
@@ -611,7 +612,7 @@ public class JRoutineFacadeTest {
     @Test
     public void testPredicateFilter() {
 
-        final Routine<String, String> routine = JRoutineFacade.on(new Predicate<String>() {
+        final Routine<String, String> routine = JRoutineFacade.filter(new Predicate<String>() {
 
             public boolean test(final String s) {
 
@@ -653,7 +654,7 @@ public class JRoutineFacadeTest {
     @Test
     public void testSupplierCommand() {
 
-        final Routine<Void, String> routine = JRoutineFacade.on(new Supplier<String>() {
+        final Routine<Void, String> routine = JRoutineFacade.command(new Supplier<String>() {
 
             public String get() {
 
@@ -666,7 +667,7 @@ public class JRoutineFacadeTest {
     @Test
     public void testSupplierFactory() {
 
-        final Routine<String, String> routine = JRoutineFacade.onFactory(new Supplier<ToCase>() {
+        final Routine<String, String> routine = JRoutineFacade.factory(new Supplier<ToCase>() {
 
             public ToCase get() {
 

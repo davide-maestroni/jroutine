@@ -15,7 +15,7 @@
  */
 
 /**
- * Annotation definitions.
+ * Definition of annotations used to configure proxy routines.
  * <p/>
  * Created by davide-maestroni on 10/14/2014.
  */

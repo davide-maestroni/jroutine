@@ -67,6 +67,62 @@ public class JRoutineFacade extends Channels {
 
     }
 
+    @NotNull
+    public static <IN, OUT> RoutineBuilder<IN, OUT> call(
+            @NotNull final BiConsumer<? super List<IN>, ? super ResultChannel<OUT>> consumer) {
+
+        return JRoutineCore.on(consumerCall(consumer));
+    }
+
+    @NotNull
+    public static <IN, OUT> RoutineBuilder<IN, OUT> call(
+            @NotNull final Function<? super List<IN>, ? extends OUT> function) {
+
+        return JRoutineCore.on(functionCall(function));
+    }
+
+    @NotNull
+    public static <OUT> RoutineBuilder<Void, OUT> command(
+            @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
+
+        return JRoutineCore.on(consumerCommand(consumer));
+    }
+
+    @NotNull
+    public static <OUT> RoutineBuilder<Void, OUT> command(
+            @NotNull final Supplier<? extends OUT> supplier) {
+
+        return JRoutineCore.on(supplierCommand(supplier));
+    }
+
+    @NotNull
+    public static <IN, OUT> RoutineBuilder<IN, OUT> factory(
+            @NotNull final Supplier<? extends Invocation<? super IN, ? extends OUT>> supplier) {
+
+        return JRoutineCore.on(supplierFactory(supplier));
+    }
+
+    @NotNull
+    public static <IN, OUT> RoutineBuilder<IN, OUT> filter(
+            @NotNull final BiConsumer<? super IN, ? super ResultChannel<OUT>> consumer) {
+
+        return JRoutineCore.on(consumerFilter(consumer));
+    }
+
+    @NotNull
+    public static <IN, OUT> RoutineBuilder<IN, OUT> filter(
+            @NotNull final Function<? super IN, ? extends OUT> function) {
+
+        return JRoutineCore.on(functionFilter(function));
+    }
+
+    @NotNull
+    public static <IN> RoutineBuilder<IN, IN> filter(
+            @NotNull final Predicate<? super IN> predicate) {
+
+        return JRoutineCore.on(predicateFilter(predicate));
+    }
+
     /**
      * Returns an I/O channel builder.
      *
@@ -76,13 +132,6 @@ public class JRoutineFacade extends Channels {
     public static IOChannelBuilder io() {
 
         return JRoutineCore.io();
-    }
-
-    @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> on(
-            @NotNull final BiConsumer<? super IN, ? super ResultChannel<OUT>> consumer) {
-
-        return JRoutineCore.on(consumerFilter(consumer));
     }
 
     /**
@@ -175,28 +224,14 @@ public class JRoutineFacade extends Channels {
     public static <OUT> RoutineBuilder<Void, OUT> on(
             @NotNull final CommandInvocation<OUT> invocation) {
 
-        return on(((InvocationFactory<Void, OUT>) invocation));
-    }
-
-    @NotNull
-    public static <OUT> RoutineBuilder<Void, OUT> on(
-            @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
-
-        return JRoutineCore.on(consumerCommand(consumer));
+        return on((InvocationFactory<Void, OUT>) invocation);
     }
 
     @NotNull
     public static <IN, OUT> RoutineBuilder<IN, OUT> on(
             @NotNull final FilterInvocation<IN, OUT> invocation) {
 
-        return on(((InvocationFactory<IN, OUT>) invocation));
-    }
-
-    @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> on(
-            @NotNull final Function<? super IN, ? extends OUT> function) {
-
-        return JRoutineCore.on(functionFilter(function));
+        return on((InvocationFactory<IN, OUT>) invocation);
     }
 
     /**
@@ -291,33 +326,6 @@ public class JRoutineFacade extends Channels {
         return new DefaultTargetRoutineBuilder(target);
     }
 
-    @NotNull
-    public static <IN> RoutineBuilder<IN, IN> on(@NotNull final Predicate<? super IN> predicate) {
-
-        return JRoutineCore.on(predicateFilter(predicate));
-    }
-
-    @NotNull
-    public static <OUT> RoutineBuilder<Void, OUT> on(
-            @NotNull final Supplier<? extends OUT> supplier) {
-
-        return JRoutineCore.on(supplierCommand(supplier));
-    }
-
-    @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> onCall(
-            @NotNull final BiConsumer<? super List<IN>, ? super ResultChannel<OUT>> consumer) {
-
-        return JRoutineCore.on(consumerCall(consumer));
-    }
-
-    @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> onCall(
-            @NotNull final Function<? super List<IN>, ? extends OUT> function) {
-
-        return JRoutineCore.on(functionCall(function));
-    }
-
     /**
      * Returns an output consumer builder employing the specified consumer function to handle the
      * invocation completion.
@@ -343,13 +351,6 @@ public class JRoutineFacade extends Channels {
             @NotNull final Consumer<RoutineException> consumer) {
 
         return Functions.onError(consumer);
-    }
-
-    @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> onFactory(
-            @NotNull final Supplier<? extends Invocation<? super IN, ? extends OUT>> supplier) {
-
-        return JRoutineCore.on(supplierFactory(supplier));
     }
 
     /**

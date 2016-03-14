@@ -365,6 +365,7 @@ public interface StreamChannel<OUT>
     @NotNull
     <AFTER> StreamChannel<AFTER> reduce(AFTER seed,
             @NotNull BiFunction<? super AFTER, ? super OUT, ? extends AFTER> function);
+    // TODO: 14/03/16 immutable
 
     /**
      * Returns a new stream repeating the output data to any newly bound channel or consumer, thus

@@ -67,8 +67,8 @@ class GroupByInvocationFactory<DATA> extends ComparableInvocationFactory<DATA, L
      * Constructor.
      *
      * @param size        the group size.
-     * @param placeholder the placeholder object used to fill the missing data needed to reach
-     *                    the group size.
+     * @param placeholder the placeholder object used to fill the missing data needed to reach the
+     *                    group size.
      * @throws java.lang.IllegalArgumentException if the size is not positive.
      */
     GroupByInvocationFactory(final int size, @Nullable final DATA placeholder) {
@@ -122,8 +122,7 @@ class GroupByInvocationFactory<DATA> extends ComparableInvocationFactory<DATA, L
          * Constructor.
          *
          * @param size        the group size.
-         * @param placeholder the placeholder object used to fill the missing data needed to
-         *                    reach
+         * @param placeholder the placeholder object used to fill the missing data needed to reach
          *                    the group size.
          */
         private GroupByInvocation(final int size, @Nullable final DATA placeholder) {

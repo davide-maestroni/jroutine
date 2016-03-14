@@ -107,15 +107,15 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
     @NotNull
     public InvocationConfiguration.Builder<? extends ProxyObjectBuilder<TYPE>> withInvocations() {
 
-        final InvocationConfiguration configuration = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<ProxyObjectBuilder<TYPE>>(this, configuration);
+        final InvocationConfiguration config = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<ProxyObjectBuilder<TYPE>>(this, config);
     }
 
     @NotNull
     public ProxyConfiguration.Builder<? extends ProxyObjectBuilder<TYPE>> withProxies() {
 
-        final ProxyConfiguration configuration = mProxyConfiguration;
-        return new ProxyConfiguration.Builder<ProxyObjectBuilder<TYPE>>(this, configuration);
+        final ProxyConfiguration config = mProxyConfiguration;
+        return new ProxyConfiguration.Builder<ProxyObjectBuilder<TYPE>>(this, config);
     }
 
     /**

@@ -41,7 +41,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import static com.github.dm.jrt.core.invocation.InvocationFactories.factoryOf;
+import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
 import static com.github.dm.jrt.function.Functions.consumerCall;
 import static com.github.dm.jrt.function.Functions.consumerCommand;
 import static com.github.dm.jrt.function.Functions.consumerFilter;

@@ -69,7 +69,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.dm.jrt.android.core.invocation.CallContextInvocationFactories.factoryOf;
+import static com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory.callFactoryOf;
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.classOfType;
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceOf;
 import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
@@ -98,7 +98,7 @@ public class LoaderObjectRoutineActivityTest
         try {
 
             JRoutineLoaderCompat.with((LoaderContextCompat) null)
-                                .on(factoryOf(TestInvocation.class));
+                                .on(callFactoryOf(TestInvocation.class));
 
             fail();
 

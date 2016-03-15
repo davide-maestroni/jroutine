@@ -61,7 +61,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.github.dm.jrt.android.core.DelegatingContextInvocation.factoryFrom;
 import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
-import static com.github.dm.jrt.core.invocation.InvocationFactories.factoryOf;
+import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.TimeDuration.ZERO;
 import static com.github.dm.jrt.core.util.TimeDuration.millis;
 import static com.github.dm.jrt.core.util.TimeDuration.seconds;

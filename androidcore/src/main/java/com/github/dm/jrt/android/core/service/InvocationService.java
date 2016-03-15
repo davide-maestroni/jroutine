@@ -26,7 +26,6 @@ import android.os.Message;
 import android.os.Messenger;
 
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
-import com.github.dm.jrt.android.core.invocation.ContextInvocationFactories;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.core.AbstractRoutine;
 import com.github.dm.jrt.core.JRoutineCore;
@@ -51,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.Reflection.findConstructor;
 
 /**
@@ -304,8 +304,7 @@ public class InvocationService extends Service {
             @NotNull final Class<? extends ContextInvocation<?, ?>> targetClass,
             @Nullable final Object... args) throws Exception {
 
-        return ContextInvocationFactories.factoryOf(
-                (Class<? extends ContextInvocation<Object, Object>>) targetClass, args);
+        return factoryOf((Class<? extends ContextInvocation<Object, Object>>) targetClass, args);
     }
 
     @Override

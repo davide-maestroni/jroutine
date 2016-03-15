@@ -76,7 +76,7 @@ import java.util.WeakHashMap;
  *
  *                 final Routine&lt;URI, MyResource&gt; routine =
  *                         JRoutineLoader.with(loaderFrom(this))
- *                                       .on(factoryOf(LoadResource.class))
+ *                                       .on(callFactoryOf(LoadResource.class))
  *                                       .buildRoutine();
  *                 routine.asyncCall(RESOURCE_URI)
  *                        .bind(new TemplateOutputConsumer&lt;MyResource&gt;() {

@@ -42,7 +42,7 @@ import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 
-import static com.github.dm.jrt.core.invocation.InvocationFactories.factoryOf;
+import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.TimeDuration.ZERO;
 import static com.github.dm.jrt.core.util.TimeDuration.micros;
 import static com.github.dm.jrt.core.util.TimeDuration.millis;

@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
-import static com.github.dm.jrt.core.invocation.InvocationFactories.factoryOf;
+import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -127,8 +127,8 @@ public class InvocationTest {
 
         assertThat(factoryOf(TestInvocation.class).newInvocation()).isExactlyInstanceOf(
                 TestInvocation.class);
-        assertThat(factoryOf(
-                ClassToken.tokenOf(TestInvocation.class)).newInvocation()).isExactlyInstanceOf(
+        assertThat(factoryOf(ClassToken.tokenOf(TestInvocation.class))
+                                    .newInvocation()).isExactlyInstanceOf(
                 TestInvocation.class);
         assertThat(factoryOf(new TestInvocation()).newInvocation()).isExactlyInstanceOf(
                 TestInvocation.class);
@@ -150,7 +150,8 @@ public class InvocationTest {
         });
         assertThat(factoryOf(TestInvocation.class).hashCode()).isEqualTo(
                 factoryOf(TestInvocation.class).hashCode());
-        assertThat(factoryOf(TestInvocation.class)).isEqualTo(factoryOf(TestInvocation.class));
+        assertThat(factoryOf(TestInvocation.class)).isEqualTo(
+                factoryOf(TestInvocation.class));
         assertThat(factoryOf(ClassToken.tokenOf(TestInvocation.class)).hashCode()).isEqualTo(
                 factoryOf(TestInvocation.class).hashCode());
         assertThat(factoryOf(ClassToken.tokenOf(TestInvocation.class))).isEqualTo(

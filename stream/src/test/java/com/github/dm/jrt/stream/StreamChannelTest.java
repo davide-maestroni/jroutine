@@ -32,7 +32,6 @@ import com.github.dm.jrt.core.common.TimeoutException;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.invocation.FilterInvocation;
-import com.github.dm.jrt.core.invocation.InvocationFactories;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
@@ -812,7 +811,7 @@ public class StreamChannelTest {
     public void testMapFactory() {
 
         final InvocationFactory<String, String> factory =
-                InvocationFactories.factoryOf(UpperCase.class);
+                InvocationFactory.factoryOf(UpperCase.class);
         assertThat(Streams.streamOf("test1", "test2")
                           .async()
                           .map(factory)

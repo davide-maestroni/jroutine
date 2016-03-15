@@ -36,7 +36,7 @@ import com.github.dm.jrt.core.util.ClassToken;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static com.github.dm.jrt.android.core.invocation.CallContextInvocationFactories.factoryOf;
+import static com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory.callFactoryOf;
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.classOfType;
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceOf;
 
@@ -148,7 +148,7 @@ public class JRoutineAndroid extends SparseChannels {
         public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
                 @NotNull final Class<? extends CallContextInvocation<IN, OUT>> invocationClass) {
 
-            return on(factoryOf(invocationClass));
+            return on(callFactoryOf(invocationClass));
         }
 
         /**
@@ -174,7 +174,7 @@ public class JRoutineAndroid extends SparseChannels {
                 @NotNull final Class<? extends CallContextInvocation<IN, OUT>> invocationClass,
                 @Nullable final Object... args) {
 
-            return on(factoryOf(invocationClass, args));
+            return on(callFactoryOf(invocationClass, args));
         }
 
         /**
@@ -192,7 +192,7 @@ public class JRoutineAndroid extends SparseChannels {
                 @NotNull final ClassToken<? extends CallContextInvocation<IN, OUT>>
                         invocationToken) {
 
-            return on(factoryOf(invocationToken));
+            return on(callFactoryOf(invocationToken));
         }
 
         /**
@@ -218,7 +218,7 @@ public class JRoutineAndroid extends SparseChannels {
                 @NotNull final ClassToken<? extends CallContextInvocation<IN, OUT>> invocationToken,
                 @Nullable final Object... args) {
 
-            return on(factoryOf(invocationToken, args));
+            return on(callFactoryOf(invocationToken, args));
         }
 
         /**

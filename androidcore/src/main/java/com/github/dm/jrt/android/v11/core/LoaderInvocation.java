@@ -56,7 +56,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactories.fromFactory;
+import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.fromFactory;
 
 /**
  * Invocation implementation employing loaders to perform background operations.

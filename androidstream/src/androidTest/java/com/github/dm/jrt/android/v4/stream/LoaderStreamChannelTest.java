@@ -35,7 +35,6 @@ import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.common.TimeoutException;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.invocation.FilterInvocation;
-import com.github.dm.jrt.core.invocation.InvocationFactories;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
@@ -1136,7 +1135,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
     public void testMapFactory() {
 
         final InvocationFactory<String, String> factory =
-                InvocationFactories.factoryOf(UpperCase.class);
+                InvocationFactory.factoryOf(UpperCase.class);
         assertThat(LoaderStreamsCompat.streamOf("test1", "test2")
                                       .with(loaderFrom(getActivity()))
                                       .async()

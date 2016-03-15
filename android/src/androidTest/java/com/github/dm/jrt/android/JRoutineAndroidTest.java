@@ -25,7 +25,6 @@ import android.test.ActivityInstrumentationTestCase2;
 import com.github.dm.jrt.android.core.TargetInvocationFactory;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
-import com.github.dm.jrt.android.core.invocation.CallContextInvocationFactories;
 import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
 import com.github.dm.jrt.android.core.log.AndroidLog;
 import com.github.dm.jrt.android.core.log.AndroidLogs;
@@ -48,6 +47,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
+import static com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory.callFactoryOf;
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.classOfType;
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceOf;
 import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
@@ -76,17 +76,17 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
 
         final ClassToken<Join<String>> token = new ClassToken<Join<String>>() {};
         assertThat(JRoutineAndroid.with(loaderFrom(getActivity()))
-                                  .on(CallContextInvocationFactories.factoryOf(token))
+                                  .on(callFactoryOf(token))
                                   .asyncCall("test")
                                   .afterMax(seconds(10))
                                   .all()).containsExactly("test");
         assertThat(JRoutineAndroid.withLoader(getActivity())
-                                  .on(CallContextInvocationFactories.factoryOf(token))
+                                  .on(callFactoryOf(token))
                                   .asyncCall("test")
                                   .afterMax(seconds(10))
                                   .all()).containsExactly("test");
         assertThat(JRoutineAndroid.withLoader(getActivity(), getActivity())
-                                  .on(CallContextInvocationFactories.factoryOf(token))
+                                  .on(callFactoryOf(token))
                                   .asyncCall("test")
                                   .afterMax(seconds(10))
                                   .all()).containsExactly("test");
@@ -94,12 +94,12 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         assertThat(JRoutineAndroid.withLoader(fragment)
-                                  .on(CallContextInvocationFactories.factoryOf(token))
+                                  .on(callFactoryOf(token))
                                   .asyncCall("test")
                                   .afterMax(seconds(10))
                                   .all()).containsExactly("test");
         assertThat(JRoutineAndroid.withLoader(fragment, getActivity())
-                                  .on(CallContextInvocationFactories.factoryOf(token))
+                                  .on(callFactoryOf(token))
                                   .asyncCall("test")
                                   .afterMax(seconds(10))
                                   .all()).containsExactly("test");

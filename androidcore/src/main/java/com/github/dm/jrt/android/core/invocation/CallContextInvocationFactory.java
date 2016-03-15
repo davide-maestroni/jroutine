@@ -16,11 +16,18 @@
 
 package com.github.dm.jrt.android.core.invocation;
 
+import com.github.dm.jrt.core.invocation.Invocation;
+import com.github.dm.jrt.core.invocation.InvocationFactory;
+import com.github.dm.jrt.core.util.ClassToken;
+import com.github.dm.jrt.core.util.Reflection;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
+
 /**
- * Abstract class defining a factory of function context invocations.
+ * Abstract class defining a factory of call context invocations.
  * <p/>
  * Created by davide-maestroni on 10/06/2015.
  *
@@ -40,9 +47,133 @@ public abstract class CallContextInvocationFactory<IN, OUT>
         super(args);
     }
 
+    /**
+     * Builds and returns a new context invocation factory creating instances of the specified
+     * class.
+     * <p/>
+     * Note that inner and anonymous classes can be passed as well. Remember however that Java
+     * creates synthetic constructors for such classes, so be sure to specify the correct arguments
+     * to guarantee proper instantiation. In fact, inner classes always have the outer instance as
+     * first constructor parameter, and anonymous classes has both the outer instance and all the
+     * variables captured in the closure.
+     *
+     * @param invocationClass the invocation class.
+     * @param <IN>            the input data type.
+     * @param <OUT>           the output data type.
+     * @return the invocation factory.
+     */
+    @NotNull
+    public static <IN, OUT> CallContextInvocationFactory<IN, OUT> callFactoryOf(
+            @NotNull final Class<? extends CallContextInvocation<IN, OUT>> invocationClass) {
+
+        return callFactoryOf(invocationClass, (Object[]) null);
+    }
+
+    /**
+     * Builds and returns a new context invocation factory creating instances of the specified
+     * class by passing the specified arguments to the class constructor.
+     * <p/>
+     * Note that inner and anonymous classes can be passed as well. Remember however that Java
+     * creates synthetic constructors for such classes, so be sure to specify the correct arguments
+     * to guarantee proper instantiation. In fact, inner classes always have the outer instance as
+     * first constructor parameter, and anonymous classes has both the outer instance and all the
+     * variables captured in the closure.
+     *
+     * @param invocationClass the invocation class.
+     * @param args            the invocation constructor arguments.
+     * @param <IN>            the input data type.
+     * @param <OUT>           the output data type.
+     * @return the invocation factory.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <IN, OUT> CallContextInvocationFactory<IN, OUT> callFactoryOf(
+            @NotNull final Class<? extends CallContextInvocation<IN, OUT>> invocationClass,
+            @Nullable final Object... args) {
+
+        return new DefaultContextInvocationFactory<IN, OUT>(invocationClass, args);
+    }
+
+    /**
+     * Builds and returns a new context invocation factory creating instances of the specified class
+     * token.
+     * <p/>
+     * Note that class tokens of inner and anonymous classes can be passed as well. Remember however
+     * that Java creates synthetic constructors for such classes, so be sure to specify the correct
+     * arguments to guarantee proper instantiation. In fact, inner classes always have the outer
+     * instance as first constructor parameter, and anonymous classes has both the outer instance
+     * and all the variables captured in the closure.
+     *
+     * @param invocationToken the invocation class token.
+     * @param <IN>            the input data type.
+     * @param <OUT>           the output data type.
+     * @return the invocation factory.
+     */
+    @NotNull
+    public static <IN, OUT> CallContextInvocationFactory<IN, OUT> callFactoryOf(
+            @NotNull final ClassToken<? extends CallContextInvocation<IN, OUT>> invocationToken) {
+
+        return callFactoryOf(invocationToken.getRawClass());
+    }
+
+    /**
+     * Builds and returns a new context invocation factory creating instances of the specified class
+     * token by passing the specified arguments to the class constructor.
+     * <p/>
+     * Note that class tokens of inner and anonymous classes can be passed as well. Remember however
+     * that Java creates synthetic constructors for such classes, so be sure to specify the correct
+     * arguments to guarantee proper instantiation. In fact, inner classes always have the outer
+     * instance as first constructor parameter, and anonymous classes has both the outer instance
+     * and all the variables captured in the closure.
+     *
+     * @param invocationToken the invocation class token.
+     * @param args            the invocation constructor arguments.
+     * @param <IN>            the input data type.
+     * @param <OUT>           the output data type.
+     * @return the invocation factory.
+     */
+    @NotNull
+    public static <IN, OUT> CallContextInvocationFactory<IN, OUT> callFactoryOf(
+            @NotNull final ClassToken<? extends CallContextInvocation<IN, OUT>> invocationToken,
+            @Nullable final Object... args) {
+
+        return callFactoryOf(invocationToken.getRawClass(), args);
+    }
+
     @NotNull
     @Override
     public abstract CallContextInvocation<IN, OUT> newInvocation() throws Exception;
 
-    // TODO: 3/15/16 move static method here
+    /**
+     * Default implementation of an invocation factory.
+     *
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
+     */
+    private static class DefaultContextInvocationFactory<IN, OUT>
+            extends CallContextInvocationFactory<IN, OUT> {
+
+        private final InvocationFactory<IN, OUT> mFactory;
+
+        /**
+         * Constructor.
+         *
+         * @param invocationClass the invocation class.
+         * @param args            the invocation constructor arguments.
+         */
+        private DefaultContextInvocationFactory(
+                @NotNull final Class<? extends CallContextInvocation<IN, OUT>> invocationClass,
+                @Nullable final Object[] args) {
+
+            super(asArgs(invocationClass, (args != null) ? args.clone() : Reflection.NO_ARGS));
+            mFactory = InvocationFactory.factoryOf(
+                    (Class<? extends Invocation<IN, OUT>>) invocationClass, args);
+        }
+
+        @NotNull
+        public CallContextInvocation<IN, OUT> newInvocation() throws Exception {
+
+            return (CallContextInvocation<IN, OUT>) mFactory.newInvocation();
+        }
+    }
 }

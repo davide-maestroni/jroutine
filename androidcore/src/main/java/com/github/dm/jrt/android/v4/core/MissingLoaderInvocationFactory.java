@@ -57,7 +57,7 @@ final class MissingLoaderInvocationFactory<OUT> extends CallContextInvocationFac
     }
 
     /**
-     * Function context invocation implementation.
+     * Call context invocation implementation.
      *
      * @param <OUT> the output data type.
      */

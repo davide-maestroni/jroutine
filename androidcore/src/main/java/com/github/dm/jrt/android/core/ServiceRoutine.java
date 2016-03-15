@@ -59,8 +59,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactories.factoryOf;
-import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactories.fromFactory;
+import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryOf;
+import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.fromFactory;
 import static com.github.dm.jrt.android.core.service.InvocationService.getAbortError;
 import static com.github.dm.jrt.android.core.service.InvocationService.getValue;
 import static com.github.dm.jrt.android.core.service.InvocationService.putAsyncInvocation;

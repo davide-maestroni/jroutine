@@ -43,7 +43,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.github.dm.jrt.core.invocation.InvocationFactories.factoryOf;
+import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.TimeDuration.millis;
 import static com.github.dm.jrt.core.util.TimeDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;

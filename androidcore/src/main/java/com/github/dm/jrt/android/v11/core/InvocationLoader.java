@@ -34,7 +34,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactories.fromFactory;
+import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.fromFactory;
 
 /**
  * Loader implementation performing the routine invocation.

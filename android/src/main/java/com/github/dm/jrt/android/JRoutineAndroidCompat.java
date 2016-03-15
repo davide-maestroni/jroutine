@@ -37,7 +37,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
-import static com.github.dm.jrt.android.core.invocation.CallContextInvocationFactories.factoryOf;
+import static com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory.callFactoryOf;
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.classOfType;
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceOf;
 import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
@@ -150,7 +150,7 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
         public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
                 @NotNull final Class<? extends CallContextInvocation<IN, OUT>> invocationClass) {
 
-            return on(factoryOf(invocationClass));
+            return on(callFactoryOf(invocationClass));
         }
 
         /**
@@ -176,7 +176,7 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
                 @NotNull final Class<? extends CallContextInvocation<IN, OUT>> invocationClass,
                 @Nullable final Object... args) {
 
-            return on(factoryOf(invocationClass, args));
+            return on(callFactoryOf(invocationClass, args));
         }
 
         /**
@@ -194,7 +194,7 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
                 @NotNull final ClassToken<? extends CallContextInvocation<IN, OUT>>
                         invocationToken) {
 
-            return on(factoryOf(invocationToken));
+            return on(callFactoryOf(invocationToken));
         }
 
         /**
@@ -220,7 +220,7 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
                 @NotNull final ClassToken<? extends CallContextInvocation<IN, OUT>> invocationToken,
                 @Nullable final Object... args) {
 
-            return on(factoryOf(invocationToken, args));
+            return on(callFactoryOf(invocationToken, args));
         }
 
         /**

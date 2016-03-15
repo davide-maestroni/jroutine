@@ -199,7 +199,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
     }
 
     /**
-     * Wrapper of function context invocation factory overriding {@code equals()} and
+     * Wrapper of call context invocation factories overriding {@code equals()} and
      * {@code hashCode()}.
      *
      * @param <IN>  the input data type.

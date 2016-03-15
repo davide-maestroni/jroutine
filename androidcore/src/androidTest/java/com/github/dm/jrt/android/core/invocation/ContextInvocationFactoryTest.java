@@ -27,8 +27,8 @@ import com.github.dm.jrt.core.util.ClassToken;
 
 import org.jetbrains.annotations.NotNull;
 
-import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactories.factoryOf;
-import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactories.fromFactory;
+import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryOf;
+import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.fromFactory;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static org.assertj.core.api.Assertions.assertThat;
 

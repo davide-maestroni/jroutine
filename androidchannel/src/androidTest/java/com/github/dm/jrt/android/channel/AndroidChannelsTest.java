@@ -32,7 +32,7 @@ import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.invocation.InvocationException;
-import com.github.dm.jrt.core.invocation.InvocationFactories;
+import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
 
@@ -983,7 +983,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         final IOChannel<String> channel4 = builder.buildChannel();
 
         final Routine<ParcelableSelectable<String>, String> routine =
-                JRoutineCore.on(InvocationFactories.factoryOf(new ClassToken<Amb<String>>() {}))
+                JRoutineCore.on(InvocationFactory.factoryOf(new ClassToken<Amb<String>>() {}))
                             .buildRoutine();
         final OutputChannel<String> outputChannel = routine.asyncCall(
                 AndroidChannels.merge(Arrays.asList(channel1, channel2, channel3, channel4))

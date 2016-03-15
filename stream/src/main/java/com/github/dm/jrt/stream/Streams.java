@@ -63,7 +63,7 @@ public class Streams extends Functions {
     }
 
     /**
-     * Returns a builder of streams blending the outputs coming from the specified ones.<br/>
+     * Returns a builder of streams blending the outputs coming from the specified channels.<br/>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
@@ -71,6 +71,8 @@ public class Streams extends Functions {
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
      * @see Channels#blend(Collection)
      */
     @NotNull
@@ -81,7 +83,7 @@ public class Streams extends Functions {
     }
 
     /**
-     * Returns a builder of streams blending the outputs coming from the specified ones.<br/>
+     * Returns a builder of streams blending the outputs coming from the specified channels.<br/>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
@@ -89,6 +91,8 @@ public class Streams extends Functions {
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.NullPointerException     if the specified array is null or contains a null
+     *                                            object.
      * @see Channels#blend(com.github.dm.jrt.core.channel.Channel.OutputChannel[])
      */
     @NotNull
@@ -109,6 +113,8 @@ public class Streams extends Functions {
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
      * @see Channels#concat(Collection)
      */
     @NotNull
@@ -129,6 +135,8 @@ public class Streams extends Functions {
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.NullPointerException     if the specified array is null or contains a null
+     *                                            object.
      * @see Channels#concat(com.github.dm.jrt.core.channel.Channel.OutputChannel[])
      */
     @NotNull
@@ -220,6 +228,8 @@ public class Streams extends Functions {
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
      * @see Channels#join(Collection)
      */
     @NotNull
@@ -239,6 +249,8 @@ public class Streams extends Functions {
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.NullPointerException     if the specified array is null or contains a null
+     *                                            object.
      * @see Channels#join(com.github.dm.jrt.core.channel.Channel.OutputChannel[])
      */
     @NotNull
@@ -262,6 +274,8 @@ public class Streams extends Functions {
      * @param <OUT>       the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
      * @see Channels#join(Object, Collection)
      */
     @NotNull
@@ -286,6 +300,8 @@ public class Streams extends Functions {
      * @param <OUT>       the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.NullPointerException     if the specified array is null or contains a null
+     *                                            object.
      * @see Channels#join(Object, com.github.dm.jrt.core.channel.Channel.OutputChannel[])
      */
     @NotNull
@@ -298,7 +314,7 @@ public class Streams extends Functions {
     /**
      * Builds and returns a new lazy stream channel.<br/>
      * The stream will start producing results only when it is bound to another channel or an output
-     * consumer or when any of the read methods is invoked.
+     * consumer, or when any of the read methods is invoked.
      *
      * @param <OUT> the output data type.
      * @return the newly created stream instance.
@@ -312,7 +328,7 @@ public class Streams extends Functions {
     /**
      * Builds and returns a new lazy stream channel generating the specified outputs.<br/>
      * The stream will start producing results only when it is bound to another channel or an output
-     * consumer or when any of the read methods is invoked.
+     * consumer, or when any of the read methods is invoked.
      *
      * @param outputs the iterable returning the output data.
      * @param <OUT>   the output data type.
@@ -327,7 +343,7 @@ public class Streams extends Functions {
     /**
      * Builds and returns a new lazy stream channel generating the specified output.<br/>
      * The stream will start producing results only when it is bound to another channel or an output
-     * consumer or when any of the read methods is invoked.
+     * consumer, or when any of the read methods is invoked.
      *
      * @param output the output.
      * @param <OUT>  the output data type.
@@ -342,7 +358,7 @@ public class Streams extends Functions {
     /**
      * Builds and returns a new lazy stream channel generating the specified outputs.<br/>
      * The stream will start producing results only when it is bound to another channel or an output
-     * consumer or when any of the read methods is invoked.
+     * consumer, or when any of the read methods is invoked.
      *
      * @param outputs the output data.
      * @param <OUT>   the output data type.
@@ -357,7 +373,7 @@ public class Streams extends Functions {
     /**
      * Builds and returns a new lazy stream channel generating the specified outputs.<br/>
      * The stream will start producing results only when it is bound to another channel or an output
-     * consumer or when any of the read methods is invoked.
+     * consumer, or when any of the read methods is invoked.
      * <p/>
      * Note that the output channel will be bound as a result of the call.
      *
@@ -411,6 +427,8 @@ public class Streams extends Functions {
      * @param <OUT>      the output data type.
      * @return the selectable stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
      * @see Channels#merge(int, Collection)
      */
     @NotNull
@@ -431,6 +449,8 @@ public class Streams extends Functions {
      * @param <OUT>      the output data type.
      * @return the selectable stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.NullPointerException     if the specified array is null or contains a null
+     *                                            object.
      * @see Channels#merge(int, com.github.dm.jrt.core.channel.Channel.OutputChannel[])
      */
     @NotNull
@@ -449,6 +469,8 @@ public class Streams extends Functions {
      * @param <OUT>    the output data type.
      * @return the selectable stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
      * @see Channels#merge(Collection)
      */
     @NotNull
@@ -467,6 +489,8 @@ public class Streams extends Functions {
      * @param <OUT>    the output data type.
      * @return the selectable stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
+     * @throws java.lang.NullPointerException     if the specified map is null or contains a null
+     *                                            object.
      * @see Channels#merge(Map)
      */
     @NotNull
@@ -485,6 +509,8 @@ public class Streams extends Functions {
      * @param <OUT>    the output data type.
      * @return the selectable stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.NullPointerException     if the specified array is null or contains a null
+     *                                            object.
      * @see Channels#merge(com.github.dm.jrt.core.channel.Channel.OutputChannel[])
      */
     @NotNull
@@ -496,7 +522,7 @@ public class Streams extends Functions {
 
     /**
      * Returns a routine builder, whose invocation instances employ the streams provided by the
-     * specified function, to process input data.<br/>
+     * specified function to process input data.<br/>
      * The function should return a new instance each time it is called, starting from the passed
      * one.
      *
@@ -618,6 +644,8 @@ public class Streams extends Functions {
      * @param indexes the list of indexes.
      * @param <OUT>   the output data type.
      * @return the map of indexes and output channels builder.
+     * @throws java.lang.NullPointerException if the specified array is null or contains a null
+     *                                        object.
      * @see Channels#select(com.github.dm.jrt.core.channel.Channel.OutputChannel, int...)
      */
     @NotNull
@@ -638,6 +666,8 @@ public class Streams extends Functions {
      * @param indexes the iterable returning the channel indexes.
      * @param <OUT>   the output data type.
      * @return the map of indexes and output channels builder.
+     * @throws java.lang.NullPointerException if the specified iterable is null or returns a null
+     *                                        object.
      * @see Channels#select(com.github.dm.jrt.core.channel.Channel.OutputChannel, Iterable)
      */
     @NotNull

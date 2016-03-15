@@ -42,9 +42,7 @@
 
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.main_layout);
-
                 try {
-
                     final ImageView imageView = (ImageView) findViewById(R.id.image);
                     JRoutineLoader.with(loaderFrom(this))
                                   .on(factoryOf(LoadBitmap.class))
@@ -119,9 +117,7 @@
 
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.main_layout);
-
                 try {
-
                     final ImageView imageView = (ImageView) findViewById(R.id.image);
                     JRoutineLoader.with(loaderFrom(this))
                                   .on(factoryOf(LoadBitmapFromService.class))

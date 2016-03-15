@@ -22,6 +22,8 @@ import com.github.dm.jrt.android.proxy.builder.ServiceProxyRoutineBuilder;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.WeakHashMap;
+
 /**
  * Utility class used to create builders of objects wrapping target ones, so to enable asynchronous
  * calls of their methods in a dedicated service.
@@ -38,6 +40,9 @@ import org.jetbrains.annotations.NotNull;
  */
 public class JRoutineServiceProxy {
 
+    private static final WeakHashMap<ServiceContext, ServiceProxyBuilder> sBuilders =
+            new WeakHashMap<ServiceContext, ServiceProxyBuilder>();
+
     /**
      * Avoid direct instantiation.
      */
@@ -52,15 +57,24 @@ public class JRoutineServiceProxy {
      * @return the context builder.
      */
     @NotNull
-    public static ContextBuilder with(@NotNull final ServiceContext context) {
+    public static ServiceProxyBuilder with(@NotNull final ServiceContext context) {
 
-        return new ContextBuilder(context);
+        synchronized (sBuilders) {
+            final WeakHashMap<ServiceContext, ServiceProxyBuilder> builders = sBuilders;
+            ServiceProxyBuilder builder = builders.get(context);
+            if (builder == null) {
+                builder = new ServiceProxyBuilder(context);
+                builders.put(context, builder);
+            }
+
+            return builder;
+        }
     }
 
     /**
      * Context based builder of service routine builders.
      */
-    public static class ContextBuilder {
+    public static class ServiceProxyBuilder {
 
         private final ServiceContext mContext;
 
@@ -70,7 +84,7 @@ public class JRoutineServiceProxy {
          * @param context the service context.
          */
         @SuppressWarnings("ConstantConditions")
-        private ContextBuilder(@NotNull final ServiceContext context) {
+        private ServiceProxyBuilder(@NotNull final ServiceContext context) {
 
             if (context == null) {
                 throw new NullPointerException("the context must not be null");

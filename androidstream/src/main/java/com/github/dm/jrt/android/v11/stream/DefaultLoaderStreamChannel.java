@@ -23,7 +23,7 @@ import com.github.dm.jrt.android.core.config.LoaderConfiguration.Configurable;
 import com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory;
 import com.github.dm.jrt.android.v11.channel.SparseChannels;
 import com.github.dm.jrt.android.v11.core.JRoutineLoader;
-import com.github.dm.jrt.android.v11.core.JRoutineLoader.LoaderContextBuilder;
+import com.github.dm.jrt.android.v11.core.JRoutineLoader.LoaderBuilder;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
 import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.core.JRoutineCore;
@@ -102,7 +102,7 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
 
     private LoaderConfiguration mConfiguration = LoaderConfiguration.DEFAULT_CONFIGURATION;
 
-    private LoaderContextBuilder mContextBuilder;
+    private LoaderBuilder mContextBuilder;
 
     private LoaderConfiguration mStreamConfiguration;
 
@@ -124,7 +124,7 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
      * @param builder the context builder.
      * @param channel the wrapped output channel.
      */
-    DefaultLoaderStreamChannel(@Nullable final LoaderContextBuilder builder,
+    DefaultLoaderStreamChannel(@Nullable final LoaderBuilder builder,
             @NotNull final OutputChannel<OUT> channel) {
 
         this(builder, channel, (Binder) null);
@@ -137,7 +137,7 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
      * @param input   the channel returning the inputs.
      * @param output  the channel consuming them.
      */
-    DefaultLoaderStreamChannel(@Nullable final LoaderContextBuilder builder,
+    DefaultLoaderStreamChannel(@Nullable final LoaderBuilder builder,
             @NotNull final OutputChannel<OUT> input, @NotNull final IOChannel<OUT> output) {
 
         this(builder, output, Binder.binderOf(input, output));
@@ -150,7 +150,7 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
      * @param channel the wrapped output channel.
      * @param binder  the binder instance.
      */
-    private DefaultLoaderStreamChannel(@Nullable final LoaderContextBuilder builder,
+    private DefaultLoaderStreamChannel(@Nullable final LoaderBuilder builder,
             @NotNull final OutputChannel<OUT> channel, @Nullable final Binder binder) {
 
         this(builder, channel, InvocationConfiguration.DEFAULT_CONFIGURATION,
@@ -168,7 +168,7 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
      * @param binder                  the binder instance.
      */
     @SuppressWarnings("ConstantConditions")
-    private DefaultLoaderStreamChannel(@Nullable final LoaderContextBuilder builder,
+    private DefaultLoaderStreamChannel(@Nullable final LoaderBuilder builder,
             @NotNull final OutputChannel<OUT> channel,
             @NotNull final InvocationConfiguration invocationConfiguration,
             @NotNull final LoaderConfiguration loaderConfiguration,
@@ -658,7 +658,7 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
             @NotNull final LoaderConfiguration loaderConfiguration,
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
 
-        final LoaderContextBuilder contextBuilder = mContextBuilder;
+        final LoaderBuilder contextBuilder = mContextBuilder;
         if (contextBuilder == null) {
             return JRoutineCore.on(factory)
                                .withInvocations()

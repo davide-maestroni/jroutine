@@ -142,8 +142,8 @@ import java.util.WeakHashMap;
  */
 public class JRoutineLoader {
 
-    private static final WeakHashMap<LoaderContext, LoaderContextBuilder> sBuilders =
-            new WeakHashMap<LoaderContext, LoaderContextBuilder>();
+    private static final WeakHashMap<LoaderContext, LoaderBuilder> sBuilders =
+            new WeakHashMap<LoaderContext, LoaderBuilder>();
 
     /**
      * Returns a context based builder of loader routine builders.
@@ -152,24 +152,24 @@ public class JRoutineLoader {
      * @return the context builder.
      */
     @NotNull
-    public static LoaderContextBuilder with(@NotNull final LoaderContext context) {
+    public static LoaderBuilder with(@NotNull final LoaderContext context) {
 
         synchronized (sBuilders) {
-            final WeakHashMap<LoaderContext, LoaderContextBuilder> builders = sBuilders;
-            LoaderContextBuilder contextBuilder = builders.get(context);
-            if (contextBuilder == null) {
-                contextBuilder = new LoaderContextBuilder(context);
-                builders.put(context, contextBuilder);
+            final WeakHashMap<LoaderContext, LoaderBuilder> builders = sBuilders;
+            LoaderBuilder builder = builders.get(context);
+            if (builder == null) {
+                builder = new LoaderBuilder(context);
+                builders.put(context, builder);
             }
 
-            return contextBuilder;
+            return builder;
         }
     }
 
     /**
      * Context based builder of loader routine builders.
      */
-    public static class LoaderContextBuilder {
+    public static class LoaderBuilder {
 
         private final LoaderContext mContext;
 
@@ -179,7 +179,7 @@ public class JRoutineLoader {
          * @param context the loader context.
          */
         @SuppressWarnings("ConstantConditions")
-        private LoaderContextBuilder(@NotNull final LoaderContext context) {
+        private LoaderBuilder(@NotNull final LoaderContext context) {
 
             if (context == null) {
                 throw new NullPointerException("the loader context must not be null");

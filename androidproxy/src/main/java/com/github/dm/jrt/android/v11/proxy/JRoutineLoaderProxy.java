@@ -45,8 +45,8 @@ import java.util.WeakHashMap;
  */
 public class JRoutineLoaderProxy {
 
-    private static final WeakHashMap<LoaderContext, ProxyContextBuilder> sBuilders =
-            new WeakHashMap<LoaderContext, ProxyContextBuilder>();
+    private static final WeakHashMap<LoaderContext, LoaderProxyBuilder> sBuilders =
+            new WeakHashMap<LoaderContext, LoaderProxyBuilder>();
 
     /**
      * Avoid direct instantiation.
@@ -62,24 +62,24 @@ public class JRoutineLoaderProxy {
      * @return the context builder.
      */
     @NotNull
-    public static ProxyContextBuilder with(@NotNull final LoaderContext context) {
+    public static LoaderProxyBuilder with(@NotNull final LoaderContext context) {
 
         synchronized (sBuilders) {
-            final WeakHashMap<LoaderContext, ProxyContextBuilder> builders = sBuilders;
-            ProxyContextBuilder contextBuilder = builders.get(context);
-            if (contextBuilder == null) {
-                contextBuilder = new ProxyContextBuilder(context);
-                builders.put(context, contextBuilder);
+            final WeakHashMap<LoaderContext, LoaderProxyBuilder> builders = sBuilders;
+            LoaderProxyBuilder builder = builders.get(context);
+            if (builder == null) {
+                builder = new LoaderProxyBuilder(context);
+                builders.put(context, builder);
             }
 
-            return contextBuilder;
+            return builder;
         }
     }
 
     /**
      * Context based builder of loader proxy routine builders.
      */
-    public static class ProxyContextBuilder {
+    public static class LoaderProxyBuilder {
 
         private final LoaderContext mContext;
 
@@ -89,7 +89,7 @@ public class JRoutineLoaderProxy {
          * @param context the loader context.
          */
         @SuppressWarnings("ConstantConditions")
-        private ProxyContextBuilder(@NotNull final LoaderContext context) {
+        private LoaderProxyBuilder(@NotNull final LoaderContext context) {
 
             if (context == null) {
                 throw new NullPointerException("the context must not be null");

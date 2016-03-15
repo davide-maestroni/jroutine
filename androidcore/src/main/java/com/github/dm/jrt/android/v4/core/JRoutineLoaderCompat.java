@@ -136,8 +136,8 @@ import java.util.WeakHashMap;
  */
 public class JRoutineLoaderCompat {
 
-    private static final WeakHashMap<LoaderContextCompat, LoaderContextBuilderCompat> sBuilders =
-            new WeakHashMap<LoaderContextCompat, LoaderContextBuilderCompat>();
+    private static final WeakHashMap<LoaderContextCompat, LoaderBuilderCompat> sBuilders =
+            new WeakHashMap<LoaderContextCompat, LoaderBuilderCompat>();
 
     /**
      * Returns a context based builder of loader routine builders.
@@ -146,24 +146,24 @@ public class JRoutineLoaderCompat {
      * @return the context builder.
      */
     @NotNull
-    public static LoaderContextBuilderCompat with(@NotNull final LoaderContextCompat context) {
+    public static LoaderBuilderCompat with(@NotNull final LoaderContextCompat context) {
 
         synchronized (sBuilders) {
-            final WeakHashMap<LoaderContextCompat, LoaderContextBuilderCompat> builders = sBuilders;
-            LoaderContextBuilderCompat contextBuilder = builders.get(context);
-            if (contextBuilder == null) {
-                contextBuilder = new LoaderContextBuilderCompat(context);
-                builders.put(context, contextBuilder);
+            final WeakHashMap<LoaderContextCompat, LoaderBuilderCompat> builders = sBuilders;
+            LoaderBuilderCompat builder = builders.get(context);
+            if (builder == null) {
+                builder = new LoaderBuilderCompat(context);
+                builders.put(context, builder);
             }
 
-            return contextBuilder;
+            return builder;
         }
     }
 
     /**
      * Context based builder of loader routine builders.
      */
-    public static class LoaderContextBuilderCompat {
+    public static class LoaderBuilderCompat {
 
         private final LoaderContextCompat mContext;
 
@@ -173,7 +173,7 @@ public class JRoutineLoaderCompat {
          * @param context the loader context.
          */
         @SuppressWarnings("ConstantConditions")
-        private LoaderContextBuilderCompat(@NotNull final LoaderContextCompat context) {
+        private LoaderBuilderCompat(@NotNull final LoaderContextCompat context) {
 
             if (context == null) {
                 throw new NullPointerException("the loader context must not be null");

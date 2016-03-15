@@ -43,4 +43,6 @@ public abstract class CallContextInvocationFactory<IN, OUT>
     @NotNull
     @Override
     public abstract CallContextInvocation<IN, OUT> newInvocation() throws Exception;
+
+    // TODO: 3/15/16 move static method here
 }

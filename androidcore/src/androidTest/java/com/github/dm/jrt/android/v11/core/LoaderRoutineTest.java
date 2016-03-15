@@ -410,7 +410,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                  .next()).isSameAs(getActivity().getApplicationContext());
         final ContextWrapper contextWrapper = new ContextWrapper(getActivity());
         assertThat(JRoutineLoader.with(loaderFrom(getActivity(), contextWrapper))
-                                 .on(factoryOf(classToken))
+                                 .on(factoryOf(classToken, (Object[]) null))
                                  .syncCall()
                                  .next()).isSameAs(getActivity().getApplicationContext());
     }

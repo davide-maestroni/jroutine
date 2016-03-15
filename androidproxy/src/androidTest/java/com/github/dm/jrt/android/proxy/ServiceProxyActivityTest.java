@@ -149,11 +149,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
     public void testNullPointerError() {
 
         try {
-
-            JRoutineServiceProxy.with(serviceFrom(getActivity()))
-                                .on(instanceOf(TestClass.class))
-                                .buildProxy((Class<?>) null);
-
+            JRoutineServiceProxy.with(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -161,11 +157,19 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         }
 
         try {
+            JRoutineServiceProxy.with(serviceFrom(getActivity()))
+                                .on(instanceOf(TestClass.class))
+                                .buildProxy((Class<?>) null);
+            fail();
 
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
             JRoutineServiceProxy.with(serviceFrom(getActivity()))
                                 .on(instanceOf(TestClass.class))
                                 .buildProxy((ClassToken<?>) null);
-
             fail();
 
         } catch (final NullPointerException ignored) {

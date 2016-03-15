@@ -85,8 +85,8 @@ import java.util.WeakHashMap;
  */
 public class JRoutineService {
 
-    private static final WeakHashMap<ServiceContext, ServiceContextBuilder> sBuilders =
-            new WeakHashMap<ServiceContext, ServiceContextBuilder>();
+    private static final WeakHashMap<ServiceContext, ServiceBuilder> sBuilders =
+            new WeakHashMap<ServiceContext, ServiceBuilder>();
 
     /**
      * Returns a context based builder of service routine builders.
@@ -95,24 +95,24 @@ public class JRoutineService {
      * @return the context builder.
      */
     @NotNull
-    public static ServiceContextBuilder with(@NotNull final ServiceContext context) {
+    public static ServiceBuilder with(@NotNull final ServiceContext context) {
 
         synchronized (sBuilders) {
-            final WeakHashMap<ServiceContext, ServiceContextBuilder> builders = sBuilders;
-            ServiceContextBuilder contextBuilder = builders.get(context);
-            if (contextBuilder == null) {
-                contextBuilder = new ServiceContextBuilder(context);
-                builders.put(context, contextBuilder);
+            final WeakHashMap<ServiceContext, ServiceBuilder> builders = sBuilders;
+            ServiceBuilder builder = builders.get(context);
+            if (builder == null) {
+                builder = new ServiceBuilder(context);
+                builders.put(context, builder);
             }
 
-            return contextBuilder;
+            return builder;
         }
     }
 
     /**
      * Context based builder of service proxy routine builders.
      */
-    public static class ServiceContextBuilder {
+    public static class ServiceBuilder {
 
         private final ServiceContext mContext;
 
@@ -122,7 +122,7 @@ public class JRoutineService {
          * @param context the service context.
          */
         @SuppressWarnings("ConstantConditions")
-        private ServiceContextBuilder(@NotNull final ServiceContext context) {
+        private ServiceBuilder(@NotNull final ServiceContext context) {
 
             if (context == null) {
                 throw new NullPointerException("the context must not be null");

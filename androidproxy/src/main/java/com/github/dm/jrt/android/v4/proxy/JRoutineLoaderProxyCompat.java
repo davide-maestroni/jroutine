@@ -41,8 +41,8 @@ import java.util.WeakHashMap;
  */
 public class JRoutineLoaderProxyCompat {
 
-    private static final WeakHashMap<LoaderContextCompat, ProxyContextBuilderCompat> sBuilders =
-            new WeakHashMap<LoaderContextCompat, ProxyContextBuilderCompat>();
+    private static final WeakHashMap<LoaderContextCompat, LoaderProxyBuilderCompat> sBuilders =
+            new WeakHashMap<LoaderContextCompat, LoaderProxyBuilderCompat>();
 
     /**
      * Avoid direct instantiation.
@@ -58,24 +58,24 @@ public class JRoutineLoaderProxyCompat {
      * @return the context builder.
      */
     @NotNull
-    public static ProxyContextBuilderCompat with(@NotNull final LoaderContextCompat context) {
+    public static LoaderProxyBuilderCompat with(@NotNull final LoaderContextCompat context) {
 
         synchronized (sBuilders) {
-            final WeakHashMap<LoaderContextCompat, ProxyContextBuilderCompat> builders = sBuilders;
-            ProxyContextBuilderCompat contextBuilder = builders.get(context);
-            if (contextBuilder == null) {
-                contextBuilder = new ProxyContextBuilderCompat(context);
-                builders.put(context, contextBuilder);
+            final WeakHashMap<LoaderContextCompat, LoaderProxyBuilderCompat> builders = sBuilders;
+            LoaderProxyBuilderCompat builder = builders.get(context);
+            if (builder == null) {
+                builder = new LoaderProxyBuilderCompat(context);
+                builders.put(context, builder);
             }
 
-            return contextBuilder;
+            return builder;
         }
     }
 
     /**
      * Context based builder of loader proxy routine builders.
      */
-    public static class ProxyContextBuilderCompat {
+    public static class LoaderProxyBuilderCompat {
 
         private final LoaderContextCompat mContext;
 
@@ -85,7 +85,7 @@ public class JRoutineLoaderProxyCompat {
          * @param context the loader context.
          */
         @SuppressWarnings("ConstantConditions")
-        private ProxyContextBuilderCompat(@NotNull final LoaderContextCompat context) {
+        private LoaderProxyBuilderCompat(@NotNull final LoaderContextCompat context) {
 
             if (context == null) {
                 throw new NullPointerException("the context must not be null");

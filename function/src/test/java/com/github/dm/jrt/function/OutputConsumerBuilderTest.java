@@ -85,7 +85,7 @@ public class OutputConsumerBuilderTest {
         outputConsumer.onComplete();
         assertThat(consumer1.isCalled()).isTrue();
         consumer1.reset();
-        outputConsumer = outputConsumer.thenOnComplete(consumer2);
+        outputConsumer = outputConsumer.thenComplete(consumer2);
         outputConsumer.onOutput("test");
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(consumer2.isCalled()).isFalse();
@@ -97,7 +97,7 @@ public class OutputConsumerBuilderTest {
         assertThat(consumer2.isCalled()).isTrue();
         consumer1.reset();
         consumer2.reset();
-        outputConsumer = onComplete(consumer1).thenOnComplete(wrap(consumer2).andThen(consumer3));
+        outputConsumer = onComplete(consumer1).thenComplete(wrap(consumer2).andThen(consumer3));
         outputConsumer.onOutput("test");
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(consumer2.isCalled()).isFalse();
@@ -113,7 +113,7 @@ public class OutputConsumerBuilderTest {
         consumer1.reset();
         final TestConsumer<Object> outConsumer = new TestConsumer<Object>();
         final TestConsumer<RoutineException> errorConsumer = new TestConsumer<RoutineException>();
-        outputConsumer = onComplete(consumer1).thenOnOutput(outConsumer).thenOnError(errorConsumer);
+        outputConsumer = onComplete(consumer1).thenOutput(outConsumer).thenError(errorConsumer);
         outputConsumer.onOutput("test");
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(outConsumer.isCalled()).isTrue();
@@ -141,7 +141,7 @@ public class OutputConsumerBuilderTest {
 
         try {
 
-            onComplete(Functions.<Void>sink()).thenOnComplete(null);
+            onComplete(Functions.<Void>sink()).thenComplete(null);
 
             fail();
 
@@ -151,7 +151,7 @@ public class OutputConsumerBuilderTest {
 
         try {
 
-            onComplete(Functions.<Void>sink()).thenOnError(null);
+            onComplete(Functions.<Void>sink()).thenError(null);
 
             fail();
 
@@ -161,7 +161,7 @@ public class OutputConsumerBuilderTest {
 
         try {
 
-            onComplete(Functions.<Void>sink()).thenOnOutput(null);
+            onComplete(Functions.<Void>sink()).thenOutput(null);
 
             fail();
 
@@ -184,7 +184,7 @@ public class OutputConsumerBuilderTest {
         outputConsumer.onError(new RoutineException());
         assertThat(consumer1.isCalled()).isTrue();
         consumer1.reset();
-        outputConsumer = outputConsumer.thenOnError(consumer2);
+        outputConsumer = outputConsumer.thenError(consumer2);
         outputConsumer.onOutput("test");
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(consumer2.isCalled()).isFalse();
@@ -196,7 +196,7 @@ public class OutputConsumerBuilderTest {
         assertThat(consumer2.isCalled()).isTrue();
         consumer1.reset();
         consumer2.reset();
-        outputConsumer = onError(consumer1).thenOnError(wrap(consumer2).andThen(consumer3));
+        outputConsumer = onError(consumer1).thenError(wrap(consumer2).andThen(consumer3));
         outputConsumer.onOutput("test");
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(consumer2.isCalled()).isFalse();
@@ -213,7 +213,7 @@ public class OutputConsumerBuilderTest {
         final TestConsumer<Object> outConsumer = new TestConsumer<Object>();
         final TestConsumer<Void> completeConsumer = new TestConsumer<Void>();
         outputConsumer =
-                onError(consumer1).thenOnOutput(outConsumer).thenOnComplete(completeConsumer);
+                onError(consumer1).thenOutput(outConsumer).thenComplete(completeConsumer);
         outputConsumer.onOutput("test");
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(outConsumer.isCalled()).isTrue();
@@ -241,7 +241,7 @@ public class OutputConsumerBuilderTest {
 
         try {
 
-            onError(Functions.<RoutineException>sink()).thenOnComplete(null);
+            onError(Functions.<RoutineException>sink()).thenComplete(null);
 
             fail();
 
@@ -251,7 +251,7 @@ public class OutputConsumerBuilderTest {
 
         try {
 
-            onError(Functions.<RoutineException>sink()).thenOnError(null);
+            onError(Functions.<RoutineException>sink()).thenError(null);
 
             fail();
 
@@ -261,7 +261,7 @@ public class OutputConsumerBuilderTest {
 
         try {
 
-            onError(Functions.<RoutineException>sink()).thenOnOutput(null);
+            onError(Functions.<RoutineException>sink()).thenOutput(null);
 
             fail();
 
@@ -284,7 +284,7 @@ public class OutputConsumerBuilderTest {
         outputConsumer.onOutput("test");
         assertThat(consumer1.isCalled()).isTrue();
         consumer1.reset();
-        outputConsumer = outputConsumer.thenOnOutput(consumer2);
+        outputConsumer = outputConsumer.thenOutput(consumer2);
         outputConsumer.onError(new RoutineException());
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(consumer2.isCalled()).isFalse();
@@ -296,7 +296,7 @@ public class OutputConsumerBuilderTest {
         assertThat(consumer2.isCalled()).isTrue();
         consumer1.reset();
         consumer2.reset();
-        outputConsumer = onOutput(consumer1).thenOnOutput(wrap(consumer2).andThen(consumer3));
+        outputConsumer = onOutput(consumer1).thenOutput(wrap(consumer2).andThen(consumer3));
         outputConsumer.onError(new RoutineException());
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(consumer2.isCalled()).isFalse();
@@ -313,7 +313,7 @@ public class OutputConsumerBuilderTest {
         final TestConsumer<RoutineException> errorConsumer = new TestConsumer<RoutineException>();
         final TestConsumer<Void> completeConsumer = new TestConsumer<Void>();
         outputConsumer =
-                onOutput(consumer1).thenOnError(errorConsumer).thenOnComplete(completeConsumer);
+                onOutput(consumer1).thenError(errorConsumer).thenComplete(completeConsumer);
         outputConsumer.onError(new RoutineException());
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(errorConsumer.isCalled()).isTrue();
@@ -341,7 +341,7 @@ public class OutputConsumerBuilderTest {
 
         try {
 
-            onOutput(sink()).thenOnComplete(null);
+            onOutput(sink()).thenComplete(null);
 
             fail();
 
@@ -351,7 +351,7 @@ public class OutputConsumerBuilderTest {
 
         try {
 
-            onOutput(sink()).thenOnError(null);
+            onOutput(sink()).thenError(null);
 
             fail();
 
@@ -361,7 +361,7 @@ public class OutputConsumerBuilderTest {
 
         try {
 
-            onOutput(sink()).thenOnOutput(null);
+            onOutput(sink()).thenOutput(null);
 
             fail();
 

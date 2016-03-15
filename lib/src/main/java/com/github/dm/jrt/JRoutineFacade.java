@@ -67,6 +67,15 @@ public class JRoutineFacade extends Channels {
 
     }
 
+    /**
+     * Returns a routine builder based on a call invocation factory backed by the specified
+     * consumer.
+     *
+     * @param consumer the consumer instance.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the routine builder instance.
+     */
     @NotNull
     public static <IN, OUT> RoutineBuilder<IN, OUT> call(
             @NotNull final BiConsumer<? super List<IN>, ? super ResultChannel<OUT>> consumer) {
@@ -74,6 +83,15 @@ public class JRoutineFacade extends Channels {
         return JRoutineCore.on(consumerCall(consumer));
     }
 
+    /**
+     * Returns a routine builder based on a call invocation factory backed by the specified
+     * function.
+     *
+     * @param function the function instance.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the routine builder instance.
+     */
     @NotNull
     public static <IN, OUT> RoutineBuilder<IN, OUT> call(
             @NotNull final Function<? super List<IN>, ? extends OUT> function) {
@@ -81,6 +99,13 @@ public class JRoutineFacade extends Channels {
         return JRoutineCore.on(functionCall(function));
     }
 
+    /**
+     * Returns a routine builder based on a command invocation backed by the specified consumer.
+     *
+     * @param consumer the consumer instance.
+     * @param <OUT>    the output data type.
+     * @return the routine builder instance.
+     */
     @NotNull
     public static <OUT> RoutineBuilder<Void, OUT> command(
             @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
@@ -88,6 +113,13 @@ public class JRoutineFacade extends Channels {
         return JRoutineCore.on(consumerCommand(consumer));
     }
 
+    /**
+     * Returns a routine builder based on a command invocation backed by the specified supplier.
+     *
+     * @param supplier the supplier instance.
+     * @param <OUT>    the output data type.
+     * @return the routine builder instance.
+     */
     @NotNull
     public static <OUT> RoutineBuilder<Void, OUT> command(
             @NotNull final Supplier<? extends OUT> supplier) {
@@ -95,6 +127,14 @@ public class JRoutineFacade extends Channels {
         return JRoutineCore.on(supplierCommand(supplier));
     }
 
+    /**
+     * Returns a routine builder based on an invocation factory backed by the specified supplier.
+     *
+     * @param supplier the supplier instance.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the routine builder instance.
+     */
     @NotNull
     public static <IN, OUT> RoutineBuilder<IN, OUT> factory(
             @NotNull final Supplier<? extends Invocation<? super IN, ? extends OUT>> supplier) {
@@ -102,6 +142,14 @@ public class JRoutineFacade extends Channels {
         return JRoutineCore.on(supplierFactory(supplier));
     }
 
+    /**
+     * Returns a routine builder based on a filter invocation backed by the specified consumer.
+     *
+     * @param consumer the consumer instance.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the routine builder instance.
+     */
     @NotNull
     public static <IN, OUT> RoutineBuilder<IN, OUT> filter(
             @NotNull final BiConsumer<? super IN, ? super ResultChannel<OUT>> consumer) {
@@ -109,6 +157,14 @@ public class JRoutineFacade extends Channels {
         return JRoutineCore.on(consumerFilter(consumer));
     }
 
+    /**
+     * Returns a routine builder based on a filter invocation backed by the specified function.
+     *
+     * @param function the function instance.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the routine builder instance.
+     */
     @NotNull
     public static <IN, OUT> RoutineBuilder<IN, OUT> filter(
             @NotNull final Function<? super IN, ? extends OUT> function) {
@@ -116,6 +172,13 @@ public class JRoutineFacade extends Channels {
         return JRoutineCore.on(functionFilter(function));
     }
 
+    /**
+     * Returns a routine builder based on a filter invocation backed by the specified predicate.
+     *
+     * @param predicate the predicate instance.
+     * @param <IN>      the input data type.
+     * @return the routine builder instance.
+     */
     @NotNull
     public static <IN> RoutineBuilder<IN, IN> filter(
             @NotNull final Predicate<? super IN> predicate) {
@@ -220,6 +283,13 @@ public class JRoutineFacade extends Channels {
         return on(factoryOf(invocationToken, args));
     }
 
+    /**
+     * Returns a routine builder based on the specified command invocation.
+     *
+     * @param invocation the command invocation instance.
+     * @param <OUT>      the output data type.
+     * @return the routine builder instance.
+     */
     @NotNull
     public static <OUT> RoutineBuilder<Void, OUT> on(
             @NotNull final CommandInvocation<OUT> invocation) {
@@ -227,6 +297,14 @@ public class JRoutineFacade extends Channels {
         return on((InvocationFactory<Void, OUT>) invocation);
     }
 
+    /**
+     * Returns a routine builder based on the specified filter invocation.
+     *
+     * @param invocation the filter invocation instance.
+     * @param <IN>       the input data type.
+     * @param <OUT>      the output data type.
+     * @return the routine builder instance.
+     */
     @NotNull
     public static <IN, OUT> RoutineBuilder<IN, OUT> on(
             @NotNull final FilterInvocation<IN, OUT> invocation) {
@@ -312,6 +390,21 @@ public class JRoutineFacade extends Channels {
         return new DefaultTargetRoutineBuilder(target);
     }
 
+    /**
+     * Returns a routine builder wrapping the specified object.<br/>
+     * The invocation target will be automatically chosen based on whether the specified object is
+     * a class or an instance.<br/>
+     * Note that it is responsibility of the caller to retain a strong reference to the target
+     * instance to prevent it from being garbage collected.<br/>
+     * Note also that the invocation input data will be cached, and the results will be produced
+     * only after the invocation channel is closed, so be sure to avoid streaming inputs in
+     * order to prevent starvation or out of memory errors.
+     *
+     * @param object the target object.
+     * @return the routine builder instance.
+     * @throws java.lang.IllegalArgumentException if the specified object class represents an
+     *                                            interface.
+     */
     @NotNull
     public static TargetRoutineBuilder on(@NotNull final Object object) {
 

@@ -88,7 +88,7 @@ public class OutputConsumerBuilder<OUT> implements OutputConsumer<OUT> {
      * @return the builder instance.
      */
     @NotNull
-    public OutputConsumerBuilder<OUT> thenOnComplete(@NotNull final Consumer<Void> consumer) {
+    public OutputConsumerBuilder<OUT> thenComplete(@NotNull final Consumer<Void> consumer) {
 
         return new OutputConsumerBuilder<OUT>(mOnComplete.andThen(consumer), mOnError, mOnOutput);
     }
@@ -101,7 +101,7 @@ public class OutputConsumerBuilder<OUT> implements OutputConsumer<OUT> {
      * @return the builder instance.
      */
     @NotNull
-    public OutputConsumerBuilder<OUT> thenOnError(
+    public OutputConsumerBuilder<OUT> thenError(
             @NotNull final Consumer<? super RoutineException> consumer) {
 
         return new OutputConsumerBuilder<OUT>(mOnComplete, mOnError.andThen(consumer), mOnOutput);
@@ -115,7 +115,7 @@ public class OutputConsumerBuilder<OUT> implements OutputConsumer<OUT> {
      * @return the builder instance.
      */
     @NotNull
-    public OutputConsumerBuilder<OUT> thenOnOutput(@NotNull final Consumer<? super OUT> consumer) {
+    public OutputConsumerBuilder<OUT> thenOutput(@NotNull final Consumer<? super OUT> consumer) {
 
         return new OutputConsumerBuilder<OUT>(mOnComplete, mOnError, mOnOutput.andThen(consumer));
     }

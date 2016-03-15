@@ -33,6 +33,8 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Method;
 
 /**
+ * Default implementation of a target routine builder.
+ * <p/>
  * Created by davide-maestroni on 03/03/2016.
  */
 class DefaultTargetRoutineBuilder implements TargetRoutineBuilder {
@@ -71,6 +73,13 @@ class DefaultTargetRoutineBuilder implements TargetRoutineBuilder {
                 }
             };
 
+    /**
+     * Constructor.
+     *
+     * @param target the invocation target.
+     * @throws java.lang.IllegalArgumentException if the class of specified target represents an
+     *                                            interface.
+     */
     DefaultTargetRoutineBuilder(@NotNull final InvocationTarget<?> target) {
 
         final Class<?> targetClass = target.getTargetClass();
@@ -127,24 +136,26 @@ class DefaultTargetRoutineBuilder implements TargetRoutineBuilder {
     }
 
     @NotNull
-    public TargetRoutineBuilder withBuilder(@Nullable final BuilderType builderType) {
-
-        mBuilderType = builderType;
-        return this;
-    }
-
-    @NotNull
     public InvocationConfiguration.Builder<? extends TargetRoutineBuilder> withInvocations() {
 
+        final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<DefaultTargetRoutineBuilder>(
-                mInvocationConfigurable, mInvocationConfiguration);
+                mInvocationConfigurable, config);
     }
 
     @NotNull
     public ProxyConfiguration.Builder<? extends TargetRoutineBuilder> withProxies() {
 
+        final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<DefaultTargetRoutineBuilder>(mProxyConfigurable,
-                mProxyConfiguration);
+                                                                           config);
+    }
+
+    @NotNull
+    public TargetRoutineBuilder withType(@Nullable final BuilderType builderType) {
+
+        mBuilderType = builderType;
+        return this;
     }
 
     @NotNull

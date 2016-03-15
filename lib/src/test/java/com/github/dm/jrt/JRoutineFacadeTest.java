@@ -310,7 +310,7 @@ public class JRoutineFacadeTest {
 
         final TestClass test = new TestClass();
         final TestStatic testStatic = JRoutineFacade.on(instance(test))
-                                                    .withBuilder(BuilderType.OBJECT)
+                                                    .withType(BuilderType.OBJECT)
                                                     .withInvocations()
                                                     .withRunner(Runners.poolRunner())
                                                     .withLogLevel(Level.DEBUG)
@@ -340,7 +340,7 @@ public class JRoutineFacadeTest {
 
         final TestClass test = new TestClass();
         final TestStatic proxy = JRoutineFacade.on(test)
-                                               .withBuilder(BuilderType.PROXY)
+                                               .withType(BuilderType.PROXY)
                                                .withInvocations()
                                                .withRunner(Runners.poolRunner())
                                                .withLogLevel(Level.DEBUG)
@@ -433,7 +433,7 @@ public class JRoutineFacadeTest {
         outputConsumer.onComplete();
         assertThat(consumer1.isCalled()).isTrue();
         consumer1.reset();
-        outputConsumer = outputConsumer.thenOnComplete(consumer2);
+        outputConsumer = outputConsumer.thenComplete(consumer2);
         outputConsumer.onOutput("test");
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(consumer2.isCalled()).isFalse();
@@ -446,7 +446,7 @@ public class JRoutineFacadeTest {
         consumer1.reset();
         consumer2.reset();
         outputConsumer = JRoutineFacade.onComplete(consumer1)
-                                       .thenOnComplete(wrap(consumer2).andThen(consumer3));
+                                       .thenComplete(wrap(consumer2).andThen(consumer3));
         outputConsumer.onOutput("test");
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(consumer2.isCalled()).isFalse();
@@ -463,8 +463,8 @@ public class JRoutineFacadeTest {
         final TestConsumer<Object> outConsumer = new TestConsumer<Object>();
         final TestConsumer<RoutineException> errorConsumer = new TestConsumer<RoutineException>();
         outputConsumer = JRoutineFacade.onComplete(consumer1)
-                                       .thenOnOutput(outConsumer)
-                                       .thenOnError(errorConsumer);
+                                       .thenOutput(outConsumer)
+                                       .thenError(errorConsumer);
         outputConsumer.onOutput("test");
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(outConsumer.isCalled()).isTrue();
@@ -490,7 +490,7 @@ public class JRoutineFacadeTest {
         outputConsumer.onError(new RoutineException());
         assertThat(consumer1.isCalled()).isTrue();
         consumer1.reset();
-        outputConsumer = outputConsumer.thenOnError(consumer2);
+        outputConsumer = outputConsumer.thenError(consumer2);
         outputConsumer.onOutput("test");
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(consumer2.isCalled()).isFalse();
@@ -503,7 +503,7 @@ public class JRoutineFacadeTest {
         consumer1.reset();
         consumer2.reset();
         outputConsumer =
-                JRoutineFacade.onError(consumer1).thenOnError(wrap(consumer2).andThen(consumer3));
+                JRoutineFacade.onError(consumer1).thenError(wrap(consumer2).andThen(consumer3));
         outputConsumer.onOutput("test");
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(consumer2.isCalled()).isFalse();
@@ -520,8 +520,8 @@ public class JRoutineFacadeTest {
         final TestConsumer<Object> outConsumer = new TestConsumer<Object>();
         final TestConsumer<Void> completeConsumer = new TestConsumer<Void>();
         outputConsumer = JRoutineFacade.onError(consumer1)
-                                       .thenOnOutput(outConsumer)
-                                       .thenOnComplete(completeConsumer);
+                                       .thenOutput(outConsumer)
+                                       .thenComplete(completeConsumer);
         outputConsumer.onOutput("test");
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(outConsumer.isCalled()).isTrue();
@@ -547,7 +547,7 @@ public class JRoutineFacadeTest {
         outputConsumer.onOutput("test");
         assertThat(consumer1.isCalled()).isTrue();
         consumer1.reset();
-        outputConsumer = outputConsumer.thenOnOutput(consumer2);
+        outputConsumer = outputConsumer.thenOutput(consumer2);
         outputConsumer.onError(new RoutineException());
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(consumer2.isCalled()).isFalse();
@@ -560,7 +560,7 @@ public class JRoutineFacadeTest {
         consumer1.reset();
         consumer2.reset();
         outputConsumer =
-                JRoutineFacade.onOutput(consumer1).thenOnOutput(wrap(consumer2).andThen(consumer3));
+                JRoutineFacade.onOutput(consumer1).thenOutput(wrap(consumer2).andThen(consumer3));
         outputConsumer.onError(new RoutineException());
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(consumer2.isCalled()).isFalse();
@@ -577,8 +577,8 @@ public class JRoutineFacadeTest {
         final TestConsumer<RoutineException> errorConsumer = new TestConsumer<RoutineException>();
         final TestConsumer<Void> completeConsumer = new TestConsumer<Void>();
         outputConsumer = JRoutineFacade.onOutput(consumer1)
-                                       .thenOnError(errorConsumer)
-                                       .thenOnComplete(completeConsumer);
+                                       .thenError(errorConsumer)
+                                       .thenComplete(completeConsumer);
         outputConsumer.onError(new RoutineException());
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(errorConsumer.isCalled()).isTrue();

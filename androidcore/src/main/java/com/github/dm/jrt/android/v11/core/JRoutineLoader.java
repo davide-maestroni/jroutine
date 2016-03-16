@@ -30,8 +30,8 @@ import java.util.WeakHashMap;
  * Routine invocations created through the returned builders can be safely restored after a change
  * in the configuration, so to avoid duplicated calls and memory leaks. Be aware, though, that the
  * invocation results will be dispatched on the configured looper thread, no matter the calling one
- * was, so that, waiting for the outputs right after the routine invocation, may result in a
- * deadlock.<br/>
+ * was, so that, waiting for the outputs on the very same looper thread, right after the routine
+ * invocation, will result in a deadlock<br/>
  * Note that the configuration of the maximum number of concurrent invocations might not work as
  * expected. In fact, the number of running loaders cannot be computed.<br/>
  * Note also that the input data will be cached, and the results will be produced only after the
@@ -45,8 +45,8 @@ import java.util.WeakHashMap;
  * implementations, a user defined ID or an input independent clash resolution should be used in
  * order to avoid unexpected results.
  * <p/>
- * The routine invocations will be identified by an ID number. In case a clash is detected, that is,
- * an already running loader with the same ID exists at the time the new invocation is executed,
+ * The routine invocations will be identified by the loader ID. In case a clash is detected, that
+ * is, an already running loader with the same ID exists at the time the new invocation is executed,
  * the clash is resolved based on the strategy specified through the builder. When a clash cannot be
  * resolved, for example when invocations with different implementations share the same ID, the new
  * invocation is aborted with a
@@ -62,18 +62,14 @@ import java.util.WeakHashMap;
  *
  *             super.onCreate(savedInstanceState);
  *             setContentView(R.layout.my_activity_layout);
- *
  *             if (savedInstanceState != null) {
- *
  *                 mResource = savedInstanceState.getParcelable(RESOURCE_KEY);
  *             }
  *
  *             if (mResource != null) {
- *
  *                 displayResource(mResource);
  *
  *             } else {
- *
  *                 final Routine&lt;URI, MyResource&gt; routine =
  *                         JRoutineLoader.with(loaderFrom(this))
  *                                       .on(callFactoryOf(LoadResource.class))
@@ -213,8 +209,8 @@ public class JRoutineLoader {
         /**
          * Returns a builder of output channels bound to the loader identified by the specified ID.
          * <br/>
-         * If no invocation with the specified ID is running at the time of the channel creation,
-         * the output will be aborted with a
+         * If no loader with the specified ID is running at the time of the channel creation, the
+         * output will be aborted with a
          * {@link com.github.dm.jrt.android.core.invocation.MissingLoaderException
          * MissingLoaderException}.<br/>
          * Note that the built routine results will be always dispatched on the configured looper

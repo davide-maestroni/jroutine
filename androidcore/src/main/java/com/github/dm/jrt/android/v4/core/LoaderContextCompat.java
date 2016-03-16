@@ -58,8 +58,8 @@ public abstract class LoaderContextCompat {
     }
 
     /**
-     * Returns a context wrapping the specified fragment, with the specified instance as base
-     * context, that is, the one used by the loader.<br/>
+     * Returns a context wrapping the specified fragment, with the specified instance as the loader
+     * context.<br/>
      * In order to prevent undesired leaks, the class of the specified context must be static.
      *
      * @param fragment the fragment instance.
@@ -88,8 +88,8 @@ public abstract class LoaderContextCompat {
     }
 
     /**
-     * Returns a context wrapping the specified activity, with the specified instance as base
-     * context, that is, the one used by the loader.<br/>
+     * Returns a context wrapping the specified activity, with the specified instance as the loader
+     * context.<br/>
      * In order to prevent undesired leaks, the class of the specified context must be static.
      *
      * @param activity the activity instance.

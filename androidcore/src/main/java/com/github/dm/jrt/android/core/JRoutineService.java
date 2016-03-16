@@ -30,7 +30,7 @@ import java.util.WeakHashMap;
  * Routine invocations created through the returned builder will be executed inside a service
  * specified by the service context. Be aware, though, that the invocation results will be
  * dispatched into the configured looper, so that, waiting for the outputs on the very same looper
- * thread, immediately after its invocation, will result in a deadlock.<br/>
+ * thread, right after the routine invocation, will result in a deadlock.<br/>
  * By default output results are dispatched in the main looper.<br/>
  * Note that the configuration of the maximum number of concurrent invocations will not be shared
  * among synchronous and asynchronous invocations, but the invocations created inside the service

@@ -20,7 +20,6 @@ import com.github.dm.jrt.android.core.builder.LoaderChannelBuilder;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.ClashResolutionType;
 import com.github.dm.jrt.android.core.invocation.MissingLoaderException;
-import com.github.dm.jrt.android.core.runner.AndroidRunners;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
@@ -37,6 +36,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import static com.github.dm.jrt.android.core.runner.AndroidRunners.mainRunner;
+import static com.github.dm.jrt.android.v4.core.LoaderInvocation.purgeLoader;
 
 /**
  * Default implementation of a loader channel builder.
@@ -137,10 +139,9 @@ class DefaultLoaderChannelBuilder
                 }
             }
 
-            AndroidRunners.mainRunner()
-                          .run(new PurgeInputsExecution(context,
-                                  mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO),
-                                  inputList), 0, TimeUnit.MILLISECONDS);
+            mainRunner().run(new PurgeInputsExecution(context,
+                    mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO), inputList), 0,
+                    TimeUnit.MILLISECONDS);
         }
     }
 
@@ -148,10 +149,9 @@ class DefaultLoaderChannelBuilder
 
         final LoaderContextCompat context = mContext;
         if (context.getComponent() != null) {
-            AndroidRunners.mainRunner()
-                          .run(new PurgeExecution(context,
-                                  mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO)), 0,
-                                  TimeUnit.MILLISECONDS);
+            mainRunner().run(new PurgeExecution(context,
+                            mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO)), 0,
+                    TimeUnit.MILLISECONDS);
         }
     }
 
@@ -160,10 +160,9 @@ class DefaultLoaderChannelBuilder
         final LoaderContextCompat context = mContext;
         if (context.getComponent() != null) {
             final List<Object> inputList = Collections.singletonList(input);
-            AndroidRunners.mainRunner()
-                          .run(new PurgeInputsExecution(context,
-                                  mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO),
-                                  inputList), 0, TimeUnit.MILLISECONDS);
+            mainRunner().run(new PurgeInputsExecution(context,
+                    mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO), inputList), 0,
+                    TimeUnit.MILLISECONDS);
         }
     }
 
@@ -180,10 +179,9 @@ class DefaultLoaderChannelBuilder
                 Collections.addAll(inputList, inputs);
             }
 
-            AndroidRunners.mainRunner()
-                          .run(new PurgeInputsExecution(context,
-                                  mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO),
-                                  inputList), 0, TimeUnit.MILLISECONDS);
+            mainRunner().run(new PurgeInputsExecution(context,
+                    mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO), inputList), 0,
+                    TimeUnit.MILLISECONDS);
         }
     }
 
@@ -249,7 +247,7 @@ class DefaultLoaderChannelBuilder
 
         public void run() {
 
-            LoaderInvocation.purgeLoader(mContext, mLoaderId);
+            purgeLoader(mContext, mLoaderId);
         }
     }
 
@@ -281,7 +279,7 @@ class DefaultLoaderChannelBuilder
 
         public void run() {
 
-            LoaderInvocation.purgeLoader(mContext, mLoaderId, mInputs);
+            purgeLoader(mContext, mLoaderId, mInputs);
         }
     }
 }

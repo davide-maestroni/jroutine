@@ -453,7 +453,7 @@ public class InvocationService extends Service {
                     (isParallel) ? routineState.parallelInvoke() : routineState.asyncInvoke();
             final RoutineInvocation routineInvocation =
                     new RoutineInvocation(invocationId, channel, routineInfo, routineState);
-            routineInvocation.bindTo(new ServiceOutputConsumer(routineInvocation, message.replyTo));
+            routineInvocation.bind(new ServiceOutputConsumer(routineInvocation, message.replyTo));
             invocations.put(invocationId, routineInvocation);
         }
     }
@@ -819,7 +819,7 @@ public class InvocationService extends Service {
          * @throws java.lang.IllegalStateException                if the channel is already closed
          *                                                        or already bound to a consumer.
          */
-        void bindTo(@NotNull final OutputConsumer<Object> consumer) {
+        void bind(@NotNull final OutputConsumer<Object> consumer) {
 
             mChannel.result().bind(consumer);
         }

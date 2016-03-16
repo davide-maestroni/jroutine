@@ -42,14 +42,14 @@ import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
  * time after which the results of the first invocation are considered to be stale, and thus the
  * invocation is repeated.<br/>
  * Finally, a specific looper, other than the main thread one, can be chosen to dispatch the results
- * coming from the invocation.
+ * coming from the invocations.
  * <p/>
  * Created by davide-maestroni on 04/19/2015.
  */
 public final class LoaderConfiguration {
 
     /**
-     * Constant identifying an loader ID computed from the executor class and the input parameters.
+     * Constant identifying a loader ID computed from the factory class and the input parameters.
      */
     public static final int AUTO = Integer.MIN_VALUE;
 

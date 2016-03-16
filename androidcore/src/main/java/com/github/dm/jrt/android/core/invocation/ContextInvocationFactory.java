@@ -212,7 +212,8 @@ public abstract class ContextInvocationFactory<IN, OUT> {
         /**
          * Constructor.
          *
-         * @param factory the context invocation class.
+         * @param context the context.
+         * @param factory the context invocation factory.
          */
         @SuppressWarnings("ConstantConditions")
         private AdaptingContextInvocationFactory(@NotNull final Context context,
@@ -256,7 +257,7 @@ public abstract class ContextInvocationFactory<IN, OUT> {
          * Constructor.
          *
          * @param invocationClass the invocation class.
-         * @param args            the invocation constructor arguments.
+         * @param args            the invocation factory arguments.
          */
         private DefaultContextInvocationFactory(
                 @NotNull final Class<? extends ContextInvocation<IN, OUT>> invocationClass,

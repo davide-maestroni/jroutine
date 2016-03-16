@@ -70,11 +70,17 @@ public abstract class ContextInvocationFactory<IN, OUT> {
     /**
      * Builds and returns a new context invocation factory creating instances of the specified
      * class.
+     * <p/>
+     * Note that inner and anonymous classes can be passed as well. Remember however that Java
+     * creates synthetic constructors for such classes, so be sure to specify the correct arguments
+     * to guarantee proper instantiation.
      *
      * @param invocationClass the invocation class.
      * @param <IN>            the input data type.
      * @param <OUT>           the output data type.
      * @return the invocation factory.
+     * @throws java.lang.IllegalArgumentException if the class of the specified invocation has not a
+     *                                            static scope.
      */
     @NotNull
     public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryOf(
@@ -89,15 +95,15 @@ public abstract class ContextInvocationFactory<IN, OUT> {
      * <p/>
      * Note that inner and anonymous classes can be passed as well. Remember however that Java
      * creates synthetic constructors for such classes, so be sure to specify the correct arguments
-     * to guarantee proper instantiation. In fact, inner classes always have the outer instance as
-     * first constructor parameter, and anonymous classes has both the outer instance and all the
-     * variables captured in the closure.
+     * to guarantee proper instantiation.
      *
      * @param invocationClass the invocation class.
      * @param args            the invocation constructor arguments.
      * @param <IN>            the input data type.
      * @param <OUT>           the output data type.
      * @return the invocation factory.
+     * @throws java.lang.IllegalArgumentException if the class of the specified invocation has not a
+     *                                            static scope.
      */
     @NotNull
     public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryOf(
@@ -110,11 +116,17 @@ public abstract class ContextInvocationFactory<IN, OUT> {
     /**
      * Builds and returns a new context invocation factory creating instances of the specified class
      * token.
+     * <p/>
+     * Note that class tokens of inner and anonymous classes can be passed as well. Remember however
+     * that Java creates synthetic constructors for such classes, so be sure to specify the correct
+     * arguments to guarantee proper instantiation.
      *
      * @param invocationToken the invocation class token.
      * @param <IN>            the input data type.
      * @param <OUT>           the output data type.
      * @return the invocation factory.
+     * @throws java.lang.IllegalArgumentException if the class of the specified invocation has not a
+     *                                            static scope.
      */
     @NotNull
     public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryOf(
@@ -129,15 +141,15 @@ public abstract class ContextInvocationFactory<IN, OUT> {
      * <p/>
      * Note that class tokens of inner and anonymous classes can be passed as well. Remember however
      * that Java creates synthetic constructors for such classes, so be sure to specify the correct
-     * arguments to guarantee proper instantiation. In fact, inner classes always have the outer
-     * instance as first constructor parameter, and anonymous classes has both the outer instance
-     * and all the variables captured in the closure.
+     * arguments to guarantee proper instantiation.
      *
      * @param invocationToken the invocation class token.
      * @param args            the invocation constructor arguments.
      * @param <IN>            the input data type.
      * @param <OUT>           the output data type.
      * @return the invocation factory.
+     * @throws java.lang.IllegalArgumentException if the class of the specified invocation has not a
+     *                                            static scope.
      */
     @NotNull
     public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryOf(
@@ -258,12 +270,19 @@ public abstract class ContextInvocationFactory<IN, OUT> {
          *
          * @param invocationClass the invocation class.
          * @param args            the invocation factory arguments.
+         * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
+         *                                            not a static scope.
          */
         private DefaultContextInvocationFactory(
                 @NotNull final Class<? extends ContextInvocation<IN, OUT>> invocationClass,
                 @Nullable final Object[] args) {
 
             super(asArgs(invocationClass, (args != null) ? args.clone() : Reflection.NO_ARGS));
+            if (!Reflection.hasStaticScope(invocationClass)) {
+                throw new IllegalArgumentException("the invocation class must have a static scope: "
+                        + invocationClass.getName());
+            }
+
             mFactory = InvocationFactory.factoryOf(
                     (Class<? extends Invocation<IN, OUT>>) invocationClass, args);
         }

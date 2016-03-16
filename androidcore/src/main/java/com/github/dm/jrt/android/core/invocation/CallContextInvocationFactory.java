@@ -16,6 +16,8 @@
 
 package com.github.dm.jrt.android.core.invocation;
 
+import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.util.ClassToken;
@@ -23,6 +25,8 @@ import com.github.dm.jrt.core.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
@@ -48,25 +52,22 @@ public abstract class CallContextInvocationFactory<IN, OUT>
     }
 
     /**
-     * Builds and returns a new context invocation factory creating instances of the specified
-     * class.
-     * <p/>
-     * Note that inner and anonymous classes can be passed as well. Remember however that Java
-     * creates synthetic constructors for such classes, so be sure to specify the correct arguments
-     * to guarantee proper instantiation. In fact, inner classes always have the outer instance as
-     * first constructor parameter, and anonymous classes has both the outer instance and all the
-     * variables captured in the closure.
+     * Builds and returns a new context invocation factory wrapping the invocation created by the
+     * specified factory.
      *
-     * @param invocationClass the invocation class.
-     * @param <IN>            the input data type.
-     * @param <OUT>           the output data type.
+     * @param factory the invocation factory.
+     * @param <IN>    the input data type.
+     * @param <OUT>   the output data type.
      * @return the invocation factory.
+     * @throws java.lang.IllegalArgumentException if the class of the specified invocation factory
+     *                                            has not a static scope.
      */
+    // TODO: 16/03/16 unit tests
     @NotNull
-    public static <IN, OUT> CallContextInvocationFactory<IN, OUT> callFactoryOf(
-            @NotNull final Class<? extends CallContextInvocation<IN, OUT>> invocationClass) {
+    public static <IN, OUT> CallContextInvocationFactory<IN, OUT> callFactoryFrom(
+            @NotNull final InvocationFactory<IN, OUT> factory) {
 
-        return callFactoryOf(invocationClass, (Object[]) null);
+        return new AdaptingContextInvocationFactory<IN, OUT>(factory);
     }
 
     /**
@@ -75,15 +76,15 @@ public abstract class CallContextInvocationFactory<IN, OUT>
      * <p/>
      * Note that inner and anonymous classes can be passed as well. Remember however that Java
      * creates synthetic constructors for such classes, so be sure to specify the correct arguments
-     * to guarantee proper instantiation. In fact, inner classes always have the outer instance as
-     * first constructor parameter, and anonymous classes has both the outer instance and all the
-     * variables captured in the closure.
+     * to guarantee proper instantiation.
      *
      * @param invocationClass the invocation class.
      * @param args            the invocation constructor arguments.
      * @param <IN>            the input data type.
      * @param <OUT>           the output data type.
      * @return the invocation factory.
+     * @throws java.lang.IllegalArgumentException if the class of the specified invocation has not a
+     *                                            static scope.
      */
     @NotNull
     @SuppressWarnings("unchecked")
@@ -100,14 +101,14 @@ public abstract class CallContextInvocationFactory<IN, OUT>
      * <p/>
      * Note that class tokens of inner and anonymous classes can be passed as well. Remember however
      * that Java creates synthetic constructors for such classes, so be sure to specify the correct
-     * arguments to guarantee proper instantiation. In fact, inner classes always have the outer
-     * instance as first constructor parameter, and anonymous classes has both the outer instance
-     * and all the variables captured in the closure.
+     * arguments to guarantee proper instantiation.
      *
      * @param invocationToken the invocation class token.
      * @param <IN>            the input data type.
      * @param <OUT>           the output data type.
      * @return the invocation factory.
+     * @throws java.lang.IllegalArgumentException if the class of the specified invocation has not a
+     *                                            static scope.
      */
     @NotNull
     public static <IN, OUT> CallContextInvocationFactory<IN, OUT> callFactoryOf(
@@ -122,15 +123,15 @@ public abstract class CallContextInvocationFactory<IN, OUT>
      * <p/>
      * Note that class tokens of inner and anonymous classes can be passed as well. Remember however
      * that Java creates synthetic constructors for such classes, so be sure to specify the correct
-     * arguments to guarantee proper instantiation. In fact, inner classes always have the outer
-     * instance as first constructor parameter, and anonymous classes has both the outer instance
-     * and all the variables captured in the closure.
+     * arguments to guarantee proper instantiation.
      *
      * @param invocationToken the invocation class token.
      * @param args            the invocation constructor arguments.
      * @param <IN>            the input data type.
      * @param <OUT>           the output data type.
      * @return the invocation factory.
+     * @throws java.lang.IllegalArgumentException if the class of the specified invocation has not a
+     *                                            static scope.
      */
     @NotNull
     public static <IN, OUT> CallContextInvocationFactory<IN, OUT> callFactoryOf(
@@ -140,9 +141,130 @@ public abstract class CallContextInvocationFactory<IN, OUT>
         return callFactoryOf(invocationToken.getRawClass(), args);
     }
 
+    /**
+     * Builds and returns a new context invocation factory creating instances of the specified
+     * class.
+     * <p/>
+     * Note that inner and anonymous classes can be passed as well. Remember however that Java
+     * creates synthetic constructors for such classes, so be sure to specify the correct arguments
+     * to guarantee proper instantiation.
+     *
+     * @param invocationClass the invocation class.
+     * @param <IN>            the input data type.
+     * @param <OUT>           the output data type.
+     * @return the invocation factory.
+     * @throws java.lang.IllegalArgumentException if the class of the specified invocation has not a
+     *                                            static scope.
+     */
+    @NotNull
+    public static <IN, OUT> CallContextInvocationFactory<IN, OUT> callFactoryOf(
+            @NotNull final Class<? extends CallContextInvocation<IN, OUT>> invocationClass) {
+
+        return callFactoryOf(invocationClass, (Object[]) null);
+    }
+
     @NotNull
     @Override
     public abstract CallContextInvocation<IN, OUT> newInvocation() throws Exception;
+
+    /**
+     * Context invocation wrapping a base one.
+     *
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
+     */
+    private static class AdaptingContextInvocation<IN, OUT> extends CallContextInvocation<IN, OUT> {
+
+        private final Invocation<IN, OUT> mInvocation;
+
+        /**
+         * Constructor.
+         *
+         * @param invocation the wrapped invocation.
+         */
+        @SuppressWarnings("ConstantConditions")
+        private AdaptingContextInvocation(@NotNull final Invocation<IN, OUT> invocation) {
+
+            if (invocation == null) {
+                throw new NullPointerException("the invocation instance must not be null");
+            }
+
+            mInvocation = invocation;
+        }
+
+        @Override
+        public void onAbort(@NotNull final RoutineException reason) throws Exception {
+
+            final Invocation<IN, OUT> invocation = mInvocation;
+            invocation.onAbort(reason);
+            invocation.onTerminate();
+        }
+
+        @Override
+        public void onDestroy() throws Exception {
+
+            mInvocation.onDestroy();
+        }
+
+        @Override
+        public void onInitialize() throws Exception {
+
+            mInvocation.onInitialize();
+        }
+
+        @Override
+        protected void onCall(@NotNull final List<? extends IN> inputs,
+                @NotNull final ResultChannel<OUT> result) throws Exception {
+
+            final Invocation<IN, OUT> invocation = mInvocation;
+            for (final IN input : inputs) {
+                invocation.onInput(input, result);
+            }
+
+            invocation.onResult(result);
+            invocation.onTerminate();
+        }
+    }
+
+    /**
+     * Context invocation factory adapting base invocations.
+     *
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
+     */
+    private static class AdaptingContextInvocationFactory<IN, OUT>
+            extends CallContextInvocationFactory<IN, OUT> {
+
+        private final InvocationFactory<IN, OUT> mFactory;
+
+        /**
+         * Constructor.
+         *
+         * @param factory the invocation factory.
+         * @throws java.lang.IllegalArgumentException if the class of the specified invocation
+         *                                            factory has not a static scope.
+         */
+        private AdaptingContextInvocationFactory(
+                @NotNull final InvocationFactory<IN, OUT> factory) {
+
+            super(asArgs(factory));
+            final Class<? extends InvocationFactory> factoryClass = factory.getClass();
+            if (!Reflection.hasStaticScope(factoryClass)) {
+                throw new IllegalArgumentException(
+                        "the invocation factory class must have a static scope: "
+                                + factoryClass.getName());
+            }
+
+            mFactory = factory;
+        }
+
+        @NotNull
+        @Override
+        public CallContextInvocation<IN, OUT> newInvocation() throws Exception {
+
+            return new AdaptingContextInvocation<IN, OUT>(mFactory.newInvocation());
+        }
+    }
 
     /**
      * Default implementation of an invocation factory.
@@ -160,12 +282,19 @@ public abstract class CallContextInvocationFactory<IN, OUT>
          *
          * @param invocationClass the invocation class.
          * @param args            the invocation constructor arguments.
+         * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
+         *                                            not a static scope.
          */
         private DefaultContextInvocationFactory(
                 @NotNull final Class<? extends CallContextInvocation<IN, OUT>> invocationClass,
                 @Nullable final Object[] args) {
 
             super(asArgs(invocationClass, (args != null) ? args.clone() : Reflection.NO_ARGS));
+            if (!Reflection.hasStaticScope(invocationClass)) {
+                throw new IllegalArgumentException("the invocation class must have a static scope: "
+                        + invocationClass.getName());
+            }
+
             mFactory = InvocationFactory.factoryOf(
                     (Class<? extends Invocation<IN, OUT>>) invocationClass, args);
         }

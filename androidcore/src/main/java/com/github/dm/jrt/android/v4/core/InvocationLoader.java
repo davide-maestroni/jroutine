@@ -19,7 +19,6 @@ package com.github.dm.jrt.android.v4.core;
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
 
-import com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.core.JRoutineCore;
@@ -44,11 +43,11 @@ import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory
  */
 class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
 
+    private final ContextInvocationFactory<IN, OUT> mFactory;
+
     private final List<? extends IN> mInputs;
 
     private final ContextInvocation<IN, OUT> mInvocation;
-
-    private final CallContextInvocationFactory<IN, OUT> mInvocationFactory;
 
     private final Logger mLogger;
 
@@ -61,17 +60,17 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
     /**
      * Constructor.
      *
-     * @param context           used to retrieve the application context.
-     * @param invocation        the invocation instance.
-     * @param invocationFactory the invocation factory.
-     * @param inputs            the input data.
-     * @param order             the data order.
-     * @param logger            the logger instance.
+     * @param context    used to retrieve the application context.
+     * @param invocation the invocation instance.
+     * @param factory    the invocation factory.
+     * @param inputs     the input data.
+     * @param order      the data order.
+     * @param logger     the logger instance.
      */
     @SuppressWarnings("ConstantConditions")
     InvocationLoader(@NotNull final Context context,
             @NotNull final ContextInvocation<IN, OUT> invocation,
-            @NotNull final CallContextInvocationFactory<IN, OUT> invocationFactory,
+            @NotNull final ContextInvocationFactory<IN, OUT> factory,
             @NotNull final List<? extends IN> inputs, @Nullable final OrderType order,
             @NotNull final Logger logger) {
 
@@ -80,7 +79,7 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
             throw new NullPointerException("the invocation instance must not be null");
         }
 
-        if (invocationFactory == null) {
+        if (factory == null) {
             throw new NullPointerException("the invocation factory must not be null");
         }
 
@@ -89,7 +88,7 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
         }
 
         mInvocation = invocation;
-        mInvocationFactory = invocationFactory;
+        mFactory = factory;
         mInputs = inputs;
         mOrderType = order;
         mLogger = logger.subContextLogger(this);
@@ -191,9 +190,9 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
      * @return the factory.
      */
     @NotNull
-    CallContextInvocationFactory<IN, OUT> getInvocationFactory() {
+    ContextInvocationFactory<IN, OUT> getInvocationFactory() {
 
-        return mInvocationFactory;
+        return mFactory;
     }
 
     /**

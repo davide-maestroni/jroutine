@@ -55,6 +55,8 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
 
     private boolean mIsInitialized;
 
+    private boolean mIsTerminated;
+
     private boolean mIsWaitingAbortInvocation;
 
     private boolean mIsWaitingInvocation;
@@ -148,6 +150,7 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
                         if (isComplete) {
                             invocation.onResult(resultChannel);
                             try {
+                                mIsTerminated = true;
                                 invocation.onTerminate();
                                 manager.recycle(invocation);
 
@@ -292,21 +295,24 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
                         final RoutineException exception = inputIterator.getAbortException();
                         mLogger.dbg(exception, "aborting invocation");
                         try {
-                            if (mInvocation == null) {
-                                mInvocation = invocation;
-                                mLogger.dbg("initializing invocation: %s", invocation);
-                                invocation.onInitialize();
-                                mIsInitialized = true;
-                            }
+                            if (!mIsTerminated) {
+                                if (mInvocation == null) {
+                                    mInvocation = invocation;
+                                    mLogger.dbg("initializing invocation: %s", invocation);
+                                    invocation.onInitialize();
+                                    mIsInitialized = true;
+                                }
 
-                            if (mIsInitialized) {
-                                invocation.onAbort(exception);
-                                invocation.onTerminate();
-                                manager.recycle(invocation);
+                                if (mIsInitialized) {
+                                    invocation.onAbort(exception);
+                                    mIsTerminated = true;
+                                    invocation.onTerminate();
+                                    manager.recycle(invocation);
 
-                            } else {
-                                // Initialization failed, so just discard the invocation
-                                manager.discard(invocation);
+                                } else {
+                                    // Initialization failed, so just discard the invocation
+                                    manager.discard(invocation);
+                                }
                             }
 
                             resultChannel.close(exception);

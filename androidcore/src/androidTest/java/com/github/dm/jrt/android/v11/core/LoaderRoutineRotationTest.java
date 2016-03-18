@@ -34,7 +34,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
-import static com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory.callFactoryOf;
+import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryOf;
 import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -61,7 +61,7 @@ public class LoaderRoutineRotationTest
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine = JRoutineLoader.with(loaderFrom(getActivity()))
-                                                              .on(callFactoryOf(ToUpperCase.class))
+                                                              .on(factoryOf(ToUpperCase.class))
                                                               .withLoaders()
                                                               .withLoaderId(0)
                                                               .withClashResolution(
@@ -86,7 +86,7 @@ public class LoaderRoutineRotationTest
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         JRoutineLoader.with(loaderFrom(getActivity()))
-                      .on(callFactoryOf(ToUpperCase.class))
+                      .on(factoryOf(ToUpperCase.class))
                       .withInvocations()
                       .withOutputOrder(OrderType.BY_CALL)
                       .getConfigured()
@@ -112,7 +112,7 @@ public class LoaderRoutineRotationTest
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine1 = JRoutineLoader.with(loaderFrom(getActivity()))
-                                                               .on(callFactoryOf(ToUpperCase.class))
+                                                               .on(factoryOf(ToUpperCase.class))
                                                                .buildRoutine();
         routine1.asyncCall("test1");
         routine1.asyncCall("test2");
@@ -120,7 +120,7 @@ public class LoaderRoutineRotationTest
         simulateRotation();
 
         final Routine<String, String> routine2 = JRoutineLoader.with(loaderFrom(getActivity()))
-                                                               .on(callFactoryOf(ToUpperCase.class))
+                                                               .on(factoryOf(ToUpperCase.class))
                                                                .buildRoutine();
         final OutputChannel<String> result1 = routine2.asyncCall("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine2.asyncCall("test2").afterMax(timeout);
@@ -139,7 +139,7 @@ public class LoaderRoutineRotationTest
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Data data1 = new Data();
         final Routine<Data, Data> routine1 = JRoutineLoader.with(loaderFrom(getActivity()))
-                                                           .on(callFactoryOf(Delay.class))
+                                                           .on(factoryOf(Delay.class))
                                                            .buildRoutine();
         routine1.asyncCall(data1);
         routine1.asyncCall(data1);
@@ -147,7 +147,7 @@ public class LoaderRoutineRotationTest
         simulateRotation();
 
         final Routine<Data, Data> routine2 = JRoutineLoader.with(loaderFrom(getActivity()))
-                                                           .on(callFactoryOf(Delay.class))
+                                                           .on(factoryOf(Delay.class))
                                                            .buildRoutine();
         final OutputChannel<Data> result1 = routine2.asyncCall(data1).afterMax(timeout);
         final OutputChannel<Data> result2 = routine2.asyncCall(data1).afterMax(timeout);
@@ -165,7 +165,7 @@ public class LoaderRoutineRotationTest
 
         final TimeDuration timeout = TimeDuration.seconds(10);
         final Routine<String, String> routine = JRoutineLoader.with(loaderFrom(getActivity()))
-                                                              .on(callFactoryOf(ToUpperCase.class))
+                                                              .on(factoryOf(ToUpperCase.class))
                                                               .withLoaders()
                                                               .withLoaderId(0)
                                                               .withClashResolution(

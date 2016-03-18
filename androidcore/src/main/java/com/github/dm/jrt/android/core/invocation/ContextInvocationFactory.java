@@ -81,6 +81,7 @@ public abstract class ContextInvocationFactory<IN, OUT> {
      * @return the invocation factory.
      * @throws java.lang.IllegalArgumentException if the class of the specified invocation has not a
      *                                            static scope.
+     *                                            TODO constructor
      */
     @NotNull
     public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryOf(

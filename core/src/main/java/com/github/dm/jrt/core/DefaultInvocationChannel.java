@@ -56,6 +56,8 @@ import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
  */
 class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
+    // TODO: 17/03/16 InternalInvocationChannel??
+
     private final ArrayList<OutputChannel<?>> mBoundChannels = new ArrayList<OutputChannel<?>>();
 
     private final InvocationExecution<IN, OUT> mExecution;
@@ -1345,6 +1347,11 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
             mIsConsuming = false;
             return false;
+        }
+
+        @Override
+        public void onInvocationComplete() {
+
         }
 
         @Nullable

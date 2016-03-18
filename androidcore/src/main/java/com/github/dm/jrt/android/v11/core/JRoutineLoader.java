@@ -18,7 +18,7 @@ package com.github.dm.jrt.android.v11.core;
 
 import com.github.dm.jrt.android.core.builder.LoaderChannelBuilder;
 import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
-import com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory;
+import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -72,7 +72,7 @@ import java.util.WeakHashMap;
  *             } else {
  *                 final Routine&lt;URI, MyResource&gt; routine =
  *                         JRoutineLoader.with(loaderFrom(this))
- *                                       .on(callFactoryOf(LoadResource.class))
+ *                                       .on(factoryOf(LoadResource.class))
  *                                       .buildRoutine();
  *                 routine.asyncCall(RESOURCE_URI)
  *                        .bind(new TemplateOutputConsumer&lt;MyResource&gt;() {
@@ -190,7 +190,10 @@ public class JRoutineLoader {
          * static scope.<br/>
          * Note that the built routine results will be always dispatched on the configured looper
          * thread, thus waiting for the outputs immediately after its invocation may result in a
-         * deadlock.
+         * deadlock.<br/>
+         * Note also that the input data passed to the invocation channel will be cached, and the
+         * results will be produced only after the invocation channel is closed, so be sure to avoid
+         * streaming inputs in order to prevent starvation or out of memory errors.
          *
          * @param factory the invocation factory.
          * @param <IN>    the input data type.
@@ -201,7 +204,7 @@ public class JRoutineLoader {
          */
         @NotNull
         public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
-                @NotNull final CallContextInvocationFactory<IN, OUT> factory) {
+                @NotNull final ContextInvocationFactory<IN, OUT> factory) {
 
             return new DefaultLoaderRoutineBuilder<IN, OUT>(mContext, factory);
         }

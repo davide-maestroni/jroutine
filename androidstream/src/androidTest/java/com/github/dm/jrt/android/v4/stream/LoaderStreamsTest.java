@@ -23,9 +23,9 @@ import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
-import com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory;
+import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.MissingLoaderException;
-import com.github.dm.jrt.android.core.invocation.PassingCallContextInvocation;
+import com.github.dm.jrt.android.core.invocation.PassingContextInvocation;
 import com.github.dm.jrt.android.v4.channel.SparseChannelsCompat;
 import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
@@ -180,8 +180,8 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
     public void testBlendAbort() {
 
         final IOChannelBuilder builder = JRoutineCore.io();
-        final CallContextInvocationFactory<Object, Object> factory =
-                PassingCallContextInvocation.factoryOf();
+        final ContextInvocationFactory<Object, Object> factory =
+                PassingContextInvocation.factoryOf();
         final Routine<Object, Object> routine =
                 JRoutineLoaderCompat.with(loaderFrom(getActivity())).on(factory).buildRoutine();
         IOChannel<String> channel1;
@@ -350,8 +350,8 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
     public void testConcatAbort() {
 
         final IOChannelBuilder builder = JRoutineCore.io();
-        final CallContextInvocationFactory<Object, Object> factory =
-                PassingCallContextInvocation.factoryOf();
+        final ContextInvocationFactory<Object, Object> factory =
+                PassingContextInvocation.factoryOf();
         final Routine<Object, Object> routine =
                 JRoutineLoaderCompat.with(loaderFrom(getActivity())).on(factory).buildRoutine();
         IOChannel<String> channel1;
@@ -491,7 +491,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
         }
 
-        final CallContextInvocationFactory<String, String> factory =
+        final ContextInvocationFactory<String, String> factory =
                 LoaderStreamsCompat.contextFactory(toUpperCaseChannel());
         assertThat(JRoutineLoaderCompat.with(loaderFrom(getActivity()))
                                        .on(factory)
@@ -536,7 +536,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
         final Function<StreamChannel<String>, StreamChannel<String>> function =
                 toUpperCaseChannel();
-        final CallContextInvocationFactory<String, String> factory =
+        final ContextInvocationFactory<String, String> factory =
                 LoaderStreamsCompat.contextFactory(function);
         assertThat(factory).isEqualTo(factory);
         assertThat(factory).isNotEqualTo(null);
@@ -743,7 +743,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
     public void testJoin() {
 
         final IOChannelBuilder builder = JRoutineCore.io();
-        final CallContextInvocationFactory<List<?>, Character> factory =
+        final ContextInvocationFactory<List<?>, Character> factory =
                 factoryFrom(JRoutineCore.on(new CharAt()).buildRoutine(), 1, DelegationType.SYNC);
         final Routine<List<?>, Character> routine =
                 JRoutineLoaderCompat.with(loaderFrom(getActivity())).on(factory).buildRoutine();
@@ -780,7 +780,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
     public void testJoinAbort() {
 
         final IOChannelBuilder builder = JRoutineCore.io();
-        final CallContextInvocationFactory<List<?>, Character> factory =
+        final ContextInvocationFactory<List<?>, Character> factory =
                 factoryFrom(JRoutineCore.on(new CharAt()).buildRoutine(), 1, DelegationType.SYNC);
         final Routine<List<?>, Character> routine =
                 JRoutineLoaderCompat.with(loaderFrom(getActivity())).on(factory).buildRoutine();
@@ -867,7 +867,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
     public void testJoinPlaceholder() {
 
         final IOChannelBuilder builder = JRoutineCore.io();
-        final CallContextInvocationFactory<List<?>, Character> factory =
+        final ContextInvocationFactory<List<?>, Character> factory =
                 factoryFrom(JRoutineCore.on(new CharAt()).buildRoutine(), 1, DelegationType.SYNC);
         final Routine<List<?>, Character> routine =
                 JRoutineLoaderCompat.with(loaderFrom(getActivity())).on(factory).buildRoutine();
@@ -914,7 +914,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
     public void testJoinPlaceholderAbort() {
 
         final IOChannelBuilder builder = JRoutineCore.io();
-        final CallContextInvocationFactory<List<?>, Character> factory =
+        final ContextInvocationFactory<List<?>, Character> factory =
                 factoryFrom(JRoutineCore.on(new CharAt()).buildRoutine(), 1, DelegationType.SYNC);
         final Routine<List<?>, Character> routine =
                 JRoutineLoaderCompat.with(loaderFrom(getActivity())).on(factory).buildRoutine();

@@ -21,14 +21,18 @@ import android.content.Context;
 import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
-import com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory;
+import com.github.dm.jrt.android.core.invocation.ContextInvocation;
+import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
+import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
 import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.android.object.AndroidBuilders;
 import com.github.dm.jrt.android.object.ContextInvocationTarget;
 import com.github.dm.jrt.android.object.builder.LoaderObjectRoutineBuilder;
 import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
+import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
@@ -241,7 +245,8 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class AliasContextInvocation<IN, OUT> extends CallContextInvocation<IN, OUT> {
+    private static class AliasContextInvocation<IN, OUT>
+            extends TemplateContextInvocation<IN, OUT> {
 
         private final String mAliasName;
 
@@ -249,6 +254,9 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         private final ContextInvocationTarget<?> mTarget;
 
+        private InvocationChannel<IN, OUT> mChannel;
+
+        @SuppressWarnings("unused")
         private Object mInstance;
 
         private Routine<IN, OUT> mRoutine = null;
@@ -269,9 +277,14 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         }
 
         @Override
+        public void onAbort(@NotNull final RoutineException reason) throws Exception {
+
+            mChannel.abort(reason);
+        }
+
+        @Override
         public void onContext(@NotNull final Context context) throws Exception {
 
-            super.onContext(context);
             final InvocationTarget<?> target = mTarget.getInvocationTarget(context);
             mInstance = target.getTarget();
             mRoutine = JRoutineObject.on(target)
@@ -282,15 +295,28 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         }
 
         @Override
-        protected void onCall(@NotNull final List<? extends IN> inputs,
-                @NotNull final ResultChannel<OUT> result) {
+        public void onInitialize() throws Exception {
 
-            final Routine<IN, OUT> routine = mRoutine;
-            if ((routine == null) || (mInstance == null)) {
-                throw new IllegalStateException("such error should never happen");
-            }
+            mChannel = mRoutine.syncInvoke();
+        }
 
-            result.pass(routine.syncCall(inputs));
+        @Override
+        public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) throws
+                Exception {
+
+            mChannel.pass(input);
+        }
+
+        @Override
+        public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
+
+            result.pass(mChannel.result());
+        }
+
+        @Override
+        public void onTerminate() throws Exception {
+
+            mChannel = null;
         }
     }
 
@@ -301,7 +327,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      * @param <OUT> the output data type.
      */
     private static class AliasContextInvocationFactory<IN, OUT>
-            extends CallContextInvocationFactory<IN, OUT> {
+            extends ContextInvocationFactory<IN, OUT> {
 
         private final String mName;
 
@@ -328,7 +354,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         }
 
         @NotNull
-        public CallContextInvocation<IN, OUT> newInvocation() {
+        public ContextInvocation<IN, OUT> newInvocation() {
 
             return new AliasContextInvocation<IN, OUT>(mProxyConfiguration, mTarget, mName);
         }
@@ -340,7 +366,8 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class MethodContextInvocation<IN, OUT> extends CallContextInvocation<IN, OUT> {
+    private static class MethodContextInvocation<IN, OUT>
+            extends TemplateContextInvocation<IN, OUT> {
 
         private final Method mMethod;
 
@@ -348,6 +375,9 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         private final ContextInvocationTarget<?> mTarget;
 
+        private InvocationChannel<IN, OUT> mChannel;
+
+        @SuppressWarnings("unused")
         private Object mInstance;
 
         private Routine<IN, OUT> mRoutine = null;
@@ -368,21 +398,14 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         }
 
         @Override
-        protected void onCall(@NotNull final List<? extends IN> inputs,
-                @NotNull final ResultChannel<OUT> result) {
+        public void onAbort(@NotNull final RoutineException reason) throws Exception {
 
-            final Routine<IN, OUT> routine = mRoutine;
-            if ((routine == null) || (mInstance == null)) {
-                throw new IllegalStateException("such error should never happen");
-            }
-
-            result.pass(routine.syncCall(inputs));
+            mChannel.abort(reason);
         }
 
         @Override
         public void onContext(@NotNull final Context context) throws Exception {
 
-            super.onContext(context);
             final InvocationTarget<?> target = mTarget.getInvocationTarget(context);
             mInstance = target.getTarget();
             mRoutine = JRoutineObject.on(target)
@@ -390,6 +413,31 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                                      .with(mProxyConfiguration)
                                      .getConfigured()
                                      .method(mMethod);
+        }
+
+        @Override
+        public void onInitialize() throws Exception {
+
+            mChannel = mRoutine.syncInvoke();
+        }
+
+        @Override
+        public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) throws
+                Exception {
+
+            mChannel.pass(input);
+        }
+
+        @Override
+        public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
+
+            result.pass(mChannel.result());
+        }
+
+        @Override
+        public void onTerminate() throws Exception {
+
+            mChannel = null;
         }
     }
 
@@ -400,7 +448,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      * @param <OUT> the output data type.
      */
     private static class MethodContextInvocationFactory<IN, OUT>
-            extends CallContextInvocationFactory<IN, OUT> {
+            extends ContextInvocationFactory<IN, OUT> {
 
         private final Method mMethod;
 
@@ -427,7 +475,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         }
 
         @NotNull
-        public CallContextInvocation<IN, OUT> newInvocation() {
+        public ContextInvocation<IN, OUT> newInvocation() {
 
             return new MethodContextInvocation<IN, OUT>(mProxyConfiguration, mTarget, mMethod);
         }
@@ -474,19 +522,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         }
 
         @Override
-        protected void onCall(@NotNull final List<?> objects,
-                @NotNull final ResultChannel<Object> result) throws Exception {
-
-            final Object targetInstance = mInstance;
-            if (targetInstance == null) {
-                throw new IllegalStateException("the target object has been destroyed");
-            }
-
-            Builders.callFromInvocation(mMutex, targetInstance, mTargetMethod, objects, result,
-                    mInputMode, mOutputMode);
-        }
-
-        @Override
         public void onContext(@NotNull final Context context) throws Exception {
 
             super.onContext(context);
@@ -498,13 +533,25 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                     mProxyConfiguration.getSharedFieldsOr(null));
             mInstance = target.getTarget();
         }
+
+        @Override
+        protected void onCall(@NotNull final List<?> objects,
+                @NotNull final ResultChannel<Object> result) throws Exception {
+
+            final Object targetInstance = mInstance;
+            if (targetInstance == null) {
+                throw new IllegalStateException("the target object has been destroyed");
+            }
+
+            Builders.callFromInvocation(mMutex, targetInstance, mTargetMethod, objects, result,
+                    mInputMode, mOutputMode);
+        }
     }
 
     /**
      * Factory of {@link ProxyInvocation}s.
      */
-    private static class ProxyInvocationFactory
-            extends CallContextInvocationFactory<Object, Object> {
+    private static class ProxyInvocationFactory extends ContextInvocationFactory<Object, Object> {
 
         private final InputMode mInputMode;
 
@@ -539,7 +586,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         }
 
         @NotNull
-        public CallContextInvocation<Object, Object> newInvocation() {
+        public ContextInvocation<Object, Object> newInvocation() {
 
             return new ProxyInvocation(mTargetMethod, mProxyConfiguration, mTarget, mInputMode,
                     mOutputMode);

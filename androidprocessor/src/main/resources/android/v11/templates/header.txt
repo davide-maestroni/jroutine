@@ -63,7 +63,7 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
     @org.jetbrains.annotations.NotNull
     private static <OUT> com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder<Object, OUT> getBuilder(
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.v11.core.LoaderContext context,
-            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory<Object, OUT> factory) {
+            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.invocation.ContextInvocationFactory<Object, OUT> factory) {
 
         return com.github.dm.jrt.android.v11.core.JRoutineLoader.with(context).on(factory);
     }

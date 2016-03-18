@@ -20,8 +20,6 @@ import com.github.dm.jrt.core.channel.ResultChannel;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-
 /**
  * Implementation of a call invocation simply passing on the input data.
  * <p/>
@@ -29,23 +27,23 @@ import java.util.List;
  *
  * @param <DATA> the data type.
  */
-public class PassingCallContextInvocation<DATA> extends CallContextInvocation<DATA, DATA> {
+public class PassingContextInvocation<DATA> extends TemplateContextInvocation<DATA, DATA> {
 
-    private static final CallContextInvocationFactory<Object, Object> sFactory =
-            new CallContextInvocationFactory<Object, Object>(null) {
+    private static final ContextInvocationFactory<Object, Object> sFactory =
+            new ContextInvocationFactory<Object, Object>(null) {
 
                 @NotNull
                 @Override
-                public CallContextInvocation<Object, Object> newInvocation() {
+                public ContextInvocation<Object, Object> newInvocation() {
 
-                    return new PassingCallContextInvocation<Object>();
+                    return new PassingContextInvocation<Object>();
                 }
             };
 
     /**
      * Avoid instantiation.
      */
-    private PassingCallContextInvocation() {
+    private PassingContextInvocation() {
 
     }
 
@@ -57,15 +55,13 @@ public class PassingCallContextInvocation<DATA> extends CallContextInvocation<DA
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <DATA> CallContextInvocationFactory<DATA, DATA> factoryOf() {
+    public static <DATA> ContextInvocationFactory<DATA, DATA> factoryOf() {
 
-        return (CallContextInvocationFactory<DATA, DATA>) sFactory;
+        return (ContextInvocationFactory<DATA, DATA>) sFactory;
     }
 
-    @Override
-    protected void onCall(@NotNull final List<? extends DATA> inputs,
-            @NotNull final ResultChannel<DATA> result) {
+    public void onInput(final DATA input, @NotNull final ResultChannel<DATA> result) {
 
-        result.pass(inputs);
+        result.pass(input);
     }
 }

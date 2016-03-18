@@ -29,7 +29,6 @@ import android.util.SparseArray;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.ClashResolutionType;
-import com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.InvocationClashException;
@@ -81,7 +80,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
 
     private final LoaderContext mContext;
 
-    private final CallContextInvocationFactory<IN, OUT> mFactory;
+    private final ContextInvocationFactory<IN, OUT> mFactory;
 
     private final ClashResolutionType mInputClashResolutionType;
 
@@ -106,7 +105,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
      */
     @SuppressWarnings("ConstantConditions")
     LoaderInvocation(@NotNull final LoaderContext context,
-            @NotNull final CallContextInvocationFactory<IN, OUT> factory,
+            @NotNull final ContextInvocationFactory<IN, OUT> factory,
             @NotNull final LoaderConfiguration configuration, @Nullable final OrderType order,
             @NotNull final Logger logger) {
 
@@ -188,8 +187,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
      */
     @SuppressWarnings("unchecked")
     static void purgeLoader(@NotNull final LoaderContext context, final int loaderId,
-            @NotNull final CallContextInvocationFactory<?, ?> factory,
-            @NotNull final List<?> inputs) {
+            @NotNull final ContextInvocationFactory<?, ?> factory, @NotNull final List<?> inputs) {
 
         final Object component = context.getComponent();
         final WeakIdentityHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
@@ -292,7 +290,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
      * @param factory  the invocation factory.
      */
     static void purgeLoaders(@NotNull final LoaderContext context, final int loaderId,
-            @NotNull final CallContextInvocationFactory<?, ?> factory) {
+            @NotNull final ContextInvocationFactory<?, ?> factory) {
 
         final Object component = context.getComponent();
         final WeakIdentityHashMap<Object, SparseArray<WeakReference<RoutineLoaderCallbacks<?>>>>
@@ -460,7 +458,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
     private ContextInvocation<IN, OUT> createInvocation(final int loaderId) throws Exception {
 
         final Logger logger = mLogger;
-        final CallContextInvocationFactory<IN, OUT> factory = mFactory;
+        final ContextInvocationFactory<IN, OUT> factory = mFactory;
         final ContextInvocation<IN, OUT> invocation;
         try {
             logger.dbg("creating a new invocation instance [%d]", loaderId);
@@ -488,7 +486,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
             throw new InvocationTypeException(loaderId);
         }
 
-        final CallContextInvocationFactory<IN, OUT> factory = mFactory;
+        final ContextInvocationFactory<IN, OUT> factory = mFactory;
         final InvocationLoader<IN, OUT> invocationLoader = (InvocationLoader<IN, OUT>) loader;
         if (!(factory instanceof MissingLoaderInvocationFactory)
                 && !invocationLoader.getInvocationFactory().equals(factory)) {

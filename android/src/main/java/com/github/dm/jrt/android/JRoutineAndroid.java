@@ -24,8 +24,8 @@ import android.content.Intent;
 import com.github.dm.jrt.android.core.ServiceContext;
 import com.github.dm.jrt.android.core.builder.LoaderChannelBuilder;
 import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
-import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
-import com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory;
+import com.github.dm.jrt.android.core.invocation.ContextInvocation;
+import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.core.service.InvocationService;
 import com.github.dm.jrt.android.object.ContextInvocationTarget;
 import com.github.dm.jrt.android.v11.channel.SparseChannels;
@@ -36,7 +36,7 @@ import com.github.dm.jrt.core.util.ClassToken;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory.callFactoryOf;
+import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryOf;
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.classOfType;
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceOf;
 
@@ -136,19 +136,23 @@ public class JRoutineAndroid extends SparseChannels {
 
         /**
          * Returns a routine builder based on an invocation factory creating instances of the
-         * specified class.
+         * specified class.<br/>
+         * Note that the input data passed to the invocation channel will be cached, and the
+         * results will be produced only after the invocation channel is closed, so be sure to avoid
+         * streaming inputs in order to prevent starvation or out of memory errors.
          *
          * @param invocationClass the invocation class.
          * @param <IN>            the input data type.
          * @param <OUT>           the output data type.
          * @return the routine builder instance.
          * @throws java.lang.IllegalArgumentException if no default constructor was found.
+         * TODO static scope
          */
         @NotNull
         public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
-                @NotNull final Class<? extends CallContextInvocation<IN, OUT>> invocationClass) {
+                @NotNull final Class<? extends ContextInvocation<IN, OUT>> invocationClass) {
 
-            return on(callFactoryOf(invocationClass));
+            return on(factoryOf(invocationClass));
         }
 
         /**
@@ -159,7 +163,10 @@ public class JRoutineAndroid extends SparseChannels {
          * creates synthetic constructors for such classes, so be sure to specify the correct
          * arguments to guarantee proper instantiation. In fact, inner classes always have the outer
          * instance as first constructor parameter, and anonymous classes have both the outer
-         * instance and all the variables captured in the closure.
+         * instance and all the variables captured in the closure.<br/>
+         * Note also that the input data passed to the invocation channel will be cached, and the
+         * results will be produced only after the invocation channel is closed, so be sure to avoid
+         * streaming inputs in order to prevent starvation or out of memory errors.
          *
          * @param invocationClass the invocation class.
          * @param args            the invocation constructor arguments.
@@ -171,15 +178,18 @@ public class JRoutineAndroid extends SparseChannels {
          */
         @NotNull
         public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
-                @NotNull final Class<? extends CallContextInvocation<IN, OUT>> invocationClass,
+                @NotNull final Class<? extends ContextInvocation<IN, OUT>> invocationClass,
                 @Nullable final Object... args) {
 
-            return on(callFactoryOf(invocationClass, args));
+            return on(factoryOf(invocationClass, args));
         }
 
         /**
          * Returns a routine builder based on an invocation factory creating instances of the
-         * specified class token.
+         * specified class token.<br/>
+         * Note that the input data passed to the invocation channel will be cached, and the
+         * results will be produced only after the invocation channel is closed, so be sure to avoid
+         * streaming inputs in order to prevent starvation or out of memory errors.
          *
          * @param invocationToken the invocation class token.
          * @param <IN>            the input data type.
@@ -189,10 +199,9 @@ public class JRoutineAndroid extends SparseChannels {
          */
         @NotNull
         public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
-                @NotNull final ClassToken<? extends CallContextInvocation<IN, OUT>>
-                        invocationToken) {
+                @NotNull final ClassToken<? extends ContextInvocation<IN, OUT>> invocationToken) {
 
-            return on(callFactoryOf(invocationToken));
+            return on(factoryOf(invocationToken));
         }
 
         /**
@@ -203,7 +212,10 @@ public class JRoutineAndroid extends SparseChannels {
          * however that Java creates synthetic constructors for such classes, so be sure to specify
          * the correct arguments to guarantee proper instantiation. In fact, inner classes always
          * have the outer instance as first constructor parameter, and anonymous classes have both
-         * the outer instance and all the variables captured in the closure.
+         * the outer instance and all the variables captured in the closure.<br/>
+         * Note also that the input data passed to the invocation channel will be cached, and the
+         * results will be produced only after the invocation channel is closed, so be sure to avoid
+         * streaming inputs in order to prevent starvation or out of memory errors.
          *
          * @param invocationToken the invocation class token.
          * @param args            the invocation constructor arguments.
@@ -215,10 +227,10 @@ public class JRoutineAndroid extends SparseChannels {
          */
         @NotNull
         public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
-                @NotNull final ClassToken<? extends CallContextInvocation<IN, OUT>> invocationToken,
+                @NotNull final ClassToken<? extends ContextInvocation<IN, OUT>> invocationToken,
                 @Nullable final Object... args) {
 
-            return on(callFactoryOf(invocationToken, args));
+            return on(factoryOf(invocationToken, args));
         }
 
         /**
@@ -227,7 +239,10 @@ public class JRoutineAndroid extends SparseChannels {
          * static scope.<br/>
          * Note that the built routine results will be always dispatched on the configured looper
          * thread, thus waiting for the outputs immediately after its invocation may result in a
-         * deadlock.
+         * deadlock.<br/>
+         * Note also that the input data passed to the invocation channel will be cached, and the
+         * results will be produced only after the invocation channel is closed, so be sure to avoid
+         * streaming inputs in order to prevent starvation or out of memory errors.
          *
          * @param factory the invocation factory.
          * @param <IN>    the input data type.
@@ -238,7 +253,7 @@ public class JRoutineAndroid extends SparseChannels {
          */
         @NotNull
         public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
-                @NotNull final CallContextInvocationFactory<IN, OUT> factory) {
+                @NotNull final ContextInvocationFactory<IN, OUT> factory) {
 
             return JRoutineLoader.with(mContext).on(factory);
         }

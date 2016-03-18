@@ -16,14 +16,13 @@
 
 package com.github.dm.jrt.android.v4.core;
 
-import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
-import com.github.dm.jrt.android.core.invocation.CallContextInvocationFactory;
+import com.github.dm.jrt.android.core.invocation.ContextInvocation;
+import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.MissingLoaderException;
+import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
 import com.github.dm.jrt.core.channel.ResultChannel;
 
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
@@ -34,7 +33,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  *
  * @param <OUT> the output data type.
  */
-final class MissingLoaderInvocationFactory<OUT> extends CallContextInvocationFactory<Void, OUT> {
+final class MissingLoaderInvocationFactory<OUT> extends ContextInvocationFactory<Void, OUT> {
 
     private final int mId;
 
@@ -51,7 +50,7 @@ final class MissingLoaderInvocationFactory<OUT> extends CallContextInvocationFac
 
     @NotNull
     @Override
-    public CallContextInvocation<Void, OUT> newInvocation() {
+    public ContextInvocation<Void, OUT> newInvocation() {
 
         return new MissingLoaderInvocation<OUT>(mId);
     }
@@ -61,7 +60,7 @@ final class MissingLoaderInvocationFactory<OUT> extends CallContextInvocationFac
      *
      * @param <OUT> the output data type.
      */
-    private static class MissingLoaderInvocation<OUT> extends CallContextInvocation<Void, OUT> {
+    private static class MissingLoaderInvocation<OUT> extends TemplateContextInvocation<Void, OUT> {
 
         private final int mId;
 
@@ -76,8 +75,7 @@ final class MissingLoaderInvocationFactory<OUT> extends CallContextInvocationFac
         }
 
         @Override
-        protected void onCall(@NotNull final List<? extends Void> inputs,
-                @NotNull final ResultChannel<OUT> result) {
+        public void onResult(@NotNull final ResultChannel<OUT> result) {
 
             result.abort(new MissingLoaderException(mId));
         }

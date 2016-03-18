@@ -136,17 +136,19 @@ public class JRoutineAndroid extends SparseChannels {
 
         /**
          * Returns a routine builder based on an invocation factory creating instances of the
-         * specified class.<br/>
-         * Note that the input data passed to the invocation channel will be cached, and the
-         * results will be produced only after the invocation channel is closed, so be sure to avoid
-         * streaming inputs in order to prevent starvation or out of memory errors.
+         * specified class.
+         * <p/>
+         * Note that inner and anonymous classes can be passed as well. Remember however that Java
+         * creates synthetic constructors for such classes, so be sure to specify the correct
+         * arguments to guarantee proper instantiation.
          *
          * @param invocationClass the invocation class.
          * @param <IN>            the input data type.
          * @param <OUT>           the output data type.
          * @return the routine builder instance.
-         * @throws java.lang.IllegalArgumentException if no default constructor was found.
-         * TODO static scope
+         * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
+         *                                            not a static scope or no default construct is
+         *                                            found.
          */
         @NotNull
         public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
@@ -161,20 +163,17 @@ public class JRoutineAndroid extends SparseChannels {
          * <p/>
          * Note that inner and anonymous classes can be passed as well. Remember however that Java
          * creates synthetic constructors for such classes, so be sure to specify the correct
-         * arguments to guarantee proper instantiation. In fact, inner classes always have the outer
-         * instance as first constructor parameter, and anonymous classes have both the outer
-         * instance and all the variables captured in the closure.<br/>
-         * Note also that the input data passed to the invocation channel will be cached, and the
-         * results will be produced only after the invocation channel is closed, so be sure to avoid
-         * streaming inputs in order to prevent starvation or out of memory errors.
+         * arguments to guarantee proper instantiation.
          *
          * @param invocationClass the invocation class.
          * @param args            the invocation constructor arguments.
          * @param <IN>            the input data type.
          * @param <OUT>           the output data type.
          * @return the routine builder instance.
-         * @throws java.lang.IllegalArgumentException if no constructor taking the specified objects
-         *                                            as parameters was found.
+         * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
+         *                                            not a static scope or no construct constructor
+         *                                            taking the specified objects as parameters is
+         *                                            found.
          */
         @NotNull
         public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
@@ -186,16 +185,19 @@ public class JRoutineAndroid extends SparseChannels {
 
         /**
          * Returns a routine builder based on an invocation factory creating instances of the
-         * specified class token.<br/>
-         * Note that the input data passed to the invocation channel will be cached, and the
-         * results will be produced only after the invocation channel is closed, so be sure to avoid
-         * streaming inputs in order to prevent starvation or out of memory errors.
+         * specified class token.
+         * <p/>
+         * Note that inner and anonymous classes can be passed as well. Remember however that Java
+         * creates synthetic constructors for such classes, so be sure to specify the correct
+         * arguments to guarantee proper instantiation.
          *
          * @param invocationToken the invocation class token.
          * @param <IN>            the input data type.
          * @param <OUT>           the output data type.
          * @return the routine builder instance.
-         * @throws java.lang.IllegalArgumentException if no default constructor was found.
+         * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
+         *                                            not a static scope or no default construct is
+         *                                            found.
          */
         @NotNull
         public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
@@ -208,22 +210,19 @@ public class JRoutineAndroid extends SparseChannels {
          * Returns a routine builder based on an invocation factory creating instances of the
          * specified class token by passing the specified arguments to the class constructor.
          * <p/>
-         * Note that class tokens of inner and anonymous classes can be passed as well. Remember
-         * however that Java creates synthetic constructors for such classes, so be sure to specify
-         * the correct arguments to guarantee proper instantiation. In fact, inner classes always
-         * have the outer instance as first constructor parameter, and anonymous classes have both
-         * the outer instance and all the variables captured in the closure.<br/>
-         * Note also that the input data passed to the invocation channel will be cached, and the
-         * results will be produced only after the invocation channel is closed, so be sure to avoid
-         * streaming inputs in order to prevent starvation or out of memory errors.
+         * Note that inner and anonymous classes can be passed as well. Remember however that Java
+         * creates synthetic constructors for such classes, so be sure to specify the correct
+         * arguments to guarantee proper instantiation.
          *
          * @param invocationToken the invocation class token.
          * @param args            the invocation constructor arguments.
          * @param <IN>            the input data type.
          * @param <OUT>           the output data type.
          * @return the routine builder instance.
-         * @throws java.lang.IllegalArgumentException if no constructor taking the specified objects
-         *                                            as parameters was found.
+         * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
+         *                                            not a static scope or no construct constructor
+         *                                            taking the specified objects as parameters is
+         *                                            found.
          */
         @NotNull
         public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
@@ -232,6 +231,8 @@ public class JRoutineAndroid extends SparseChannels {
 
             return on(factoryOf(invocationToken, args));
         }
+
+        // TODO: 18/03/16 on invocation instance? on Invocation?
 
         /**
          * Returns a builder of routines bound to the builder context.<br/>

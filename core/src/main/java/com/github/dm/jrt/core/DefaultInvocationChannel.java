@@ -56,8 +56,6 @@ import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
  */
 class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
-    // TODO: 17/03/16 InternalInvocationChannel??
-
     private final ArrayList<OutputChannel<?>> mBoundChannels = new ArrayList<OutputChannel<?>>();
 
     private final InvocationExecution<IN, OUT> mExecution;
@@ -712,6 +710,11 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
             throw consumerException();
         }
 
+        @Override
+        public void onInvocationComplete() {
+
+        }
+
         @Nullable
         @Override
         Execution onHandlerAbort(@NotNull final RoutineException reason) {
@@ -741,9 +744,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
             final RoutineException abortException = mAbortException;
             mSubLogger.dbg(abortException, "abort exception");
             throw abortException;
-        }
-
-        @Override
+        }        @Override
         void orderBy(@NotNull final OrderType orderType) {
 
             throw exception();
@@ -755,10 +756,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
             return true;
         }
 
-        @Override
-        public void onInvocationComplete() {
 
-        }
 
         @Nullable
         @Override

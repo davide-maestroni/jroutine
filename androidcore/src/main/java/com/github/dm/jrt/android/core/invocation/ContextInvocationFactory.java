@@ -80,8 +80,7 @@ public abstract class ContextInvocationFactory<IN, OUT> {
      * @param <OUT>           the output data type.
      * @return the invocation factory.
      * @throws java.lang.IllegalArgumentException if the class of the specified invocation has not a
-     *                                            static scope.
-     *                                            TODO constructor
+     *                                            static scope or no default construct is found.
      */
     @NotNull
     public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryOf(
@@ -104,7 +103,8 @@ public abstract class ContextInvocationFactory<IN, OUT> {
      * @param <OUT>           the output data type.
      * @return the invocation factory.
      * @throws java.lang.IllegalArgumentException if the class of the specified invocation has not a
-     *                                            static scope.
+     *                                            static scope or no construct constructor taking
+     *                                            the specified objects as parameters is found.
      */
     @NotNull
     public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryOf(
@@ -127,7 +127,7 @@ public abstract class ContextInvocationFactory<IN, OUT> {
      * @param <OUT>           the output data type.
      * @return the invocation factory.
      * @throws java.lang.IllegalArgumentException if the class of the specified invocation has not a
-     *                                            static scope.
+     *                                            static scope or no default construct is found.
      */
     @NotNull
     public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryOf(
@@ -150,7 +150,8 @@ public abstract class ContextInvocationFactory<IN, OUT> {
      * @param <OUT>           the output data type.
      * @return the invocation factory.
      * @throws java.lang.IllegalArgumentException if the class of the specified invocation has not a
-     *                                            static scope.
+     *                                            static scope or no construct constructor taking
+     *                                            the specified objects as parameters is found.
      */
     @NotNull
     public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryOf(

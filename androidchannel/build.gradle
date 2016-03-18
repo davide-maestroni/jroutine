@@ -64,6 +64,7 @@ dependencies {
 conditionalDependencies {
     compile name: 'core', artifact: { "${it.parent.name}-${it.name}" }
     compile name: 'channel', artifact: { "${it.parent.name}-${it.name}" }
+    compile name: 'androidcore', artifact: { "${it.parent.name}-${it.name}" }
 }
 
 findbugs {

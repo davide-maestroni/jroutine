@@ -58,7 +58,8 @@ public class LoaderStreamsCompat extends Streams {
     }
 
     /**
-     * Returns a builder of loader streams blending the outputs coming from the specified ones.<br/>
+     * Returns a builder of loader streams blending the outputs coming from the specified ones.
+     * <p/>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
@@ -76,7 +77,8 @@ public class LoaderStreamsCompat extends Streams {
     }
 
     /**
-     * Returns a builder of loader streams blending the outputs coming from the specified ones.<br/>
+     * Returns a builder of loader streams blending the outputs coming from the specified ones.
+     * <p/>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
@@ -96,7 +98,8 @@ public class LoaderStreamsCompat extends Streams {
     /**
      * Returns a builder of loader stream channels concatenating the outputs coming from the
      * specified ones, so that, all the outputs of the first channel will come before all the
-     * outputs of the second one, and so on.<br/>
+     * outputs of the second one, and so on.
+     * <p/>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
@@ -116,7 +119,8 @@ public class LoaderStreamsCompat extends Streams {
     /**
      * Returns a builder of loader stream channels concatenating the outputs coming from the
      * specified ones, so that, all the outputs of the first channel will come before all the
-     * outputs of the second one, and so on.<br/>
+     * outputs of the second one, and so on.
+     * <p/>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
@@ -158,7 +162,8 @@ public class LoaderStreamsCompat extends Streams {
 
     /**
      * Returns a builder of loader streams joining the data coming from the specified channels.<br/>
-     * An output will be generated only when at least one result is available for each channel.<br/>
+     * An output will be generated only when at least one result is available for each channel.
+     * <p/>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
@@ -178,7 +183,8 @@ public class LoaderStreamsCompat extends Streams {
 
     /**
      * Returns a builder of loader streams joining the data coming from the specified channels.<br/>
-     * An output will be generated only when at least one result is available for each channel.<br/>
+     * An output will be generated only when at least one result is available for each channel.
+     * <p/>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
@@ -201,7 +207,8 @@ public class LoaderStreamsCompat extends Streams {
      * An output will be generated only when at least one result is available for each channel.
      * Moreover, when all the output channels complete, the remaining outputs will be returned by
      * filling the gaps with the specified placeholder instance, so that the generated list of data
-     * will always have the same size of the channel list.<br/>
+     * will always have the same size of the channel list.
+     * <p/>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
@@ -227,7 +234,8 @@ public class LoaderStreamsCompat extends Streams {
      * An output will be generated only when at least one result is available for each channel.
      * Moreover, when all the output channels complete, the remaining outputs will be returned by
      * filling the gaps with the specified placeholder instance, so that the generated list of data
-     * will always have the same size of the channel list.<br/>
+     * will always have the same size of the channel list.
+     * <p/>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
@@ -333,7 +341,8 @@ public class LoaderStreamsCompat extends Streams {
     }
 
     /**
-     * Returns a builder of loader stream merging the specified channels into a selectable one.<br/>
+     * Returns a builder of loader stream merging the specified channels into a selectable one.
+     * <p/>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
@@ -354,7 +363,8 @@ public class LoaderStreamsCompat extends Streams {
     }
 
     /**
-     * Returns a builder of loader stream merging the specified channels into a selectable one.<br/>
+     * Returns a builder of loader stream merging the specified channels into a selectable one.
+     * <p/>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
@@ -375,7 +385,8 @@ public class LoaderStreamsCompat extends Streams {
     }
 
     /**
-     * Returns a builder of loader stream merging the specified channels into a selectable one.<br/>
+     * Returns a builder of loader stream merging the specified channels into a selectable one.
+     * <p/>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
@@ -394,7 +405,8 @@ public class LoaderStreamsCompat extends Streams {
     }
 
     /**
-     * Returns a builder of loader stream merging the specified channels into a selectable one.<br/>
+     * Returns a builder of loader stream merging the specified channels into a selectable one.
+     * <p/>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
@@ -413,7 +425,8 @@ public class LoaderStreamsCompat extends Streams {
     }
 
     /**
-     * Returns a builder of loader stream merging the specified channels into a selectable one.<br/>
+     * Returns a builder of loader stream merging the specified channels into a selectable one.
+     * <p/>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
@@ -487,7 +500,8 @@ public class LoaderStreamsCompat extends Streams {
 
     /**
      * Returns a builder of streams repeating the output data to any newly bound channel or
-     * consumer, thus effectively supporting binding of several output consumers.<br/>
+     * consumer, thus effectively supporting binding of several output consumers.
+     * <p/>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
@@ -505,7 +519,8 @@ public class LoaderStreamsCompat extends Streams {
 
     /**
      * Returns a builder of maps of loader stream channels returning the output data filtered by the
-     * specified indexes.<br/>
+     * specified indexes.
+     * <p/>
      * Note that the builder will return the same map for the same inputs and equal configuration,
      * and that the passed channels will be bound as a result of the creation.
      *
@@ -529,7 +544,8 @@ public class LoaderStreamsCompat extends Streams {
 
     /**
      * Returns a builder of maps of loader stream channels returning the output data filtered by the
-     * specified indexes.<br/>
+     * specified indexes.
+     * <p/>
      * Note that the builder will return the same map for the same inputs and equal configuration,
      * and that the passed channels will be bound as a result of the creation.
      *
@@ -550,7 +566,8 @@ public class LoaderStreamsCompat extends Streams {
 
     /**
      * Returns a builder of maps of loader stream channels returning the output data filtered by the
-     * specified indexes.<br/>
+     * specified indexes.
+     * <p/>
      * Note that the builder will return the same map for the same inputs and equal configuration,
      * and that the passed channels will be bound as a result of the creation.
      *
@@ -639,7 +656,8 @@ public class LoaderStreamsCompat extends Streams {
 
     /**
      * Returns a builder of channels making the specified one selectable.<br/>
-     * Each output will be passed along unchanged.<br/>
+     * Each output will be passed along unchanged.
+     * <p/>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *

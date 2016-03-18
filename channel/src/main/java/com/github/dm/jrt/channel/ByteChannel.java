@@ -150,7 +150,8 @@ public class ByteChannel {
     }
 
     /**
-     * Creates an input stream returning the data contained in the specified buffer.<br/>
+     * Creates an input stream returning the data contained in the specified buffer.
+     * <p/>
      * Note that only one input stream can be created for each buffer.
      *
      * @param buffer the byte buffer.
@@ -166,7 +167,8 @@ public class ByteChannel {
 
     /**
      * Creates an input stream returning the concatenation of the data contained in the specified
-     * buffers.<br/>
+     * buffers.
+     * <p/>
      * Note that only one input stream can be created for each buffer.
      *
      * @param buffers the byte buffers whose data have to be concatenated.
@@ -182,7 +184,8 @@ public class ByteChannel {
 
     /**
      * Creates an input stream returning the concatenation of the data contained in the specified
-     * buffers.<br/>
+     * buffers.
+     * <p/>
      * Note that only one input stream can be created for each buffer.
      *
      * @param buffers the byte buffers whose data have to be concatenated.
@@ -220,7 +223,8 @@ public class ByteChannel {
     }
 
     /**
-     * Returns the output stream used to write bytes into the specified channel.<br/>
+     * Returns the output stream used to write bytes into the specified channel.
+     * <p/>
      * Note that the channel will be automatically closed as soon as the returned output stream is
      * closed.
      *

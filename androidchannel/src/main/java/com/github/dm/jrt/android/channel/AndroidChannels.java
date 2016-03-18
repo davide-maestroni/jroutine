@@ -43,7 +43,8 @@ public class AndroidChannels extends Channels {
 
     /**
      * Returns a builder of output channels merging the specified channels into a selectable one.
-     * The selectable indexes will start from the specified one.<br/>
+     * The selectable indexes will start from the specified one.
+     * <p/>
      * Note that the builder will successfully create only one output channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
@@ -66,7 +67,8 @@ public class AndroidChannels extends Channels {
 
     /**
      * Returns a builder of output channels merging the specified channels into a selectable one.
-     * The selectable indexes will start from the specified one.<br/>
+     * The selectable indexes will start from the specified one.
+     * <p/>
      * Note that the builder will successfully create only one output channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
@@ -90,7 +92,8 @@ public class AndroidChannels extends Channels {
 
     /**
      * Returns a builder of output channels merging the specified channels into a selectable one.
-     * The selectable indexes will be the position in the collection.<br/>
+     * The selectable indexes will be the position in the collection.
+     * <p/>
      * Note that the builder will successfully create only one output channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
@@ -112,7 +115,8 @@ public class AndroidChannels extends Channels {
 
     /**
      * Returns a builder of output channels merging the specified channels into a selectable one.
-     * The selectable indexes will be the position in the array.<br/>
+     * The selectable indexes will be the position in the array.
+     * <p/>
      * Note that the builder will successfully create only one output channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
@@ -132,7 +136,8 @@ public class AndroidChannels extends Channels {
     }
 
     /**
-     * Returns a builder of channels transforming the input data into selectable ones.<br/>
+     * Returns a builder of channels transforming the input data into selectable ones.
+     * <p/>
      * Note that the builder will successfully create several input channel instances, and that the
      * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
      * invocation lifecycle.
@@ -154,7 +159,8 @@ public class AndroidChannels extends Channels {
 
     /**
      * Returns a builder of channels making the specified one selectable.<br/>
-     * Each output will be passed along unchanged.<br/>
+     * Each output will be passed along unchanged.
+     * <p/>
      * Note that the builder will successfully create only one output channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *

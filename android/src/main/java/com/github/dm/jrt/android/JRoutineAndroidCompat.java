@@ -237,7 +237,8 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
         /**
          * Returns a builder of routines bound to the builder context.<br/>
          * In order to prevent undesired leaks, the class of the specified factory must have a
-         * static scope.<br/>
+         * static scope.
+         * <p/>
          * Note that the built routine results will be always dispatched on the configured looper
          * thread, thus waiting for the outputs immediately after its invocation may result in a
          * deadlock.<br/>
@@ -264,7 +265,8 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
          * target object.<br/>
          * In order to customize the object creation, the caller must employ an implementation of a
          * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
-         * application context.<br/>
+         * application context.
+         * <p/>
          * Note that the built routine results will be always dispatched on the configured looper
          * thread, thus waiting for the outputs immediately after its invocation may result in a
          * deadlock.
@@ -290,7 +292,8 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
          * If no invocation with the specified ID is running at the time of the channel creation,
          * the output will be aborted with a
          * {@link com.github.dm.jrt.android.core.invocation.MissingLoaderException
-         * MissingLoaderException}.<br/>
+         * MissingLoaderException}.
+         * <p/>
          * Note that the built routine results will be always dispatched on the configured looper
          * thread, thus waiting for the outputs immediately after its invocation may result in a
          * deadlock.

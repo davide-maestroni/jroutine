@@ -59,7 +59,8 @@ public class DelegatingContextInvocation<IN, OUT> extends TemplateContextInvocat
     }
 
     /**
-     * Returns a factory of delegating invocations.<br/>
+     * Returns a factory of delegating invocations.
+     * <p/>
      * Note that the specified identifier will be used to detect clashing of invocations (see
      * {@link com.github.dm.jrt.android.v11.core.JRoutineLoader} and
      * {@link com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat}).

@@ -53,7 +53,8 @@ public class AndroidRunners {
     }
 
     /**
-     * Returns a runner employing the specified looper.<br/>
+     * Returns a runner employing the specified looper.
+     * <p/>
      * Note that, when the invocation runs in the looper thread, the executions with a delay of 0
      * will be performed synchronously, while the ones with a positive delay will be posted on the
      * same thread.
@@ -68,7 +69,8 @@ public class AndroidRunners {
     }
 
     /**
-     * Returns a runner employing the specified looper.<br/>
+     * Returns a runner employing the specified looper.
+     * <p/>
      * Note that, based on the choice of the runner to be used when the invocation runs in the
      * looper thread, waiting for results in the very same thread may result in a deadlock
      * exception.
@@ -86,7 +88,8 @@ public class AndroidRunners {
     }
 
     /**
-     * Returns the shared runner employing the main thread looper.<br/>
+     * Returns the shared runner employing the main thread looper.
+     * <p/>
      * Note that, when the invocation runs in the main thread, the executions with a delay of 0 will
      * be performed synchronously, while the ones with a positive delay will be posted on the main
      * thread.

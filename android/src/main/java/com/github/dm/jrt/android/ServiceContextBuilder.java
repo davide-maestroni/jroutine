@@ -149,8 +149,7 @@ public class ServiceContextBuilder {
      * <p/>
      * Note that the built routine results will be dispatched into the configured looper, thus,
      * waiting for the outputs on the very same looper thread, immediately after its invocation,
-     * will result in a deadlock. By default output results are dispatched in the main looper.
-     * <br/>
+     * will result in a deadlock. By default output results are dispatched in the main looper.<br/>
      * Note also that the invocation input data will be cached, and the results will be produced
      * only after the invocation channel is closed, so be sure to avoid streaming inputs in
      * order to prevent starvation or out of memory errors.

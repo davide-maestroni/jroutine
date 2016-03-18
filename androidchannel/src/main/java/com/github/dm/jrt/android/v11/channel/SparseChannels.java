@@ -49,7 +49,8 @@ public class SparseChannels extends AndroidChannels {
 
     /**
      * Returns a builder of input channels combining the specified channels into a selectable one.
-     * The selectable indexes will be the keys of the specified map.<br/>
+     * The selectable indexes will be the keys of the specified map.
+     * <p/>
      * Note that the builder will successfully create only one input channel instance, and that the
      * returned channel <b>must be explicitly closed</b> in order to ensure the completion of the
      * invocation lifecycle.
@@ -71,7 +72,8 @@ public class SparseChannels extends AndroidChannels {
 
     /**
      * Returns a builder of output channels merging the specified channels into a selectable one.
-     * The selectable indexes will be the keys of the specified sparse array.<br/>
+     * The selectable indexes will be the keys of the specified sparse array.
+     * <p/>
      * Note that the builder will successfully create only one output channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
@@ -93,7 +95,8 @@ public class SparseChannels extends AndroidChannels {
 
     /**
      * Returns a builder of maps of input channels accepting the data identified by the specified
-     * indexes.<br/>
+     * indexes.
+     * <p/>
      * Note that the builder will successfully create several input channel map instances, and that
      * the returned channels <b>must be explicitly closed</b> in order to ensure the completion of
      * the invocation lifecycle.
@@ -123,7 +126,8 @@ public class SparseChannels extends AndroidChannels {
 
     /**
      * Returns a builder of maps of input channels accepting the data identified by the specified
-     * indexes.<br/>
+     * indexes.
+     * <p/>
      * Note that the builder will successfully create several input channel map instances, and that
      * the returned channels <b>must be explicitly closed</b> in order to ensure the completion of
      * the invocation lifecycle.
@@ -153,7 +157,8 @@ public class SparseChannels extends AndroidChannels {
 
     /**
      * Returns a builder of maps of input channels accepting the data identified by the specified
-     * indexes.<br/>
+     * indexes.
+     * <p/>
      * Note that the builder will successfully create several input channel map instances, and that
      * the returned channels <b>must be explicitly closed</b> in order to ensure the completion of
      * the invocation lifecycle.
@@ -188,7 +193,8 @@ public class SparseChannels extends AndroidChannels {
 
     /**
      * Returns a builder of maps of output channels returning the output data filtered by the
-     * specified indexes.<br/>
+     * specified indexes.
+     * <p/>
      * Note that the builder will return the same map for the same inputs and equal configuration,
      * and that the passed channels will be bound as a result of the creation.
      *
@@ -220,7 +226,8 @@ public class SparseChannels extends AndroidChannels {
 
     /**
      * Returns a builder of maps of output channels returning the output data filtered by the
-     * specified indexes.<br/>
+     * specified indexes.
+     * <p/>
      * Note that the builder will return the same map for the same inputs and equal configuration,
      * and that the passed channels will be bound as a result of the creation.
      *
@@ -247,7 +254,8 @@ public class SparseChannels extends AndroidChannels {
 
     /**
      * Returns a builder of maps of output channels returning the output data filtered by the
-     * specified indexes.<br/>
+     * specified indexes.
+     * <p/>
      * Note that the builder will return the same map for the same inputs and equal configuration,
      * and that the passed channels will be bound as a result of the creation.
      *

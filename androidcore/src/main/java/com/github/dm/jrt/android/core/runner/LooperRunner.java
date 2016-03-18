@@ -43,7 +43,8 @@ class LooperRunner implements Runner {
     private final Thread mThread;
 
     /**
-     * Constructor.<br/>
+     * Constructor.
+     * <p/>
      * Note that, when the invocation runs in the looper thread, the executions with a delay of 0
      * will be performed synchronously, while the ones with a positive delay will be posted on the
      * same thread.

@@ -94,7 +94,8 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
     }
 
     /**
-     * Returns an invocation target based on the specified context.<br/>
+     * Returns an invocation target based on the specified context.
+     * <p/>
      * Note that a new instance will be returned each time the method is invoked.
      *
      * @param context the target context.

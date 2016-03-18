@@ -52,6 +52,8 @@ public class AndroidChannels extends Channels {
      * @param <OUT>      the output data type.
      * @return the selectable output channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
      * @see Channels#merge(int, Collection)
      */
     @NotNull
@@ -73,6 +75,8 @@ public class AndroidChannels extends Channels {
      * @param <OUT>      the output data type.
      * @return the selectable output channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.NullPointerException     if the specified array is null or contains a null
+     *                                            object.
      * @see Channels#merge(int, com.github.dm.jrt.core.channel.Channel.OutputChannel[])
      */
     @NotNull
@@ -94,6 +98,8 @@ public class AndroidChannels extends Channels {
      * @param <OUT>    the output data type.
      * @return the selectable output channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
      * @see Channels#merge(Collection)
      */
     @NotNull
@@ -114,6 +120,8 @@ public class AndroidChannels extends Channels {
      * @param <OUT>    the output data type.
      * @return the selectable output channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.NullPointerException     if the specified array is null or contains a null
+     *                                            object.
      * @see Channels#merge(com.github.dm.jrt.core.channel.Channel.OutputChannel[])
      */
     @NotNull

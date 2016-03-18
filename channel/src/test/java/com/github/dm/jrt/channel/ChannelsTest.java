@@ -1766,6 +1766,18 @@ public class ChannelsTest {
     }
 
     @Test
+    public void testOutputMapCache() {
+
+        final Routine<Selectable<Object>, Selectable<Object>> routine =
+                JRoutineCore.on(factoryOf(Sort.class)).buildRoutine();
+        final OutputChannel<Selectable<Object>> channel = routine.asyncCall();
+        final Map<Integer, OutputChannel<Object>> channelMap =
+                Channels.select(channel, Arrays.asList(Sort.INTEGER, Sort.STRING)).build();
+        assertThat(channelMap).isEqualTo(
+                Channels.select(channel, Sort.INTEGER, Sort.STRING).build());
+    }
+
+    @Test
     public void testOutputMapError() {
 
         try {

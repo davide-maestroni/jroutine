@@ -710,11 +710,6 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
             throw consumerException();
         }
 
-        @Override
-        public void onInvocationComplete() {
-
-        }
-
         @Nullable
         @Override
         Execution onHandlerAbort(@NotNull final RoutineException reason) {

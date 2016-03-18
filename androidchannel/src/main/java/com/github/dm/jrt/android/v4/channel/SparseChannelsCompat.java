@@ -20,11 +20,13 @@ import android.support.v4.util.SparseArrayCompat;
 
 import com.github.dm.jrt.android.channel.AndroidChannels;
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
+import com.github.dm.jrt.channel.AbstractBuilder;
 import com.github.dm.jrt.channel.ChannelsBuilder;
 import com.github.dm.jrt.channel.Selectable;
 import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
+import com.github.dm.jrt.core.config.ChannelConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -56,6 +58,8 @@ public class SparseChannelsCompat extends AndroidChannels {
      * @param <IN>     the input data type.
      * @return the selectable I/O channel builder.
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
+     * @throws java.lang.NullPointerException     if the specified map is null or contains a null
+     *                                            object.
      * @see AndroidChannels#combine(Map)
      */
     @NotNull
@@ -75,6 +79,8 @@ public class SparseChannelsCompat extends AndroidChannels {
      * @param <OUT>    the output data type.
      * @return the selectable output channel builder.
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
+     * @throws java.lang.NullPointerException     if the specified map is null or contains a null
+     *                                            object.
      * @see AndroidChannels#merge(Map)
      */
     @NotNull
@@ -97,6 +103,8 @@ public class SparseChannelsCompat extends AndroidChannels {
      * @param <DATA>  the channel data type.
      * @param <IN>    the input data type.
      * @return the map of indexes and I/O channels builder.
+     * @throws java.lang.NullPointerException if the specified array is null or contains a null
+     *                                        object.
      * @see AndroidChannels#select(com.github.dm.jrt.core.channel.Channel.InputChannel, int...)
      */
     @NotNull
@@ -125,6 +133,8 @@ public class SparseChannelsCompat extends AndroidChannels {
      * @param <DATA>  the channel data type.
      * @param <IN>    the input data type.
      * @return the map of indexes and I/O channels builder.
+     * @throws java.lang.NullPointerException if the specified iterable is null or returns a null
+     *                                        object.
      * @see AndroidChannels#select(com.github.dm.jrt.core.channel.Channel.InputChannel, Iterable)
      */
     @NotNull
@@ -153,8 +163,8 @@ public class SparseChannelsCompat extends AndroidChannels {
      * @param channel    the selectable channel.
      * @param <DATA>     the channel data type.
      * @param <IN>       the input data type.
-     * @return the map of indexes and I/O channels  builder.
-     * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
+     * @return the map of indexes and I/O channels builder.
+     * @throws java.lang.IllegalArgumentException if the specified range size is not positive.
      * @see AndroidChannels#select(int, int, com.github.dm.jrt.core.channel.Channel.InputChannel)
      */
     @NotNull
@@ -187,7 +197,7 @@ public class SparseChannelsCompat extends AndroidChannels {
      * @param channel    the selectable channel.
      * @param <OUT>      the output data type.
      * @return the map of indexes and output channels builder.
-     * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
+     * @throws java.lang.IllegalArgumentException if the specified range size is not positive.
      * @see AndroidChannels#select(int, int, com.github.dm.jrt.core.channel.Channel.OutputChannel)
      */
     @NotNull
@@ -219,6 +229,8 @@ public class SparseChannelsCompat extends AndroidChannels {
      * @param indexes the list of indexes.
      * @param <OUT>   the output data type.
      * @return the map of indexes and output channels builder.
+     * @throws java.lang.NullPointerException if the specified array is null or contains a null
+     *                                        object.
      * @see AndroidChannels#select(com.github.dm.jrt.core.channel.Channel.OutputChannel, int...)
      */
     @NotNull
@@ -245,6 +257,8 @@ public class SparseChannelsCompat extends AndroidChannels {
      * @param indexes the iterable returning the channel indexes.
      * @param <OUT>   the output data type.
      * @return the map of indexes and output channels builder.
+     * @throws java.lang.NullPointerException if the specified iterable is null or returns a null
+     *                                        object.
      * @see AndroidChannels#select(com.github.dm.jrt.core.channel.Channel.OutputChannel, Iterable)
      */
     @NotNull
@@ -259,5 +273,71 @@ public class SparseChannelsCompat extends AndroidChannels {
         }
 
         return new OutputMapBuilder<OUT>(channel, indexSet);
+    }
+
+    /**
+     * Builder implementation returning a map of input channels accepting selectable data.
+     *
+     * @param <DATA> the channel data type.
+     * @param <IN>   the input data type.
+     */
+    private static class InputMapBuilder<DATA, IN extends DATA>
+            extends AbstractBuilder<SparseArrayCompat<IOChannel<IN>>> {
+
+        private final InputChannel<? super ParcelableSelectable<DATA>> mChannel;
+
+        private final HashSet<Integer> mIndexes;
+
+        /**
+         * Constructor.
+         *
+         * @param channel the selectable channel.
+         * @param indexes the set of indexes.
+         * @throws java.lang.NullPointerException if the specified set of indexes is null or
+         *                                        contains a null object.
+         */
+        @SuppressWarnings("ConstantConditions")
+        private InputMapBuilder(
+                @NotNull final InputChannel<? super ParcelableSelectable<DATA>> channel,
+                @NotNull final HashSet<Integer> indexes) {
+
+            if (channel == null) {
+                throw new NullPointerException("the input channel must not be null");
+            }
+
+            if (indexes == null) {
+                throw new NullPointerException("the set of indexes must not be null");
+            }
+
+            final HashSet<Integer> indexSet = new HashSet<Integer>(indexes);
+            if (indexSet.contains(null)) {
+                throw new NullPointerException("the set of indexes must not contain null objects");
+            }
+
+            mChannel = channel;
+            mIndexes = indexSet;
+        }
+
+        @NotNull
+        @Override
+        protected SparseArrayCompat<IOChannel<IN>> build(
+                @NotNull final ChannelConfiguration configuration) {
+
+            final HashSet<Integer> indexes = mIndexes;
+            final InputChannel<? super ParcelableSelectable<DATA>> channel = mChannel;
+            final SparseArrayCompat<IOChannel<IN>> channelMap =
+                    new SparseArrayCompat<IOChannel<IN>>(indexes.size());
+            for (final Integer index : indexes) {
+                final IOChannel<IN> ioChannel =
+                        SparseChannelsCompat.<DATA, IN>selectParcelable(channel, index)
+                                            .withChannels()
+                                            .with(configuration)
+                                            .getConfigured()
+                                            .build();
+                channelMap.put(index, ioChannel);
+            }
+
+            return channelMap;
+        }
     }
 }

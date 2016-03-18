@@ -45,6 +45,8 @@ class MergeMapBuilder<OUT>
      *
      * @param channels the map of channels to merge.
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
+     * @throws java.lang.NullPointerException     if the specified map is null or contains a null
+     *                                            object.
      */
     MergeMapBuilder(@NotNull final SparseArray<? extends OutputChannel<? extends OUT>> channels) {
 

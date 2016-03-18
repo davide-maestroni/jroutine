@@ -43,6 +43,8 @@ class CombineMapBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<? exten
      *
      * @param channels the map of channels to combine.
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
+     * @throws java.lang.NullPointerException     if the specified map is null or contains a null
+     *                                            object.
      */
     CombineMapBuilder(@NotNull final SparseArray<? extends InputChannel<? extends IN>> channels) {
 

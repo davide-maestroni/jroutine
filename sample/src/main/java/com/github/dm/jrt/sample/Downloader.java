@@ -42,6 +42,8 @@ import static com.github.dm.jrt.core.util.TimeDuration.seconds;
  */
 public class Downloader {
 
+    // TODO: 18/03/16 Android sample
+
     private static final Runner sReadRunner = Runners.poolRunner();
 
     private static final Runner sWriteRunner = Runners.poolRunner(1);

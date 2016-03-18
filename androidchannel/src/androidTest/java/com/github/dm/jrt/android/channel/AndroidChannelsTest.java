@@ -1248,6 +1248,19 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         }
     }
 
+    public void testOutputMapCache() {
+
+        final Routine<ParcelableSelectable<Object>, ParcelableSelectable<Object>> routine =
+                JRoutineService.with(serviceFrom(getActivity()))
+                               .on(factoryOf(Sort.class))
+                               .buildRoutine();
+        final OutputChannel<ParcelableSelectable<Object>> channel = routine.asyncCall();
+        final Map<Integer, OutputChannel<Object>> channelMap =
+                AndroidChannels.select(channel, Arrays.asList(Sort.INTEGER, Sort.STRING)).build();
+        assertThat(channelMap).isEqualTo(
+                AndroidChannels.select(channel, Sort.INTEGER, Sort.STRING).build());
+    }
+
     public void testOutputMapError() {
 
         try {

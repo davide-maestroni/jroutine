@@ -322,7 +322,8 @@ public class Time {
     }
 
     /**
-     * Returns a new instance whose time value is decremented by the specified one.<br/>
+     * Returns a new instance whose time value is decremented by the specified one.
+     * <p/>
      * Note that the unit of the returned time will match the one with the highest precision.
      *
      * @param time the time to subtract.
@@ -361,7 +362,8 @@ public class Time {
     }
 
     /**
-     * Returns a new instance whose time value is incremented by the specified one.<br/>
+     * Returns a new instance whose time value is incremented by the specified one.
+     * <p/>
      * Note that the unit of the returned time will match the one with the highest precision.
      *
      * @param time the time to add.

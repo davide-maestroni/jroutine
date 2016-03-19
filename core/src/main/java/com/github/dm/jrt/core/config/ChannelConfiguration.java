@@ -706,7 +706,8 @@ public final class ChannelConfiguration {
 
         /**
          * Sets the order in which data are collected from the channel. A null value means that it
-         * is up to the specific implementation to choose a default one.<br/>
+         * is up to the specific implementation to choose a default one.
+         * <p/>
          * Note that this is just the initial configuration, since the channel order can be
          * dynamically changed through the dedicated methods.
          *
@@ -749,7 +750,8 @@ public final class ChannelConfiguration {
         }
 
         /**
-         * Sets the timeout for the channel instance to produce a readable output.<br/>
+         * Sets the timeout for the channel instance to produce a readable output.
+         * <p/>
          * Note that this is just the initial configuration, since the output timeout can be
          * dynamically changed through the dedicated channel methods.
          *
@@ -766,7 +768,8 @@ public final class ChannelConfiguration {
 
         /**
          * Sets the timeout for the channel instance to produce a readable output. A null value
-         * means that it is up to the specific implementation to choose a default one.<br/>
+         * means that it is up to the specific implementation to choose a default one.
+         * <p/>
          * Note that this is just the initial configuration, since the output timeout can be
          * dynamically changed through the dedicated channel methods.
          *
@@ -783,7 +786,8 @@ public final class ChannelConfiguration {
         /**
          * Sets the action to be taken if the timeout elapses before an output can be read from the
          * output channel. A null value means that it is up to the specific implementation to choose
-         * a default one.<br/>
+         * a default one.
+         * <p/>
          * Note that this is just the initial configuration, since the output timeout action can be
          * dynamically changed through the dedicated channel methods.
          *

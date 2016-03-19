@@ -15,7 +15,7 @@
  */
 
 /**
- * Routine interfaces and implementations specific to the Android platform.
+ * Object routine interfaces and implementations specific to the Android platform.
  * <p/>
  * Created by davide-maestroni on 09/25/2014.
  */

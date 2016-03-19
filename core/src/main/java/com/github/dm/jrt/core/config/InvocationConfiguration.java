@@ -589,7 +589,8 @@ public final class InvocationConfiguration {
     }
 
     /**
-     * Interface exposing constants which can be used as a common set of priorities.<br/>
+     * Interface exposing constants which can be used as a common set of priorities.
+     * <p/>
      * Note that, since the priority value can be any in an integer range, it is always possible to
      * customize the values so to create a personalized set.
      */
@@ -640,7 +641,8 @@ public final class InvocationConfiguration {
 
     /**
      * Interface exposing constants which can be used as a set of priorities ignoring the aging of
-     * executions.<br/>
+     * executions.
+     * <p/>
      * Note that, since the priority value can be any in an integer range, it is always possible to
      * customize the values so to create a personalized set.
      */
@@ -896,7 +898,8 @@ public final class InvocationConfiguration {
 
         /**
          * Sets the order in which input data are collected from the input channel. A null value
-         * means that it is up to the specific implementation to choose a default one.<br/>
+         * means that it is up to the specific implementation to choose a default one.
+         * <p/>
          * Note that this is just the initial configuration of the invocation, since the channel
          * order can be dynamically changed through the dedicated methods.
          *
@@ -1049,7 +1052,8 @@ public final class InvocationConfiguration {
 
         /**
          * Sets the order in which output data are collected from the result channel. A null value
-         * means that it is up to the specific implementation to choose a default order one.<br/>
+         * means that it is up to the specific implementation to choose a default order one.
+         * <p/>
          * Note that this is just the initial configuration of the invocation, since the channel
          * order can be dynamically changed through the dedicated methods.
          *
@@ -1079,7 +1083,8 @@ public final class InvocationConfiguration {
         }
 
         /**
-         * Sets the timeout for an invocation instance to produce a readable result.<br/>
+         * Sets the timeout for an invocation instance to produce a readable result.
+         * <p/>
          * Note that this is just the initial configuration of the invocation, since the output
          * timeout can be dynamically changed through the dedicated methods.
          *
@@ -1096,7 +1101,8 @@ public final class InvocationConfiguration {
 
         /**
          * Sets the timeout for an invocation instance to produce a readable result. A null value
-         * means that it is up to the specific implementation to choose a default one.<br/>
+         * means that it is up to the specific implementation to choose a default one.
+         * <p/>
          * Note that this is just the initial configuration of the invocation, since the output
          * timeout can be dynamically changed through the dedicated methods.
          *
@@ -1113,7 +1119,8 @@ public final class InvocationConfiguration {
         /**
          * Sets the action to be taken if the timeout elapses before a result can be read from the
          * output channel. A null value means that it is up to the specific implementation to choose
-         * a default one.<br/>
+         * a default one.
+         * <p/>
          * Note that this is just the initial configuration of the invocation, since the output
          * timeout action can be dynamically changed through the dedicated methods.
          *

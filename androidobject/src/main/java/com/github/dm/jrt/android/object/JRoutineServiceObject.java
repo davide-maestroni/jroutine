@@ -88,7 +88,7 @@ public class JRoutineServiceObject {
     }
 
     /**
-     * Context based builder of service proxy routine builders.
+     * Context based builder of service routine builders.
      */
     public static class ServiceContextBuilder {
 

@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
  * The implementation can both be synchronous or asynchronous, it can allocate specific threads or
  * share a pool of them between different instances.<br/>
  * The only requirement is that the specified execution is called each time a run method is invoked.
- * <br/>
+ * <p/>
  * Note that, a proper asynchronous runner implementation will never synchronously run an execution,
  * no matter the delay, unless it employs a single thread. While, a proper synchronous runner, will
  * always run executions in the very same caller thread.<br/>
@@ -45,7 +45,8 @@ import java.util.concurrent.TimeUnit;
 public interface Runner {
 
     /**
-     * Cancels the specified execution if not already run.<br/>
+     * Cancels the specified execution if not already run.
+     * <p/>
      * Note that the method will have no effect in case the runner does not maintain a queue or the
      * specified execution has been already processed at the moment of the call.<br/>
      * Note also that, in case the same execution has been added more than once to the runner queue,

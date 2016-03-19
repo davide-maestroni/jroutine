@@ -56,7 +56,7 @@ public class Channels {
 
     /**
      * Returns a builder of output channels blending the outputs coming from the specified ones.
-     * <br/>
+     * <p/>
      * Note that the builder will successfully create only one output channel instance, and that the
      * passed channels will be bound as a result of the creation.
      * <p/>
@@ -84,7 +84,7 @@ public class Channels {
 
     /**
      * Returns a builder of output channels blending the outputs coming from the specified ones.
-     * <br/>
+     * <p/>
      * Note that the builder will successfully create only one output channel instance, and that the
      * passed channels will be bound as a result of the creation.
      * <p/>
@@ -118,7 +118,8 @@ public class Channels {
 
     /**
      * Returns a builder of input channels combining the specified channels into a selectable one.
-     * The selectable indexes will be the position in the array.<br/>
+     * The selectable indexes will be the position in the array.
+     * <p/>
      * Note that the builder will successfully create several input channel instances, and that the
      * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
      * invocation lifecycle.
@@ -149,7 +150,8 @@ public class Channels {
 
     /**
      * Returns a builder of input channels combining the specified channels into a selectable one.
-     * The selectable indexes will start from the specified one.<br/>
+     * The selectable indexes will start from the specified one.
+     * <p/>
      * Note that the builder will successfully create several input channel instances, and that the
      * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
      * invocation lifecycle.
@@ -187,7 +189,8 @@ public class Channels {
 
     /**
      * Returns a builder of input channels combining the specified channels into a selectable one.
-     * The selectable indexes will start from the specified one.<br/>
+     * The selectable indexes will start from the specified one.
+     * <p/>
      * Note that the builder will successfully create several input channel instances, and that the
      * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
      * invocation lifecycle.
@@ -220,7 +223,8 @@ public class Channels {
 
     /**
      * Returns a builder of input channels combining the specified channels into a selectable one.
-     * The selectable indexes will be the position in the collection.<br/>
+     * The selectable indexes will be the position in the collection.
+     * <p/>
      * Note that the builder will successfully create several input channel instances, and that the
      * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
      * invocation lifecycle.
@@ -251,7 +255,8 @@ public class Channels {
 
     /**
      * Returns a builder of input channels combining the specified channels into a selectable one.
-     * The selectable indexes will be the keys of the specified map.<br/>
+     * The selectable indexes will be the keys of the specified map.
+     * <p/>
      * Note that the builder will successfully create several input channel instances, and that the
      * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
      * invocation lifecycle.
@@ -283,7 +288,8 @@ public class Channels {
     /**
      * Returns a builder of output channels concatenating the outputs coming from the specified
      * ones, so that, all the outputs of the first channel will come before all the outputs of the
-     * second one, and so on.<br/>
+     * second one, and so on.
+     * <p/>
      * Note that the builder will successfully create only one output channel instance, and that the
      * passed channels will be bound as a result of the creation.
      * <p/>
@@ -312,7 +318,8 @@ public class Channels {
     /**
      * Returns a builder of output channels concatenating the outputs coming from the specified
      * ones, so that, all the outputs of the first channel will come before all the outputs of the
-     * second one, and so on.<br/>
+     * second one, and so on.
+     * <p/>
      * Note that the builder will successfully create only one output channel instance, and that the
      * passed channels will be bound as a result of the creation.
      * <p/>
@@ -346,7 +353,8 @@ public class Channels {
 
     /**
      * Returns a builder of channels distributing the input data among the specified channels. If
-     * the list of data exceeds the number of channels, the invocation will be aborted.<br/>
+     * the list of data exceeds the number of channels, the invocation will be aborted.
+     * <p/>
      * Note that the builder will successfully create several input channel instances, and that the
      * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
      * invocation lifecycle.
@@ -377,7 +385,8 @@ public class Channels {
 
     /**
      * Returns a builder of channels distributing the input data among the specified channels. If
-     * the list of data exceeds the number of channels, the invocation will be aborted.<br/>
+     * the list of data exceeds the number of channels, the invocation will be aborted.
+     * <p/>
      * Note that the builder will successfully create several input channel instances, and that the
      * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
      * invocation lifecycle.
@@ -410,7 +419,8 @@ public class Channels {
      * Returns a builder of channels distributing the input data among the specified channels. If
      * the list of data is smaller than the specified number of channels, the remaining ones will be
      * fed with the specified placeholder instance. While, if the list of data exceeds the number of
-     * channels, the invocation will be aborted.<br/>
+     * channels, the invocation will be aborted.
+     * <p/>
      * Note that the builder will successfully create several input channel instances, and that the
      * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
      * invocation lifecycle.
@@ -444,7 +454,8 @@ public class Channels {
      * Returns a builder of channels distributing the input data among the specified channels. If
      * the list of data is smaller than the specified number of channels, the remaining ones will be
      * fed with the specified placeholder instance. While, if the list of data exceeds the number of
-     * channels, the invocation will be aborted.<br/>
+     * channels, the invocation will be aborted.
+     * <p/>
      * Note that the builder will successfully create several input channel instances, and that the
      * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
      * invocation lifecycle.
@@ -478,7 +489,8 @@ public class Channels {
     /**
      * Returns a builder of output channels joining the data coming from the specified channels.
      * <br/>
-     * An output will be generated only when at least one result is available for each channel.<br/>
+     * An output will be generated only when at least one result is available for each channel.
+     * <p/>
      * Note that the builder will successfully create only one output channel instance, and that the
      * passed channels will be bound as a result of the creation.
      * <p/>
@@ -507,7 +519,8 @@ public class Channels {
     /**
      * Returns a builder of output channels joining the data coming from the specified channels.
      * <br/>
-     * An output will be generated only when at least one result is available for each channel.<br/>
+     * An output will be generated only when at least one result is available for each channel.
+     * <p/>
      * Note that the builder will successfully create only one output channel instance, and that the
      * passed channels will be bound as a result of the creation.
      * <p/>
@@ -539,7 +552,8 @@ public class Channels {
      * An output will be generated only when at least one result is available for each channel.
      * Moreover, when all the output channels complete, the remaining outputs will be returned by
      * filling the gaps with the specified placeholder instance, so that the generated list of data
-     * will always have the same size as the channel list.<br/>
+     * will always have the same size as the channel list.
+     * <p/>
      * Note that the builder will successfully create only one output channel instance, and that the
      * passed channels will be bound as a result of the creation.
      * <p/>
@@ -573,7 +587,8 @@ public class Channels {
      * An output will be generated only when at least one result is available for each channel.
      * Moreover, when all the output channels complete, the remaining outputs will be returned by
      * filling the gaps with the specified placeholder instance, so that the generated list of data
-     * will always have the same size as the channel list.<br/>
+     * will always have the same size as the channel list.
+     * <p/>
      * Note that the builder will successfully create only one output channel instance, and that the
      * passed channels will be bound as a result of the creation.
      * <p/>
@@ -602,7 +617,8 @@ public class Channels {
 
     /**
      * Returns a builder of output channels merging the specified channels into a selectable one.
-     * The selectable indexes will start from the specified one.<br/>
+     * The selectable indexes will start from the specified one.
+     * <p/>
      * Note that the builder will successfully create only one output channel instance, and that the
      * passed channels will be bound as a result of the creation.
      * <p/>
@@ -632,7 +648,8 @@ public class Channels {
 
     /**
      * Returns a builder of output channels merging the specified channels into a selectable one.
-     * The selectable indexes will start from the specified one.<br/>
+     * The selectable indexes will start from the specified one.
+     * <p/>
      * Note that the builder will successfully create only one output channel instance, and that the
      * passed channels will be bound as a result of the creation.
      * <p/>
@@ -666,7 +683,8 @@ public class Channels {
 
     /**
      * Returns a builder of output channels merging the specified channels into a selectable one.
-     * The selectable indexes will be the position in the collection.<br/>
+     * The selectable indexes will be the position in the collection.
+     * <p/>
      * Note that the builder will successfully create only one output channel instance, and that the
      * passed channels will be bound as a result of the creation.
      * <p/>
@@ -694,7 +712,8 @@ public class Channels {
 
     /**
      * Returns a builder of output channels merging the specified channels into a selectable one.
-     * The selectable indexes will be the keys of the specified map.<br/>
+     * The selectable indexes will be the keys of the specified map.
+     * <p/>
      * Note that the builder will successfully create only one output channel instance, and that the
      * passed channels will be bound as a result of the creation.
      * <p/>
@@ -722,7 +741,8 @@ public class Channels {
 
     /**
      * Returns a builder of output channels merging the specified channels into a selectable one.
-     * The selectable indexes will be the position in the array.<br/>
+     * The selectable indexes will be the position in the array.
+     * <p/>
      * Note that the builder will successfully create only one output channel instance, and that the
      * passed channels will be bound as a result of the creation.
      * <p/>
@@ -780,7 +800,8 @@ public class Channels {
     }
 
     /**
-     * Returns a builder of channels transforming the input data into selectable ones.<br/>
+     * Returns a builder of channels transforming the input data into selectable ones.
+     * <p/>
      * Note that the builder will successfully create several input channel instances, and that the
      * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
      * invocation lifecycle.
@@ -808,7 +829,8 @@ public class Channels {
 
     /**
      * Returns a builder of maps of input channels accepting the data identified by the specified
-     * indexes.<br/>
+     * indexes.
+     * <p/>
      * Note that the builder will successfully create several input channel map instances, and that
      * the returned channels <b>must be explicitly closed</b> in order to ensure the completion of
      * the invocation lifecycle.
@@ -846,7 +868,8 @@ public class Channels {
 
     /**
      * Returns a builder of maps of input channels accepting the data identified by the specified
-     * indexes.<br/>
+     * indexes.
+     * <p/>
      * Note that the builder will successfully create several input channel map instances, and that
      * the returned channels <b>must be explicitly closed</b> in order to ensure the completion of
      * the invocation lifecycle.
@@ -884,7 +907,8 @@ public class Channels {
 
     /**
      * Returns a builder of maps of input channels accepting the data identified by the specified
-     * indexes.<br/>
+     * indexes.
+     * <p/>
      * Note that the builder will successfully create several input channel map instances, and that
      * the returned channels <b>must be explicitly closed</b> in order to ensure the completion of
      * the invocation lifecycle.
@@ -927,7 +951,8 @@ public class Channels {
 
     /**
      * Returns a builder of maps of output channels returning the output data filtered by the
-     * specified indexes.<br/>
+     * specified indexes.
+     * <p/>
      * Note that the builder will return the same map for the same inputs and equal configuration,
      * and that the passed channels will be bound as a result of the creation.
      * <p/>
@@ -969,7 +994,8 @@ public class Channels {
 
     /**
      * Returns a builder of maps of output channels returning the output data filtered by the
-     * specified indexes.<br/>
+     * specified indexes.
+     * <p/>
      * Note that the builder will return the same map for the same inputs and equal configuration,
      * and that the passed channels will be bound as a result of the creation.
      * <p/>
@@ -1006,7 +1032,8 @@ public class Channels {
 
     /**
      * Returns a builder of maps of output channels returning the output data filtered by the
-     * specified indexes.<br/>
+     * specified indexes.
+     * <p/>
      * Note that the builder will return the same map for the same inputs and equal configuration,
      * and that the passed channels will be bound as a result of the creation.
      * <p/>
@@ -1043,7 +1070,8 @@ public class Channels {
 
     /**
      * Returns a builder of selectable channels feeding the specified one.<br/>
-     * Each output will be filtered based on the specified index.<br/>
+     * Each output will be filtered based on the specified index.
+     * <p/>
      * Note that the builder will return the same map for the same inputs and equal configuration,
      * and that the returned channels <b>must be explicitly closed</b> in order to ensure the
      * completion of the invocation lifecycle.
@@ -1070,7 +1098,8 @@ public class Channels {
 
     /**
      * Returns a builder of channels making the specified one selectable.<br/>
-     * Each output will be passed along unchanged.<br/>
+     * Each output will be passed along unchanged.
+     * <p/>
      * Note that the builder will successfully create only one output channel instance, and that the
      * passed channels will be bound as a result of the creation.
      * <p/>

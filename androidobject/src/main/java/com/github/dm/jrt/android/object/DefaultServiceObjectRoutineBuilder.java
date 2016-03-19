@@ -24,7 +24,9 @@ import com.github.dm.jrt.android.core.TargetInvocationFactory;
 import com.github.dm.jrt.android.core.builder.ServiceRoutineBuilder;
 import com.github.dm.jrt.android.core.config.ServiceConfiguration;
 import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
+import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
 import com.github.dm.jrt.android.object.builder.ServiceObjectRoutineBuilder;
+import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.routine.Routine;
@@ -292,7 +294,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     /**
      * Alias method invocation.
      */
-    private static class MethodAliasInvocation extends CallContextInvocation<Object, Object> {
+    private static class MethodAliasInvocation extends TemplateContextInvocation<Object, Object> {
 
         private final String mAliasName;
 
@@ -300,6 +302,9 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         private final ContextInvocationTarget<?> mTarget;
 
+        private InvocationChannel<Object, Object> mChannel;
+
+        @SuppressWarnings("unused")
         private Object mInstance;
 
         private Routine<Object, Object> mRoutine;
@@ -333,22 +338,36 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         }
 
         @Override
-        protected void onCall(@NotNull final List<?> inputs,
-                @NotNull final ResultChannel<Object> result) {
+        public void onInitialize() throws Exception {
 
-            final Routine<Object, Object> routine = mRoutine;
-            if ((routine == null) || (mInstance == null)) {
-                throw new IllegalStateException("such error should never happen");
-            }
+            mChannel = mRoutine.syncInvoke();
+        }
 
-            result.pass(routine.syncCall(inputs));
+        @Override
+        public void onInput(final Object input, @NotNull final ResultChannel<Object> result) throws
+                Exception {
+
+            mChannel.pass(input);
+        }
+
+        @Override
+        public void onResult(@NotNull final ResultChannel<Object> result) throws Exception {
+
+            result.pass(mChannel.result());
+        }
+
+        @Override
+        public void onTerminate() throws Exception {
+
+            mChannel = null;
         }
     }
 
     /**
      * Invocation based on method signature.
      */
-    private static class MethodSignatureInvocation extends CallContextInvocation<Object, Object> {
+    private static class MethodSignatureInvocation
+            extends TemplateContextInvocation<Object, Object> {
 
         private final String mMethodName;
 
@@ -358,6 +377,9 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         private final ContextInvocationTarget<?> mTarget;
 
+        private InvocationChannel<Object, Object> mChannel;
+
+        @SuppressWarnings("unused")
         private Object mInstance;
 
         private Routine<Object, Object> mRoutine;
@@ -382,18 +404,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         }
 
         @Override
-        protected void onCall(@NotNull final List<?> inputs,
-                @NotNull final ResultChannel<Object> result) {
-
-            final Routine<Object, Object> routine = mRoutine;
-            if ((routine == null) || (mInstance == null)) {
-                throw new IllegalStateException("such error should never happen");
-            }
-
-            result.pass(routine.syncCall(inputs));
-        }
-
-        @Override
         public void onContext(@NotNull final Context context) throws Exception {
 
             super.onContext(context);
@@ -404,6 +414,31 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                                      .withSharedFields(mSharedFields)
                                      .getConfigured()
                                      .method(mMethodName, mParameterTypes);
+        }
+
+        @Override
+        public void onInitialize() throws Exception {
+
+            mChannel = mRoutine.syncInvoke();
+        }
+
+        @Override
+        public void onInput(final Object input, @NotNull final ResultChannel<Object> result) throws
+                Exception {
+
+            mChannel.pass(input);
+        }
+
+        @Override
+        public void onResult(@NotNull final ResultChannel<Object> result) throws Exception {
+
+            result.pass(mChannel.result());
+        }
+
+        @Override
+        public void onTerminate() throws Exception {
+
+            mChannel = null;
         }
     }
 
@@ -454,6 +489,18 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         }
 
         @Override
+        public void onContext(@NotNull final Context context) throws Exception {
+
+            super.onContext(context);
+            final InvocationTarget target = mTarget.getInvocationTarget(context);
+            final Object mutexTarget =
+                    (Modifier.isStatic(mTargetMethod.getModifiers())) ? target.getTargetClass()
+                            : target.getTarget();
+            mMutex = getSharedMutex(mutexTarget, mSharedFields);
+            mInstance = target.getTarget();
+        }
+
+        @Override
         protected void onCall(@NotNull final List<?> objects,
                 @NotNull final ResultChannel<Object> result) throws Exception {
 
@@ -464,18 +511,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
             callFromInvocation(mMutex, targetInstance, mTargetMethod, objects, result, mInputMode,
                     mOutputMode);
-        }
-
-        @Override
-        public void onContext(@NotNull final Context context) throws Exception {
-
-            super.onContext(context);
-            final InvocationTarget target = mTarget.getInvocationTarget(context);
-            final Object mutexTarget =
-                    (Modifier.isStatic(mTargetMethod.getModifiers())) ? target.getTargetClass()
-                            : target.getTarget();
-            mMutex = getSharedMutex(mutexTarget, mSharedFields);
-            mInstance = target.getTarget();
         }
     }
 

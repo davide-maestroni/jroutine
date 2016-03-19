@@ -456,13 +456,6 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
             }
         }
 
-        public boolean isAborting() {
-
-            synchronized (mMutex) {
-                return mState.isAborting();
-            }
-        }
-
         @Nullable
         public IN nextInput() {
 
@@ -739,19 +732,13 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
             final RoutineException abortException = mAbortException;
             mSubLogger.dbg(abortException, "abort exception");
             throw abortException;
-        }        @Override
+        }
+
+        @Override
         void orderBy(@NotNull final OrderType orderType) {
 
             throw exception();
         }
-
-        @Override
-        public boolean isAborting() {
-
-            return true;
-        }
-
-
 
         @Nullable
         @Override
@@ -1158,11 +1145,6 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
         public boolean hasInput() {
 
             return !mInputQueue.isEmpty();
-        }
-
-        public boolean isAborting() {
-
-            return false;
         }
 
         @Nullable

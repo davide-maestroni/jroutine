@@ -294,7 +294,8 @@ public class TimeDuration extends Time {
     }
 
     /**
-     * Returns a new instance whose time value is decremented by the specified one.<br/>
+     * Returns a new instance whose time value is decremented by the specified one.
+     * <p/>
      * Note that the unit of the returned time will match the one with the highest precision.<br/>
      * Note also that, if the resulting time is negative, the value will be clipped to 0.
      *
@@ -337,7 +338,8 @@ public class TimeDuration extends Time {
     }
 
     /**
-     * Returns a new instance whose time value is incremented by the specified one.<br/>
+     * Returns a new instance whose time value is incremented by the specified one.
+     * <p/>
      * Note that the unit of the returned time will match the one with the highest precision.<br/>
      * Note also that, if the resulting time is negative, the value will be clipped to 0.
      *

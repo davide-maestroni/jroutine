@@ -43,7 +43,7 @@ public abstract class InvocationFactory<IN, OUT> {
      * @param <IN>            the input data type.
      * @param <OUT>           the output data type.
      * @return the invocation factory.
-     * @throws IllegalArgumentException if no default constructor was found.
+     * @throws java.lang.IllegalArgumentException if no default constructor was found.
      */
     @NotNull
     public static <IN, OUT> InvocationFactory<IN, OUT> factoryOf(
@@ -67,8 +67,8 @@ public abstract class InvocationFactory<IN, OUT> {
      * @param <IN>            the input data type.
      * @param <OUT>           the output data type.
      * @return the invocation factory.
-     * @throws IllegalArgumentException if no constructor taking the specified objects as
-     *                                  parameters was found.
+     * @throws java.lang.IllegalArgumentException if no constructor taking the specified objects as
+     *                                            parameters was found.
      */
     @NotNull
     public static <IN, OUT> InvocationFactory<IN, OUT> factoryOf(
@@ -85,7 +85,7 @@ public abstract class InvocationFactory<IN, OUT> {
      * @param <IN>            the input data type.
      * @param <OUT>           the output data type.
      * @return the invocation factory.
-     * @throws IllegalArgumentException if no default constructor was found.
+     * @throws java.lang.IllegalArgumentException if no default constructor was found.
      */
     @NotNull
     public static <IN, OUT> InvocationFactory<IN, OUT> factoryOf(
@@ -109,8 +109,8 @@ public abstract class InvocationFactory<IN, OUT> {
      * @param <IN>            the input data type.
      * @param <OUT>           the output data type.
      * @return the invocation factory.
-     * @throws IllegalArgumentException if no constructor taking the specified objects as
-     *                                  parameters was found.
+     * @throws java.lang.IllegalArgumentException if no constructor taking the specified objects as
+     *                                            parameters was found.
      */
     @NotNull
     public static <IN, OUT> InvocationFactory<IN, OUT> factoryOf(
@@ -127,7 +127,7 @@ public abstract class InvocationFactory<IN, OUT> {
      * @param <IN>       the input data type.
      * @param <OUT>      the output data type.
      * @return the invocation factory.
-     * @throws IllegalArgumentException if no default constructor was found.
+     * @throws java.lang.IllegalArgumentException if no default constructor was found.
      */
     @NotNull
     @SuppressWarnings("unchecked")
@@ -152,8 +152,8 @@ public abstract class InvocationFactory<IN, OUT> {
      * @param <IN>       the input data type.
      * @param <OUT>      the output data type.
      * @return the invocation factory.
-     * @throws IllegalArgumentException if no constructor taking the specified objects as
-     *                                  parameters was found.
+     * @throws java.lang.IllegalArgumentException if no constructor taking the specified objects as
+     *                                            parameters was found.
      */
     @NotNull
     @SuppressWarnings("unchecked")
@@ -193,8 +193,8 @@ public abstract class InvocationFactory<IN, OUT> {
          *
          * @param invocationClass the invocation class.
          * @param args            the invocation constructor arguments.
-         * @throws IllegalArgumentException if no constructor taking the specified objects
-         *                                  as parameters was found.
+         * @throws java.lang.IllegalArgumentException if no constructor taking the specified objects
+         *                                            as parameters was found.
          */
         @SuppressWarnings("ConstantConditions")
         private DefaultInvocationFactory(

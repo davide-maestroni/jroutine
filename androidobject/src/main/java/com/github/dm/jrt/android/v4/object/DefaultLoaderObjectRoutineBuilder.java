@@ -56,6 +56,7 @@ import java.util.List;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.Reflection.findMethod;
+import static com.github.dm.jrt.object.Builders.callFromInvocation;
 
 /**
  * Class implementing a builder of routines wrapping an object methods.
@@ -543,8 +544,8 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 throw new IllegalStateException("the target object has been destroyed");
             }
 
-            Builders.callFromInvocation(mMutex, targetInstance, mTargetMethod, objects, result,
-                    mInputMode, mOutputMode);
+            callFromInvocation(mMutex, targetInstance, mTargetMethod, objects, result, mInputMode,
+                    mOutputMode);
         }
     }
 

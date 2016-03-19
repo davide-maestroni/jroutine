@@ -408,7 +408,7 @@ public interface LoaderStreamChannel<OUT>
      * Gets the loader configuration builder related only to the next concatenated routine instance.
      * Any further addition to the chain will retain only the stream configuration.<br/>
      * Only the options set in this configuration (that is, the ones with a value different from the
-     * default) will override the stream one.
+     * default) will override the stream ones.
      * <p/>
      * Note that the configuration builder will be initialized with the current configuration for
      * the next routine.

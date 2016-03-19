@@ -67,6 +67,8 @@ public class LoaderStreams extends Streams {
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
      * @see AndroidChannels#blend(Collection)
      */
     @NotNull
@@ -86,6 +88,8 @@ public class LoaderStreams extends Streams {
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.NullPointerException     if the specified array is null or contains a null
+     *                                            object.
      * @see AndroidChannels#blend(com.github.dm.jrt.core.channel.Channel.OutputChannel[])
      */
     @NotNull
@@ -107,6 +111,8 @@ public class LoaderStreams extends Streams {
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
      * @see AndroidChannels#concat(Collection)
      */
     @NotNull
@@ -128,6 +134,8 @@ public class LoaderStreams extends Streams {
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.NullPointerException     if the specified array is null or contains a null
+     *                                            object.
      * @see AndroidChannels#concat(com.github.dm.jrt.core.channel.Channel.OutputChannel[])
      */
     @NotNull
@@ -171,6 +179,8 @@ public class LoaderStreams extends Streams {
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
      * @see AndroidChannels#join(Collection)
      */
     @NotNull
@@ -191,6 +201,8 @@ public class LoaderStreams extends Streams {
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.NullPointerException     if the specified array is null or contains a null
+     *                                            object.
      * @see AndroidChannels#join(com.github.dm.jrt.core.channel.Channel.OutputChannel[])
      */
     @NotNull
@@ -215,6 +227,8 @@ public class LoaderStreams extends Streams {
      * @param <OUT>       the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
      * @see AndroidChannels#join(Object, Collection)
      */
     @NotNull
@@ -240,6 +254,8 @@ public class LoaderStreams extends Streams {
      * @param <OUT>       the output data type.
      * @return the stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.NullPointerException     if the specified array is null or contains a null
+     *                                            object.
      * @see AndroidChannels#join(Object, com.github.dm.jrt.core.channel.Channel.OutputChannel[])
      */
     @NotNull
@@ -252,7 +268,7 @@ public class LoaderStreams extends Streams {
     /**
      * Builds and returns a new lazy loader stream channel.<br/>
      * The stream will start producing results only when it is bound to another channel or an output
-     * consumer or when any of the read methods is invoked.
+     * consumer, or when any of the read methods is invoked.
      *
      * @param <OUT> the output data type.
      * @return the newly created stream instance.
@@ -266,7 +282,7 @@ public class LoaderStreams extends Streams {
     /**
      * Builds and returns a new lazy loader stream channel generating the specified outputs.<br/>
      * The stream will start producing results only when it is bound to another channel or an output
-     * consumer or when any of the read methods is invoked.
+     * consumer, or when any of the read methods is invoked.
      *
      * @param outputs the iterable returning the output data.
      * @param <OUT>   the output data type.
@@ -282,7 +298,7 @@ public class LoaderStreams extends Streams {
     /**
      * Builds and returns a new lazy loader stream channel generating the specified output.<br/>
      * The stream will start producing results only when it is bound to another channel or an output
-     * consumer or when any of the read methods is invoked.
+     * consumer, or when any of the read methods is invoked.
      *
      * @param output the output.
      * @param <OUT>  the output data type.
@@ -297,7 +313,7 @@ public class LoaderStreams extends Streams {
     /**
      * Builds and returns a new lazy loader stream channel generating the specified outputs.<br/>
      * The stream will start producing results only when it is bound to another channel or an output
-     * consumer or when any of the read methods is invoked.
+     * consumer, or when any of the read methods is invoked.
      *
      * @param outputs the output data.
      * @param <OUT>   the output data type.
@@ -312,7 +328,7 @@ public class LoaderStreams extends Streams {
     /**
      * Builds and returns a new lazy loader stream channel generating the specified outputs.<br/>
      * The stream will start producing results only when it is bound to another channel or an output
-     * consumer or when any of the read methods is invoked.
+     * consumer, or when any of the read methods is invoked.
      * <p/>
      * Note that the output channel will be bound as a result of the call.
      *
@@ -344,6 +360,8 @@ public class LoaderStreams extends Streams {
      * @param <OUT>      the output data type.
      * @return the selectable stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
      * @see AndroidChannels#merge(int, Collection)
      */
     @NotNull
@@ -366,6 +384,8 @@ public class LoaderStreams extends Streams {
      * @param <OUT>      the output data type.
      * @return the selectable stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.NullPointerException     if the specified array is null or contains a null
+     *                                            object.
      * @see AndroidChannels#merge(int, com.github.dm.jrt.core.channel.Channel.OutputChannel[])
      */
     @NotNull
@@ -387,6 +407,8 @@ public class LoaderStreams extends Streams {
      * @param <OUT>    the output data type.
      * @return the selectable stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
      * @see AndroidChannels#merge(Collection)
      */
     @NotNull
@@ -407,6 +429,8 @@ public class LoaderStreams extends Streams {
      * @param <OUT>    the output data type.
      * @return the selectable stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.NullPointerException     if the specified array is null or contains a null
+     *                                            object.
      * @see AndroidChannels#merge(com.github.dm.jrt.core.channel.Channel.OutputChannel[])
      */
     @NotNull
@@ -426,6 +450,8 @@ public class LoaderStreams extends Streams {
      * @param <OUT>    the output data type.
      * @return the selectable stream channel builder.
      * @throws java.lang.IllegalArgumentException if the specified map is empty.
+     * @throws java.lang.NullPointerException     if the specified map is null or contains a null
+     *                                            object.
      * @see SparseChannels#merge(SparseArray)
      */
     @NotNull
@@ -462,7 +488,7 @@ public class LoaderStreams extends Streams {
                                                                                      .getName());
         }
 
-        return com.github.dm.jrt.stream.Streams.onStream(function);
+        return Streams.onStream(function);
     }
 
     /**
@@ -545,6 +571,8 @@ public class LoaderStreams extends Streams {
      * @param indexes the list of indexes.
      * @param <OUT>   the output data type.
      * @return the map of indexes and output channels builder.
+     * @throws java.lang.NullPointerException if the specified array is null or contains a null
+     *                                        object.
      * @see AndroidChannels#select(com.github.dm.jrt.core.channel.Channel.OutputChannel, int...)
      */
     @NotNull
@@ -567,6 +595,8 @@ public class LoaderStreams extends Streams {
      * @param indexes the iterable returning the channel indexes.
      * @param <OUT>   the output data type.
      * @return the map of indexes and output channels builder.
+     * @throws java.lang.NullPointerException if the specified iterable is null or returns a null
+     *                                        object.
      * @see AndroidChannels#select(com.github.dm.jrt.core.channel.Channel.OutputChannel, Iterable)
      */
     @NotNull

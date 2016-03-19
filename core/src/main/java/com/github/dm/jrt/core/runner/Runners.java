@@ -98,6 +98,7 @@ public class Runners {
     @NotNull
     public static PriorityRunner priorityRunner(@NotNull final Runner wrapped) {
 
+        // TODO: 19/03/16 sync runners will not work...
         return PriorityRunner.getInstance(wrapped);
     }
 

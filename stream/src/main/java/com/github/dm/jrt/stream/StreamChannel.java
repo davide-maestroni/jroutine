@@ -304,7 +304,8 @@ public interface StreamChannel<OUT>
 
     /**
      * Short for {@code withStreamInvocations().withOutputOrder(orderType).getConfigured()}.<br/>
-     * This method is useful to easily make the stream ordered or not.<br/>
+     * This method is useful to easily make the stream ordered or not.
+     * <p/>
      * Note that an ordered stream has a slightly increased cost in memory and computation.
      *
      * @return the configured stream.
@@ -368,7 +369,8 @@ public interface StreamChannel<OUT>
 
     /**
      * Returns a new stream repeating the output data to any newly bound channel or consumer, thus
-     * effectively supporting multiple binding.<br/>
+     * effectively supporting multiple binding.
+     * <p/>
      * Note that this stream will be bound as a result of the call.
      *
      * @return the repeating stream.
@@ -379,7 +381,8 @@ public interface StreamChannel<OUT>
     /**
      * Short for {@code withStreamInvocations().withRunner(runner).getConfigured().asyncMap(
      * Function.<OUT>identity())}.<br/>
-     * This method is useful to easily make the stream run on the specified runner.<br/>
+     * This method is useful to easily make the stream run on the specified runner.
+     * <p/>
      * Note that it is not necessary to explicitly concatenate a routine to have a stream delivering
      * the output data with the specified runner.
      *
@@ -514,7 +517,8 @@ public interface StreamChannel<OUT>
 
     /**
      * Returns a new stream making this one selectable.<br/>
-     * Each output will be passed along unchanged.<br/>
+     * Each output will be passed along unchanged.
+     * <p/>
      * Note that this stream will be bound as a result of the call.
      *
      * @param index the stream index.

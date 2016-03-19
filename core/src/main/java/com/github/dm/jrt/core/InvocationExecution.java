@@ -230,13 +230,6 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
         boolean hasInput();
 
         /**
-         * Checks if the input channel is aborting the execution.
-         *
-         * @return whether the execution is aborting.
-         */
-        boolean isAborting();
-
-        /**
          * Gets the next input.
          *
          * @return the input.
@@ -273,8 +266,6 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
      */
     private class AbortExecution extends TemplateExecution implements InvocationObserver<IN, OUT> {
 
-        private int mAbortExecutionCount = 1;
-
         public void onCreate(@NotNull final Invocation<IN, OUT> invocation) {
 
             synchronized (mMutex) {
@@ -282,45 +273,36 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
                 final InputIterator<IN> inputIterator = mInputIterator;
                 final InvocationManager<IN, OUT> manager = mInvocationManager;
                 final DefaultResultChannel<OUT> resultChannel = mResultChannel;
-                final int count = mAbortExecutionCount;
-                mAbortExecutionCount = 1;
                 try {
                     resultChannel.enterInvocation();
-                    for (int i = 0; i < count; ++i) {
-                        if (!inputIterator.isAborting()) {
-                            mLogger.wrn("avoiding aborting since input is already aborted");
-                            return;
-                        }
-
-                        final RoutineException exception = inputIterator.getAbortException();
-                        mLogger.dbg(exception, "aborting invocation");
-                        try {
-                            if (!mIsTerminated) {
-                                if (mInvocation == null) {
-                                    mInvocation = invocation;
-                                    mLogger.dbg("initializing invocation: %s", invocation);
-                                    invocation.onInitialize();
-                                    mIsInitialized = true;
-                                }
-
-                                if (mIsInitialized) {
-                                    invocation.onAbort(exception);
-                                    mIsTerminated = true;
-                                    invocation.onTerminate();
-                                    manager.recycle(invocation);
-
-                                } else {
-                                    // Initialization failed, so just discard the invocation
-                                    manager.discard(invocation);
-                                }
+                    final RoutineException exception = inputIterator.getAbortException();
+                    mLogger.dbg(exception, "aborting invocation");
+                    try {
+                        if (!mIsTerminated) {
+                            if (mInvocation == null) {
+                                mInvocation = invocation;
+                                mLogger.dbg("initializing invocation: %s", invocation);
+                                invocation.onInitialize();
+                                mIsInitialized = true;
                             }
 
-                            resultChannel.close(exception);
+                            if (mIsInitialized) {
+                                invocation.onAbort(exception);
+                                mIsTerminated = true;
+                                invocation.onTerminate();
+                                manager.recycle(invocation);
 
-                        } catch (final Throwable t) {
-                            manager.discard(invocation);
-                            resultChannel.close(t);
+                            } else {
+                                // Initialization failed, so just discard the invocation
+                                manager.discard(invocation);
+                            }
                         }
+
+                        resultChannel.close(exception);
+
+                    } catch (final Throwable t) {
+                        manager.discard(invocation);
+                        resultChannel.close(t);
                     }
 
                 } finally {
@@ -345,7 +327,6 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
             final Invocation<IN, OUT> invocation;
             synchronized (mMutex) {
                 if (mIsWaitingAbortInvocation) {
-                    ++mAbortExecutionCount;
                     return;
                 }
 

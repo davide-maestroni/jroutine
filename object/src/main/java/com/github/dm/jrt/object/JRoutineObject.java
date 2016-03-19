@@ -76,7 +76,8 @@ public class JRoutineObject {
     }
 
     /**
-     * Returns a routine builder wrapping the specified target object.<br/>
+     * Returns a routine builder wrapping the specified target object.
+     * <p/>
      * Note that it is responsibility of the caller to retain a strong reference to the target
      * instance to prevent it from being garbage collected.<br/>
      * Note also that the invocation input data will be cached, and the results will be produced

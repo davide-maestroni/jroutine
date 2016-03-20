@@ -142,7 +142,7 @@ public class JRoutineLoaderCompat {
      * Returns a context based builder of loader routine builders.
      *
      * @param context the loader context.
-     * @return the context builder.
+     * @return the context based builder.
      */
     @NotNull
     public static LoaderBuilderCompat with(@NotNull final LoaderContextCompat context) {

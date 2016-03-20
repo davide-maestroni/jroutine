@@ -24,6 +24,7 @@ import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.core.DecoratingService.StringInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
+import com.github.dm.jrt.android.core.invocation.TargetInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.routine.Routine;
@@ -32,7 +33,7 @@ import com.github.dm.jrt.core.util.ClassToken;
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
-import static com.github.dm.jrt.android.core.TargetInvocationFactory.factoryOf;
+import static com.github.dm.jrt.android.core.invocation.TargetInvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.core.util.TimeDuration.millis;
 import static com.github.dm.jrt.core.util.TimeDuration.seconds;

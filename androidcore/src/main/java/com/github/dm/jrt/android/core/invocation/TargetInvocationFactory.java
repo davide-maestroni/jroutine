@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android.core;
+package com.github.dm.jrt.android.core.invocation;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.Reflection;
 
@@ -32,6 +31,30 @@ import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 
 /**
  * Class representing a context invocation factory target.
+ * <p/>
+ * It is possible to create a target invocation factory of a common invocation by either defining a
+ * specialized class like:
+ * <pre>
+ *     <code>
+ *
+ *         public class MyInvocationWrapper&lt;IN, OUT&gt;
+ *                 extends ContextInvocationWrapper&lt;IN, OUT&gt; {
+ *
+ *             public MyInvocationWrapper() {
+ *
+ *                 super(new MyInvocation&lt;IN, OUT&gt;(2, "name"));
+ *             }
+ *         }
+ *     </code>
+ * </pre>
+ * or via reflection like:
+ * <pre>
+ *     <code>
+ *
+ *         TargetInvocationFactory.factoryOf(ContextInvocationWrapper.class, MyInvocation.class,
+ *                 Reflection.asArgs(2, "name"));
+ *     </code>
+ * </pre>
  * <p/>
  * Created by davide-maestroni on 08/20/2015.
  *

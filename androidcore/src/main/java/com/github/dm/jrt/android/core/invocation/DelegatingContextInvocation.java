@@ -14,11 +14,8 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android.core;
+package com.github.dm.jrt.android.core.invocation;
 
-import com.github.dm.jrt.android.core.invocation.ContextInvocation;
-import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
-import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
 import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;

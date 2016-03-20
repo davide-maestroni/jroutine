@@ -25,6 +25,7 @@ import android.test.ActivityInstrumentationTestCase2;
 import com.github.dm.jrt.android.core.config.ServiceConfiguration;
 import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationWrapper;
+import com.github.dm.jrt.android.core.invocation.TargetInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
 import com.github.dm.jrt.android.core.log.AndroidLog;
 import com.github.dm.jrt.android.core.runner.MainRunner;
@@ -49,7 +50,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
-import static com.github.dm.jrt.android.core.TargetInvocationFactory.factoryOf;
+import static com.github.dm.jrt.android.core.invocation.TargetInvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.core.util.TimeDuration.millis;
 import static com.github.dm.jrt.core.util.TimeDuration.seconds;

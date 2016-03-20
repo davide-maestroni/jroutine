@@ -20,8 +20,10 @@ import android.content.Context;
 
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationDecorator;
+import com.github.dm.jrt.core.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Implementation of a platform specific Android invocation wrapping a base invocation instance.
@@ -42,6 +44,42 @@ public class ContextInvocationWrapper<IN, OUT> extends InvocationDecorator<IN, O
     public ContextInvocationWrapper(@NotNull final Invocation<IN, OUT> invocation) {
 
         super(invocation);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param invocationClass the wrapped invocation class.
+     * @throws java.lang.ReflectiveOperationException if the invocation instantiation failed.
+     */
+    public ContextInvocationWrapper(
+            @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass) throws
+            ReflectiveOperationException {
+
+        this(invocationClass, (Object[]) null);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param invocationClass the wrapped invocation class.
+     * @param invocationArgs  the invocation constructor arguments
+     * @throws java.lang.ReflectiveOperationException if the invocation instantiation failed.
+     */
+    public ContextInvocationWrapper(
+            @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass,
+            @Nullable final Object... invocationArgs) throws ReflectiveOperationException {
+
+        this(newInvocation(invocationClass, invocationArgs));
+    }
+
+    @NotNull
+    private static <IN, OUT> Invocation<IN, OUT> newInvocation(
+            @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass,
+            @Nullable final Object... invocationArgs) throws ReflectiveOperationException {
+
+        final Object[] args = (invocationArgs != null) ? invocationArgs : Reflection.NO_ARGS;
+        return Reflection.findConstructor(invocationClass, args).newInstance(args);
     }
 
     public void onContext(@NotNull final Context context) {

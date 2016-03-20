@@ -68,6 +68,23 @@ public abstract class ContextInvocationFactory<IN, OUT> {
     }
 
     /**
+     * Builds and returns a new context invocation factory wrapping the specified one.
+     *
+     * @param factory the invocation factory.
+     * @param <IN>    the input data type.
+     * @param <OUT>   the output data type.
+     * @return the invocation factory.
+     * @throws java.lang.IllegalArgumentException if the class of the specified factory has not a
+     *                                            static scope.
+     */
+    @NotNull
+    public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryFrom(
+            @NotNull final InvocationFactory<IN, OUT> factory) {
+
+        return new WrappingContextInvocationFactory<IN, OUT>(factory);
+    }
+
+    /**
      * Builds and returns a new context invocation factory creating instances of the specified
      * class.
      * <p/>
@@ -211,7 +228,8 @@ public abstract class ContextInvocationFactory<IN, OUT> {
     public abstract ContextInvocation<IN, OUT> newInvocation() throws Exception;
 
     /**
-     * Implementation of an invocation factory.
+     * Implementation of an invocation factory adapting context invocations to be used as common
+     * ones.
      *
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
@@ -293,6 +311,44 @@ public abstract class ContextInvocationFactory<IN, OUT> {
         public ContextInvocation<IN, OUT> newInvocation() throws Exception {
 
             return (ContextInvocation<IN, OUT>) mFactory.newInvocation();
+        }
+    }
+
+    /**
+     * Implementation of a context invocation factory wrapping common invocations.
+     *
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
+     */
+    private static class WrappingContextInvocationFactory<IN, OUT>
+            extends ContextInvocationFactory<IN, OUT> {
+
+        private final InvocationFactory<IN, OUT> mFactory;
+
+        /**
+         * Constructor.
+         *
+         * @param factory the invocation factory.
+         */
+        private WrappingContextInvocationFactory(
+                @NotNull final InvocationFactory<IN, OUT> factory) {
+
+            super(asArgs(factory));
+            final Class<? extends InvocationFactory> factoryClass = factory.getClass();
+            if (!Reflection.hasStaticScope(factoryClass)) {
+                throw new IllegalArgumentException(
+                        "the invocation factory class must have a static scope: "
+                                + factoryClass.getName());
+            }
+
+            mFactory = factory;
+        }
+
+        @NotNull
+        @Override
+        public ContextInvocation<IN, OUT> newInvocation() throws Exception {
+
+            return new ContextInvocationWrapper<IN, OUT>(mFactory.newInvocation());
         }
     }
 }

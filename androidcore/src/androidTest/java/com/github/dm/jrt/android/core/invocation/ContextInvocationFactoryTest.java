@@ -23,13 +23,16 @@ import android.test.ActivityInstrumentationTestCase2;
 import com.github.dm.jrt.android.core.TestActivity;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.util.ClassToken;
 
 import org.jetbrains.annotations.NotNull;
 
+import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryFrom;
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryOf;
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.fromFactory;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -45,7 +48,7 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
         super(TestActivity.class);
     }
 
-    public void testClass() throws Exception {
+    public void testClass() {
 
         assertThat(JRoutineCore.on(fromFactory(getActivity(), factoryOf(Case.class)))
                                .syncCall("TEST")
@@ -56,7 +59,7 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
     }
 
     @SuppressWarnings("ConstantConditions")
-    public void testClassError() throws Exception {
+    public void testClassError() {
 
         try {
             factoryOf((Class<Case>) null);
@@ -75,7 +78,28 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
         }
     }
 
-    public void testToken() throws Exception {
+    public void testFromFactory() {
+
+        final InvocationFactory<String, String> factory =
+                fromFactory(getActivity(), factoryOf(tokenOf(Case.class)));
+        assertThat(JRoutineCore.on(fromFactory(getActivity(), factoryFrom(factory)))
+                               .syncCall("TEST")
+                               .all()).containsExactly("test");
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public void testFromFactoryError() {
+
+        try {
+            factoryFrom(null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    public void testToken() {
 
         assertThat(JRoutineCore.on(fromFactory(getActivity(), factoryOf(tokenOf(Case.class))))
                                .syncCall("TEST")
@@ -86,7 +110,7 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
     }
 
     @SuppressWarnings("ConstantConditions")
-    public void testTokenError() throws Exception {
+    public void testTokenError() {
 
         try {
             factoryOf((ClassToken<Case>) null);
@@ -105,6 +129,26 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
         }
     }
 
+    public void testWrapper() {
+
+        assertThat(JRoutineCore.on(fromFactory(getActivity(), factoryOf(CaseWrapper.class)))
+                               .syncCall("TEST")
+                               .all()).containsExactly("test");
+        assertThat(JRoutineCore.on(fromFactory(getActivity(), factoryOf(CaseWrapper.class, true)))
+                               .syncCall("test")
+                               .all()).containsExactly("TEST");
+        final ClassToken<ContextInvocationWrapper<String, String>> classToken =
+                new ClassToken<ContextInvocationWrapper<String, String>>() {};
+        assertThat(JRoutineCore.on(fromFactory(getActivity(), factoryOf(classToken, Case.class)))
+                               .syncCall("TEST")
+                               .all()).containsExactly("test");
+        assertThat(JRoutineCore.on(
+                fromFactory(getActivity(), factoryOf(classToken, Case.class, asArgs(true))))
+                               .syncCall("test")
+                               .all()).containsExactly("TEST");
+    }
+
+    @SuppressWarnings("unused")
     public static class Case extends TemplateContextInvocation<String, String> {
 
         private final boolean mIsUpper;
@@ -124,6 +168,20 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
                 Exception {
 
             result.pass(mIsUpper ? input.toUpperCase() : input.toLowerCase());
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public static class CaseWrapper extends ContextInvocationWrapper<String, String> {
+
+        public CaseWrapper() {
+
+            super(new Case());
+        }
+
+        public CaseWrapper(final boolean isUpper) {
+
+            super(new Case(isUpper));
         }
     }
 }

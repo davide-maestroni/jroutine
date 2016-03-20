@@ -41,7 +41,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.List;
 
-import static com.github.dm.jrt.android.core.DelegatingContextInvocation.factoryFrom;
+import static com.github.dm.jrt.android.core.invocation.DelegatingContextInvocation.factoryFrom;
 
 /**
  * Utility class acting as a factory of stream output channels.

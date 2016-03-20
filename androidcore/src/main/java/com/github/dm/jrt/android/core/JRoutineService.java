@@ -17,6 +17,7 @@
 package com.github.dm.jrt.android.core;
 
 import com.github.dm.jrt.android.core.builder.ServiceRoutineBuilder;
+import com.github.dm.jrt.android.core.invocation.TargetInvocationFactory;
 import com.github.dm.jrt.android.core.log.AndroidLogs;
 import com.github.dm.jrt.core.log.Logger;
 
@@ -92,7 +93,7 @@ public class JRoutineService {
      * Returns a context based builder of service routine builders.
      *
      * @param context the service context.
-     * @return the context builder.
+     * @return the context based builder.
      */
     @NotNull
     public static ServiceBuilder with(@NotNull final ServiceContext context) {

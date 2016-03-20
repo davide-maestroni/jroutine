@@ -36,9 +36,9 @@ import com.github.dm.jrt.core.util.ClassToken;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryOf;
-import static com.github.dm.jrt.android.object.ContextInvocationTarget.classOfType;
-import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceOf;
+import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
 
 /**
  * Created by davide-maestroni on 03/06/2016.
@@ -48,20 +48,112 @@ public class JRoutineAndroid extends SparseChannels {
     /**
      * Returns a context based builder of loader routine builders.
      *
-     * @param context the loader context.
-     * @return the context builder.
+     * @param activity the loader activity.
+     * @return the context based builder.
      */
     @NotNull
-    public static LoaderContextBuilder with(@NotNull final LoaderContext context) {
+    public static LoaderBuilder with(@NotNull final Activity activity) {
 
-        return new LoaderContextBuilder(context);
+        return with(loaderFrom(activity));
+    }
+
+    /**
+     * Returns a context based builder of loader routine builders.
+     *
+     * @param activity the loader activity.
+     * @param context  the context used to get the application one.
+     * @return the context based builder.
+     */
+    @NotNull
+    public static LoaderBuilder with(@NotNull final Activity activity,
+            @NotNull final Context context) {
+
+        return with(loaderFrom(activity, context));
     }
 
     /**
      * Returns a context based builder of service routine builders.
      *
      * @param context the service context.
-     * @return the context builder.
+     * @return the context based builder.
+     */
+    @NotNull
+    public static ServiceContextBuilder with(@NotNull final Context context) {
+
+        return with(serviceFrom(context));
+    }
+
+    /**
+     * Returns a context based builder of service routine builders.
+     *
+     * @param context      the service context.
+     * @param serviceClass the service class.
+     * @return the context based builder.
+     */
+    @NotNull
+    public static ServiceContextBuilder with(@NotNull final Context context,
+            @NotNull final Class<? extends InvocationService> serviceClass) {
+
+        return with(serviceFrom(context, serviceClass));
+    }
+
+    /**
+     * Returns a context based builder of service routine builders.
+     *
+     * @param context the service context.
+     * @param service the service intent.
+     * @return the context based builder.
+     */
+    @NotNull
+    public static ServiceContextBuilder with(@NotNull final Context context,
+            @NotNull final Intent service) {
+
+        return with(serviceFrom(context, service));
+    }
+
+    /**
+     * Returns a context based builder of loader routine builders.
+     *
+     * @param fragment the loader fragment.
+     * @return the context based builder.
+     */
+    @NotNull
+    public static LoaderBuilder with(@NotNull final Fragment fragment) {
+
+        return with(loaderFrom(fragment));
+    }
+
+    /**
+     * Returns a context based builder of loader routine builders.
+     *
+     * @param fragment the loader fragment.
+     * @param context  the context used to get the application one.
+     * @return the context based builder.
+     */
+    @NotNull
+    public static LoaderBuilder with(@NotNull final Fragment fragment,
+            @NotNull final Context context) {
+
+        return with(loaderFrom(fragment, context));
+    }
+
+    /**
+     * Returns a context based builder of loader routine builders.
+     *
+     * @param context the loader context.
+     * @return the context based builder.
+     */
+    @NotNull
+    public static LoaderBuilder with(@NotNull final LoaderContext context) {
+
+        return new LoaderBuilder(context);
+    }
+
+    /**
+     * Returns a context based builder of service routine builders.
+     *
+     * @param context the service context.
+     * @return the context based builder.
      */
     @NotNull
     public static ServiceContextBuilder with(@NotNull final ServiceContext context) {
@@ -69,53 +161,10 @@ public class JRoutineAndroid extends SparseChannels {
         return new ServiceContextBuilder(context);
     }
 
-    @NotNull
-    public static LoaderContextBuilder withLoader(@NotNull final Activity activity) {
-
-        return with(LoaderContext.loaderFrom(activity));
-    }
-
-    @NotNull
-    public static LoaderContextBuilder withLoader(@NotNull final Activity activity,
-            @NotNull final Context context) {
-
-        return with(LoaderContext.loaderFrom(activity, context));
-    }
-
-    @NotNull
-    public static LoaderContextBuilder withLoader(@NotNull final Fragment fragment) {
-
-        return with(LoaderContext.loaderFrom(fragment));
-    }
-
-    @NotNull
-    public static LoaderContextBuilder withLoader(@NotNull final Fragment fragment,
-            @NotNull final Context context) {
-
-        return with(LoaderContext.loaderFrom(fragment, context));
-    }
-
-    @NotNull
-    public static ServiceContextBuilder withService(@NotNull final Context context) {
-
-        return with(ServiceContext.serviceFrom(context));
-    }
-
-    @NotNull
-    public static ServiceContextBuilder withService(@NotNull final Context context,
-            @NotNull final Class<? extends InvocationService> serviceClass) {
-
-        return with(ServiceContext.serviceFrom(context, serviceClass));
-    }
-
-    @NotNull
-    public static ServiceContextBuilder withService(@NotNull final Context context,
-            @NotNull final Intent service) {
-
-        return with(ServiceContext.serviceFrom(context, service));
-    }
-
-    public static class LoaderContextBuilder {
+    /**
+     * Context based builder of loader routine builders.
+     */
+    public static class LoaderBuilder {
 
         private final LoaderContext mContext;
 
@@ -125,13 +174,75 @@ public class JRoutineAndroid extends SparseChannels {
          * @param context the loader context.
          */
         @SuppressWarnings("ConstantConditions")
-        private LoaderContextBuilder(@NotNull final LoaderContext context) {
+        private LoaderBuilder(@NotNull final LoaderContext context) {
 
             if (context == null) {
                 throw new NullPointerException("the loader context must not be null");
             }
 
             mContext = context;
+        }
+
+        /**
+         * Returns a builder of routines bound to the builder context, wrapping the specified
+         * target class.<br/>
+         * In order to customize the object creation, the caller must employ an implementation of a
+         * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
+         * application context.
+         * <p/>
+         * Note that the built routine results will be always dispatched on the configured looper
+         * thread, thus waiting for the outputs immediately after its invocation may result in a
+         * deadlock.
+         *
+         * @param targetClass the invocation target class.
+         * @return the routine builder instance.
+         */
+        @NotNull
+        public LoaderTargetRoutineBuilder classOfType(@NotNull final Class<?> targetClass) {
+
+            return on(ContextInvocationTarget.classOfType(targetClass));
+        }
+
+        /**
+         * Returns a builder of routines bound to the builder context, wrapping the specified
+         * target object.<br/>
+         * In order to customize the object creation, the caller must employ an implementation of a
+         * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
+         * application context.
+         * <p/>
+         * Note that the built routine results will be always dispatched on the configured looper
+         * thread, thus waiting for the outputs immediately after its invocation may result in a
+         * deadlock.
+         *
+         * @param targetClass the class of the invocation target.
+         * @return the routine builder instance.
+         */
+        @NotNull
+        public LoaderTargetRoutineBuilder instanceOf(@NotNull final Class<?> targetClass) {
+
+            return on(ContextInvocationTarget.instanceOf(targetClass));
+        }
+
+        /**
+         * Returns a builder of routines bound to the builder context, wrapping the specified
+         * target object.<br/>
+         * In order to customize the object creation, the caller must employ an implementation of a
+         * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
+         * application context.
+         * <p/>
+         * Note that the built routine results will be always dispatched on the configured looper
+         * thread, thus waiting for the outputs immediately after its invocation may result in a
+         * deadlock.
+         *
+         * @param targetClass the class of the invocation target.
+         * @param factoryArgs the object factory arguments.
+         * @return the routine builder instance.
+         */
+        @NotNull
+        public LoaderTargetRoutineBuilder instanceOf(@NotNull final Class<?> targetClass,
+                @Nullable final Object... factoryArgs) {
+
+            return on(ContextInvocationTarget.instanceOf(targetClass, factoryArgs));
         }
 
         /**
@@ -156,6 +267,8 @@ public class JRoutineAndroid extends SparseChannels {
 
             return on(factoryOf(invocationClass));
         }
+
+        // TODO: 18/03/16 on Invocation?
 
         /**
          * Returns a routine builder based on an invocation factory creating instances of the
@@ -232,7 +345,55 @@ public class JRoutineAndroid extends SparseChannels {
             return on(factoryOf(invocationToken, args));
         }
 
-        // TODO: 18/03/16 on invocation instance? on Invocation?
+        /**
+         * Returns a routine builder based on an invocation factory creating instances of the
+         * specified object.
+         * <p/>
+         * Note that inner and anonymous objects can be passed as well. Remember however that Java
+         * creates synthetic constructors for such classes, so be sure to specify the correct
+         * arguments to guarantee proper instantiation.
+         *
+         * @param invocation the invocation instance.
+         * @param <IN>       the input data type.
+         * @param <OUT>      the output data type.
+         * @return the routine builder instance.
+         * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
+         *                                            not a static scope or no default construct is
+         *                                            found.
+         */
+        @NotNull
+        @SuppressWarnings("unchecked")
+        public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
+                @NotNull final ContextInvocation<IN, OUT> invocation) {
+
+            return on(factoryOf(invocation.getClass()));
+        }
+
+        /**
+         * Returns a routine builder based on an invocation factory creating instances of the
+         * specified object.
+         * <p/>
+         * Note that inner and anonymous objects can be passed as well. Remember however that Java
+         * creates synthetic constructors for such classes, so be sure to specify the correct
+         * arguments to guarantee proper instantiation.
+         *
+         * @param invocation the invocation instance.
+         * @param args       the invocation constructor arguments.
+         * @param <IN>       the input data type.
+         * @param <OUT>      the output data type.
+         * @return the routine builder instance.
+         * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
+         *                                            not a static scope or no default construct is
+         *                                            found.
+         */
+        @NotNull
+        @SuppressWarnings("unchecked")
+        public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
+                @NotNull final ContextInvocation<IN, OUT> invocation,
+                @Nullable final Object... args) {
+
+            return on(factoryOf(invocation.getClass(), args));
+        }
 
         /**
          * Returns a builder of routines bound to the builder context.<br/>
@@ -280,12 +441,6 @@ public class JRoutineAndroid extends SparseChannels {
             return new DefaultLoaderTargetRoutineBuilder(mContext, target);
         }
 
-        @NotNull
-        public LoaderTargetRoutineBuilder onClass(@NotNull final Class<?> targetClass) {
-
-            return on(classOfType(targetClass));
-        }
-
         /**
          * Returns a builder of output channels bound to the loader identified by the specified ID.
          * <br/>
@@ -305,19 +460,6 @@ public class JRoutineAndroid extends SparseChannels {
         public LoaderChannelBuilder onId(final int loaderId) {
 
             return JRoutineLoader.with(mContext).onId(loaderId);
-        }
-
-        @NotNull
-        public LoaderTargetRoutineBuilder onInstance(@NotNull final Class<?> targetClass) {
-
-            return on(instanceOf(targetClass));
-        }
-
-        @NotNull
-        public LoaderTargetRoutineBuilder onInstance(@NotNull final Class<?> targetClass,
-                @Nullable final Object... factoryArgs) {
-
-            return on(instanceOf(targetClass, factoryArgs));
         }
     }
 }

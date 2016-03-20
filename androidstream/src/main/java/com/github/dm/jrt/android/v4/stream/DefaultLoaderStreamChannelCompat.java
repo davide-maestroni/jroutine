@@ -55,7 +55,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.dm.jrt.android.core.DelegatingContextInvocation.factoryFrom;
+import static com.github.dm.jrt.android.core.invocation.DelegatingContextInvocation.factoryFrom;
 import static com.github.dm.jrt.function.Functions.wrap;
 
 /**

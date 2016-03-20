@@ -50,8 +50,6 @@ import static com.github.dm.jrt.function.Functions.functionFilter;
 import static com.github.dm.jrt.function.Functions.predicateFilter;
 import static com.github.dm.jrt.function.Functions.supplierCommand;
 import static com.github.dm.jrt.function.Functions.supplierFactory;
-import static com.github.dm.jrt.object.InvocationTarget.classOfType;
-import static com.github.dm.jrt.object.InvocationTarget.instance;
 
 /**
  * Class acting as a façade of all the JRoutine library features.
@@ -97,6 +95,25 @@ public class JRoutineFacade extends Channels {
             @NotNull final Function<? super List<IN>, ? extends OUT> function) {
 
         return JRoutineCore.on(functionCall(function));
+    }
+
+    /**
+     * Returns a routine builder wrapping the specified class.
+     * <p/>
+     * Note that it is responsibility of the caller to retain a strong reference to the target
+     * instance to prevent it from being garbage collected.<br/>
+     * Note also that the invocation input data will be cached, and the results will be produced
+     * only after the invocation channel is closed, so be sure to avoid streaming inputs in
+     * order to prevent starvation or out of memory errors.
+     *
+     * @param targetClass the target class.
+     * @return the routine builder instance.
+     * @throws java.lang.IllegalArgumentException if the specified class represents an interface.
+     */
+    @NotNull
+    public static TargetRoutineBuilder classOfType(@NotNull final Class<?> targetClass) {
+
+        return new DefaultTargetRoutineBuilder(InvocationTarget.classOfType(targetClass));
     }
 
     /**
@@ -184,6 +201,24 @@ public class JRoutineFacade extends Channels {
             @NotNull final Predicate<? super IN> predicate) {
 
         return JRoutineCore.on(predicateFilter(predicate));
+    }
+
+    /**
+     * Returns a routine builder wrapping the specified object.
+     * <p/>
+     * Note that it is responsibility of the caller to retain a strong reference to the target
+     * instance to prevent it from being garbage collected.<br/>
+     * Note also that the invocation input data will be cached, and the results will be produced
+     * only after the invocation channel is closed, so be sure to avoid streaming inputs in
+     * order to prevent starvation or out of memory errors.
+     *
+     * @param object the target object.
+     * @return the routine builder instance.
+     */
+    @NotNull
+    public static TargetRoutineBuilder instance(@NotNull final Object object) {
+
+        return new DefaultTargetRoutineBuilder(InvocationTarget.instance(object));
     }
 
     /**
@@ -410,15 +445,7 @@ public class JRoutineFacade extends Channels {
     @NotNull
     public static TargetRoutineBuilder on(@NotNull final Object object) {
 
-        final InvocationTarget<?> target;
-        if (object instanceof Class) {
-            target = classOfType((Class<?>) object);
-
-        } else {
-            target = instance(object);
-        }
-
-        return new DefaultTargetRoutineBuilder(target);
+        return (object instanceof Class) ? classOfType((Class<?>) object) : instance(object);
     }
 
     /**

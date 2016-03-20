@@ -47,6 +47,52 @@ import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
  */
 public class JRoutineAndroidCompat extends SparseChannelsCompat {
 
+    @NotNull
+    public static ServiceContextBuilder with(@NotNull final Context context) {
+
+        return with(serviceFrom(context));
+    }
+
+    @NotNull
+    public static ServiceContextBuilder with(@NotNull final Context context,
+            @NotNull final Class<? extends InvocationService> serviceClass) {
+
+        return with(serviceFrom(context, serviceClass));
+    }
+
+    @NotNull
+    public static ServiceContextBuilder with(@NotNull final Context context,
+            @NotNull final Intent service) {
+
+        return with(serviceFrom(context, service));
+    }
+
+    @NotNull
+    public static LoaderContextBuilderCompat with(@NotNull final Fragment fragment) {
+
+        return with(loaderFrom(fragment));
+    }
+
+    @NotNull
+    public static LoaderContextBuilderCompat with(@NotNull final Fragment fragment,
+            @NotNull final Context context) {
+
+        return with(loaderFrom(fragment, context));
+    }
+
+    @NotNull
+    public static LoaderContextBuilderCompat with(@NotNull final FragmentActivity activity) {
+
+        return with(loaderFrom(activity));
+    }
+
+    @NotNull
+    public static LoaderContextBuilderCompat with(@NotNull final FragmentActivity activity,
+            @NotNull final Context context) {
+
+        return with(loaderFrom(activity, context));
+    }
+
     /**
      * Returns a context based builder of loader routine builders.
      *
@@ -69,52 +115,6 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
     public static ServiceContextBuilder with(@NotNull final ServiceContext context) {
 
         return new ServiceContextBuilder(context);
-    }
-
-    @NotNull
-    public static LoaderContextBuilderCompat withLoader(@NotNull final FragmentActivity activity) {
-
-        return with(loaderFrom(activity));
-    }
-
-    @NotNull
-    public static LoaderContextBuilderCompat withLoader(@NotNull final FragmentActivity activity,
-            @NotNull final Context context) {
-
-        return with(loaderFrom(activity, context));
-    }
-
-    @NotNull
-    public static LoaderContextBuilderCompat withLoader(@NotNull final Fragment fragment) {
-
-        return with(loaderFrom(fragment));
-    }
-
-    @NotNull
-    public static LoaderContextBuilderCompat withLoader(@NotNull final Fragment fragment,
-            @NotNull final Context context) {
-
-        return with(loaderFrom(fragment, context));
-    }
-
-    @NotNull
-    public static ServiceContextBuilder withService(@NotNull final Context context) {
-
-        return with(serviceFrom(context));
-    }
-
-    @NotNull
-    public static ServiceContextBuilder withService(@NotNull final Context context,
-            @NotNull final Class<? extends InvocationService> serviceClass) {
-
-        return with(serviceFrom(context, serviceClass));
-    }
-
-    @NotNull
-    public static ServiceContextBuilder withService(@NotNull final Context context,
-            @NotNull final Intent service) {
-
-        return with(serviceFrom(context, service));
     }
 
     public static class LoaderContextBuilderCompat {

@@ -31,14 +31,18 @@ import com.github.dm.jrt.android.object.ContextInvocationTarget;
 import com.github.dm.jrt.android.v11.channel.SparseChannels;
 import com.github.dm.jrt.android.v11.core.JRoutineLoader;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
+import com.github.dm.jrt.core.invocation.Invocation;
+import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.util.ClassToken;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
+import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryFrom;
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryOf;
 import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
+import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 
 /**
  * Created by davide-maestroni on 03/06/2016.
@@ -78,7 +82,7 @@ public class JRoutineAndroid extends SparseChannels {
      * @return the context based builder.
      */
     @NotNull
-    public static ServiceContextBuilder with(@NotNull final Context context) {
+    public static ServiceBuilder with(@NotNull final Context context) {
 
         return with(serviceFrom(context));
     }
@@ -91,7 +95,7 @@ public class JRoutineAndroid extends SparseChannels {
      * @return the context based builder.
      */
     @NotNull
-    public static ServiceContextBuilder with(@NotNull final Context context,
+    public static ServiceBuilder with(@NotNull final Context context,
             @NotNull final Class<? extends InvocationService> serviceClass) {
 
         return with(serviceFrom(context, serviceClass));
@@ -105,7 +109,7 @@ public class JRoutineAndroid extends SparseChannels {
      * @return the context based builder.
      */
     @NotNull
-    public static ServiceContextBuilder with(@NotNull final Context context,
+    public static ServiceBuilder with(@NotNull final Context context,
             @NotNull final Intent service) {
 
         return with(serviceFrom(context, service));
@@ -156,9 +160,9 @@ public class JRoutineAndroid extends SparseChannels {
      * @return the context based builder.
      */
     @NotNull
-    public static ServiceContextBuilder with(@NotNull final ServiceContext context) {
+    public static ServiceBuilder with(@NotNull final ServiceContext context) {
 
-        return new ServiceContextBuilder(context);
+        return new ServiceBuilder(context);
     }
 
     /**
@@ -262,13 +266,159 @@ public class JRoutineAndroid extends SparseChannels {
          *                                            found.
          */
         @NotNull
+        public <IN, OUT> LoaderRoutineBuilder<IN, OUT> invocation(
+                @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass) {
+
+            return on(InvocationFactory.factoryOf(invocationClass));
+        }
+
+        /**
+         * Returns a routine builder based on an invocation factory creating instances of the
+         * specified class by passing the specified arguments to the class constructor.
+         * <p/>
+         * Note that inner and anonymous classes can be passed as well. Remember however that Java
+         * creates synthetic constructors for such classes, so be sure to specify the correct
+         * arguments to guarantee proper instantiation.
+         *
+         * @param invocationClass the invocation class.
+         * @param args            the invocation constructor arguments.
+         * @param <IN>            the input data type.
+         * @param <OUT>           the output data type.
+         * @return the routine builder instance.
+         * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
+         *                                            not a static scope or no construct constructor
+         *                                            taking the specified objects as parameters is
+         *                                            found.
+         */
+        @NotNull
+        public <IN, OUT> LoaderRoutineBuilder<IN, OUT> invocation(
+                @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass,
+                @Nullable final Object... args) {
+
+            return on(InvocationFactory.factoryOf(invocationClass, args));
+        }
+
+        /**
+         * Returns a routine builder based on an invocation factory creating instances of the
+         * specified class token.
+         * <p/>
+         * Note that inner and anonymous classes can be passed as well. Remember however that Java
+         * creates synthetic constructors for such classes, so be sure to specify the correct
+         * arguments to guarantee proper instantiation.
+         *
+         * @param invocationToken the invocation class token.
+         * @param <IN>            the input data type.
+         * @param <OUT>           the output data type.
+         * @return the routine builder instance.
+         * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
+         *                                            not a static scope or no default construct is
+         *                                            found.
+         */
+        @NotNull
+        public <IN, OUT> LoaderRoutineBuilder<IN, OUT> invocation(
+                @NotNull final ClassToken<? extends Invocation<IN, OUT>> invocationToken) {
+
+            return on(InvocationFactory.factoryOf(invocationToken));
+        }
+
+        /**
+         * Returns a routine builder based on an invocation factory creating instances of the
+         * specified class token by passing the specified arguments to the class constructor.
+         * <p/>
+         * Note that inner and anonymous classes can be passed as well. Remember however that Java
+         * creates synthetic constructors for such classes, so be sure to specify the correct
+         * arguments to guarantee proper instantiation.
+         *
+         * @param invocationToken the invocation class token.
+         * @param args            the invocation constructor arguments.
+         * @param <IN>            the input data type.
+         * @param <OUT>           the output data type.
+         * @return the routine builder instance.
+         * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
+         *                                            not a static scope or no construct constructor
+         *                                            taking the specified objects as parameters is
+         *                                            found.
+         */
+        @NotNull
+        @SuppressWarnings("unchecked")
+        public <IN, OUT> LoaderRoutineBuilder<IN, OUT> invocation(
+                @NotNull final ClassToken<? extends Invocation<IN, OUT>> invocationToken,
+                @Nullable final Object... args) {
+
+            return on(InvocationFactory.factoryOf(invocationToken, args));
+        }
+
+        /**
+         * Returns a routine builder based on an invocation factory creating instances of the
+         * specified object.
+         * <p/>
+         * Note that inner and anonymous objects can be passed as well. Remember however that Java
+         * creates synthetic constructors for such classes, so be sure to specify the correct
+         * arguments to guarantee proper instantiation.
+         *
+         * @param invocation the invocation instance.
+         * @param <IN>       the input data type.
+         * @param <OUT>      the output data type.
+         * @return the routine builder instance.
+         * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
+         *                                            not a static scope or no default construct is
+         *                                            found.
+         */
+        @NotNull
+        @SuppressWarnings("unchecked")
+        public <IN, OUT> LoaderRoutineBuilder<IN, OUT> invocation(
+                @NotNull final Invocation<IN, OUT> invocation) {
+
+            return on(InvocationFactory.factoryOf(invocation));
+        }
+
+        /**
+         * Returns a routine builder based on an invocation factory creating instances of the
+         * specified object.
+         * <p/>
+         * Note that inner and anonymous objects can be passed as well. Remember however that Java
+         * creates synthetic constructors for such classes, so be sure to specify the correct
+         * arguments to guarantee proper instantiation.
+         *
+         * @param invocation the invocation instance.
+         * @param args       the invocation constructor arguments.
+         * @param <IN>       the input data type.
+         * @param <OUT>      the output data type.
+         * @return the routine builder instance.
+         * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
+         *                                            not a static scope or no default construct is
+         *                                            found.
+         */
+        @NotNull
+        @SuppressWarnings("unchecked")
+        public <IN, OUT> LoaderRoutineBuilder<IN, OUT> invocation(
+                @NotNull final Invocation<IN, OUT> invocation, @Nullable final Object... args) {
+
+            return on(InvocationFactory.factoryOf(invocation, args));
+        }
+
+        /**
+         * Returns a routine builder based on an invocation factory creating instances of the
+         * specified class.
+         * <p/>
+         * Note that inner and anonymous classes can be passed as well. Remember however that Java
+         * creates synthetic constructors for such classes, so be sure to specify the correct
+         * arguments to guarantee proper instantiation.
+         *
+         * @param invocationClass the invocation class.
+         * @param <IN>            the input data type.
+         * @param <OUT>           the output data type.
+         * @return the routine builder instance.
+         * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
+         *                                            not a static scope or no default construct is
+         *                                            found.
+         */
+        @NotNull
         public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
                 @NotNull final Class<? extends ContextInvocation<IN, OUT>> invocationClass) {
 
             return on(factoryOf(invocationClass));
         }
-
-        // TODO: 18/03/16 on Invocation?
 
         /**
          * Returns a routine builder based on an invocation factory creating instances of the
@@ -366,7 +516,7 @@ public class JRoutineAndroid extends SparseChannels {
         public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
                 @NotNull final ContextInvocation<IN, OUT> invocation) {
 
-            return on(factoryOf(invocation.getClass()));
+            return on(tokenOf(invocation));
         }
 
         /**
@@ -392,7 +542,7 @@ public class JRoutineAndroid extends SparseChannels {
                 @NotNull final ContextInvocation<IN, OUT> invocation,
                 @Nullable final Object... args) {
 
-            return on(factoryOf(invocation.getClass(), args));
+            return on(tokenOf(invocation), args);
         }
 
         /**
@@ -439,6 +589,32 @@ public class JRoutineAndroid extends SparseChannels {
         public LoaderTargetRoutineBuilder on(@NotNull final ContextInvocationTarget<?> target) {
 
             return new DefaultLoaderTargetRoutineBuilder(mContext, target);
+        }
+
+        /**
+         * Returns a builder of routines bound to the builder context.<br/>
+         * In order to prevent undesired leaks, the class of the specified factory must have a
+         * static scope.
+         * <p/>
+         * Note that the built routine results will be always dispatched on the configured looper
+         * thread, thus waiting for the outputs immediately after its invocation may result in a
+         * deadlock.<br/>
+         * Note also that the input data passed to the invocation channel will be cached, and the
+         * results will be produced only after the invocation channel is closed, so be sure to avoid
+         * streaming inputs in order to prevent starvation or out of memory errors.
+         *
+         * @param factory the invocation factory.
+         * @param <IN>    the input data type.
+         * @param <OUT>   the output data type.
+         * @return the routine builder instance.
+         * @throws java.lang.IllegalArgumentException if the class of the specified factory has not
+         *                                            a static scope.
+         */
+        @NotNull
+        public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
+                @NotNull final InvocationFactory<IN, OUT> factory) {
+
+            return JRoutineLoader.with(mContext).on(factoryFrom(factory));
         }
 
         /**

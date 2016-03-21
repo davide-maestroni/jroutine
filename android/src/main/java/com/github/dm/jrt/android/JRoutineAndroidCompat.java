@@ -48,20 +48,20 @@ import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
 public class JRoutineAndroidCompat extends SparseChannelsCompat {
 
     @NotNull
-    public static ServiceContextBuilder with(@NotNull final Context context) {
+    public static ServiceBuilder with(@NotNull final Context context) {
 
         return with(serviceFrom(context));
     }
 
     @NotNull
-    public static ServiceContextBuilder with(@NotNull final Context context,
+    public static ServiceBuilder with(@NotNull final Context context,
             @NotNull final Class<? extends InvocationService> serviceClass) {
 
         return with(serviceFrom(context, serviceClass));
     }
 
     @NotNull
-    public static ServiceContextBuilder with(@NotNull final Context context,
+    public static ServiceBuilder with(@NotNull final Context context,
             @NotNull final Intent service) {
 
         return with(serviceFrom(context, service));
@@ -112,9 +112,9 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
      * @return the context builder.
      */
     @NotNull
-    public static ServiceContextBuilder with(@NotNull final ServiceContext context) {
+    public static ServiceBuilder with(@NotNull final ServiceContext context) {
 
-        return new ServiceContextBuilder(context);
+        return new ServiceBuilder(context);
     }
 
     public static class LoaderContextBuilderCompat {

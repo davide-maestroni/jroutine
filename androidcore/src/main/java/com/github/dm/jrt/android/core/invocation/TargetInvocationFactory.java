@@ -19,6 +19,7 @@ package com.github.dm.jrt.android.core.invocation;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.Reflection;
 
@@ -28,33 +29,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
  * Class representing a context invocation factory target.
- * <p/>
- * It is possible to create a target invocation factory of a common invocation by either defining a
- * specialized class like:
- * <pre>
- *     <code>
- *
- *         public class MyInvocationWrapper&lt;IN, OUT&gt;
- *                 extends ContextInvocationWrapper&lt;IN, OUT&gt; {
- *
- *             public MyInvocationWrapper() {
- *
- *                 super(new MyInvocation&lt;IN, OUT&gt;(2, "name"));
- *             }
- *         }
- *     </code>
- * </pre>
- * or via reflection like:
- * <pre>
- *     <code>
- *
- *         TargetInvocationFactory.factoryOf(ContextInvocationWrapper.class, MyInvocation.class,
- *                 Reflection.asArgs(2, "name"));
- *     </code>
- * </pre>
  * <p/>
  * Created by davide-maestroni on 08/20/2015.
  *
@@ -68,6 +46,93 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
      */
     private TargetInvocationFactory() {
 
+    }
+
+    // TODO: 3/21/16 unit tests
+
+    /**
+     * Returns a target based on the specified invocation class.
+     *
+     * @param targetClass the target invocation class.
+     * @param <IN>        the input data type.
+     * @param <OUT>       the output data type.
+     * @return the invocation factory target.
+     */
+    @NotNull
+    public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryFrom(
+            @NotNull final Class<? extends Invocation<IN, OUT>> targetClass) {
+
+        return factoryFrom(targetClass, (Object[]) null);
+    }
+
+    /**
+     * Returns a target based on the specified invocation class.
+     *
+     * @param targetClass the target invocation class.
+     * @param factoryArgs the invocation factory arguments.
+     * @param <IN>        the input data type.
+     * @param <OUT>       the output data type.
+     * @return the invocation factory target.
+     */
+    @NotNull
+    @SuppressWarnings("ConstantConditions")
+    public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryFrom(
+            @NotNull final Class<? extends Invocation<IN, OUT>> targetClass,
+            @Nullable final Object... factoryArgs) {
+
+        if (targetClass == null) {
+            throw new NullPointerException("the invocation class must not be null");
+        }
+
+        return new DefaultTargetInvocationFactory<IN, OUT>(ContextInvocationWrapper.class,
+                asArgs(targetClass, factoryArgs));
+    }
+
+    /**
+     * Returns a target based on the specified invocation token.
+     *
+     * @param targetToken the target invocation token.
+     * @param <IN>        the input data type.
+     * @param <OUT>       the output data type.
+     * @return the invocation factory target.
+     */
+    @NotNull
+    public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryFrom(
+            @NotNull final ClassToken<? extends Invocation<IN, OUT>> targetToken) {
+
+        return factoryFrom(targetToken.getRawClass());
+    }
+
+    /**
+     * Returns a target based on the specified invocation token.
+     *
+     * @param targetToken the target invocation token.
+     * @param factoryArgs the invocation factory arguments.
+     * @param <IN>        the input data type.
+     * @param <OUT>       the output data type.
+     * @return the invocation factory target.
+     */
+    @NotNull
+    public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryFrom(
+            @NotNull final ClassToken<? extends Invocation<IN, OUT>> targetToken,
+            @Nullable final Object... factoryArgs) {
+
+        return factoryFrom(targetToken.getRawClass(), factoryArgs);
+    }
+
+    /**
+     * Returns a target based on the specified invocation.
+     *
+     * @param targetInvocation the target invocation.
+     * @param <IN>             the input data type.
+     * @param <OUT>            the output data type.
+     * @return the invocation factory target.
+     */
+    @NotNull
+    public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryFrom(
+            @NotNull final Invocation<IN, OUT> targetInvocation) {
+
+        return factoryFrom(tokenOf(targetInvocation));
     }
 
     /**

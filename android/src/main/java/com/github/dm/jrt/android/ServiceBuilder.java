@@ -29,13 +29,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static com.github.dm.jrt.android.core.invocation.TargetInvocationFactory.factoryOf;
-import static com.github.dm.jrt.android.object.ContextInvocationTarget.classOfType;
-import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceOf;
 
 /**
  * Created by davide-maestroni on 03/06/2016.
  */
-public class ServiceContextBuilder {
+public class ServiceBuilder {
 
     private final ServiceContext mContext;
 
@@ -45,13 +43,74 @@ public class ServiceContextBuilder {
      * @param context the service context.
      */
     @SuppressWarnings("ConstantConditions")
-    ServiceContextBuilder(@NotNull final ServiceContext context) {
+    ServiceBuilder(@NotNull final ServiceContext context) {
 
         if (context == null) {
             throw new NullPointerException("the context must not be null");
         }
 
         mContext = context;
+    }
+
+    /**
+     * Returns a builder of routines running in a service, wrapping the specified target class.<br/>
+     * In order to customize the object creation, the caller must employ an implementation of a
+     * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
+     * application context.
+     * <p/>
+     * Note that the built routine results will be always dispatched on the configured looper
+     * thread, thus waiting for the outputs immediately after its invocation may result in a
+     * deadlock.
+     *
+     * @param targetClass the invocation target class.
+     * @return the routine builder instance.
+     */
+    @NotNull
+    public ServiceTargetRoutineBuilder classOfType(@NotNull final Class<?> targetClass) {
+
+        return on(ContextInvocationTarget.classOfType(targetClass));
+    }
+
+    /**
+     * Returns a builder of routines running in a service, wrapping the specified target object.
+     * <br/>
+     * In order to customize the object creation, the caller must employ an implementation of a
+     * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
+     * application context.
+     * <p/>
+     * Note that the built routine results will be always dispatched on the configured looper
+     * thread, thus waiting for the outputs immediately after its invocation may result in a
+     * deadlock.
+     *
+     * @param targetClass the class of the invocation target.
+     * @return the routine builder instance.
+     */
+    @NotNull
+    public ServiceTargetRoutineBuilder instanceOf(@NotNull final Class<?> targetClass) {
+
+        return on(ContextInvocationTarget.instanceOf(targetClass));
+    }
+
+    /**
+     * Returns a builder of routines bound to the builder context, wrapping the specified
+     * target object.<br/>
+     * In order to customize the object creation, the caller must employ an implementation of a
+     * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
+     * invocation service.
+     * <p/>
+     * Note that the built routine results will be always dispatched on the configured looper
+     * thread, thus waiting for the outputs immediately after its invocation may result in a
+     * deadlock.
+     *
+     * @param targetClass the class of the invocation target.
+     * @param factoryArgs the object factory arguments.
+     * @return the routine builder instance.
+     */
+    @NotNull
+    public ServiceTargetRoutineBuilder instanceOf(@NotNull final Class<?> targetClass,
+            @Nullable final Object... factoryArgs) {
+
+        return on(ContextInvocationTarget.instanceOf(targetClass, factoryArgs));
     }
 
     /**
@@ -183,24 +242,5 @@ public class ServiceContextBuilder {
             @NotNull final TargetInvocationFactory<IN, OUT> target) {
 
         return JRoutineService.with(mContext).on(target);
-    }
-
-    @NotNull
-    public ServiceTargetRoutineBuilder onClass(@NotNull final Class<?> targetClass) {
-
-        return on(classOfType(targetClass));
-    }
-
-    @NotNull
-    public ServiceTargetRoutineBuilder onInstance(@NotNull final Class<?> targetClass) {
-
-        return on(instanceOf(targetClass));
-    }
-
-    @NotNull
-    public ServiceTargetRoutineBuilder onInstance(@NotNull final Class<?> targetClass,
-            @Nullable final Object... factoryArgs) {
-
-        return on(instanceOf(targetClass, factoryArgs));
     }
 }

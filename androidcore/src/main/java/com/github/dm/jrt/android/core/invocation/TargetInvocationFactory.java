@@ -84,7 +84,9 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
             throw new NullPointerException("the invocation class must not be null");
         }
 
-        return new DefaultTargetInvocationFactory<IN, OUT>(ContextInvocationWrapper.class,
+        final Class<? extends TargetInvocationWrapper<IN, OUT>> targetWrapper =
+                TargetInvocationWrapper.class;
+        return new DefaultTargetInvocationFactory<IN, OUT>(targetWrapper,
                 asArgs(targetClass, factoryArgs));
     }
 
@@ -356,6 +358,53 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
         public Class<? extends ContextInvocation<IN, OUT>> getInvocationClass() {
 
             return mTargetClass;
+        }
+    }
+
+    /**
+     * Context invocation wrapping a base one.
+     *
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
+     */
+    @SuppressWarnings("unused")
+    private static class TargetInvocationWrapper<IN, OUT>
+            extends ContextInvocationWrapper<IN, OUT> {
+
+        /**
+         * Constructor.
+         *
+         * @param invocationClass the wrapped invocation class.
+         * @throws java.lang.ReflectiveOperationException if the invocation instantiation failed.
+         */
+        public TargetInvocationWrapper(
+                @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass) throws
+                ReflectiveOperationException {
+
+            this(invocationClass, (Object[]) null);
+        }
+
+        /**
+         * Constructor.
+         *
+         * @param invocationClass the wrapped invocation class.
+         * @param invocationArgs  the invocation constructor arguments
+         * @throws java.lang.ReflectiveOperationException if the invocation instantiation failed.
+         */
+        public TargetInvocationWrapper(
+                @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass,
+                @Nullable final Object... invocationArgs) throws ReflectiveOperationException {
+
+            super(newInvocation(invocationClass, invocationArgs));
+        }
+
+        @NotNull
+        private static <IN, OUT> Invocation<IN, OUT> newInvocation(
+                @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass,
+                @Nullable final Object... invocationArgs) throws ReflectiveOperationException {
+
+            final Object[] args = (invocationArgs != null) ? invocationArgs : Reflection.NO_ARGS;
+            return Reflection.findConstructor(invocationClass, args).newInstance(args);
         }
     }
 }

@@ -35,6 +35,8 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Method;
 
 /**
+ * Default implementation of a service target routine builder.
+ * <p/>
  * Created by davide-maestroni on 03/06/2016.
  */
 class DefaultServiceTargetRoutineBuilder implements ServiceTargetRoutineBuilder {
@@ -158,7 +160,7 @@ class DefaultServiceTargetRoutineBuilder implements ServiceTargetRoutineBuilder 
     }
 
     @NotNull
-    public ServiceTargetRoutineBuilder withBuilder(@Nullable final BuilderType builderType) {
+    public ServiceTargetRoutineBuilder withType(@Nullable final BuilderType builderType) {
 
         mBuilderType = builderType;
         return this;

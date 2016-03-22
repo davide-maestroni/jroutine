@@ -36,6 +36,8 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Method;
 
 /**
+ * Default implementation of a loader target routine builder.
+ * <p/>
  * Created by davide-maestroni on 03/07/2016.
  */
 class DefaultLoaderTargetRoutineBuilderCompat implements LoaderTargetRoutineBuilder {
@@ -159,7 +161,7 @@ class DefaultLoaderTargetRoutineBuilderCompat implements LoaderTargetRoutineBuil
     }
 
     @NotNull
-    public LoaderTargetRoutineBuilder withBuilder(@Nullable final BuilderType builderType) {
+    public LoaderTargetRoutineBuilder withType(@Nullable final BuilderType builderType) {
 
         mBuilderType = builderType;
         return this;

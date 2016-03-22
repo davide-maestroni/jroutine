@@ -34,6 +34,24 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
 /**
  * Class representing a context invocation factory target.
  * <p/>
+ * Note that a base invocation class will be passed as the first argument to a special context
+ * invocation in order to be automatically instantiated via reflection.<br/>
+ * It is possible to avoid that, by creating a target invocation factory of a common invocation by
+ * defining a specialized class like:
+ * <pre>
+ *     <code>
+ *
+ *         public class MyInvocationWrapper&lt;IN, OUT&gt;
+ *                 extends ContextInvocationWrapper&lt;IN, OUT&gt; {
+ *
+ *             public MyInvocationWrapper(final String arg) {
+ *
+ *                 super(new MyInvocation&lt;IN, OUT&gt;(arg));
+ *             }
+ *         }
+ *     </code>
+ * </pre>
+ * <p/>
  * Created by davide-maestroni on 08/20/2015.
  *
  * @param <IN>  the input data type.
@@ -57,10 +75,10 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
      * @return the invocation factory target.
      */
     @NotNull
-    public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryFrom(
+    public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
             @NotNull final Class<? extends Invocation<IN, OUT>> targetClass) {
 
-        return factoryFrom(targetClass, (Object[]) null);
+        return factoryOf(targetClass, (Object[]) null);
     }
 
     /**
@@ -73,13 +91,14 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
      * @return the invocation factory target.
      */
     @NotNull
-    @SuppressWarnings("ConstantConditions")
-    public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryFrom(
+    @SuppressWarnings("unchecked")
+    public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
             @NotNull final Class<? extends Invocation<IN, OUT>> targetClass,
             @Nullable final Object... factoryArgs) {
 
-        if (targetClass == null) {
-            throw new NullPointerException("the invocation class must not be null");
+        if (ContextInvocation.class.isAssignableFrom(targetClass)) {
+            return new DefaultTargetInvocationFactory<IN, OUT>(
+                    (Class<? extends ContextInvocation<IN, OUT>>) targetClass, factoryArgs);
         }
 
         final Class<? extends TargetInvocationWrapper<IN, OUT>> targetWrapper =
@@ -97,104 +116,8 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
      * @return the invocation factory target.
      */
     @NotNull
-    public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryFrom(
+    public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
             @NotNull final ClassToken<? extends Invocation<IN, OUT>> targetToken) {
-
-        return factoryFrom(targetToken.getRawClass());
-    }
-
-    /**
-     * Returns a target based on the specified invocation token.
-     *
-     * @param targetToken the target invocation token.
-     * @param factoryArgs the invocation factory arguments.
-     * @param <IN>        the input data type.
-     * @param <OUT>       the output data type.
-     * @return the invocation factory target.
-     */
-    @NotNull
-    public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryFrom(
-            @NotNull final ClassToken<? extends Invocation<IN, OUT>> targetToken,
-            @Nullable final Object... factoryArgs) {
-
-        return factoryFrom(targetToken.getRawClass(), factoryArgs);
-    }
-
-    /**
-     * Returns a target based on the specified invocation.
-     *
-     * @param targetInvocation the target invocation.
-     * @param <IN>             the input data type.
-     * @param <OUT>            the output data type.
-     * @return the invocation factory target.
-     */
-    @NotNull
-    public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryFrom(
-            @NotNull final Invocation<IN, OUT> targetInvocation) {
-
-        return factoryFrom(tokenOf(targetInvocation));
-    }
-
-    /**
-     * Returns a target based on the specified invocation.
-     *
-     * @param targetInvocation the target invocation.
-     * @param factoryArgs      the invocation factory arguments.
-     * @param <IN>             the input data type.
-     * @param <OUT>            the output data type.
-     * @return the invocation factory target.
-     */
-    @NotNull
-    public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryFrom(
-            @NotNull final Invocation<IN, OUT> targetInvocation,
-            @Nullable final Object... factoryArgs) {
-
-        return factoryFrom(tokenOf(targetInvocation), factoryArgs);
-    }
-
-    /**
-     * Returns a target based on the specified invocation class.
-     *
-     * @param targetClass the target invocation class.
-     * @param <IN>        the input data type.
-     * @param <OUT>       the output data type.
-     * @return the invocation factory target.
-     */
-    @NotNull
-    public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
-            @NotNull final Class<? extends ContextInvocation<IN, OUT>> targetClass) {
-
-        return factoryOf(targetClass, (Object[]) null);
-    }
-
-    /**
-     * Returns a target based on the specified invocation class.
-     *
-     * @param targetClass the target invocation class.
-     * @param factoryArgs the invocation factory arguments.
-     * @param <IN>        the input data type.
-     * @param <OUT>       the output data type.
-     * @return the invocation factory target.
-     */
-    @NotNull
-    public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
-            @NotNull final Class<? extends ContextInvocation<IN, OUT>> targetClass,
-            @Nullable final Object... factoryArgs) {
-
-        return new DefaultTargetInvocationFactory<IN, OUT>(targetClass, factoryArgs);
-    }
-
-    /**
-     * Returns a target based on the specified invocation token.
-     *
-     * @param targetToken the target invocation token.
-     * @param <IN>        the input data type.
-     * @param <OUT>       the output data type.
-     * @return the invocation factory target.
-     */
-    @NotNull
-    public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
-            @NotNull final ClassToken<? extends ContextInvocation<IN, OUT>> targetToken) {
 
         return factoryOf(targetToken.getRawClass());
     }
@@ -210,7 +133,7 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
      */
     @NotNull
     public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
-            @NotNull final ClassToken<? extends ContextInvocation<IN, OUT>> targetToken,
+            @NotNull final ClassToken<? extends Invocation<IN, OUT>> targetToken,
             @Nullable final Object... factoryArgs) {
 
         return factoryOf(targetToken.getRawClass(), factoryArgs);
@@ -226,7 +149,7 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
      */
     @NotNull
     public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
-            @NotNull final ContextInvocation<IN, OUT> targetInvocation) {
+            @NotNull final Invocation<IN, OUT> targetInvocation) {
 
         return factoryOf(tokenOf(targetInvocation));
     }
@@ -242,7 +165,7 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
      */
     @NotNull
     public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryOf(
-            @NotNull final ContextInvocation<IN, OUT> targetInvocation,
+            @NotNull final Invocation<IN, OUT> targetInvocation,
             @Nullable final Object... factoryArgs) {
 
         return factoryOf(tokenOf(targetInvocation), factoryArgs);

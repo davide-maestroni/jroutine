@@ -31,28 +31,72 @@ import com.github.dm.jrt.android.object.ContextInvocationTarget;
 import com.github.dm.jrt.android.v4.channel.SparseChannelsCompat;
 import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
+import com.github.dm.jrt.core.invocation.Invocation;
+import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.util.ClassToken;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
+import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryFrom;
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryOf;
-import static com.github.dm.jrt.android.object.ContextInvocationTarget.classOfType;
-import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceOf;
 import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
+import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 
 /**
+ * Class acting as a façade of all the JRoutine library features, with support for the Android
+ * compatibility library.
+ * <p/>
  * Created by davide-maestroni on 03/06/2016.
  */
 public class JRoutineAndroidCompat extends SparseChannelsCompat {
 
+    /**
+     * Returns a context based builder of loader routine builders.
+     *
+     * @param activity the loader activity.
+     * @return the context based builder.
+     */
+    @NotNull
+    public static LoaderBuilderCompat with(@NotNull final FragmentActivity activity) {
+
+        return with(loaderFrom(activity));
+    }
+
+    /**
+     * Returns a context based builder of loader routine builders.
+     *
+     * @param activity the loader activity.
+     * @param context  the context used to get the application one.
+     * @return the context based builder.
+     */
+    @NotNull
+    public static LoaderBuilderCompat with(@NotNull final FragmentActivity activity,
+            @NotNull final Context context) {
+
+        return with(loaderFrom(activity, context));
+    }
+
+    /**
+     * Returns a context based builder of service routine builders.
+     *
+     * @param context the service context.
+     * @return the context based builder.
+     */
     @NotNull
     public static ServiceBuilder with(@NotNull final Context context) {
 
         return with(serviceFrom(context));
     }
 
+    /**
+     * Returns a context based builder of service routine builders.
+     *
+     * @param context      the service context.
+     * @param serviceClass the service class.
+     * @return the context based builder.
+     */
     @NotNull
     public static ServiceBuilder with(@NotNull final Context context,
             @NotNull final Class<? extends InvocationService> serviceClass) {
@@ -60,6 +104,13 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
         return with(serviceFrom(context, serviceClass));
     }
 
+    /**
+     * Returns a context based builder of service routine builders.
+     *
+     * @param context the service context.
+     * @param service the service intent.
+     * @return the context based builder.
+     */
     @NotNull
     public static ServiceBuilder with(@NotNull final Context context,
             @NotNull final Intent service) {
@@ -67,49 +118,49 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
         return with(serviceFrom(context, service));
     }
 
+    /**
+     * Returns a context based builder of loader routine builders.
+     *
+     * @param fragment the loader fragment.
+     * @return the context based builder.
+     */
     @NotNull
-    public static LoaderContextBuilderCompat with(@NotNull final Fragment fragment) {
+    public static LoaderBuilderCompat with(@NotNull final Fragment fragment) {
 
         return with(loaderFrom(fragment));
     }
 
+    /**
+     * Returns a context based builder of loader routine builders.
+     *
+     * @param fragment the loader fragment.
+     * @param context  the context used to get the application one.
+     * @return the context based builder.
+     */
     @NotNull
-    public static LoaderContextBuilderCompat with(@NotNull final Fragment fragment,
+    public static LoaderBuilderCompat with(@NotNull final Fragment fragment,
             @NotNull final Context context) {
 
         return with(loaderFrom(fragment, context));
-    }
-
-    @NotNull
-    public static LoaderContextBuilderCompat with(@NotNull final FragmentActivity activity) {
-
-        return with(loaderFrom(activity));
-    }
-
-    @NotNull
-    public static LoaderContextBuilderCompat with(@NotNull final FragmentActivity activity,
-            @NotNull final Context context) {
-
-        return with(loaderFrom(activity, context));
     }
 
     /**
      * Returns a context based builder of loader routine builders.
      *
      * @param context the loader context.
-     * @return the context builder.
+     * @return the context based builder.
      */
     @NotNull
-    public static LoaderContextBuilderCompat with(@NotNull final LoaderContextCompat context) {
+    public static LoaderBuilderCompat with(@NotNull final LoaderContextCompat context) {
 
-        return new LoaderContextBuilderCompat(context);
+        return new LoaderBuilderCompat(context);
     }
 
     /**
      * Returns a context based builder of service routine builders.
      *
      * @param context the service context.
-     * @return the context builder.
+     * @return the context based builder.
      */
     @NotNull
     public static ServiceBuilder with(@NotNull final ServiceContext context) {
@@ -117,7 +168,10 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
         return new ServiceBuilder(context);
     }
 
-    public static class LoaderContextBuilderCompat {
+    /**
+     * Context based builder of loader routine builders.
+     */
+    public static class LoaderBuilderCompat {
 
         private final LoaderContextCompat mContext;
 
@@ -127,13 +181,76 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
          * @param context the loader context.
          */
         @SuppressWarnings("ConstantConditions")
-        private LoaderContextBuilderCompat(@NotNull final LoaderContextCompat context) {
+        private LoaderBuilderCompat(@NotNull final LoaderContextCompat context) {
 
             if (context == null) {
                 throw new NullPointerException("the loader context must not be null");
             }
 
             mContext = context;
+        }
+
+
+        /**
+         * Returns a builder of routines bound to the builder context, wrapping the specified
+         * target class.<br/>
+         * In order to customize the object creation, the caller must employ an implementation of a
+         * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
+         * application context.
+         * <p/>
+         * Note that the built routine results will be always dispatched on the configured looper
+         * thread, thus waiting for the outputs immediately after its invocation may result in a
+         * deadlock.
+         *
+         * @param targetClass the invocation target class.
+         * @return the routine builder instance.
+         */
+        @NotNull
+        public LoaderTargetRoutineBuilder classOfType(@NotNull final Class<?> targetClass) {
+
+            return on(ContextInvocationTarget.classOfType(targetClass));
+        }
+
+        /**
+         * Returns a builder of routines bound to the builder context, wrapping the specified
+         * target object.<br/>
+         * In order to customize the object creation, the caller must employ an implementation of a
+         * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
+         * application context.
+         * <p/>
+         * Note that the built routine results will be always dispatched on the configured looper
+         * thread, thus waiting for the outputs immediately after its invocation may result in a
+         * deadlock.
+         *
+         * @param targetClass the class of the invocation target.
+         * @return the routine builder instance.
+         */
+        @NotNull
+        public LoaderTargetRoutineBuilder instanceOf(@NotNull final Class<?> targetClass) {
+
+            return on(ContextInvocationTarget.instanceOf(targetClass));
+        }
+
+        /**
+         * Returns a builder of routines bound to the builder context, wrapping the specified
+         * target object.<br/>
+         * In order to customize the object creation, the caller must employ an implementation of a
+         * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
+         * application context.
+         * <p/>
+         * Note that the built routine results will be always dispatched on the configured looper
+         * thread, thus waiting for the outputs immediately after its invocation may result in a
+         * deadlock.
+         *
+         * @param targetClass the class of the invocation target.
+         * @param factoryArgs the object factory arguments.
+         * @return the routine builder instance.
+         */
+        @NotNull
+        public LoaderTargetRoutineBuilder instanceOf(@NotNull final Class<?> targetClass,
+                @Nullable final Object... factoryArgs) {
+
+            return on(ContextInvocationTarget.instanceOf(targetClass, factoryArgs));
         }
 
         /**
@@ -153,10 +270,15 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
          *                                            found.
          */
         @NotNull
+        @SuppressWarnings("unchecked")
         public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
-                @NotNull final Class<? extends ContextInvocation<IN, OUT>> invocationClass) {
+                @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass) {
 
-            return on(factoryOf(invocationClass));
+            if (ContextInvocation.class.isAssignableFrom(invocationClass)) {
+                return on(factoryOf((Class<? extends ContextInvocation<IN, OUT>>) invocationClass));
+            }
+
+            return on(InvocationFactory.factoryOf(invocationClass));
         }
 
         /**
@@ -178,11 +300,17 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
          *                                            found.
          */
         @NotNull
+        @SuppressWarnings("unchecked")
         public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
-                @NotNull final Class<? extends ContextInvocation<IN, OUT>> invocationClass,
+                @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass,
                 @Nullable final Object... args) {
 
-            return on(factoryOf(invocationClass, args));
+            if (ContextInvocation.class.isAssignableFrom(invocationClass)) {
+                return on(factoryOf((Class<? extends ContextInvocation<IN, OUT>>) invocationClass,
+                        args));
+            }
+
+            return on(InvocationFactory.factoryOf(invocationClass, args));
         }
 
         /**
@@ -202,10 +330,16 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
          *                                            found.
          */
         @NotNull
+        @SuppressWarnings("unchecked")
         public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
-                @NotNull final ClassToken<? extends ContextInvocation<IN, OUT>> invocationToken) {
+                @NotNull final ClassToken<? extends Invocation<IN, OUT>> invocationToken) {
 
-            return on(factoryOf(invocationToken));
+            if (ContextInvocation.class.isAssignableFrom(invocationToken.getRawClass())) {
+                return on(factoryOf(
+                        (ClassToken<? extends ContextInvocation<IN, OUT>>) invocationToken));
+            }
+
+            return on(InvocationFactory.factoryOf(invocationToken));
         }
 
         /**
@@ -227,11 +361,66 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
          *                                            found.
          */
         @NotNull
+        @SuppressWarnings("unchecked")
         public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
-                @NotNull final ClassToken<? extends ContextInvocation<IN, OUT>> invocationToken,
+                @NotNull final ClassToken<? extends Invocation<IN, OUT>> invocationToken,
                 @Nullable final Object... args) {
 
-            return on(factoryOf(invocationToken, args));
+            if (ContextInvocation.class.isAssignableFrom(invocationToken.getRawClass())) {
+                return on(factoryOf(
+                        (ClassToken<? extends ContextInvocation<IN, OUT>>) invocationToken, args));
+            }
+
+            return on(InvocationFactory.factoryOf(invocationToken, args));
+        }
+
+        /**
+         * Returns a routine builder based on an invocation factory creating instances of the
+         * specified object.
+         * <p/>
+         * Note that inner and anonymous objects can be passed as well. Remember however that Java
+         * creates synthetic constructors for such classes, so be sure to specify the correct
+         * arguments to guarantee proper instantiation.
+         *
+         * @param invocation the invocation instance.
+         * @param <IN>       the input data type.
+         * @param <OUT>      the output data type.
+         * @return the routine builder instance.
+         * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
+         *                                            not a static scope or no default construct is
+         *                                            found.
+         */
+        @NotNull
+        @SuppressWarnings("unchecked")
+        public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
+                @NotNull final Invocation<IN, OUT> invocation) {
+
+            return on(tokenOf(invocation));
+        }
+
+        /**
+         * Returns a routine builder based on an invocation factory creating instances of the
+         * specified object.
+         * <p/>
+         * Note that inner and anonymous objects can be passed as well. Remember however that Java
+         * creates synthetic constructors for such classes, so be sure to specify the correct
+         * arguments to guarantee proper instantiation.
+         *
+         * @param invocation the invocation instance.
+         * @param args       the invocation constructor arguments.
+         * @param <IN>       the input data type.
+         * @param <OUT>      the output data type.
+         * @return the routine builder instance.
+         * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
+         *                                            not a static scope or no default construct is
+         *                                            found.
+         */
+        @NotNull
+        @SuppressWarnings("unchecked")
+        public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
+                @NotNull final Invocation<IN, OUT> invocation, @Nullable final Object... args) {
+
+            return on(tokenOf(invocation), args);
         }
 
         /**
@@ -280,10 +469,30 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
             return new DefaultLoaderTargetRoutineBuilderCompat(mContext, target);
         }
 
+        /**
+         * Returns a builder of routines bound to the builder context.<br/>
+         * In order to prevent undesired leaks, the class of the specified factory must have a
+         * static scope.
+         * <p/>
+         * Note that the built routine results will be always dispatched on the configured looper
+         * thread, thus waiting for the outputs immediately after its invocation may result in a
+         * deadlock.<br/>
+         * Note also that the input data passed to the invocation channel will be cached, and the
+         * results will be produced only after the invocation channel is closed, so be sure to avoid
+         * streaming inputs in order to prevent starvation or out of memory errors.
+         *
+         * @param factory the invocation factory.
+         * @param <IN>    the input data type.
+         * @param <OUT>   the output data type.
+         * @return the routine builder instance.
+         * @throws java.lang.IllegalArgumentException if the class of the specified factory has not
+         *                                            a static scope.
+         */
         @NotNull
-        public LoaderTargetRoutineBuilder onClass(@NotNull final Class<?> targetClass) {
+        public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
+                @NotNull final InvocationFactory<IN, OUT> factory) {
 
-            return on(classOfType(targetClass));
+            return JRoutineLoaderCompat.with(mContext).on(factoryFrom(factory));
         }
 
         /**
@@ -305,19 +514,6 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
         public LoaderChannelBuilder onId(final int loaderId) {
 
             return JRoutineLoaderCompat.with(mContext).onId(loaderId);
-        }
-
-        @NotNull
-        public LoaderTargetRoutineBuilder onInstance(@NotNull final Class<?> targetClass) {
-
-            return on(instanceOf(targetClass));
-        }
-
-        @NotNull
-        public LoaderTargetRoutineBuilder onInstance(@NotNull final Class<?> targetClass,
-                @Nullable final Object... factoryArgs) {
-
-            return on(instanceOf(targetClass, factoryArgs));
         }
     }
 }

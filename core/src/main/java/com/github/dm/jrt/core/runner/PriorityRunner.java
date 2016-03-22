@@ -96,6 +96,14 @@ public class PriorityRunner {
         mQueue = new PriorityBlockingQueue<PriorityExecution>(10, PRIORITY_EXECUTION_COMPARATOR);
     }
 
+    /**
+     * Returns the priority runner wrapping the specified one.
+     * <p/>
+     * Note that wrapping a synchronous runner may lead to unpredictable results.
+     *
+     * @param wrapped the wrapped instance.
+     * @return the priority runner.
+     */
     @NotNull
     static PriorityRunner getInstance(@NotNull final Runner wrapped) {
 

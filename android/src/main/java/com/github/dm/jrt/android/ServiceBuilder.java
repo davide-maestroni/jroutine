@@ -29,11 +29,12 @@ import com.github.dm.jrt.core.util.ClassToken;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static com.github.dm.jrt.android.core.invocation.TargetInvocationFactory.factoryFrom;
 import static com.github.dm.jrt.android.core.invocation.TargetInvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 
 /**
+ * Context based builder of service routine builders.
+ * <p/>
  * Created by davide-maestroni on 03/06/2016.
  */
 public class ServiceBuilder {
@@ -119,154 +120,6 @@ public class ServiceBuilder {
     /**
      * Returns a routine builder based on an invocation factory creating instances of the
      * specified class.
-     * <p/>
-     * Note that inner and anonymous classes can be passed as well. Remember however that Java
-     * creates synthetic constructors for such classes, so be sure to specify the correct
-     * arguments to guarantee proper instantiation.
-     *
-     * @param invocationClass the invocation class.
-     * @param <IN>            the input data type.
-     * @param <OUT>           the output data type.
-     * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
-     *                                            not a static scope or no default construct is
-     *                                            found.
-     */
-    @NotNull
-    public <IN, OUT> RoutineBuilder<IN, OUT> invocation(
-            @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass) {
-
-        return on(factoryFrom(invocationClass));
-    }
-
-    /**
-     * Returns a routine builder based on an invocation factory creating instances of the
-     * specified class by passing the specified arguments to the class constructor.
-     * <p/>
-     * Note that inner and anonymous classes can be passed as well. Remember however that Java
-     * creates synthetic constructors for such classes, so be sure to specify the correct
-     * arguments to guarantee proper instantiation.
-     *
-     * @param invocationClass the invocation class.
-     * @param args            the invocation constructor arguments.
-     * @param <IN>            the input data type.
-     * @param <OUT>           the output data type.
-     * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
-     *                                            not a static scope or no construct constructor
-     *                                            taking the specified objects as parameters is
-     *                                            found.
-     */
-    @NotNull
-    public <IN, OUT> RoutineBuilder<IN, OUT> invocation(
-            @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass,
-            @Nullable final Object... args) {
-
-        return on(factoryFrom(invocationClass, args));
-    }
-
-    /**
-     * Returns a routine builder based on an invocation factory creating instances of the
-     * specified class token.
-     * <p/>
-     * Note that inner and anonymous classes can be passed as well. Remember however that Java
-     * creates synthetic constructors for such classes, so be sure to specify the correct
-     * arguments to guarantee proper instantiation.
-     *
-     * @param invocationToken the invocation class token.
-     * @param <IN>            the input data type.
-     * @param <OUT>           the output data type.
-     * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
-     *                                            not a static scope or no default construct is
-     *                                            found.
-     */
-    @NotNull
-    public <IN, OUT> RoutineBuilder<IN, OUT> invocation(
-            @NotNull final ClassToken<? extends Invocation<IN, OUT>> invocationToken) {
-
-        return on(factoryFrom(invocationToken));
-    }
-
-    /**
-     * Returns a routine builder based on an invocation factory creating instances of the
-     * specified class token by passing the specified arguments to the class constructor.
-     * <p/>
-     * Note that inner and anonymous classes can be passed as well. Remember however that Java
-     * creates synthetic constructors for such classes, so be sure to specify the correct
-     * arguments to guarantee proper instantiation.
-     *
-     * @param invocationToken the invocation class token.
-     * @param args            the invocation constructor arguments.
-     * @param <IN>            the input data type.
-     * @param <OUT>           the output data type.
-     * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
-     *                                            not a static scope or no construct constructor
-     *                                            taking the specified objects as parameters is
-     *                                            found.
-     */
-    @NotNull
-    @SuppressWarnings("unchecked")
-    public <IN, OUT> RoutineBuilder<IN, OUT> invocation(
-            @NotNull final ClassToken<? extends Invocation<IN, OUT>> invocationToken,
-            @Nullable final Object... args) {
-
-        return on(factoryFrom(invocationToken, args));
-    }
-
-    /**
-     * Returns a routine builder based on an invocation factory creating instances of the
-     * specified object.
-     * <p/>
-     * Note that inner and anonymous objects can be passed as well. Remember however that Java
-     * creates synthetic constructors for such classes, so be sure to specify the correct
-     * arguments to guarantee proper instantiation.
-     *
-     * @param invocation the invocation instance.
-     * @param <IN>       the input data type.
-     * @param <OUT>      the output data type.
-     * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
-     *                                            not a static scope or no default construct is
-     *                                            found.
-     */
-    @NotNull
-    @SuppressWarnings("unchecked")
-    public <IN, OUT> RoutineBuilder<IN, OUT> invocation(
-            @NotNull final Invocation<IN, OUT> invocation) {
-
-        return on(factoryFrom(invocation));
-    }
-
-    /**
-     * Returns a routine builder based on an invocation factory creating instances of the
-     * specified object.
-     * <p/>
-     * Note that inner and anonymous objects can be passed as well. Remember however that Java
-     * creates synthetic constructors for such classes, so be sure to specify the correct
-     * arguments to guarantee proper instantiation.
-     *
-     * @param invocation the invocation instance.
-     * @param args       the invocation constructor arguments.
-     * @param <IN>       the input data type.
-     * @param <OUT>      the output data type.
-     * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if the class of the specified invocation has
-     *                                            not a static scope or no default construct is
-     *                                            found.
-     */
-    @NotNull
-    @SuppressWarnings("unchecked")
-    public <IN, OUT> RoutineBuilder<IN, OUT> invocation(
-            @NotNull final Invocation<IN, OUT> invocation, @Nullable final Object... args) {
-
-        return on(factoryFrom(invocation, args));
-    }
-
-    /**
-     * Returns a routine builder based on an invocation factory creating instances of the
-     * specified class.
      *
      * @param invocationClass the invocation class.
      * @param <IN>            the input data type.
@@ -276,7 +129,7 @@ public class ServiceBuilder {
      */
     @NotNull
     public <IN, OUT> RoutineBuilder<IN, OUT> on(
-            @NotNull final Class<? extends ContextInvocation<IN, OUT>> invocationClass) {
+            @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass) {
 
         return on(factoryOf(invocationClass));
     }
@@ -301,7 +154,7 @@ public class ServiceBuilder {
      */
     @NotNull
     public <IN, OUT> RoutineBuilder<IN, OUT> on(
-            @NotNull final Class<? extends ContextInvocation<IN, OUT>> invocationClass,
+            @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass,
             @Nullable final Object... args) {
 
         return on(factoryOf(invocationClass, args));
@@ -319,7 +172,7 @@ public class ServiceBuilder {
      */
     @NotNull
     public <IN, OUT> RoutineBuilder<IN, OUT> on(
-            @NotNull final ClassToken<? extends ContextInvocation<IN, OUT>> invocationToken) {
+            @NotNull final ClassToken<? extends Invocation<IN, OUT>> invocationToken) {
 
         return on(factoryOf(invocationToken));
     }
@@ -344,7 +197,7 @@ public class ServiceBuilder {
      */
     @NotNull
     public <IN, OUT> RoutineBuilder<IN, OUT> on(
-            @NotNull final ClassToken<? extends ContextInvocation<IN, OUT>> invocationToken,
+            @NotNull final ClassToken<? extends Invocation<IN, OUT>> invocationToken,
             @Nullable final Object... args) {
 
         return on(factoryOf(invocationToken, args));

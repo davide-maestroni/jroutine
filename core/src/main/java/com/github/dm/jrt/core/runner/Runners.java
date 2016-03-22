@@ -91,6 +91,8 @@ public class Runners {
 
     /**
      * Returns a runner providing ordering of executions based on priority.
+     * <p/>
+     * Note that wrapping a synchronous runner may lead to unpredictable results.
      *
      * @param wrapped the wrapped runner instance.
      * @return the runner instance.
@@ -98,7 +100,6 @@ public class Runners {
     @NotNull
     public static PriorityRunner priorityRunner(@NotNull final Runner wrapped) {
 
-        // TODO: 19/03/16 sync runners will not work...
         return PriorityRunner.getInstance(wrapped);
     }
 

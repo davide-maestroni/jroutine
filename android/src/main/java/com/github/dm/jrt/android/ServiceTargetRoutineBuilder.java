@@ -25,12 +25,17 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
+ * Service routine builder acting both as proxy and object builder.
+ * <p/>
+ * The builder will automatically decide whether to employ reflection or code generation to build
+ * the proxy instance, based on the presence of the proper annotation and target value. So, if the
+ * pre-processor annotation is present in the proxy interface and the target object is assignable to
+ * the annotation target class, then code generation will be employed, reflection otherwise.<br/>
+ * Note that the use of one or the other can be forced by calling the proper method.
+ * <p/>
  * Created by davide-maestroni on 03/06/2016.
  */
 public interface ServiceTargetRoutineBuilder extends ServiceObjectRoutineBuilder {
-
-    @NotNull
-    ServiceTargetRoutineBuilder withBuilder(@Nullable BuilderType builderType);
 
     /**
      * {@inheritDoc}
@@ -50,8 +55,31 @@ public interface ServiceTargetRoutineBuilder extends ServiceObjectRoutineBuilder
     @NotNull
     ServiceConfiguration.Builder<? extends ServiceTargetRoutineBuilder> withService();
 
+    /**
+     * Force the type of builder to be employed to create the proxy instance.<br/>
+     * A null value means default algorithm will be applied, that is, the builder type will be
+     * automatically chosen based on the proxy interface definition.
+     *
+     * @param builderType the builder type.
+     * @return this builder.
+     */
+    @NotNull
+    ServiceTargetRoutineBuilder withType(@Nullable BuilderType builderType);
+
+    /**
+     * Builder type enumeration.
+     */
     enum BuilderType {
+
+        /**
+         * Object routine builder.<br/>
+         * The proxy instance will be created through reflection.
+         */
         OBJECT,
+        /**
+         * Proxy routine builder.<br/>
+         * The proxy instance will be created through code generation.
+         */
         PROXY
     }
 }

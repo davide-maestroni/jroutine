@@ -29,13 +29,13 @@ import com.github.dm.jrt.android.core.RemoteDecoratingService;
 import com.github.dm.jrt.android.core.TestActivity;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.invocation.Invocation;
+import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
 
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
-import static com.github.dm.jrt.android.core.invocation.TargetInvocationFactory.factoryFrom;
 import static com.github.dm.jrt.android.core.invocation.TargetInvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.core.util.TimeDuration.millis;
@@ -71,14 +71,14 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
     public void testEquals2() {
 
         final TargetInvocationFactory<String, String> factory =
-                factoryFrom(PassingStringInvocation.class);
+                factoryOf(PassingStringInvocation2.class);
         assertThat(factory).isEqualTo(factory);
         assertThat(factory).isNotEqualTo(null);
         assertThat(factory).isNotEqualTo("test");
-        assertThat(factory).isNotEqualTo(factoryFrom(PassingStringInvocation.class, 3));
-        assertThat(factory).isEqualTo(factoryFrom(PassingStringInvocation.class));
+        assertThat(factory).isNotEqualTo(factoryOf(PassingStringInvocation2.class, 3));
+        assertThat(factory).isEqualTo(factoryOf(PassingStringInvocation2.class));
         assertThat(factory.hashCode()).isEqualTo(
-                factoryFrom(PassingStringInvocation.class).hashCode());
+                factoryOf(PassingStringInvocation2.class).hashCode());
     }
 
     public void testInvocationDecoratorAbort() {
@@ -95,7 +95,7 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
 
         final Routine<String, String> routine =
                 JRoutineService.with(serviceFrom(getActivity(), DecoratingService.class))
-                               .on(factoryFrom(PassingStringInvocation.class))
+                               .on(factoryOf(PassingStringInvocation2.class))
                                .buildRoutine();
         assertThat(routine.asyncInvoke().after(millis(100)).pass("test").result().abort()).isTrue();
         routine.purge();
@@ -115,7 +115,7 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
 
         final Routine<String, String> routine =
                 JRoutineService.with(serviceFrom(getActivity(), DecoratingService.class))
-                               .on(factoryFrom(PassingStringInvocation.class))
+                               .on(factoryOf(PassingStringInvocation2.class))
                                .buildRoutine();
         assertThat(routine.asyncCall("test").afterMax(seconds(10)).all()).containsExactly("test");
         routine.purge();
@@ -151,24 +151,24 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
     public void testInvocationFactory2() {
 
         Routine<String, String> routine = JRoutineService.with(serviceFrom(getActivity()))
-                                                         .on(factoryFrom(
-                                                                 PassingStringInvocation.class))
+                                                         .on(factoryOf(
+                                                                 PassingStringInvocation2.class))
                                                          .buildRoutine();
         assertThat(routine.asyncCall("test").afterMax(seconds(10)).all()).containsExactly("test");
         routine.purge();
         routine = JRoutineService.with(serviceFrom(getActivity()))
-                                 .on(factoryFrom(PassingStringInvocation.class, 3))
+                                 .on(factoryOf(PassingStringInvocation2.class, 3))
                                  .buildRoutine();
         assertThat(routine.asyncCall("test").afterMax(seconds(10)).all()).containsExactly("test",
                 "test", "test");
         routine.purge();
         routine = JRoutineService.with(serviceFrom(getActivity()))
-                                 .on(factoryFrom(tokenOf(PassingStringInvocation.class)))
+                                 .on(factoryOf(tokenOf(PassingStringInvocation2.class)))
                                  .buildRoutine();
         assertThat(routine.asyncCall("test").afterMax(seconds(10)).all()).containsExactly("test");
         routine.purge();
         routine = JRoutineService.with(serviceFrom(getActivity()))
-                                 .on(factoryFrom(tokenOf(PassingStringInvocation.class), 3))
+                                 .on(factoryOf(tokenOf(PassingStringInvocation2.class), 3))
                                  .buildRoutine();
         assertThat(routine.asyncCall("test").afterMax(seconds(10)).all()).containsExactly("test",
                 "test", "test");
@@ -231,7 +231,7 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
     public void testInvocationFactoryError2() {
 
         try {
-            factoryFrom((Class<ContextInvocation<Object, Object>>) null);
+            factoryOf((Class<Invocation<Object, Object>>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -239,7 +239,7 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
         }
 
         try {
-            factoryFrom((Class<ContextInvocation<Object, Object>>) null, "test");
+            factoryOf((Class<Invocation<Object, Object>>) null, "test");
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -247,7 +247,7 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
         }
 
         try {
-            factoryFrom((ClassToken<ContextInvocation<Object, Object>>) null);
+            factoryOf((ClassToken<Invocation<Object, Object>>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -255,7 +255,7 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
         }
 
         try {
-            factoryFrom((ClassToken<ContextInvocation<Object, Object>>) null, "test");
+            factoryOf((ClassToken<Invocation<Object, Object>>) null, "test");
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -263,7 +263,7 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
         }
 
         try {
-            factoryFrom((Invocation<Object, Object>) null);
+            factoryOf((Invocation<Object, Object>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -271,7 +271,7 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
         }
 
         try {
-            factoryFrom((Invocation<Object, Object>) null, "test");
+            factoryOf((Invocation<Object, Object>) null, "test");
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -296,7 +296,7 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
 
         final Parcel parcel = Parcel.obtain();
         final TargetInvocationFactory<String, String> factory =
-                factoryFrom(PassingStringInvocation.class);
+                factoryOf(PassingStringInvocation2.class);
         parcel.writeParcelable(factory, 0);
         parcel.setDataPosition(0);
         final Parcelable parcelable =
@@ -319,7 +319,7 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
 
         final Routine<String, String> routine =
                 JRoutineService.with(serviceFrom(getActivity(), RemoteDecoratingService.class))
-                               .on(factoryFrom(PassingStringInvocation.class))
+                               .on(factoryOf(PassingStringInvocation2.class))
                                .buildRoutine();
         assertThat(routine.asyncInvoke().after(millis(100)).pass("test").result().abort()).isTrue();
         routine.purge();
@@ -339,7 +339,7 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
 
         final Routine<String, String> routine =
                 JRoutineService.with(serviceFrom(getActivity(), RemoteDecoratingService.class))
-                               .on(factoryFrom(PassingStringInvocation.class))
+                               .on(factoryOf(PassingStringInvocation2.class))
                                .buildRoutine();
         assertThat(routine.asyncCall("test").afterMax(seconds(10)).all()).containsExactly("test");
         routine.purge();
@@ -357,6 +357,29 @@ public class TargetInvocationFactoryTest extends ActivityInstrumentationTestCase
         }
 
         public PassingStringInvocation(final int count) {
+
+            mCount = count;
+        }
+
+        public void onInput(final String input, @NotNull final ResultChannel<String> result) {
+
+            for (int i = 0; i < mCount; i++) {
+                result.pass(input);
+            }
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private static class PassingStringInvocation2 extends TemplateInvocation<String, String> {
+
+        private final int mCount;
+
+        public PassingStringInvocation2() {
+
+            this(1);
+        }
+
+        public PassingStringInvocation2(final int count) {
 
             mCount = count;
         }

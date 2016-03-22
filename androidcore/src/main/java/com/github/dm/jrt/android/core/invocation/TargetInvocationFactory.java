@@ -48,8 +48,6 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
 
     }
 
-    // TODO: 3/21/16 unit tests
-
     /**
      * Returns a target based on the specified invocation class.
      *
@@ -85,7 +83,7 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
         }
 
         final Class<? extends TargetInvocationWrapper<IN, OUT>> targetWrapper =
-                TargetInvocationWrapper.class;
+                new ClassToken<TargetInvocationWrapper<IN, OUT>>() {}.getRawClass();
         return new DefaultTargetInvocationFactory<IN, OUT>(targetWrapper,
                 asArgs(targetClass, factoryArgs));
     }
@@ -135,6 +133,23 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
             @NotNull final Invocation<IN, OUT> targetInvocation) {
 
         return factoryFrom(tokenOf(targetInvocation));
+    }
+
+    /**
+     * Returns a target based on the specified invocation.
+     *
+     * @param targetInvocation the target invocation.
+     * @param factoryArgs      the invocation factory arguments.
+     * @param <IN>             the input data type.
+     * @param <OUT>            the output data type.
+     * @return the invocation factory target.
+     */
+    @NotNull
+    public static <IN, OUT> TargetInvocationFactory<IN, OUT> factoryFrom(
+            @NotNull final Invocation<IN, OUT> targetInvocation,
+            @Nullable final Object... factoryArgs) {
+
+        return factoryFrom(tokenOf(targetInvocation), factoryArgs);
     }
 
     /**
@@ -375,11 +390,11 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
          * Constructor.
          *
          * @param invocationClass the wrapped invocation class.
-         * @throws java.lang.ReflectiveOperationException if the invocation instantiation failed.
+         * @throws java.lang.Exception if the invocation instantiation failed.
          */
         public TargetInvocationWrapper(
                 @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass) throws
-                ReflectiveOperationException {
+                Exception {
 
             this(invocationClass, (Object[]) null);
         }
@@ -389,11 +404,11 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
          *
          * @param invocationClass the wrapped invocation class.
          * @param invocationArgs  the invocation constructor arguments
-         * @throws java.lang.ReflectiveOperationException if the invocation instantiation failed.
+         * @throws java.lang.Exception if the invocation instantiation failed.
          */
         public TargetInvocationWrapper(
                 @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass,
-                @Nullable final Object... invocationArgs) throws ReflectiveOperationException {
+                @Nullable final Object... invocationArgs) throws Exception {
 
             super(newInvocation(invocationClass, invocationArgs));
         }
@@ -401,7 +416,7 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
         @NotNull
         private static <IN, OUT> Invocation<IN, OUT> newInvocation(
                 @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass,
-                @Nullable final Object... invocationArgs) throws ReflectiveOperationException {
+                @Nullable final Object... invocationArgs) throws Exception {
 
             final Object[] args = (invocationArgs != null) ? invocationArgs : Reflection.NO_ARGS;
             return Reflection.findConstructor(invocationClass, args).newInstance(args);

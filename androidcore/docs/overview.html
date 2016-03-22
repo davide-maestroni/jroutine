@@ -42,59 +42,50 @@
 
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.main_layout);
-                try {
-                    final ImageView imageView = (ImageView) findViewById(R.id.image);
-                    JRoutineLoader.with(loaderFrom(this))
-                                  .on(factoryOf(LoadBitmap.class))
-                                  .withLoaders()
-                                  .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
-                                  .getConfigured()
-                                  .asyncCall(new URI(IMAGE_URI))
-                                  .bind(new TemplateOutputConsumer&lt;Bitmap&gt;() {
+                final ImageView imageView = (ImageView) findViewById(R.id.image);
+                JRoutineLoader.with(loaderFrom(this))
+                              .on(factoryOf(LoadBitmap.class))
+                              .withLoaders()
+                              .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
+                              .getConfigured()
+                              .asyncCall(URI.create(IMAGE_URI))
+                              .bind(new TemplateOutputConsumer&lt;Bitmap&gt;() {
 
-                                      &commat;Override
-                                      public void onError(&commat;NotNull final RoutineException error) {
+                                  &commat;Override
+                                  public void onError(&commat;NotNull final RoutineException error) {
 
-                                          Toast.makeText(MainTestActivity.this, (error != null) ?
-                                                  error.getMessage() : "Cannot load image",
-                                                  Toast.LENGTH_LONG).show();
-                                      }
+                                      Toast.makeText(MainTestActivity.this, (error != null) ?
+                                              error.getMessage() : "Cannot load image",
+                                              Toast.LENGTH_LONG).show();
+                                  }
 
-                                      &commat;Override
-                                      public void onOutput(final Bitmap bitmap) {
+                                  &commat;Override
+                                  public void onOutput(final Bitmap bitmap) {
 
-                                          imageView.setImageBitmap(bitmap);
-                                      }
-                                  });
-
-                } catch (final URISyntaxException ignored) {
-
-                }
+                                      imageView.setImageBitmap(bitmap);
+                                  }
+                              });
             }
 
-            private static class LoadBitmap extends CallContextInvocation&lt;URI, Bitmap&gt; {
+            private static class LoadBitmap extends TemplateContextInvocation&lt;URI, Bitmap&gt; {
 
                 &commat;Override
-                protected void onCall(final List&lt;? extends URI&gt; uris,
-                    &commat;NotNull final ResultChannel&lt;Bitmap&gt; result) {
+                public void onInput(final URI input, &commat;NotNull final ResultChannel&lt;Bitmap&gt; result) throws
+                        Exception {
 
-                    for (final URI uri : uris) {
-                        try {
-                            final InputStream stream = uri.toURL().openConnection().getInputStream();
-                            final Bitmap bitmap = BitmapFactory.decodeStream(stream);
-                            if (bitmap != null) {
-                                result.pass(bitmap);
+                    final URLConnection urlConnection = input.toURL().openConnection();
+                    final InputStream inputStream = urlConnection.getInputStream();
+                    try {
+                        final Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                        if (bitmap != null) {
+                            result.pass(bitmap);
 
-                            } else {
-                                result.abort();
-                            }
-
-                        } catch (final IOException e) {
-                            throw new InvocationException(e);
-
-                        } catch (final InterruptedException e) {
-                            throw new InvocationInterruptedException(e);
+                        } else {
+                            result.abort();
                         }
+
+                    } finally {
+                        inputStream.close();
                     }
                 }
             }
@@ -117,64 +108,55 @@
 
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.main_layout);
-                try {
-                    final ImageView imageView = (ImageView) findViewById(R.id.image);
-                    JRoutineLoader.with(loaderFrom(this))
-                                  .on(factoryOf(LoadBitmapFromService.class))
-                                  .withLoaders()
-                                  .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
-                                  .getConfigured()
-                                  .asyncCall(new URI(IMAGE_URI))
-                                  .bind(new TemplateOutputConsumer&lt;Bitmap&gt;() {
+                final ImageView imageView = (ImageView) findViewById(R.id.image);
+                JRoutineLoader.with(loaderFrom(this))
+                              .on(factoryOf(LoadBitmapFromService.class))
+                              .withLoaders()
+                              .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
+                              .getConfigured()
+                              .asyncCall(URI.create(IMAGE_URI))
+                              .bind(new TemplateOutputConsumer&lt;Bitmap&gt;() {
 
-                                      &commat;Override
-                                      public void onError(&commat;NotNull final RoutineException error) {
+                                  &commat;Override
+                                  public void onError(&commat;NotNull final RoutineException error) {
 
-                                          Toast.makeText(MainTestActivity.this, (error != null) ?
-                                                  error.getMessage() : "Cannot load image",
-                                                  Toast.LENGTH_LONG).show();
-                                      }
+                                      Toast.makeText(MainTestActivity.this, (error != null) ?
+                                              error.getMessage() : "Cannot load image",
+                                              Toast.LENGTH_LONG).show();
+                                  }
 
-                                      &commat;Override
-                                      public void onOutput(final Bitmap bitmap) {
+                                  &commat;Override
+                                  public void onOutput(final Bitmap bitmap) {
 
-                                          imageView.setImageBitmap(bitmap);
-                                      }
-                                  });
-
-                } catch (final URISyntaxException ignored) {
-
-                }
+                                      imageView.setImageBitmap(bitmap);
+                                  }
+                              });
             }
 
-            private static class LoadBitmap extends CallContextInvocation&lt;URI, Bitmap&gt; {
+            private static class LoadBitmap extends TemplateContextInvocation&lt;URI, Bitmap&gt; {
 
                 &commat;Override
-                protected void onCall(final List&lt;? extends URI&gt; uris,
-                    &commat;NotNull final ResultChannel&lt;Bitmap&gt; result) {
+                public void onInput(final URI uri, &commat;NotNull final ResultChannel&lt;Bitmap&gt; result) throws
+                        Exception {
 
-                    for (final URI uri : uris) {
-                        try {
-                            final InputStream stream = uri.toURL().openConnection().getInputStream();
-                            final Bitmap bitmap = BitmapFactory.decodeStream(stream);
-                            if (bitmap != null) {
-                                result.pass(bitmap);
+                    final URLConnection urlConnection = uri.toURL().openConnection();
+                    final InputStream inputStream = urlConnection.getInputStream();
+                    try {
+                        final Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                        if (bitmap != null) {
+                            result.pass(bitmap);
 
-                            } else {
-                                result.abort();
-                            }
-
-                        } catch (final IOException e) {
-                            throw new InvocationException(e);
-
-                        } catch (final InterruptedException e) {
-                            throw new InvocationInterruptedException(e);
+                        } else {
+                            result.abort();
                         }
+
+                    } finally {
+                       inputStream.close();
                     }
                 }
             }
 
-            private static class LoadBitmapFromService extends CallContextInvocation&lt;URI, Bitmap&gt; {
+            private static class LoadBitmapFromService extends TemplateContextInvocation&lt;URI, Bitmap&gt; {
 
                 private Routine&lt;URI, Bitmap&gt; mRoutine;
 
@@ -183,15 +165,14 @@
 
                     super.onContext(context);
                     mRoutine = JRoutineService.with(serviceFrom(context))
-                                              .on(factoryOf(LoadBitmap.class))
+                                              .on(TargetInvocationFactory.factoryOf(LoadBitmap.class))
                                               .buildRoutine();
                 }
 
                 &commat;Override
-                protected void onCall(final List&lt;? extends URI&gt; uris,
-                    &commat;NotNull final ResultChannel&lt;Bitmap&gt; result) {
+                protected onInput(final URI uri, &commat;NotNull final ResultChannel&lt;Bitmap&gt; result) {
 
-                    result.pass(mRoutine.asyncCall(uris));
+                    result.pass(mRoutine.asyncCall(uri));
                 }
             }
         }

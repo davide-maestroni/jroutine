@@ -220,7 +220,6 @@ public class ServiceBuilder {
      *                                            found.
      */
     @NotNull
-    @SuppressWarnings("unchecked")
     public <IN, OUT> RoutineBuilder<IN, OUT> on(
             @NotNull final ContextInvocation<IN, OUT> invocation) {
 
@@ -245,7 +244,6 @@ public class ServiceBuilder {
      *                                            found.
      */
     @NotNull
-    @SuppressWarnings("unchecked")
     public <IN, OUT> RoutineBuilder<IN, OUT> on(
             @NotNull final ContextInvocation<IN, OUT> invocation, @Nullable final Object... args) {
 

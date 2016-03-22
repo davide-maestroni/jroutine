@@ -24,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 
+import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
@@ -130,11 +131,10 @@ public abstract class InvocationFactory<IN, OUT> {
      * @throws java.lang.IllegalArgumentException if no default constructor was found.
      */
     @NotNull
-    @SuppressWarnings("unchecked")
     public static <IN, OUT> InvocationFactory<IN, OUT> factoryOf(
             @NotNull final Invocation<IN, OUT> invocation) {
 
-        return factoryOf((Class<? extends Invocation<IN, OUT>>) invocation.getClass());
+        return factoryOf(tokenOf(invocation));
     }
 
     /**
@@ -156,11 +156,10 @@ public abstract class InvocationFactory<IN, OUT> {
      *                                            parameters was found.
      */
     @NotNull
-    @SuppressWarnings("unchecked")
     public static <IN, OUT> InvocationFactory<IN, OUT> factoryOf(
             @NotNull final Invocation<IN, OUT> invocation, @Nullable final Object... args) {
 
-        return factoryOf((Class<? extends Invocation<IN, OUT>>) invocation.getClass(), args);
+        return factoryOf(tokenOf(invocation), args);
     }
 
     /**
@@ -196,7 +195,6 @@ public abstract class InvocationFactory<IN, OUT> {
          * @throws java.lang.IllegalArgumentException if no constructor taking the specified objects
          *                                            as parameters was found.
          */
-        @SuppressWarnings("ConstantConditions")
         private DefaultInvocationFactory(
                 @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass,
                 @Nullable final Object[] args) {

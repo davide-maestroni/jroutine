@@ -38,7 +38,6 @@
         }
 
         @Override
-        @SuppressWarnings({"unchecked", "ConstantConditions"})
         public void onContext(@org.jetbrains.annotations.NotNull final android.content.Context context) throws Exception {
 
             super.onContext(context);

@@ -29,7 +29,6 @@ import com.github.dm.jrt.android.object.R;
 import com.github.dm.jrt.android.object.builder.FactoryContextWrapper;
 import com.github.dm.jrt.android.object.builder.LoaderObjectRoutineBuilder;
 import com.github.dm.jrt.android.v11.core.JRoutineLoader;
-import com.github.dm.jrt.android.v11.core.LoaderContext;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
@@ -367,7 +366,7 @@ public class LoaderObjectRoutineFragmentTest
         }
     }
 
-    @SuppressWarnings({"ConstantConditions", "RedundantCast"})
+    @SuppressWarnings("ConstantConditions")
     public void testFragmentNullPointerErrors() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
@@ -381,7 +380,7 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutineLoader.with((LoaderContext) null).on(factoryOf(TestInvocation.class));
+            JRoutineLoader.with(null).on(factoryOf(TestInvocation.class));
 
             fail();
 
@@ -401,7 +400,7 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutineLoaderObject.with((LoaderContext) null).on(classOfType(TestInvocation.class));
+            JRoutineLoaderObject.with(null).on(classOfType(TestInvocation.class));
 
             fail();
 
@@ -411,7 +410,7 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutineLoaderObject.with((LoaderContext) null)
+            JRoutineLoaderObject.with(null)
                                 .on(instanceOf(TestInvocation.class, Reflection.NO_ARGS));
 
             fail();
@@ -443,7 +442,7 @@ public class LoaderObjectRoutineFragmentTest
 
         try {
 
-            JRoutineLoaderObject.with((LoaderContext) null);
+            JRoutineLoaderObject.with(null);
 
             fail();
 
@@ -1107,7 +1106,6 @@ public class LoaderObjectRoutineFragmentTest
         itf.setL6().asyncCall(Arrays.asList(1, 2, 3)).hasCompleted();
     }
 
-    @SuppressWarnings("NullArgumentToVariableArgMethod")
     public void testProxyRoutine() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {

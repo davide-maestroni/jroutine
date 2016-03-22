@@ -596,7 +596,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         }
     }
 
-    @SuppressWarnings({"ConstantConditions", "RedundantCast"})
+    @SuppressWarnings("ConstantConditions")
     public void testActivityNullPointerErrors() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
@@ -606,7 +606,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            JRoutineLoader.with((LoaderContext) null).on(factoryOf(ToUpperCase.class));
+            JRoutineLoader.with(null).on(factoryOf(ToUpperCase.class));
 
             fail();
 
@@ -627,7 +627,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            JRoutineLoader.with((LoaderContext) null);
+            JRoutineLoader.with(null);
 
             fail();
 
@@ -1392,7 +1392,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         }
     }
 
-    @SuppressWarnings({"ConstantConditions", "RedundantCast"})
+    @SuppressWarnings("ConstantConditions")
     public void testFragmentNullPointerErrors() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
@@ -1406,7 +1406,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            JRoutineLoader.with((LoaderContext) null).on(factoryOf(ToUpperCase.class));
+            JRoutineLoader.with(null).on(factoryOf(ToUpperCase.class));
 
             fail();
 
@@ -1426,7 +1426,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         try {
 
-            JRoutineLoader.with((LoaderContext) null);
+            JRoutineLoader.with(null);
 
             fail();
 

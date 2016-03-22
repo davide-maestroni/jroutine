@@ -1028,7 +1028,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
 
         @NotNull
-        @SuppressWarnings({"unchecked", "ConstantConditions"})
+        @SuppressWarnings("ConstantConditions")
         public OutputChannel<OUT> allInto(@NotNull final Collection<? super OUT> results) {
 
             boolean isAbort = false;

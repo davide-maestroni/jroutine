@@ -27,7 +27,6 @@ import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.object.builder.FactoryContextWrapper;
 import com.github.dm.jrt.android.object.builder.LoaderObjectRoutineBuilder;
 import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
-import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
@@ -92,13 +91,12 @@ public class LoaderObjectRoutineActivityTest
         super(TestActivity.class);
     }
 
-    @SuppressWarnings({"ConstantConditions", "RedundantCast"})
+    @SuppressWarnings("ConstantConditions")
     public void testActivityNullPointerErrors() {
 
         try {
 
-            JRoutineLoaderCompat.with((LoaderContextCompat) null)
-                                .on(factoryOf(TestInvocation.class));
+            JRoutineLoaderCompat.with(null).on(factoryOf(TestInvocation.class));
 
             fail();
 
@@ -119,8 +117,7 @@ public class LoaderObjectRoutineActivityTest
 
         try {
 
-            JRoutineLoaderObjectCompat.with((LoaderContextCompat) null)
-                                      .on(classOfType(TestInvocation.class));
+            JRoutineLoaderObjectCompat.with(null).on(classOfType(TestInvocation.class));
 
             fail();
 
@@ -130,7 +127,7 @@ public class LoaderObjectRoutineActivityTest
 
         try {
 
-            JRoutineLoaderObjectCompat.with((LoaderContextCompat) null)
+            JRoutineLoaderObjectCompat.with(null)
                                       .on(instanceOf(TestInvocation.class, Reflection.NO_ARGS));
 
             fail();
@@ -163,7 +160,7 @@ public class LoaderObjectRoutineActivityTest
 
         try {
 
-            JRoutineLoaderObjectCompat.with((LoaderContextCompat) null);
+            JRoutineLoaderObjectCompat.with(null);
 
             fail();
 
@@ -927,7 +924,6 @@ public class LoaderObjectRoutineActivityTest
         itf.setL6().asyncCall(Arrays.asList(1, 2, 3)).hasCompleted();
     }
 
-    @SuppressWarnings("NullArgumentToVariableArgMethod")
     public void testProxyRoutine() {
 
         final TimeDuration timeout = seconds(10);

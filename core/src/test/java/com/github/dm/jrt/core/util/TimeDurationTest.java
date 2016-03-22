@@ -575,7 +575,6 @@ public class TimeDurationTest {
     }
 
     @Test
-    @SuppressWarnings("ConstantConditions")
     public void testSleepError() {
 
         try {

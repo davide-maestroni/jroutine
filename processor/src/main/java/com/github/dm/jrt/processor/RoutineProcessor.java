@@ -805,7 +805,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @return the class name.
      */
     @NotNull
-    @SuppressWarnings({"ConstantConditions", "UnusedParameters"})
+    @SuppressWarnings("UnusedParameters")
     protected String getGeneratedClassName(@NotNull final TypeElement annotationElement,
             @NotNull final TypeElement element, @NotNull final Element targetElement) {
 
@@ -832,7 +832,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @return the class package.
      */
     @NotNull
-    @SuppressWarnings({"ConstantConditions", "UnusedParameters"})
+    @SuppressWarnings("UnusedParameters")
     protected String getGeneratedClassPackage(@NotNull final TypeElement annotationElement,
             @NotNull final TypeElement element, @NotNull final Element targetElement) {
 
@@ -854,7 +854,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @return the name prefix.
      */
     @NotNull
-    @SuppressWarnings({"ConstantConditions", "UnusedParameters"})
+    @SuppressWarnings("UnusedParameters")
     protected String getGeneratedClassPrefix(@NotNull final TypeElement annotationElement,
             @NotNull final TypeElement element, @NotNull final Element targetElement) {
 
@@ -873,7 +873,7 @@ public class RoutineProcessor extends AbstractProcessor {
      * @return the name suffix.
      */
     @NotNull
-    @SuppressWarnings({"ConstantConditions", "UnusedParameters"})
+    @SuppressWarnings("UnusedParameters")
     protected String getGeneratedClassSuffix(@NotNull final TypeElement annotationElement,
             @NotNull final TypeElement element, @NotNull final Element targetElement) {
 
@@ -1590,7 +1590,7 @@ public class RoutineProcessor extends AbstractProcessor {
     }
 
     @NotNull
-    @SuppressWarnings({"ConstantConditions", "unchecked"})
+    @SuppressWarnings("UnusedParameters")
     private ExecutableElement findMatchingMethod(@NotNull final ExecutableElement methodElement,
             @NotNull final Element targetElement) {
 

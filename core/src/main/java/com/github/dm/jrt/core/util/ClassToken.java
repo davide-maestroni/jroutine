@@ -141,10 +141,10 @@ public abstract class ClassToken<TYPE> {
         if (mRawClass == null) {
             final Type type = getGenericType();
             if (type instanceof Class) {
-                mRawClass = ((Class<TYPE>) type);
+                mRawClass = (Class<TYPE>) type;
 
             } else if (type instanceof ParameterizedType) {
-                mRawClass = ((Class<TYPE>) ((ParameterizedType) type).getRawType());
+                mRawClass = (Class<TYPE>) ((ParameterizedType) type).getRawType();
 
             } else {
                 throw new IllegalStateException(

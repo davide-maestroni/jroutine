@@ -389,7 +389,6 @@ public class JRoutineAndroid extends SparseChannels {
          *                                            found.
          */
         @NotNull
-        @SuppressWarnings("unchecked")
         public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
                 @NotNull final Invocation<IN, OUT> invocation) {
 
@@ -414,7 +413,6 @@ public class JRoutineAndroid extends SparseChannels {
          *                                            found.
          */
         @NotNull
-        @SuppressWarnings("unchecked")
         public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
                 @NotNull final Invocation<IN, OUT> invocation, @Nullable final Object... args) {
 

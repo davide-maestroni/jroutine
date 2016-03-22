@@ -24,20 +24,20 @@
         android:name=".app.TestApp"
         android:label="jroutine-androidproxy">
         <activity
-            android:name="com.github.dm.jrt.android.proxy.core.TestActivity"
+            android:name="com.github.dm.jrt.android.proxy.TestActivity"
             android:label="test">
         </activity>
         <activity
-            android:name="com.github.dm.jrt.android.proxy.v4.core.TestActivity"
+            android:name="com.github.dm.jrt.android.v4.proxy.TestActivity"
             android:label="test">
         </activity>
         <activity
-            android:name="com.github.dm.jrt.android.proxy.v11.core.TestActivity"
+            android:name="com.github.dm.jrt.android.v11.proxy.TestActivity"
             android:label="test">
         </activity>
 
         <service
-            android:name="com.github.dm.jrt.android.proxy.core.TestService"
+            android:name="com.github.dm.jrt.android.proxy.TestService"
             android:process=":remote"/>
     </application>
 

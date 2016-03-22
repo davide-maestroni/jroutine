@@ -1,0 +1,75 @@
+<!--
+  ~ Copyright 2016 Davide Maestroni
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<html>
+<head>
+    <title>jroutine-stream</title>
+</head>
+<body>
+<a href="https://github.com/davide-maestroni/jroutine" target="_blank">Parallel programming on the go.</a>
+<p>
+    Stream-like routine concatenation based on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/v6/library" target="_blank">jroutine</a> libraries.
+</p>
+<h2>Usage examples</h2>
+<p>
+    The code below shows how it is possible to implement the computation of the root mean square of some input data, by distributing it in a number of background threads.
+</p>
+<b>Example 1:</b> via stream channel.
+<p>
+    The library provides an additional fluent notation to compose routines.<br/>
+    Note that the passed instances are expected to behave like functions (that is, no variable state and no side effects).<br/>
+    The lambda notation used in the example is just for demonstration purpose. In order to compile with Java 7 or below, explicit object creation must be employed.<br/>
+    In fact, the interfaces defined in the "function" package are conceptually <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/FunctionalInterface.html" target="_blank">functional interfaces</a>.
+</p>
+<pre>
+    <code>
+        public class Main {
+
+            public static void main(final String[] args) {
+
+                final StreamChannel&lt;Double&gt; channel =
+                        Streams.streamOf(args)
+                               .parallel()
+                               .map(Integer::parseInt)
+                               .map(integer -&gt; integer * integer)
+                               .sync()
+                               .map(integer -&gt; new SumData(integer, 1))
+                               .async()
+                               .reduce((data1, data2) -&gt; new SumData(data1.sum + data2.sum,
+                                                                data1.count + data2.count))
+                               .map(sumData -&gt; Math.sqrt((double) sumData.sum / sumData.count));
+                final Double rms = channel.afterMax(seconds(1)).next();
+                System.out.println(rms);
+                System.exit(0);
+            }
+
+            private static class SumData {
+
+                private final int count;
+
+                private final int sum;
+
+                private SumData(final int sum, final int count) {
+
+                    this.sum = sum;
+                    this.count = count;
+                }
+            }
+        }
+    </code>
+</pre>
+</body>
+</html>

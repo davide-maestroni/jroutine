@@ -16,9 +16,9 @@
 
 package com.github.dm.jrt.proxy.builder;
 
-import com.github.dm.jrt.builder.InvocationConfiguration;
-import com.github.dm.jrt.builder.ProxyConfiguration;
-import com.github.dm.jrt.util.WeakIdentityHashMap;
+import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.util.WeakIdentityHashMap;
+import com.github.dm.jrt.object.config.ProxyConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -107,15 +107,15 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
     @NotNull
     public InvocationConfiguration.Builder<? extends ProxyObjectBuilder<TYPE>> withInvocations() {
 
-        final InvocationConfiguration configuration = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<ProxyObjectBuilder<TYPE>>(this, configuration);
+        final InvocationConfiguration config = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<ProxyObjectBuilder<TYPE>>(this, config);
     }
 
     @NotNull
     public ProxyConfiguration.Builder<? extends ProxyObjectBuilder<TYPE>> withProxies() {
 
-        final ProxyConfiguration configuration = mProxyConfiguration;
-        return new ProxyConfiguration.Builder<ProxyObjectBuilder<TYPE>>(this, configuration);
+        final ProxyConfiguration config = mProxyConfiguration;
+        return new ProxyConfiguration.Builder<ProxyObjectBuilder<TYPE>>(this, config);
     }
 
     /**

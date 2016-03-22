@@ -22,35 +22,16 @@
         android:name=".app.TestApp"
         android:label="jroutine-android">
         <activity
-            android:name="com.github.dm.jrt.android.core.TestActivity"
-            android:label="test">
-        </activity>
-        <activity
             android:name="com.github.dm.jrt.android.v11.TestActivity"
-            android:label="test">
-        </activity>
-        <activity
-            android:name="com.github.dm.jrt.android.v11.core.RotationTestActivity"
             android:label="test">
         </activity>
         <activity
             android:name="com.github.dm.jrt.android.v4.TestActivity"
             android:label="test">
         </activity>
-        <activity
-            android:name="com.github.dm.jrt.android.v4.core.RotationTestActivity"
-            android:label="test">
-        </activity>
 
         <service
-            android:name="com.github.dm.jrt.android.service.InvocationService"
-            android:process=":remote"/>
-        <service
-            android:name="com.github.dm.jrt.android.core.DecoratingService"
-            android:process=":remote"/>
-        <service
-            android:name="com.github.dm.jrt.android.core.TestService"
-            android:process=":remote"/>
+            android:name="com.github.dm.jrt.android.core.service.InvocationService"/>
     </application>
 
 </manifest>

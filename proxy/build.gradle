@@ -30,8 +30,9 @@ dependencies {
     testCompile 'org.assertj:assertj-core:1.7.1'
 }
 conditionalDependencies {
+    compile name: 'core', artifact: { "${it.parent.name}-${it.name}" }
+    compile name: 'object', artifact: { "${it.parent.name}-${it.name}" }
     compile name: 'processor', artifact: { "${it.parent.name}-${it.name}" }
-    compile name: 'library', artifact: { it.parent.name }
 }
 
 jacocoTestReport {
@@ -48,6 +49,7 @@ findbugs {
 javadoc {
     options.overview("${project.projectDir}/docs/overview.html")
     options.links('http://docs.oracle.com/javase/7/docs/api/',
-            'http://davide-maestroni.github.io/jroutine/javadoc/library/',
-            'http://davide-maestroni.github.io/jroutine/javadoc/processor/')
+            'http://davide-maestroni.github.io/jroutine/javadoc/v6/core/',
+            'http://davide-maestroni.github.io/jroutine/javadoc/v6/object/',
+            'http://davide-maestroni.github.io/jroutine/javadoc/v6/processor/')
 }

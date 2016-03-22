@@ -19,6 +19,73 @@ allprojects {
     }
 }
 
+task clean(type: Delete) {
+    delete buildDir
+}
+
 task wrapper(type: Wrapper) {
     gradleVersion = '2.10'
+}
+
+gradle.projectsEvaluated {
+
+    apply plugin: 'com.github.kt3k.coveralls'
+    apply plugin: 'jacoco'
+
+    def publishedProjects = subprojects.findAll {
+        it.plugins.hasPlugin('jacoco')
+    }
+
+    coveralls {
+        def sources = files()
+        publishedProjects.each {
+            if (it.plugins.hasPlugin('java')) {
+                sources += files(it.sourceSets.main.allSource.srcDirs)
+            } else {
+                sources += files(it.android.sourceSets.main.java.srcDirs)
+            }
+        }
+        sourceDirs = sources.flatten()
+        jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
+    }
+
+    task jacocoRootReport(type: JacocoReport, group: 'Coverage reports') {
+        description = 'Generates an aggregate report from all subprojects'
+        dependsOn(publishedProjects.test)
+
+        def additionalSources = files()
+        def sources = files()
+        def classes = files()
+        def execs = files()
+        publishedProjects.each {
+            if (it.plugins.hasPlugin('java')) {
+                additionalSources += files(it.sourceSets.main.allJava.srcDirs)
+                sources += files(it.sourceSets.main.allSource.srcDirs)
+                classes += files(it.sourceSets.main.output)
+                execs += files(it.jacocoTestReport.executionData)
+            } else {
+                sources += files(it.android.sourceSets.main.java.srcDirs)
+                classes += fileTree(dir: "${it.buildDir}/intermediates/classes/debug", exclude: ['**/R*.class', '**/BuildConfig.class'])
+                execs += fileTree("${it.buildDir}/outputs/code-coverage/connected")
+            }
+        }
+
+        additionalSourceDirs = additionalSources
+        sourceDirectories = sources
+        classDirectories = classes
+        executionData = execs
+
+        reports {
+            html.enabled = true // human readable
+            xml.enabled = true // required by coveralls
+        }
+
+        onlyIf = {
+            true
+        }
+
+        doFirst {
+            executionData = files(executionData.findAll { it.exists() })
+        }
+    }
 }

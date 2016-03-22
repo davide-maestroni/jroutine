@@ -19,7 +19,7 @@
         @Override
         @SuppressWarnings({"unchecked", "ConstantConditions", "SynchronizeOnNonFinalField"})
         protected void onCall(@org.jetbrains.annotations.NotNull final java.util.List<?> objects,
-                @org.jetbrains.annotations.NotNull final com.github.dm.jrt.channel.ResultChannel<${resultClassName}> result) throws Exception {
+                @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.channel.ResultChannel<${resultClassName}> result) throws Exception {
 
             if (objects.size() > ${maxParamSize}) {
                 throw new IllegalArgumentException(
@@ -27,7 +27,7 @@
                         objects.size() + " while expected " + (${maxParamSize}));
             }
 
-            final com.github.dm.jrt.common.Mutex mutex = mMutex;
+            final com.github.dm.jrt.object.common.Mutex mutex = mMutex;
             mutex.acquire();
             try {
                 ${invocationTarget}.${targetMethodName}(${paramValues});

@@ -18,8 +18,7 @@ package com.github.dm.jrt.android.proxy.app;
 
 import android.app.Application;
 
-import com.github.dm.jrt.android.builder.FactoryContext;
-import com.github.dm.jrt.invocation.InvocationException;
+import com.github.dm.jrt.android.object.builder.FactoryContext;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import static com.github.dm.jrt.util.Reflection.findConstructor;
+import static com.github.dm.jrt.core.util.Reflection.findConstructor;
 
 /**
  * Test application.
@@ -43,19 +42,14 @@ public class TestApp extends Application implements FactoryContext {
     @Nullable
     @SuppressWarnings("unchecked")
     public <TYPE> TYPE geInstance(@NotNull final Class<? extends TYPE> type,
-            @NotNull final Object[] args) {
+            @NotNull final Object[] args) throws Exception {
 
         final HashMap<InstanceInfo, Object> instances = sInstances;
         final InstanceInfo instanceInfo = new InstanceInfo(type, args);
         Object instance = instances.get(instanceInfo);
         if (instance == null) {
-            try {
-                instance = findConstructor(type, args).newInstance(args);
-                instances.put(instanceInfo, instance);
-
-            } catch (final Throwable t) {
-                throw InvocationException.wrapIfNeeded(t);
-            }
+            instance = findConstructor(type, args).newInstance(args);
+            instances.put(instanceInfo, instance);
         }
 
         return (TYPE) instance;

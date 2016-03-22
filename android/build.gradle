@@ -17,7 +17,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'jacoco'
 apply plugin: 'findbugs'
-apply plugin: 'com.github.kt3k.coveralls'
 apply plugin: 'com.github.ben-manes.versions'
 apply from: '../extra.gradle'
 
@@ -26,12 +25,12 @@ version = project.getProperty('releaseVersion')
 archivesBaseName = "${project.parent.name}-${project.name}"
 
 android {
-    compileSdkVersion 22
-    buildToolsVersion '22.0.1'
+    compileSdkVersion 23
+    buildToolsVersion '23.0.2'
 
     defaultConfig {
         minSdkVersion 4
-        targetSdkVersion 22
+        targetSdkVersion 23
         versionCode Integer.parseInt(project.getProperty('releaseVersionCode'))
         versionName version
     }
@@ -39,7 +38,7 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
 
         debug {
@@ -56,26 +55,30 @@ android {
     dexOptions {
         preDexLibraries false
     }
+
+    packagingOptions {
+        exclude 'META-INF/services/javax.annotation.processing.Processor'
+    }
 }
 
 dependencies {
     androidTestCompile 'org.assertj:assertj-core:1.7.1'
-    compile 'com.android.support:support-v4:22.2.1'
+    compile 'com.android.support:support-v4:23.2.1'
 }
 conditionalDependencies {
-    compile name: 'library', artifact: { it.parent.name }
+    compile name: 'androidcore', artifact: { "${it.parent.name}-${it.name}" }
+    compile name: 'androidobject', artifact: { "${it.parent.name}-${it.name}" }
+    compile name: 'androidproxy', artifact: { "${it.parent.name}-${it.name}" }
+    compile name: 'androidchannel', artifact: { "${it.parent.name}-${it.name}" }
+    compile name: 'androidstream', artifact: { "${it.parent.name}-${it.name}" }
 }
 
 findbugs {
     toolVersion '3.0.1'
 }
 
-tasks.withType(FindBugs) {
-    excludeFilter = file('findbugs.xml')
-}
-
 tasks.withType(Javadoc) {
     options.overview("${project.projectDir}/docs/overview.html")
     options.links('http://docs.oracle.com/javase/7/docs/api/',
-            'http://davide-maestroni.github.io/jroutine/javadoc/library/')
+            'http://davide-maestroni.github.io/jroutine/javadoc/v6/library/')
 }

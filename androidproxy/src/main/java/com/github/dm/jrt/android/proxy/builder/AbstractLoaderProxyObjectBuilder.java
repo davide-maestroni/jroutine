@@ -16,11 +16,11 @@
 
 package com.github.dm.jrt.android.proxy.builder;
 
-import com.github.dm.jrt.android.builder.LoaderConfiguration;
-import com.github.dm.jrt.builder.InvocationConfiguration;
-import com.github.dm.jrt.builder.ProxyConfiguration;
-import com.github.dm.jrt.runner.Runner;
-import com.github.dm.jrt.util.WeakIdentityHashMap;
+import com.github.dm.jrt.android.core.config.LoaderConfiguration;
+import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.runner.Runner;
+import com.github.dm.jrt.core.util.WeakIdentityHashMap;
+import com.github.dm.jrt.object.config.ProxyConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -82,7 +82,7 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
             final LoaderConfiguration loaderConfiguration = mLoaderConfiguration;
             final ProxyInfo proxyInfo =
                     new ProxyInfo(getInterfaceClass(), invocationConfiguration, proxyConfiguration,
-                                  loaderConfiguration);
+                            loaderConfiguration);
             final Object instance = proxies.get(proxyInfo);
             if (instance != null) {
                 return (TYPE) instance;
@@ -92,7 +92,7 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
             if (asyncRunner != null) {
                 invocationConfiguration.newLogger(this)
                                        .wrn("the specified runner will be ignored: %s",
-                                            asyncRunner);
+                                               asyncRunner);
             }
 
             try {

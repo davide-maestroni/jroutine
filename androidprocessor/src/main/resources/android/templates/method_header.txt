@@ -16,20 +16,20 @@
 
 // GENERATED CODE - PLEASE DO NOT EDIT
 
-    private final com.github.dm.jrt.routine.Routine<?, ${resultClassName}> mRoutine${methodCount};
+    private final com.github.dm.jrt.core.routine.Routine<?, ${resultClassName}> mRoutine${methodCount};
 
     @org.jetbrains.annotations.NotNull
     @SuppressWarnings("unchecked")
-    private com.github.dm.jrt.routine.Routine<?, ${resultClassName}> initRoutine${methodCount}(
-            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.ContextInvocationTarget<?> target,
-            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.builder.InvocationConfiguration invocationConfiguration,
-            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.builder.ProxyConfiguration proxyConfiguration,
-            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.builder.ServiceConfiguration serviceConfiguration) {
+    private com.github.dm.jrt.core.routine.Routine<?, ${resultClassName}> initRoutine${methodCount}(
+            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.object.ContextInvocationTarget<?> target,
+            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.config.InvocationConfiguration invocationConfiguration,
+            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.config.ProxyConfiguration proxyConfiguration,
+            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.config.ServiceConfiguration serviceConfiguration) {
 
         final java.util.List<String> sharedFields = ${sharedFields};
-        final com.github.dm.jrt.android.core.TargetInvocationFactory<Object, ${resultClassName}> targetFactory = com.github.dm.jrt.android.core.TargetInvocationFactory.factoryOf(
+        final com.github.dm.jrt.android.core.invocation.TargetInvocationFactory<Object, ${resultClassName}> targetFactory = com.github.dm.jrt.android.core.invocation.TargetInvocationFactory.factoryOf(
                 // We need to work around Proguard stripping away generics information, so the use of a ClassToken is not an option
-                (Class<? extends com.github.dm.jrt.android.invocation.ContextInvocation<Object, ${resultClassName}>>) new ContextInvocation${methodCount}${genericTypes}(sharedFields, target).getClass(), sharedFields, target);
+                (Class<? extends com.github.dm.jrt.android.core.invocation.ContextInvocation<Object, ${resultClassName}>>) new ContextInvocation${methodCount}${genericTypes}(sharedFields, target).getClass(), sharedFields, target);
         return getBuilder(mContext, targetFactory).withInvocations()
                                                   .with(invocationConfiguration)
                                                   ${routineBuilderOptions}

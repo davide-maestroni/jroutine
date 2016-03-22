@@ -15,7 +15,6 @@
  */
 
 apply plugin: 'java'
-apply plugin: 'jacoco'
 apply plugin: 'findbugs'
 apply plugin: 'com.github.ben-manes.versions'
 apply from: '../extra.gradle'
@@ -29,13 +28,6 @@ conditionalDependencies {
     compile name: 'processor', artifact: { "${it.parent.name}-${it.name}" }
 }
 
-jacocoTestReport {
-    reports {
-        xml.enabled = true // Coveralls plugin depends on xml format report
-        html.enabled = true
-    }
-}
-
 findbugs {
     toolVersion '3.0.1'
 }
@@ -43,6 +35,6 @@ findbugs {
 javadoc {
     options.overview("${project.projectDir}/docs/overview.html")
     options.links('http://docs.oracle.com/javase/7/docs/api/',
-            'http://davide-maestroni.github.io/jroutine/javadoc/library/',
-            'http://davide-maestroni.github.io/jroutine/javadoc/processor/')
+            'http://davide-maestroni.github.io/jroutine/javadoc/v6/processor/',
+            'http://davide-maestroni.github.io/jroutine/javadoc/v6/androidobject/')
 }

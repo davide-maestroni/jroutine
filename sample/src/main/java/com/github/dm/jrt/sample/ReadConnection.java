@@ -16,11 +16,11 @@
 
 package com.github.dm.jrt.sample;
 
-import com.github.dm.jrt.channel.ResultChannel;
-import com.github.dm.jrt.core.ByteChannel;
-import com.github.dm.jrt.core.ByteChannel.BufferOutputStream;
-import com.github.dm.jrt.core.ByteChannel.ByteBuffer;
-import com.github.dm.jrt.invocation.FilterInvocation;
+import com.github.dm.jrt.channel.ByteChannel;
+import com.github.dm.jrt.channel.ByteChannel.BufferOutputStream;
+import com.github.dm.jrt.channel.ByteChannel.ByteBuffer;
+import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.invocation.FilterInvocation;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -40,7 +40,7 @@ public class ReadConnection extends FilterInvocation<URI, ByteBuffer> {
     private static final int MAX_CHUNK_SIZE = 2048;
 
     public void onInput(final URI uri, @NotNull final ResultChannel<ByteBuffer> result) throws
-            Exception {
+            IOException {
 
         InputStream inputStream = null;
         try {
@@ -57,7 +57,7 @@ public class ReadConnection extends FilterInvocation<URI, ByteBuffer> {
             // We employ the utility class dedicated to the optimized transfer of bytes through a
             // routine channel
             final BufferOutputStream outputStream =
-                    ByteChannel.byteChannel(MAX_CHUNK_SIZE).passTo(result);
+                    ByteChannel.byteChannel(MAX_CHUNK_SIZE).bind(result);
             try {
                 outputStream.writeAll(inputStream);
 

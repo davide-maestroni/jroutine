@@ -6,14 +6,14 @@ language: android
 android:
   components:
     # Platform tools
-    - platform-tools
     - tools
+    - platform-tools
 
     # The BuildTools version
-    - build-tools-22.0.1
+    - build-tools-23.0.2
 
     # The SDK version
-    - android-22
+    - android-23
 
     # Extras
     - extra-android-support
@@ -22,7 +22,8 @@ android:
 # Env configuration
 env:
   global:
-    JAVA_OPTS=-Xmx2g -XX:MaxPermSize=512m
+    - JAVA_OPTS=-Xmx2g -XX:MaxPermSize=512m
+    - ADB_INSTALL_TIMEOUT=8
   matrix:
     - ANDROID_SDKS=android-10            ANDROID_TARGET=android-10  ANDROID_ABI=armeabi
     - ANDROID_SDKS=android-19,sysimg-19  ANDROID_TARGET=android-19  ANDROID_ABI=armeabi-v7a
@@ -35,10 +36,10 @@ before_install:
 before_script:
   - android-wait-for-emulator
   - adb shell input keyevent 82 &
-script: ./gradlew -i build connectedCheck
+script: ./gradlew build connectedCheck
 
 # Print reports
 after_failure: find . -name TEST-\*.xml -print -exec cat {} \;
 
 # Code coverage
-after_success: ./gradlew jacocoTestReport coveralls
+after_success: ./gradlew jacocoRootReport coveralls

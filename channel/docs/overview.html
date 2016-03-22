@@ -1,0 +1,46 @@
+<!--
+  ~ Copyright 2016 Davide Maestroni
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<html>
+<head>
+    <title>jroutine-channel</title>
+</head>
+<body>
+<a href="https://github.com/davide-maestroni/jroutine" target="_blank">Parallel programming on the go.</a>
+<p>
+    Channel utility classes based on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/v6/core" target="_blank">jroutine-core</a> library.
+</p>
+<h2>Usage examples</h2>
+<b>Example 1:</b> blending the output of two channels.
+<pre>
+    <code>
+      final OutputChannel&lt;Object&gt; channel = Channels.blend(channel1, channel2).build();
+    </code>
+</pre>
+<b>Example 2:</b> concatenating the output of two channels.
+<pre>
+    <code>
+      final OutputChannel&lt;Object&gt; channel = Channels.concat(channel1, channel2).build();
+    </code>
+</pre>
+<b>Example 3:</b> joining the output of two channels.
+<pre>
+    <code>
+      final OutputChannel&lt;List&lt;Object&gt;&gt; channel = Channels.join(channel1, channel2).build();
+    </code>
+</pre>
+</body>
+</html>

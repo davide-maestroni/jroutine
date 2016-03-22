@@ -16,16 +16,16 @@
 
 // GENERATED CODE - PLEASE DO NOT EDIT
 
-    private final com.github.dm.jrt.routine.Routine<?, ${resultClassName}> mRoutine${methodCount};
+    private final com.github.dm.jrt.core.routine.Routine<?, ${resultClassName}> mRoutine${methodCount};
 
-    private static class ContextInvocationFactory${methodCount}${genericTypes} extends com.github.dm.jrt.android.invocation.FunctionContextInvocationFactory<Object, ${resultClassName}> {
+    private static class ContextInvocationFactory${methodCount}${genericTypes} extends com.github.dm.jrt.android.core.invocation.ContextInvocationFactory<Object, ${resultClassName}> {
 
         private final java.util.List<String> mSharedFields;
 
-        private final com.github.dm.jrt.android.core.ContextInvocationTarget<?> mTarget;
+        private final com.github.dm.jrt.android.object.ContextInvocationTarget<?> mTarget;
 
         private ContextInvocationFactory${methodCount}(@org.jetbrains.annotations.Nullable final java.util.List<String> sharedFields,
-                @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.ContextInvocationTarget<?> target) {
+                @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.object.ContextInvocationTarget<?> target) {
 
             super(new Object[]{sharedFields, target});
             mSharedFields = sharedFields;
@@ -34,18 +34,18 @@
 
         @org.jetbrains.annotations.NotNull
         @Override
-        public com.github.dm.jrt.android.invocation.FunctionContextInvocation<Object, ${resultClassName}> newInvocation() {
+        public com.github.dm.jrt.android.core.invocation.ContextInvocation<Object, ${resultClassName}> newInvocation() {
 
             return new ContextInvocation${methodCount}${genericTypes}(mSharedFields, mTarget);
         }
     }
 
     @org.jetbrains.annotations.NotNull
-    private com.github.dm.jrt.routine.Routine<?, ${resultClassName}> initRoutine${methodCount}(
-            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.ContextInvocationTarget<?> target,
-            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.builder.InvocationConfiguration invocationConfiguration,
-            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.builder.ProxyConfiguration proxyConfiguration,
-            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.builder.LoaderConfiguration loaderConfiguration) {
+    private com.github.dm.jrt.core.routine.Routine<?, ${resultClassName}> initRoutine${methodCount}(
+            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.object.ContextInvocationTarget<?> target,
+            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.config.InvocationConfiguration invocationConfiguration,
+            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.config.ProxyConfiguration proxyConfiguration,
+            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.config.LoaderConfiguration loaderConfiguration) {
 
         return getBuilder(mContext, new ContextInvocationFactory${methodCount}${genericTypes}(${sharedFields}, target))
                                            .withInvocations()

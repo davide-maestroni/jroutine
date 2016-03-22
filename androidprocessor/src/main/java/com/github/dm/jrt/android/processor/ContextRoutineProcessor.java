@@ -86,17 +86,18 @@ public class ContextRoutineProcessor extends RoutineProcessor {
     public synchronized void init(final ProcessingEnvironment processingEnv) {
 
         super.init(processingEnv);
-        mIdAnnotationType = getMirrorFromName("com.github.dm.jrt.android.annotation.LoaderId");
+        mIdAnnotationType =
+                getMirrorFromName("com.github.dm.jrt.android.object.annotation.LoaderId");
         mRoutineIdAnnotationType =
-                getMirrorFromName("com.github.dm.jrt.android.annotation.RoutineId");
+                getMirrorFromName("com.github.dm.jrt.android.object.annotation.RoutineId");
         mClashAnnotationType =
-                getMirrorFromName("com.github.dm.jrt.android.annotation.ClashResolution");
-        mInputClashAnnotationType =
-                getMirrorFromName("com.github.dm.jrt.android.annotation.InputClashResolution");
+                getMirrorFromName("com.github.dm.jrt.android.object.annotation.ClashResolution");
+        mInputClashAnnotationType = getMirrorFromName(
+                "com.github.dm.jrt.android.object.annotation.InputClashResolution");
         mCacheAnnotationType =
-                getMirrorFromName("com.github.dm.jrt.android.annotation.CacheStrategy");
+                getMirrorFromName("com.github.dm.jrt.android.object.annotation.CacheStrategy");
         mStaleTimeAnnotationType =
-                getMirrorFromName("com.github.dm.jrt.android.annotation.ResultStaleTime");
+                getMirrorFromName("com.github.dm.jrt.android.object.annotation.ResultStaleTime");
         final Types typeUtils = processingEnv.getTypeUtils();
         mServiceProxyElement = (TypeElement) typeUtils.asElement(
                 getMirrorFromName("com.github.dm.jrt.android.proxy.annotation.ServiceProxy"));
@@ -118,11 +119,11 @@ public class ContextRoutineProcessor extends RoutineProcessor {
             builder.append("mRoutine").append(i).append(" = ").append("initRoutine").append(i);
             if (annotationElement == serviceProxyElement) {
                 builder.append("(target, invocationConfiguration, proxyConfiguration, "
-                                       + "serviceConfiguration);");
+                        + "serviceConfiguration);");
 
             } else {
                 builder.append("(target, invocationConfiguration, proxyConfiguration, "
-                                       + "loaderConfiguration);");
+                        + "loaderConfiguration);");
             }
 
             builder.append(NEW_LINE);
@@ -179,7 +180,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
             }
 
             return mMethodHeaderV1.replace("${invocationBuilderOptions}",
-                                           buildInvocationOptions(methodElement));
+                    buildInvocationOptions(methodElement));
         }
 
         if (mMethodHeader == null) {
@@ -238,15 +239,15 @@ public class ContextRoutineProcessor extends RoutineProcessor {
                 getAnnotationValue(methodElement, mClashAnnotationType, "value");
         if (resolutionType != null) {
             builder.append(
-                    ".withClashResolution(com.github.dm.jrt.android.builder.LoaderConfiguration"
+                    ".withClashResolution(com.github.dm.jrt.android.core.config.LoaderConfiguration"
                             + ".ClashResolutionType.").append(resolutionType).append(")");
         }
 
         final Object inputResolutionType =
                 getAnnotationValue(methodElement, mInputClashAnnotationType, "value");
         if (inputResolutionType != null) {
-            builder.append(".withInputClashResolution(com.github.dm.jrt.android.builder"
-                                   + ".LoaderConfiguration" + ".ClashResolutionType.")
+            builder.append(".withInputClashResolution(com.github.dm.jrt.android.core.config"
+                    + ".LoaderConfiguration" + ".ClashResolutionType.")
                    .append(resolutionType)
                    .append(")");
         }
@@ -255,7 +256,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
                 getAnnotationValue(methodElement, mCacheAnnotationType, "value");
         if (strategyType != null) {
             builder.append(
-                    ".withCacheStrategy(com.github.dm.jrt.android.builder.LoaderConfiguration"
+                    ".withCacheStrategy(com.github.dm.jrt.android.core.config.LoaderConfiguration"
                             + ".CacheStrategyType.").append(strategyType).append(")");
         }
 

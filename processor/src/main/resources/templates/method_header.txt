@@ -16,17 +16,17 @@
 
 // GENERATED CODE - PLEASE DO NOT EDIT
 
-    private final com.github.dm.jrt.routine.Routine<?, ${resultClassName}> mRoutine${methodCount};
+    private final com.github.dm.jrt.core.routine.Routine<?, ${resultClassName}> mRoutine${methodCount};
 
-    private static class InvocationFactory${methodCount}${genericTypes} extends com.github.dm.jrt.invocation.InvocationFactory<Object, ${resultClassName}> {
+    private static class InvocationFactory${methodCount}${genericTypes} extends com.github.dm.jrt.core.invocation.InvocationFactory<Object, ${resultClassName}> {
 
-        private final com.github.dm.jrt.builder.ProxyConfiguration mProxyConfiguration;
+        private final com.github.dm.jrt.object.config.ProxyConfiguration mProxyConfiguration;
 
-        private final com.github.dm.jrt.core.InvocationTarget<?> mTarget;
+        private final com.github.dm.jrt.object.InvocationTarget<?> mTarget;
 
         private InvocationFactory${methodCount}(
-                @org.jetbrains.annotations.NotNull final com.github.dm.jrt.builder.ProxyConfiguration proxyConfiguration,
-                @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.InvocationTarget<?> target) {
+                @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.config.ProxyConfiguration proxyConfiguration,
+                @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.InvocationTarget<?> target) {
 
             mProxyConfiguration = proxyConfiguration;
             mTarget = target;
@@ -34,22 +34,22 @@
 
         @org.jetbrains.annotations.NotNull
         @Override
-        public com.github.dm.jrt.invocation.Invocation<Object, ${resultClassName}> newInvocation() {
+        public com.github.dm.jrt.core.invocation.Invocation<Object, ${resultClassName}> newInvocation() {
 
             return new Invocation${methodCount}${genericTypes}(mProxyConfiguration, mTarget);
         }
     }
 
     @org.jetbrains.annotations.NotNull
-    private com.github.dm.jrt.routine.Routine<?, ${resultClassName}> initRoutine${methodCount}(
-            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.InvocationTarget<?> target,
-            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.builder.InvocationConfiguration invocationConfiguration,
-            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.builder.ProxyConfiguration proxyConfiguration) {
+    private com.github.dm.jrt.core.routine.Routine<?, ${resultClassName}> initRoutine${methodCount}(
+            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.InvocationTarget<?> target,
+            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.config.InvocationConfiguration invocationConfiguration,
+            @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.config.ProxyConfiguration proxyConfiguration) {
 
-        return com.github.dm.jrt.core.JRoutine.on(new InvocationFactory${methodCount}${genericTypes}(proxyConfiguration, target))
-                                           .withInvocations()
-                                           .with(invocationConfiguration)
-                                           ${routineBuilderOptions}
-                                           .getConfigured()
-                                           .buildRoutine();
+        return com.github.dm.jrt.core.JRoutineCore.on(new InvocationFactory${methodCount}${genericTypes}(proxyConfiguration, target))
+                                                  .withInvocations()
+                                                  .with(invocationConfiguration)
+                                                  ${routineBuilderOptions}
+                                                  .getConfigured()
+                                                  .buildRoutine();
     }

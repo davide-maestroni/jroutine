@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.sample;
 
-import com.github.dm.jrt.util.TimeDuration;
+import com.github.dm.jrt.core.util.TimeDuration;
 
 import org.junit.Before;
 import org.junit.Test;

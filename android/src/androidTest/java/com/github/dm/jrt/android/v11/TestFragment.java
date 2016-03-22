@@ -30,7 +30,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Test fragment.
  * <p/>
- * Created by davide-maestroni on 12/16/2014.
+ * Created by davide-maestroni on 03/06/2016.
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)
 public class TestFragment extends Fragment {

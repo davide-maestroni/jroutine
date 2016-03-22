@@ -18,81 +18,11 @@ package com.github.dm.jrt.android.app;
 
 import android.app.Application;
 
-import com.github.dm.jrt.android.builder.FactoryContext;
-import com.github.dm.jrt.invocation.InvocationException;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Arrays;
-import java.util.HashMap;
-
-import static com.github.dm.jrt.util.Reflection.findConstructor;
-
 /**
  * Test application.
  * <p/>
- * Created by davide-maestroni on 04/06/2015.
+ * Created by davide-maestroni on 03/06/2016.
  */
-@SuppressWarnings("unused")
-public class TestApp extends Application implements FactoryContext {
+public class TestApp extends Application {
 
-    private final HashMap<InstanceInfo, Object> mInstances = new HashMap<InstanceInfo, Object>();
-
-    @Nullable
-    @SuppressWarnings("unchecked")
-    public <TYPE> TYPE geInstance(@NotNull final Class<? extends TYPE> type,
-            @NotNull final Object[] args) {
-
-        final HashMap<InstanceInfo, Object> instances = mInstances;
-        final InstanceInfo instanceInfo = new InstanceInfo(type, args);
-        Object instance = instances.get(instanceInfo);
-        if (instance == null) {
-            try {
-                instance = findConstructor(type, args).newInstance(args);
-                instances.put(instanceInfo, instance);
-
-            } catch (final Throwable t) {
-                throw InvocationException.wrapIfNeeded(t);
-            }
-        }
-
-        return (TYPE) instance;
-    }
-
-    private static class InstanceInfo {
-
-        private final Object[] mArgs;
-
-        private final Class<?> mType;
-
-        private InstanceInfo(@NotNull final Class<?> type, @NotNull final Object[] args) {
-
-            mType = type;
-            mArgs = args;
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof InstanceInfo)) {
-                return false;
-            }
-
-            final InstanceInfo that = (InstanceInfo) o;
-            return Arrays.deepEquals(mArgs, that.mArgs) && mType.equals(that.mType);
-        }
-
-        @Override
-        public int hashCode() {
-
-            int result = Arrays.deepHashCode(mArgs);
-            result = 31 * result + mType.hashCode();
-            return result;
-        }
-    }
 }

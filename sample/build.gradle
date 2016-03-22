@@ -20,7 +20,7 @@ apply from: '../extra.gradle'
 javaCompatibility = JavaVersion.VERSION_1_5
 
 dependencies {
-    compile project(':library')
+    compile project(':lib')
     testCompile 'junit:junit:4.12'
     testCompile 'org.assertj:assertj-core:1.7.1'
 }
@@ -28,5 +28,5 @@ dependencies {
 javadoc {
     options.overview("${project.projectDir}/docs/overview.html")
     options.links('http://docs.oracle.com/javase/7/docs/api/',
-            'http://davide-maestroni.github.io/jroutine/javadoc/library/')
+            'http://davide-maestroni.github.io/jroutine/javadoc/v6/library/')
 }

@@ -18,10 +18,10 @@ package com.github.dm.jrt.android.proxy.builder;
 
 import android.content.Context;
 
-import com.github.dm.jrt.android.builder.ServiceConfiguration;
-import com.github.dm.jrt.builder.InvocationConfiguration;
-import com.github.dm.jrt.builder.ProxyConfiguration;
-import com.github.dm.jrt.util.WeakIdentityHashMap;
+import com.github.dm.jrt.android.core.config.ServiceConfiguration;
+import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.util.WeakIdentityHashMap;
+import com.github.dm.jrt.object.config.ProxyConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -84,7 +84,7 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
             final ServiceConfiguration serviceConfiguration = mServiceConfiguration;
             final ProxyInfo proxyInfo =
                     new ProxyInfo(getInterfaceClass(), invocationConfiguration, proxyConfiguration,
-                                  serviceConfiguration);
+                            serviceConfiguration);
             final Object instance = proxies.get(proxyInfo);
             if (instance != null) {
                 return (TYPE) instance;

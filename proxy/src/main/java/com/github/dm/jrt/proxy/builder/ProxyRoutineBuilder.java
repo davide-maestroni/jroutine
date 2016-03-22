@@ -16,9 +16,9 @@
 
 package com.github.dm.jrt.proxy.builder;
 
-import com.github.dm.jrt.builder.ConfigurableBuilder;
-import com.github.dm.jrt.builder.ProxyConfigurableBuilder;
-import com.github.dm.jrt.util.ClassToken;
+import com.github.dm.jrt.core.builder.ConfigurableBuilder;
+import com.github.dm.jrt.core.util.ClassToken;
+import com.github.dm.jrt.object.builder.ProxyConfigurableBuilder;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -50,7 +50,7 @@ public interface ProxyRoutineBuilder extends ConfigurableBuilder<ProxyRoutineBui
      * @return the proxy object.
      * @throws java.lang.IllegalArgumentException if the specified class does not represent an
      *                                            interface.
-     * @see com.github.dm.jrt.annotation Annotations
+     * @see com.github.dm.jrt.object.annotation Annotations
      */
     @NotNull
     <TYPE> TYPE buildProxy(@NotNull Class<TYPE> itf);
@@ -75,7 +75,7 @@ public interface ProxyRoutineBuilder extends ConfigurableBuilder<ProxyRoutineBui
      * @return the proxy object.
      * @throws java.lang.IllegalArgumentException if the specified class does not represent an
      *                                            interface.
-     * @see com.github.dm.jrt.annotation Annotations
+     * @see com.github.dm.jrt.object.annotation Annotations
      */
     @NotNull
     <TYPE> TYPE buildProxy(@NotNull ClassToken<TYPE> itf);

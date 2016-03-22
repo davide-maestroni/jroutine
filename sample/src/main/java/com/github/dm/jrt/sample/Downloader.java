@@ -16,14 +16,14 @@
 
 package com.github.dm.jrt.sample;
 
-import com.github.dm.jrt.channel.Channel.OutputChannel;
-import com.github.dm.jrt.core.ByteChannel.ByteBuffer;
-import com.github.dm.jrt.core.JRoutine;
-import com.github.dm.jrt.invocation.InvocationException;
-import com.github.dm.jrt.routine.Routine;
-import com.github.dm.jrt.runner.Runner;
-import com.github.dm.jrt.runner.Runners;
-import com.github.dm.jrt.util.TimeDuration;
+import com.github.dm.jrt.channel.ByteChannel.ByteBuffer;
+import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.channel.Channel.OutputChannel;
+import com.github.dm.jrt.core.invocation.InvocationException;
+import com.github.dm.jrt.core.routine.Routine;
+import com.github.dm.jrt.core.runner.Runner;
+import com.github.dm.jrt.core.runner.Runners;
+import com.github.dm.jrt.core.util.TimeDuration;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,8 +32,8 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import static com.github.dm.jrt.invocation.Invocations.factoryOf;
-import static com.github.dm.jrt.util.TimeDuration.seconds;
+import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
+import static com.github.dm.jrt.core.util.TimeDuration.seconds;
 
 /**
  * The downloader implementation.
@@ -41,6 +41,8 @@ import static com.github.dm.jrt.util.TimeDuration.seconds;
  * Created by davide-maestroni on 10/17/2014.
  */
 public class Downloader {
+
+    // TODO: 18/03/16 Android sample
 
     private static final Runner sReadRunner = Runners.poolRunner();
 
@@ -61,7 +63,7 @@ public class Downloader {
     public Downloader(final int maxParallelDownloads) {
 
         // The read connection invocation is stateless so we can just use a single instance of it
-        mReadConnection = JRoutine.on(new ReadConnection()).withInvocations()
+        mReadConnection = JRoutineCore.on(new ReadConnection()).withInvocations()
                 // Since each download may take a long time to complete, we use a dedicated runner
                 .withRunner(sReadRunner)
                         // By setting the maximum number of parallel invocations we effectively
@@ -153,7 +155,7 @@ public class Downloader {
             // the specific routine
             // That's why we store the routine output channel in an internal map
             final Routine<ByteBuffer, Boolean> writeFile =
-                    JRoutine.on(factoryOf(WriteFile.class, dstFile)).withInvocations()
+                    JRoutineCore.on(factoryOf(WriteFile.class, dstFile)).withInvocations()
                             // Since we want to limit the number of allocated chunks, we have to
                             // make the writing happen in a dedicated runner, so that waiting for
                             // available space becomes allowed

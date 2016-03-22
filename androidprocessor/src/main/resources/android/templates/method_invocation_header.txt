@@ -16,22 +16,22 @@
 
 // GENERATED CODE - PLEASE DO NOT EDIT
 
-    private static class ContextInvocation${methodCount}${genericTypes} extends com.github.dm.jrt.android.invocation.FunctionContextInvocation<Object, ${resultClassName}> {
+    private static class ContextInvocation${methodCount}${genericTypes} extends com.github.dm.jrt.android.core.invocation.CallContextInvocation<Object, ${resultClassName}> {
 
-        private final  com.github.dm.jrt.android.core.ContextInvocationTarget<?> mContextTarget;
+        private final  com.github.dm.jrt.android.object.ContextInvocationTarget<?> mContextTarget;
 
         private final java.util.List<String> mSharedFields;
 
         @SuppressWarnings("unused")
         private Object mInstance;
 
-        private com.github.dm.jrt.common.Mutex mMutex = com.github.dm.jrt.common.Mutex.NO_MUTEX;
+        private com.github.dm.jrt.object.common.Mutex mMutex = com.github.dm.jrt.object.common.Mutex.NO_MUTEX;
 
         @SuppressWarnings("unused")
-        private com.github.dm.jrt.core.InvocationTarget mTarget;
+        private com.github.dm.jrt.object.InvocationTarget mTarget;
 
         private ContextInvocation${methodCount}(@org.jetbrains.annotations.Nullable final java.util.List<String> sharedFields,
-                @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.ContextInvocationTarget<?> target) {
+                @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.object.ContextInvocationTarget<?> target) {
 
             mSharedFields = sharedFields;
             mContextTarget = target;
@@ -42,8 +42,8 @@
         public void onContext(@org.jetbrains.annotations.NotNull final android.content.Context context) throws Exception {
 
             super.onContext(context);
-            final com.github.dm.jrt.core.InvocationTarget<?> target = mContextTarget.getInvocationTarget(context);
-            mMutex = com.github.dm.jrt.android.core.Builders.getSharedMutex(${mutexTarget}, mSharedFields);
+            final com.github.dm.jrt.object.InvocationTarget<?> target = mContextTarget.getInvocationTarget(context);
+            mMutex = com.github.dm.jrt.object.Builders.getSharedMutex(${mutexTarget}, mSharedFields);
             mTarget = target;
             mInstance = target.getTarget();
         }

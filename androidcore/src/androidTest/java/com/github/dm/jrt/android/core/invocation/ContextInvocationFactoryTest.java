@@ -32,7 +32,6 @@ import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryOf;
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.fromFactory;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
-import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -135,15 +134,6 @@ public class ContextInvocationFactoryTest extends ActivityInstrumentationTestCas
                                .syncCall("TEST")
                                .all()).containsExactly("test");
         assertThat(JRoutineCore.on(fromFactory(getActivity(), factoryOf(CaseWrapper.class, true)))
-                               .syncCall("test")
-                               .all()).containsExactly("TEST");
-        final ClassToken<ContextInvocationWrapper<String, String>> classToken =
-                new ClassToken<ContextInvocationWrapper<String, String>>() {};
-        assertThat(JRoutineCore.on(fromFactory(getActivity(), factoryOf(classToken, Case.class)))
-                               .syncCall("TEST")
-                               .all()).containsExactly("test");
-        assertThat(JRoutineCore.on(
-                fromFactory(getActivity(), factoryOf(classToken, Case.class, asArgs(true))))
                                .syncCall("test")
                                .all()).containsExactly("TEST");
     }

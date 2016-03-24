@@ -23,5 +23,276 @@
 <p>
     Java annotation proxy code generator based on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/v6/android" target="_blank">jroutine-android</a> libraries.
 </p>
+<p>
+    The code below shows how it is possible to load an image from the network in a background thread, by letting the library automatically handle any change in the configuration.<br/>
+    Note that the very same examples can be re-written using JRoutineLoaderProxyCompat or the JRoutineServiceProxy class, in order to make the processing happen in a service instead of a loader.
+</p>
+<b>Example 1:</b> via code generation.
+<p>
+    Note that this approach is fairly naive, since it lets the framework retain the instance of the downloaded bitmap.<br/>
+    A smarter implementation would involve the use of a dedicated cache.
+</p>
+<pre>
+    <code>
+        public class MainActivity extends Activity {
+
+            private static final String IMAGE_URI = "http://...";
+
+            private static final String LOAD_BITMAP = "load_bitmap";
+
+            &commat;Override
+            protected void onCreate(final Bundle savedInstanceState) {
+
+                super.onCreate(savedInstanceState);
+                setContentView(R.layout.main_layout);
+                final ImageView imageView = (ImageView) findViewById(R.id.image);
+                JRoutineLoaderProxy.with(loaderFrom(this))
+                                   .on(instanceOf(BitmapLoader.class))
+                                   .buildProxy(BitmapLoaderItf.class)
+                                   .loadFromUri(URI.create(IMAGE_URI))
+                                   .bind(new TemplateOutputConsumer&lt;Bitmap&gt;() {
+
+                                       &commat;Override
+                                       public void onError(&commat;NotNull final RoutineException error) {
+
+                                           Toast.makeText(MainTestActivity.this, (error != null) ?
+                                                   error.getMessage() : "Cannot load image",
+                                                   Toast.LENGTH_LONG).show();
+                                       }
+
+                                       &commat;Override
+                                       public void onOutput(final Bitmap bitmap) {
+
+                                           imageView.setImageBitmap(bitmap);
+                                       }
+                                   });
+            }
+
+            &commat;LoaderProxy(BitmapLoader.class)
+            public interface BitmapLoaderItf {
+
+                &commat;Alias(LOAD_BITMAP)
+                &commat;CacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
+                &commat;AsyncOut
+                &commat;NotNull
+                OutputChannel&lt;Bitmap&gt; loadFromUri(&commat;NotNull URI uri);
+            }
+
+            public static class BitmapLoader {
+
+                &commat;Alias(LOAD_BITMAP)
+                &commat;NotNull
+                public Bitmap loadFromUri(&commat;NotNull final URI uri) throws IOException {
+
+                    final URLConnection urlConnection = uri.toURL().openConnection();
+                    final InputStream inputStream = urlConnection.getInputStream();
+                    try {
+                        final Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                        if (bitmap == null) {
+                            throw new IOException("failed to decode bitmap");
+                        }
+
+                        return bitmap;
+
+                    } finally {
+                        inputStream.close();
+                    }
+                }
+            }
+        }
+    </code>
+</pre>
+<b>Example 2:</b> via code generation with custom context.
+<p>
+    It is possible to customize the creation of the wrapped object by using a context wrapper as shown below.
+</p>
+<pre>
+    <code>
+        public class MainActivity extends Activity {
+
+            private static final String IMAGE_URI = "http://...";
+
+            private static final String LOAD_BITMAP = "load_bitmap";
+
+            &commat;Override
+            protected void onCreate(final Bundle savedInstanceState) {
+
+                super.onCreate(savedInstanceState);
+                setContentView(R.layout.main_layout);
+                final ImageView imageView = (ImageView) findViewById(R.id.image);
+                JRoutineLoaderProxy.with(loaderFrom(this, new MyContext(this)))
+                                   .on(instanceOf(BitmapLoader.class))
+                                   .buildProxy(BitmapLoaderItf.class)
+                                   .loadFromUri(URI.create(IMAGE_URI))
+                                   .bind(new TemplateOutputConsumer&lt;Bitmap&gt;() {
+
+                                       &commat;Override
+                                       public void onError(&commat;NotNull final RoutineException error) {
+
+                                           Toast.makeText(MainTestActivity.this, (error != null) ?
+                                                   error.getMessage() : "Cannot load image",
+                                                   Toast.LENGTH_LONG).show();
+                                       }
+
+                                       &commat;Override
+                                       public void onOutput(final Bitmap bitmap) {
+
+                                           imageView.setImageBitmap(bitmap);
+                                       }
+                                   });
+            }
+
+            &commat;LoaderProxy(BitmapLoader.class)
+            public interface BitmapLoaderItf {
+
+                &commat;Alias(LOAD_BITMAP)
+                &commat;CacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
+                &commat;AsyncOut
+                &commat;NotNull
+                OutputChannel&lt;Bitmap&gt; loadFromUri(&commat;NotNull URI uri);
+            }
+
+            public static class BitmapLoader {
+
+                &commat;Alias(LOAD_BITMAP)
+                &commat;NotNull
+                public Bitmap loadFromUri(&commat;NotNull final URI uri) throws IOException {
+
+                    final URLConnection urlConnection = uri.toURL().openConnection();
+                    final InputStream inputStream = urlConnection.getInputStream();
+                    try {
+                        final Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                        if (bitmap == null) {
+                            throw new IOException("failed to decode bitmap");
+                        }
+
+                        return bitmap;
+
+                    } finally {
+                        inputStream.close();
+                    }
+                }
+            }
+
+            private static class MyContext extends FactoryContextWrapper {
+
+                private final BitmapLoader mLoader;
+
+                public MyContext(&commat;NotNull final Context base) {
+
+                    super(base);
+                    mLoader = new BitmapLoader();
+                }
+
+                &commat;Nullable
+                public &lt;TYPE&gt; TYPE geInstance(&commat;NotNull final Class&lt;? extends TYPE&gt; type,
+                        &commat;NotNull final Object... args) {
+
+                    if (type == BitmapLoader.class) {
+                        return type.cast(mLoader);
+                    }
+
+                    return null;
+                }
+            }
+        }
+    </code>
+</pre>
+<b>Example 3:</b> via code generation avoiding reflection.
+<p>
+    It is possible to completely avoid the use of reflection by explicitly employing the generated classes.
+</p>
+<pre>
+    <code>
+        public class MainActivity extends Activity {
+
+            private static final String IMAGE_URI = "http://...";
+
+            private static final String LOAD_BITMAP = "load_bitmap";
+
+            &commat;Override
+            protected void onCreate(final Bundle savedInstanceState) {
+
+                super.onCreate(savedInstanceState);
+                setContentView(R.layout.main_layout);
+                final ImageView imageView = (ImageView) findViewById(R.id.image);
+                LoaderProxy_MainActivity_BitmapLoaderItf.with(loaderFrom(this, new MyContext(this)))
+                                   .on(instanceOf(BitmapLoader.class))
+                                   .buildProxy()
+                                   .loadFromUri(URI.create(IMAGE_URI))
+                                   .bind(new TemplateOutputConsumer&lt;Bitmap&gt;() {
+
+                                       &commat;Override
+                                       public void onError(&commat;NotNull final RoutineException error) {
+
+                                           Toast.makeText(MainTestActivity.this, (error != null) ?
+                                                   error.getMessage() : "Cannot load image",
+                                                   Toast.LENGTH_LONG).show();
+                                       }
+
+                                       &commat;Override
+                                       public void onOutput(final Bitmap bitmap) {
+
+                                           imageView.setImageBitmap(bitmap);
+                                       }
+                                   });
+            }
+
+            &commat;LoaderProxy(BitmapLoader.class)
+            public interface BitmapLoaderItf {
+
+                &commat;Alias(LOAD_BITMAP)
+                &commat;CacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
+                &commat;AsyncOut
+                &commat;NotNull
+                OutputChannel&lt;Bitmap&gt; loadFromUri(&commat;NotNull URI uri);
+            }
+
+            public static class BitmapLoader {
+
+                &commat;Alias(LOAD_BITMAP)
+                &commat;NotNull
+                public Bitmap loadFromUri(&commat;NotNull final URI uri) throws IOException {
+
+                    final URLConnection urlConnection = uri.toURL().openConnection();
+                    final InputStream inputStream = urlConnection.getInputStream();
+                    try {
+                        final Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                        if (bitmap == null) {
+                            throw new IOException("failed to decode bitmap");
+                        }
+
+                        return bitmap;
+
+                    } finally {
+                        inputStream.close();
+                    }
+                }
+            }
+
+            private static class MyContext extends FactoryContextWrapper {
+
+                private final BitmapLoader mLoader;
+
+                public MyContext(&commat;NotNull final Context base) {
+
+                    super(base);
+                    mLoader = new BitmapLoader();
+                }
+
+                &commat;Nullable
+                public &lt;TYPE&gt; TYPE geInstance(&commat;NotNull final Class&lt;? extends TYPE&gt; type,
+                        &commat;NotNull final Object... args) {
+
+                    if (type == BitmapLoader.class) {
+                        return type.cast(mLoader);
+                    }
+
+                    return null;
+                }
+            }
+        }
+    </code>
+</pre>
 </body>
 </html>

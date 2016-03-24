@@ -763,6 +763,7 @@ public final class InvocationConfiguration {
         @NotNull
         public TYPE getConfigured() {
 
+            // TODO: 23/03/16 getConfiguration??
             return mConfigurable.setConfiguration(buildConfiguration());
         }
 

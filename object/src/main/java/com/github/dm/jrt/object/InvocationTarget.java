@@ -46,7 +46,7 @@ public abstract class InvocationTarget<TYPE> {
      * @return the invocation target.
      */
     @NotNull
-    public static <TYPE> ClassInvocationTarget<TYPE> classOfType(
+    public static <TYPE> InvocationTarget<TYPE> classOfType(
             @NotNull final Class<TYPE> targetClass) {
 
         return new ClassInvocationTarget<TYPE>(targetClass);
@@ -60,7 +60,7 @@ public abstract class InvocationTarget<TYPE> {
      * @return the invocation target.
      */
     @NotNull
-    public static <TYPE> InstanceInvocationTarget<TYPE> instance(@NotNull final TYPE target) {
+    public static <TYPE> InvocationTarget<TYPE> instance(@NotNull final TYPE target) {
 
         return new InstanceInvocationTarget<TYPE>(target);
     }
@@ -102,7 +102,7 @@ public abstract class InvocationTarget<TYPE> {
      *
      * @param <TYPE> the target object type.
      */
-    public static class ClassInvocationTarget<TYPE> extends InvocationTarget<TYPE> {
+    private static class ClassInvocationTarget<TYPE> extends InvocationTarget<TYPE> {
 
         private final Class<TYPE> mTargetClass;
 
@@ -176,7 +176,7 @@ public abstract class InvocationTarget<TYPE> {
      *
      * @param <TYPE> the target object type.
      */
-    public static class InstanceInvocationTarget<TYPE> extends InvocationTarget<TYPE> {
+    private static class InstanceInvocationTarget<TYPE> extends InvocationTarget<TYPE> {
 
         private final WeakReference<TYPE> mTarget;
 

@@ -24,8 +24,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.test.ActivityInstrumentationTestCase2;
 
-import com.github.dm.jrt.android.object.ContextInvocationTarget.ClassContextInvocationTarget;
-import com.github.dm.jrt.android.object.ContextInvocationTarget.ObjectContextInvocationTarget;
 import com.github.dm.jrt.android.object.builder.FactoryContext;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.object.InvocationTarget;
@@ -50,9 +48,9 @@ public class ContextInvocationTargetTest extends ActivityInstrumentationTestCase
         super(TestActivity.class);
     }
 
-    public void testClass() {
+    public void testClass() throws Exception {
 
-        final ClassContextInvocationTarget<TestClass> target = classOfType(TestClass.class);
+        final ContextInvocationTarget<TestClass> target = classOfType(TestClass.class);
         assertThat(target.getTargetClass()).isEqualTo(TestClass.class);
         assertThat(target.isAssignableTo(TestClass.class)).isTrue();
         assertThat(target.isAssignableTo(Object.class)).isTrue();
@@ -66,7 +64,7 @@ public class ContextInvocationTargetTest extends ActivityInstrumentationTestCase
 
     public void testClassEquals() {
 
-        final ClassContextInvocationTarget<TestClass> target = classOfType(TestClass.class);
+        final ContextInvocationTarget<TestClass> target = classOfType(TestClass.class);
         assertThat(target).isEqualTo(target);
         assertThat(target).isNotEqualTo(null);
         assertThat(target).isNotEqualTo("test");
@@ -90,18 +88,18 @@ public class ContextInvocationTargetTest extends ActivityInstrumentationTestCase
     public void testClassParcelable() {
 
         final Parcel parcel = Parcel.obtain();
-        final ClassContextInvocationTarget<TestClass> target = classOfType(TestClass.class);
+        final ContextInvocationTarget<TestClass> target = classOfType(TestClass.class);
         parcel.writeParcelable(target, 0);
         parcel.setDataPosition(0);
         final Parcelable parcelable =
-                parcel.readParcelable(ClassContextInvocationTarget.class.getClassLoader());
+                parcel.readParcelable(ContextInvocationTarget.class.getClassLoader());
         assertThat(parcelable).isEqualTo(target);
         parcel.recycle();
     }
 
     public void testInstance() throws Exception {
 
-        final ObjectContextInvocationTarget<TestClass> target = instanceOf(TestClass.class);
+        final ContextInvocationTarget<TestClass> target = instanceOf(TestClass.class);
         assertThat(target.getTargetClass()).isEqualTo(TestClass.class);
         assertThat(target.isAssignableTo(TestClass.class)).isTrue();
         assertThat(target.isAssignableTo(Object.class)).isTrue();
@@ -117,7 +115,7 @@ public class ContextInvocationTargetTest extends ActivityInstrumentationTestCase
 
     public void testInstanceEquals() {
 
-        final ObjectContextInvocationTarget<TestClass> target = instanceOf(TestClass.class);
+        final ContextInvocationTarget<TestClass> target = instanceOf(TestClass.class);
         assertThat(target).isEqualTo(target);
         assertThat(target).isNotEqualTo(null);
         assertThat(target).isNotEqualTo("test");
@@ -145,7 +143,7 @@ public class ContextInvocationTargetTest extends ActivityInstrumentationTestCase
 
         }
 
-        final ObjectContextInvocationTarget<TestClass> target = instanceOf(TestClass.class);
+        final ContextInvocationTarget<TestClass> target = instanceOf(TestClass.class);
         try {
             target.getInvocationTarget(new ObjectContext(getActivity()));
             fail();
@@ -158,11 +156,11 @@ public class ContextInvocationTargetTest extends ActivityInstrumentationTestCase
     public void testInstanceParcelable() {
 
         final Parcel parcel = Parcel.obtain();
-        final ObjectContextInvocationTarget<TestClass> target = instanceOf(TestClass.class);
+        final ContextInvocationTarget<TestClass> target = instanceOf(TestClass.class);
         parcel.writeParcelable(target, 0);
         parcel.setDataPosition(0);
         final Parcelable parcelable =
-                parcel.readParcelable(ObjectContextInvocationTarget.class.getClassLoader());
+                parcel.readParcelable(ContextInvocationTarget.class.getClassLoader());
         assertThat(parcelable).isEqualTo(target);
         parcel.recycle();
     }

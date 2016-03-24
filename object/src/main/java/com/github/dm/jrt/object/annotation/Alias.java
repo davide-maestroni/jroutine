@@ -81,6 +81,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Alias {
 
+    // TODO: 23/03/16 use another annotation to reference it?
+
     /**
      * The name used to identify the method independently from its original signature.
      *

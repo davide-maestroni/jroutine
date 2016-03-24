@@ -83,15 +83,14 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
         }
 
         @org.jetbrains.annotations.NotNull
-        public ${genericTypes} com.github.dm.jrt.android.proxy.builder.LoaderProxyObjectBuilder<${interfaceFullName}> on(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.object.ContextInvocationTarget.ObjectContextInvocationTarget<? extends ${classFullName}> target) {
+        public ${genericTypes} com.github.dm.jrt.android.proxy.builder.LoaderProxyObjectBuilder<${interfaceFullName}> on(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.object.ContextInvocationTarget<? extends ${classFullName}> target) {
+
+            if (!target.isOfType(${classErasure}.class)) {
+                throw new IllegalArgumentException("the invocation target must be the class or an instance of " +
+                        "${classFullName}");
+            }
 
             return new LoaderProxyObjectBuilder${genericTypes}(mContext, target);
-        }
-
-        @org.jetbrains.annotations.NotNull
-        public ${genericTypes} com.github.dm.jrt.android.proxy.builder.LoaderProxyObjectBuilder<${interfaceFullName}> onClass() {
-
-            return new LoaderProxyObjectBuilder${genericTypes}(mContext, com.github.dm.jrt.android.object.ContextInvocationTarget.classOfType(${classErasure}.class));
         }
     }
 

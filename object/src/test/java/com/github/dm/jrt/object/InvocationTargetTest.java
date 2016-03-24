@@ -16,9 +16,6 @@
 
 package com.github.dm.jrt.object;
 
-import com.github.dm.jrt.object.InvocationTarget.ClassInvocationTarget;
-import com.github.dm.jrt.object.InvocationTarget.InstanceInvocationTarget;
-
 import org.junit.Test;
 
 import static com.github.dm.jrt.object.InvocationTarget.classOfType;
@@ -36,7 +33,7 @@ public class InvocationTargetTest {
     @Test
     public void testClassTarget() {
 
-        final ClassInvocationTarget<TargetClass> target = classOfType(TargetClass.class);
+        final InvocationTarget<TargetClass> target = classOfType(TargetClass.class);
         assertThat(target.getTarget()).isSameAs(TargetClass.class);
         assertThat(target.getTargetClass()).isSameAs(TargetClass.class);
         assertThat(target.isAssignableTo(TargetClass.class)).isTrue();
@@ -50,7 +47,7 @@ public class InvocationTargetTest {
     @Test
     public void testClassTargetEquals() {
 
-        final ClassInvocationTarget<TargetClass> target = classOfType(TargetClass.class);
+        final InvocationTarget<TargetClass> target = classOfType(TargetClass.class);
         assertThat(target).isEqualTo(target);
         assertThat(target).isNotEqualTo("");
         assertThat(target.hashCode()).isEqualTo(classOfType(TargetClass.class).hashCode());
@@ -78,7 +75,7 @@ public class InvocationTargetTest {
     public void testInstanceTarget() {
 
         final TargetClass t = new TargetClass();
-        final InstanceInvocationTarget<TargetClass> target = instance(t);
+        final InvocationTarget<TargetClass> target = instance(t);
         assertThat(target.getTarget()).isSameAs(t);
         assertThat(target.getTargetClass()).isSameAs(TargetClass.class);
         assertThat(target.isAssignableTo(TargetClass.class)).isTrue();
@@ -93,7 +90,7 @@ public class InvocationTargetTest {
     public void testInstanceTargetEquals() {
 
         final TargetClass t = new TargetClass();
-        final InstanceInvocationTarget<TargetClass> target = instance(t);
+        final InvocationTarget<TargetClass> target = instance(t);
         assertThat(target).isEqualTo(target);
         assertThat(target).isNotEqualTo("");
         assertThat(target.hashCode()).isEqualTo(instance(t).hashCode());

@@ -57,7 +57,7 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
      * @return the context invocation target.
      */
     @NotNull
-    public static <TYPE> ClassContextInvocationTarget<TYPE> classOfType(
+    public static <TYPE> ContextInvocationTarget<TYPE> classOfType(
             @NotNull final Class<TYPE> targetClass) {
 
         return new ClassContextInvocationTarget<TYPE>(targetClass);
@@ -72,7 +72,7 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
      * @return the context invocation target.
      */
     @NotNull
-    public static <TYPE> ObjectContextInvocationTarget<TYPE> instanceOf(
+    public static <TYPE> ContextInvocationTarget<TYPE> instanceOf(
             @NotNull final Class<TYPE> targetClass) {
 
         return instanceOf(targetClass, (Object[]) null);
@@ -135,7 +135,7 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
      *
      * @param <TYPE> the target object type.
      */
-    public static class ClassContextInvocationTarget<TYPE> extends ContextInvocationTarget<TYPE> {
+    private static class ClassContextInvocationTarget<TYPE> extends ContextInvocationTarget<TYPE> {
 
         /**
          * Creator instance needed by the parcelable protocol.
@@ -238,7 +238,7 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
      *
      * @param <TYPE> the target object type.
      */
-    public static class ObjectContextInvocationTarget<TYPE> extends ContextInvocationTarget<TYPE> {
+    private static class ObjectContextInvocationTarget<TYPE> extends ContextInvocationTarget<TYPE> {
 
         /**
          * Creator instance needed by the parcelable protocol.

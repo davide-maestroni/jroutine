@@ -683,7 +683,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
                                                        .withChannels()
                                                        .withLog(logger.getLog())
                                                        .withLogLevel(logger.getLogLevel())
-                                                       .getConfigured()
+                                                       .setConfiguration()
                                                        .buildChannel();
             channels.add(channel);
             internalLoader.setInvocationCount(Math.max(channels.size() + mAbortedChannels.size(),
@@ -694,7 +694,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
                                    .withRunner(AndroidRunners.looperRunner(looper))
                                    .withLog(logger.getLog())
                                    .withLogLevel(logger.getLogLevel())
-                                   .getConfigured()
+                                   .setConfiguration()
                                    .asyncCall(channel);
             }
 

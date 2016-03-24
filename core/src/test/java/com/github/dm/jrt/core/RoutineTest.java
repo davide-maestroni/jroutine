@@ -213,7 +213,7 @@ public class RoutineTest {
         assertThat(JRoutineCore.on(new CloseInvocation(semaphore, isFailed))
                                .withInvocations()
                                .withLogLevel(Level.SILENT)
-                               .getConfigured()
+                               .setConfiguration()
                                .asyncCall("test")
                                .afterMax(timeout)
                                .all()).isEmpty();
@@ -280,14 +280,14 @@ public class RoutineTest {
                                                              .withRunner(runner)
                                                              .withPriority(
                                                                      AgingPriority.NORMAL_PRIORITY)
-                                                             .getConfigured()
+                                                             .setConfiguration()
                                                              .buildRoutine();
         final Routine<Object, Object> routine2 = JRoutineCore.on(PassingInvocation.factoryOf())
                                                              .withInvocations()
                                                              .withRunner(runner)
                                                              .withPriority(
                                                                      AgingPriority.HIGH_PRIORITY)
-                                                             .getConfigured()
+                                                             .setConfiguration()
                                                              .buildRoutine();
         final OutputChannel<Object> output1 = routine1.asyncCall("test1").eventuallyExit();
         final InvocationChannel<Object, Object> input2 = routine2.asyncInvoke();
@@ -645,7 +645,7 @@ public class RoutineTest {
                             .withInvocations()
                             .withInputOrder(OrderType.BY_CALL)
                             .withOutputOrder(OrderType.BY_CALL)
-                            .getConfigured()
+                            .setConfiguration()
                             .asyncInvoke();
         channel1.after(100, TimeUnit.MILLISECONDS).pass("test1");
         channel1.after(millis(10).nanosTime()).pass("test2");
@@ -674,12 +674,12 @@ public class RoutineTest {
 
         final InvocationConfiguration configuration = builder().withInputOrder(OrderType.BY_CALL)
                                                                .withOutputOrder(OrderType.BY_CALL)
-                                                               .getConfigured();
+                                                               .setConfiguration();
         final InvocationChannel<String, String> channel3 =
                 JRoutineCore.on(factoryOf(DelayedListInvocation.class, millis(10), 2))
                             .withInvocations()
                             .with(configuration)
-                            .getConfigured()
+                            .setConfiguration()
                             .asyncInvoke();
         channel3.after(100, TimeUnit.MILLISECONDS).pass("test1");
         channel3.after(millis(10).nanosTime()).pass("test2");
@@ -710,7 +710,7 @@ public class RoutineTest {
                 JRoutineCore.on(factoryOf(DelayedListInvocation.class, TimeDuration.ZERO, 2))
                             .withInvocations()
                             .with(configuration)
-                            .getConfigured()
+                            .setConfiguration()
                             .asyncInvoke();
         channel5.after(100, TimeUnit.MILLISECONDS).pass("test1");
         channel5.after(millis(10).nanosTime()).pass("test2");
@@ -741,7 +741,7 @@ public class RoutineTest {
                 JRoutineCore.on(factoryOf(DelayedChannelInvocation.class, millis(10)))
                             .withInvocations()
                             .with(configuration)
-                            .getConfigured()
+                            .setConfiguration()
                             .asyncInvoke();
         channel7.after(100, TimeUnit.MILLISECONDS).pass("test1");
         channel7.after(millis(10).nanosTime()).pass("test2");
@@ -772,7 +772,7 @@ public class RoutineTest {
                 JRoutineCore.on(factoryOf(DelayedChannelInvocation.class, TimeDuration.ZERO))
                             .withInvocations()
                             .with(configuration)
-                            .getConfigured()
+                            .setConfiguration()
                             .asyncInvoke();
         channel9.after(100, TimeUnit.MILLISECONDS).pass("test1");
         channel9.after(millis(10).nanosTime()).pass("test2");
@@ -918,7 +918,7 @@ public class RoutineTest {
         final Routine<String, String> routine1 = JRoutineCore.on(factoryOf(TestDestroy.class))
                                                              .withInvocations()
                                                              .withCoreInstances(0)
-                                                             .getConfigured()
+                                                             .setConfiguration()
                                                              .buildRoutine();
         assertThat(routine1.syncCall("1", "2", "3", "4", "5").afterMax(timeout).all()).containsOnly(
                 "1", "2", "3", "4", "5");
@@ -934,7 +934,7 @@ public class RoutineTest {
                 JRoutineCore.on(factoryOf(TestDiscardException.class))
                             .withInvocations()
                             .withCoreInstances(0)
-                            .getConfigured()
+                            .setConfiguration()
                             .buildRoutine();
         assertThat(routine2.syncCall("1", "2", "3", "4", "5").afterMax(timeout).all()).containsOnly(
                 "1", "2", "3", "4", "5");
@@ -1007,7 +1007,7 @@ public class RoutineTest {
         final Routine<String, String> routine1 = JRoutineCore.on(factoryOf(TestDestroy.class))
                                                              .withInvocations()
                                                              .withCoreInstances(0)
-                                                             .getConfigured()
+                                                             .setConfiguration()
                                                              .buildRoutine();
         assertThat(
                 routine1.asyncCall("1", "2", "3", "4", "5").afterMax(timeout).all()).containsOnly(
@@ -1023,7 +1023,7 @@ public class RoutineTest {
                 JRoutineCore.on(factoryOf(TestDiscardException.class))
                             .withInvocations()
                             .withCoreInstances(0)
-                            .getConfigured()
+                            .setConfiguration()
                             .buildRoutine();
         assertThat(
                 routine2.asyncCall("1", "2", "3", "4", "5").afterMax(timeout).all()).containsOnly(
@@ -1097,7 +1097,7 @@ public class RoutineTest {
                             .withInvocations()
                             .withInputLimit(1)
                             .withInputMaxDelay(seconds(3))
-                            .getConfigured()
+                            .setConfiguration()
                             .asyncInvoke();
         assertThat(channel.isEmpty()).isTrue();
         assertThat(channel.pass("test1").pass("test2").isEmpty()).isFalse();
@@ -1115,7 +1115,7 @@ public class RoutineTest {
                                                             .withInvocations()
                                                             .withInputLimit(1)
                                                             .withInputMaxDelay(seconds(3))
-                                                            .getConfigured()
+                                                            .setConfiguration()
                                                             .buildRoutine();
         InvocationChannel<Object, Object> channel = routine.asyncInvoke();
         assertThat(channel.isEmpty()).isTrue();
@@ -1140,7 +1140,7 @@ public class RoutineTest {
             JRoutineCore.on(factoryOf(ConstructorException.class))
                         .withInvocations()
                         .withLogLevel(Level.SILENT)
-                        .getConfigured()
+                        .setConfiguration()
                         .syncCall()
                         .all();
 
@@ -1421,7 +1421,7 @@ public class RoutineTest {
             JRoutineCore.on(new SleepInvocation(millis(100)))
                         .withInvocations()
                         .withInputMaxSize(1)
-                        .getConfigured()
+                        .setConfiguration()
                         .asyncCall("test", "test")
                         .all();
 
@@ -1436,7 +1436,7 @@ public class RoutineTest {
             JRoutineCore.on(new SleepInvocation(millis(100)))
                         .withInvocations()
                         .withInputMaxSize(1)
-                        .getConfigured()
+                        .setConfiguration()
                         .asyncCall(Arrays.asList("test", "test"))
                         .all();
 
@@ -1455,7 +1455,7 @@ public class RoutineTest {
                                .withInputOrder(OrderType.BY_CALL)
                                .withInputLimit(1)
                                .withInputMaxDelay(TimeDuration.ZERO)
-                               .getConfigured()
+                               .setConfiguration()
                                .asyncInvoke()
                                .orderByDelay()
                                .orderByCall()
@@ -1472,7 +1472,7 @@ public class RoutineTest {
                                .withInputOrder(OrderType.BY_CALL)
                                .withInputLimit(1)
                                .withInputMaxDelay(millis(1000))
-                               .getConfigured()
+                               .setConfiguration()
                                .asyncInvoke()
                                .orderByCall()
                                .after(millis(100))
@@ -1488,7 +1488,7 @@ public class RoutineTest {
                                .withInputOrder(OrderType.BY_CALL)
                                .withInputLimit(1)
                                .withInputMaxDelay(millis(1000))
-                               .getConfigured()
+                               .setConfiguration()
                                .asyncInvoke()
                                .orderByCall()
                                .after(millis(100))
@@ -1504,7 +1504,7 @@ public class RoutineTest {
                                .withInputOrder(OrderType.BY_CALL)
                                .withInputLimit(1)
                                .withInputMaxDelay(millis(1000))
-                               .getConfigured()
+                               .setConfiguration()
                                .asyncInvoke()
                                .orderByCall()
                                .after(millis(100))
@@ -1522,7 +1522,7 @@ public class RoutineTest {
                                .withInputOrder(OrderType.BY_CALL)
                                .withInputLimit(1)
                                .withInputMaxDelay(millis(1000))
-                               .getConfigured()
+                               .setConfiguration()
                                .asyncInvoke()
                                .orderByCall()
                                .after(millis(100))
@@ -1599,7 +1599,7 @@ public class RoutineTest {
                         .withInputOrder(OrderType.BY_CALL)
                         .withInputMaxSize(1)
                         .withInputMaxDelay(millis(1000))
-                        .getConfigured()
+                        .setConfiguration()
                         .asyncInvoke()
                         .orderByCall()
                         .after(millis(100))
@@ -1751,7 +1751,7 @@ public class RoutineTest {
         final Routine<Void, Void> routine = JRoutineCore.on(new SleepCommand())
                                                         .withInvocations()
                                                         .withMaxInstances(1)
-                                                        .getConfigured()
+                                                        .setConfiguration()
                                                         .buildRoutine();
 
         routine.asyncCall();
@@ -1933,7 +1933,7 @@ public class RoutineTest {
 
                         result.pass(strings);
                     }
-                }, this)).withInvocations().withOutputMaxSize(1).getConfigured().buildRoutine();
+                }, this)).withInvocations().withOutputMaxSize(1).setConfiguration().buildRoutine();
 
         try {
 
@@ -1954,7 +1954,7 @@ public class RoutineTest {
 
                         result.pass(strings.toArray(new String[strings.size()]));
                     }
-                }, this)).withInvocations().withOutputMaxSize(1).getConfigured().buildRoutine();
+                }, this)).withInvocations().withOutputMaxSize(1).setConfiguration().buildRoutine();
 
         try {
 
@@ -1975,7 +1975,7 @@ public class RoutineTest {
                             .withInvocations()
                             .withOutputLimit(1)
                             .withOutputMaxDelay(TimeDuration.ZERO)
-                            .getConfigured()
+                            .setConfiguration()
                             .buildRoutine();
         final OutputChannel<String> outputChannel =
                 routine.asyncCall("test1", "test2").afterMax(seconds(1));
@@ -1986,7 +1986,7 @@ public class RoutineTest {
                                                        .withChannels()
                                                        .withChannelMaxSize(1)
                                                        .withChannelMaxDelay(millis(1000))
-                                                       .getConfigured()
+                                                       .setConfiguration()
                                                        .buildChannel();
         new Thread() {
 
@@ -2003,7 +2003,7 @@ public class RoutineTest {
                                                        .withChannels()
                                                        .withChannelMaxSize(1)
                                                        .withChannelMaxDelay(millis(1000))
-                                                       .getConfigured()
+                                                       .setConfiguration()
                                                        .buildChannel();
         new Thread() {
 
@@ -2020,7 +2020,7 @@ public class RoutineTest {
                                                        .withChannels()
                                                        .withChannelMaxSize(1)
                                                        .withChannelMaxDelay(millis(1000))
-                                                       .getConfigured()
+                                                       .setConfiguration()
                                                        .buildChannel();
         new Thread() {
 
@@ -2037,7 +2037,7 @@ public class RoutineTest {
                                                        .withChannels()
                                                        .withChannelMaxSize(1)
                                                        .withChannelMaxDelay(millis(1000))
-                                                       .getConfigured()
+                                                       .setConfiguration()
                                                        .buildChannel();
         new Thread() {
 
@@ -2188,7 +2188,7 @@ public class RoutineTest {
                 JRoutineCore.on(factoryOf(DelayedInvocation.class, TimeDuration.ZERO))
                             .withInvocations()
                             .withLogLevel(Level.SILENT)
-                            .getConfigured()
+                            .setConfiguration()
                             .syncCall();
 
         try {
@@ -2277,7 +2277,7 @@ public class RoutineTest {
                 JRoutineCore.on(factoryOf(DelayedInvocation.class, millis(100)))
                             .withInvocations()
                             .withLogLevel(Level.SILENT)
-                            .getConfigured()
+                            .setConfiguration()
                             .buildRoutine();
         final Iterator<String> iterator =
                 routine1.asyncCall("test").afterMax(millis(500)).eventuallyExit().iterator();
@@ -2333,7 +2333,7 @@ public class RoutineTest {
             JRoutineCore.on(new ResultRunnerDeadlock())
                         .withInvocations()
                         .withOutputMaxSize(1)
-                        .getConfigured()
+                        .setConfiguration()
                         .asyncCall("test")
                         .afterMax(seconds(1))
                         .all();
@@ -2349,7 +2349,7 @@ public class RoutineTest {
             JRoutineCore.on(new ResultListRunnerDeadlock())
                         .withInvocations()
                         .withOutputMaxSize(1)
-                        .getConfigured()
+                        .setConfiguration()
                         .asyncCall("test")
                         .afterMax(seconds(1))
                         .all();
@@ -2365,7 +2365,7 @@ public class RoutineTest {
             JRoutineCore.on(new ResultArrayRunnerDeadlock())
                         .withInvocations()
                         .withOutputMaxSize(1)
-                        .getConfigured()
+                        .setConfiguration()
                         .asyncCall("test")
                         .afterMax(seconds(1))
                         .all();
@@ -2420,7 +2420,7 @@ public class RoutineTest {
                                .withOutputMaxDelay(1, TimeUnit.SECONDS)
                                .withOutputMaxSize(2)
                                .withOutputOrder(OrderType.BY_CALL)
-                               .getConfigured()
+                               .setConfiguration()
                                .syncCall("test1", "test2")
                                .all()).containsExactly("test1", "test2");
 
@@ -2436,7 +2436,7 @@ public class RoutineTest {
                                .withOutputMaxDelay(TimeDuration.ZERO)
                                .withOutputMaxSize(2)
                                .withOutputOrder(OrderType.BY_CALL)
-                               .getConfigured()
+                               .setConfiguration()
                                .syncCall("test1", "test2")
                                .all()).containsExactly("test1", "test2");
     }
@@ -2551,7 +2551,7 @@ public class RoutineTest {
                 JRoutineCore.on(factoryOf(DelayedInvocation.class, seconds(1)))
                             .withInvocations()
                             .withReadTimeoutAction(TimeoutActionType.ABORT)
-                            .getConfigured()
+                            .setConfiguration()
                             .buildRoutine();
 
         try {
@@ -2612,7 +2612,7 @@ public class RoutineTest {
                             .withInvocations()
                             .withReadTimeoutAction(TimeoutActionType.ABORT)
                             .withReadTimeout(millis(10))
-                            .getConfigured()
+                            .setConfiguration()
                             .buildRoutine();
 
         try {
@@ -2672,7 +2672,7 @@ public class RoutineTest {
                 JRoutineCore.on(factoryOf(DelayedInvocation.class, seconds(1)))
                             .withInvocations()
                             .withReadTimeoutAction(TimeoutActionType.THROW)
-                            .getConfigured()
+                            .setConfiguration()
                             .buildRoutine();
         final OutputChannel<String> channel3 = routine3.asyncCall("test1");
 
@@ -2788,7 +2788,7 @@ public class RoutineTest {
                 JRoutineCore.on(factoryOf(DelayedInvocation.class, seconds(1)))
                             .withInvocations()
                             .withReadTimeoutAction(TimeoutActionType.EXIT)
-                            .getConfigured()
+                            .setConfiguration()
                             .buildRoutine();
         final OutputChannel<String> channel4 = routine4.asyncCall("test1");
 
@@ -3631,7 +3631,7 @@ public class RoutineTest {
                         .withInvocations()
                         .withInputMaxSize(1)
                         .withInputMaxDelay(TimeDuration.INFINITY)
-                        .getConfigured()
+                        .setConfiguration()
                         .asyncInvoke()
                         .after(millis(500))
                         .pass(s)
@@ -3651,7 +3651,7 @@ public class RoutineTest {
                                     .withInvocations()
                                     .withInputMaxSize(1)
                                     .withInputMaxDelay(TimeDuration.INFINITY)
-                                    .getConfigured()
+                                    .setConfiguration()
                                     .asyncInvoke()
                                     .after(millis(500))
                                     .pass(channel)
@@ -3668,7 +3668,7 @@ public class RoutineTest {
                         .withInvocations()
                         .withInputMaxSize(1)
                         .withInputMaxDelay(TimeDuration.INFINITY)
-                        .getConfigured()
+                        .setConfiguration()
                         .asyncInvoke()
                         .after(millis(500))
                         .pass(s)
@@ -3687,7 +3687,7 @@ public class RoutineTest {
                         .withInvocations()
                         .withInputMaxSize(1)
                         .withInputMaxDelay(TimeDuration.INFINITY)
-                        .getConfigured()
+                        .setConfiguration()
                         .asyncInvoke()
                         .after(millis(500))
                         .pass(s)

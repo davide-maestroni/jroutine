@@ -70,7 +70,7 @@ class BuilderWrapper<OUT> implements ChannelsBuilder<StreamChannel<OUT>>,
         }
 
         mConfiguration = configuration;
-        mBuilder.withChannels().with(null).with(configuration).getConfigured();
+        mBuilder.withChannels().with(null).with(configuration).setConfiguration();
         return this;
     }
 

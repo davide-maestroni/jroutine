@@ -255,7 +255,7 @@ public final class ServiceConfiguration {
          * @return the configured object.
          */
         @NotNull
-        public TYPE getConfigured() {
+        public TYPE setConfiguration() {
 
             return mConfigurable.setConfiguration(buildConfiguration());
         }

@@ -761,9 +761,8 @@ public final class InvocationConfiguration {
          * @return the configured object.
          */
         @NotNull
-        public TYPE getConfigured() {
+        public TYPE setConfiguration() {
 
-            // TODO: 23/03/16 getConfiguration??
             return mConfigurable.setConfiguration(buildConfiguration());
         }
 

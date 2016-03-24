@@ -164,10 +164,10 @@ class DefaultTargetRoutineBuilder implements TargetRoutineBuilder {
         return JRoutineObject.on(mTarget)
                              .withInvocations()
                              .with(mInvocationConfiguration)
-                             .getConfigured()
+                             .setConfiguration()
                              .withProxies()
                              .with(mProxyConfiguration)
-                             .getConfigured();
+                             .setConfiguration();
     }
 
     @NotNull
@@ -176,9 +176,9 @@ class DefaultTargetRoutineBuilder implements TargetRoutineBuilder {
         return JRoutineProxy.on(mTarget)
                             .withInvocations()
                             .with(mInvocationConfiguration)
-                            .getConfigured()
+                            .setConfiguration()
                             .withProxies()
                             .with(mProxyConfiguration)
-                            .getConfigured();
+                            .setConfiguration();
     }
 }

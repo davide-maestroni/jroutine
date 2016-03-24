@@ -341,7 +341,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                          .with(loaderFrom(activity))
                          .withInvocations()
                          .withRunner(runner1)
-                         .getConfigured()
+                         .setConfiguration()
                          .map(new Function<String, Object>() {
 
                              public Object apply(final String s) {
@@ -350,11 +350,11 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                                      .with(loaderFrom(activity))
                                                      .withInvocations()
                                                      .withRunner(runner1)
-                                                     .getConfigured()
+                                                     .setConfiguration()
                                                      .map(Functions.identity())
                                                      .withInvocations()
                                                      .withRunner(runner2)
-                                                     .getConfigured()
+                                                     .setConfiguration()
                                                      .map(Functions.identity())
                                                      .afterMax(minutes(3))
                                                      .next();
@@ -1382,7 +1382,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         final Routine<String, String> routine = JRoutineCore.on(new UpperCase())
                                                             .withInvocations()
                                                             .withOutputOrder(OrderType.BY_CALL)
-                                                            .getConfigured()
+                                                            .setConfiguration()
                                                             .buildRoutine();
         assertThat(LoaderStreams.streamOf("test1", "test2")
                                 .with(loaderFrom(getActivity()))

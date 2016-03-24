@@ -174,10 +174,10 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         return (Routine<IN, OUT>) builder.withInvocations()
                                          .with(configurationWithAnnotations(
                                                  mInvocationConfiguration, targetMethod))
-                                         .getConfigured()
+                                         .setConfiguration()
                                          .withService()
                                          .with(mServiceConfiguration)
-                                         .getConfigured()
+                                         .setConfiguration()
                                          .buildRoutine();
     }
 
@@ -217,10 +217,10 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         return (Routine<IN, OUT>) builder.withInvocations()
                                          .with(configurationWithAnnotations(
                                                  mInvocationConfiguration, targetMethod))
-                                         .getConfigured()
+                                         .setConfiguration()
                                          .withService()
                                          .with(mServiceConfiguration)
-                                         .getConfigured()
+                                         .setConfiguration()
                                          .buildRoutine();
     }
 
@@ -333,7 +333,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             mRoutine = JRoutineObject.on(target)
                                      .withProxies()
                                      .withSharedFields(mSharedFields)
-                                     .getConfigured()
+                                     .setConfiguration()
                                      .alias(mAliasName);
         }
 
@@ -412,7 +412,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             mRoutine = JRoutineObject.on(target)
                                      .withProxies()
                                      .withSharedFields(mSharedFields)
-                                     .getConfigured()
+                                     .setConfiguration()
                                      .method(mMethodName, mParameterTypes);
         }
 
@@ -564,10 +564,10 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                     JRoutineService.with(mContext).on(factory);
             final Routine<Object, Object> routine = builder.withInvocations()
                                                            .with(invocationConfiguration)
-                                                           .getConfigured()
+                                                           .setConfiguration()
                                                            .withService()
                                                            .with(mServiceConfiguration)
-                                                           .getConfigured()
+                                                           .setConfiguration()
                                                            .buildRoutine();
             return invokeRoutine(routine, method, asArgs(args), methodInfo.invocationMode,
                     inputMode, outputMode);

@@ -124,7 +124,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
         mRoutine = JRoutineCore.on(fromFactory(serviceContext.getApplicationContext(), factory))
                                .withInvocations()
                                .with(invocationConfiguration)
-                               .getConfigured()
+                               .setConfiguration()
                                .buildRoutine();
         final Logger logger = mLogger;
         logger.dbg("building service routine on invocation %s with configurations: %s - %s",
@@ -238,7 +238,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
                                  .withChannelMaxSize(inputMaxSize)
                                  .withLog(log)
                                  .withLogLevel(logLevel)
-                                 .getConfigured()
+                                 .setConfiguration()
                                  .buildChannel();
             final int outputLimit =
                     invocationConfiguration.getOutputLimitOr(ChannelConfiguration.DEFAULT);
@@ -258,7 +258,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
                                   .withReadTimeoutAction(timeoutActionType)
                                   .withLog(log)
                                   .withLogLevel(logLevel)
-                                  .getConfigured()
+                                  .setConfiguration()
                                   .buildChannel();
         }
 

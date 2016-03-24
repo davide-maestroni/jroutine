@@ -227,7 +227,7 @@ public class JRoutineLoaderCompat {
 
             return new DefaultLoaderChannelBuilder(mContext).withLoaders()
                                                             .withLoaderId(loaderId)
-                                                            .getConfigured();
+                                                            .setConfiguration();
         }
     }
 }

@@ -195,13 +195,13 @@ class DefaultServiceTargetRoutineBuilder implements ServiceTargetRoutineBuilder 
                                     .on(mTarget)
                                     .withInvocations()
                                     .with(mInvocationConfiguration)
-                                    .getConfigured()
+                                    .setConfiguration()
                                     .withProxies()
                                     .with(mProxyConfiguration)
-                                    .getConfigured()
+                                    .setConfiguration()
                                     .withService()
                                     .with(mServiceConfiguration)
-                                    .getConfigured();
+                                    .setConfiguration();
     }
 
     @NotNull
@@ -211,12 +211,12 @@ class DefaultServiceTargetRoutineBuilder implements ServiceTargetRoutineBuilder 
                                    .on(mTarget)
                                    .withInvocations()
                                    .with(mInvocationConfiguration)
-                                   .getConfigured()
+                                   .setConfiguration()
                                    .withProxies()
                                    .with(mProxyConfiguration)
-                                   .getConfigured()
+                                   .setConfiguration()
                                    .withService()
                                    .with(mServiceConfiguration)
-                                   .getConfigured();
+                                   .setConfiguration();
     }
 }

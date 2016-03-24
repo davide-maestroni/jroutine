@@ -82,7 +82,7 @@ class MapBuilderWrapper<OUT> implements ChannelsBuilder<SparseArray<LoaderStream
         }
 
         mConfiguration = configuration;
-        mBuilder.withChannels().with(null).with(configuration).getConfigured();
+        mBuilder.withChannels().with(null).with(configuration).setConfiguration();
         return this;
     }
 

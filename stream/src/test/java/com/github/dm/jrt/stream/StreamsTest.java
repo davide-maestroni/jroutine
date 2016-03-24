@@ -325,7 +325,7 @@ public class StreamsTest {
                           .withChannels()
                           .withChannelOrder(OrderType.BY_CALL)
                           .withReadTimeout(seconds(1))
-                          .getConfigured()
+                          .setConfiguration()
                           .build()
                           .all()).containsExactly("test4", "test5", "test6", "test1", "test2",
                 "test3");
@@ -912,7 +912,7 @@ public class StreamsTest {
         final IOChannelBuilder builder = JRoutineCore.io()
                                                      .withChannels()
                                                      .withChannelOrder(OrderType.BY_CALL)
-                                                     .getConfigured();
+                                                     .setConfiguration();
         final IOChannel<String> channel1 = builder.buildChannel();
         final IOChannel<Integer> channel2 = builder.buildChannel();
 
@@ -922,7 +922,7 @@ public class StreamsTest {
                                                                      .withInvocations()
                                                                      .withInputOrder(
                                                                              OrderType.BY_CALL)
-                                                                     .getConfigured()
+                                                                     .setConfiguration()
                                                                      .asyncCall(channel);
         final Map<Integer, OutputChannel<Object>> channelMap =
                 Channels.select(output, Sort.INTEGER, Sort.STRING).build();
@@ -953,7 +953,7 @@ public class StreamsTest {
         final IOChannelBuilder builder = JRoutineCore.io()
                                                      .withChannels()
                                                      .withChannelOrder(OrderType.BY_CALL)
-                                                     .getConfigured();
+                                                     .setConfiguration();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
         OutputChannel<? extends Selectable<?>> outputChannel;
@@ -1006,7 +1006,7 @@ public class StreamsTest {
         final IOChannelBuilder builder = JRoutineCore.io()
                                                      .withChannels()
                                                      .withChannelOrder(OrderType.BY_CALL)
-                                                     .getConfigured();
+                                                     .setConfiguration();
         final IOChannel<String> channel1 = builder.buildChannel();
         final IOChannel<String> channel2 = builder.buildChannel();
         final IOChannel<String> channel3 = builder.buildChannel();
@@ -1040,7 +1040,7 @@ public class StreamsTest {
         final IOChannelBuilder builder = JRoutineCore.io()
                                                      .withChannels()
                                                      .withChannelOrder(OrderType.BY_CALL)
-                                                     .getConfigured();
+                                                     .setConfiguration();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
         OutputChannel<? extends Selectable<?>> outputChannel;
@@ -1711,14 +1711,14 @@ public class StreamsTest {
                 Streams.select(outputChannel, Sort.INTEGER, Sort.STRING)
                        .withChannels()
                        .withLogLevel(Level.WARNING)
-                       .getConfigured()
+                       .setConfiguration()
                        .build()
                        .get(Sort.INTEGER);
         final StreamChannel<Object> strChannel =
                 Streams.select(outputChannel, Arrays.asList(Sort.STRING, Sort.INTEGER))
                        .withChannels()
                        .withLogLevel(Level.WARNING)
-                       .getConfigured()
+                       .setConfiguration()
                        .build()
                        .get(Sort.STRING);
         inputChannel.pass(new Selectable<Object>("test21", Sort.STRING),

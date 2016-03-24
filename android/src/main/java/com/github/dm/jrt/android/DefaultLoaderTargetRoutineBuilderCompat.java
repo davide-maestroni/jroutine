@@ -195,13 +195,13 @@ class DefaultLoaderTargetRoutineBuilderCompat implements LoaderTargetRoutineBuil
                                          .on(mTarget)
                                          .withInvocations()
                                          .with(mInvocationConfiguration)
-                                         .getConfigured()
+                                         .setConfiguration()
                                          .withProxies()
                                          .with(mProxyConfiguration)
-                                         .getConfigured()
+                                         .setConfiguration()
                                          .withLoaders()
                                          .with(mLoaderConfiguration)
-                                         .getConfigured();
+                                         .setConfiguration();
     }
 
     @NotNull
@@ -211,12 +211,12 @@ class DefaultLoaderTargetRoutineBuilderCompat implements LoaderTargetRoutineBuil
                                         .on(mTarget)
                                         .withInvocations()
                                         .with(mInvocationConfiguration)
-                                        .getConfigured()
+                                        .setConfiguration()
                                         .withProxies()
                                         .with(mProxyConfiguration)
-                                        .getConfigured()
+                                        .setConfiguration()
                                         .withLoaders()
                                         .with(mLoaderConfiguration)
-                                        .getConfigured();
+                                        .setConfiguration();
     }
 }

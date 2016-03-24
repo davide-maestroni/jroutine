@@ -78,7 +78,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
                                .on(factoryOf(Delay.class))
                                .withService()
                                .withRunnerClass(MainRunner.class)
-                               .getConfigured()
+                               .setConfiguration()
                                .asyncCall(data);
         assertThat(channel.abort(new IllegalArgumentException("test"))).isTrue();
 
@@ -191,10 +191,10 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
                                .withInvocations()
                                .withInputOrder(OrderType.BY_DELAY)
                                .withLogLevel(Level.DEBUG)
-                               .getConfigured()
+                               .setConfiguration()
                                .withService()
                                .withLogClass(AndroidLog.class)
-                               .getConfigured()
+                               .setConfiguration()
                                .buildRoutine();
         assertThat(routine.syncCall("1", "2", "3", "4", "5").afterMax(timeout).all()).containsOnly(
                 "1", "2", "3", "4", "5");
@@ -208,7 +208,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
                                .withInvocations()
                                .withReadTimeout(millis(10))
                                .withReadTimeoutAction(TimeoutActionType.EXIT)
-                               .getConfigured()
+                               .setConfiguration()
                                .asyncCall("test1");
         assertThat(channel.all()).isEmpty();
         assertThat(channel.afterMax(seconds(10)).hasCompleted()).isTrue();
@@ -222,7 +222,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
                                .withInvocations()
                                .withReadTimeout(millis(10))
                                .withReadTimeoutAction(TimeoutActionType.ABORT)
-                               .getConfigured()
+                               .setConfiguration()
                                .asyncCall("test2");
 
         try {
@@ -246,7 +246,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
                                .withInvocations()
                                .withReadTimeout(millis(10))
                                .withReadTimeoutAction(TimeoutActionType.THROW)
-                               .getConfigured()
+                               .setConfiguration()
                                .asyncCall("test3");
 
         try {
@@ -273,10 +273,10 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
                                .withInvocations()
                                .withInputOrder(OrderType.BY_DELAY)
                                .withLogLevel(Level.DEBUG)
-                               .getConfigured()
+                               .setConfiguration()
                                .withService()
                                .withLogClass(AndroidLog.class)
-                               .getConfigured()
+                               .setConfiguration()
                                .buildRoutine();
         assertThat(routine1.syncCall("1", "2", "3", "4", "5").afterMax(timeout).all()).containsOnly(
                 "1", "2", "3", "4", "5");
@@ -298,10 +298,10 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
                                .withInvocations()
                                .withOutputOrder(OrderType.BY_DELAY)
                                .withLogLevel(Level.DEBUG)
-                               .getConfigured()
+                               .setConfiguration()
                                .withService()
                                .withLogClass(AndroidLog.class)
-                               .getConfigured()
+                               .setConfiguration()
                                .buildRoutine();
         assertThat(
                 routine2.syncCall("1", "2", "3", "4", "5").afterMax(timeout).all()).containsExactly(
@@ -325,7 +325,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
                                .withInvocations()
                                .withInputOrder(OrderType.BY_CALL)
                                .withOutputOrder(OrderType.BY_CALL)
-                               .getConfigured()
+                               .setConfiguration()
                                .buildRoutine();
         assertThat(
                 routine3.syncCall("1", "2", "3", "4", "5").afterMax(timeout).all()).containsExactly(
@@ -349,7 +349,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
                                .withInvocations()
                                .withCoreInstances(0)
                                .withMaxInstances(2)
-                               .getConfigured()
+                               .setConfiguration()
                                .buildRoutine();
         assertThat(routine4.syncCall("1", "2", "3", "4", "5").afterMax(timeout).all()).containsOnly(
                 "1", "2", "3", "4", "5");
@@ -372,7 +372,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
                                .withInvocations()
                                .withCoreInstances(0)
                                .withMaxInstances(2)
-                               .getConfigured()
+                               .setConfiguration()
                                .buildRoutine();
         assertThat(routine4.syncCall().afterMax(timeout).all()).containsOnly("test1", "test2",
                 "test3");

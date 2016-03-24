@@ -79,7 +79,7 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
                     DefaultLoaderStreamChannelCompat.super.withInvocations()
                                                           .with(null)
                                                           .with(configuration)
-                                                          .getConfigured();
+                                                          .setConfiguration();
                     return DefaultLoaderStreamChannelCompat.this;
                 }
             };
@@ -95,7 +95,7 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
                     DefaultLoaderStreamChannelCompat.super.withStreamInvocations()
                                                           .with(null)
                                                           .with(configuration)
-                                                          .getConfigured();
+                                                          .setConfiguration();
                     return DefaultLoaderStreamChannelCompat.this;
                 }
             };
@@ -523,7 +523,7 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
         return newChannel(SparseChannelsCompat.toSelectable(this, index)
                                               .withChannels()
                                               .with(configuration)
-                                              .getConfigured()
+                                              .setConfiguration()
                                               .build(), getStreamConfiguration(),
                 getDelegationType(), getBinder());
     }
@@ -591,38 +591,38 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
 
         return newRoutine(configuration,
-                mStreamConfiguration.builderFrom().with(mConfiguration).getConfigured(), factory);
+                mStreamConfiguration.builderFrom().with(mConfiguration).setConfiguration(), factory);
     }
 
     @NotNull
     public LoaderStreamChannelCompat<OUT> cache(@Nullable final CacheStrategyType strategyType) {
 
-        return withLoaders().withCacheStrategy(strategyType).getConfigured();
+        return withLoaders().withCacheStrategy(strategyType).setConfiguration();
     }
 
     @NotNull
     public LoaderStreamChannelCompat<OUT> loaderId(final int loaderId) {
 
-        return withLoaders().withLoaderId(loaderId).getConfigured();
+        return withLoaders().withLoaderId(loaderId).setConfiguration();
     }
 
     @NotNull
     public LoaderStreamChannelCompat<OUT> routineId(final int routineId) {
 
-        return withLoaders().withRoutineId(routineId).getConfigured();
+        return withLoaders().withRoutineId(routineId).setConfiguration();
     }
 
     @NotNull
     public LoaderStreamChannelCompat<OUT> staleAfter(final long time,
             @NotNull final TimeUnit timeUnit) {
 
-        return withLoaders().withResultStaleTime(time, timeUnit).getConfigured();
+        return withLoaders().withResultStaleTime(time, timeUnit).setConfiguration();
     }
 
     @NotNull
     public LoaderStreamChannelCompat<OUT> staleAfter(@Nullable final TimeDuration staleTime) {
 
-        return withLoaders().withResultStaleTime(staleTime).getConfigured();
+        return withLoaders().withResultStaleTime(staleTime).setConfiguration();
     }
 
     @NotNull
@@ -670,7 +670,7 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
             return JRoutineCore.on(factory)
                                .withInvocations()
                                .with(invocationConfiguration)
-                               .getConfigured()
+                               .setConfiguration()
                                .buildRoutine();
         }
 
@@ -680,10 +680,10 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
         return contextBuilder.on(invocationFactory)
                              .withInvocations()
                              .with(invocationConfiguration)
-                             .getConfigured()
+                             .setConfiguration()
                              .withLoaders()
                              .with(loaderConfiguration)
-                             .getConfigured()
+                             .setConfiguration()
                              .buildRoutine();
     }
 

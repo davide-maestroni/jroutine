@@ -894,7 +894,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         final IOChannelBuilder builder = JRoutineCore.io()
                                                      .withChannels()
                                                      .withChannelOrder(OrderType.BY_CALL)
-                                                     .getConfigured();
+                                                     .setConfiguration();
         final IOChannel<String> channel1 = builder.buildChannel();
         final IOChannel<Integer> channel2 = builder.buildChannel();
 
@@ -905,7 +905,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
                                .on(factoryOf(Sort.class))
                                .withInvocations()
                                .withInputOrder(OrderType.BY_CALL)
-                               .getConfigured()
+                               .setConfiguration()
                                .asyncCall(channel);
         final Map<Integer, OutputChannel<Object>> channelMap =
                 AndroidChannels.select(output, Sort.INTEGER, Sort.STRING).build();
@@ -932,7 +932,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         final IOChannelBuilder builder = JRoutineCore.io()
                                                      .withChannels()
                                                      .withChannelOrder(OrderType.BY_CALL)
-                                                     .getConfigured();
+                                                     .setConfiguration();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
         OutputChannel<? extends ParcelableSelectable<?>> outputChannel;
@@ -976,7 +976,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         final IOChannelBuilder builder = JRoutineCore.io()
                                                      .withChannels()
                                                      .withChannelOrder(OrderType.BY_CALL)
-                                                     .getConfigured();
+                                                     .setConfiguration();
         final IOChannel<String> channel1 = builder.buildChannel();
         final IOChannel<String> channel2 = builder.buildChannel();
         final IOChannel<String> channel3 = builder.buildChannel();
@@ -1012,7 +1012,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         final IOChannelBuilder builder = JRoutineCore.io()
                                                      .withChannels()
                                                      .withChannelOrder(OrderType.BY_CALL)
-                                                     .getConfigured();
+                                                     .setConfiguration();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
         OutputChannel<? extends ParcelableSelectable<?>> outputChannel;

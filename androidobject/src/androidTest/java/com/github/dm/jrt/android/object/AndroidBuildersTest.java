@@ -50,7 +50,7 @@ public class AndroidBuildersTest extends AndroidTestCase {
                          .withLoaderId(-77)
                          .withResultStaleTime(TimeDuration.millis(333))
                          .withRoutineId(13)
-                         .getConfigured());
+                         .setConfiguration());
     }
 
     public interface AnnotationItf {

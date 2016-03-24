@@ -74,7 +74,7 @@ class MergeBuilder<OUT>
             @NotNull final ChannelConfiguration configuration) {
 
         final IOChannel<ParcelableSelectable<OUT>> ioChannel =
-                JRoutineCore.io().withChannels().with(configuration).getConfigured().buildChannel();
+                JRoutineCore.io().withChannels().with(configuration).setConfiguration().buildChannel();
         int i = mStartIndex;
         for (final OutputChannel<? extends OUT> channel : mChannels) {
             ioChannel.pass(AndroidChannels.toSelectable(channel, i++).build());

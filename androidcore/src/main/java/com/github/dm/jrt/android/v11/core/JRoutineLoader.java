@@ -230,7 +230,7 @@ public class JRoutineLoader {
 
             return new DefaultLoaderChannelBuilder(mContext).withLoaders()
                                                             .withLoaderId(loaderId)
-                                                            .getConfigured();
+                                                            .setConfiguration();
         }
     }
 }

@@ -48,7 +48,7 @@
                               .on(factoryOf(LoadBitmap.class))
                               .withLoaders()
                               .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
-                              .getConfigured()
+                              .setConfiguration()
                               .asyncCall(URI.create(IMAGE_URI))
                               .bind(new TemplateOutputConsumer&lt;Bitmap&gt;() {
 
@@ -114,7 +114,7 @@
                               .on(factoryOf(LoadBitmapFromService.class))
                               .withLoaders()
                               .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
-                              .getConfigured()
+                              .setConfiguration()
                               .asyncCall(URI.create(IMAGE_URI))
                               .bind(new TemplateOutputConsumer&lt;Bitmap&gt;() {
 

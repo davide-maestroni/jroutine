@@ -98,7 +98,7 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
 
         final InvocationConfiguration.Builder<InvocationConfiguration> builder =
                 configuration.builderFrom().withRunner(mainRunner);
-        return new DefaultLoaderRoutine<IN, OUT>(mContext, mFactory, builder.getConfigured(),
+        return new DefaultLoaderRoutine<IN, OUT>(mContext, mFactory, builder.setConfiguration(),
                 mLoaderConfiguration);
     }
 

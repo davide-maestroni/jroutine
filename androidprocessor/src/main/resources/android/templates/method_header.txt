@@ -33,9 +33,9 @@
         return getBuilder(mContext, targetFactory).withInvocations()
                                                   .with(invocationConfiguration)
                                                   ${routineBuilderOptions}
-                                                  .getConfigured()
+                                                  .setConfiguration()
                                                   .withService()
                                                   .with(serviceConfiguration)
-                                                  .getConfigured()
+                                                  .setConfiguration()
                                                   .buildRoutine();
     }

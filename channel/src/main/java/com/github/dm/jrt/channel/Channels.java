@@ -1225,7 +1225,7 @@ public class Channels {
                 final IOChannel<IN> ioChannel = Channels.<DATA, IN>select(channel, index)
                                                         .withChannels()
                                                         .with(configuration)
-                                                        .getConfigured()
+                                                        .setConfiguration()
                                                         .build();
                 channelMap.put(index, ioChannel);
             }
@@ -1393,7 +1393,7 @@ public class Channels {
             final IOChannel<List<? extends OUT>> ioChannel = JRoutineCore.io()
                                                                          .withChannels()
                                                                          .with(configuration)
-                                                                         .getConfigured()
+                                                                         .setConfiguration()
                                                                          .buildChannel();
             final JoinOutputConsumer<OUT> consumer =
                     new JoinOutputConsumer<OUT>(mIsFlush, channels.size(), mPlaceholder, ioChannel);
@@ -1449,7 +1449,7 @@ public class Channels {
             final IOChannel<Selectable<OUT>> ioChannel = JRoutineCore.io()
                                                                      .withChannels()
                                                                      .with(configuration)
-                                                                     .getConfigured()
+                                                                     .setConfiguration()
                                                                      .buildChannel();
             int i = mStartIndex;
             for (final OutputChannel<? extends OUT> channel : mChannels) {
@@ -1502,7 +1502,7 @@ public class Channels {
             final IOChannel<Selectable<OUT>> ioChannel = JRoutineCore.io()
                                                                      .withChannels()
                                                                      .with(configuration)
-                                                                     .getConfigured()
+                                                                     .setConfiguration()
                                                                      .buildChannel();
             for (final Entry<Integer, ? extends OutputChannel<? extends OUT>> entry : mChannelMap
                     .entrySet()) {

@@ -46,7 +46,7 @@ import java.lang.annotation.Target;
  *     <code>
  *
  *         final MyClass myInstance = new MyClass();
- *         JRoutineObject.on(instance(myInstance)).alias(MyClass.METHOD_NAME).asyncCall();
+ *         JRoutineObject.on(instance(myInstance)).method(MyClass.METHOD_NAME).asyncCall();
  *     </code>
  * </pre>
  * <p/>
@@ -80,8 +80,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Alias {
-
-    // TODO: 23/03/16 use another annotation to reference it?
 
     /**
      * The name used to identify the method independently from its original signature.

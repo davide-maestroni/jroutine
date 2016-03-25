@@ -92,12 +92,6 @@ class DefaultTargetRoutineBuilder implements TargetRoutineBuilder {
     }
 
     @NotNull
-    public <IN, OUT> Routine<IN, OUT> alias(@NotNull final String name) {
-
-        return newObjectBuilder().alias(name);
-    }
-
-    @NotNull
     public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
 
         final BuilderType builderType = mBuilderType;
@@ -120,6 +114,12 @@ class DefaultTargetRoutineBuilder implements TargetRoutineBuilder {
     public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
 
         return buildProxy(itf.getRawClass());
+    }
+
+    @NotNull
+    public <IN, OUT> Routine<IN, OUT> method(@NotNull final String name) {
+
+        return newObjectBuilder().method(name);
     }
 
     @NotNull
@@ -148,7 +148,7 @@ class DefaultTargetRoutineBuilder implements TargetRoutineBuilder {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<DefaultTargetRoutineBuilder>(mProxyConfigurable,
-                                                                           config);
+                config);
     }
 
     @NotNull

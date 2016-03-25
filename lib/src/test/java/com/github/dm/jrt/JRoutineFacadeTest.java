@@ -84,7 +84,7 @@ public class JRoutineFacadeTest {
                                                               .withLogLevel(Level.DEBUG)
                                                               .withLog(new NullLog())
                                                               .setConfiguration()
-                                                              .alias(TestClass.GET);
+                                                              .method(TestClass.GET);
         assertThat(routine.syncCall().afterMax(timeout).all()).containsExactly(-77L);
     }
 
@@ -331,7 +331,7 @@ public class JRoutineFacadeTest {
                                                               .withLogLevel(Level.DEBUG)
                                                               .withLog(new NullLog())
                                                               .setConfiguration()
-                                                              .alias(TestClass.GET);
+                                                              .method(TestClass.GET);
         assertThat(routine.syncCall().all()).containsExactly(-77L);
     }
 

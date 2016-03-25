@@ -90,18 +90,6 @@ class DefaultObjectRoutineBuilder
     }
 
     @NotNull
-    public <IN, OUT> Routine<IN, OUT> alias(@NotNull final String name) {
-
-        final Method method = getAnnotatedMethod(mTarget.getTargetClass(), name);
-        if (method == null) {
-            throw new IllegalArgumentException(
-                    "no annotated method with alias '" + name + "' has been found");
-        }
-
-        return method(method);
-    }
-
-    @NotNull
     public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
 
         if (!itf.isInterface()) {
@@ -118,6 +106,17 @@ class DefaultObjectRoutineBuilder
     public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
 
         return itf.cast(buildProxy(itf.getRawClass()));
+    }
+
+    @NotNull
+    public <IN, OUT> Routine<IN, OUT> method(@NotNull final String name) {
+
+        final Method method = getAnnotatedMethod(mTarget.getTargetClass(), name);
+        if (method == null) {
+            return method(name, Reflection.NO_PARAMS);
+        }
+
+        return method(method);
     }
 
     @NotNull

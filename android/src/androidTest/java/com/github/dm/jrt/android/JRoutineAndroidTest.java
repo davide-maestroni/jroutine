@@ -127,7 +127,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                                   .all()).containsExactly("TEST");
         assertThat(JRoutineAndroid.with(getActivity())
                                   .on(classOfType(TestClass.class))
-                                  .alias("TEST")
+                                  .method("TEST")
                                   .asyncCall()
                                   .afterMax(seconds(10))
                                   .all()).containsExactly("TEST");
@@ -177,7 +177,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                                   .all()).containsExactly("test");
         assertThat(JRoutineAndroid.with(getActivity())
                                   .on(instanceOf(TestClass.class))
-                                  .alias("test")
+                                  .method("test")
                                   .asyncCall()
                                   .afterMax(seconds(10))
                                   .all()).containsExactly("test");
@@ -355,7 +355,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                                   .all()).containsExactly("TEST");
         assertThat(JRoutineAndroid.with((Context) getActivity())
                                   .on(classOfType(TestClass.class))
-                                  .alias("TEST")
+                                  .method("TEST")
                                   .asyncCall()
                                   .afterMax(seconds(10))
                                   .all()).containsExactly("TEST");
@@ -381,7 +381,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                                   .all()).containsExactly("test");
         assertThat(JRoutineAndroid.with((Context) getActivity())
                                   .on(instanceOf(TestClass.class))
-                                  .alias("test")
+                                  .method("test")
                                   .asyncCall()
                                   .afterMax(seconds(10))
                                   .all()).containsExactly("test");

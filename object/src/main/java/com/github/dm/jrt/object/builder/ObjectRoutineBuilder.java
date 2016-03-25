@@ -33,27 +33,6 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
         ProxyConfigurableBuilder<ObjectRoutineBuilder> {
 
     /**
-     * Returns a routine used to call the method whose identifying name is specified in a
-     * {@link com.github.dm.jrt.object.annotation.Alias Alias} annotation.<br/>
-     * Optional <i>{@code com.github.dm.jrt.object.annotation.*}</i> method annotations will be
-     * honored as well.<br/>
-     * Note that such annotations will override any configuration set through the builder.
-     * <p/>
-     * Note that it is up to the caller to ensure that the input data are passed to the routine in
-     * the correct order.
-     *
-     * @param name  the name specified in the annotation.
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
-     * @return the routine.
-     * @throws java.lang.IllegalArgumentException if the specified method is not found.
-     * @see <a href='{@docRoot}/com/github/dm/jrt/object/annotation/package-summary.html'>
-     * Annotations</a>
-     */
-    @NotNull
-    <IN, OUT> Routine<IN, OUT> alias(@NotNull String name);
-
-    /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any optional
@@ -106,6 +85,29 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
      */
     @NotNull
     <TYPE> TYPE buildProxy(@NotNull ClassToken<TYPE> itf);
+
+    /**
+     * Returns a routine used to call the method whose identifying name is specified in a
+     * {@link com.github.dm.jrt.object.annotation.Alias Alias} annotation.<br/>
+     * If no method with the specified alias is found, this method will behave like
+     * {@link #method(String, Class[])} with no parameter.<br/>
+     * Optional <i>{@code com.github.dm.jrt.object.annotation.*}</i> method annotations will be
+     * honored as well.<br/>
+     * Note that such annotations will override any configuration set through the builder.
+     * <p/>
+     * Note that it is up to the caller to ensure that the input data are passed to the routine in
+     * the correct order.
+     *
+     * @param name  the name specified in the annotation.
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
+     * @return the routine.
+     * @throws java.lang.IllegalArgumentException if the specified method is not found.
+     * @see <a href='{@docRoot}/com/github/dm/jrt/object/annotation/package-summary.html'>
+     * Annotations</a>
+     */
+    @NotNull
+    <IN, OUT> Routine<IN, OUT> method(@NotNull String name);
 
     /**
      * Returns a routine used to call the specified method.

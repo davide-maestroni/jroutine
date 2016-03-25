@@ -31,6 +31,7 @@ import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
+import com.github.dm.jrt.core.util.Reflection;
 import com.github.dm.jrt.object.Builders.MethodInfo;
 import com.github.dm.jrt.object.InvocationTarget;
 import com.github.dm.jrt.object.JRoutineObject;
@@ -154,14 +155,32 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     @NotNull
+    public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
+
+        if (!itf.isInterface()) {
+            throw new IllegalArgumentException(
+                    "the specified class is not an interface: " + itf.getName());
+        }
+
+        final Object proxy = Proxy.newProxyInstance(itf.getClassLoader(), new Class[]{itf},
+                new ProxyInvocationHandler(this));
+        return itf.cast(proxy);
+    }
+
+    @NotNull
+    public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
+
+        return buildProxy(itf.getRawClass());
+    }
+
+    @NotNull
     @SuppressWarnings("unchecked")
-    public <IN, OUT> Routine<IN, OUT> alias(@NotNull final String name) {
+    public <IN, OUT> Routine<IN, OUT> method(@NotNull final String name) {
 
         final ContextInvocationTarget<?> target = mTarget;
         final Method targetMethod = getAnnotatedMethod(target.getTargetClass(), name);
         if (targetMethod == null) {
-            throw new IllegalArgumentException(
-                    "no annotated method with alias '" + name + "' has been found");
+            return method(name, Reflection.NO_PARAMS);
         }
 
         final List<String> sharedFields =
@@ -179,25 +198,6 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                                          .with(mServiceConfiguration)
                                          .setConfiguration()
                                          .buildRoutine();
-    }
-
-    @NotNull
-    public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
-
-        if (!itf.isInterface()) {
-            throw new IllegalArgumentException(
-                    "the specified class is not an interface: " + itf.getName());
-        }
-
-        final Object proxy = Proxy.newProxyInstance(itf.getClassLoader(), new Class[]{itf},
-                new ProxyInvocationHandler(this));
-        return itf.cast(proxy);
-    }
-
-    @NotNull
-    public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
-
-        return buildProxy(itf.getRawClass());
     }
 
     @NotNull
@@ -334,7 +334,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                                      .withProxies()
                                      .withSharedFields(mSharedFields)
                                      .setConfiguration()
-                                     .alias(mAliasName);
+                                     .method(mAliasName);
         }
 
         @Override

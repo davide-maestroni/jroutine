@@ -131,7 +131,7 @@ public class ObjectRoutineTest {
                                                               .withLogLevel(Level.DEBUG)
                                                               .withLog(new NullLog())
                                                               .setConfiguration()
-                                                              .alias(TestClass.GET);
+                                                              .method(TestClass.GET);
 
         assertThat(routine.syncCall().afterMax(timeout).all()).containsExactly(-77L);
     }
@@ -146,7 +146,7 @@ public class ObjectRoutineTest {
                                                               .withLogLevel(Level.DEBUG)
                                                               .withLog(new NullLog())
                                                               .setConfiguration()
-                                                              .alias(TestStatic.GET);
+                                                              .method(TestStatic.GET);
 
         assertThat(routine.syncCall().afterMax(timeout).all()).containsExactly(-77L);
     }
@@ -156,7 +156,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutineObject.on(classOfType(TestStatic.class)).alias("test");
+            JRoutineObject.on(classOfType(TestStatic.class)).method("test");
 
             fail();
 
@@ -296,7 +296,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutineObject.on(instance(new DuplicateAnnotation())).alias(DuplicateAnnotation.GET);
+            JRoutineObject.on(instance(new DuplicateAnnotation())).method(DuplicateAnnotation.GET);
 
             fail();
 
@@ -307,7 +307,7 @@ public class ObjectRoutineTest {
         try {
 
             JRoutineObject.on(classOfType(DuplicateAnnotationStatic.class))
-                          .alias(DuplicateAnnotationStatic.GET);
+                          .method(DuplicateAnnotationStatic.GET);
 
             fail();
 
@@ -322,7 +322,7 @@ public class ObjectRoutineTest {
         final TimeDuration timeout = seconds(1);
         final TestClass test = new TestClass();
         final Routine<Object, Object> routine3 =
-                JRoutineObject.on(instance(test)).alias(TestClass.THROW);
+                JRoutineObject.on(instance(test)).method(TestClass.THROW);
 
         try {
 
@@ -343,7 +343,7 @@ public class ObjectRoutineTest {
         final TimeDuration timeout = seconds(1);
 
         final Routine<Object, Object> routine3 =
-                JRoutineObject.on(classOfType(TestStatic.class)).alias(TestStatic.THROW);
+                JRoutineObject.on(classOfType(TestStatic.class)).method(TestStatic.THROW);
 
         try {
 
@@ -685,17 +685,17 @@ public class ObjectRoutineTest {
                                  .afterMax(timeout)
                                  .all()).containsExactly(1);
         assertThat(JRoutineObject.on(instance(test))
-                                 .alias(TestClassImpl.GET)
+                                 .method(TestClassImpl.GET)
                                  .syncCall()
                                  .afterMax(timeout)
                                  .all()).containsExactly(1);
         assertThat(JRoutineObject.on(classOfType(TestClassImpl.class))
-                                 .alias(TestClassImpl.STATIC_GET)
+                                 .method(TestClassImpl.STATIC_GET)
                                  .syncCall(3)
                                  .afterMax(timeout)
                                  .all()).containsExactly(3);
         assertThat(JRoutineObject.on(classOfType(TestClassImpl.class))
-                                 .alias("sget")
+                                 .method("sget")
                                  .asyncCall(-3)
                                  .afterMax(timeout)
                                  .all()).containsExactly(-3);
@@ -712,7 +712,7 @@ public class ObjectRoutineTest {
         try {
 
             JRoutineObject.on(classOfType(TestClassImpl.class))
-                          .alias("sget")
+                          .method("sget")
                           .asyncCall()
                           .afterMax(timeout)
                           .all();
@@ -725,7 +725,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutineObject.on(classOfType(TestClassImpl.class)).alias("take");
+            JRoutineObject.on(classOfType(TestClassImpl.class)).method("take");
 
             fail();
 
@@ -763,7 +763,7 @@ public class ObjectRoutineTest {
 
         try {
 
-            JRoutineObject.on(instance(test)).alias("test");
+            JRoutineObject.on(instance(test)).method("test");
 
             fail();
 
@@ -861,7 +861,7 @@ public class ObjectRoutineTest {
                                                               .withLogLevel(Level.DEBUG)
                                                               .withLog(new NullLog())
                                                               .setConfiguration()
-                                                              .alias(TestStatic.GET);
+                                                              .method(TestStatic.GET);
 
         assertThat(routine.syncCall().afterMax(timeout).all()).containsExactly(-77L);
     }
@@ -1112,7 +1112,7 @@ public class ObjectRoutineTest {
                                                                .withLogLevel(Level.DEBUG)
                                                                .withLog(nullLog)
                                                                .setConfiguration()
-                                                               .alias(TestClass.GET);
+                                                               .method(TestClass.GET);
 
         assertThat(routine1.syncCall().all()).containsExactly(-77L);
 
@@ -1123,7 +1123,7 @@ public class ObjectRoutineTest {
                                                                .withLogLevel(Level.DEBUG)
                                                                .withLog(nullLog)
                                                                .setConfiguration()
-                                                               .alias(TestClass.GET);
+                                                               .method(TestClass.GET);
 
         assertThat(routine2.syncCall().all()).containsExactly(-77L);
         assertThat(routine1).isEqualTo(routine2);
@@ -1135,7 +1135,7 @@ public class ObjectRoutineTest {
                                                                .withLogLevel(Level.DEBUG)
                                                                .withLog(nullLog)
                                                                .setConfiguration()
-                                                               .alias(TestClass.GET);
+                                                               .method(TestClass.GET);
 
         assertThat(routine3.syncCall().all()).containsExactly(-77L);
         assertThat(routine1).isNotEqualTo(routine3);
@@ -1148,7 +1148,7 @@ public class ObjectRoutineTest {
                                                                .withLogLevel(Level.WARNING)
                                                                .withLog(nullLog)
                                                                .setConfiguration()
-                                                               .alias(TestClass.GET);
+                                                               .method(TestClass.GET);
 
         assertThat(routine4.syncCall().all()).containsExactly(-77L);
         assertThat(routine3).isNotEqualTo(routine4);
@@ -1160,7 +1160,7 @@ public class ObjectRoutineTest {
                                                                .withLogLevel(Level.WARNING)
                                                                .withLog(new NullLog())
                                                                .setConfiguration()
-                                                               .alias(TestClass.GET);
+                                                               .method(TestClass.GET);
 
         assertThat(routine5.syncCall().all()).containsExactly(-77L);
         assertThat(routine4).isNotEqualTo(routine5);
@@ -1177,7 +1177,7 @@ public class ObjectRoutineTest {
                                                                .withLogLevel(Level.DEBUG)
                                                                .withLog(nullLog)
                                                                .setConfiguration()
-                                                               .alias(TestStatic.GET);
+                                                               .method(TestStatic.GET);
 
         assertThat(routine1.syncCall().all()).containsExactly(-77L);
 
@@ -1188,7 +1188,7 @@ public class ObjectRoutineTest {
                                                                .withLogLevel(Level.DEBUG)
                                                                .withLog(nullLog)
                                                                .setConfiguration()
-                                                               .alias(TestStatic.GET);
+                                                               .method(TestStatic.GET);
 
         assertThat(routine2.syncCall().all()).containsExactly(-77L);
         assertThat(routine1).isEqualTo(routine2);
@@ -1200,7 +1200,7 @@ public class ObjectRoutineTest {
                                                                .withLogLevel(Level.DEBUG)
                                                                .withLog(nullLog)
                                                                .setConfiguration()
-                                                               .alias(TestStatic.GET);
+                                                               .method(TestStatic.GET);
 
         assertThat(routine3.syncCall().all()).containsExactly(-77L);
         assertThat(routine1).isNotEqualTo(routine3);
@@ -1213,7 +1213,7 @@ public class ObjectRoutineTest {
                                                                .withLogLevel(Level.WARNING)
                                                                .withLog(nullLog)
                                                                .setConfiguration()
-                                                               .alias(TestStatic.GET);
+                                                               .method(TestStatic.GET);
 
         assertThat(routine4.syncCall().all()).containsExactly(-77L);
         assertThat(routine3).isNotEqualTo(routine4);
@@ -1225,7 +1225,7 @@ public class ObjectRoutineTest {
                                                                .withLogLevel(Level.WARNING)
                                                                .withLog(new NullLog())
                                                                .setConfiguration()
-                                                               .alias(TestStatic.GET);
+                                                               .method(TestStatic.GET);
 
         assertThat(routine5.syncCall().all()).containsExactly(-77L);
         assertThat(routine4).isNotEqualTo(routine5);
@@ -1527,7 +1527,7 @@ public class ObjectRoutineTest {
                                  .withInvocations()
                                  .withReadTimeout(seconds(1))
                                  .setConfiguration()
-                                 .alias("test")
+                                 .method("test")
                                  .asyncCall()
                                  .next()).isEqualTo(31);
 
@@ -1537,7 +1537,7 @@ public class ObjectRoutineTest {
                           .withInvocations()
                           .withReadTimeoutAction(TimeoutActionType.THROW)
                           .setConfiguration()
-                          .alias("test")
+                          .method("test")
                           .asyncCall()
                           .next();
 

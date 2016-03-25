@@ -93,7 +93,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                                      .withLogLevel(Level.DEBUG)
                                      .withLog(new NullLog())
                                      .setConfiguration()
-                                     .alias(TestClass.GET);
+                                     .method(TestClass.GET);
         assertThat(routine.syncCall().afterMax(timeout).all()).containsExactly(-77L);
     }
 
@@ -196,7 +196,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
             JRoutineServiceObject.with(serviceFrom(getActivity()))
                                  .on(instanceOf(DuplicateAnnotation.class))
-                                 .alias(DuplicateAnnotation.GET);
+                                 .method(DuplicateAnnotation.GET);
 
             fail();
 
@@ -211,7 +211,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         final Routine<Object, Object> routine3 =
                 JRoutineServiceObject.with(serviceFrom(getActivity()))
                                      .on(instanceOf(TestClass.class))
-                                     .alias(TestClass.THROW);
+                                     .method(TestClass.THROW);
 
         try {
 
@@ -493,7 +493,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
             JRoutineServiceObject.with(serviceFrom(getActivity()))
                                  .on(instanceOf(TestClass.class))
-                                 .alias("test");
+                                 .method("test");
 
             fail();
 
@@ -844,7 +844,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                                         .withInvocations()
                                         .withReadTimeout(seconds(10))
                                         .setConfiguration()
-                                        .alias("test")
+                                        .method("test")
                                         .asyncCall()
                                         .next()).isEqualTo(31);
 
@@ -855,7 +855,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
                                  .withInvocations()
                                  .withReadTimeoutAction(TimeoutActionType.THROW)
                                  .setConfiguration()
-                                 .alias("test")
+                                 .method("test")
                                  .asyncCall()
                                  .next();
 

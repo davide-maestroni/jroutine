@@ -183,7 +183,7 @@ public class LoaderObjectRoutineActivityTest
                                           .withLogLevel(Level.DEBUG)
                                           .withLog(new NullLog())
                                           .setConfiguration()
-                                          .alias(TestClass.GET);
+                                          .method(TestClass.GET);
 
         assertThat(routine.syncCall().afterMax(timeout).all()).containsExactly(-77L);
     }
@@ -304,7 +304,7 @@ public class LoaderObjectRoutineActivityTest
                                   .withProxies()
                                   .withSharedFields("test")
                                   .setConfiguration()
-                                  .alias(TestClass.GET);
+                                  .method(TestClass.GET);
         assertThat(countLog.getWrnCount()).isEqualTo(1);
 
         JRoutineLoaderObjectCompat.with(loaderFrom(getActivity()))
@@ -338,7 +338,7 @@ public class LoaderObjectRoutineActivityTest
 
             JRoutineLoaderObjectCompat.with(loaderFrom(getActivity()))
                                       .on(instanceOf(DuplicateAnnotation.class))
-                                      .alias(DuplicateAnnotation.GET);
+                                      .method(DuplicateAnnotation.GET);
 
             fail();
 
@@ -353,7 +353,7 @@ public class LoaderObjectRoutineActivityTest
         final Routine<Object, Object> routine3 =
                 JRoutineLoaderObjectCompat.with(loaderFrom(getActivity()))
                                           .on(instanceOf(TestClass.class))
-                                          .alias(TestClass.THROW);
+                                          .method(TestClass.THROW);
 
         try {
 
@@ -636,7 +636,7 @@ public class LoaderObjectRoutineActivityTest
 
             JRoutineLoaderObjectCompat.with(loaderFrom(getActivity()))
                                       .on(instanceOf(TestClass.class))
-                                      .alias("test");
+                                      .method("test");
 
             fail();
 
@@ -989,7 +989,7 @@ public class LoaderObjectRoutineActivityTest
                                              .withLoaders()
                                              .withLoaderId(0)
                                              .setConfiguration()
-                                             .alias("test")
+                                             .method("test")
                                              .asyncCall()
                                              .next()).isEqualTo(31);
 
@@ -1003,7 +1003,7 @@ public class LoaderObjectRoutineActivityTest
                                       .withLoaders()
                                       .withLoaderId(1)
                                       .setConfiguration()
-                                      .alias("test")
+                                      .method("test")
                                       .asyncCall()
                                       .next();
 

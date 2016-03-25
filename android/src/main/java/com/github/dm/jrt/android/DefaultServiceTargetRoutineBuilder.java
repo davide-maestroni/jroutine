@@ -116,12 +116,6 @@ class DefaultServiceTargetRoutineBuilder implements ServiceTargetRoutineBuilder 
     }
 
     @NotNull
-    public <IN, OUT> Routine<IN, OUT> alias(@NotNull final String name) {
-
-        return newObjectBuilder().alias(name);
-    }
-
-    @NotNull
     public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
 
         final BuilderType builderType = mBuilderType;
@@ -147,6 +141,12 @@ class DefaultServiceTargetRoutineBuilder implements ServiceTargetRoutineBuilder 
     }
 
     @NotNull
+    public <IN, OUT> Routine<IN, OUT> method(@NotNull final String name) {
+
+        return newObjectBuilder().method(name);
+    }
+
+    @NotNull
     public <IN, OUT> Routine<IN, OUT> method(@NotNull final String name,
             @NotNull final Class<?>... parameterTypes) {
 
@@ -157,13 +157,6 @@ class DefaultServiceTargetRoutineBuilder implements ServiceTargetRoutineBuilder 
     public <IN, OUT> Routine<IN, OUT> method(@NotNull final Method method) {
 
         return newObjectBuilder().method(method);
-    }
-
-    @NotNull
-    public ServiceTargetRoutineBuilder withType(@Nullable final BuilderType builderType) {
-
-        mBuilderType = builderType;
-        return this;
     }
 
     @NotNull
@@ -186,6 +179,13 @@ class DefaultServiceTargetRoutineBuilder implements ServiceTargetRoutineBuilder 
 
         return new ServiceConfiguration.Builder<DefaultServiceTargetRoutineBuilder>(
                 mServiceConfigurable, mServiceConfiguration);
+    }
+
+    @NotNull
+    public ServiceTargetRoutineBuilder withType(@Nullable final BuilderType builderType) {
+
+        mBuilderType = builderType;
+        return this;
     }
 
     @NotNull

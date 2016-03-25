@@ -39,6 +39,11 @@ public class Reflection {
      */
     public static final Object[] NO_ARGS = new Object[0];
 
+    /**
+     * Constant defining an empty parameter type array for method discovery.
+     */
+    public static final Class<?>[] NO_PARAMS = new Class[0];
+
     private static final HashMap<Class<?>, Class<?>> sBoxingClasses =
             new HashMap<Class<?>, Class<?>>(9);
 

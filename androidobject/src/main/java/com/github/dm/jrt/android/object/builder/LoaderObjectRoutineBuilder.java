@@ -39,26 +39,6 @@ public interface LoaderObjectRoutineBuilder
         extends ObjectRoutineBuilder, LoaderConfigurableBuilder<LoaderObjectRoutineBuilder> {
 
     /**
-     * Returns a routine used to call the method whose identifying name is specified in an
-     * {@link com.github.dm.jrt.object.annotation.Alias Alias} annotation.<br/>
-     * Optional <i>{@code com.github.dm.jrt.object.annotation.*}</i> as well as
-     * <i>{@code com.github.dm.jrt.android.object.annotation.*}</i> method annotations will be
-     * honored.<br/>
-     * Note that such annotations will override any configuration set through the builder.
-     *
-     * @param name  the name specified in the annotation.
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
-     * @return the routine.
-     * @throws java.lang.IllegalArgumentException if the specified method is not found.
-     * @see <a href='{@docRoot}/com/github/dm/jrt/android/object/annotation/package-summary.html'>
-     * Android Annotations</a>
-     * @see com.github.dm.jrt.object.annotation Annotations
-     */
-    @NotNull
-    <IN, OUT> LoaderRoutine<IN, OUT> alias(@NotNull String name);
-
-    /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.
      * <p/>
      * The routines used for calling the methods will honor the attributes specified in any optional
@@ -97,6 +77,28 @@ public interface LoaderObjectRoutineBuilder
      */
     @NotNull
     <TYPE> TYPE buildProxy(@NotNull ClassToken<TYPE> itf);
+
+    /**
+     * Returns a routine used to call the method whose identifying name is specified in an
+     * {@link com.github.dm.jrt.object.annotation.Alias Alias} annotation.<br/>
+     * If no method with the specified alias is found, this method will behave like
+     * {@link #method(String, Class[])} with no parameter.<br/>
+     * Optional <i>{@code com.github.dm.jrt.object.annotation.*}</i> as well as
+     * <i>{@code com.github.dm.jrt.android.object.annotation.*}</i> method annotations will be
+     * honored.<br/>
+     * Note that such annotations will override any configuration set through the builder.
+     *
+     * @param name  the name specified in the annotation.
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
+     * @return the routine.
+     * @throws java.lang.IllegalArgumentException if the specified method is not found.
+     * @see <a href='{@docRoot}/com/github/dm/jrt/android/object/annotation/package-summary.html'>
+     * Android Annotations</a>
+     * @see com.github.dm.jrt.object.annotation Annotations
+     */
+    @NotNull
+    <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull String name);
 
     /**
      * Returns a routine used to call the specified method.

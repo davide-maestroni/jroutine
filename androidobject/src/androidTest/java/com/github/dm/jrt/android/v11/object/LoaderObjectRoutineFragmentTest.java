@@ -116,7 +116,7 @@ public class LoaderObjectRoutineFragmentTest
                                                                     .withLogLevel(Level.DEBUG)
                                                                     .withLog(new NullLog())
                                                                     .setConfiguration()
-                                                                    .alias(TestClass.GET);
+                                                                    .method(TestClass.GET);
 
         assertThat(routine.syncCall().afterMax(timeout).all()).containsExactly(-77L);
     }
@@ -278,7 +278,7 @@ public class LoaderObjectRoutineFragmentTest
                             .withProxies()
                             .withSharedFields("test")
                             .setConfiguration()
-                            .alias(TestClass.GET);
+                            .method(TestClass.GET);
         assertThat(countLog.getWrnCount()).isEqualTo(1);
 
         JRoutineLoaderObject.with(loaderFrom(fragment))
@@ -328,7 +328,7 @@ public class LoaderObjectRoutineFragmentTest
 
             JRoutineLoaderObject.with(loaderFrom(fragment))
                                 .on(instanceOf(DuplicateAnnotation.class))
-                                .alias(DuplicateAnnotation.GET);
+                                .method(DuplicateAnnotation.GET);
 
             fail();
 
@@ -351,7 +351,7 @@ public class LoaderObjectRoutineFragmentTest
         final Routine<Object, Object> routine3 = JRoutineLoaderObject.with(loaderFrom(fragment))
                                                                      .on(instanceOf(
                                                                              TestClass.class))
-                                                                     .alias(TestClass.THROW);
+                                                                     .method(TestClass.THROW);
 
         try {
 
@@ -783,7 +783,7 @@ public class LoaderObjectRoutineFragmentTest
 
             JRoutineLoaderObject.with(loaderFrom(fragment))
                                 .on(instanceOf(TestClass.class))
-                                .alias("test");
+                                .method("test");
 
             fail();
 
@@ -1195,7 +1195,7 @@ public class LoaderObjectRoutineFragmentTest
                                        .withLoaders()
                                        .withLoaderId(0)
                                        .setConfiguration()
-                                       .alias("test")
+                                       .method("test")
                                        .asyncCall()
                                        .next()).isEqualTo(31);
 
@@ -1209,7 +1209,7 @@ public class LoaderObjectRoutineFragmentTest
                                 .withLoaders()
                                 .withLoaderId(1)
                                 .setConfiguration()
-                                .alias("test")
+                                .method("test")
                                 .asyncCall()
                                 .next();
 

@@ -36,6 +36,7 @@ import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
+import com.github.dm.jrt.core.util.Reflection;
 import com.github.dm.jrt.object.Builders;
 import com.github.dm.jrt.object.Builders.MethodInfo;
 import com.github.dm.jrt.object.InvocationTarget;
@@ -57,6 +58,7 @@ import java.util.List;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.Reflection.findMethod;
 import static com.github.dm.jrt.object.Builders.callFromInvocation;
+import static com.github.dm.jrt.object.Builders.getAnnotatedMethod;
 
 /**
  * Class implementing a builder of routines wrapping an object methods.
@@ -102,13 +104,31 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     }
 
     @NotNull
-    public <IN, OUT> LoaderRoutine<IN, OUT> alias(@NotNull final String name) {
+    public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
+
+        if (!itf.isInterface()) {
+            throw new IllegalArgumentException(
+                    "the specified class is not an interface: " + itf.getName());
+        }
+
+        final Object proxy = Proxy.newProxyInstance(itf.getClassLoader(), new Class[]{itf},
+                new ProxyInvocationHandler(this));
+        return itf.cast(proxy);
+    }
+
+    @NotNull
+    public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
+
+        return buildProxy(itf.getRawClass());
+    }
+
+    @NotNull
+    public <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull final String name) {
 
         final ContextInvocationTarget<?> target = mTarget;
-        final Method targetMethod = Builders.getAnnotatedMethod(target.getTargetClass(), name);
+        final Method targetMethod = getAnnotatedMethod(target.getTargetClass(), name);
         if (targetMethod == null) {
-            throw new IllegalArgumentException(
-                    "no annotated method with alias '" + name + "' has been found");
+            return method(name, Reflection.NO_PARAMS);
         }
 
         final ProxyConfiguration proxyConfiguration =
@@ -129,25 +149,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                       .with(loaderConfiguration)
                       .setConfiguration()
                       .buildRoutine();
-    }
-
-    @NotNull
-    public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
-
-        if (!itf.isInterface()) {
-            throw new IllegalArgumentException(
-                    "the specified class is not an interface: " + itf.getName());
-        }
-
-        final Object proxy = Proxy.newProxyInstance(itf.getClassLoader(), new Class[]{itf},
-                new ProxyInvocationHandler(this));
-        return itf.cast(proxy);
-    }
-
-    @NotNull
-    public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
-
-        return buildProxy(itf.getRawClass());
     }
 
     @NotNull
@@ -292,7 +293,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                                      .withProxies()
                                      .with(mProxyConfiguration)
                                      .setConfiguration()
-                                     .alias(mAliasName);
+                                     .method(mAliasName);
         }
 
         @Override

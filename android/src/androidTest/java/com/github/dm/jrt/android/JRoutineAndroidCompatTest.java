@@ -118,7 +118,7 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
                                         .all()).containsExactly("TEST");
         assertThat(JRoutineAndroidCompat.with(getActivity())
                                         .on(classOfType(TestClass.class))
-                                        .alias("TEST")
+                                        .method("TEST")
                                         .asyncCall()
                                         .afterMax(seconds(10))
                                         .all()).containsExactly("TEST");
@@ -160,7 +160,7 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
                                         .all()).containsExactly("test");
         assertThat(JRoutineAndroidCompat.with(getActivity())
                                         .on(instanceOf(TestClass.class))
-                                        .alias("test")
+                                        .method("test")
                                         .asyncCall()
                                         .afterMax(seconds(10))
                                         .all()).containsExactly("test");
@@ -314,7 +314,7 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
                                         .all()).containsExactly("TEST");
         assertThat(JRoutineAndroidCompat.with((Context) getActivity())
                                         .on(classOfType(TestClass.class))
-                                        .alias("TEST")
+                                        .method("TEST")
                                         .asyncCall()
                                         .afterMax(seconds(10))
                                         .all()).containsExactly("TEST");
@@ -336,7 +336,7 @@ public class JRoutineAndroidCompatTest extends ActivityInstrumentationTestCase2<
                                         .all()).containsExactly("test");
         assertThat(JRoutineAndroidCompat.with((Context) getActivity())
                                         .on(instanceOf(TestClass.class))
-                                        .alias("test")
+                                        .method("test")
                                         .asyncCall()
                                         .afterMax(seconds(10))
                                         .all()).containsExactly("test");

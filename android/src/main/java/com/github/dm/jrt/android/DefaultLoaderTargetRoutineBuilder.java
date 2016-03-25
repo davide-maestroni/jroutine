@@ -117,12 +117,6 @@ class DefaultLoaderTargetRoutineBuilder implements LoaderTargetRoutineBuilder {
     }
 
     @NotNull
-    public <IN, OUT> LoaderRoutine<IN, OUT> alias(@NotNull final String name) {
-
-        return newObjectBuilder().alias(name);
-    }
-
-    @NotNull
     public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
 
         final BuilderType builderType = mBuilderType;
@@ -148,6 +142,12 @@ class DefaultLoaderTargetRoutineBuilder implements LoaderTargetRoutineBuilder {
     }
 
     @NotNull
+    public <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull final String name) {
+
+        return newObjectBuilder().method(name);
+    }
+
+    @NotNull
     public <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull final String name,
             @NotNull final Class<?>... parameterTypes) {
 
@@ -158,13 +158,6 @@ class DefaultLoaderTargetRoutineBuilder implements LoaderTargetRoutineBuilder {
     public <IN, OUT> LoaderRoutine<IN, OUT> method(@NotNull final Method method) {
 
         return newObjectBuilder().method(method);
-    }
-
-    @NotNull
-    public LoaderTargetRoutineBuilder withType(@Nullable final BuilderType builderType) {
-
-        mBuilderType = builderType;
-        return this;
     }
 
     @NotNull
@@ -186,6 +179,13 @@ class DefaultLoaderTargetRoutineBuilder implements LoaderTargetRoutineBuilder {
 
         return new LoaderConfiguration.Builder<LoaderTargetRoutineBuilder>(mLoaderConfigurable,
                 mLoaderConfiguration);
+    }
+
+    @NotNull
+    public LoaderTargetRoutineBuilder withType(@Nullable final BuilderType builderType) {
+
+        mBuilderType = builderType;
+        return this;
     }
 
     @NotNull

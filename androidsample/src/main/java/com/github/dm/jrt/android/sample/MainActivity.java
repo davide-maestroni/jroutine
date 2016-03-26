@@ -33,6 +33,9 @@ import retrofit2.Retrofit;
 import retrofit2.Retrofit.Builder;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+/**
+ * Main activity.
+ */
 public class MainActivity extends AppCompatActivity {
 
     private ArrayAdapter<Repo> mRepoAdapter;

@@ -14,19 +14,24 @@
  * limitations under the License.
  */
 
-apply plugin: 'java'
-apply from: '../extra.gradle'
+package com.github.dm.jrt.android.retrofit;
 
-javaCompatibility = JavaVersion.VERSION_1_5
+import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.invocation.FilterInvocation;
 
-dependencies {
-    compile project(':lib')
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.assertj:assertj-core:1.7.1'
-}
+import org.jetbrains.annotations.NotNull;
 
-javadoc {
-    options.overview("${project.projectDir}/docs/overview.html")
-    options.links('http://docs.oracle.com/javase/7/docs/api/',
-            'http://davide-maestroni.github.io/jroutine/javadoc/v6/lib/')
+/**
+ * Implementation of an invocation handling the execution of call instances.
+ *
+ * @param <T> the response type.
+ */
+public class CallExecuteInvocation<T> extends FilterInvocation<ComparableCall<T>, T> {
+
+    @Override
+    public void onInput(final ComparableCall<T> call, @NotNull final ResultChannel<T> result) throws
+            Exception {
+
+        result.pass(call.execute().body());
+    }
 }

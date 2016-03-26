@@ -22,7 +22,7 @@ import com.github.dm.jrt.android.JRoutineAndroidCompat;
 import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.object.AndroidBuilders;
-import com.github.dm.jrt.android.retrofit.AbstractCallAdapter;
+import com.github.dm.jrt.android.retrofit.AbstractCallAdapterFactory;
 import com.github.dm.jrt.android.retrofit.ComparableCall;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
@@ -39,7 +39,7 @@ import retrofit2.Retrofit;
  * <p/>
  * Created by davide-maestroni on 03/25/2016.
  */
-public class OutputChannelCallAdapter extends AbstractCallAdapter<OutputChannel> {
+public class OutputChannelCallAdapterFactory extends AbstractCallAdapterFactory<OutputChannel> {
 
     private final LoaderRoutineBuilder<ComparableCall<Object>, Object> mBuilder;
 
@@ -48,7 +48,7 @@ public class OutputChannelCallAdapter extends AbstractCallAdapter<OutputChannel>
      *
      * @param activity the context activity.
      */
-    public OutputChannelCallAdapter(@NotNull final FragmentActivity activity) {
+    public OutputChannelCallAdapterFactory(@NotNull final FragmentActivity activity) {
 
         super(OutputChannel.class, 0);
         mBuilder = JRoutineAndroidCompat.with(activity).on(getFactory());

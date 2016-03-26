@@ -56,9 +56,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
 
         super.onResume();
-        final OutputChannelCallAdapter callAdapter = new OutputChannelCallAdapter(this);
+        final OutputChannelCallAdapterFactory adapterFactory =
+                new OutputChannelCallAdapterFactory(this);
         final Retrofit retrofit = new Builder().baseUrl("https://api.github.com")
-                                               .addCallAdapterFactory(callAdapter)
+                                               .addCallAdapterFactory(adapterFactory)
                                                .addConverterFactory(GsonConverterFactory.create())
                                                .build();
         final GitHubService service = retrofit.create(GitHubService.class);

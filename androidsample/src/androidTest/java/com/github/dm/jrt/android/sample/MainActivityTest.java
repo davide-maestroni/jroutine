@@ -18,6 +18,7 @@ package com.github.dm.jrt.android.sample;
 
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
+import android.support.test.espresso.IdlingPolicies;
 import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
 import android.support.test.rule.ActivityTestRule;
@@ -29,6 +30,8 @@ import org.hamcrest.Matcher;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.concurrent.TimeUnit;
 
 import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
@@ -54,6 +57,7 @@ public class MainActivityTest {
     @Test
     public void testRepoList() {
 
+        IdlingPolicies.setIdlingResourceTimeout(60, TimeUnit.SECONDS);
         onData(anything()).inAdapterView(withId(R.id.repo_list))
                           .atPosition(0)
                           .check(matches(isDisplayed()));
@@ -62,6 +66,7 @@ public class MainActivityTest {
     @Test
     public void testRepoListRotation() {
 
+        IdlingPolicies.setIdlingResourceTimeout(60, TimeUnit.SECONDS);
         onData(anything()).inAdapterView(withId(R.id.repo_list))
                           .atPosition(0)
                           .check(matches(isDisplayed()));

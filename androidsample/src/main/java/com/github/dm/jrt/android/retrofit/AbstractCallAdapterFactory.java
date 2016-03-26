@@ -16,9 +16,7 @@
 
 package com.github.dm.jrt.android.retrofit;
 
-import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.invocation.ComparableInvocationFactory;
-import com.github.dm.jrt.core.invocation.FilterInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 
@@ -47,7 +45,7 @@ import retrofit2.Retrofit;
  *
  * @param <T> the return type.
  */
-public abstract class AbstractCallAdapter<T> extends CallAdapter.Factory {
+public abstract class AbstractCallAdapterFactory<T> extends CallAdapter.Factory {
 
     private static final CallInvocationFactory<Object> sFactory = new CallInvocationFactory<>();
 
@@ -62,7 +60,7 @@ public abstract class AbstractCallAdapter<T> extends CallAdapter.Factory {
      * @param parameterIndex the index of the response type in the return type generic parameters
      *                       (-1 if not applicable).
      */
-    protected AbstractCallAdapter(final Class<T> returnType, final int parameterIndex) {
+    protected AbstractCallAdapterFactory(final Class<T> returnType, final int parameterIndex) {
 
         mReturnType = returnType;
         mParameterIndex = parameterIndex;
@@ -161,25 +159,10 @@ public abstract class AbstractCallAdapter<T> extends CallAdapter.Factory {
             @Override
             public <R> T adapt(final Call<R> call) {
 
-                return AbstractCallAdapter.this.adapt(ComparableCall.wrap(call),
+                return AbstractCallAdapterFactory.this.adapt(ComparableCall.wrap(call),
                         annotations.clone(), retrofit);
             }
         };
-    }
-
-    /**
-     * Implementation of an invocation handling call instances.
-     *
-     * @param <T> the response type.
-     */
-    private static class CallInvocation<T> extends FilterInvocation<ComparableCall<T>, T> {
-
-        @Override
-        public void onInput(final ComparableCall<T> input,
-                @NotNull final ResultChannel<T> result) throws Exception {
-
-            result.pass(input.execute().body());
-        }
     }
 
     /**
@@ -202,7 +185,7 @@ public abstract class AbstractCallAdapter<T> extends CallAdapter.Factory {
         @Override
         public Invocation<ComparableCall<T>, T> newInvocation() {
 
-            return new CallInvocation<>();
+            return new CallExecuteInvocation<>();
         }
     }
 }

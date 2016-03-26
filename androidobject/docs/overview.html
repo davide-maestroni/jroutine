@@ -58,8 +58,9 @@
                                         &commat;Override
                                         public void onError(&commat;NotNull final RoutineException error) {
 
-                                            Toast.makeText(MainTestActivity.this, (error != null) ?
-                                                    error.getMessage() : "Cannot load image",
+                                            final Throwable cause = error.getCause();
+                                            Toast.makeText(MainTestActivity.this, (cause != null) ?
+                                                    cause.getMessage() : "Cannot load image",
                                                     Toast.LENGTH_LONG).show();
                                         }
 
@@ -122,8 +123,9 @@
                                         &commat;Override
                                         public void onError(&commat;NotNull final RoutineException error) {
 
-                                            Toast.makeText(MainTestActivity.this, (error != null) ?
-                                                    error.getMessage() : "Cannot load image",
+                                            final Throwable cause = error.getCause();
+                                            Toast.makeText(MainTestActivity.this, (cause != null) ?
+                                                    cause.getMessage() : "Cannot load image",
                                                     Toast.LENGTH_LONG).show();
                                         }
 
@@ -195,8 +197,9 @@
                                         &commat;Override
                                         public void onError(&commat;NotNull final RoutineException error) {
 
-                                            Toast.makeText(MainTestActivity.this, (error != null) ?
-                                                    error.getMessage() : "Cannot load image",
+                                            final Throwable cause = error.getCause();
+                                            Toast.makeText(MainTestActivity.this, (cause != null) ?
+                                                    cause.getMessage() : "Cannot load image",
                                                     Toast.LENGTH_LONG).show();
                                         }
 

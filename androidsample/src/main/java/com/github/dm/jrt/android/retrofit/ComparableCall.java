@@ -22,6 +22,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.TreeSet;
 
 import okhttp3.Headers;
@@ -92,13 +93,14 @@ public class ComparableCall<T> implements Call<T> {
             return false;
         }
 
+        final Locale locale = Locale.getDefault();
         final HashMap<String, List<String>> map1 = new HashMap<>();
         final HashMap<String, List<String>> map2 = new HashMap<>();
         for (int i = 0; i < size; ++i) {
             final String name1 = h1.name(i);
-            map1.put(name1.toLowerCase(), h1.values(name1));
+            map1.put(name1.toLowerCase(locale), h1.values(name1));
             final String name2 = h2.name(i);
-            map2.put(name2.toLowerCase(), h2.values(name2));
+            map2.put(name2.toLowerCase(locale), h2.values(name2));
         }
 
         return map1.equals(map2);
@@ -149,9 +151,10 @@ public class ComparableCall<T> implements Call<T> {
 
         final Headers headers = request.headers();
         if (headers.size() > 0) {
+            final Locale locale = Locale.getDefault();
             final TreeSet<String> names = new TreeSet<>(headers.names());
             for (final String name : names) {
-                result += result * 31 + ((name != null) ? name.toLowerCase().hashCode() : 0);
+                result += result * 31 + ((name != null) ? name.toLowerCase(locale).hashCode() : 0);
                 final List<String> values = headers.values(name);
                 result += result * 31 + ((values != null) ? values.hashCode() : 0);
             }

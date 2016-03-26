@@ -65,21 +65,13 @@ public class MainActivityTest {
         onData(anything()).inAdapterView(withId(R.id.repo_list))
                           .atPosition(0)
                           .check(matches(isDisplayed()));
-        onView(isRoot()).perform(
-                new OrientationChangeAction(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE));
+        onView(isRoot()).perform(new LandscapeOrientationAction());
         onData(anything()).inAdapterView(withId(R.id.repo_list))
                           .atPosition(0)
                           .check(matches(isDisplayed()));
     }
 
-    private static class OrientationChangeAction implements ViewAction {
-
-        private final int mOrientation;
-
-        private OrientationChangeAction(final int orientation) {
-
-            mOrientation = orientation;
-        }
+    private static class LandscapeOrientationAction implements ViewAction {
 
         @Override
         public Matcher<View> getConstraints() {
@@ -90,14 +82,15 @@ public class MainActivityTest {
         @Override
         public String getDescription() {
 
-            return "change device orientation to " + mOrientation;
+            return "change device orientation to landscape";
         }
 
         @Override
         public void perform(final UiController uiController, final View view) {
 
             uiController.loopMainThreadUntilIdle();
-            ((Activity) view.getContext()).setRequestedOrientation(mOrientation);
+            ((Activity) view.getContext()).setRequestedOrientation(
+                    ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
             if (getInstance().getActivitiesInStage(Stage.RESUMED).isEmpty()) {
                 throw new RuntimeException("orientation change failed");
             }

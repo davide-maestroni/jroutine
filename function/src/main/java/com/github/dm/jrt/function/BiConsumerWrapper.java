@@ -48,7 +48,6 @@ public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2>, Wrappe
      *
      * @param consumer the wrapped consumer.
      */
-    @SuppressWarnings("ConstantConditions")
     BiConsumerWrapper(@NotNull final BiConsumer<?, ?> consumer) {
 
         this(Collections.<BiConsumer<?, ?>>singletonList(
@@ -88,7 +87,6 @@ public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2>, Wrappe
      * @return the composed bi-consumer.
      */
     @NotNull
-    @SuppressWarnings("ConstantConditions")
     public BiConsumerWrapper<IN1, IN2> andThen(
             @NotNull final BiConsumer<? super IN1, ? super IN2> after) {
 

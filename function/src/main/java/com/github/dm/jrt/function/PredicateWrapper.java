@@ -211,7 +211,6 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
      * @return the composed predicate.
      */
     @NotNull
-    @SuppressWarnings("ConstantConditions")
     public PredicateWrapper<IN> and(@NotNull final Predicate<? super IN> other) {
 
         final List<Predicate<?>> predicates = mPredicates;
@@ -311,7 +310,6 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
      * @return the composed predicate.
      */
     @NotNull
-    @SuppressWarnings("ConstantConditions")
     public PredicateWrapper<IN> or(@NotNull final Predicate<? super IN> other) {
 
         final List<Predicate<?>> predicates = mPredicates;

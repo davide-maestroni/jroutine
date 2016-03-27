@@ -85,7 +85,6 @@ public class ConsumerWrapper<IN> implements Consumer<IN>, Wrapper {
      * @return the composed consumer.
      */
     @NotNull
-    @SuppressWarnings("ConstantConditions")
     public ConsumerWrapper<IN> andThen(@NotNull final Consumer<? super IN> after) {
 
         final List<Consumer<?>> consumers = mConsumers;

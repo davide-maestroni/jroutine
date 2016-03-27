@@ -124,7 +124,6 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT>, Wrapper {
      * @return the composed function.
      */
     @NotNull
-    @SuppressWarnings("ConstantConditions")
     public <AFTER> FunctionWrapper<IN, AFTER> andThen(
             @NotNull final Function<? super OUT, ? extends AFTER> after) {
 
@@ -151,7 +150,6 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT>, Wrapper {
      * @return the composed function.
      */
     @NotNull
-    @SuppressWarnings("ConstantConditions")
     public <BEFORE> FunctionWrapper<BEFORE, OUT> compose(
             @NotNull final Function<? super BEFORE, ? extends IN> before) {
 

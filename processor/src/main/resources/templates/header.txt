@@ -20,7 +20,6 @@ ${generatedPackage}
 
 public final class ${generatedClassName}${genericTypes} implements ${interfaceFullName} {
 
-    @SuppressWarnings("ConstantConditions")
     public ${generatedClassName}(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.InvocationTarget<?> target,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.config.InvocationConfiguration invocationConfiguration,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.config.ProxyConfiguration proxyConfiguration) {

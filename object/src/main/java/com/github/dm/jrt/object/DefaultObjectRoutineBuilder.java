@@ -25,6 +25,7 @@ import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.Reflection;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 import com.github.dm.jrt.object.Builders.MethodInfo;
@@ -134,27 +135,18 @@ class DefaultObjectRoutineBuilder
     }
 
     @NotNull
-    @SuppressWarnings("ConstantConditions")
-    public ObjectRoutineBuilder setConfiguration(@NotNull final ProxyConfiguration configuration) {
+    public ObjectRoutineBuilder setConfiguration(
+            @NotNull final InvocationConfiguration configuration) {
 
-        if (configuration == null) {
-            throw new NullPointerException("the proxy configuration must not be null");
-        }
-
-        mProxyConfiguration = configuration;
+        mInvocationConfiguration =
+                ConstantConditions.notNull("invocation configuration", configuration);
         return this;
     }
 
     @NotNull
-    @SuppressWarnings("ConstantConditions")
-    public ObjectRoutineBuilder setConfiguration(
-            @NotNull final InvocationConfiguration configuration) {
+    public ObjectRoutineBuilder setConfiguration(@NotNull final ProxyConfiguration configuration) {
 
-        if (configuration == null) {
-            throw new NullPointerException("the invocation configuration must not be null");
-        }
-
-        mInvocationConfiguration = configuration;
+        mProxyConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
         return this;
     }
 

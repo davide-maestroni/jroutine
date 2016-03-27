@@ -19,6 +19,7 @@ package com.github.dm.jrt.android.proxy;
 import com.github.dm.jrt.android.core.ServiceContext;
 import com.github.dm.jrt.android.object.ContextInvocationTarget;
 import com.github.dm.jrt.android.proxy.builder.ServiceProxyRoutineBuilder;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -44,7 +45,7 @@ public class JRoutineServiceProxy {
             new WeakHashMap<ServiceContext, ServiceProxyBuilder>();
 
     /**
-     * Avoid direct instantiation.
+     * Avoid explicit instantiation.
      */
     protected JRoutineServiceProxy() {
 
@@ -83,14 +84,9 @@ public class JRoutineServiceProxy {
          *
          * @param context the service context.
          */
-        @SuppressWarnings("ConstantConditions")
         private ServiceProxyBuilder(@NotNull final ServiceContext context) {
 
-            if (context == null) {
-                throw new NullPointerException("the context must not be null");
-            }
-
-            mContext = context;
+            mContext = ConstantConditions.notNull("service context", context);
         }
 
         /**

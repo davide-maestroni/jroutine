@@ -19,6 +19,7 @@ package com.github.dm.jrt.android.v4.core;
 import com.github.dm.jrt.android.core.builder.LoaderChannelBuilder;
 import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -171,14 +172,9 @@ public class JRoutineLoaderCompat {
          *
          * @param context the loader context.
          */
-        @SuppressWarnings("ConstantConditions")
         private LoaderBuilderCompat(@NotNull final LoaderContextCompat context) {
 
-            if (context == null) {
-                throw new NullPointerException("the loader context must not be null");
-            }
-
-            mContext = context;
+            mContext = ConstantConditions.notNull("loader context", context);
         }
 
         /**

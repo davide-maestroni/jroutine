@@ -96,7 +96,7 @@ import org.jetbrains.annotations.NotNull;
 public class JRoutineCore {
 
     /**
-     * Avoid direct instantiation.
+     * Avoid explicit instantiation.
      */
     protected JRoutineCore() {
 

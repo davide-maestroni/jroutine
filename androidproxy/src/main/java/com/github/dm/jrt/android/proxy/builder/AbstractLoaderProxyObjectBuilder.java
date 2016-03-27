@@ -19,6 +19,7 @@ package com.github.dm.jrt.android.proxy.builder;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.runner.Runner;
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 import com.github.dm.jrt.object.config.ProxyConfiguration;
 
@@ -123,41 +124,27 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
     }
 
     @NotNull
-    @SuppressWarnings("ConstantConditions")
-    public LoaderProxyObjectBuilder<TYPE> setConfiguration(
-            @NotNull final LoaderConfiguration configuration) {
-
-        if (configuration == null) {
-            throw new NullPointerException("the loader configuration must not be null");
-        }
-
-        mLoaderConfiguration = configuration;
-        return this;
-    }
-
-    @NotNull
-    @SuppressWarnings("ConstantConditions")
     public LoaderProxyObjectBuilder<TYPE> setConfiguration(
             @NotNull final InvocationConfiguration configuration) {
 
-        if (configuration == null) {
-            throw new NullPointerException("the invocation configuration must not be null");
-        }
-
-        mInvocationConfiguration = configuration;
+        mInvocationConfiguration =
+                ConstantConditions.notNull("invocation configuration", configuration);
         return this;
     }
 
     @NotNull
-    @SuppressWarnings("ConstantConditions")
+    public LoaderProxyObjectBuilder<TYPE> setConfiguration(
+            @NotNull final LoaderConfiguration configuration) {
+
+        mLoaderConfiguration = ConstantConditions.notNull("loader configuration", configuration);
+        return this;
+    }
+
+    @NotNull
     public LoaderProxyObjectBuilder<TYPE> setConfiguration(
             @NotNull final ProxyConfiguration configuration) {
 
-        if (configuration == null) {
-            throw new NullPointerException("the proxy configuration must not be null");
-        }
-
-        mProxyConfiguration = configuration;
+        mProxyConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
         return this;
     }
 

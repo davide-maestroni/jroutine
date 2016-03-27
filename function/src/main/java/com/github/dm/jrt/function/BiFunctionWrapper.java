@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.function;
 
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.Reflection;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
@@ -93,13 +94,10 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
      *
      * @param biFunction the wrapped supplier.
      */
-    @SuppressWarnings("ConstantConditions")
     BiFunctionWrapper(@NotNull final BiFunction<IN1, IN2, ?> biFunction) {
 
-        this(biFunction, FunctionWrapper.<OUT>identity());
-        if (biFunction == null) {
-            throw new NullPointerException("the bi-function instance must not be null");
-        }
+        this(ConstantConditions.notNull("bi-function instance", biFunction),
+                FunctionWrapper.<OUT>identity());
     }
 
     /**
@@ -154,14 +152,11 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
      * @param <IN>       the input data type.
      * @return the bi-function wrapper.
      */
-    @SuppressWarnings({"unchecked", "ConstantConditions"})
+    @SuppressWarnings("unchecked")
     public static <IN> BiFunctionWrapper<IN, IN, IN> maxBy(
             @NotNull final Comparator<? super IN> comparator) {
 
-        if (comparator == null) {
-            throw new NullPointerException("the comparator must not be null");
-        }
-
+        ConstantConditions.notNull("comparator", comparator);
         synchronized (mMaxFunctions) {
             final WeakIdentityHashMap<Comparator<?>, BiFunctionWrapper<?, ?, ?>> functions =
                     mMaxFunctions;
@@ -200,14 +195,11 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
      * @param <IN>       the input data type.
      * @return the bi-function wrapper.
      */
-    @SuppressWarnings({"unchecked", "ConstantConditions"})
+    @SuppressWarnings("unchecked")
     public static <IN> BiFunctionWrapper<IN, IN, IN> minBy(
             @NotNull final Comparator<? super IN> comparator) {
 
-        if (comparator == null) {
-            throw new NullPointerException("the comparator must not be null");
-        }
-
+        ConstantConditions.notNull("comparator", comparator);
         synchronized (mMinFunctions) {
             final WeakIdentityHashMap<Comparator<?>, BiFunctionWrapper<?, ?, ?>> functions =
                     mMinFunctions;

@@ -21,6 +21,7 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -44,14 +45,9 @@ class SelectableOutputBuilder<OUT>
      * @param channel the output channel.
      * @param index   the selectable index.
      */
-    @SuppressWarnings("ConstantConditions")
     SelectableOutputBuilder(@NotNull final OutputChannel<? extends OUT> channel, final int index) {
 
-        if (channel == null) {
-            throw new NullPointerException("the output channel must not be null");
-        }
-
-        mChannel = channel;
+        mChannel = ConstantConditions.notNull("output channel", channel);
         mIndex = index;
     }
 
@@ -60,8 +56,11 @@ class SelectableOutputBuilder<OUT>
     protected OutputChannel<? extends ParcelableSelectable<OUT>> build(
             @NotNull final ChannelConfiguration configuration) {
 
-        final IOChannel<ParcelableSelectable<OUT>> ioChannel =
-                JRoutineCore.io().withChannels().with(configuration).setConfiguration().buildChannel();
+        final IOChannel<ParcelableSelectable<OUT>> ioChannel = JRoutineCore.io()
+                                                                           .withChannels()
+                                                                           .with(configuration)
+                                                                           .setConfiguration()
+                                                                           .buildChannel();
         mChannel.bind(new SelectableOutputConsumer<OUT, OUT>(ioChannel, mIndex));
         return ioChannel;
     }

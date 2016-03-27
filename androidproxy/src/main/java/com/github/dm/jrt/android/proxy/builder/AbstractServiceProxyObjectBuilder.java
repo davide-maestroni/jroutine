@@ -20,6 +20,7 @@ import android.content.Context;
 
 import com.github.dm.jrt.android.core.config.ServiceConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 import com.github.dm.jrt.object.config.ProxyConfiguration;
 
@@ -118,41 +119,27 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
     }
 
     @NotNull
-    @SuppressWarnings("ConstantConditions")
-    public ServiceProxyObjectBuilder<TYPE> setConfiguration(
-            @NotNull final ServiceConfiguration configuration) {
-
-        if (configuration == null) {
-            throw new NullPointerException("the service configuration must not be null");
-        }
-
-        mServiceConfiguration = configuration;
-        return this;
-    }
-
-    @NotNull
-    @SuppressWarnings("ConstantConditions")
     public ServiceProxyObjectBuilder<TYPE> setConfiguration(
             @NotNull final InvocationConfiguration configuration) {
 
-        if (configuration == null) {
-            throw new NullPointerException("the invocation configuration must not be null");
-        }
-
-        mInvocationConfiguration = configuration;
+        mInvocationConfiguration =
+                ConstantConditions.notNull("invocation configuration", configuration);
         return this;
     }
 
     @NotNull
-    @SuppressWarnings("ConstantConditions")
     public ServiceProxyObjectBuilder<TYPE> setConfiguration(
             @NotNull final ProxyConfiguration configuration) {
 
-        if (configuration == null) {
-            throw new NullPointerException("the proxy configuration must not be null");
-        }
+        mProxyConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
+        return this;
+    }
 
-        mProxyConfiguration = configuration;
+    @NotNull
+    public ServiceProxyObjectBuilder<TYPE> setConfiguration(
+            @NotNull final ServiceConfiguration configuration) {
+
+        mServiceConfiguration = ConstantConditions.notNull("service configuration", configuration);
         return this;
     }
 

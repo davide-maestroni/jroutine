@@ -18,6 +18,7 @@ package com.github.dm.jrt.android.object;
 
 import com.github.dm.jrt.android.core.ServiceContext;
 import com.github.dm.jrt.android.object.builder.ServiceObjectRoutineBuilder;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -99,14 +100,9 @@ public class JRoutineServiceObject {
          *
          * @param context the service context.
          */
-        @SuppressWarnings("ConstantConditions")
         private ServiceContextBuilder(@NotNull final ServiceContext context) {
 
-            if (context == null) {
-                throw new NullPointerException("the context must not be null");
-            }
-
-            mContext = context;
+            mContext = ConstantConditions.notNull("service context", context);
         }
 
         /**

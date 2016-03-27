@@ -69,7 +69,7 @@ import org.jetbrains.annotations.NotNull;
 public class JRoutineObject {
 
     /**
-     * Avoid direct instantiation.
+     * Avoid explicit instantiation.
      */
     protected JRoutineObject() {
 

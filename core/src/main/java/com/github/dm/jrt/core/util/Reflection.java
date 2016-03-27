@@ -48,7 +48,7 @@ public class Reflection {
             new HashMap<Class<?>, Class<?>>(9);
 
     /**
-     * Avoid direct instantiation.
+     * Avoid explicit instantiation.
      */
     protected Reflection() {
 

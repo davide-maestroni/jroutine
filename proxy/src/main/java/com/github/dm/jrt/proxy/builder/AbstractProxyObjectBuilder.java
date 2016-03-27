@@ -17,6 +17,7 @@
 package com.github.dm.jrt.proxy.builder;
 
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 import com.github.dm.jrt.object.config.ProxyConfiguration;
 
@@ -79,28 +80,19 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
     }
 
     @NotNull
-    @SuppressWarnings("ConstantConditions")
     public ProxyObjectBuilder<TYPE> setConfiguration(
-            @NotNull final ProxyConfiguration configuration) {
+            @NotNull final InvocationConfiguration configuration) {
 
-        if (configuration == null) {
-            throw new NullPointerException("the proxy configuration must not be null");
-        }
-
-        mProxyConfiguration = configuration;
+        mInvocationConfiguration =
+                ConstantConditions.notNull("invocation configuration", configuration);
         return this;
     }
 
     @NotNull
-    @SuppressWarnings("ConstantConditions")
     public ProxyObjectBuilder<TYPE> setConfiguration(
-            @NotNull final InvocationConfiguration configuration) {
+            @NotNull final ProxyConfiguration configuration) {
 
-        if (configuration == null) {
-            throw new NullPointerException("the invocation configuration must not be null");
-        }
-
-        mInvocationConfiguration = configuration;
+        mProxyConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
         return this;
     }
 

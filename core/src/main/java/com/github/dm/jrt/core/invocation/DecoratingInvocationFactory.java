@@ -16,6 +16,8 @@
 
 package com.github.dm.jrt.core.invocation;
 
+import com.github.dm.jrt.core.util.ConstantConditions;
+
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
@@ -38,15 +40,10 @@ public abstract class DecoratingInvocationFactory<IN, OUT>
      *
      * @param wrapped the wrapped factory instance.
      */
-    @SuppressWarnings("ConstantConditions")
     public DecoratingInvocationFactory(@NotNull final InvocationFactory<IN, OUT> wrapped) {
 
         super(asArgs(wrapped));
-        if (wrapped == null) {
-            throw new NullPointerException("the wrapped invocation factory must not be null");
-        }
-
-        mFactory = wrapped;
+        mFactory = ConstantConditions.notNull("wrapped factory", wrapped);
     }
 
     @NotNull

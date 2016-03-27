@@ -27,6 +27,7 @@ import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -41,7 +42,7 @@ import java.util.Map;
 public class SparseChannels extends AndroidChannels {
 
     /**
-     * Avoid direct instantiation.
+     * Avoid explicit instantiation.
      */
     protected SparseChannels() {
 
@@ -301,25 +302,17 @@ public class SparseChannels extends AndroidChannels {
          * @throws java.lang.NullPointerException if the specified set of indexes is null or
          *                                        contains a null object.
          */
-        @SuppressWarnings("ConstantConditions")
         private InputMapBuilder(
                 @NotNull final InputChannel<? super ParcelableSelectable<DATA>> channel,
                 @NotNull final HashSet<Integer> indexes) {
 
-            if (channel == null) {
-                throw new NullPointerException("the input channel must not be null");
-            }
-
-            if (indexes == null) {
-                throw new NullPointerException("the set of indexes must not be null");
-            }
-
-            final HashSet<Integer> indexSet = new HashSet<Integer>(indexes);
+            mChannel = ConstantConditions.notNull("input channel", channel);
+            final HashSet<Integer> indexSet =
+                    new HashSet<Integer>(ConstantConditions.notNull("set of indexes", indexes));
             if (indexSet.contains(null)) {
                 throw new NullPointerException("the set of indexes must not contain null objects");
             }
 
-            mChannel = channel;
             mIndexes = indexSet;
         }
 

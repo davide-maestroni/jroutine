@@ -22,17 +22,16 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
     private final com.github.dm.jrt.android.core.ServiceContext mContext;
 
-    @SuppressWarnings("ConstantConditions")
     public ${generatedClassName}(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.ServiceContext context,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.object.ContextInvocationTarget<?> target,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.core.config.InvocationConfiguration invocationConfiguration,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.config.ProxyConfiguration proxyConfiguration,
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.config.ServiceConfiguration serviceConfiguration) {
 
-        if (context == null) {
-            throw new NullPointerException("the service context must not be null");
-        }
-
+        com.github.dm.jrt.core.util.ConstantConditions.notNull("service context", context);
+        com.github.dm.jrt.core.util.ConstantConditions.notNull("invocation configuration", invocationConfiguration);
+        com.github.dm.jrt.core.util.ConstantConditions.notNull("proxy configuration", proxyConfiguration);
+        com.github.dm.jrt.core.util.ConstantConditions.notNull("service configuration", serviceConfiguration);
         if (target.getTargetClass().isPrimitive()) {
             // The parceling of primitive classes is broken...
             throw new IllegalArgumentException("the target class cannot be primitive");
@@ -41,18 +40,6 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
         if (!target.isOfType(${classErasure}.class)) {
             throw new IllegalArgumentException("the invocation target must be the class or an instance of " +
                     "${classFullName}");
-        }
-
-        if (invocationConfiguration == null) {
-            throw new NullPointerException("the invocation configuration must not be null");
-        }
-
-        if (proxyConfiguration == null) {
-            throw new NullPointerException("the proxy configuration must not be null");
-        }
-
-        if (serviceConfiguration == null) {
-            throw new NullPointerException("the service configuration must not be null");
         }
 
         mContext = context;
@@ -77,14 +64,9 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
         private final com.github.dm.jrt.android.core.ServiceContext mContext;
 
-        @SuppressWarnings("ConstantConditions")
         private ContextBuilder(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.ServiceContext context) {
 
-            if (context == null) {
-                throw new NullPointerException("the context must not be null");
-            }
-
-            mContext = context;
+            mContext = com.github.dm.jrt.core.util.ConstantConditions.notNull("service context", context);
         }
 
         @org.jetbrains.annotations.NotNull
@@ -105,14 +87,10 @@ public final class ${generatedClassName}${genericTypes} implements ${interfaceFu
 
         private final com.github.dm.jrt.android.object.ContextInvocationTarget<?> mTarget;
 
-        @SuppressWarnings("ConstantConditions")
         private ServiceProxyObjectBuilder(@org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.ServiceContext context,
                 @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.object.ContextInvocationTarget<?> target) {
 
-            if (context == null) {
-                throw new NullPointerException("the service context must not be null");
-            }
-
+            com.github.dm.jrt.core.util.ConstantConditions.notNull("service context", context);
             if (target.getTargetClass().isPrimitive()) {
                 // The parceling of primitive classes is broken...
                 throw new IllegalArgumentException("the target class cannot be primitive");

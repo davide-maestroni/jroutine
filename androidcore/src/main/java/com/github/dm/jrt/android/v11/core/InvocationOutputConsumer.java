@@ -29,6 +29,7 @@ import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.TemplateExecution;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -71,14 +72,10 @@ class InvocationOutputConsumer<OUT> extends TemplateOutputConsumer<OUT> {
      * @param loader the loader instance.
      * @param logger the logger instance.
      */
-    @SuppressWarnings("ConstantConditions")
     InvocationOutputConsumer(@NotNull final Loader<InvocationResult<OUT>> loader,
             @NotNull final Logger logger) {
 
-        if (loader == null) {
-            throw new NullPointerException("the loader must not be null");
-        }
-
+        ConstantConditions.notNull("loader instance", loader);
         mDeliverResult = new TemplateExecution() {
 
             public void run() {

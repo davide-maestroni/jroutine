@@ -31,6 +31,7 @@ import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.Reflection;
 import com.github.dm.jrt.object.Builders.MethodInfo;
 import com.github.dm.jrt.object.InvocationTarget;
@@ -92,20 +93,11 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
      * @param context the service context.
      * @param target  the invocation target.
      */
-    @SuppressWarnings("ConstantConditions")
     DefaultServiceObjectRoutineBuilder(@NotNull final ServiceContext context,
             @NotNull final ContextInvocationTarget<?> target) {
 
-        if (context == null) {
-            throw new NullPointerException("the context must not be null");
-        }
-
-        if (target == null) {
-            throw new NullPointerException("the invocation target must not be null");
-        }
-
-        mContext = context;
-        mTarget = target;
+        mContext = ConstantConditions.notNull("service context", context);
+        mTarget = ConstantConditions.notNull("invocation target", target);
     }
 
     @Nullable
@@ -231,41 +223,27 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     @NotNull
-    @SuppressWarnings("ConstantConditions")
-    public ServiceObjectRoutineBuilder setConfiguration(
-            @NotNull final ProxyConfiguration configuration) {
-
-        if (configuration == null) {
-            throw new NullPointerException("the proxy configuration must not be null");
-        }
-
-        mProxyConfiguration = configuration;
-        return this;
-    }
-
-    @NotNull
-    @SuppressWarnings("ConstantConditions")
     public ServiceObjectRoutineBuilder setConfiguration(
             @NotNull final InvocationConfiguration configuration) {
 
-        if (configuration == null) {
-            throw new NullPointerException("the invocation configuration must not be null");
-        }
-
-        mInvocationConfiguration = configuration;
+        mInvocationConfiguration =
+                ConstantConditions.notNull("invocation configuration", configuration);
         return this;
     }
 
     @NotNull
-    @SuppressWarnings("ConstantConditions")
+    public ServiceObjectRoutineBuilder setConfiguration(
+            @NotNull final ProxyConfiguration configuration) {
+
+        mProxyConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
+        return this;
+    }
+
+    @NotNull
     public ServiceObjectRoutineBuilder setConfiguration(
             @NotNull final ServiceConfiguration configuration) {
 
-        if (configuration == null) {
-            throw new NullPointerException("the service configuration must not be null");
-        }
-
-        mServiceConfiguration = configuration;
+        mServiceConfiguration = ConstantConditions.notNull("service configuration", configuration);
         return this;
     }
 

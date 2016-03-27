@@ -29,6 +29,7 @@ import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.TemplateExecution;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -72,23 +73,15 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
      * @param invocationConfiguration the invocation configuration.
      * @param loaderConfiguration     the loader configuration.
      */
-    @SuppressWarnings("ConstantConditions")
     DefaultLoaderRoutine(@NotNull final LoaderContextCompat context,
             @NotNull final ContextInvocationFactory<IN, OUT> factory,
             @NotNull final InvocationConfiguration invocationConfiguration,
             @NotNull final LoaderConfiguration loaderConfiguration) {
 
         super(invocationConfiguration);
-        if (context == null) {
-            throw new NullPointerException("the routine context must not be null");
-        }
-
-        if (factory == null) {
-            throw new NullPointerException("the context invocation factory must not be null");
-        }
-
         final int routineId = loaderConfiguration.getRoutineIdOr(LoaderConfiguration.AUTO);
-        mContext = context;
+        mContext = ConstantConditions.notNull("loader context", context);
+        ConstantConditions.notNull("context invocation factory", factory);
         mFactory = (routineId == LoaderConfiguration.AUTO) ? factory
                 : new FactoryWrapper<IN, OUT>(factory, routineId);
         mConfiguration = loaderConfiguration;

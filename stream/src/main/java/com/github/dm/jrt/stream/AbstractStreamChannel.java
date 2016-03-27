@@ -38,6 +38,7 @@ import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.invocation.PassingInvocation;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.TimeDuration;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
@@ -121,26 +122,14 @@ public abstract class AbstractStreamChannel<OUT>
      * @param delegationType the delegation type.
      * @param binder         the binding runnable.
      */
-    @SuppressWarnings("ConstantConditions")
     protected AbstractStreamChannel(@NotNull final OutputChannel<OUT> channel,
             @NotNull final InvocationConfiguration configuration,
             @NotNull final DelegationType delegationType, @Nullable final Binder binder) {
 
-        if (configuration == null) {
-            throw new NullPointerException("the configuration must not be null");
-        }
-
-        if (delegationType == null) {
-            throw new NullPointerException("the delegation type must not be null");
-        }
-
-        if (channel == null) {
-            throw new NullPointerException("the output channel instance must not be null");
-        }
-
-        mStreamConfiguration = configuration;
-        mDelegationType = delegationType;
-        mChannel = channel;
+        mStreamConfiguration =
+                ConstantConditions.notNull("invocation configuration", configuration);
+        mDelegationType = ConstantConditions.notNull("delegation type", delegationType);
+        mChannel = ConstantConditions.notNull("output channel", channel);
         mBinder = (binder != null) ? binder : NO_OP;
     }
 
@@ -489,15 +478,11 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
-    @SuppressWarnings("ConstantConditions")
     public StreamChannel<OUT> tryCatch(
             @NotNull final BiConsumer<? super RoutineException, ? super InputChannel<OUT>>
                     consumer) {
 
-        if (consumer == null) {
-            throw new NullPointerException("the consumer instance must not be null");
-        }
-
+        ConstantConditions.notNull("consumer instance", consumer);
         final IOChannel<OUT> ioChannel = JRoutineCore.io()
                                                      .withChannels()
                                                      .with(buildChannelConfiguration())
@@ -508,26 +493,18 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
-    @SuppressWarnings("ConstantConditions")
     public StreamChannel<OUT> tryCatch(@NotNull final Consumer<? super RoutineException> consumer) {
 
-        if (consumer == null) {
-            throw new NullPointerException("the consumer instance must not be null");
-        }
-
-        return tryCatch(new TryCatchBiConsumerConsumer<OUT>(consumer));
+        return tryCatch(new TryCatchBiConsumerConsumer<OUT>(
+                ConstantConditions.notNull("consumer instance", consumer)));
     }
 
     @NotNull
-    @SuppressWarnings("ConstantConditions")
     public StreamChannel<OUT> tryCatch(
             @NotNull final Function<? super RoutineException, ? extends OUT> function) {
 
-        if (function == null) {
-            throw new NullPointerException("the function instance must not be null");
-        }
-
-        return tryCatch(new TryCatchBiConsumerFunction<OUT>(function));
+        return tryCatch(new TryCatchBiConsumerFunction<OUT>(
+                ConstantConditions.notNull("function instance", function)));
     }
 
     @NotNull
@@ -748,19 +725,11 @@ public abstract class AbstractStreamChannel<OUT>
          * @param <DATA> the data type.
          * @return the binder instance.
          */
-        @SuppressWarnings("ConstantConditions")
         public static <DATA> Binder binderOf(@NotNull final OutputChannel<DATA> input,
                 @NotNull final IOChannel<DATA> output) {
 
-            if (input == null) {
-                throw new NullPointerException("the input channel must not be null");
-            }
-
-            if (output == null) {
-                throw new NullPointerException("the output channel must not be null");
-            }
-
-            return new InputBinder<DATA>(input, output);
+            return new InputBinder<DATA>(ConstantConditions.notNull("input channel", input),
+                    ConstantConditions.notNull("output channel", output));
         }
 
         /**
@@ -1117,15 +1086,10 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
-    @SuppressWarnings("ConstantConditions")
     public StreamChannel<OUT> setConfiguration(
             @NotNull final InvocationConfiguration configuration) {
 
-        if (configuration == null) {
-            throw new NullPointerException("the invocation configuration must not be null");
-        }
-
-        mConfiguration = configuration;
+        mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
         return this;
     }
 }

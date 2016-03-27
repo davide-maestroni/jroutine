@@ -24,6 +24,7 @@ import com.github.dm.jrt.android.core.runner.AndroidRunners;
 import com.github.dm.jrt.core.builder.TemplateRoutineBuilder;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.runner.Runner;
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
@@ -67,21 +68,16 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
      * @throws java.lang.IllegalArgumentException if the class of the specified factory has not a
      *                                            static scope.
      */
-    @SuppressWarnings("ConstantConditions")
     DefaultLoaderRoutineBuilder(@NotNull final LoaderContextCompat context,
             @NotNull final ContextInvocationFactory<IN, OUT> factory) {
 
-        if (context == null) {
-            throw new NullPointerException("the routine context must not be null");
-        }
-
+        mContext = ConstantConditions.notNull("loader context", context);
         final Class<? extends ContextInvocationFactory> factoryClass = factory.getClass();
         if (!Reflection.hasStaticScope(factoryClass)) {
             throw new IllegalArgumentException(
                     "the factory class must have a static scope: " + factoryClass.getName());
         }
 
-        mContext = context;
         mFactory = factory;
     }
 
@@ -141,15 +137,10 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
     }
 
     @NotNull
-    @SuppressWarnings("ConstantConditions")
     public LoaderRoutineBuilder<IN, OUT> setConfiguration(
             @NotNull final LoaderConfiguration configuration) {
 
-        if (configuration == null) {
-            throw new NullPointerException("the loader configuration must not be null");
-        }
-
-        mLoaderConfiguration = configuration;
+        mLoaderConfiguration = ConstantConditions.notNull("loader configuration", configuration);
         return this;
     }
 

@@ -16,6 +16,8 @@
 
 package com.github.dm.jrt.android.retrofit;
 
+import com.github.dm.jrt.core.util.ConstantConditions;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -50,14 +52,10 @@ public class ComparableCall<T> implements Call<T> {
      *
      * @param wrapped the wrapped instance.
      */
-    @SuppressWarnings({"unchecked", "ConstantConditions"})
+    @SuppressWarnings("unchecked")
     private ComparableCall(@NotNull final Call<?> wrapped) {
 
-        if (wrapped == null) {
-            throw new NullPointerException("the call instance must not be null");
-        }
-
-        mCall = (Call<T>) wrapped;
+        mCall = (Call<T>) ConstantConditions.notNull("call instance", wrapped);
     }
 
     /**

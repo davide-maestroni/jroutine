@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.core.runner;
 
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
@@ -53,13 +54,9 @@ class ThrottlingRunner implements Runner {
      * @param maxExecutions the maximum number of running executions.
      * @throws java.lang.IllegalArgumentException if the specified max number is less than 1.
      */
-    @SuppressWarnings("ConstantConditions")
     ThrottlingRunner(@NotNull final Runner wrapped, final int maxExecutions) {
 
-        if (wrapped == null) {
-            throw new NullPointerException("the wrapped runner must not be null");
-        }
-
+        ConstantConditions.notNull("wrapped runner", wrapped);
         if (maxExecutions < 1) {
             throw new IllegalArgumentException(
                     "the maximum number of running executions must be at least 1, while it was: "

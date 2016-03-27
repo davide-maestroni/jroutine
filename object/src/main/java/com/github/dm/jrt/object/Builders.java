@@ -88,7 +88,7 @@ public class Builders {
             new WeakIdentityHashMap<Object, ExchangeMutex>();
 
     /**
-     * Avoid direct instantiation.
+     * Avoid explicit instantiation.
      */
     protected Builders() {
 

@@ -20,6 +20,7 @@ import android.content.Context;
 
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -40,14 +41,9 @@ public class ContextInvocationDecorator<IN, OUT> implements ContextInvocation<IN
      *
      * @param wrapped the wrapped invocation instance.
      */
-    @SuppressWarnings("ConstantConditions")
     public ContextInvocationDecorator(@NotNull final ContextInvocation<IN, OUT> wrapped) {
 
-        if (wrapped == null) {
-            throw new NullPointerException("the wrapped invocation instance must not be null");
-        }
-
-        mInvocation = wrapped;
+        mInvocation = ConstantConditions.notNull("wrapped invocation instance", wrapped);
     }
 
     public void onAbort(@NotNull final RoutineException reason) throws Exception {

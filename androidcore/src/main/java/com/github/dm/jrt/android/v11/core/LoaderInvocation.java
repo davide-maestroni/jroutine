@@ -45,6 +45,7 @@ import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.invocation.PassingInvocation;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.routine.Routine;
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.TimeDuration;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
@@ -103,22 +104,13 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
      * @param order         the input data order.
      * @param logger        the logger instance.
      */
-    @SuppressWarnings("ConstantConditions")
     LoaderInvocation(@NotNull final LoaderContext context,
             @NotNull final ContextInvocationFactory<IN, OUT> factory,
             @NotNull final LoaderConfiguration configuration, @Nullable final OrderType order,
             @NotNull final Logger logger) {
 
-        if (context == null) {
-            throw new NullPointerException("the routine context must not be null");
-        }
-
-        if (factory == null) {
-            throw new NullPointerException("the context invocation factory must not be null");
-        }
-
-        mContext = context;
-        mFactory = factory;
+        mContext = ConstantConditions.notNull("loader context", context);
+        mFactory = ConstantConditions.notNull("context invocation factory", factory);
         mLooper = configuration.getResultLooperOr(null);
         mLoaderId = configuration.getLoaderIdOr(LoaderConfiguration.AUTO);
         mClashResolutionType =

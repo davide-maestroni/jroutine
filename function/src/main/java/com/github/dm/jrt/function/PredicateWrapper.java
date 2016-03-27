@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.function;
 
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
@@ -75,13 +76,10 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
      *
      * @param predicate the core predicate.
      */
-    @SuppressWarnings("ConstantConditions")
     PredicateWrapper(@NotNull final Predicate<? super IN> predicate) {
 
-        this(predicate, Collections.<Predicate<?>>singletonList(predicate));
-        if (predicate == null) {
-            throw new NullPointerException("the predicate must not be null");
-        }
+        this(predicate, Collections.<Predicate<?>>singletonList(
+                ConstantConditions.notNull("predicate instance", predicate)));
     }
 
     /**
@@ -125,14 +123,10 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
      * @return the predicate wrapper.
      */
     @NotNull
-    @SuppressWarnings("ConstantConditions")
     public static <IN> PredicateWrapper<IN> isInstanceOf(@NotNull final Class<?> type) {
 
-        if (type == null) {
-            throw new NullPointerException("the type must not be null");
-        }
-
-        return new PredicateWrapper<IN>(new InstanceOfPredicate<IN>(type));
+        return new PredicateWrapper<IN>(
+                new InstanceOfPredicate<IN>(ConstantConditions.notNull("type", type)));
     }
 
     /**
@@ -229,11 +223,8 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
         if (other instanceof PredicateWrapper) {
             newPredicates.addAll(((PredicateWrapper<?>) other).mPredicates);
 
-        } else if (other == null) {
-            throw new NullPointerException("the predicate must not be null");
-
         } else {
-            newPredicates.add(other);
+            newPredicates.add(ConstantConditions.notNull("predicate instance", other));
         }
 
         newPredicates.add(CLOSE_PREDICATE);
@@ -332,11 +323,8 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
         if (other instanceof PredicateWrapper) {
             newPredicates.addAll(((PredicateWrapper<?>) other).mPredicates);
 
-        } else if (other == null) {
-            throw new NullPointerException("the predicate must not be null");
-
         } else {
-            newPredicates.add(other);
+            newPredicates.add(ConstantConditions.notNull("predicate instance", other));
         }
 
         newPredicates.add(CLOSE_PREDICATE);

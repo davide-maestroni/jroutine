@@ -17,6 +17,7 @@
 package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.core.util.ClassToken;
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
@@ -51,13 +52,10 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT>, Wrapper {
      *
      * @param function the wrapped function.
      */
-    @SuppressWarnings("ConstantConditions")
     FunctionWrapper(@NotNull final Function<?, ?> function) {
 
-        this(Collections.<Function<?, ?>>singletonList(function));
-        if (function == null) {
-            throw new NullPointerException("the function instance must not be null");
-        }
+        this(Collections.<Function<?, ?>>singletonList(
+                ConstantConditions.notNull("function instance", function)));
     }
 
     /**
@@ -80,15 +78,11 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT>, Wrapper {
      * @return the function wrapper.
      */
     @NotNull
-    @SuppressWarnings("ConstantConditions")
     public static <IN, OUT> FunctionWrapper<IN, OUT> castTo(
             @NotNull final Class<? extends OUT> type) {
 
-        if (type == null) {
-            throw new NullPointerException("the type must not be null");
-        }
-
-        return new FunctionWrapper<IN, OUT>(new ClassCastFunction<IN, OUT>(type));
+        return new FunctionWrapper<IN, OUT>(
+                new ClassCastFunction<IN, OUT>(ConstantConditions.notNull("type", type)));
     }
 
     /**
@@ -141,11 +135,8 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT>, Wrapper {
         if (after instanceof FunctionWrapper) {
             newFunctions.addAll(((FunctionWrapper<?, ?>) after).mFunctions);
 
-        } else if (after == null) {
-            throw new NullPointerException("the function must not be null");
-
         } else {
-            newFunctions.add(after);
+            newFunctions.add(ConstantConditions.notNull("function instance", after));
         }
 
         return new FunctionWrapper<IN, AFTER>(newFunctions);
@@ -170,11 +161,8 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT>, Wrapper {
         if (before instanceof FunctionWrapper) {
             newFunctions.addAll(((FunctionWrapper<?, ?>) before).mFunctions);
 
-        } else if (before == null) {
-            throw new NullPointerException("the consumer must not be null");
-
         } else {
-            newFunctions.add(before);
+            newFunctions.add(ConstantConditions.notNull("function instance", before));
         }
 
         newFunctions.addAll(functions);

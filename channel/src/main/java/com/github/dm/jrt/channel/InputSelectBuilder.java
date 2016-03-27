@@ -20,6 +20,7 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -43,15 +44,10 @@ class InputSelectBuilder<DATA, IN extends DATA> extends AbstractBuilder<IOChanne
      * @param channel the input channel.
      * @param index   the selectable index.
      */
-    @SuppressWarnings("ConstantConditions")
     InputSelectBuilder(@NotNull final InputChannel<? super Selectable<DATA>> channel,
             final int index) {
 
-        if (channel == null) {
-            throw new NullPointerException("the input channel must not be null");
-        }
-
-        mChannel = channel;
+        mChannel = ConstantConditions.notNull("input channel", channel);
         mIndex = index;
     }
 

@@ -85,14 +85,9 @@ public class TimeDuration extends Time {
      * @throws java.lang.IllegalArgumentException if the specified duration is negative.
      */
     @NotNull
-    @SuppressWarnings("ConstantConditions")
     public static TimeDuration fromUnit(final long time, @NotNull final TimeUnit unit) {
 
-        if (unit == null) {
-            throw new NullPointerException("the time unit must not be null");
-        }
-
-        return new TimeDuration(time, unit);
+        return new TimeDuration(time, ConstantConditions.notNull("time unit", unit));
     }
 
     /**

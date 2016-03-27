@@ -20,6 +20,7 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -43,14 +44,9 @@ class SelectableOutputBuilder<OUT>
      * @param channel the output channel.
      * @param index   the selectable index.
      */
-    @SuppressWarnings("ConstantConditions")
     SelectableOutputBuilder(@NotNull final OutputChannel<? extends OUT> channel, final int index) {
 
-        if (channel == null) {
-            throw new NullPointerException("the output channel must not be null");
-        }
-
-        mChannel = channel;
+        mChannel = ConstantConditions.notNull("output channel", channel);
         mIndex = index;
     }
 

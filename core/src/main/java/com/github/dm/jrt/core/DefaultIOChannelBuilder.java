@@ -21,6 +21,7 @@ import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.Builder;
 import com.github.dm.jrt.core.config.ChannelConfiguration.Configurable;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -35,7 +36,7 @@ class DefaultIOChannelBuilder implements IOChannelBuilder, Configurable<IOChanne
     private ChannelConfiguration mConfiguration = ChannelConfiguration.DEFAULT_CONFIGURATION;
 
     /**
-     * Avoid direct instantiation.
+     * Avoid explicit instantiation.
      */
     DefaultIOChannelBuilder() {
 
@@ -66,14 +67,9 @@ class DefaultIOChannelBuilder implements IOChannelBuilder, Configurable<IOChanne
     }
 
     @NotNull
-    @SuppressWarnings("ConstantConditions")
     public IOChannelBuilder setConfiguration(@NotNull final ChannelConfiguration configuration) {
 
-        if (configuration == null) {
-            throw new NullPointerException("the invocation configuration must not be null");
-        }
-
-        mConfiguration = configuration;
+        mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
         return this;
     }
 

@@ -36,7 +36,7 @@ public class Runners {
     private static Runner sSharedRunner;
 
     /**
-     * Avoid direct instantiation.
+     * Avoid explicit instantiation.
      */
     protected Runners() {
 

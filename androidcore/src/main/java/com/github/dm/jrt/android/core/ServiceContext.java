@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.github.dm.jrt.android.core.service.InvocationService;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -38,7 +39,7 @@ import java.lang.ref.WeakReference;
 public abstract class ServiceContext {
 
     /**
-     * Avoid direct instantiation.
+     * Avoid explicit instantiation.
      */
     private ServiceContext() {
 
@@ -177,20 +178,12 @@ public abstract class ServiceContext {
          * @param context the context.
          * @param service the service intent.
          */
-        @SuppressWarnings("ConstantConditions")
         private IntentServiceContext(@NotNull final Context context,
                 @NotNull final Intent service) {
 
-            if (context == null) {
-                throw new NullPointerException("the service context must not be null");
-            }
-
-            if (service == null) {
-                throw new NullPointerException("the service intent must not be null");
-            }
-
-            mContext = new WeakReference<Context>(context);
-            mIntent = service;
+            mContext = new WeakReference<Context>(
+                    ConstantConditions.notNull("service context", context));
+            mIntent = ConstantConditions.notNull("service intent", service);
         }
 
         @Override

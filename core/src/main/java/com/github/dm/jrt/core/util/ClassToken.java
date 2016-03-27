@@ -57,13 +57,9 @@ public abstract class ClassToken<TYPE> {
      * @return the newly created token.
      */
     @NotNull
-    @SuppressWarnings("ConstantConditions")
     public static <TYPE> ClassToken<TYPE> tokenOf(@NotNull final Class<TYPE> rawClass) {
 
-        if (rawClass == null) {
-            throw new NullPointerException("the classification raw type must not be null");
-        }
-
+        ConstantConditions.notNull("token raw type", rawClass);
         final ClassToken<TYPE> classToken = new DefaultClassToken<TYPE>();
         classToken.mGenericType = rawClass;
         classToken.mRawClass = rawClass;

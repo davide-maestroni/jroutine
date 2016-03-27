@@ -22,6 +22,7 @@ import com.github.dm.jrt.core.invocation.ComparableInvocationFactory;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.util.ClassToken;
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
@@ -247,21 +248,12 @@ public abstract class ContextInvocationFactory<IN, OUT> {
          * @param context the context.
          * @param factory the context invocation factory.
          */
-        @SuppressWarnings("ConstantConditions")
         private AdaptingContextInvocationFactory(@NotNull final Context context,
                 @NotNull final ContextInvocationFactory<IN, OUT> factory) {
 
             super(asArgs(context, factory));
-            if (context == null) {
-                throw new NullPointerException("the routine context must not be null");
-            }
-
-            if (factory == null) {
-                throw new NullPointerException("the context invocation factory must not be null");
-            }
-
-            mContext = context;
-            mFactory = factory;
+            mContext = ConstantConditions.notNull("routine context", context);
+            mFactory = ConstantConditions.notNull("context invocation factory", factory);
         }
 
         @NotNull

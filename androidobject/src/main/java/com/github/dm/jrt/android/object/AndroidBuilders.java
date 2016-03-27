@@ -40,7 +40,7 @@ import java.lang.reflect.Method;
 public class AndroidBuilders {
 
     /**
-     * Avoid direct instantiation.
+     * Avoid explicit instantiation.
      */
     protected AndroidBuilders() {
 

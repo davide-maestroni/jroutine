@@ -17,6 +17,7 @@
 package com.github.dm.jrt.core.log;
 
 import com.github.dm.jrt.core.log.Log.Level;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -87,14 +88,9 @@ public class Logger {
      *
      * @param level the log level.
      */
-    @SuppressWarnings("ConstantConditions")
     public static void setDefaultLevel(@NotNull final Level level) {
 
-        if (level == null) {
-            throw new NullPointerException("the default log level must not be null");
-        }
-
-        sLogLevel.set(level);
+        sLogLevel.set(ConstantConditions.notNull("default log level", level));
     }
 
     /**
@@ -113,14 +109,9 @@ public class Logger {
      *
      * @param log the log instance.
      */
-    @SuppressWarnings("ConstantConditions")
     public static void setDefaultLog(@NotNull final Log log) {
 
-        if (log == null) {
-            throw new NullPointerException("the default log instance must not be null");
-        }
-
-        sLog.set(log);
+        sLog.set(ConstantConditions.notNull("default log instance", log));
     }
 
     /**
@@ -132,15 +123,11 @@ public class Logger {
      * @return the new logger.
      */
     @NotNull
-    @SuppressWarnings("ConstantConditions")
     public static Logger newLogger(@Nullable final Log log, @Nullable final Level level,
             @NotNull final Object context) {
 
-        if (context == null) {
-            throw new NullPointerException("the context must not be null");
-        }
-
-        return new Logger(asArgs(context), log, level);
+        return new Logger(asArgs(ConstantConditions.notNull("logger context", context)), log,
+                level);
     }
 
     /**
@@ -570,13 +557,9 @@ public class Logger {
      * @return the new logger.
      */
     @NotNull
-    @SuppressWarnings("ConstantConditions")
     public Logger subContextLogger(@NotNull final Object context) {
 
-        if (context == null) {
-            throw new NullPointerException("the context must not be null");
-        }
-
+        ConstantConditions.notNull("logger context", context);
         final Object[] thisContexts = mContexts;
         final int thisLength = thisContexts.length;
         final Object[] newContexts = new Object[thisLength + 1];

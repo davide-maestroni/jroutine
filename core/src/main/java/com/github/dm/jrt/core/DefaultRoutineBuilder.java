@@ -19,6 +19,7 @@ package com.github.dm.jrt.core;
 import com.github.dm.jrt.core.builder.TemplateRoutineBuilder;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.Routine;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -39,14 +40,9 @@ class DefaultRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OUT> {
      *
      * @param factory the invocation factory.
      */
-    @SuppressWarnings("ConstantConditions")
     DefaultRoutineBuilder(@NotNull final InvocationFactory<IN, OUT> factory) {
 
-        if (factory == null) {
-            throw new NullPointerException("the invocation factory must not be null");
-        }
-
-        mFactory = factory;
+        mFactory = ConstantConditions.notNull("invocation factory", factory);
     }
 
     @NotNull

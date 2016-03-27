@@ -27,6 +27,7 @@ import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.TemplateExecution;
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.TimeDuration;
 
 import org.jetbrains.annotations.NotNull;
@@ -60,14 +61,9 @@ class DefaultLoaderChannelBuilder
      *
      * @param context the context instance.
      */
-    @SuppressWarnings("ConstantConditions")
     DefaultLoaderChannelBuilder(@NotNull final LoaderContextCompat context) {
 
-        if (context == null) {
-            throw new NullPointerException("the channel context must not be null");
-        }
-
-        mContext = context;
+        mContext = ConstantConditions.notNull("loader context", context);
     }
 
     @NotNull
@@ -193,27 +189,17 @@ class DefaultLoaderChannelBuilder
     }
 
     @NotNull
-    @SuppressWarnings("ConstantConditions")
-    public LoaderChannelBuilder setConfiguration(@NotNull final LoaderConfiguration configuration) {
+    public LoaderChannelBuilder setConfiguration(
+            @NotNull final ChannelConfiguration configuration) {
 
-        if (configuration == null) {
-            throw new NullPointerException("the loader configuration must not be null");
-        }
-
-        mLoaderConfiguration = configuration;
+        mChannelConfiguration = ConstantConditions.notNull("channel configuration", configuration);
         return this;
     }
 
     @NotNull
-    @SuppressWarnings("ConstantConditions")
-    public LoaderChannelBuilder setConfiguration(
-            @NotNull final ChannelConfiguration configuration) {
+    public LoaderChannelBuilder setConfiguration(@NotNull final LoaderConfiguration configuration) {
 
-        if (configuration == null) {
-            throw new NullPointerException("the channel configuration must not be null");
-        }
-
-        mChannelConfiguration = configuration;
+        mLoaderConfiguration = ConstantConditions.notNull("loader configuration", configuration);
         return this;
     }
 

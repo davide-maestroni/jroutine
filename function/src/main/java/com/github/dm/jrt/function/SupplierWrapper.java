@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.function;
 
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
@@ -38,13 +39,10 @@ public class SupplierWrapper<OUT> implements Supplier<OUT>, Wrapper {
      *
      * @param supplier the initial wrapped supplier.
      */
-    @SuppressWarnings("ConstantConditions")
     SupplierWrapper(@NotNull final Supplier<?> supplier) {
 
-        this(supplier, FunctionWrapper.<OUT>identity());
-        if (supplier == null) {
-            throw new NullPointerException("the supplier instance must not be null");
-        }
+        this(ConstantConditions.notNull("supplier instance", supplier),
+                FunctionWrapper.<OUT>identity());
     }
 
     /**

@@ -22,6 +22,7 @@ import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -44,14 +45,9 @@ class InputFilterBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<IN>>> 
      * @param channel the input channel.
      * @param index   the selectable index.
      */
-    @SuppressWarnings("ConstantConditions")
     InputFilterBuilder(@NotNull final InputChannel<? super IN> channel, final int index) {
 
-        if (channel == null) {
-            throw new NullPointerException("the input channel must not be null");
-        }
-
-        mChannel = channel;
+        mChannel = ConstantConditions.notNull("input channel", channel);
         mIndex = index;
     }
 

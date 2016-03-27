@@ -18,6 +18,7 @@ package com.github.dm.jrt.android.core.config;
 
 import android.os.Looper;
 
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.TimeDuration;
 
 import org.jetbrains.annotations.NotNull;
@@ -399,14 +400,9 @@ public final class LoaderConfiguration {
          *
          * @param configurable the configurable instance.
          */
-        @SuppressWarnings("ConstantConditions")
         public Builder(@NotNull final Configurable<? extends TYPE> configurable) {
 
-            if (configurable == null) {
-                throw new NullPointerException("the configurable instance must no be null");
-            }
-
-            mConfigurable = configurable;
+            mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
             mLoaderId = AUTO;
             mRoutineId = AUTO;
         }
@@ -416,15 +412,10 @@ public final class LoaderConfiguration {
          *
          * @param initialConfiguration the initial loader configuration.
          */
-        @SuppressWarnings("ConstantConditions")
         public Builder(@NotNull final Configurable<? extends TYPE> configurable,
                 @NotNull final LoaderConfiguration initialConfiguration) {
 
-            if (configurable == null) {
-                throw new NullPointerException("the configurable instance must no be null");
-            }
-
-            mConfigurable = configurable;
+            mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
             setConfiguration(initialConfiguration);
         }
 

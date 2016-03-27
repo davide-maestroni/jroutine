@@ -24,6 +24,7 @@ import com.github.dm.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.util.ClassToken;
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.object.config.ProxyConfiguration;
 import com.github.dm.jrt.proxy.annotation.Proxy;
 
@@ -61,20 +62,11 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
      * @param context the routine context.
      * @param target  the invocation target.
      */
-    @SuppressWarnings("ConstantConditions")
     DefaultLoaderProxyRoutineBuilder(@NotNull final LoaderContextCompat context,
             @NotNull final ContextInvocationTarget<?> target) {
 
-        if (context == null) {
-            throw new NullPointerException("the routine context must not be null");
-        }
-
-        if (target == null) {
-            throw new NullPointerException("the invocation target must not be null");
-        }
-
-        mContext = context;
-        mTarget = target;
+        mContext = ConstantConditions.notNull("loader context", context);
+        mTarget = ConstantConditions.notNull("context invocation target", target);
     }
 
     @NotNull
@@ -126,41 +118,27 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
     }
 
     @NotNull
-    @SuppressWarnings("ConstantConditions")
     public LoaderProxyRoutineBuilder setConfiguration(
             @NotNull final InvocationConfiguration configuration) {
 
-        if (configuration == null) {
-            throw new NullPointerException("the invocation configuration must not be null");
-        }
-
-        mInvocationConfiguration = configuration;
+        mInvocationConfiguration =
+                ConstantConditions.notNull("invocation configuration", configuration);
         return this;
     }
 
     @NotNull
-    @SuppressWarnings("ConstantConditions")
-    public LoaderProxyRoutineBuilder setConfiguration(
-            @NotNull final ProxyConfiguration configuration) {
-
-        if (configuration == null) {
-            throw new NullPointerException("the proxy configuration must not be null");
-        }
-
-        mProxyConfiguration = configuration;
-        return this;
-    }
-
-    @NotNull
-    @SuppressWarnings("ConstantConditions")
     public LoaderProxyRoutineBuilder setConfiguration(
             @NotNull final LoaderConfiguration configuration) {
 
-        if (configuration == null) {
-            throw new NullPointerException("the loader configuration must not be null");
-        }
+        mLoaderConfiguration = ConstantConditions.notNull("loader configuration", configuration);
+        return this;
+    }
 
-        mLoaderConfiguration = configuration;
+    @NotNull
+    public LoaderProxyRoutineBuilder setConfiguration(
+            @NotNull final ProxyConfiguration configuration) {
+
+        mProxyConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
         return this;
     }
 

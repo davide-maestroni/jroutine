@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.function;
 
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
@@ -46,13 +47,10 @@ public class ConsumerWrapper<IN> implements Consumer<IN>, Wrapper {
      *
      * @param consumer the wrapped consumer.
      */
-    @SuppressWarnings("ConstantConditions")
     ConsumerWrapper(@NotNull final Consumer<?> consumer) {
 
-        this(Collections.<Consumer<?>>singletonList(consumer));
-        if (consumer == null) {
-            throw new NullPointerException("the consumer instance must not be null");
-        }
+        this(Collections.<Consumer<?>>singletonList(
+                ConstantConditions.notNull("consumer instance", consumer)));
     }
 
     /**
@@ -97,11 +95,8 @@ public class ConsumerWrapper<IN> implements Consumer<IN>, Wrapper {
         if (after instanceof ConsumerWrapper) {
             newConsumers.addAll(((ConsumerWrapper<?>) after).mConsumers);
 
-        } else if (after == null) {
-            throw new NullPointerException("the consumer must not be null");
-
         } else {
-            newConsumers.add(after);
+            newConsumers.add(ConstantConditions.notNull("consumer instance", after));
         }
 
         return new ConsumerWrapper<IN>(newConsumers);

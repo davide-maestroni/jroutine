@@ -18,6 +18,7 @@ package com.github.dm.jrt.proxy;
 
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.util.ClassToken;
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.object.InvocationTarget;
 import com.github.dm.jrt.object.config.ProxyConfiguration;
 import com.github.dm.jrt.proxy.annotation.Proxy;
@@ -97,27 +98,18 @@ class DefaultProxyRoutineBuilder
     }
 
     @NotNull
-    @SuppressWarnings("ConstantConditions")
-    public ProxyRoutineBuilder setConfiguration(@NotNull final ProxyConfiguration configuration) {
+    public ProxyRoutineBuilder setConfiguration(
+            @NotNull final InvocationConfiguration configuration) {
 
-        if (configuration == null) {
-            throw new NullPointerException("the proxy configuration must not be null");
-        }
-
-        mProxyConfiguration = configuration;
+        mInvocationConfiguration =
+                ConstantConditions.notNull("invocation configuration", configuration);
         return this;
     }
 
     @NotNull
-    @SuppressWarnings("ConstantConditions")
-    public ProxyRoutineBuilder setConfiguration(
-            @NotNull final InvocationConfiguration configuration) {
+    public ProxyRoutineBuilder setConfiguration(@NotNull final ProxyConfiguration configuration) {
 
-        if (configuration == null) {
-            throw new NullPointerException("the invocation configuration must not be null");
-        }
-
-        mInvocationConfiguration = configuration;
+        mProxyConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
         return this;
     }
 

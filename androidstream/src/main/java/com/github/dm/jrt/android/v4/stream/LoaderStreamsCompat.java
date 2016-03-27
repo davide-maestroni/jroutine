@@ -31,6 +31,7 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.stream.StreamChannel;
 import com.github.dm.jrt.stream.Streams;
@@ -51,7 +52,7 @@ import static com.github.dm.jrt.android.core.invocation.DelegatingContextInvocat
 public class LoaderStreamsCompat extends Streams {
 
     /**
-     * Avoid direct instantiation.
+     * Avoid explicit instantiation.
      */
     protected LoaderStreamsCompat() {
 
@@ -344,14 +345,10 @@ public class LoaderStreamsCompat extends Streams {
      * @return the newly created stream instance.
      */
     @NotNull
-    @SuppressWarnings("ConstantConditions")
     public static <OUT> LoaderStreamChannelCompat<OUT> lazyStreamOf(
             @NotNull final OutputChannel<OUT> output) {
 
-        if (output == null) {
-            throw new NullPointerException("the output channel instance must not be null");
-        }
-
+        ConstantConditions.notNull("output channel", output);
         final IOChannel<OUT> ioChannel = JRoutineCore.io().buildChannel();
         return new DefaultLoaderStreamChannelCompat<OUT>(null, output, ioChannel);
     }

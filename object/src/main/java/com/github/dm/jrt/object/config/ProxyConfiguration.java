@@ -16,6 +16,8 @@
 
 package com.github.dm.jrt.object.config;
 
+import com.github.dm.jrt.core.util.ConstantConditions;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -172,14 +174,9 @@ public final class ProxyConfiguration {
          *
          * @param configurable the configurable instance.
          */
-        @SuppressWarnings("ConstantConditions")
         public Builder(@NotNull final Configurable<? extends TYPE> configurable) {
 
-            if (configurable == null) {
-                throw new NullPointerException("the configurable instance must no be null");
-            }
-
-            mConfigurable = configurable;
+            mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
         }
 
         /**
@@ -188,15 +185,10 @@ public final class ProxyConfiguration {
          * @param configurable         the configurable instance.
          * @param initialConfiguration the initial proxy configuration.
          */
-        @SuppressWarnings("ConstantConditions")
         public Builder(@NotNull final Configurable<? extends TYPE> configurable,
                 @NotNull final ProxyConfiguration initialConfiguration) {
 
-            if (configurable == null) {
-                throw new NullPointerException("the configurable instance must no be null");
-            }
-
-            mConfigurable = configurable;
+            mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
             setConfiguration(initialConfiguration);
         }
 

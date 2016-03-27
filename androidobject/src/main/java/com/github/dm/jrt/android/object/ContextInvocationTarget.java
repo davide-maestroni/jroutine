@@ -43,7 +43,7 @@ import static com.github.dm.jrt.core.util.Reflection.findConstructor;
 public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
 
     /**
-     * Avoid direct instantiation.
+     * Avoid explicit instantiation.
      */
     private ContextInvocationTarget() {
 

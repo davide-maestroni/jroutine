@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.function;
 
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
@@ -50,10 +51,8 @@ public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2>, Wrappe
     @SuppressWarnings("ConstantConditions")
     BiConsumerWrapper(@NotNull final BiConsumer<?, ?> consumer) {
 
-        this(Collections.<BiConsumer<?, ?>>singletonList(consumer));
-        if (consumer == null) {
-            throw new NullPointerException("the consumer instance must not be null");
-        }
+        this(Collections.<BiConsumer<?, ?>>singletonList(
+                ConstantConditions.notNull("consumer instance", consumer)));
     }
 
     /**
@@ -100,11 +99,8 @@ public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2>, Wrappe
         if (after instanceof BiConsumerWrapper) {
             newConsumers.addAll(((BiConsumerWrapper<?, ?>) after).mConsumers);
 
-        } else if (after == null) {
-            throw new NullPointerException("the consumer must not be null");
-
         } else {
-            newConsumers.add(after);
+            newConsumers.add(ConstantConditions.notNull("consumer instance", after));
         }
 
         return new BiConsumerWrapper<IN1, IN2>(newConsumers);

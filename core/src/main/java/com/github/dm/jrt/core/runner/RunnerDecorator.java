@@ -16,6 +16,8 @@
 
 package com.github.dm.jrt.core.runner;
 
+import com.github.dm.jrt.core.util.ConstantConditions;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
@@ -34,14 +36,9 @@ public class RunnerDecorator implements Runner {
      *
      * @param wrapped the wrapped instance.
      */
-    @SuppressWarnings("ConstantConditions")
     public RunnerDecorator(@NotNull final Runner wrapped) {
 
-        if (wrapped == null) {
-            throw new NullPointerException("the wrapped runner must not be null");
-        }
-
-        mRunner = wrapped;
+        mRunner = ConstantConditions.notNull("wrapped runner", wrapped);
     }
 
     public void cancel(@NotNull final Execution execution) {

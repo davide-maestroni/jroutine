@@ -59,7 +59,7 @@ import static com.github.dm.jrt.function.Functions.supplierFactory;
 public class JRoutineFacade extends Channels {
 
     /**
-     * Avoid direct instantiation.
+     * Avoid explicit instantiation.
      */
     protected JRoutineFacade() {
 

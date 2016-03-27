@@ -33,6 +33,7 @@ import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.TemplateExecution;
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.SimpleQueue;
 import com.github.dm.jrt.core.util.TimeDuration;
 import com.github.dm.jrt.core.util.TimeDuration.Condition;
@@ -138,22 +139,13 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
      * @param runner        the runner instance.
      * @param logger        the logger instance.
      */
-    @SuppressWarnings("ConstantConditions")
     DefaultResultChannel(@NotNull final InvocationConfiguration configuration,
             @NotNull final AbortHandler handler, @NotNull final Runner runner,
             @NotNull final Logger logger) {
 
-        if (handler == null) {
-            throw new NullPointerException("the abort handler must not be null");
-        }
-
-        if (runner == null) {
-            throw new NullPointerException("the runner instance must not be null");
-        }
-
         mLogger = logger.subContextLogger(this);
-        mHandler = handler;
-        mRunner = runner;
+        mHandler = ConstantConditions.notNull("abort handler", handler);
+        mRunner = ConstantConditions.notNull("runner instance", runner);
         mResultOrder = configuration.getOutputOrderTypeOr(OrderType.BY_DELAY);
         mExecutionTimeout = configuration.getReadTimeoutOr(ZERO);
         mTimeoutActionType = configuration.getReadTimeoutActionOr(TimeoutActionType.THROW);

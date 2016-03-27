@@ -18,6 +18,7 @@ package com.github.dm.jrt.core.invocation;
 
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -38,14 +39,9 @@ public class InvocationDecorator<IN, OUT> implements Invocation<IN, OUT> {
      *
      * @param wrapped the wrapped invocation instance.
      */
-    @SuppressWarnings("ConstantConditions")
     public InvocationDecorator(@NotNull final Invocation<IN, OUT> wrapped) {
 
-        if (wrapped == null) {
-            throw new NullPointerException("the wrapped invocation instance must not be null");
-        }
-
-        mInvocation = wrapped;
+        mInvocation = ConstantConditions.notNull("wrapped invocation", wrapped);
     }
 
     public void onAbort(@NotNull final RoutineException reason) throws Exception {

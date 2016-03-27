@@ -24,6 +24,7 @@ import com.github.dm.jrt.android.retrofit.ComparableCall;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.object.Builders;
 
 import org.jetbrains.annotations.NotNull;
@@ -46,15 +47,10 @@ public class OutputChannelCallAdapterFactory extends AbstractCallAdapterFactory<
      *
      * @param context the loader context.
      */
-    @SuppressWarnings("ConstantConditions")
     private OutputChannelCallAdapterFactory(@NotNull final LoaderContextCompat context) {
 
         super(OutputChannel.class, 0);
-        if (context == null) {
-            throw new NullPointerException("the context instance must not be null");
-        }
-
-        mContext = context;
+        mContext = ConstantConditions.notNull("loader context", context);
     }
 
     /**

@@ -20,6 +20,7 @@ import com.github.dm.jrt.android.core.builder.ServiceRoutineBuilder;
 import com.github.dm.jrt.android.core.invocation.TargetInvocationFactory;
 import com.github.dm.jrt.android.core.log.AndroidLogs;
 import com.github.dm.jrt.core.log.Logger;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -122,14 +123,9 @@ public class JRoutineService {
          *
          * @param context the service context.
          */
-        @SuppressWarnings("ConstantConditions")
         private ServiceBuilder(@NotNull final ServiceContext context) {
 
-            if (context == null) {
-                throw new NullPointerException("the context must not be null");
-            }
-
-            mContext = context;
+            mContext = ConstantConditions.notNull("service context", context);
         }
 
         /**

@@ -21,6 +21,7 @@ import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.Builder;
 import com.github.dm.jrt.core.config.ChannelConfiguration.Configurable;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -47,15 +48,10 @@ class MapBuilderWrapper<OUT> implements ChannelsBuilder<Map<Integer, StreamChann
      *
      * @param wrapped the wrapped instance.
      */
-    @SuppressWarnings("ConstantConditions")
     MapBuilderWrapper(
             @NotNull final ChannelsBuilder<? extends Map<Integer, OutputChannel<OUT>>> wrapped) {
 
-        if (wrapped == null) {
-            throw new NullPointerException("the wrapped builder instance must not be null");
-        }
-
-        mBuilder = wrapped;
+        mBuilder = ConstantConditions.notNull("wrapped instance", wrapped);
     }
 
     @NotNull
@@ -72,15 +68,10 @@ class MapBuilderWrapper<OUT> implements ChannelsBuilder<Map<Integer, StreamChann
     }
 
     @NotNull
-    @SuppressWarnings("ConstantConditions")
     public ChannelsBuilder<Map<Integer, StreamChannel<OUT>>> setConfiguration(
             @NotNull final ChannelConfiguration configuration) {
 
-        if (configuration == null) {
-            throw new NullPointerException("the invocation configuration must not be null");
-        }
-
-        mConfiguration = configuration;
+        mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
         mBuilder.withChannels().with(null).with(configuration).setConfiguration();
         return this;
     }

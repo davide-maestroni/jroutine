@@ -18,6 +18,7 @@ package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -37,14 +38,9 @@ class RepeatedChannelBuilder<OUT> extends AbstractBuilder<OutputChannel<OUT>> {
      *
      * @param channel the output channel.
      */
-    @SuppressWarnings("ConstantConditions")
     RepeatedChannelBuilder(@NotNull final OutputChannel<OUT> channel) {
 
-        if (channel == null) {
-            throw new NullPointerException("the output channel must not be null");
-        }
-
-        mChannel = channel;
+        mChannel = ConstantConditions.notNull("output channel", channel);
     }
 
     @NotNull

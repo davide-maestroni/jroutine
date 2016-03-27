@@ -34,6 +34,7 @@ import com.github.dm.jrt.android.v11.core.LoaderContext;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.util.ClassToken;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -180,14 +181,9 @@ public class JRoutineAndroid extends SparseChannels {
          *
          * @param context the loader context.
          */
-        @SuppressWarnings("ConstantConditions")
         private LoaderBuilder(@NotNull final LoaderContext context) {
 
-            if (context == null) {
-                throw new NullPointerException("the loader context must not be null");
-            }
-
-            mContext = context;
+            mContext = ConstantConditions.notNull("loader context", context);
         }
 
         /**

@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.core.runner;
 
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
@@ -47,14 +48,9 @@ class ScheduledRunner implements Runner {
      *
      * @param service the executor service.
      */
-    @SuppressWarnings("ConstantConditions")
     ScheduledRunner(@NotNull final ScheduledExecutorService service) {
 
-        if (service == null) {
-            throw new NullPointerException("the executor service must not be null");
-        }
-
-        mService = service;
+        mService = ConstantConditions.notNull("executor service", service);
     }
 
     public void cancel(@NotNull final Execution execution) {

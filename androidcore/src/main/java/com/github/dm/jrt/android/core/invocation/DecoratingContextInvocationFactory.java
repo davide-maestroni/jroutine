@@ -16,6 +16,8 @@
 
 package com.github.dm.jrt.android.core.invocation;
 
+import com.github.dm.jrt.core.util.ConstantConditions;
+
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
@@ -38,16 +40,11 @@ public abstract class DecoratingContextInvocationFactory<IN, OUT>
      *
      * @param wrapped the wrapped factory instance.
      */
-    @SuppressWarnings("ConstantConditions")
     public DecoratingContextInvocationFactory(
             @NotNull final ContextInvocationFactory<IN, OUT> wrapped) {
 
         super(asArgs(wrapped));
-        if (wrapped == null) {
-            throw new NullPointerException("the wrapped invocation factory must not be null");
-        }
-
-        mFactory = wrapped;
+        mFactory = ConstantConditions.notNull("wrapped invocation factory", wrapped);
     }
 
     @NotNull

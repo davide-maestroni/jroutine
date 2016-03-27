@@ -27,6 +27,7 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.log.Logger;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -70,7 +71,6 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
      * @param order      the data order.
      * @param logger     the logger instance.
      */
-    @SuppressWarnings("ConstantConditions")
     InvocationLoader(@NotNull final Context context,
             @NotNull final ContextInvocation<IN, OUT> invocation,
             @NotNull final ContextInvocationFactory<IN, OUT> factory,
@@ -78,21 +78,9 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
             @NotNull final Logger logger) {
 
         super(context);
-        if (invocation == null) {
-            throw new NullPointerException("the invocation instance must not be null");
-        }
-
-        if (factory == null) {
-            throw new NullPointerException("the invocation factory must not be null");
-        }
-
-        if (inputs == null) {
-            throw new NullPointerException("the list of input data must not be null");
-        }
-
-        mInvocation = invocation;
-        mFactory = factory;
-        mInputs = inputs;
+        mInvocation = ConstantConditions.notNull("invocation instance", invocation);
+        mFactory = ConstantConditions.notNull("invocation factory", factory);
+        mInputs = ConstantConditions.notNull("list of input data", inputs);
         mOrderType = order;
         mLogger = logger.subContextLogger(this);
     }

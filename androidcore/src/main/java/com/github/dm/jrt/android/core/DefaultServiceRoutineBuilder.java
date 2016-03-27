@@ -22,6 +22,7 @@ import com.github.dm.jrt.android.core.invocation.TargetInvocationFactory;
 import com.github.dm.jrt.core.builder.TemplateRoutineBuilder;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.routine.Routine;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -61,20 +62,11 @@ class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, O
      * @param context the routine context.
      * @param target  the invocation factory target.
      */
-    @SuppressWarnings("ConstantConditions")
     DefaultServiceRoutineBuilder(@NotNull final ServiceContext context,
             @NotNull final TargetInvocationFactory<IN, OUT> target) {
 
-        if (context == null) {
-            throw new NullPointerException("the context must not be null");
-        }
-
-        if (target == null) {
-            throw new NullPointerException("the invocation target not be null");
-        }
-
-        mContext = context;
-        mTargetFactory = target;
+        mContext = ConstantConditions.notNull("service context", context);
+        mTargetFactory = ConstantConditions.notNull("target invocation factory", target);
     }
 
     @NotNull
@@ -104,15 +96,10 @@ class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, O
     }
 
     @NotNull
-    @SuppressWarnings("ConstantConditions")
     public ServiceRoutineBuilder<IN, OUT> setConfiguration(
             @NotNull final ServiceConfiguration configuration) {
 
-        if (configuration == null) {
-            throw new NullPointerException("the service configuration must not be null");
-        }
-
-        mServiceConfiguration = configuration;
+        mServiceConfiguration = ConstantConditions.notNull("service configuration", configuration);
         return this;
     }
 

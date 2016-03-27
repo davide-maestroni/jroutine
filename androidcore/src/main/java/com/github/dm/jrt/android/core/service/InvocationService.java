@@ -40,6 +40,7 @@ import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.Runner;
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
@@ -252,7 +253,6 @@ public class InvocationService extends Service {
         bundle.putSerializable(KEY_ABORT_EXCEPTION, error);
     }
 
-    @SuppressWarnings("ConstantConditions")
     private static void putInvocation(@NotNull final Bundle bundle,
             @NotNull final String invocationId,
             @NotNull final Class<? extends ContextInvocation<?, ?>> targetClass,
@@ -261,16 +261,10 @@ public class InvocationService extends Service {
             @Nullable final Class<? extends Runner> runnerClass,
             @Nullable final Class<? extends Log> logClass, boolean isParallel) {
 
-        if (invocationId == null) {
-            throw new NullPointerException("the invocation ID must not be null");
-        }
-
-        if (targetClass == null) {
-            throw new NullPointerException("the target invocation class must not be null");
-        }
-
-        bundle.putString(KEY_INVOCATION_ID, invocationId);
-        bundle.putSerializable(KEY_TARGET_INVOCATION, targetClass);
+        bundle.putString(KEY_INVOCATION_ID,
+                ConstantConditions.notNull("invocation ID", invocationId));
+        bundle.putSerializable(KEY_TARGET_INVOCATION,
+                ConstantConditions.notNull("target invocation class", targetClass));
         bundle.putParcelable(KEY_FACTORY_ARGS,
                 (factoryArgs != null) ? new ParcelableValue(factoryArgs) : null);
         bundle.putInt(KEY_CORE_INVOCATIONS,
@@ -733,16 +727,11 @@ public class InvocationService extends Service {
          * @param invocation the routine invocation.
          * @param messenger  the output messenger.
          */
-        @SuppressWarnings("ConstantConditions")
         private ServiceOutputConsumer(@NotNull final RoutineInvocation invocation,
                 @NotNull final Messenger messenger) {
 
-            if (messenger == null) {
-                throw new NullPointerException("the output messenger must not be null");
-            }
-
             mInvocation = invocation;
-            mOutMessenger = messenger;
+            mOutMessenger = ConstantConditions.notNull("output messenger", messenger);
         }
 
         public void onComplete() throws Exception {

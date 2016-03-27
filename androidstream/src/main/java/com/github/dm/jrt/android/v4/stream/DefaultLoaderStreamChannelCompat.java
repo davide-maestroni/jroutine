@@ -37,6 +37,7 @@ import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.Reflection;
 import com.github.dm.jrt.core.util.TimeDuration;
 import com.github.dm.jrt.function.BiConsumer;
@@ -167,7 +168,6 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
      * @param delegationType          the delegation type.
      * @param binder                  the binder instance.
      */
-    @SuppressWarnings("ConstantConditions")
     private DefaultLoaderStreamChannelCompat(@Nullable final LoaderBuilderCompat builder,
             @NotNull final OutputChannel<OUT> channel,
             @NotNull final InvocationConfiguration invocationConfiguration,
@@ -175,12 +175,9 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
             @NotNull final DelegationType delegationType, @Nullable final Binder binder) {
 
         super(channel, invocationConfiguration, delegationType, binder);
-        if (loaderConfiguration == null) {
-            throw new NullPointerException("the loader configuration must not be null");
-        }
-
         mContextBuilder = builder;
-        mStreamConfiguration = loaderConfiguration;
+        mStreamConfiguration =
+                ConstantConditions.notNull("loader configuration", loaderConfiguration);
     }
 
     private static void checkStatic(@NotNull final Wrapper wrapper,
@@ -591,7 +588,8 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
 
         return newRoutine(configuration,
-                mStreamConfiguration.builderFrom().with(mConfiguration).setConfiguration(), factory);
+                mStreamConfiguration.builderFrom().with(mConfiguration).setConfiguration(),
+                factory);
     }
 
     @NotNull
@@ -688,15 +686,10 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
     }
 
     @NotNull
-    @SuppressWarnings("ConstantConditions")
     public LoaderStreamChannelCompat<OUT> setConfiguration(
             @NotNull final LoaderConfiguration configuration) {
 
-        if (configuration == null) {
-            throw new NullPointerException("the loader configuration must not be null");
-        }
-
-        mConfiguration = configuration;
+        mConfiguration = ConstantConditions.notNull("loader configuration", configuration);
         return this;
     }
 }

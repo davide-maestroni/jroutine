@@ -27,6 +27,7 @@ import com.github.dm.jrt.android.proxy.builder.ServiceProxyRoutineBuilder;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.object.config.ProxyConfiguration;
 
 import org.jetbrains.annotations.NotNull;
@@ -99,20 +100,11 @@ class DefaultServiceTargetRoutineBuilder implements ServiceTargetRoutineBuilder 
      * @param context the service context.
      * @param target  the invocation target.
      */
-    @SuppressWarnings("ConstantConditions")
     DefaultServiceTargetRoutineBuilder(@NotNull final ServiceContext context,
             @NotNull final ContextInvocationTarget<?> target) {
 
-        if (context == null) {
-            throw new NullPointerException("the context must not be null");
-        }
-
-        if (target == null) {
-            throw new NullPointerException("the invocation target must not be null");
-        }
-
-        mContext = context;
-        mTarget = target;
+        mContext = ConstantConditions.notNull("service context", context);
+        mTarget = ConstantConditions.notNull("invocation target", target);
     }
 
     @NotNull

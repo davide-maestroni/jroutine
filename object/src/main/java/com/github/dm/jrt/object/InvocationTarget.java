@@ -16,6 +16,8 @@
 
 package com.github.dm.jrt.object;
 
+import com.github.dm.jrt.core.util.ConstantConditions;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,7 +34,7 @@ import java.lang.ref.WeakReference;
 public abstract class InvocationTarget<TYPE> {
 
     /**
-     * Avoid direct instantiation.
+     * Avoid explicit instantiation.
      */
     private InvocationTarget() {
 
@@ -111,14 +113,9 @@ public abstract class InvocationTarget<TYPE> {
          *
          * @param targetClass the target class.
          */
-        @SuppressWarnings("ConstantConditions")
         private ClassInvocationTarget(@NotNull final Class<TYPE> targetClass) {
 
-            if (targetClass == null) {
-                throw new NullPointerException("the target class must not be null");
-            }
-
-            mTargetClass = targetClass;
+            mTargetClass = ConstantConditions.notNull("target class", targetClass);
         }
 
         @Nullable

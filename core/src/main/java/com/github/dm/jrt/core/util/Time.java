@@ -144,14 +144,9 @@ public class Time {
      * @return the time instance.
      */
     @NotNull
-    @SuppressWarnings("ConstantConditions")
     public static Time fromUnit(final long time, @NotNull final TimeUnit unit) {
 
-        if (unit == null) {
-            throw new NullPointerException("the time unit must not be null");
-        }
-
-        return new Time(time, unit);
+        return new Time(time, ConstantConditions.notNull("time unit", unit));
     }
 
     /**

@@ -18,6 +18,7 @@ package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -43,26 +44,13 @@ public class OutputConsumerBuilder<OUT> implements OutputConsumer<OUT> {
      * @param onError    the error consumer.
      * @param onOutput   the output consumer.
      */
-    @SuppressWarnings("ConstantConditions")
     OutputConsumerBuilder(@NotNull final ConsumerWrapper<Void> onComplete,
             @NotNull final ConsumerWrapper<RoutineException> onError,
             @NotNull final ConsumerWrapper<OUT> onOutput) {
 
-        if (onComplete == null) {
-            throw new NullPointerException("the complete consumer must not be null");
-        }
-
-        if (onError == null) {
-            throw new NullPointerException("the error consumer must not be null");
-        }
-
-        if (onOutput == null) {
-            throw new NullPointerException("the output consumer must not be null");
-        }
-
-        mOnOutput = onOutput;
-        mOnError = onError;
-        mOnComplete = onComplete;
+        mOnOutput = ConstantConditions.notNull("output consumer", onOutput);
+        mOnError = ConstantConditions.notNull("error consumer", onError);
+        mOnComplete = ConstantConditions.notNull("complete consumer", onComplete);
     }
 
     public void onComplete() {

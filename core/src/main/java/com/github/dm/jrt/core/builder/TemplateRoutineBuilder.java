@@ -21,6 +21,7 @@ import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Configurable;
 import com.github.dm.jrt.core.routine.TemplateRoutine;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -59,15 +60,10 @@ public abstract class TemplateRoutineBuilder<IN, OUT> extends TemplateRoutine<IN
     }
 
     @NotNull
-    @SuppressWarnings("ConstantConditions")
     public RoutineBuilder<IN, OUT> setConfiguration(
             @NotNull final InvocationConfiguration configuration) {
 
-        if (configuration == null) {
-            throw new NullPointerException("the invocation configuration must not be null");
-        }
-
-        mConfiguration = configuration;
+        mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
         return this;
     }
 

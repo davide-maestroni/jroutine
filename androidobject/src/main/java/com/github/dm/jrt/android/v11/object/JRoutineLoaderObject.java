@@ -19,6 +19,7 @@ package com.github.dm.jrt.android.v11.object;
 import com.github.dm.jrt.android.object.ContextInvocationTarget;
 import com.github.dm.jrt.android.object.builder.LoaderObjectRoutineBuilder;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -108,14 +109,9 @@ public class JRoutineLoaderObject {
          *
          * @param context the loader context.
          */
-        @SuppressWarnings("ConstantConditions")
         private ContextBuilder(@NotNull final LoaderContext context) {
 
-            if (context == null) {
-                throw new NullPointerException("the loader context must not be null");
-            }
-
-            mContext = context;
+            mContext = ConstantConditions.notNull("loader context", context);
         }
 
         /**

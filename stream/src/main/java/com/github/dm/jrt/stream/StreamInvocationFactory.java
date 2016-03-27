@@ -22,6 +22,7 @@ import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.invocation.ComparableInvocationFactory;
 import com.github.dm.jrt.core.invocation.Invocation;
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.FunctionWrapper;
 
@@ -47,16 +48,11 @@ class StreamInvocationFactory<IN, OUT> extends ComparableInvocationFactory<IN, O
      *
      * @param function the function used to instantiate the stream output channel.
      */
-    @SuppressWarnings("ConstantConditions")
     StreamInvocationFactory(@NotNull final FunctionWrapper<? super StreamChannel<IN>, ? extends
             StreamChannel<? extends OUT>> function) {
 
         super(asArgs(function));
-        if (function == null) {
-            throw new NullPointerException("the function instance must not be null");
-        }
-
-        mFunction = function;
+        mFunction = ConstantConditions.notNull("function instance", function);
     }
 
     @NotNull

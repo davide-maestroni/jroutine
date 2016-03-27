@@ -20,6 +20,7 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
@@ -57,24 +58,16 @@ class OutputMapBuilder<OUT> extends AbstractBuilder<Map<Integer, OutputChannel<O
      * @throws java.lang.NullPointerException if the specified set of indexes is null or contains a
      *                                        null object.
      */
-    @SuppressWarnings("ConstantConditions")
     OutputMapBuilder(@NotNull final OutputChannel<? extends Selectable<? extends OUT>> channel,
             @NotNull final Set<Integer> indexes) {
 
-        if (channel == null) {
-            throw new NullPointerException("the output channel must not be null");
-        }
-
-        if (indexes == null) {
-            throw new NullPointerException("the set of indexes must not be null");
-        }
-
-        final HashSet<Integer> indexSet = new HashSet<Integer>(indexes);
+        mChannel = ConstantConditions.notNull("output channel", channel);
+        final HashSet<Integer> indexSet =
+                new HashSet<Integer>(ConstantConditions.notNull("set of indexes", indexes));
         if (indexSet.contains(null)) {
             throw new NullPointerException("the set of indexes must not contain null objects");
         }
 
-        mChannel = channel;
         mIndexes = indexSet;
     }
 

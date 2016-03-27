@@ -25,6 +25,7 @@ import com.github.dm.jrt.android.object.ContextInvocationTarget;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.util.ClassToken;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -46,14 +47,9 @@ public class ServiceBuilder {
      *
      * @param context the service context.
      */
-    @SuppressWarnings("ConstantConditions")
     ServiceBuilder(@NotNull final ServiceContext context) {
 
-        if (context == null) {
-            throw new NullPointerException("the context must not be null");
-        }
-
-        mContext = context;
+        mContext = ConstantConditions.notNull("service context", context);
     }
 
     /**

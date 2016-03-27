@@ -45,7 +45,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
 public class Functions {
 
     /**
-     * Avoid direct instantiation.
+     * Avoid explicit instantiation.
      */
     protected Functions() {
 

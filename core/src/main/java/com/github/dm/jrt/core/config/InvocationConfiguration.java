@@ -20,6 +20,7 @@ import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.Runner;
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.TimeDuration;
 
 import org.jetbrains.annotations.NotNull;
@@ -720,14 +721,9 @@ public final class InvocationConfiguration {
          *
          * @param configurable the configurable instance.
          */
-        @SuppressWarnings("ConstantConditions")
         public Builder(@NotNull final Configurable<? extends TYPE> configurable) {
 
-            if (configurable == null) {
-                throw new NullPointerException("the configurable instance must no be null");
-            }
-
-            mConfigurable = configurable;
+            mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
             mPriority = DEFAULT;
             mMaxInstances = DEFAULT;
             mCoreInstances = DEFAULT;
@@ -743,15 +739,10 @@ public final class InvocationConfiguration {
          * @param configurable         the configurable instance.
          * @param initialConfiguration the initial configuration.
          */
-        @SuppressWarnings("ConstantConditions")
         public Builder(@NotNull final Configurable<? extends TYPE> configurable,
                 @NotNull final InvocationConfiguration initialConfiguration) {
 
-            if (configurable == null) {
-                throw new NullPointerException("the configurable instance must no be null");
-            }
-
-            mConfigurable = configurable;
+            mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
             setConfiguration(initialConfiguration);
         }
 

@@ -29,6 +29,7 @@ import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.channel.TemplateOutputConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
@@ -436,15 +437,10 @@ public class ParcelableByteChannel {
          *
          * @param channel the input channel to which to pass the data.
          */
-        @SuppressWarnings("ConstantConditions")
         private BufferOutputConsumer(
                 @NotNull final InputChannel<? super ParcelableByteBuffer> channel) {
 
-            if (channel == null) {
-                throw new NullPointerException("the input channel must not be null");
-            }
-
-            mChannel = channel;
+            mChannel = ConstantConditions.notNull("input channel", channel);
         }
 
         @Override
@@ -535,15 +531,10 @@ public class ParcelableByteChannel {
          *
          * @param channel the input channel to which to pass the data.
          */
-        @SuppressWarnings("ConstantConditions")
         private IOBufferOutputConsumer(
                 @NotNull final IOChannel<? super ParcelableByteBuffer> channel) {
 
-            if (channel == null) {
-                throw new NullPointerException("the I/O channel must not be null");
-            }
-
-            mChannel = channel;
+            mChannel = ConstantConditions.notNull("I/O channel", channel);
         }
 
         public void onComplete() {

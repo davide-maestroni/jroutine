@@ -18,6 +18,7 @@ package com.github.dm.jrt.channel;
 
 import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
@@ -1087,14 +1088,9 @@ public class ByteChannel {
          *
          * @param channel the input channel to which pass the data.
          */
-        @SuppressWarnings("ConstantConditions")
         private DefaultBufferOutputStream(@NotNull final InputChannel<? super ByteBuffer> channel) {
 
-            if (channel == null) {
-                throw new NullPointerException("the input channel must not be null");
-            }
-
-            mChannel = channel;
+            mChannel = ConstantConditions.notNull("input channel", channel);
         }
 
         @NotNull

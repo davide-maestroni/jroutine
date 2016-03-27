@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.core.runner;
 
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
@@ -85,14 +86,9 @@ public class PriorityRunner {
      *
      * @param wrapped the wrapped instance.
      */
-    @SuppressWarnings("ConstantConditions")
     private PriorityRunner(@NotNull final Runner wrapped) {
 
-        if (wrapped == null) {
-            throw new NullPointerException("the wrapped runner must not be null");
-        }
-
-        mRunner = wrapped;
+        mRunner = ConstantConditions.notNull("wrapped runner", wrapped);
         mQueue = new PriorityBlockingQueue<PriorityExecution>(10, PRIORITY_EXECUTION_COMPARATOR);
     }
 

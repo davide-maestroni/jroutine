@@ -19,6 +19,7 @@ package com.github.dm.jrt.android.v4.proxy;
 import com.github.dm.jrt.android.object.ContextInvocationTarget;
 import com.github.dm.jrt.android.proxy.builder.LoaderProxyRoutineBuilder;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -45,7 +46,7 @@ public class JRoutineLoaderProxyCompat {
             new WeakHashMap<LoaderContextCompat, LoaderProxyBuilderCompat>();
 
     /**
-     * Avoid direct instantiation.
+     * Avoid explicit instantiation.
      */
     protected JRoutineLoaderProxyCompat() {
 
@@ -84,14 +85,9 @@ public class JRoutineLoaderProxyCompat {
          *
          * @param context the loader context.
          */
-        @SuppressWarnings("ConstantConditions")
         private LoaderProxyBuilderCompat(@NotNull final LoaderContextCompat context) {
 
-            if (context == null) {
-                throw new NullPointerException("the context must not be null");
-            }
-
-            mContext = context;
+            mContext = ConstantConditions.notNull("loader context", context);
         }
 
         /**

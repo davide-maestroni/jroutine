@@ -35,7 +35,7 @@ import java.util.Collection;
 public class AndroidChannels extends Channels {
 
     /**
-     * Avoid direct instantiation.
+     * Avoid explicit instantiation.
      */
     protected AndroidChannels() {
 

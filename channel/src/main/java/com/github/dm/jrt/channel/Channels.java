@@ -23,6 +23,7 @@ import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.SimpleQueue;
 
 import org.jetbrains.annotations.NotNull;
@@ -48,7 +49,7 @@ import java.util.Set;
 public class Channels {
 
     /**
-     * Avoid direct instantiation.
+     * Avoid explicit instantiation.
      */
     protected Channels() {
 
@@ -1191,24 +1192,16 @@ public class Channels {
          * @throws java.lang.NullPointerException if the specified set of indexes is null or
          *                                        contains a null object.
          */
-        @SuppressWarnings("ConstantConditions")
         private InputMapBuilder(@NotNull final InputChannel<? super Selectable<DATA>> channel,
                 @NotNull final Set<Integer> indexes) {
 
-            if (channel == null) {
-                throw new NullPointerException("the input channel must not be null");
-            }
-
-            if (indexes == null) {
-                throw new NullPointerException("the set of indexes must not be null");
-            }
-
-            final HashSet<Integer> indexSet = new HashSet<Integer>(indexes);
+            mChannel = ConstantConditions.notNull("input channel", channel);
+            final HashSet<Integer> indexSet =
+                    new HashSet<Integer>(ConstantConditions.notNull("set of indexes", indexes));
             if (indexSet.contains(null)) {
                 throw new NullPointerException("the set of indexes must not contain null objects");
             }
 
-            mChannel = channel;
             mIndexes = indexSet;
         }
 

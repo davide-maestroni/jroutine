@@ -28,6 +28,7 @@ import com.github.dm.jrt.android.v4.proxy.JRoutineLoaderProxyCompat;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 import com.github.dm.jrt.core.util.ClassToken;
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.object.config.ProxyConfiguration;
 
 import org.jetbrains.annotations.NotNull;
@@ -100,20 +101,11 @@ class DefaultLoaderTargetRoutineBuilderCompat implements LoaderTargetRoutineBuil
      * @param context the loader context.
      * @param target  the invocation target.
      */
-    @SuppressWarnings("ConstantConditions")
     DefaultLoaderTargetRoutineBuilderCompat(@NotNull final LoaderContextCompat context,
             @NotNull final ContextInvocationTarget<?> target) {
 
-        if (context == null) {
-            throw new NullPointerException("the context must not be null");
-        }
-
-        if (target == null) {
-            throw new NullPointerException("the invocation target must not be null");
-        }
-
-        mContext = context;
-        mTarget = target;
+        mContext = ConstantConditions.notNull("loader context", context);
+        mTarget = ConstantConditions.notNull("invocation target", target);
     }
 
     @NotNull

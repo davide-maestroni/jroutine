@@ -21,6 +21,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
@@ -39,7 +40,7 @@ import java.lang.ref.WeakReference;
 public abstract class LoaderContextCompat {
 
     /**
-     * Avoid direct instantiation.
+     * Avoid explicit instantiation.
      */
     private LoaderContextCompat() {
 
@@ -146,21 +147,17 @@ public abstract class LoaderContextCompat {
          * @throws java.lang.IllegalArgumentException if the class of the specified context has not
          *                                            a static scope.
          */
-        @SuppressWarnings("ConstantConditions")
         private ActivityContextCompat(@NotNull final FragmentActivity activity,
                 @NotNull final Context context) {
 
-            if (activity == null) {
-                throw new NullPointerException("the activity must not be null");
-            }
-
+            mActivity = new WeakReference<FragmentActivity>(
+                    ConstantConditions.notNull("activity", activity));
             final Class<? extends Context> contextClass = context.getClass();
             if (!Reflection.hasStaticScope(contextClass)) {
                 throw new IllegalArgumentException(
                         "the context class must have a static scope: " + contextClass.getName());
             }
 
-            mActivity = new WeakReference<FragmentActivity>(activity);
             mContext = new WeakReference<Context>(context);
         }
 
@@ -235,21 +232,17 @@ public abstract class LoaderContextCompat {
          * @throws java.lang.IllegalArgumentException if the class of the specified context has not
          *                                            a static scope.
          */
-        @SuppressWarnings("ConstantConditions")
         private FragmentContextCompat(@NotNull final Fragment fragment,
                 @NotNull final Context context) {
 
-            if (fragment == null) {
-                throw new NullPointerException("the fragment must not be null");
-            }
-
+            mFragment =
+                    new WeakReference<Fragment>(ConstantConditions.notNull("fragment", fragment));
             final Class<? extends Context> contextClass = context.getClass();
             if (!Reflection.hasStaticScope(contextClass)) {
                 throw new IllegalArgumentException(
                         "the context class must have a static scope: " + contextClass.getName());
             }
 
-            mFragment = new WeakReference<Fragment>(fragment);
             mContext = new WeakReference<Context>(context);
         }
 

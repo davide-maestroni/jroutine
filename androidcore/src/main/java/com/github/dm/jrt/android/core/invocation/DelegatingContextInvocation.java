@@ -21,6 +21,7 @@ import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.routine.Routine;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -45,14 +46,14 @@ public class DelegatingContextInvocation<IN, OUT> extends TemplateContextInvocat
     /**
      * Constructor.
      *
-     * @param routine    the routine used to execute this invocation.
-     * @param delegation the type of routine invocation.
+     * @param routine        the routine used to execute this invocation.
+     * @param delegationType the type of routine invocation.
      */
     private DelegatingContextInvocation(@NotNull final Routine<IN, OUT> routine,
-            @NotNull final DelegationType delegation) {
+            @NotNull final DelegationType delegationType) {
 
         mRoutine = routine;
-        mDelegationType = delegation;
+        mDelegationType = delegationType;
     }
 
     /**
@@ -62,19 +63,19 @@ public class DelegatingContextInvocation<IN, OUT> extends TemplateContextInvocat
      * {@link com.github.dm.jrt.android.v11.core.JRoutineLoader} and
      * {@link com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat}).
      *
-     * @param routine    the routine used to execute this invocation.
-     * @param routineId  the routine identifier.
-     * @param delegation the type of routine invocation.
-     * @param <IN>       the input data type.
-     * @param <OUT>      the output data type.
+     * @param routine        the routine used to execute this invocation.
+     * @param routineId      the routine identifier.
+     * @param delegationType the type of routine invocation.
+     * @param <IN>           the input data type.
+     * @param <OUT>          the output data type.
      * @return the factory.
      */
     @NotNull
     public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryFrom(
             @NotNull final Routine<IN, OUT> routine, final int routineId,
-            @NotNull final DelegationType delegation) {
+            @NotNull final DelegationType delegationType) {
 
-        return new DelegatingContextInvocationFactory<IN, OUT>(routine, routineId, delegation);
+        return new DelegatingContextInvocationFactory<IN, OUT>(routine, routineId, delegationType);
     }
 
     @Override
@@ -126,25 +127,16 @@ public class DelegatingContextInvocation<IN, OUT> extends TemplateContextInvocat
         /**
          * Constructor.
          *
-         * @param routine    the delegated routine.
-         * @param routineId  the routine identifier.
-         * @param delegation the type of routine invocation.
+         * @param routine        the delegated routine.
+         * @param routineId      the routine identifier.
+         * @param delegationType the type of routine invocation.
          */
-        @SuppressWarnings("ConstantConditions")
         private DelegatingContextInvocationFactory(@NotNull final Routine<IN, OUT> routine,
-                final int routineId, @NotNull final DelegationType delegation) {
+                final int routineId, @NotNull final DelegationType delegationType) {
 
-            super(asArgs(routineId, delegation));
-            if (routine == null) {
-                throw new NullPointerException("the routine must not be null");
-            }
-
-            if (delegation == null) {
-                throw new NullPointerException("the invocation type must not be null");
-            }
-
-            mRoutine = routine;
-            mDelegationType = delegation;
+            super(asArgs(routineId, delegationType));
+            mRoutine = ConstantConditions.notNull("routine instance", routine);
+            mDelegationType = ConstantConditions.notNull("delegation type", delegationType);
         }
 
         @NotNull

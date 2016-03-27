@@ -38,7 +38,7 @@ import org.jetbrains.annotations.NotNull;
 public class JRoutineProxy {
 
     /**
-     * Avoid direct instantiation.
+     * Avoid explicit instantiation.
      */
     protected JRoutineProxy() {
 

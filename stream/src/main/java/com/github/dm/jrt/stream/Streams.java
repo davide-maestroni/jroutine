@@ -26,6 +26,7 @@ import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
@@ -56,7 +57,7 @@ public class Streams extends Functions {
             };
 
     /**
-     * Avoid direct instantiation.
+     * Avoid explicit instantiation.
      */
     protected Streams() {
 
@@ -390,13 +391,9 @@ public class Streams extends Functions {
      * @return the newly created stream instance.
      */
     @NotNull
-    @SuppressWarnings("ConstantConditions")
     public static <OUT> StreamChannel<OUT> lazyStreamOf(@NotNull final OutputChannel<OUT> output) {
 
-        if (output == null) {
-            throw new NullPointerException("the output channel instance must not be null");
-        }
-
+        ConstantConditions.notNull("output channel", output);
         final IOChannel<OUT> ioChannel = JRoutineCore.io().buildChannel();
         return new DefaultStreamChannel<OUT>(output, ioChannel);
     }
@@ -932,20 +929,11 @@ public class Streams extends Functions {
          * @param end       the last element of the range.
          * @param increment the function incrementing the current element.
          */
-        @SuppressWarnings("ConstantConditions")
         private RangeConsumer(@NotNull final OUT start, @NotNull final OUT end,
                 @NotNull final Function<OUT, OUT> increment) {
 
-            if (start == null) {
-                throw new NullPointerException("the start element must not be null");
-            }
-
-            if (end == null) {
-                throw new NullPointerException("the end element must not be null");
-            }
-
-            mStart = start;
-            mEnd = end;
+            mStart = ConstantConditions.notNull("start element", start);
+            mEnd = ConstantConditions.notNull("end element", end);
             mIncrement = increment;
         }
 

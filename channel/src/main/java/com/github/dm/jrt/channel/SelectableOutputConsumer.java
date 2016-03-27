@@ -19,6 +19,7 @@ package com.github.dm.jrt.channel;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -42,15 +43,10 @@ class SelectableOutputConsumer<OUT, IN extends OUT> implements OutputConsumer<IN
      * @param channel the selectable channel.
      * @param index   the selectable index.
      */
-    @SuppressWarnings("ConstantConditions")
     SelectableOutputConsumer(@NotNull final IOChannel<? super Selectable<OUT>> channel,
             final int index) {
 
-        if (channel == null) {
-            throw new NullPointerException("the channel must not be null");
-        }
-
-        mChannel = channel;
+        mChannel = ConstantConditions.notNull("I/O channel", channel);
         mIndex = index;
     }
 

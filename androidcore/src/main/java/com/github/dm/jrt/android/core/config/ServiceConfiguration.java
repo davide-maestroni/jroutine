@@ -20,6 +20,7 @@ import android.os.Looper;
 
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.runner.Runner;
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
@@ -221,14 +222,9 @@ public final class ServiceConfiguration {
          *
          * @param configurable the configurable instance.
          */
-        @SuppressWarnings("ConstantConditions")
         public Builder(@NotNull final Configurable<? extends TYPE> configurable) {
 
-            if (configurable == null) {
-                throw new NullPointerException("the configurable instance must no be null");
-            }
-
-            mConfigurable = configurable;
+            mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
         }
 
         /**
@@ -237,15 +233,10 @@ public final class ServiceConfiguration {
          * @param configurable         the configurable instance.
          * @param initialConfiguration the initial configuration.
          */
-        @SuppressWarnings("ConstantConditions")
         public Builder(@NotNull final Configurable<? extends TYPE> configurable,
                 @NotNull final ServiceConfiguration initialConfiguration) {
 
-            if (configurable == null) {
-                throw new NullPointerException("the configurable instance must no be null");
-            }
-
-            mConfigurable = configurable;
+            mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
             setConfiguration(initialConfiguration);
         }
 

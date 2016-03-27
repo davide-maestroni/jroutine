@@ -30,7 +30,7 @@ public class Logs {
     private static final SystemLog sSystemLog = new SystemLog();
 
     /**
-     * Avoid direct instantiation.
+     * Avoid explicit instantiation.
      */
     protected Logs() {
 

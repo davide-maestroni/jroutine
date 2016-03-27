@@ -21,6 +21,7 @@ import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.TemplateExecution;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -69,26 +70,13 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
      * @param result  the result channel.
      * @param logger  the logger instance.
      */
-    @SuppressWarnings("ConstantConditions")
     InvocationExecution(@NotNull final InvocationManager<IN, OUT> manager,
             @NotNull final InputIterator<IN> inputs,
             @NotNull final DefaultResultChannel<OUT> result, @NotNull final Logger logger) {
 
-        if (manager == null) {
-            throw new NullPointerException("the invocation manager must not be null");
-        }
-
-        if (inputs == null) {
-            throw new NullPointerException("the input iterator must not be null");
-        }
-
-        if (result == null) {
-            throw new NullPointerException("the result channel must not be null");
-        }
-
-        mInvocationManager = manager;
-        mInputIterator = inputs;
-        mResultChannel = result;
+        mInvocationManager = ConstantConditions.notNull("invocation manager", manager);
+        mInputIterator = ConstantConditions.notNull("input iterator", inputs);
+        mResultChannel = ConstantConditions.notNull("result channel", result);
         mLogger = logger.subContextLogger(this);
     }
 

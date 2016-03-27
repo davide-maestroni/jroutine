@@ -20,6 +20,7 @@ import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.log.Logger;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -41,16 +42,11 @@ class DefaultRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
      * @param configuration the invocation configuration.
      * @param factory       the invocation factory.
      */
-    @SuppressWarnings("ConstantConditions")
     DefaultRoutine(@NotNull final InvocationConfiguration configuration,
             @NotNull final InvocationFactory<IN, OUT> factory) {
 
         super(configuration);
-        if (factory == null) {
-            throw new NullPointerException("the invocation factory must not be null");
-        }
-
-        mFactory = factory;
+        mFactory = ConstantConditions.notNull("invocation factory", factory);
     }
 
     @NotNull

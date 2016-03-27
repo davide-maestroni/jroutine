@@ -43,7 +43,6 @@ class SortingMapOutputConsumer<OUT> implements OutputConsumer<Selectable<? exten
      * @throws java.lang.NullPointerException if the specified map is null or contains a null
      *                                        object.
      */
-    @SuppressWarnings("ConstantConditions")
     SortingMapOutputConsumer(@NotNull final Map<Integer, IOChannel<OUT>> channels) {
 
         final HashMap<Integer, IOChannel<OUT>> channelMap =

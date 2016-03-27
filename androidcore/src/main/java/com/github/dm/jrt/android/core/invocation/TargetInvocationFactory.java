@@ -21,6 +21,7 @@ import android.os.Parcelable;
 
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.util.ClassToken;
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
@@ -60,7 +61,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
 public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
 
     /**
-     * Avoid direct instantiation.
+     * Avoid explicit instantiation.
      */
     private TargetInvocationFactory() {
 
@@ -235,16 +236,11 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
          * @param targetClass the target invocation class.
          * @param factoryArgs the invocation factory arguments.
          */
-        @SuppressWarnings("ConstantConditions")
         private DefaultTargetInvocationFactory(
                 @NotNull final Class<? extends ContextInvocation<IN, OUT>> targetClass,
                 @Nullable final Object[] factoryArgs) {
 
-            if (targetClass == null) {
-                throw new NullPointerException("the target class must not be null");
-            }
-
-            mTargetClass = targetClass;
+            mTargetClass = ConstantConditions.notNull("target invocation class", targetClass);
             mFactoryArgs = (factoryArgs != null) ? factoryArgs.clone() : Reflection.NO_ARGS;
         }
 

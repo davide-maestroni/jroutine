@@ -34,6 +34,7 @@ import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.util.ClassToken;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -180,16 +181,10 @@ public class JRoutineAndroidCompat extends SparseChannelsCompat {
          *
          * @param context the loader context.
          */
-        @SuppressWarnings("ConstantConditions")
         private LoaderBuilderCompat(@NotNull final LoaderContextCompat context) {
 
-            if (context == null) {
-                throw new NullPointerException("the loader context must not be null");
-            }
-
-            mContext = context;
+            mContext = ConstantConditions.notNull("loader context", context);
         }
-
 
         /**
          * Returns a builder of routines bound to the builder context, wrapping the specified

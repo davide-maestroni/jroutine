@@ -52,7 +52,7 @@ import static com.github.dm.jrt.function.Functions.supplierCommand;
 import static com.github.dm.jrt.function.Functions.supplierFactory;
 
 /**
- * Class acting as a façade of all the JRoutine library features.
+ * Class acting as a fa&ccedil;ade of all the JRoutine library features.
  * <p/>
  * Created by davide-maestroni on 02/29/2016.
  */

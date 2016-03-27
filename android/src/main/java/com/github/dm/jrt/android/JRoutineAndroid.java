@@ -45,7 +45,8 @@ import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 
 /**
- * Class acting as a façade of all the JRoutine library features, specific to the Android platform.
+ * Class acting as a fa&ccedil;ade of all the JRoutine library features, specific to the Android
+ * platform.
  * <p/>
  * Created by davide-maestroni on 03/06/2016.
  */

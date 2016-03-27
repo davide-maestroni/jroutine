@@ -16,14 +16,12 @@
 
 package com.github.dm.jrt.android.sample;
 
-import android.support.v4.app.FragmentActivity;
-
 import com.github.dm.jrt.android.JRoutineAndroidCompat;
-import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.object.AndroidBuilders;
 import com.github.dm.jrt.android.retrofit.AbstractCallAdapterFactory;
 import com.github.dm.jrt.android.retrofit.ComparableCall;
+import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.object.Builders;
@@ -41,17 +39,34 @@ import retrofit2.Retrofit;
  */
 public class OutputChannelCallAdapterFactory extends AbstractCallAdapterFactory<OutputChannel> {
 
-    private final LoaderRoutineBuilder<ComparableCall<Object>, Object> mBuilder;
+    private final LoaderContextCompat mContext;
 
     /**
      * Constructor.
      *
-     * @param activity the context activity.
+     * @param context the loader context.
      */
-    public OutputChannelCallAdapterFactory(@NotNull final FragmentActivity activity) {
+    @SuppressWarnings("ConstantConditions")
+    private OutputChannelCallAdapterFactory(@NotNull final LoaderContextCompat context) {
 
         super(OutputChannel.class, 0);
-        mBuilder = JRoutineAndroidCompat.with(activity).on(getFactory());
+        if (context == null) {
+            throw new NullPointerException("the context instance must not be null");
+        }
+
+        mContext = context;
+    }
+
+    /**
+     * Returns a new factory based on the specified context.
+     *
+     * @param context the loader context.
+     * @return the factory instance.
+     */
+    @NotNull
+    public static OutputChannelCallAdapterFactory with(@NotNull final LoaderContextCompat context) {
+
+        return new OutputChannelCallAdapterFactory(context);
     }
 
     @NotNull
@@ -65,12 +80,14 @@ public class OutputChannelCallAdapterFactory extends AbstractCallAdapterFactory<
         final LoaderConfiguration loaderConfiguration =
                 AndroidBuilders.configurationWithAnnotations(
                         LoaderConfiguration.DEFAULT_CONFIGURATION, annotations);
-        return mBuilder.withInvocations()
-                       .with(invocationConfiguration)
-                       .setConfiguration()
-                       .withLoaders()
-                       .with(loaderConfiguration)
-                       .setConfiguration()
-                       .asyncCall(call);
+        return JRoutineAndroidCompat.with(mContext)
+                                    .on(getFactory())
+                                    .withInvocations()
+                                    .with(invocationConfiguration)
+                                    .setConfiguration()
+                                    .withLoaders()
+                                    .with(loaderConfiguration)
+                                    .setConfiguration()
+                                    .asyncCall(call);
     }
 }

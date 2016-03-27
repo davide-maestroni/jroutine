@@ -33,6 +33,8 @@ import retrofit2.Retrofit;
 import retrofit2.Retrofit.Builder;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
+
 /**
  * Main activity.
  */
@@ -57,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
         super.onResume();
         final OutputChannelCallAdapterFactory adapterFactory =
-                new OutputChannelCallAdapterFactory(this);
+                OutputChannelCallAdapterFactory.with(loaderFrom(this));
         final Retrofit retrofit = new Builder().baseUrl("https://api.github.com")
                                                .addCallAdapterFactory(adapterFactory)
                                                .addConverterFactory(GsonConverterFactory.create())

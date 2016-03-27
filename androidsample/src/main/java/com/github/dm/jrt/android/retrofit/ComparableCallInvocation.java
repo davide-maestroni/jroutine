@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <T> the response type.
  */
-public class CallExecuteInvocation<T> extends FilterInvocation<ComparableCall<T>, T> {
+public class ComparableCallInvocation<T> extends FilterInvocation<ComparableCall<T>, T> {
 
     @Override
     public void onInput(final ComparableCall<T> call, @NotNull final ResultChannel<T> result) throws

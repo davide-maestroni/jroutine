@@ -38,8 +38,8 @@ import retrofit2.Retrofit;
  * It is possible to customize the adapter instantiation by overriding the
  * {@link #newAdapter(Type, Annotation[], Retrofit)} method. In such case the implementation of
  * {@link #adapt(ComparableCall, Annotation[], Retrofit)} is not mandatory.<br/>
- * On the contrary, the {@code adapt()} method must be implemented by the inheriting class, and will
- * be called at each new network request.
+ * Otherwise, the {@code adapt()} method must be implemented by the inheriting class, and will be
+ * called at each new network request.
  * <p/>
  * Created by davide-maestroni on 03/26/2016.
  *
@@ -185,7 +185,7 @@ public abstract class AbstractCallAdapterFactory<T> extends CallAdapter.Factory 
         @Override
         public Invocation<ComparableCall<T>, T> newInvocation() {
 
-            return new CallExecuteInvocation<>();
+            return new ComparableCallInvocation<>();
         }
     }
 }

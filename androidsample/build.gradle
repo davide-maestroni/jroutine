@@ -64,8 +64,8 @@ tasks.withType(Javadoc) {
             'http://davide-maestroni.github.io/jroutine/javadoc/v6/android/')
 }
 
-gradle.taskGraph.whenReady {
-    connectedAndroidTest {
+project.gradle.taskGraph.whenReady {
+    connectedDebugAndroidTest {
         // Sample tests are quite unstable on Travis CI...
         ignoreFailures = true
     }

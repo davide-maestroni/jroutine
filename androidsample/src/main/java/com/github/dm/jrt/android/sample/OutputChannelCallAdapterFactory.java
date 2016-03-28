@@ -27,7 +27,7 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.object.Builders;
 import com.github.dm.jrt.retrofit.AbstractCallAdapterFactory;
 import com.github.dm.jrt.retrofit.ComparableCall;
-import com.github.dm.jrt.retrofit.ExecuteCallFactory;
+import com.github.dm.jrt.retrofit.ExecuteCall;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -94,7 +94,7 @@ public class OutputChannelCallAdapterFactory extends AbstractCallAdapterFactory<
                 AndroidBuilders.configurationWithAnnotations(
                         LoaderConfiguration.DEFAULT_CONFIGURATION, annotations);
         return JRoutineAndroidCompat.with(mContext)
-                                    .on(ExecuteCallFactory.<OutputChannel>getInstance())
+                                    .on(new ExecuteCall<OutputChannel>())
                                     .withInvocations()
                                     .with(invocationConfiguration)
                                     .setConfiguration()

@@ -24,6 +24,7 @@ import android.support.test.espresso.ViewAction;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.support.test.runner.lifecycle.Stage;
+import android.test.ActivityInstrumentationTestCase2;
 import android.view.View;
 
 import org.hamcrest.Matcher;
@@ -48,11 +49,16 @@ import static org.hamcrest.CoreMatchers.anything;
  * Created by davide-maestroni on 03/26/2016.
  */
 @RunWith(AndroidJUnit4.class)
-public class MainActivityTest {
+public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActivity> {
 
     @Rule
     public ActivityTestRule<MainActivity> mActivityRule =
             new ActivityTestRule<>(MainActivity.class);
+
+    public MainActivityTest() {
+
+        super(MainActivity.class);
+    }
 
     @Test
     public void testRepoList() {

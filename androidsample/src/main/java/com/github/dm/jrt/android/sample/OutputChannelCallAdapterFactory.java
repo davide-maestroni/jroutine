@@ -19,15 +19,15 @@ package com.github.dm.jrt.android.sample;
 import com.github.dm.jrt.android.JRoutineAndroidCompat;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.object.AndroidBuilders;
-import com.github.dm.jrt.android.retrofit.AbstractCallAdapterFactory;
-import com.github.dm.jrt.android.retrofit.ComparableCall;
-import com.github.dm.jrt.android.retrofit.ExecuteCallFactory;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.object.Builders;
+import com.github.dm.jrt.retrofit.AbstractCallAdapterFactory;
+import com.github.dm.jrt.retrofit.ComparableCall;
+import com.github.dm.jrt.retrofit.ExecuteCallFactory;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -76,7 +76,8 @@ public class OutputChannelCallAdapterFactory extends AbstractCallAdapterFactory<
             @NotNull final Routine<C, OutputChannel> routine, @NotNull final Call<?> call) {
 
         // Makes the call comparable so to ensure the correct computation of the loader ID
-        return routine.asyncCall((C) ComparableCall.<OutputChannel>wrap(call));
+        final ComparableCall<OutputChannel> comparableCall = ComparableCall.of(call);
+        return routine.asyncCall((C) comparableCall);
     }
 
     @NotNull

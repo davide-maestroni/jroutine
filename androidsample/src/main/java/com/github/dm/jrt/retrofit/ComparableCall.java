@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android.retrofit;
+package com.github.dm.jrt.retrofit;
 
 import com.github.dm.jrt.core.util.ConstantConditions;
 
@@ -66,7 +66,7 @@ public class ComparableCall<T> implements Call<T> {
      * @return the comparable call.
      */
     @NotNull
-    public static <T> ComparableCall<T> wrap(@NotNull final Call<?> wrapped) {
+    public static <T> ComparableCall<T> of(@NotNull final Call<?> wrapped) {
 
         return new ComparableCall<>(wrapped);
     }

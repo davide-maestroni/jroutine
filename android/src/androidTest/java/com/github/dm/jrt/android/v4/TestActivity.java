@@ -16,6 +16,8 @@
 
 package com.github.dm.jrt.android.v4;
 
+import android.annotation.TargetApi;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.WindowManager.LayoutParams;
@@ -27,13 +29,16 @@ import com.github.dm.jrt.android.R;
  * <p/>
  * Created by davide-maestroni on 03/06/2016.
  */
+@TargetApi(VERSION_CODES.ECLAIR)
 public class TestActivity extends FragmentActivity {
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+        getWindow().addFlags(LayoutParams.FLAG_DISMISS_KEYGUARD |
+                LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+                LayoutParams.FLAG_TURN_SCREEN_ON | LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.test_v4_layout);
-        getWindow().addFlags(LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 }

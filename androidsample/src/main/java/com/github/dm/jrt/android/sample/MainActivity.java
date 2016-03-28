@@ -18,6 +18,7 @@ package com.github.dm.jrt.android.sample;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.WindowManager.LayoutParams;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -46,6 +47,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(final Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+        getWindow().addFlags(LayoutParams.FLAG_DISMISS_KEYGUARD |
+                LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+                LayoutParams.FLAG_TURN_SCREEN_ON | LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_main);
         mRepoAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
         final ListView repoList = (ListView) findViewById(R.id.repo_list);

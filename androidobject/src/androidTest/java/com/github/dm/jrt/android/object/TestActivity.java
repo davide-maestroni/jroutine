@@ -16,8 +16,10 @@
 
 package com.github.dm.jrt.android.object;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.view.WindowManager.LayoutParams;
 
@@ -26,14 +28,17 @@ import android.view.WindowManager.LayoutParams;
  * <p/>
  * Created by davide-maestroni on 11/01/2015.
  */
+@TargetApi(VERSION_CODES.ECLAIR)
 public class TestActivity extends Activity {
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+        getWindow().addFlags(LayoutParams.FLAG_DISMISS_KEYGUARD |
+                LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+                LayoutParams.FLAG_TURN_SCREEN_ON | LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.test_layout);
-        getWindow().addFlags(LayoutParams.FLAG_KEEP_SCREEN_ON);
         startService(new Intent(this, TestService.class));
     }
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android.retrofit;
+package com.github.dm.jrt.retrofit;
 
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.invocation.FilterInvocation;

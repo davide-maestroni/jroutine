@@ -21,16 +21,20 @@ import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.object.AndroidBuilders;
 import com.github.dm.jrt.android.retrofit.AbstractCallAdapterFactory;
 import com.github.dm.jrt.android.retrofit.ComparableCall;
+import com.github.dm.jrt.android.retrofit.ExecuteCallFactory;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
+import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.object.Builders;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 
+import retrofit2.Call;
 import retrofit2.Retrofit;
 
 /**
@@ -67,9 +71,21 @@ public class OutputChannelCallAdapterFactory extends AbstractCallAdapterFactory<
 
     @NotNull
     @Override
-    protected OutputChannel<?> adapt(@NotNull final ComparableCall<Object> call,
-            @NotNull final Annotation[] annotations, @NotNull final Retrofit retrofit) {
+    @SuppressWarnings("unchecked")
+    protected <C extends Call<OutputChannel>> OutputChannel adapt(
+            @NotNull final Routine<C, OutputChannel> routine, @NotNull final Call<?> call) {
 
+        // Makes the call comparable so to ensure the correct computation of the loader ID
+        return routine.asyncCall((C) ComparableCall.<OutputChannel>wrap(call));
+    }
+
+    @NotNull
+    @Override
+    protected Routine<? extends Call<OutputChannel>, OutputChannel> getRoutine(
+            @NotNull final Type responseType, @NotNull final Annotation[] annotations,
+            @NotNull final Retrofit retrofit) {
+
+        // Use annotations to configure the routine
         final InvocationConfiguration invocationConfiguration =
                 Builders.configurationWithAnnotations(InvocationConfiguration.DEFAULT_CONFIGURATION,
                         annotations);
@@ -77,13 +93,13 @@ public class OutputChannelCallAdapterFactory extends AbstractCallAdapterFactory<
                 AndroidBuilders.configurationWithAnnotations(
                         LoaderConfiguration.DEFAULT_CONFIGURATION, annotations);
         return JRoutineAndroidCompat.with(mContext)
-                                    .on(getFactory())
+                                    .on(ExecuteCallFactory.<OutputChannel>getInstance())
                                     .withInvocations()
                                     .with(invocationConfiguration)
                                     .setConfiguration()
                                     .withLoaders()
                                     .with(loaderConfiguration)
                                     .setConfiguration()
-                                    .asyncCall(call);
+                                    .buildRoutine();
     }
 }

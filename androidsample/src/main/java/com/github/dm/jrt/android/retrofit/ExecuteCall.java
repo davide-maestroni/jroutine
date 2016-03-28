@@ -21,15 +21,17 @@ import com.github.dm.jrt.core.invocation.FilterInvocation;
 
 import org.jetbrains.annotations.NotNull;
 
+import retrofit2.Call;
+
 /**
  * Implementation of an invocation handling the execution of call instances.
  *
  * @param <T> the response type.
  */
-public class ComparableCallInvocation<T> extends FilterInvocation<ComparableCall<T>, T> {
+public class ExecuteCall<T> extends FilterInvocation<Call<T>, T> {
 
     @Override
-    public void onInput(final ComparableCall<T> call, @NotNull final ResultChannel<T> result) throws
+    public void onInput(final Call<T> call, @NotNull final ResultChannel<T> result) throws
             Exception {
 
         result.pass(call.execute().body());

@@ -23,7 +23,6 @@ import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.invocation.CallContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
-import com.github.dm.jrt.android.core.invocation.TemplateContextInvocation;
 import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.android.object.AndroidBuilders;
 import com.github.dm.jrt.android.object.ContextInvocationTarget;
@@ -225,8 +224,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class AliasContextInvocation<IN, OUT>
-            extends TemplateContextInvocation<IN, OUT> {
+    private static class AliasContextInvocation<IN, OUT> implements ContextInvocation<IN, OUT> {
 
         private final String mAliasName;
 
@@ -236,7 +234,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         private InvocationChannel<IN, OUT> mChannel;
 
-        @SuppressWarnings("unused")
         private Object mInstance;
 
         private Routine<IN, OUT> mRoutine = null;
@@ -256,17 +253,20 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             mAliasName = name;
         }
 
-        @Override
         public void onAbort(@NotNull final RoutineException reason) throws Exception {
 
             mChannel.abort(reason);
         }
 
-        @Override
         public void onContext(@NotNull final Context context) throws Exception {
 
             final InvocationTarget<?> target = mTarget.getInvocationTarget(context);
             mInstance = target.getTarget();
+            final Object targetInstance = mInstance;
+            if (targetInstance == null) {
+                throw new IllegalStateException("the target object has been destroyed");
+            }
+
             mRoutine = JRoutineObject.on(target)
                                      .withProxies()
                                      .with(mProxyConfiguration)
@@ -274,26 +274,28 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                                      .method(mAliasName);
         }
 
-        @Override
+        public void onDestroy() throws Exception {
+
+            mRoutine = null;
+            mInstance = null;
+        }
+
         public void onInitialize() throws Exception {
 
             mChannel = mRoutine.syncInvoke();
         }
 
-        @Override
         public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) throws
                 Exception {
 
             mChannel.pass(input);
         }
 
-        @Override
         public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
 
             result.pass(mChannel.result());
         }
 
-        @Override
         public void onTerminate() throws Exception {
 
             mChannel = null;
@@ -346,8 +348,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class MethodContextInvocation<IN, OUT>
-            extends TemplateContextInvocation<IN, OUT> {
+    private static class MethodContextInvocation<IN, OUT> implements ContextInvocation<IN, OUT> {
 
         private final Method mMethod;
 
@@ -357,7 +358,6 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         private InvocationChannel<IN, OUT> mChannel;
 
-        @SuppressWarnings("unused")
         private Object mInstance;
 
         private Routine<IN, OUT> mRoutine = null;
@@ -377,47 +377,52 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             mMethod = method;
         }
 
-        @Override
         public void onAbort(@NotNull final RoutineException reason) throws Exception {
 
             mChannel.abort(reason);
         }
 
-        @Override
-        public void onContext(@NotNull final Context context) throws Exception {
+        public void onDestroy() throws Exception {
 
-            final InvocationTarget<?> target = mTarget.getInvocationTarget(context);
-            mInstance = target.getTarget();
-            mRoutine = JRoutineObject.on(target)
-                                     .withProxies()
-                                     .with(mProxyConfiguration)
-                                     .setConfiguration()
-                                     .method(mMethod);
+            mRoutine = null;
+            mInstance = null;
         }
 
-        @Override
         public void onInitialize() throws Exception {
 
             mChannel = mRoutine.syncInvoke();
         }
 
-        @Override
         public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) throws
                 Exception {
 
             mChannel.pass(input);
         }
 
-        @Override
         public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
 
             result.pass(mChannel.result());
         }
 
-        @Override
         public void onTerminate() throws Exception {
 
             mChannel = null;
+        }
+
+        public void onContext(@NotNull final Context context) throws Exception {
+
+            final InvocationTarget<?> target = mTarget.getInvocationTarget(context);
+            mInstance = target.getTarget();
+            final Object targetInstance = mInstance;
+            if (targetInstance == null) {
+                throw new IllegalStateException("the target object has been destroyed");
+            }
+
+            mRoutine = JRoutineObject.on(target)
+                                     .withProxies()
+                                     .with(mProxyConfiguration)
+                                     .setConfiguration()
+                                     .method(mMethod);
         }
     }
 
@@ -512,18 +517,23 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             mMutex = Builders.getSharedMutex(mutexTarget,
                     mProxyConfiguration.getSharedFieldsOr(null));
             mInstance = target.getTarget();
+            final Object targetInstance = mInstance;
+            if (targetInstance == null) {
+                throw new IllegalStateException("the target object has been destroyed");
+            }
+        }
+
+        @Override
+        public void onDestroy() throws Exception {
+
+            mInstance = null;
         }
 
         @Override
         protected void onCall(@NotNull final List<?> objects,
                 @NotNull final ResultChannel<Object> result) throws Exception {
 
-            final Object targetInstance = mInstance;
-            if (targetInstance == null) {
-                throw new IllegalStateException("the target object has been destroyed");
-            }
-
-            callFromInvocation(mMutex, targetInstance, mTargetMethod, objects, result, mInputMode,
+            callFromInvocation(mMutex, mInstance, mTargetMethod, objects, result, mInputMode,
                     mOutputMode);
         }
     }

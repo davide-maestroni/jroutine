@@ -59,7 +59,7 @@ public class ConstantConditions {
     public static <TYPE> TYPE notNull(final String name, final TYPE object) {
 
         if (object == null) {
-            throw new NullPointerException(String.format("the %s must not be null", name));
+            throw new NullPointerException("the " + name + " must not be null");
         }
 
         return object;

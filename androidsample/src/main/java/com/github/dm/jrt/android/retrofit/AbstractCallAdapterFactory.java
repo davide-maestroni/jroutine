@@ -16,14 +16,12 @@
 
 package com.github.dm.jrt.android.retrofit;
 
-import com.github.dm.jrt.core.invocation.ComparableInvocationFactory;
-import com.github.dm.jrt.core.invocation.Invocation;
-import com.github.dm.jrt.core.invocation.InvocationFactory;
+import com.github.dm.jrt.core.routine.Routine;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
@@ -35,19 +33,11 @@ import retrofit2.Retrofit;
  * Abstract implementation of a call adapter factory providing boilerplate code for common features,
  * like extraction of the response type and adapter instantiation.
  * <p/>
- * It is possible to customize the adapter instantiation by overriding the
- * {@link #newAdapter(Type, Annotation[], Retrofit)} method. In such case the implementation of
- * {@link #adapt(ComparableCall, Annotation[], Retrofit)} is not mandatory.<br/>
- * Otherwise, the {@code adapt()} method must be implemented by the inheriting class, and will be
- * called at each new network request.
- * <p/>
  * Created by davide-maestroni on 03/26/2016.
  *
  * @param <T> the return type.
  */
 public abstract class AbstractCallAdapterFactory<T> extends CallAdapter.Factory {
-
-    private static final CallInvocationFactory<Object> sFactory = new CallInvocationFactory<>();
 
     private final int mParameterIndex;
 
@@ -96,96 +86,67 @@ public abstract class AbstractCallAdapterFactory<T> extends CallAdapter.Factory 
             return null;
         }
 
-        return newAdapter(responseType, annotations, retrofit);
+        final Routine<? extends Call<T>, T> routine =
+                getRoutine(responseType, annotations, retrofit);
+        return new CallAdapterInternal(ConstantConditions.notNull("builder", routine),
+                responseType);
     }
 
     /**
      * Adapts the specified call and returns the adapted object.
      *
-     * @param call        the call instance.
-     * @param annotations the method annotations.
-     * @param retrofit    the retrofit instance
+     * @param routine the routine instance
+     * @param call    the call instance.
+     * @param <C>     the call type.
      * @return the adapted instance.
-     * @throws java.lang.UnsupportedOperationException if this method has not been implemented by
-     *                                                 the inheriting class.
      */
     @NotNull
-    protected T adapt(@NotNull final ComparableCall<Object> call,
-            @NotNull final Annotation[] annotations, @NotNull final Retrofit retrofit) throws
-            UnsupportedOperationException {
-
-        try {
-            final Method method =
-                    getClass().getMethod("adapt", ComparableCall.class, Annotation[].class,
-                            Retrofit.class);
-            throw new UnsupportedOperationException("the method " + method + " is not implemented");
-
-        } catch (final NoSuchMethodException e) {
-            throw new UnsupportedOperationException(e);
-        }
-    }
+    protected abstract <C extends Call<T>> T adapt(@NotNull final Routine<C, T> routine,
+            @NotNull final Call<?> call);
 
     /**
-     * Returns the default invocation factory used to handle calls.
-     *
-     * @return the factory instance.
-     */
-    @NotNull
-    protected InvocationFactory<ComparableCall<Object>, Object> getFactory() {
-
-        return sFactory;
-    }
-
-    /**
-     * Creates a new adapter
+     * Gets the routine used to handle the invocation of the method with the specified response type
+     * and annotations.
      *
      * @param responseType the response type.
      * @param annotations  the method annotations.
-     * @param retrofit     the retrofit instance
-     * @return the adapter instance.
+     * @param retrofit     the retrofit instance.
+     * @return the routine instance.
      */
     @NotNull
-    protected CallAdapter<T> newAdapter(@NotNull final Type responseType,
-            @NotNull final Annotation[] annotations, @NotNull final Retrofit retrofit) {
-
-        return new CallAdapter<T>() {
-
-            @Override
-            public Type responseType() {
-
-                return responseType;
-            }
-
-            @Override
-            public <R> T adapt(final Call<R> call) {
-
-                return AbstractCallAdapterFactory.this.adapt(ComparableCall.wrap(call),
-                        annotations.clone(), retrofit);
-            }
-        };
-    }
+    protected abstract Routine<? extends Call<T>, T> getRoutine(@NotNull Type responseType,
+            @NotNull Annotation[] annotations, @NotNull Retrofit retrofit);
 
     /**
-     * Implementation of a factory of invocations handling call instances.
-     *
-     * @param <T> the response type.
+     * Internal adapter implementation.
      */
-    private static class CallInvocationFactory<T>
-            extends ComparableInvocationFactory<ComparableCall<T>, T> {
+    private class CallAdapterInternal implements CallAdapter<T> {
+
+        private final Type mResponseType;
+
+        private final Routine<? extends Call<T>, T> mRoutine;
 
         /**
-         * Constructor.
+         * @param routine      the routine instance.
+         * @param responseType the response type.
          */
-        private CallInvocationFactory() {
+        private CallAdapterInternal(@NotNull final Routine<? extends Call<T>, T> routine,
+                @NotNull final Type responseType) {
 
-            super(null);
+            mResponseType = responseType;
+            mRoutine = routine;
         }
 
-        @NotNull
         @Override
-        public Invocation<ComparableCall<T>, T> newInvocation() {
+        public Type responseType() {
 
-            return new ComparableCallInvocation<>();
+            return mResponseType;
+        }
+
+        @Override
+        public <R> T adapt(final Call<R> call) {
+
+            return AbstractCallAdapterFactory.this.adapt(mRoutine, call);
         }
     }
 }

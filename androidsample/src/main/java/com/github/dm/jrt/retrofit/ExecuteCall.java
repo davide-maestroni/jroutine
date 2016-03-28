@@ -33,7 +33,7 @@ public class ExecuteCall<T> extends ComparableFilterInvocation<Call<T>, T> {
     /**
      * Constructor.
      */
-    protected ExecuteCall() {
+    public ExecuteCall() {
 
         super(null);
     }

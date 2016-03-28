@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         service.listRepos("octocat").bind(new TemplateOutputConsumer<List<Repo>>() {
 
             @Override
-            public void onError(@NotNull final RoutineException error) throws Exception {
+            public void onError(@NotNull final RoutineException error) {
 
                 final Throwable cause = error.getCause();
                 Toast.makeText(MainActivity.this,
@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onOutput(final List<Repo> output) throws Exception {
+            public void onOutput(final List<Repo> output) {
 
                 final ArrayAdapter<Repo> adapter = mRepoAdapter;
                 for (final Repo repo : output) {

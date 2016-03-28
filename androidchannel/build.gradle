@@ -55,10 +55,6 @@ android {
     dexOptions {
         preDexLibraries false
     }
-
-    lintOptions {
-        disable 'MissingRegistered'
-    }
 }
 
 dependencies {

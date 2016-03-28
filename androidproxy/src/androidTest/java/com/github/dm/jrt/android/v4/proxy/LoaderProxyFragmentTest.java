@@ -239,8 +239,10 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
                                                                           R.id.test_fragment);
         final NullLog log = new NullLog();
         final Runner runner = Runners.poolRunner();
-        final InvocationConfiguration configuration =
-                builder().withRunner(runner).withLogLevel(Level.DEBUG).withLog(log).setConfiguration();
+        final InvocationConfiguration configuration = builder().withRunner(runner)
+                                                               .withLogLevel(Level.DEBUG)
+                                                               .withLog(log)
+                                                               .setConfiguration();
         final LoaderProxyObjectBuilder<TestProxy> builder =
                 com.github.dm.jrt.android.proxy.LoaderProxyCompat_TestFragment.with(
                         loaderFrom(fragment)).on(instanceOf(TestClass.class));
@@ -277,8 +279,10 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
                                                                           R.id.test_fragment);
         final NullLog log = new NullLog();
         final Runner runner = Runners.poolRunner();
-        final InvocationConfiguration configuration =
-                builder().withRunner(runner).withLogLevel(Level.DEBUG).withLog(log).setConfiguration();
+        final InvocationConfiguration configuration = builder().withRunner(runner)
+                                                               .withLogLevel(Level.DEBUG)
+                                                               .withLog(log)
+                                                               .setConfiguration();
         final TestProxy testProxy = JRoutineLoaderProxyCompat.with(loaderFrom(fragment))
                                                              .on(instanceOf(TestClass.class))
                                                              .withInvocations()

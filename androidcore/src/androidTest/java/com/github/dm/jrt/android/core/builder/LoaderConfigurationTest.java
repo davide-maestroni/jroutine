@@ -164,7 +164,8 @@ public class LoaderConfigurationTest extends AndroidTestCase {
                                                            .withResultStaleTime(1, TimeUnit.SECONDS)
                                                            .setConfiguration();
         assertThat(configuration).isNotEqualTo(
-                builder().withInputClashResolution(ClashResolutionType.ABORT_THIS).setConfiguration());
+                builder().withInputClashResolution(ClashResolutionType.ABORT_THIS)
+                         .setConfiguration());
         assertThat(configuration.builderFrom()
                                 .withInputClashResolution(ClashResolutionType.JOIN)
                                 .setConfiguration()).isNotEqualTo(
@@ -185,8 +186,9 @@ public class LoaderConfigurationTest extends AndroidTestCase {
         assertThat(configuration).isNotEqualTo(
                 builder().withResultLooper(new Handler().getLooper()).setConfiguration());
         final Looper looper = new Handler().getLooper();
-        assertThat(
-                configuration.builderFrom().withResultLooper(looper).setConfiguration()).isNotEqualTo(
+        assertThat(configuration.builderFrom()
+                                .withResultLooper(looper)
+                                .setConfiguration()).isNotEqualTo(
                 builder().withResultLooper(looper).setConfiguration());
     }
 

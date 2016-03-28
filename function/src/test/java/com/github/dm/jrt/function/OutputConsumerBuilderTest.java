@@ -212,8 +212,7 @@ public class OutputConsumerBuilderTest {
         consumer1.reset();
         final TestConsumer<Object> outConsumer = new TestConsumer<Object>();
         final TestConsumer<Void> completeConsumer = new TestConsumer<Void>();
-        outputConsumer =
-                onError(consumer1).thenOutput(outConsumer).thenComplete(completeConsumer);
+        outputConsumer = onError(consumer1).thenOutput(outConsumer).thenComplete(completeConsumer);
         outputConsumer.onOutput("test");
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(outConsumer.isCalled()).isTrue();

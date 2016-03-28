@@ -55,8 +55,11 @@ class SelectableOutputBuilder<OUT>
     protected OutputChannel<? extends Selectable<OUT>> build(
             @NotNull final ChannelConfiguration configuration) {
 
-        final IOChannel<Selectable<OUT>> ioChannel =
-                JRoutineCore.io().withChannels().with(configuration).setConfiguration().buildChannel();
+        final IOChannel<Selectable<OUT>> ioChannel = JRoutineCore.io()
+                                                                 .withChannels()
+                                                                 .with(configuration)
+                                                                 .setConfiguration()
+                                                                 .buildChannel();
         mChannel.bind(new SelectableOutputConsumer<OUT, OUT>(ioChannel, mIndex));
         return ioChannel;
     }

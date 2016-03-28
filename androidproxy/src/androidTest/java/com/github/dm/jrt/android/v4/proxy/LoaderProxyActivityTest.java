@@ -216,8 +216,10 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
 
         final NullLog log = new NullLog();
         final Runner runner = Runners.poolRunner();
-        final InvocationConfiguration configuration =
-                builder().withRunner(runner).withLogLevel(Level.DEBUG).withLog(log).setConfiguration();
+        final InvocationConfiguration configuration = builder().withRunner(runner)
+                                                               .withLogLevel(Level.DEBUG)
+                                                               .withLog(log)
+                                                               .setConfiguration();
         final LoaderProxyObjectBuilder<TestProxy> builder =
                 com.github.dm.jrt.android.proxy.LoaderProxyCompat_TestActivity.with(
                         loaderFrom(getActivity())).on(instanceOf(TestClass.class));
@@ -251,8 +253,10 @@ public class LoaderProxyActivityTest extends ActivityInstrumentationTestCase2<Te
 
         final NullLog log = new NullLog();
         final Runner runner = Runners.poolRunner();
-        final InvocationConfiguration configuration =
-                builder().withRunner(runner).withLogLevel(Level.DEBUG).withLog(log).setConfiguration();
+        final InvocationConfiguration configuration = builder().withRunner(runner)
+                                                               .withLogLevel(Level.DEBUG)
+                                                               .withLog(log)
+                                                               .setConfiguration();
         final TestProxy testProxy = JRoutineLoaderProxyCompat.with(loaderFrom(getActivity()))
                                                              .on(instanceOf(TestClass.class))
                                                              .withInvocations()

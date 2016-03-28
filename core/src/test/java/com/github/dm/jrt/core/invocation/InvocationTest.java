@@ -127,8 +127,8 @@ public class InvocationTest {
 
         assertThat(factoryOf(TestInvocation.class).newInvocation()).isExactlyInstanceOf(
                 TestInvocation.class);
-        assertThat(factoryOf(ClassToken.tokenOf(TestInvocation.class))
-                                    .newInvocation()).isExactlyInstanceOf(
+        assertThat(factoryOf(
+                ClassToken.tokenOf(TestInvocation.class)).newInvocation()).isExactlyInstanceOf(
                 TestInvocation.class);
         assertThat(factoryOf(new TestInvocation()).newInvocation()).isExactlyInstanceOf(
                 TestInvocation.class);
@@ -150,8 +150,7 @@ public class InvocationTest {
         });
         assertThat(factoryOf(TestInvocation.class).hashCode()).isEqualTo(
                 factoryOf(TestInvocation.class).hashCode());
-        assertThat(factoryOf(TestInvocation.class)).isEqualTo(
-                factoryOf(TestInvocation.class));
+        assertThat(factoryOf(TestInvocation.class)).isEqualTo(factoryOf(TestInvocation.class));
         assertThat(factoryOf(ClassToken.tokenOf(TestInvocation.class)).hashCode()).isEqualTo(
                 factoryOf(TestInvocation.class).hashCode());
         assertThat(factoryOf(ClassToken.tokenOf(TestInvocation.class))).isEqualTo(

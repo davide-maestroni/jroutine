@@ -55,8 +55,11 @@ class InputSelectBuilder<DATA, IN extends DATA> extends AbstractBuilder<IOChanne
     @Override
     protected IOChannel<IN> build(@NotNull final ChannelConfiguration configuration) {
 
-        final IOChannel<IN> inputChannel =
-                JRoutineCore.io().withChannels().with(configuration).setConfiguration().buildChannel();
+        final IOChannel<IN> inputChannel = JRoutineCore.io()
+                                                       .withChannels()
+                                                       .with(configuration)
+                                                       .setConfiguration()
+                                                       .buildChannel();
         final IOChannel<Selectable<DATA>> ioChannel = JRoutineCore.io().buildChannel();
         ioChannel.bind(mChannel);
         return inputChannel.bind(new SelectableOutputConsumer<DATA, IN>(ioChannel, mIndex));

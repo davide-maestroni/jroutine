@@ -205,7 +205,8 @@ public class ChannelConfigurationTest {
                                                             .withChannelMaxSize(100)
                                                             .setConfiguration();
         assertThat(configuration).isNotEqualTo(builder().withChannelMaxSize(10).setConfiguration());
-        assertThat(configuration.builderFrom().withChannelMaxSize(1).setConfiguration()).isNotEqualTo(
+        assertThat(
+                configuration.builderFrom().withChannelMaxSize(1).setConfiguration()).isNotEqualTo(
                 builder().withChannelMaxSize(1).setConfiguration());
     }
 
@@ -320,9 +321,11 @@ public class ChannelConfigurationTest {
                                                             .withLog(new NullLog())
                                                             .withChannelMaxSize(100)
                                                             .setConfiguration();
-        assertThat(configuration).isNotEqualTo(builder().withLog(Logs.nullLog()).setConfiguration());
-        assertThat(
-                configuration.builderFrom().withLog(Logs.systemLog()).setConfiguration()).isNotEqualTo(
+        assertThat(configuration).isNotEqualTo(
+                builder().withLog(Logs.nullLog()).setConfiguration());
+        assertThat(configuration.builderFrom()
+                                .withLog(Logs.systemLog())
+                                .setConfiguration()).isNotEqualTo(
                 builder().withLog(Logs.systemLog()).setConfiguration());
     }
 
@@ -334,7 +337,8 @@ public class ChannelConfigurationTest {
                                                             .withLog(new NullLog())
                                                             .withChannelMaxSize(100)
                                                             .setConfiguration();
-        assertThat(configuration).isNotEqualTo(builder().withLogLevel(Level.DEBUG).setConfiguration());
+        assertThat(configuration).isNotEqualTo(
+                builder().withLogLevel(Level.DEBUG).setConfiguration());
         assertThat(configuration.builderFrom()
                                 .withLogLevel(Level.WARNING)
                                 .setConfiguration()).isNotEqualTo(

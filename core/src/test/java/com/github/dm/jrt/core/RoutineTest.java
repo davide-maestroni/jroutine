@@ -3890,11 +3890,6 @@ public class RoutineTest {
             return false;
         }
 
-        public boolean isAborting() {
-
-            return false;
-        }
-
         public Object nextInput() {
 
             return null;
@@ -3915,6 +3910,11 @@ public class RoutineTest {
 
         public void onInvocationComplete() {
 
+        }
+
+        public boolean isAborting() {
+
+            return false;
         }
     }
 

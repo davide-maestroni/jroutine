@@ -222,11 +222,11 @@ public class JRoutineFacadeTest {
         final Routine<Object, String> routine =
                 JRoutineFacade.filter(new Function<Object, String>() {
 
-                            public String apply(final Object o) {
+                    public String apply(final Object o) {
 
-                                return o.toString();
-                            }
-                        }).buildRoutine();
+                        return o.toString();
+                    }
+                }).buildRoutine();
         assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
                 "1");
     }

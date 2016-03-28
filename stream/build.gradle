@@ -49,11 +49,12 @@ findbugs {
 }
 
 javadoc {
+    def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/v6'
     options.overview("${project.projectDir}/docs/overview.html")
     options.links('http://docs.oracle.com/javase/7/docs/api/',
-            'http://davide-maestroni.github.io/jroutine/javadoc/v6/core/',
-            'http://davide-maestroni.github.io/jroutine/javadoc/v6/function/',
-            'http://davide-maestroni.github.io/jroutine/javadoc/v6/channel/')
+            "${prefix}/core/",
+            "${prefix}/function/",
+            "${prefix}/channel/")
 }
 
 tasks.withType(FindBugs) {

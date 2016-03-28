@@ -81,12 +81,13 @@ findbugs {
 }
 
 tasks.withType(Javadoc) {
+    def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/v6'
     options.overview("${project.projectDir}/docs/overview.html")
     options.links('http://docs.oracle.com/javase/7/docs/api/',
-            'http://davide-maestroni.github.io/jroutine/javadoc/v6/core/',
-            'http://davide-maestroni.github.io/jroutine/javadoc/v6/object/',
-            'http://davide-maestroni.github.io/jroutine/javadoc/v6/proxy/',
-            'http://davide-maestroni.github.io/jroutine/javadoc/v6/android/',
-            'http://davide-maestroni.github.io/jroutine/javadoc/v6/androidobject/',
-            'http://davide-maestroni.github.io/jroutine/javadoc/v6/androidprocessor/')
+            "${prefix}/core/",
+            "${prefix}/object/",
+            "${prefix}/proxy/",
+            "${prefix}/androidcore/",
+            "${prefix}/androidobject/",
+            "${prefix}/androidprocessor/")
 }

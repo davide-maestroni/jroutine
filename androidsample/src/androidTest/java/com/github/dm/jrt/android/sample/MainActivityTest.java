@@ -24,8 +24,9 @@ import android.support.test.espresso.ViewAction;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.support.test.runner.lifecycle.Stage;
-import android.test.ActivityInstrumentationTestCase2;
 import android.view.View;
+
+import com.github.dm.jrt.core.util.TimeDuration;
 
 import org.hamcrest.Matcher;
 import org.junit.Rule;
@@ -49,20 +50,17 @@ import static org.hamcrest.CoreMatchers.anything;
  * Created by davide-maestroni on 03/26/2016.
  */
 @RunWith(AndroidJUnit4.class)
-public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActivity> {
+public class MainActivityTest {
 
     @Rule
     public ActivityTestRule<MainActivity> mActivityRule =
             new ActivityTestRule<>(MainActivity.class);
 
-    public MainActivityTest() {
-
-        super(MainActivity.class);
-    }
-
     @Test
-    public void testRepoList() {
+    public void testRepoList() throws InterruptedException {
 
+        // Wait for the network request to complete
+        TimeDuration.seconds(10).sleepAtLeast();
         IdlingPolicies.setIdlingResourceTimeout(60, TimeUnit.SECONDS);
         onData(anything()).inAdapterView(withId(R.id.repo_list))
                           .atPosition(0)
@@ -70,8 +68,10 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
     }
 
     @Test
-    public void testRepoListRotation() {
+    public void testRepoListRotation() throws InterruptedException {
 
+        // Wait for the network request to complete
+        TimeDuration.seconds(10).sleepAtLeast();
         IdlingPolicies.setIdlingResourceTimeout(60, TimeUnit.SECONDS);
         onData(anything()).inAdapterView(withId(R.id.repo_list))
                           .atPosition(0)

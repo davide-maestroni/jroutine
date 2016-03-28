@@ -59,9 +59,20 @@ dependencies {
 }
 
 tasks.withType(Javadoc) {
+    def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/v6'
     options.overview("${project.projectDir}/docs/overview.html")
     options.links('http://docs.oracle.com/javase/7/docs/api/',
-            'http://davide-maestroni.github.io/jroutine/javadoc/v6/android/')
+            "${prefix}/core/",
+            "${prefix}/object/",
+            "${prefix}/proxy/",
+            "${prefix}/channel/",
+            "${prefix}/stream/",
+            "${prefix}/androidcore/",
+            "${prefix}/androidobject/",
+            "${prefix}/androidproxy/",
+            "${prefix}/androidchannel/",
+            "${prefix}/androidstream/",
+            "${prefix}/android/")
 }
 
 project.gradle.taskGraph.whenReady {

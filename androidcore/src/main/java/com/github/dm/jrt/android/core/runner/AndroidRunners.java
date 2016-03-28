@@ -21,6 +21,7 @@ import android.os.Looper;
 
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -108,10 +109,10 @@ public class AndroidRunners {
      * @return the runner instance.
      */
     @NotNull
-    @SuppressWarnings("ConstantConditions")
     public static Runner myRunner() {
 
-        return looperRunner(Looper.myLooper(), Runners.syncRunner());
+        return looperRunner(ConstantConditions.notNull("thread looper", Looper.myLooper()),
+                Runners.syncRunner());
     }
 
     /**

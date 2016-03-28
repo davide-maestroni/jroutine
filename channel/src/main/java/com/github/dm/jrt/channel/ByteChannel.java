@@ -600,13 +600,10 @@ public class ByteChannel {
         }
 
         @Override
-        @SuppressWarnings("ConstantConditions")
         public int read(@NotNull final byte[] b, final int off, final int len) {
 
-            if (b == null) {
-                throw new NullPointerException();
-
-            } else if ((off < 0) || (len < 0) || (len > b.length - off) || ((off + len) < 0)) {
+            ConstantConditions.notNull("byte array", b);
+            if ((off < 0) || (len < 0) || (len > b.length - off) || ((off + len) < 0)) {
                 throw new IndexOutOfBoundsException();
 
             } else if (len == 0) {
@@ -968,13 +965,10 @@ public class ByteChannel {
         }
 
         @Override
-        @SuppressWarnings("ConstantConditions")
         public int read(@NotNull final byte[] b, final int off, final int len) {
 
-            if (b == null) {
-                throw new NullPointerException();
-
-            } else if ((off < 0) || (len < 0) || (len > b.length - off) || ((off + len) < 0)) {
+            ConstantConditions.notNull("byte array", b);
+            if ((off < 0) || (len < 0) || (len > b.length - off) || ((off + len) < 0)) {
                 throw new IndexOutOfBoundsException();
 
             } else if (len == 0) {
@@ -1245,14 +1239,11 @@ public class ByteChannel {
         }
 
         @Override
-        @SuppressWarnings("ConstantConditions")
         public void write(@NotNull final byte[] b, final int off, final int len) throws
                 IOException {
 
-            if (b == null) {
-                throw new NullPointerException();
-
-            } else if ((off < 0) || (len < 0) || (len > b.length - off) || ((off + len) < 0)) {
+            ConstantConditions.notNull("byte array", b);
+            if ((off < 0) || (len < 0) || (len > b.length - off) || ((off + len) < 0)) {
                 throw new IndexOutOfBoundsException();
 
             } else if (len == 0) {

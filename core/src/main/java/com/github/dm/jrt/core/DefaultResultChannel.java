@@ -990,13 +990,15 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         private Throwable mTimeoutException;
 
         @NotNull
-        @SuppressWarnings("ConstantConditions")
         public OutputChannel<OUT> afterMax(@NotNull final TimeDuration timeout) {
 
             synchronized (mMutex) {
-                if (timeout == null) {
+                try {
+                    ConstantConditions.notNull("output timeout", timeout);
+
+                } catch (final NullPointerException e) {
                     mSubLogger.err("invalid null timeout");
-                    throw new NullPointerException("the output timeout must not be null");
+                    throw e;
                 }
 
                 mExecutionTimeout = timeout;
@@ -1020,7 +1022,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
 
         @NotNull
-        @SuppressWarnings("ConstantConditions")
         public OutputChannel<OUT> allInto(@NotNull final Collection<? super OUT> results) {
 
             boolean isAbort = false;
@@ -1028,9 +1029,12 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             synchronized (mMutex) {
                 verifyBound();
                 final Logger logger = mSubLogger;
-                if (results == null) {
-                    logger.err("invalid null output list");
-                    throw new NullPointerException("the result list must not be null");
+                try {
+                    ConstantConditions.notNull("result collection", results);
+
+                } catch (final NullPointerException e) {
+                    logger.err("invalid null result collection");
+                    throw e;
                 }
 
                 final TimeDuration executionTimeout = mExecutionTimeout;
@@ -1117,15 +1121,17 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
 
         @NotNull
-        @SuppressWarnings("ConstantConditions")
         public OutputChannel<OUT> bind(@NotNull final OutputConsumer<? super OUT> consumer) {
 
             final boolean forceClose;
             synchronized (mMutex) {
                 verifyBound();
-                if (consumer == null) {
+                try {
+                    ConstantConditions.notNull("output consumer", consumer);
+
+                } catch (final NullPointerException e) {
                     mSubLogger.err("invalid null consumer");
-                    throw new NullPointerException("the output consumer must not be null");
+                    throw e;
                 }
 
                 forceClose = mState.isDone();
@@ -1949,12 +1955,14 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
          *
          * @param delay the delay.
          */
-        @SuppressWarnings("ConstantConditions")
         void after(@NotNull final TimeDuration delay) {
 
-            if (delay == null) {
+            try {
+                ConstantConditions.notNull("input delay", delay);
+
+            } catch (final NullPointerException e) {
                 mSubLogger.err("invalid null delay");
-                throw new NullPointerException("the input delay must not be null");
+                throw e;
             }
 
             mResultDelay = delay;

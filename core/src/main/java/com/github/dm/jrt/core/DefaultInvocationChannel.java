@@ -31,6 +31,7 @@ import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.TemplateExecution;
+import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.SimpleQueue;
 import com.github.dm.jrt.core.util.TimeDuration;
 import com.github.dm.jrt.core.util.TimeDuration.Condition;
@@ -812,12 +813,14 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
          *
          * @param delay the delay.
          */
-        @SuppressWarnings("ConstantConditions")
         void after(@NotNull final TimeDuration delay) {
 
-            if (delay == null) {
+            try {
+                ConstantConditions.notNull("input delay", delay);
+
+            } catch (final NullPointerException e) {
                 mLogger.err("invalid null delay");
-                throw new NullPointerException("the input delay must not be null");
+                throw e;
             }
 
             mInputDelay = delay;

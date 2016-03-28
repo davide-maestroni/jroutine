@@ -1,9 +1,10 @@
-com.github.dm.jrt.android.builder
 com.github.dm.jrt.android.core
-com.github.dm.jrt.android.invocation
-com.github.dm.jrt.android.log
-com.github.dm.jrt.android.routine
-com.github.dm.jrt.android.runner
-com.github.dm.jrt.android.service
+com.github.dm.jrt.android.core.builder
+com.github.dm.jrt.android.core.config
+com.github.dm.jrt.android.core.invocation
+com.github.dm.jrt.android.core.log
+com.github.dm.jrt.android.core.routine
+com.github.dm.jrt.android.core.runner
+com.github.dm.jrt.android.core.service
 com.github.dm.jrt.android.v11.core
 com.github.dm.jrt.android.v4.core

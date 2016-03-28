@@ -1,5 +1,5 @@
+com.github.dm.jrt.android.object
 com.github.dm.jrt.android.object.annotation
 com.github.dm.jrt.android.object.builder
-com.github.dm.jrt.android.object.core
-com.github.dm.jrt.android.v11.object.core
-com.github.dm.jrt.android.v4.object.core
+com.github.dm.jrt.android.v11.object
+com.github.dm.jrt.android.v4.object

@@ -35,8 +35,10 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
 /**
  * Class representing a context invocation factory target.
  * <p/>
- * Note that a base invocation class will be passed as the first argument to a special context
+ * Note that, in case a class not representing a {@link ContextInvocation} is passed to the factory,
+ * the specified invocation class will be passed as the first argument to a special context
  * invocation in order to be automatically instantiated via reflection.<br/>
+ * The latter class will inherit from {@link ContextInvocationWrapper}.<br/>
  * It is possible to avoid that, by creating a target invocation factory of a common invocation by
  * defining a specialized class like:
  * <pre>
@@ -69,6 +71,10 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
 
     /**
      * Returns a target based on the specified invocation class.
+     * <p/>
+     * Note that, in case a class not representing a {@link ContextInvocation} is passed to the
+     * factory, the specified invocation class will be passed as the first argument to a special
+     * context invocation in order to be automatically instantiated via reflection.
      *
      * @param targetClass the target invocation class.
      * @param <IN>        the input data type.
@@ -84,6 +90,10 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
 
     /**
      * Returns a target based on the specified invocation class.
+     * <p/>
+     * Note that, in case a class not representing a {@link ContextInvocation} is passed to the
+     * factory, the specified invocation class will be passed as the first argument to a special
+     * context invocation in order to be automatically instantiated via reflection.
      *
      * @param targetClass the target invocation class.
      * @param factoryArgs the invocation factory arguments.
@@ -110,6 +120,10 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
 
     /**
      * Returns a target based on the specified invocation token.
+     * <p/>
+     * Note that, in case a class not representing a {@link ContextInvocation} is passed to the
+     * factory, the specified invocation class will be passed as the first argument to a special
+     * context invocation in order to be automatically instantiated via reflection.
      *
      * @param targetToken the target invocation token.
      * @param <IN>        the input data type.
@@ -125,6 +139,10 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
 
     /**
      * Returns a target based on the specified invocation token.
+     * <p/>
+     * Note that, in case a class not representing a {@link ContextInvocation} is passed to the
+     * factory, the specified invocation class will be passed as the first argument to a special
+     * context invocation in order to be automatically instantiated via reflection.
      *
      * @param targetToken the target invocation token.
      * @param factoryArgs the invocation factory arguments.
@@ -142,6 +160,10 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
 
     /**
      * Returns a target based on the specified invocation.
+     * <p/>
+     * Note that, in case a class not representing a {@link ContextInvocation} is passed to the
+     * factory, the specified invocation class will be passed as the first argument to a special
+     * context invocation in order to be automatically instantiated via reflection.
      *
      * @param targetInvocation the target invocation.
      * @param <IN>             the input data type.
@@ -157,6 +179,10 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
 
     /**
      * Returns a target based on the specified invocation.
+     * <p/>
+     * Note that, in case a class not representing a {@link ContextInvocation} is passed to the
+     * factory, the specified invocation class will be passed as the first argument to a special
+     * context invocation in order to be automatically instantiated via reflection.
      *
      * @param targetInvocation the target invocation.
      * @param factoryArgs      the invocation factory arguments.

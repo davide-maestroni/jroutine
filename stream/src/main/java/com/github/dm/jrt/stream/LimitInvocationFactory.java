@@ -17,8 +17,8 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.channel.ResultChannel;
-import com.github.dm.jrt.core.invocation.ComparableInvocationFactory;
 import com.github.dm.jrt.core.invocation.Invocation;
+import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +32,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  *
  * @param <DATA> the data type.
  */
-class LimitInvocationFactory<DATA> extends ComparableInvocationFactory<DATA, DATA> {
+class LimitInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
 
     private final int mCount;
 

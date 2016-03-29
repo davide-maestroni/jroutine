@@ -20,8 +20,8 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.common.RoutineException;
-import com.github.dm.jrt.core.invocation.ComparableInvocationFactory;
 import com.github.dm.jrt.core.invocation.Invocation;
+import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.FunctionWrapper;
@@ -38,7 +38,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class StreamInvocationFactory<IN, OUT> extends ComparableInvocationFactory<IN, OUT> {
+class StreamInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
     private final FunctionWrapper<? super StreamChannel<IN>, ? extends
             StreamChannel<? extends OUT>> mFunction;

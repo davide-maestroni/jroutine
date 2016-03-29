@@ -17,7 +17,7 @@
 package com.github.dm.jrt.retrofit;
 
 import com.github.dm.jrt.core.channel.ResultChannel;
-import com.github.dm.jrt.core.invocation.ComparableFilterInvocation;
+import com.github.dm.jrt.core.invocation.FilterInvocation;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -28,7 +28,7 @@ import retrofit2.Call;
  *
  * @param <T> the response type.
  */
-public class ExecuteCall<T> extends ComparableFilterInvocation<Call<T>, T> {
+public class ExecuteCall<T> extends FilterInvocation<Call<T>, T> {
 
     /**
      * Constructor.

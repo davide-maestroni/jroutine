@@ -17,7 +17,6 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.channel.ResultChannel;
-import com.github.dm.jrt.core.invocation.ComparableInvocationFactory;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
@@ -137,8 +136,7 @@ class AccumulateInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class AccumulateInvocationFactory<IN, OUT>
-            extends ComparableInvocationFactory<IN, OUT> {
+    private static class AccumulateInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
         private final BiFunctionWrapper<? super OUT, ? super IN, ? extends OUT> mFunction;
 

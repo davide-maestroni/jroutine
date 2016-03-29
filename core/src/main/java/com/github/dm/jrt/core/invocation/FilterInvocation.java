@@ -20,6 +20,7 @@ import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.common.RoutineException;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Abstract implementation of an invocation filtering each input and transforming it in output data.
@@ -33,6 +34,16 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class FilterInvocation<IN, OUT> extends InvocationFactory<IN, OUT>
         implements Invocation<IN, OUT> {
+
+    /**
+     * Constructor.
+     *
+     * @param args the constructor arguments.
+     */
+    protected FilterInvocation(@Nullable final Object[] args) {
+
+        super(args);
+    }
 
     @NotNull
     @Override

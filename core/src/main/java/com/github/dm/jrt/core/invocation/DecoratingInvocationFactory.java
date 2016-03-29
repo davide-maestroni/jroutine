@@ -30,8 +30,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public abstract class DecoratingInvocationFactory<IN, OUT>
-        extends ComparableInvocationFactory<IN, OUT> {
+public abstract class DecoratingInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
     private final InvocationFactory<IN, OUT> mFactory;
 

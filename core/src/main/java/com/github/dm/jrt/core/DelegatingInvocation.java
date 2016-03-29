@@ -27,6 +27,8 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
+
 /**
  * Invocation implementation delegating the execution to another routine.
  * <p/>
@@ -162,6 +164,7 @@ public class DelegatingInvocation<IN, OUT> implements Invocation<IN, OUT> {
         private DelegatingInvocationFactory(@NotNull final Routine<IN, OUT> routine,
                 @NotNull final DelegationType delegationType) {
 
+            super(asArgs(routine, delegationType));
             mRoutine = ConstantConditions.notNull("routine instance", routine);
             mDelegationType = ConstantConditions.notNull("delegation type", delegationType);
         }

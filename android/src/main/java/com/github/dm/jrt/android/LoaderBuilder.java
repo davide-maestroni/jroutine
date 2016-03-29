@@ -18,7 +18,6 @@ package com.github.dm.jrt.android;
 
 import com.github.dm.jrt.android.core.builder.LoaderChannelBuilder;
 import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
-import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.object.ContextInvocationTarget;
 import com.github.dm.jrt.android.v11.core.JRoutineLoader;
@@ -138,11 +137,7 @@ public class LoaderBuilder {
     public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
             @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass) {
 
-        if (ContextInvocation.class.isAssignableFrom(invocationClass)) {
-            return on(factoryOf((Class<? extends ContextInvocation<IN, OUT>>) invocationClass));
-        }
-
-        return on(InvocationFactory.factoryOf(invocationClass));
+        return on(factoryOf(invocationClass));
     }
 
     /**
@@ -168,12 +163,7 @@ public class LoaderBuilder {
             @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass,
             @Nullable final Object... args) {
 
-        if (ContextInvocation.class.isAssignableFrom(invocationClass)) {
-            return on(
-                    factoryOf((Class<? extends ContextInvocation<IN, OUT>>) invocationClass, args));
-        }
-
-        return on(InvocationFactory.factoryOf(invocationClass, args));
+        return on(factoryOf(invocationClass, args));
     }
 
     /**
@@ -196,12 +186,7 @@ public class LoaderBuilder {
     public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
             @NotNull final ClassToken<? extends Invocation<IN, OUT>> invocationToken) {
 
-        if (ContextInvocation.class.isAssignableFrom(invocationToken.getRawClass())) {
-            return on(
-                    factoryOf((ClassToken<? extends ContextInvocation<IN, OUT>>) invocationToken));
-        }
-
-        return on(InvocationFactory.factoryOf(invocationToken));
+        return on(factoryOf(invocationToken));
     }
 
     /**
@@ -227,12 +212,7 @@ public class LoaderBuilder {
             @NotNull final ClassToken<? extends Invocation<IN, OUT>> invocationToken,
             @Nullable final Object... args) {
 
-        if (ContextInvocation.class.isAssignableFrom(invocationToken.getRawClass())) {
-            return on(factoryOf((ClassToken<? extends ContextInvocation<IN, OUT>>) invocationToken,
-                    args));
-        }
-
-        return on(InvocationFactory.factoryOf(invocationToken, args));
+        return on(factoryOf(invocationToken, args));
     }
 
     /**

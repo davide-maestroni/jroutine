@@ -1935,6 +1935,14 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
 
     private static class UpperCase extends FilterInvocation<String, String> {
 
+        /**
+         * Constructor.
+         */
+        protected UpperCase() {
+
+            super(null);
+        }
+
         public void onInput(final String input, @NotNull final ResultChannel<String> result) {
 
             result.pass(input.toUpperCase());

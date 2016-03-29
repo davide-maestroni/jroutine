@@ -18,7 +18,6 @@ package com.github.dm.jrt.android.core.invocation;
 
 import android.content.Context;
 
-import com.github.dm.jrt.core.invocation.ComparableInvocationFactory;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.util.ClassToken;
@@ -102,7 +101,7 @@ public abstract class ContextInvocationFactory<IN, OUT> {
      */
     @NotNull
     public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryOf(
-            @NotNull final Class<? extends ContextInvocation<IN, OUT>> invocationClass) {
+            @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass) {
 
         return factoryOf(invocationClass, (Object[]) null);
     }
@@ -125,11 +124,17 @@ public abstract class ContextInvocationFactory<IN, OUT> {
      *                                            the specified objects as parameters is found.
      */
     @NotNull
+    @SuppressWarnings("unchecked")
     public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryOf(
-            @NotNull final Class<? extends ContextInvocation<IN, OUT>> invocationClass,
+            @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass,
             @Nullable final Object... args) {
 
-        return new DefaultContextInvocationFactory<IN, OUT>(invocationClass, args);
+        if (ContextInvocation.class.isAssignableFrom(invocationClass)) {
+            return new DefaultContextInvocationFactory<IN, OUT>(
+                    (Class<? extends ContextInvocation<IN, OUT>>) invocationClass, args);
+        }
+
+        return factoryFrom(InvocationFactory.factoryOf(invocationClass, args));
     }
 
     /**
@@ -149,7 +154,7 @@ public abstract class ContextInvocationFactory<IN, OUT> {
      */
     @NotNull
     public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryOf(
-            @NotNull final ClassToken<? extends ContextInvocation<IN, OUT>> invocationToken) {
+            @NotNull final ClassToken<? extends Invocation<IN, OUT>> invocationToken) {
 
         return factoryOf(invocationToken.getRawClass());
     }
@@ -173,7 +178,7 @@ public abstract class ContextInvocationFactory<IN, OUT> {
      */
     @NotNull
     public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryOf(
-            @NotNull final ClassToken<? extends ContextInvocation<IN, OUT>> invocationToken,
+            @NotNull final ClassToken<? extends Invocation<IN, OUT>> invocationToken,
             @Nullable final Object... args) {
 
         return factoryOf(invocationToken.getRawClass(), args);
@@ -236,7 +241,7 @@ public abstract class ContextInvocationFactory<IN, OUT> {
      * @param <OUT> the output data type.
      */
     private static class AdaptingContextInvocationFactory<IN, OUT>
-            extends ComparableInvocationFactory<IN, OUT> {
+            extends InvocationFactory<IN, OUT> {
 
         private final Context mContext;
 

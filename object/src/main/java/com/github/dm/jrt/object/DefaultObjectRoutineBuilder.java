@@ -285,6 +285,7 @@ class DefaultObjectRoutineBuilder
                 @NotNull final InvocationTarget<?> target, @NotNull final Method method,
                 @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
+            super(asArgs(proxyConfiguration, target, method, inputMode, outputMode));
             mProxyConfiguration = proxyConfiguration;
             mTarget = target;
             mMethod = method;

@@ -20,6 +20,7 @@ import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.common.RoutineException;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Abstract implementation of an invocation performing a command (that is, no input is required)
@@ -33,6 +34,16 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class CommandInvocation<OUT> extends InvocationFactory<Void, OUT>
         implements Invocation<Void, OUT> {
+
+    /**
+     * Constructor.
+     *
+     * @param args the constructor arguments.
+     */
+    protected CommandInvocation(@Nullable final Object[] args) {
+
+        super(args);
+    }
 
     @NotNull
     @Override

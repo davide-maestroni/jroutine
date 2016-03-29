@@ -23,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
+import java.util.Arrays;
 
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
@@ -36,6 +37,29 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * @param <OUT> the output data type.
  */
 public abstract class InvocationFactory<IN, OUT> {
+
+    private final Object[] mArgs;
+
+    /**
+     * Constructor.
+     *
+     * @param args the constructor arguments.
+     */
+    protected InvocationFactory(@Nullable final Object[] args) {
+
+        mArgs = (args != null) ? args.clone() : Reflection.NO_ARGS;
+    }
+
+    /**
+     * Constructor.
+     * <p/>
+     * Forces the inheriting classes to explicitly pass the arguments.
+     */
+    @SuppressWarnings("unused")
+    private InvocationFactory() {
+
+        this(null);
+    }
 
     /**
      * Builds and returns a new invocation factory creating instances of the specified class.
@@ -162,6 +186,27 @@ public abstract class InvocationFactory<IN, OUT> {
         return factoryOf(tokenOf(invocation), args);
     }
 
+    @Override
+    public int hashCode() {
+
+        return 31 * getClass().hashCode() + Arrays.deepHashCode(mArgs);
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+
+        if (this == o) {
+            return true;
+        }
+
+        if ((o == null) || (getClass() != o.getClass())) {
+            return false;
+        }
+
+        final InvocationFactory<?, ?> that = (InvocationFactory<?, ?>) o;
+        return Arrays.deepEquals(mArgs, that.mArgs);
+    }
+
     /**
      * Creates and return a new invocation instance.<br/>
      * A proper implementation will return a new invocation instance each time it is called, unless
@@ -180,8 +225,7 @@ public abstract class InvocationFactory<IN, OUT> {
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class DefaultInvocationFactory<IN, OUT>
-            extends ComparableInvocationFactory<IN, OUT> {
+    private static class DefaultInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
         private final Object[] mArgs;
 
@@ -199,7 +243,7 @@ public abstract class InvocationFactory<IN, OUT> {
                 @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass,
                 @Nullable final Object[] args) {
 
-            super(asArgs(invocationClass, (args != null) ? args : Reflection.NO_ARGS));
+            super(asArgs(invocationClass, (args != null) ? args.clone() : Reflection.NO_ARGS));
             final Object[] invocationArgs =
                     (mArgs = (args != null) ? args.clone() : Reflection.NO_ARGS);
             mConstructor = Reflection.findConstructor(invocationClass, invocationArgs);

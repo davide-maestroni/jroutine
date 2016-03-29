@@ -17,8 +17,8 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.channel.ResultChannel;
-import com.github.dm.jrt.core.invocation.ComparableInvocationFactory;
 import com.github.dm.jrt.core.invocation.Invocation;
+import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 
 import org.jetbrains.annotations.NotNull;
@@ -37,7 +37,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  *
  * @param <DATA> the data type.
  */
-class GroupByInvocationFactory<DATA> extends ComparableInvocationFactory<DATA, List<DATA>> {
+class GroupByInvocationFactory<DATA> extends InvocationFactory<DATA, List<DATA>> {
 
     private final boolean mIsPlaceholder;
 

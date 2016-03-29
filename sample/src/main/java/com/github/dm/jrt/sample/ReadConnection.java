@@ -39,6 +39,14 @@ public class ReadConnection extends FilterInvocation<URI, ByteBuffer> {
 
     private static final int MAX_CHUNK_SIZE = 2048;
 
+    /**
+     * Constructor.
+     */
+    protected ReadConnection() {
+
+        super(null);
+    }
+
     public void onInput(final URI uri, @NotNull final ResultChannel<ByteBuffer> result) throws
             IOException {
 

@@ -20,9 +20,6 @@ import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
-import com.github.dm.jrt.core.invocation.ComparableCommandInvocation;
-import com.github.dm.jrt.core.invocation.ComparableFilterInvocation;
-import com.github.dm.jrt.core.invocation.ComparableInvocationFactory;
 import com.github.dm.jrt.core.invocation.FilterInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
@@ -681,7 +678,7 @@ public class Functions {
      *
      * @param <OUT> the output data type.
      */
-    private static class ConsumerCommandInvocation<OUT> extends ComparableCommandInvocation<OUT> {
+    private static class ConsumerCommandInvocation<OUT> extends CommandInvocation<OUT> {
 
         private final ConsumerWrapper<? super ResultChannel<OUT>> mConsumer;
 
@@ -709,8 +706,7 @@ public class Functions {
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class ConsumerFilterInvocation<IN, OUT>
-            extends ComparableFilterInvocation<IN, OUT> {
+    private static class ConsumerFilterInvocation<IN, OUT> extends FilterInvocation<IN, OUT> {
 
         private final BiConsumerWrapper<? super IN, ? super ResultChannel<OUT>> mConsumer;
 
@@ -738,8 +734,7 @@ public class Functions {
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class ConsumerInvocationFactory<IN, OUT>
-            extends ComparableInvocationFactory<IN, OUT> {
+    private static class ConsumerInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
         private final CallInvocation<IN, OUT> mInvocation;
 
@@ -777,8 +772,7 @@ public class Functions {
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class FunctionFilterInvocation<IN, OUT>
-            extends ComparableFilterInvocation<IN, OUT> {
+    private static class FunctionFilterInvocation<IN, OUT> extends FilterInvocation<IN, OUT> {
 
         private final FunctionWrapper<? super IN, ? extends OUT> mFunction;
 
@@ -806,8 +800,7 @@ public class Functions {
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class FunctionInvocationFactory<IN, OUT>
-            extends ComparableInvocationFactory<IN, OUT> {
+    private static class FunctionInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
         private final CallInvocation<IN, OUT> mInvocation;
 
@@ -844,7 +837,7 @@ public class Functions {
      *
      * @param <IN> the input data type.
      */
-    private static class PredicateFilterInvocation<IN> extends ComparableFilterInvocation<IN, IN> {
+    private static class PredicateFilterInvocation<IN> extends FilterInvocation<IN, IN> {
 
         private final PredicateWrapper<? super IN> mPredicate;
 
@@ -872,7 +865,7 @@ public class Functions {
      *
      * @param <OUT> the output data type.
      */
-    private static class SupplierCommandInvocation<OUT> extends ComparableCommandInvocation<OUT> {
+    private static class SupplierCommandInvocation<OUT> extends CommandInvocation<OUT> {
 
         private final SupplierWrapper<? extends OUT> mSupplier;
 
@@ -899,8 +892,7 @@ public class Functions {
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class SupplierInvocationFactory<IN, OUT>
-            extends ComparableInvocationFactory<IN, OUT> {
+    private static class SupplierInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
         private final SupplierWrapper<? extends Invocation<? super IN, ? extends OUT>> mSupplier;
 

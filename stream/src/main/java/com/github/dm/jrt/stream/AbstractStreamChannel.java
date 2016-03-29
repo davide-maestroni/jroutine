@@ -30,8 +30,7 @@ import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Configurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
-import com.github.dm.jrt.core.invocation.ComparableFilterInvocation;
-import com.github.dm.jrt.core.invocation.ComparableInvocationFactory;
+import com.github.dm.jrt.core.invocation.FilterInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
@@ -778,7 +777,7 @@ public abstract class AbstractStreamChannel<OUT>
      *
      * @param <OUT> the output data type.
      */
-    private static class ConsumerInvocation<OUT> extends ComparableFilterInvocation<OUT, Void> {
+    private static class ConsumerInvocation<OUT> extends FilterInvocation<OUT, Void> {
 
         private final ConsumerWrapper<? super OUT> mConsumer;
 
@@ -804,8 +803,8 @@ public abstract class AbstractStreamChannel<OUT>
      *
      * @param <OUT> the output data type.
      */
-    private abstract static class GenerateInvocation<OUT>
-            extends ComparableInvocationFactory<Object, OUT> implements Invocation<Object, OUT> {
+    private abstract static class GenerateInvocation<OUT> extends InvocationFactory<Object, OUT>
+            implements Invocation<Object, OUT> {
 
         /**
          * Constructor.
@@ -955,7 +954,7 @@ public abstract class AbstractStreamChannel<OUT>
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class MapInvocation<IN, OUT> extends ComparableFilterInvocation<IN, OUT> {
+    private static class MapInvocation<IN, OUT> extends FilterInvocation<IN, OUT> {
 
         private final FunctionWrapper<? super IN, ? extends OutputChannel<? extends OUT>> mFunction;
 

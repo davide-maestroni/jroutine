@@ -40,7 +40,7 @@ public class InvocationTest {
     @SuppressWarnings("ConstantConditions")
     public void testCommandInvocation() throws Exception {
 
-        final CommandInvocation<Object> invocation = new CommandInvocation<Object>() {
+        final CommandInvocation<Object> invocation = new CommandInvocation<Object>(null) {
 
             public void onResult(@NotNull final ResultChannel<Object> result) throws Exception {
 
@@ -62,7 +62,7 @@ public class InvocationTest {
                 new TestComparableCommandInvocation(asArgs(1));
         assertThat(factory).isEqualTo(factory);
         assertThat(factory).isNotEqualTo(null);
-        assertThat(factory).isNotEqualTo(new InvocationFactory<Object, Object>() {
+        assertThat(factory).isNotEqualTo(new InvocationFactory<Object, Object>(null) {
 
             @NotNull
             @Override
@@ -84,7 +84,7 @@ public class InvocationTest {
                 new TestComparableFilterInvocation(asArgs(1));
         assertThat(factory).isEqualTo(factory);
         assertThat(factory).isNotEqualTo(null);
-        assertThat(factory).isNotEqualTo(new InvocationFactory<Object, Object>() {
+        assertThat(factory).isNotEqualTo(new InvocationFactory<Object, Object>(null) {
 
             @NotNull
             @Override
@@ -106,7 +106,7 @@ public class InvocationTest {
                 new TestComparableInvocationFactory(asArgs(1));
         assertThat(factory).isEqualTo(factory);
         assertThat(factory).isNotEqualTo(null);
-        assertThat(factory).isNotEqualTo(new InvocationFactory<Object, Object>() {
+        assertThat(factory).isNotEqualTo(new InvocationFactory<Object, Object>(null) {
 
             @NotNull
             @Override
@@ -139,7 +139,7 @@ public class InvocationTest {
 
         final InvocationFactory<Object, Object> factory = factoryOf(TestInvocation.class);
         assertThat(factory).isEqualTo(factory);
-        assertThat(factory).isNotEqualTo(new InvocationFactory<Object, Object>() {
+        assertThat(factory).isNotEqualTo(new InvocationFactory<Object, Object>(null) {
 
             @NotNull
             @Override
@@ -244,8 +244,7 @@ public class InvocationTest {
         }
     }
 
-    private static class TestComparableCommandInvocation
-            extends ComparableCommandInvocation<Object> {
+    private static class TestComparableCommandInvocation extends CommandInvocation<Object> {
 
         /**
          * Constructor.
@@ -262,8 +261,7 @@ public class InvocationTest {
         }
     }
 
-    private static class TestComparableFilterInvocation
-            extends ComparableFilterInvocation<Object, Object> {
+    private static class TestComparableFilterInvocation extends FilterInvocation<Object, Object> {
 
         /**
          * Constructor.
@@ -280,8 +278,7 @@ public class InvocationTest {
         }
     }
 
-    private static class TestComparableInvocationFactory
-            extends ComparableInvocationFactory<Object, Object> {
+    private static class TestComparableInvocationFactory extends InvocationFactory<Object, Object> {
 
         /**
          * Constructor.
@@ -302,6 +299,14 @@ public class InvocationTest {
     }
 
     private static class TestInvocation extends FilterInvocation<Object, Object> {
+
+        /**
+         * Constructor.
+         */
+        protected TestInvocation() {
+
+            super(null);
+        }
 
         public void onInput(final Object o, @NotNull final ResultChannel<Object> result) {
 

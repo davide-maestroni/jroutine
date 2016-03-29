@@ -213,6 +213,14 @@ public class RunnerTest extends AndroidTestCase {
 
     private static class LooperInvocationFactory extends InvocationFactory<Object, Object> {
 
+        /**
+         * Constructor.
+         */
+        protected LooperInvocationFactory() {
+
+            super(null);
+        }
+
         @NotNull
         @Override
         public Invocation<Object, Object> newInvocation() {

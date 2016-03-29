@@ -1171,7 +1171,7 @@ public class RoutineTest {
 
         try {
 
-            new DefaultRoutine<Object, Object>(null, new InvocationFactory<Object, Object>() {
+            new DefaultRoutine<Object, Object>(null, new InvocationFactory<Object, Object>(null) {
 
                 @NotNull
                 @Override
@@ -3320,6 +3320,14 @@ public class RoutineTest {
 
     private static class AbortInvocation extends FilterInvocation<String, String> {
 
+        /**
+         * Constructor.
+         */
+        protected AbortInvocation() {
+
+            super(null);
+        }
+
         public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
             result.orderByCall().orderByDelay();
@@ -3382,6 +3390,14 @@ public class RoutineTest {
 
     private static class AbortInvocation2 extends FilterInvocation<String, String> {
 
+        /**
+         * Constructor.
+         */
+        protected AbortInvocation2() {
+
+            super(null);
+        }
+
         public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
             assertThat(result.abort()).isTrue();
@@ -3390,6 +3406,14 @@ public class RoutineTest {
     }
 
     private static class AllInvocation extends FilterInvocation<Object, Object> {
+
+        /**
+         * Constructor.
+         */
+        protected AllInvocation() {
+
+            super(null);
+        }
 
         public void onInput(final Object o, @NotNull final ResultChannel<Object> result) {
 
@@ -3401,6 +3425,14 @@ public class RoutineTest {
     }
 
     private static class CheckCompleteInvocation extends FilterInvocation<Object, Object> {
+
+        /**
+         * Constructor.
+         */
+        protected CheckCompleteInvocation() {
+
+            super(null);
+        }
 
         public void onInput(final Object o, @NotNull final ResultChannel<Object> result) {
 
@@ -3420,6 +3452,7 @@ public class RoutineTest {
         private CloseInvocation(@NotNull final Semaphore semaphore,
                 @NotNull final AtomicBoolean isFailed) {
 
+            super(null);
             mSemaphore = semaphore;
             mIsFailed = isFailed;
         }
@@ -3613,6 +3646,14 @@ public class RoutineTest {
 
     private static class HasNextInvocation extends FilterInvocation<Object, Object> {
 
+        /**
+         * Constructor.
+         */
+        protected HasNextInvocation() {
+
+            super(null);
+        }
+
         public void onInput(final Object o, @NotNull final ResultChannel<Object> result) {
 
             JRoutineCore.on(factoryOf(DelayedInvocation.class, millis(100)))
@@ -3624,6 +3665,14 @@ public class RoutineTest {
     }
 
     private static class InputArrayRunnerDeadlock extends FilterInvocation<String, String> {
+
+        /**
+         * Constructor.
+         */
+        protected InputArrayRunnerDeadlock() {
+
+            super(null);
+        }
 
         public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
@@ -3644,6 +3693,14 @@ public class RoutineTest {
 
     private static class InputConsumerRunnerDeadlock extends FilterInvocation<String, String> {
 
+        /**
+         * Constructor.
+         */
+        protected InputConsumerRunnerDeadlock() {
+
+            super(null);
+        }
+
         public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
             final IOChannel<String> channel = JRoutineCore.io().buildChannel();
@@ -3661,6 +3718,14 @@ public class RoutineTest {
     }
 
     private static class InputListRunnerDeadlock extends FilterInvocation<String, String> {
+
+        /**
+         * Constructor.
+         */
+        protected InputListRunnerDeadlock() {
+
+            super(null);
+        }
 
         public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
@@ -3681,6 +3746,14 @@ public class RoutineTest {
 
     private static class InputRunnerDeadlock extends FilterInvocation<String, String> {
 
+        /**
+         * Constructor.
+         */
+        protected InputRunnerDeadlock() {
+
+            super(null);
+        }
+
         public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
             JRoutineCore.on(PassingInvocation.<String>factoryOf())
@@ -3699,6 +3772,14 @@ public class RoutineTest {
     }
 
     private static class NextInvocation extends FilterInvocation<Object, Object> {
+
+        /**
+         * Constructor.
+         */
+        protected NextInvocation() {
+
+            super(null);
+        }
 
         public void onInput(final Object o, @NotNull final ResultChannel<Object> result) {
 
@@ -3728,6 +3809,14 @@ public class RoutineTest {
 
     private static class ResultArrayRunnerDeadlock extends FilterInvocation<String, String> {
 
+        /**
+         * Constructor.
+         */
+        protected ResultArrayRunnerDeadlock() {
+
+            super(null);
+        }
+
         public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
             result.after(millis(500)).pass(s).after(millis(100)).pass(new String[]{s});
@@ -3735,6 +3824,14 @@ public class RoutineTest {
     }
 
     private static class ResultListRunnerDeadlock extends FilterInvocation<String, String> {
+
+        /**
+         * Constructor.
+         */
+        protected ResultListRunnerDeadlock() {
+
+            super(null);
+        }
 
         public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
@@ -3744,6 +3841,14 @@ public class RoutineTest {
 
     private static class ResultRunnerDeadlock extends FilterInvocation<String, String> {
 
+        /**
+         * Constructor.
+         */
+        protected ResultRunnerDeadlock() {
+
+            super(null);
+        }
+
         public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
             result.after(millis(500)).pass(s).after(millis(100)).pass(s);
@@ -3751,6 +3856,14 @@ public class RoutineTest {
     }
 
     private static class SleepCommand extends CommandInvocation<Void> {
+
+        /**
+         * Constructor.
+         */
+        protected SleepCommand() {
+
+            super(null);
+        }
 
         public void onResult(@NotNull final ResultChannel<Void> result) throws Exception {
 
@@ -3764,6 +3877,7 @@ public class RoutineTest {
 
         private SleepInvocation(@NotNull final TimeDuration sleepDuration) {
 
+            super(asArgs(sleepDuration));
             mSleepDuration = sleepDuration;
         }
 
@@ -3783,6 +3897,14 @@ public class RoutineTest {
     }
 
     private static class SquareInvocation extends FilterInvocation<Integer, Integer> {
+
+        /**
+         * Constructor.
+         */
+        protected SquareInvocation() {
+
+            super(null);
+        }
 
         public void onInput(final Integer integer, @NotNull final ResultChannel<Integer> result) {
 
@@ -3910,11 +4032,6 @@ public class RoutineTest {
 
         public void onInvocationComplete() {
 
-        }
-
-        public boolean isAborting() {
-
-            return false;
         }
     }
 

@@ -1959,6 +1959,14 @@ public class StreamsTest {
 
     private static class CharAt extends FilterInvocation<List<?>, Character> {
 
+        /**
+         * Constructor.
+         */
+        protected CharAt() {
+
+            super(null);
+        }
+
         public void onInput(final List<?> objects, @NotNull final ResultChannel<Character> result) {
 
             final String text = (String) objects.get(0);
@@ -1972,6 +1980,14 @@ public class StreamsTest {
         private static final int INTEGER = 1;
 
         private static final int STRING = 0;
+
+        /**
+         * Constructor.
+         */
+        protected Sort() {
+
+            super(null);
+        }
 
         public void onInput(final Selectable<Object> selectable,
                 @NotNull final ResultChannel<Selectable<Object>> result) {

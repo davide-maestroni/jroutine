@@ -102,7 +102,7 @@ public class FunctionsTest {
 
             public Invocation<Object, String> get() {
 
-                return new FilterInvocation<Object, String>() {
+                return new FilterInvocation<Object, String>(null) {
 
                     public void onInput(final Object input,
                             @NotNull final ResultChannel<String> result) {

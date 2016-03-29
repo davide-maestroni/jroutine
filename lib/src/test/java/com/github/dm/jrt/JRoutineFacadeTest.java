@@ -53,6 +53,7 @@ import java.util.List;
 
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.TimeDuration.millis;
 import static com.github.dm.jrt.core.util.TimeDuration.seconds;
 import static com.github.dm.jrt.function.Functions.functionFilter;
@@ -698,6 +699,14 @@ public class JRoutineFacadeTest {
 
     public static class GetString extends CommandInvocation<String> {
 
+        /**
+         * Constructor.
+         */
+        protected GetString() {
+
+            super(null);
+        }
+
         public void onResult(@NotNull final ResultChannel<String> result) throws Exception {
 
             result.pass("test");
@@ -745,6 +754,7 @@ public class JRoutineFacadeTest {
 
         public ToCase(final boolean isUpper) {
 
+            super(asArgs(isUpper));
             mIsUpper = isUpper;
         }
 

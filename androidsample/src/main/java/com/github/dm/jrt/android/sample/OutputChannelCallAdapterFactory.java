@@ -44,6 +44,8 @@ import retrofit2.Retrofit;
  */
 public class OutputChannelCallAdapterFactory extends AbstractCallAdapterFactory<OutputChannel> {
 
+    private static final ExecuteCall<OutputChannel> sFactory = new ExecuteCall<>();
+
     private final LoaderContextCompat mContext;
 
     /**
@@ -94,7 +96,7 @@ public class OutputChannelCallAdapterFactory extends AbstractCallAdapterFactory<
                 AndroidBuilders.configurationWithAnnotations(
                         LoaderConfiguration.DEFAULT_CONFIGURATION, annotations);
         return JRoutineAndroidCompat.with(mContext)
-                                    .on(new ExecuteCall<OutputChannel>())
+                                    .on(sFactory)
                                     .withInvocations()
                                     .with(invocationConfiguration)
                                     .setConfiguration()

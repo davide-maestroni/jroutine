@@ -866,6 +866,49 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         }
     }
 
+    public void testFactoryId() {
+
+        assertThat(JRoutineLoaderCompat.with(loaderFrom(getActivity()))
+                                       .on(factoryOf(StringCallInvocation.class))
+                                       .withLoaders()
+                                       .withFactoryId(0)
+                                       .withCacheStrategy(CacheStrategyType.CACHE)
+                                       .setConfiguration()
+                                       .asyncCall("test")
+                                       .afterMax(seconds(10))
+                                       .all()).containsExactly("test");
+        assertThat(JRoutineLoaderCompat.with(loaderFrom(getActivity()))
+                                       .on(factoryOf(ToUpperCase.class))
+                                       .withLoaders()
+                                       .withFactoryId(0)
+                                       .withCacheStrategy(CacheStrategyType.CACHE)
+                                       .setConfiguration()
+                                       .asyncCall("test")
+                                       .afterMax(seconds(10))
+                                       .all()).containsExactly("test");
+        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
+                                                                  .findFragmentById(
+                                                                          R.id.test_fragment);
+        assertThat(JRoutineLoaderCompat.with(loaderFrom(fragment))
+                                       .on(factoryOf(ToUpperCase.class))
+                                       .withLoaders()
+                                       .withFactoryId(0)
+                                       .withCacheStrategy(CacheStrategyType.CACHE)
+                                       .setConfiguration()
+                                       .asyncCall("test")
+                                       .afterMax(seconds(10))
+                                       .all()).containsExactly("TEST");
+        assertThat(JRoutineLoaderCompat.with(loaderFrom(fragment))
+                                       .on(factoryOf(StringCallInvocation.class))
+                                       .withLoaders()
+                                       .withFactoryId(0)
+                                       .withCacheStrategy(CacheStrategyType.CACHE)
+                                       .setConfiguration()
+                                       .asyncCall("test")
+                                       .afterMax(seconds(10))
+                                       .all()).containsExactly("TEST");
+    }
+
     public void testFragmentAbort() {
 
         final TimeDuration timeout = seconds(10);
@@ -1579,49 +1622,6 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         } catch (final NullPointerException ignored) {
 
         }
-    }
-
-    public void testRoutineId() {
-
-        assertThat(JRoutineLoaderCompat.with(loaderFrom(getActivity()))
-                                       .on(factoryOf(StringCallInvocation.class))
-                                       .withLoaders()
-                                       .withRoutineId(0)
-                                       .withCacheStrategy(CacheStrategyType.CACHE)
-                                       .setConfiguration()
-                                       .asyncCall("test")
-                                       .afterMax(seconds(10))
-                                       .all()).containsExactly("test");
-        assertThat(JRoutineLoaderCompat.with(loaderFrom(getActivity()))
-                                       .on(factoryOf(ToUpperCase.class))
-                                       .withLoaders()
-                                       .withRoutineId(0)
-                                       .withCacheStrategy(CacheStrategyType.CACHE)
-                                       .setConfiguration()
-                                       .asyncCall("test")
-                                       .afterMax(seconds(10))
-                                       .all()).containsExactly("test");
-        final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
-                                                                  .findFragmentById(
-                                                                          R.id.test_fragment);
-        assertThat(JRoutineLoaderCompat.with(loaderFrom(fragment))
-                                       .on(factoryOf(ToUpperCase.class))
-                                       .withLoaders()
-                                       .withRoutineId(0)
-                                       .withCacheStrategy(CacheStrategyType.CACHE)
-                                       .setConfiguration()
-                                       .asyncCall("test")
-                                       .afterMax(seconds(10))
-                                       .all()).containsExactly("TEST");
-        assertThat(JRoutineLoaderCompat.with(loaderFrom(fragment))
-                                       .on(factoryOf(StringCallInvocation.class))
-                                       .withLoaders()
-                                       .withRoutineId(0)
-                                       .withCacheStrategy(CacheStrategyType.CACHE)
-                                       .setConfiguration()
-                                       .asyncCall("test")
-                                       .afterMax(seconds(10))
-                                       .all()).containsExactly("TEST");
     }
 
     private static class Abort extends CallContextInvocation<Data, Data> {

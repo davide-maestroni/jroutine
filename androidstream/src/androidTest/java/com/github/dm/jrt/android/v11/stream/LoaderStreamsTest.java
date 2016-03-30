@@ -626,6 +626,43 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         }
     }
 
+    public void testFactoryId() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+
+            return;
+        }
+
+        final LoaderContext context = loaderFrom(getActivity());
+        LoaderStreams.streamOf("test1").with(context).factoryId(11).async().map(toUpperCase());
+
+        try {
+            JRoutineLoader.with(context).onId(11).buildChannel().afterMax(seconds(10)).next();
+            fail();
+
+        } catch (final MissingLoaderException ignored) {
+
+        }
+
+        assertThat(LoaderStreams.streamOf("test2")
+                                .with(context)
+                                .withLoaders()
+                                .withFactoryId(11)
+                                .setConfiguration()
+                                .async()
+                                .map(toUpperCase())
+                                .afterMax(seconds(10))
+                                .next()).isEqualTo("TEST2");
+        final AtomicInteger count = new AtomicInteger();
+        LoaderStreams.streamOf().with(context).factoryId(11).then(delayedIncrement(count));
+        assertThat(LoaderStreams.streamOf()
+                                .with(context)
+                                .factoryId(11)
+                                .then(increment(count))
+                                .afterMax(seconds(10))
+                                .next()).isEqualTo(1);
+    }
+
     @SuppressWarnings("unchecked")
     public void testGroupBy() {
 
@@ -1704,43 +1741,6 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         } catch (final AbortException ignored) {
 
         }
-    }
-
-    public void testRoutineId() {
-
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-
-            return;
-        }
-
-        final LoaderContext context = loaderFrom(getActivity());
-        LoaderStreams.streamOf("test1").with(context).routineId(11).async().map(toUpperCase());
-
-        try {
-            JRoutineLoader.with(context).onId(11).buildChannel().afterMax(seconds(10)).next();
-            fail();
-
-        } catch (final MissingLoaderException ignored) {
-
-        }
-
-        assertThat(LoaderStreams.streamOf("test2")
-                                .with(context)
-                                .withLoaders()
-                                .withRoutineId(11)
-                                .setConfiguration()
-                                .async()
-                                .map(toUpperCase())
-                                .afterMax(seconds(10))
-                                .next()).isEqualTo("TEST2");
-        final AtomicInteger count = new AtomicInteger();
-        LoaderStreams.streamOf().with(context).routineId(11).then(delayedIncrement(count));
-        assertThat(LoaderStreams.streamOf()
-                                .with(context)
-                                .routineId(11)
-                                .then(increment(count))
-                                .afterMax(seconds(10))
-                                .next()).isEqualTo(1);
     }
 
     @SuppressWarnings("unchecked")

@@ -19,10 +19,10 @@ package com.github.dm.jrt.android.object;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.object.annotation.CacheStrategy;
 import com.github.dm.jrt.android.object.annotation.ClashResolution;
+import com.github.dm.jrt.android.object.annotation.FactoryId;
 import com.github.dm.jrt.android.object.annotation.InputClashResolution;
 import com.github.dm.jrt.android.object.annotation.LoaderId;
 import com.github.dm.jrt.android.object.annotation.ResultStaleTime;
-import com.github.dm.jrt.android.object.annotation.RoutineId;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -55,10 +55,10 @@ public class AndroidBuilders {
      * @return the modified configuration.
      * @see com.github.dm.jrt.android.object.annotation.CacheStrategy CacheStrategy
      * @see com.github.dm.jrt.android.object.annotation.ClashResolution ClashResolution
+     * @see com.github.dm.jrt.android.object.annotation.FactoryId FactoryId
      * @see com.github.dm.jrt.android.object.annotation.InputClashResolution InputClashResolution
      * @see com.github.dm.jrt.android.object.annotation.LoaderId LoaderId
      * @see com.github.dm.jrt.android.object.annotation.ResultStaleTime ResultStaleTime
-     * @see com.github.dm.jrt.android.object.annotation.RoutineId RoutineId
      */
     @NotNull
     public static LoaderConfiguration configurationWithAnnotations(
@@ -76,8 +76,8 @@ public class AndroidBuilders {
             if (annotationType == LoaderId.class) {
                 builder.withLoaderId(((LoaderId) annotation).value());
 
-            } else if (annotationType == RoutineId.class) {
-                builder.withRoutineId(((RoutineId) annotation).value());
+            } else if (annotationType == FactoryId.class) {
+                builder.withFactoryId(((FactoryId) annotation).value());
 
             } else if (annotationType == ClashResolution.class) {
                 builder.withClashResolution(((ClashResolution) annotation).value());
@@ -106,10 +106,10 @@ public class AndroidBuilders {
      * @return the modified configuration.
      * @see com.github.dm.jrt.android.object.annotation.CacheStrategy CacheStrategy
      * @see com.github.dm.jrt.android.object.annotation.ClashResolution ClashResolution
+     * @see com.github.dm.jrt.android.object.annotation.FactoryId FactoryId
      * @see com.github.dm.jrt.android.object.annotation.InputClashResolution InputClashResolution
      * @see com.github.dm.jrt.android.object.annotation.LoaderId LoaderId
      * @see com.github.dm.jrt.android.object.annotation.ResultStaleTime ResultStaleTime
-     * @see com.github.dm.jrt.android.object.annotation.RoutineId RoutineId
      */
     @NotNull
     public static LoaderConfiguration configurationWithAnnotations(

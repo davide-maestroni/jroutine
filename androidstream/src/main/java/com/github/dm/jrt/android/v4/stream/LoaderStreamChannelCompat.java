@@ -354,6 +354,17 @@ public interface LoaderStreamChannelCompat<OUT>
     LoaderStreamChannelCompat<OUT> cache(@Nullable CacheStrategyType strategyType);
 
     /**
+     * Short for {@code withLoaders().withFactoryId(factoryId).setConfiguration()}.<br/>
+     * This method is useful to easily apply a configuration to the next routine concatenated to the
+     * stream, which will force the factory ID to the specified one.
+     *
+     * @param factoryId the factory ID.
+     * @return the configured stream.
+     */
+    @NotNull
+    LoaderStreamChannelCompat<OUT> factoryId(int factoryId);
+
+    /**
      * Short for {@code withLoaders().withLoaderId(loaderId).setConfiguration()}.<br/>
      * This method is useful to easily apply a configuration to the next routine concatenated to the
      * stream, which will force the routine loader ID.
@@ -363,17 +374,6 @@ public interface LoaderStreamChannelCompat<OUT>
      */
     @NotNull
     LoaderStreamChannelCompat<OUT> loaderId(int loaderId);
-
-    /**
-     * Short for {@code withLoaders().withRoutineId(routineId).setConfiguration()}.<br/>
-     * This method is useful to easily apply a configuration to the next routine concatenated to the
-     * stream, which will force the routine ID.
-     *
-     * @param routineId the routine ID.
-     * @return the configured stream.
-     */
-    @NotNull
-    LoaderStreamChannelCompat<OUT> routineId(int routineId);
 
     /**
      * Short for {@code withLoaders().withResultStaleTime(time, timeUnit).setConfiguration()}.

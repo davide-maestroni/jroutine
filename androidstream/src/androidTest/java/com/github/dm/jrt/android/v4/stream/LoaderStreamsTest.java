@@ -582,6 +582,42 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         }
     }
 
+    public void testFactoryId() {
+
+        final LoaderContextCompat context = loaderFrom(getActivity());
+        LoaderStreamsCompat.streamOf("test1")
+                           .with(context)
+                           .factoryId(11)
+                           .async()
+                           .map(toUpperCase());
+
+        try {
+            JRoutineLoaderCompat.with(context).onId(11).buildChannel().afterMax(seconds(10)).next();
+            fail();
+
+        } catch (final MissingLoaderException ignored) {
+
+        }
+
+        assertThat(LoaderStreamsCompat.streamOf("test2")
+                                      .with(context)
+                                      .withLoaders()
+                                      .withFactoryId(11)
+                                      .setConfiguration()
+                                      .async()
+                                      .map(toUpperCase())
+                                      .afterMax(seconds(10))
+                                      .next()).isEqualTo("TEST2");
+        final AtomicInteger count = new AtomicInteger();
+        LoaderStreamsCompat.streamOf().with(context).factoryId(11).then(delayedIncrement(count));
+        assertThat(LoaderStreamsCompat.streamOf()
+                                      .with(context)
+                                      .factoryId(11)
+                                      .then(increment(count))
+                                      .afterMax(seconds(10))
+                                      .next()).isEqualTo(1);
+    }
+
     @SuppressWarnings("unchecked")
     public void testGroupBy() {
 
@@ -1588,42 +1624,6 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         } catch (final AbortException ignored) {
 
         }
-    }
-
-    public void testRoutineId() {
-
-        final LoaderContextCompat context = loaderFrom(getActivity());
-        LoaderStreamsCompat.streamOf("test1")
-                           .with(context)
-                           .routineId(11)
-                           .async()
-                           .map(toUpperCase());
-
-        try {
-            JRoutineLoaderCompat.with(context).onId(11).buildChannel().afterMax(seconds(10)).next();
-            fail();
-
-        } catch (final MissingLoaderException ignored) {
-
-        }
-
-        assertThat(LoaderStreamsCompat.streamOf("test2")
-                                      .with(context)
-                                      .withLoaders()
-                                      .withRoutineId(11)
-                                      .setConfiguration()
-                                      .async()
-                                      .map(toUpperCase())
-                                      .afterMax(seconds(10))
-                                      .next()).isEqualTo("TEST2");
-        final AtomicInteger count = new AtomicInteger();
-        LoaderStreamsCompat.streamOf().with(context).routineId(11).then(delayedIncrement(count));
-        assertThat(LoaderStreamsCompat.streamOf()
-                                      .with(context)
-                                      .routineId(11)
-                                      .then(increment(count))
-                                      .afterMax(seconds(10))
-                                      .next()).isEqualTo(1);
     }
 
     @SuppressWarnings("unchecked")

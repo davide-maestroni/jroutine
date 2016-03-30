@@ -35,7 +35,7 @@ import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
  * must be created starting from the specific configuration instance.
  * <p/>
  * The configuration is used to set a specific loader ID to each invocation created by a routine, or
- * to override the factory {@code equals()} and {@code hashCode()} by specifying a routine ID.<br/>
+ * to override the factory {@code equals()} and {@code hashCode()} by specifying a factory ID.<br/>
  * Moreover, it is possible to set a specific type of resolution when two invocations clashes, that
  * is, they share the same loader ID, and to set a specific type of caching of the invocation
  * results.<br/>
@@ -61,6 +61,8 @@ public final class LoaderConfiguration {
      */
     public static final LoaderConfiguration DEFAULT_CONFIGURATION = builder().buildConfiguration();
 
+    private final int mFactoryId;
+
     private final ClashResolutionType mInputResolutionType;
 
     private final int mLoaderId;
@@ -68,8 +70,6 @@ public final class LoaderConfiguration {
     private final Looper mLooper;
 
     private final ClashResolutionType mResolutionType;
-
-    private final int mRoutineId;
 
     private final TimeDuration mStaleTime;
 
@@ -80,21 +80,21 @@ public final class LoaderConfiguration {
      *
      * @param looper              the looper instance.
      * @param loaderId            the the loader ID.
-     * @param routineId           the the routine ID.
+     * @param factoryId           the the factory ID.
      * @param resolutionType      the type of resolution.
      * @param inputResolutionType the type of input resolution.
      * @param strategyType        the cache strategy type.
      * @param staleTime           the stale time.
      */
     private LoaderConfiguration(@Nullable final Looper looper, final int loaderId,
-            final int routineId, @Nullable final ClashResolutionType resolutionType,
+            final int factoryId, @Nullable final ClashResolutionType resolutionType,
             @Nullable final ClashResolutionType inputResolutionType,
             @Nullable final CacheStrategyType strategyType,
             @Nullable final TimeDuration staleTime) {
 
         mLooper = looper;
         mLoaderId = loaderId;
-        mRoutineId = routineId;
+        mFactoryId = factoryId;
         mResolutionType = resolutionType;
         mInputResolutionType = inputResolutionType;
         mStrategyType = strategyType;
@@ -151,11 +151,11 @@ public final class LoaderConfiguration {
         }
 
         final LoaderConfiguration that = (LoaderConfiguration) o;
-        if (mLoaderId != that.mLoaderId) {
+        if (mFactoryId != that.mFactoryId) {
             return false;
         }
 
-        if (mRoutineId != that.mRoutineId) {
+        if (mLoaderId != that.mLoaderId) {
             return false;
         }
 
@@ -182,11 +182,11 @@ public final class LoaderConfiguration {
     public int hashCode() {
 
         // AUTO-GENERATED CODE
-        int result = mInputResolutionType != null ? mInputResolutionType.hashCode() : 0;
+        int result = mFactoryId;
+        result = 31 * result + (mInputResolutionType != null ? mInputResolutionType.hashCode() : 0);
         result = 31 * result + mLoaderId;
         result = 31 * result + (mLooper != null ? mLooper.hashCode() : 0);
         result = 31 * result + (mResolutionType != null ? mResolutionType.hashCode() : 0);
-        result = 31 * result + mRoutineId;
         result = 31 * result + (mStaleTime != null ? mStaleTime.hashCode() : 0);
         result = 31 * result + (mStrategyType != null ? mStrategyType.hashCode() : 0);
         return result;
@@ -197,11 +197,11 @@ public final class LoaderConfiguration {
 
         // AUTO-GENERATED CODE
         return "LoaderConfiguration{" +
-                "mInputResolutionType=" + mInputResolutionType +
+                "mFactoryId=" + mFactoryId +
+                ", mInputResolutionType=" + mInputResolutionType +
                 ", mLoaderId=" + mLoaderId +
                 ", mLooper=" + mLooper +
                 ", mResolutionType=" + mResolutionType +
-                ", mRoutineId=" + mRoutineId +
                 ", mStaleTime=" + mStaleTime +
                 ", mStrategyType=" + mStrategyType +
                 '}';
@@ -231,6 +231,18 @@ public final class LoaderConfiguration {
 
         final ClashResolutionType resolutionType = mResolutionType;
         return (resolutionType != null) ? resolutionType : valueIfNotSet;
+    }
+
+    /**
+     * Returns the factory ID (AUTO by default).
+     *
+     * @param valueIfNotSet the default value if none was set.
+     * @return the factory ID.
+     */
+    public int getFactoryIdOr(final int valueIfNotSet) {
+
+        final int factoryId = mFactoryId;
+        return (factoryId != AUTO) ? factoryId : valueIfNotSet;
     }
 
     /**
@@ -280,18 +292,6 @@ public final class LoaderConfiguration {
 
         final TimeDuration staleTime = mStaleTime;
         return (staleTime != null) ? staleTime : valueIfNotSet;
-    }
-
-    /**
-     * Returns the routine ID (AUTO by default).
-     *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the routine ID.
-     */
-    public int getRoutineIdOr(final int valueIfNotSet) {
-
-        final int routineId = mRoutineId;
-        return (routineId != AUTO) ? routineId : valueIfNotSet;
     }
 
     /**
@@ -381,6 +381,8 @@ public final class LoaderConfiguration {
 
         private final Configurable<? extends TYPE> mConfigurable;
 
+        private int mFactoryId;
+
         private ClashResolutionType mInputResolutionType;
 
         private int mLoaderId;
@@ -388,8 +390,6 @@ public final class LoaderConfiguration {
         private Looper mLooper;
 
         private ClashResolutionType mResolutionType;
-
-        private int mRoutineId;
 
         private TimeDuration mStaleTime;
 
@@ -404,7 +404,7 @@ public final class LoaderConfiguration {
 
             mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
             mLoaderId = AUTO;
-            mRoutineId = AUTO;
+            mFactoryId = AUTO;
         }
 
         /**
@@ -456,9 +456,9 @@ public final class LoaderConfiguration {
                 withLoaderId(loaderId);
             }
 
-            final int routineId = configuration.mRoutineId;
-            if (routineId != AUTO) {
-                withRoutineId(routineId);
+            final int factoryId = configuration.mFactoryId;
+            if (factoryId != AUTO) {
+                withFactoryId(factoryId);
             }
 
             final ClashResolutionType resolutionType = configuration.mResolutionType;
@@ -511,6 +511,19 @@ public final class LoaderConfiguration {
                 @Nullable final ClashResolutionType resolutionType) {
 
             mResolutionType = resolutionType;
+            return this;
+        }
+
+        /**
+         * Tells the builder to identify the backing invocation factory with the specified ID.
+         *
+         * @param factoryId the factory ID.
+         * @return this builder.
+         */
+        @NotNull
+        public Builder<TYPE> withFactoryId(final int factoryId) {
+
+            mFactoryId = factoryId;
             return this;
         }
 
@@ -587,23 +600,10 @@ public final class LoaderConfiguration {
             return withResultStaleTime(fromUnit(time, timeUnit));
         }
 
-        /**
-         * Tells the builder to identify the routine with the specified ID.
-         *
-         * @param routineId the routine ID.
-         * @return this builder.
-         */
-        @NotNull
-        public Builder<TYPE> withRoutineId(final int routineId) {
-
-            mRoutineId = routineId;
-            return this;
-        }
-
         @NotNull
         private LoaderConfiguration buildConfiguration() {
 
-            return new LoaderConfiguration(mLooper, mLoaderId, mRoutineId, mResolutionType,
+            return new LoaderConfiguration(mLooper, mLoaderId, mFactoryId, mResolutionType,
                     mInputResolutionType, mStrategyType, mStaleTime);
         }
 
@@ -611,7 +611,7 @@ public final class LoaderConfiguration {
 
             mLooper = configuration.mLooper;
             mLoaderId = configuration.mLoaderId;
-            mRoutineId = configuration.mRoutineId;
+            mFactoryId = configuration.mFactoryId;
             mResolutionType = configuration.mResolutionType;
             mInputResolutionType = configuration.mInputResolutionType;
             mStrategyType = configuration.mStrategyType;

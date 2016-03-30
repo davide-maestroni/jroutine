@@ -79,11 +79,11 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
             @NotNull final LoaderConfiguration loaderConfiguration) {
 
         super(invocationConfiguration);
-        final int routineId = loaderConfiguration.getRoutineIdOr(LoaderConfiguration.AUTO);
+        final int factoryId = loaderConfiguration.getFactoryIdOr(LoaderConfiguration.AUTO);
         mContext = ConstantConditions.notNull("loader context", context);
         ConstantConditions.notNull("context invocation factory", factory);
-        mFactory = (routineId == LoaderConfiguration.AUTO) ? factory
-                : new FactoryWrapper<IN, OUT>(factory, routineId);
+        mFactory = (factoryId == LoaderConfiguration.AUTO) ? factory
+                : new FactoryWrapper<IN, OUT>(factory, factoryId);
         mConfiguration = loaderConfiguration;
         mLoaderId = loaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO);
         mOrderType = invocationConfiguration.getOutputOrderTypeOr(null);
@@ -206,12 +206,12 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
          * Constructor.
          *
          * @param factory   the wrapped factory.
-         * @param routineId the routine ID.
+         * @param factoryId the factory ID.
          */
         protected FactoryWrapper(@NotNull final ContextInvocationFactory<IN, OUT> factory,
-                final int routineId) {
+                final int factoryId) {
 
-            super(asArgs(routineId));
+            super(asArgs(factoryId));
             mFactory = factory;
         }
 

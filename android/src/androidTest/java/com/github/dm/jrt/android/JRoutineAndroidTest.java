@@ -281,7 +281,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
                                   .withSharedFields()
                                   .setConfiguration()
                                   .withLoaders()
-                                  .withRoutineId(11)
+                                  .withFactoryId(11)
                                   .setConfiguration()
                                   .buildProxy(TestAnnotatedProxy.class)
                                   .getStringLow()

@@ -23,10 +23,10 @@ import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyTy
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.ClashResolutionType;
 import com.github.dm.jrt.android.object.annotation.CacheStrategy;
 import com.github.dm.jrt.android.object.annotation.ClashResolution;
+import com.github.dm.jrt.android.object.annotation.FactoryId;
 import com.github.dm.jrt.android.object.annotation.InputClashResolution;
 import com.github.dm.jrt.android.object.annotation.LoaderId;
 import com.github.dm.jrt.android.object.annotation.ResultStaleTime;
-import com.github.dm.jrt.android.object.annotation.RoutineId;
 import com.github.dm.jrt.core.util.TimeDuration;
 
 import static com.github.dm.jrt.android.core.config.LoaderConfiguration.builder;
@@ -46,10 +46,10 @@ public class AndroidBuildersTest extends AndroidTestCase {
                 AnnotationItf.class.getMethod("toString"))).isEqualTo(
                 builder().withCacheStrategy(CacheStrategyType.CACHE_IF_ERROR)
                          .withClashResolution(ClashResolutionType.ABORT)
+                         .withFactoryId(13)
                          .withInputClashResolution(ClashResolutionType.ABORT_THIS)
                          .withLoaderId(-77)
                          .withResultStaleTime(TimeDuration.millis(333))
-                         .withRoutineId(13)
                          .setConfiguration());
     }
 
@@ -57,10 +57,10 @@ public class AndroidBuildersTest extends AndroidTestCase {
 
         @CacheStrategy(CacheStrategyType.CACHE_IF_ERROR)
         @ClashResolution(ClashResolutionType.ABORT)
+        @FactoryId(13)
         @InputClashResolution(ClashResolutionType.ABORT_THIS)
         @LoaderId(-77)
         @ResultStaleTime(333)
-        @RoutineId(13)
         String toString();
     }
 }

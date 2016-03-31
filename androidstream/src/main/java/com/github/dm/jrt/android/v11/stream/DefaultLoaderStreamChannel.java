@@ -504,12 +504,13 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
     public LoaderStreamChannel<? extends ParcelableSelectable<OUT>> toSelectable(final int index) {
 
         final ChannelConfiguration configuration = buildChannelConfiguration();
-        return newChannel(SparseChannels.toSelectable(this, index)
-                                        .withChannels()
-                                        .with(configuration)
-                                        .setConfiguration()
-                                        .buildChannels(), getStreamConfiguration(), getDelegationType(),
-                getBinder());
+        final OutputChannel<? extends ParcelableSelectable<OUT>> channel =
+                SparseChannels.toSelectable(this, index)
+                              .withChannels()
+                              .with(configuration)
+                              .setConfiguration()
+                              .buildChannels();
+        return newChannel(channel, getStreamConfiguration(), getDelegationType(), getBinder());
     }
 
     @NotNull

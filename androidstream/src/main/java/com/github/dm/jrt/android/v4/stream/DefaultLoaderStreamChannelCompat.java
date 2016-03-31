@@ -517,12 +517,13 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
             final int index) {
 
         final ChannelConfiguration configuration = buildChannelConfiguration();
-        return newChannel(SparseChannelsCompat.toSelectable(this, index)
-                                              .withChannels()
-                                              .with(configuration)
-                                              .setConfiguration()
-                                              .buildChannels(), getStreamConfiguration(),
-                getDelegationType(), getBinder());
+        final OutputChannel<? extends ParcelableSelectable<OUT>> channel =
+                SparseChannelsCompat.toSelectable(this, index)
+                                    .withChannels()
+                                    .with(configuration)
+                                    .setConfiguration()
+                                    .buildChannels();
+        return newChannel(channel, getStreamConfiguration(), getDelegationType(), getBinder());
     }
 
     @NotNull

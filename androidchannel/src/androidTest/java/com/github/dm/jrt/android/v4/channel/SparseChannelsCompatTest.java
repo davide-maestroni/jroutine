@@ -356,8 +356,8 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
         channelMap.get(Sort.STRING).pass("test21").close();
         assertThat(channel.result().afterMax(seconds(10)).all()).containsOnlyElementsOf(outputs);
         channel = routine.asyncInvoke();
-        channelMap =
-                SparseChannelsCompat.selectParcelable(channel, Sort.INTEGER, Sort.STRING).buildChannels();
+        channelMap = SparseChannelsCompat.selectParcelable(channel, Sort.INTEGER, Sort.STRING)
+                                         .buildChannels();
         channelMap.get(Sort.INTEGER).pass(-11).close();
         channelMap.get(Sort.STRING).pass("test21").close();
         assertThat(channel.result().afterMax(seconds(10)).all()).containsOnlyElementsOf(outputs);
@@ -394,8 +394,8 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
         }
 
         channel = routine.asyncInvoke();
-        channelMap =
-                SparseChannelsCompat.selectParcelable(channel, Sort.INTEGER, Sort.STRING).buildChannels();
+        channelMap = SparseChannelsCompat.selectParcelable(channel, Sort.INTEGER, Sort.STRING)
+                                         .buildChannels();
         channelMap.get(Sort.INTEGER).abort();
         channelMap.get(Sort.STRING).pass("test21").close();
 
@@ -452,7 +452,8 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
         final IOChannel<Integer> channel2 = builder.buildChannel();
 
         final OutputChannel<? extends ParcelableSelectable<Object>> channel =
-                SparseChannelsCompat.merge(Arrays.<IOChannel<?>>asList(channel1, channel2)).buildChannels();
+                SparseChannelsCompat.merge(Arrays.<IOChannel<?>>asList(channel1, channel2))
+                                    .buildChannels();
         final OutputChannel<ParcelableSelectable<Object>> output =
                 JRoutineLoaderCompat.with(loaderFrom(getActivity()))
                                     .on(factoryOf(Sort.class))
@@ -461,7 +462,8 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
                                     .setConfiguration()
                                     .asyncCall(channel);
         final SparseArrayCompat<OutputChannel<Object>> channelMap =
-                SparseChannelsCompat.selectParcelable(output, Sort.INTEGER, Sort.STRING).buildChannels();
+                SparseChannelsCompat.selectParcelable(output, Sort.INTEGER, Sort.STRING)
+                                    .buildChannels();
 
         for (int i = 0; i < 4; i++) {
 
@@ -560,8 +562,8 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
         assertThat(channelMap.get(Sort.STRING).afterMax(seconds(10)).all()).containsOnly("test21");
         channel = routine.asyncCall(new ParcelableSelectable<Object>(-11, Sort.INTEGER),
                 new ParcelableSelectable<Object>("test21", Sort.STRING));
-        channelMap =
-                SparseChannelsCompat.selectParcelable(channel, Sort.INTEGER, Sort.STRING).buildChannels();
+        channelMap = SparseChannelsCompat.selectParcelable(channel, Sort.INTEGER, Sort.STRING)
+                                         .buildChannels();
         assertThat(channelMap.get(Sort.INTEGER).afterMax(seconds(10)).all()).containsOnly(-11);
         assertThat(channelMap.get(Sort.STRING).afterMax(seconds(10)).all()).containsOnly("test21");
         channel = routine.asyncCall(new ParcelableSelectable<Object>("test21", Sort.STRING),
@@ -615,8 +617,8 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
                          .pass(new ParcelableSelectable<Object>(-11, Sort.INTEGER),
                                  new ParcelableSelectable<Object>("test21", Sort.STRING))
                          .result();
-        channelMap =
-                SparseChannelsCompat.selectParcelable(channel, Sort.INTEGER, Sort.STRING).buildChannels();
+        channelMap = SparseChannelsCompat.selectParcelable(channel, Sort.INTEGER, Sort.STRING)
+                                         .buildChannels();
         channel.abort();
 
         try {
@@ -705,7 +707,9 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
 
         final IOChannel<ParcelableSelectable<String>> channel = JRoutineCore.io().buildChannel();
         final OutputChannel<String> outputChannel =
-                SparseChannelsCompat.selectParcelable(channel.asOutput(), 33).buildChannels().get(33);
+                SparseChannelsCompat.selectParcelable(channel.asOutput(), 33)
+                                    .buildChannels()
+                                    .get(33);
         channel.pass(new ParcelableSelectable<String>("test1", 33),
                 new ParcelableSelectable<String>("test2", -33),
                 new ParcelableSelectable<String>("test3", 33),
@@ -718,7 +722,9 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
 
         final IOChannel<ParcelableSelectable<String>> channel = JRoutineCore.io().buildChannel();
         final OutputChannel<String> outputChannel =
-                SparseChannelsCompat.selectParcelable(channel.asOutput(), 33).buildChannels().get(33);
+                SparseChannelsCompat.selectParcelable(channel.asOutput(), 33)
+                                    .buildChannels()
+                                    .get(33);
         channel.abort();
 
         try {

@@ -53,7 +53,8 @@ class BuilderWrapper<OUT> implements ChannelsBuilder<LoaderStreamChannel<OUT>>,
     @SuppressWarnings("unchecked")
     public LoaderStreamChannel<OUT> buildChannels() {
 
-        return new DefaultLoaderStreamChannel<OUT>(null, (OutputChannel<OUT>) mBuilder.buildChannels());
+        return new DefaultLoaderStreamChannel<OUT>(null,
+                (OutputChannel<OUT>) mBuilder.buildChannels());
     }
 
     @NotNull

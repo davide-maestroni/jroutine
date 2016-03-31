@@ -362,9 +362,12 @@ public abstract class AbstractStreamChannel<OUT>
     public StreamChannel<OUT> repeat() {
 
         final ChannelConfiguration configuration = buildChannelConfiguration();
-        return newChannel(
-                Channels.repeat(this).withChannels().with(configuration).setConfiguration().buildChannels(),
-                getStreamConfiguration(), mDelegationType, mBinder);
+        final OutputChannel<OUT> channel = Channels.repeat(this)
+                                                   .withChannels()
+                                                   .with(configuration)
+                                                   .setConfiguration()
+                                                   .buildChannels();
+        return newChannel(channel, getStreamConfiguration(), mDelegationType, mBinder);
     }
 
     @NotNull
@@ -469,11 +472,12 @@ public abstract class AbstractStreamChannel<OUT>
     public StreamChannel<? extends Selectable<OUT>> toSelectable(final int index) {
 
         final ChannelConfiguration configuration = buildChannelConfiguration();
-        return newChannel(Channels.toSelectable(this, index)
-                                  .withChannels()
-                                  .with(configuration)
-                                  .setConfiguration()
-                                  .buildChannels(), getStreamConfiguration(), mDelegationType, mBinder);
+        final OutputChannel<? extends Selectable<OUT>> channel = Channels.toSelectable(this, index)
+                                                                         .withChannels()
+                                                                         .with(configuration)
+                                                                         .setConfiguration()
+                                                                         .buildChannels();
+        return newChannel(channel, getStreamConfiguration(), mDelegationType, mBinder);
     }
 
     @NotNull

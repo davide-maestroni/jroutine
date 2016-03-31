@@ -21,6 +21,7 @@ import com.github.dm.jrt.channel.ChannelsBuilder;
 import com.github.dm.jrt.channel.Selectable;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
@@ -96,7 +97,7 @@ public class Streams extends Functions {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see Channels#blend(OutputChannel...)
+     * @see Channels#blend(Channel.OutputChannel...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<OUT>> blend(
@@ -115,7 +116,7 @@ public class Streams extends Functions {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified collection is null or contains a
      *                                            null object.
-     * @see Channels#combine(InputChannel...)
+     * @see Channels#combine(Channel.InputChannel...)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
@@ -139,7 +140,7 @@ public class Streams extends Functions {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see Channels#combine(int, InputChannel...)
+     * @see Channels#combine(int, Channel.InputChannel...)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
@@ -256,7 +257,7 @@ public class Streams extends Functions {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see Channels#concat(OutputChannel...)
+     * @see Channels#concat(Channel.OutputChannel...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<OUT>> concat(
@@ -279,7 +280,7 @@ public class Streams extends Functions {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see Channels#distribute(InputChannel...)
+     * @see Channels#distribute(Channel.InputChannel...)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<List<? extends IN>>> distribute(
@@ -328,7 +329,7 @@ public class Streams extends Functions {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see Channels#distribute(Object, InputChannel...)
+     * @see Channels#distribute(Object, Channel.InputChannel...)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<List<? extends IN>>> distribute(
@@ -471,7 +472,7 @@ public class Streams extends Functions {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see Channels#join(OutputChannel...)
+     * @see Channels#join(Channel.OutputChannel...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<List<? extends OUT>>> join(
@@ -524,7 +525,7 @@ public class Streams extends Functions {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see Channels#join(Object, OutputChannel...)
+     * @see Channels#join(Object, Channel.OutputChannel...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<List<? extends OUT>>> join(
@@ -671,7 +672,7 @@ public class Streams extends Functions {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see Channels#merge(int, OutputChannel...)
+     * @see Channels#merge(int, Channel.OutputChannel...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<? extends Selectable<OUT>>> merge(
@@ -734,7 +735,7 @@ public class Streams extends Functions {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see Channels#merge(OutputChannel...)
+     * @see Channels#merge(Channel.OutputChannel...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<? extends Selectable<OUT>>> merge(
@@ -827,7 +828,7 @@ public class Streams extends Functions {
      * @param channel the output channel.
      * @param <OUT>   the output data type.
      * @return the repeating stream channel builder.
-     * @see Channels#repeat(OutputChannel)
+     * @see Channels#repeat(Channel.OutputChannel)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<OUT>> repeat(
@@ -848,7 +849,7 @@ public class Streams extends Functions {
      * @param <DATA>  the channel data type.
      * @param <IN>    the input data type.
      * @return the I/O channel builder.
-     * @see Channels#select(InputChannel, int)
+     * @see Channels#select(Channel.InputChannel, int)
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends IOChannel<IN>> select(
@@ -872,7 +873,7 @@ public class Streams extends Functions {
      * @return the map of indexes and I/O channels builder.
      * @throws java.lang.NullPointerException if the specified iterable is null or returns a null
      *                                        object.
-     * @see Channels#select(InputChannel, Iterable)
+     * @see Channels#select(Channel.InputChannel, Iterable)
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends Map<Integer, IOChannel<IN>>>
@@ -898,7 +899,7 @@ public class Streams extends Functions {
      * @return the map of indexes and I/O channels builder.
      * @throws java.lang.NullPointerException if the specified array is null or contains a null
      *                                        object.
-     * @see Channels#select(InputChannel, int...)
+     * @see Channels#select(Channel.InputChannel, int...)
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends Map<Integer, IOChannel<IN>>>
@@ -924,7 +925,7 @@ public class Streams extends Functions {
      * @param <IN>       the input data type.
      * @return the map of indexes and I/O channels builder.
      * @throws java.lang.IllegalArgumentException if the specified range size is not positive.
-     * @see Channels#select(int, int, InputChannel)
+     * @see Channels#select(int, int, Channel.InputChannel)
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends Map<Integer, IOChannel<IN>>>
@@ -948,7 +949,7 @@ public class Streams extends Functions {
      * @param <OUT>      the output data type.
      * @return the map of indexes and output channels builder.
      * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
-     * @see Channels#select(int, int, OutputChannel)
+     * @see Channels#select(int, int, Channel.OutputChannel)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends Map<Integer, StreamChannel<OUT>>> select(
@@ -971,7 +972,7 @@ public class Streams extends Functions {
      * @return the map of indexes and output channels builder.
      * @throws java.lang.NullPointerException if the specified array is null or contains a null
      *                                        object.
-     * @see Channels#select(OutputChannel, int...)
+     * @see Channels#select(Channel.OutputChannel, int...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends Map<Integer, StreamChannel<OUT>>> select(
@@ -994,7 +995,7 @@ public class Streams extends Functions {
      * @return the map of indexes and output channels builder.
      * @throws java.lang.NullPointerException if the specified iterable is null or returns a null
      *                                        object.
-     * @see Channels#select(OutputChannel, Iterable)
+     * @see Channels#select(Channel.OutputChannel, Iterable)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends Map<Integer, StreamChannel<OUT>>> select(
@@ -1109,7 +1110,7 @@ public class Streams extends Functions {
      * @param index   the channel index.
      * @param <IN>    the input data type.
      * @return the selectable I/O channel builder.
-     * @see Channels#toSelectable(InputChannel, int)
+     * @see Channels#toSelectable(Channel.InputChannel, int)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<IN>>> toSelectable(
@@ -1129,7 +1130,7 @@ public class Streams extends Functions {
      * @param index   the channel index.
      * @param <OUT>   the output data type.
      * @return the selectable stream builder.
-     * @see Channels#toSelectable(OutputChannel, int)
+     * @see Channels#toSelectable(Channel.OutputChannel, int)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<? extends Selectable<OUT>>>

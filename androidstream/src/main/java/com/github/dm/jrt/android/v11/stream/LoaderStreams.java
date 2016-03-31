@@ -29,6 +29,7 @@ import com.github.dm.jrt.channel.Selectable;
 import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
@@ -93,7 +94,7 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see SparseChannels#blend(OutputChannel...)
+     * @see SparseChannels#blend(Channel.OutputChannel...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<OUT>> blend(
@@ -112,7 +113,7 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified collection is null or contains a
      *                                            null object.
-     * @see SparseChannels#combine(InputChannel...)
+     * @see SparseChannels#combine(Channel.InputChannel...)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
@@ -136,7 +137,7 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see SparseChannels#combine(int, InputChannel...)
+     * @see SparseChannels#combine(int, Channel.InputChannel...)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
@@ -276,7 +277,7 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see SparseChannels#concat(OutputChannel...)
+     * @see SparseChannels#concat(Channel.OutputChannel...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<OUT>> concat(
@@ -322,7 +323,7 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see SparseChannels#distribute(InputChannel...)
+     * @see SparseChannels#distribute(Channel.InputChannel...)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<List<? extends IN>>> distribute(
@@ -371,7 +372,7 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see SparseChannels#distribute(Object, InputChannel...)
+     * @see SparseChannels#distribute(Object, Channel.InputChannel...)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<List<? extends IN>>> distribute(
@@ -442,7 +443,7 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see SparseChannels#join(OutputChannel...)
+     * @see SparseChannels#join(Channel.OutputChannel...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<List<? extends OUT>>> join(
@@ -495,7 +496,7 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see SparseChannels#join(Object, OutputChannel...)
+     * @see SparseChannels#join(Object, Channel.OutputChannel...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<List<? extends OUT>>> join(
@@ -621,7 +622,7 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see SparseChannels#merge(int, OutputChannel...)
+     * @see SparseChannels#merge(int, Channel.OutputChannel...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<? extends
@@ -666,7 +667,7 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see SparseChannels#merge(OutputChannel...)
+     * @see SparseChannels#merge(Channel.OutputChannel...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<? extends
@@ -761,7 +762,7 @@ public class LoaderStreams extends Streams {
      * @param channel the output channel.
      * @param <OUT>   the output data type.
      * @return the repeating stream channel builder.
-     * @see SparseChannels#repeat(OutputChannel)
+     * @see SparseChannels#repeat(Channel.OutputChannel)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<OUT>> repeat(
@@ -782,7 +783,7 @@ public class LoaderStreams extends Streams {
      * @param <DATA>  the channel data type.
      * @param <IN>    the input data type.
      * @return the I/O channel builder.
-     * @see SparseChannels#select(InputChannel, int)
+     * @see SparseChannels#select(Channel.InputChannel, int)
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends IOChannel<IN>> select(
@@ -806,7 +807,7 @@ public class LoaderStreams extends Streams {
      * @return the map of indexes and I/O channels builder.
      * @throws java.lang.NullPointerException if the specified iterable is null or returns a null
      *                                        object.
-     * @see SparseChannels#select(InputChannel, Iterable)
+     * @see SparseChannels#select(Channel.InputChannel, Iterable)
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends Map<Integer, IOChannel<IN>>>
@@ -832,7 +833,7 @@ public class LoaderStreams extends Streams {
      * @return the map of indexes and I/O channels builder.
      * @throws java.lang.NullPointerException if the specified array is null or contains a null
      *                                        object.
-     * @see SparseChannels#select(InputChannel, int...)
+     * @see SparseChannels#select(Channel.InputChannel, int...)
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends Map<Integer, IOChannel<IN>>>
@@ -858,7 +859,7 @@ public class LoaderStreams extends Streams {
      * @param <IN>       the input data type.
      * @return the map of indexes and I/O channels builder.
      * @throws java.lang.IllegalArgumentException if the specified range size is not positive.
-     * @see SparseChannels#select(int, int, InputChannel)
+     * @see SparseChannels#select(int, int, Channel.InputChannel)
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends Map<Integer, IOChannel<IN>>>
@@ -881,7 +882,7 @@ public class LoaderStreams extends Streams {
      * @param <DATA>  the channel data type.
      * @param <IN>    the input data type.
      * @return the I/O channel builder.
-     * @see SparseChannels#selectParcelable(InputChannel, int)
+     * @see SparseChannels#selectParcelable(Channel.InputChannel, int)
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends IOChannel<IN>> selectParcelable(
@@ -906,7 +907,7 @@ public class LoaderStreams extends Streams {
      * @return the map of indexes and I/O channels builder.
      * @throws java.lang.NullPointerException if the specified array is null or contains a null
      *                                        object.
-     * @see SparseChannels#selectParcelable(InputChannel, int...)
+     * @see SparseChannels#selectParcelable(Channel.InputChannel, int...)
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends SparseArray<IOChannel<IN>>>
@@ -932,7 +933,7 @@ public class LoaderStreams extends Streams {
      * @return the map of indexes and I/O channels builder.
      * @throws java.lang.NullPointerException if the specified iterable is null or returns a null
      *                                        object.
-     * @see SparseChannels#selectParcelable(InputChannel, Iterable)
+     * @see SparseChannels#selectParcelable(Channel.InputChannel, Iterable)
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends SparseArray<IOChannel<IN>>>
@@ -958,7 +959,7 @@ public class LoaderStreams extends Streams {
      * @param <IN>       the input data type.
      * @return the map of indexes and I/O channels builder.
      * @throws java.lang.IllegalArgumentException if the specified range size is not positive.
-     * @see SparseChannels#selectParcelable(int, int, InputChannel)
+     * @see SparseChannels#selectParcelable(int, int, Channel.InputChannel)
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends SparseArray<IOChannel<IN>>>
@@ -982,7 +983,7 @@ public class LoaderStreams extends Streams {
      * @param <OUT>      the output data type.
      * @return the map of indexes and output channels builder.
      * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
-     * @see SparseChannels#select(int, int, OutputChannel)
+     * @see SparseChannels#select(int, int, Channel.OutputChannel)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends SparseArray<LoaderStreamChannel<OUT>>>
@@ -1007,7 +1008,7 @@ public class LoaderStreams extends Streams {
      * @return the map of indexes and output channels builder.
      * @throws java.lang.NullPointerException if the specified array is null or contains a null
      *                                        object.
-     * @see SparseChannels#select(OutputChannel, int...)
+     * @see SparseChannels#select(Channel.OutputChannel, int...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends SparseArray<LoaderStreamChannel<OUT>>>
@@ -1031,7 +1032,7 @@ public class LoaderStreams extends Streams {
      * @return the map of indexes and output channels builder.
      * @throws java.lang.NullPointerException if the specified iterable is null or returns a null
      *                                        object.
-     * @see SparseChannels#select(OutputChannel, Iterable)
+     * @see SparseChannels#select(Channel.OutputChannel, Iterable)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends SparseArray<LoaderStreamChannel<OUT>>>
@@ -1125,7 +1126,7 @@ public class LoaderStreams extends Streams {
      * @param index   the channel index.
      * @param <IN>    the input data type.
      * @return the selectable I/O channel builder.
-     * @see SparseChannels#toSelectable(InputChannel, int)
+     * @see SparseChannels#toSelectable(Channel.InputChannel, int)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<IN>>> toSelectable(
@@ -1145,7 +1146,7 @@ public class LoaderStreams extends Streams {
      * @param index   the channel index.
      * @param <OUT>   the output data type.
      * @return the selectable loader stream builder.
-     * @see SparseChannels#toSelectable(OutputChannel, int)
+     * @see SparseChannels#toSelectable(Channel.OutputChannel, int)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<? extends

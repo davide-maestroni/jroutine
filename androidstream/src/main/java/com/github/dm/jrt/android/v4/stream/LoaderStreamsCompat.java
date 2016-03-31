@@ -29,6 +29,7 @@ import com.github.dm.jrt.channel.Selectable;
 import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
+import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
@@ -93,7 +94,7 @@ public class LoaderStreamsCompat extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see SparseChannelsCompat#blend(OutputChannel...)
+     * @see SparseChannelsCompat#blend(Channel.OutputChannel...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<OUT>> blend(
@@ -112,7 +113,7 @@ public class LoaderStreamsCompat extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified collection is null or contains a
      *                                            null object.
-     * @see SparseChannelsCompat#combine(InputChannel...)
+     * @see SparseChannelsCompat#combine(Channel.InputChannel...)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
@@ -136,7 +137,7 @@ public class LoaderStreamsCompat extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see SparseChannelsCompat#combine(int, InputChannel...)
+     * @see SparseChannelsCompat#combine(int, Channel.InputChannel...)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
@@ -276,7 +277,7 @@ public class LoaderStreamsCompat extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see SparseChannelsCompat#concat(OutputChannel...)
+     * @see SparseChannelsCompat#concat(Channel.OutputChannel...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<OUT>> concat(
@@ -322,7 +323,7 @@ public class LoaderStreamsCompat extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see SparseChannelsCompat#distribute(InputChannel...)
+     * @see SparseChannelsCompat#distribute(Channel.InputChannel...)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<List<? extends IN>>> distribute(
@@ -371,7 +372,7 @@ public class LoaderStreamsCompat extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see SparseChannelsCompat#distribute(Object, InputChannel...)
+     * @see SparseChannelsCompat#distribute(Object, Channel.InputChannel...)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<List<? extends IN>>> distribute(
@@ -443,7 +444,7 @@ public class LoaderStreamsCompat extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see SparseChannelsCompat#join(OutputChannel...)
+     * @see SparseChannelsCompat#join(Channel.OutputChannel...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<List<? extends OUT>>>
@@ -499,7 +500,7 @@ public class LoaderStreamsCompat extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see SparseChannelsCompat#join(Object, OutputChannel...)
+     * @see SparseChannelsCompat#join(Object, Channel.OutputChannel...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<List<? extends OUT>>>
@@ -628,7 +629,7 @@ public class LoaderStreamsCompat extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see SparseChannelsCompat#merge(int, OutputChannel...)
+     * @see SparseChannelsCompat#merge(int, Channel.OutputChannel...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<? extends
@@ -673,7 +674,7 @@ public class LoaderStreamsCompat extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see SparseChannelsCompat#merge(OutputChannel...)
+     * @see SparseChannelsCompat#merge(Channel.OutputChannel...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<? extends
@@ -769,7 +770,7 @@ public class LoaderStreamsCompat extends Streams {
      * @param channel the output channel.
      * @param <OUT>   the output data type.
      * @return the repeating stream channel builder.
-     * @see SparseChannelsCompat#repeat(OutputChannel)
+     * @see SparseChannelsCompat#repeat(Channel.OutputChannel)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<OUT>> repeat(
@@ -790,7 +791,7 @@ public class LoaderStreamsCompat extends Streams {
      * @param <DATA>  the channel data type.
      * @param <IN>    the input data type.
      * @return the I/O channel builder.
-     * @see SparseChannelsCompat#select(InputChannel, int)
+     * @see SparseChannelsCompat#select(Channel.InputChannel, int)
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends IOChannel<IN>> select(
@@ -814,7 +815,7 @@ public class LoaderStreamsCompat extends Streams {
      * @return the map of indexes and I/O channels builder.
      * @throws java.lang.NullPointerException if the specified iterable is null or returns a null
      *                                        object.
-     * @see SparseChannelsCompat#select(InputChannel, Iterable)
+     * @see SparseChannelsCompat#select(Channel.InputChannel, Iterable)
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends Map<Integer, IOChannel<IN>>>
@@ -840,7 +841,7 @@ public class LoaderStreamsCompat extends Streams {
      * @return the map of indexes and I/O channels builder.
      * @throws java.lang.NullPointerException if the specified array is null or contains a null
      *                                        object.
-     * @see SparseChannelsCompat#select(InputChannel, int...)
+     * @see SparseChannelsCompat#select(Channel.InputChannel, int...)
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends Map<Integer, IOChannel<IN>>>
@@ -866,7 +867,7 @@ public class LoaderStreamsCompat extends Streams {
      * @param <IN>       the input data type.
      * @return the map of indexes and I/O channels builder.
      * @throws java.lang.IllegalArgumentException if the specified range size is not positive.
-     * @see SparseChannelsCompat#select(int, int, InputChannel)
+     * @see SparseChannelsCompat#select(int, int, Channel.InputChannel)
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends Map<Integer, IOChannel<IN>>>
@@ -889,7 +890,7 @@ public class LoaderStreamsCompat extends Streams {
      * @param <DATA>  the channel data type.
      * @param <IN>    the input data type.
      * @return the I/O channel builder.
-     * @see SparseChannelsCompat#selectParcelable(InputChannel, int)
+     * @see SparseChannelsCompat#selectParcelable(Channel.InputChannel, int)
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends IOChannel<IN>> selectParcelable(
@@ -914,7 +915,7 @@ public class LoaderStreamsCompat extends Streams {
      * @return the map of indexes and I/O channels builder.
      * @throws java.lang.NullPointerException if the specified array is null or contains a null
      *                                        object.
-     * @see SparseChannelsCompat#selectParcelable(InputChannel, int...)
+     * @see SparseChannelsCompat#selectParcelable(Channel.InputChannel, int...)
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends
@@ -940,7 +941,7 @@ public class LoaderStreamsCompat extends Streams {
      * @return the map of indexes and I/O channels builder.
      * @throws java.lang.NullPointerException if the specified iterable is null or returns a null
      *                                        object.
-     * @see SparseChannelsCompat#selectParcelable(InputChannel, Iterable)
+     * @see SparseChannelsCompat#selectParcelable(Channel.InputChannel, Iterable)
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends
@@ -966,7 +967,7 @@ public class LoaderStreamsCompat extends Streams {
      * @param <IN>       the input data type.
      * @return the map of indexes and I/O channels builder.
      * @throws java.lang.IllegalArgumentException if the specified range size is not positive.
-     * @see SparseChannelsCompat#selectParcelable(int, int, InputChannel)
+     * @see SparseChannelsCompat#selectParcelable(int, int, Channel.InputChannel)
      */
     @NotNull
     public static <DATA, IN extends DATA> ChannelsBuilder<? extends
@@ -990,7 +991,7 @@ public class LoaderStreamsCompat extends Streams {
      * @param <OUT>      the output data type.
      * @return the map of indexes and output channels builder.
      * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
-     * @see SparseChannelsCompat#select(int, int, OutputChannel)
+     * @see SparseChannelsCompat#select(int, int, Channel.OutputChannel)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends
@@ -1015,7 +1016,7 @@ public class LoaderStreamsCompat extends Streams {
      * @return the map of indexes and output channels builder.
      * @throws java.lang.NullPointerException if the specified array is null or contains a null
      *                                        object.
-     * @see SparseChannelsCompat#select(OutputChannel, int...)
+     * @see SparseChannelsCompat#select(Channel.OutputChannel, int...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends
@@ -1039,7 +1040,7 @@ public class LoaderStreamsCompat extends Streams {
      * @return the map of indexes and output channels builder.
      * @throws java.lang.NullPointerException if the specified iterable is null or returns a null
      *                                        object.
-     * @see SparseChannelsCompat#select(OutputChannel, Iterable)
+     * @see SparseChannelsCompat#select(Channel.OutputChannel, Iterable)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends
@@ -1134,7 +1135,7 @@ public class LoaderStreamsCompat extends Streams {
      * @param index   the channel index.
      * @param <IN>    the input data type.
      * @return the selectable I/O channel builder.
-     * @see SparseChannelsCompat#toSelectable(InputChannel, int)
+     * @see SparseChannelsCompat#toSelectable(Channel.InputChannel, int)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<IN>>> toSelectable(
@@ -1154,7 +1155,7 @@ public class LoaderStreamsCompat extends Streams {
      * @param index   the channel index.
      * @param <OUT>   the output data type.
      * @return the selectable loader stream builder.
-     * @see SparseChannelsCompat#toSelectable(OutputChannel, int)
+     * @see SparseChannelsCompat#toSelectable(Channel.OutputChannel, int)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<? extends

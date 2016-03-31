@@ -55,9 +55,9 @@ class MapBuilderWrapper<OUT>
     }
 
     @NotNull
-    public SparseArrayCompat<LoaderStreamChannelCompat<OUT>> build() {
+    public SparseArrayCompat<LoaderStreamChannelCompat<OUT>> buildChannels() {
 
-        final SparseArrayCompat<OutputChannel<OUT>> channels = mBuilder.build();
+        final SparseArrayCompat<OutputChannel<OUT>> channels = mBuilder.buildChannels();
         final int size = channels.size();
         final SparseArrayCompat<LoaderStreamChannelCompat<OUT>> channelMap =
                 new SparseArrayCompat<LoaderStreamChannelCompat<OUT>>(size);

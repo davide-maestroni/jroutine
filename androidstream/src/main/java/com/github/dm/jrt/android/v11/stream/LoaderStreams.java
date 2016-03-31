@@ -18,7 +18,6 @@ package com.github.dm.jrt.android.v11.stream;
 
 import android.util.SparseArray;
 
-import com.github.dm.jrt.android.channel.AndroidChannels;
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
 import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
@@ -26,9 +25,11 @@ import com.github.dm.jrt.android.v11.channel.SparseChannels;
 import com.github.dm.jrt.android.v11.core.JRoutineLoader;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
 import com.github.dm.jrt.channel.ChannelsBuilder;
+import com.github.dm.jrt.channel.Selectable;
 import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
+import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.util.ConstantConditions;
@@ -41,6 +42,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import static com.github.dm.jrt.android.core.invocation.DelegatingContextInvocation.factoryFrom;
 
@@ -70,7 +72,7 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
      * @throws java.lang.NullPointerException     if the specified collection is null or contains a
      *                                            null object.
-     * @see AndroidChannels#blend(Collection)
+     * @see SparseChannels#blend(Collection)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<OUT>> blend(
@@ -91,13 +93,150 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see AndroidChannels#blend(com.github.dm.jrt.core.channel.Channel.OutputChannel[])
+     * @see SparseChannels#blend(OutputChannel...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<OUT>> blend(
             @NotNull final OutputChannel<?>... channels) {
 
         return new BuilderWrapper<OUT>(SparseChannels.<OUT>blend(channels));
+    }
+
+    /**
+     * Returns a builder of input channels combining the specified channels into a selectable one.
+     * The selectable indexes will be the position in the array.
+     *
+     * @param channels the array of input channels.
+     * @param <IN>     the input data type.
+     * @return the selectable I/O channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
+     * @see SparseChannels#combine(InputChannel...)
+     */
+    @NotNull
+    public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
+            @NotNull final InputChannel<?>... channels) {
+
+        return SparseChannels.combine(channels);
+    }
+
+    /**
+     * Returns a builder of input channels combining the specified channels into a selectable one.
+     * The selectable indexes will start from the specified one.
+     * <p/>
+     * Note that the builder will successfully create several input channel instances, and that the
+     * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
+     * invocation lifecycle.
+     *
+     * @param startIndex the selectable start index.
+     * @param channels   the array of input channels.
+     * @param <IN>       the input data type.
+     * @return the selectable I/O channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.NullPointerException     if the specified array is null or contains a null
+     *                                            object.
+     * @see SparseChannels#combine(int, InputChannel...)
+     */
+    @NotNull
+    public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
+            final int startIndex, @NotNull final InputChannel<?>... channels) {
+
+        return SparseChannels.combine(startIndex, channels);
+    }
+
+    /**
+     * Returns a builder of input channels combining the specified channels into a selectable one.
+     * The selectable indexes will start from the specified one.
+     * <p/>
+     * Note that the builder will successfully create several input channel instances, and that the
+     * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
+     * invocation lifecycle.
+     *
+     * @param startIndex the selectable start index.
+     * @param channels   the collection of input channels.
+     * @param <IN>       the input data type.
+     * @return the selectable I/O channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
+     * @see SparseChannels#combine(int, Collection)
+     */
+    @NotNull
+    public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
+            final int startIndex,
+            @NotNull final Collection<? extends InputChannel<? extends IN>> channels) {
+
+        return SparseChannels.combine(startIndex, channels);
+    }
+
+    /**
+     * Returns a builder of input channels combining the specified channels into a selectable one.
+     * The selectable indexes will be the position in the collection.
+     * <p/>
+     * Note that the builder will successfully create several input channel instances, and that the
+     * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
+     * invocation lifecycle.
+     *
+     * @param channels the collection of input channels.
+     * @param <IN>     the input data type.
+     * @return the selectable I/O channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
+     * @see SparseChannels#combine(Collection)
+     */
+    @NotNull
+    public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
+            @NotNull final Collection<? extends InputChannel<? extends IN>> channels) {
+
+        return SparseChannels.combine(channels);
+    }
+
+    /**
+     * Returns a builder of input channels combining the specified channels into a selectable one.
+     * The selectable indexes will be the keys of the specified map.
+     * <p/>
+     * Note that the builder will successfully create several input channel instances, and that the
+     * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
+     * invocation lifecycle.
+     *
+     * @param channels the map of indexes and input channels.
+     * @param <IN>     the input data type.
+     * @return the selectable I/O channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified map is empty.
+     * @throws java.lang.NullPointerException     if the specified map is null or contains a null
+     *                                            object.
+     * @see SparseChannels#combine(Map)
+     */
+    @NotNull
+    public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
+            @NotNull final Map<Integer, ? extends InputChannel<? extends IN>> channels) {
+
+        return SparseChannels.combine(channels);
+    }
+
+    /**
+     * Returns a builder of input channels combining the specified channels into a selectable one.
+     * The selectable indexes will be the keys of the specified map.
+     * <p/>
+     * Note that the builder will successfully create only one input channel instance, and that the
+     * returned channel <b>must be explicitly closed</b> in order to ensure the completion of the
+     * invocation lifecycle.
+     *
+     * @param channels the map of indexes and input channels.
+     * @param <IN>     the input data type.
+     * @return the selectable I/O channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified map is empty.
+     * @throws java.lang.NullPointerException     if the specified map is null or contains a null
+     *                                            object.
+     * @see SparseChannels#combine(Map)
+     */
+    @NotNull
+    public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
+            @NotNull final SparseArray<? extends InputChannel<? extends IN>> channels) {
+
+        return SparseChannels.combine(channels);
     }
 
     /**
@@ -114,7 +253,7 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
      * @throws java.lang.NullPointerException     if the specified collection is null or contains a
      *                                            null object.
-     * @see AndroidChannels#concat(Collection)
+     * @see SparseChannels#concat(Collection)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<OUT>> concat(
@@ -137,7 +276,7 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see AndroidChannels#concat(com.github.dm.jrt.core.channel.Channel.OutputChannel[])
+     * @see SparseChannels#concat(OutputChannel...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<OUT>> concat(
@@ -170,6 +309,105 @@ public class LoaderStreams extends Streams {
     }
 
     /**
+     * Returns a builder of channels distributing the input data among the specified channels. If
+     * the list of data exceeds the number of channels, the invocation will be aborted.
+     * <p/>
+     * Note that the builder will successfully create several input channel instances, and that the
+     * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
+     * invocation lifecycle.
+     *
+     * @param channels the array of channels.
+     * @param <IN>     the input data type.
+     * @return the I/O channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.NullPointerException     if the specified array is null or contains a null
+     *                                            object.
+     * @see SparseChannels#distribute(InputChannel...)
+     */
+    @NotNull
+    public static <IN> ChannelsBuilder<? extends IOChannel<List<? extends IN>>> distribute(
+            @NotNull final InputChannel<?>... channels) {
+
+        return SparseChannels.distribute(channels);
+    }
+
+    /**
+     * Returns a builder of channels distributing the input data among the specified channels. If
+     * the list of data exceeds the number of channels, the invocation will be aborted.
+     * <p/>
+     * Note that the builder will successfully create several input channel instances, and that the
+     * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
+     * invocation lifecycle.
+     *
+     * @param channels the collection of channels.
+     * @param <IN>     the input data type.
+     * @return the I/O channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
+     * @see SparseChannels#distribute(Collection)
+     */
+    @NotNull
+    public static <IN> ChannelsBuilder<? extends IOChannel<List<? extends IN>>> distribute(
+            @NotNull final Collection<? extends InputChannel<? extends IN>> channels) {
+
+        return SparseChannels.distribute(channels);
+    }
+
+    /**
+     * Returns a builder of channels distributing the input data among the specified channels. If
+     * the list of data is smaller than the specified number of channels, the remaining ones will be
+     * fed with the specified placeholder instance. While, if the list of data exceeds the number of
+     * channels, the invocation will be aborted.
+     * <p/>
+     * Note that the builder will successfully create several input channel instances, and that the
+     * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
+     * invocation lifecycle.
+     *
+     * @param placeholder the placeholder instance.
+     * @param channels    the array of channels.
+     * @param <IN>        the input data type.
+     * @return the I/O channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.NullPointerException     if the specified array is null or contains a null
+     *                                            object.
+     * @see SparseChannels#distribute(Object, InputChannel...)
+     */
+    @NotNull
+    public static <IN> ChannelsBuilder<? extends IOChannel<List<? extends IN>>> distribute(
+            @Nullable final IN placeholder, @NotNull final InputChannel<?>... channels) {
+
+        return SparseChannels.distribute(placeholder, channels);
+    }
+
+    /**
+     * Returns a builder of channels distributing the input data among the specified channels. If
+     * the list of data is smaller than the specified number of channels, the remaining ones will be
+     * fed with the specified placeholder instance. While, if the list of data exceeds the number of
+     * channels, the invocation will be aborted.
+     * <p/>
+     * Note that the builder will successfully create several input channel instances, and that the
+     * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
+     * invocation lifecycle.
+     *
+     * @param placeholder the placeholder instance.
+     * @param channels    the collection of channels.
+     * @param <IN>        the input data type.
+     * @return the I/O channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
+     * @see SparseChannels#distribute(Object, Collection)
+     */
+    @NotNull
+    public static <IN> ChannelsBuilder<? extends IOChannel<List<? extends IN>>> distribute(
+            @Nullable final IN placeholder,
+            @NotNull final Collection<? extends InputChannel<? extends IN>> channels) {
+
+        return SparseChannels.distribute(placeholder, channels);
+    }
+
+    /**
      * Returns a builder of loader streams joining the data coming from the specified channels.<br/>
      * An output will be generated only when at least one result is available for each channel.
      * <p/>
@@ -182,7 +420,7 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
      * @throws java.lang.NullPointerException     if the specified collection is null or contains a
      *                                            null object.
-     * @see AndroidChannels#join(Collection)
+     * @see SparseChannels#join(Collection)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<List<? extends OUT>>> join(
@@ -204,7 +442,7 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see AndroidChannels#join(com.github.dm.jrt.core.channel.Channel.OutputChannel[])
+     * @see SparseChannels#join(OutputChannel...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<List<? extends OUT>>> join(
@@ -230,7 +468,7 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
      * @throws java.lang.NullPointerException     if the specified collection is null or contains a
      *                                            null object.
-     * @see AndroidChannels#join(Object, Collection)
+     * @see SparseChannels#join(Object, Collection)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<List<? extends OUT>>> join(
@@ -257,7 +495,7 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see AndroidChannels#join(Object, com.github.dm.jrt.core.channel.Channel.OutputChannel[])
+     * @see SparseChannels#join(Object, OutputChannel...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<List<? extends OUT>>> join(
@@ -359,7 +597,7 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
      * @throws java.lang.NullPointerException     if the specified collection is null or contains a
      *                                            null object.
-     * @see AndroidChannels#merge(int, Collection)
+     * @see SparseChannels#merge(int, Collection)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<? extends
@@ -383,7 +621,7 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see AndroidChannels#merge(int, com.github.dm.jrt.core.channel.Channel.OutputChannel[])
+     * @see SparseChannels#merge(int, OutputChannel...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<? extends
@@ -406,7 +644,7 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
      * @throws java.lang.NullPointerException     if the specified collection is null or contains a
      *                                            null object.
-     * @see AndroidChannels#merge(Collection)
+     * @see SparseChannels#merge(Collection)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<? extends
@@ -428,7 +666,7 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see AndroidChannels#merge(com.github.dm.jrt.core.channel.Channel.OutputChannel[])
+     * @see SparseChannels#merge(OutputChannel...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<? extends
@@ -523,13 +761,212 @@ public class LoaderStreams extends Streams {
      * @param channel the output channel.
      * @param <OUT>   the output data type.
      * @return the repeating stream channel builder.
-     * @see AndroidChannels#repeat(com.github.dm.jrt.core.channel.Channel.OutputChannel)
+     * @see SparseChannels#repeat(OutputChannel)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<OUT>> repeat(
             @NotNull final OutputChannel<OUT> channel) {
 
         return new BuilderWrapper<OUT>(SparseChannels.repeat(channel));
+    }
+
+    /**
+     * Returns a builder of channels transforming the input data into selectable ones.
+     * <p/>
+     * Note that the builder will successfully create several input channel instances, and that the
+     * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
+     * invocation lifecycle.
+     *
+     * @param channel the selectable channel.
+     * @param index   the channel index.
+     * @param <DATA>  the channel data type.
+     * @param <IN>    the input data type.
+     * @return the I/O channel builder.
+     * @see SparseChannels#select(InputChannel, int)
+     */
+    @NotNull
+    public static <DATA, IN extends DATA> ChannelsBuilder<? extends IOChannel<IN>> select(
+            @NotNull final InputChannel<? super Selectable<DATA>> channel, final int index) {
+
+        return SparseChannels.select(channel, index);
+    }
+
+    /**
+     * Returns a builder of maps of input channels accepting the data identified by the specified
+     * indexes.
+     * <p/>
+     * Note that the builder will successfully create several input channel map instances, and that
+     * the returned channels <b>must be explicitly closed</b> in order to ensure the completion of
+     * the invocation lifecycle.
+     *
+     * @param channel the selectable channel.
+     * @param indexes the iterable returning the channel indexes.
+     * @param <DATA>  the channel data type.
+     * @param <IN>    the input data type.
+     * @return the map of indexes and I/O channels builder.
+     * @throws java.lang.NullPointerException if the specified iterable is null or returns a null
+     *                                        object.
+     * @see SparseChannels#select(InputChannel, Iterable)
+     */
+    @NotNull
+    public static <DATA, IN extends DATA> ChannelsBuilder<? extends Map<Integer, IOChannel<IN>>>
+    select(
+            @NotNull final InputChannel<? super Selectable<DATA>> channel,
+            @NotNull final Iterable<Integer> indexes) {
+
+        return SparseChannels.select(channel, indexes);
+    }
+
+    /**
+     * Returns a builder of maps of input channels accepting the data identified by the specified
+     * indexes.
+     * <p/>
+     * Note that the builder will successfully create several input channel map instances, and that
+     * the returned channels <b>must be explicitly closed</b> in order to ensure the completion of
+     * the invocation lifecycle.
+     *
+     * @param channel the selectable channel.
+     * @param indexes the array of indexes.
+     * @param <DATA>  the channel data type.
+     * @param <IN>    the input data type.
+     * @return the map of indexes and I/O channels builder.
+     * @throws java.lang.NullPointerException if the specified array is null or contains a null
+     *                                        object.
+     * @see SparseChannels#select(InputChannel, int...)
+     */
+    @NotNull
+    public static <DATA, IN extends DATA> ChannelsBuilder<? extends Map<Integer, IOChannel<IN>>>
+    select(
+            @NotNull final InputChannel<? super Selectable<DATA>> channel,
+            @NotNull final int... indexes) {
+
+        return SparseChannels.select(channel, indexes);
+    }
+
+    /**
+     * Returns a builder of maps of input channels accepting the data identified by the specified
+     * indexes.
+     * <p/>
+     * Note that the builder will successfully create several input channel map instances, and that
+     * the returned channels <b>must be explicitly closed</b> in order to ensure the completion of
+     * the invocation lifecycle.
+     *
+     * @param startIndex the selectable start index.
+     * @param rangeSize  the size of the range of indexes (must be positive).
+     * @param channel    the selectable channel.
+     * @param <DATA>     the channel data type.
+     * @param <IN>       the input data type.
+     * @return the map of indexes and I/O channels builder.
+     * @throws java.lang.IllegalArgumentException if the specified range size is not positive.
+     * @see SparseChannels#select(int, int, InputChannel)
+     */
+    @NotNull
+    public static <DATA, IN extends DATA> ChannelsBuilder<? extends Map<Integer, IOChannel<IN>>>
+    select(
+            final int startIndex, final int rangeSize,
+            @NotNull final InputChannel<? super Selectable<DATA>> channel) {
+
+        return SparseChannels.select(startIndex, rangeSize, channel);
+    }
+
+    /**
+     * Returns a builder of channels transforming the input data into selectable ones.
+     * <p/>
+     * Note that the builder will successfully create several input channel instances, and that the
+     * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
+     * invocation lifecycle.
+     *
+     * @param channel the selectable channel.
+     * @param index   the channel index.
+     * @param <DATA>  the channel data type.
+     * @param <IN>    the input data type.
+     * @return the I/O channel builder.
+     * @see SparseChannels#selectParcelable(InputChannel, int)
+     */
+    @NotNull
+    public static <DATA, IN extends DATA> ChannelsBuilder<? extends IOChannel<IN>> selectParcelable(
+            @NotNull final InputChannel<? super ParcelableSelectable<DATA>> channel,
+            final int index) {
+
+        return SparseChannels.selectParcelable(channel, index);
+    }
+
+    /**
+     * Returns a builder of maps of input channels accepting the data identified by the specified
+     * indexes.
+     * <p/>
+     * Note that the builder will successfully create several input channel map instances, and that
+     * the returned channels <b>must be explicitly closed</b> in order to ensure the completion of
+     * the invocation lifecycle.
+     *
+     * @param channel the selectable channel.
+     * @param indexes the array of indexes.
+     * @param <DATA>  the channel data type.
+     * @param <IN>    the input data type.
+     * @return the map of indexes and I/O channels builder.
+     * @throws java.lang.NullPointerException if the specified array is null or contains a null
+     *                                        object.
+     * @see SparseChannels#selectParcelable(InputChannel, int...)
+     */
+    @NotNull
+    public static <DATA, IN extends DATA> ChannelsBuilder<? extends SparseArray<IOChannel<IN>>>
+    selectParcelable(
+            @NotNull final InputChannel<? super ParcelableSelectable<DATA>> channel,
+            @NotNull final int... indexes) {
+
+        return SparseChannels.selectParcelable(channel, indexes);
+    }
+
+    /**
+     * Returns a builder of maps of input channels accepting the data identified by the specified
+     * indexes.
+     * <p/>
+     * Note that the builder will successfully create several input channel map instances, and that
+     * the returned channels <b>must be explicitly closed</b> in order to ensure the completion of
+     * the invocation lifecycle.
+     *
+     * @param channel the selectable channel.
+     * @param indexes the iterable returning the channel indexes.
+     * @param <DATA>  the channel data type.
+     * @param <IN>    the input data type.
+     * @return the map of indexes and I/O channels builder.
+     * @throws java.lang.NullPointerException if the specified iterable is null or returns a null
+     *                                        object.
+     * @see SparseChannels#selectParcelable(InputChannel, Iterable)
+     */
+    @NotNull
+    public static <DATA, IN extends DATA> ChannelsBuilder<? extends SparseArray<IOChannel<IN>>>
+    selectParcelable(
+            @NotNull final InputChannel<? super ParcelableSelectable<DATA>> channel,
+            @NotNull final Iterable<Integer> indexes) {
+
+        return SparseChannels.selectParcelable(channel, indexes);
+    }
+
+    /**
+     * Returns a builder of maps of input channels accepting the data identified by the specified
+     * indexes.
+     * <p/>
+     * Note that the builder will successfully create several input channel map instances, and that
+     * the returned channels <b>must be explicitly closed</b> in order to ensure the completion of
+     * the invocation lifecycle.
+     *
+     * @param startIndex the selectable start index.
+     * @param rangeSize  the size of the range of indexes (must be positive).
+     * @param channel    the selectable channel.
+     * @param <DATA>     the channel data type.
+     * @param <IN>       the input data type.
+     * @return the map of indexes and I/O channels builder.
+     * @throws java.lang.IllegalArgumentException if the specified range size is not positive.
+     * @see SparseChannels#selectParcelable(int, int, InputChannel)
+     */
+    @NotNull
+    public static <DATA, IN extends DATA> ChannelsBuilder<? extends SparseArray<IOChannel<IN>>>
+    selectParcelable(
+            final int startIndex, final int rangeSize,
+            @NotNull final InputChannel<? super ParcelableSelectable<DATA>> channel) {
+
+        return SparseChannels.selectParcelable(startIndex, rangeSize, channel);
     }
 
     /**
@@ -545,7 +982,7 @@ public class LoaderStreams extends Streams {
      * @param <OUT>      the output data type.
      * @return the map of indexes and output channels builder.
      * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
-     * @see AndroidChannels#select(int, int, com.github.dm.jrt.core.channel.Channel.OutputChannel)
+     * @see SparseChannels#select(int, int, OutputChannel)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends SparseArray<LoaderStreamChannel<OUT>>>
@@ -570,7 +1007,7 @@ public class LoaderStreams extends Streams {
      * @return the map of indexes and output channels builder.
      * @throws java.lang.NullPointerException if the specified array is null or contains a null
      *                                        object.
-     * @see AndroidChannels#select(com.github.dm.jrt.core.channel.Channel.OutputChannel, int...)
+     * @see SparseChannels#select(OutputChannel, int...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends SparseArray<LoaderStreamChannel<OUT>>>
@@ -594,7 +1031,7 @@ public class LoaderStreams extends Streams {
      * @return the map of indexes and output channels builder.
      * @throws java.lang.NullPointerException if the specified iterable is null or returns a null
      *                                        object.
-     * @see AndroidChannels#select(com.github.dm.jrt.core.channel.Channel.OutputChannel, Iterable)
+     * @see SparseChannels#select(OutputChannel, Iterable)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends SparseArray<LoaderStreamChannel<OUT>>>
@@ -669,7 +1106,32 @@ public class LoaderStreams extends Streams {
     public static <OUT> LoaderStreamChannel<OUT> streamOf(
             @NotNull final OutputChannel<OUT> output) {
 
+        if (output instanceof LoaderStreamChannel) {
+            return (LoaderStreamChannel<OUT>) output;
+        }
+
         return new DefaultLoaderStreamChannel<OUT>(null, output);
+    }
+
+    /**
+     * Returns a builder of selectable channels feeding the specified one.<br/>
+     * Each output will be filtered based on the specified index.
+     * <p/>
+     * Note that the builder will return the same map for the same inputs and equal configuration,
+     * and that the returned channels <b>must be explicitly closed</b> in order to ensure the
+     * completion of the invocation lifecycle.
+     *
+     * @param channel the channel to make selectable.
+     * @param index   the channel index.
+     * @param <IN>    the input data type.
+     * @return the selectable I/O channel builder.
+     * @see SparseChannels#toSelectable(InputChannel, int)
+     */
+    @NotNull
+    public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<IN>>> toSelectable(
+            @NotNull final InputChannel<? super IN> channel, final int index) {
+
+        return SparseChannels.toSelectable(channel, index);
     }
 
     /**
@@ -683,7 +1145,7 @@ public class LoaderStreams extends Streams {
      * @param index   the channel index.
      * @param <OUT>   the output data type.
      * @return the selectable loader stream builder.
-     * @see AndroidChannels#toSelectable(com.github.dm.jrt.core.channel.Channel.OutputChannel, int)
+     * @see SparseChannels#toSelectable(OutputChannel, int)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<? extends

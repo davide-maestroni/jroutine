@@ -51,9 +51,9 @@ class BuilderWrapper<OUT> implements ChannelsBuilder<StreamChannel<OUT>>,
 
     @NotNull
     @SuppressWarnings("unchecked")
-    public StreamChannel<OUT> build() {
+    public StreamChannel<OUT> buildChannels() {
 
-        return (StreamChannel<OUT>) Streams.streamOf(mBuilder.build());
+        return (StreamChannel<OUT>) Streams.streamOf(mBuilder.buildChannels());
     }
 
     @NotNull

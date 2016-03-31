@@ -78,7 +78,7 @@ class MergeMapBuilder<OUT>
         final int size = channelMap.size();
         for (int i = 0; i < size; ++i) {
             ioChannel.pass(AndroidChannels.toSelectable(channelMap.valueAt(i), channelMap.keyAt(i))
-                                          .build());
+                                          .buildChannels());
         }
 
         return ioChannel.close();

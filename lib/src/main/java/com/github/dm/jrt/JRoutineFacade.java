@@ -16,12 +16,10 @@
 
 package com.github.dm.jrt;
 
-import com.github.dm.jrt.channel.Channels;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.builder.IOChannelBuilder;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.ResultChannel;
-import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
 import com.github.dm.jrt.core.invocation.FilterInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
@@ -30,11 +28,10 @@ import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
-import com.github.dm.jrt.function.Functions;
-import com.github.dm.jrt.function.OutputConsumerBuilder;
 import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.object.InvocationTarget;
+import com.github.dm.jrt.stream.Streams;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -42,21 +39,13 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
-import static com.github.dm.jrt.function.Functions.consumerCall;
-import static com.github.dm.jrt.function.Functions.consumerCommand;
-import static com.github.dm.jrt.function.Functions.consumerFilter;
-import static com.github.dm.jrt.function.Functions.functionCall;
-import static com.github.dm.jrt.function.Functions.functionFilter;
-import static com.github.dm.jrt.function.Functions.predicateFilter;
-import static com.github.dm.jrt.function.Functions.supplierCommand;
-import static com.github.dm.jrt.function.Functions.supplierFactory;
 
 /**
  * Class acting as a fa&ccedil;ade of all the JRoutine library features.
  * <p/>
  * Created by davide-maestroni on 02/29/2016.
  */
-public class JRoutineFacade extends Channels {
+public class JRoutineFacade extends Streams {
 
     /**
      * Avoid explicit instantiation.
@@ -446,46 +435,5 @@ public class JRoutineFacade extends Channels {
     public static TargetRoutineBuilder on(@NotNull final Object object) {
 
         return (object instanceof Class) ? classOfType((Class<?>) object) : instance(object);
-    }
-
-    /**
-     * Returns an output consumer builder employing the specified consumer function to handle the
-     * invocation completion.
-     *
-     * @param consumer the consumer function.
-     * @return the builder instance.
-     */
-    @NotNull
-    public static OutputConsumerBuilder<Object> onComplete(@NotNull final Consumer<Void> consumer) {
-
-        return Functions.onComplete(consumer);
-    }
-
-    /**
-     * Returns an output consumer builder employing the specified consumer function to handle the
-     * invocation errors.
-     *
-     * @param consumer the consumer function.
-     * @return the builder instance.
-     */
-    @NotNull
-    public static OutputConsumerBuilder<Object> onError(
-            @NotNull final Consumer<RoutineException> consumer) {
-
-        return Functions.onError(consumer);
-    }
-
-    /**
-     * Returns an output consumer builder employing the specified consumer function to handle the
-     * invocation outputs.
-     *
-     * @param consumer the consumer function.
-     * @param <OUT>    the output data type.
-     * @return the builder instance.
-     */
-    @NotNull
-    public static <OUT> OutputConsumerBuilder<OUT> onOutput(@NotNull final Consumer<OUT> consumer) {
-
-        return Functions.onOutput(consumer);
     }
 }

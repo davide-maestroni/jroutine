@@ -55,9 +55,9 @@ class MapBuilderWrapper<OUT> implements ChannelsBuilder<Map<Integer, StreamChann
     }
 
     @NotNull
-    public Map<Integer, StreamChannel<OUT>> build() {
+    public Map<Integer, StreamChannel<OUT>> buildChannels() {
 
-        final Map<Integer, OutputChannel<OUT>> channels = mBuilder.build();
+        final Map<Integer, OutputChannel<OUT>> channels = mBuilder.buildChannels();
         final HashMap<Integer, StreamChannel<OUT>> channelMap =
                 new HashMap<Integer, StreamChannel<OUT>>(channels.size());
         for (final Entry<Integer, OutputChannel<OUT>> entry : channels.entrySet()) {

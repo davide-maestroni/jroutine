@@ -21,7 +21,7 @@ import com.github.dm.jrt.core.builder.ChannelConfigurableBuilder;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Interface defining a generic configurable builder.
+ * Interface defining a generic configurable builder of channels.
  * <p/>
  * Created by davide-maestroni on 02/26/2016.
  *
@@ -35,5 +35,5 @@ public interface ChannelsBuilder<TYPE> extends ChannelConfigurableBuilder<Channe
      * @return the object instance.
      */
     @NotNull
-    TYPE build();
+    TYPE buildChannels();
 }

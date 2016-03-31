@@ -1219,7 +1219,7 @@ public class Channels {
                                                         .withChannels()
                                                         .with(configuration)
                                                         .setConfiguration()
-                                                        .build();
+                                                        .buildChannels();
                 channelMap.put(index, ioChannel);
             }
 
@@ -1390,7 +1390,7 @@ public class Channels {
                                                                          .buildChannel();
             final JoinOutputConsumer<OUT> consumer =
                     new JoinOutputConsumer<OUT>(mIsFlush, channels.size(), mPlaceholder, ioChannel);
-            merge(channels).build().bind(consumer);
+            merge(channels).buildChannels().bind(consumer);
             return ioChannel;
         }
     }
@@ -1446,7 +1446,7 @@ public class Channels {
                                                                      .buildChannel();
             int i = mStartIndex;
             for (final OutputChannel<? extends OUT> channel : mChannels) {
-                ioChannel.pass(toSelectable(channel, i++).build());
+                ioChannel.pass(toSelectable(channel, i++).buildChannels());
             }
 
             return ioChannel.close();
@@ -1499,7 +1499,7 @@ public class Channels {
                                                                      .buildChannel();
             for (final Entry<Integer, ? extends OutputChannel<? extends OUT>> entry : mChannelMap
                     .entrySet()) {
-                ioChannel.pass(toSelectable(entry.getValue(), entry.getKey()).build());
+                ioChannel.pass(toSelectable(entry.getValue(), entry.getKey()).buildChannels());
             }
 
             return ioChannel.close();

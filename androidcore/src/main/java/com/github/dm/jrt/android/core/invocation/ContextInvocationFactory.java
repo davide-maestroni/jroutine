@@ -20,14 +20,13 @@ import android.content.Context;
 
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
+import com.github.dm.jrt.core.util.AutoComparable;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Arrays;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
@@ -42,9 +41,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public abstract class ContextInvocationFactory<IN, OUT> {
-
-    private final Object[] mArgs;
+public abstract class ContextInvocationFactory<IN, OUT> extends AutoComparable {
 
     /**
      * Constructor.
@@ -53,18 +50,7 @@ public abstract class ContextInvocationFactory<IN, OUT> {
      */
     protected ContextInvocationFactory(@Nullable final Object[] args) {
 
-        mArgs = (args != null) ? args.clone() : Reflection.NO_ARGS;
-    }
-
-    /**
-     * Constructor.
-     * <p/>
-     * Forces the inheriting classes to explicitly pass the arguments.
-     */
-    @SuppressWarnings("unused")
-    private ContextInvocationFactory() {
-
-        this(null);
+        super(args);
     }
 
     /**
@@ -198,27 +184,6 @@ public abstract class ContextInvocationFactory<IN, OUT> {
             @NotNull final ContextInvocationFactory<IN, OUT> factory) {
 
         return new AdaptingContextInvocationFactory<IN, OUT>(context, factory);
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-
-        if (this == o) {
-            return true;
-        }
-
-        if ((o == null) || (getClass() != o.getClass())) {
-            return false;
-        }
-
-        final ContextInvocationFactory<?, ?> that = (ContextInvocationFactory<?, ?>) o;
-        return Arrays.deepEquals(mArgs, that.mArgs);
-    }
-
-    @Override
-    public int hashCode() {
-
-        return 31 * getClass().hashCode() + Arrays.deepHashCode(mArgs);
     }
 
     /**

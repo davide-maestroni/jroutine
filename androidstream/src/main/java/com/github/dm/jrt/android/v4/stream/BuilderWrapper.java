@@ -51,10 +51,10 @@ class BuilderWrapper<OUT> implements ChannelsBuilder<LoaderStreamChannelCompat<O
 
     @NotNull
     @SuppressWarnings("unchecked")
-    public LoaderStreamChannelCompat<OUT> build() {
+    public LoaderStreamChannelCompat<OUT> buildChannels() {
 
         return new DefaultLoaderStreamChannelCompat<OUT>(null,
-                (OutputChannel<OUT>) mBuilder.build());
+                (OutputChannel<OUT>) mBuilder.buildChannels());
     }
 
     @NotNull

@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.core.invocation;
 
+import com.github.dm.jrt.core.util.AutoComparable;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.Reflection;
 
@@ -23,22 +24,21 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
-import java.util.Arrays;
 
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Abstract class defining an invocation factory.
+ * Abstract class defining an invocation factory.<br/>
+ * The inheriting class must specify the constructor arguments to be used in the {@code equals()}
+ * and {@code hashCode()} implementations.
  * <p/>
  * Created by davide-maestroni on 02/12/2015.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public abstract class InvocationFactory<IN, OUT> {
-
-    private final Object[] mArgs;
+public abstract class InvocationFactory<IN, OUT> extends AutoComparable {
 
     /**
      * Constructor.
@@ -47,18 +47,7 @@ public abstract class InvocationFactory<IN, OUT> {
      */
     protected InvocationFactory(@Nullable final Object[] args) {
 
-        mArgs = (args != null) ? args.clone() : Reflection.NO_ARGS;
-    }
-
-    /**
-     * Constructor.
-     * <p/>
-     * Forces the inheriting classes to explicitly pass the arguments.
-     */
-    @SuppressWarnings("unused")
-    private InvocationFactory() {
-
-        this(null);
+        super(args);
     }
 
     /**
@@ -184,27 +173,6 @@ public abstract class InvocationFactory<IN, OUT> {
             @NotNull final Invocation<IN, OUT> invocation, @Nullable final Object... args) {
 
         return factoryOf(tokenOf(invocation), args);
-    }
-
-    @Override
-    public int hashCode() {
-
-        return 31 * getClass().hashCode() + Arrays.deepHashCode(mArgs);
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-
-        if (this == o) {
-            return true;
-        }
-
-        if ((o == null) || (getClass() != o.getClass())) {
-            return false;
-        }
-
-        final InvocationFactory<?, ?> that = (InvocationFactory<?, ?>) o;
-        return Arrays.deepEquals(mArgs, that.mArgs);
     }
 
     /**

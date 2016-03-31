@@ -44,7 +44,7 @@ public class RepeatedChannelTest {
     public void testRepeat() {
 
         final IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
-        final OutputChannel<Object> channel = Channels.repeat(ioChannel).build();
+        final OutputChannel<Object> channel = Channels.repeat(ioChannel).buildChannels();
         assertThat(channel.isBound()).isFalse();
         assertThat(channel.isEmpty()).isTrue();
         ioChannel.pass("test1", "test2");
@@ -68,7 +68,7 @@ public class RepeatedChannelTest {
     public void testRepeatAbort() {
 
         IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
-        OutputChannel<Object> channel = Channels.repeat(ioChannel).build();
+        OutputChannel<Object> channel = Channels.repeat(ioChannel).buildChannels();
         ioChannel.pass("test1", "test2");
         final IOChannel<Object> output1 = JRoutineCore.io().buildChannel();
         channel.bind(output1).close();
@@ -94,7 +94,7 @@ public class RepeatedChannelTest {
         }
 
         ioChannel = JRoutineCore.io().buildChannel();
-        channel = Channels.repeat(ioChannel).build();
+        channel = Channels.repeat(ioChannel).buildChannels();
         ioChannel.pass("test").close();
         channel.bind(new TemplateOutputConsumer<Object>() {
 
@@ -112,7 +112,7 @@ public class RepeatedChannelTest {
     public void testRepeatAbortException() {
 
         IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
-        OutputChannel<Object> channel = Channels.repeat(ioChannel).build();
+        OutputChannel<Object> channel = Channels.repeat(ioChannel).buildChannels();
         channel.bind(new TemplateOutputConsumer<Object>() {
 
             @Override
@@ -124,7 +124,7 @@ public class RepeatedChannelTest {
         ioChannel.abort();
         assertThat(channel.getError().getCause()).isNull();
         ioChannel = JRoutineCore.io().buildChannel();
-        channel = Channels.repeat(ioChannel).build();
+        channel = Channels.repeat(ioChannel).buildChannels();
         channel.bind(new TemplateOutputConsumer<Object>() {
 
             @Override
@@ -137,7 +137,7 @@ public class RepeatedChannelTest {
         assertThat(channel.getError().getCause()).isNull();
 
         ioChannel = JRoutineCore.io().buildChannel();
-        channel = Channels.repeat(ioChannel).build();
+        channel = Channels.repeat(ioChannel).buildChannels();
         ioChannel.abort();
         channel.bind(new TemplateOutputConsumer<Object>() {
 
@@ -149,7 +149,7 @@ public class RepeatedChannelTest {
         });
         assertThat(channel.getError().getCause()).isNull();
         ioChannel = JRoutineCore.io().buildChannel();
-        channel = Channels.repeat(ioChannel).build();
+        channel = Channels.repeat(ioChannel).buildChannels();
         ioChannel.abort();
         channel.bind(new TemplateOutputConsumer<Object>() {
 
@@ -166,7 +166,7 @@ public class RepeatedChannelTest {
     public void testRepeatConsumer() {
 
         final IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
-        final OutputChannel<Object> channel = Channels.repeat(ioChannel).build();
+        final OutputChannel<Object> channel = Channels.repeat(ioChannel).buildChannels();
         assertThat(channel.isBound()).isFalse();
         assertThat(channel.isEmpty()).isTrue();
         ioChannel.pass("test1", "test2");
@@ -193,7 +193,7 @@ public class RepeatedChannelTest {
     public void testRepeatError() {
 
         final IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
-        final OutputChannel<Object> channel = Channels.repeat(ioChannel).build();
+        final OutputChannel<Object> channel = Channels.repeat(ioChannel).buildChannels();
         channel.eventuallyExit();
         try {
             channel.remove();
@@ -262,7 +262,7 @@ public class RepeatedChannelTest {
     public void testRepeatException() {
 
         IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
-        OutputChannel<Object> channel = Channels.repeat(ioChannel).build();
+        OutputChannel<Object> channel = Channels.repeat(ioChannel).buildChannels();
         channel.bind(new TemplateOutputConsumer<Object>() {
 
             @Override
@@ -273,7 +273,7 @@ public class RepeatedChannelTest {
         });
         ioChannel.pass("test").close().throwError();
         ioChannel = JRoutineCore.io().buildChannel();
-        channel = Channels.repeat(ioChannel).build();
+        channel = Channels.repeat(ioChannel).buildChannels();
         channel.bind(new TemplateOutputConsumer<Object>() {
 
             @Override
@@ -285,7 +285,7 @@ public class RepeatedChannelTest {
         ioChannel.pass("test").close().throwError();
 
         ioChannel = JRoutineCore.io().buildChannel();
-        channel = Channels.repeat(ioChannel).build();
+        channel = Channels.repeat(ioChannel).buildChannels();
         ioChannel.pass("test").close();
         channel.bind(new TemplateOutputConsumer<Object>() {
 
@@ -297,7 +297,7 @@ public class RepeatedChannelTest {
         });
         channel.throwError();
         ioChannel = JRoutineCore.io().buildChannel();
-        channel = Channels.repeat(ioChannel).build();
+        channel = Channels.repeat(ioChannel).buildChannels();
         ioChannel.pass("test").close();
         channel.bind(new TemplateOutputConsumer<Object>() {
 

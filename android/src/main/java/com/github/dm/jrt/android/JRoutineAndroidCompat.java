@@ -23,8 +23,8 @@ import android.support.v4.app.FragmentActivity;
 
 import com.github.dm.jrt.android.core.ServiceContext;
 import com.github.dm.jrt.android.core.service.InvocationService;
-import com.github.dm.jrt.android.v4.channel.SparseChannelsCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
+import com.github.dm.jrt.android.v4.stream.LoaderStreamsCompat;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -37,7 +37,7 @@ import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
  * <p/>
  * Created by davide-maestroni on 03/06/2016.
  */
-public class JRoutineAndroidCompat extends SparseChannelsCompat {
+public class JRoutineAndroidCompat extends LoaderStreamsCompat {
 
     /**
      * Returns a context based builder of loader routine builders.

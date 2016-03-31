@@ -36,7 +36,7 @@ public abstract class AbstractBuilder<TYPE>
     private ChannelConfiguration mConfiguration = ChannelConfiguration.DEFAULT_CONFIGURATION;
 
     @NotNull
-    public TYPE build() {
+    public TYPE buildChannels() {
 
         return build(mConfiguration);
     }

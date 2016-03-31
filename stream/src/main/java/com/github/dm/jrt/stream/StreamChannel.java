@@ -384,7 +384,7 @@ public interface StreamChannel<OUT>
      * This method is useful to easily make the stream run on the specified runner.
      * <p/>
      * Note that it is not necessary to explicitly concatenate a routine to have a stream delivering
-     * the output data with the specified runner.
+     * the output data through the specified runner.
      *
      * @param runner the runner instance.
      * @return the concatenated stream.

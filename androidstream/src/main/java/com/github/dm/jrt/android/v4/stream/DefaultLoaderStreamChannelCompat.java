@@ -521,7 +521,7 @@ public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel
                                               .withChannels()
                                               .with(configuration)
                                               .setConfiguration()
-                                              .build(), getStreamConfiguration(),
+                                              .buildChannels(), getStreamConfiguration(),
                 getDelegationType(), getBinder());
     }
 

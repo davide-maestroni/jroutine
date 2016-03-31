@@ -363,7 +363,7 @@ public abstract class AbstractStreamChannel<OUT>
 
         final ChannelConfiguration configuration = buildChannelConfiguration();
         return newChannel(
-                Channels.repeat(this).withChannels().with(configuration).setConfiguration().build(),
+                Channels.repeat(this).withChannels().with(configuration).setConfiguration().buildChannels(),
                 getStreamConfiguration(), mDelegationType, mBinder);
     }
 
@@ -473,7 +473,7 @@ public abstract class AbstractStreamChannel<OUT>
                                   .withChannels()
                                   .with(configuration)
                                   .setConfiguration()
-                                  .build(), getStreamConfiguration(), mDelegationType, mBinder);
+                                  .buildChannels(), getStreamConfiguration(), mDelegationType, mBinder);
     }
 
     @NotNull

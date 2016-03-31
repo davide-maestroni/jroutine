@@ -80,7 +80,7 @@ class MergeBuilder<OUT>
                                                                            .buildChannel();
         int i = mStartIndex;
         for (final OutputChannel<? extends OUT> channel : mChannels) {
-            ioChannel.pass(AndroidChannels.toSelectable(channel, i++).build());
+            ioChannel.pass(AndroidChannels.toSelectable(channel, i++).buildChannels());
         }
 
         return ioChannel.close();

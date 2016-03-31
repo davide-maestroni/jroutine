@@ -331,7 +331,7 @@ public class SparseChannels extends AndroidChannels {
                                       .withChannels()
                                       .with(configuration)
                                       .setConfiguration()
-                                      .build();
+                                      .buildChannels();
                 channelMap.put(index, ioChannel);
             }
 

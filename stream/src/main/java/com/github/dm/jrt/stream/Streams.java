@@ -96,13 +96,127 @@ public class Streams extends Functions {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see Channels#blend(com.github.dm.jrt.core.channel.Channel.OutputChannel[])
+     * @see Channels#blend(OutputChannel...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<OUT>> blend(
             @NotNull final OutputChannel<?>... channels) {
 
         return new BuilderWrapper<OUT>(Channels.<OUT>blend(channels));
+    }
+
+    /**
+     * Returns a builder of input channels combining the specified channels into a selectable one.
+     * The selectable indexes will be the position in the array.
+     *
+     * @param channels the array of input channels.
+     * @param <IN>     the input data type.
+     * @return the selectable I/O channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
+     * @see Channels#combine(InputChannel...)
+     */
+    @NotNull
+    public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
+            @NotNull final InputChannel<?>... channels) {
+
+        return Channels.combine(channels);
+    }
+
+    /**
+     * Returns a builder of input channels combining the specified channels into a selectable one.
+     * The selectable indexes will start from the specified one.
+     * <p/>
+     * Note that the builder will successfully create several input channel instances, and that the
+     * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
+     * invocation lifecycle.
+     *
+     * @param startIndex the selectable start index.
+     * @param channels   the array of input channels.
+     * @param <IN>       the input data type.
+     * @return the selectable I/O channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.NullPointerException     if the specified array is null or contains a null
+     *                                            object.
+     * @see Channels#combine(int, InputChannel...)
+     */
+    @NotNull
+    public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
+            final int startIndex, @NotNull final InputChannel<?>... channels) {
+
+        return Channels.combine(startIndex, channels);
+    }
+
+    /**
+     * Returns a builder of input channels combining the specified channels into a selectable one.
+     * The selectable indexes will start from the specified one.
+     * <p/>
+     * Note that the builder will successfully create several input channel instances, and that the
+     * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
+     * invocation lifecycle.
+     *
+     * @param startIndex the selectable start index.
+     * @param channels   the collection of input channels.
+     * @param <IN>       the input data type.
+     * @return the selectable I/O channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
+     * @see Channels#combine(int, Collection)
+     */
+    @NotNull
+    public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
+            final int startIndex,
+            @NotNull final Collection<? extends InputChannel<? extends IN>> channels) {
+
+        return Channels.combine(startIndex, channels);
+    }
+
+    /**
+     * Returns a builder of input channels combining the specified channels into a selectable one.
+     * The selectable indexes will be the position in the collection.
+     * <p/>
+     * Note that the builder will successfully create several input channel instances, and that the
+     * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
+     * invocation lifecycle.
+     *
+     * @param channels the collection of input channels.
+     * @param <IN>     the input data type.
+     * @return the selectable I/O channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
+     * @see Channels#combine(Collection)
+     */
+    @NotNull
+    public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
+            @NotNull final Collection<? extends InputChannel<? extends IN>> channels) {
+
+        return Channels.combine(channels);
+    }
+
+    /**
+     * Returns a builder of input channels combining the specified channels into a selectable one.
+     * The selectable indexes will be the keys of the specified map.
+     * <p/>
+     * Note that the builder will successfully create several input channel instances, and that the
+     * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
+     * invocation lifecycle.
+     *
+     * @param channels the map of indexes and input channels.
+     * @param <IN>     the input data type.
+     * @return the selectable I/O channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified map is empty.
+     * @throws java.lang.NullPointerException     if the specified map is null or contains a null
+     *                                            object.
+     * @see Channels#combine(Map)
+     */
+    @NotNull
+    public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
+            @NotNull final Map<Integer, ? extends InputChannel<? extends IN>> channels) {
+
+        return Channels.combine(channels);
     }
 
     /**
@@ -142,13 +256,112 @@ public class Streams extends Functions {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see Channels#concat(com.github.dm.jrt.core.channel.Channel.OutputChannel[])
+     * @see Channels#concat(OutputChannel...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<OUT>> concat(
             @NotNull final OutputChannel<?>... channels) {
 
         return new BuilderWrapper<OUT>(Channels.<OUT>concat(channels));
+    }
+
+    /**
+     * Returns a builder of channels distributing the input data among the specified channels. If
+     * the list of data exceeds the number of channels, the invocation will be aborted.
+     * <p/>
+     * Note that the builder will successfully create several input channel instances, and that the
+     * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
+     * invocation lifecycle.
+     *
+     * @param channels the array of channels.
+     * @param <IN>     the input data type.
+     * @return the I/O channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.NullPointerException     if the specified array is null or contains a null
+     *                                            object.
+     * @see Channels#distribute(InputChannel...)
+     */
+    @NotNull
+    public static <IN> ChannelsBuilder<? extends IOChannel<List<? extends IN>>> distribute(
+            @NotNull final InputChannel<?>... channels) {
+
+        return Channels.distribute(channels);
+    }
+
+    /**
+     * Returns a builder of channels distributing the input data among the specified channels. If
+     * the list of data exceeds the number of channels, the invocation will be aborted.
+     * <p/>
+     * Note that the builder will successfully create several input channel instances, and that the
+     * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
+     * invocation lifecycle.
+     *
+     * @param channels the collection of channels.
+     * @param <IN>     the input data type.
+     * @return the I/O channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
+     * @see Channels#distribute(Collection)
+     */
+    @NotNull
+    public static <IN> ChannelsBuilder<? extends IOChannel<List<? extends IN>>> distribute(
+            @NotNull final Collection<? extends InputChannel<? extends IN>> channels) {
+
+        return Channels.distribute(channels);
+    }
+
+    /**
+     * Returns a builder of channels distributing the input data among the specified channels. If
+     * the list of data is smaller than the specified number of channels, the remaining ones will be
+     * fed with the specified placeholder instance. While, if the list of data exceeds the number of
+     * channels, the invocation will be aborted.
+     * <p/>
+     * Note that the builder will successfully create several input channel instances, and that the
+     * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
+     * invocation lifecycle.
+     *
+     * @param placeholder the placeholder instance.
+     * @param channels    the array of channels.
+     * @param <IN>        the input data type.
+     * @return the I/O channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified array is empty.
+     * @throws java.lang.NullPointerException     if the specified array is null or contains a null
+     *                                            object.
+     * @see Channels#distribute(Object, InputChannel...)
+     */
+    @NotNull
+    public static <IN> ChannelsBuilder<? extends IOChannel<List<? extends IN>>> distribute(
+            @Nullable final IN placeholder, @NotNull final InputChannel<?>... channels) {
+
+        return Channels.distribute(placeholder, channels);
+    }
+
+    /**
+     * Returns a builder of channels distributing the input data among the specified channels. If
+     * the list of data is smaller than the specified number of channels, the remaining ones will be
+     * fed with the specified placeholder instance. While, if the list of data exceeds the number of
+     * channels, the invocation will be aborted.
+     * <p/>
+     * Note that the builder will successfully create several input channel instances, and that the
+     * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
+     * invocation lifecycle.
+     *
+     * @param placeholder the placeholder instance.
+     * @param channels    the collection of channels.
+     * @param <IN>        the input data type.
+     * @return the I/O channel builder.
+     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
+     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     *                                            null object.
+     * @see Channels#distribute(Object, Collection)
+     */
+    @NotNull
+    public static <IN> ChannelsBuilder<? extends IOChannel<List<? extends IN>>> distribute(
+            @Nullable final IN placeholder,
+            @NotNull final Collection<? extends InputChannel<? extends IN>> channels) {
+
+        return Channels.distribute(placeholder, channels);
     }
 
     /**
@@ -258,7 +471,7 @@ public class Streams extends Functions {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see Channels#join(com.github.dm.jrt.core.channel.Channel.OutputChannel[])
+     * @see Channels#join(OutputChannel...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<List<? extends OUT>>> join(
@@ -311,7 +524,7 @@ public class Streams extends Functions {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see Channels#join(Object, com.github.dm.jrt.core.channel.Channel.OutputChannel[])
+     * @see Channels#join(Object, OutputChannel...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<List<? extends OUT>>> join(
@@ -458,7 +671,7 @@ public class Streams extends Functions {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see Channels#merge(int, com.github.dm.jrt.core.channel.Channel.OutputChannel[])
+     * @see Channels#merge(int, OutputChannel...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<? extends Selectable<OUT>>> merge(
@@ -521,7 +734,7 @@ public class Streams extends Functions {
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
      * @throws java.lang.NullPointerException     if the specified array is null or contains a null
      *                                            object.
-     * @see Channels#merge(com.github.dm.jrt.core.channel.Channel.OutputChannel[])
+     * @see Channels#merge(OutputChannel...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<? extends Selectable<OUT>>> merge(
@@ -614,13 +827,112 @@ public class Streams extends Functions {
      * @param channel the output channel.
      * @param <OUT>   the output data type.
      * @return the repeating stream channel builder.
-     * @see Channels#repeat(com.github.dm.jrt.core.channel.Channel.OutputChannel)
+     * @see Channels#repeat(OutputChannel)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<OUT>> repeat(
             @NotNull final OutputChannel<OUT> channel) {
 
         return new BuilderWrapper<OUT>(Channels.repeat(channel));
+    }
+
+    /**
+     * Returns a builder of channels transforming the input data into selectable ones.
+     * <p/>
+     * Note that the builder will successfully create several input channel instances, and that the
+     * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
+     * invocation lifecycle.
+     *
+     * @param channel the selectable channel.
+     * @param index   the channel index.
+     * @param <DATA>  the channel data type.
+     * @param <IN>    the input data type.
+     * @return the I/O channel builder.
+     * @see Channels#select(InputChannel, int)
+     */
+    @NotNull
+    public static <DATA, IN extends DATA> ChannelsBuilder<? extends IOChannel<IN>> select(
+            @NotNull final InputChannel<? super Selectable<DATA>> channel, final int index) {
+
+        return Channels.select(channel, index);
+    }
+
+    /**
+     * Returns a builder of maps of input channels accepting the data identified by the specified
+     * indexes.
+     * <p/>
+     * Note that the builder will successfully create several input channel map instances, and that
+     * the returned channels <b>must be explicitly closed</b> in order to ensure the completion of
+     * the invocation lifecycle.
+     *
+     * @param channel the selectable channel.
+     * @param indexes the iterable returning the channel indexes.
+     * @param <DATA>  the channel data type.
+     * @param <IN>    the input data type.
+     * @return the map of indexes and I/O channels builder.
+     * @throws java.lang.NullPointerException if the specified iterable is null or returns a null
+     *                                        object.
+     * @see Channels#select(InputChannel, Iterable)
+     */
+    @NotNull
+    public static <DATA, IN extends DATA> ChannelsBuilder<? extends Map<Integer, IOChannel<IN>>>
+    select(
+            @NotNull final InputChannel<? super Selectable<DATA>> channel,
+            @NotNull final Iterable<Integer> indexes) {
+
+        return Channels.select(channel, indexes);
+    }
+
+    /**
+     * Returns a builder of maps of input channels accepting the data identified by the specified
+     * indexes.
+     * <p/>
+     * Note that the builder will successfully create several input channel map instances, and that
+     * the returned channels <b>must be explicitly closed</b> in order to ensure the completion of
+     * the invocation lifecycle.
+     *
+     * @param channel the selectable channel.
+     * @param indexes the array of indexes.
+     * @param <DATA>  the channel data type.
+     * @param <IN>    the input data type.
+     * @return the map of indexes and I/O channels builder.
+     * @throws java.lang.NullPointerException if the specified array is null or contains a null
+     *                                        object.
+     * @see Channels#select(InputChannel, int...)
+     */
+    @NotNull
+    public static <DATA, IN extends DATA> ChannelsBuilder<? extends Map<Integer, IOChannel<IN>>>
+    select(
+            @NotNull final InputChannel<? super Selectable<DATA>> channel,
+            @NotNull final int... indexes) {
+
+        return Channels.select(channel, indexes);
+    }
+
+    /**
+     * Returns a builder of maps of input channels accepting the data identified by the specified
+     * indexes.
+     * <p/>
+     * Note that the builder will successfully create several input channel map instances, and that
+     * the returned channels <b>must be explicitly closed</b> in order to ensure the completion of
+     * the invocation lifecycle.
+     *
+     * @param startIndex the selectable start index.
+     * @param rangeSize  the size of the range of indexes (must be positive).
+     * @param channel    the selectable channel.
+     * @param <DATA>     the channel data type.
+     * @param <IN>       the input data type.
+     * @return the map of indexes and I/O channels builder.
+     * @throws java.lang.IllegalArgumentException if the specified range size is not positive.
+     * @see Channels#select(int, int, InputChannel)
+     */
+    @NotNull
+    public static <DATA, IN extends DATA> ChannelsBuilder<? extends Map<Integer, IOChannel<IN>>>
+    select(
+            final int startIndex, final int rangeSize,
+            @NotNull final InputChannel<? super Selectable<DATA>> channel) {
+
+        return Channels.select(startIndex, rangeSize, channel);
     }
 
     /**
@@ -636,7 +948,7 @@ public class Streams extends Functions {
      * @param <OUT>      the output data type.
      * @return the map of indexes and output channels builder.
      * @throws java.lang.IllegalArgumentException if the specified range size is negative or 0.
-     * @see Channels#select(int, int, com.github.dm.jrt.core.channel.Channel.OutputChannel)
+     * @see Channels#select(int, int, OutputChannel)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends Map<Integer, StreamChannel<OUT>>> select(
@@ -659,7 +971,7 @@ public class Streams extends Functions {
      * @return the map of indexes and output channels builder.
      * @throws java.lang.NullPointerException if the specified array is null or contains a null
      *                                        object.
-     * @see Channels#select(com.github.dm.jrt.core.channel.Channel.OutputChannel, int...)
+     * @see Channels#select(OutputChannel, int...)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends Map<Integer, StreamChannel<OUT>>> select(
@@ -682,7 +994,7 @@ public class Streams extends Functions {
      * @return the map of indexes and output channels builder.
      * @throws java.lang.NullPointerException if the specified iterable is null or returns a null
      *                                        object.
-     * @see Channels#select(com.github.dm.jrt.core.channel.Channel.OutputChannel, Iterable)
+     * @see Channels#select(OutputChannel, Iterable)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends Map<Integer, StreamChannel<OUT>>> select(
@@ -778,7 +1090,32 @@ public class Streams extends Functions {
     @NotNull
     public static <OUT> StreamChannel<OUT> streamOf(@NotNull final OutputChannel<OUT> output) {
 
+        if (output instanceof StreamChannel) {
+            return (StreamChannel<OUT>) output;
+        }
+
         return new DefaultStreamChannel<OUT>(output);
+    }
+
+    /**
+     * Returns a builder of selectable channels feeding the specified one.<br/>
+     * Each output will be filtered based on the specified index.
+     * <p/>
+     * Note that the builder will return the same map for the same inputs and equal configuration,
+     * and that the returned channels <b>must be explicitly closed</b> in order to ensure the
+     * completion of the invocation lifecycle.
+     *
+     * @param channel the channel to make selectable.
+     * @param index   the channel index.
+     * @param <IN>    the input data type.
+     * @return the selectable I/O channel builder.
+     * @see Channels#toSelectable(InputChannel, int)
+     */
+    @NotNull
+    public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<IN>>> toSelectable(
+            @NotNull final InputChannel<? super IN> channel, final int index) {
+
+        return Channels.toSelectable(channel, index);
     }
 
     /**
@@ -792,7 +1129,7 @@ public class Streams extends Functions {
      * @param index   the channel index.
      * @param <OUT>   the output data type.
      * @return the selectable stream builder.
-     * @see Channels#toSelectable(com.github.dm.jrt.core.channel.Channel.OutputChannel, int)
+     * @see Channels#toSelectable(OutputChannel, int)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<? extends Selectable<OUT>>>

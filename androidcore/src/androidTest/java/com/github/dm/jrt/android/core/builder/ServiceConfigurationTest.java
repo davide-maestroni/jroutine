@@ -35,7 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Service invocation configuration unit tests.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 04/23/2015.
  */
 public class ServiceConfigurationTest extends AndroidTestCase {

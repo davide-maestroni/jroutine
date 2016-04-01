@@ -46,7 +46,7 @@ import static org.hamcrest.CoreMatchers.anything;
 
 /**
  * Main activity unit test.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/26/2016.
  */
 @RunWith(AndroidJUnit4.class)

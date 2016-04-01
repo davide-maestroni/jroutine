@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Abstract base builder implementation.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
  * @param <TYPE> the built object type.

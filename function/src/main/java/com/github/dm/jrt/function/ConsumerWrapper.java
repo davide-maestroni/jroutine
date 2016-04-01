@@ -27,7 +27,7 @@ import java.util.List;
 
 /**
  * Class wrapping a consumer instance.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 10/11/2015.
  *
  * @param <IN> the input data type.
@@ -64,7 +64,7 @@ public class ConsumerWrapper<IN> implements Consumer<IN>, Wrapper {
     }
 
     /**
-     * Returns a consumer wrapper just discarding the passed inputs.<br/>
+     * Returns a consumer wrapper just discarding the passed inputs.<br>
      * The returned object will support concatenation and comparison.
      *
      * @param <IN> the input data type.

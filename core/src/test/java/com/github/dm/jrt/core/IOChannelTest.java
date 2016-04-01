@@ -48,7 +48,7 @@ import static org.junit.Assert.fail;
 
 /**
  * I/O channel unit tests.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 10/26/2014.
  */
 public class IOChannelTest {

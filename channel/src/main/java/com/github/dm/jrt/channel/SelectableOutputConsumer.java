@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Output consumer transforming data into selectable ones.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
  * @param <IN>  the input data type.

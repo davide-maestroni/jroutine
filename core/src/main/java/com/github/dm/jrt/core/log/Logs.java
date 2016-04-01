@@ -20,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Utility class for creating and sharing log instances.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 12/22/2014.
  */
 public class Logs {

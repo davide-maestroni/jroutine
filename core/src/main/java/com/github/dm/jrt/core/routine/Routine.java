@@ -24,60 +24,60 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * This interface defines the main component of the library architecture.
- * <p/>
+ * <p>
  * The interface takes inspiration from the Go routines, where functions are executed
  * asynchronously and communicate with the external world only through channels. Being Java a
  * strictly object oriented programming language, the routine itself must be an object based on
  * logic implemented in other objects.
- * <p/>
+ * <p>
  * The library includes a routine class based on the implementation of an invocation interface.
  * Invocation objects are dynamically instantiated when needed, effectively mimicking the temporary
- * scope of a function call.<br/>
+ * scope of a function call.<br>
  * The paradigm is based on input, result and output channels. A routine can be invoked in
  * different ways (as explained below). Each routine invocation returns an input channel through
  * which the caller can pass the input parameters. When all the parameters has been passed, the
  * input channel is closed and returns the output channel from which to read the invocation
  * results. At the same time a result channel is passed to the invocation implementation, so that
- * the output computed from the input parameters can be published outside.<br/>
+ * the output computed from the input parameters can be published outside.<br>
  * The advantage of this approach is that the invocation flow can be run in steps, allowing for
  * continuous streaming of the input data and for abortion in the middle of the execution, without
- * blocking the running thread for the whole duration of the asynchronous invocation.<br/>
+ * blocking the running thread for the whole duration of the asynchronous invocation.<br>
  * In fact, each channel can abort the execution at any time.
- * <p/>
+ * <p>
  * The implementing class must provides an automatic synchronization of the invocation member
  * fields, though, in order to avoid concurrency issues, data passed through the routine channels
- * should be immutable or, at least, never shared inside and outside the routine.<br/>
+ * should be immutable or, at least, never shared inside and outside the routine.<br>
  * Moreover, it is possible to recursively call the same or another routine from inside a routine
  * invocation in a safe way. Nevertheless, it is not allow to perform blocking calls (such as
  * reading data from an output channel) in the middle of an execution when shared runner instances
  * are employed. Additionally, to prevent deadlock or starvation issues, it is encouraged the use of
  * finite timeouts when performing blocking calls.
- * <p/>
+ * <p>
  * The routine object provides three different ways to invoke an execution:
- * <p/>
- * <b>Synchronous invocation</b><br/>
+ * <p>
+ * <b>Synchronous invocation</b><br>
  * The routine starts an invocation employing a synchronous runner. The result is similar to a
  * classic method call where the processing completes as soon as the function exits.
- * <p/>
- * <b>Asynchronous invocation</b><br/>
+ * <p>
+ * <b>Asynchronous invocation</b><br>
  * The routine starts an invocation employing an asynchronous runner. In this case the processing
  * happens in a different thread, while the calling process may go on with its own execution and
  * perform other tasks. The invocation results can be collected at any time through the output
  * channel methods.
- * <p/>
- * <b>Parallel invocation</b><br/>
+ * <p>
+ * <b>Parallel invocation</b><br>
  * Processing parallelization is the key to leverage the power of multi-core machines. In order to
  * achieve it, the input data must be divided into subsets which are then processed on different
- * threads.<br/>
+ * threads.<br>
  * A routine object provides a convenient way to start an invocation which in turn spawns another
  * invocation for each input passed. This particular type of invocation obviously produces
  * meaningful results only for routines which takes a single input parameter and computes the
  * relative output results.
- * <p/>
+ * <p>
  * It is worth noting how the library has been designed only through interfaces, so that, as far as
  * the implementation honors the specific contracts, it is possible to seamlessly combine different
  * routine instances, even the ones coming from third party libraries.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/07/2014.
  *
  * @param <IN>  the input data type.
@@ -139,7 +139,7 @@ public interface Routine<IN, OUT> {
 
     /**
      * Short for {@code parallelInvoke().result()}.
-     * <p/>
+     * <p>
      * (This method actually makes little sense, and should never need to be called, thought it is
      * here for completeness)
      *
@@ -150,7 +150,7 @@ public interface Routine<IN, OUT> {
 
     /**
      * Short for {@code parallelInvoke().pass(input).result()}.
-     * <p/>
+     * <p>
      * (This method actually makes little sense, and should never need to be called, thought it is
      * here for completeness)
      *
@@ -197,10 +197,10 @@ public interface Routine<IN, OUT> {
 
     /**
      * Makes the routine destroy all the cached invocation instances.
-     * <p/>
+     * <p>
      * This method is useful to force the release of external resources when done with the routine.
      * Note however that the routine will still be usable after the method returns.
-     * <p/>
+     * <p>
      * Normally it is not needed to call this method.
      */
     void purge();

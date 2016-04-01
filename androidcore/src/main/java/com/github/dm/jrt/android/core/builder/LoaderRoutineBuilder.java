@@ -24,18 +24,18 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Interface defining a builder of routines bound to a context lifecycle through loaders.
- * <p/>
+ * <p>
  * Routine invocations started through the returned objects can be safely restored after a change in
  * the configuration, so to avoid duplicated calls and memory leaks. Be aware, though, that the
  * invocation results will be dispatched on the configured looper thread, no matter the calling one
  * was. If the invocation and the result looper are the same, waiting for the outputs right after
- * the routine invocation, may result in a deadlock.<br/>
+ * the routine invocation, may result in a deadlock.<br>
  * Note that the configuration of the maximum number of concurrent invocations might not work as
- * expected, since the number of running loaders cannot be computed.<br/>
+ * expected, since the number of running loaders cannot be computed.<br>
  * Note also that the input data will be cached, so be sure to avoid streaming inputs in order to
- * prevent out of memory errors.<br/>
+ * prevent out of memory errors.<br>
  * The local context of the invocations will always be the application one.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 12/09/2014.
  *
  * @param <IN>  the input data type.

@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Interface defining an object managing the creation and the recycling of invocation instances.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 11/26/2015.
  *
  * @param <IN>  the input data type.

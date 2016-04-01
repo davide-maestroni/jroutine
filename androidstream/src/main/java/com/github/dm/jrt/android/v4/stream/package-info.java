@@ -16,7 +16,7 @@
 
 /**
  * Streams implementation classes with support for Android compatibility library.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 01/04/2016.
  */
 package com.github.dm.jrt.android.v4.stream;

@@ -65,7 +65,7 @@ import static org.junit.Assert.fail;
 
 /**
  * Stream output channel unit tests.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 10/22/2015.
  */
 public class StreamChannelTest {

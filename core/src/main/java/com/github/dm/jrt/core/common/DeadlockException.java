@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Exception indicating a possible deadlock.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 06/18/2015.
  */
 public class DeadlockException extends RoutineException {

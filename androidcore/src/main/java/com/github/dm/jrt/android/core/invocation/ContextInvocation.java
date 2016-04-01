@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Interface defining an invocation aware of the specific Android context.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 01/08/2015.
  *
  * @param <IN>  the input data type.

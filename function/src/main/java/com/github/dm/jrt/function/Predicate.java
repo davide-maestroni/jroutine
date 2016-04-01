@@ -18,7 +18,7 @@ package com.github.dm.jrt.function;
 
 /**
  * Interface representing a predicate (boolean-valued function) of one argument.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 10/16/2015.
  *
  * @param <IN> the input data type.

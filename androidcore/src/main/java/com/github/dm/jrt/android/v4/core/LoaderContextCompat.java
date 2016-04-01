@@ -31,10 +31,10 @@ import java.lang.ref.WeakReference;
 
 /**
  * Class representing an Android loader context (like activities or fragments).
- * <p/>
+ * <p>
  * No strong reference to the wrapped objects will be retained by this class implementations. So,
  * it is up to the caller to ensure that they are not garbage collected before being called.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 07/08/2015.
  */
 public abstract class LoaderContextCompat {
@@ -60,7 +60,7 @@ public abstract class LoaderContextCompat {
 
     /**
      * Returns a context wrapping the specified fragment, with the specified instance as the loader
-     * context.<br/>
+     * context.<br>
      * In order to prevent undesired leaks, the class of the specified context must be static.
      *
      * @param fragment the fragment instance.
@@ -90,7 +90,7 @@ public abstract class LoaderContextCompat {
 
     /**
      * Returns a context wrapping the specified activity, with the specified instance as the loader
-     * context.<br/>
+     * context.<br>
      * In order to prevent undesired leaks, the class of the specified context must be static.
      *
      * @param activity the activity instance.

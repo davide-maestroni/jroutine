@@ -66,7 +66,7 @@ import static org.junit.Assert.fail;
 
 /**
  * Functions unit tests.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/24/2015.
  */
 public class FunctionsTest {

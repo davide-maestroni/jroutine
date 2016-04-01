@@ -16,7 +16,7 @@
 
 /**
  * Routine interfaces and implementations.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/25/2014.
  */
 package com.github.dm.jrt.core.routine;

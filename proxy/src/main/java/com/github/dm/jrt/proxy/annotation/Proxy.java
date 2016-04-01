@@ -23,20 +23,20 @@ import java.lang.annotation.Target;
 
 /**
  * This annotation is used to indicate interfaces used as templates to generate proxy classes,
- * enabling asynchronous calls of the target instance methods.<br/>
+ * enabling asynchronous calls of the target instance methods.<br>
  * The target class is specified in the annotation value. A proxy class implementing the annotated
  * interface will be generated according to the specific annotation attributes.
- * <p/>
+ * <p>
  * The routines used for calling the methods will honor the attributes specified in any optional
  * <i>{@code com.github.dm.jrt.object.annotation.*}</i> annotations defined for each interface
  * method.
- * <p/>
+ * <p>
  * Special care must be taken when dealing with proxies of generic classes. First of all, the
  * proxy interface must declare the same generic types as the wrapped class or interface.
  * Additionally, the generic parameters must be declared as {@code Object} in order for the proxy
- * interface methods to match the target ones.<br/>
+ * interface methods to match the target ones.<br>
  * Be also aware that it is responsibility of the caller to ensure that the same instance is not
- * wrapped around two different generic interfaces.<br/>
+ * wrapped around two different generic interfaces.<br>
  * For example, a class of the type:
  * <pre>
  *     <code>
@@ -74,7 +74,7 @@ import java.lang.annotation.Target;
  *             }
  *     </code>
  * </pre>
- * <p/>
+ * <p>
  * Remember also that, in order for the annotation to properly work at run time, you will need to
  * add the following rules to your Proguard file (if employing it for shrinking or obfuscation):
  * <pre>
@@ -96,7 +96,7 @@ import java.lang.annotation.Target;
  *         }
  *     </code>
  * </pre>
- * <p/>
+ * <p>
  * Created by davide-maestroni on 11/03/2014.
  *
  * @see com.github.dm.jrt.object.annotation Annotations
@@ -123,7 +123,7 @@ public @interface Proxy {
     /**
      * The generated class name. By default the name is obtained by the interface simple name,
      * prepending all the outer class names in case it is not a top level class.
-     * <p/>
+     * <p>
      * For instance, an interface named <code>MyItf</code> defined inside a class named
      * <code>MyClass</code>, will result in the generation of a class named
      * <code>Proxy_MyClass_MyItf</code>.

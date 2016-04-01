@@ -28,7 +28,7 @@ import java.util.List;
 
 /**
  * Class wrapping a function instance.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 10/11/2015.
  *
  * @param <IN>  the input data type.
@@ -69,7 +69,7 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT>, Wrapper {
     }
 
     /**
-     * Returns a function wrapper casting the passed inputs to the specified class.<br/>
+     * Returns a function wrapper casting the passed inputs to the specified class.<br>
      * The returned object will support concatenation and comparison.
      *
      * @param type  the class type.
@@ -86,7 +86,7 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT>, Wrapper {
     }
 
     /**
-     * Returns a function wrapper casting the passed inputs to the specified class token type.<br/>
+     * Returns a function wrapper casting the passed inputs to the specified class token type.<br>
      * The returned object will support concatenation and comparison.
      *
      * @param token the class token.
@@ -102,7 +102,7 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT>, Wrapper {
     }
 
     /**
-     * Returns the identity function wrapper.<br/>
+     * Returns the identity function wrapper.<br>
      * The returned object will support concatenation and comparison.
      *
      * @param <IN> the input data type.

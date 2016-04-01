@@ -61,7 +61,7 @@ import static com.github.dm.jrt.function.Functions.wrap;
 
 /**
  * Default implementation of a loader stream output channel.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 01/15/2016.
  *
  * @param <OUT> the output data type.

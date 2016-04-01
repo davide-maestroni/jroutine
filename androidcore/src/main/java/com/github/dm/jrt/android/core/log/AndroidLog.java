@@ -25,7 +25,7 @@ import java.util.List;
 
 /**
  * Android specific log implementation.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 10/07/2014.
  */
 public class AndroidLog implements com.github.dm.jrt.core.log.Log {

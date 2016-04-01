@@ -65,7 +65,7 @@ import static org.junit.Assert.fail;
 
 /**
  * JRoutineFacade unit tests.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 02/29/2016.
  */
 public class JRoutineFacadeTest {

@@ -43,7 +43,7 @@ import static com.github.dm.jrt.android.v4.core.LoaderInvocation.purgeLoader;
 
 /**
  * Default implementation of a loader channel builder.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 01/14/2015.
  */
 class DefaultLoaderChannelBuilder

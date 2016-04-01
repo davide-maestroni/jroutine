@@ -18,17 +18,17 @@ package com.github.dm.jrt.core.runner;
 
 /**
  * Interface defining an invocation execution.
- * <p/>
+ * <p>
  * This interface is meant to be used by a runner to ensure that the routine execution will take
  * place in the specific handled thread or threads.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/7/2014.
  */
 public interface Execution extends Runnable {
 
     /**
      * Checks if this execution might be cancelled in the future.
-     * <p/>
+     * <p>
      * Note that this is just an hint for the runner: if false is returned, the runner might not be
      * able to cancel the execution when requested. On the other side, the runner may be unable to
      * cancel the execution in any case, based on the internal status or specific implementation.

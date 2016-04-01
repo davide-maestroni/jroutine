@@ -16,7 +16,7 @@
 
 /**
  * Log classes specific to the Android platform.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 10/10/2014.
  */
 package com.github.dm.jrt.android.core.log;

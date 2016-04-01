@@ -26,7 +26,7 @@ import java.util.Collection;
 /**
  * Implementation of a nested queue ensuring that data are returned in the same order as they are
  * added, even if added later through a nested queue.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/30/2014.
  *
  * @param <E> the element type.
@@ -82,7 +82,7 @@ class NestedQueue<E> {
 
     /**
      * Adds the specified element to the queue.
-     * <p/>
+     * <p>
      * Note that the element can be null.
      *
      * @param element the element to add.
@@ -96,7 +96,7 @@ class NestedQueue<E> {
 
     /**
      * Adds all the elements returned by the specified iterable.
-     * <p/>
+     * <p>
      * Note that the any of the returned element can be null.
      *
      * @param elements the element iterable.
@@ -132,7 +132,7 @@ class NestedQueue<E> {
     }
 
     /**
-     * Closes this queue.<br/>
+     * Closes this queue.<br>
      * After the method returns no further additions can be made to this queue. Though, elements can
      * be safely removed.
      */

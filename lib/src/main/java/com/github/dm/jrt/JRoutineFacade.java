@@ -42,7 +42,7 @@ import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
 
 /**
  * Class acting as a fa&ccedil;ade of all the JRoutine library features.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 02/29/2016.
  */
 public class JRoutineFacade extends Streams {
@@ -88,9 +88,9 @@ public class JRoutineFacade extends Streams {
 
     /**
      * Returns a routine builder wrapping the specified class.
-     * <p/>
+     * <p>
      * Note that it is responsibility of the caller to retain a strong reference to the target
-     * instance to prevent it from being garbage collected.<br/>
+     * instance to prevent it from being garbage collected.<br>
      * Note also that the invocation input data will be cached, and the results will be produced
      * only after the invocation channel is closed, so be sure to avoid streaming inputs in
      * order to prevent starvation or out of memory errors.
@@ -194,9 +194,9 @@ public class JRoutineFacade extends Streams {
 
     /**
      * Returns a routine builder wrapping the specified object.
-     * <p/>
+     * <p>
      * Note that it is responsibility of the caller to retain a strong reference to the target
-     * instance to prevent it from being garbage collected.<br/>
+     * instance to prevent it from being garbage collected.<br>
      * Note also that the invocation input data will be cached, and the results will be produced
      * only after the invocation channel is closed, so be sure to avoid streaming inputs in
      * order to prevent starvation or out of memory errors.
@@ -241,7 +241,7 @@ public class JRoutineFacade extends Streams {
     /**
      * Returns a routine builder based on an invocation factory creating instances of the specified
      * class by passing the specified arguments to the class constructor.
-     * <p/>
+     * <p>
      * Note that inner and anonymous classes can be passed as well. Remember however that Java
      * creates synthetic constructors for such classes, so be sure to specify the correct arguments
      * to guarantee proper instantiation. In fact, inner classes always have the outer instance as
@@ -284,7 +284,7 @@ public class JRoutineFacade extends Streams {
     /**
      * Returns a routine builder based on an invocation factory creating instances of the specified
      * class token by passing the specified arguments to the class constructor.
-     * <p/>
+     * <p>
      * Note that class tokens of inner and anonymous classes can be passed as well. Remember however
      * that Java creates synthetic constructors for such classes, so be sure to specify the correct
      * arguments to guarantee proper instantiation. In fact, inner classes always have the outer
@@ -356,7 +356,7 @@ public class JRoutineFacade extends Streams {
     /**
      * Returns a routine builder based on an invocation factory creating instances of the specified
      * object by passing the specified arguments to the class constructor.
-     * <p/>
+     * <p>
      * Note that inner and anonymous objects can be passed as well. Remember however that Java
      * creates synthetic constructors for such classes, so be sure to specify the correct arguments
      * to guarantee proper instantiation. In fact, inner classes always have the outer instance as
@@ -379,7 +379,7 @@ public class JRoutineFacade extends Streams {
     }
 
     /**
-     * Returns a routine builder based on the specified invocation factory.<br/>
+     * Returns a routine builder based on the specified invocation factory.<br>
      * In order to prevent undesired leaks, the class of the specified factory should have a static
      * scope.
      *
@@ -397,9 +397,9 @@ public class JRoutineFacade extends Streams {
 
     /**
      * Returns a routine builder wrapping the specified target.
-     * <p/>
+     * <p>
      * Note that it is responsibility of the caller to retain a strong reference to the target
-     * instance to prevent it from being garbage collected.<br/>
+     * instance to prevent it from being garbage collected.<br>
      * Note also that the invocation input data will be cached, and the results will be produced
      * only after the invocation channel is closed, so be sure to avoid streaming inputs in
      * order to prevent starvation or out of memory errors.
@@ -416,12 +416,12 @@ public class JRoutineFacade extends Streams {
     }
 
     /**
-     * Returns a routine builder wrapping the specified object.<br/>
+     * Returns a routine builder wrapping the specified object.<br>
      * The invocation target will be automatically chosen based on whether the specified object is
      * a class or an instance.
-     * <p/>
+     * <p>
      * Note that it is responsibility of the caller to retain a strong reference to the target
-     * instance to prevent it from being garbage collected.<br/>
+     * instance to prevent it from being garbage collected.<br>
      * Note also that the invocation input data will be cached, and the results will be produced
      * only after the invocation channel is closed, so be sure to avoid streaming inputs in
      * order to prevent starvation or out of memory errors.

@@ -17,7 +17,7 @@
 /**
  * Loader based routine interfaces and implementations with support for Android compatibility
  * library.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/25/2014.
  */
 package com.github.dm.jrt.android.v4.core;

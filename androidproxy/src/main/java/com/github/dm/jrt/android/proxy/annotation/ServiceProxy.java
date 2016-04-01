@@ -25,14 +25,14 @@ import java.lang.annotation.Target;
 
 /**
  * This annotation is used to indicate interfaces used as templates to generate proxy classes,
- * enabling asynchronous calls to the target instance methods in a dedicated service.<br/>
+ * enabling asynchronous calls to the target instance methods in a dedicated service.<br>
  * The target class is specified in the annotation value. A proxy class implementing the annotated
  * interface will be generated according to the specific annotation attributes.
- * <p/>
+ * <p>
  * The routines used for calling the methods will honor the attributes specified in any optional
  * <i>{@code com.github.dm.jrt.object.annotation.*}</i> annotations defined for each interface
  * method.
- * <p/>
+ * <p>
  * Remember also that, in order for the annotation to properly work at run time, you will need to
  * add the following rules to your Proguard file (if employing it for shrinking or obfuscation):
  * <pre>
@@ -54,7 +54,7 @@ import java.lang.annotation.Target;
  *         }
  *     </code>
  * </pre>
- * <p/>
+ * <p>
  * Created by davide-maestroni on 05/13/2015.
  *
  * @see com.github.dm.jrt.object.annotation Annotations

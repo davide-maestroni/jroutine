@@ -27,7 +27,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
  * Factory of skip invocations.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
  * @param <DATA> the data type.

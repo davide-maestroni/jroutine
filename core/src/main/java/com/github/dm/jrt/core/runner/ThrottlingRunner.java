@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Runner implementation throttling the number of running executions so to keep it under a specified
  * limit.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 07/18/2015.
  */
 class ThrottlingRunner implements Runner {

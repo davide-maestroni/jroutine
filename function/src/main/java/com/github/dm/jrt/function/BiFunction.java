@@ -18,7 +18,7 @@ package com.github.dm.jrt.function;
 
 /**
  * Interface representing an operation that accepts two input arguments and produces a result.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 10/16/2015.
  *
  * @param <IN1> the first input data type.

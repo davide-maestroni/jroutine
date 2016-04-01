@@ -37,7 +37,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Implementation of a runner employing {@link android.os.AsyncTask} instances to execute the
  * routine invocations.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/28/2014.
  */
 class AsyncTaskRunner extends MainRunner {
@@ -54,7 +54,7 @@ class AsyncTaskRunner extends MainRunner {
 
     /**
      * Constructor.
-     * <p/>
+     * <p>
      * Note that, in case a null executor is passed as parameter, the default one will be used.
      *
      * @param executor the executor.

@@ -23,36 +23,36 @@ import java.util.concurrent.TimeUnit;
 /**
  * The runner interface defines an object responsible for executing routine invocations inside
  * specifically managed threads.
- * <p/>
+ * <p>
  * The implementation can both be synchronous or asynchronous, it can allocate specific threads or
- * share a pool of them between different instances.<br/>
+ * share a pool of them between different instances.<br>
  * The only requirement is that the specified execution is called each time a run method is invoked.
- * <p/>
+ * <p>
  * Note that, a proper asynchronous runner implementation will never synchronously run an execution,
  * no matter the delay, unless it employs a single thread. While, a proper synchronous runner, will
- * always run executions in the very same caller thread.<br/>
+ * always run executions in the very same caller thread.<br>
  * Note also that the runner methods can be called from different threads, so, it is up to the
  * implementing class to ensure synchronization when required.
- * <p/>
+ * <p>
  * The implementing class can optionally support the cancellation of executions not yet run (
  * waiting, for example, in a consuming queue).
- * <p/>
+ * <p>
  * The class {@link com.github.dm.jrt.core.runner.Runners Runners} provides a few implementations
  * employing concurrent Java classes.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/07/2014.
  */
 public interface Runner {
 
     /**
      * Cancels the specified execution if not already run.
-     * <p/>
+     * <p>
      * Note that the method will have no effect in case the runner does not maintain a queue or the
-     * specified execution has been already processed at the moment of the call.<br/>
+     * specified execution has been already processed at the moment of the call.<br>
      * Note also that, in case the same execution has been added more than once to the runner queue,
      * when the method returns, the queue will not contain the execution instance anymore, with the
      * consequence that the {@link Execution#run()} method will never be called.
-     * <p/>
+     * <p>
      * The implementation of this method is optional, still, it may greatly increase the performance
      * by avoiding to start invocations which are already aborted. The runner implementation can
      * safely ignore all those executions whose method {@link Execution#canBeCancelled()} returns
@@ -64,9 +64,9 @@ public interface Runner {
 
     /**
      * Checks if the calling thread belongs to the ones managed by the runner implementation.
-     * <p/>
+     * <p>
      * The implementation of this method is not strictly mandatory, even if, the classes always
-     * returning false effectively prevent the correct detection of possible deadlocks.<br/>
+     * returning false effectively prevent the correct detection of possible deadlocks.<br>
      * A synchronous runner implementation will always return true.
      *
      * @return whether the calling thread is managed by the runner.

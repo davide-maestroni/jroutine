@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Implementation of an invocation simply passing on the input data.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 10/23/2014.
  *
  * @param <DATA> the data type.

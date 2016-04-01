@@ -29,7 +29,7 @@ import static com.github.dm.jrt.core.util.Reflection.findConstructor;
 
 /**
  * Test service.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 01/16/2015.
  */
 public class TestService extends InvocationService implements FactoryContext {

@@ -16,7 +16,7 @@
 
 /**
  * Streams implementation classes specific to the Android platform.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 01/04/2016.
  */
 package com.github.dm.jrt.android.v11.stream;

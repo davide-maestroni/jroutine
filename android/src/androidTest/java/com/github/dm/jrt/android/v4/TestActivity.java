@@ -26,7 +26,7 @@ import com.github.dm.jrt.android.R;
 
 /**
  * Test activity.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/06/2016.
  */
 @TargetApi(VERSION_CODES.ECLAIR)

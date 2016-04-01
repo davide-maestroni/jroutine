@@ -74,7 +74,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Streams unit tests.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 01/04/2016.
  */
 @TargetApi(VERSION_CODES.FROYO)

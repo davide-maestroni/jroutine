@@ -49,7 +49,7 @@ import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
 
 /**
  * Default implementation of a invocation input channel.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 06/11/2015.
  *
  * @param <IN>  the input data type.

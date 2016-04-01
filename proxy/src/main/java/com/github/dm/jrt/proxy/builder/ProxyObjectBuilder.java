@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Interface defining a builder of async proxy objects.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/07/2015.
  *
  * @param <TYPE> the interface type.
@@ -33,11 +33,11 @@ public interface ProxyObjectBuilder<TYPE> extends ConfigurableBuilder<ProxyObjec
 
     /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.
-     * <p/>
+     * <p>
      * The routines used for calling the methods will honor the attributes specified in any optional
-     * <i>{@code com.github.dm.jrt.annotation.*}</i> annotations.<br/>
+     * <i>{@code com.github.dm.jrt.annotation.*}</i> annotations.<br>
      * Note that such annotations will override any configuration set through the builder.
-     * <p/>
+     * <p>
      * The proxy object is created through code generation based on the interfaces annotated with
      * {@link com.github.dm.jrt.proxy.annotation.Proxy Proxy}.
      *

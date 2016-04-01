@@ -26,7 +26,7 @@ import java.util.Collection;
 
 /**
  * Interface defining a loader invocation result.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 01/04/2015.
  *
  * @param <OUT> the output data type.

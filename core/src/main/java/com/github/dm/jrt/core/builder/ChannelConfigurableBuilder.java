@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Interface defining a configurable builder of channels.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 08/18/2015.
  *
  * @param <TYPE> the builder type.
@@ -31,7 +31,7 @@ public interface ChannelConfigurableBuilder<TYPE> {
 
     /**
      * Gets the channel configuration builder related to the channel builder instance.
-     * <p/>
+     * <p>
      * Note that the configuration builder will be initialized with the current configuration.
      *
      * @return the channel configuration builder.

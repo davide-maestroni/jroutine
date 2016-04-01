@@ -27,15 +27,15 @@ import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Interface defining a channel which is both an input and an output.<br/>
+ * Interface defining a channel which is both an input and an output.<br>
  * The channel synchronously delivers the passed inputs the the bound output consumer or input
  * channel, unless a specific delay is set by calling the proper methods.
- * <p/>
- * An I/O channel is useful to make other asynchronous tasks communicate with a routine.<br/>
+ * <p>
+ * An I/O channel is useful to make other asynchronous tasks communicate with a routine.<br>
  * The channel output can be passed to a routine input channel in order to feed it with data coming
  * asynchronously from other sources. Note however that, in any case, the {@code close()} method
  * must be called in order to correctly terminate the invocation lifecycle.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/24/2015.
  *
  * @param <DATA> the data type.
@@ -173,9 +173,9 @@ public interface IOChannel<DATA> extends InputChannel<DATA>, OutputChannel<DATA>
     OutputChannel<DATA> asOutput();
 
     /**
-     * Closes the channel input.<br/>
+     * Closes the channel input.<br>
      * If the channel is already closed, this method has no effect.
-     * <p/>
+     * <p>
      * Note that this method must be always called when done with the channel.
      *
      * @return this channel.

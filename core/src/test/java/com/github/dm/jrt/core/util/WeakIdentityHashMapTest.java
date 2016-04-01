@@ -29,7 +29,7 @@ import static org.junit.Assert.fail;
 
 /**
  * Cache hash map unit tests.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 11/18/2014.
  */
 public class WeakIdentityHashMapTest {

@@ -34,7 +34,7 @@ import java.lang.reflect.Method;
 
 /**
  * Default implementation of a target routine builder.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/03/2016.
  */
 class DefaultTargetRoutineBuilder implements TargetRoutineBuilder {

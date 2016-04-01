@@ -16,7 +16,7 @@
 
 /**
  * Routine proxy core interfaces and implementations, specific to the Android platform.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 05/14/2015.
  */
 package com.github.dm.jrt.android.proxy;

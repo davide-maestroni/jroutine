@@ -25,16 +25,16 @@ import org.jetbrains.annotations.NotNull;
 /**
  * This utility class represents the entry point to the library by acting as a factory of routine
  * builders.
- * <p/>
+ * <p>
  * The main way of creating a routine is to implement an invocation object. Invocations mimic the
  * scope of a function call. Objects are instantiated when needed and recycled for successive
  * invocations.
- * <p/>
+ * <p>
  * This class provides also a way to build I/O channel instances, which can be used to pass data
  * without the need to start a routine invocation.
- * <p/>
+ * <p>
  * <b>Some usage examples</b>
- * <p/>
+ * <p>
  * <b>Example 1:</b> Asynchronously merge the output of two routines.
  * <pre>
  *     <code>
@@ -59,7 +59,7 @@ import org.jetbrains.annotations.NotNull;
  * </pre>
  * (Note that, the order of the input or the output of the routine is not guaranteed unless properly
  * configured)
- * <p/>
+ * <p>
  * <b>Example 2:</b> Asynchronously concatenate the output of two routines.
  * <pre>
  *     <code>
@@ -67,7 +67,7 @@ import org.jetbrains.annotations.NotNull;
  *         doSomething2.asyncCall(doSomething1.asyncCall())).afterMax(seconds(20)).allInto(results);
  *     </code>
  * </pre>
- * <p/>
+ * <p>
  * <b>Example 3:</b> Asynchronously feed a routine from a different thread.
  * <pre>
  *     <code>
@@ -90,7 +90,7 @@ import org.jetbrains.annotations.NotNull;
  *         routine.asyncCall(channel).afterMax(seconds(20)).allInto(results);
  *     </code>
  * </pre>
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/07/2014.
  */
 public class JRoutineCore {
@@ -114,7 +114,7 @@ public class JRoutineCore {
     }
 
     /**
-     * Returns a routine builder based on the specified invocation factory.<br/>
+     * Returns a routine builder based on the specified invocation factory.<br>
      * In order to prevent undesired leaks, the class of the specified factory should have a static
      * scope.
      *

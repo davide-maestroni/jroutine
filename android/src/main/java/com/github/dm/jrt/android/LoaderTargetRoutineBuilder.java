@@ -26,13 +26,13 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Loader routine builder acting both as proxy and object builder.
- * <p/>
+ * <p>
  * The builder will automatically decide whether to employ reflection or code generation to build
  * the proxy instance, based on the presence of the proper annotation and target value. So, if the
  * pre-processor annotation is present in the proxy interface and the target object is assignable to
- * the annotation target class, then code generation will be employed, reflection otherwise.<br/>
+ * the annotation target class, then code generation will be employed, reflection otherwise.<br>
  * Note that the use of one or the other can be forced by calling the proper method.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/06/2016.
  */
 public interface LoaderTargetRoutineBuilder extends LoaderObjectRoutineBuilder {
@@ -56,7 +56,7 @@ public interface LoaderTargetRoutineBuilder extends LoaderObjectRoutineBuilder {
     LoaderConfiguration.Builder<? extends LoaderTargetRoutineBuilder> loaderConfiguration();
 
     /**
-     * Force the type of builder to be employed to create the proxy instance.<br/>
+     * Force the type of builder to be employed to create the proxy instance.<br>
      * A null value means default algorithm will be applied, that is, the builder type will be
      * automatically chosen based on the proxy interface definition.
      *
@@ -72,12 +72,12 @@ public interface LoaderTargetRoutineBuilder extends LoaderObjectRoutineBuilder {
     enum BuilderType {
 
         /**
-         * Object routine builder.<br/>
+         * Object routine builder.<br>
          * The proxy instance will be created through reflection.
          */
         OBJECT,
         /**
-         * Proxy routine builder.<br/>
+         * Proxy routine builder.<br>
          * The proxy instance will be created through code generation.
          */
         PROXY

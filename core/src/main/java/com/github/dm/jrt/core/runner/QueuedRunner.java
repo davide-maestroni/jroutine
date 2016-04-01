@@ -22,10 +22,10 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Class implementing a queued synchronous runner.
- * <p/>
+ * <p>
  * The runner maintains an internal buffer of executions that are consumed only when the last one
  * completes, thus avoiding overflowing the call stack because of nested calls to other routines.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/18/2014.
  */
 class QueuedRunner implements Runner {

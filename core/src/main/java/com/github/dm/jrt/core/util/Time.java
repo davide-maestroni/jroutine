@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Utility class for handling time in different time units.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/09/2014.
  */
 public class Time {
@@ -318,7 +318,7 @@ public class Time {
 
     /**
      * Returns a new instance whose time value is decremented by the specified one.
-     * <p/>
+     * <p>
      * Note that the unit of the returned time will match the one with the highest precision.
      *
      * @param time the time to subtract.
@@ -358,7 +358,7 @@ public class Time {
 
     /**
      * Returns a new instance whose time value is incremented by the specified one.
-     * <p/>
+     * <p>
      * Note that the unit of the returned time will match the one with the highest precision.
      *
      * @param time the time to add.
@@ -388,6 +388,7 @@ public class Time {
     /**
      * Converts this time in the specified unit.
      *
+     * @param timeUnit the time unit to convert to.
      * @return the time value in the specified unit.
      */
     public long to(@NotNull final TimeUnit timeUnit) {

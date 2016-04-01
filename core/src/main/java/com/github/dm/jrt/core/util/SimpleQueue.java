@@ -26,7 +26,7 @@ import java.util.NoSuchElementException;
 /**
  * Minimal implementation of a light-weight queue storing elements into dynamically increasing
  * circular buffer.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/27/2014.
  *
  * @param <E> the element type.
@@ -49,7 +49,7 @@ public class SimpleQueue<E> {
 
     /**
      * Adds the specified element to the queue.
-     * <p/>
+     * <p>
      * Note that the element can be null.
      *
      * @param element the element to add.
@@ -68,7 +68,7 @@ public class SimpleQueue<E> {
 
     /**
      * Adds all the elements returned by the specified iterable.
-     * <p/>
+     * <p>
      * Note that any of the returned element can be null.
      *
      * @param elements the element iterable.

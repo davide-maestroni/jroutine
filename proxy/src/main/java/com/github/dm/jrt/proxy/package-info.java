@@ -16,7 +16,7 @@
 
 /**
  * Routine proxy core interfaces and implementations.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/24/2014.
  */
 package com.github.dm.jrt.proxy;

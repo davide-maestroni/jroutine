@@ -33,7 +33,7 @@ import java.util.HashMap;
 /**
  * Abstract implementation of a builder of async proxy objects, whose methods are executed in a
  * dedicated service.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 05/13/2015.
  *
  * @param <TYPE> the interface type.
@@ -161,7 +161,7 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
     protected abstract Class<? super TYPE> getInterfaceClass();
 
     /**
-     * Returns the context on which the invocation is based.<br/>
+     * Returns the context on which the invocation is based.<br>
      * Returning null means that the context has been destroyed, so an exception will be thrown.
      *
      * @return the invocation context.

@@ -16,7 +16,7 @@
 
 /**
  * Proxy annotation definitions.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/23/2015.
  */
 package com.github.dm.jrt.proxy.annotation;

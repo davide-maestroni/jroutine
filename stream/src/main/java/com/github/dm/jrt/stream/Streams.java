@@ -42,7 +42,7 @@ import java.util.Map;
 
 /**
  * Utility class acting as a factory of stream output channels.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 11/26/2015.
  */
 public class Streams extends Functions {
@@ -66,7 +66,7 @@ public class Streams extends Functions {
 
     /**
      * Returns a builder of streams blending the outputs coming from the specified channels.
-     * <p/>
+     * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
@@ -87,7 +87,7 @@ public class Streams extends Functions {
 
     /**
      * Returns a builder of streams blending the outputs coming from the specified channels.
-     * <p/>
+     * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
@@ -128,7 +128,7 @@ public class Streams extends Functions {
     /**
      * Returns a builder of input channels combining the specified channels into a selectable one.
      * The selectable indexes will start from the specified one.
-     * <p/>
+     * <p>
      * Note that the builder will successfully create several input channel instances, and that the
      * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
      * invocation lifecycle.
@@ -152,7 +152,7 @@ public class Streams extends Functions {
     /**
      * Returns a builder of input channels combining the specified channels into a selectable one.
      * The selectable indexes will start from the specified one.
-     * <p/>
+     * <p>
      * Note that the builder will successfully create several input channel instances, and that the
      * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
      * invocation lifecycle.
@@ -177,7 +177,7 @@ public class Streams extends Functions {
     /**
      * Returns a builder of input channels combining the specified channels into a selectable one.
      * The selectable indexes will be the position in the collection.
-     * <p/>
+     * <p>
      * Note that the builder will successfully create several input channel instances, and that the
      * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
      * invocation lifecycle.
@@ -200,7 +200,7 @@ public class Streams extends Functions {
     /**
      * Returns a builder of input channels combining the specified channels into a selectable one.
      * The selectable indexes will be the keys of the specified map.
-     * <p/>
+     * <p>
      * Note that the builder will successfully create several input channel instances, and that the
      * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
      * invocation lifecycle.
@@ -224,7 +224,7 @@ public class Streams extends Functions {
      * Returns a builder of stream channels concatenating the outputs coming from the specified
      * ones, so that, all the outputs of the first channel will come before all the outputs of the
      * second one, and so on.
-     * <p/>
+     * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
@@ -247,7 +247,7 @@ public class Streams extends Functions {
      * Returns a builder of stream channels concatenating the outputs coming from the specified
      * ones, so that, all the outputs of the first channel will come before all the outputs of the
      * second one, and so on.
-     * <p/>
+     * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
@@ -269,7 +269,7 @@ public class Streams extends Functions {
     /**
      * Returns a builder of channels distributing the input data among the specified channels. If
      * the list of data exceeds the number of channels, the invocation will be aborted.
-     * <p/>
+     * <p>
      * Note that the builder will successfully create several input channel instances, and that the
      * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
      * invocation lifecycle.
@@ -292,7 +292,7 @@ public class Streams extends Functions {
     /**
      * Returns a builder of channels distributing the input data among the specified channels. If
      * the list of data exceeds the number of channels, the invocation will be aborted.
-     * <p/>
+     * <p>
      * Note that the builder will successfully create several input channel instances, and that the
      * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
      * invocation lifecycle.
@@ -317,7 +317,7 @@ public class Streams extends Functions {
      * the list of data is smaller than the specified number of channels, the remaining ones will be
      * fed with the specified placeholder instance. While, if the list of data exceeds the number of
      * channels, the invocation will be aborted.
-     * <p/>
+     * <p>
      * Note that the builder will successfully create several input channel instances, and that the
      * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
      * invocation lifecycle.
@@ -343,7 +343,7 @@ public class Streams extends Functions {
      * the list of data is smaller than the specified number of channels, the remaining ones will be
      * fed with the specified placeholder instance. While, if the list of data exceeds the number of
      * channels, the invocation will be aborted.
-     * <p/>
+     * <p>
      * Note that the builder will successfully create several input channel instances, and that the
      * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
      * invocation lifecycle.
@@ -367,7 +367,7 @@ public class Streams extends Functions {
 
     /**
      * Returns an invocation factory, whose invocation instances employ the stream output channels,
-     * provided by the specified function, to process input data.<br/>
+     * provided by the specified function, to process input data.<br>
      * The function should return a new instance each time it is called, starting from the passed
      * one.
      *
@@ -387,7 +387,7 @@ public class Streams extends Functions {
     /**
      * Returns a factory of invocations grouping the input data in collections of the specified
      * size.
-     * <p/>
+     * <p>
      * Given a numeric sequence of inputs starting from 0, and a size of 3, the final output will
      * be:
      * <pre>
@@ -410,10 +410,10 @@ public class Streams extends Functions {
 
     /**
      * Returns a factory of invocations grouping the input data in collections of the specified
-     * size.<br/>
+     * size.<br>
      * If the inputs complete and the last group length is less than the target size, the missing
      * spaces will be filled with the specified placeholder instance.
-     * <p/>
+     * <p>
      * Given a numeric sequence of inputs starting from 0, and a size of 3, the final output will
      * be:
      * <pre>
@@ -438,9 +438,9 @@ public class Streams extends Functions {
     }
 
     /**
-     * Returns a builder of stream channels joining the data coming from the specified ones.<br/>
+     * Returns a builder of stream channels joining the data coming from the specified ones.<br>
      * An output will be generated only when at least one result is available for each channel.
-     * <p/>
+     * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
@@ -460,9 +460,9 @@ public class Streams extends Functions {
     }
 
     /**
-     * Returns a builder of stream channels joining the data coming from the specified ones.<br/>
+     * Returns a builder of stream channels joining the data coming from the specified ones.<br>
      * An output will be generated only when at least one result is available for each channel.
-     * <p/>
+     * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
@@ -482,12 +482,12 @@ public class Streams extends Functions {
     }
 
     /**
-     * Returns a builder of stream channels joining the data coming from the specified ones.<br/>
+     * Returns a builder of stream channels joining the data coming from the specified ones.<br>
      * An output will be generated only when at least one result is available for each channel.
      * Moreover, when all the output channels complete, the remaining outputs will be returned by
      * filling the gaps with the specified placeholder instance, so that the generated list of data
      * will always have the same size of the channel list.
-     * <p/>
+     * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
@@ -509,12 +509,12 @@ public class Streams extends Functions {
     }
 
     /**
-     * Returns a builder of stream channels joining the data coming from the specified ones.<br/>
+     * Returns a builder of stream channels joining the data coming from the specified ones.<br>
      * An output will be generated only when at least one result is available for each channel.
      * Moreover, when all the output channels complete, the remaining outputs will be returned by
      * filling the gaps with the specified placeholder instance, so that the generated list of data
      * will always have the same size of the channel list.
-     * <p/>
+     * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
@@ -535,7 +535,7 @@ public class Streams extends Functions {
     }
 
     /**
-     * Builds and returns a new lazy stream channel.<br/>
+     * Builds and returns a new lazy stream channel.<br>
      * The stream will start producing results only when it is bound to another channel or an output
      * consumer, or when any of the read methods is invoked.
      *
@@ -549,7 +549,7 @@ public class Streams extends Functions {
     }
 
     /**
-     * Builds and returns a new lazy stream channel generating the specified outputs.<br/>
+     * Builds and returns a new lazy stream channel generating the specified outputs.<br>
      * The stream will start producing results only when it is bound to another channel or an output
      * consumer, or when any of the read methods is invoked.
      *
@@ -564,7 +564,7 @@ public class Streams extends Functions {
     }
 
     /**
-     * Builds and returns a new lazy stream channel generating the specified output.<br/>
+     * Builds and returns a new lazy stream channel generating the specified output.<br>
      * The stream will start producing results only when it is bound to another channel or an output
      * consumer, or when any of the read methods is invoked.
      *
@@ -579,7 +579,7 @@ public class Streams extends Functions {
     }
 
     /**
-     * Builds and returns a new lazy stream channel generating the specified outputs.<br/>
+     * Builds and returns a new lazy stream channel generating the specified outputs.<br>
      * The stream will start producing results only when it is bound to another channel or an output
      * consumer, or when any of the read methods is invoked.
      *
@@ -594,10 +594,10 @@ public class Streams extends Functions {
     }
 
     /**
-     * Builds and returns a new lazy stream channel generating the specified outputs.<br/>
+     * Builds and returns a new lazy stream channel generating the specified outputs.<br>
      * The stream will start producing results only when it is bound to another channel or an output
      * consumer, or when any of the read methods is invoked.
-     * <p/>
+     * <p>
      * Note that the output channel will be bound as a result of the call.
      *
      * @param output the output channel returning the output data.
@@ -615,7 +615,7 @@ public class Streams extends Functions {
     /**
      * Returns an factory of invocations passing at max the specified number of input data and
      * discarding the following ones.
-     * <p/>
+     * <p>
      * Given a numeric sequence of inputs starting from 0, and a limit count of 5, the final output
      * will be:
      * <pre>
@@ -638,7 +638,7 @@ public class Streams extends Functions {
 
     /**
      * Returns a builder merging the specified channels into a selectable stream.
-     * <p/>
+     * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
@@ -661,7 +661,7 @@ public class Streams extends Functions {
 
     /**
      * Returns a builder merging the specified channels into a selectable stream.
-     * <p/>
+     * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
@@ -683,7 +683,7 @@ public class Streams extends Functions {
 
     /**
      * Returns a builder merging the specified channels into a selectable stream.
-     * <p/>
+     * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
@@ -704,7 +704,7 @@ public class Streams extends Functions {
 
     /**
      * Returns a builder merging the specified channels into a selectable stream.
-     * <p/>
+     * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
@@ -725,7 +725,7 @@ public class Streams extends Functions {
 
     /**
      * Returns a builder merging the specified channels into a selectable stream.
-     * <p/>
+     * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
@@ -746,7 +746,7 @@ public class Streams extends Functions {
 
     /**
      * Returns a routine builder, whose invocation instances employ the streams provided by the
-     * specified function to process input data.<br/>
+     * specified function to process input data.<br>
      * The function should return a new instance each time it is called, starting from the passed
      * one.
      *
@@ -764,7 +764,7 @@ public class Streams extends Functions {
     }
 
     /**
-     * Returns a consumer generating the specified range of data.<br/>
+     * Returns a consumer generating the specified range of data.<br>
      * The generated data will start from the specified first one up to and including the specified
      * last one, by computing each next element through the specified function.
      *
@@ -783,7 +783,7 @@ public class Streams extends Functions {
     }
 
     /**
-     * Returns a consumer generating the specified range of data.<br/>
+     * Returns a consumer generating the specified range of data.<br>
      * The stream will generate a range of numbers up to and including the {@code end} element, by
      * applying a default increment of {@code +1} or {@code -1} depending on the comparison between
      * the first and the last element. That is, if the first element is less than the last, the
@@ -802,7 +802,7 @@ public class Streams extends Functions {
     }
 
     /**
-     * Returns a consumer generating the specified range of data.<br/>
+     * Returns a consumer generating the specified range of data.<br>
      * The stream will generate a range of numbers by applying the specified increment up to and
      * including the {@code end} element.
      *
@@ -821,7 +821,7 @@ public class Streams extends Functions {
     /**
      * Returns a builder of streams repeating the output data to any newly bound channel or
      * consumer, thus effectively supporting binding of several output consumers.
-     * <p/>
+     * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
@@ -839,7 +839,7 @@ public class Streams extends Functions {
 
     /**
      * Returns a builder of channels transforming the input data into selectable ones.
-     * <p/>
+     * <p>
      * Note that the builder will successfully create several input channel instances, and that the
      * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
      * invocation lifecycle.
@@ -861,7 +861,7 @@ public class Streams extends Functions {
     /**
      * Returns a builder of maps of input channels accepting the data identified by the specified
      * indexes.
-     * <p/>
+     * <p>
      * Note that the builder will successfully create several input channel map instances, and that
      * the returned channels <b>must be explicitly closed</b> in order to ensure the completion of
      * the invocation lifecycle.
@@ -887,7 +887,7 @@ public class Streams extends Functions {
     /**
      * Returns a builder of maps of input channels accepting the data identified by the specified
      * indexes.
-     * <p/>
+     * <p>
      * Note that the builder will successfully create several input channel map instances, and that
      * the returned channels <b>must be explicitly closed</b> in order to ensure the completion of
      * the invocation lifecycle.
@@ -913,7 +913,7 @@ public class Streams extends Functions {
     /**
      * Returns a builder of maps of input channels accepting the data identified by the specified
      * indexes.
-     * <p/>
+     * <p>
      * Note that the builder will successfully create several input channel map instances, and that
      * the returned channels <b>must be explicitly closed</b> in order to ensure the completion of
      * the invocation lifecycle.
@@ -939,7 +939,7 @@ public class Streams extends Functions {
     /**
      * Returns a builder of maps of stream channels returning the output data filtered by the
      * specified indexes.
-     * <p/>
+     * <p>
      * Note that the builder will return the same map for the same inputs and equal configuration,
      * and that the passed channels will be bound as a result of the creation.
      *
@@ -962,7 +962,7 @@ public class Streams extends Functions {
     /**
      * Returns a builder of maps of stream channels returning the output data filtered by the
      * specified indexes.
-     * <p/>
+     * <p>
      * Note that the builder will return the same map for the same inputs and equal configuration,
      * and that the passed channels will be bound as a result of the creation.
      *
@@ -985,7 +985,7 @@ public class Streams extends Functions {
     /**
      * Returns a builder of maps of stream channels returning the output data filtered by the
      * specified indexes.
-     * <p/>
+     * <p>
      * Note that the builder will return the same map for the same inputs and equal configuration,
      * and that the passed channels will be bound as a result of the creation.
      *
@@ -1007,7 +1007,7 @@ public class Streams extends Functions {
 
     /**
      * Returns an factory of invocations skipping the specified number of input data.
-     * <p/>
+     * <p>
      * Given a numeric sequence of inputs starting from 0, and a skip count of 5, the final output
      * will be:
      * <pre>
@@ -1081,7 +1081,7 @@ public class Streams extends Functions {
 
     /**
      * Builds and returns a new stream channel generating the specified outputs.
-     * <p/>
+     * <p>
      * Note that the output channel will be bound as a result of the call.
      *
      * @param output the output channel returning the output data.
@@ -1099,9 +1099,9 @@ public class Streams extends Functions {
     }
 
     /**
-     * Returns a builder of selectable channels feeding the specified one.<br/>
+     * Returns a builder of selectable channels feeding the specified one.<br>
      * Each output will be filtered based on the specified index.
-     * <p/>
+     * <p>
      * Note that the builder will return the same map for the same inputs and equal configuration,
      * and that the returned channels <b>must be explicitly closed</b> in order to ensure the
      * completion of the invocation lifecycle.
@@ -1120,9 +1120,9 @@ public class Streams extends Functions {
     }
 
     /**
-     * Returns a builder of channels making the specified one selectable.<br/>
+     * Returns a builder of channels making the specified one selectable.<br>
      * Each output will be passed along unchanged.
-     * <p/>
+     * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
@@ -1445,7 +1445,7 @@ public class Streams extends Functions {
     }
 
     /**
-     * Base abstract function incrementing a number of a specific value.<br/>
+     * Base abstract function incrementing a number of a specific value.<br>
      * It provides an implementation for {@code equals()} and {@code hashCode()} methods.
      */
     private static abstract class NumberInc<N extends Number> implements Function<N, N> {

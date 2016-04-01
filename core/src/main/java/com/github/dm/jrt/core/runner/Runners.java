@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Utility class for creating and sharing runner instances.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/09/2014.
  */
 public class Runners {
@@ -43,7 +43,7 @@ public class Runners {
     }
 
     /**
-     * Returns a runner employing a dynamic pool of threads.<br/>
+     * Returns a runner employing a dynamic pool of threads.<br>
      * The number of threads may increase when needed from the core to the maximum pool size. The
      * number of threads exceeding the core size are kept alive when idle for the specified time.
      * If they stay idle for a longer time they will be destroyed.
@@ -91,7 +91,7 @@ public class Runners {
 
     /**
      * Returns a runner providing ordering of executions based on priority.
-     * <p/>
+     * <p>
      * Note that wrapping a synchronous runner may lead to unpredictable results.
      *
      * @param wrapped the wrapped runner instance.

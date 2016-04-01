@@ -83,7 +83,7 @@ import static org.junit.Assert.fail;
 
 /**
  * Routine unit tests.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/09/2014.
  */
 public class RoutineTest {

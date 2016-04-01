@@ -33,21 +33,21 @@ import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
 
 /**
  * Class storing the channel configuration.
- * <p/>
+ * <p>
  * Each instance is immutable, thus, in order to modify a configuration parameter, a new builder
  * must be created starting from the specific configuration.
- * <p/>
- * The configuration has an asynchronous runner associated.<br/>
+ * <p>
+ * The configuration has an asynchronous runner associated.<br>
  * The number of input data buffered in the channel can be limited in order to avoid excessive
  * memory consumption. In case the maximum number is reached when passing an input, the call will
- * block until enough data are consumed or the specified delay elapses.<br/>
+ * block until enough data are consumed or the specified delay elapses.<br>
  * A maximum size can additionally be set so that, when the number of buffered data exceeds it, a
- * {@link com.github.dm.jrt.core.common.DeadlockException DeadlockException} will be thrown.<br/>
- * By default the timeout is set to 0.<br/>
+ * {@link com.github.dm.jrt.core.common.DeadlockException DeadlockException} will be thrown.<br>
+ * By default the timeout is set to 0.<br>
  * The order of input data is not guaranteed. Nevertheless, it is possible to force data to be
  * delivered in the same order as they are passed to the channels, at the cost of a slightly
  * increase in memory usage and computation.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 07/03/2015.
  */
 public final class ChannelConfiguration {
@@ -60,7 +60,7 @@ public final class ChannelConfiguration {
     private static final DefaultConfigurable sDefaultConfigurable = new DefaultConfigurable();
 
     /**
-     * Empty configuration constant.<br/>The configuration has all the options set to their default.
+     * Empty configuration constant.<br>The configuration has all the options set to their default.
      */
     public static final ChannelConfiguration DEFAULT_CONFIGURATION = builder().buildConfiguration();
 
@@ -616,7 +616,7 @@ public final class ChannelConfiguration {
          * Sets the limit of data that the channel can retain before starting to slow down the
          * feeding thread. A {@link ChannelConfiguration#DEFAULT DEFAULT} value means that it is
          * up to the specific implementation to choose a default one.
-         * <p/>
+         * <p>
          * This configuration option is useful when the data coming from the invocation execution
          * are meant to be explicitly read through this channel. The execution will slow down until
          * enough data are consumed. Note, however, that binding the channel to an output consumer
@@ -641,7 +641,7 @@ public final class ChannelConfiguration {
         /**
          * Sets the maximum delay to apply to the feeding thread waiting for the channel to have
          * room for additional data.
-         * <p/>
+         * <p>
          * This configuration option should be used on conjunction with the channel limit, or it
          * might have no effect on the invocation execution.
          *
@@ -660,7 +660,7 @@ public final class ChannelConfiguration {
         /**
          * Sets the maximum delay to apply to the feeding thread waiting for the channel to have
          * room for additional data.
-         * <p/>
+         * <p>
          * This configuration option should be used on conjunction with the channel limit, or it
          * might have no effect on the invocation execution.
          *
@@ -698,7 +698,7 @@ public final class ChannelConfiguration {
         /**
          * Sets the order in which data are collected from the channel. A null value means that it
          * is up to the specific implementation to choose a default one.
-         * <p/>
+         * <p>
          * Note that this is just the initial configuration, since the channel order can be
          * dynamically changed through the dedicated methods.
          *
@@ -742,7 +742,7 @@ public final class ChannelConfiguration {
 
         /**
          * Sets the timeout for the channel instance to produce a readable output.
-         * <p/>
+         * <p>
          * Note that this is just the initial configuration, since the output timeout can be
          * dynamically changed through the dedicated channel methods.
          *
@@ -760,7 +760,7 @@ public final class ChannelConfiguration {
         /**
          * Sets the timeout for the channel instance to produce a readable output. A null value
          * means that it is up to the specific implementation to choose a default one.
-         * <p/>
+         * <p>
          * Note that this is just the initial configuration, since the output timeout can be
          * dynamically changed through the dedicated channel methods.
          *
@@ -778,7 +778,7 @@ public final class ChannelConfiguration {
          * Sets the action to be taken if the timeout elapses before an output can be read from the
          * output channel. A null value means that it is up to the specific implementation to choose
          * a default one.
-         * <p/>
+         * <p>
          * Note that this is just the initial configuration, since the output timeout action can be
          * dynamically changed through the dedicated channel methods.
          *

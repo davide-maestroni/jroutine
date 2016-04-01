@@ -33,7 +33,7 @@ import java.io.IOException;
 
 /**
  * Invocation writing the downloaded data into the output file.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 10/17/2014.
  */
 public class WriteFile extends TemplateInvocation<ByteBuffer, Boolean> {

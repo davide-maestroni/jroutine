@@ -27,7 +27,7 @@ import java.util.List;
 
 /**
  * Class wrapping a bi-consumer instance.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 10/11/2015.
  *
  * @param <IN1> the first input data type.
@@ -65,7 +65,7 @@ public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2>, Wrappe
     }
 
     /**
-     * Returns a bi-consumer wrapper just discarding the passed inputs.<br/>
+     * Returns a bi-consumer wrapper just discarding the passed inputs.<br>
      * The returned object will support concatenation and comparison.
      *
      * @param <IN1> the first input data type.

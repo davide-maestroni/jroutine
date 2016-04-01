@@ -28,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Accumulate invocation unit tests.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 10/27/2015.
  */
 public class AccumulateInvocationTest {

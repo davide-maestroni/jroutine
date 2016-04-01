@@ -30,7 +30,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
  * Utility class used for logging messages.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 10/03/2014.
  */
 public class Logger {

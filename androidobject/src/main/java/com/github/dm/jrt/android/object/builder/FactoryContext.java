@@ -22,13 +22,13 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Interface defining a factory providing object instances, whose methods are to be called inside
  * asynchronous invocations.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 04/06/2015.
  */
 public interface FactoryContext {
 
     /**
-     * Returns an instance of the object described by the specified parameters.<br/>
+     * Returns an instance of the object described by the specified parameters.<br>
      * If a null instance is returned, the constructor matching the specified arguments will be
      * called by default.
      *

@@ -30,7 +30,7 @@ import java.util.Collection;
 
 /**
  * Builder implementation returning a channel combining data from a collection of input channels.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
  * @param <IN> the input data type.
@@ -140,7 +140,7 @@ class CombineBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<? extends 
                 return;
             }
 
-            final IOChannel<? extends IN> channel = mChannelList.get(index);
+            final IOChannel<IN> channel = (IOChannel<IN>) mChannelList.get(index);
             if (channel != null) {
                 channel.pass(selectable.data);
             }

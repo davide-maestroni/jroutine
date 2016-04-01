@@ -30,7 +30,7 @@ import static com.github.dm.jrt.core.util.Reflection.findConstructor;
 
 /**
  * Test application.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 04/06/2015.
  */
 @SuppressWarnings("unused")

@@ -27,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Builder implementation returning a channel passing selectable data to an input channel.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
  * @param <DATA> the channel data type.

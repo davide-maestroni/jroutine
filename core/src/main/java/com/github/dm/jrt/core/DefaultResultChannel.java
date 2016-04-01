@@ -57,12 +57,12 @@ import static com.github.dm.jrt.core.util.TimeDuration.timeUntilMillis;
 
 /**
  * Class handling the invocation output.
- * <p/>
+ * <p>
  * This class centralizes the managing of data passing through the routine output and result
  * channels, since, logically, the two objects are part of the same entity. In fact, on one end the
  * result channel puts data into the output queue and, on the other end, the output channel reads
  * them from the same queue.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 06/12/2015.
  *
  * @param <OUT> the output data type.

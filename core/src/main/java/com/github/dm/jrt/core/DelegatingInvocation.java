@@ -31,7 +31,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
  * Invocation implementation delegating the execution to another routine.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 04/18/2015.
  *
  * @param <IN>  the input data type.

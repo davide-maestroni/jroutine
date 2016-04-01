@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Exception wrapping any throwable escaping an invocation execution.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/08/2014.
  */
 public class InvocationException extends RoutineException {

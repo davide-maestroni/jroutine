@@ -22,7 +22,7 @@ import org.junit.Test;
 
 /**
  * System log unit tests.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 07/02/2015.
  */
 public class SystemLogTest {

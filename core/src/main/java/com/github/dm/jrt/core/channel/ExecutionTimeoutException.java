@@ -22,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Exception indicating that no result became available before the specific timeout elapsed.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 11/25/2014.
  */
 public class ExecutionTimeoutException extends TimeoutException {

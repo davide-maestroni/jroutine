@@ -42,7 +42,7 @@ import static org.junit.Assert.fail;
 
 /**
  * Channel configuration unit tests.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 07/03/2015.
  */
 public class ChannelConfigurationTest {

@@ -22,9 +22,9 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Empty abstract implementation of an output consumer.
- * <p/>
+ * <p>
  * This class is useful to avoid the need of implementing all the methods defined in the interface.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/16/2014.
  *
  * @param <OUT> the output data type.

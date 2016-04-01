@@ -30,7 +30,7 @@ import static org.junit.Assert.fail;
 
 /**
  * Output consumer builder unit tests.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/24/2015.
  */
 public class OutputConsumerBuilderTest {

@@ -51,7 +51,7 @@ import static org.junit.Assert.fail;
 
 /**
  * Routine channels unit tests.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/18/2015.
  */
 public class ChannelsTest {

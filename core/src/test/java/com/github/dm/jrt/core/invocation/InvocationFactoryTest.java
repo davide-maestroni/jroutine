@@ -30,7 +30,7 @@ import static org.junit.Assert.fail;
 
 /**
  * Invocation factories unit test.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 08/19/2015.
  */
 public class InvocationFactoryTest {

@@ -31,19 +31,19 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Class providing ordering of executions based on priority.<br/>
+ * Class providing ordering of executions based on priority.<br>
  * Each class instance wraps a supporting runner and then provides different runner instances, each
  * one enqueuing executions with a specific priority.
- * <p/>
+ * <p>
  * Each enqueued execution will age every time an higher priority one takes the precedence, so that
  * older executions slowly increases their priority. Such mechanism has been implemented to avoid
  * starvation of low priority executions. Hence, when assigning priority to different runners, it is
  * important to keep in mind that the difference between two priorities corresponds to the maximum
  * age the lower priority execution will have, before getting precedence over the higher priority
  * one.
- * <p/>
+ * <p>
  * Note that the queue is not shared between different instances of this class.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 04/28/2015.
  */
 public class PriorityRunner {
@@ -94,7 +94,7 @@ public class PriorityRunner {
 
     /**
      * Returns the priority runner wrapping the specified one.
-     * <p/>
+     * <p>
      * Note that wrapping a synchronous runner may lead to unpredictable results.
      *
      * @param wrapped the wrapped instance.

@@ -40,7 +40,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Class consuming the invocation loader results.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 12/12/2014.
  *
  * @param <OUT> the output data type.

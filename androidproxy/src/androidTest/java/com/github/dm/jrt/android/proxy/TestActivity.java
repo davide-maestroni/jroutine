@@ -25,7 +25,7 @@ import android.view.WindowManager.LayoutParams;
 
 /**
  * Test activity.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 01/11/2015.
  */
 @TargetApi(VERSION_CODES.ECLAIR)

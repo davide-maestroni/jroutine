@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Class implementing a builder of routine objects based on an invocation factory.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/21/2014.
  *
  * @param <IN>  the input data type.

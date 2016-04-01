@@ -48,7 +48,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Parcelable byte channel unit tests.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/03/2015.
  */
 @TargetApi(VERSION_CODES.FROYO)

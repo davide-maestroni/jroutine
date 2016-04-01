@@ -31,7 +31,7 @@ import static org.junit.Assert.fail;
 
 /**
  * Time duration unit tests.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 10/02/2014.
  */
 public class TimeDurationTest {

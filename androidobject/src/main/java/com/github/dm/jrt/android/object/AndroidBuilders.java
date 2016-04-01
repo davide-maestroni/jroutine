@@ -31,10 +31,10 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
 /**
- * Utility class providing helper methods used to implement a builder of routines.<br/>
+ * Utility class providing helper methods used to implement a builder of routines.<br>
  * Specifically, this class provided several utilities to manage routines used to call object
  * methods asynchronously.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 01/29/2016.
  */
 public class AndroidBuilders {

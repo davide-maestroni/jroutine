@@ -23,13 +23,13 @@ import java.lang.reflect.Type;
 
 /**
  * Utility abstract class used to work around Java type erasure.
- * <p/>
+ * <p>
  * By using class objects it is impossible to distinguish between two different generic classes.
  * For example there is no way to declare a <code>Class&lt;List&lt;String&gt;&gt;</code> as
- * opposed to <code>Class&lt;List&lt;Integer&gt;&gt;</code>.<br/>
+ * opposed to <code>Class&lt;List&lt;Integer&gt;&gt;</code>.<br>
  * The workaround consists in forcing the inheritance from a special generic class, then inspected
  * via reflection, to obtain the generic type rather than the class object.
- * <p/>
+ * <p>
  * Remember that, in order for the work around to properly work at run time, you will need to add
  * the following rule to your Proguard file (if employing it for shrinking or obfuscation):
  * <pre>
@@ -38,7 +38,7 @@ import java.lang.reflect.Type;
  *         -keepattributes Signature
  *     </code>
  * </pre>
- * <p/>
+ * <p>
  * Created by davide-maestroni on 06/14/2014.
  *
  * @param <TYPE> the class type.
@@ -82,7 +82,7 @@ public abstract class ClassToken<TYPE> {
 
     /**
      * Casts the specified object to this token type.
-     * <p/>
+     * <p>
      * Note that the cast is unsafe and may raise an exception.
      *
      * @param object the object to cast.

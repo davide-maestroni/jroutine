@@ -34,7 +34,7 @@ import static com.github.dm.jrt.core.util.Reflection.findConstructor;
 
 /**
  * Default implementation of a proxy builder.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/23/2015.
  */
 class DefaultProxyRoutineBuilder

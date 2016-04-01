@@ -34,7 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Loader invocation configuration unit tests.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 04/22/2015.
  */
 public class LoaderConfigurationTest extends AndroidTestCase {

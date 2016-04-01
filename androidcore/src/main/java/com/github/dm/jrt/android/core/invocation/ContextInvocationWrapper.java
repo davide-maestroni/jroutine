@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Implementation of a platform specific Android invocation wrapping a base invocation instance.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/21/2015.
  *
  * @param <IN>  the input data type.

@@ -85,7 +85,7 @@ import static org.junit.Assert.fail;
 
 /**
  * Object routine unit tests.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/27/2015.
  */
 public class ObjectRoutineTest {

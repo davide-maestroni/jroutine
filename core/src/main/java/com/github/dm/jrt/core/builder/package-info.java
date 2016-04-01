@@ -16,7 +16,7 @@
 
 /**
  * Classes and interfaces related to routine and channel builders.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/19/2014.
  */
 package com.github.dm.jrt.core.builder;

@@ -62,7 +62,7 @@ import static com.github.dm.jrt.object.Builders.getAnnotatedMethod;
 
 /**
  * Class implementing a builder of routines wrapping an object methods.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 04/06/2015.
  */
 class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,

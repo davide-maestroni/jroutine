@@ -24,12 +24,12 @@
     Java annotation proxy code generator based on the <a href="http://davide-maestroni.github.io/jroutine/javadoc/v6/android" target="_blank">jroutine-android</a> libraries.
 </p>
 <p>
-    The code below shows how it is possible to load an image from the network in a background thread, by letting the library automatically handle any change in the configuration.<br/>
+    The code below shows how it is possible to load an image from the network in a background thread, by letting the library automatically handle any change in the configuration.<br>
     Note that the very same examples can be re-written using JRoutineLoaderProxyCompat and a FragmentActivity, or the JRoutineServiceProxy class, in order to make the processing happen in a service instead of a loader.
 </p>
 <b>Example 1:</b> via code generation.
 <p>
-    Note that this approach is fairly naive, since it lets the framework retain the instance of the downloaded bitmap.<br/>
+    Note that this approach is fairly naive, since it lets the framework retain the instance of the downloaded bitmap.<br>
     A smarter implementation would involve the use of a dedicated cache.
 </p>
 <pre>

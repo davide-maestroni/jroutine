@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Class implementing a runner employing an executor service.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 10/14/2014.
  */
 class ScheduledRunner implements Runner {

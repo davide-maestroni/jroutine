@@ -30,7 +30,7 @@ import static com.github.dm.jrt.stream.AbstractStreamChannel.Binder.binderOf;
 
 /**
  * Default implementation of a stream output channel.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 12/23/2015.
  *
  * @param <OUT> the output data type.

@@ -28,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Default implementation of an invocation execution.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/24/2014.
  *
  * @param <IN>  the input data type.

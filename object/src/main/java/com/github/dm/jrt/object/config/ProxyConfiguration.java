@@ -28,15 +28,15 @@ import java.util.List;
 
 /**
  * Class storing the proxy configuration.
- * <p/>
+ * <p>
  * Each instance is immutable, thus, in order to modify a configuration parameter, a new builder
  * must be created starting from the specific configuration.
- * <p/>
+ * <p>
  * The configuration has a list of shared fields associated. Every method accessing a specific
  * set of fields is protected so that the related variables can be accessed in a thread safe way.
- * By default all fields are protected.<br/>
+ * By default all fields are protected.<br>
  * Note, however, that methods sharing the same fields cannot be executed in parallel.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 04/20/2015.
  */
 public final class ProxyConfiguration {
@@ -44,7 +44,7 @@ public final class ProxyConfiguration {
     private static final DefaultConfigurable sDefaultConfigurable = new DefaultConfigurable();
 
     /**
-     * Empty configuration constant.<br/>The configuration has all the options set to their default.
+     * Empty configuration constant.<br>The configuration has all the options set to their default.
      */
     public static final ProxyConfiguration DEFAULT_CONFIGURATION = builder().buildConfiguration();
 

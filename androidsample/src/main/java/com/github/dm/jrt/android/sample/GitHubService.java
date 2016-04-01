@@ -29,7 +29,7 @@ import retrofit2.http.Path;
 
 /**
  * GitHub service interface.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/25/2016.
  */
 public interface GitHubService {

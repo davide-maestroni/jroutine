@@ -16,7 +16,7 @@
 
 /**
  * Utility classes handling routine channels specific to the Android platform.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/01/2016.
  */
 package com.github.dm.jrt.android.channel;

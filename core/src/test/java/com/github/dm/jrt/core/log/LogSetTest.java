@@ -24,7 +24,7 @@ import java.util.Collections;
 
 /**
  * Log set unit tests.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 12/29/2015.
  */
 public class LogSetTest {

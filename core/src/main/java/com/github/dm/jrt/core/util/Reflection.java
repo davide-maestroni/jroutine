@@ -29,7 +29,7 @@ import java.util.HashMap;
 
 /**
  * Reflection utility class.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/09/2014.
  */
 public class Reflection {
@@ -68,7 +68,7 @@ public class Reflection {
 
     /**
      * Returns the class boxing the specified primitive type.
-     * <p/>
+     * <p>
      * If the passed class does not represent a primitive type the same class is returned.
      *
      * @param type the primitive type.
@@ -86,7 +86,7 @@ public class Reflection {
 
     /**
      * Finds the constructor of the specified class best matching the passed arguments.
-     * <p/>
+     * <p>
      * Note that clashing of signature is automatically avoided, since constructors are not
      * identified by their name. Hence the best match will always be unique in the class.
      *
@@ -116,7 +116,7 @@ public class Reflection {
 
     /**
      * Finds the method matching the specified parameters.
-     * <p/>
+     * <p>
      * Note that the returned method may not be accessible.
      *
      * @param type           the target class.

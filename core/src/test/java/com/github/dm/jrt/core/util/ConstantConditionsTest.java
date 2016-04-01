@@ -23,7 +23,7 @@ import static org.junit.Assert.fail;
 
 /**
  * Constant conditions unit tests.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/27/2016.
  */
 public class ConstantConditionsTest {

@@ -28,7 +28,7 @@ import static org.junit.Assert.fail;
 
 /**
  * Proxy configuration unit tests.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 04/21/2015.
  */
 public class ProxyConfigurationTest {

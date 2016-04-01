@@ -34,7 +34,7 @@ import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
 /**
  * Class acting as a fa&ccedil;ade of all the JRoutine library features, with support for the
  * Android compatibility library.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/06/2016.
  */
 public class JRoutineAndroidCompat extends LoaderStreamsCompat {

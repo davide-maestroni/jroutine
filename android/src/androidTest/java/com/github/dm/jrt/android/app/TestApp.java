@@ -20,7 +20,7 @@ import android.app.Application;
 
 /**
  * Test application.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/06/2016.
  */
 public class TestApp extends Application {

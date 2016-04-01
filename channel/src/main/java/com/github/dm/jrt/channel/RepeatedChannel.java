@@ -37,12 +37,12 @@ import java.util.concurrent.TimeUnit;
 /**
  * I/O channel caching the output data and passing them to newly bound consumer, thus effectively
  * supporting binding of several output consumers.
- * <p/>
+ * <p>
  * The {@link #isBound()} method will always return false and the bound methods will never fail.
- * <br/>
+ * <br>
  * Note, however, that the implementation will silently prevent the same consumer or channel
  * instance to be bound twice.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
  * @param <OUT> the output data type.

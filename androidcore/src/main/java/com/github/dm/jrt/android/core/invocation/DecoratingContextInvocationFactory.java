@@ -24,7 +24,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
  * Class decorating the invocations produced by a context invocation factory.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 08/19/2015.
  *
  * @param <IN>  the input data type.

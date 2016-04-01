@@ -20,7 +20,7 @@ import com.github.dm.jrt.android.core.service.InvocationService;
 
 /**
  * Test service.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 01/16/2015.
  */
 public class TestService extends InvocationService {

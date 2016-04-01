@@ -30,10 +30,10 @@ import java.lang.ref.WeakReference;
 
 /**
  * Class representing an Android service context.
- * <p/>
+ * <p>
  * No strong reference to the wrapped contexts will be retained by this class implementations. So,
  * it is up to the caller to ensure that they are not garbage collected before being called.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 07/11/2015.
  */
 public abstract class ServiceContext {
@@ -46,7 +46,7 @@ public abstract class ServiceContext {
     }
 
     /**
-     * Returns a context based on the specified instance.<br/>
+     * Returns a context based on the specified instance.<br>
      * The default {@link com.github.dm.jrt.android.core.service.InvocationService
      * InvocationService} class will be employed.
      *

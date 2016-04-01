@@ -33,7 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Exceptions unit tests.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 12/25/2015.
  */
 @TargetApi(VERSION_CODES.FROYO)

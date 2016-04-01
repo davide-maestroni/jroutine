@@ -28,7 +28,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Builder implementation returning a channel making an input one selectable.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
  * @param <IN> the input data type.

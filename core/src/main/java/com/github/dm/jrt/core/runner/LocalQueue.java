@@ -25,10 +25,10 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Class maintaining a queue of executions which is local to the calling thread.
- * <p/>
+ * <p>
  * The implementation ensures that recursive executions are broken into commands handled inside a
  * consuming loop, running in the same thread.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/18/2014.
  */
 class LocalQueue {

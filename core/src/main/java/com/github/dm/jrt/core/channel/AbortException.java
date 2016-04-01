@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Exception indicating that an invocation has been explicitly aborted.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 01/27/2015.
  */
 public class AbortException extends RoutineException {

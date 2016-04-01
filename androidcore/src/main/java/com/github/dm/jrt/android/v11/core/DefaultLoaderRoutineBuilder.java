@@ -32,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Default implementation of a loader routine builder.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 12/09/2014.
  *
  * @param <IN>  the input data type.

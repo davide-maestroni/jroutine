@@ -25,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Helper class handling routine exceptions so that they can be transferred through the routine
  * channels.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/08/2014.
  */
 class RoutineExceptionWrapper {

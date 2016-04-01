@@ -27,10 +27,10 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Empty abstract implementation of a routine builder.
- * <p/>
+ * <p>
  * This class is useful to avoid the need of implementing some of the methods defined in the
  * interface.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/16/2015.
  *
  * @param <IN>  the input data type.

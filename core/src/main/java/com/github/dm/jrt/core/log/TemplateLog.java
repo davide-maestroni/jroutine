@@ -28,13 +28,13 @@ import java.util.Locale;
 
 /**
  * Abstract implementation of a log.
- * <p/>
+ * <p>
  * This class is useful to avoid the need of implementing all the methods defined in the interface.
- * <p/>
- * A standard format is applied to the log messages.<br/>
+ * <p>
+ * A standard format is applied to the log messages.<br>
  * The inheriting class may just implement the writing of the formatted message, or customize it
  * at any level.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 10/03/2014.
  */
 public abstract class TemplateLog implements Log {

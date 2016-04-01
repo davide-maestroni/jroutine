@@ -32,7 +32,7 @@ import java.util.List;
 
 /**
  * Builder implementation returning a channel distributing data into a set of input channels.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
  * @param <IN> the input data type.

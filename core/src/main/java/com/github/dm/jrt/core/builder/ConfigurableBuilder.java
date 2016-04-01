@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Interface defining a configurable builder of routines.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/06/2015.
  *
  * @param <TYPE> the builder type.
@@ -30,10 +30,10 @@ import org.jetbrains.annotations.NotNull;
 public interface ConfigurableBuilder<TYPE> {
 
     /**
-     * Gets the invocation configuration builder related to the routine builder instance.<br/>
+     * Gets the invocation configuration builder related to the routine builder instance.<br>
      * The configuration options not supported by the routine builder implementation might be
      * ignored.
-     * <p/>
+     * <p>
      * Note that the configuration builder will be initialized with the current configuration.
      *
      * @return the invocation configuration builder.

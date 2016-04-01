@@ -23,10 +23,10 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Empty abstract implementation of a routine.
- * <p/>
+ * <p>
  * This class is useful to avoid the need of implementing some of the methods defined in the
  * interface.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 10/17/2014.
  *
  * @param <IN>  the input data type.

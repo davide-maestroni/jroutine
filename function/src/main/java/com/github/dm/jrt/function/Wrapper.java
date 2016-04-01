@@ -18,7 +18,7 @@ package com.github.dm.jrt.function;
 
 /**
  * Interface defining a wrapper of functions.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 02/13/2016.
  */
 public interface Wrapper {

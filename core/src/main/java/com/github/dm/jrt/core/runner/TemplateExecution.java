@@ -18,9 +18,9 @@ package com.github.dm.jrt.core.runner;
 
 /**
  * Empty abstract implementation of an execution.
- * <p/>
+ * <p>
  * This class is useful to avoid the need of implementing all the methods defined in the interface.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 07/07/2015.
  */
 public abstract class TemplateExecution implements Execution {

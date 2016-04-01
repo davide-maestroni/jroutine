@@ -20,7 +20,7 @@ import com.github.dm.jrt.android.core.service.InvocationService;
 
 /**
  * Test service.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/12/2016.
  */
 public class RemoteInvocationService extends InvocationService {

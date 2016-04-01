@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Implementation of a decorator of a runner object.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/22/2014.
  */
 public class RunnerDecorator implements Runner {

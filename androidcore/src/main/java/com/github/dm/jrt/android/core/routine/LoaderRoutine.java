@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Interface defining a routine that can purge specific invocation instances, identifying them by
  * their inputs.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/09/2015.
  *
  * @param <IN>  the input data type.

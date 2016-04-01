@@ -30,7 +30,7 @@ import java.util.concurrent.Executor;
 
 /**
  * Utility class for creating and sharing runner instances, employing specific Android classes.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/28/2014.
  */
 public class AndroidRunners {
@@ -55,7 +55,7 @@ public class AndroidRunners {
 
     /**
      * Returns a runner employing the specified looper.
-     * <p/>
+     * <p>
      * Note that, when the invocation runs in the looper thread, the executions with a delay of 0
      * will be performed synchronously, while the ones with a positive delay will be posted on the
      * same thread.
@@ -71,7 +71,7 @@ public class AndroidRunners {
 
     /**
      * Returns a runner employing the specified looper.
-     * <p/>
+     * <p>
      * Note that, based on the choice of the runner to be used when the invocation runs in the
      * looper thread, waiting for results in the very same thread may result in a deadlock
      * exception.
@@ -90,7 +90,7 @@ public class AndroidRunners {
 
     /**
      * Returns the shared runner employing the main thread looper.
-     * <p/>
+     * <p>
      * Note that, when the invocation runs in the main thread, the executions with a delay of 0 will
      * be performed synchronously, while the ones with a positive delay will be posted on the main
      * thread.
@@ -117,9 +117,9 @@ public class AndroidRunners {
 
     /**
      * Returns a runner employing async tasks.
-     * <p/>
+     * <p>
      * Beware of the caveats of using
-     * <a href="http://developer.android.com/reference/android/os/AsyncTask.html">AsyncTask<a/>s
+     * <a href="http://developer.android.com/reference/android/os/AsyncTask.html">AsyncTask</a>s
      * especially on some platform versions.
      *
      * @return the runner instance.
@@ -132,11 +132,11 @@ public class AndroidRunners {
 
     /**
      * Returns a runner employing async tasks running on the specified executor.
-     * <p/>
+     * <p>
      * Beware of the caveats of using
-     * <a href="http://developer.android.com/reference/android/os/AsyncTask.html">AsyncTask<a/>s
+     * <a href="http://developer.android.com/reference/android/os/AsyncTask.html">AsyncTask</a>s
      * especially on some platform versions.
-     * <p/>
+     * <p>
      * Note also that the executor instance will be ignored on platforms with API level lower than
      * {@value android.os.Build.VERSION_CODES#HONEYCOMB}.
      *

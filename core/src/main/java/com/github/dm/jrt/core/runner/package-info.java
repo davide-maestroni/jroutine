@@ -16,7 +16,7 @@
 
 /**
  * Classes and interfaces related to invocation runners.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/25/2014.
  */
 package com.github.dm.jrt.core.runner;

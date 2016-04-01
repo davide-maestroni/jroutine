@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Common base exception class.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 01/23/2015.
  */
 public class RoutineException extends RuntimeException {

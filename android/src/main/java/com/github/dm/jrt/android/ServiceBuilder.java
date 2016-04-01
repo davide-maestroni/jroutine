@@ -35,7 +35,7 @@ import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 
 /**
  * Context based builder of service routine builders.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/06/2016.
  */
 public class ServiceBuilder {
@@ -53,11 +53,11 @@ public class ServiceBuilder {
     }
 
     /**
-     * Returns a builder of routines running in a service, wrapping the specified target class.<br/>
+     * Returns a builder of routines running in a service, wrapping the specified target class.<br>
      * In order to customize the object creation, the caller must employ an implementation of a
      * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
      * application context.
-     * <p/>
+     * <p>
      * Note that the built routine results will be always dispatched on the configured looper
      * thread, thus waiting for the outputs immediately after its invocation may result in a
      * deadlock.
@@ -73,11 +73,11 @@ public class ServiceBuilder {
 
     /**
      * Returns a builder of routines running in a service, wrapping the specified target object.
-     * <br/>
+     * <br>
      * In order to customize the object creation, the caller must employ an implementation of a
      * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
      * application context.
-     * <p/>
+     * <p>
      * Note that the built routine results will be always dispatched on the configured looper
      * thread, thus waiting for the outputs immediately after its invocation may result in a
      * deadlock.
@@ -93,11 +93,11 @@ public class ServiceBuilder {
 
     /**
      * Returns a builder of routines running in a service, wrapping the specified target object.
-     * <br/>
+     * <br>
      * In order to customize the object creation, the caller must employ an implementation of a
      * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
      * invocation service.
-     * <p/>
+     * <p>
      * Note that the built routine results will be always dispatched on the configured looper
      * thread, thus waiting for the outputs immediately after its invocation may result in a
      * deadlock.
@@ -133,7 +133,7 @@ public class ServiceBuilder {
     /**
      * Returns a routine builder based on an invocation factory creating instances of the
      * specified class by passing the specified arguments to the class constructor.
-     * <p/>
+     * <p>
      * Note that inner and anonymous classes can be passed as well. Remember however that Java
      * creates synthetic constructors for such classes, so be sure to specify the correct
      * arguments to guarantee proper instantiation. In fact, inner classes always have the outer
@@ -176,7 +176,7 @@ public class ServiceBuilder {
     /**
      * Returns a routine builder based on an invocation factory creating instances of the
      * specified class token by passing the specified arguments to the class constructor.
-     * <p/>
+     * <p>
      * Note that class tokens of inner and anonymous classes can be passed as well. Remember
      * however that Java creates synthetic constructors for such classes, so be sure to specify
      * the correct arguments to guarantee proper instantiation. In fact, inner classes always
@@ -202,7 +202,7 @@ public class ServiceBuilder {
     /**
      * Returns a routine builder based on an invocation factory creating instances of the
      * specified object.
-     * <p/>
+     * <p>
      * Note that inner and anonymous objects can be passed as well. Remember however that Java
      * creates synthetic constructors for such classes, so be sure to specify the correct
      * arguments to guarantee proper instantiation.
@@ -225,7 +225,7 @@ public class ServiceBuilder {
     /**
      * Returns a routine builder based on an invocation factory creating instances of the
      * specified object.
-     * <p/>
+     * <p>
      * Note that inner and anonymous objects can be passed as well. Remember however that Java
      * creates synthetic constructors for such classes, so be sure to specify the correct
      * arguments to guarantee proper instantiation.
@@ -248,14 +248,14 @@ public class ServiceBuilder {
 
     /**
      * Returns a builder of routines running in a service based on the builder context, wrapping
-     * the specified target object.<br/>
+     * the specified target object.<br>
      * In order to customize the object creation, the caller must employ an implementation of a
      * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
      * invocation service.
-     * <p/>
+     * <p>
      * Note that the built routine results will be dispatched into the configured looper, thus,
      * waiting for the outputs on the very same looper thread, immediately after its invocation,
-     * will result in a deadlock. By default output results are dispatched in the main looper.<br/>
+     * will result in a deadlock. By default output results are dispatched in the main looper.<br>
      * Note also that the invocation input data will be cached, and the results will be produced
      * only after the invocation channel is closed, so be sure to avoid streaming inputs in
      * order to prevent starvation or out of memory errors.
@@ -270,11 +270,11 @@ public class ServiceBuilder {
     }
 
     /**
-     * Returns a builder of routines running in a service based on the builder context.<br/>
+     * Returns a builder of routines running in a service based on the builder context.<br>
      * In order to customize the invocation creation, the caller must override the method
      * {@link com.github.dm.jrt.android.core.service.InvocationService#getInvocationFactory(
      *Class, Object...) getInvocationFactory(Class, Object...)} of the routine service.
-     * <p/>
+     * <p>
      * Note that the built routine results will be dispatched into the configured looper, thus,
      * waiting for the outputs on the very same looper thread, immediately after its invocation,
      * will result in a deadlock. By default output results are dispatched in the main looper.

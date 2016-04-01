@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Selectable unit test.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 02/24/2016.
  */
 public class SelectableTest {

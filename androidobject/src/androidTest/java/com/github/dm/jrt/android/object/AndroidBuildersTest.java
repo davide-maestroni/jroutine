@@ -35,7 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Android builder unit tests.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/08/2016.
  */
 public class AndroidBuildersTest extends AndroidTestCase {

@@ -29,7 +29,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Test fragment.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/06/2016.
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)

@@ -16,7 +16,7 @@
 
 /**
  * Classes handling routine and channel configurations.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/12/2016.
  */
 package com.github.dm.jrt.core.config;

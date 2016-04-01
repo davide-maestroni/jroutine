@@ -33,7 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Downloader unit tests.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 10/17/2014.
  */
 public class DownloaderTest {

@@ -25,10 +25,10 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Interface defining a builder of routines wrapping an object methods.
- * <p/>
+ * <p>
  * The single methods can be accessed via reflection or the whole instance can be proxied through
  * an interface.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/29/2015.
  */
 public interface ServiceObjectRoutineBuilder

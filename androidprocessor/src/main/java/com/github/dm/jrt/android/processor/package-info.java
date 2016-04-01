@@ -16,7 +16,7 @@
 
 /**
  * Annotation pre-processor implementation, specific to the Android platform.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 05/10/2015.
  */
 package com.github.dm.jrt.android.processor;

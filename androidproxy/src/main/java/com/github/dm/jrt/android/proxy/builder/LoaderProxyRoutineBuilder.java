@@ -27,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Interface defining a builder of routines wrapping an object methods, bound to a context
  * lifecycle.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 05/06/2015.
  */
 public interface LoaderProxyRoutineBuilder
@@ -35,18 +35,18 @@ public interface LoaderProxyRoutineBuilder
 
     /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.
-     * <p/>
+     * <p>
      * The routines used for calling the methods will honor the attributes specified in any optional
      * <i>{@code com.github.dm.jrt.object.annotation.*}</i> as well as
-     * <i>{@code com.github.dm.jrt.android.object.annotation.*}</i> annotations.<br/>
+     * <i>{@code com.github.dm.jrt.android.object.annotation.*}</i> annotations.<br>
      * Note that such annotations will override any configuration set through the builder.
-     * <p/>
+     * <p>
      * The proxy object is created through code generation based on the interfaces annotated with
      * {@link com.github.dm.jrt.android.proxy.annotation.LoaderProxyCompat LoaderProxyCompat} or
      * {@link com.github.dm.jrt.android.proxy.annotation.LoaderProxy LoaderProxy}. The generated
-     * class name and package will be chosen according to the specific annotation attributes.<br/>
+     * class name and package will be chosen according to the specific annotation attributes.<br>
      * It is actually possible to avoid the use of reflection for the proxy object instantiation by
-     * explicitly calling the <code>&lt;generated_class_name&gt;.with()</code> method.<br/>
+     * explicitly calling the <code>&lt;generated_class_name&gt;.with()</code> method.<br>
      * Note, however, that, since the class is generated, a generic IDE may highlight an error even
      * if the compilation is successful.
      *
@@ -63,18 +63,18 @@ public interface LoaderProxyRoutineBuilder
 
     /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.
-     * <p/>
+     * <p>
      * The routines used for calling the methods will honor the attributes specified in any optional
      * <i>{@code com.github.dm.jrt.object.annotation.*}</i> as well as
-     * <i>{@code com.github.dm.jrt.android.object.annotation.*}</i> annotations.<br/>
+     * <i>{@code com.github.dm.jrt.android.object.annotation.*}</i> annotations.<br>
      * Note that such annotations will override any configuration set through the builder.
-     * <p/>
+     * <p>
      * The proxy object is created through code generation based on the interfaces annotated with
      * {@link com.github.dm.jrt.android.proxy.annotation.LoaderProxyCompat LoaderProxyCompat} or
      * {@link com.github.dm.jrt.android.proxy.annotation.LoaderProxy LoaderProxy}. The generated
-     * class name and package will be chosen according to the specific annotation attributes.<br/>
+     * class name and package will be chosen according to the specific annotation attributes.<br>
      * It is actually possible to avoid the use of reflection for the proxy object instantiation by
-     * explicitly calling the <code>&lt;generated_class_name&gt;.with()</code> method.<br/>
+     * explicitly calling the <code>&lt;generated_class_name&gt;.with()</code> method.<br>
      * Note, however, that, since the class is generated, a generic IDE may highlight an error even
      * if the compilation is successful.
      *

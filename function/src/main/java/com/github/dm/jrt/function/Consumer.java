@@ -18,7 +18,7 @@ package com.github.dm.jrt.function;
 
 /**
  * Interface representing an operation that accepts an input argument and returns no result.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/21/2015.
  *
  * @param <IN> the input data type.

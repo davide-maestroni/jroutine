@@ -29,7 +29,7 @@ import java.util.HashMap;
 
 /**
  * Abstract implementation of a builder of async proxy objects.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 02/26/2015.
  *
  * @param <TYPE> the interface type.

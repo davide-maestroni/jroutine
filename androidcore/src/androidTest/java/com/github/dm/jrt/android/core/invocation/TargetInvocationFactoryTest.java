@@ -44,7 +44,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Target invocation factories unit test.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 10/06/2015.
  */
 @TargetApi(VERSION_CODES.FROYO)

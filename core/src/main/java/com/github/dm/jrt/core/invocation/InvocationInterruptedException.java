@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Exception wrapping a thread interrupted exception caught inside a routine execution.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/08/2014.
  */
 public class InvocationInterruptedException extends InvocationException {

@@ -29,20 +29,20 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Interface defining the basic communication channel with the routine invocation.
- * <p/>
+ * <p>
  * Channel instances are used to transfer data to and from the code executed inside the routine
  * invocation.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/09/2014.
  */
 public interface Channel {
 
     /**
      * Closes the channel and abort the transfer of data, thus aborting the routine invocation.
-     * <p/>
+     * <p>
      * An instance of {@link com.github.dm.jrt.core.channel.AbortException AbortException} will be
      * passed as the abortion reason.
-     * <p/>
+     * <p>
      * Note that, in case the channel is already closed, the method invocation will have no effect.
      *
      * @return whether the channel status changed as a result of the call.
@@ -51,12 +51,12 @@ public interface Channel {
 
     /**
      * Closes the channel and abort the transfer of data, thus aborting the routine invocation and
-     * causing the specified throwable to be passed as the abortion reason.<br/>
+     * causing the specified throwable to be passed as the abortion reason.<br>
      * The throwable, unless it extends the base
      * {@link com.github.dm.jrt.core.common.RoutineException RoutineException}, will be wrapped as
      * the cause of an {@link com.github.dm.jrt.core.channel.AbortException AbortException}
      * instance.
-     * <p/>
+     * <p>
      * Note that, in case the channel is already closed, the method invocation will have no effect.
      *
      * @param reason the throwable object identifying the reason of the invocation abortion.
@@ -80,7 +80,7 @@ public interface Channel {
 
     /**
      * Interface defining an input channel.
-     * <p/>
+     * <p>
      * Note that the delivery order of the input data might not be guaranteed.
      *
      * @param <IN> the input data type.
@@ -89,7 +89,7 @@ public interface Channel {
 
         /**
          * Tells the channel to delay the transfer of data of the specified time duration.
-         * <p/>
+         * <p>
          * Note that an abortion command will be delayed as well. Note, however, that a delayed
          * abortion will not prevent the invocation from completing, as pending input data do.
          *
@@ -103,7 +103,7 @@ public interface Channel {
 
         /**
          * Tells the channel to delay the transfer of data of the specified time duration.
-         * <p/>
+         * <p>
          * Note that an abortion command will be delayed as well. Note, however, that a delayed
          * abortion will not prevent the invocation from completing, as pending input data do.
          *
@@ -131,7 +131,7 @@ public interface Channel {
         /**
          * Tells the channel to sort the passed input data based on the order of the calls to the
          * pass methods.
-         * <p/>
+         * <p>
          * By default no particular order is applied.
          *
          * @return this channel.
@@ -144,11 +144,11 @@ public interface Channel {
 
         /**
          * Tells the channel to not sort the passed input data.
-         * <p/>
+         * <p>
          * Note that only the inputs passed with a 0 delay will be delivered in the same order as
          * they are passed to the channel, while the others will be delivered as soon as the
          * dedicated runner handles the specific execution.
-         * <p/>
+         * <p>
          * This is the default behavior.
          *
          * @return this channel.
@@ -161,7 +161,7 @@ public interface Channel {
 
         /**
          * Passes the data returned by the specified channel to this one.
-         * <p/>
+         * <p>
          * Note that the output channel will be bound as a result of the call, thus effectively
          * preventing any other consumer from getting data from it.
          *
@@ -210,7 +210,7 @@ public interface Channel {
     /**
      * Interface defining an output channel, that is the channel used to read the routine invocation
      * output data.
-     * <p/>
+     * <p>
      * Note that the delivery order of the output data might not be guaranteed.
      *
      * @param <OUT> the output data type.
@@ -220,7 +220,7 @@ public interface Channel {
         /**
          * Tells the channel to wait at the maximum the specified time duration for the next result
          * to be available.
-         * <p/>
+         * <p>
          * By default the timeout is set to 0 to avoid unexpected deadlocks.
          *
          * @param timeout the maximum timeout.
@@ -232,7 +232,7 @@ public interface Channel {
         /**
          * Tells the channel to wait at the maximum the specified time duration for the next result
          * to be available.
-         * <p/>
+         * <p>
          * By default the timeout is set to 0 to avoid unexpected deadlocks.
          *
          * @param timeout  the maximum timeout value.
@@ -246,7 +246,7 @@ public interface Channel {
         /**
          * Consumes all the results by waiting for the routine to complete at the maximum for the
          * set timeout.
-         * <p/>
+         * <p>
          * Note that this method invocation will block the calling thread until the routine
          * invocation completes or the timeout elapses.
          *
@@ -274,7 +274,7 @@ public interface Channel {
         /**
          * Consumes all the results by waiting for the routine to complete at the maximum for the
          * set timeout, and put them into the specified collection.
-         * <p/>
+         * <p>
          * Note that this method invocation will block the calling thread until the routine
          * invocation completes or the timeout elapses.
          *
@@ -317,7 +317,7 @@ public interface Channel {
          * Binds this channel to the specified consumer. After the call, all the output will be
          * passed only to the consumer. Attempting to read through the dedicated methods will cause
          * an {@link java.lang.IllegalStateException} to be thrown.
-         * <p/>
+         * <p>
          * Note that the consumer methods may be called on the runner thread.
          *
          * @param consumer the consumer instance.
@@ -330,7 +330,7 @@ public interface Channel {
         /**
          * Tells the channel to abort the invocation execution in case, after a read method is
          * invoked, no result is available before the timeout has elapsed.
-         * <p/>
+         * <p>
          * By default an {@link com.github.dm.jrt.core.channel.ExecutionTimeoutException
          * ExecutionTimeoutException} exception will be thrown.
          *
@@ -348,7 +348,7 @@ public interface Channel {
         /**
          * Tells the channel to abort the invocation execution in case, after a read method is
          * invoked, no result is available before the timeout has elapsed.
-         * <p/>
+         * <p>
          * By default an {@link com.github.dm.jrt.core.channel.ExecutionTimeoutException
          * ExecutionTimeoutException} exception will be thrown.
          *
@@ -367,7 +367,7 @@ public interface Channel {
         /**
          * Tells the channel to break the invocation execution in case, after a read method is
          * invoked, no result is available before the timeout has elapsed.
-         * <p/>
+         * <p>
          * By default an {@link com.github.dm.jrt.core.channel.ExecutionTimeoutException
          * ExecutionTimeoutException} exception will be thrown.
          *
@@ -387,7 +387,7 @@ public interface Channel {
          * {@link com.github.dm.jrt.core.channel.ExecutionTimeoutException
          * ExecutionTimeoutException} in case, after a read method is invoked, no result is
          * available before the timeout has elapsed.
-         * <p/>
+         * <p>
          * This is the default behavior.
          *
          * @return this channel.
@@ -404,7 +404,7 @@ public interface Channel {
         /**
          * Gets the invocation error or abort exception, if the invocation is aborted, waiting at
          * the maximum for the set timeout.
-         * <p/>
+         * <p>
          * Note that this method invocation will block the calling thread until the routine
          * invocation completes or is aborted, or the timeout elapses.
          *
@@ -418,7 +418,7 @@ public interface Channel {
 
         /**
          * Checks if the invocation has completed, waiting at the maximum for the set timeout.
-         * <p/>
+         * <p>
          * Note that this method invocation will block the calling thread until the routine
          * invocation completes or the timeout elapses.
          *
@@ -431,7 +431,7 @@ public interface Channel {
 
         /**
          * Checks if more results are available by waiting at the maximum for the set timeout.
-         * <p/>
+         * <p>
          * Note that this method invocation will block the calling thread until a new output is
          * available, the routine invocation completes or the timeout elapses.
          *
@@ -457,7 +457,7 @@ public interface Channel {
 
         /**
          * Consumes the first available result by waiting at the maximum for the set timeout.
-         * <p/>
+         * <p>
          * Note that this method invocation will block the calling thread until a new output is
          * available, the routine invocation completes or the timeout elapses.
          *
@@ -489,7 +489,7 @@ public interface Channel {
 
         /**
          * Tells the channel to not wait for results to be available.
-         * <p/>
+         * <p>
          * By default the timeout is set to 0 to avoid unexpected deadlocks.
          *
          * @return this channel.
@@ -509,10 +509,11 @@ public interface Channel {
         /**
          * Consumes the first {@code count} available results by waiting at the maximum for the set
          * timeout.
-         * <p/>
+         * <p>
          * Note that this method invocation will block the calling thread until {@code count} new
          * outputs are available, the routine invocation completes or the timeout elapses.
          *
+         * @param count the number of outputs to read.
          * @return the first {@code count} available results.
          * @throws com.github.dm.jrt.core.channel.ExecutionTimeoutException if the channel is set to
          *                                                                  throw an exception when
@@ -535,13 +536,14 @@ public interface Channel {
         List<OUT> next(int count);
 
         /**
-         * Consumes the first available result by waiting at the maximum for the set timeout.<br/>
+         * Consumes the first available result by waiting at the maximum for the set timeout.<br>
          * If the timeout elapses and the channel is not configured to throw an exception or abort
          * the invocation, the specified alternative output is returned.
-         * <p/>
+         * <p>
          * Note that this method invocation will block the calling thread until a new output is
          * available, the routine invocation completes or the timeout elapses.
          *
+         * @param output the default output to return.
          * @return the first available result.
          * @throws com.github.dm.jrt.core.channel.ExecutionTimeoutException if the channel is set to
          *                                                                  throw an exception when
@@ -571,10 +573,11 @@ public interface Channel {
         /**
          * Skips the first {@code count} available results by waiting at the maximum for the set
          * timeout.
-         * <p/>
+         * <p>
          * Note that this method invocation will block the calling thread until {@code count} new
          * outputs are available, the routine invocation completes or the timeout elapses.
          *
+         * @param count the number of outputs to skip.
          * @return this channel.
          * @throws com.github.dm.jrt.core.channel.ExecutionTimeoutException if the channel is set to
          *                                                                  throw an exception when
@@ -599,7 +602,7 @@ public interface Channel {
         /**
          * Throws the invocation error or abort exception, if the invocation is aborted, waiting at
          * the maximum for the set timeout.
-         * <p/>
+         * <p>
          * Note that this method invocation will block the calling thread until the routine
          * invocation completes or is aborted, or the timeout elapses.
          *

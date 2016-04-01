@@ -24,9 +24,9 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Abstract implementation of an invocation filtering each input and transforming it in output data.
- * <p/>
+ * <p>
  * Note that the implementing class must not retain an internal variable state.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 02/14/2015.
  *
  * @param <IN>  the input data type.

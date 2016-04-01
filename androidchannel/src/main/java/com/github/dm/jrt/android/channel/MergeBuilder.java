@@ -29,7 +29,7 @@ import java.util.Collection;
 
 /**
  * Builder implementation merging data from a set of output channels into selectable objects.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
  * @param <OUT> the output data type.

@@ -24,9 +24,9 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.ref.WeakReference;
 
 /**
- * Class representing an invocation target.<br/>
+ * Class representing an invocation target.<br>
  * The target identifies a class or an instance whose methods are to be called asynchronously.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 08/20/2015.
  *
  * @param <TYPE> the target object type.

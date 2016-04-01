@@ -16,7 +16,7 @@
 
 /**
  * Functional interfaces and utility classes.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/22/2015.
  */
 package com.github.dm.jrt.function;

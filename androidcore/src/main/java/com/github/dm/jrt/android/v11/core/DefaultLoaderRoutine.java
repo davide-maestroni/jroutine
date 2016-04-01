@@ -46,7 +46,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
  * Routine implementation delegating to Android loaders the asynchronous processing.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 01/10/2015.
  *
  * @param <IN>  the input data type.

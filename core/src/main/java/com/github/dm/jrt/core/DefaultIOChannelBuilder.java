@@ -28,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Class implementing a builder of I/O channel objects.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 10/25/2014.
  */
 class DefaultIOChannelBuilder implements IOChannelBuilder, Configurable<IOChannelBuilder> {

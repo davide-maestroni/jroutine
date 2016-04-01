@@ -32,7 +32,7 @@ import java.net.URLConnection;
 
 /**
  * Invocation reading data from the URL connection.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 10/17/2014.
  */
 public class ReadConnection extends FilterInvocation<URI, ByteBuffer> {

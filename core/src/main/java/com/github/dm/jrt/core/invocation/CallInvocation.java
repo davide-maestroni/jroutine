@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * Special abstract implementation that centralizes the routine invocation inside a single method,
  * which gets called only when all the inputs are available.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/07/2014.
  *
  * @param <IN>  the input data type.

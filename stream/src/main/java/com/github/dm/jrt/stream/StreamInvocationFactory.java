@@ -32,7 +32,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
  * Implementation of a factory creating invocations wrapping a stream output channel.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
  * @param <IN>  the input data type.

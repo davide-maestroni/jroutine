@@ -60,7 +60,7 @@ import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory
 
 /**
  * Invocation implementation employing loaders to perform background operations.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 12/11/2014.
  *
  * @param <IN>  the input data type.
@@ -556,7 +556,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
     }
 
     /**
-     * Loader callbacks implementation.<br/>
+     * Loader callbacks implementation.<br>
      * The callbacks object will make sure that the loader results are passed to the returned output
      * channels.
      *

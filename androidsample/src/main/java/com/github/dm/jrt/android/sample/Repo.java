@@ -20,7 +20,7 @@ import com.google.gson.annotations.SerializedName;
 
 /**
  * GitHub repository resource model.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/25/2016.
  */
 @SuppressWarnings("unused")

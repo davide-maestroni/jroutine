@@ -23,9 +23,9 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Empty abstract implementation of a routine invocation.
- * <p/>
+ * <p>
  * This class is useful to avoid the need of implementing all the methods defined in the interface.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/11/2014.
  *
  * @param <IN>  the input data type.

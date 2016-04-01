@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Interface defining a builder of routines wrapping an object methods.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/07/2015.
  */
 public interface ProxyRoutineBuilder extends ConfigurableBuilder<ProxyRoutineBuilder>,
@@ -32,16 +32,16 @@ public interface ProxyRoutineBuilder extends ConfigurableBuilder<ProxyRoutineBui
 
     /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.
-     * <p/>
+     * <p>
      * The routines used for calling the methods will honor the attributes specified in any optional
-     * <i>{@code com.github.dm.jrt.annotation.*}</i> annotations.<br/>
+     * <i>{@code com.github.dm.jrt.annotation.*}</i> annotations.<br>
      * Note that such annotations will override any configuration set through the builder.
-     * <p/>
+     * <p>
      * The proxy object is created through code generation based on the interfaces annotated with
      * {@link com.github.dm.jrt.proxy.annotation.Proxy Proxy}. The generated class name and package
-     * will be chosen according to the specific annotation attributes.<br/>
+     * will be chosen according to the specific annotation attributes.<br>
      * It is actually possible to avoid the use of reflection for the proxy object instantiation by
-     * explicitly calling the <code>&lt;generated_class_name&gt;.on()</code> methods.<br/>
+     * explicitly calling the <code>&lt;generated_class_name&gt;.on()</code> methods.<br>
      * Note, however, that, since the class is generated, a generic IDE may highlight an error even
      * if the compilation is successful.
      *
@@ -57,16 +57,16 @@ public interface ProxyRoutineBuilder extends ConfigurableBuilder<ProxyRoutineBui
 
     /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.
-     * <p/>
+     * <p>
      * The routines used for calling the methods will honor the attributes specified in any optional
-     * <i>{@code com.github.dm.jrt.annotation.*}</i> annotations.<br/>
+     * <i>{@code com.github.dm.jrt.annotation.*}</i> annotations.<br>
      * Note that such annotations will override any configuration set through the builder.
-     * <p/>
+     * <p>
      * The proxy object is created through code generation based on the interfaces annotated with
      * {@link com.github.dm.jrt.proxy.annotation.Proxy Proxy}. The generated class name and package
-     * will be chosen according to the specific annotation attributes.<br/>
+     * will be chosen according to the specific annotation attributes.<br>
      * It is actually possible to avoid the use of reflection for the proxy object instantiation by
-     * explicitly calling the <code>&lt;generated_class_name&gt;.on()</code> methods.<br/>
+     * explicitly calling the <code>&lt;generated_class_name&gt;.on()</code> methods.<br>
      * Note, however, that, since the class is generated, a generic IDE may highlight an error even
      * if the compilation is successful.
      *

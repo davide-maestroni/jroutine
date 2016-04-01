@@ -24,12 +24,12 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Utility class used to create builders of objects wrapping target ones, so to enable asynchronous
  * calls of their methods.
- * <p/>
+ * <p>
  * The builders returned by this class are based on compile time code generation, enabled by
- * pre-processing of Java annotations.<br/>
+ * pre-processing of Java annotations.<br>
  * The pre-processing is automatically triggered just by including the artifact of this class
  * module.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/23/2015.
  *
  * @see com.github.dm.jrt.object.annotation Annotations
@@ -46,9 +46,9 @@ public class JRoutineProxy {
 
     /**
      * Returns a routine builder wrapping the specified target object.
-     * <p/>
+     * <p>
      * Note that it is responsibility of the caller to retain a strong reference to the target
-     * instance to prevent it from being garbage collected.<br/>
+     * instance to prevent it from being garbage collected.<br>
      * Note also that the invocation input data will be cached, and the results will be produced
      * only after the invocation channel is closed, so be sure to avoid streaming inputs in order to
      * prevent starvation or out of memory errors.

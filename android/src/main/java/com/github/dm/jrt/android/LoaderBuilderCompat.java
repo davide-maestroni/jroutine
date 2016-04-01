@@ -38,7 +38,7 @@ import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 
 /**
  * Context based builder of loader routine builders.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/06/2016.
  */
 public class LoaderBuilderCompat {
@@ -57,11 +57,11 @@ public class LoaderBuilderCompat {
 
     /**
      * Returns a builder of routines bound to the builder context, wrapping the specified target
-     * class.<br/>
+     * class.<br>
      * In order to customize the object creation, the caller must employ an implementation of a
      * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
      * application context.
-     * <p/>
+     * <p>
      * Note that the built routine results will be always dispatched on the configured looper
      * thread, thus waiting for the outputs immediately after its invocation may result in a
      * deadlock.
@@ -77,11 +77,11 @@ public class LoaderBuilderCompat {
 
     /**
      * Returns a builder of routines bound to the builder context, wrapping the specified target
-     * object.<br/>
+     * object.<br>
      * In order to customize the object creation, the caller must employ an implementation of a
      * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
      * application context.
-     * <p/>
+     * <p>
      * Note that the built routine results will be always dispatched on the configured looper
      * thread, thus waiting for the outputs immediately after its invocation may result in a
      * deadlock.
@@ -97,11 +97,11 @@ public class LoaderBuilderCompat {
 
     /**
      * Returns a builder of routines bound to the builder context, wrapping the specified target
-     * object.<br/>
+     * object.<br>
      * In order to customize the object creation, the caller must employ an implementation of a
      * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
      * application context.
-     * <p/>
+     * <p>
      * Note that the built routine results will be always dispatched on the configured looper
      * thread, thus waiting for the outputs immediately after its invocation may result in a
      * deadlock.
@@ -120,7 +120,7 @@ public class LoaderBuilderCompat {
     /**
      * Returns a routine builder based on an invocation factory creating instances of the specified
      * class.
-     * <p/>
+     * <p>
      * Note that inner and anonymous classes can be passed as well. Remember however that Java
      * creates synthetic constructors for such classes, so be sure to specify the correct arguments
      * to guarantee proper instantiation.
@@ -143,7 +143,7 @@ public class LoaderBuilderCompat {
     /**
      * Returns a routine builder based on an invocation factory creating instances of the specified
      * class by passing the specified arguments to the class constructor.
-     * <p/>
+     * <p>
      * Note that inner and anonymous classes can be passed as well. Remember however that Java
      * creates synthetic constructors for such classes, so be sure to specify the correct arguments
      * to guarantee proper instantiation.
@@ -169,7 +169,7 @@ public class LoaderBuilderCompat {
     /**
      * Returns a routine builder based on an invocation factory creating instances of the specified
      * class token.
-     * <p/>
+     * <p>
      * Note that inner and anonymous classes can be passed as well. Remember however that Java
      * creates synthetic constructors for such classes, so be sure to specify the correct arguments
      * to guarantee proper instantiation.
@@ -192,7 +192,7 @@ public class LoaderBuilderCompat {
     /**
      * Returns a routine builder based on an invocation factory creating instances of the specified
      * class token by passing the specified arguments to the class constructor.
-     * <p/>
+     * <p>
      * Note that inner and anonymous classes can be passed as well. Remember however that Java
      * creates synthetic constructors for such classes, so be sure to specify the correct
      * arguments to guarantee proper instantiation.
@@ -251,7 +251,7 @@ public class LoaderBuilderCompat {
     /**
      * Returns a routine builder based on an invocation factory creating instances of the specified
      * object.
-     * <p/>
+     * <p>
      * Note that inner and anonymous objects can be passed as well. Remember however that Java
      * creates synthetic constructors for such classes, so be sure to specify the correct arguments
      * to guarantee proper instantiation.
@@ -273,7 +273,7 @@ public class LoaderBuilderCompat {
     /**
      * Returns a routine builder based on an invocation factory creating instances of the specified
      * object.
-     * <p/>
+     * <p>
      * Note that inner and anonymous objects can be passed as well. Remember however that Java
      * creates synthetic constructors for such classes, so be sure to specify the correct arguments
      * to guarantee proper instantiation.
@@ -294,13 +294,13 @@ public class LoaderBuilderCompat {
     }
 
     /**
-     * Returns a builder of routines bound to the builder context.<br/>
+     * Returns a builder of routines bound to the builder context.<br>
      * In order to prevent undesired leaks, the class of the specified factory must have a static
      * scope.
-     * <p/>
+     * <p>
      * Note that the built routine results will be always dispatched on the configured looper
      * thread, thus waiting for the outputs immediately after its invocation may result in a
-     * deadlock.<br/>
+     * deadlock.<br>
      * Note also that the input data passed to the invocation channel will be cached, and the
      * results will be produced only after the invocation channel is closed, so be sure to avoid
      * streaming inputs in order to prevent starvation or out of memory errors.
@@ -321,11 +321,11 @@ public class LoaderBuilderCompat {
 
     /**
      * Returns a builder of routines bound to the builder context, wrapping the specified target
-     * object.<br/>
+     * object.<br>
      * In order to customize the object creation, the caller must employ an implementation of a
      * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
      * application context.
-     * <p/>
+     * <p>
      * Note that the built routine results will be always dispatched on the configured looper
      * thread, thus waiting for the outputs immediately after its invocation may result in a
      * deadlock.
@@ -340,13 +340,13 @@ public class LoaderBuilderCompat {
     }
 
     /**
-     * Returns a builder of routines bound to the builder context.<br/>
+     * Returns a builder of routines bound to the builder context.<br>
      * In order to prevent undesired leaks, the class of the specified factory must have a static
      * scope.
-     * <p/>
+     * <p>
      * Note that the built routine results will be always dispatched on the configured looper
      * thread, thus waiting for the outputs immediately after its invocation may result in a
-     * deadlock.<br/>
+     * deadlock.<br>
      * Note also that the input data passed to the invocation channel will be cached, and the
      * results will be produced only after the invocation channel is closed, so be sure to avoid
      * streaming inputs in order to prevent starvation or out of memory errors.
@@ -367,12 +367,12 @@ public class LoaderBuilderCompat {
 
     /**
      * Returns a builder of output channels bound to the loader identified by the specified ID.
-     * <br/>
+     * <br>
      * If no invocation with the specified ID is running at the time of the channel creation, the
      * output will be aborted with a
      * {@link com.github.dm.jrt.android.core.invocation.MissingLoaderException
      * MissingLoaderException}.
-     * <p/>
+     * <p>
      * Note that the built routine results will be always dispatched on the configured looper
      * thread, thus waiting for the outputs immediately after its invocation may result in a
      * deadlock.

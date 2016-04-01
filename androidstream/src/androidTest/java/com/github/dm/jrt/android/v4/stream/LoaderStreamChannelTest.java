@@ -67,7 +67,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Android stream channel unit tests.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/10/2016.
  */
 @TargetApi(VERSION_CODES.FROYO)

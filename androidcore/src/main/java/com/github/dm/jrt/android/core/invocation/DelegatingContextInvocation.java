@@ -29,7 +29,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
  * Call invocation implementation delegating the execution to another routine.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 10/07/2015.
  *
  * @param <IN>  the input data type.
@@ -58,7 +58,7 @@ public class DelegatingContextInvocation<IN, OUT> extends TemplateContextInvocat
 
     /**
      * Returns a factory of delegating invocations.
-     * <p/>
+     * <p>
      * Note that the specified identifier will be used to detect clashing of invocations (see
      * {@link com.github.dm.jrt.android.v11.core.JRoutineLoader} and
      * {@link com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat}).

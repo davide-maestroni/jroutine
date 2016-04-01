@@ -28,12 +28,12 @@ import java.util.WeakHashMap;
 /**
  * Utility class used to create builders of objects wrapping target ones, so to enable asynchronous
  * calls of their methods in a dedicated service.
- * <p/>
+ * <p>
  * The builders returned by this class are based on compile time code generation, enabled by
- * pre-processing of Java annotations.<br/>
+ * pre-processing of Java annotations.<br>
  * The pre-processing is automatically triggered just by including the artifact of this class
  * module.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 05/13/2015.
  *
  * @see com.github.dm.jrt.android.proxy.annotation.ServiceProxy ServiceProxy
@@ -91,15 +91,15 @@ public class JRoutineServiceProxy {
 
         /**
          * Returns a builder of routines, wrapping the specified object instance, running in a
-         * service based on the builder context.<br/>
+         * service based on the builder context.<br>
          * In order to customize the object creation, the caller must employ an implementation of a
          * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
          * invocation service.
-         * <p/>
+         * <p>
          * Note that the built routine results will be dispatched into the configured looper, thus,
          * waiting for the outputs on the very same looper thread, immediately after its invocation,
          * will result in a deadlock. By default, output results are dispatched in the main looper.
-         * <br/>
+         * <br>
          * Note also that the invocation input data will be cached, and the results will be produced
          * only after the invocation channel is closed, so be sure to avoid streaming inputs in
          * order to prevent starvation or out of memory errors.

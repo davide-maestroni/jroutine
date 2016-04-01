@@ -26,7 +26,7 @@ import static org.junit.Assert.fail;
 
 /**
  * Class token unit tests.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 06/15/2014.
  */
 public class ClassTokenTest {

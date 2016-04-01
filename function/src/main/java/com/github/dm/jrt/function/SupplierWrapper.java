@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Class wrapping a supplier instance.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 10/11/2015.
  *
  * @param <OUT> the output data type.
@@ -59,7 +59,7 @@ public class SupplierWrapper<OUT> implements Supplier<OUT>, Wrapper {
     }
 
     /**
-     * Returns a supplier wrapper always returning the same result.<br/>
+     * Returns a supplier wrapper always returning the same result.<br>
      * The returned object will support concatenation and comparison.
      *
      * @param result the result.

@@ -23,10 +23,10 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Parcelable implementation wrapping a generic value.
- * <p/>
+ * <p>
  * Note that specified object must be among the ones supported by the
  * {@link android.os.Parcel#writeValue(Object)} method.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 01/10/2015.
  */
 class ParcelableValue implements Parcelable {

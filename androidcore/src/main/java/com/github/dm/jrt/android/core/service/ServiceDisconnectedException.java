@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Exception indicating that the routine service has unexpectedly disconnected.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 05/25/2015.
  */
 public class ServiceDisconnectedException extends RoutineException {

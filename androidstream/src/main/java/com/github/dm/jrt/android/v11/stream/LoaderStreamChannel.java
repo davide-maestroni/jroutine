@@ -47,15 +47,15 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Interface defining a stream output channel, that is, a channel concatenating map and reduce
- * functions, employing Android loaders to run the backing routines.<br/>
+ * functions, employing Android loaders to run the backing routines.<br>
  * In fact, each function in the channel is backed by a routine instance, that can have its own
- * specific configuration and invocation mode.<br/>
+ * specific configuration and invocation mode.<br>
  * In order to prevent undesired leaks, the class of the specified functions must have a static
  * scope.
- * <p/>
+ * <p>
  * Note that, if at least one reduce function is part of the concatenation, the results will be
  * propagated only when the previous routine invocations complete.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 01/15/2016.
  *
  * @param <OUT> the output data type.
@@ -352,7 +352,7 @@ public interface LoaderStreamChannel<OUT>
     LoaderStreamChannel<OUT> cache(@Nullable CacheStrategyType strategyType);
 
     /**
-     * Short for {@code loaderConfiguration().withFactoryId(factoryId).setConfiguration()}.<br/>
+     * Short for {@code loaderConfiguration().withFactoryId(factoryId).setConfiguration()}.<br>
      * This method is useful to easily apply a configuration to the next routine concatenated to the
      * stream, which will force the factory ID to the specified one.
      *
@@ -364,10 +364,10 @@ public interface LoaderStreamChannel<OUT>
 
     /**
      * Gets the loader configuration builder related only to the next concatenated routine instance.
-     * Any further addition to the chain will retain only the stream configuration.<br/>
+     * Any further addition to the chain will retain only the stream configuration.<br>
      * Only the options set in this configuration (that is, the ones with a value different from the
      * default) will override the stream ones.
-     * <p/>
+     * <p>
      * Note that the configuration builder will be initialized with the current configuration for
      * the next routine.
      *
@@ -377,7 +377,7 @@ public interface LoaderStreamChannel<OUT>
     Builder<? extends LoaderStreamChannel<OUT>> loaderConfiguration();
 
     /**
-     * Short for {@code loaderConfiguration().withLoaderId(loaderId).setConfiguration()}.<br/>
+     * Short for {@code loaderConfiguration().withLoaderId(loaderId).setConfiguration()}.<br>
      * This method is useful to easily apply a configuration to the next routine concatenated to the
      * stream, which will force the routine loader ID.
      *
@@ -408,8 +408,8 @@ public interface LoaderStreamChannel<OUT>
     LoaderStreamChannel<OUT> staleAfter(long time, @NotNull TimeUnit timeUnit);
 
     /**
-     * Sets the stream loader context.<br/>
-     * The context will be used by all the concatenated routines until changed.<br/>
+     * Sets the stream loader context.<br>
+     * The context will be used by all the concatenated routines until changed.<br>
      * If null it will cause the next routines to employ the configured runner instead of an Android
      * loader.
      *
@@ -420,10 +420,10 @@ public interface LoaderStreamChannel<OUT>
     LoaderStreamChannel<OUT> with(@Nullable LoaderContext context);
 
     /**
-     * Gets the loader configuration builder related to the whole stream.<br/>
+     * Gets the loader configuration builder related to the whole stream.<br>
      * The configuration options will be applied to all the next concatenated routine unless
      * overwritten by specific ones.
-     * <p/>
+     * <p>
      * Note that the configuration builder will be initialized with the current stream
      * configuration.
      *

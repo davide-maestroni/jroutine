@@ -26,7 +26,7 @@ import java.lang.reflect.Method;
 
 /**
  * Interface defining a builder of routines wrapping object methods.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/07/2015.
  */
 public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineBuilder>,
@@ -34,14 +34,14 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
 
     /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.
-     * <p/>
+     * <p>
      * The routines used for calling the methods will honor the attributes specified in any optional
-     * <i>{@code com.github.dm.jrt.object.annotation.*}</i> annotations.<br/>
+     * <i>{@code com.github.dm.jrt.object.annotation.*}</i> annotations.<br>
      * Note that such annotations will override any configuration set through the builder.
-     * <p/>
+     * <p>
      * In case the wrapped object does not implement the specified interface, the alias annotation
      * value will be used to bind the interface method with the instance ones. If no annotation is
-     * present, the method name will be used instead.<br/>
+     * present, the method name will be used instead.<br>
      * The interface will be interpreted as a proxy of the target object methods, and the optional
      * {@link com.github.dm.jrt.object.annotation.AsyncIn AsyncIn},
      * {@link com.github.dm.jrt.object.annotation.AsyncMethod AsyncMethod},
@@ -61,14 +61,14 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
 
     /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.
-     * <p/>
+     * <p>
      * The routines used for calling the methods will honor the attributes specified in any optional
-     * <i>{@code com.github.dm.jrt.object.annotation.*}</i> annotations.<br/>
+     * <i>{@code com.github.dm.jrt.object.annotation.*}</i> annotations.<br>
      * Note that such annotations will override any configuration set through the builder.
-     * <p/>
+     * <p>
      * In case the wrapped object does not implement the specified interface, the alias annotation
      * value will be used to bind the interface method with the instance ones. If no annotation is
-     * present, the method name will be used instead.<br/>
+     * present, the method name will be used instead.<br>
      * The interface will be interpreted as a proxy of the target object methods, and the optional
      * {@link com.github.dm.jrt.object.annotation.AsyncIn AsyncIn},
      * {@link com.github.dm.jrt.object.annotation.AsyncMethod AsyncMethod},
@@ -88,13 +88,13 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
 
     /**
      * Returns a routine used to call the method whose identifying name is specified in a
-     * {@link com.github.dm.jrt.object.annotation.Alias Alias} annotation.<br/>
+     * {@link com.github.dm.jrt.object.annotation.Alias Alias} annotation.<br>
      * If no method with the specified alias is found, this method will behave like
-     * {@link #method(String, Class[])} with no parameter.<br/>
+     * {@link #method(String, Class[])} with no parameter.<br>
      * Optional <i>{@code com.github.dm.jrt.object.annotation.*}</i> method annotations will be
-     * honored as well.<br/>
+     * honored as well.<br>
      * Note that such annotations will override any configuration set through the builder.
-     * <p/>
+     * <p>
      * Note that it is up to the caller to ensure that the input data are passed to the routine in
      * the correct order.
      *
@@ -111,17 +111,19 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
 
     /**
      * Returns a routine used to call the specified method.
-     * <p/>
+     * <p>
      * The method is searched via reflection ignoring a name specified in a
      * {@link com.github.dm.jrt.object.annotation.Alias Alias} annotation. Though, optional
-     * <i>{@code com.github.dm.jrt.object.annotation.*}</i> method annotations will be honored.<br/>
+     * <i>{@code com.github.dm.jrt.object.annotation.*}</i> method annotations will be honored.<br>
      * Note that such annotations will override any configuration set through the builder.
-     * <p/>
+     * <p>
      * Note that it is up to the caller to ensure that the input data are passed to the routine in
      * the correct order.
      *
      * @param name           the method name.
      * @param parameterTypes the method parameter types.
+     * @param <IN>   the input data type.
+     * @param <OUT>  the output data type.
      * @return the routine.
      * @throws java.lang.IllegalArgumentException if no matching method is found.
      * @see <a href='{@docRoot}/com/github/dm/jrt/object/annotation/package-summary.html'>
@@ -132,12 +134,12 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
 
     /**
      * Returns a routine used to call the specified method.
-     * <p/>
+     * <p>
      * The method is invoked ignoring a name specified in a
      * {@link com.github.dm.jrt.object.annotation.Alias Alias} annotation. Though, optional
-     * <i>{@code com.github.dm.jrt.object.annotation.*}</i> method annotations will be honored.<br/>
+     * <i>{@code com.github.dm.jrt.object.annotation.*}</i> method annotations will be honored.<br>
      * Note that such annotations will override any configuration set through the builder.
-     * <p/>
+     * <p>
      * Note that it is up to the caller to ensure that the input data are passed to the routine in
      * the correct order.
      *

@@ -37,7 +37,7 @@ import static org.junit.Assert.fail;
 
 /**
  * Invocation configuration unit tests.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 11/22/2014.
  */
 public class InvocationConfigurationTest {

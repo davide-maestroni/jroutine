@@ -31,7 +31,7 @@ import java.util.HashMap;
 
 /**
  * Abstract implementation of a builder of async proxy objects, bound to a context lifecycle.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 05/06/2015.
  *
  * @param <TYPE> the interface type.
@@ -167,7 +167,7 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
 
     /**
      * Returns the context or component (Activity, Fragment, etc.) on which the invocation is based.
-     * <br/>
+     * <br>
      * Returning null means that the context has been destroyed, so an exception will be thrown.
      *
      * @return the invocation context.

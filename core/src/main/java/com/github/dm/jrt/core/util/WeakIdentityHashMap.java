@@ -30,9 +30,9 @@ import java.util.Set;
 /**
  * Map implementation combining the features of {@link java.util.IdentityHashMap} and
  * {@link java.util.WeakHashMap}.
- * <p/>
+ * <p>
  * Note that the map entries might change each time the object is explicitly accessed.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 11/17/2014.
  *
  * @param <K> the key type.

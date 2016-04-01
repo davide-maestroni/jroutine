@@ -26,7 +26,7 @@ import com.github.dm.jrt.android.channel.R;
 
 /**
  * Test activity.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 12/16/2014.
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)

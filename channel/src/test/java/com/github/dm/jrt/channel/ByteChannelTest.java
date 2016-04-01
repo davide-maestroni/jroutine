@@ -36,7 +36,7 @@ import static org.junit.Assert.fail;
 
 /**
  * Byte channel unit tests.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 08/29/2015.
  */
 public class ByteChannelTest {

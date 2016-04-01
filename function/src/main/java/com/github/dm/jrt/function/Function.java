@@ -18,7 +18,7 @@ package com.github.dm.jrt.function;
 
 /**
  * Interface representing a function that accepts one argument and produces a result.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/21/2015.
  *
  * @param <IN>  the input data type.

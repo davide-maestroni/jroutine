@@ -32,43 +32,43 @@ import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
 
 /**
  * Class storing the invocation configuration.
- * <p/>
+ * <p>
  * Each instance is immutable, thus, in order to modify a configuration parameter, a new builder
  * must be created starting from the specific configuration.
- * <p/>
- * The configuration has an asynchronous runner associated.<br/>
+ * <p>
+ * The configuration has an asynchronous runner associated.<br>
  * The default runner is shared among all the routines.
- * <p/>
+ * <p>
  * A specific priority can be set. Every invocation will age each time an higher priority one takes
  * the precedence, so that older invocations slowly increases their priority. Such mechanism has
  * been implemented to avoid starvation of low priority invocations. Hence, when assigning
  * priority values, it is important to keep in mind that the difference between two priorities
  * corresponds to the maximum age the lower priority invocation will have, before getting precedence
  * over the higher priority one.
- * <p/>
+ * <p>
  * Additionally, a recycling mechanism is provided so that, when an invocation successfully
  * completes, the instance is retained for future executions. Moreover, the maximum running
  * invocation instances at one time can be limited by calling the specific builder method. When the
  * limit is reached and an additional instance is required, the call is delayed until one becomes
  * available.
- * <p/>
+ * <p>
  * The maximum time of execution can also be set so that, if no result is produced before the
  * timeout elapses, an action will be taken choosing between throwing an
  * {@link com.github.dm.jrt.core.channel.ExecutionTimeoutException ExecutionTimeoutException},
  * aborting the invocation, or continuing with the execution.
- * <p/>
+ * <p>
  * Finally, the number of input and output data buffered in the corresponding channel can be
  * limited in order to avoid excessive memory consumption. In case the limit is reached when passing
  * an input or output, the call blocks until enough data are consumed or the specified maximum delay
  * elapses. A maximum size can additionally be set so that, when the number of buffered data
  * exceeds it, a {@link com.github.dm.jrt.core.common.DeadlockException DeadlockException} will be
- * thrown.<br/>
+ * thrown.<br>
  * By default the delay is set to 0.
- * <p/>
+ * <p>
  * The order of input and output data is not guaranteed. Nevertheless, it is possible to force data
  * to be delivered in the same order as they are passed to the channels, at the cost of a slightly
  * increase in memory usage and computation time.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 11/15/2014.
  */
 public final class InvocationConfiguration {
@@ -81,7 +81,7 @@ public final class InvocationConfiguration {
     private static final DefaultConfigurable sDefaultConfigurable = new DefaultConfigurable();
 
     /**
-     * Empty configuration constant.<br/>The configuration has all the options set to their default.
+     * Empty configuration constant.<br>The configuration has all the options set to their default.
      */
     public static final InvocationConfiguration DEFAULT_CONFIGURATION =
             builder().buildConfiguration();
@@ -551,13 +551,13 @@ public final class InvocationConfiguration {
     public enum OrderType {
 
         /**
-         * Order by call.<br/>
+         * Order by call.<br>
          * Data are passed to the invocation or the output consumer in the same order as they are
          * passed to the channel, independently from the specific delay.
          */
         BY_CALL,
         /**
-         * Order by delay.<br/>
+         * Order by delay.<br>
          * Data are passed to the invocation or the output consumer based on their delay.
          */
         BY_DELAY
@@ -569,20 +569,20 @@ public final class InvocationConfiguration {
     public enum TimeoutActionType {
 
         /**
-         * Throw.<br/>
+         * Throw.<br>
          * If no result is available after the specified timeout, the called method will throw an
          * {@link com.github.dm.jrt.core.channel.ExecutionTimeoutException
          * ExecutionTimeoutException}.
          */
         THROW,
         /**
-         * Break execution.<br/>
+         * Break execution.<br>
          * If no result is available after the specified timeout, the called method will stop its
          * execution and exit immediately.
          */
         EXIT,
         /**
-         * Abort invocation.<br/>
+         * Abort invocation.<br>
          * If no result is available after the specified timeout, the invocation will be aborted and
          * the method will immediately exit.
          */
@@ -591,7 +591,7 @@ public final class InvocationConfiguration {
 
     /**
      * Interface exposing constants which can be used as a common set of priorities.
-     * <p/>
+     * <p>
      * Note that, since the priority value can be any in an integer range, it is always possible to
      * customize the values so to create a personalized set.
      */
@@ -643,7 +643,7 @@ public final class InvocationConfiguration {
     /**
      * Interface exposing constants which can be used as a set of priorities ignoring the aging of
      * executions.
-     * <p/>
+     * <p>
      * Note that, since the priority value can be any in an integer range, it is always possible to
      * customize the values so to create a personalized set.
      */
@@ -805,7 +805,7 @@ public final class InvocationConfiguration {
          * Sets the limit of data that the input channel can retain before starting to slow down the
          * feeding thread. A {@link InvocationConfiguration#DEFAULT DEFAULT} value means that it is
          * up to the specific implementation to choose a default one.
-         * <p/>
+         * <p>
          * This configuration option is used to slow down the process feeding the routine invocation
          * when its execution time increases. Note, however, that it is not allowed to block the
          * invocation execution thread, so make sure that the feeding routine and this one does not
@@ -830,7 +830,7 @@ public final class InvocationConfiguration {
         /**
          * Sets the maximum delay to apply to the feeding thread, waiting for the input channel to
          * have room for additional data.
-         * <p/>
+         * <p>
          * This configuration option should be used on conjunction with the input limit, or it might
          * have no effect on the invocation execution.
          *
@@ -849,7 +849,7 @@ public final class InvocationConfiguration {
         /**
          * Sets the maximum delay to apply to the feeding thread, waiting for the input channel to
          * have room for additional data.
-         * <p/>
+         * <p>
          * This configuration option should be used on conjunction with the input limit, or it might
          * have no effect on the invocation execution.
          *
@@ -867,7 +867,7 @@ public final class InvocationConfiguration {
         /**
          * Sets the maximum number of data that the input channel can retain before they are
          * consumed. A {@link InvocationConfiguration#DEFAULT DEFAULT} value means that it is up
-         * to the specific implementation to choose a default one.<br/>
+         * to the specific implementation to choose a default one.<br>
          * When the maximum capacity is reached, the invocation will be aborted with an
          * {@link com.github.dm.jrt.core.channel.InputDeadlockException InputDeadlockException}.
          *
@@ -890,7 +890,7 @@ public final class InvocationConfiguration {
         /**
          * Sets the order in which input data are collected from the input channel. A null value
          * means that it is up to the specific implementation to choose a default one.
-         * <p/>
+         * <p>
          * Note that this is just the initial configuration of the invocation, since the channel
          * order can be dynamically changed through the dedicated methods.
          *
@@ -958,7 +958,7 @@ public final class InvocationConfiguration {
          * Sets the limit of data that the output channel can retain before starting to slow down
          * the feeding thread. A {@link InvocationConfiguration#DEFAULT DEFAULT} value means that it
          * is up to the specific implementation to choose a default one.
-         * <p/>
+         * <p>
          * This configuration option is useful when the results coming from the invocation execution
          * are meant to be explicitly read through its output channel. The execution will slow down
          * until enough data are consumed. Note, however, that binding the channel to an output
@@ -983,7 +983,7 @@ public final class InvocationConfiguration {
         /**
          * Sets the maximum delay to apply to the feeding thread, waiting for the result channel to
          * have room for additional data.
-         * <p/>
+         * <p>
          * This configuration option should be used on conjunction with the output limit, or it
          * might have no effect on the invocation execution.
          *
@@ -1003,7 +1003,7 @@ public final class InvocationConfiguration {
         /**
          * Sets the maximum delay to apply to the feeding thread, waiting for the result channel to
          * have room for additional data.
-         * <p/>
+         * <p>
          * This configuration option should be used on conjunction with the output limit, or it
          * might have no effect on the invocation execution.
          *
@@ -1021,7 +1021,7 @@ public final class InvocationConfiguration {
         /**
          * Sets the maximum number of data that the result channel can retain before they are
          * consumed. A {@link InvocationConfiguration#DEFAULT DEFAULT} value means that it is up
-         * to the specific implementation to choose a default one.<br/>
+         * to the specific implementation to choose a default one.<br>
          * When the maximum capacity is reached, the invocation will be aborted with an
          * {@link com.github.dm.jrt.core.channel.InputDeadlockException InputDeadlockException}.
          *
@@ -1044,7 +1044,7 @@ public final class InvocationConfiguration {
         /**
          * Sets the order in which output data are collected from the result channel. A null value
          * means that it is up to the specific implementation to choose a default order one.
-         * <p/>
+         * <p>
          * Note that this is just the initial configuration of the invocation, since the channel
          * order can be dynamically changed through the dedicated methods.
          *
@@ -1075,7 +1075,7 @@ public final class InvocationConfiguration {
 
         /**
          * Sets the timeout for an invocation instance to produce a readable result.
-         * <p/>
+         * <p>
          * Note that this is just the initial configuration of the invocation, since the output
          * timeout can be dynamically changed through the dedicated methods.
          *
@@ -1093,7 +1093,7 @@ public final class InvocationConfiguration {
         /**
          * Sets the timeout for an invocation instance to produce a readable result. A null value
          * means that it is up to the specific implementation to choose a default one.
-         * <p/>
+         * <p>
          * Note that this is just the initial configuration of the invocation, since the output
          * timeout can be dynamically changed through the dedicated methods.
          *
@@ -1111,7 +1111,7 @@ public final class InvocationConfiguration {
          * Sets the action to be taken if the timeout elapses before a result can be read from the
          * output channel. A null value means that it is up to the specific implementation to choose
          * a default one.
-         * <p/>
+         * <p>
          * Note that this is just the initial configuration of the invocation, since the output
          * timeout action can be dynamically changed through the dedicated methods.
          *

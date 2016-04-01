@@ -26,7 +26,7 @@ import java.util.Comparator;
 
 /**
  * Class wrapping a bi-function instance.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 10/16/2015.
  *
  * @param <IN1> the first input data type.
@@ -114,7 +114,7 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
     }
 
     /**
-     * Returns a bi-function wrapper just returning the first passed argument.<br/>
+     * Returns a bi-function wrapper just returning the first passed argument.<br>
      * The returned object will support concatenation and comparison.
      *
      * @param <IN1> the first input data type.
@@ -130,7 +130,7 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
 
     /**
      * Returns a bi-function wrapper returning the greater of the two inputs as per natural
-     * ordering.<br/>
+     * ordering.<br>
      * The returned object will support concatenation and comparison.
      *
      * @param <IN> the input data type.
@@ -145,7 +145,7 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
 
     /**
      * Returns a bi-function wrapper returning the greater of the two inputs as indicated by the
-     * specified comparator.<br/>
+     * specified comparator.<br>
      * The returned object will support concatenation and comparison.
      *
      * @param comparator the comparator instance.
@@ -173,7 +173,7 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
 
     /**
      * Returns a bi-function wrapper returning the smaller of the two inputs as per natural
-     * ordering.<br/>
+     * ordering.<br>
      * The returned object will support concatenation and comparison.
      *
      * @param <IN> the input data type.
@@ -188,7 +188,7 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
 
     /**
      * Returns a bi-function wrapper returning the smaller of the two inputs as indicated by the
-     * specified comparator.<br/>
+     * specified comparator.<br>
      * The returned object will support concatenation and comparison.
      *
      * @param comparator the comparator instance.
@@ -215,7 +215,7 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
     }
 
     /**
-     * Returns a bi-function wrapper just returning the second passed argument.<br/>
+     * Returns a bi-function wrapper just returning the second passed argument.<br>
      * The returned object will support concatenation and comparison.
      *
      * @param <IN1> the first input data type.

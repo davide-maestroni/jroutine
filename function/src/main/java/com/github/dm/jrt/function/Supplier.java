@@ -18,7 +18,7 @@ package com.github.dm.jrt.function;
 
 /**
  * Interface representing a supplier of results.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/21/2015.
  *
  * @param <OUT> the output data type.

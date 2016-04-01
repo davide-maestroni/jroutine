@@ -37,7 +37,7 @@ import static com.github.dm.jrt.core.util.Reflection.findConstructor;
 
 /**
  * Default implementation of a context proxy builder.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 05/06/2015.
  */
 class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,

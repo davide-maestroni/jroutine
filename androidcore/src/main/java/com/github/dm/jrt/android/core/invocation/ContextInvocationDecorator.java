@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Base context invocation decorator implementation.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 08/19/2015.
  *
  * @param <IN>  the input data type.

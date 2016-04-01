@@ -16,7 +16,7 @@
 
 /**
  * Utility classes definitions.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/25/2014.
  */
 package com.github.dm.jrt.core.util;

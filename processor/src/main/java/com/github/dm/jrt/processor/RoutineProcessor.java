@@ -90,7 +90,7 @@ import javax.tools.JavaFileObject;
 
 /**
  * Annotation processor used to generate proxy classes enabling method asynchronous invocations.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 11/03/2014.
  */
 public class RoutineProcessor extends AbstractProcessor {

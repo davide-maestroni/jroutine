@@ -16,7 +16,7 @@
 
 /**
  * Common classes and interfaces.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 01/30/2016.
  */
 package com.github.dm.jrt.object.common;

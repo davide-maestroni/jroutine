@@ -21,7 +21,7 @@ import com.github.dm.jrt.core.common.RoutineException;
 /**
  * Base exception indicating that an unrecoverable error occurred during a loader invocation
  * execution.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 06/03/2015.
  */
 public class LoaderInvocationException extends RoutineException {

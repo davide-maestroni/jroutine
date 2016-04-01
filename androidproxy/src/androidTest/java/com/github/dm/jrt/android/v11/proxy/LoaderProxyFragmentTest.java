@@ -69,7 +69,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Proxy builder fragment unit tests.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 05/11/2015.
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)

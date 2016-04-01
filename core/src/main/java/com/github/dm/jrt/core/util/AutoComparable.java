@@ -22,9 +22,9 @@ import java.util.Arrays;
 
 /**
  * Base abstract class providing a default implementation of @code equals()}, {@code hashCode()} and
- * {@code toString()} based on the list of objects passed as the constructor arguments.<br/>
+ * {@code toString()} based on the list of objects passed as the constructor arguments.<br>
  * Note that the inheriting class and the argument instances are expected to be immutable.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/31/2016.
  */
 public abstract class AutoComparable {
@@ -43,7 +43,7 @@ public abstract class AutoComparable {
 
     /**
      * Constructor.
-     * <p/>
+     * <p>
      * Forces the inheriting classes to explicitly pass the arguments.
      */
     @SuppressWarnings("unused")

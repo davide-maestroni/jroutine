@@ -38,7 +38,7 @@ import retrofit2.Response;
 /**
  * Decorator implementation making a call instance comparable (that is, {@code equals(Object)} and
  * {@code hashCode()} methods are properly implemented.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/25/2016.
  *
  * @param <T> the response type.

@@ -16,7 +16,7 @@
 
 /**
  * Classes and interfaces related to proxy routine builders, specific to the Android platform.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 05/10/2015.
  */
 package com.github.dm.jrt.android.proxy.builder;

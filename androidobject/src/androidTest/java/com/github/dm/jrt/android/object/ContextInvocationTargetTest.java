@@ -37,7 +37,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Context invocation target unit tests.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/08/2016.
  */
 @TargetApi(VERSION_CODES.FROYO)

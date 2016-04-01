@@ -24,9 +24,9 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Empty abstract implementation of a context invocation.
- * <p/>
+ * <p>
  * This class is useful to avoid the need of implementing all the methods defined in the interface.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 01/08/2015.
  *
  * @param <IN>  the input data type.

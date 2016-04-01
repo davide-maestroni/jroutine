@@ -25,7 +25,7 @@ import android.view.ViewGroup;
 
 /**
  * Test fragment.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 12/16/2014.
  */
 public class TestFragment extends Fragment {

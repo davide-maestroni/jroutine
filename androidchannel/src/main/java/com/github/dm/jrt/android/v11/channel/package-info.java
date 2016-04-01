@@ -16,7 +16,7 @@
 
 /**
  * Utility classes handling routine channels with support for Android sparse array collections.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/25/2014.
  */
 package com.github.dm.jrt.android.v11.channel;

@@ -38,7 +38,7 @@ import java.lang.reflect.Method;
 
 /**
  * Default implementation of a loader target routine builder.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/07/2016.
  */
 class DefaultLoaderTargetRoutineBuilder implements LoaderTargetRoutineBuilder {

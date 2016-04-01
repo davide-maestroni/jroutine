@@ -16,7 +16,7 @@
 
 /**
  * Annotation pre-processor classes.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 10/14/2014.
  */
 package com.github.dm.jrt.processor;

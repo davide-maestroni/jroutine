@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Exception indicating that a timeout occurred.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 11/25/2014.
  */
 public class TimeoutException extends RoutineException {

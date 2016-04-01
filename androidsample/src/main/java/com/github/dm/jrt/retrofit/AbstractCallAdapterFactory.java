@@ -32,7 +32,7 @@ import retrofit2.Retrofit;
 /**
  * Abstract implementation of a call adapter factory providing boilerplate code for common features,
  * like extraction of the response type and adapter instantiation.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/26/2016.
  *
  * @param <T> the return type.

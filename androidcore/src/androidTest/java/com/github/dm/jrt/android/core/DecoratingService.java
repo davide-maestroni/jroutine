@@ -27,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Invocation service decorating the invocation factory.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 10/06/2015.
  */
 public class DecoratingService extends InvocationService {

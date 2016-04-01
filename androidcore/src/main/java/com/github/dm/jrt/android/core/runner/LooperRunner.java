@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Implementation of a runner employing the Android {@link android.os.Looper} queue to execute the
  * routine invocations.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/28/2014.
  */
 class LooperRunner implements Runner {
@@ -44,7 +44,7 @@ class LooperRunner implements Runner {
 
     /**
      * Constructor.
-     * <p/>
+     * <p>
      * Note that, when the invocation runs in the looper thread, the executions with a delay of 0
      * will be performed synchronously, while the ones with a positive delay will be posted on the
      * same thread.

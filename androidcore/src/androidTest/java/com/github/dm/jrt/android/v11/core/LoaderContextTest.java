@@ -31,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Loader context unit tests.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/09/2016.
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)

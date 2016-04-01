@@ -16,7 +16,7 @@
 
 /**
  * Core classes and interfaces related to object routine building and invocation.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 04/06/2015.
  */
 package com.github.dm.jrt.object;

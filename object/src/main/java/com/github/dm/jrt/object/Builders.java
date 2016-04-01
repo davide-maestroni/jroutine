@@ -67,10 +67,10 @@ import java.util.concurrent.locks.ReentrantLock;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Utility class providing helper methods used to implement a builder of routines.<br/>
+ * Utility class providing helper methods used to implement a builder of routines.<br>
  * Specifically, this class provided several utilities to manage routines used to call object
  * methods asynchronously.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/23/2015.
  */
 public class Builders {
@@ -362,7 +362,7 @@ public class Builders {
     /**
      * Gets the input transfer mode associated to the specified method parameter, while also
      * validating the use of the {@link com.github.dm.jrt.object.annotation.AsyncIn AsyncIn}
-     * annotation.<br/>
+     * annotation.<br>
      * In case no annotation is present, the function will return with null.
      *
      * @param method the proxy method.
@@ -426,7 +426,7 @@ public class Builders {
 
     /**
      * Gets the routine invocation mode associated to the specified method, while also validating
-     * the use of the {@link com.github.dm.jrt.object.annotation.Invoke Invoke} annotation.<br/>
+     * the use of the {@link com.github.dm.jrt.object.annotation.Invoke Invoke} annotation.<br>
      * In case no annotation is present, the function will return with null.
      *
      * @param method the proxy method.
@@ -456,7 +456,7 @@ public class Builders {
     /**
      * Gets the output transfer mode of the return type of the specified method, while also
      * validating the use of the {@link com.github.dm.jrt.object.annotation.AsyncOut AsyncOut}
-     * annotation.<br/>
+     * annotation.<br>
      * In case no annotation is present, the function will return with null.
      *
      * @param method           the proxy method.
@@ -494,8 +494,8 @@ public class Builders {
     }
 
     /**
-     * Returns the cached mutex associated with the specified target and shared fields.<br/>
-     * If the cache was empty, it is filled with a new object automatically created.<br/>
+     * Returns the cached mutex associated with the specified target and shared fields.<br>
+     * If the cache was empty, it is filled with a new object automatically created.<br>
      * If the target is null {@link com.github.dm.jrt.object.common.Mutex#NO_MUTEX} will be
      * returned.
      *

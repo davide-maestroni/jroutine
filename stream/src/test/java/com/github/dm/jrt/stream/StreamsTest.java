@@ -59,7 +59,7 @@ import static org.junit.Assert.fail;
 
 /**
  * Streams unit tests.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 12/24/2015.
  */
 public class StreamsTest {

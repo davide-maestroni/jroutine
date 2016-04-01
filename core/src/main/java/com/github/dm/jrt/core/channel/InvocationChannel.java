@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Interface defining an invocation input channel, that is the channel used to pass input data to
  * the routine invocation.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 09/15/2014.
  *
  * @param <IN>  the input data type.

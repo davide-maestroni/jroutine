@@ -29,10 +29,10 @@ import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Abstract class defining an invocation factory.<br/>
+ * Abstract class defining an invocation factory.<br>
  * The inheriting class must specify the constructor arguments to be used in the {@code equals()}
  * and {@code hashCode()} implementations.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 02/12/2015.
  *
  * @param <IN>  the input data type.
@@ -69,7 +69,7 @@ public abstract class InvocationFactory<IN, OUT> extends AutoComparable {
     /**
      * Builds and returns a new invocation factory creating instances of the specified class by
      * passing the specified arguments to the class constructor.
-     * <p/>
+     * <p>
      * Note that inner and anonymous classes can be passed as well. Remember however that Java
      * creates synthetic constructors for such classes, so be sure to specify the correct arguments
      * to guarantee proper instantiation. In fact, inner classes always have the outer instance as
@@ -111,7 +111,7 @@ public abstract class InvocationFactory<IN, OUT> extends AutoComparable {
     /**
      * Builds and returns a new invocation factory creating instances of the specified class token
      * by passing the specified arguments to the class constructor.
-     * <p/>
+     * <p>
      * Note that class tokens of inner and anonymous classes can be passed as well. Remember however
      * that Java creates synthetic constructors for such classes, so be sure to specify the correct
      * arguments to guarantee proper instantiation. In fact, inner classes always have the outer
@@ -153,7 +153,7 @@ public abstract class InvocationFactory<IN, OUT> extends AutoComparable {
     /**
      * Builds and returns a new invocation factory creating instances of the specified object by
      * passing the specified arguments to the class constructor.
-     * <p/>
+     * <p>
      * Note that inner and anonymous objects can be passed as well. Remember however that Java
      * creates synthetic constructors for such classes, so be sure to specify the correct arguments
      * to guarantee proper instantiation. In fact, inner classes always have the outer instance as
@@ -176,9 +176,9 @@ public abstract class InvocationFactory<IN, OUT> extends AutoComparable {
     }
 
     /**
-     * Creates and return a new invocation instance.<br/>
+     * Creates and return a new invocation instance.<br>
      * A proper implementation will return a new invocation instance each time it is called, unless
-     * the returned object is immutable and does not cause any side effect.<br/>
+     * the returned object is immutable and does not cause any side effect.<br>
      * Any behavior other than that may lead to unexpected results.
      *
      * @return the invocation instance.

@@ -52,7 +52,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Routine channels unit tests.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 08/03/2015.
  */
 @TargetApi(VERSION_CODES.FROYO)

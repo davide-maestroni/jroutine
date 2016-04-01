@@ -68,7 +68,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Remote service object routine unit tests.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/12/2016.
  */
 @TargetApi(VERSION_CODES.FROYO)

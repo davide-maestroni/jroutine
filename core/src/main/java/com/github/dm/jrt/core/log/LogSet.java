@@ -24,7 +24,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * Log implementation backed by a set of log objects.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 12/28/2015.
  */
 public class LogSet extends CopyOnWriteArraySet<Log> implements Log {

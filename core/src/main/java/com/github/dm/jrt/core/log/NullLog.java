@@ -23,7 +23,7 @@ import java.util.List;
 
 /**
  * Log implementation simply discarding all messages.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 10/04/2014.
  */
 public class NullLog extends TemplateLog {

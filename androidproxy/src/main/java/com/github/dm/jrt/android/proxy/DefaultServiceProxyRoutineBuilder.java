@@ -39,7 +39,7 @@ import static com.github.dm.jrt.core.util.Reflection.findConstructor;
 
 /**
  * Default implementation of a service proxy builder.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 05/13/2015.
  */
 class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,

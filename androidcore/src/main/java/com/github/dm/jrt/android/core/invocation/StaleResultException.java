@@ -18,7 +18,7 @@ package com.github.dm.jrt.android.core.invocation;
 
 /**
  * Exception indicating a clash of routine invocations caused by stale results.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 08/08/2015.
  */
 public class StaleResultException extends InvocationClashException {

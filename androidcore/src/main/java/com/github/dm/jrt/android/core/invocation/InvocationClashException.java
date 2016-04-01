@@ -18,7 +18,7 @@ package com.github.dm.jrt.android.core.invocation;
 
 /**
  * Exception indicating a clash of routine invocations sharing the same ID and type.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 12/14/2014.
  */
 public class InvocationClashException extends LoaderInvocationException {

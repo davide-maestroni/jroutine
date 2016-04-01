@@ -39,7 +39,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Default implementation of an I/O channel.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 10/24/2014.
  *
  * @param <DATA> the data type.

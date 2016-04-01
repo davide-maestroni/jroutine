@@ -39,7 +39,7 @@ import retrofit2.Retrofit;
 
 /**
  * Output channel adapter implementation.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/25/2016.
  */
 public class OutputChannelCallAdapterFactory extends AbstractCallAdapterFactory<OutputChannel> {

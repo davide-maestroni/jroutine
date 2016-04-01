@@ -72,10 +72,10 @@ import static com.github.dm.jrt.function.Functions.wrap;
 
 /**
  * Abstract implementation of a stream output channel.
- * <p/>
+ * <p>
  * This class provides a default implementation of all the stream channel features. The inheriting
  * class just needs to create routine and channel instances when required.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 01/12/2016.
  *
  * @param <OUT> the output data type.
@@ -736,7 +736,7 @@ public abstract class AbstractStreamChannel<OUT>
         }
 
         /**
-         * Binds the two channel.<br/>
+         * Binds the two channel.<br>
          * The call will have no effect if the method has been already invoked at least once.
          */
         public abstract void bind();

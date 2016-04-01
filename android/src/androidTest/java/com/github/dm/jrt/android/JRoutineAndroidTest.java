@@ -58,7 +58,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Android facade unit tests.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 02/29/2016.
  */
 @TargetApi(VERSION_CODES.HONEYCOMB)

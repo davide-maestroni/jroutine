@@ -35,7 +35,7 @@ import java.util.Set;
 
 /**
  * Builder implementation returning a map of output channels returning selectable output data.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
  * @param <OUT> the output data type.

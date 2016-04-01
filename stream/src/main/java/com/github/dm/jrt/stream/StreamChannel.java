@@ -44,13 +44,13 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Interface defining a stream output channel, that is, a channel concatenating map and reduce
- * functions.<br/>
+ * functions.<br>
  * Each function in the stream is backed by a routine instance, that can have its own specific
  * configuration and invocation mode.
- * <p/>
+ * <p>
  * Note that, if at least one reduce function is part of the chain, the results will be propagated
  * only when the previous routine invocations complete.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 12/23/2015.
  *
  * @param <OUT> the output data type.
@@ -129,7 +129,7 @@ public interface StreamChannel<OUT>
 
     /**
      * Short for {@code invocationConfiguration().withRunner(runner).withInputLimit(maxInputs)
-     * .withInputMaxDelay(maxDelay, timeUnit).setConfiguration()}.<br/>
+     * .withInputMaxDelay(maxDelay, timeUnit).setConfiguration()}.<br>
      * This method is useful to easily apply a configuration which will slow down the thread
      * feeding the next routine concatenated to the stream, when the number of buffered inputs
      * exceeds the specified limit. Since waiting on the same runner thread is not allowed, it is
@@ -149,7 +149,7 @@ public interface StreamChannel<OUT>
 
     /**
      * Short for {@code invocationConfiguration().withRunner(runner).withInputLimit(maxInputs)
-     * .withInputMaxDelay(maxDelay).setConfiguration()}.<br/>
+     * .withInputMaxDelay(maxDelay).setConfiguration()}.<br>
      * This method is useful to easily apply a configuration to the next routine concatenated to the
      * stream, which will slow down the thread feeding it, when the number of buffered inputs
      * exceeds the specified limit. Since waiting on the same runner thread is not allowed, it is
@@ -167,10 +167,10 @@ public interface StreamChannel<OUT>
             @Nullable TimeDuration maxDelay);
 
     /**
-     * Concatenates a stream based on the specified consumer to this one.<br/>
+     * Concatenates a stream based on the specified consumer to this one.<br>
      * All the outputs are collected and then passed to the consumer.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration.<br/>
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.<br>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param consumer the bi-consumer instance.
@@ -182,10 +182,10 @@ public interface StreamChannel<OUT>
             @NotNull BiConsumer<? super List<OUT>, ? super ResultChannel<AFTER>> consumer);
 
     /**
-     * Concatenates a stream based on the specified function to this one.<br/>
+     * Concatenates a stream based on the specified function to this one.<br>
      * All the outputs are collected and then the function will be applied to them.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration.<br/>
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.<br>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param function the function instance.
@@ -197,10 +197,10 @@ public interface StreamChannel<OUT>
             @NotNull Function<? super List<OUT>, ? extends AFTER> function);
 
     /**
-     * Concatenates a stream based on the specified consumer to this one.<br/>
+     * Concatenates a stream based on the specified consumer to this one.<br>
      * The stream outputs will be no further propagated.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration.<br/>
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.<br>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param consumer the consumer instance.
@@ -210,10 +210,10 @@ public interface StreamChannel<OUT>
     StreamChannel<Void> consume(@NotNull Consumer<? super OUT> consumer);
 
     /**
-     * Concatenates a stream based on the specified predicate to this one.<br/>
+     * Concatenates a stream based on the specified predicate to this one.<br>
      * The output will be filtered according to the result returned by the predicate.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration.<br/>
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.<br>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param predicate the predicate instance.
@@ -224,8 +224,8 @@ public interface StreamChannel<OUT>
 
     /**
      * Concatenates a stream mapping this stream outputs by applying the specified function.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration.<br/>
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.<br>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param function the function instance.
@@ -238,10 +238,10 @@ public interface StreamChannel<OUT>
 
     /**
      * Gets the invocation configuration builder related only to the next concatenated routine
-     * instance. Any further addition to the chain will retain only the stream configuration.<br/>
+     * instance. Any further addition to the chain will retain only the stream configuration.<br>
      * Only the options set in this configuration (that is, the ones with a value different from the
      * default) will override the stream ones.
-     * <p/>
+     * <p>
      * Note that the configuration builder will be initialized with the current configuration for
      * the next routine.
      *
@@ -252,8 +252,8 @@ public interface StreamChannel<OUT>
 
     /**
      * Concatenates a stream based on the specified mapping consumer to this one.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration.<br/>
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.<br>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param consumer the bi-consumer instance.
@@ -266,8 +266,8 @@ public interface StreamChannel<OUT>
 
     /**
      * Concatenates a stream based on the specified mapping function to this one.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration.<br/>
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.<br>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param function the function instance.
@@ -279,8 +279,8 @@ public interface StreamChannel<OUT>
 
     /**
      * Concatenates a stream based on the specified mapping invocation factory to this one.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration.<br/>
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.<br>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param factory the invocation factory.
@@ -292,10 +292,10 @@ public interface StreamChannel<OUT>
             @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
 
     /**
-     * Concatenates a stream based on the specified instance to this one.<br/>
+     * Concatenates a stream based on the specified instance to this one.<br>
      * The set configuration will be ignored.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration.<br/>
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.<br>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param routine the routine instance.
@@ -307,7 +307,7 @@ public interface StreamChannel<OUT>
 
     /**
      * Short for {@code invocationConfiguration().withMaxInstances(maxInvocations)
-     * .setConfiguration()}.<br/>
+     * .setConfiguration()}.<br>
      * This method is useful to easily apply a configuration to the next routine concatenated to the
      * stream, which will limit the maximum number of concurrent invocations to the specified value.
      *
@@ -318,11 +318,12 @@ public interface StreamChannel<OUT>
     StreamChannel<OUT> maxParallelInvocations(int maxInvocations);
 
     /**
-     * Short for {@code withStreamInvocations().withOutputOrder(orderType).setConfiguration()}.<br/>
+     * Short for {@code withStreamInvocations().withOutputOrder(orderType).setConfiguration()}.<br>
      * This method is useful to easily make the stream ordered or not.
-     * <p/>
+     * <p>
      * Note that an ordered stream has a slightly increased cost in memory and computation.
      *
+     * @param orderType the order type.
      * @return the configured stream.
      */
     @NotNull
@@ -338,7 +339,7 @@ public interface StreamChannel<OUT>
     StreamChannel<OUT> parallel();
 
     /**
-     * Concatenates a stream based on the specified accumulating function to this one.<br/>
+     * Concatenates a stream based on the specified accumulating function to this one.<br>
      * The output will be computed as follows, where the initial accumulated value will be the
      * the first input:
      * <pre>
@@ -348,8 +349,8 @@ public interface StreamChannel<OUT>
      *     </code>
      * </pre>
      * The accumulated value will be passed as result only when the outputs complete.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration.<br/>
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.<br>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param function the bi-function instance.
@@ -360,7 +361,7 @@ public interface StreamChannel<OUT>
             @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
 
     /**
-     * Concatenates a stream based on the specified accumulating function to this one.<br/>
+     * Concatenates a stream based on the specified accumulating function to this one.<br>
      * The output will be computed as follows, where the initial accumulated value will be the
      * specified {@code seed}:
      * <pre>
@@ -370,10 +371,11 @@ public interface StreamChannel<OUT>
      *     </code>
      * </pre>
      * The accumulated value will be passed as result only when the outputs complete.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration.<br/>
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.<br>
      * Note also that this stream will be bound as a result of the call.
      *
+     * @param seed     the initial accumulation value.
      * @param function the bi-function instance.
      * @param <AFTER>  the concatenation output type.
      * @return the concatenated stream.
@@ -385,7 +387,7 @@ public interface StreamChannel<OUT>
     /**
      * Returns a new stream repeating the output data to any newly bound channel or consumer, thus
      * effectively supporting multiple binding.
-     * <p/>
+     * <p>
      * Note that this stream will be bound as a result of the call.
      *
      * @return the repeating stream.
@@ -395,9 +397,9 @@ public interface StreamChannel<OUT>
 
     /**
      * Short for {@code withStreamInvocations().withRunner(runner).setConfiguration().asyncMap(
-     * Function.<OUT>identity())}.<br/>
+     * Function.<OUT>identity())}.<br>
      * This method is useful to easily make the stream run on the specified runner.
-     * <p/>
+     * <p>
      * Note that it is not necessary to explicitly concatenate a routine to have a stream delivering
      * the output data through the specified runner.
      *
@@ -426,10 +428,10 @@ public interface StreamChannel<OUT>
     StreamChannel<OUT> sync();
 
     /**
-     * Concatenates a stream generating the specified output.<br/>
+     * Concatenates a stream generating the specified output.<br>
      * The outputs will be generated only when the previous routine invocations complete.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration.<br/>
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.<br>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param output  the output.
@@ -440,10 +442,10 @@ public interface StreamChannel<OUT>
     <AFTER> StreamChannel<AFTER> then(@Nullable AFTER output);
 
     /**
-     * Concatenates a stream generating the specified outputs.<br/>
+     * Concatenates a stream generating the specified outputs.<br>
      * The outputs will be generated only when the previous routine invocations complete.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration.<br/>
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.<br>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param outputs the outputs.
@@ -454,10 +456,10 @@ public interface StreamChannel<OUT>
     <AFTER> StreamChannel<AFTER> then(@Nullable AFTER... outputs);
 
     /**
-     * Concatenates a stream generating the output returned by the specified iterable.<br/>
+     * Concatenates a stream generating the output returned by the specified iterable.<br>
      * The outputs will be generated only when the previous routine invocations complete.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration.<br/>
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.<br>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param outputs the iterable returning the outputs.
@@ -468,11 +470,11 @@ public interface StreamChannel<OUT>
     <AFTER> StreamChannel<AFTER> then(@Nullable Iterable<? extends AFTER> outputs);
 
     /**
-     * Concatenates a stream based on the specified consumer to this one.<br/>
+     * Concatenates a stream based on the specified consumer to this one.<br>
      * The consumer will be called {@code count} number of times only when the previous routine
      * invocations complete. The count number must be positive.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration.<br/>
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.<br>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param count    the number of generated outputs.
@@ -486,10 +488,10 @@ public interface StreamChannel<OUT>
             @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
 
     /**
-     * Concatenates a stream based on the specified consumer to this one.<br/>
+     * Concatenates a stream based on the specified consumer to this one.<br>
      * The consumer will be called only when the previous routine invocations complete.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration.<br/>
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.<br>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param consumer the consumer instance.
@@ -500,11 +502,11 @@ public interface StreamChannel<OUT>
     <AFTER> StreamChannel<AFTER> then(@NotNull Consumer<? super ResultChannel<AFTER>> consumer);
 
     /**
-     * Concatenates a stream based on the specified supplier to this one.<br/>
+     * Concatenates a stream based on the specified supplier to this one.<br>
      * The supplier will be called {@code count} number of times only when the previous routine
      * invocations complete. The count number must be positive.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration.<br/>
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.<br>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param count    the number of generated outputs.
@@ -517,10 +519,10 @@ public interface StreamChannel<OUT>
     <AFTER> StreamChannel<AFTER> then(long count, @NotNull Supplier<? extends AFTER> supplier);
 
     /**
-     * Concatenates a stream based on the specified supplier to this one.<br/>
+     * Concatenates a stream based on the specified supplier to this one.<br>
      * The supplier will be called only when the previous routine invocations complete.
-     * <p/>
-     * Note that the created routine will be initialized with the current configuration.<br/>
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.<br>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param supplier the supplier instance.
@@ -531,9 +533,9 @@ public interface StreamChannel<OUT>
     <AFTER> StreamChannel<AFTER> then(@NotNull Supplier<? extends AFTER> supplier);
 
     /**
-     * Returns a new stream making this one selectable.<br/>
+     * Returns a new stream making this one selectable.<br>
      * Each output will be passed along unchanged.
-     * <p/>
+     * <p>
      * Note that this stream will be bound as a result of the call.
      *
      * @param index the stream index.
@@ -543,9 +545,9 @@ public interface StreamChannel<OUT>
     StreamChannel<? extends Selectable<OUT>> toSelectable(int index);
 
     /**
-     * Concatenates a consumer handling the invocation exceptions.<br/>
+     * Concatenates a consumer handling the invocation exceptions.<br>
      * The errors will not be automatically further propagated.
-     * <p/>
+     * <p>
      * Note that this stream will be bound as a result of the call.
      *
      * @param consumer the bi-consumer instance.
@@ -556,9 +558,9 @@ public interface StreamChannel<OUT>
             @NotNull BiConsumer<? super RoutineException, ? super InputChannel<OUT>> consumer);
 
     /**
-     * Concatenates a consumer handling a invocation exceptions.<br/>
+     * Concatenates a consumer handling a invocation exceptions.<br>
      * The errors will not be automatically further propagated.
-     * <p/>
+     * <p>
      * Note that this stream will be bound as a result of the call.
      *
      * @param consumer the consumer instance.
@@ -568,9 +570,9 @@ public interface StreamChannel<OUT>
     StreamChannel<OUT> tryCatch(@NotNull Consumer<? super RoutineException> consumer);
 
     /**
-     * Concatenates a function handling a invocation exceptions.<br/>
+     * Concatenates a function handling a invocation exceptions.<br>
      * The errors will not be automatically further propagated.
-     * <p/>
+     * <p>
      * Note that this stream will be bound as a result of the call.
      *
      * @param function the function instance.
@@ -581,15 +583,15 @@ public interface StreamChannel<OUT>
             @NotNull Function<? super RoutineException, ? extends OUT> function);
 
     /**
-     * Gets the invocation configuration builder related to the whole stream.<br/>
+     * Gets the invocation configuration builder related to the whole stream.<br>
      * The configuration options will be applied to all the next concatenated routine unless
      * overwritten by specific ones.
-     * <p/>
+     * <p>
      * Note that the configuration builder will be initialized with the current stream
      * configuration.
      *
      * @return the invocation configuration builder.
      */
     @NotNull
-    Builder<? extends StreamChannel<OUT>> withStreamInvocations();
+    Builder<? extends StreamChannel<OUT>> withStreamInvocations(); // TODO: 4/1/16 rename
 }

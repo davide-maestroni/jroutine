@@ -18,7 +18,7 @@ package com.github.dm.jrt.android.core;
 
 /**
  * Test service.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/07/2016.
  */
 public class RemoteTestService extends TestService {

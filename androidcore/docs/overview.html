@@ -24,12 +24,12 @@
     Android platform customization of the <a href="http://davide-maestroni.github.io/jroutine/javadoc/v6/core" target="_blank">jroutine-core</a> library.
 </p>
 <p>
-    The code below shows how it is possible to load an image from the network in a background thread, by letting the library automatically handle any change in the configuration.<br/>
+    The code below shows how it is possible to load an image from the network in a background thread, by letting the library automatically handle any change in the configuration.<br>
     Note that the very same examples can be re-written using JRoutineLoaderCompat class and a FragmentActivity.
 </p>
 <b>Example 1:</b> simple approach.
 <p>
-    Note that this approach is fairly naive, since it lets the framework retain the instance of the downloaded bitmap.<br/>
+    Note that this approach is fairly naive, since it lets the framework retain the instance of the downloaded bitmap.<br>
     A smarter implementation would involve the use of a dedicated cache.
 </p>
 <pre>
@@ -96,7 +96,7 @@
 </pre>
 <b>Example 2:</b> load in a service.
 <p>
-    The above example can be slightly modified to make the real loading happen in a dedicated service.<br/>
+    The above example can be slightly modified to make the real loading happen in a dedicated service.<br>
     Note that the service might even run in a separate process, since the Bitmap class implements the Parcelable interface. However, keep in mind that, depending on the specific image size, the amount of serialized data might exceed the parcel limits.
 </p>
 <pre>

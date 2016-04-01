@@ -36,7 +36,7 @@ import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory
 
 /**
  * Loader implementation performing the routine invocation.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 12/08/2014.
  *
  * @param <IN>  the input data type.

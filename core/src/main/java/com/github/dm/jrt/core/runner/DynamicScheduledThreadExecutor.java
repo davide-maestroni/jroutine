@@ -27,10 +27,10 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Scheduled thread pool executor implementing a dynamic allocation of threads.<br/>
+ * Scheduled thread pool executor implementing a dynamic allocation of threads.<br>
  * When the number of running threads reaches the maximum pool size, further commands are queued
  * for later execution.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 01/23/2015.
  */
 class DynamicScheduledThreadExecutor extends ScheduledThreadPoolExecutor {

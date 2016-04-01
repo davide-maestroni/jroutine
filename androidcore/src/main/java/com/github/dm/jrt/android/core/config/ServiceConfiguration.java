@@ -28,10 +28,10 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Class storing the service configuration.
- * <p/>
+ * <p>
  * Each instance is immutable, thus, in order to modify a configuration parameter, a new builder
  * must be created starting from the specific configuration instance.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 04/20/2015.
  */
 public final class ServiceConfiguration {
@@ -39,7 +39,7 @@ public final class ServiceConfiguration {
     private static final DefaultConfigurable sDefaultConfigurable = new DefaultConfigurable();
 
     /**
-     * Empty configuration constant.<br/>The configuration has all the values set to their default.
+     * Empty configuration constant.<br>The configuration has all the values set to their default.
      */
     public static final ServiceConfiguration DEFAULT_CONFIGURATION = builder().buildConfiguration();
 

@@ -16,7 +16,7 @@
 
 /**
  * Fa&ccedil;ade classes exposing the JRoutine library features.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/12/2016.
  */
 package com.github.dm.jrt;

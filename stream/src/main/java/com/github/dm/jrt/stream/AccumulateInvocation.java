@@ -30,7 +30,7 @@ import static com.github.dm.jrt.function.Functions.wrap;
 
 /**
  * Invocation implementation accumulating the result returned by a bi-function instance.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 10/18/2015.
  *
  * @param <IN>  the input data type.

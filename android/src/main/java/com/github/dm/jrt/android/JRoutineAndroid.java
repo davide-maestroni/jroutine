@@ -34,7 +34,7 @@ import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
 /**
  * Class acting as a fa&ccedil;ade of all the JRoutine library features, specific to the Android
  * platform.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/06/2016.
  */
 public class JRoutineAndroid extends LoaderStreams {

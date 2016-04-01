@@ -71,7 +71,7 @@ import static org.junit.Assert.fail;
 
 /**
  * Proxy builder unit tests.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 03/06/2015.
  */
 public class ProxyRoutineTest {

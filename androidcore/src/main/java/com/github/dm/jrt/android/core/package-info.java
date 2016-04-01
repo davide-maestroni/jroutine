@@ -16,7 +16,7 @@
 
 /**
  * Core routine classes and interfaces specific to the Android platform.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 04/06/2015.
  */
 package com.github.dm.jrt.android.core;

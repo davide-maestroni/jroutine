@@ -28,7 +28,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
  * Invocation factory used to know whether a loader with a specific ID is present or not.
- * <p/>
+ * <p>
  * Created by davide-maestroni on 01/14/2015.
  *
  * @param <OUT> the output data type.

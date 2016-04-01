@@ -671,7 +671,7 @@ public class StreamChannelTest {
             final Runner runner1 = Runners.poolRunner(1);
             final Runner runner2 = Runners.poolRunner(1);
             Streams.streamOf("test")
-                   .withInvocations()
+                   .invocationConfiguration()
                    .withRunner(runner1)
                    .setConfiguration()
                    .map(new Function<String, Object>() {
@@ -679,11 +679,11 @@ public class StreamChannelTest {
                        public Object apply(final String s) {
 
                            return Streams.streamOf(s)
-                                         .withInvocations()
+                                         .invocationConfiguration()
                                          .withRunner(runner1)
                                          .setConfiguration()
                                          .map(Functions.identity())
-                                         .withInvocations()
+                                         .invocationConfiguration()
                                          .withRunner(runner2)
                                          .setConfiguration()
                                          .map(Functions.identity())
@@ -987,7 +987,7 @@ public class StreamChannelTest {
     public void testMapRoutine() {
 
         final Routine<String, String> routine = JRoutineCore.on(new UpperCase())
-                                                            .withInvocations()
+                                                            .invocationConfiguration()
                                                             .withOutputOrder(OrderType.BY_CALL)
                                                             .setConfiguration()
                                                             .buildRoutine();

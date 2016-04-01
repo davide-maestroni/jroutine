@@ -67,7 +67,7 @@
                 final ImageView imageView = (ImageView) findViewById(R.id.image);
                 LoaderStreams.streamOf(uri)
                              .with(loaderFrom(this))
-                             .withLoaders()
+                             .loaderConfiguration()
                              .withFactoryId(11)
                              .setConfiguration()
                              .map(sLoaderFunction)

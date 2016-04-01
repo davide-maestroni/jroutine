@@ -110,26 +110,26 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
 
     @NotNull
     public InvocationConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>>
-    withInvocations() {
+    invocationConfiguration() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<LoaderProxyObjectBuilder<TYPE>>(this, config);
     }
 
     @NotNull
-    public ProxyConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>> withProxies() {
+    public ProxyConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>>
+    proxyConfiguration() {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<LoaderProxyObjectBuilder<TYPE>>(this, config);
     }
 
     @NotNull
-    public LoaderProxyObjectBuilder<TYPE> setConfiguration(
-            @NotNull final InvocationConfiguration configuration) {
+    public LoaderConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>>
+    loaderConfiguration() {
 
-        mInvocationConfiguration =
-                ConstantConditions.notNull("invocation configuration", configuration);
-        return this;
+        final LoaderConfiguration config = mLoaderConfiguration;
+        return new LoaderConfiguration.Builder<LoaderProxyObjectBuilder<TYPE>>(this, config);
     }
 
     @NotNull
@@ -149,10 +149,12 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
     }
 
     @NotNull
-    public LoaderConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>> withLoaders() {
+    public LoaderProxyObjectBuilder<TYPE> setConfiguration(
+            @NotNull final InvocationConfiguration configuration) {
 
-        final LoaderConfiguration config = mLoaderConfiguration;
-        return new LoaderConfiguration.Builder<LoaderProxyObjectBuilder<TYPE>>(this, config);
+        mInvocationConfiguration =
+                ConstantConditions.notNull("invocation configuration", configuration);
+        return this;
     }
 
     /**

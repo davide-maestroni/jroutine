@@ -41,19 +41,20 @@ public interface ServiceTargetRoutineBuilder extends ServiceObjectRoutineBuilder
      * {@inheritDoc}
      */
     @NotNull
-    InvocationConfiguration.Builder<? extends ServiceTargetRoutineBuilder> withInvocations();
+    InvocationConfiguration.Builder<? extends ServiceTargetRoutineBuilder>
+    invocationConfiguration();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    ProxyConfiguration.Builder<? extends ServiceTargetRoutineBuilder> withProxies();
+    ProxyConfiguration.Builder<? extends ServiceTargetRoutineBuilder> proxyConfiguration();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    ServiceConfiguration.Builder<? extends ServiceTargetRoutineBuilder> withService();
+    ServiceConfiguration.Builder<? extends ServiceTargetRoutineBuilder> serviceConfiguration();
 
     /**
      * Force the type of builder to be employed to create the proxy instance.<br/>

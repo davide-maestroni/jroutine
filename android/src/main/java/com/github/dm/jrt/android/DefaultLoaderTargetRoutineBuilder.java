@@ -153,21 +153,21 @@ class DefaultLoaderTargetRoutineBuilder implements LoaderTargetRoutineBuilder {
     }
 
     @NotNull
-    public Builder<? extends LoaderTargetRoutineBuilder> withInvocations() {
+    public Builder<? extends LoaderTargetRoutineBuilder> invocationConfiguration() {
 
         return new InvocationConfiguration.Builder<LoaderTargetRoutineBuilder>(
                 mInvocationConfigurable, mInvocationConfiguration);
     }
 
     @NotNull
-    public ProxyConfiguration.Builder<? extends LoaderTargetRoutineBuilder> withProxies() {
+    public ProxyConfiguration.Builder<? extends LoaderTargetRoutineBuilder> proxyConfiguration() {
 
         return new ProxyConfiguration.Builder<LoaderTargetRoutineBuilder>(mProxyConfigurable,
                 mProxyConfiguration);
     }
 
     @NotNull
-    public LoaderConfiguration.Builder<? extends LoaderTargetRoutineBuilder> withLoaders() {
+    public LoaderConfiguration.Builder<? extends LoaderTargetRoutineBuilder> loaderConfiguration() {
 
         return new LoaderConfiguration.Builder<LoaderTargetRoutineBuilder>(mLoaderConfigurable,
                 mLoaderConfiguration);
@@ -185,13 +185,13 @@ class DefaultLoaderTargetRoutineBuilder implements LoaderTargetRoutineBuilder {
 
         return JRoutineLoaderObject.with(mContext)
                                    .on(mTarget)
-                                   .withInvocations()
+                                   .invocationConfiguration()
                                    .with(mInvocationConfiguration)
                                    .setConfiguration()
-                                   .withProxies()
+                                   .proxyConfiguration()
                                    .with(mProxyConfiguration)
                                    .setConfiguration()
-                                   .withLoaders()
+                                   .loaderConfiguration()
                                    .with(mLoaderConfiguration)
                                    .setConfiguration();
     }
@@ -201,13 +201,13 @@ class DefaultLoaderTargetRoutineBuilder implements LoaderTargetRoutineBuilder {
 
         return JRoutineLoaderProxy.with(mContext)
                                   .on(mTarget)
-                                  .withInvocations()
+                                  .invocationConfiguration()
                                   .with(mInvocationConfiguration)
                                   .setConfiguration()
-                                  .withProxies()
+                                  .proxyConfiguration()
                                   .with(mProxyConfiguration)
                                   .setConfiguration()
-                                  .withLoaders()
+                                  .loaderConfiguration()
                                   .with(mLoaderConfiguration)
                                   .setConfiguration();
     }

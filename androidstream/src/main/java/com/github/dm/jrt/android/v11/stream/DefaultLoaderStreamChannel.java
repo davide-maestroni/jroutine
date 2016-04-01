@@ -77,7 +77,7 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
                 public LoaderStreamChannel<OUT> setConfiguration(
                         @NotNull final InvocationConfiguration configuration) {
 
-                    DefaultLoaderStreamChannel.super.withInvocations()
+                    DefaultLoaderStreamChannel.super.invocationConfiguration()
                                                     .with(null)
                                                     .with(configuration)
                                                     .setConfiguration();
@@ -332,6 +332,15 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
 
     @NotNull
     @Override
+    public InvocationConfiguration.Builder<? extends LoaderStreamChannel<OUT>>
+    invocationConfiguration() {
+
+        return new InvocationConfiguration.Builder<LoaderStreamChannel<OUT>>(
+                mInvocationConfigurable, getConfiguration());
+    }
+
+    @NotNull
+    @Override
     public <AFTER> LoaderStreamChannel<AFTER> map(
             @NotNull final BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer) {
 
@@ -543,14 +552,6 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
 
     @NotNull
     @Override
-    public InvocationConfiguration.Builder<? extends LoaderStreamChannel<OUT>> withInvocations() {
-
-        return new InvocationConfiguration.Builder<LoaderStreamChannel<OUT>>(
-                mInvocationConfigurable, getConfiguration());
-    }
-
-    @NotNull
-    @Override
     public InvocationConfiguration.Builder<? extends LoaderStreamChannel<OUT>>
     withStreamInvocations() {
 
@@ -582,31 +583,38 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
     @NotNull
     public LoaderStreamChannel<OUT> cache(@Nullable final CacheStrategyType strategyType) {
 
-        return withLoaders().withCacheStrategy(strategyType).setConfiguration();
+        return loaderConfiguration().withCacheStrategy(strategyType).setConfiguration();
     }
 
     @NotNull
     public LoaderStreamChannel<OUT> factoryId(final int factoryId) {
 
-        return withLoaders().withFactoryId(factoryId).setConfiguration();
+        return loaderConfiguration().withFactoryId(factoryId).setConfiguration();
+    }
+
+    @NotNull
+    public LoaderConfiguration.Builder<? extends LoaderStreamChannel<OUT>> loaderConfiguration() {
+
+        final LoaderConfiguration configuration = mConfiguration;
+        return new LoaderConfiguration.Builder<LoaderStreamChannel<OUT>>(this, configuration);
     }
 
     @NotNull
     public LoaderStreamChannel<OUT> loaderId(final int loaderId) {
 
-        return withLoaders().withLoaderId(loaderId).setConfiguration();
-    }
-
-    @NotNull
-    public LoaderStreamChannel<OUT> staleAfter(final long time, @NotNull final TimeUnit timeUnit) {
-
-        return withLoaders().withResultStaleTime(time, timeUnit).setConfiguration();
+        return loaderConfiguration().withLoaderId(loaderId).setConfiguration();
     }
 
     @NotNull
     public LoaderStreamChannel<OUT> staleAfter(@Nullable final TimeDuration staleTime) {
 
-        return withLoaders().withResultStaleTime(staleTime).setConfiguration();
+        return loaderConfiguration().withResultStaleTime(staleTime).setConfiguration();
+    }
+
+    @NotNull
+    public LoaderStreamChannel<OUT> staleAfter(final long time, @NotNull final TimeUnit timeUnit) {
+
+        return loaderConfiguration().withResultStaleTime(time, timeUnit).setConfiguration();
     }
 
     @NotNull
@@ -614,13 +622,6 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
 
         mContextBuilder = (context != null) ? JRoutineLoader.with(context) : null;
         return this;
-    }
-
-    @NotNull
-    public LoaderConfiguration.Builder<? extends LoaderStreamChannel<OUT>> withLoaders() {
-
-        final LoaderConfiguration configuration = mConfiguration;
-        return new LoaderConfiguration.Builder<LoaderStreamChannel<OUT>>(this, configuration);
     }
 
     @NotNull
@@ -660,7 +661,7 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
         final LoaderBuilder contextBuilder = mContextBuilder;
         if (contextBuilder == null) {
             return JRoutineCore.on(factory)
-                               .withInvocations()
+                               .invocationConfiguration()
                                .with(invocationConfiguration)
                                .setConfiguration()
                                .buildRoutine();
@@ -670,10 +671,10 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
                 factoryFrom(JRoutineCore.on(factory).buildRoutine(), factory.hashCode(),
                         DelegationType.SYNC);
         return contextBuilder.on(invocationFactory)
-                             .withInvocations()
+                             .invocationConfiguration()
                              .with(invocationConfiguration)
                              .setConfiguration()
-                             .withLoaders()
+                             .loaderConfiguration()
                              .with(loaderConfiguration)
                              .setConfiguration()
                              .buildRoutine();

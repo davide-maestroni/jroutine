@@ -108,10 +108,10 @@ class DefaultLoaderChannelBuilder
             logger.wrn("the specified results stale time will be ignored: %s", resultStaleTime);
         }
 
-        return builder.withInvocations()
+        return builder.invocationConfiguration()
                       .with(invocationConfiguration)
                       .setConfiguration()
-                      .withLoaders()
+                      .loaderConfiguration()
                       .with(loaderConfiguration)
                       .withClashResolution(ClashResolutionType.JOIN)
                       .withInputClashResolution(ClashResolutionType.JOIN)
@@ -136,8 +136,8 @@ class DefaultLoaderChannelBuilder
             }
 
             mainRunner().run(new PurgeInputsExecution(context,
-                    mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO), inputList), 0,
-                    TimeUnit.MILLISECONDS);
+                            mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO),
+                            inputList), 0, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -157,8 +157,8 @@ class DefaultLoaderChannelBuilder
         if (context.getComponent() != null) {
             final List<Object> inputList = Collections.singletonList(input);
             mainRunner().run(new PurgeInputsExecution(context,
-                    mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO), inputList), 0,
-                    TimeUnit.MILLISECONDS);
+                            mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO),
+                            inputList), 0, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -176,13 +176,13 @@ class DefaultLoaderChannelBuilder
             }
 
             mainRunner().run(new PurgeInputsExecution(context,
-                    mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO), inputList), 0,
-                    TimeUnit.MILLISECONDS);
+                            mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO),
+                            inputList), 0, TimeUnit.MILLISECONDS);
         }
     }
 
     @NotNull
-    public LoaderConfiguration.Builder<? extends LoaderChannelBuilder> withLoaders() {
+    public LoaderConfiguration.Builder<? extends LoaderChannelBuilder> loaderConfiguration() {
 
         final LoaderConfiguration config = mLoaderConfiguration;
         return new LoaderConfiguration.Builder<LoaderChannelBuilder>(this, config);

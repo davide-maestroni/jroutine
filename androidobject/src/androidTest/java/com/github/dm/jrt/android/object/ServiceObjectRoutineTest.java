@@ -85,7 +85,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         final Routine<Object, Object> routine =
                 JRoutineServiceObject.with(serviceFrom(getActivity()))
                                      .on(instanceOf(TestClass.class))
-                                     .withInvocations()
+                                     .invocationConfiguration()
                                      .withRunner(Runners.poolRunner())
                                      .withMaxInstances(1)
                                      .withCoreInstances(1)
@@ -112,7 +112,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         final TimeDuration timeout = seconds(10);
         final SumItf sumAsync = JRoutineServiceObject.with(serviceFrom(getActivity()))
                                                      .on(instanceOf(Sum.class))
-                                                     .withInvocations()
+                                                     .invocationConfiguration()
                                                      .withReadTimeout(timeout)
                                                      .setConfiguration()
                                                      .buildProxy(ClassToken.tokenOf(SumItf.class));
@@ -142,7 +142,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         final TimeDuration timeout = seconds(10);
         final CountItf countAsync = JRoutineServiceObject.with(serviceFrom(getActivity()))
                                                          .on(instanceOf(Count.class))
-                                                         .withInvocations()
+                                                         .invocationConfiguration()
                                                          .withReadTimeout(timeout)
                                                          .setConfiguration()
                                                          .buildProxy(CountItf.class);
@@ -355,7 +355,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
             JRoutineServiceObject.with(serviceFrom(getActivity()))
                                  .on(instanceOf(TestClass.class))
-                                 .withInvocations()
+                                 .invocationConfiguration()
                                  .withReadTimeout(INFINITY)
                                  .setConfiguration()
                                  .buildProxy(TestItf.class)
@@ -371,7 +371,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
             JRoutineServiceObject.with(serviceFrom(getActivity()))
                                  .on(instanceOf(TestClass.class))
-                                 .withInvocations()
+                                 .invocationConfiguration()
                                  .withReadTimeout(INFINITY)
                                  .setConfiguration()
                                  .buildProxy(TestItf.class)
@@ -387,7 +387,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
             JRoutineServiceObject.with(serviceFrom(getActivity()))
                                  .on(instanceOf(TestClass.class))
-                                 .withInvocations()
+                                 .invocationConfiguration()
                                  .withReadTimeout(INFINITY)
                                  .setConfiguration()
                                  .buildProxy(TestItf.class)
@@ -461,11 +461,11 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         final Routine<Object, Object> routine2 =
                 JRoutineServiceObject.with(serviceFrom(getActivity()))
                                      .on(instanceOf(TestClass.class))
-                                     .withInvocations()
+                                     .invocationConfiguration()
                                      .withRunner(Runners.poolRunner())
                                      .withMaxInstances(1)
                                      .setConfiguration()
-                                     .withProxies()
+                                     .proxyConfiguration()
                                      .withSharedFields("test")
                                      .setConfiguration()
                                      .method(TestClass.class.getMethod("getLong"));
@@ -479,7 +479,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         final Routine<Object, Object> routine1 =
                 JRoutineServiceObject.with(serviceFrom(getActivity()))
                                      .on(instanceOf(TestClass.class))
-                                     .withInvocations()
+                                     .invocationConfiguration()
                                      .withRunner(Runners.poolRunner())
                                      .setConfiguration()
                                      .method("getLong");
@@ -574,7 +574,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
         final Itf itf = JRoutineServiceObject.with(serviceFrom(getActivity()))
                                              .on(instanceOf(Impl.class))
-                                             .withInvocations()
+                                             .invocationConfiguration()
                                              .withReadTimeout(INFINITY)
                                              .setConfiguration()
                                              .buildProxy(Itf.class);
@@ -806,18 +806,18 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         final ServiceObjectRoutineBuilder builder =
                 JRoutineServiceObject.with(serviceFrom(getActivity(), TestService.class))
                                      .on(instanceOf(TestClass2.class))
-                                     .withInvocations()
+                                     .invocationConfiguration()
                                      .withReadTimeout(seconds(10))
                                      .setConfiguration();
 
         long startTime = System.currentTimeMillis();
 
-        OutputChannel<Object> getOne = builder.withProxies()
+        OutputChannel<Object> getOne = builder.proxyConfiguration()
                                               .withSharedFields("1")
                                               .setConfiguration()
                                               .method("getOne")
                                               .asyncCall();
-        OutputChannel<Object> getTwo = builder.withProxies()
+        OutputChannel<Object> getTwo = builder.proxyConfiguration()
                                               .withSharedFields("2")
                                               .setConfiguration()
                                               .method("getTwo")
@@ -841,7 +841,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
         assertThat(JRoutineServiceObject.with(serviceFrom(getActivity()))
                                         .on(instanceOf(TestTimeout.class))
-                                        .withInvocations()
+                                        .invocationConfiguration()
                                         .withReadTimeout(seconds(10))
                                         .setConfiguration()
                                         .method("test")
@@ -852,7 +852,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
             JRoutineServiceObject.with(serviceFrom(getActivity()))
                                  .on(instanceOf(TestTimeout.class))
-                                 .withInvocations()
+                                 .invocationConfiguration()
                                  .withReadTimeoutAction(TimeoutActionType.THROW)
                                  .setConfiguration()
                                  .method("test")
@@ -867,7 +867,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
         assertThat(JRoutineServiceObject.with(serviceFrom(getActivity()))
                                         .on(instanceOf(TestTimeout.class))
-                                        .withInvocations()
+                                        .invocationConfiguration()
                                         .withReadTimeout(seconds(10))
                                         .setConfiguration()
                                         .method("getInt")
@@ -878,7 +878,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
             JRoutineServiceObject.with(serviceFrom(getActivity()))
                                  .on(instanceOf(TestTimeout.class))
-                                 .withInvocations()
+                                 .invocationConfiguration()
                                  .withReadTimeoutAction(TimeoutActionType.THROW)
                                  .setConfiguration()
                                  .method("getInt")
@@ -893,7 +893,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
         assertThat(JRoutineServiceObject.with(serviceFrom(getActivity()))
                                         .on(instanceOf(TestTimeout.class))
-                                        .withInvocations()
+                                        .invocationConfiguration()
                                         .withReadTimeout(seconds(10))
                                         .setConfiguration()
                                         .method(TestTimeout.class.getMethod("getInt"))
@@ -904,7 +904,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
             JRoutineServiceObject.with(serviceFrom(getActivity()))
                                  .on(instanceOf(TestTimeout.class))
-                                 .withInvocations()
+                                 .invocationConfiguration()
                                  .withReadTimeoutAction(TimeoutActionType.THROW)
                                  .setConfiguration()
                                  .method(TestTimeout.class.getMethod("getInt"))
@@ -919,7 +919,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
         assertThat(JRoutineServiceObject.with(serviceFrom(getActivity()))
                                         .on(instanceOf(TestTimeout.class))
-                                        .withInvocations()
+                                        .invocationConfiguration()
                                         .withReadTimeout(seconds(10))
                                         .setConfiguration()
                                         .buildProxy(TestTimeoutItf.class)
@@ -929,7 +929,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
             JRoutineServiceObject.with(serviceFrom(getActivity()))
                                  .on(instanceOf(TestTimeout.class))
-                                 .withInvocations()
+                                 .invocationConfiguration()
                                  .withReadTimeoutAction(TimeoutActionType.THROW)
                                  .setConfiguration()
                                  .buildProxy(TestTimeoutItf.class)

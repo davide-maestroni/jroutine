@@ -725,7 +725,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
         assertThat(LoaderStreamsCompat.streamOf("test2")
                                       .with(context)
-                                      .withLoaders()
+                                      .loaderConfiguration()
                                       .withFactoryId(11)
                                       .setConfiguration()
                                       .async()
@@ -1404,7 +1404,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                                        .next()).isEqualTo("TEST1");
         LoaderStreamsCompat.streamOf("test2")
                            .with(context)
-                           .withLoaders()
+                           .loaderConfiguration()
                            .withLoaderId(21)
                            .setConfiguration()
                            .async()
@@ -1443,7 +1443,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         final OutputChannel<ParcelableSelectable<Object>> output =
                 JRoutineLoaderCompat.with(loaderFrom(getActivity()))
                                     .on(factoryFrom(new Sort()))
-                                    .withInvocations()
+                                    .invocationConfiguration()
                                     .withInputOrder(OrderType.BY_CALL)
                                     .setConfiguration()
                                     .asyncCall(channel);

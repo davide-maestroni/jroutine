@@ -87,11 +87,11 @@ public interface ServiceProxyRoutineBuilder
      * {@inheritDoc}
      */
     @NotNull
-    InvocationConfiguration.Builder<? extends ServiceProxyRoutineBuilder> withInvocations();
+    InvocationConfiguration.Builder<? extends ServiceProxyRoutineBuilder> invocationConfiguration();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    ProxyConfiguration.Builder<? extends ServiceProxyRoutineBuilder> withProxies();
+    ProxyConfiguration.Builder<? extends ServiceProxyRoutineBuilder> proxyConfiguration();
 }

@@ -1347,7 +1347,7 @@ public class ChannelsTest {
         final OutputChannel<? extends Selectable<Object>> channel =
                 Channels.merge(Arrays.<OutputChannel<?>>asList(channel1, channel2)).buildChannels();
         final OutputChannel<Selectable<Object>> output = JRoutineCore.on(new Sort())
-                                                                     .withInvocations()
+                                                                     .invocationConfiguration()
                                                                      .withInputOrder(
                                                                              OrderType.BY_CALL)
                                                                      .setConfiguration()

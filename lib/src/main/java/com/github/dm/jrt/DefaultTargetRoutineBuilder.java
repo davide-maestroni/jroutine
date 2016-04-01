@@ -136,7 +136,8 @@ class DefaultTargetRoutineBuilder implements TargetRoutineBuilder {
     }
 
     @NotNull
-    public InvocationConfiguration.Builder<? extends TargetRoutineBuilder> withInvocations() {
+    public InvocationConfiguration.Builder<? extends TargetRoutineBuilder>
+    invocationConfiguration() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<DefaultTargetRoutineBuilder>(
@@ -144,7 +145,7 @@ class DefaultTargetRoutineBuilder implements TargetRoutineBuilder {
     }
 
     @NotNull
-    public ProxyConfiguration.Builder<? extends TargetRoutineBuilder> withProxies() {
+    public ProxyConfiguration.Builder<? extends TargetRoutineBuilder> proxyConfiguration() {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<DefaultTargetRoutineBuilder>(mProxyConfigurable,
@@ -162,10 +163,10 @@ class DefaultTargetRoutineBuilder implements TargetRoutineBuilder {
     private ObjectRoutineBuilder newObjectBuilder() {
 
         return JRoutineObject.on(mTarget)
-                             .withInvocations()
+                             .invocationConfiguration()
                              .with(mInvocationConfiguration)
                              .setConfiguration()
-                             .withProxies()
+                             .proxyConfiguration()
                              .with(mProxyConfiguration)
                              .setConfiguration();
     }
@@ -174,10 +175,10 @@ class DefaultTargetRoutineBuilder implements TargetRoutineBuilder {
     private ProxyRoutineBuilder newProxyBuilder() {
 
         return JRoutineProxy.on(mTarget)
-                            .withInvocations()
+                            .invocationConfiguration()
                             .with(mInvocationConfiguration)
                             .setConfiguration()
-                            .withProxies()
+                            .proxyConfiguration()
                             .with(mProxyConfiguration)
                             .setConfiguration();
     }

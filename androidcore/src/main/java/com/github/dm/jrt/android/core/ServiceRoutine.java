@@ -122,7 +122,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
         final ContextInvocationFactory<IN, OUT> factory =
                 factoryOf(invocationClass, target.getFactoryArgs());
         mRoutine = JRoutineCore.on(fromFactory(serviceContext.getApplicationContext(), factory))
-                               .withInvocations()
+                               .invocationConfiguration()
                                .with(invocationConfiguration)
                                .setConfiguration()
                                .buildRoutine();

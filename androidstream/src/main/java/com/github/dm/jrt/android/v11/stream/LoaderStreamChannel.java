@@ -180,6 +180,12 @@ public interface LoaderStreamChannel<OUT>
      * {@inheritDoc}
      */
     @NotNull
+    InvocationConfiguration.Builder<? extends LoaderStreamChannel<OUT>> invocationConfiguration();
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
     <AFTER> LoaderStreamChannel<AFTER> map(
             @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
 
@@ -334,16 +340,10 @@ public interface LoaderStreamChannel<OUT>
      * {@inheritDoc}
      */
     @NotNull
-    InvocationConfiguration.Builder<? extends LoaderStreamChannel<OUT>> withInvocations();
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
     InvocationConfiguration.Builder<? extends LoaderStreamChannel<OUT>> withStreamInvocations();
 
     /**
-     * Short for {@code withLoaders().withCacheStrategy(strategyType).setConfiguration()}.
+     * Short for {@code loaderConfiguration().withCacheStrategy(strategyType).setConfiguration()}.
      *
      * @param strategyType the cache strategy type.
      * @return the configured stream.
@@ -352,7 +352,7 @@ public interface LoaderStreamChannel<OUT>
     LoaderStreamChannel<OUT> cache(@Nullable CacheStrategyType strategyType);
 
     /**
-     * Short for {@code withLoaders().withFactoryId(factoryId).setConfiguration()}.<br/>
+     * Short for {@code loaderConfiguration().withFactoryId(factoryId).setConfiguration()}.<br/>
      * This method is useful to easily apply a configuration to the next routine concatenated to the
      * stream, which will force the factory ID to the specified one.
      *
@@ -361,48 +361,6 @@ public interface LoaderStreamChannel<OUT>
      */
     @NotNull
     LoaderStreamChannel<OUT> factoryId(int factoryId);
-
-    /**
-     * Short for {@code withLoaders().withLoaderId(loaderId).setConfiguration()}.<br/>
-     * This method is useful to easily apply a configuration to the next routine concatenated to the
-     * stream, which will force the routine loader ID.
-     *
-     * @param loaderId the loader ID.
-     * @return the configured stream.
-     */
-    @NotNull
-    LoaderStreamChannel<OUT> loaderId(int loaderId);
-
-    /**
-     * Short for {@code withLoaders().withResultStaleTime(time, timeUnit).setConfiguration()}.
-     *
-     * @param time     the time.
-     * @param timeUnit the time unit.
-     * @return the configured stream.
-     */
-    @NotNull
-    LoaderStreamChannel<OUT> staleAfter(long time, @NotNull TimeUnit timeUnit);
-
-    /**
-     * Short for {@code withLoaders().withResultStaleTime(staleTime).setConfiguration()}.
-     *
-     * @param staleTime the stale time.
-     * @return the configured stream.
-     */
-    @NotNull
-    LoaderStreamChannel<OUT> staleAfter(@Nullable TimeDuration staleTime);
-
-    /**
-     * Sets the stream loader context.<br/>
-     * The context will be used by all the concatenated routines until changed.<br/>
-     * If null it will cause the next routines to employ the configured runner instead of an Android
-     * loader.
-     *
-     * @param context the loader context.
-     * @return the configured stream.
-     */
-    @NotNull
-    LoaderStreamChannel<OUT> with(@Nullable LoaderContext context);
 
     /**
      * Gets the loader configuration builder related only to the next concatenated routine instance.
@@ -416,7 +374,50 @@ public interface LoaderStreamChannel<OUT>
      * @return the invocation configuration builder.
      */
     @NotNull
-    Builder<? extends LoaderStreamChannel<OUT>> withLoaders();
+    Builder<? extends LoaderStreamChannel<OUT>> loaderConfiguration();
+
+    /**
+     * Short for {@code loaderConfiguration().withLoaderId(loaderId).setConfiguration()}.<br/>
+     * This method is useful to easily apply a configuration to the next routine concatenated to the
+     * stream, which will force the routine loader ID.
+     *
+     * @param loaderId the loader ID.
+     * @return the configured stream.
+     */
+    @NotNull
+    LoaderStreamChannel<OUT> loaderId(int loaderId);
+
+    /**
+     * Short for {@code loaderConfiguration().withResultStaleTime(staleTime).setConfiguration()}.
+     *
+     * @param staleTime the stale time.
+     * @return the configured stream.
+     */
+    @NotNull
+    LoaderStreamChannel<OUT> staleAfter(@Nullable TimeDuration staleTime);
+
+    /**
+     * Short for {@code loaderConfiguration().withResultStaleTime(time, timeUnit)
+     * .setConfiguration()}.
+     *
+     * @param time     the time.
+     * @param timeUnit the time unit.
+     * @return the configured stream.
+     */
+    @NotNull
+    LoaderStreamChannel<OUT> staleAfter(long time, @NotNull TimeUnit timeUnit);
+
+    /**
+     * Sets the stream loader context.<br/>
+     * The context will be used by all the concatenated routines until changed.<br/>
+     * If null it will cause the next routines to employ the configured runner instead of an Android
+     * loader.
+     *
+     * @param context the loader context.
+     * @return the configured stream.
+     */
+    @NotNull
+    LoaderStreamChannel<OUT> with(@Nullable LoaderContext context);
 
     /**
      * Gets the loader configuration builder related to the whole stream.<br/>

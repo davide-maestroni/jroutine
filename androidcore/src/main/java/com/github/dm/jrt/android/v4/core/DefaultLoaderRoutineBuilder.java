@@ -98,6 +98,31 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
                 mLoaderConfiguration);
     }
 
+    @NotNull
+    @Override
+    public InvocationConfiguration.Builder<? extends
+            LoaderRoutineBuilder<IN, OUT>> invocationConfiguration() {
+
+        return new InvocationConfiguration.Builder<LoaderRoutineBuilder<IN, OUT>>(
+                mRoutineConfigurable, getConfiguration());
+    }
+
+    @NotNull
+    public LoaderRoutineBuilder<IN, OUT> setConfiguration(
+            @NotNull final InvocationConfiguration configuration) {
+
+        super.setConfiguration(configuration);
+        return this;
+    }
+
+    @NotNull
+    public LoaderConfiguration.Builder<? extends LoaderRoutineBuilder<IN, OUT>>
+    loaderConfiguration() {
+
+        final LoaderConfiguration config = mLoaderConfiguration;
+        return new LoaderConfiguration.Builder<LoaderRoutineBuilder<IN, OUT>>(this, config);
+    }
+
     @Override
     public void purge() {
 
@@ -121,33 +146,9 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
 
     @NotNull
     public LoaderRoutineBuilder<IN, OUT> setConfiguration(
-            @NotNull final InvocationConfiguration configuration) {
-
-        super.setConfiguration(configuration);
-        return this;
-    }
-
-    @NotNull
-    @Override
-    public InvocationConfiguration.Builder<? extends
-            LoaderRoutineBuilder<IN, OUT>> withInvocations() {
-
-        return new InvocationConfiguration.Builder<LoaderRoutineBuilder<IN, OUT>>(
-                mRoutineConfigurable, getConfiguration());
-    }
-
-    @NotNull
-    public LoaderRoutineBuilder<IN, OUT> setConfiguration(
             @NotNull final LoaderConfiguration configuration) {
 
         mLoaderConfiguration = ConstantConditions.notNull("loader configuration", configuration);
         return this;
-    }
-
-    @NotNull
-    public LoaderConfiguration.Builder<? extends LoaderRoutineBuilder<IN, OUT>> withLoaders() {
-
-        final LoaderConfiguration config = mLoaderConfiguration;
-        return new LoaderConfiguration.Builder<LoaderRoutineBuilder<IN, OUT>>(this, config);
     }
 }

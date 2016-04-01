@@ -75,7 +75,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         final Data data = new Data();
         final OutputChannel<Data> channel = JRoutineService.with(serviceFrom(getActivity()))
                                                            .on(factoryOf(Delay.class))
-                                                           .withService()
+                                                           .serviceConfiguration()
                                                            .withRunnerClass(MainRunner.class)
                                                            .setConfiguration()
                                                            .asyncCall(data);
@@ -183,11 +183,11 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                 factoryOf(new PassingWrapper<String>());
         final Routine<String, String> routine = JRoutineService.with(serviceFrom(getActivity()))
                                                                .on(targetFactory)
-                                                               .withInvocations()
+                                                               .invocationConfiguration()
                                                                .withInputOrder(OrderType.BY_DELAY)
                                                                .withLogLevel(Level.DEBUG)
                                                                .setConfiguration()
-                                                               .withService()
+                                                               .serviceConfiguration()
                                                                .withLogClass(AndroidLog.class)
                                                                .setConfiguration()
                                                                .buildRoutine();
@@ -199,7 +199,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         final OutputChannel<String> channel = JRoutineService.with(serviceFrom(getActivity()))
                                                              .on(factoryOf(StringDelay.class))
-                                                             .withInvocations()
+                                                             .invocationConfiguration()
                                                              .withReadTimeout(millis(10))
                                                              .withReadTimeoutAction(
                                                                      TimeoutActionType.EXIT)
@@ -213,7 +213,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         final OutputChannel<String> channel = JRoutineService.with(serviceFrom(getActivity()))
                                                              .on(factoryOf(StringDelay.class))
-                                                             .withInvocations()
+                                                             .invocationConfiguration()
                                                              .withReadTimeout(millis(10))
                                                              .withReadTimeoutAction(
                                                                      TimeoutActionType.ABORT)
@@ -237,7 +237,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         final OutputChannel<String> channel = JRoutineService.with(serviceFrom(getActivity()))
                                                              .on(factoryOf(StringDelay.class))
-                                                             .withInvocations()
+                                                             .invocationConfiguration()
                                                              .withReadTimeout(millis(10))
                                                              .withReadTimeoutAction(
                                                                      TimeoutActionType.THROW)
@@ -264,11 +264,11 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                 factoryOf(StringPassingInvocation.class);
         final Routine<String, String> routine1 = JRoutineService.with(serviceFrom(getActivity()))
                                                                 .on(targetFactory)
-                                                                .withInvocations()
+                                                                .invocationConfiguration()
                                                                 .withInputOrder(OrderType.BY_DELAY)
                                                                 .withLogLevel(Level.DEBUG)
                                                                 .setConfiguration()
-                                                                .withService()
+                                                                .serviceConfiguration()
                                                                 .withLogClass(AndroidLog.class)
                                                                 .setConfiguration()
                                                                 .buildRoutine();
@@ -288,11 +288,11 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         final ClassToken<StringCallInvocation> token = tokenOf(StringCallInvocation.class);
         final Routine<String, String> routine2 = JRoutineService.with(serviceFrom(getActivity()))
                                                                 .on(factoryOf(token))
-                                                                .withInvocations()
+                                                                .invocationConfiguration()
                                                                 .withOutputOrder(OrderType.BY_DELAY)
                                                                 .withLogLevel(Level.DEBUG)
                                                                 .setConfiguration()
-                                                                .withService()
+                                                                .serviceConfiguration()
                                                                 .withLogClass(AndroidLog.class)
                                                                 .setConfiguration()
                                                                 .buildRoutine();
@@ -314,7 +314,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                 factoryOf(StringCallInvocation.class);
         final Routine<String, String> routine3 = JRoutineService.with(serviceFrom(getActivity()))
                                                                 .on(targetFactory)
-                                                                .withInvocations()
+                                                                .invocationConfiguration()
                                                                 .withInputOrder(OrderType.BY_CALL)
                                                                 .withOutputOrder(OrderType.BY_CALL)
                                                                 .setConfiguration()
@@ -337,7 +337,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                 factoryOf(StringCallInvocation.class);
         final Routine<String, String> routine4 = JRoutineService.with(serviceFrom(getActivity()))
                                                                 .on(targetFactory)
-                                                                .withInvocations()
+                                                                .invocationConfiguration()
                                                                 .withCoreInstances(0)
                                                                 .withMaxInstances(2)
                                                                 .setConfiguration()
@@ -359,7 +359,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
                 factoryOf(TextCommandInvocation.class);
         final Routine<Void, String> routine4 = JRoutineService.with(serviceFrom(getActivity()))
                                                               .on(targetFactory)
-                                                              .withInvocations()
+                                                              .invocationConfiguration()
                                                               .withCoreInstances(0)
                                                               .withMaxInstances(2)
                                                               .setConfiguration()

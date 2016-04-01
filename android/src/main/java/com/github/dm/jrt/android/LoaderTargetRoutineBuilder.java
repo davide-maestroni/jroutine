@@ -41,19 +41,19 @@ public interface LoaderTargetRoutineBuilder extends LoaderObjectRoutineBuilder {
      * {@inheritDoc}
      */
     @NotNull
-    InvocationConfiguration.Builder<? extends LoaderTargetRoutineBuilder> withInvocations();
+    InvocationConfiguration.Builder<? extends LoaderTargetRoutineBuilder> invocationConfiguration();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    ProxyConfiguration.Builder<? extends LoaderTargetRoutineBuilder> withProxies();
+    ProxyConfiguration.Builder<? extends LoaderTargetRoutineBuilder> proxyConfiguration();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderConfiguration.Builder<? extends LoaderTargetRoutineBuilder> withLoaders();
+    LoaderConfiguration.Builder<? extends LoaderTargetRoutineBuilder> loaderConfiguration();
 
     /**
      * Force the type of builder to be employed to create the proxy instance.<br/>

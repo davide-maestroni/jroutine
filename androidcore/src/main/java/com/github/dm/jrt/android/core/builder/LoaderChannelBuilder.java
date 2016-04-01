@@ -46,11 +46,12 @@ public interface LoaderChannelBuilder extends ChannelConfigurableBuilder<LoaderC
     <OUT> OutputChannel<OUT> buildChannel();
 
     /**
-     * Makes the builder destroy the cached invocation instances with the specified inputs.
+     * Note that the clash resolution types will be ignored.
      *
-     * @param inputs the inputs.
+     * @return the loader configuration builder.
      */
-    void purge(@Nullable Iterable<?> inputs);
+    @NotNull
+    Builder<? extends LoaderChannelBuilder> loaderConfiguration();
 
     /**
      * Makes the builder destroy all the cached invocation instances.
@@ -72,10 +73,9 @@ public interface LoaderChannelBuilder extends ChannelConfigurableBuilder<LoaderC
     void purge(@Nullable Object... inputs);
 
     /**
-     * Note that the clash resolution types will be ignored.
+     * Makes the builder destroy the cached invocation instances with the specified inputs.
      *
-     * @return the loader configuration builder.
+     * @param inputs the inputs.
      */
-    @NotNull
-    Builder<? extends LoaderChannelBuilder> withLoaders();
+    void purge(@Nullable Iterable<?> inputs);
 }

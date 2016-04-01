@@ -245,10 +245,10 @@ public abstract class AbstractStreamChannel<OUT>
     public StreamChannel<OUT> backPressureOn(@Nullable final Runner runner, final int maxInputs,
             @Nullable final TimeDuration maxDelay) {
 
-        return withInvocations().withRunner(runner)
-                                .withInputLimit(maxInputs)
-                                .withInputMaxDelay(maxDelay)
-                                .setConfiguration();
+        return invocationConfiguration().withRunner(runner)
+                                        .withInputLimit(maxInputs)
+                                        .withInputMaxDelay(maxDelay)
+                                        .setConfiguration();
     }
 
     @NotNull
@@ -283,6 +283,12 @@ public abstract class AbstractStreamChannel<OUT>
                     function) {
 
         return map(new MapInvocation<OUT, AFTER>(wrap(function)));
+    }
+
+    @NotNull
+    public Builder<? extends StreamChannel<OUT>> invocationConfiguration() {
+
+        return new Builder<StreamChannel<OUT>>(this, mConfiguration);
     }
 
     @NotNull
@@ -328,7 +334,7 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public StreamChannel<OUT> maxParallelInvocations(final int maxInvocations) {
 
-        return withInvocations().withMaxInstances(maxInvocations).setConfiguration();
+        return invocationConfiguration().withMaxInstances(maxInvocations).setConfiguration();
     }
 
     @NotNull
@@ -508,12 +514,6 @@ public abstract class AbstractStreamChannel<OUT>
 
         return tryCatch(new TryCatchBiConsumerFunction<OUT>(
                 ConstantConditions.notNull("function instance", function)));
-    }
-
-    @NotNull
-    public Builder<? extends StreamChannel<OUT>> withInvocations() {
-
-        return new Builder<StreamChannel<OUT>>(this, mConfiguration);
     }
 
     @NotNull

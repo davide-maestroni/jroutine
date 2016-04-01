@@ -145,7 +145,7 @@ class InvocationLoader<IN, OUT> extends AsyncTaskLoader<InvocationResult<OUT>> {
         final LoaderContextInvocationFactory<IN, OUT> factory =
                 new LoaderContextInvocationFactory<IN, OUT>(mInvocation);
         JRoutineCore.on(fromFactory(getContext(), factory))
-                    .withInvocations()
+                    .invocationConfiguration()
                     .withOutputOrder(mOrderType)
                     .withLog(logger.getLog())
                     .withLogLevel(logger.getLogLevel())

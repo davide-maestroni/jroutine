@@ -135,6 +135,21 @@ class DefaultObjectRoutineBuilder
     }
 
     @NotNull
+    public InvocationConfiguration.Builder<? extends ObjectRoutineBuilder>
+    invocationConfiguration() {
+
+        final InvocationConfiguration config = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<ObjectRoutineBuilder>(this, config);
+    }
+
+    @NotNull
+    public ProxyConfiguration.Builder<? extends ObjectRoutineBuilder> proxyConfiguration() {
+
+        final ProxyConfiguration config = mProxyConfiguration;
+        return new ProxyConfiguration.Builder<ObjectRoutineBuilder>(this, config);
+    }
+
+    @NotNull
     public ObjectRoutineBuilder setConfiguration(
             @NotNull final InvocationConfiguration configuration) {
 
@@ -148,20 +163,6 @@ class DefaultObjectRoutineBuilder
 
         mProxyConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
         return this;
-    }
-
-    @NotNull
-    public InvocationConfiguration.Builder<? extends ObjectRoutineBuilder> withInvocations() {
-
-        final InvocationConfiguration config = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<ObjectRoutineBuilder>(this, config);
-    }
-
-    @NotNull
-    public ProxyConfiguration.Builder<? extends ObjectRoutineBuilder> withProxies() {
-
-        final ProxyConfiguration config = mProxyConfiguration;
-        return new ProxyConfiguration.Builder<ObjectRoutineBuilder>(this, config);
     }
 
     @NotNull
@@ -195,7 +196,7 @@ class DefaultObjectRoutineBuilder
                         new MethodInvocationFactory(proxyConfiguration, target, method, inputMode,
                                 outputMode);
                 routine = JRoutineCore.on(factory)
-                                      .withInvocations()
+                                      .invocationConfiguration()
                                       .with(invocationConfiguration)
                                       .setConfiguration()
                                       .buildRoutine();

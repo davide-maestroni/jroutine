@@ -679,7 +679,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
                     internalLoader.getInvocationCount()));
             if ((looper != null) && (looper != Looper.getMainLooper())) {
                 return JRoutineCore.on(PassingInvocation.<OUT>factoryOf())
-                                   .withInvocations()
+                                   .invocationConfiguration()
                                    .withRunner(AndroidRunners.looperRunner(looper))
                                    .withLog(logger.getLog())
                                    .withLogLevel(logger.getLogLevel())

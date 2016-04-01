@@ -57,5 +57,5 @@ public interface LoaderRoutineBuilder<IN, OUT>
      * @return the invocation configuration builder.
      */
     @NotNull
-    Builder<? extends LoaderRoutineBuilder<IN, OUT>> withInvocations();
+    Builder<? extends LoaderRoutineBuilder<IN, OUT>> invocationConfiguration();
 }

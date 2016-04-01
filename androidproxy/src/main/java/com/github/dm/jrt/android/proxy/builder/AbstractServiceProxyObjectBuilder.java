@@ -105,26 +105,26 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
 
     @NotNull
     public InvocationConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
-    withInvocations() {
+    invocationConfiguration() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ServiceProxyObjectBuilder<TYPE>>(this, config);
     }
 
     @NotNull
-    public ProxyConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>> withProxies() {
+    public ProxyConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
+    proxyConfiguration() {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<ServiceProxyObjectBuilder<TYPE>>(this, config);
     }
 
     @NotNull
-    public ServiceProxyObjectBuilder<TYPE> setConfiguration(
-            @NotNull final InvocationConfiguration configuration) {
+    public ServiceConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
+    serviceConfiguration() {
 
-        mInvocationConfiguration =
-                ConstantConditions.notNull("invocation configuration", configuration);
-        return this;
+        final ServiceConfiguration config = mServiceConfiguration;
+        return new ServiceConfiguration.Builder<ServiceProxyObjectBuilder<TYPE>>(this, config);
     }
 
     @NotNull
@@ -144,10 +144,12 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
     }
 
     @NotNull
-    public ServiceConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>> withService() {
+    public ServiceProxyObjectBuilder<TYPE> setConfiguration(
+            @NotNull final InvocationConfiguration configuration) {
 
-        final ServiceConfiguration config = mServiceConfiguration;
-        return new ServiceConfiguration.Builder<ServiceProxyObjectBuilder<TYPE>>(this, config);
+        mInvocationConfiguration =
+                ConstantConditions.notNull("invocation configuration", configuration);
+        return this;
     }
 
     /**

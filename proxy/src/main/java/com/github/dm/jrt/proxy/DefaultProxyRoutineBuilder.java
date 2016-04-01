@@ -82,10 +82,10 @@ class DefaultProxyRoutineBuilder
 
         final TargetProxyObjectBuilder<TYPE> builder =
                 new TargetProxyObjectBuilder<TYPE>(mTarget, itf);
-        return builder.withInvocations()
+        return builder.invocationConfiguration()
                       .with(mInvocationConfiguration)
                       .setConfiguration()
-                      .withProxies()
+                      .proxyConfiguration()
                       .with(mProxyConfiguration)
                       .setConfiguration()
                       .buildProxy();
@@ -95,6 +95,21 @@ class DefaultProxyRoutineBuilder
     public <TYPE> TYPE buildProxy(@NotNull final ClassToken<TYPE> itf) {
 
         return buildProxy(itf.getRawClass());
+    }
+
+    @NotNull
+    public InvocationConfiguration.Builder<? extends ProxyRoutineBuilder> invocationConfiguration
+            () {
+
+        final InvocationConfiguration config = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<ProxyRoutineBuilder>(this, config);
+    }
+
+    @NotNull
+    public ProxyConfiguration.Builder<? extends ProxyRoutineBuilder> proxyConfiguration() {
+
+        final ProxyConfiguration config = mProxyConfiguration;
+        return new ProxyConfiguration.Builder<ProxyRoutineBuilder>(this, config);
     }
 
     @NotNull
@@ -111,20 +126,6 @@ class DefaultProxyRoutineBuilder
 
         mProxyConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
         return this;
-    }
-
-    @NotNull
-    public InvocationConfiguration.Builder<? extends ProxyRoutineBuilder> withInvocations() {
-
-        final InvocationConfiguration config = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<ProxyRoutineBuilder>(this, config);
-    }
-
-    @NotNull
-    public ProxyConfiguration.Builder<? extends ProxyRoutineBuilder> withProxies() {
-
-        final ProxyConfiguration config = mProxyConfiguration;
-        return new ProxyConfiguration.Builder<ProxyRoutineBuilder>(this, config);
     }
 
     /**

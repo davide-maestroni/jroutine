@@ -80,6 +80,21 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
     }
 
     @NotNull
+    public InvocationConfiguration.Builder<? extends ProxyObjectBuilder<TYPE>>
+    invocationConfiguration() {
+
+        final InvocationConfiguration config = mInvocationConfiguration;
+        return new InvocationConfiguration.Builder<ProxyObjectBuilder<TYPE>>(this, config);
+    }
+
+    @NotNull
+    public ProxyConfiguration.Builder<? extends ProxyObjectBuilder<TYPE>> proxyConfiguration() {
+
+        final ProxyConfiguration config = mProxyConfiguration;
+        return new ProxyConfiguration.Builder<ProxyObjectBuilder<TYPE>>(this, config);
+    }
+
+    @NotNull
     public ProxyObjectBuilder<TYPE> setConfiguration(
             @NotNull final InvocationConfiguration configuration) {
 
@@ -94,20 +109,6 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
 
         mProxyConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
         return this;
-    }
-
-    @NotNull
-    public InvocationConfiguration.Builder<? extends ProxyObjectBuilder<TYPE>> withInvocations() {
-
-        final InvocationConfiguration config = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<ProxyObjectBuilder<TYPE>>(this, config);
-    }
-
-    @NotNull
-    public ProxyConfiguration.Builder<? extends ProxyObjectBuilder<TYPE>> withProxies() {
-
-        final ProxyConfiguration config = mProxyConfiguration;
-        return new ProxyConfiguration.Builder<ProxyObjectBuilder<TYPE>>(this, config);
     }
 
     /**

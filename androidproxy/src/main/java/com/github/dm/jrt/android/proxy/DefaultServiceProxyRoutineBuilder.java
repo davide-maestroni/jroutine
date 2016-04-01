@@ -87,13 +87,13 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
 
         final TargetServiceProxyObjectBuilder<TYPE> builder =
                 new TargetServiceProxyObjectBuilder<TYPE>(mContext, mTarget, itf);
-        return builder.withInvocations()
+        return builder.invocationConfiguration()
                       .with(mInvocationConfiguration)
                       .setConfiguration()
-                      .withProxies()
+                      .proxyConfiguration()
                       .with(mProxyConfiguration)
                       .setConfiguration()
-                      .withService()
+                      .serviceConfiguration()
                       .with(mServiceConfiguration)
                       .setConfiguration()
                       .buildProxy();
@@ -106,26 +106,26 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
     }
 
     @NotNull
-    public InvocationConfiguration.Builder<? extends ServiceProxyRoutineBuilder> withInvocations() {
+    public InvocationConfiguration.Builder<? extends ServiceProxyRoutineBuilder>
+    invocationConfiguration() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ServiceProxyRoutineBuilder>(this, config);
     }
 
     @NotNull
-    public ProxyConfiguration.Builder<? extends ServiceProxyRoutineBuilder> withProxies() {
+    public ProxyConfiguration.Builder<? extends ServiceProxyRoutineBuilder> proxyConfiguration() {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<ServiceProxyRoutineBuilder>(this, config);
     }
 
     @NotNull
-    public ServiceProxyRoutineBuilder setConfiguration(
-            @NotNull final InvocationConfiguration configuration) {
+    public ServiceConfiguration.Builder<? extends ServiceProxyRoutineBuilder>
+    serviceConfiguration() {
 
-        mInvocationConfiguration =
-                ConstantConditions.notNull("invocation configuration", configuration);
-        return this;
+        final ServiceConfiguration config = mServiceConfiguration;
+        return new ServiceConfiguration.Builder<ServiceProxyRoutineBuilder>(this, config);
     }
 
     @NotNull
@@ -145,10 +145,12 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
     }
 
     @NotNull
-    public ServiceConfiguration.Builder<? extends ServiceProxyRoutineBuilder> withService() {
+    public ServiceProxyRoutineBuilder setConfiguration(
+            @NotNull final InvocationConfiguration configuration) {
 
-        final ServiceConfiguration config = mServiceConfiguration;
-        return new ServiceConfiguration.Builder<ServiceProxyRoutineBuilder>(this, config);
+        mInvocationConfiguration =
+                ConstantConditions.notNull("invocation configuration", configuration);
+        return this;
     }
 
     /**

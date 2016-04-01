@@ -211,7 +211,7 @@ public class RoutineTest {
         final Semaphore semaphore = new Semaphore(0);
         final AtomicBoolean isFailed = new AtomicBoolean(false);
         assertThat(JRoutineCore.on(new CloseInvocation(semaphore, isFailed))
-                               .withInvocations()
+                               .invocationConfiguration()
                                .withLogLevel(Level.SILENT)
                                .setConfiguration()
                                .asyncCall("test")
@@ -276,14 +276,14 @@ public class RoutineTest {
 
         final TestRunner runner = new TestRunner();
         final Routine<Object, Object> routine1 = JRoutineCore.on(PassingInvocation.factoryOf())
-                                                             .withInvocations()
+                                                             .invocationConfiguration()
                                                              .withRunner(runner)
                                                              .withPriority(
                                                                      AgingPriority.NORMAL_PRIORITY)
                                                              .setConfiguration()
                                                              .buildRoutine();
         final Routine<Object, Object> routine2 = JRoutineCore.on(PassingInvocation.factoryOf())
-                                                             .withInvocations()
+                                                             .invocationConfiguration()
                                                              .withRunner(runner)
                                                              .withPriority(
                                                                      AgingPriority.HIGH_PRIORITY)
@@ -642,7 +642,7 @@ public class RoutineTest {
 
         final InvocationChannel<String, String> channel1 =
                 JRoutineCore.on(factoryOf(ClassToken.tokenOf(DelayedInvocation.class), millis(10)))
-                            .withInvocations()
+                            .invocationConfiguration()
                             .withInputOrder(OrderType.BY_CALL)
                             .withOutputOrder(OrderType.BY_CALL)
                             .setConfiguration()
@@ -677,7 +677,7 @@ public class RoutineTest {
                                                                .setConfiguration();
         final InvocationChannel<String, String> channel3 =
                 JRoutineCore.on(factoryOf(DelayedListInvocation.class, millis(10), 2))
-                            .withInvocations()
+                            .invocationConfiguration()
                             .with(configuration)
                             .setConfiguration()
                             .asyncInvoke();
@@ -708,7 +708,7 @@ public class RoutineTest {
 
         final InvocationChannel<String, String> channel5 =
                 JRoutineCore.on(factoryOf(DelayedListInvocation.class, TimeDuration.ZERO, 2))
-                            .withInvocations()
+                            .invocationConfiguration()
                             .with(configuration)
                             .setConfiguration()
                             .asyncInvoke();
@@ -739,7 +739,7 @@ public class RoutineTest {
 
         final InvocationChannel<String, String> channel7 =
                 JRoutineCore.on(factoryOf(DelayedChannelInvocation.class, millis(10)))
-                            .withInvocations()
+                            .invocationConfiguration()
                             .with(configuration)
                             .setConfiguration()
                             .asyncInvoke();
@@ -770,7 +770,7 @@ public class RoutineTest {
 
         final InvocationChannel<String, String> channel9 =
                 JRoutineCore.on(factoryOf(DelayedChannelInvocation.class, TimeDuration.ZERO))
-                            .withInvocations()
+                            .invocationConfiguration()
                             .with(configuration)
                             .setConfiguration()
                             .asyncInvoke();
@@ -916,7 +916,7 @@ public class RoutineTest {
 
         final TimeDuration timeout = seconds(1);
         final Routine<String, String> routine1 = JRoutineCore.on(factoryOf(TestDestroy.class))
-                                                             .withInvocations()
+                                                             .invocationConfiguration()
                                                              .withCoreInstances(0)
                                                              .setConfiguration()
                                                              .buildRoutine();
@@ -932,7 +932,7 @@ public class RoutineTest {
 
         final Routine<String, String> routine2 =
                 JRoutineCore.on(factoryOf(TestDiscardException.class))
-                            .withInvocations()
+                            .invocationConfiguration()
                             .withCoreInstances(0)
                             .setConfiguration()
                             .buildRoutine();
@@ -1005,7 +1005,7 @@ public class RoutineTest {
 
         final TimeDuration timeout = seconds(1);
         final Routine<String, String> routine1 = JRoutineCore.on(factoryOf(TestDestroy.class))
-                                                             .withInvocations()
+                                                             .invocationConfiguration()
                                                              .withCoreInstances(0)
                                                              .setConfiguration()
                                                              .buildRoutine();
@@ -1021,7 +1021,7 @@ public class RoutineTest {
 
         final Routine<String, String> routine2 =
                 JRoutineCore.on(factoryOf(TestDiscardException.class))
-                            .withInvocations()
+                            .invocationConfiguration()
                             .withCoreInstances(0)
                             .setConfiguration()
                             .buildRoutine();
@@ -1094,7 +1094,7 @@ public class RoutineTest {
 
         final InvocationChannel<Object, Object> channel =
                 JRoutineCore.on(new SleepInvocation(millis(500)))
-                            .withInvocations()
+                            .invocationConfiguration()
                             .withInputLimit(1)
                             .withInputMaxDelay(seconds(3))
                             .setConfiguration()
@@ -1112,7 +1112,7 @@ public class RoutineTest {
     public void testEmptyAbort() {
 
         final Routine<Object, Object> routine = JRoutineCore.on(new SleepInvocation(millis(500)))
-                                                            .withInvocations()
+                                                            .invocationConfiguration()
                                                             .withInputLimit(1)
                                                             .withInputMaxDelay(seconds(3))
                                                             .setConfiguration()
@@ -1138,7 +1138,7 @@ public class RoutineTest {
         try {
 
             JRoutineCore.on(factoryOf(ConstructorException.class))
-                        .withInvocations()
+                        .invocationConfiguration()
                         .withLogLevel(Level.SILENT)
                         .setConfiguration()
                         .syncCall()
@@ -1419,7 +1419,7 @@ public class RoutineTest {
         try {
 
             JRoutineCore.on(new SleepInvocation(millis(100)))
-                        .withInvocations()
+                        .invocationConfiguration()
                         .withInputMaxSize(1)
                         .setConfiguration()
                         .asyncCall("test", "test")
@@ -1434,7 +1434,7 @@ public class RoutineTest {
         try {
 
             JRoutineCore.on(new SleepInvocation(millis(100)))
-                        .withInvocations()
+                        .invocationConfiguration()
                         .withInputMaxSize(1)
                         .setConfiguration()
                         .asyncCall(Arrays.asList("test", "test"))
@@ -1451,7 +1451,7 @@ public class RoutineTest {
     public void testInputDelay() {
 
         assertThat(JRoutineCore.on(PassingInvocation.factoryOf())
-                               .withInvocations()
+                               .invocationConfiguration()
                                .withInputOrder(OrderType.BY_CALL)
                                .withInputLimit(1)
                                .withInputMaxDelay(TimeDuration.ZERO)
@@ -1468,7 +1468,7 @@ public class RoutineTest {
                                .all()).containsExactly("test1", "test2");
 
         assertThat(JRoutineCore.on(PassingInvocation.factoryOf())
-                               .withInvocations()
+                               .invocationConfiguration()
                                .withInputOrder(OrderType.BY_CALL)
                                .withInputLimit(1)
                                .withInputMaxDelay(millis(1000))
@@ -1484,7 +1484,7 @@ public class RoutineTest {
                                .all()).containsExactly("test1", "test2");
 
         assertThat(JRoutineCore.on(PassingInvocation.factoryOf())
-                               .withInvocations()
+                               .invocationConfiguration()
                                .withInputOrder(OrderType.BY_CALL)
                                .withInputLimit(1)
                                .withInputMaxDelay(millis(1000))
@@ -1500,7 +1500,7 @@ public class RoutineTest {
                                .all()).containsExactly("test1", "test2");
 
         assertThat(JRoutineCore.on(PassingInvocation.factoryOf())
-                               .withInvocations()
+                               .invocationConfiguration()
                                .withInputOrder(OrderType.BY_CALL)
                                .withInputLimit(1)
                                .withInputMaxDelay(millis(1000))
@@ -1518,7 +1518,7 @@ public class RoutineTest {
         final IOChannel<Object> channel = JRoutineCore.io().buildChannel();
         channel.pass("test2").close();
         assertThat(JRoutineCore.on(PassingInvocation.factoryOf())
-                               .withInvocations()
+                               .invocationConfiguration()
                                .withInputOrder(OrderType.BY_CALL)
                                .withInputLimit(1)
                                .withInputMaxDelay(millis(1000))
@@ -1595,7 +1595,7 @@ public class RoutineTest {
             final IOChannel<Object> channel = JRoutineCore.io().buildChannel();
             channel.pass("test2").close();
             JRoutineCore.on(PassingInvocation.factoryOf())
-                        .withInvocations()
+                        .invocationConfiguration()
                         .withInputOrder(OrderType.BY_CALL)
                         .withInputMaxSize(1)
                         .withInputMaxDelay(millis(1000))
@@ -1749,7 +1749,7 @@ public class RoutineTest {
     public void testInvocationNotAvailable() throws InterruptedException {
 
         final Routine<Void, Void> routine = JRoutineCore.on(new SleepCommand())
-                                                        .withInvocations()
+                                                        .invocationConfiguration()
                                                         .withMaxInstances(1)
                                                         .setConfiguration()
                                                         .buildRoutine();
@@ -1933,7 +1933,11 @@ public class RoutineTest {
 
                         result.pass(strings);
                     }
-                }, this)).withInvocations().withOutputMaxSize(1).setConfiguration().buildRoutine();
+                }, this))
+                            .invocationConfiguration()
+                            .withOutputMaxSize(1)
+                            .setConfiguration()
+                            .buildRoutine();
 
         try {
 
@@ -1954,7 +1958,11 @@ public class RoutineTest {
 
                         result.pass(strings.toArray(new String[strings.size()]));
                     }
-                }, this)).withInvocations().withOutputMaxSize(1).setConfiguration().buildRoutine();
+                }, this))
+                            .invocationConfiguration()
+                            .withOutputMaxSize(1)
+                            .setConfiguration()
+                            .buildRoutine();
 
         try {
 
@@ -1972,7 +1980,7 @@ public class RoutineTest {
 
         final Routine<String, String> routine =
                 JRoutineCore.on(PassingInvocation.<String>factoryOf())
-                            .withInvocations()
+                            .invocationConfiguration()
                             .withOutputLimit(1)
                             .withOutputMaxDelay(TimeDuration.ZERO)
                             .setConfiguration()
@@ -2186,7 +2194,7 @@ public class RoutineTest {
 
         final OutputChannel<String> channel =
                 JRoutineCore.on(factoryOf(DelayedInvocation.class, TimeDuration.ZERO))
-                            .withInvocations()
+                            .invocationConfiguration()
                             .withLogLevel(Level.SILENT)
                             .setConfiguration()
                             .syncCall();
@@ -2275,7 +2283,7 @@ public class RoutineTest {
 
         final Routine<String, String> routine1 =
                 JRoutineCore.on(factoryOf(DelayedInvocation.class, millis(100)))
-                            .withInvocations()
+                            .invocationConfiguration()
                             .withLogLevel(Level.SILENT)
                             .setConfiguration()
                             .buildRoutine();
@@ -2331,7 +2339,7 @@ public class RoutineTest {
         try {
 
             JRoutineCore.on(new ResultRunnerDeadlock())
-                        .withInvocations()
+                        .invocationConfiguration()
                         .withOutputMaxSize(1)
                         .setConfiguration()
                         .asyncCall("test")
@@ -2347,7 +2355,7 @@ public class RoutineTest {
         try {
 
             JRoutineCore.on(new ResultListRunnerDeadlock())
-                        .withInvocations()
+                        .invocationConfiguration()
                         .withOutputMaxSize(1)
                         .setConfiguration()
                         .asyncCall("test")
@@ -2363,7 +2371,7 @@ public class RoutineTest {
         try {
 
             JRoutineCore.on(new ResultArrayRunnerDeadlock())
-                        .withInvocations()
+                        .invocationConfiguration()
                         .withOutputMaxSize(1)
                         .setConfiguration()
                         .asyncCall("test")
@@ -2409,7 +2417,7 @@ public class RoutineTest {
     public void testRoutineBuilder() {
 
         assertThat(JRoutineCore.on(factoryOf(new ClassToken<PassingInvocation<String>>() {}))
-                               .withInvocations()
+                               .invocationConfiguration()
                                .withRunner(Runners.poolRunner())
                                .withCoreInstances(0)
                                .withMaxInstances(1)
@@ -2425,7 +2433,7 @@ public class RoutineTest {
                                .all()).containsExactly("test1", "test2");
 
         assertThat(JRoutineCore.on(factoryOf(new ClassToken<PassingInvocation<String>>() {}))
-                               .withInvocations()
+                               .invocationConfiguration()
                                .withRunner(Runners.poolRunner())
                                .withCoreInstances(0)
                                .withMaxInstances(1)
@@ -2549,7 +2557,7 @@ public class RoutineTest {
 
         final Routine<String, String> routine1 =
                 JRoutineCore.on(factoryOf(DelayedInvocation.class, seconds(1)))
-                            .withInvocations()
+                            .invocationConfiguration()
                             .withReadTimeoutAction(TimeoutActionType.ABORT)
                             .setConfiguration()
                             .buildRoutine();
@@ -2609,7 +2617,7 @@ public class RoutineTest {
 
         final Routine<String, String> routine2 =
                 JRoutineCore.on(factoryOf(DelayedInvocation.class, seconds(1)))
-                            .withInvocations()
+                            .invocationConfiguration()
                             .withReadTimeoutAction(TimeoutActionType.ABORT)
                             .withReadTimeout(millis(10))
                             .setConfiguration()
@@ -2670,7 +2678,7 @@ public class RoutineTest {
 
         final Routine<String, String> routine3 =
                 JRoutineCore.on(factoryOf(DelayedInvocation.class, seconds(1)))
-                            .withInvocations()
+                            .invocationConfiguration()
                             .withReadTimeoutAction(TimeoutActionType.THROW)
                             .setConfiguration()
                             .buildRoutine();
@@ -2786,7 +2794,7 @@ public class RoutineTest {
 
         final Routine<String, String> routine4 =
                 JRoutineCore.on(factoryOf(DelayedInvocation.class, seconds(1)))
-                            .withInvocations()
+                            .invocationConfiguration()
                             .withReadTimeoutAction(TimeoutActionType.EXIT)
                             .setConfiguration()
                             .buildRoutine();
@@ -3677,7 +3685,7 @@ public class RoutineTest {
         public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
             JRoutineCore.on(PassingInvocation.<String>factoryOf())
-                        .withInvocations()
+                        .invocationConfiguration()
                         .withInputMaxSize(1)
                         .withInputMaxDelay(TimeDuration.INFINITY)
                         .setConfiguration()
@@ -3705,7 +3713,7 @@ public class RoutineTest {
 
             final IOChannel<String> channel = JRoutineCore.io().buildChannel();
             result.pass(JRoutineCore.on(PassingInvocation.<String>factoryOf())
-                                    .withInvocations()
+                                    .invocationConfiguration()
                                     .withInputMaxSize(1)
                                     .withInputMaxDelay(TimeDuration.INFINITY)
                                     .setConfiguration()
@@ -3730,7 +3738,7 @@ public class RoutineTest {
         public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
             JRoutineCore.on(PassingInvocation.<String>factoryOf())
-                        .withInvocations()
+                        .invocationConfiguration()
                         .withInputMaxSize(1)
                         .withInputMaxDelay(TimeDuration.INFINITY)
                         .setConfiguration()
@@ -3757,7 +3765,7 @@ public class RoutineTest {
         public void onInput(final String s, @NotNull final ResultChannel<String> result) {
 
             JRoutineCore.on(PassingInvocation.<String>factoryOf())
-                        .withInvocations()
+                        .invocationConfiguration()
                         .withInputMaxSize(1)
                         .withInputMaxDelay(TimeDuration.INFINITY)
                         .setConfiguration()

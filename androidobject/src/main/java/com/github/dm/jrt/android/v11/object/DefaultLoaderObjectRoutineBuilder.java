@@ -132,10 +132,10 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         final LoaderConfiguration loaderConfiguration =
                 AndroidBuilders.configurationWithAnnotations(mLoaderConfiguration, targetMethod);
         final LoaderRoutineBuilder<IN, OUT> builder = JRoutineLoader.with(mContext).on(factory);
-        return builder.withInvocations()
+        return builder.invocationConfiguration()
                       .with(invocationConfiguration)
                       .setConfiguration()
-                      .withLoaders()
+                      .loaderConfiguration()
                       .with(loaderConfiguration)
                       .setConfiguration()
                       .buildRoutine();
@@ -161,36 +161,35 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         final LoaderConfiguration loaderConfiguration =
                 AndroidBuilders.configurationWithAnnotations(mLoaderConfiguration, method);
         final LoaderRoutineBuilder<IN, OUT> builder = JRoutineLoader.with(mContext).on(factory);
-        return builder.withInvocations()
+        return builder.invocationConfiguration()
                       .with(invocationConfiguration)
                       .setConfiguration()
-                      .withLoaders()
+                      .loaderConfiguration()
                       .with(loaderConfiguration)
                       .setConfiguration()
                       .buildRoutine();
     }
 
     @NotNull
-    public InvocationConfiguration.Builder<? extends LoaderObjectRoutineBuilder> withInvocations() {
+    public InvocationConfiguration.Builder<? extends LoaderObjectRoutineBuilder>
+    invocationConfiguration() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<LoaderObjectRoutineBuilder>(this, config);
     }
 
     @NotNull
-    public ProxyConfiguration.Builder<? extends LoaderObjectRoutineBuilder> withProxies() {
+    public ProxyConfiguration.Builder<? extends LoaderObjectRoutineBuilder> proxyConfiguration() {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<LoaderObjectRoutineBuilder>(this, config);
     }
 
     @NotNull
-    public LoaderObjectRoutineBuilder setConfiguration(
-            @NotNull final InvocationConfiguration configuration) {
+    public LoaderConfiguration.Builder<? extends LoaderObjectRoutineBuilder> loaderConfiguration() {
 
-        mInvocationConfiguration =
-                ConstantConditions.notNull("invocation configuration", configuration);
-        return this;
+        final LoaderConfiguration config = mLoaderConfiguration;
+        return new LoaderConfiguration.Builder<LoaderObjectRoutineBuilder>(this, config);
     }
 
     @NotNull
@@ -210,10 +209,12 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     }
 
     @NotNull
-    public LoaderConfiguration.Builder<? extends LoaderObjectRoutineBuilder> withLoaders() {
+    public LoaderObjectRoutineBuilder setConfiguration(
+            @NotNull final InvocationConfiguration configuration) {
 
-        final LoaderConfiguration config = mLoaderConfiguration;
-        return new LoaderConfiguration.Builder<LoaderObjectRoutineBuilder>(this, config);
+        mInvocationConfiguration =
+                ConstantConditions.notNull("invocation configuration", configuration);
+        return this;
     }
 
     /**
@@ -266,7 +267,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             }
 
             mRoutine = JRoutineObject.on(target)
-                                     .withProxies()
+                                     .proxyConfiguration()
                                      .with(mProxyConfiguration)
                                      .setConfiguration()
                                      .method(mAliasName);
@@ -417,7 +418,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             }
 
             mRoutine = JRoutineObject.on(target)
-                                     .withProxies()
+                                     .proxyConfiguration()
                                      .with(mProxyConfiguration)
                                      .setConfiguration()
                                      .method(mMethod);
@@ -630,10 +631,10 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                             outputMode);
             final LoaderRoutineBuilder<Object, Object> builder =
                     JRoutineLoader.with(mContext).on(factory);
-            final LoaderRoutine<Object, Object> routine = builder.withInvocations()
+            final LoaderRoutine<Object, Object> routine = builder.invocationConfiguration()
                                                                  .with(invocationConfiguration)
                                                                  .setConfiguration()
-                                                                 .withLoaders()
+                                                                 .loaderConfiguration()
                                                                  .with(loaderConfiguration)
                                                                  .setConfiguration()
                                                                  .buildRoutine();

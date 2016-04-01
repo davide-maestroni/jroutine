@@ -76,7 +76,7 @@ public class JRoutineFacadeTest {
         final TimeDuration timeout = seconds(1);
         final TestClass test = new TestClass();
         final Routine<Object, Object> routine = JRoutineFacade.on(instance(test))
-                                                              .withInvocations()
+                                                              .invocationConfiguration()
                                                               .withRunner(Runners.poolRunner())
                                                               .withMaxInstances(1)
                                                               .withCoreInstances(1)
@@ -137,7 +137,7 @@ public class JRoutineFacadeTest {
     public void testClassStaticMethod() {
 
         final TestStatic testStatic = JRoutineFacade.on(classOfType(TestClass.class))
-                                                    .withInvocations()
+                                                    .invocationConfiguration()
                                                     .withRunner(Runners.poolRunner())
                                                     .withLogLevel(Level.DEBUG)
                                                     .withLog(new NullLog())
@@ -312,7 +312,7 @@ public class JRoutineFacadeTest {
         final TestClass test = new TestClass();
         final TestStatic testStatic = JRoutineFacade.on(instance(test))
                                                     .withType(BuilderType.OBJECT)
-                                                    .withInvocations()
+                                                    .invocationConfiguration()
                                                     .withRunner(Runners.poolRunner())
                                                     .withLogLevel(Level.DEBUG)
                                                     .withLog(new NullLog())
@@ -327,7 +327,7 @@ public class JRoutineFacadeTest {
 
         final TestClass test = new TestClass();
         final Routine<Object, Object> routine = JRoutineFacade.on(test)
-                                                              .withInvocations()
+                                                              .invocationConfiguration()
                                                               .withRunner(Runners.poolRunner())
                                                               .withLogLevel(Level.DEBUG)
                                                               .withLog(new NullLog())
@@ -342,7 +342,7 @@ public class JRoutineFacadeTest {
         final TestClass test = new TestClass();
         final TestStatic proxy = JRoutineFacade.on(test)
                                                .withType(BuilderType.PROXY)
-                                               .withInvocations()
+                                               .invocationConfiguration()
                                                .withRunner(Runners.poolRunner())
                                                .withLogLevel(Level.DEBUG)
                                                .withLog(new NullLog())
@@ -356,7 +356,7 @@ public class JRoutineFacadeTest {
 
         final TestClass test = new TestClass();
         final TestStatic proxy = JRoutineFacade.on(test)
-                                               .withInvocations()
+                                               .invocationConfiguration()
                                                .withRunner(Runners.poolRunner())
                                                .withLogLevel(Level.DEBUG)
                                                .withLog(new NullLog())
@@ -370,7 +370,7 @@ public class JRoutineFacadeTest {
 
         final TestClass test = new TestClass();
         final Routine<Object, Object> routine = JRoutineFacade.on(test)
-                                                              .withProxies()
+                                                              .proxyConfiguration()
                                                               .withSharedFields()
                                                               .setConfiguration()
                                                               .method(TestClass.class.getMethod(
@@ -383,7 +383,7 @@ public class JRoutineFacadeTest {
 
         final TestClass test = new TestClass();
         final Routine<Object, Object> routine = JRoutineFacade.on(test)
-                                                              .withInvocations()
+                                                              .invocationConfiguration()
                                                               .withRunner(Runners.poolRunner())
                                                               .withLogLevel(Level.DEBUG)
                                                               .withLog(new NullLog())
@@ -397,7 +397,7 @@ public class JRoutineFacadeTest {
 
         final TestClass test = new TestClass();
         final TestItf proxy = JRoutineFacade.on(test)
-                                            .withInvocations()
+                                            .invocationConfiguration()
                                             .withRunner(Runners.poolRunner())
                                             .withLogLevel(Level.DEBUG)
                                             .withLog(new NullLog())
@@ -411,7 +411,7 @@ public class JRoutineFacadeTest {
 
         final TestClass test = new TestClass();
         final TestItf proxy = JRoutineFacade.on(test)
-                                            .withInvocations()
+                                            .invocationConfiguration()
                                             .withRunner(Runners.poolRunner())
                                             .withLogLevel(Level.DEBUG)
                                             .withLog(new NullLog())
@@ -628,12 +628,12 @@ public class JRoutineFacadeTest {
 
         final TestClass test = new TestClass();
         final TestItf proxy = JRoutineFacade.on(test)
-                                            .withInvocations()
+                                            .invocationConfiguration()
                                             .withRunner(Runners.poolRunner())
                                             .withLogLevel(Level.DEBUG)
                                             .withLog(new NullLog())
                                             .setConfiguration()
-                                            .withProxies()
+                                            .proxyConfiguration()
                                             .withSharedFields()
                                             .setConfiguration()
                                             .buildProxy(TestItf.class);

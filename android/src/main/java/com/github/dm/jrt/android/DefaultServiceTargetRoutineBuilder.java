@@ -152,22 +152,23 @@ class DefaultServiceTargetRoutineBuilder implements ServiceTargetRoutineBuilder 
     }
 
     @NotNull
-    public InvocationConfiguration.Builder<? extends ServiceTargetRoutineBuilder> withInvocations
-            () {
+    public InvocationConfiguration.Builder<? extends ServiceTargetRoutineBuilder>
+    invocationConfiguration() {
 
         return new InvocationConfiguration.Builder<DefaultServiceTargetRoutineBuilder>(
                 mInvocationConfigurable, mInvocationConfiguration);
     }
 
     @NotNull
-    public ProxyConfiguration.Builder<? extends ServiceTargetRoutineBuilder> withProxies() {
+    public ProxyConfiguration.Builder<? extends ServiceTargetRoutineBuilder> proxyConfiguration() {
 
         return new ProxyConfiguration.Builder<DefaultServiceTargetRoutineBuilder>(
                 mProxyConfigurable, mProxyConfiguration);
     }
 
     @NotNull
-    public ServiceConfiguration.Builder<? extends ServiceTargetRoutineBuilder> withService() {
+    public ServiceConfiguration.Builder<? extends ServiceTargetRoutineBuilder>
+    serviceConfiguration() {
 
         return new ServiceConfiguration.Builder<DefaultServiceTargetRoutineBuilder>(
                 mServiceConfigurable, mServiceConfiguration);
@@ -185,13 +186,13 @@ class DefaultServiceTargetRoutineBuilder implements ServiceTargetRoutineBuilder 
 
         return JRoutineServiceObject.with(mContext)
                                     .on(mTarget)
-                                    .withInvocations()
+                                    .invocationConfiguration()
                                     .with(mInvocationConfiguration)
                                     .setConfiguration()
-                                    .withProxies()
+                                    .proxyConfiguration()
                                     .with(mProxyConfiguration)
                                     .setConfiguration()
-                                    .withService()
+                                    .serviceConfiguration()
                                     .with(mServiceConfiguration)
                                     .setConfiguration();
     }
@@ -201,13 +202,13 @@ class DefaultServiceTargetRoutineBuilder implements ServiceTargetRoutineBuilder 
 
         return JRoutineServiceProxy.with(mContext)
                                    .on(mTarget)
-                                   .withInvocations()
+                                   .invocationConfiguration()
                                    .with(mInvocationConfiguration)
                                    .setConfiguration()
-                                   .withProxies()
+                                   .proxyConfiguration()
                                    .with(mProxyConfiguration)
                                    .setConfiguration()
-                                   .withService()
+                                   .serviceConfiguration()
                                    .with(mServiceConfiguration)
                                    .setConfiguration();
     }

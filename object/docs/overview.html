@@ -45,10 +45,10 @@
             public static void main(final String[] args) {
 
                 final ObjectRoutineBuilder builder = JRoutineObject.on(classOfType(Main.class))
-                                                                   .withProxies()
+                                                                   .proxyConfiguration()
                                                                    .withSharedFields()
                                                                    .setConfiguration()
-                                                                   .withInvocations()
+                                                                   .invocationConfiguration()
                                                                    .withReadTimeout(seconds(3))
                                                                    .setConfiguration();
                 final Routine&lt;String, Integer&gt; parseRoutine = builder.alias(PARSE);
@@ -102,10 +102,10 @@
 
                 final Main main = new Main();
                 final AsyncMain proxy = JRoutineObject.on(instance(main))
-                                                      .withProxies()
+                                                      .proxyConfiguration()
                                                       .withSharedFields()
                                                       .setConfiguration()
-                                                      .withInvocations()
+                                                      .invocationConfiguration()
                                                       .withReadTimeout(seconds(3))
                                                       .setConfiguration()
                                                       .buildProxy(AsyncMain.class);

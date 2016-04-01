@@ -60,17 +60,17 @@ public abstract class TemplateRoutineBuilder<IN, OUT> extends TemplateRoutine<IN
     }
 
     @NotNull
+    public Builder<? extends RoutineBuilder<IN, OUT>> invocationConfiguration() {
+
+        return new Builder<RoutineBuilder<IN, OUT>>(this, mConfiguration);
+    }
+
+    @NotNull
     public RoutineBuilder<IN, OUT> setConfiguration(
             @NotNull final InvocationConfiguration configuration) {
 
         mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
         return this;
-    }
-
-    @NotNull
-    public Builder<? extends RoutineBuilder<IN, OUT>> withInvocations() {
-
-        return new Builder<RoutineBuilder<IN, OUT>>(this, mConfiguration);
     }
 
     /**

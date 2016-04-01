@@ -265,6 +265,13 @@ public interface LoaderStreamChannelCompat<OUT>
      * {@inheritDoc}
      */
     @NotNull
+    InvocationConfiguration.Builder<? extends LoaderStreamChannelCompat<OUT>>
+    streamInvocationConfiguration();
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
     LoaderStreamChannelCompat<OUT> sync();
 
     /**
@@ -339,13 +346,6 @@ public interface LoaderStreamChannelCompat<OUT>
             @NotNull Function<? super RoutineException, ? extends OUT> function);
 
     /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    InvocationConfiguration.Builder<? extends LoaderStreamChannelCompat<OUT>>
-    withStreamInvocations();
-
-    /**
      * Short for {@code loaderConfiguration().withCacheStrategy(strategyType).setConfiguration()}.
      *
      * @param strategyType the cache strategy type.
@@ -411,18 +411,6 @@ public interface LoaderStreamChannelCompat<OUT>
     LoaderStreamChannelCompat<OUT> staleAfter(long time, @NotNull TimeUnit timeUnit);
 
     /**
-     * Sets the stream loader context.<br>
-     * The context will be used by all the concatenated routines until changed.<br>
-     * If null it will cause the next routines to employ the configured runner instead of an Android
-     * loader.
-     *
-     * @param context the loader context.
-     * @return the configured stream.
-     */
-    @NotNull
-    LoaderStreamChannelCompat<OUT> with(@Nullable LoaderContextCompat context);
-
-    /**
      * Gets the loader configuration builder related to the whole stream.<br>
      * The configuration options will be applied to all the next concatenated routine unless
      * overwritten by specific ones.
@@ -433,5 +421,17 @@ public interface LoaderStreamChannelCompat<OUT>
      * @return the invocation configuration builder.
      */
     @NotNull
-    Builder<? extends LoaderStreamChannelCompat<OUT>> withStreamLoaders();
+    Builder<? extends LoaderStreamChannelCompat<OUT>> streamLoaderConfiguration();
+
+    /**
+     * Sets the stream loader context.<br>
+     * The context will be used by all the concatenated routines until changed.<br>
+     * If null it will cause the next routines to employ the configured runner instead of an Android
+     * loader.
+     *
+     * @param context the loader context.
+     * @return the configured stream.
+     */
+    @NotNull
+    LoaderStreamChannelCompat<OUT> with(@Nullable LoaderContextCompat context);
 }

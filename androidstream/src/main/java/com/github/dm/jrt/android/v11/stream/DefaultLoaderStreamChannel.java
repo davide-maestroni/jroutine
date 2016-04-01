@@ -93,7 +93,7 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
                 public LoaderStreamChannel<OUT> setConfiguration(
                         @NotNull final InvocationConfiguration configuration) {
 
-                    DefaultLoaderStreamChannel.super.withStreamInvocations()
+                    DefaultLoaderStreamChannel.super.streamInvocationConfiguration()
                                                     .with(null)
                                                     .with(configuration)
                                                     .setConfiguration();
@@ -335,8 +335,9 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
     public InvocationConfiguration.Builder<? extends LoaderStreamChannel<OUT>>
     invocationConfiguration() {
 
+        final InvocationConfiguration config = getConfiguration();
         return new InvocationConfiguration.Builder<LoaderStreamChannel<OUT>>(
-                mInvocationConfigurable, getConfiguration());
+                mInvocationConfigurable, config);
     }
 
     @NotNull
@@ -440,6 +441,16 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
     public LoaderStreamChannel<OUT> runOnShared() {
 
         return (LoaderStreamChannel<OUT>) super.runOnShared();
+    }
+
+    @NotNull
+    @Override
+    public InvocationConfiguration.Builder<? extends LoaderStreamChannel<OUT>>
+    streamInvocationConfiguration() {
+
+        final InvocationConfiguration config = getStreamConfiguration();
+        return new InvocationConfiguration.Builder<LoaderStreamChannel<OUT>>(
+                mStreamInvocationConfigurable, config);
     }
 
     @NotNull
@@ -552,15 +563,6 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
 
     @NotNull
     @Override
-    public InvocationConfiguration.Builder<? extends LoaderStreamChannel<OUT>>
-    withStreamInvocations() {
-
-        return new InvocationConfiguration.Builder<LoaderStreamChannel<OUT>>(
-                mStreamInvocationConfigurable, getStreamConfiguration());
-    }
-
-    @NotNull
-    @Override
     protected <AFTER> LoaderStreamChannel<AFTER> newChannel(
             @NotNull final OutputChannel<AFTER> channel,
             @NotNull final InvocationConfiguration configuration,
@@ -595,8 +597,8 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
     @NotNull
     public LoaderConfiguration.Builder<? extends LoaderStreamChannel<OUT>> loaderConfiguration() {
 
-        final LoaderConfiguration configuration = mConfiguration;
-        return new LoaderConfiguration.Builder<LoaderStreamChannel<OUT>>(this, configuration);
+        final LoaderConfiguration config = mConfiguration;
+        return new LoaderConfiguration.Builder<LoaderStreamChannel<OUT>>(this, config);
     }
 
     @NotNull
@@ -618,18 +620,19 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
     }
 
     @NotNull
+    public LoaderConfiguration.Builder<? extends LoaderStreamChannel<OUT>>
+    streamLoaderConfiguration() {
+
+        final LoaderConfiguration config = mStreamConfiguration;
+        return new LoaderConfiguration.Builder<LoaderStreamChannel<OUT>>(mStreamConfigurable,
+                config);
+    }
+
+    @NotNull
     public LoaderStreamChannel<OUT> with(@Nullable final LoaderContext context) {
 
         mContextBuilder = (context != null) ? JRoutineLoader.with(context) : null;
         return this;
-    }
-
-    @NotNull
-    public LoaderConfiguration.Builder<? extends LoaderStreamChannel<OUT>> withStreamLoaders() {
-
-        final LoaderConfiguration configuration = mStreamConfiguration;
-        return new LoaderConfiguration.Builder<LoaderStreamChannel<OUT>>(mStreamConfigurable,
-                configuration);
     }
 
     private void checkStatic(@NotNull final Wrapper wrapper, @NotNull final Object function) {

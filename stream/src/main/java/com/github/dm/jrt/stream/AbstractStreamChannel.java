@@ -340,7 +340,7 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public StreamChannel<OUT> ordered(@Nullable final OrderType orderType) {
 
-        return withStreamInvocations().withOutputOrder(orderType).setConfiguration();
+        return streamInvocationConfiguration().withOutputOrder(orderType).setConfiguration();
     }
 
     @NotNull
@@ -380,11 +380,11 @@ public abstract class AbstractStreamChannel<OUT>
     public StreamChannel<OUT> runOn(@Nullable final Runner runner) {
 
         final DelegationType delegationType = mDelegationType;
-        final StreamChannel<OUT> channel = withStreamInvocations().withRunner(runner)
-                                                                  .setConfiguration()
-                                                                  .async()
-                                                                  .map(PassingInvocation
-                                                                          .<OUT>factoryOf());
+        final FilterInvocation<OUT, OUT> factory = PassingInvocation.factoryOf();
+        final StreamChannel<OUT> channel = streamInvocationConfiguration().withRunner(runner)
+                                                                          .setConfiguration()
+                                                                          .async()
+                                                                          .map(factory);
         if (delegationType == DelegationType.ASYNC) {
             return channel.async();
         }
@@ -400,6 +400,12 @@ public abstract class AbstractStreamChannel<OUT>
     public StreamChannel<OUT> runOnShared() {
 
         return runOn(null);
+    }
+
+    @NotNull
+    public Builder<? extends StreamChannel<OUT>> streamInvocationConfiguration() {
+
+        return new Builder<StreamChannel<OUT>>(mStreamConfigurable, getStreamConfiguration());
     }
 
     @NotNull
@@ -514,12 +520,6 @@ public abstract class AbstractStreamChannel<OUT>
 
         return tryCatch(new TryCatchBiConsumerFunction<OUT>(
                 ConstantConditions.notNull("function instance", function)));
-    }
-
-    @NotNull
-    public Builder<? extends StreamChannel<OUT>> withStreamInvocations() {
-
-        return new Builder<StreamChannel<OUT>>(mStreamConfigurable, getStreamConfiguration());
     }
 
     @NotNull

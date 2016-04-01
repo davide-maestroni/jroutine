@@ -1047,7 +1047,7 @@ public class StreamChannelTest {
 
             assertThat(Streams.streamOf()
                               .then(range(1, 1000))
-                              .withStreamInvocations()
+                              .streamInvocationConfiguration()
                               .withRunner(mSingleThreadRunner)
                               .withInputLimit(2)
                               .withInputMaxDelay(seconds(3))
@@ -1100,7 +1100,7 @@ public class StreamChannelTest {
 
             assertThat(Streams.streamOf()
                               .then(range(1, 1000))
-                              .withStreamInvocations()
+                              .streamInvocationConfiguration()
                               .withRunner(mSingleThreadRunner)
                               .withOutputLimit(2)
                               .withOutputMaxDelay(seconds(3))
@@ -1149,7 +1149,7 @@ public class StreamChannelTest {
 
             assertThat(Streams.streamOf()
                               .then(range(1, 1000))
-                              .withStreamInvocations()
+                              .streamInvocationConfiguration()
                               .withRunner(mSingleThreadRunner)
                               .withInputLimit(2)
                               .withInputMaxDelay(seconds(3))

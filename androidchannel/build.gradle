@@ -64,6 +64,7 @@ dependencies {
 conditionalDependencies {
     compile name: 'core', artifact: { "${it.parent.name}-${it.name}" }
     compile name: 'channel', artifact: { "${it.parent.name}-${it.name}" }
+    compile name: 'androidcore', artifact: { "${it.parent.name}-${it.name}" }
 }
 
 findbugs {
@@ -75,5 +76,6 @@ tasks.withType(Javadoc) {
     options.overview("${project.projectDir}/docs/overview.html")
     options.links('http://docs.oracle.com/javase/7/docs/api/',
             "${prefix}/core/",
-            "${prefix}/channel/")
+            "${prefix}/channel/",
+            "${prefix}/androidcore/")
 }

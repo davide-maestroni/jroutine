@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.android;
 
+import com.github.dm.jrt.TargetRoutineBuilder;
 import com.github.dm.jrt.android.core.config.ServiceConfiguration;
 import com.github.dm.jrt.android.object.builder.ServiceObjectRoutineBuilder;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
@@ -35,7 +36,8 @@ import org.jetbrains.annotations.Nullable;
  * <p>
  * Created by davide-maestroni on 03/06/2016.
  */
-public interface ServiceTargetRoutineBuilder extends ServiceObjectRoutineBuilder {
+public interface ServiceTargetRoutineBuilder
+        extends TargetRoutineBuilder, ServiceObjectRoutineBuilder {
 
     /**
      * {@inheritDoc}
@@ -54,33 +56,11 @@ public interface ServiceTargetRoutineBuilder extends ServiceObjectRoutineBuilder
      * {@inheritDoc}
      */
     @NotNull
-    ServiceConfiguration.Builder<? extends ServiceTargetRoutineBuilder> serviceConfiguration();
-
-    /**
-     * Force the type of builder to be employed to create the proxy instance.<br>
-     * A null value means default algorithm will be applied, that is, the builder type will be
-     * automatically chosen based on the proxy interface definition.
-     *
-     * @param builderType the builder type.
-     * @return this builder.
-     */
-    @NotNull
     ServiceTargetRoutineBuilder withType(@Nullable BuilderType builderType);
 
     /**
-     * Builder type enumeration.
+     * {@inheritDoc}
      */
-    enum BuilderType {
-
-        /**
-         * Object routine builder.<br>
-         * The proxy instance will be created through reflection.
-         */
-        OBJECT,
-        /**
-         * Proxy routine builder.<br>
-         * The proxy instance will be created through code generation.
-         */
-        PROXY
-    }
+    @NotNull
+    ServiceConfiguration.Builder<? extends ServiceTargetRoutineBuilder> serviceConfiguration();
 }

@@ -167,17 +167,17 @@ class DefaultLoaderTargetRoutineBuilder implements LoaderTargetRoutineBuilder {
     }
 
     @NotNull
-    public LoaderConfiguration.Builder<? extends LoaderTargetRoutineBuilder> loaderConfiguration() {
-
-        return new LoaderConfiguration.Builder<LoaderTargetRoutineBuilder>(mLoaderConfigurable,
-                mLoaderConfiguration);
-    }
-
-    @NotNull
     public LoaderTargetRoutineBuilder withType(@Nullable final BuilderType builderType) {
 
         mBuilderType = builderType;
         return this;
+    }
+
+    @NotNull
+    public LoaderConfiguration.Builder<? extends LoaderTargetRoutineBuilder> loaderConfiguration() {
+
+        return new LoaderConfiguration.Builder<LoaderTargetRoutineBuilder>(mLoaderConfigurable,
+                mLoaderConfiguration);
     }
 
     @NotNull

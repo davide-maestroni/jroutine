@@ -167,18 +167,18 @@ class DefaultServiceTargetRoutineBuilder implements ServiceTargetRoutineBuilder 
     }
 
     @NotNull
+    public ServiceTargetRoutineBuilder withType(@Nullable final BuilderType builderType) {
+
+        mBuilderType = builderType;
+        return this;
+    }
+
+    @NotNull
     public ServiceConfiguration.Builder<? extends ServiceTargetRoutineBuilder>
     serviceConfiguration() {
 
         return new ServiceConfiguration.Builder<DefaultServiceTargetRoutineBuilder>(
                 mServiceConfigurable, mServiceConfiguration);
-    }
-
-    @NotNull
-    public ServiceTargetRoutineBuilder withType(@Nullable final BuilderType builderType) {
-
-        mBuilderType = builderType;
-        return this;
     }
 
     @NotNull

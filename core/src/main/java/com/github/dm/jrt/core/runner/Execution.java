@@ -26,14 +26,4 @@ package com.github.dm.jrt.core.runner;
  */
 public interface Execution extends Runnable {
 
-    /**
-     * Checks if this execution might be cancelled in the future.
-     * <p>
-     * Note that this is just an hint for the runner: if false is returned, the runner might not be
-     * able to cancel the execution when requested. On the other side, the runner may be unable to
-     * cancel the execution in any case, based on the internal status or specific implementation.
-     *
-     * @return whether the execution should be cancellable.
-     */
-    boolean canBeCancelled();
 }

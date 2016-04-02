@@ -278,7 +278,7 @@ class LocalQueue {
     /**
      * Empty execution implementation.
      */
-    private static class EmptyExecution extends TemplateExecution {
+    private static class EmptyExecution implements Execution {
 
         public void run() {
 

@@ -28,10 +28,10 @@ import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
+import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.RunnerDecorator;
 import com.github.dm.jrt.core.runner.Runners;
-import com.github.dm.jrt.core.runner.TemplateExecution;
 import com.github.dm.jrt.core.util.TimeDuration;
 
 import org.jetbrains.annotations.NotNull;
@@ -284,7 +284,7 @@ public class RunnerTest extends AndroidTestCase {
         }
     }
 
-    private static class TestRunExecution extends TemplateExecution {
+    private static class TestRunExecution implements Execution {
 
         private final TimeDuration mDelay;
 

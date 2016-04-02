@@ -118,15 +118,14 @@ class ThrottlingRunner implements Runner {
     @NotNull
     private ThrottlingExecution getThrottlingExecution(@NotNull final Execution execution) {
 
-        final WeakReference<ThrottlingExecution> executionReference = mExecutions.get(execution);
+        final WeakIdentityHashMap<Execution, WeakReference<ThrottlingExecution>> executions =
+                mExecutions;
+        final WeakReference<ThrottlingExecution> executionReference = executions.get(execution);
         ThrottlingExecution throttlingExecution =
                 (executionReference != null) ? executionReference.get() : null;
         if (throttlingExecution == null) {
             throttlingExecution = new ThrottlingExecution(execution);
-            if (execution.canBeCancelled()) {
-                mExecutions.put(execution,
-                        new WeakReference<ThrottlingExecution>(throttlingExecution));
-            }
+            executions.put(execution, new WeakReference<ThrottlingExecution>(throttlingExecution));
         }
 
         return throttlingExecution;
@@ -135,7 +134,7 @@ class ThrottlingRunner implements Runner {
     /**
      * Pending execution implementation.
      */
-    private class PendingExecution extends TemplateExecution {
+    private class PendingExecution implements Execution {
 
         private final long mDelay;
 
@@ -185,11 +184,6 @@ class ThrottlingRunner implements Runner {
         private ThrottlingExecution(@NotNull final Execution execution) {
 
             mExecution = execution;
-        }
-
-        public boolean canBeCancelled() {
-
-            return mExecution.canBeCancelled();
         }
 
         public void run() {

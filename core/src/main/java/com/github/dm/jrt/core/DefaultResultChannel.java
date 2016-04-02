@@ -32,7 +32,6 @@ import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
-import com.github.dm.jrt.core.runner.TemplateExecution;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.SimpleQueue;
 import com.github.dm.jrt.core.util.TimeDuration;
@@ -1533,7 +1532,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     /**
      * Implementation of an execution handling a delayed abortion.
      */
-    private class DelayedAbortExecution extends TemplateExecution {
+    private class DelayedAbortExecution implements Execution {
 
         private final RoutineException mAbortException;
 
@@ -1563,7 +1562,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     /**
      * Implementation of an execution handling a delayed output of a list of data.
      */
-    private class DelayedListOutputExecution extends TemplateExecution {
+    private class DelayedListOutputExecution implements Execution {
 
         private final ArrayList<OUT> mOutputs;
 
@@ -1598,7 +1597,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     /**
      * Implementation of an execution handling a delayed output.
      */
-    private class DelayedOutputExecution extends TemplateExecution {
+    private class DelayedOutputExecution implements Execution {
 
         private final OUT mOutput;
 
@@ -1645,11 +1644,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         private DelayedWrappedExecution(@NotNull final Execution execution) {
 
             mExecution = execution;
-        }
-
-        public boolean canBeCancelled() {
-
-            return mExecution.canBeCancelled();
         }
 
         public void run() {
@@ -1873,7 +1867,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
     /**
      * Execution flushing the output to the bound consumer.
      */
-    private class FlushExecution extends TemplateExecution {
+    private class FlushExecution implements Execution {
 
         private final boolean mForceClose;
 
@@ -2394,11 +2388,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         private WrappedExecution(@NotNull final Execution execution) {
 
             mExecution = execution;
-        }
-
-        public boolean canBeCancelled() {
-
-            return mExecution.canBeCancelled();
         }
 
         public void run() {

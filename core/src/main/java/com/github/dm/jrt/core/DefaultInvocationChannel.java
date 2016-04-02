@@ -30,7 +30,6 @@ import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
-import com.github.dm.jrt.core.runner.TemplateExecution;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.SimpleQueue;
 import com.github.dm.jrt.core.util.TimeDuration;
@@ -404,7 +403,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
     /**
      * Implementation of an execution handling the abortion of the result channel.
      */
-    private class AbortResultExecution extends TemplateExecution {
+    private class AbortResultExecution implements Execution {
 
         private final Throwable mAbortException;
 
@@ -586,7 +585,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
     /**
      * Implementation of an execution handling a delayed abortion.
      */
-    private class DelayedAbortExecution extends TemplateExecution {
+    private class DelayedAbortExecution implements Execution {
 
         private final RoutineException mAbortException;
 
@@ -616,7 +615,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
     /**
      * Implementation of an execution handling a delayed input.
      */
-    private class DelayedInputExecution extends TemplateExecution {
+    private class DelayedInputExecution implements Execution {
 
         private final IN mInput;
 
@@ -651,7 +650,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
     /**
      * Implementation of an execution handling a delayed input of a list of data.
      */
-    private class DelayedListInputExecution extends TemplateExecution {
+    private class DelayedListInputExecution implements Execution {
 
         private final ArrayList<IN> mInputs;
 

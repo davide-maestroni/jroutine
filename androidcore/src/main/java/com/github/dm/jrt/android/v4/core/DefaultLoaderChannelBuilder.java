@@ -26,7 +26,7 @@ import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.log.Logger;
-import com.github.dm.jrt.core.runner.TemplateExecution;
+import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.TimeDuration;
 
@@ -213,7 +213,7 @@ class DefaultLoaderChannelBuilder
     /**
      * Execution implementation purging the loader with a specific ID.
      */
-    private static class PurgeExecution extends TemplateExecution {
+    private static class PurgeExecution implements Execution {
 
         private final LoaderContextCompat mContext;
 
@@ -240,7 +240,7 @@ class DefaultLoaderChannelBuilder
     /**
      * Execution implementation purging the loader with a specific ID and inputs.
      */
-    private static class PurgeInputsExecution extends TemplateExecution {
+    private static class PurgeInputsExecution implements Execution {
 
         private final LoaderContextCompat mContext;
 

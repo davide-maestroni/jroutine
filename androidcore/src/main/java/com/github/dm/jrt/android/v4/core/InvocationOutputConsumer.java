@@ -25,8 +25,8 @@ import com.github.dm.jrt.core.channel.TemplateOutputConsumer;
 import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.log.Logger;
+import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
-import com.github.dm.jrt.core.runner.TemplateExecution;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -49,7 +49,7 @@ class InvocationOutputConsumer<OUT> extends TemplateOutputConsumer<OUT> {
 
     private final ArrayList<OUT> mCachedResults = new ArrayList<OUT>();
 
-    private final TemplateExecution mDeliverResult;
+    private final Execution mDeliverResult;
 
     private final ArrayList<OUT> mLastResults = new ArrayList<OUT>();
 
@@ -73,7 +73,7 @@ class InvocationOutputConsumer<OUT> extends TemplateOutputConsumer<OUT> {
             @NotNull final Logger logger) {
 
         ConstantConditions.notNull("loader instance", loader);
-        mDeliverResult = new TemplateExecution() {
+        mDeliverResult = new Execution() {
 
             public void run() {
 

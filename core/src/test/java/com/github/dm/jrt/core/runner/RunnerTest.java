@@ -125,7 +125,6 @@ public class RunnerTest {
         assertThat(runner.isExecutionThread()).isFalse();
         testRunner.setExecutionThread(Thread.currentThread());
         assertThat(runner.isExecutionThread()).isTrue();
-        execution.setCancelable(true);
         runner.run(execution, 0, TimeUnit.MILLISECONDS);
         assertThat(execution.isRun()).isFalse();
         testRunner.getLastExecution().run();
@@ -152,12 +151,11 @@ public class RunnerTest {
         runner.cancel(execution);
         assertThat(execution.isRun()).isFalse();
         assertThat(testRunner.getLastCancelExecution()).isNotNull();
-        execution.setCancelable(false);
         testRunner.cancel(null);
         runner.run(execution, 1, TimeUnit.MILLISECONDS);
         runner.cancel(execution);
         assertThat(execution.isRun()).isFalse();
-        assertThat(testRunner.getLastCancelExecution()).isNull();
+        assertThat(testRunner.getLastCancelExecution()).isNotNull();
     }
 
     @Test
@@ -274,7 +272,6 @@ public class RunnerTest {
         }, 0, TimeUnit.MILLISECONDS);
 
         millis(300).sleepAtLeast();
-        execution.setCancelable(true);
         runner.run(execution, 0, TimeUnit.MILLISECONDS);
         millis(300).sleepAtLeast();
         assertThat(execution.isRun()).isFalse();
@@ -440,14 +437,7 @@ public class RunnerTest {
 
     private static class TestExecution implements Execution {
 
-        private boolean mIsCancelable;
-
         private boolean mIsRun;
-
-        public boolean canBeCancelled() {
-
-            return mIsCancelable;
-        }
 
         public void run() {
 
@@ -462,11 +452,6 @@ public class RunnerTest {
         private void reset() {
 
             mIsRun = false;
-        }
-
-        private void setCancelable(final boolean isCancelable) {
-
-            mIsCancelable = isCancelable;
         }
     }
 
@@ -509,7 +494,7 @@ public class RunnerTest {
         }
     }
 
-    private static class TestRunExecution extends TemplateExecution {
+    private static class TestRunExecution implements Execution {
 
         private final TimeDuration mDelay;
 

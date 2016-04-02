@@ -20,7 +20,6 @@ import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.Execution;
-import com.github.dm.jrt.core.runner.TemplateExecution;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -95,11 +94,6 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
 
             return mAbortExecution;
         }
-    }
-
-    public boolean canBeCancelled() {
-
-        return true;
     }
 
     public void onCreate(@NotNull final Invocation<IN, OUT> invocation) {
@@ -252,7 +246,7 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
     /**
      * Abort execution implementation.
      */
-    private class AbortExecution extends TemplateExecution implements InvocationObserver<IN, OUT> {
+    private class AbortExecution implements Execution, InvocationObserver<IN, OUT> {
 
         public void onCreate(@NotNull final Invocation<IN, OUT> invocation) {
 

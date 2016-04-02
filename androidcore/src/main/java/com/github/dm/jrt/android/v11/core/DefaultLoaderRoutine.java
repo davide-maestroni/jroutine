@@ -28,7 +28,7 @@ import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.log.Logger;
-import com.github.dm.jrt.core.runner.TemplateExecution;
+import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
@@ -226,7 +226,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
     /**
      * Execution implementation purging all loaders with a specific invocation factory.
      */
-    private static class PurgeExecution extends TemplateExecution {
+    private static class PurgeExecution implements Execution {
 
         private final LoaderContext mContext;
 
@@ -260,7 +260,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
      *
      * @param <IN> the input data type.
      */
-    private static class PurgeInputsExecution<IN> extends TemplateExecution {
+    private static class PurgeInputsExecution<IN> implements Execution {
 
         private final LoaderContext mContext;
 

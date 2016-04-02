@@ -26,9 +26,9 @@ import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.routine.TemplateRoutine;
+import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
-import com.github.dm.jrt.core.runner.TemplateExecution;
 import com.github.dm.jrt.core.util.SimpleQueue;
 
 import org.jetbrains.annotations.NotNull;
@@ -335,7 +335,7 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
     /**
      * Execution implementation used to delay the creation of invocations.
      */
-    private class CreateExecution extends TemplateExecution {
+    private class CreateExecution implements Execution {
 
         private final DefaultInvocationManager mManager;
 

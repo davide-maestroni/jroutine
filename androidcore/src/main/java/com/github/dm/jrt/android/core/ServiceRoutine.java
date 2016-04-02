@@ -50,9 +50,9 @@ import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.routine.TemplateRoutine;
+import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
-import com.github.dm.jrt.core.runner.TemplateExecution;
 import com.github.dm.jrt.core.util.TimeDuration;
 
 import org.jetbrains.annotations.NotNull;
@@ -397,7 +397,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
             }
 
             // Unbind on main thread to avoid crashing the IPC
-            AndroidRunners.mainRunner().run(new TemplateExecution() {
+            AndroidRunners.mainRunner().run(new Execution() {
 
                 public void run() {
 

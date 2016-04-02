@@ -76,18 +76,16 @@ class ScheduledRunner implements Runner {
 
         final ScheduledFuture<?> future =
                 mService.schedule(new ExecutionWrapper(execution, mThreads), delay, timeUnit);
-        if (execution.canBeCancelled()) {
-            synchronized (mFutures) {
-                final WeakIdentityHashMap<Execution, WeakHashMap<ScheduledFuture<?>, Void>>
-                        futures = mFutures;
-                WeakHashMap<ScheduledFuture<?>, Void> scheduledFutures = futures.get(execution);
-                if (scheduledFutures == null) {
-                    scheduledFutures = new WeakHashMap<ScheduledFuture<?>, Void>();
-                    futures.put(execution, scheduledFutures);
-                }
-
-                scheduledFutures.put(future, null);
+        synchronized (mFutures) {
+            final WeakIdentityHashMap<Execution, WeakHashMap<ScheduledFuture<?>, Void>> futures =
+                    mFutures;
+            WeakHashMap<ScheduledFuture<?>, Void> scheduledFutures = futures.get(execution);
+            if (scheduledFutures == null) {
+                scheduledFutures = new WeakHashMap<ScheduledFuture<?>, Void>();
+                futures.put(execution, scheduledFutures);
             }
+
+            scheduledFutures.put(future, null);
         }
     }
 

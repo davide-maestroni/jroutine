@@ -65,7 +65,7 @@ public class PriorityRunner {
 
     private final PriorityBlockingQueue<PriorityExecution> mQueue;
 
-    private final TemplateExecution mExecution = new TemplateExecution() {
+    private final Execution mExecution = new Execution() {
 
         public void run() {
 
@@ -169,11 +169,6 @@ public class PriorityRunner {
             mExecution = execution;
         }
 
-        public boolean canBeCancelled() {
-
-            return mExecution.canBeCancelled();
-        }
-
         public void run() {
 
             final PriorityBlockingQueue<PriorityExecution> queue = mQueue;
@@ -210,11 +205,6 @@ public class PriorityRunner {
             mExecution = execution;
             mPriority = priority;
             mAge = age;
-        }
-
-        public boolean canBeCancelled() {
-
-            return mExecution.canBeCancelled();
         }
 
         public void run() {
@@ -287,22 +277,18 @@ public class PriorityRunner {
         public void run(@NotNull final Execution execution, final long delay,
                 @NotNull final TimeUnit timeUnit) {
 
-            final boolean canBeCancelled = execution.canBeCancelled();
             final PriorityExecution priorityExecution =
                     new PriorityExecution(execution, mPriority, mAge.getAndDecrement());
-            if (canBeCancelled) {
-                synchronized (mExecutions) {
-                    final WeakIdentityHashMap<Execution, WeakHashMap<PriorityExecution, Void>>
-                            executions = mExecutions;
-                    WeakHashMap<PriorityExecution, Void> priorityExecutions =
-                            executions.get(execution);
-                    if (priorityExecutions == null) {
-                        priorityExecutions = new WeakHashMap<PriorityExecution, Void>();
-                        executions.put(execution, priorityExecutions);
-                    }
-
-                    priorityExecutions.put(priorityExecution, null);
+            synchronized (mExecutions) {
+                final WeakIdentityHashMap<Execution, WeakHashMap<PriorityExecution, Void>>
+                        executions = mExecutions;
+                WeakHashMap<PriorityExecution, Void> priorityExecutions = executions.get(execution);
+                if (priorityExecutions == null) {
+                    priorityExecutions = new WeakHashMap<PriorityExecution, Void>();
+                    executions.put(execution, priorityExecutions);
                 }
+
+                priorityExecutions.put(priorityExecution, null);
             }
 
             if (delay == 0) {
@@ -312,10 +298,7 @@ public class PriorityRunner {
             } else {
                 final DelayedExecution delayedExecution =
                         new DelayedExecution(mQueue, priorityExecution);
-                if (canBeCancelled) {
-                    mDelayedExecutions.put(priorityExecution, delayedExecution);
-                }
-
+                mDelayedExecutions.put(priorityExecution, delayedExecution);
                 mRunner.run(delayedExecution, delay, timeUnit);
             }
         }

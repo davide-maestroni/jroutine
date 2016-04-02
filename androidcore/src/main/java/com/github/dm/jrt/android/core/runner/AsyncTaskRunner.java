@@ -89,18 +89,15 @@ class AsyncTaskRunner extends MainRunner {
             @NotNull final TimeUnit timeUnit) {
 
         final ExecutionTask task = new ExecutionTask(execution, mExecutor, mThreads);
-        if (execution.canBeCancelled()) {
-            synchronized (mTasks) {
-                final WeakIdentityHashMap<Execution, WeakHashMap<ExecutionTask, Void>> tasks =
-                        mTasks;
-                WeakHashMap<ExecutionTask, Void> executionTasks = tasks.get(execution);
-                if (executionTasks == null) {
-                    executionTasks = new WeakHashMap<ExecutionTask, Void>();
-                    tasks.put(execution, executionTasks);
-                }
-
-                executionTasks.put(task, null);
+        synchronized (mTasks) {
+            final WeakIdentityHashMap<Execution, WeakHashMap<ExecutionTask, Void>> tasks = mTasks;
+            WeakHashMap<ExecutionTask, Void> executionTasks = tasks.get(execution);
+            if (executionTasks == null) {
+                executionTasks = new WeakHashMap<ExecutionTask, Void>();
+                tasks.put(execution, executionTasks);
             }
+
+            executionTasks.put(task, null);
         }
 
         // The super method is called to ensure that a task is always started from the main thread
@@ -131,11 +128,6 @@ class AsyncTaskRunner extends MainRunner {
             mExecution = execution;
             mExecutor = executor;
             mThreads = threads;
-        }
-
-        public boolean canBeCancelled() {
-
-            return mExecution.canBeCancelled();
         }
 
         @TargetApi(VERSION_CODES.HONEYCOMB)

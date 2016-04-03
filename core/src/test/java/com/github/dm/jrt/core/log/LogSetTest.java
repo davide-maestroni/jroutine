@@ -20,7 +20,7 @@ import com.github.dm.jrt.core.log.Log.Level;
 
 import org.junit.Test;
 
-import java.util.Collections;
+import java.util.Arrays;
 
 /**
  * Log set unit tests.
@@ -45,8 +45,7 @@ public class LogSetTest {
     public void testLogDbg() {
 
         final NullPointerException ex = new NullPointerException();
-        final LogSet logSet = new LogSet();
-        Collections.addAll(logSet, new SystemLog(), new NullLog());
+        final LogSet logSet = LogSet.of(new SystemLog(), new NullLog());
         final Logger logger = Logger.newLogger(logSet, Level.DEBUG, this);
 
         logger.dbg(ARGS[0]);
@@ -68,8 +67,7 @@ public class LogSetTest {
     public void testLogErr() {
 
         final NullPointerException ex = new NullPointerException();
-        final LogSet logSet = new LogSet();
-        Collections.addAll(logSet, new SystemLog(), new NullLog());
+        final LogSet logSet = LogSet.of(Arrays.asList(new SystemLog(), new NullLog()));
         final Logger logger = Logger.newLogger(logSet, Level.DEBUG, this);
 
         logger.err(ARGS[0]);
@@ -91,8 +89,7 @@ public class LogSetTest {
     public void testLogWrn() {
 
         final NullPointerException ex = new NullPointerException();
-        final LogSet logSet = new LogSet();
-        Collections.addAll(logSet, new SystemLog(), new NullLog());
+        final LogSet logSet = new LogSet().append(new SystemLog()).append(new NullLog());
         final Logger logger = Logger.newLogger(logSet, Level.DEBUG, this);
 
         logger.wrn(ARGS[0]);

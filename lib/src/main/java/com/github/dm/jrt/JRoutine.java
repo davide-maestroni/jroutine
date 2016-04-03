@@ -45,12 +45,12 @@ import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
  * <p>
  * Created by davide-maestroni on 02/29/2016.
  */
-public class JRoutineFacade extends Streams {
+public class JRoutine extends Streams {
 
     /**
      * Avoid explicit instantiation.
      */
-    protected JRoutineFacade() {
+    protected JRoutine() {
 
     }
 

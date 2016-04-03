@@ -21,7 +21,7 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 
-import com.github.dm.jrt.JRoutineFacade;
+import com.github.dm.jrt.JRoutine;
 import com.github.dm.jrt.android.core.ServiceContext;
 import com.github.dm.jrt.android.core.service.InvocationService;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
@@ -56,7 +56,7 @@ public class JRoutineAndroid extends LoaderStreams {
     @NotNull
     public static IOChannelBuilder io() {
 
-        return JRoutineFacade.io();
+        return JRoutine.io();
     }
 
     /**

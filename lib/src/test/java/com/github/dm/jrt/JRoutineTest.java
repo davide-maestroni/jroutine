@@ -64,28 +64,28 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 /**
- * JRoutineFacade unit tests.
+ * JRoutine unit tests.
  * <p>
  * Created by davide-maestroni on 02/29/2016.
  */
-public class JRoutineFacadeTest {
+public class JRoutineTest {
 
     @Test
     public void testAliasMethod() throws NoSuchMethodException {
 
         final TimeDuration timeout = seconds(1);
         final TestClass test = new TestClass();
-        final Routine<Object, Object> routine = JRoutineFacade.on(instance(test))
-                                                              .invocationConfiguration()
-                                                              .withRunner(Runners.poolRunner())
-                                                              .withMaxInstances(1)
-                                                              .withCoreInstances(1)
-                                                              .withReadTimeoutAction(
-                                                                      TimeoutActionType.EXIT)
-                                                              .withLogLevel(Level.DEBUG)
-                                                              .withLog(new NullLog())
-                                                              .setConfiguration()
-                                                              .method(TestClass.GET);
+        final Routine<Object, Object> routine = JRoutine.on(instance(test))
+                                                        .invocationConfiguration()
+                                                        .withRunner(Runners.poolRunner())
+                                                        .withMaxInstances(1)
+                                                        .withCoreInstances(1)
+                                                        .withReadTimeoutAction(
+                                                                TimeoutActionType.EXIT)
+                                                        .withLogLevel(Level.DEBUG)
+                                                        .withLog(new NullLog())
+                                                        .setConfiguration()
+                                                        .method(TestClass.GET);
         assertThat(routine.syncCall().afterMax(timeout).all()).containsExactly(-77L);
     }
 
@@ -109,9 +109,9 @@ public class JRoutineFacadeTest {
         };
 
         final Routine<Integer, Integer> sumRoutine =
-                JRoutineFacade.on(factoryOf(execSum, this)).buildRoutine();
+                JRoutine.on(factoryOf(execSum, this)).buildRoutine();
         final Routine<Integer, Integer> squareRoutine =
-                JRoutineFacade.on(functionFilter(new Function<Integer, Integer>() {
+                JRoutine.on(functionFilter(new Function<Integer, Integer>() {
 
                     public Integer apply(final Integer integer) {
 
@@ -136,13 +136,13 @@ public class JRoutineFacadeTest {
     @Test
     public void testClassStaticMethod() {
 
-        final TestStatic testStatic = JRoutineFacade.on(classOfType(TestClass.class))
-                                                    .invocationConfiguration()
-                                                    .withRunner(Runners.poolRunner())
-                                                    .withLogLevel(Level.DEBUG)
-                                                    .withLog(new NullLog())
-                                                    .setConfiguration()
-                                                    .buildProxy(TestStatic.class);
+        final TestStatic testStatic = JRoutine.on(classOfType(TestClass.class))
+                                              .invocationConfiguration()
+                                              .withRunner(Runners.poolRunner())
+                                              .withLogLevel(Level.DEBUG)
+                                              .withLog(new NullLog())
+                                              .setConfiguration()
+                                              .buildProxy(TestStatic.class);
         try {
             assertThat(testStatic.getOne().all()).containsExactly(1);
             fail();
@@ -157,7 +157,7 @@ public class JRoutineFacadeTest {
     @Test
     public void testCommandInvocation() {
 
-        final Routine<Void, String> routine = JRoutineFacade.on(new GetString()).buildRoutine();
+        final Routine<Void, String> routine = JRoutine.on(new GetString()).buildRoutine();
         assertThat(routine.asyncCall().afterMax(seconds(1)).all()).containsOnly("test");
     }
 
@@ -165,7 +165,7 @@ public class JRoutineFacadeTest {
     public void testConsumerCommand() {
 
         final Routine<Void, String> routine =
-                JRoutineFacade.command(new Consumer<ResultChannel<String>>() {
+                JRoutine.command(new Consumer<ResultChannel<String>>() {
 
                     public void accept(final ResultChannel<String> result) {
 
@@ -179,7 +179,7 @@ public class JRoutineFacadeTest {
     public void testConsumerFilter() {
 
         final Routine<Object, String> routine =
-                JRoutineFacade.filter(new BiConsumer<Object, ResultChannel<String>>() {
+                JRoutine.filter(new BiConsumer<Object, ResultChannel<String>>() {
 
                     public void accept(final Object o, final ResultChannel<String> result) {
 
@@ -194,7 +194,7 @@ public class JRoutineFacadeTest {
     public void testConsumerFunction() {
 
         final Routine<String, String> routine =
-                JRoutineFacade.call(new BiConsumer<List<String>, ResultChannel<String>>() {
+                JRoutine.call(new BiConsumer<List<String>, ResultChannel<String>>() {
 
                     public void accept(final List<String> strings,
                             final ResultChannel<String> result) {
@@ -213,21 +213,20 @@ public class JRoutineFacadeTest {
     @Test
     public void testFilterInvocation() {
 
-        final Routine<String, String> routine = JRoutineFacade.on(new ToCase()).buildRoutine();
+        final Routine<String, String> routine = JRoutine.on(new ToCase()).buildRoutine();
         assertThat(routine.asyncCall("TEST").afterMax(seconds(1)).all()).containsOnly("test");
     }
 
     @Test
     public void testFunctionFilter() {
 
-        final Routine<Object, String> routine =
-                JRoutineFacade.filter(new Function<Object, String>() {
+        final Routine<Object, String> routine = JRoutine.filter(new Function<Object, String>() {
 
-                    public String apply(final Object o) {
+            public String apply(final Object o) {
 
-                        return o.toString();
-                    }
-                }).buildRoutine();
+                return o.toString();
+            }
+        }).buildRoutine();
         assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
                 "1");
     }
@@ -235,19 +234,18 @@ public class JRoutineFacadeTest {
     @Test
     public void testFunctionFunction() {
 
-        final Routine<String, String> routine =
-                JRoutineFacade.call(new Function<List<String>, String>() {
+        final Routine<String, String> routine = JRoutine.call(new Function<List<String>, String>() {
 
-                    public String apply(final List<String> strings) {
+            public String apply(final List<String> strings) {
 
-                        final StringBuilder builder = new StringBuilder();
-                        for (final String string : strings) {
-                            builder.append(string);
-                        }
+                final StringBuilder builder = new StringBuilder();
+                for (final String string : strings) {
+                    builder.append(string);
+                }
 
-                        return builder.toString();
-                    }
-                }).buildRoutine();
+                return builder.toString();
+            }
+        }).buildRoutine();
         assertThat(routine.asyncCall("test", "1").afterMax(seconds(1)).all()).containsOnly("test1");
     }
 
@@ -255,30 +253,28 @@ public class JRoutineFacadeTest {
     public void testInvocation() {
 
         final Routine<String, String> routine =
-                JRoutineFacade.on((Invocation<String, String>) new ToCase()).buildRoutine();
+                JRoutine.on((Invocation<String, String>) new ToCase()).buildRoutine();
         assertThat(routine.asyncCall("TEST").afterMax(seconds(1)).all()).containsOnly("test");
     }
 
     @Test
     public void testInvocationAndArgs() {
 
-        final Routine<String, String> routine =
-                JRoutineFacade.on(new ToCase(), true).buildRoutine();
+        final Routine<String, String> routine = JRoutine.on(new ToCase(), true).buildRoutine();
         assertThat(routine.asyncCall("test").afterMax(seconds(1)).all()).containsOnly("TEST");
     }
 
     @Test
     public void testInvocationClass() {
 
-        final Routine<String, String> routine = JRoutineFacade.on(ToCase.class).buildRoutine();
+        final Routine<String, String> routine = JRoutine.on(ToCase.class).buildRoutine();
         assertThat(routine.asyncCall("TEST").afterMax(seconds(1)).all()).containsOnly("test");
     }
 
     @Test
     public void testInvocationClassAndArgs() {
 
-        final Routine<String, String> routine =
-                JRoutineFacade.on(ToCase.class, true).buildRoutine();
+        final Routine<String, String> routine = JRoutine.on(ToCase.class, true).buildRoutine();
         assertThat(routine.asyncCall("test").afterMax(seconds(1)).all()).containsOnly("TEST");
     }
 
@@ -286,15 +282,14 @@ public class JRoutineFacadeTest {
     public void testInvocationFactory() {
 
         final Routine<String, String> routine =
-                JRoutineFacade.on((InvocationFactory<String, String>) new ToCase()).buildRoutine();
+                JRoutine.on((InvocationFactory<String, String>) new ToCase()).buildRoutine();
         assertThat(routine.asyncCall("TEST").afterMax(seconds(1)).all()).containsOnly("test");
     }
 
     @Test
     public void testInvocationToken() {
 
-        final Routine<String, String> routine =
-                JRoutineFacade.on(tokenOf(ToCase.class)).buildRoutine();
+        final Routine<String, String> routine = JRoutine.on(tokenOf(ToCase.class)).buildRoutine();
         assertThat(routine.asyncCall("TEST").afterMax(seconds(1)).all()).containsOnly("test");
     }
 
@@ -302,7 +297,7 @@ public class JRoutineFacadeTest {
     public void testInvocationTokenAndArgs() {
 
         final Routine<String, String> routine =
-                JRoutineFacade.on(tokenOf(ToCase.class), true).buildRoutine();
+                JRoutine.on(tokenOf(ToCase.class), true).buildRoutine();
         assertThat(routine.asyncCall("test").afterMax(seconds(1)).all()).containsOnly("TEST");
     }
 
@@ -310,14 +305,14 @@ public class JRoutineFacadeTest {
     public void testObjectStaticMethod() {
 
         final TestClass test = new TestClass();
-        final TestStatic testStatic = JRoutineFacade.on(instance(test))
-                                                    .withType(BuilderType.OBJECT)
-                                                    .invocationConfiguration()
-                                                    .withRunner(Runners.poolRunner())
-                                                    .withLogLevel(Level.DEBUG)
-                                                    .withLog(new NullLog())
-                                                    .setConfiguration()
-                                                    .buildProxy(TestStatic.class);
+        final TestStatic testStatic = JRoutine.on(instance(test))
+                                              .withType(BuilderType.OBJECT)
+                                              .invocationConfiguration()
+                                              .withRunner(Runners.poolRunner())
+                                              .withLogLevel(Level.DEBUG)
+                                              .withLog(new NullLog())
+                                              .setConfiguration()
+                                              .buildProxy(TestStatic.class);
         assertThat(testStatic.getOne().all()).containsExactly(1);
         assertThat(testStatic.getTwo().all()).containsExactly(2);
     }
@@ -326,13 +321,13 @@ public class JRoutineFacadeTest {
     public void testObjectWrapAlias() {
 
         final TestClass test = new TestClass();
-        final Routine<Object, Object> routine = JRoutineFacade.on(test)
-                                                              .invocationConfiguration()
-                                                              .withRunner(Runners.poolRunner())
-                                                              .withLogLevel(Level.DEBUG)
-                                                              .withLog(new NullLog())
-                                                              .setConfiguration()
-                                                              .method(TestClass.GET);
+        final Routine<Object, Object> routine = JRoutine.on(test)
+                                                        .invocationConfiguration()
+                                                        .withRunner(Runners.poolRunner())
+                                                        .withLogLevel(Level.DEBUG)
+                                                        .withLog(new NullLog())
+                                                        .setConfiguration()
+                                                        .method(TestClass.GET);
         assertThat(routine.syncCall().all()).containsExactly(-77L);
     }
 
@@ -340,14 +335,14 @@ public class JRoutineFacadeTest {
     public void testObjectWrapGeneratedProxy() {
 
         final TestClass test = new TestClass();
-        final TestStatic proxy = JRoutineFacade.on(test)
-                                               .withType(BuilderType.PROXY)
-                                               .invocationConfiguration()
-                                               .withRunner(Runners.poolRunner())
-                                               .withLogLevel(Level.DEBUG)
-                                               .withLog(new NullLog())
-                                               .setConfiguration()
-                                               .buildProxy(TestStatic.class);
+        final TestStatic proxy = JRoutine.on(test)
+                                         .withType(BuilderType.PROXY)
+                                         .invocationConfiguration()
+                                         .withRunner(Runners.poolRunner())
+                                         .withLogLevel(Level.DEBUG)
+                                         .withLog(new NullLog())
+                                         .setConfiguration()
+                                         .buildProxy(TestStatic.class);
         assertThat(proxy.getOne().all()).containsExactly(1);
     }
 
@@ -355,13 +350,13 @@ public class JRoutineFacadeTest {
     public void testObjectWrapGeneratedProxyToken() {
 
         final TestClass test = new TestClass();
-        final TestStatic proxy = JRoutineFacade.on(test)
-                                               .invocationConfiguration()
-                                               .withRunner(Runners.poolRunner())
-                                               .withLogLevel(Level.DEBUG)
-                                               .withLog(new NullLog())
-                                               .setConfiguration()
-                                               .buildProxy(tokenOf(TestStatic.class));
+        final TestStatic proxy = JRoutine.on(test)
+                                         .invocationConfiguration()
+                                         .withRunner(Runners.poolRunner())
+                                         .withLogLevel(Level.DEBUG)
+                                         .withLog(new NullLog())
+                                         .setConfiguration()
+                                         .buildProxy(tokenOf(TestStatic.class));
         assertThat(proxy.getOne().all()).containsExactly(1);
     }
 
@@ -369,12 +364,12 @@ public class JRoutineFacadeTest {
     public void testObjectWrapMethod() throws NoSuchMethodException {
 
         final TestClass test = new TestClass();
-        final Routine<Object, Object> routine = JRoutineFacade.on(test)
-                                                              .proxyConfiguration()
-                                                              .withSharedFields()
-                                                              .setConfiguration()
-                                                              .method(TestClass.class.getMethod(
-                                                                      "getLong"));
+        final Routine<Object, Object> routine = JRoutine.on(test)
+                                                        .proxyConfiguration()
+                                                        .withSharedFields()
+                                                        .setConfiguration()
+                                                        .method(TestClass.class.getMethod(
+                                                                "getLong"));
         assertThat(routine.syncCall().all()).containsExactly(-77L);
     }
 
@@ -382,13 +377,13 @@ public class JRoutineFacadeTest {
     public void testObjectWrapMethodName() {
 
         final TestClass test = new TestClass();
-        final Routine<Object, Object> routine = JRoutineFacade.on(test)
-                                                              .invocationConfiguration()
-                                                              .withRunner(Runners.poolRunner())
-                                                              .withLogLevel(Level.DEBUG)
-                                                              .withLog(new NullLog())
-                                                              .setConfiguration()
-                                                              .method("getLong");
+        final Routine<Object, Object> routine = JRoutine.on(test)
+                                                        .invocationConfiguration()
+                                                        .withRunner(Runners.poolRunner())
+                                                        .withLogLevel(Level.DEBUG)
+                                                        .withLog(new NullLog())
+                                                        .setConfiguration()
+                                                        .method("getLong");
         assertThat(routine.syncCall().all()).containsExactly(-77L);
     }
 
@@ -396,13 +391,13 @@ public class JRoutineFacadeTest {
     public void testObjectWrapProxy() {
 
         final TestClass test = new TestClass();
-        final TestItf proxy = JRoutineFacade.on(test)
-                                            .invocationConfiguration()
-                                            .withRunner(Runners.poolRunner())
-                                            .withLogLevel(Level.DEBUG)
-                                            .withLog(new NullLog())
-                                            .setConfiguration()
-                                            .buildProxy(TestItf.class);
+        final TestItf proxy = JRoutine.on(test)
+                                      .invocationConfiguration()
+                                      .withRunner(Runners.poolRunner())
+                                      .withLogLevel(Level.DEBUG)
+                                      .withLog(new NullLog())
+                                      .setConfiguration()
+                                      .buildProxy(TestItf.class);
         assertThat(proxy.getOne().all()).containsExactly(1);
     }
 
@@ -410,13 +405,13 @@ public class JRoutineFacadeTest {
     public void testObjectWrapProxyToken() {
 
         final TestClass test = new TestClass();
-        final TestItf proxy = JRoutineFacade.on(test)
-                                            .invocationConfiguration()
-                                            .withRunner(Runners.poolRunner())
-                                            .withLogLevel(Level.DEBUG)
-                                            .withLog(new NullLog())
-                                            .setConfiguration()
-                                            .buildProxy(tokenOf(TestItf.class));
+        final TestItf proxy = JRoutine.on(test)
+                                      .invocationConfiguration()
+                                      .withRunner(Runners.poolRunner())
+                                      .withLogLevel(Level.DEBUG)
+                                      .withLog(new NullLog())
+                                      .setConfiguration()
+                                      .buildProxy(tokenOf(TestItf.class));
         assertThat(proxy.getOne().all()).containsExactly(1);
     }
 
@@ -426,7 +421,7 @@ public class JRoutineFacadeTest {
         final TestConsumer<Void> consumer1 = new TestConsumer<Void>();
         final TestConsumer<Void> consumer2 = new TestConsumer<Void>();
         final TestConsumer<Void> consumer3 = new TestConsumer<Void>();
-        OutputConsumerBuilder<Object> outputConsumer = JRoutineFacade.onComplete(consumer1);
+        OutputConsumerBuilder<Object> outputConsumer = JRoutine.onComplete(consumer1);
         outputConsumer.onOutput("test");
         assertThat(consumer1.isCalled()).isFalse();
         outputConsumer.onError(new RoutineException());
@@ -446,8 +441,8 @@ public class JRoutineFacadeTest {
         assertThat(consumer2.isCalled()).isTrue();
         consumer1.reset();
         consumer2.reset();
-        outputConsumer = JRoutineFacade.onComplete(consumer1)
-                                       .thenComplete(wrap(consumer2).andThen(consumer3));
+        outputConsumer =
+                JRoutine.onComplete(consumer1).thenComplete(wrap(consumer2).andThen(consumer3));
         outputConsumer.onOutput("test");
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(consumer2.isCalled()).isFalse();
@@ -463,9 +458,8 @@ public class JRoutineFacadeTest {
         consumer1.reset();
         final TestConsumer<Object> outConsumer = new TestConsumer<Object>();
         final TestConsumer<RoutineException> errorConsumer = new TestConsumer<RoutineException>();
-        outputConsumer = JRoutineFacade.onComplete(consumer1)
-                                       .thenOutput(outConsumer)
-                                       .thenError(errorConsumer);
+        outputConsumer =
+                JRoutine.onComplete(consumer1).thenOutput(outConsumer).thenError(errorConsumer);
         outputConsumer.onOutput("test");
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(outConsumer.isCalled()).isTrue();
@@ -483,7 +477,7 @@ public class JRoutineFacadeTest {
         final TestConsumer<RoutineException> consumer1 = new TestConsumer<RoutineException>();
         final TestConsumer<RoutineException> consumer2 = new TestConsumer<RoutineException>();
         final TestConsumer<RoutineException> consumer3 = new TestConsumer<RoutineException>();
-        OutputConsumerBuilder<Object> outputConsumer = JRoutineFacade.onError(consumer1);
+        OutputConsumerBuilder<Object> outputConsumer = JRoutine.onError(consumer1);
         outputConsumer.onOutput("test");
         assertThat(consumer1.isCalled()).isFalse();
         outputConsumer.onComplete();
@@ -503,8 +497,7 @@ public class JRoutineFacadeTest {
         assertThat(consumer2.isCalled()).isTrue();
         consumer1.reset();
         consumer2.reset();
-        outputConsumer =
-                JRoutineFacade.onError(consumer1).thenError(wrap(consumer2).andThen(consumer3));
+        outputConsumer = JRoutine.onError(consumer1).thenError(wrap(consumer2).andThen(consumer3));
         outputConsumer.onOutput("test");
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(consumer2.isCalled()).isFalse();
@@ -520,9 +513,8 @@ public class JRoutineFacadeTest {
         consumer1.reset();
         final TestConsumer<Object> outConsumer = new TestConsumer<Object>();
         final TestConsumer<Void> completeConsumer = new TestConsumer<Void>();
-        outputConsumer = JRoutineFacade.onError(consumer1)
-                                       .thenOutput(outConsumer)
-                                       .thenComplete(completeConsumer);
+        outputConsumer =
+                JRoutine.onError(consumer1).thenOutput(outConsumer).thenComplete(completeConsumer);
         outputConsumer.onOutput("test");
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(outConsumer.isCalled()).isTrue();
@@ -540,7 +532,7 @@ public class JRoutineFacadeTest {
         final TestConsumer<Object> consumer1 = new TestConsumer<Object>();
         final TestConsumer<Object> consumer2 = new TestConsumer<Object>();
         final TestConsumer<Object> consumer3 = new TestConsumer<Object>();
-        OutputConsumerBuilder<Object> outputConsumer = JRoutineFacade.onOutput(consumer1);
+        OutputConsumerBuilder<Object> outputConsumer = JRoutine.onOutput(consumer1);
         outputConsumer.onError(new RoutineException());
         assertThat(consumer1.isCalled()).isFalse();
         outputConsumer.onComplete();
@@ -561,7 +553,7 @@ public class JRoutineFacadeTest {
         consumer1.reset();
         consumer2.reset();
         outputConsumer =
-                JRoutineFacade.onOutput(consumer1).thenOutput(wrap(consumer2).andThen(consumer3));
+                JRoutine.onOutput(consumer1).thenOutput(wrap(consumer2).andThen(consumer3));
         outputConsumer.onError(new RoutineException());
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(consumer2.isCalled()).isFalse();
@@ -577,9 +569,9 @@ public class JRoutineFacadeTest {
         consumer1.reset();
         final TestConsumer<RoutineException> errorConsumer = new TestConsumer<RoutineException>();
         final TestConsumer<Void> completeConsumer = new TestConsumer<Void>();
-        outputConsumer = JRoutineFacade.onOutput(consumer1)
-                                       .thenError(errorConsumer)
-                                       .thenComplete(completeConsumer);
+        outputConsumer = JRoutine.onOutput(consumer1)
+                                 .thenError(errorConsumer)
+                                 .thenComplete(completeConsumer);
         outputConsumer.onError(new RoutineException());
         assertThat(consumer1.isCalled()).isFalse();
         assertThat(errorConsumer.isCalled()).isTrue();
@@ -595,13 +587,13 @@ public class JRoutineFacadeTest {
     public void testPendingInputs() {
 
         final InvocationChannel<Object, Object> channel =
-                JRoutineFacade.on(PassingInvocation.factoryOf()).asyncInvoke();
+                JRoutine.on(PassingInvocation.factoryOf()).asyncInvoke();
         assertThat(channel.isOpen()).isTrue();
         channel.pass("test");
         assertThat(channel.isOpen()).isTrue();
         channel.after(millis(500)).pass("test");
         assertThat(channel.isOpen()).isTrue();
-        final IOChannel<Object> ioChannel = JRoutineFacade.io().buildChannel();
+        final IOChannel<Object> ioChannel = JRoutine.io().buildChannel();
         channel.pass(ioChannel);
         assertThat(channel.isOpen()).isTrue();
         channel.result();
@@ -613,7 +605,7 @@ public class JRoutineFacadeTest {
     @Test
     public void testPredicateFilter() {
 
-        final Routine<String, String> routine = JRoutineFacade.filter(new Predicate<String>() {
+        final Routine<String, String> routine = JRoutine.filter(new Predicate<String>() {
 
             public boolean test(final String s) {
 
@@ -627,16 +619,16 @@ public class JRoutineFacadeTest {
     public void testProxyConfiguration() {
 
         final TestClass test = new TestClass();
-        final TestItf proxy = JRoutineFacade.on(test)
-                                            .invocationConfiguration()
-                                            .withRunner(Runners.poolRunner())
-                                            .withLogLevel(Level.DEBUG)
-                                            .withLog(new NullLog())
-                                            .setConfiguration()
-                                            .proxyConfiguration()
-                                            .withSharedFields()
-                                            .setConfiguration()
-                                            .buildProxy(TestItf.class);
+        final TestItf proxy = JRoutine.on(test)
+                                      .invocationConfiguration()
+                                      .withRunner(Runners.poolRunner())
+                                      .withLogLevel(Level.DEBUG)
+                                      .withLog(new NullLog())
+                                      .setConfiguration()
+                                      .proxyConfiguration()
+                                      .withSharedFields()
+                                      .setConfiguration()
+                                      .buildProxy(TestItf.class);
         assertThat(proxy.getOne().all()).containsExactly(1);
     }
 
@@ -644,7 +636,7 @@ public class JRoutineFacadeTest {
     public void testProxyError() {
 
         try {
-            JRoutineFacade.on(TestItf.class);
+            JRoutine.on(TestItf.class);
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -655,7 +647,7 @@ public class JRoutineFacadeTest {
     @Test
     public void testSupplierCommand() {
 
-        final Routine<Void, String> routine = JRoutineFacade.command(new Supplier<String>() {
+        final Routine<Void, String> routine = JRoutine.command(new Supplier<String>() {
 
             public String get() {
 
@@ -668,7 +660,7 @@ public class JRoutineFacadeTest {
     @Test
     public void testSupplierFactory() {
 
-        final Routine<String, String> routine = JRoutineFacade.factory(new Supplier<ToCase>() {
+        final Routine<String, String> routine = JRoutine.factory(new Supplier<ToCase>() {
 
             public ToCase get() {
 

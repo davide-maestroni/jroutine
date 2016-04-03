@@ -21,7 +21,7 @@ import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 
-import com.github.dm.jrt.JRoutineFacade;
+import com.github.dm.jrt.JRoutine;
 import com.github.dm.jrt.android.core.ServiceContext;
 import com.github.dm.jrt.android.core.service.InvocationService;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
@@ -56,7 +56,7 @@ public class JRoutineAndroidCompat extends LoaderStreamsCompat {
     @NotNull
     public static IOChannelBuilder io() {
 
-        return JRoutineFacade.io();
+        return JRoutine.io();
     }
 
     /**

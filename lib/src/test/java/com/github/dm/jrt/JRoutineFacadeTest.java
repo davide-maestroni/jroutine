@@ -592,7 +592,7 @@ public class JRoutineFacadeTest {
     }
 
     @Test
-    public void testPendingInputs() throws InterruptedException {
+    public void testPendingInputs() {
 
         final InvocationChannel<Object, Object> channel =
                 JRoutineFacade.on(PassingInvocation.factoryOf()).asyncInvoke();
@@ -707,7 +707,7 @@ public class JRoutineFacadeTest {
             super(null);
         }
 
-        public void onResult(@NotNull final ResultChannel<String> result) throws Exception {
+        public void onResult(@NotNull final ResultChannel<String> result) {
 
             result.pass("test");
         }
@@ -758,8 +758,7 @@ public class JRoutineFacadeTest {
             mIsUpper = isUpper;
         }
 
-        public void onInput(final String input, @NotNull final ResultChannel<String> result) throws
-                Exception {
+        public void onInput(final String input, @NotNull final ResultChannel<String> result) {
 
             result.pass(mIsUpper ? input.toUpperCase() : input.toLowerCase());
         }

@@ -26,16 +26,18 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * The implementation can both be synchronous or asynchronous, it can allocate specific threads or
  * share a pool of them between different instances.<br>
- * The only requirement is that the specified execution is called each time a run method is invoked.
+ * The only requirement is that the specified execution is called each time a run method is invoked,
+ * even if the same execution instance is passed several times as parameter.
  * <p>
  * Note that, a proper asynchronous runner implementation will never synchronously run an execution,
- * no matter the delay, unless it employs a single thread. While, a proper synchronous runner, will
- * always run executions in the very same caller thread.<br>
- * Note also that the runner methods can be called from different threads, so, it is up to the
+ * no matter the delay, unless it employs a single thread and the run method is called inside it.
+ * While, a proper synchronous runner, will always run executions in the very same caller thread.
+ * <br>
+ * Note also that the runner methods might be called from different threads, so, it is up to the
  * implementing class to ensure synchronization when required.
  * <p>
- * The implementing class can optionally support the cancellation of executions not yet run (
- * waiting, for example, in a consuming queue).
+ * The implementing class can optionally support the cancellation of executions not yet run
+ * (waiting, for example, in a consuming queue).
  * <p>
  * The class {@link com.github.dm.jrt.core.runner.Runners Runners} provides a few implementations
  * employing concurrent Java classes.

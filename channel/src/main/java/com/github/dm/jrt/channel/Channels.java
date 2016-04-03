@@ -1216,7 +1216,7 @@ public class Channels {
                     new HashMap<Integer, IOChannel<IN>>(indexes.size());
             for (final Integer index : indexes) {
                 final IOChannel<IN> ioChannel = Channels.<DATA, IN>select(channel, index)
-                                                        .withChannels()
+                                                        .channelConfiguration()
                                                         .with(configuration)
                                                         .setConfiguration()
                                                         .buildChannels();
@@ -1384,7 +1384,7 @@ public class Channels {
 
             final ArrayList<OutputChannel<? extends OUT>> channels = mChannels;
             final IOChannel<List<? extends OUT>> ioChannel = JRoutineCore.io()
-                                                                         .withChannels()
+                                                                         .channelConfiguration()
                                                                          .with(configuration)
                                                                          .setConfiguration()
                                                                          .buildChannel();
@@ -1440,7 +1440,7 @@ public class Channels {
                 @NotNull final ChannelConfiguration configuration) {
 
             final IOChannel<Selectable<OUT>> ioChannel = JRoutineCore.io()
-                                                                     .withChannels()
+                                                                     .channelConfiguration()
                                                                      .with(configuration)
                                                                      .setConfiguration()
                                                                      .buildChannel();
@@ -1493,7 +1493,7 @@ public class Channels {
                 @NotNull final ChannelConfiguration configuration) {
 
             final IOChannel<Selectable<OUT>> ioChannel = JRoutineCore.io()
-                                                                     .withChannels()
+                                                                     .channelConfiguration()
                                                                      .with(configuration)
                                                                      .setConfiguration()
                                                                      .buildChannel();

@@ -33,7 +33,7 @@ public class ConstantConditions {
     }
 
     /**
-     * Assert that the specified object is not null.
+     * Asserts that the specified object is not null.
      *
      * @param object the object.
      * @param <TYPE> the object type.
@@ -47,7 +47,7 @@ public class ConstantConditions {
     }
 
     /**
-     * Assert that the specified object is not null.
+     * Asserts that the specified object is not null.
      *
      * @param name   the name of the object used to build the error message.
      * @param object the object.

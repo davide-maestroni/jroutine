@@ -31,7 +31,37 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
 /**
  * Abstract class defining an invocation factory.<br>
  * The inheriting class must specify the constructor arguments to be used in the {@code equals()}
- * and {@code hashCode()} implementations.
+ * and {@code hashCode()} implementations. Like for example:
+ * <pre>
+ *     <code>
+ *
+ *         public class MyFactory extends InvocationFactory&lt;String, Integer&gt; {
+ *
+ *             public MyFactory(final String regex) {
+ *
+ *                 super(Reflection.asArgs(regex));
+ *                 mRegex = regex;
+ *             }
+ *
+ *             ...
+ *         }
+ *     </code>
+ * </pre>
+ * Or {@code null}, in case the constructor takes no arguments:
+ * <pre>
+ *     <code>
+ *
+ *         public class MyFactory extends InvocationFactory&lt;String, Integer&gt; {
+ *
+ *             public MyFactory() {
+ *
+ *                 super(null);
+ *             }
+ *
+ *             ...
+ *         }
+ *     </code>
+ * </pre>
  * <p>
  * Created by davide-maestroni on 02/12/2015.
  *

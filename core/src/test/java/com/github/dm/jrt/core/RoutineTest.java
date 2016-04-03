@@ -1189,7 +1189,7 @@ public class RoutineTest {
 
         try {
 
-            new DefaultRoutine<Object, Object>(InvocationConfiguration.DEFAULT_CONFIGURATION, null);
+            new DefaultRoutine<Object, Object>(InvocationConfiguration.defaultConfiguration(), null);
 
             fail();
 
@@ -1202,7 +1202,7 @@ public class RoutineTest {
         try {
 
             final DefaultResultChannel<Object> channel =
-                    new DefaultResultChannel<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
+                    new DefaultResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
                             new TestAbortHandler(), Runners.syncRunner(), logger);
 
             new InvocationExecution<Object, Object>(null, new TestInputIterator(), channel, logger);
@@ -1216,7 +1216,7 @@ public class RoutineTest {
         try {
 
             final DefaultResultChannel<Object> channel =
-                    new DefaultResultChannel<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
+                    new DefaultResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
                             new TestAbortHandler(), Runners.syncRunner(), logger);
 
             new InvocationExecution<Object, Object>(new TestInvocationManager(), null, channel,
@@ -1242,7 +1242,7 @@ public class RoutineTest {
         try {
 
             final DefaultResultChannel<Object> channel =
-                    new DefaultResultChannel<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
+                    new DefaultResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
                             new TestAbortHandler(), Runners.syncRunner(), logger);
 
             new InvocationExecution<Object, Object>(new TestInvocationManager(),
@@ -1382,7 +1382,7 @@ public class RoutineTest {
     public void testInitInvocationException() {
 
         final ExceptionRoutine routine =
-                new ExceptionRoutine(InvocationConfiguration.DEFAULT_CONFIGURATION);
+                new ExceptionRoutine(InvocationConfiguration.defaultConfiguration());
 
         try {
 
@@ -1399,7 +1399,7 @@ public class RoutineTest {
     @Test
     public void testInitInvocationNull() {
 
-        final NullRoutine routine = new NullRoutine(InvocationConfiguration.DEFAULT_CONFIGURATION);
+        final NullRoutine routine = new NullRoutine(InvocationConfiguration.defaultConfiguration());
 
         try {
 
@@ -1626,7 +1626,7 @@ public class RoutineTest {
         try {
 
             new DefaultInvocationChannel<Object, Object>(
-                    InvocationConfiguration.DEFAULT_CONFIGURATION, null, Runners.sharedRunner(),
+                    InvocationConfiguration.defaultConfiguration(), null, Runners.sharedRunner(),
                     logger);
 
             fail();
@@ -1638,7 +1638,7 @@ public class RoutineTest {
         try {
 
             new DefaultInvocationChannel<Object, Object>(
-                    InvocationConfiguration.DEFAULT_CONFIGURATION, new TestInvocationManager(),
+                    InvocationConfiguration.defaultConfiguration(), new TestInvocationManager(),
                     null, logger);
 
             fail();
@@ -1650,7 +1650,7 @@ public class RoutineTest {
         try {
 
             new DefaultInvocationChannel<Object, Object>(
-                    InvocationConfiguration.DEFAULT_CONFIGURATION, new TestInvocationManager(),
+                    InvocationConfiguration.defaultConfiguration(), new TestInvocationManager(),
                     Runners.sharedRunner(), null);
 
             fail();
@@ -1674,7 +1674,7 @@ public class RoutineTest {
 
             final DefaultInvocationChannel<Object, Object> channel =
                     new DefaultInvocationChannel<Object, Object>(
-                            InvocationConfiguration.DEFAULT_CONFIGURATION,
+                            InvocationConfiguration.defaultConfiguration(),
                             new TestInvocationManager(), Runners.sharedRunner(), logger);
 
             channel.result();
@@ -1690,7 +1690,7 @@ public class RoutineTest {
 
             final DefaultInvocationChannel<Object, Object> channel =
                     new DefaultInvocationChannel<Object, Object>(
-                            InvocationConfiguration.DEFAULT_CONFIGURATION,
+                            InvocationConfiguration.defaultConfiguration(),
                             new TestInvocationManager(), Runners.sharedRunner(), logger);
 
             channel.after(null);
@@ -1705,7 +1705,7 @@ public class RoutineTest {
 
             final DefaultInvocationChannel<Object, Object> channel =
                     new DefaultInvocationChannel<Object, Object>(
-                            InvocationConfiguration.DEFAULT_CONFIGURATION,
+                            InvocationConfiguration.defaultConfiguration(),
                             new TestInvocationManager(), Runners.sharedRunner(), logger);
 
             channel.after(1, null);
@@ -1720,7 +1720,7 @@ public class RoutineTest {
 
             final DefaultInvocationChannel<Object, Object> channel =
                     new DefaultInvocationChannel<Object, Object>(
-                            InvocationConfiguration.DEFAULT_CONFIGURATION,
+                            InvocationConfiguration.defaultConfiguration(),
                             new TestInvocationManager(), Runners.sharedRunner(), logger);
 
             channel.after(-1, TimeUnit.MILLISECONDS);
@@ -1991,7 +1991,7 @@ public class RoutineTest {
         assertThat(outputChannel.all()).containsExactly("test1", "test2");
 
         final IOChannel<String> channel1 = JRoutineCore.io()
-                                                       .withChannels()
+                                                       .channelConfiguration()
                                                        .withChannelMaxSize(1)
                                                        .withChannelMaxDelay(millis(1000))
                                                        .setConfiguration()
@@ -2008,7 +2008,7 @@ public class RoutineTest {
         assertThat(channel1.afterMax(seconds(10)).all()).containsOnly("test1", "test2");
 
         final IOChannel<String> channel2 = JRoutineCore.io()
-                                                       .withChannels()
+                                                       .channelConfiguration()
                                                        .withChannelMaxSize(1)
                                                        .withChannelMaxDelay(millis(1000))
                                                        .setConfiguration()
@@ -2025,7 +2025,7 @@ public class RoutineTest {
         assertThat(channel2.afterMax(seconds(10)).all()).containsOnly("test1", "test2");
 
         final IOChannel<String> channel3 = JRoutineCore.io()
-                                                       .withChannels()
+                                                       .channelConfiguration()
                                                        .withChannelMaxSize(1)
                                                        .withChannelMaxDelay(millis(1000))
                                                        .setConfiguration()
@@ -2042,7 +2042,7 @@ public class RoutineTest {
         assertThat(channel3.afterMax(seconds(10)).all()).containsOnly("test1", "test2");
 
         final IOChannel<String> channel4 = JRoutineCore.io()
-                                                       .withChannels()
+                                                       .channelConfiguration()
                                                        .withChannelMaxSize(1)
                                                        .withChannelMaxDelay(millis(1000))
                                                        .setConfiguration()
@@ -2125,7 +2125,7 @@ public class RoutineTest {
 
         try {
 
-            new DefaultResultChannel<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION, null,
+            new DefaultResultChannel<Object>(InvocationConfiguration.defaultConfiguration(), null,
                     Runners.sharedRunner(), logger);
 
             fail();
@@ -2136,7 +2136,7 @@ public class RoutineTest {
 
         try {
 
-            new DefaultResultChannel<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
+            new DefaultResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
                     new TestAbortHandler(), null, logger);
 
             fail();
@@ -2147,7 +2147,7 @@ public class RoutineTest {
 
         try {
 
-            new DefaultResultChannel<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
+            new DefaultResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
                     new TestAbortHandler(), Runners.sharedRunner(), null);
 
             fail();
@@ -2158,7 +2158,7 @@ public class RoutineTest {
 
         try {
 
-            new DefaultResultChannel<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
+            new DefaultResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
                     new TestAbortHandler(), Runners.sharedRunner(), logger).after(null);
 
             fail();
@@ -2169,7 +2169,7 @@ public class RoutineTest {
 
         try {
 
-            new DefaultResultChannel<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
+            new DefaultResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
                     new TestAbortHandler(), Runners.sharedRunner(), logger).after(0, null);
 
             fail();
@@ -2181,7 +2181,7 @@ public class RoutineTest {
         try {
 
             final DefaultResultChannel<Object> channel =
-                    new DefaultResultChannel<Object>(InvocationConfiguration.DEFAULT_CONFIGURATION,
+                    new DefaultResultChannel<Object>(InvocationConfiguration.defaultConfiguration(),
                             new TestAbortHandler(), Runners.sharedRunner(), logger);
 
             channel.after(-1, TimeUnit.MILLISECONDS);

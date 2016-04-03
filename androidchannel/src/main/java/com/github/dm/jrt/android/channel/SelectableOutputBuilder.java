@@ -57,7 +57,7 @@ class SelectableOutputBuilder<OUT>
             @NotNull final ChannelConfiguration configuration) {
 
         final IOChannel<ParcelableSelectable<OUT>> ioChannel = JRoutineCore.io()
-                                                                           .withChannels()
+                                                                           .channelConfiguration()
                                                                            .with(configuration)
                                                                            .setConfiguration()
                                                                            .buildChannel();

@@ -49,7 +49,7 @@ class DefaultServiceTargetRoutineBuilder implements ServiceTargetRoutineBuilder 
     private BuilderType mBuilderType;
 
     private InvocationConfiguration mInvocationConfiguration =
-            InvocationConfiguration.DEFAULT_CONFIGURATION;
+            InvocationConfiguration.defaultConfiguration();
 
     private final InvocationConfiguration.Configurable<DefaultServiceTargetRoutineBuilder>
             mInvocationConfigurable =
@@ -64,7 +64,7 @@ class DefaultServiceTargetRoutineBuilder implements ServiceTargetRoutineBuilder 
                 }
             };
 
-    private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.DEFAULT_CONFIGURATION;
+    private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.defaultConfiguration();
 
     private final ProxyConfiguration.Configurable<DefaultServiceTargetRoutineBuilder>
             mProxyConfigurable =
@@ -79,7 +79,7 @@ class DefaultServiceTargetRoutineBuilder implements ServiceTargetRoutineBuilder 
                 }
             };
 
-    private ServiceConfiguration mServiceConfiguration = ServiceConfiguration.DEFAULT_CONFIGURATION;
+    private ServiceConfiguration mServiceConfiguration = ServiceConfiguration.defaultConfiguration();
 
     private final ServiceConfiguration.Configurable<DefaultServiceTargetRoutineBuilder>
             mServiceConfigurable =

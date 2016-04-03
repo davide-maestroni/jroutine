@@ -59,10 +59,8 @@ public final class ChannelConfiguration {
 
     private static final DefaultConfigurable sDefaultConfigurable = new DefaultConfigurable();
 
-    /**
-     * Empty configuration constant.<br>The configuration has all the options set to their default.
-     */
-    public static final ChannelConfiguration DEFAULT_CONFIGURATION = builder().buildConfiguration();
+    private static final ChannelConfiguration sDefaultConfiguration =
+            builder().buildConfiguration();
 
     private final int mChannelLimit;
 
@@ -205,6 +203,17 @@ public final class ChannelConfiguration {
                       .withChannelMaxDelay(initialConfiguration.getOutputMaxDelayOr(null))
                       .withChannelMaxSize(initialConfiguration.getOutputMaxSizeOr(
                               ChannelConfiguration.DEFAULT));
+    }
+
+    /**
+     * Returns a configuration with all the options set to their default.
+     *
+     * @return the configuration instance.
+     */
+    @NotNull
+    public static ChannelConfiguration defaultConfiguration() {
+
+        return sDefaultConfiguration;
     }
 
     /**
@@ -560,7 +569,7 @@ public final class ChannelConfiguration {
         public Builder<TYPE> with(@Nullable final ChannelConfiguration configuration) {
 
             if (configuration == null) {
-                setConfiguration(DEFAULT_CONFIGURATION);
+                setConfiguration(defaultConfiguration());
                 return this;
             }
 

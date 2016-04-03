@@ -94,12 +94,12 @@ public abstract class AbstractStreamChannel<OUT>
 
     private final OutputChannel<OUT> mChannel;
 
-    private InvocationConfiguration mConfiguration = InvocationConfiguration.DEFAULT_CONFIGURATION;
+    private InvocationConfiguration mConfiguration = InvocationConfiguration.defaultConfiguration();
 
     private DelegationType mDelegationType;
 
     private InvocationConfiguration mStreamConfiguration =
-            InvocationConfiguration.DEFAULT_CONFIGURATION;
+            InvocationConfiguration.defaultConfiguration();
 
     private final Configurable<StreamChannel<OUT>> mStreamConfigurable =
             new Configurable<StreamChannel<OUT>>() {
@@ -369,7 +369,7 @@ public abstract class AbstractStreamChannel<OUT>
 
         final ChannelConfiguration configuration = buildChannelConfiguration();
         final OutputChannel<OUT> channel = Channels.repeat(this)
-                                                   .withChannels()
+                                                   .channelConfiguration()
                                                    .with(configuration)
                                                    .setConfiguration()
                                                    .buildChannels();
@@ -485,7 +485,7 @@ public abstract class AbstractStreamChannel<OUT>
 
         final ChannelConfiguration configuration = buildChannelConfiguration();
         final OutputChannel<? extends Selectable<OUT>> channel = Channels.toSelectable(this, index)
-                                                                         .withChannels()
+                                                                         .channelConfiguration()
                                                                          .with(configuration)
                                                                          .setConfiguration()
                                                                          .buildChannels();
@@ -499,7 +499,7 @@ public abstract class AbstractStreamChannel<OUT>
 
         ConstantConditions.notNull("consumer instance", consumer);
         final IOChannel<OUT> ioChannel = JRoutineCore.io()
-                                                     .withChannels()
+                                                     .channelConfiguration()
                                                      .with(buildChannelConfiguration())
                                                      .setConfiguration()
                                                      .buildChannel();

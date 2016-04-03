@@ -89,7 +89,7 @@ class DistributeBuilder<IN> extends AbstractBuilder<IOChannel<List<? extends IN>
         }
 
         final IOChannel<List<? extends IN>> ioChannel = JRoutineCore.io()
-                                                                    .withChannels()
+                                                                    .channelConfiguration()
                                                                     .with(configuration)
                                                                     .setConfiguration()
                                                                     .buildChannel();

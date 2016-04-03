@@ -50,7 +50,7 @@ public class ServiceConfigurationTest extends AndroidTestCase {
 
         assertThat(builderFrom(configuration).setConfiguration()).isEqualTo(configuration);
         assertThat(builderFrom(null).setConfiguration()).isEqualTo(
-                ServiceConfiguration.DEFAULT_CONFIGURATION);
+                ServiceConfiguration.defaultConfiguration());
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -68,7 +68,7 @@ public class ServiceConfigurationTest extends AndroidTestCase {
 
         try {
 
-            new Builder<Object>(null, ServiceConfiguration.DEFAULT_CONFIGURATION);
+            new Builder<Object>(null, ServiceConfiguration.defaultConfiguration());
 
             fail();
 
@@ -87,7 +87,7 @@ public class ServiceConfigurationTest extends AndroidTestCase {
         assertThat(builder().with(configuration).setConfiguration()).isEqualTo(configuration);
         assertThat(configuration.builderFrom().setConfiguration()).isEqualTo(configuration);
         assertThat(configuration.builderFrom().with(null).setConfiguration()).isEqualTo(
-                ServiceConfiguration.DEFAULT_CONFIGURATION);
+                ServiceConfiguration.defaultConfiguration());
     }
 
     public void testConfigurationErrors() {

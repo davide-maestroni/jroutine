@@ -363,7 +363,7 @@ public class StreamsTest {
         final StreamChannel<String> channel1 = Streams.streamOf("test1", "test2", "test3");
         final StreamChannel<String> channel2 = Streams.streamOf("test4", "test5", "test6");
         assertThat(Streams.blend(channel2, channel1)
-                          .withChannels()
+                          .channelConfiguration()
                           .withChannelOrder(OrderType.BY_CALL)
                           .withReadTimeout(seconds(1))
                           .setConfiguration()
@@ -1053,7 +1053,7 @@ public class StreamsTest {
     public void testMap() {
 
         final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .withChannels()
+                                                     .channelConfiguration()
                                                      .withChannelOrder(OrderType.BY_CALL)
                                                      .setConfiguration();
         final IOChannel<String> channel1 = builder.buildChannel();
@@ -1094,7 +1094,7 @@ public class StreamsTest {
     public void testMerge() {
 
         final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .withChannels()
+                                                     .channelConfiguration()
                                                      .withChannelOrder(OrderType.BY_CALL)
                                                      .setConfiguration();
         IOChannel<String> channel1;
@@ -1148,7 +1148,7 @@ public class StreamsTest {
     public void testMerge4() {
 
         final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .withChannels()
+                                                     .channelConfiguration()
                                                      .withChannelOrder(OrderType.BY_CALL)
                                                      .setConfiguration();
         final IOChannel<String> channel1 = builder.buildChannel();
@@ -1183,7 +1183,7 @@ public class StreamsTest {
     public void testMergeAbort() {
 
         final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .withChannels()
+                                                     .channelConfiguration()
                                                      .withChannelOrder(OrderType.BY_CALL)
                                                      .setConfiguration();
         IOChannel<String> channel1;
@@ -1855,14 +1855,14 @@ public class StreamsTest {
         final OutputChannel<Selectable<Object>> outputChannel = routine.asyncCall(inputChannel);
         final StreamChannel<Object> intChannel =
                 Streams.select(outputChannel, Sort.INTEGER, Sort.STRING)
-                       .withChannels()
+                       .channelConfiguration()
                        .withLogLevel(Level.WARNING)
                        .setConfiguration()
                        .buildChannels()
                        .get(Sort.INTEGER);
         final StreamChannel<Object> strChannel =
                 Streams.select(outputChannel, Arrays.asList(Sort.STRING, Sort.INTEGER))
-                       .withChannels()
+                       .channelConfiguration()
                        .withLogLevel(Level.WARNING)
                        .setConfiguration()
                        .buildChannels()

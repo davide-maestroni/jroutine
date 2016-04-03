@@ -42,9 +42,9 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
             new WeakIdentityHashMap<Object, HashMap<ClassInfo, Object>>();
 
     private InvocationConfiguration mInvocationConfiguration =
-            InvocationConfiguration.DEFAULT_CONFIGURATION;
+            InvocationConfiguration.defaultConfiguration();
 
-    private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.DEFAULT_CONFIGURATION;
+    private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.defaultConfiguration();
 
     @NotNull
     @SuppressWarnings("unchecked")

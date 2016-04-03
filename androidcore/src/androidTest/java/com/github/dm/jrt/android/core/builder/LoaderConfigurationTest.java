@@ -53,7 +53,7 @@ public class LoaderConfigurationTest extends AndroidTestCase {
                                                            .setConfiguration();
         assertThat(configuration.builderFrom().setConfiguration()).isEqualTo(configuration);
         assertThat(builderFrom(null).setConfiguration()).isEqualTo(
-                LoaderConfiguration.DEFAULT_CONFIGURATION);
+                LoaderConfiguration.defaultConfiguration());
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -71,7 +71,7 @@ public class LoaderConfigurationTest extends AndroidTestCase {
 
         try {
 
-            new Builder<Object>(null, LoaderConfiguration.DEFAULT_CONFIGURATION);
+            new Builder<Object>(null, LoaderConfiguration.defaultConfiguration());
 
             fail();
 
@@ -95,7 +95,7 @@ public class LoaderConfigurationTest extends AndroidTestCase {
         assertThat(builder().with(configuration).setConfiguration()).isEqualTo(configuration);
         assertThat(configuration.builderFrom().setConfiguration()).isEqualTo(configuration);
         assertThat(configuration.builderFrom().with(null).setConfiguration()).isEqualTo(
-                LoaderConfiguration.DEFAULT_CONFIGURATION);
+                LoaderConfiguration.defaultConfiguration());
     }
 
     public void testCacheStrategyEquals() {

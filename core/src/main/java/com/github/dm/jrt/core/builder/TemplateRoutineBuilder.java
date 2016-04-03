@@ -39,7 +39,7 @@ import org.jetbrains.annotations.NotNull;
 public abstract class TemplateRoutineBuilder<IN, OUT> extends TemplateRoutine<IN, OUT>
         implements RoutineBuilder<IN, OUT>, Configurable<RoutineBuilder<IN, OUT>> {
 
-    private InvocationConfiguration mConfiguration = InvocationConfiguration.DEFAULT_CONFIGURATION;
+    private InvocationConfiguration mConfiguration = InvocationConfiguration.defaultConfiguration();
 
     @NotNull
     public InvocationChannel<IN, OUT> asyncInvoke() {

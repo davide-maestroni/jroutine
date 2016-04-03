@@ -90,11 +90,11 @@ public class OutputChannelCallAdapterFactory extends AbstractCallAdapterFactory<
 
         // Use annotations to configure the routine
         final InvocationConfiguration invocationConfiguration =
-                Builders.configurationWithAnnotations(InvocationConfiguration.DEFAULT_CONFIGURATION,
+                Builders.configurationWithAnnotations(InvocationConfiguration.defaultConfiguration(),
                         annotations);
         final LoaderConfiguration loaderConfiguration =
                 AndroidBuilders.configurationWithAnnotations(
-                        LoaderConfiguration.DEFAULT_CONFIGURATION, annotations);
+                        LoaderConfiguration.defaultConfiguration(), annotations);
         return JRoutineAndroidCompat.with(mContext)
                                     .on(sFactory)
                                     .invocationConfiguration()

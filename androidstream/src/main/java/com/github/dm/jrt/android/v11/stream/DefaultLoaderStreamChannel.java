@@ -101,7 +101,7 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
                 }
             };
 
-    private LoaderConfiguration mConfiguration = LoaderConfiguration.DEFAULT_CONFIGURATION;
+    private LoaderConfiguration mConfiguration = LoaderConfiguration.defaultConfiguration();
 
     private LoaderBuilder mContextBuilder;
 
@@ -154,8 +154,8 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
     private DefaultLoaderStreamChannel(@Nullable final LoaderBuilder builder,
             @NotNull final OutputChannel<OUT> channel, @Nullable final Binder binder) {
 
-        this(builder, channel, InvocationConfiguration.DEFAULT_CONFIGURATION,
-                LoaderConfiguration.DEFAULT_CONFIGURATION, DelegationType.ASYNC, binder);
+        this(builder, channel, InvocationConfiguration.defaultConfiguration(),
+                LoaderConfiguration.defaultConfiguration(), DelegationType.ASYNC, binder);
     }
 
     /**
@@ -526,7 +526,7 @@ public class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
         final ChannelConfiguration configuration = buildChannelConfiguration();
         final OutputChannel<? extends ParcelableSelectable<OUT>> channel =
                 SparseChannels.toSelectable(this, index)
-                              .withChannels()
+                              .channelConfiguration()
                               .with(configuration)
                               .setConfiguration()
                               .buildChannels();

@@ -104,7 +104,7 @@
 </pre>
 <b>Example 2:</b> via invocation implementations (again).
 <p>
-    It is possible to completely avoid the use of reflection by slightly modifying the example above.
+    It is possible to completely avoid the use of reflection by slightly modifying the above example.
 </p>
 <pre>
     <code>
@@ -116,7 +116,6 @@
                 final Routine&lt;Integer, Integer&gt; squareRoutine = JRoutineCore.on(new Square()).buildRoutine();
                 final Routine&lt;Integer, Double&gt; meanRoutine =
                         JRoutineCore.on(new SquareRootMeanFactory()).buildRoutine();
-
                 final Double rms =
                         meanRoutine.asyncCall(squareRoutine.parallelCall(parseRoutine.parallelCall(args)))
                                    .afterMax(seconds(3))
@@ -127,6 +126,11 @@
 
             private static class Parse extends FilterInvocation&lt;String, Integer&gt; {
 
+                public Parse() {
+
+                    super(null);
+                }
+
                 public void onInput(final String s, &commat;NotNull final ResultChannel&lt;Integer&gt; result) {
 
                     result.pass(Integer.parseInt(s));
@@ -134,6 +138,11 @@
             }
 
             private static class Square extends FilterInvocation&lt;Integer, Integer&gt; {
+
+                public Square() {
+
+                    super(null);
+                }
 
                 public void onInput(final Integer integer, &commat;NotNull final ResultChannel&lt;Integer&gt; result) {
 
@@ -175,6 +184,11 @@
             }
 
             private static class SquareRootMeanFactory extends InvocationFactory&lt;Integer, Double&gt; {
+
+                public SquareRootMeanFactory() {
+
+                    super(null);
+                }
 
                 &commat;NotNull
                 public Invocation&lt;Integer, Double&gt; newInvocation() {

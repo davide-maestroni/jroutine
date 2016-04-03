@@ -42,7 +42,7 @@ public class AndroidBuildersTest extends AndroidTestCase {
 
     public void testBuilderConfigurationThroughAnnotations() throws NoSuchMethodException {
 
-        assertThat(configurationWithAnnotations(LoaderConfiguration.DEFAULT_CONFIGURATION,
+        assertThat(configurationWithAnnotations(LoaderConfiguration.defaultConfiguration(),
                 AnnotationItf.class.getMethod("toString"))).isEqualTo(
                 builder().withCacheStrategy(CacheStrategyType.CACHE_IF_ERROR)
                          .withClashResolution(ClashResolutionType.ABORT)

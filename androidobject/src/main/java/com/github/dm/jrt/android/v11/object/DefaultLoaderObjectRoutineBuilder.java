@@ -75,11 +75,11 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     private final ContextInvocationTarget<?> mTarget;
 
     private InvocationConfiguration mInvocationConfiguration =
-            InvocationConfiguration.DEFAULT_CONFIGURATION;
+            InvocationConfiguration.defaultConfiguration();
 
-    private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.DEFAULT_CONFIGURATION;
+    private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.defaultConfiguration();
 
-    private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.DEFAULT_CONFIGURATION;
+    private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.defaultConfiguration();
 
     /**
      * Constructor.

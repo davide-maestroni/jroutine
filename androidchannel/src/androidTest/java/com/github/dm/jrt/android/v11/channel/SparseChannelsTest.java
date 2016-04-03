@@ -484,7 +484,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
         }
 
         final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .withChannels()
+                                                     .channelConfiguration()
                                                      .withChannelOrder(OrderType.BY_CALL)
                                                      .setConfiguration();
         final IOChannel<String> channel1 = builder.buildChannel();
@@ -528,7 +528,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
         }
 
         final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .withChannels()
+                                                     .channelConfiguration()
                                                      .withChannelOrder(OrderType.BY_CALL)
                                                      .setConfiguration();
         final IOChannel<String> channel1 = builder.buildChannel();
@@ -554,7 +554,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
         }
 
         final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .withChannels()
+                                                     .channelConfiguration()
                                                      .withChannelOrder(OrderType.BY_CALL)
                                                      .setConfiguration();
         final IOChannel<String> channel1 = builder.buildChannel();

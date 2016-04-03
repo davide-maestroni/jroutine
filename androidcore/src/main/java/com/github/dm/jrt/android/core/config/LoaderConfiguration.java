@@ -56,10 +56,7 @@ public final class LoaderConfiguration {
 
     private static final DefaultConfigurable sDefaultConfigurable = new DefaultConfigurable();
 
-    /**
-     * Empty configuration constant.<br>The configuration has all the values set to their default.
-     */
-    public static final LoaderConfiguration DEFAULT_CONFIGURATION = builder().buildConfiguration();
+    private static final LoaderConfiguration sDefaultConfiguration = builder().buildConfiguration();
 
     private final int mFactoryId;
 
@@ -79,8 +76,8 @@ public final class LoaderConfiguration {
      * Constructor.
      *
      * @param looper              the looper instance.
-     * @param loaderId            the the loader ID.
-     * @param factoryId           the the factory ID.
+     * @param loaderId            the loader ID.
+     * @param factoryId           the factory ID.
      * @param resolutionType      the type of resolution.
      * @param inputResolutionType the type of input resolution.
      * @param strategyType        the cache strategy type.
@@ -124,6 +121,17 @@ public final class LoaderConfiguration {
 
         return (initialConfiguration == null) ? builder()
                 : new Builder<LoaderConfiguration>(sDefaultConfigurable, initialConfiguration);
+    }
+
+    /**
+     * Returns a configuration with all the options set to their default.
+     *
+     * @return the configuration instance.
+     */
+    @NotNull
+    public static LoaderConfiguration defaultConfiguration() {
+
+        return sDefaultConfiguration;
     }
 
     /**
@@ -443,7 +451,7 @@ public final class LoaderConfiguration {
         public Builder<TYPE> with(@Nullable final LoaderConfiguration configuration) {
 
             if (configuration == null) {
-                setConfiguration(DEFAULT_CONFIGURATION);
+                setConfiguration(defaultConfiguration());
                 return this;
             }
 

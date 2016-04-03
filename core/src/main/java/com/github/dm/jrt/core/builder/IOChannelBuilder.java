@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Interface defining a builder of I/O channel objects.
  * <p>
- * Note that the passed inputs might be delivered though the configured runner.
+ * Note that the passed inputs might be delivered through the configured runner.
  * <p>
  * Created by davide-maestroni on 03/07/2015.
  */

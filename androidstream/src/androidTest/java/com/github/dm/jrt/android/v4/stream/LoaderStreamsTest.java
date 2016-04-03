@@ -524,7 +524,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         final LoaderStreamChannelCompat<String> channel2 =
                 LoaderStreamsCompat.streamOf("test4", "test5", "test6");
         assertThat(LoaderStreamsCompat.blend(channel2, channel1)
-                                      .withChannels()
+                                      .channelConfiguration()
                                       .withChannelOrder(OrderType.BY_CALL)
                                       .withReadTimeout(seconds(1))
                                       .setConfiguration()
@@ -1431,7 +1431,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
     public void testMap() {
 
         final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .withChannels()
+                                                     .channelConfiguration()
                                                      .withChannelOrder(OrderType.BY_CALL)
                                                      .setConfiguration();
         final IOChannel<String> channel1 = builder.buildChannel();
@@ -1477,7 +1477,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
     public void testMerge() {
 
         final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .withChannels()
+                                                     .channelConfiguration()
                                                      .withChannelOrder(OrderType.BY_CALL)
                                                      .setConfiguration();
         IOChannel<String> channel1;
@@ -1537,7 +1537,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
     public void testMerge4() {
 
         final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .withChannels()
+                                                     .channelConfiguration()
                                                      .withChannelOrder(OrderType.BY_CALL)
                                                      .setConfiguration();
         final IOChannel<String> channel1 = builder.buildChannel();
@@ -1573,7 +1573,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
     public void testMergeAbort() {
 
         final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .withChannels()
+                                                     .channelConfiguration()
                                                      .withChannelOrder(OrderType.BY_CALL)
                                                      .setConfiguration();
         IOChannel<String> channel1;
@@ -1857,14 +1857,14 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                 routine.asyncCall(inputChannel);
         final StreamChannel<Object> intChannel =
                 LoaderStreamsCompat.selectParcelable(outputChannel, Sort.INTEGER, Sort.STRING)
-                                   .withChannels()
+                                   .channelConfiguration()
                                    .withLogLevel(Level.WARNING)
                                    .setConfiguration()
                                    .buildChannels()
                                    .get(Sort.INTEGER);
         final StreamChannel<Object> strChannel = LoaderStreamsCompat.selectParcelable(outputChannel,
                 Arrays.asList(Sort.STRING, Sort.INTEGER))
-                                                                    .withChannels()
+                                                                    .channelConfiguration()
                                                                     .withLogLevel(Level.WARNING)
                                                                     .setConfiguration()
                                                                     .buildChannels()

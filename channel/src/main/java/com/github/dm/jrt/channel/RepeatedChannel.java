@@ -79,7 +79,7 @@ class RepeatedChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
             @NotNull final OutputChannel<OUT> channel) {
 
         mConfiguration = (configuration != null) ? configuration
-                : ChannelConfiguration.DEFAULT_CONFIGURATION;
+                : ChannelConfiguration.defaultConfiguration();
         mOutputChannel = createOutputChannel();
         mChannel = channel;
         channel.bind(this);
@@ -361,7 +361,7 @@ class RepeatedChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
     private IOChannel<OUT> createOutputChannel() {
 
         return JRoutineCore.io()
-                           .withChannels()
+                           .channelConfiguration()
                            .with(mConfiguration)
                            .setConfiguration()
                            .buildChannel();

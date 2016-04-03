@@ -233,7 +233,7 @@ public class ObjectRoutineTest {
     @Test
     public void testBuilderConfigurationThroughAnnotations() throws NoSuchMethodException {
 
-        assertThat(configurationWithAnnotations(InvocationConfiguration.DEFAULT_CONFIGURATION,
+        assertThat(configurationWithAnnotations(InvocationConfiguration.defaultConfiguration(),
                 AnnotationItf.class.getMethod("toString"))).isEqualTo(builder().withCoreInstances(3)
                                                                                .withInputOrder(
                                                                                        OrderType

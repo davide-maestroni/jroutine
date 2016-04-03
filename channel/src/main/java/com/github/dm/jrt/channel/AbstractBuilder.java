@@ -33,7 +33,7 @@ import org.jetbrains.annotations.NotNull;
 public abstract class AbstractBuilder<TYPE>
         implements ChannelsBuilder<TYPE>, Configurable<ChannelsBuilder<TYPE>> {
 
-    private ChannelConfiguration mConfiguration = ChannelConfiguration.DEFAULT_CONFIGURATION;
+    private ChannelConfiguration mConfiguration = ChannelConfiguration.defaultConfiguration();
 
     @NotNull
     public TYPE buildChannels() {
@@ -50,7 +50,7 @@ public abstract class AbstractBuilder<TYPE>
     }
 
     @NotNull
-    public Builder<ChannelsBuilder<TYPE>> withChannels() {
+    public Builder<ChannelsBuilder<TYPE>> channelConfiguration() {
 
         return new Builder<ChannelsBuilder<TYPE>>(this, mConfiguration);
     }

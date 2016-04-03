@@ -52,9 +52,9 @@ class DefaultLoaderChannelBuilder
 
     private final LoaderContext mContext;
 
-    private ChannelConfiguration mChannelConfiguration = ChannelConfiguration.DEFAULT_CONFIGURATION;
+    private ChannelConfiguration mChannelConfiguration = ChannelConfiguration.defaultConfiguration();
 
-    private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.DEFAULT_CONFIGURATION;
+    private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.defaultConfiguration();
 
     /**
      * Constructor.
@@ -204,7 +204,7 @@ class DefaultLoaderChannelBuilder
     }
 
     @NotNull
-    public ChannelConfiguration.Builder<? extends LoaderChannelBuilder> withChannels() {
+    public ChannelConfiguration.Builder<? extends LoaderChannelBuilder> channelConfiguration() {
 
         final ChannelConfiguration config = mChannelConfiguration;
         return new ChannelConfiguration.Builder<LoaderChannelBuilder>(this, config);

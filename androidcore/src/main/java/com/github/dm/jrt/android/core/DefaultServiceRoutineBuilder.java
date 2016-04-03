@@ -54,7 +54,7 @@ class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, O
 
     private final TargetInvocationFactory<IN, OUT> mTargetFactory;
 
-    private ServiceConfiguration mServiceConfiguration = ServiceConfiguration.DEFAULT_CONFIGURATION;
+    private ServiceConfiguration mServiceConfiguration = ServiceConfiguration.defaultConfiguration();
 
     /**
      * Constructor.

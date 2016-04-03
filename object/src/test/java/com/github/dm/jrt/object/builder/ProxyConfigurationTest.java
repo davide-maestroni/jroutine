@@ -42,7 +42,7 @@ public class ProxyConfigurationTest {
         assertThat(configuration.builderFrom().setConfiguration().hashCode()).isEqualTo(
                 configuration.hashCode());
         assertThat(builderFrom(null).setConfiguration()).isEqualTo(
-                ProxyConfiguration.DEFAULT_CONFIGURATION);
+                ProxyConfiguration.defaultConfiguration());
     }
 
     @Test
@@ -61,7 +61,7 @@ public class ProxyConfigurationTest {
 
         try {
 
-            new Builder<Object>(null, ProxyConfiguration.DEFAULT_CONFIGURATION);
+            new Builder<Object>(null, ProxyConfiguration.defaultConfiguration());
 
             fail();
 
@@ -78,7 +78,7 @@ public class ProxyConfigurationTest {
         assertThat(builder().with(configuration).setConfiguration()).isEqualTo(configuration);
         assertThat(configuration.builderFrom().setConfiguration()).isEqualTo(configuration);
         assertThat(configuration.builderFrom().with(null).setConfiguration()).isEqualTo(
-                ProxyConfiguration.DEFAULT_CONFIGURATION);
+                ProxyConfiguration.defaultConfiguration());
     }
 
     @Test

@@ -80,10 +80,7 @@ public final class InvocationConfiguration {
 
     private static final DefaultConfigurable sDefaultConfigurable = new DefaultConfigurable();
 
-    /**
-     * Empty configuration constant.<br>The configuration has all the options set to their default.
-     */
-    public static final InvocationConfiguration DEFAULT_CONFIGURATION =
+    private static final InvocationConfiguration sDefaultConfiguration =
             builder().buildConfiguration();
 
     private final int mCoreInstances;
@@ -194,6 +191,17 @@ public final class InvocationConfiguration {
 
         return (initialConfiguration == null) ? builder()
                 : new Builder<InvocationConfiguration>(sDefaultConfigurable, initialConfiguration);
+    }
+
+    /**
+     * Returns a configuration with all the options set to their default.
+     *
+     * @return the configuration instance.
+     */
+    @NotNull
+    public static InvocationConfiguration defaultConfiguration() {
+
+        return sDefaultConfiguration;
     }
 
     /**
@@ -534,7 +542,7 @@ public final class InvocationConfiguration {
     }
 
     /**
-     * Creates a new logger.
+     * Creates a new logger based on this configuration.
      *
      * @param context the context.
      * @return the new logger.
@@ -769,7 +777,7 @@ public final class InvocationConfiguration {
         public Builder<TYPE> with(@Nullable final InvocationConfiguration configuration) {
 
             if (configuration == null) {
-                setConfiguration(DEFAULT_CONFIGURATION);
+                setConfiguration(defaultConfiguration());
                 return this;
             }
 

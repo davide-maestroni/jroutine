@@ -248,7 +248,7 @@ public interface Channel {
          * set timeout.
          * <p>
          * Note that this method invocation will block the calling thread until the routine
-         * invocation completes or the timeout elapses.
+         * invocation completes or is aborted, or the timeout elapses.
          *
          * @return the list of results.
          * @throws com.github.dm.jrt.core.channel.ExecutionTimeoutException if the channel is set to
@@ -276,7 +276,7 @@ public interface Channel {
          * set timeout, and put them into the specified collection.
          * <p>
          * Note that this method invocation will block the calling thread until the routine
-         * invocation completes or the timeout elapses.
+         * invocation completes or is aborted, or the timeout elapses.
          *
          * @param results the collection to fill.
          * @return this channel.
@@ -420,7 +420,7 @@ public interface Channel {
          * Checks if the invocation has completed, waiting at the maximum for the set timeout.
          * <p>
          * Note that this method invocation will block the calling thread until the routine
-         * invocation completes or the timeout elapses.
+         * invocation completes or is aborted, or the timeout elapses.
          *
          * @return whether the routine execution has complete.
          * @see #afterMax(TimeDuration)
@@ -433,7 +433,7 @@ public interface Channel {
          * Checks if more results are available by waiting at the maximum for the set timeout.
          * <p>
          * Note that this method invocation will block the calling thread until a new output is
-         * available, the routine invocation completes or the timeout elapses.
+         * available, the routine invocation completes or is aborted, or the timeout elapses.
          *
          * @return whether at least one result is available.
          * @throws com.github.dm.jrt.core.channel.ExecutionTimeoutException if the channel is set to
@@ -459,7 +459,7 @@ public interface Channel {
          * Consumes the first available result by waiting at the maximum for the set timeout.
          * <p>
          * Note that this method invocation will block the calling thread until a new output is
-         * available, the routine invocation completes or the timeout elapses.
+         * available, the routine invocation completes or is aborted, or the timeout elapses.
          *
          * @return the first available result.
          * @throws com.github.dm.jrt.core.channel.ExecutionTimeoutException if the channel is set to
@@ -511,7 +511,8 @@ public interface Channel {
          * timeout.
          * <p>
          * Note that this method invocation will block the calling thread until {@code count} new
-         * outputs are available, the routine invocation completes or the timeout elapses.
+         * outputs are available, the routine invocation completes or is aborted, or the timeout
+         * elapses.
          *
          * @param count the number of outputs to read.
          * @return the first {@code count} available results.
@@ -541,7 +542,7 @@ public interface Channel {
          * the invocation, the specified alternative output is returned.
          * <p>
          * Note that this method invocation will block the calling thread until a new output is
-         * available, the routine invocation completes or the timeout elapses.
+         * available, the routine invocation completes or is aborted, or the timeout elapses.
          *
          * @param output the default output to return.
          * @return the first available result.
@@ -575,7 +576,8 @@ public interface Channel {
          * timeout.
          * <p>
          * Note that this method invocation will block the calling thread until {@code count} new
-         * outputs are available, the routine invocation completes or the timeout elapses.
+         * outputs are available, the routine invocation completes or is aborted, or the timeout
+         * elapses.
          *
          * @param count the number of outputs to skip.
          * @return this channel.

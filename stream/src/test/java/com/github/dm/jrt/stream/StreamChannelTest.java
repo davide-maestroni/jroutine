@@ -430,7 +430,7 @@ public class StreamChannelTest {
 
         final IOChannel<Object> channel = JRoutineCore.io().buildChannel();
         final TestStreamChannel streamChannel =
-                new TestStreamChannel(channel, InvocationConfiguration.DEFAULT_CONFIGURATION,
+                new TestStreamChannel(channel, InvocationConfiguration.defaultConfiguration(),
                         DelegationType.ASYNC, null);
         assertThat(streamChannel.getBinder()).isNotNull();
         assertThat(streamChannel.getConfiguration()).isNotNull();
@@ -443,7 +443,7 @@ public class StreamChannelTest {
     public void testConstructorError() {
 
         try {
-            new TestStreamChannel(null, InvocationConfiguration.DEFAULT_CONFIGURATION,
+            new TestStreamChannel(null, InvocationConfiguration.defaultConfiguration(),
                     DelegationType.ASYNC, null);
             fail();
 
@@ -461,7 +461,7 @@ public class StreamChannelTest {
         }
 
         try {
-            new TestStreamChannel(channel, InvocationConfiguration.DEFAULT_CONFIGURATION, null,
+            new TestStreamChannel(channel, InvocationConfiguration.defaultConfiguration(), null,
                     null);
             fail();
 
@@ -470,7 +470,7 @@ public class StreamChannelTest {
         }
 
         try {
-            new TestStreamChannel(channel, InvocationConfiguration.DEFAULT_CONFIGURATION,
+            new TestStreamChannel(channel, InvocationConfiguration.defaultConfiguration(),
                     DelegationType.ASYNC, null).setConfiguration(null);
             fail();
 

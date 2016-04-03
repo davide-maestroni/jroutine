@@ -59,9 +59,9 @@ public class ChannelConfigurationTest {
                 configuration.hashCode());
         assertThat(builderFrom(configuration).setConfiguration()).isEqualTo(configuration);
         assertThat(builderFrom(null).setConfiguration().hashCode()).isEqualTo(
-                ChannelConfiguration.DEFAULT_CONFIGURATION.hashCode());
+                ChannelConfiguration.defaultConfiguration().hashCode());
         assertThat(builderFrom(null).setConfiguration()).isEqualTo(
-                ChannelConfiguration.DEFAULT_CONFIGURATION);
+                ChannelConfiguration.defaultConfiguration());
     }
 
     @Test
@@ -80,7 +80,7 @@ public class ChannelConfigurationTest {
 
         try {
 
-            new Builder<Object>(null, ChannelConfiguration.DEFAULT_CONFIGURATION);
+            new Builder<Object>(null, ChannelConfiguration.defaultConfiguration());
 
             fail();
 
@@ -107,7 +107,7 @@ public class ChannelConfigurationTest {
         assertThat(builder().with(configuration).setConfiguration()).isEqualTo(configuration);
         assertThat(configuration.builderFrom().setConfiguration()).isEqualTo(configuration);
         assertThat(configuration.builderFrom().with(null).setConfiguration()).isEqualTo(
-                ChannelConfiguration.DEFAULT_CONFIGURATION);
+                ChannelConfiguration.defaultConfiguration());
     }
 
     @Test

@@ -44,7 +44,7 @@ class DefaultTargetRoutineBuilder implements TargetRoutineBuilder {
     private BuilderType mBuilderType;
 
     private InvocationConfiguration mInvocationConfiguration =
-            InvocationConfiguration.DEFAULT_CONFIGURATION;
+            InvocationConfiguration.defaultConfiguration();
 
     private final InvocationConfiguration.Configurable<DefaultTargetRoutineBuilder>
             mInvocationConfigurable =
@@ -59,7 +59,7 @@ class DefaultTargetRoutineBuilder implements TargetRoutineBuilder {
                 }
             };
 
-    private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.DEFAULT_CONFIGURATION;
+    private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.defaultConfiguration();
 
     private final ProxyConfiguration.Configurable<DefaultTargetRoutineBuilder> mProxyConfigurable =
             new ProxyConfiguration.Configurable<DefaultTargetRoutineBuilder>() {

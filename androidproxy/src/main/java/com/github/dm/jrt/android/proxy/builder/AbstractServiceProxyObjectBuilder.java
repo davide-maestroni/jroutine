@@ -49,11 +49,11 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
             new WeakIdentityHashMap<Context, HashMap<Class<?>, HashMap<ProxyInfo, Object>>>();
 
     private InvocationConfiguration mInvocationConfiguration =
-            InvocationConfiguration.DEFAULT_CONFIGURATION;
+            InvocationConfiguration.defaultConfiguration();
 
-    private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.DEFAULT_CONFIGURATION;
+    private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.defaultConfiguration();
 
-    private ServiceConfiguration mServiceConfiguration = ServiceConfiguration.DEFAULT_CONFIGURATION;
+    private ServiceConfiguration mServiceConfiguration = ServiceConfiguration.defaultConfiguration();
 
     @NotNull
     @SuppressWarnings("unchecked")

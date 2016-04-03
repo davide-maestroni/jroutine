@@ -43,10 +43,7 @@ public final class ProxyConfiguration {
 
     private static final DefaultConfigurable sDefaultConfigurable = new DefaultConfigurable();
 
-    /**
-     * Empty configuration constant.<br>The configuration has all the options set to their default.
-     */
-    public static final ProxyConfiguration DEFAULT_CONFIGURATION = builder().buildConfiguration();
+    private static final ProxyConfiguration sDefaultConfiguration = builder().buildConfiguration();
 
     private final List<String> mFieldNames;
 
@@ -83,6 +80,17 @@ public final class ProxyConfiguration {
 
         return (initialConfiguration == null) ? builder()
                 : new Builder<ProxyConfiguration>(sDefaultConfigurable, initialConfiguration);
+    }
+
+    /**
+     * Returns a configuration with all the options set to their default.
+     *
+     * @return the configuration instance.
+     */
+    @NotNull
+    public static ProxyConfiguration defaultConfiguration() {
+
+        return sDefaultConfiguration;
     }
 
     /**
@@ -215,7 +223,7 @@ public final class ProxyConfiguration {
         public Builder<TYPE> with(@Nullable final ProxyConfiguration configuration) {
 
             if (configuration == null) {
-                setConfiguration(DEFAULT_CONFIGURATION);
+                setConfiguration(defaultConfiguration());
                 return this;
             }
 

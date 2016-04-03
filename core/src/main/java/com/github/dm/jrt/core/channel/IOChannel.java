@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Interface defining a channel which is both an input and an output.<br>
- * The channel synchronously delivers the passed inputs the the bound output consumer or input
+ * The channel synchronously delivers the passed inputs to the bound output consumer or input
  * channel, unless a specific delay is set by calling the proper methods.
  * <p>
  * An I/O channel is useful to make other asynchronous tasks communicate with a routine.<br>

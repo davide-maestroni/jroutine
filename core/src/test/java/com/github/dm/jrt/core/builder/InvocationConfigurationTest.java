@@ -55,9 +55,9 @@ public class InvocationConfigurationTest {
                 configuration.hashCode());
         assertThat(builderFrom(configuration).setConfiguration()).isEqualTo(configuration);
         assertThat(builderFrom(null).setConfiguration().hashCode()).isEqualTo(
-                InvocationConfiguration.DEFAULT_CONFIGURATION.hashCode());
+                InvocationConfiguration.defaultConfiguration().hashCode());
         assertThat(builderFrom(null).setConfiguration()).isEqualTo(
-                InvocationConfiguration.DEFAULT_CONFIGURATION);
+                InvocationConfiguration.defaultConfiguration());
     }
 
     @Test
@@ -76,7 +76,7 @@ public class InvocationConfigurationTest {
 
         try {
 
-            new Builder<Object>(null, InvocationConfiguration.DEFAULT_CONFIGURATION);
+            new Builder<Object>(null, InvocationConfiguration.defaultConfiguration());
 
             fail();
 
@@ -97,7 +97,7 @@ public class InvocationConfigurationTest {
         assertThat(builder().with(configuration).setConfiguration()).isEqualTo(configuration);
         assertThat(configuration.builderFrom().setConfiguration()).isEqualTo(configuration);
         assertThat(configuration.builderFrom().with(null).setConfiguration()).isEqualTo(
-                InvocationConfiguration.DEFAULT_CONFIGURATION);
+                InvocationConfiguration.defaultConfiguration());
     }
 
     @Test

@@ -672,7 +672,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
             final InvocationLoader<?, OUT> internalLoader = mLoader;
             final ArrayList<IOChannel<OUT>> channels = mNewChannels;
             final IOChannel<OUT> channel = JRoutineCore.io()
-                                                       .withChannels()
+                                                       .channelConfiguration()
                                                        .withLog(logger.getLog())
                                                        .withLogLevel(logger.getLogLevel())
                                                        .setConfiguration()

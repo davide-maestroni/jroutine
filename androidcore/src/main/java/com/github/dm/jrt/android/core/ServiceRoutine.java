@@ -230,7 +230,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
             final int inputMaxSize =
                     invocationConfiguration.getInputMaxSizeOr(ChannelConfiguration.DEFAULT);
             mInput = JRoutineCore.io()
-                                 .withChannels()
+                                 .channelConfiguration()
                                  .withRunner(runner)
                                  .withChannelOrder(inputOrderType)
                                  .withChannelLimit(inputLimit)
@@ -249,7 +249,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
             final TimeoutActionType timeoutActionType =
                     invocationConfiguration.getReadTimeoutActionOr(null);
             mOutput = JRoutineCore.io()
-                                  .withChannels()
+                                  .channelConfiguration()
                                   .withRunner(AndroidRunners.looperRunner(looper))
                                   .withChannelLimit(outputLimit)
                                   .withChannelMaxDelay(outputMaxDelay)

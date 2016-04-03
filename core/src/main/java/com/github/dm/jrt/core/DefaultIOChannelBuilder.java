@@ -33,7 +33,7 @@ import org.jetbrains.annotations.Nullable;
  */
 class DefaultIOChannelBuilder implements IOChannelBuilder, Configurable<IOChannelBuilder> {
 
-    private ChannelConfiguration mConfiguration = ChannelConfiguration.DEFAULT_CONFIGURATION;
+    private ChannelConfiguration mConfiguration = ChannelConfiguration.defaultConfiguration();
 
     /**
      * Avoid explicit instantiation.
@@ -74,7 +74,7 @@ class DefaultIOChannelBuilder implements IOChannelBuilder, Configurable<IOChanne
     }
 
     @NotNull
-    public Builder<? extends IOChannelBuilder> withChannels() {
+    public Builder<? extends IOChannelBuilder> channelConfiguration() {
 
         return new Builder<IOChannelBuilder>(this, mConfiguration);
     }

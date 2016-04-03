@@ -228,7 +228,7 @@ public class IOChannelTest {
 
         final TimeDuration timeout = seconds(1);
         final IOChannel<String> ioChannel1 = JRoutineCore.io()
-                                                         .withChannels()
+                                                         .channelConfiguration()
                                                          .withChannelOrder(OrderType.BY_CALL)
                                                          .setConfiguration()
                                                          .buildChannel();
@@ -568,7 +568,7 @@ public class IOChannelTest {
 
         final TimeDuration timeout = seconds(1);
         final IOChannel<Object> channel = JRoutineCore.io()
-                                                      .withChannels()
+                                                      .channelConfiguration()
                                                       .withChannelOrder(OrderType.BY_CALL)
                                                       .withRunner(Runners.sharedRunner())
                                                       .withChannelMaxSize(1)
@@ -625,7 +625,7 @@ public class IOChannelTest {
     public void testPassTimeout() {
 
         final IOChannel<Object> channel1 = JRoutineCore.io()
-                                                       .withChannels()
+                                                       .channelConfiguration()
                                                        .withReadTimeout(millis(10))
                                                        .withReadTimeoutAction(
                                                                TimeoutActionType.EXIT)
@@ -639,7 +639,7 @@ public class IOChannelTest {
     public void testPassTimeout2() {
 
         final IOChannel<Object> channel2 = JRoutineCore.io()
-                                                       .withChannels()
+                                                       .channelConfiguration()
                                                        .withReadTimeout(millis(10))
                                                        .withReadTimeoutAction(
                                                                TimeoutActionType.ABORT)
@@ -661,7 +661,7 @@ public class IOChannelTest {
     public void testPassTimeout3() {
 
         final IOChannel<Object> channel3 = JRoutineCore.io()
-                                                       .withChannels()
+                                                       .channelConfiguration()
                                                        .withReadTimeout(millis(10))
                                                        .withReadTimeoutAction(
                                                                TimeoutActionType.THROW)

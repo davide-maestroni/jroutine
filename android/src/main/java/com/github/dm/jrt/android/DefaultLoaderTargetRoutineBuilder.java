@@ -50,7 +50,7 @@ class DefaultLoaderTargetRoutineBuilder implements LoaderTargetRoutineBuilder {
     private BuilderType mBuilderType;
 
     private InvocationConfiguration mInvocationConfiguration =
-            InvocationConfiguration.DEFAULT_CONFIGURATION;
+            InvocationConfiguration.defaultConfiguration();
 
     private final InvocationConfiguration.Configurable<DefaultLoaderTargetRoutineBuilder>
             mInvocationConfigurable =
@@ -65,7 +65,7 @@ class DefaultLoaderTargetRoutineBuilder implements LoaderTargetRoutineBuilder {
                 }
             };
 
-    private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.DEFAULT_CONFIGURATION;
+    private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.defaultConfiguration();
 
     private final LoaderConfiguration.Configurable<DefaultLoaderTargetRoutineBuilder>
             mLoaderConfigurable =
@@ -80,7 +80,7 @@ class DefaultLoaderTargetRoutineBuilder implements LoaderTargetRoutineBuilder {
                 }
             };
 
-    private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.DEFAULT_CONFIGURATION;
+    private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.defaultConfiguration();
 
     private final ProxyConfiguration.Configurable<DefaultLoaderTargetRoutineBuilder>
             mProxyConfigurable =

@@ -38,10 +38,8 @@ public final class ServiceConfiguration {
 
     private static final DefaultConfigurable sDefaultConfigurable = new DefaultConfigurable();
 
-    /**
-     * Empty configuration constant.<br>The configuration has all the values set to their default.
-     */
-    public static final ServiceConfiguration DEFAULT_CONFIGURATION = builder().buildConfiguration();
+    private static final ServiceConfiguration sDefaultConfiguration =
+            builder().buildConfiguration();
 
     private final Class<? extends Log> mLogClass;
 
@@ -88,6 +86,17 @@ public final class ServiceConfiguration {
 
         return (initialConfiguration == null) ? builder()
                 : new Builder<ServiceConfiguration>(sDefaultConfigurable, initialConfiguration);
+    }
+
+    /**
+     * Returns a configuration with all the options set to their default.
+     *
+     * @return the configuration instance.
+     */
+    @NotNull
+    public static ServiceConfiguration defaultConfiguration() {
+
+        return sDefaultConfiguration;
     }
 
     /**
@@ -263,7 +272,7 @@ public final class ServiceConfiguration {
         public Builder<TYPE> with(@Nullable final ServiceConfiguration configuration) {
 
             if (configuration == null) {
-                setConfiguration(DEFAULT_CONFIGURATION);
+                setConfiguration(defaultConfiguration());
                 return this;
             }
 

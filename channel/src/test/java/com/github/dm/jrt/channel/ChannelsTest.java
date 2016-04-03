@@ -1338,7 +1338,7 @@ public class ChannelsTest {
     public void testMap() {
 
         final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .withChannels()
+                                                     .channelConfiguration()
                                                      .withChannelOrder(OrderType.BY_CALL)
                                                      .setConfiguration();
         final IOChannel<String> channel1 = builder.buildChannel();
@@ -1375,7 +1375,7 @@ public class ChannelsTest {
     public void testMerge() {
 
         final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .withChannels()
+                                                     .channelConfiguration()
                                                      .withChannelOrder(OrderType.BY_CALL)
                                                      .setConfiguration();
         IOChannel<String> channel1;
@@ -1429,7 +1429,7 @@ public class ChannelsTest {
     public void testMerge4() {
 
         final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .withChannels()
+                                                     .channelConfiguration()
                                                      .withChannelOrder(OrderType.BY_CALL)
                                                      .setConfiguration();
         final IOChannel<String> channel1 = builder.buildChannel();
@@ -1464,7 +1464,7 @@ public class ChannelsTest {
     public void testMergeAbort() {
 
         final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .withChannels()
+                                                     .channelConfiguration()
                                                      .withChannelOrder(OrderType.BY_CALL)
                                                      .setConfiguration();
         IOChannel<String> channel1;
@@ -1926,14 +1926,14 @@ public class ChannelsTest {
         final OutputChannel<Selectable<Object>> outputChannel = routine.asyncCall(inputChannel);
         final OutputChannel<Object> intChannel =
                 Channels.select(outputChannel, Sort.INTEGER, Sort.STRING)
-                        .withChannels()
+                        .channelConfiguration()
                         .withLogLevel(Level.WARNING)
                         .setConfiguration()
                         .buildChannels()
                         .get(Sort.INTEGER);
         final OutputChannel<Object> strChannel =
                 Channels.select(outputChannel, Sort.STRING, Sort.INTEGER)
-                        .withChannels()
+                        .channelConfiguration()
                         .withLogLevel(Level.WARNING)
                         .setConfiguration()
                         .buildChannels()

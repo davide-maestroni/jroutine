@@ -64,7 +64,7 @@ import org.jetbrains.annotations.NotNull;
  * <pre>
  *     <code>
  *
- *         doSomething2.asyncCall(doSomething1.asyncCall())).afterMax(seconds(20)).allInto(results);
+ *         doSomething2.asyncCall(doSomething1.asyncCall()).afterMax(seconds(20).allInto(results);
  *     </code>
  * </pre>
  * <p>
@@ -85,7 +85,7 @@ import org.jetbrains.annotations.NotNull;
  *         }.start();
  *
  *         final Routine&lt;Result, Result&gt; routine =
- *                  JRoutineCore.&lt;Result&gt;on(PassingInvocation.&lt;Result&gt;factoryOf())
+ *                  JRoutineCore.on(PassingInvocation.&lt;Result&gt;factoryOf())
  *                              .buildRoutine();
  *         routine.asyncCall(channel).afterMax(seconds(20)).allInto(results);
  *     </code>

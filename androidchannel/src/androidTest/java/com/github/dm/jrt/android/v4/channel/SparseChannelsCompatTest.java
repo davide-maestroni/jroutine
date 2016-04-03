@@ -445,7 +445,7 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
     public void testMap() {
 
         final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .withChannels()
+                                                     .channelConfiguration()
                                                      .withChannelOrder(OrderType.BY_CALL)
                                                      .setConfiguration();
         final IOChannel<String> channel1 = builder.buildChannel();
@@ -485,7 +485,7 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
     public void testMerge() {
 
         final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .withChannels()
+                                                     .channelConfiguration()
                                                      .withChannelOrder(OrderType.BY_CALL)
                                                      .setConfiguration();
         final IOChannel<String> channel1 = builder.buildChannel();
@@ -507,7 +507,7 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
     public void testMergeAbort() {
 
         final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .withChannels()
+                                                     .channelConfiguration()
                                                      .withChannelOrder(OrderType.BY_CALL)
                                                      .setConfiguration();
         final IOChannel<String> channel1 = builder.buildChannel();

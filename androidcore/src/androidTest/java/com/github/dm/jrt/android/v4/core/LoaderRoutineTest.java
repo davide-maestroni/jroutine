@@ -781,7 +781,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                           .setConfiguration();
         JRoutineLoaderCompat.with(loaderFrom(getActivity()))
                             .onId(0)
-                            .withChannels()
+                            .channelConfiguration()
                             .with(configuration)
                             .setConfiguration()
                             .buildChannel();
@@ -792,7 +792,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                           R.id.test_fragment);
         JRoutineLoaderCompat.with(loaderFrom(fragment))
                             .onId(0)
-                            .withChannels()
+                            .channelConfiguration()
                             .with(configuration)
                             .setConfiguration()
                             .buildChannel();
@@ -1484,7 +1484,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
     public void testLoaderError() throws NoSuchMethodException {
 
         final Logger logger = Logger.newLogger(null, null, this);
-        final LoaderConfiguration configuration = LoaderConfiguration.DEFAULT_CONFIGURATION;
+        final LoaderConfiguration configuration = LoaderConfiguration.defaultConfiguration();
         final LoaderContextCompat context = loaderFrom(getActivity());
 
         try {
@@ -1576,13 +1576,13 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
     @SuppressWarnings("ConstantConditions")
     public void testRoutineError() throws NoSuchMethodException {
 
-        final LoaderConfiguration configuration = LoaderConfiguration.DEFAULT_CONFIGURATION;
+        final LoaderConfiguration configuration = LoaderConfiguration.defaultConfiguration();
         final LoaderContextCompat context = loaderFrom(getActivity());
 
         try {
 
             new DefaultLoaderRoutine<String, String>(null, factoryOf(ToUpperCase.class),
-                    InvocationConfiguration.DEFAULT_CONFIGURATION, configuration);
+                    InvocationConfiguration.defaultConfiguration(), configuration);
 
             fail();
 
@@ -1593,7 +1593,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         try {
 
             new DefaultLoaderRoutine<String, String>(context, null,
-                    InvocationConfiguration.DEFAULT_CONFIGURATION, configuration);
+                    InvocationConfiguration.defaultConfiguration(), configuration);
 
             fail();
 
@@ -1615,7 +1615,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         try {
 
             new DefaultLoaderRoutine<String, String>(context, factoryOf(ToUpperCase.class),
-                    InvocationConfiguration.DEFAULT_CONFIGURATION, null);
+                    InvocationConfiguration.defaultConfiguration(), null);
 
             fail();
 

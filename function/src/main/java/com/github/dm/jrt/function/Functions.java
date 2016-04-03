@@ -356,7 +356,7 @@ public class Functions {
     }
 
     /**
-     * Returns a predicate wrapper always returning the false.<br>
+     * Returns a predicate wrapper always returning false.<br>
      * The returned object will support concatenation and comparison.
      *
      * @param <IN> the input data type.
@@ -426,7 +426,7 @@ public class Functions {
     }
 
     /**
-     * Returns a predicate wrapper always returning the true.<br>
+     * Returns a predicate wrapper always returning true.<br>
      * The returned object will support concatenation and comparison.
      *
      * @param <IN> the input data type.

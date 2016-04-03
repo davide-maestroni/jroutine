@@ -22,6 +22,8 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 /**
  * Log set unit tests.
  * <p>
@@ -40,6 +42,40 @@ public class LogSetTest {
     private static final String FORMAT3 = "0: %s - 1: %s - 2: %s - 3: %s";
 
     private static final String FORMAT4 = "0: %s - 1: %s - 2: %s - 3: %s - 4: %s";
+
+    @Test
+    public void testAdd() {
+
+        final NullLog log1 = new NullLog();
+        final NullLog log2 = new NullLog();
+        final NullLog log3 = new NullLog();
+        final LogSet logs = new LogSet();
+        logs.addAll(log1, log2, log3);
+        assertThat(logs).containsAll(Arrays.asList(log1, log2, log3));
+        assertThat(new LogSet().appendAll(log1, log2, log3)).containsAll(
+                Arrays.asList(log1, log2, log3));
+        assertThat(new LogSet().appendAll(Arrays.asList(log1, log2, log3))).containsAll(
+                Arrays.asList(log1, log2, log3));
+        assertThat(new LogSet().append(log1).append(log2).append(log3)).containsAll(
+                Arrays.asList(log1, log2, log3));
+        logs.clear();
+        logs.add(LogSet.of(log1, log2, log3));
+        assertThat(logs).containsAll(Arrays.asList(log1, log2, log3));
+    }
+
+    @Test
+    public void testContains() {
+
+        final NullLog log1 = new NullLog();
+        final NullLog log2 = new NullLog();
+        final NullLog log3 = new NullLog();
+        final LogSet logs = LogSet.of(Arrays.asList(log1, log2, log3));
+        assertThat(logs.contains(log1)).isTrue();
+        assertThat(logs.containsAll(Arrays.asList(log1, log2, log3))).isTrue();
+        assertThat(logs.contains(LogSet.of(log1, log2, log3))).isTrue();
+        assertThat(logs.contains(LogSet.of(new NullLog()))).isFalse();
+        assertThat(logs.containsAll(log1, log2, new NullLog())).isFalse();
+    }
 
     @Test
     public void testLogDbg() {
@@ -105,5 +141,33 @@ public class LogSetTest {
         logger.wrn(ex, FORMAT2, ARGS[0], ARGS[1], ARGS[2]);
         logger.wrn(ex, FORMAT3, ARGS[0], ARGS[1], ARGS[2], ARGS[3]);
         logger.wrn(ex, FORMAT4, ARGS[0], ARGS[1], ARGS[2], ARGS[3], ARGS[4]);
+    }
+
+    @Test
+    public void testRemove() {
+
+        final NullLog log1 = new NullLog();
+        final NullLog log2 = new NullLog();
+        final NullLog log3 = new NullLog();
+        assertThat(LogSet.of(log1, log2, log3).remove(log1)).isTrue();
+        assertThat(LogSet.of(log1, log2).remove(log3)).isFalse();
+        assertThat(LogSet.of(log1, log2).removeAll(log1, log2)).isTrue();
+        assertThat(LogSet.of(log1, log2).removeAll(Arrays.asList(log3, log3))).isFalse();
+        assertThat(LogSet.of(log1, log2, log3).remove(LogSet.of(log2, log3))).isTrue();
+        assertThat(LogSet.of(log1, log2).remove(LogSet.of(log3))).isFalse();
+    }
+
+    @Test
+    public void testRetain() {
+
+        final NullLog log1 = new NullLog();
+        final NullLog log2 = new NullLog();
+        final NullLog log3 = new NullLog();
+        assertThat(LogSet.of(log1, log2, log3).retainAll(log1)).isTrue();
+        assertThat(LogSet.of(log1, log2).retainAll(log1, log2)).isFalse();
+        assertThat(LogSet.of(log1, log2, log3).retainAll(Arrays.asList(log1, log3))).isTrue();
+        assertThat(LogSet.of(log1, log2).retainAll(Arrays.asList(log1, log2))).isFalse();
+        assertThat(LogSet.of(log1, log2, log3).retainAll(LogSet.of(log1))).isTrue();
+        assertThat(LogSet.of(log1, log2).retainAll(LogSet.of(log1, log2))).isFalse();
     }
 }

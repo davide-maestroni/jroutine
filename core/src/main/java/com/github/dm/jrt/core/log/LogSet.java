@@ -218,6 +218,24 @@ public class LogSet extends CopyOnWriteArraySet<Log> implements Log {
         return super.retainAll(list);
     }
 
+    /**
+     * Returns <tt>true</tt> if this set contains all of the elements of the specified array.
+     *
+     * @param logs array to be checked for containment in this set.
+     * @return <tt>true</tt> if this set contains all of the elements of the specified collection.
+     * @see #contains(Object)
+     */
+    public boolean containsAll(final Log... logs) {
+
+        for (final Log log : logs) {
+            if (!contains(log)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public void dbg(@NotNull final List<Object> contexts, @Nullable final String message,
             @Nullable final Throwable throwable) {
 
@@ -240,5 +258,46 @@ public class LogSet extends CopyOnWriteArraySet<Log> implements Log {
         for (final Log log : this) {
             log.wrn(contexts, message, throwable);
         }
+    }
+
+    /**
+     * Removes from this set all of its elements that are contained in the specified array.
+     *
+     * @param logs array containing elements to be removed from this set.
+     * @return <tt>true</tt> if this set changed as a result of the call
+     * @see #remove(Object)
+     */
+    public boolean removeAll(final Log... logs) {
+
+        boolean result = true;
+        for (final Log log : logs) {
+            result &= remove(log);
+        }
+
+        return result;
+    }
+
+    /**
+     * Retains only the elements in this set that are contained in the specified array. In other
+     * words, removes from this set all of its elements that are not contained in the specified
+     * collection.
+     *
+     * @param logs array containing elements to be retained in this set.
+     * @return <tt>true</tt> if this set changed as a result of the call.
+     * @see #remove(Object)
+     */
+    public boolean retainAll(final Log... logs) {
+
+        final ArrayList<Object> list = new ArrayList<Object>(logs.length);
+        for (final Log log : logs) {
+            if (log instanceof LogSet) {
+                list.addAll((LogSet) log);
+
+            } else {
+                list.add(log);
+            }
+        }
+
+        return super.retainAll(list);
     }
 }

@@ -73,8 +73,8 @@ import java.util.WeakHashMap;
  */
 public class JRoutineLoaderObject {
 
-    private static final WeakHashMap<LoaderContext, ContextBuilder> sBuilders =
-            new WeakHashMap<LoaderContext, ContextBuilder>();
+    private static final WeakHashMap<LoaderContext, LoaderObjectBuilder> sBuilders =
+            new WeakHashMap<LoaderContext, LoaderObjectBuilder>();
 
     /**
      * Avoid explicit instantiation.
@@ -90,24 +90,24 @@ public class JRoutineLoaderObject {
      * @return the context builder.
      */
     @NotNull
-    public static ContextBuilder with(@NotNull final LoaderContext context) {
+    public static LoaderObjectBuilder with(@NotNull final LoaderContext context) {
 
         synchronized (sBuilders) {
-            final WeakHashMap<LoaderContext, ContextBuilder> builders = sBuilders;
-            ContextBuilder contextBuilder = builders.get(context);
-            if (contextBuilder == null) {
-                contextBuilder = new ContextBuilder(context);
-                builders.put(context, contextBuilder);
+            final WeakHashMap<LoaderContext, LoaderObjectBuilder> builders = sBuilders;
+            LoaderObjectBuilder builder = builders.get(context);
+            if (builder == null) {
+                builder = new LoaderObjectBuilder(context);
+                builders.put(context, builder);
             }
 
-            return contextBuilder;
+            return builder;
         }
     }
 
     /**
      * Context based builder of loader routine builders.
      */
-    public static class ContextBuilder {
+    public static class LoaderObjectBuilder {
 
         private final LoaderContext mContext;
 
@@ -116,7 +116,7 @@ public class JRoutineLoaderObject {
          *
          * @param context the loader context.
          */
-        private ContextBuilder(@NotNull final LoaderContext context) {
+        private LoaderObjectBuilder(@NotNull final LoaderContext context) {
 
             mContext = ConstantConditions.notNull("loader context", context);
         }

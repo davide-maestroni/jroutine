@@ -66,7 +66,7 @@ import static com.github.dm.jrt.function.Functions.wrap;
  *
  * @param <OUT> the output data type.
  */
-public class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel<OUT>
+class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel<OUT>
         implements LoaderStreamChannelCompat<OUT>, Configurable<LoaderStreamChannelCompat<OUT>> {
 
     private final InvocationConfiguration.Configurable<LoaderStreamChannelCompat<OUT>>

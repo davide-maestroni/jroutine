@@ -36,7 +36,7 @@ import java.util.WeakHashMap;
  * By default output results are dispatched in the main looper.<br>
  * Note that the configuration of the maximum number of concurrent invocations will not be shared
  * among synchronous and asynchronous invocations, but the invocations created inside the service
- * and the synchronous will respect the same limit separately.
+ * and the synchronous ones will respect the same limit separately.
  * <p>
  * It is up to the caller to properly declare the service in the manifest file. Note also that it is
  * possible to manage the service lifecycle starting it through the

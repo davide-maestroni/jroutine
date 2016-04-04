@@ -51,7 +51,7 @@
                                     .loaderConfiguration()
                                     .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
                                     .setConfiguration()
-                                    .alias(LOAD_BITMAP)
+                                    .method(LOAD_BITMAP)
                                     .asyncCall(URI.create(IMAGE_URI))
                                     .bind(new TemplateOutputConsumer&lt;Bitmap&gt;() {
 

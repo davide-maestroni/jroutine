@@ -61,12 +61,24 @@ import static com.github.dm.jrt.core.util.Reflection.findConstructor;
  */
 public class InvocationService extends Service {
 
+    /**
+     * Value used as {@code what} of a message identifying an abort operation.
+     */
     public static final int MSG_ABORT = -1;
 
+    /**
+     * Value used as {@code what} of a message identifying a completion operation.
+     */
     public static final int MSG_COMPLETE = 2;
 
+    /**
+     * Value used as {@code what} of a message identifying a data transfer operation.
+     */
     public static final int MSG_DATA = 1;
 
+    /**
+     * Value used as {@code what} of a message identifying an initialization operation.
+     */
     public static final int MSG_INIT = 0;
 
     private static final String KEY_ABORT_EXCEPTION = "abort_exception";

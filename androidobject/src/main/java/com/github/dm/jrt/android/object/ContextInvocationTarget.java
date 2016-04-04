@@ -87,7 +87,7 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
      * @return the context invocation target.
      */
     @NotNull
-    public static <TYPE> ObjectContextInvocationTarget<TYPE> instanceOf(
+    public static <TYPE> ContextInvocationTarget<TYPE> instanceOf(
             @NotNull final Class<TYPE> targetClass, @Nullable final Object... factoryArgs) {
 
         return new ObjectContextInvocationTarget<TYPE>(targetClass, factoryArgs);

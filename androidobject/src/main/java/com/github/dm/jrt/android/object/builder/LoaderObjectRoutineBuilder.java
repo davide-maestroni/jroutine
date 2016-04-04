@@ -80,7 +80,8 @@ public interface LoaderObjectRoutineBuilder
 
     /**
      * Returns a routine used to call the method whose identifying name is specified in an
-     * {@link com.github.dm.jrt.object.annotation.Alias Alias} annotation.<br>
+     * {@link com.github.dm.jrt.object.annotation.Alias Alias} annotation.
+     * <p>
      * If no method with the specified alias is found, this method will behave like
      * {@link #method(String, Class[])} with no parameter.<br>
      * Optional <i>{@code com.github.dm.jrt.object.annotation.*}</i> as well as

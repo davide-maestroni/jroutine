@@ -418,6 +418,17 @@ public class ParcelableByteChannel {
             return mBuffer != null ? mBuffer.hashCode() : 0;
         }
 
+        /**
+         * Returns the size in number of bytes of this buffer.
+         *
+         * @return the buffer size.
+         */
+        public int getSize() {
+
+            final ByteBuffer buffer = mBuffer;
+            return (buffer != null) ? buffer.getSize() : 0;
+        }
+
         @Nullable
         private ByteBuffer getBuffer() {
 

@@ -70,8 +70,8 @@ import java.util.WeakHashMap;
  */
 public class JRoutineLoaderObjectCompat {
 
-    private static final WeakHashMap<LoaderContextCompat, ContextBuilderCompat> sBuilders =
-            new WeakHashMap<LoaderContextCompat, ContextBuilderCompat>();
+    private static final WeakHashMap<LoaderContextCompat, LoaderObjectBuilderCompat> sBuilders =
+            new WeakHashMap<LoaderContextCompat, LoaderObjectBuilderCompat>();
 
     /**
      * Avoid explicit instantiation.
@@ -87,24 +87,24 @@ public class JRoutineLoaderObjectCompat {
      * @return the context builder.
      */
     @NotNull
-    public static ContextBuilderCompat with(@NotNull final LoaderContextCompat context) {
+    public static LoaderObjectBuilderCompat with(@NotNull final LoaderContextCompat context) {
 
         synchronized (sBuilders) {
-            final WeakHashMap<LoaderContextCompat, ContextBuilderCompat> builders = sBuilders;
-            ContextBuilderCompat contextBuilder = builders.get(context);
-            if (contextBuilder == null) {
-                contextBuilder = new ContextBuilderCompat(context);
-                builders.put(context, contextBuilder);
+            final WeakHashMap<LoaderContextCompat, LoaderObjectBuilderCompat> builders = sBuilders;
+            LoaderObjectBuilderCompat builder = builders.get(context);
+            if (builder == null) {
+                builder = new LoaderObjectBuilderCompat(context);
+                builders.put(context, builder);
             }
 
-            return contextBuilder;
+            return builder;
         }
     }
 
     /**
      * Context based builder of loader routine builders.
      */
-    public static class ContextBuilderCompat {
+    public static class LoaderObjectBuilderCompat {
 
         private final LoaderContextCompat mContext;
 
@@ -113,7 +113,7 @@ public class JRoutineLoaderObjectCompat {
          *
          * @param context the loader context.
          */
-        private ContextBuilderCompat(@NotNull final LoaderContextCompat context) {
+        private LoaderObjectBuilderCompat(@NotNull final LoaderContextCompat context) {
 
             mContext = ConstantConditions.notNull("loader context", context);
         }

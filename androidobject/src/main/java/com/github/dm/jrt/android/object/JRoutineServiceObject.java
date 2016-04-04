@@ -64,8 +64,8 @@ import java.util.WeakHashMap;
  */
 public class JRoutineServiceObject {
 
-    private static final WeakHashMap<ServiceContext, ServiceContextBuilder> sBuilders =
-            new WeakHashMap<ServiceContext, ServiceContextBuilder>();
+    private static final WeakHashMap<ServiceContext, ServiceObjectBuilder> sBuilders =
+            new WeakHashMap<ServiceContext, ServiceObjectBuilder>();
 
     /**
      * Avoid explicit instantiation.
@@ -81,24 +81,24 @@ public class JRoutineServiceObject {
      * @return the context builder.
      */
     @NotNull
-    public static ServiceContextBuilder with(@NotNull final ServiceContext context) {
+    public static ServiceObjectBuilder with(@NotNull final ServiceContext context) {
 
         synchronized (sBuilders) {
-            final WeakHashMap<ServiceContext, ServiceContextBuilder> builders = sBuilders;
-            ServiceContextBuilder contextBuilder = builders.get(context);
-            if (contextBuilder == null) {
-                contextBuilder = new ServiceContextBuilder(context);
-                builders.put(context, contextBuilder);
+            final WeakHashMap<ServiceContext, ServiceObjectBuilder> builders = sBuilders;
+            ServiceObjectBuilder builder = builders.get(context);
+            if (builder == null) {
+                builder = new ServiceObjectBuilder(context);
+                builders.put(context, builder);
             }
 
-            return contextBuilder;
+            return builder;
         }
     }
 
     /**
      * Context based builder of service routine builders.
      */
-    public static class ServiceContextBuilder {
+    public static class ServiceObjectBuilder {
 
         private final ServiceContext mContext;
 
@@ -107,7 +107,7 @@ public class JRoutineServiceObject {
          *
          * @param context the service context.
          */
-        private ServiceContextBuilder(@NotNull final ServiceContext context) {
+        private ServiceObjectBuilder(@NotNull final ServiceContext context) {
 
             mContext = ConstantConditions.notNull("service context", context);
         }

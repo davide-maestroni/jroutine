@@ -101,8 +101,8 @@ public abstract class AbstractCallAdapterFactory<T> extends CallAdapter.Factory 
      * @return the adapted instance.
      */
     @NotNull
-    protected abstract <C extends Call<T>> T adapt(@NotNull final Routine<C, T> routine,
-            @NotNull final Call<?> call);
+    protected abstract <C extends Call<T>> T adapt(@NotNull Routine<C, T> routine,
+            @NotNull Call<?> call);
 
     /**
      * Gets the routine used to handle the invocation of the method with the specified response type

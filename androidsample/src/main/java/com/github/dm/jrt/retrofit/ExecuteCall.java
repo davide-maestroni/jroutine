@@ -25,6 +25,8 @@ import retrofit2.Call;
 
 /**
  * Implementation of an invocation handling the execution of call instances.
+ * <p>
+ * Created by davide-maestroni on 03/26/2016.
  *
  * @param <T> the response type.
  */

@@ -38,6 +38,8 @@ import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
 
 /**
  * Main activity.
+ * <p>
+ * Created by davide-maestroni on 03/25/2016.
  */
 public class MainActivity extends AppCompatActivity {
 

@@ -364,7 +364,7 @@ public interface StreamChannel<OUT>
     /**
      * Concatenates a stream based on the specified accumulating function to this one.<br>
      * The output will be computed as follows, where the initial accumulated value will be the
-     * specified {@code seed}:
+     * one returned by the specified supplier:
      * <pre>
      *     <code>
      *
@@ -376,13 +376,13 @@ public interface StreamChannel<OUT>
      * Note that the created routine will be initialized with the current configuration.<br>
      * Note also that this stream will be bound as a result of the call.
      *
-     * @param seed     the initial accumulation value.
+     * @param supplier the supplier of initial accumulation values.
      * @param function the bi-function instance.
      * @param <AFTER>  the concatenation output type.
      * @return the concatenated stream.
      */
     @NotNull
-    <AFTER> StreamChannel<AFTER> reduce(AFTER seed,
+    <AFTER> StreamChannel<AFTER> reduce(@NotNull Supplier<? extends AFTER> supplier,
             @NotNull BiFunction<? super AFTER, ? super OUT, ? extends AFTER> function);
 
     /**

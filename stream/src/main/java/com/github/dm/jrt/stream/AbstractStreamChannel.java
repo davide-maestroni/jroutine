@@ -358,10 +358,10 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
-    public <AFTER> StreamChannel<AFTER> reduce(final AFTER seed,
+    public <AFTER> StreamChannel<AFTER> reduce(@NotNull Supplier<? extends AFTER> supplier,
             @NotNull final BiFunction<? super AFTER, ? super OUT, ? extends AFTER> function) {
 
-        return map(AccumulateInvocation.functionFactory(seed, function));
+        return map(AccumulateInvocation.functionFactory(supplier, function));
     }
 
     @NotNull

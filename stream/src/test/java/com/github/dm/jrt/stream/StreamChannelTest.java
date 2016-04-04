@@ -1277,15 +1277,19 @@ public class StreamChannelTest {
 
         assertThat(Streams.streamOf("test1", "test2", "test3")
                           .async()
-                          .reduce(new StringBuilder(),
-                                  new BiFunction<StringBuilder, String, StringBuilder>() {
+                          .reduce(new Supplier<StringBuilder>() {
 
-                                      public StringBuilder apply(final StringBuilder b,
-                                              final String s) {
+                              public StringBuilder get() {
 
-                                          return b.append(s);
-                                      }
-                                  })
+                                  return new StringBuilder();
+                              }
+                          }, new BiFunction<StringBuilder, String, StringBuilder>() {
+
+                              public StringBuilder apply(final StringBuilder b, final String s) {
+
+                                  return b.append(s);
+                              }
+                          })
                           .map(new Function<StringBuilder, String>() {
 
                               public String apply(final StringBuilder builder) {
@@ -1297,15 +1301,19 @@ public class StreamChannelTest {
                           .all()).containsExactly("test1test2test3");
         assertThat(Streams.streamOf("test1", "test2", "test3")
                           .sync()
-                          .reduce(new StringBuilder(),
-                                  new BiFunction<StringBuilder, String, StringBuilder>() {
+                          .reduce(new Supplier<StringBuilder>() {
 
-                                      public StringBuilder apply(final StringBuilder b,
-                                              final String s) {
+                              public StringBuilder get() {
 
-                                          return b.append(s);
-                                      }
-                                  })
+                                  return new StringBuilder();
+                              }
+                          }, new BiFunction<StringBuilder, String, StringBuilder>() {
+
+                              public StringBuilder apply(final StringBuilder b, final String s) {
+
+                                  return b.append(s);
+                              }
+                          })
                           .map(new Function<StringBuilder, String>() {
 
                               public String apply(final StringBuilder builder) {

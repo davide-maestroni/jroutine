@@ -240,7 +240,7 @@ public interface LoaderStreamChannelCompat<OUT>
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannelCompat<AFTER> reduce(AFTER seed,
+    <AFTER> LoaderStreamChannelCompat<AFTER> reduce(@NotNull Supplier<? extends AFTER> supplier,
             @NotNull BiFunction<? super AFTER, ? super OUT, ? extends AFTER> function);
 
     /**

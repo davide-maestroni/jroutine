@@ -22,8 +22,11 @@ import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.BiFunctionWrapper;
+import com.github.dm.jrt.function.Supplier;
+import com.github.dm.jrt.function.SupplierWrapper;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.function.Functions.wrap;
@@ -38,11 +41,9 @@ import static com.github.dm.jrt.function.Functions.wrap;
  */
 class AccumulateInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
 
-    private static final Object NO_SEED = new Object();
-
     private final BiFunction<? super OUT, ? super IN, ? extends OUT> mFunction;
 
-    private final Object mSeed;
+    private final SupplierWrapper<? extends OUT> mSupplier;
 
     private OUT mAccumulated;
 
@@ -51,13 +52,13 @@ class AccumulateInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
     /**
      * Constructor.
      *
-     * @param seed     the accumulation seed.
-     * @param function the bi-function instance.
+     * @param supplier the supplier of initial accumulation values.
+     * @param function the accumulating bi-function instance.
      */
-    private AccumulateInvocation(final Object seed,
+    private AccumulateInvocation(@Nullable final SupplierWrapper<? extends OUT> supplier,
             @NotNull final BiFunction<? super OUT, ? super IN, ? extends OUT> function) {
 
-        mSeed = seed;
+        mSupplier = supplier;
         mFunction = function;
     }
 
@@ -65,7 +66,7 @@ class AccumulateInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
      * Builds and returns a new accumulating invocation factory backed by the specified bi-function
      * instance.
      *
-     * @param function the bi-function instance.
+     * @param function the accumulating bi-function instance.
      * @param <IN>     the input data type.
      * @return the invocation factory.
      */
@@ -73,24 +74,26 @@ class AccumulateInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
     public static <IN> InvocationFactory<IN, IN> functionFactory(
             @NotNull final BiFunction<? super IN, ? super IN, ? extends IN> function) {
 
-        return new AccumulateInvocationFactory<IN, IN>(NO_SEED, wrap(function));
+        return new AccumulateInvocationFactory<IN, IN>(null, wrap(function));
     }
 
     /**
      * Builds and returns a new accumulating invocation factory backed by the specified bi-function
      * instance.
      *
-     * @param seed     the initial accumulated value.
-     * @param function the bi-function instance.
+     * @param supplier the supplier of initial accumulation values.
+     * @param function the accumulating bi-function instance.
      * @param <IN>     the input data type.
      * @param <OUT>    the output data type.
      * @return the invocation factory.
      */
     @NotNull
-    public static <IN, OUT> InvocationFactory<IN, OUT> functionFactory(OUT seed,
+    @SuppressWarnings("unchecked")
+    public static <IN, OUT> InvocationFactory<IN, OUT> functionFactory(
+            @NotNull final Supplier<? extends OUT> supplier,
             @NotNull final BiFunction<? super OUT, ? super IN, ? extends OUT> function) {
 
-        return new AccumulateInvocationFactory<IN, OUT>(seed, wrap(function));
+        return new AccumulateInvocationFactory<IN, OUT>(wrap(supplier), wrap(function));
     }
 
     @Override
@@ -105,12 +108,12 @@ class AccumulateInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
 
         if (mIsFirst) {
             mIsFirst = false;
-            final Object seed = mSeed;
-            if (seed == NO_SEED) {
-                mAccumulated = (OUT) input;
+            final SupplierWrapper<? extends OUT> supplier = mSupplier;
+            if (supplier != null) {
+                mAccumulated = mFunction.apply(supplier.get(), input);
 
             } else {
-                mAccumulated = mFunction.apply((OUT) seed, input);
+                mAccumulated = (OUT) input;
             }
 
         } else {
@@ -140,19 +143,19 @@ class AccumulateInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
 
         private final BiFunctionWrapper<? super OUT, ? super IN, ? extends OUT> mFunction;
 
-        private final Object mSeed;
+        private final SupplierWrapper<? extends OUT> mSupplier;
 
         /**
          * Constructor.
          *
-         * @param seed     the accumulation seed.
-         * @param function the bi-function instance.
+         * @param supplier the supplier of initial accumulation values.
+         * @param function the accumulating bi-function instance.
          */
-        private AccumulateInvocationFactory(Object seed,
+        private AccumulateInvocationFactory(@Nullable final SupplierWrapper<? extends OUT> supplier,
                 @NotNull final BiFunctionWrapper<? super OUT, ? super IN, ? extends OUT> function) {
 
-            super(asArgs(seed, function));
-            mSeed = seed;
+            super(asArgs(supplier, function));
+            mSupplier = supplier;
             mFunction = function;
         }
 
@@ -160,7 +163,7 @@ class AccumulateInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
         @Override
         public Invocation<IN, OUT> newInvocation() {
 
-            return new AccumulateInvocation<IN, OUT>(mSeed, mFunction);
+            return new AccumulateInvocation<IN, OUT>(mSupplier, mFunction);
         }
     }
 }

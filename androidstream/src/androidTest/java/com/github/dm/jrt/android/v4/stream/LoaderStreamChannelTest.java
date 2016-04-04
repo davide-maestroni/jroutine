@@ -491,16 +491,20 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(LoaderStreamsCompat.streamOf("test1", "test2", "test3")
                                       .with(loaderFrom(activity))
                                       .async()
-                                      .reduce(new StringBuilder(),
-                                              new BiFunction<StringBuilder, String,
-                                                      StringBuilder>() {
+                                      .reduce(new Supplier<StringBuilder>() {
 
-                                                  public StringBuilder apply(final StringBuilder b,
-                                                          final String s) {
+                                          public StringBuilder get() {
 
-                                                      return b.append(s);
-                                                  }
-                                              })
+                                              return new StringBuilder();
+                                          }
+                                      }, new BiFunction<StringBuilder, String, StringBuilder>() {
+
+                                          public StringBuilder apply(final StringBuilder b,
+                                                  final String s) {
+
+                                              return b.append(s);
+                                          }
+                                      })
                                       .map(new Function<StringBuilder, String>() {
 
                                           public String apply(final StringBuilder builder) {
@@ -513,16 +517,20 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(LoaderStreamsCompat.streamOf("test1", "test2", "test3")
                                       .with(loaderFrom(activity))
                                       .sync()
-                                      .reduce(new StringBuilder(),
-                                              new BiFunction<StringBuilder, String,
-                                                      StringBuilder>() {
+                                      .reduce(new Supplier<StringBuilder>() {
 
-                                                  public StringBuilder apply(final StringBuilder b,
-                                                          final String s) {
+                                          public StringBuilder get() {
 
-                                                      return b.append(s);
-                                                  }
-                                              })
+                                              return new StringBuilder();
+                                          }
+                                      }, new BiFunction<StringBuilder, String, StringBuilder>() {
+
+                                          public StringBuilder apply(final StringBuilder b,
+                                                  final String s) {
+
+                                              return b.append(s);
+                                          }
+                                      })
                                       .map(new Function<StringBuilder, String>() {
 
                                           public String apply(final StringBuilder builder) {

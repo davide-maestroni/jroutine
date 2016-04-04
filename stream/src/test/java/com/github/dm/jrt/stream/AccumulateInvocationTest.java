@@ -19,6 +19,7 @@ package com.github.dm.jrt.stream;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.function.BiFunction;
+import com.github.dm.jrt.function.Supplier;
 
 import org.junit.Test;
 
@@ -51,6 +52,13 @@ public class AccumulateInvocationTest {
         assertThat(JRoutineCore.on(functionFactory(function))
                                .syncCall("test1", "test2", "test3")
                                .next()).isEqualTo("test1test2test3");
+        assertThat(JRoutineCore.on(functionFactory(new Supplier<String>() {
+
+            public String get() {
+
+                return "test0";
+            }
+        }, function)).syncCall("test1", "test2", "test3").next()).isEqualTo("test0test1test2test3");
     }
 
     @Test

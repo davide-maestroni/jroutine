@@ -140,6 +140,13 @@ public class JRoutineLoaderCompat {
             new WeakHashMap<LoaderContextCompat, LoaderBuilderCompat>();
 
     /**
+     * Avoid explicit instantiation.
+     */
+    protected JRoutineLoaderCompat() {
+
+    }
+
+    /**
      * Returns a context based builder of loader routine builders.
      *
      * @param context the loader context.

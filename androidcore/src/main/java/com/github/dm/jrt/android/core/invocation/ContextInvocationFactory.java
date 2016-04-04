@@ -72,7 +72,8 @@ public abstract class ContextInvocationFactory<IN, OUT> extends AutoComparable {
 
     /**
      * Builds and returns a new context invocation factory creating instances of the specified
-     * class.
+     * class.<br>
+     * The method accepts also classes inheriting from {@link ContextInvocation}.
      * <p>
      * Note that inner and anonymous classes can be passed as well. Remember however that Java
      * creates synthetic constructors for such classes, so be sure to specify the correct arguments
@@ -94,7 +95,8 @@ public abstract class ContextInvocationFactory<IN, OUT> extends AutoComparable {
 
     /**
      * Builds and returns a new context invocation factory creating instances of the specified
-     * class by passing the specified arguments to the class constructor.
+     * class by passing the specified arguments to the class constructor.<br>
+     * The method accepts also classes inheriting from {@link ContextInvocation}.
      * <p>
      * Note that inner and anonymous classes can be passed as well. Remember however that Java
      * creates synthetic constructors for such classes, so be sure to specify the correct arguments
@@ -125,7 +127,8 @@ public abstract class ContextInvocationFactory<IN, OUT> extends AutoComparable {
 
     /**
      * Builds and returns a new context invocation factory creating instances of the specified class
-     * token.
+     * token.<br>
+     * The method accepts also classes inheriting from {@link ContextInvocation}.
      * <p>
      * Note that class tokens of inner and anonymous classes can be passed as well. Remember however
      * that Java creates synthetic constructors for such classes, so be sure to specify the correct
@@ -147,7 +150,8 @@ public abstract class ContextInvocationFactory<IN, OUT> extends AutoComparable {
 
     /**
      * Builds and returns a new context invocation factory creating instances of the specified class
-     * token by passing the specified arguments to the class constructor.
+     * token by passing the specified arguments to the class constructor.<br>
+     * The method accepts also classes inheriting from {@link ContextInvocation}.
      * <p>
      * Note that class tokens of inner and anonymous classes can be passed as well. Remember however
      * that Java creates synthetic constructors for such classes, so be sure to specify the correct

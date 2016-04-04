@@ -77,6 +77,13 @@ public class JRoutineLoaderObject {
             new WeakHashMap<LoaderContext, ContextBuilder>();
 
     /**
+     * Avoid explicit instantiation.
+     */
+    protected JRoutineLoaderObject() {
+
+    }
+
+    /**
      * Returns a context based builder of loader routine builders.
      *
      * @param context the loader context.

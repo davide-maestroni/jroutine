@@ -68,6 +68,13 @@ public class JRoutineServiceObject {
             new WeakHashMap<ServiceContext, ServiceContextBuilder>();
 
     /**
+     * Avoid explicit instantiation.
+     */
+    protected JRoutineServiceObject() {
+
+    }
+
+    /**
      * Returns a context based builder of service routine builders.
      *
      * @param context the service context.

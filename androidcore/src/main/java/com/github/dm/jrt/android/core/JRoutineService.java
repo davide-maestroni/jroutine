@@ -59,7 +59,6 @@ import java.util.WeakHashMap;
  *
  *             super.onCreate(savedInstanceState);
  *             setContentView(R.layout.my_activity_layout);
- *
  *             final Routine&lt;URI, MyResource&gt; routine =
  *                     JRoutineService.with(serviceFrom(this))
  *                                    .on(factoryOf(LoadResourceUri.class))
@@ -89,6 +88,13 @@ public class JRoutineService {
 
     private static final WeakHashMap<ServiceContext, ServiceBuilder> sBuilders =
             new WeakHashMap<ServiceContext, ServiceBuilder>();
+
+    /**
+     * Avoid explicit instantiation.
+     */
+    protected JRoutineService() {
+
+    }
 
     /**
      * Returns a context based builder of service routine builders.

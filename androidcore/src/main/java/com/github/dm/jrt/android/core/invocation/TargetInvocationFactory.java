@@ -70,7 +70,8 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
     }
 
     /**
-     * Returns a target based on the specified invocation class.
+     * Returns a target based on the specified invocation class.<br>
+     * The method accepts also classes inheriting from {@link ContextInvocation}.
      * <p>
      * Note that, in case a class not representing a {@link ContextInvocation} is passed to the
      * factory, the specified invocation class will be passed as the first argument to a special
@@ -89,7 +90,8 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
     }
 
     /**
-     * Returns a target based on the specified invocation class.
+     * Returns a target based on the specified invocation class.<br>
+     * The method accepts also classes inheriting from {@link ContextInvocation}.
      * <p>
      * Note that, in case a class not representing a {@link ContextInvocation} is passed to the
      * factory, the specified invocation class will be passed as the first argument to a special
@@ -119,7 +121,8 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
     }
 
     /**
-     * Returns a target based on the specified invocation token.
+     * Returns a target based on the specified invocation token.<br>
+     * The method accepts also classes inheriting from {@link ContextInvocation}.
      * <p>
      * Note that, in case a class not representing a {@link ContextInvocation} is passed to the
      * factory, the specified invocation class will be passed as the first argument to a special
@@ -138,7 +141,8 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
     }
 
     /**
-     * Returns a target based on the specified invocation token.
+     * Returns a target based on the specified invocation token.<br>
+     * The method accepts also classes inheriting from {@link ContextInvocation}.
      * <p>
      * Note that, in case a class not representing a {@link ContextInvocation} is passed to the
      * factory, the specified invocation class will be passed as the first argument to a special
@@ -159,7 +163,8 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
     }
 
     /**
-     * Returns a target based on the specified invocation.
+     * Returns a target based on the specified invocation.<br>
+     * The method accepts also instances inheriting from {@link ContextInvocation}.
      * <p>
      * Note that, in case a class not representing a {@link ContextInvocation} is passed to the
      * factory, the specified invocation class will be passed as the first argument to a special
@@ -178,7 +183,8 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
     }
 
     /**
-     * Returns a target based on the specified invocation.
+     * Returns a target based on the specified invocation.<br>
+     * The method accepts also instances inheriting from {@link ContextInvocation}.
      * <p>
      * Note that, in case a class not representing a {@link ContextInvocation} is passed to the
      * factory, the specified invocation class will be passed as the first argument to a special

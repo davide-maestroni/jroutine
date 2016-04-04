@@ -68,18 +68,19 @@ class MapBuilderWrapper<OUT> implements ChannelsBuilder<Map<Integer, StreamChann
     }
 
     @NotNull
+    public Builder<? extends ChannelsBuilder<Map<Integer, StreamChannel<OUT>>>>
+    channelConfiguration() {
+
+        final ChannelConfiguration config = mConfiguration;
+        return new Builder<ChannelsBuilder<Map<Integer, StreamChannel<OUT>>>>(this, config);
+    }
+
+    @NotNull
     public ChannelsBuilder<Map<Integer, StreamChannel<OUT>>> setConfiguration(
             @NotNull final ChannelConfiguration configuration) {
 
         mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
         mBuilder.channelConfiguration().with(null).with(configuration).setConfiguration();
         return this;
-    }
-
-    @NotNull
-    public Builder<? extends ChannelsBuilder<Map<Integer, StreamChannel<OUT>>>> channelConfiguration() {
-
-        final ChannelConfiguration config = mConfiguration;
-        return new Builder<ChannelsBuilder<Map<Integer, StreamChannel<OUT>>>>(this, config);
     }
 }

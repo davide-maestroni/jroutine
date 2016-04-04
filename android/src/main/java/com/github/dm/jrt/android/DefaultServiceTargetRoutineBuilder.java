@@ -79,7 +79,8 @@ class DefaultServiceTargetRoutineBuilder implements ServiceTargetRoutineBuilder 
                 }
             };
 
-    private ServiceConfiguration mServiceConfiguration = ServiceConfiguration.defaultConfiguration();
+    private ServiceConfiguration mServiceConfiguration =
+            ServiceConfiguration.defaultConfiguration();
 
     private final ServiceConfiguration.Configurable<DefaultServiceTargetRoutineBuilder>
             mServiceConfigurable =

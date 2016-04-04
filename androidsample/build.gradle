@@ -59,7 +59,7 @@ dependencies {
 }
 
 tasks.withType(Javadoc) {
-    def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/v6'
+    def prefix = 'http://davide-maestroni.github.io/jroutine/javadoc/6'
     options.overview("${project.projectDir}/docs/overview.html")
     options.links('http://docs.oracle.com/javase/7/docs/api/',
             "${prefix}/core/",

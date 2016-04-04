@@ -53,7 +53,8 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
 
     private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.defaultConfiguration();
 
-    private ServiceConfiguration mServiceConfiguration = ServiceConfiguration.defaultConfiguration();
+    private ServiceConfiguration mServiceConfiguration =
+            ServiceConfiguration.defaultConfiguration();
 
     @NotNull
     @SuppressWarnings("unchecked")

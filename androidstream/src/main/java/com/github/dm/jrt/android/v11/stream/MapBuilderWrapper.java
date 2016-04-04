@@ -69,18 +69,19 @@ class MapBuilderWrapper<OUT> implements ChannelsBuilder<SparseArray<LoaderStream
     }
 
     @NotNull
+    public Builder<? extends ChannelsBuilder<SparseArray<LoaderStreamChannel<OUT>>>>
+    channelConfiguration() {
+
+        final ChannelConfiguration config = mConfiguration;
+        return new Builder<ChannelsBuilder<SparseArray<LoaderStreamChannel<OUT>>>>(this, config);
+    }
+
+    @NotNull
     public ChannelsBuilder<SparseArray<LoaderStreamChannel<OUT>>> setConfiguration(
             @NotNull final ChannelConfiguration configuration) {
 
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
         mBuilder.channelConfiguration().with(null).with(configuration).setConfiguration();
         return this;
-    }
-
-    @NotNull
-    public Builder<? extends ChannelsBuilder<SparseArray<LoaderStreamChannel<OUT>>>> channelConfiguration() {
-
-        final ChannelConfiguration config = mConfiguration;
-        return new Builder<ChannelsBuilder<SparseArray<LoaderStreamChannel<OUT>>>>(this, config);
     }
 }

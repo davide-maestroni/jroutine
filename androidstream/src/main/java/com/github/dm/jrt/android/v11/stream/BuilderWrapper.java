@@ -58,18 +58,18 @@ class BuilderWrapper<OUT> implements ChannelsBuilder<LoaderStreamChannel<OUT>>,
     }
 
     @NotNull
+    public Builder<? extends ChannelsBuilder<LoaderStreamChannel<OUT>>> channelConfiguration() {
+
+        final ChannelConfiguration config = mConfiguration;
+        return new Builder<ChannelsBuilder<LoaderStreamChannel<OUT>>>(this, config);
+    }
+
+    @NotNull
     public ChannelsBuilder<LoaderStreamChannel<OUT>> setConfiguration(
             @NotNull final ChannelConfiguration configuration) {
 
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
         mBuilder.channelConfiguration().with(null).with(configuration).setConfiguration();
         return this;
-    }
-
-    @NotNull
-    public Builder<? extends ChannelsBuilder<LoaderStreamChannel<OUT>>> channelConfiguration() {
-
-        final ChannelConfiguration config = mConfiguration;
-        return new Builder<ChannelsBuilder<LoaderStreamChannel<OUT>>>(this, config);
     }
 }

@@ -122,8 +122,8 @@ public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineB
      *
      * @param name           the method name.
      * @param parameterTypes the method parameter types.
-     * @param <IN>   the input data type.
-     * @param <OUT>  the output data type.
+     * @param <IN>           the input data type.
+     * @param <OUT>          the output data type.
      * @return the routine.
      * @throws java.lang.IllegalArgumentException if no matching method is found.
      * @see <a href='{@docRoot}/com/github/dm/jrt/object/annotation/package-summary.html'>

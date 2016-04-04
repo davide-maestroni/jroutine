@@ -56,7 +56,8 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
 
     private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.defaultConfiguration();
 
-    private ServiceConfiguration mServiceConfiguration = ServiceConfiguration.defaultConfiguration();
+    private ServiceConfiguration mServiceConfiguration =
+            ServiceConfiguration.defaultConfiguration();
 
     /**
      * Constructor.

@@ -52,7 +52,8 @@ class DefaultLoaderChannelBuilder
 
     private final LoaderContextCompat mContext;
 
-    private ChannelConfiguration mChannelConfiguration = ChannelConfiguration.defaultConfiguration();
+    private ChannelConfiguration mChannelConfiguration =
+            ChannelConfiguration.defaultConfiguration();
 
     private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.defaultConfiguration();
 
@@ -120,25 +121,11 @@ class DefaultLoaderChannelBuilder
                       .asyncCall();
     }
 
-    public void purge(@Nullable final Iterable<?> inputs) {
+    @NotNull
+    public LoaderConfiguration.Builder<? extends LoaderChannelBuilder> loaderConfiguration() {
 
-        final LoaderContextCompat context = mContext;
-        if (context.getComponent() != null) {
-            final List<Object> inputList;
-            if (inputs == null) {
-                inputList = Collections.emptyList();
-
-            } else {
-                inputList = new ArrayList<Object>();
-                for (final Object input : inputs) {
-                    inputList.add(input);
-                }
-            }
-
-            mainRunner().run(new PurgeInputsExecution(context,
-                            mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO),
-                            inputList), 0, TimeUnit.MILLISECONDS);
-        }
+        final LoaderConfiguration config = mLoaderConfiguration;
+        return new LoaderConfiguration.Builder<LoaderChannelBuilder>(this, config);
     }
 
     public void purge() {
@@ -157,8 +144,8 @@ class DefaultLoaderChannelBuilder
         if (context.getComponent() != null) {
             final List<Object> inputList = Collections.singletonList(input);
             mainRunner().run(new PurgeInputsExecution(context,
-                            mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO),
-                            inputList), 0, TimeUnit.MILLISECONDS);
+                    mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO), inputList), 0,
+                    TimeUnit.MILLISECONDS);
         }
     }
 
@@ -176,24 +163,37 @@ class DefaultLoaderChannelBuilder
             }
 
             mainRunner().run(new PurgeInputsExecution(context,
-                            mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO),
-                            inputList), 0, TimeUnit.MILLISECONDS);
+                    mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO), inputList), 0,
+                    TimeUnit.MILLISECONDS);
+        }
+    }
+
+    public void purge(@Nullable final Iterable<?> inputs) {
+
+        final LoaderContextCompat context = mContext;
+        if (context.getComponent() != null) {
+            final List<Object> inputList;
+            if (inputs == null) {
+                inputList = Collections.emptyList();
+
+            } else {
+                inputList = new ArrayList<Object>();
+                for (final Object input : inputs) {
+                    inputList.add(input);
+                }
+            }
+
+            mainRunner().run(new PurgeInputsExecution(context,
+                    mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO), inputList), 0,
+                    TimeUnit.MILLISECONDS);
         }
     }
 
     @NotNull
-    public LoaderConfiguration.Builder<? extends LoaderChannelBuilder> loaderConfiguration() {
+    public ChannelConfiguration.Builder<? extends LoaderChannelBuilder> channelConfiguration() {
 
-        final LoaderConfiguration config = mLoaderConfiguration;
-        return new LoaderConfiguration.Builder<LoaderChannelBuilder>(this, config);
-    }
-
-    @NotNull
-    public LoaderChannelBuilder setConfiguration(
-            @NotNull final ChannelConfiguration configuration) {
-
-        mChannelConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-        return this;
+        final ChannelConfiguration config = mChannelConfiguration;
+        return new ChannelConfiguration.Builder<LoaderChannelBuilder>(this, config);
     }
 
     @NotNull
@@ -204,10 +204,11 @@ class DefaultLoaderChannelBuilder
     }
 
     @NotNull
-    public ChannelConfiguration.Builder<? extends LoaderChannelBuilder> channelConfiguration() {
+    public LoaderChannelBuilder setConfiguration(
+            @NotNull final ChannelConfiguration configuration) {
 
-        final ChannelConfiguration config = mChannelConfiguration;
-        return new ChannelConfiguration.Builder<LoaderChannelBuilder>(this, config);
+        mChannelConfiguration = ConstantConditions.notNull("channel configuration", configuration);
+        return this;
     }
 
     /**

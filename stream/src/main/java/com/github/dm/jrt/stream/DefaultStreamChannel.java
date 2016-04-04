@@ -68,7 +68,8 @@ class DefaultStreamChannel<OUT> extends AbstractStreamChannel<OUT> {
     private DefaultStreamChannel(@NotNull final OutputChannel<OUT> channel,
             @Nullable final Binder binder) {
 
-        super(channel, InvocationConfiguration.defaultConfiguration(), DelegationType.ASYNC, binder);
+        super(channel, InvocationConfiguration.defaultConfiguration(), DelegationType.ASYNC,
+                binder);
     }
 
     /**

@@ -1189,7 +1189,8 @@ public class RoutineTest {
 
         try {
 
-            new DefaultRoutine<Object, Object>(InvocationConfiguration.defaultConfiguration(), null);
+            new DefaultRoutine<Object, Object>(InvocationConfiguration.defaultConfiguration(),
+                    null);
 
             fail();
 

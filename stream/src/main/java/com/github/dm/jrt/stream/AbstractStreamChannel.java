@@ -324,8 +324,11 @@ public abstract class AbstractStreamChannel<OUT>
         } else if (delegationType == DelegationType.PARALLEL) {
             channel = routine.parallelInvoke();
 
-        } else {
+        } else if (delegationType == DelegationType.SYNC) {
             channel = routine.syncInvoke();
+
+        } else {
+            channel = routine.serialInvoke();
         }
 
         return concatRoutine(channel);
@@ -393,13 +396,24 @@ public abstract class AbstractStreamChannel<OUT>
             return channel.parallel();
         }
 
-        return channel.sync();
+        if (delegationType == DelegationType.SYNC) {
+            return channel.sync();
+        }
+
+        return channel.serial();
     }
 
     @NotNull
     public StreamChannel<OUT> runOnShared() {
 
         return runOn(null);
+    }
+
+    @NotNull
+    public StreamChannel<OUT> serial() {
+
+        mDelegationType = DelegationType.SERIAL;
+        return this;
     }
 
     @NotNull

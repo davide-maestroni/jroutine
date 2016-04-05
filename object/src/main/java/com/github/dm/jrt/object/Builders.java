@@ -443,10 +443,10 @@ public class Builders {
         }
 
         final InvocationMode invocationMode = invokeAnnotation.value();
-        if ((invocationMode == InvocationMode.PARALLEL) && (method.getParameterTypes().length
-                > 1)) {
+        if (((invocationMode == InvocationMode.PARALLEL) || (invocationMode
+                == InvocationMode.SERIAL)) && (method.getParameterTypes().length > 1)) {
             throw new IllegalArgumentException(
-                    "methods annotated with invocation mode " + InvocationMode.PARALLEL
+                    "methods annotated with invocation mode " + invocationMode
                             + " must have at maximum one input parameter: " + method);
         }
 
@@ -616,10 +616,10 @@ public class Builders {
                     }
                 }
 
-                if ((invocationMode == InvocationMode.PARALLEL) && (targetParameterTypes.length
-                        > 1)) {
+                if (((invocationMode == InvocationMode.PARALLEL) || (invocationMode
+                        == InvocationMode.SERIAL)) && (targetParameterTypes.length > 1)) {
                     throw new IllegalArgumentException(
-                            "methods annotated with invocation mode " + InvocationMode.PARALLEL
+                            "methods annotated with invocation mode " + invocationMode
                                     + " must have no input parameters: " + proxyMethod);
                 }
 
@@ -667,9 +667,7 @@ public class Builders {
         final Class<?> returnType = method.getReturnType();
         if (method.isAnnotationPresent(AsyncMethod.class)) {
             if (returnType.isAssignableFrom(InvocationChannel.class)) {
-                return (invocationMode == InvocationMode.SYNC) ? routine.syncInvoke()
-                        : (invocationMode == InvocationMode.PARALLEL) ? routine.parallelInvoke()
-                                : routine.asyncInvoke();
+                return invokeRoutine(routine, invocationMode);
             }
 
             return routine;
@@ -677,9 +675,7 @@ public class Builders {
 
         final OutputChannel<Object> outputChannel;
         final InvocationChannel<Object, Object> invocationChannel =
-                (invocationMode == InvocationMode.SYNC) ? routine.syncInvoke()
-                        : (invocationMode == InvocationMode.PARALLEL) ? routine.parallelInvoke()
-                                : routine.asyncInvoke();
+                invokeRoutine(routine, invocationMode);
         if (inputMode == InputMode.VALUE) {
             invocationChannel.orderByCall();
             final Class<?>[] parameterTypes = method.getParameterTypes();
@@ -776,6 +772,17 @@ public class Builders {
         }
 
         return targetMethod;
+    }
+
+    @NotNull
+    private static InvocationChannel<Object, Object> invokeRoutine(
+            @NotNull final Routine<Object, Object> routine,
+            @Nullable final InvocationMode invocationMode) {
+
+        return (invocationMode == InvocationMode.SYNC) ? routine.syncInvoke()
+                : (invocationMode == InvocationMode.PARALLEL) ? routine.parallelInvoke()
+                        : (invocationMode == InvocationMode.SERIAL) ? routine.serialInvoke()
+                                : routine.asyncInvoke();
     }
 
     /**

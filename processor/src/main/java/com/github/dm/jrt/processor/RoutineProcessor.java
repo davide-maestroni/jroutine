@@ -977,10 +977,10 @@ public class RoutineProcessor extends AbstractProcessor {
             @NotNull final Invoke annotation) {
 
         final InvocationMode invocationMode = annotation.value();
-        if ((invocationMode == InvocationMode.PARALLEL) && (methodElement.getParameters().size()
-                > 1)) {
+        if (((invocationMode == InvocationMode.PARALLEL) || (invocationMode
+                == InvocationMode.SERIAL)) && (methodElement.getParameters().size() > 1)) {
             throw new IllegalArgumentException(
-                    "methods annotated with invocation mode " + InvocationMode.PARALLEL
+                    "methods annotated with invocation mode " + invocationMode
                             + " must have at maximum one input parameter: " + methodElement);
         }
 
@@ -1883,10 +1883,10 @@ public class RoutineProcessor extends AbstractProcessor {
             outputMode = getOutputMode(methodElement, targetMethod);
         }
 
-        if ((invocationMode == InvocationMode.PARALLEL) && (targetMethod.getParameters().size()
-                > 1)) {
+        if (((invocationMode == InvocationMode.PARALLEL) || (invocationMode
+                == InvocationMode.SERIAL)) && (targetMethod.getParameters().size() > 1)) {
             throw new IllegalArgumentException(
-                    "methods annotated with invocation mode " + InvocationMode.PARALLEL
+                    "methods annotated with invocation mode " + invocationMode
                             + " must have no input parameters: " + methodElement);
         }
 
@@ -1942,7 +1942,8 @@ public class RoutineProcessor extends AbstractProcessor {
         method = method.replace("${invokeMethod}",
                 (invocationMode == InvocationMode.SYNC) ? "syncInvoke"
                         : (invocationMode == InvocationMode.PARALLEL) ? "parallelInvoke"
-                                : "asyncInvoke");
+                                : (invocationMode == InvocationMode.SERIAL) ? "serialInvoke"
+                                        : "asyncInvoke");
         writer.append(method);
         String methodInvocationHeader;
         methodInvocationHeader =

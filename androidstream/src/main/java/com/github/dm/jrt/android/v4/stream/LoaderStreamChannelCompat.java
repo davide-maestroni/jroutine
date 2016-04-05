@@ -265,6 +265,12 @@ public interface LoaderStreamChannelCompat<OUT>
      * {@inheritDoc}
      */
     @NotNull
+    LoaderStreamChannelCompat<OUT> serial();
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
     InvocationConfiguration.Builder<? extends LoaderStreamChannelCompat<OUT>>
     streamInvocationConfiguration();
 

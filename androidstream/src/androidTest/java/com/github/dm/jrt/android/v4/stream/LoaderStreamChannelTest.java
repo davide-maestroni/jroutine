@@ -338,6 +338,22 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                       })
                                       .afterMax(seconds(10))
                                       .all()).containsOnly("test1", "test2");
+        assertThat(LoaderStreamsCompat.streamOf("test1", null, "test2", null)
+                                      .with(loaderFrom(activity))
+                                      .serial()
+                                      .flatMap(new Function<String, OutputChannel<String>>() {
+
+                                          public OutputChannel<String> apply(final String s) {
+
+                                              return LoaderStreamsCompat.streamOf(s)
+                                                                        .with(loaderFrom(activity))
+                                                                        .sync()
+                                                                        .filter(Functions
+                                                                                .<String>notNull());
+                                          }
+                                      })
+                                      .afterMax(seconds(10))
+                                      .all()).containsOnly("test1", "test2");
     }
 
     private static void testInvocationDeadlock(@NotNull final FragmentActivity activity) {
@@ -417,6 +433,20 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                           }
                                       })
                                       .all()).containsExactly("TEST1", "TEST2");
+        assertThat(LoaderStreamsCompat.streamOf("test1", "test2")
+                                      .with(loaderFrom(activity))
+                                      .ordered(OrderType.BY_CALL)
+                                      .serial()
+                                      .map(new BiConsumer<String, ResultChannel<String>>() {
+
+                                          public void accept(final String s,
+                                                  final ResultChannel<String> result) {
+
+                                              result.pass(s.toUpperCase());
+                                          }
+                                      })
+                                      .afterMax(seconds(10))
+                                      .all()).containsExactly("TEST1", "TEST2");
     }
 
     private static void testMapFunction(@NotNull final FragmentActivity activity) {
@@ -456,6 +486,19 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                               return s.toUpperCase();
                                           }
                                       })
+                                      .all()).containsExactly("TEST1", "TEST2");
+        assertThat(LoaderStreamsCompat.streamOf("test1", "test2")
+                                      .with(loaderFrom(activity))
+                                      .ordered(OrderType.BY_CALL)
+                                      .serial()
+                                      .map(new Function<String, String>() {
+
+                                          public String apply(final String s) {
+
+                                              return s.toUpperCase();
+                                          }
+                                      })
+                                      .afterMax(seconds(10))
                                       .all()).containsExactly("TEST1", "TEST2");
     }
 
@@ -631,6 +674,31 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(LoaderStreamsCompat.streamOf("test1")
                                       .with(loaderFrom(activity))
                                       .parallel()
+                                      .then(3, new Supplier<String>() {
+
+                                          public String get() {
+
+                                              return "TEST2";
+                                          }
+                                      })
+                                      .afterMax(seconds(10))
+                                      .all()).containsExactly("TEST2", "TEST2", "TEST2");
+        assertThat(LoaderStreamsCompat.streamOf("test1")
+                                      .with(loaderFrom(activity))
+                                      .serial()
+                                      .then(3, new Consumer<ResultChannel<String>>() {
+
+                                          public void accept(
+                                                  final ResultChannel<String> resultChannel) {
+
+                                              resultChannel.pass("TEST2");
+                                          }
+                                      })
+                                      .afterMax(seconds(10))
+                                      .all()).containsExactly("TEST2", "TEST2", "TEST2");
+        assertThat(LoaderStreamsCompat.streamOf("test1")
+                                      .with(loaderFrom(activity))
+                                      .serial()
                                       .then(3, new Supplier<String>() {
 
                                           public String get() {
@@ -994,6 +1062,12 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                       .sync()
                                       .filter(Functions.notNull())
                                       .all()).containsExactly("test");
+        assertThat(LoaderStreamsCompat.streamOf(null, "test")
+                                      .with(loaderFrom(getActivity()))
+                                      .serial()
+                                      .filter(Functions.notNull())
+                                      .afterMax(seconds(10))
+                                      .all()).containsExactly("test");
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -1017,6 +1091,14 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
 
         try {
             LoaderStreamsCompat.streamOf().with(loaderFrom(getActivity())).sync().filter(null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+            LoaderStreamsCompat.streamOf().serial().filter(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -1050,6 +1132,14 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
 
         try {
             LoaderStreamsCompat.streamOf().with(loaderFrom(getActivity())).parallel().flatMap(null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+            LoaderStreamsCompat.streamOf().with(loaderFrom(getActivity())).serial().flatMap(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -1138,6 +1228,17 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         } catch (final NullPointerException ignored) {
 
         }
+
+        try {
+            LoaderStreamsCompat.streamOf()
+                               .with(loaderFrom(getActivity()))
+                               .serial()
+                               .map((BiConsumer<Object, ResultChannel<Object>>) null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
     }
 
     public void testMapFactory() {
@@ -1161,6 +1262,13 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                       .with(loaderFrom(getActivity()))
                                       .sync()
                                       .map(factory)
+                                      .all()).containsExactly("TEST1", "TEST2");
+        assertThat(LoaderStreamsCompat.streamOf("test1", "test2")
+                                      .with(loaderFrom(getActivity()))
+                                      .ordered(OrderType.BY_CALL)
+                                      .serial()
+                                      .map(factory)
+                                      .afterMax(seconds(10))
                                       .all()).containsExactly("TEST1", "TEST2");
     }
 
@@ -1199,6 +1307,17 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         } catch (final NullPointerException ignored) {
 
         }
+
+        try {
+            LoaderStreamsCompat.streamOf()
+                               .with(loaderFrom(getActivity()))
+                               .serial()
+                               .map((InvocationFactory<Object, Object>) null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
     }
 
     public void testMapFilter() {
@@ -1220,6 +1339,13 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                       .with(loaderFrom(getActivity()))
                                       .sync()
                                       .map(new UpperCase())
+                                      .all()).containsExactly("TEST1", "TEST2");
+        assertThat(LoaderStreamsCompat.streamOf("test1", "test2")
+                                      .with(loaderFrom(getActivity()))
+                                      .ordered(OrderType.BY_CALL)
+                                      .serial()
+                                      .map(new UpperCase())
+                                      .afterMax(seconds(10))
                                       .all()).containsExactly("TEST1", "TEST2");
     }
 
@@ -1252,6 +1378,17 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
                                .sync()
+                               .map((FilterInvocation<Object, Object>) null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+            LoaderStreamsCompat.streamOf()
+                               .with(loaderFrom(getActivity()))
+                               .serial()
                                .map((FilterInvocation<Object, Object>) null);
             fail();
 
@@ -1300,6 +1437,17 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         } catch (final NullPointerException ignored) {
 
         }
+
+        try {
+            LoaderStreamsCompat.streamOf()
+                               .with(loaderFrom(getActivity()))
+                               .serial()
+                               .map((Function<Object, Object>) null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
     }
 
     public void testMapRoutine() {
@@ -1325,6 +1473,12 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                       .with(loaderFrom(getActivity()))
                                       .sync()
                                       .map(routine)
+                                      .all()).containsExactly("TEST1", "TEST2");
+        assertThat(LoaderStreamsCompat.streamOf("test1", "test2")
+                                      .with(loaderFrom(getActivity()))
+                                      .serial()
+                                      .map(routine)
+                                      .afterMax(seconds(10))
                                       .all()).containsExactly("TEST1", "TEST2");
     }
 
@@ -1357,6 +1511,17 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
                                .sync()
+                               .map((Routine<Object, Object>) null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+            LoaderStreamsCompat.streamOf()
+                               .with(loaderFrom(getActivity()))
+                               .serial()
                                .map((Routine<Object, Object>) null);
             fail();
 
@@ -1665,6 +1830,54 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                       .then(Collections.singletonList("TEST2"))
                                       .afterMax(seconds(10))
                                       .all()).containsOnly("TEST2");
+        assertThat(LoaderStreamsCompat.streamOf("test1")
+                                      .with(loaderFrom(getActivity()))
+                                      .serial()
+                                      .then((String) null)
+                                      .afterMax(seconds(10))
+                                      .all()).containsOnly((String) null);
+        assertThat(LoaderStreamsCompat.streamOf("test1")
+                                      .with(loaderFrom(getActivity()))
+                                      .serial()
+                                      .then((String[]) null)
+                                      .afterMax(seconds(10))
+                                      .all()).isEmpty();
+        assertThat(LoaderStreamsCompat.streamOf("test1")
+                                      .with(loaderFrom(getActivity()))
+                                      .serial()
+                                      .then()
+                                      .afterMax(seconds(10))
+                                      .all()).isEmpty();
+        assertThat(LoaderStreamsCompat.streamOf("test1")
+                                      .with(loaderFrom(getActivity()))
+                                      .serial()
+                                      .then((List<String>) null)
+                                      .afterMax(seconds(10))
+                                      .all()).isEmpty();
+        assertThat(LoaderStreamsCompat.streamOf("test1")
+                                      .with(loaderFrom(getActivity()))
+                                      .serial()
+                                      .then(Collections.<String>emptyList())
+                                      .afterMax(seconds(10))
+                                      .all()).isEmpty();
+        assertThat(LoaderStreamsCompat.streamOf("test1")
+                                      .with(loaderFrom(getActivity()))
+                                      .serial()
+                                      .then("TEST2")
+                                      .afterMax(seconds(10))
+                                      .all()).containsOnly("TEST2");
+        assertThat(LoaderStreamsCompat.streamOf("test1")
+                                      .with(loaderFrom(getActivity()))
+                                      .serial()
+                                      .then("TEST2", "TEST2")
+                                      .afterMax(seconds(10))
+                                      .all()).containsOnly("TEST2", "TEST2");
+        assertThat(LoaderStreamsCompat.streamOf("test1")
+                                      .with(loaderFrom(getActivity()))
+                                      .serial()
+                                      .then(Collections.singletonList("TEST2"))
+                                      .afterMax(seconds(10))
+                                      .all()).containsOnly("TEST2");
     }
 
     public void testThenNegativeCount() {
@@ -1717,6 +1930,39 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
                                .parallel()
+                               .then(-1, Functions.sink());
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+            LoaderStreamsCompat.streamOf()
+                               .with(loaderFrom(getActivity()))
+                               .serial()
+                               .then(-1, Functions.constant(null));
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+            LoaderStreamsCompat.streamOf()
+                               .with(loaderFrom(getActivity()))
+                               .serial()
+                               .then(-1, Functions.constant(null));
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
+
+        }
+
+        try {
+            LoaderStreamsCompat.streamOf()
+                               .with(loaderFrom(getActivity()))
+                               .serial()
                                .then(-1, Functions.sink());
             fail();
 
@@ -1831,6 +2077,28 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
                                .parallel()
+                               .then(3, (Consumer<ResultChannel<?>>) null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+            LoaderStreamsCompat.streamOf()
+                               .with(loaderFrom(getActivity()))
+                               .serial()
+                               .then(3, (Supplier<?>) null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+            LoaderStreamsCompat.streamOf()
+                               .with(loaderFrom(getActivity()))
+                               .serial()
                                .then(3, (Consumer<ResultChannel<?>>) null);
             fail();
 

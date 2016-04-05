@@ -184,88 +184,77 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
     @Override
     public LoaderStreamChannel<OUT> afterMax(@NotNull final TimeDuration timeout) {
 
-        super.afterMax(timeout);
-        return this;
+        return (LoaderStreamChannel<OUT>) super.afterMax(timeout);
     }
 
     @NotNull
     @Override
     public LoaderStreamChannel<OUT> afterMax(final long timeout, @NotNull final TimeUnit timeUnit) {
 
-        super.afterMax(timeout, timeUnit);
-        return this;
+        return (LoaderStreamChannel<OUT>) super.afterMax(timeout, timeUnit);
     }
 
     @NotNull
     @Override
     public LoaderStreamChannel<OUT> allInto(@NotNull final Collection<? super OUT> results) {
 
-        super.allInto(results);
-        return this;
+        return (LoaderStreamChannel<OUT>) super.allInto(results);
     }
 
     @NotNull
     @Override
     public LoaderStreamChannel<OUT> bind(@NotNull final OutputConsumer<? super OUT> consumer) {
 
-        super.bind(consumer);
-        return this;
+        return (LoaderStreamChannel<OUT>) super.bind(consumer);
     }
 
     @NotNull
     @Override
     public LoaderStreamChannel<OUT> eventuallyAbort() {
 
-        super.eventuallyAbort();
-        return this;
+        return (LoaderStreamChannel<OUT>) super.eventuallyAbort();
     }
 
     @NotNull
     @Override
     public LoaderStreamChannel<OUT> eventuallyAbort(@Nullable final Throwable reason) {
 
-        super.eventuallyAbort(reason);
-        return this;
+        return (LoaderStreamChannel<OUT>) super.eventuallyAbort(reason);
     }
 
     @NotNull
     @Override
     public LoaderStreamChannel<OUT> eventuallyExit() {
 
-        super.eventuallyExit();
-        return this;
+        return (LoaderStreamChannel<OUT>) super.eventuallyExit();
     }
 
     @NotNull
     @Override
     public LoaderStreamChannel<OUT> eventuallyThrow() {
 
-        super.eventuallyThrow();
-        return this;
+        return (LoaderStreamChannel<OUT>) super.eventuallyThrow();
     }
 
     @NotNull
     @Override
     public LoaderStreamChannel<OUT> immediately() {
 
-        super.immediately();
-        return this;
+        return (LoaderStreamChannel<OUT>) super.immediately();
     }
 
     @NotNull
     @Override
     public LoaderStreamChannel<OUT> skip(final int count) {
 
-        super.skip(count);
-        return this;
+        return (LoaderStreamChannel<OUT>) super.skip(count);
     }
 
     @NotNull
     @Override
     public LoaderStreamChannel<OUT> async() {
 
-        super.async();
-        return this;
+        return (LoaderStreamChannel<OUT>) super.async();
     }
 
     @NotNull
@@ -273,8 +262,7 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
     public LoaderStreamChannel<OUT> backPressureOn(@Nullable final Runner runner,
             final int maxInputs, final long maxDelay, @NotNull final TimeUnit timeUnit) {
 
-        super.backPressureOn(runner, maxInputs, maxDelay, timeUnit);
-        return this;
+        return (LoaderStreamChannel<OUT>) super.backPressureOn(runner, maxInputs, maxDelay, timeUnit);
     }
 
     @NotNull
@@ -282,8 +270,7 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
     public LoaderStreamChannel<OUT> backPressureOn(@Nullable final Runner runner,
             final int maxInputs, @Nullable final TimeDuration maxDelay) {
 
-        super.backPressureOn(runner, maxInputs, maxDelay);
-        return this;
+        return (LoaderStreamChannel<OUT>) super.backPressureOn(runner, maxInputs, maxDelay);
     }
 
     @NotNull
@@ -384,24 +371,21 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
     @Override
     public LoaderStreamChannel<OUT> maxParallelInvocations(final int maxInvocations) {
 
-        super.maxParallelInvocations(maxInvocations);
-        return this;
+        return (LoaderStreamChannel<OUT>) super.maxParallelInvocations(maxInvocations);
     }
 
     @NotNull
     @Override
     public LoaderStreamChannel<OUT> ordered(@Nullable final OrderType orderType) {
 
-        super.ordered(orderType);
-        return this;
+        return (LoaderStreamChannel<OUT>) super.ordered(orderType);
     }
 
     @NotNull
     @Override
     public LoaderStreamChannel<OUT> parallel() {
 
-        super.parallel();
-        return this;
+        return (LoaderStreamChannel<OUT>) super.parallel();
     }
 
     @NotNull
@@ -447,6 +431,13 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
 
     @NotNull
     @Override
+    public LoaderStreamChannel<OUT> serial() {
+
+        return (LoaderStreamChannel<OUT>) super.serial();
+    }
+
+    @NotNull
+    @Override
     public InvocationConfiguration.Builder<? extends LoaderStreamChannel<OUT>>
     streamInvocationConfiguration() {
 
@@ -459,8 +450,7 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
     @Override
     public LoaderStreamChannel<OUT> sync() {
 
-        super.sync();
-        return this;
+        return (LoaderStreamChannel<OUT>) super.sync();
     }
 
     @NotNull

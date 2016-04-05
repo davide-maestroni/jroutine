@@ -99,6 +99,36 @@ public abstract class TemplateRoutine<IN, OUT> implements Routine<IN, OUT> {
     }
 
     @NotNull
+    public OutputChannel<OUT> serialCall() {
+
+        return serialInvoke().result();
+    }
+
+    @NotNull
+    public OutputChannel<OUT> serialCall(@Nullable final IN input) {
+
+        return serialInvoke().pass(input).result();
+    }
+
+    @NotNull
+    public OutputChannel<OUT> serialCall(@Nullable final IN... inputs) {
+
+        return serialInvoke().pass(inputs).result();
+    }
+
+    @NotNull
+    public OutputChannel<OUT> serialCall(@Nullable final Iterable<? extends IN> inputs) {
+
+        return serialInvoke().pass(inputs).result();
+    }
+
+    @NotNull
+    public OutputChannel<OUT> serialCall(@Nullable final OutputChannel<? extends IN> inputs) {
+
+        return serialInvoke().pass(inputs).result();
+    }
+
+    @NotNull
     public OutputChannel<OUT> syncCall() {
 
         return syncInvoke().result();

@@ -421,6 +421,14 @@ public interface StreamChannel<OUT>
     StreamChannel<OUT> runOnShared();
 
     /**
+     * Makes the stream serial, that is, the concatenated routines will be invoked in serial mode.
+     *
+     * @return this stream.
+     */
+    @NotNull
+    StreamChannel<OUT> serial();
+
+    /**
      * Gets the invocation configuration builder related to the whole stream.<br>
      * The configuration options will be applied to all the next concatenated routine unless
      * overwritten by specific ones.

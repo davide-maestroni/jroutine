@@ -64,6 +64,8 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
 
     private final int mCoreInvocations;
 
+    private final Object mElementMutex = new Object();
+
     private final Logger mLogger;
 
     private final int mMaxInvocations;
@@ -73,8 +75,6 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
     private final SimpleQueue<InvocationObserver<IN, OUT>> mObservers =
             new SimpleQueue<InvocationObserver<IN, OUT>>();
 
-    private final Object mParallelMutex = new Object();
-
     private final LinkedList<Invocation<IN, OUT>> mSyncInvocations =
             new LinkedList<Invocation<IN, OUT>>();
 
@@ -82,7 +82,7 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
 
     private volatile DefaultInvocationManager mAsyncManager;
 
-    private AbstractRoutine<IN, OUT> mParallelRoutine;
+    private AbstractRoutine<IN, OUT> mElementRoutine;
 
     private int mRunningCount;
 
@@ -141,25 +141,15 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
     @NotNull
     public InvocationChannel<IN, OUT> parallelInvoke() {
 
-        synchronized (mParallelMutex) {
-            mLogger.dbg("invoking routine: parallel");
-            if (mParallelRoutine == null) {
-                mParallelRoutine =
-                        new AbstractRoutine<IN, OUT>(mConfiguration, mSyncRunner, mAsyncRunner,
-                                mLogger) {
+        mLogger.dbg("invoking routine: parallel");
+        return getElementRoutine().asyncInvoke();
+    }
 
-                            @NotNull
-                            @Override
-                            protected Invocation<IN, OUT> newInvocation(
-                                    @NotNull final InvocationType type) {
+    @NotNull
+    public InvocationChannel<IN, OUT> serialInvoke() {
 
-                                return new ParallelInvocation<IN, OUT>(AbstractRoutine.this);
-                            }
-                        };
-            }
-        }
-
-        return mParallelRoutine.asyncInvoke();
+        mLogger.dbg("invoking routine: serial");
+        return getElementRoutine().syncInvoke();
     }
 
     @NotNull
@@ -201,10 +191,12 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
     }
 
     /**
-     * Converts an invocation instance to the specified type.
+     * Converts an invocation instance to the specified type.<br>
+     * It's responsibility of the implementing class to call {@link Invocation#onDestroy()} on the
+     * passed invocation, in case it gets discarded during the conversion.
      *
      * @param invocation the invocation to convert.
-     * @param type       the converted invocation type.
+     * @param type       the type of the invocation after the conversion.
      * @return the converted invocation.
      * @throws java.lang.Exception if an unexpected error occurs.
      */
@@ -248,6 +240,41 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
     @NotNull
     protected abstract Invocation<IN, OUT> newInvocation(@NotNull InvocationType type) throws
             Exception;
+
+    @NotNull
+    private Routine<IN, OUT> getElementRoutine() {
+
+        synchronized (mElementMutex) {
+            if (mElementRoutine == null) {
+                mElementRoutine =
+                        new AbstractRoutine<IN, OUT>(mConfiguration, mSyncRunner, mAsyncRunner,
+                                mLogger) {
+
+                            @NotNull
+                            @Override
+                            protected Invocation<IN, OUT> convertInvocation(
+                                    @NotNull final Invocation<IN, OUT> invocation,
+                                    @NotNull final InvocationType type) throws Exception {
+
+                                // No need to destroy the old one
+                                return newInvocation(type);
+                            }
+
+                            @NotNull
+                            @Override
+                            protected Invocation<IN, OUT> newInvocation(
+                                    @NotNull final InvocationType type) {
+
+                                return (type == InvocationType.ASYNC)
+                                        ? new ParallelInvocation<IN, OUT>(AbstractRoutine.this)
+                                        : new SerialInvocation<IN, OUT>(AbstractRoutine.this);
+                            }
+                        };
+            }
+        }
+
+        return mElementRoutine;
+    }
 
     @NotNull
     private DefaultInvocationManager getInvocationManager(@NotNull final InvocationType type) {
@@ -328,6 +355,50 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
 
             if (!mHasInputs) {
                 result.pass(mRoutine.asyncCall());
+            }
+        }
+    }
+
+    /**
+     * Implementation of an invocation handling serial mode.
+     *
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
+     */
+    private static class SerialInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
+
+        private final Routine<IN, OUT> mRoutine;
+
+        private boolean mHasInputs;
+
+        /**
+         * Constructor.
+         *
+         * @param routine the routine to invoke in serial mode.
+         */
+        private SerialInvocation(@NotNull final Routine<IN, OUT> routine) {
+
+            mRoutine = routine;
+        }
+
+        @Override
+        public void onInitialize() {
+
+            mHasInputs = false;
+        }
+
+        @Override
+        public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
+
+            mHasInputs = true;
+            result.pass(mRoutine.syncCall(input));
+        }
+
+        @Override
+        public void onResult(@NotNull final ResultChannel<OUT> result) {
+
+            if (!mHasInputs) {
+                result.pass(mRoutine.syncCall());
             }
         }
     }

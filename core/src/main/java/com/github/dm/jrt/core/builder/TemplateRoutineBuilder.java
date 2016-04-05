@@ -54,6 +54,12 @@ public abstract class TemplateRoutineBuilder<IN, OUT> extends TemplateRoutine<IN
     }
 
     @NotNull
+    public InvocationChannel<IN, OUT> serialInvoke() {
+
+        return buildRoutine().serialInvoke();
+    }
+
+    @NotNull
     public InvocationChannel<IN, OUT> syncInvoke() {
 
         return buildRoutine().syncInvoke();

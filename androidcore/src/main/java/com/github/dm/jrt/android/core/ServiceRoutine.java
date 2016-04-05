@@ -146,6 +146,12 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
     }
 
     @NotNull
+    public InvocationChannel<IN, OUT> serialInvoke() {
+
+        return mRoutine.serialInvoke();
+    }
+
+    @NotNull
     public InvocationChannel<IN, OUT> syncInvoke() {
 
         return mRoutine.syncInvoke();

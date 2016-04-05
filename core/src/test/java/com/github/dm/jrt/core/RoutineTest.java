@@ -368,6 +368,16 @@ public class RoutineTest {
         assertThat(routine.parallelCall("test1").afterMax(timeout).all()).containsOnly("test1");
         assertThat(routine.parallelCall("test1", "test2").afterMax(timeout).all()).containsOnly(
                 "test1", "test2");
+        assertThat(routine.serialCall().afterMax(timeout).all()).isEmpty();
+        assertThat(routine.serialCall(Arrays.asList("test1", "test2"))
+                          .afterMax(timeout)
+                          .all()).containsOnly("test1", "test2");
+        assertThat(routine.serialCall(routine.syncCall("test1", "test2"))
+                          .afterMax(timeout)
+                          .all()).containsOnly("test1", "test2");
+        assertThat(routine.serialCall("test1").afterMax(timeout).all()).containsOnly("test1");
+        assertThat(routine.serialCall("test1", "test2").afterMax(timeout).all()).containsOnly(
+                "test1", "test2");
 
         assertThat(routine.syncInvoke().pass().result().all()).isEmpty();
         assertThat(routine.syncInvoke()
@@ -429,6 +439,25 @@ public class RoutineTest {
                           .all()).containsOnly("test1");
         assertThat(routine.parallelInvoke().pass("test1", "test2").result().afterMax(timeout).all())
                 .containsOnly("test1", "test2");
+        assertThat(routine.serialInvoke().pass().result().afterMax(timeout).all()).isEmpty();
+        assertThat(routine.serialInvoke()
+                          .pass(Arrays.asList("test1", "test2"))
+                          .result()
+                          .afterMax(timeout)
+                          .all()).containsOnly("test1", "test2");
+        assertThat(routine.serialInvoke()
+                          .pass(routine.syncCall("test1", "test2"))
+                          .result()
+                          .afterMax(timeout)
+                          .all()).containsOnly("test1", "test2");
+        assertThat(
+                routine.serialInvoke().pass("test1").result().afterMax(timeout).all()).containsOnly(
+                "test1");
+        assertThat(routine.serialInvoke()
+                          .pass("test1", "test2")
+                          .result()
+                          .afterMax(timeout)
+                          .all()).containsOnly("test1", "test2");
     }
 
     @Test
@@ -460,12 +489,18 @@ public class RoutineTest {
         assertThat(sumRoutine.syncCall(squareRoutine.syncCall(1, 2, 3, 4))
                              .afterMax(timeout)
                              .all()).containsExactly(30);
+        assertThat(sumRoutine.syncCall(squareRoutine.serialCall(1, 2, 3, 4))
+                             .afterMax(timeout)
+                             .all()).containsExactly(30);
         assertThat(sumRoutine.asyncCall(squareRoutine.syncCall(1, 2, 3, 4)).afterMax(timeout).all())
                 .containsExactly(30);
         assertThat(sumRoutine.asyncCall(squareRoutine.asyncCall(1, 2, 3, 4))
                              .afterMax(timeout)
                              .all()).containsExactly(30);
         assertThat(sumRoutine.asyncCall(squareRoutine.parallelCall(1, 2, 3, 4))
+                             .afterMax(timeout)
+                             .all()).containsExactly(30);
+        assertThat(sumRoutine.asyncCall(squareRoutine.serialCall(1, 2, 3, 4))
                              .afterMax(timeout)
                              .all()).containsExactly(30);
     }
@@ -530,10 +565,6 @@ public class RoutineTest {
         final Routine<Integer, Integer> squareSumRoutine =
                 JRoutineCore.on(factoryOf(invokeSquareSum, this, sumRoutine, squareRoutine))
                             .buildRoutine();
-
-        //        assertThat(squareSumRoutine.syncCall(1, 2, 3, 4).afterMax(timeout).all())
-        // .containsExactly(
-        //                30);
         assertThat(squareSumRoutine.asyncCall(1, 2, 3, 4).afterMax(timeout).all()).containsExactly(
                 30);
     }
@@ -879,36 +910,21 @@ public class RoutineTest {
         final Routine<String, String> routine4 =
                 JRoutineCore.on(DelegatingInvocation.factoryFrom(routine3, DelegationType.ASYNC))
                             .buildRoutine();
-
         assertThat(routine4.asyncCall("test4").afterMax(timeout).all()).containsExactly("test4");
         routine4.purge();
         assertThat(TestDestroy.getInstanceCount()).isZero();
-    }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testDelegationError() {
-
-        try {
-
-            DelegatingInvocation.factoryFrom(null, DelegationType.SYNC);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-
-        try {
-
-            DelegatingInvocation.factoryFrom(
-                    JRoutineCore.on(PassingInvocation.factoryOf()).buildRoutine(), null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
+        final Routine<String, String> routine5 =
+                JRoutineCore.on(DelegatingInvocation.factoryFrom(routine3, DelegationType.PARALLEL))
+                            .buildRoutine();
+        assertThat(routine5.asyncCall("test5").afterMax(timeout).all()).containsExactly("test5");
+        routine5.purge();
+        assertThat(TestDestroy.getInstanceCount()).isZero();
+        final Routine<String, String> routine6 =
+                JRoutineCore.on(DelegatingInvocation.factoryFrom(routine3, DelegationType.SERIAL))
+                            .buildRoutine();
+        assertThat(routine6.asyncCall("test5").afterMax(timeout).all()).containsExactly("test5");
+        routine6.purge();
+        assertThat(TestDestroy.getInstanceCount()).isZero();
     }
 
     @Test
@@ -3253,6 +3269,31 @@ public class RoutineTest {
 
         try {
 
+            routine.serialCall(input).afterMax(timeout).all();
+
+            fail();
+
+        } catch (final InvocationException e) {
+
+            assertThat(e.getCause().getMessage()).isEqualTo(expected);
+        }
+
+        try {
+
+            for (final String s : routine.serialCall(input).afterMax(timeout)) {
+
+                assertThat(s).isNotEmpty();
+            }
+
+            fail();
+
+        } catch (final InvocationException e) {
+
+            assertThat(e.getCause().getMessage()).isEqualTo(expected);
+        }
+
+        try {
+
             routine.syncInvoke().pass(input).result().afterMax(timeout).all();
 
             fail();
@@ -3315,6 +3356,31 @@ public class RoutineTest {
         try {
 
             for (final String s : routine.parallelInvoke().pass(input).result().afterMax(timeout)) {
+
+                assertThat(s).isNotEmpty();
+            }
+
+            fail();
+
+        } catch (final InvocationException e) {
+
+            assertThat(e.getCause().getMessage()).isEqualTo(expected);
+        }
+
+        try {
+
+            routine.serialInvoke().pass(input).result().afterMax(timeout).all();
+
+            fail();
+
+        } catch (final InvocationException e) {
+
+            assertThat(e.getCause().getMessage()).isEqualTo(expected);
+        }
+
+        try {
+
+            for (final String s : routine.serialInvoke().pass(input).result().afterMax(timeout)) {
 
                 assertThat(s).isNotEmpty();
             }

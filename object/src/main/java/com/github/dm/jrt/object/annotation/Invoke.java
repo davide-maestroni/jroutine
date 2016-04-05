@@ -82,6 +82,10 @@ public @interface Invoke {
         /**
          * Parallel mode.
          */
-        PARALLEL
+        PARALLEL,
+        /**
+         * Serial mode.
+         */
+        SERIAL
     }
 }

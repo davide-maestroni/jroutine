@@ -95,7 +95,8 @@ public class DelegatingInvocation<IN, OUT> implements Invocation<IN, OUT> {
         mInputChannel = inputChannel;
         mOutputChannel = (delegationType == DelegationType.ASYNC) ? mRoutine.asyncCall(inputChannel)
                 : (delegationType == DelegationType.PARALLEL) ? mRoutine.parallelCall(inputChannel)
-                        : mRoutine.syncCall(inputChannel);
+                        : (delegationType == DelegationType.SYNC) ? mRoutine.syncCall(inputChannel)
+                                : mRoutine.serialCall(inputChannel);
     }
 
     public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
@@ -131,16 +132,28 @@ public class DelegatingInvocation<IN, OUT> implements Invocation<IN, OUT> {
 
         /**
          * The delegated routine is invoked in synchronous mode.
+         *
+         * @see com.github.dm.jrt.core.routine.Routine Routine
          */
         SYNC,
         /**
          * The delegated routine is invoked in asynchronous mode.
+         *
+         * @see com.github.dm.jrt.core.routine.Routine Routine
          */
         ASYNC,
         /**
          * The delegated routine is invoked in parallel mode.
+         *
+         * @see com.github.dm.jrt.core.routine.Routine Routine
          */
-        PARALLEL
+        PARALLEL,
+        /**
+         * The delegated routine is invoked in serial mode.
+         *
+         * @see com.github.dm.jrt.core.routine.Routine Routine
+         */
+        SERIAL
     }
 
     /**

@@ -75,6 +75,10 @@ import org.jetbrains.annotations.Nullable;
  * meaningful results only for routines which takes a single input parameter and computes the
  * relative output results.
  * <p>
+ * <b>serial invocation</b><br>
+ * The serial invocation behaves exactly in the same way as the parallel one, with the exception
+ * that the routine is invoked synchronously for each input instead of asynchronously.
+ * <p>
  * It is worth noting how the library has been designed only through interfaces, so that, as far as
  * the implementation honors the specific contracts, it is possible to seamlessly combine different
  * routine instances, even the ones coming from third party libraries.
@@ -205,6 +209,64 @@ public interface Routine<IN, OUT> {
      * Normally it is not needed to call this method.
      */
     void purge();
+
+    /**
+     * Short for {@code serialInvoke().result()}.
+     * <p>
+     * (This method actually makes little sense, and should never need to be called, thought it is
+     * here for completeness)
+     *
+     * @return the output channel.
+     */
+    @NotNull
+    OutputChannel<OUT> serialCall();
+
+    /**
+     * Short for {@code serialInvoke().pass(input).result()}.
+     * <p>
+     * (This method actually makes little sense, and should never need to be called, thought it is
+     * here for completeness)
+     *
+     * @param input the input.
+     * @return the output channel.
+     */
+    @NotNull
+    OutputChannel<OUT> serialCall(@Nullable IN input);
+
+    /**
+     * Short for {@code serialInvoke().pass(inputs).result()}.
+     *
+     * @param inputs the input data.
+     * @return the output channel.
+     */
+    @NotNull
+    OutputChannel<OUT> serialCall(@Nullable IN... inputs);
+
+    /**
+     * Short for {@code serialInvoke().pass(inputs).result()}.
+     *
+     * @param inputs the iterable returning the input data.
+     * @return the output channel.
+     */
+    @NotNull
+    OutputChannel<OUT> serialCall(@Nullable Iterable<? extends IN> inputs);
+
+    /**
+     * Short for {@code serialInvoke().pass(inputs).result()}.
+     *
+     * @param inputs the output channel returning the input data.
+     * @return the output channel.
+     */
+    @NotNull
+    OutputChannel<OUT> serialCall(@Nullable OutputChannel<? extends IN> inputs);
+
+    /**
+     * Invokes the execution of this routine in serial mode.
+     *
+     * @return the invocation channel.
+     */
+    @NotNull
+    InvocationChannel<IN, OUT> serialInvoke();
 
     /**
      * Short for {@code syncInvoke().result()}.

@@ -24,7 +24,8 @@ package com.github.dm.jrt.object.common;
 public interface Mutex {
 
     /**
-     * Empty mutex implementation.<br>
+     * Empty mutex implementation.
+     * <br>
      * This mutex does not implement any kind of synchronization.
      */
     Mutex NO_MUTEX = new Mutex() {
@@ -35,7 +36,8 @@ public interface Mutex {
     };
 
     /**
-     * Acquires this mutex.<br>
+     * Acquires this mutex.
+     * <br>
      * The calling thread will block until the resource becomes available.
      *
      * @throws java.lang.InterruptedException if the current thread is interrupted.
@@ -43,7 +45,8 @@ public interface Mutex {
     void acquire() throws InterruptedException;
 
     /**
-     * Releases this mutex.<br>
+     * Releases this mutex.
+     * <br>
      * If the calling thread is not the holder of the mutex, an exception will be thrown.
      */
     void release();

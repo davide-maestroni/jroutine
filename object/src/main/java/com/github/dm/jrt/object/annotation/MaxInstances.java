@@ -25,9 +25,11 @@ import java.lang.annotation.Target;
  * Through this annotation it is possible to indicate the maximum number of concurrently running
  * invocation instances.
  * <p>
- * This annotation is used to decorate methods that are to be invoked in an asynchronous way.<br>
+ * This annotation is used to decorate methods that are to be invoked in an asynchronous way.
+ * <br>
  * Note that the piece of code inside such methods will be automatically protected so to avoid
- * concurrency issues. Though, other parts of the code inside the same class will be not.<br>
+ * concurrency issues. Though, other parts of the code inside the same class will be not.
+ * <br>
  * In order to prevent unexpected behaviors, it is advisable to avoid using the same class fields
  * (unless immutable) in protected and non-protected code, or to call synchronous methods through
  * routines as well.

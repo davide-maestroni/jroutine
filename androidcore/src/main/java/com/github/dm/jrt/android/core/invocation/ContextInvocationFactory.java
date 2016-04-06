@@ -31,7 +31,8 @@ import org.jetbrains.annotations.Nullable;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Abstract class defining a factory of context invocations.<br>
+ * Abstract class defining a factory of context invocations.
+ * <br>
  * The inheriting class must specify the constructor arguments to be used in the {@code equals()}
  * and {@code hashCode()} implementations. Note that such methods might be employed to uniquely
  * identify the loader backing the routine execution.
@@ -72,7 +73,8 @@ public abstract class ContextInvocationFactory<IN, OUT> extends AutoComparable {
 
     /**
      * Builds and returns a new context invocation factory creating instances of the specified
-     * class.<br>
+     * class.
+     * <br>
      * The method accepts also classes inheriting from {@link ContextInvocation}.
      * <p>
      * Note that inner and anonymous classes can be passed as well. Remember however that Java
@@ -95,7 +97,8 @@ public abstract class ContextInvocationFactory<IN, OUT> extends AutoComparable {
 
     /**
      * Builds and returns a new context invocation factory creating instances of the specified
-     * class by passing the specified arguments to the class constructor.<br>
+     * class by passing the specified arguments to the class constructor.
+     * <br>
      * The method accepts also classes inheriting from {@link ContextInvocation}.
      * <p>
      * Note that inner and anonymous classes can be passed as well. Remember however that Java
@@ -127,7 +130,8 @@ public abstract class ContextInvocationFactory<IN, OUT> extends AutoComparable {
 
     /**
      * Builds and returns a new context invocation factory creating instances of the specified class
-     * token.<br>
+     * token.
+     * <br>
      * The method accepts also classes inheriting from {@link ContextInvocation}.
      * <p>
      * Note that class tokens of inner and anonymous classes can be passed as well. Remember however
@@ -150,7 +154,8 @@ public abstract class ContextInvocationFactory<IN, OUT> extends AutoComparable {
 
     /**
      * Builds and returns a new context invocation factory creating instances of the specified class
-     * token by passing the specified arguments to the class constructor.<br>
+     * token by passing the specified arguments to the class constructor.
+     * <br>
      * The method accepts also classes inheriting from {@link ContextInvocation}.
      * <p>
      * Note that class tokens of inner and anonymous classes can be passed as well. Remember however
@@ -191,9 +196,11 @@ public abstract class ContextInvocationFactory<IN, OUT> extends AutoComparable {
     }
 
     /**
-     * Creates and return a new context invocation instance.<br>
+     * Creates and return a new context invocation instance.
+     * <br>
      * A proper implementation will return a new invocation instance each time it is called, unless
-     * the returned object is immutable and does not cause any side effect.<br>
+     * the returned object is immutable and does not cause any side effect.
+     * <br>
      * Any behavior other than that may lead to unexpected results.
      *
      * @return the context invocation instance.

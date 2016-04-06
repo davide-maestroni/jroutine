@@ -51,7 +51,8 @@ public interface Channel {
 
     /**
      * Closes the channel and abort the transfer of data, thus aborting the routine invocation and
-     * causing the specified throwable to be passed as the abortion reason.<br>
+     * causing the specified throwable to be passed as the abortion reason.
+     * <br>
      * The throwable, unless it extends the base
      * {@link com.github.dm.jrt.core.common.RoutineException RoutineException}, will be wrapped as
      * the cause of an {@link com.github.dm.jrt.core.channel.AbortException AbortException}
@@ -537,7 +538,8 @@ public interface Channel {
         List<OUT> next(int count);
 
         /**
-         * Consumes the first available result by waiting at the maximum for the set timeout.<br>
+         * Consumes the first available result by waiting at the maximum for the set timeout.
+         * <br>
          * If the timeout elapses and the channel is not configured to throw an exception or abort
          * the invocation, the specified alternative output is returned.
          * <p>

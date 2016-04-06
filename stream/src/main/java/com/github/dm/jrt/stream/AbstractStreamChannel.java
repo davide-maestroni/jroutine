@@ -750,7 +750,8 @@ public abstract class AbstractStreamChannel<OUT>
         }
 
         /**
-         * Binds the two channel.<br>
+         * Binds the two channel.
+         * <br>
          * The call will have no effect if the method has been already invoked at least once.
          */
         public abstract void bind();

@@ -69,20 +69,24 @@ import org.jetbrains.annotations.NotNull;
  * initialization.
  * <p>
  * Note also that {@code onAbort()} might be called at any time between {@code onInitialize()} and
- * {@code onTerminate()} in case the execution is aborted.<br>
+ * {@code onTerminate()} in case the execution is aborted.
+ * <br>
  * The only case in which the {@code onTerminate()} method does not get call at all, is when an
  * exception escapes the {@code onAbort()} method invocation.
  * <p>
  * The {@code onTerminate()} method is meant to allow the clean up and reset operations needed to
  * prepare the invocation object to be reused. When the method is not called or does not complete
- * successfully, the invocation object is discarded.<br>
+ * successfully, the invocation object is discarded.
+ * <br>
  * While the {@code onDestroy()} method is meant to indicate that the invocation object is no longer
  * needed, so any associated resource can be safely released. Note that this method may never get
  * called if the routine is automatically garbage collected.
  * <p>
  * Keep in mind, when implementing an invocation class, that the result channel passed to the
- * {@code onInput()} and {@code onResult()} methods will be closed as soon as the latter exits.<br>
- * Any further attempt to post results will generate an exception.<br>
+ * {@code onInput()} and {@code onResult()} methods will be closed as soon as the latter exits.
+ * <br>
+ * Any further attempt to post results will generate an exception.
+ * <br>
  * It is anyway possible to keep on generating results by passing to the result channel an output or
  * an I/O channel.
  * <p>
@@ -106,7 +110,8 @@ import org.jetbrains.annotations.NotNull;
 public interface Invocation<IN, OUT> {
 
     /**
-     * Called when the routine execution is aborted.<br>
+     * Called when the routine execution is aborted.
+     * <br>
      * This method may be called at any time after the invocation initialization.
      *
      * @param reason the reason of the abortion.
@@ -122,7 +127,8 @@ public interface Invocation<IN, OUT> {
     void onDestroy() throws Exception;
 
     /**
-     * Called when the routine invocation is initialized.<br>
+     * Called when the routine invocation is initialized.
+     * <br>
      * This is always the first method in the invocation lifecycle.
      *
      * @throws java.lang.Exception if an unexpected error occurs.
@@ -130,7 +136,8 @@ public interface Invocation<IN, OUT> {
     void onInitialize() throws Exception;
 
     /**
-     * Called when an input is passed to the routine.<br>
+     * Called when an input is passed to the routine.
+     * <br>
      * This method is called once for each input object.
      *
      * @param input  the input.
@@ -140,7 +147,8 @@ public interface Invocation<IN, OUT> {
     void onInput(IN input, @NotNull ResultChannel<OUT> result) throws Exception;
 
     /**
-     * Called when all the inputs has been passed to the routine.<br>
+     * Called when all the inputs has been passed to the routine.
+     * <br>
      * This method is called once in the invocation lifecycle to indicate that the final invocation
      * results should be passed to the result channel.
      *

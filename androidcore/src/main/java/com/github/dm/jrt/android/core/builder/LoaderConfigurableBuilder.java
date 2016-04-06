@@ -30,7 +30,8 @@ import org.jetbrains.annotations.NotNull;
 public interface LoaderConfigurableBuilder<TYPE> {
 
     /**
-     * Gets the loader configuration builder related to the routine builder instance.<br>
+     * Gets the loader configuration builder related to the routine builder instance.
+     * <br>
      * The configuration options not supported by the routine builder implementation might be
      * ignored.
      * <p>

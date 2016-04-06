@@ -28,7 +28,8 @@ import org.jetbrains.annotations.Nullable;
 public interface FactoryContext {
 
     /**
-     * Returns an instance of the object described by the specified parameters.<br>
+     * Returns an instance of the object described by the specified parameters.
+     * <br>
      * If a null instance is returned, the constructor matching the specified arguments will be
      * called by default.
      *

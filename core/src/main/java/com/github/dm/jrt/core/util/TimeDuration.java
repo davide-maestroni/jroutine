@@ -210,7 +210,8 @@ public class TimeDuration extends Time {
 
     /**
      * Creates and returns an object representing the time range between now and a time in the
-     * future.<br>
+     * future.
+     * <br>
      * If the specified is in the past, a {@code ZERO} duration will be returned.
      *
      * @param milliTime the system time in milliseconds.
@@ -226,7 +227,8 @@ public class TimeDuration extends Time {
 
     /**
      * Creates and returns an object representing the time range between now and a time in the
-     * future.<br>
+     * future.
+     * <br>
      * If the specified is in the past, a {@code ZERO} duration will be returned.
      *
      * @param nanoTime the high precision system time in nanoseconds.
@@ -291,7 +293,8 @@ public class TimeDuration extends Time {
     /**
      * Returns a new instance whose time value is decremented by the specified one.
      * <p>
-     * Note that the unit of the returned time will match the one with the highest precision.<br>
+     * Note that the unit of the returned time will match the one with the highest precision.
+     * <br>
      * Note also that, if the resulting time is negative, the value will be clipped to 0.
      *
      * @param time the time to subtract.
@@ -335,7 +338,8 @@ public class TimeDuration extends Time {
     /**
      * Returns a new instance whose time value is incremented by the specified one.
      * <p>
-     * Note that the unit of the returned time will match the one with the highest precision.<br>
+     * Note that the unit of the returned time will match the one with the highest precision.
+     * <br>
      * Note also that, if the resulting time is negative, the value will be clipped to 0.
      *
      * @param time the time to add.

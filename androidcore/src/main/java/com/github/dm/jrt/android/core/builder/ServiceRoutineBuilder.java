@@ -22,10 +22,12 @@ import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Interface defining a builder of routine objects executed in a dedicated service.<br>
+ * Interface defining a builder of routine objects executed in a dedicated service.
+ * <br>
  * Note that the configuration of the maximum number of concurrent invocations will not be shared
  * among synchronous and asynchronous invocations, but the invocations created inside the service
- * and the synchronous ones will respect the same limit separately.<br>
+ * and the synchronous ones will respect the same limit separately.
+ * <br>
  * Note also that, it is responsibility of the caller to ensure that the started invocations have
  * completed or have been aborted when the relative context (for example the activity) is destroyed,
  * so to avoid the leak of IPC connections.

@@ -162,7 +162,8 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
     protected abstract Class<? super TYPE> getInterfaceClass();
 
     /**
-     * Returns the context on which the invocation is based.<br>
+     * Returns the context on which the invocation is based.
+     * <br>
      * Returning null means that the context has been destroyed, so an exception will be thrown.
      *
      * @return the invocation context.

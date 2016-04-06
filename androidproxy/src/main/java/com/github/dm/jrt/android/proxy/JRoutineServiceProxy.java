@@ -30,7 +30,8 @@ import java.util.WeakHashMap;
  * calls of their methods in a dedicated service.
  * <p>
  * The builders returned by this class are based on compile time code generation, enabled by
- * pre-processing of Java annotations.<br>
+ * pre-processing of Java annotations.
+ * <br>
  * The pre-processing is automatically triggered just by including the artifact of this class
  * module.
  * <p>
@@ -91,7 +92,8 @@ public class JRoutineServiceProxy {
 
         /**
          * Returns a builder of routines, wrapping the specified object instance, running in a
-         * service based on the builder context.<br>
+         * service based on the builder context.
+         * <br>
          * In order to customize the object creation, the caller must employ an implementation of a
          * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
          * invocation service.

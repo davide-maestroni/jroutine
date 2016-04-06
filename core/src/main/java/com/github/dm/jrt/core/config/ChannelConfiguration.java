@@ -37,13 +37,17 @@ import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
  * Each instance is immutable, thus, in order to modify a configuration parameter, a new builder
  * must be created starting from the specific configuration.
  * <p>
- * The configuration has an asynchronous runner associated.<br>
+ * The configuration has an asynchronous runner associated.
+ * <br>
  * The number of input data buffered in the channel can be limited in order to avoid excessive
  * memory consumption. In case the maximum number is reached when passing an input, the call will
- * block until enough data are consumed or the specified delay elapses.<br>
+ * block until enough data are consumed or the specified delay elapses.
+ * <br>
  * A maximum size can additionally be set so that, when the number of buffered data exceeds it, a
- * {@link com.github.dm.jrt.core.common.DeadlockException DeadlockException} will be thrown.<br>
- * By default the timeout is set to 0.<br>
+ * {@link com.github.dm.jrt.core.common.DeadlockException DeadlockException} will be thrown.
+ * <br>
+ * By default the timeout is set to 0.
+ * <br>
  * The order of input data is not guaranteed. Nevertheless, it is possible to force data to be
  * delivered in the same order as they are passed to the channels, at the cost of a slightly
  * increase in memory usage and computation.

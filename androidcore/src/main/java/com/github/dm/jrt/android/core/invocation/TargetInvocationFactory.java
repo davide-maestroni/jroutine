@@ -37,8 +37,10 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * <p>
  * Note that, in case a class not representing a {@link ContextInvocation} is passed to the factory,
  * the specified invocation class will be passed as the first argument to a special context
- * invocation in order to be automatically instantiated via reflection.<br>
- * The latter class will inherit from {@link ContextInvocationWrapper}.<br>
+ * invocation in order to be automatically instantiated via reflection.
+ * <br>
+ * The latter class will inherit from {@link ContextInvocationWrapper}.
+ * <br>
  * It is possible to avoid that, by creating a target invocation factory of a common invocation by
  * defining a specialized class like:
  * <pre>
@@ -70,7 +72,8 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
     }
 
     /**
-     * Returns a target based on the specified invocation class.<br>
+     * Returns a target based on the specified invocation class.
+     * <br>
      * The method accepts also classes inheriting from {@link ContextInvocation}.
      * <p>
      * Note that, in case a class not representing a {@link ContextInvocation} is passed to the
@@ -90,7 +93,8 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
     }
 
     /**
-     * Returns a target based on the specified invocation class.<br>
+     * Returns a target based on the specified invocation class.
+     * <br>
      * The method accepts also classes inheriting from {@link ContextInvocation}.
      * <p>
      * Note that, in case a class not representing a {@link ContextInvocation} is passed to the
@@ -121,7 +125,8 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
     }
 
     /**
-     * Returns a target based on the specified invocation token.<br>
+     * Returns a target based on the specified invocation token.
+     * <br>
      * The method accepts also classes inheriting from {@link ContextInvocation}.
      * <p>
      * Note that, in case a class not representing a {@link ContextInvocation} is passed to the
@@ -141,7 +146,8 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
     }
 
     /**
-     * Returns a target based on the specified invocation token.<br>
+     * Returns a target based on the specified invocation token.
+     * <br>
      * The method accepts also classes inheriting from {@link ContextInvocation}.
      * <p>
      * Note that, in case a class not representing a {@link ContextInvocation} is passed to the
@@ -163,7 +169,8 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
     }
 
     /**
-     * Returns a target based on the specified invocation.<br>
+     * Returns a target based on the specified invocation.
+     * <br>
      * The method accepts also instances inheriting from {@link ContextInvocation}.
      * <p>
      * Note that, in case a class not representing a {@link ContextInvocation} is passed to the
@@ -183,7 +190,8 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
     }
 
     /**
-     * Returns a target based on the specified invocation.<br>
+     * Returns a target based on the specified invocation.
+     * <br>
      * The method accepts also instances inheriting from {@link ContextInvocation}.
      * <p>
      * Note that, in case a class not representing a {@link ContextInvocation} is passed to the

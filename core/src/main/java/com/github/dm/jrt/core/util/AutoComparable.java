@@ -22,7 +22,8 @@ import java.util.Arrays;
 
 /**
  * Base abstract class providing a default implementation of @code equals()}, {@code hashCode()} and
- * {@code toString()} based on the list of objects passed as the constructor arguments.<br>
+ * {@code toString()} based on the list of objects passed as the constructor arguments.
+ * <br>
  * Note that the inheriting class and the argument instances are expected to be immutable.
  * <p>
  * Created by davide-maestroni on 03/31/2016.

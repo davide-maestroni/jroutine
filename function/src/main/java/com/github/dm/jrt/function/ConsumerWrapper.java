@@ -64,7 +64,8 @@ public class ConsumerWrapper<IN> implements Consumer<IN>, Wrapper {
     }
 
     /**
-     * Returns a consumer wrapper just discarding the passed inputs.<br>
+     * Returns a consumer wrapper just discarding the passed inputs.
+     * <br>
      * The returned object will support concatenation and comparison.
      *
      * @param <IN> the input data type.

@@ -34,7 +34,8 @@ import java.util.List;
  * <p>
  * The configuration has a list of shared fields associated. Every method accessing a specific
  * set of fields is protected so that the related variables can be accessed in a thread safe way.
- * By default all fields are protected.<br>
+ * By default all fields are protected.
+ * <br>
  * Note, however, that methods sharing the same fields cannot be executed in parallel.
  * <p>
  * Created by davide-maestroni on 04/20/2015.

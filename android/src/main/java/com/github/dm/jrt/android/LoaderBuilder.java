@@ -57,7 +57,8 @@ public class LoaderBuilder {
 
     /**
      * Returns a builder of routines bound to the builder context, wrapping the specified target
-     * class.<br>
+     * class.
+     * <br>
      * In order to customize the object creation, the caller must employ an implementation of a
      * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
      * application context.
@@ -77,7 +78,8 @@ public class LoaderBuilder {
 
     /**
      * Returns a builder of routines bound to the builder context, wrapping the specified target
-     * object.<br>
+     * object.
+     * <br>
      * In order to customize the object creation, the caller must employ an implementation of a
      * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
      * application context.
@@ -97,7 +99,8 @@ public class LoaderBuilder {
 
     /**
      * Returns a builder of routines bound to the builder context, wrapping the specified target
-     * object.<br>
+     * object.
+     * <br>
      * In order to customize the object creation, the caller must employ an implementation of a
      * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
      * application context.
@@ -294,13 +297,15 @@ public class LoaderBuilder {
     }
 
     /**
-     * Returns a builder of routines bound to the builder context.<br>
+     * Returns a builder of routines bound to the builder context.
+     * <br>
      * In order to prevent undesired leaks, the class of the specified factory must have a static
      * scope.
      * <p>
      * Note that the built routine results will be always dispatched on the configured looper
      * thread, thus waiting for the outputs immediately after its invocation may result in a
-     * deadlock.<br>
+     * deadlock.
+     * <br>
      * Note also that the input data passed to the invocation channel will be cached, and the
      * results will be produced only after the invocation channel is closed, so be sure to avoid
      * streaming inputs in order to prevent starvation or out of memory errors.
@@ -321,7 +326,8 @@ public class LoaderBuilder {
 
     /**
      * Returns a builder of routines bound to the builder context, wrapping the specified target
-     * object.<br>
+     * object.
+     * <br>
      * In order to customize the object creation, the caller must employ an implementation of a
      * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
      * application context.
@@ -340,13 +346,15 @@ public class LoaderBuilder {
     }
 
     /**
-     * Returns a builder of routines bound to the builder context.<br>
+     * Returns a builder of routines bound to the builder context.
+     * <br>
      * In order to prevent undesired leaks, the class of the specified factory must have a static
      * scope.
      * <p>
      * Note that the built routine results will be always dispatched on the configured looper
      * thread, thus waiting for the outputs immediately after its invocation may result in a
-     * deadlock.<br>
+     * deadlock.
+     * <br>
      * Note also that the input data passed to the invocation channel will be cached, and the
      * results will be produced only after the invocation channel is closed, so be sure to avoid
      * streaming inputs in order to prevent starvation or out of memory errors.

@@ -48,9 +48,11 @@ import java.lang.annotation.Target;
  * Note that the transfer mode is specifically chosen through the annotation {@code mode} attribute
  * (it's {@link AsyncIn.InputMode#VALUE VALUE} by default).
  * <p>
- * This annotation is used to decorate methods that are to be invoked in an asynchronous way.<br>
+ * This annotation is used to decorate methods that are to be invoked in an asynchronous way.
+ * <br>
  * Note that the piece of code inside such methods will be automatically protected so to avoid
- * concurrency issues. Though, other parts of the code inside the same class will be not.<br>
+ * concurrency issues. Though, other parts of the code inside the same class will be not.
+ * <br>
  * In order to prevent unexpected behaviors, it is advisable to avoid using the same class fields
  * (unless immutable) in protected and non-protected code, or to call synchronous methods through
  * routines as well.
@@ -87,13 +89,15 @@ public @interface AsyncIn {
     Class<?> value();
 
     /**
-     * Input transfer mode type.<br>
+     * Input transfer mode type.
+     * <br>
      * The mode indicates in which way a parameter is passed to the wrapped method.
      */
     enum InputMode {
 
         /**
-         * Value mode.<br>
+         * Value mode.
+         * <br>
          * The variable is just read from an output channel.
          * <p>
          * The annotated parameters must extend an
@@ -101,7 +105,8 @@ public @interface AsyncIn {
          */
         VALUE,
         /**
-         * Collection mode.<br>
+         * Collection mode.
+         * <br>
          * The inputs are collected from the channel and passed as an array or collection to the
          * wrapped method.
          * <p>

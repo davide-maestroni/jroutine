@@ -32,22 +32,26 @@ import org.jetbrains.annotations.Nullable;
  * <p>
  * The library includes a routine class based on the implementation of an invocation interface.
  * Invocation objects are dynamically instantiated when needed, effectively mimicking the temporary
- * scope of a function call.<br>
+ * scope of a function call.
+ * <br>
  * The paradigm is based on input, result and output channels. A routine can be invoked in
  * different ways (as explained below). Each routine invocation returns an input channel through
  * which the caller can pass the input parameters. When all the parameters has been passed, the
  * input channel is closed and returns the output channel from which to read the invocation
  * results. At the same time a result channel is passed to the invocation implementation, so that
- * the output computed from the input parameters can be published outside.<br>
+ * the output computed from the input parameters can be published outside.
+ * <br>
  * The advantage of this approach is that the invocation flow can be run in steps, allowing for
  * continuous streaming of the input data and for abortion in the middle of the execution, without
- * blocking the running thread for the whole duration of the asynchronous invocation.<br>
+ * blocking the running thread for the whole duration of the asynchronous invocation.
+ * <br>
  * In fact, each channel can abort the execution at any time.
  * <p>
  * The implementing class must provides an automatic synchronization of the invocation member
  * fields, though, in order to avoid concurrency issues, it is up to the caller to ensure that data
  * passed through the routine channels are immutable or, at least, never shared inside and outside
- * the routine.<br>
+ * the routine.
+ * <br>
  * Moreover, it is possible to recursively call the same or another routine from inside a routine
  * invocation in a safe way. However, it is not allowed to perform blocking calls (such as
  * reading data from an output channel) in the middle of an execution when shared runner instances
@@ -69,7 +73,8 @@ import org.jetbrains.annotations.Nullable;
  * <b>Parallel invocation</b><br>
  * Processing parallelization is the key to leverage the power of multi-core machines. In order to
  * achieve it, the input data must be divided into subsets which are then processed on different
- * threads.<br>
+ * threads.
+ * <br>
  * A routine object provides a convenient way to start an invocation which in turn spawns another
  * invocation for each input passed. This particular type of invocation obviously produces
  * meaningful results only for routines which takes a single input parameter and computes the

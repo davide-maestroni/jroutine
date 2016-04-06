@@ -62,7 +62,8 @@ import java.util.List;
  * Each instance maintains a pool of byte buffers which are re-used to minimize memory consumption.
  * When the pool is empty, additional buffers are created in order to avoid blocking the caller
  * thread. Though, the pool will retain its maximum capacity and every buffer exceeding it will be
- * discarded.<br>
+ * discarded.
+ * <br>
  * Note that the streams used to write into and read from buffers should be properly closed as the
  * Java best practices suggest.
  * <p>
@@ -320,7 +321,8 @@ public class ByteChannel {
 
         /**
          * Reads all the bytes returned by the input stream and writes them into the specified
-         * output stream.<br>
+         * output stream.
+         * <br>
          * Calling this method has the same effect as calling:
          * <pre>
          *     <code>
@@ -368,7 +370,8 @@ public class ByteChannel {
 
         /**
          * Writes all the returned bytes into the output stream by reading them from the specified
-         * input stream.<br>
+         * input stream.
+         * <br>
          * Calling this method has the same effect as calling:
          * <pre>
          *     <code>
@@ -729,11 +732,13 @@ public class ByteChannel {
      * <p>
      * Buffer instances are managed by the owning byte channel and recycled when released, in order
      * to minimize memory consumption. Byte buffers are automatically acquired by
-     * <code>BufferOutputStream</code>s and passed to the underlying channel.<br>
+     * <code>BufferOutputStream</code>s and passed to the underlying channel.
+     * <br>
      * The data contained in a buffer can be read through the dedicated
      * {@code BufferInputStream} returned by one of the {@code ByteChannel.inputStream()}
      * methods. Note that only one input stream can be created for each buffer, any further attempt
-     * will generate an exception.<br>
+     * will generate an exception.
+     * <br>
      * Used buffers will be released as soon as the corresponding input stream is closed.
      *
      * @see ByteChannel#inputStream(ByteBuffer)

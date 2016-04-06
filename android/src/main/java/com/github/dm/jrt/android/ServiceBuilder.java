@@ -19,7 +19,6 @@ package com.github.dm.jrt.android;
 import com.github.dm.jrt.android.core.JRoutineService;
 import com.github.dm.jrt.android.core.ServiceContext;
 import com.github.dm.jrt.android.core.builder.ServiceRoutineBuilder;
-import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.TargetInvocationFactory;
 import com.github.dm.jrt.android.object.ContextInvocationTarget;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
@@ -53,7 +52,8 @@ public class ServiceBuilder {
     }
 
     /**
-     * Returns a builder of routines running in a service, wrapping the specified target class.<br>
+     * Returns a builder of routines running in a service, wrapping the specified target class.
+     * <br>
      * In order to customize the object creation, the caller must employ an implementation of a
      * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
      * routine service.
@@ -216,8 +216,7 @@ public class ServiceBuilder {
      *                                            found.
      */
     @NotNull
-    public <IN, OUT> RoutineBuilder<IN, OUT> on(
-            @NotNull final ContextInvocation<IN, OUT> invocation) {
+    public <IN, OUT> RoutineBuilder<IN, OUT> on(@NotNull final Invocation<IN, OUT> invocation) {
 
         return on(tokenOf(invocation));
     }
@@ -240,22 +239,24 @@ public class ServiceBuilder {
      *                                            found.
      */
     @NotNull
-    public <IN, OUT> RoutineBuilder<IN, OUT> on(
-            @NotNull final ContextInvocation<IN, OUT> invocation, @Nullable final Object... args) {
+    public <IN, OUT> RoutineBuilder<IN, OUT> on(@NotNull final Invocation<IN, OUT> invocation,
+            @Nullable final Object... args) {
 
         return on(tokenOf(invocation), args);
     }
 
     /**
      * Returns a builder of routines running in a service based on the builder context, wrapping
-     * the specified target object.<br>
+     * the specified target object.
+     * <br>
      * In order to customize the object creation, the caller must employ an implementation of a
      * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
      * routine service.
      * <p>
      * Note that the built routine results will be dispatched into the configured looper, thus,
      * waiting for the outputs on the very same looper thread, immediately after its invocation,
-     * will result in a deadlock. By default output results are dispatched in the main looper.<br>
+     * will result in a deadlock. By default output results are dispatched in the main looper.
+     * <br>
      * Note also that the invocation input data will be cached, and the results will be produced
      * only after the invocation channel is closed, so be sure to avoid streaming inputs in
      * order to prevent starvation or out of memory errors.
@@ -270,7 +271,8 @@ public class ServiceBuilder {
     }
 
     /**
-     * Returns a builder of routines running in a service based on the builder context.<br>
+     * Returns a builder of routines running in a service based on the builder context.
+     * <br>
      * In order to customize the invocation creation, the caller must override the method
      * {@link com.github.dm.jrt.android.core.service.InvocationService#getInvocationFactory(
      * Class, Object...) getInvocationFactory(Class, Object...)} of the routine service.

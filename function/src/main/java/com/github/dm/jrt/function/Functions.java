@@ -49,7 +49,8 @@ public class Functions {
     }
 
     /**
-     * Returns a bi-consumer wrapper just discarding the passed inputs.<br>
+     * Returns a bi-consumer wrapper just discarding the passed inputs.
+     * <br>
      * The returned object will support concatenation and comparison.
      *
      * @param <IN1> the first input data type.
@@ -63,7 +64,8 @@ public class Functions {
     }
 
     /**
-     * Returns a function wrapper casting the passed inputs to the specified class.<br>
+     * Returns a function wrapper casting the passed inputs to the specified class.
+     * <br>
      * The returned object will support concatenation and comparison.
      *
      * @param type  the class type.
@@ -79,7 +81,8 @@ public class Functions {
     }
 
     /**
-     * Returns a function wrapper casting the passed inputs to the specified class token type.<br>
+     * Returns a function wrapper casting the passed inputs to the specified class token type.
+     * <br>
      * The returned object will support concatenation and comparison.
      *
      * @param token the class token.
@@ -95,7 +98,8 @@ public class Functions {
     }
 
     /**
-     * Returns a supplier wrapper always returning the same result.<br>
+     * Returns a supplier wrapper always returning the same result.
+     * <br>
      * The returned object will support concatenation and comparison.
      *
      * @param result the result.
@@ -114,7 +118,8 @@ public class Functions {
      * It's up to the caller to prevent undesired leaks.
      * <p>
      * Note that the passed object is expected to behave like a function, that is, it must not
-     * retain a mutable internal state.<br>
+     * retain a mutable internal state.
+     * <br>
      * Note also that any external object used inside the function must be synchronized in order to
      * avoid concurrency issues.
      *
@@ -131,11 +136,13 @@ public class Functions {
     }
 
     /**
-     * Builds and returns a new command invocation based on the specified consumer instance.<br>
+     * Builds and returns a new command invocation based on the specified consumer instance.
+     * <br>
      * It's up to the caller to prevent undesired leaks.
      * <p>
      * Note that the passed object is expected to behave like a function, that is, it must not
-     * retain a mutable internal state.<br>
+     * retain a mutable internal state.
+     * <br>
      * Note also that any external object used inside the function must be synchronized in order to
      * avoid concurrency issues.
      *
@@ -151,11 +158,13 @@ public class Functions {
     }
 
     /**
-     * Builds and returns a new filter invocation based on the specified bi-consumer instance.<br>
+     * Builds and returns a new filter invocation based on the specified bi-consumer instance.
+     * <br>
      * It's up to the caller to prevent undesired leaks.
      * <p>
      * Note that the passed object is expected to behave like a function, that is, it must not
-     * retain a mutable internal state.<br>
+     * retain a mutable internal state.
+     * <br>
      * Note also that any external object used inside the function must be synchronized in order to
      * avoid concurrency issues.
      *
@@ -172,7 +181,8 @@ public class Functions {
     }
 
     /**
-     * Returns a bi-function wrapper just returning the first passed argument.<br>
+     * Returns a bi-function wrapper just returning the first passed argument.
+     * <br>
      * The returned object will support concatenation and comparison.
      *
      * @param <IN1> the first input data type.
@@ -191,7 +201,8 @@ public class Functions {
      * It's up to the caller to prevent undesired leaks.
      * <p>
      * Note that the passed object is expected to behave like a function, that is, it must not
-     * retain a mutable internal state.<br>
+     * retain a mutable internal state.
+     * <br>
      * Note also that any external object used inside the function must be synchronized in order to
      * avoid concurrency issues.
      *
@@ -208,11 +219,13 @@ public class Functions {
     }
 
     /**
-     * Builds and returns a new filter invocation based on the specified function instance.<br>
+     * Builds and returns a new filter invocation based on the specified function instance.
+     * <br>
      * It's up to the caller to prevent undesired leaks.
      * <p>
      * Note that the passed object is expected to behave like a function, that is, it must not
-     * retain a mutable internal state.<br>
+     * retain a mutable internal state.
+     * <br>
      * Note also that any external object used inside the function must be synchronized in order to
      * avoid concurrency issues.
      *
@@ -229,7 +242,8 @@ public class Functions {
     }
 
     /**
-     * Returns the identity function wrapper.<br>
+     * Returns the identity function wrapper.
+     * <br>
      * The returned object will support concatenation and comparison.
      *
      * @param <IN> the input data type.
@@ -242,7 +256,8 @@ public class Functions {
     }
 
     /**
-     * Returns a predicate wrapper testing for equality to the specified object.<br>
+     * Returns a predicate wrapper testing for equality to the specified object.
+     * <br>
      * The returned object will support concatenation and comparison.
      *
      * @param targetRef the target reference.
@@ -257,7 +272,8 @@ public class Functions {
 
     /**
      * Returns a predicate wrapper testing whether the passed inputs are instances of the specified
-     * class.<br>
+     * class.
+     * <br>
      * The returned object will support concatenation and comparison.
      *
      * @param type the class type.
@@ -271,7 +287,8 @@ public class Functions {
     }
 
     /**
-     * Returns a predicate wrapper returning true when the passed argument is null.<br>
+     * Returns a predicate wrapper returning true when the passed argument is null.
+     * <br>
      * The returned object will support concatenation and comparison.
      *
      * @param <IN> the input data type.
@@ -284,7 +301,8 @@ public class Functions {
     }
 
     /**
-     * Returns a predicate wrapper testing for identity to the specified object.<br>
+     * Returns a predicate wrapper testing for identity to the specified object.
+     * <br>
      * The returned object will support concatenation and comparison.
      *
      * @param targetRef the target reference.
@@ -299,7 +317,8 @@ public class Functions {
 
     /**
      * Returns a bi-function wrapper returning the greater of the two inputs as per natural
-     * ordering.<br>
+     * ordering.
+     * <br>
      * The returned object will support concatenation and comparison.
      *
      * @param <IN> the input data type.
@@ -313,7 +332,8 @@ public class Functions {
 
     /**
      * Returns a bi-function wrapper returning the greater of the two inputs as indicated by the
-     * specified comparator.<br>
+     * specified comparator.
+     * <br>
      * The returned object will support concatenation and comparison.
      *
      * @param comparator the comparator instance.
@@ -328,7 +348,8 @@ public class Functions {
 
     /**
      * Returns a bi-function wrapper returning the smaller of the two inputs as per natural
-     * ordering.<br>
+     * ordering.
+     * <br>
      * The returned object will support concatenation and comparison.
      *
      * @param <IN> the input data type.
@@ -342,7 +363,8 @@ public class Functions {
 
     /**
      * Returns a bi-function wrapper returning the smaller of the two inputs as indicated by the
-     * specified comparator.<br>
+     * specified comparator.
+     * <br>
      * The returned object will support concatenation and comparison.
      *
      * @param comparator the comparator instance.
@@ -356,7 +378,8 @@ public class Functions {
     }
 
     /**
-     * Returns a predicate wrapper always returning false.<br>
+     * Returns a predicate wrapper always returning false.
+     * <br>
      * The returned object will support concatenation and comparison.
      *
      * @param <IN> the input data type.
@@ -369,7 +392,8 @@ public class Functions {
     }
 
     /**
-     * Returns a predicate wrapper returning true when the passed argument is not null.<br>
+     * Returns a predicate wrapper returning true when the passed argument is not null.
+     * <br>
      * The returned object will support concatenation and comparison.
      *
      * @param <IN> the input data type.
@@ -426,7 +450,8 @@ public class Functions {
     }
 
     /**
-     * Returns a predicate wrapper always returning true.<br>
+     * Returns a predicate wrapper always returning true.
+     * <br>
      * The returned object will support concatenation and comparison.
      *
      * @param <IN> the input data type.
@@ -439,13 +464,16 @@ public class Functions {
     }
 
     /**
-     * Builds and returns a new filter invocation based on the specified predicate instance.<br>
+     * Builds and returns a new filter invocation based on the specified predicate instance.
+     * <br>
      * Only the inputs which satisfies the predicate will be passed on, while the others will be
-     * filtered out.<br>
+     * filtered out.
+     * <br>
      * It's up to the caller to prevent undesired leaks.
      * <p>
      * Note that the passed object is expected to behave like a function, that is, it must not
-     * retain a mutable internal state.<br>
+     * retain a mutable internal state.
+     * <br>
      * Note also that any external object used inside the function must be synchronized in order to
      * avoid concurrency issues.
      *
@@ -461,7 +489,8 @@ public class Functions {
     }
 
     /**
-     * Returns a bi-function wrapper just returning the second passed argument.<br>
+     * Returns a bi-function wrapper just returning the second passed argument.
+     * <br>
      * The returned object will support concatenation and comparison.
      *
      * @param <IN1> the first input data type.
@@ -475,7 +504,8 @@ public class Functions {
     }
 
     /**
-     * Returns a consumer wrapper just discarding the passed inputs.<br>
+     * Returns a consumer wrapper just discarding the passed inputs.
+     * <br>
      * The returned object will support concatenation and comparison.
      *
      * @param <IN> the input data type.
@@ -488,11 +518,13 @@ public class Functions {
     }
 
     /**
-     * Builds and returns a new command invocation based on the specified supplier instance.<br>
+     * Builds and returns a new command invocation based on the specified supplier instance.
+     * <br>
      * It's up to the caller to prevent undesired leaks.
      * <p>
      * Note that the passed object is expected to behave like a function, that is, it must not
-     * retain a mutable internal state.<br>
+     * retain a mutable internal state.
+     * <br>
      * Note also that any external object used inside the function must be synchronized in order to
      * avoid concurrency issues.
      *
@@ -508,11 +540,13 @@ public class Functions {
     }
 
     /**
-     * Builds and returns a new invocation factory based on the specified supplier instance.<br>
+     * Builds and returns a new invocation factory based on the specified supplier instance.
+     * <br>
      * It's up to the caller to prevent undesired leaks.
      * <p>
      * Note that the passed object is expected to behave like a function, that is, it must not
-     * retain a mutable internal state.<br>
+     * retain a mutable internal state.
+     * <br>
      * Note also that any external object used inside the function must be synchronized in order to
      * avoid concurrency issues.
      *
@@ -529,11 +563,13 @@ public class Functions {
     }
 
     /**
-     * Wraps the specified bi-consumer instance so to provide additional features.<br>
+     * Wraps the specified bi-consumer instance so to provide additional features.
+     * <br>
      * The returned object will support concatenation and comparison.
      * <p>
      * Note that the passed object is expected to behave like a function, that is, it must not
-     * retain a mutable internal state.<br>
+     * retain a mutable internal state.
+     * <br>
      * Note also that any external object used inside the function must be synchronized in order to
      * avoid concurrency issues.
      *
@@ -554,11 +590,13 @@ public class Functions {
     }
 
     /**
-     * Wraps the specified bi-function instance so to provide additional features.<br>
+     * Wraps the specified bi-function instance so to provide additional features.
+     * <br>
      * The returned object will support concatenation and comparison.
      * <p>
      * Note that the passed object is expected to behave like a function, that is, it must not
-     * retain a mutable internal state.<br>
+     * retain a mutable internal state.
+     * <br>
      * Note also that any external object used inside the function must be synchronized in order to
      * avoid concurrency issues.
      *
@@ -580,11 +618,13 @@ public class Functions {
     }
 
     /**
-     * Wraps the specified consumer instance so to provide additional features.<br>
+     * Wraps the specified consumer instance so to provide additional features.
+     * <br>
      * The returned object will support concatenation and comparison.
      * <p>
      * Note that the passed object is expected to behave like a function, that is, it must not
-     * retain a mutable internal state.<br>
+     * retain a mutable internal state.
+     * <br>
      * Note also that any external object used inside the function must be synchronized in order to
      * avoid concurrency issues.
      *
@@ -603,11 +643,13 @@ public class Functions {
     }
 
     /**
-     * Wraps the specified function instance so to provide additional features.<br>
+     * Wraps the specified function instance so to provide additional features.
+     * <br>
      * The returned object will support concatenation and comparison.
      * <p>
      * Note that the passed object is expected to behave like a function, that is, it must not
-     * retain a mutable internal state.<br>
+     * retain a mutable internal state.
+     * <br>
      * Note also that any external object used inside the function must be synchronized in order to
      * avoid concurrency issues.
      *
@@ -628,11 +670,13 @@ public class Functions {
     }
 
     /**
-     * Wraps the specified predicate instance so to provide additional features.<br>
+     * Wraps the specified predicate instance so to provide additional features.
+     * <br>
      * The returned object will support concatenation and comparison.
      * <p>
      * Note that the passed object is expected to behave like a function, that is, it must not
-     * retain a mutable internal state.<br>
+     * retain a mutable internal state.
+     * <br>
      * Note also that any external object used inside the function must be synchronized in order to
      * avoid concurrency issues.
      *
@@ -651,11 +695,13 @@ public class Functions {
     }
 
     /**
-     * Wraps the specified supplier instance so to provide additional features.<br>
+     * Wraps the specified supplier instance so to provide additional features.
+     * <br>
      * The returned object will support concatenation and comparison.
      * <p>
      * Note that the passed object is expected to behave like a function, that is, it must not
-     * retain a mutable internal state.<br>
+     * retain a mutable internal state.
+     * <br>
      * Note also that any external object used inside the function must be synchronized in order to
      * avoid concurrency issues.
      *

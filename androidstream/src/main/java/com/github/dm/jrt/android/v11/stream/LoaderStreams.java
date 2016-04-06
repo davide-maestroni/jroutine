@@ -288,9 +288,11 @@ public class LoaderStreams extends Streams {
 
     /**
      * Returns an invocation factory, whose invocation instances employ the stream output channels,
-     * provided by the specified function, to process input data.<br>
+     * provided by the specified function, to process input data.
+     * <br>
      * In order to prevent undesired leaks, the class of the specified function must have a static
-     * scope.<br>
+     * scope.
+     * <br>
      * The function should return a new instance each time it is called, starting from the passed
      * one.
      *
@@ -409,7 +411,8 @@ public class LoaderStreams extends Streams {
     }
 
     /**
-     * Returns a builder of loader streams joining the data coming from the specified channels.<br>
+     * Returns a builder of loader streams joining the data coming from the specified channels.
+     * <br>
      * An output will be generated only when at least one result is available for each channel.
      * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
@@ -431,7 +434,8 @@ public class LoaderStreams extends Streams {
     }
 
     /**
-     * Returns a builder of loader streams joining the data coming from the specified channels.<br>
+     * Returns a builder of loader streams joining the data coming from the specified channels.
+     * <br>
      * An output will be generated only when at least one result is available for each channel.
      * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
@@ -453,7 +457,8 @@ public class LoaderStreams extends Streams {
     }
 
     /**
-     * Returns a builder of loader streams joining the data coming from the specified channels.<br>
+     * Returns a builder of loader streams joining the data coming from the specified channels.
+     * <br>
      * An output will be generated only when at least one result is available for each channel.
      * Moreover, when all the output channels complete, the remaining outputs will be returned by
      * filling the gaps with the specified placeholder instance, so that the generated list of data
@@ -480,7 +485,8 @@ public class LoaderStreams extends Streams {
     }
 
     /**
-     * Returns a builder of loader streams joining the data coming from the specified channels.<br>
+     * Returns a builder of loader streams joining the data coming from the specified channels.
+     * <br>
      * An output will be generated only when at least one result is available for each channel.
      * Moreover, when all the output channels complete, the remaining outputs will be returned by
      * filling the gaps with the specified placeholder instance, so that the generated list of data
@@ -506,7 +512,8 @@ public class LoaderStreams extends Streams {
     }
 
     /**
-     * Builds and returns a new lazy loader stream channel.<br>
+     * Builds and returns a new lazy loader stream channel.
+     * <br>
      * The stream will start producing results only when it is bound to another channel or an output
      * consumer, or when any of the read methods is invoked.
      *
@@ -520,7 +527,8 @@ public class LoaderStreams extends Streams {
     }
 
     /**
-     * Builds and returns a new lazy loader stream channel generating the specified outputs.<br>
+     * Builds and returns a new lazy loader stream channel generating the specified outputs.
+     * <br>
      * The stream will start producing results only when it is bound to another channel or an output
      * consumer, or when any of the read methods is invoked.
      *
@@ -536,7 +544,8 @@ public class LoaderStreams extends Streams {
     }
 
     /**
-     * Builds and returns a new lazy loader stream channel generating the specified output.<br>
+     * Builds and returns a new lazy loader stream channel generating the specified output.
+     * <br>
      * The stream will start producing results only when it is bound to another channel or an output
      * consumer, or when any of the read methods is invoked.
      *
@@ -551,7 +560,8 @@ public class LoaderStreams extends Streams {
     }
 
     /**
-     * Builds and returns a new lazy loader stream channel generating the specified outputs.<br>
+     * Builds and returns a new lazy loader stream channel generating the specified outputs.
+     * <br>
      * The stream will start producing results only when it is bound to another channel or an output
      * consumer, or when any of the read methods is invoked.
      *
@@ -566,7 +576,8 @@ public class LoaderStreams extends Streams {
     }
 
     /**
-     * Builds and returns a new lazy loader stream channel generating the specified outputs.<br>
+     * Builds and returns a new lazy loader stream channel generating the specified outputs.
+     * <br>
      * The stream will start producing results only when it is bound to another channel or an output
      * consumer, or when any of the read methods is invoked.
      * <p>
@@ -700,9 +711,11 @@ public class LoaderStreams extends Streams {
 
     /**
      * Returns a routine builder, whose invocation instances employ the streams provided by the
-     * specified function, to process input data.<br>
+     * specified function, to process input data.
+     * <br>
      * In order to prevent undesired leaks, the class of the specified function must have a static
-     * scope.<br>
+     * scope.
+     * <br>
      * The function should return a new instance each time it is called, starting from the passed
      * one.
      *
@@ -729,9 +742,11 @@ public class LoaderStreams extends Streams {
 
     /**
      * Returns a loader routine builder, whose invocation instances employ the streams provided by
-     * the specified function, to process input data.<br>
+     * the specified function, to process input data.
+     * <br>
      * In order to prevent undesired leaks, the class of the specified function must have a static
-     * scope.<br>
+     * scope.
+     * <br>
      * The function should return a new instance each time it is called, starting from the passed
      * one.
      *
@@ -1115,7 +1130,8 @@ public class LoaderStreams extends Streams {
     }
 
     /**
-     * Returns a builder of selectable channels feeding the specified one.<br>
+     * Returns a builder of selectable channels feeding the specified one.
+     * <br>
      * Each output will be filtered based on the specified index.
      * <p>
      * Note that the builder will return the same map for the same inputs and equal configuration,
@@ -1136,7 +1152,8 @@ public class LoaderStreams extends Streams {
     }
 
     /**
-     * Returns a builder of channels making the specified one selectable.<br>
+     * Returns a builder of channels making the specified one selectable.
+     * <br>
      * Each output will be passed along unchanged.
      * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the

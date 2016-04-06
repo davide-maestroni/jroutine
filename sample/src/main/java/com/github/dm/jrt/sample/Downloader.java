@@ -88,7 +88,8 @@ public class Downloader {
     }
 
     /**
-     * Main.<br>
+     * Main.
+     * <br>
      * The first argument is the path to the download directory, the second one is the maximum
      * number of parallel downloads, and all the further ones are the URIs of the resources to
      * download.

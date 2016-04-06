@@ -26,7 +26,8 @@ import org.jetbrains.annotations.NotNull;
  * calls of their methods.
  * <p>
  * The builders returned by this class are based on compile time code generation, enabled by
- * pre-processing of Java annotations.<br>
+ * pre-processing of Java annotations.
+ * <br>
  * The pre-processing is automatically triggered just by including the artifact of this class
  * module.
  * <p>
@@ -48,7 +49,8 @@ public class JRoutineProxy {
      * Returns a routine builder wrapping the specified target object.
      * <p>
      * Note that it is responsibility of the caller to retain a strong reference to the target
-     * instance to prevent it from being garbage collected.<br>
+     * instance to prevent it from being garbage collected.
+     * <br>
      * Note also that the invocation input data will be cached, and the results will be produced
      * only after the invocation channel is closed, so be sure to avoid streaming inputs in order to
      * prevent starvation or out of memory errors.

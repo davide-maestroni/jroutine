@@ -31,7 +31,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Class providing ordering of executions based on priority.<br>
+ * Class providing ordering of executions based on priority.
+ * <br>
  * Each class instance wraps a supporting runner and then provides different runner instances, each
  * one enqueuing executions with a specific priority.
  * <p>

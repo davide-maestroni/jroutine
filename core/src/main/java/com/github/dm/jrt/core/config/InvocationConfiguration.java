@@ -36,7 +36,8 @@ import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
  * Each instance is immutable, thus, in order to modify a configuration parameter, a new builder
  * must be created starting from the specific configuration.
  * <p>
- * The configuration has an asynchronous runner associated.<br>
+ * The configuration has an asynchronous runner associated.
+ * <br>
  * The default runner is shared among all the routines.
  * <p>
  * A specific priority can be set. Every invocation will age each time an higher priority one takes
@@ -62,7 +63,8 @@ import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
  * an input or output, the call blocks until enough data are consumed or the specified maximum delay
  * elapses. A maximum size can additionally be set so that, when the number of buffered data
  * exceeds it, a {@link com.github.dm.jrt.core.common.DeadlockException DeadlockException} will be
- * thrown.<br>
+ * thrown.
+ * <br>
  * By default the delay is set to 0.
  * <p>
  * The order of input and output data is not guaranteed. Nevertheless, it is possible to force data
@@ -559,13 +561,15 @@ public final class InvocationConfiguration {
     public enum OrderType {
 
         /**
-         * Order by call.<br>
+         * Order by call.
+         * <br>
          * Data are passed to the invocation or the output consumer in the same order as they are
          * passed to the channel, independently from the specific delay.
          */
         BY_CALL,
         /**
-         * Order by delay.<br>
+         * Order by delay.
+         * <br>
          * Data are passed to the invocation or the output consumer based on their delay.
          */
         BY_DELAY
@@ -577,20 +581,23 @@ public final class InvocationConfiguration {
     public enum TimeoutActionType {
 
         /**
-         * Throw.<br>
+         * Throw.
+         * <br>
          * If no result is available after the specified timeout, the called method will throw an
          * {@link com.github.dm.jrt.core.channel.ExecutionTimeoutException
          * ExecutionTimeoutException}.
          */
         THROW,
         /**
-         * Break execution.<br>
+         * Break execution.
+         * <br>
          * If no result is available after the specified timeout, the called method will stop its
          * execution and exit immediately.
          */
         EXIT,
         /**
-         * Abort invocation.<br>
+         * Abort invocation.
+         * <br>
          * If no result is available after the specified timeout, the invocation will be aborted and
          * the method will immediately exit.
          */
@@ -875,7 +882,8 @@ public final class InvocationConfiguration {
         /**
          * Sets the maximum number of data that the input channel can retain before they are
          * consumed. A {@link InvocationConfiguration#DEFAULT DEFAULT} value means that it is up
-         * to the specific implementation to choose a default one.<br>
+         * to the specific implementation to choose a default one.
+         * <br>
          * When the maximum capacity is reached, the invocation will be aborted with an
          * {@link com.github.dm.jrt.core.channel.InputDeadlockException InputDeadlockException}.
          *
@@ -1029,7 +1037,8 @@ public final class InvocationConfiguration {
         /**
          * Sets the maximum number of data that the result channel can retain before they are
          * consumed. A {@link InvocationConfiguration#DEFAULT DEFAULT} value means that it is up
-         * to the specific implementation to choose a default one.<br>
+         * to the specific implementation to choose a default one.
+         * <br>
          * When the maximum capacity is reached, the invocation will be aborted with an
          * {@link com.github.dm.jrt.core.channel.InputDeadlockException InputDeadlockException}.
          *

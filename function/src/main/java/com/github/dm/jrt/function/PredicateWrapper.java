@@ -96,7 +96,8 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
     }
 
     /**
-     * Returns a predicate wrapper testing for equality to the specified object.<br>
+     * Returns a predicate wrapper testing for equality to the specified object.
+     * <br>
      * The returned object will support concatenation and comparison.
      *
      * @param targetRef the target reference.
@@ -115,7 +116,8 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
 
     /**
      * Returns a predicate wrapper testing whether the passed inputs are instances of the specified
-     * class.<br>
+     * class.
+     * <br>
      * The returned object will support concatenation and comparison.
      *
      * @param type the class type.
@@ -130,7 +132,8 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
     }
 
     /**
-     * Returns a predicate wrapper returning true when the passed argument is null.<br>
+     * Returns a predicate wrapper returning true when the passed argument is null.
+     * <br>
      * The returned object will support concatenation and comparison.
      *
      * @param <IN> the input data type.
@@ -144,7 +147,8 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
     }
 
     /**
-     * Returns a predicate wrapper testing for identity to the specified object.<br>
+     * Returns a predicate wrapper testing for identity to the specified object.
+     * <br>
      * The returned object will support concatenation and comparison.
      *
      * @param targetRef the target reference.
@@ -162,7 +166,8 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
     }
 
     /**
-     * Returns a predicate wrapper always returning the false.<br>
+     * Returns a predicate wrapper always returning the false.
+     * <br>
      * The returned object will support concatenation and comparison.
      *
      * @param <IN> the input data type.
@@ -176,7 +181,8 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
     }
 
     /**
-     * Returns a predicate wrapper returning true when the passed argument is not null.<br>
+     * Returns a predicate wrapper returning true when the passed argument is not null.
+     * <br>
      * The returned object will support concatenation and comparison.
      *
      * @param <IN> the input data type.
@@ -190,7 +196,8 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
     }
 
     /**
-     * Returns a predicate wrapper always returning the true.<br>
+     * Returns a predicate wrapper always returning the true.
+     * <br>
      * The returned object will support concatenation and comparison.
      *
      * @param <IN> the input data type.

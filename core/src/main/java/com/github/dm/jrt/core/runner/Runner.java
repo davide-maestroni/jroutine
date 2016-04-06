@@ -25,7 +25,8 @@ import java.util.concurrent.TimeUnit;
  * specifically managed threads.
  * <p>
  * The implementation can both be synchronous or asynchronous, it can allocate specific threads or
- * share a pool of them between different instances.<br>
+ * share a pool of them between different instances.
+ * <br>
  * The only requirement is that the specified execution is called each time a run method is invoked,
  * even if the same execution instance is passed several times as parameter.
  * <p>
@@ -50,7 +51,8 @@ public interface Runner {
      * Cancels the specified execution if not already run.
      * <p>
      * Note that the method will have no effect in case the runner does not maintain a queue or the
-     * specified execution has been already processed at the moment of the call.<br>
+     * specified execution has been already processed at the moment of the call.
+     * <br>
      * Note also that, in case the same execution has been added more than once to the runner queue,
      * when the method returns, the queue will not contain the execution instance anymore, with the
      * consequence that the {@link Execution#run()} method will never be called.
@@ -66,7 +68,8 @@ public interface Runner {
      * Checks if the calling thread belongs to the ones managed by the runner implementation.
      * <p>
      * The implementation of this method is not strictly mandatory, even if, the classes always
-     * returning false effectively prevent the correct detection of possible deadlocks.<br>
+     * returning false effectively prevent the correct detection of possible deadlocks.
+     * <br>
      * A synchronous runner implementation will always return true.
      *
      * @return whether the calling thread is managed by the runner.

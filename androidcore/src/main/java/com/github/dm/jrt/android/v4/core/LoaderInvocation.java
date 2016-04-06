@@ -559,7 +559,8 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
     }
 
     /**
-     * Loader callbacks implementation.<br>
+     * Loader callbacks implementation.
+     * <br>
      * The callbacks object will make sure that the loader results are passed to the returned output
      * channels.
      *

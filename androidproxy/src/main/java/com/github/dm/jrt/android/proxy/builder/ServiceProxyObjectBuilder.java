@@ -38,11 +38,13 @@ public interface ServiceProxyObjectBuilder<TYPE> extends ProxyObjectBuilder<TYPE
      * Returns a proxy object enabling asynchronous call of the target instance methods.
      * <p>
      * The routines used for calling the methods will honor the attributes specified in any optional
-     * <i>{@code com.github.dm.jrt.object.annotation.*}</i> annotations.<br>
+     * <i>{@code com.github.dm.jrt.object.annotation.*}</i> annotations.
+     * <br>
      * Note that such annotations will override any configuration set through the builder.
      * <p>
      * The proxy object is created through code generation based on the interfaces annotated with
-     * {@link com.github.dm.jrt.android.proxy.annotation.ServiceProxy ServiceProxy}.<br>
+     * {@link com.github.dm.jrt.android.proxy.annotation.ServiceProxy ServiceProxy}.
+     * <br>
      * Note that, you'll need to enable annotation pre-processing by adding the processor artifact
      * to the specific project dependencies.
      *

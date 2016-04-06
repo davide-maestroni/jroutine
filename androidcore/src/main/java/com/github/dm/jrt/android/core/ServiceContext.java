@@ -46,7 +46,8 @@ public abstract class ServiceContext {
     }
 
     /**
-     * Returns a context based on the specified instance.<br>
+     * Returns a context based on the specified instance.
+     * <br>
      * The default {@link com.github.dm.jrt.android.core.service.InvocationService
      * InvocationService} class will be employed.
      *

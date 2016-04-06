@@ -35,13 +35,16 @@ import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
  * must be created starting from the specific configuration instance.
  * <p>
  * The configuration is used to set a specific loader ID to each invocation created by a routine, or
- * to override the factory {@code equals()} and {@code hashCode()} by specifying a factory ID.<br>
+ * to override the factory {@code equals()} and {@code hashCode()} by specifying a factory ID.
+ * <br>
  * Moreover, it is possible to set a specific type of resolution when two invocations clashes, that
  * is, they share the same loader ID, and to set a specific type of caching of the invocation
- * results.<br>
+ * results.
+ * <br>
  * In case a clash is resolved by joining the two invocations, it is possible to specify a maximum
  * time after which the results of the first invocation are considered to be stale, and thus the
- * invocation is repeated.<br>
+ * invocation is repeated.
+ * <br>
  * Finally, a specific looper, other than the main thread one, can be chosen to dispatch the results
  * coming from the invocations.
  * <p>
@@ -303,7 +306,8 @@ public final class LoaderConfiguration {
     }
 
     /**
-     * Result cache type enumeration.<br>
+     * Result cache type enumeration.
+     * <br>
      * The cache strategy type indicates what will happen to the result of an invocation after its
      * completion.
      */
@@ -329,7 +333,8 @@ public final class LoaderConfiguration {
     }
 
     /**
-     * Invocation clash resolution enumeration.<br>
+     * Invocation clash resolution enumeration.
+     * <br>
      * The clash of two invocations happens when the same loader ID is already in use at the time of
      * the routine execution. The possible outcomes are:
      * <ul>

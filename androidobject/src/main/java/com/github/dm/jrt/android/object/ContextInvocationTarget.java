@@ -33,7 +33,8 @@ import java.util.Arrays;
 import static com.github.dm.jrt.core.util.Reflection.findConstructor;
 
 /**
- * Class representing a context invocation target.<br>
+ * Class representing a context invocation target.
+ * <br>
  * The target identifies a class or an instance whose methods are to be called asynchronously.
  * <p>
  * Created by davide-maestroni on 08/21/2015.
@@ -64,7 +65,8 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
     }
 
     /**
-     * Returns a target based on the specified instance.<br>
+     * Returns a target based on the specified instance.
+     * <br>
      * No argument will be passed to the object factory.
      *
      * @param targetClass the target class.

@@ -24,7 +24,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Interface defining a builder of output channels bound to loader invocations.<br>
+ * Interface defining a builder of output channels bound to loader invocations.
+ * <br>
  * In order to be successfully bound, the specific routine invocation must have a user defined ID
  * and still be running (or cached) at the time of the channel creation.
  * <p>

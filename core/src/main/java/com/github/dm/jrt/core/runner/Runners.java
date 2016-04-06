@@ -43,7 +43,8 @@ public class Runners {
     }
 
     /**
-     * Returns a runner employing a dynamic pool of threads.<br>
+     * Returns a runner employing a dynamic pool of threads.
+     * <br>
      * The number of threads may increase when needed from the core to the maximum pool size. The
      * number of threads exceeding the core size are kept alive when idle for the specified time.
      * If they stay idle for a longer time they will be destroyed.

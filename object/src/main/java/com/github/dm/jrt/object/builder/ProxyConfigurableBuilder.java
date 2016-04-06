@@ -30,7 +30,8 @@ import org.jetbrains.annotations.NotNull;
 public interface ProxyConfigurableBuilder<TYPE> {
 
     /**
-     * Gets the proxy configuration builder related to the routine builder instance.<br>
+     * Gets the proxy configuration builder related to the routine builder instance.
+     * <br>
      * The configuration options not supported by the routine builder implementation might be
      * ignored.
      * <p>

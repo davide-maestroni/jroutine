@@ -25,9 +25,11 @@ import java.lang.annotation.Target;
  * Through this annotation it is possible to indicate the fields accessed by the target object
  * method.
  * <p>
- * This annotation is used to decorate methods that are to be invoked in an asynchronous way.<br>
+ * This annotation is used to decorate methods that are to be invoked in an asynchronous way.
+ * <br>
  * Note that the piece of code inside such methods will be automatically protected so to avoid
- * concurrency issues. Though, other parts of the code inside the same class will be not.<br>
+ * concurrency issues. Though, other parts of the code inside the same class will be not.
+ * <br>
  * In order to prevent unexpected behaviors, it is advisable to avoid using the same class fields
  * (unless immutable) in protected and non-protected code, or to call synchronous methods through
  * routines as well.
@@ -35,7 +37,8 @@ import java.lang.annotation.Target;
  * This annotation is meant to have a finer control on this kind of protection. Each method can be
  * associated to specific fields accessed by the implementation, so that, shared ones are
  * guaranteed to be handled in a thread safe way. By default, that is when this annotation is
- * missing, all fields are protected.<br>
+ * missing, all fields are protected.
+ * <br>
  * Note that methods sharing the same fields cannot be executed in parallel.
  * <p>
  * Finally, be aware that a method might need to be made accessible in order to be called. That

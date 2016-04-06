@@ -23,7 +23,8 @@ import java.lang.annotation.Target;
 
 /**
  * This annotation is used to indicate interfaces used as templates to generate proxy classes,
- * enabling asynchronous calls of the target instance methods.<br>
+ * enabling asynchronous calls of the target instance methods.
+ * <br>
  * The target class is specified in the annotation value. A proxy class implementing the annotated
  * interface will be generated according to the specific annotation attributes.
  * <p>
@@ -34,9 +35,11 @@ import java.lang.annotation.Target;
  * Special care must be taken when dealing with proxies of generic classes. First of all, the
  * proxy interface must declare the same generic types as the wrapped class or interface.
  * Additionally, the generic parameters must be declared as {@code Object} in order for the proxy
- * interface methods to match the target ones.<br>
+ * interface methods to match the target ones.
+ * <br>
  * Be also aware that it is responsibility of the caller to ensure that the same instance is not
- * wrapped around two different generic interfaces.<br>
+ * wrapped around two different generic interfaces.
+ * <br>
  * For example, a class of the type:
  * <pre>
  *     <code>

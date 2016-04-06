@@ -43,7 +43,8 @@ public interface LoaderObjectRoutineBuilder
      * <p>
      * The routines used for calling the methods will honor the attributes specified in any optional
      * <i>{@code com.github.dm.jrt.object.annotation.*}</i> as well as
-     * <i>{@code com.github.dm.jrt.android.object.annotation.*}</i> annotations.<br>
+     * <i>{@code com.github.dm.jrt.android.object.annotation.*}</i> annotations.
+     * <br>
      * Note that such annotations will override any configuration set through the builder.
      *
      * @param itf    the token of the interface implemented by the return object.
@@ -63,7 +64,8 @@ public interface LoaderObjectRoutineBuilder
      * <p>
      * The routines used for calling the methods will honor the attributes specified in any optional
      * <i>{@code com.github.dm.jrt.object.annotation.*}</i> as well as
-     * <i>{@code com.github.dm.jrt.android.object.annotation.*}</i> annotations.<br>
+     * <i>{@code com.github.dm.jrt.android.object.annotation.*}</i> annotations.
+     * <br>
      * Note that such annotations will override any configuration set through the builder.
      *
      * @param itf    the token of the interface implemented by the return object.
@@ -83,10 +85,12 @@ public interface LoaderObjectRoutineBuilder
      * {@link com.github.dm.jrt.object.annotation.Alias Alias} annotation.
      * <p>
      * If no method with the specified alias is found, this method will behave like
-     * {@link #method(String, Class[])} with no parameter.<br>
+     * {@link #method(String, Class[])} with no parameter.
+     * <br>
      * Optional <i>{@code com.github.dm.jrt.object.annotation.*}</i> as well as
      * <i>{@code com.github.dm.jrt.android.object.annotation.*}</i> method annotations will be
-     * honored.<br>
+     * honored.
+     * <br>
      * Note that such annotations will override any configuration set through the builder.
      *
      * @param name  the name specified in the annotation.
@@ -108,7 +112,8 @@ public interface LoaderObjectRoutineBuilder
      * {@link com.github.dm.jrt.object.annotation.Alias Alias} annotation. Though, optional
      * <i>{@code com.github.dm.jrt.object.annotation.*}</i> as well as
      * <i>{@code com.github.dm.jrt.android.object.annotation.*}</i> method annotations will be
-     * honored.<br>
+     * honored.
+     * <br>
      * Note that such annotations will override any configuration set through the builder.
      *
      * @param name           the method name.
@@ -132,7 +137,8 @@ public interface LoaderObjectRoutineBuilder
      * {@link com.github.dm.jrt.object.annotation.Alias Alias} annotation. Though, optional
      * <i>{@code com.github.dm.jrt.object.annotation.*}</i> as well as
      * <i>{@code com.github.dm.jrt.android.object.annotation.*}</i> method annotations will be
-     * honored.<br>
+     * honored.
+     * <br>
      * Note that such annotations will override any configuration set through the builder.
      *
      * @param method the method instance.

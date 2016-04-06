@@ -26,12 +26,15 @@ import java.util.WeakHashMap;
 
 /**
  * Utility class extending the base one in order to support additional routine builders specific to
- * the Android platform.<br>
+ * the Android platform.
+ * <br>
  * Routine invocations created through the returned builder will be executed inside a service
  * specified by the service context. Be aware, though, that the invocation results will be
  * dispatched into the configured looper, so that, waiting for the outputs on the very same looper
- * thread, immediately after its invocation, will result in a deadlock.<br>
- * By default output results are dispatched in the main looper.<br>
+ * thread, immediately after its invocation, will result in a deadlock.
+ * <br>
+ * By default output results are dispatched in the main looper.
+ * <br>
  * Note that the configuration of the maximum number of concurrent invocations will not be shared
  * among synchronous and asynchronous invocations, but the invocations created inside the service
  * and the synchronous will respect the same limit separately.
@@ -41,7 +44,8 @@ import java.util.WeakHashMap;
  * {@link android.content.Context#startService(android.content.Intent)} method. Normally the service
  * will stay active only during a routine invocation. In fact, it is responsibility of the caller
  * to ensure that the started invocations have completed or have been aborted when the relative
- * context (for example the activity) is destroyed, so to avoid the leak of IPC connections.<br>
+ * context (for example the activity) is destroyed, so to avoid the leak of IPC connections.
+ * <br>
  * The service can be also made run in a different process, however, in such case, the data passed
  * through the routine input and output channels, as well as the factory arguments, must comply with
  * the {@link android.os.Parcel#writeValue(Object)} method. Be aware though, that issues may arise
@@ -49,7 +53,8 @@ import java.util.WeakHashMap;
  * use {@link android.os.Parcelable} objects instead.
  * <p>
  * The class provides an additional way to build a routine, based on the asynchronous invocation of
- * a method of an existing class or object via reflection.<br>
+ * a method of an existing class or object via reflection.
+ * <br>
  * It is possible to annotate selected methods to be asynchronously invoked, or to simply select
  * a method through its signature. It is also possible to build a proxy object whose methods will
  * in turn asynchronously invoke the target object ones.
@@ -114,7 +119,8 @@ public class JRoutineServiceObject {
 
         /**
          * Returns a builder of routines running in a service based on the builder context, wrapping
-         * the specified target object.<br>
+         * the specified target object.
+         * <br>
          * In order to customize the object creation, the caller must employ an implementation of a
          * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
          * invocation service.

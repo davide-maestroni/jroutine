@@ -158,7 +158,8 @@ public class AndroidChannels extends Channels {
     }
 
     /**
-     * Returns a builder of channels making the specified one selectable.<br>
+     * Returns a builder of channels making the specified one selectable.
+     * <br>
      * Each output will be passed along unchanged.
      * <p>
      * Note that the builder will successfully create only one output channel instance, and that the

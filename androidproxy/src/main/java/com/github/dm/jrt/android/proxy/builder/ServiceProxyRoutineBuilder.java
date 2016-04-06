@@ -37,14 +37,17 @@ public interface ServiceProxyRoutineBuilder
      * Returns a proxy object enabling asynchronous call of the target instance methods.
      * <p>
      * The routines used for calling the methods will honor the attributes specified in any optional
-     * <i>{@code com.github.dm.jrt.object.annotation.*}</i> annotations.<br>
+     * <i>{@code com.github.dm.jrt.object.annotation.*}</i> annotations.
+     * <br>
      * Note that such annotations will override any configuration set through the builder.
      * <p>
      * The proxy object is created through code generation based on the interfaces annotated with
      * {@link com.github.dm.jrt.android.proxy.annotation.ServiceProxy ServiceProxy}. The generated
-     * class name and package will be chosen according to the specific annotation attributes.<br>
+     * class name and package will be chosen according to the specific annotation attributes.
+     * <br>
      * It is actually possible to avoid the use of reflection for the proxy object instantiation by
-     * explicitly calling the <code>&lt;generated_class_name&gt;.with()</code> method.<br>
+     * explicitly calling the <code>&lt;generated_class_name&gt;.with()</code> method.
+     * <br>
      * Note, however, that, since the class is generated, a generic IDE may highlight an error even
      * if the compilation is successful.
      *
@@ -62,14 +65,17 @@ public interface ServiceProxyRoutineBuilder
      * Returns a proxy object enabling asynchronous call of the target instance methods.
      * <p>
      * The routines used for calling the methods will honor the attributes specified in any optional
-     * <i>{@code com.github.dm.jrt.object.annotation.*}</i> annotations.<br>
+     * <i>{@code com.github.dm.jrt.object.annotation.*}</i> annotations.
+     * <br>
      * Note that such annotations will override any configuration set through the builder.
      * <p>
      * The proxy object is created through code generation based on the interfaces annotated with
      * {@link com.github.dm.jrt.android.proxy.annotation.ServiceProxy ServiceProxy}. The generated
-     * class name and package will be chosen according to the specific annotation attributes.<br>
+     * class name and package will be chosen according to the specific annotation attributes.
+     * <br>
      * It is actually possible to avoid the use of reflection for the proxy object instantiation by
-     * explicitly calling the <code>&lt;generated_class_name&gt;.with()</code> method.<br>
+     * explicitly calling the <code>&lt;generated_class_name&gt;.with()</code> method.
+     * <br>
      * Note, however, that, since the class is generated, a generic IDE may highlight an error even
      * if the compilation is successful.
      *

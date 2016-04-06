@@ -59,7 +59,8 @@ public class SupplierWrapper<OUT> implements Supplier<OUT>, Wrapper {
     }
 
     /**
-     * Returns a supplier wrapper always returning the same result.<br>
+     * Returns a supplier wrapper always returning the same result.
+     * <br>
      * The returned object will support concatenation and comparison.
      *
      * @param result the result.

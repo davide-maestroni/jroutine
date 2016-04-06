@@ -82,10 +82,12 @@ public class LogSet extends CopyOnWriteArraySet<Log> implements Log {
     }
 
     /**
-     * Adds the specified element to this set if it is not already present.<br>
+     * Adds the specified element to this set if it is not already present.
+     * <br>
      * More formally, adds the specified element <tt>e</tt> to this set if the set contains no
      * element <tt>e2</tt> such that
-     * <tt>(e==null&nbsp;?&nbsp;e2==null&nbsp;:&nbsp;e.equals(e2))</tt>.<br>
+     * <tt>(e==null&nbsp;?&nbsp;e2==null&nbsp;:&nbsp;e.equals(e2))</tt>.
+     * <br>
      * If this set already contains the element, the call leaves the set unchanged and returns
      * <tt>false</tt>.
      *
@@ -120,7 +122,8 @@ public class LogSet extends CopyOnWriteArraySet<Log> implements Log {
 
     /**
      * Adds all of the elements in the specified collection to this set if they're not already
-     * present.<br>
+     * present.
+     * <br>
      * If the specified collection is also a set, the <tt>addAll</tt> operation effectively modifies
      * this set so that its value is the <i>union</i> of the two sets.  The behavior of this
      * operation is undefined if the specified collection is modified while the operation is in

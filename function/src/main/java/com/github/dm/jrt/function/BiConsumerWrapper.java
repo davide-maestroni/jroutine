@@ -65,7 +65,8 @@ public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2>, Wrappe
     }
 
     /**
-     * Returns a bi-consumer wrapper just discarding the passed inputs.<br>
+     * Returns a bi-consumer wrapper just discarding the passed inputs.
+     * <br>
      * The returned object will support concatenation and comparison.
      *
      * @param <IN1> the first input data type.

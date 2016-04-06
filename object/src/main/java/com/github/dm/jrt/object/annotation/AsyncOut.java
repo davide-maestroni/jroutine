@@ -23,14 +23,17 @@ import java.lang.annotation.Target;
 
 /**
  * Through this annotation it is possible to indicate that the result returned by the target object
- * method must be dispatched in an asynchronous way.<br>
+ * method must be dispatched in an asynchronous way.
+ * <br>
  * If, on the contrary, this annotation is missing, be aware that the proxy method will block until
  * the target one completes, even if no result is expected (that is, the method returns a void
  * result).
  * <p>
- * This annotation is used to decorate methods that are to be invoked in an asynchronous way.<br>
+ * This annotation is used to decorate methods that are to be invoked in an asynchronous way.
+ * <br>
  * Note that the piece of code inside such methods will be automatically protected so to avoid
- * concurrency issues. Though, other parts of the code inside the same class will be not.<br>
+ * concurrency issues. Though, other parts of the code inside the same class will be not.
+ * <br>
  * In order to prevent unexpected behaviors, it is advisable to avoid using the same class fields
  * (unless immutable) in protected and non-protected code, or to call synchronous methods through
  * routines as well.
@@ -85,13 +88,15 @@ public @interface AsyncOut {
     OutputMode value() default OutputMode.VALUE;
 
     /**
-     * Output transfer mode type.<br>
+     * Output transfer mode type.
+     * <br>
      * The mode indicates in which way the result is passed outside.
      */
     enum OutputMode {
 
         /**
-         * Value mode.<br>
+         * Value mode.
+         * <br>
          * The variable is just passed to the output channel.
          * <p>
          * The annotated method must return a superclass of
@@ -99,7 +104,8 @@ public @interface AsyncOut {
          */
         VALUE,
         /**
-         * Element mode.<br>
+         * Element mode.
+         * <br>
          * The elements of the result array or iterable are passed one by one to the output channel.
          * <p>
          * The annotated method must return a superclass of

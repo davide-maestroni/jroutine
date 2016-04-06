@@ -40,7 +40,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 /**
- * Utility class for handling routine channels.<br>
+ * Utility class for handling routine channels.
+ * <br>
  * The class provides several methods to split and merge channels together, making also possible to
  * transfer data in multiple sub-channels, each one identified by a specific index.
  * <p>
@@ -774,7 +775,8 @@ public class Channels {
      * consumer, thus effectively supporting multiple bindings.
      * <p>
      * The {@link com.github.dm.jrt.core.channel.Channel.OutputChannel#isBound()} method will always
-     * return false and the bound methods will never fail.<br>
+     * return false and the bound methods will never fail.
+     * <br>
      * Note, however, that the implementation will silently prevent the same consumer or channel
      * instance to be bound twice.
      * <p>
@@ -1070,7 +1072,8 @@ public class Channels {
     }
 
     /**
-     * Returns a builder of selectable channels feeding the specified one.<br>
+     * Returns a builder of selectable channels feeding the specified one.
+     * <br>
      * Each output will be filtered based on the specified index.
      * <p>
      * Note that the builder will return the same map for the same inputs and equal configuration,
@@ -1098,7 +1101,8 @@ public class Channels {
     }
 
     /**
-     * Returns a builder of channels making the specified one selectable.<br>
+     * Returns a builder of channels making the specified one selectable.
+     * <br>
      * Each output will be passed along unchanged.
      * <p>
      * Note that the builder will successfully create only one output channel instance, and that the

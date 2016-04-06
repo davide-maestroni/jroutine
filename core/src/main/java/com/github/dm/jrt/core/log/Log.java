@@ -86,18 +86,21 @@ public interface Log {
     enum Level {
 
         /**
-         * The most verbose log level.<br>
+         * The most verbose log level.
+         * <br>
          * Debug logs are meant to describe in detail what's happening inside the routine.
          */
         DEBUG,
         /**
-         * The medium log level.<br>
+         * The medium log level.
+         * <br>
          * Warning logs are meant to notify events that are not completely unexpected,
          * but might be a clue that something wrong is happening.
          */
         WARNING,
         /**
-         * The least verbose level.<br>
+         * The least verbose level.
+         * <br>
          * Error logs notify unexpected events that are clearly an exception in the normal code
          * execution.
          */

@@ -29,7 +29,8 @@ import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Abstract class defining an invocation factory.<br>
+ * Abstract class defining an invocation factory.
+ * <br>
  * The inheriting class must specify the constructor arguments to be used in the {@code equals()}
  * and {@code hashCode()} implementations. Like for example:
  * <pre>
@@ -206,9 +207,11 @@ public abstract class InvocationFactory<IN, OUT> extends AutoComparable {
     }
 
     /**
-     * Creates and return a new invocation instance.<br>
+     * Creates and return a new invocation instance.
+     * <br>
      * A proper implementation will return a new invocation instance each time it is called, unless
-     * the returned object is immutable and does not cause any side effect.<br>
+     * the returned object is immutable and does not cause any side effect.
+     * <br>
      * Any behavior other than that may lead to unexpected results.
      *
      * @return the invocation instance.

@@ -114,7 +114,8 @@ public class JRoutineCore {
     }
 
     /**
-     * Returns a routine builder based on the specified invocation factory.<br>
+     * Returns a routine builder based on the specified invocation factory.
+     * <br>
      * In order to prevent undesired leaks, the class of the specified factory should have a static
      * scope.
      *

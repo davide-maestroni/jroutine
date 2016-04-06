@@ -26,7 +26,8 @@ import java.lang.reflect.Type;
  * <p>
  * By using class objects it is impossible to distinguish between two different generic classes.
  * For example there is no way to declare a <code>Class&lt;List&lt;String&gt;&gt;</code> as
- * opposed to <code>Class&lt;List&lt;Integer&gt;&gt;</code>.<br>
+ * opposed to <code>Class&lt;List&lt;Integer&gt;&gt;</code>.
+ * <br>
  * The workaround consists in forcing the inheritance from a special generic class, then inspected
  * via reflection, to obtain the generic type rather than the class object.
  * <p>

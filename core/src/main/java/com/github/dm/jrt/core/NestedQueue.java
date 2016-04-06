@@ -132,7 +132,8 @@ class NestedQueue<E> {
     }
 
     /**
-     * Closes this queue.<br>
+     * Closes this queue.
+     * <br>
      * After the method returns no further additions can be made to this queue. Though, elements can
      * be safely removed.
      */

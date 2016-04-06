@@ -30,12 +30,15 @@ import java.lang.annotation.Target;
  * the wrapping routine.
  * <p>
  * Note that, unless the {@link Invoke.InvocationMode#PARALLEL} is specified, to each call to a
- * method of the proxy interface will correspond a single invocation of the wrapping routine.<br>
+ * method of the proxy interface will correspond a single invocation of the wrapping routine.
+ * <br>
  * In case this annotation is absent, the asynchronous invocation mode will be employed.
  * <p>
- * This annotation is used to decorate methods that are to be invoked in an asynchronous way.<br>
+ * This annotation is used to decorate methods that are to be invoked in an asynchronous way.
+ * <br>
  * Note that the piece of code inside such methods will be automatically protected so to avoid
- * concurrency issues. Though, other parts of the code inside the same class will be not.<br>
+ * concurrency issues. Though, other parts of the code inside the same class will be not.
+ * <br>
  * In order to prevent unexpected behaviors, it is advisable to avoid using the same class fields
  * (unless immutable) in protected and non-protected code, or to call synchronous methods through
  * routines as well.
@@ -66,7 +69,8 @@ public @interface Invoke {
     InvocationMode value() default InvocationMode.ASYNC;
 
     /**
-     * Routine invocation mode type.<br>
+     * Routine invocation mode type.
+     * <br>
      * The mode indicates in which way the wrapping routine should be invoked.
      */
     enum InvocationMode {

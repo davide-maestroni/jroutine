@@ -1165,7 +1165,7 @@ public class LoaderObjectRoutineFragmentTest
 
         assertThat(getOne.hasCompleted()).isTrue();
         assertThat(getTwo.hasCompleted()).isTrue();
-        assertThat(System.currentTimeMillis() - startTime).isLessThan(2000);
+        assertThat(System.currentTimeMillis() - startTime).isLessThan(4000);
 
         startTime = System.currentTimeMillis();
 
@@ -1174,7 +1174,7 @@ public class LoaderObjectRoutineFragmentTest
 
         assertThat(getOne.hasCompleted()).isTrue();
         assertThat(getTwo.hasCompleted()).isTrue();
-        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(2000);
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(4000);
     }
 
     public void testTimeoutActionAnnotation() throws NoSuchMethodException {
@@ -2067,14 +2067,14 @@ public class LoaderObjectRoutineFragmentTest
 
         public int getOne() throws InterruptedException {
 
-            TimeDuration.millis(1000).sleepAtLeast();
+            TimeDuration.millis(2000).sleepAtLeast();
 
             return 1;
         }
 
         public int getTwo() throws InterruptedException {
 
-            TimeDuration.millis(1000).sleepAtLeast();
+            TimeDuration.millis(2000).sleepAtLeast();
 
             return 2;
         }

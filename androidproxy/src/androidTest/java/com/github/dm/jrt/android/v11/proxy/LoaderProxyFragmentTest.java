@@ -410,7 +410,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
         assertThat(getOne.next()).isEqualTo(1);
         assertThat(getOne.hasCompleted()).isTrue();
         assertThat(getTwo.hasCompleted()).isTrue();
-        assertThat(System.currentTimeMillis() - startTime).isLessThan(2000);
+        assertThat(System.currentTimeMillis() - startTime).isLessThan(4000);
 
         startTime = System.currentTimeMillis();
 
@@ -419,7 +419,7 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
 
         assertThat(getOne.hasCompleted()).isTrue();
         assertThat(getTwo.hasCompleted()).isTrue();
-        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(2000);
+        assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(4000);
     }
 
     @SuppressWarnings("unchecked")
@@ -1217,14 +1217,14 @@ public class LoaderProxyFragmentTest extends ActivityInstrumentationTestCase2<Te
 
         public int getOne() throws InterruptedException {
 
-            TimeDuration.millis(1000).sleepAtLeast();
+            TimeDuration.millis(2000).sleepAtLeast();
 
             return 1;
         }
 
         public int getTwo() throws InterruptedException {
 
-            TimeDuration.millis(1000).sleepAtLeast();
+            TimeDuration.millis(2000).sleepAtLeast();
 
             return 2;
         }

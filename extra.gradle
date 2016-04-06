@@ -139,7 +139,8 @@ afterEvaluate { project ->
 
         project.task('jar', dependsOn: 'jarRelease')
 
-        project.android.libraryVariants.all { variant ->
+        def variants = getAndroidVariants(project)
+        variants.all { variant ->
 
             def buildTypeName = variant.buildType.name
 
@@ -277,7 +278,22 @@ def isJavaProject(project) {
 
 def isAndroidProject(project) {
 
-    project.plugins.hasPlugin('com.android.library') || project.plugins.hasPlugin('com.android.application')
+    isAndroidLibrary(project) || isAndroidApplication(project)
+}
+
+def isAndroidLibrary(project) {
+
+    project.plugins.hasPlugin('com.android.library')
+}
+
+def isAndroidApplication(project) {
+
+    project.plugins.hasPlugin('com.android.application')
+}
+
+def getAndroidVariants(project) {
+
+    isAndroidLibrary(project) ? project.android.libraryVariants : project.android.applicationVariants
 }
 
 def addJavadocTask(project, variant, taskName) {

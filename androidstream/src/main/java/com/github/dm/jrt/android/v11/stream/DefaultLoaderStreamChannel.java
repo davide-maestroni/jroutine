@@ -262,7 +262,8 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
     public LoaderStreamChannel<OUT> backPressureOn(@Nullable final Runner runner,
             final int maxInputs, final long maxDelay, @NotNull final TimeUnit timeUnit) {
 
-        return (LoaderStreamChannel<OUT>) super.backPressureOn(runner, maxInputs, maxDelay, timeUnit);
+        return (LoaderStreamChannel<OUT>) super.backPressureOn(runner, maxInputs, maxDelay,
+                timeUnit);
     }
 
     @NotNull

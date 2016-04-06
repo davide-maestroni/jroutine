@@ -143,8 +143,8 @@ class DefaultLoaderChannelBuilder
         final LoaderContext context = mContext;
         if (context.getComponent() != null) {
             final List<Object> inputList = Collections.singletonList(input);
-            mainRunner().run(new PurgeInputsExecution(context,
-                    mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO), inputList), 0,
+            final int loaderId = mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO);
+            mainRunner().run(new PurgeInputsExecution(context, loaderId, inputList), 0,
                     TimeUnit.MILLISECONDS);
         }
     }
@@ -162,8 +162,8 @@ class DefaultLoaderChannelBuilder
                 Collections.addAll(inputList, inputs);
             }
 
-            mainRunner().run(new PurgeInputsExecution(context,
-                    mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO), inputList), 0,
+            final int loaderId = mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO);
+            mainRunner().run(new PurgeInputsExecution(context, loaderId, inputList), 0,
                     TimeUnit.MILLISECONDS);
         }
     }
@@ -183,8 +183,8 @@ class DefaultLoaderChannelBuilder
                 }
             }
 
-            mainRunner().run(new PurgeInputsExecution(context,
-                    mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO), inputList), 0,
+            final int loaderId = mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO);
+            mainRunner().run(new PurgeInputsExecution(context, loaderId, inputList), 0,
                     TimeUnit.MILLISECONDS);
         }
     }

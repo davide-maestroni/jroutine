@@ -422,7 +422,7 @@ public interface LoaderStreamChannel<OUT>
     /**
      * Gets the loader configuration builder related to the whole stream.
      * <br>
-     * The configuration options will be applied to all the next concatenated routine unless
+     * The configuration options will be applied to all the next concatenated routines unless
      * overwritten by specific ones.
      * <p>
      * Note that the configuration builder will be initialized with the current stream

@@ -41,7 +41,7 @@ public class DelegatingContextInvocation<IN, OUT> extends ContextInvocationWrapp
      *
      * @param invocation the wrapped invocation.
      */
-    public DelegatingContextInvocation(@NotNull final Invocation<IN, OUT> invocation) {
+    private DelegatingContextInvocation(@NotNull final Invocation<IN, OUT> invocation) {
 
         super(invocation);
     }

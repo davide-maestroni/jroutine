@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Abstract implementation of an invocation filtering each input and transforming it in output data.
+ * Abstract implementation of an invocation transforming each input into output data.
  * <p>
  * Note that the implementing class must not retain an internal variable state.
  * <p>
@@ -34,6 +34,8 @@ import org.jetbrains.annotations.Nullable;
  */
 public abstract class FilterInvocation<IN, OUT> extends InvocationFactory<IN, OUT>
         implements Invocation<IN, OUT> {
+
+    // TODO: 4/8/16 MapInvocation? FunctionInvocation?
 
     /**
      * Constructor.

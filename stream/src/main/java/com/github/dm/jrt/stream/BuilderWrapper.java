@@ -57,7 +57,7 @@ class BuilderWrapper<OUT> implements ChannelsBuilder<StreamChannel<OUT>>,
     }
 
     @NotNull
-    public Builder<? extends ChannelsBuilder<StreamChannel<OUT>>> channelConfiguration() {
+    public Builder<? extends ChannelsBuilder<StreamChannel<OUT>>> getChannelConfiguration() {
 
         return new Builder<ChannelsBuilder<StreamChannel<OUT>>>(this, mConfiguration);
     }
@@ -67,7 +67,7 @@ class BuilderWrapper<OUT> implements ChannelsBuilder<StreamChannel<OUT>>,
             @NotNull final ChannelConfiguration configuration) {
 
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-        mBuilder.channelConfiguration().with(null).with(configuration).setConfiguration();
+        mBuilder.getChannelConfiguration().with(null).with(configuration).setConfiguration();
         return this;
     }
 }

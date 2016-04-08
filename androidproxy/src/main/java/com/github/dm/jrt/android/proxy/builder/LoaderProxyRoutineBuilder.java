@@ -101,11 +101,11 @@ public interface LoaderProxyRoutineBuilder
      * @return the invocation configuration builder.
      */
     @NotNull
-    InvocationConfiguration.Builder<? extends LoaderProxyRoutineBuilder> invocationConfiguration();
+    InvocationConfiguration.Builder<? extends LoaderProxyRoutineBuilder> getInvocationConfiguration();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    ProxyConfiguration.Builder<? extends LoaderProxyRoutineBuilder> proxyConfiguration();
+    ProxyConfiguration.Builder<? extends LoaderProxyRoutineBuilder> getProxyConfiguration();
 }

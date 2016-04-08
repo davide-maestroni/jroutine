@@ -58,12 +58,11 @@ public interface ServiceProxyObjectBuilder<TYPE> extends ProxyObjectBuilder<TYPE
      * {@inheritDoc}
      */
     @NotNull
-    InvocationConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
-    invocationConfiguration();
+    InvocationConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>> getInvocationConfiguration();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    ProxyConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>> proxyConfiguration();
+    ProxyConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>> getProxyConfiguration();
 }

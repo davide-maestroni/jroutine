@@ -182,7 +182,7 @@ public interface LoaderStreamChannel<OUT>
      * {@inheritDoc}
      */
     @NotNull
-    InvocationConfiguration.Builder<? extends LoaderStreamChannel<OUT>> invocationConfiguration();
+    InvocationConfiguration.Builder<? extends LoaderStreamChannel<OUT>> getInvocationConfiguration();
 
     /**
      * {@inheritDoc}
@@ -352,7 +352,7 @@ public interface LoaderStreamChannel<OUT>
             @NotNull Function<? super RoutineException, ? extends OUT> function);
 
     /**
-     * Short for {@code loaderConfiguration().withCacheStrategy(strategyType).setConfiguration()}.
+     * Short for {@code getLoaderConfiguration().withCacheStrategy(strategyType).setConfiguration()}.
      *
      * @param strategyType the cache strategy type.
      * @return the configured stream.
@@ -361,7 +361,7 @@ public interface LoaderStreamChannel<OUT>
     LoaderStreamChannel<OUT> cache(@Nullable CacheStrategyType strategyType);
 
     /**
-     * Short for {@code loaderConfiguration().withFactoryId(factoryId).setConfiguration()}.
+     * Short for {@code getLoaderConfiguration().withFactoryId(factoryId).setConfiguration()}.
      * <br>
      * This method is useful to easily apply a configuration to the next routine concatenated to the
      * stream, which will force the factory ID to the specified one.
@@ -385,10 +385,10 @@ public interface LoaderStreamChannel<OUT>
      * @return the invocation configuration builder.
      */
     @NotNull
-    Builder<? extends LoaderStreamChannel<OUT>> loaderConfiguration();
+    Builder<? extends LoaderStreamChannel<OUT>> getLoaderConfiguration();
 
     /**
-     * Short for {@code loaderConfiguration().withLoaderId(loaderId).setConfiguration()}.
+     * Short for {@code getLoaderConfiguration().withLoaderId(loaderId).setConfiguration()}.
      * <br>
      * This method is useful to easily apply a configuration to the next routine concatenated to the
      * stream, which will force the routine loader ID.
@@ -400,7 +400,7 @@ public interface LoaderStreamChannel<OUT>
     LoaderStreamChannel<OUT> loaderId(int loaderId);
 
     /**
-     * Short for {@code loaderConfiguration().withResultStaleTime(staleTime).setConfiguration()}.
+     * Short for {@code getLoaderConfiguration().withResultStaleTime(staleTime).setConfiguration()}.
      *
      * @param staleTime the stale time.
      * @return the configured stream.
@@ -409,7 +409,7 @@ public interface LoaderStreamChannel<OUT>
     LoaderStreamChannel<OUT> staleAfter(@Nullable TimeDuration staleTime);
 
     /**
-     * Short for {@code loaderConfiguration().withResultStaleTime(time, timeUnit)
+     * Short for {@code getLoaderConfiguration().withResultStaleTime(time, timeUnit)
      * .setConfiguration()}.
      *
      * @param time     the time.

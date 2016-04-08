@@ -46,10 +46,10 @@ gradle.projectsEvaluated {
             }
         }
         sourceDirs = sources.flatten()
-        jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
+        jacocoReportPath = "${buildDir}/reports/jacoco/jacocoFullReport/jacocoFullReport.xml"
     }
 
-    task jacocoRootReport(type: JacocoReport, group: 'Coverage reports') {
+    task jacocoFullReport(type: JacocoReport, group: 'Coverage reports') {
         description = 'Generates an aggregate report from all subprojects'
         dependsOn(publishedProjects.test)
 

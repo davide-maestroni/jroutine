@@ -328,7 +328,7 @@ public class SparseChannels extends AndroidChannels {
             for (final Integer index : indexes) {
                 final IOChannel<IN> ioChannel =
                         SparseChannels.<DATA, IN>selectParcelable(channel, index)
-                                      .channelConfiguration()
+                                      .getChannelConfiguration()
                                       .with(configuration)
                                       .setConfiguration()
                                       .buildChannels();

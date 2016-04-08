@@ -129,7 +129,7 @@ public interface StreamChannel<OUT>
     StreamChannel<OUT> async();
 
     /**
-     * Short for {@code invocationConfiguration().withRunner(runner).withInputLimit(maxInputs)
+     * Short for {@code getInvocationConfiguration().withRunner(runner).withInputLimit(maxInputs)
      * .withInputMaxDelay(maxDelay, timeUnit).setConfiguration()}.
      * <br>
      * This method is useful to easily apply a configuration which will slow down the thread
@@ -150,7 +150,7 @@ public interface StreamChannel<OUT>
             @NotNull TimeUnit timeUnit);
 
     /**
-     * Short for {@code invocationConfiguration().withRunner(runner).withInputLimit(maxInputs)
+     * Short for {@code getInvocationConfiguration().withRunner(runner).withInputLimit(maxInputs)
      * .withInputMaxDelay(maxDelay).setConfiguration()}.
      * <br>
      * This method is useful to easily apply a configuration to the next routine concatenated to the
@@ -261,7 +261,7 @@ public interface StreamChannel<OUT>
      * @return the invocation configuration builder.
      */
     @NotNull
-    Builder<? extends StreamChannel<OUT>> invocationConfiguration();
+    Builder<? extends StreamChannel<OUT>> getInvocationConfiguration();
 
     /**
      * Concatenates a stream based on the specified mapping consumer to this one.
@@ -324,7 +324,7 @@ public interface StreamChannel<OUT>
     <AFTER> StreamChannel<AFTER> map(@NotNull Routine<? super OUT, ? extends AFTER> routine);
 
     /**
-     * Short for {@code invocationConfiguration().withMaxInstances(maxInvocations)
+     * Short for {@code getInvocationConfiguration().withMaxInstances(maxInvocations)
      * .setConfiguration()}.
      * <br>
      * This method is useful to easily apply a configuration to the next routine concatenated to the

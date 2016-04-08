@@ -37,5 +37,5 @@ public interface ChannelConfigurableBuilder<TYPE> {
      * @return the channel configuration builder.
      */
     @NotNull
-    Builder<? extends TYPE> channelConfiguration();
+    Builder<? extends TYPE> getChannelConfiguration();
 }

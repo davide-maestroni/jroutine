@@ -71,7 +71,7 @@ class MergeMapBuilder<OUT>
 
         final SparseArrayCompat<? extends OutputChannel<? extends OUT>> channelMap = mChannelMap;
         final IOChannel<ParcelableSelectable<OUT>> ioChannel = JRoutineCore.io()
-                                                                           .channelConfiguration()
+                                                                           .getChannelConfiguration()
                                                                            .with(configuration)
                                                                            .setConfiguration()
                                                                            .buildChannel();

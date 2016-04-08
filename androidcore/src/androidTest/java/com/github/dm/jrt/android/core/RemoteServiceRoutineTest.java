@@ -76,7 +76,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
         final OutputChannel<Data> channel =
                 JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
                                .on(factoryOf(Delay.class))
-                               .serviceConfiguration()
+                               .getServiceConfiguration()
                                .withRunnerClass(MainRunner.class)
                                .setConfiguration()
                                .asyncCall(data);
@@ -188,11 +188,11 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
         final Routine<String, String> routine =
                 JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
                                .on(targetFactory)
-                               .invocationConfiguration()
+                               .getInvocationConfiguration()
                                .withInputOrder(OrderType.BY_DELAY)
                                .withLogLevel(Level.DEBUG)
                                .setConfiguration()
-                               .serviceConfiguration()
+                               .getServiceConfiguration()
                                .withLogClass(AndroidLog.class)
                                .setConfiguration()
                                .buildRoutine();
@@ -205,7 +205,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
         final OutputChannel<String> channel =
                 JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
                                .on(factoryOf(StringDelay.class))
-                               .invocationConfiguration()
+                               .getInvocationConfiguration()
                                .withReadTimeout(millis(10))
                                .withReadTimeoutAction(TimeoutActionType.EXIT)
                                .setConfiguration()
@@ -219,7 +219,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
         final OutputChannel<String> channel =
                 JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
                                .on(factoryOf(StringDelay.class))
-                               .invocationConfiguration()
+                               .getInvocationConfiguration()
                                .withReadTimeout(millis(10))
                                .withReadTimeoutAction(TimeoutActionType.ABORT)
                                .setConfiguration()
@@ -243,7 +243,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
         final OutputChannel<String> channel =
                 JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
                                .on(factoryOf(StringDelay.class))
-                               .invocationConfiguration()
+                               .getInvocationConfiguration()
                                .withReadTimeout(millis(10))
                                .withReadTimeoutAction(TimeoutActionType.THROW)
                                .setConfiguration()
@@ -270,11 +270,11 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
         final Routine<String, String> routine1 =
                 JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
                                .on(targetFactory)
-                               .invocationConfiguration()
+                               .getInvocationConfiguration()
                                .withInputOrder(OrderType.BY_DELAY)
                                .withLogLevel(Level.DEBUG)
                                .setConfiguration()
-                               .serviceConfiguration()
+                               .getServiceConfiguration()
                                .withLogClass(AndroidLog.class)
                                .setConfiguration()
                                .buildRoutine();
@@ -295,11 +295,11 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
         final Routine<String, String> routine2 =
                 JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
                                .on(factoryOf(token))
-                               .invocationConfiguration()
+                               .getInvocationConfiguration()
                                .withOutputOrder(OrderType.BY_DELAY)
                                .withLogLevel(Level.DEBUG)
                                .setConfiguration()
-                               .serviceConfiguration()
+                               .getServiceConfiguration()
                                .withLogClass(AndroidLog.class)
                                .setConfiguration()
                                .buildRoutine();
@@ -322,7 +322,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
         final Routine<String, String> routine3 =
                 JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
                                .on(targetFactory)
-                               .invocationConfiguration()
+                               .getInvocationConfiguration()
                                .withInputOrder(OrderType.BY_CALL)
                                .withOutputOrder(OrderType.BY_CALL)
                                .setConfiguration()
@@ -346,7 +346,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
         final Routine<String, String> routine4 =
                 JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
                                .on(targetFactory)
-                               .invocationConfiguration()
+                               .getInvocationConfiguration()
                                .withCoreInstances(0)
                                .withMaxInstances(2)
                                .setConfiguration()
@@ -369,7 +369,7 @@ public class RemoteServiceRoutineTest extends ActivityInstrumentationTestCase2<T
         final Routine<Void, String> routine4 =
                 JRoutineService.with(serviceFrom(getActivity(), RemoteInvocationService.class))
                                .on(targetFactory)
-                               .invocationConfiguration()
+                               .getInvocationConfiguration()
                                .withCoreInstances(0)
                                .withMaxInstances(2)
                                .setConfiguration()

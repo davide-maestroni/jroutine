@@ -484,7 +484,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
         }
 
         final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .channelConfiguration()
+                                                     .getChannelConfiguration()
                                                      .withChannelOrder(OrderType.BY_CALL)
                                                      .setConfiguration();
         final IOChannel<String> channel1 = builder.buildChannel();
@@ -496,7 +496,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
         final OutputChannel<ParcelableSelectable<Object>> output =
                 JRoutineLoader.with(loaderFrom(getActivity()))
                               .on(factoryOf(Sort.class))
-                              .invocationConfiguration()
+                              .getInvocationConfiguration()
                               .withInputOrder(OrderType.BY_CALL)
                               .setConfiguration()
                               .asyncCall(channel);
@@ -528,7 +528,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
         }
 
         final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .channelConfiguration()
+                                                     .getChannelConfiguration()
                                                      .withChannelOrder(OrderType.BY_CALL)
                                                      .setConfiguration();
         final IOChannel<String> channel1 = builder.buildChannel();
@@ -554,7 +554,7 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
         }
 
         final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .channelConfiguration()
+                                                     .getChannelConfiguration()
                                                      .withChannelOrder(OrderType.BY_CALL)
                                                      .setConfiguration();
         final IOChannel<String> channel1 = builder.buildChannel();

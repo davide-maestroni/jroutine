@@ -896,7 +896,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     public void testMap() {
 
         final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .channelConfiguration()
+                                                     .getChannelConfiguration()
                                                      .withChannelOrder(OrderType.BY_CALL)
                                                      .setConfiguration();
         final IOChannel<String> channel1 = builder.buildChannel();
@@ -908,7 +908,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
         final OutputChannel<ParcelableSelectable<Object>> output =
                 JRoutineService.with(serviceFrom(getActivity()))
                                .on(factoryOf(Sort.class))
-                               .invocationConfiguration()
+                               .getInvocationConfiguration()
                                .withInputOrder(OrderType.BY_CALL)
                                .setConfiguration()
                                .asyncCall(channel);
@@ -935,7 +935,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     public void testMerge() {
 
         final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .channelConfiguration()
+                                                     .getChannelConfiguration()
                                                      .withChannelOrder(OrderType.BY_CALL)
                                                      .setConfiguration();
         IOChannel<String> channel1;
@@ -980,7 +980,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     public void testMerge4() {
 
         final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .channelConfiguration()
+                                                     .getChannelConfiguration()
                                                      .withChannelOrder(OrderType.BY_CALL)
                                                      .setConfiguration();
         final IOChannel<String> channel1 = builder.buildChannel();
@@ -1016,7 +1016,7 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
     public void testMergeAbort() {
 
         final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .channelConfiguration()
+                                                     .getChannelConfiguration()
                                                      .withChannelOrder(OrderType.BY_CALL)
                                                      .setConfiguration();
         IOChannel<String> channel1;

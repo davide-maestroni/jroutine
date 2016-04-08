@@ -122,7 +122,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
         final ContextInvocationFactory<IN, OUT> factory =
                 factoryOf(invocationClass, target.getFactoryArgs());
         mRoutine = JRoutineCore.on(fromFactory(serviceContext.getApplicationContext(), factory))
-                               .invocationConfiguration()
+                               .getInvocationConfiguration()
                                .with(invocationConfiguration)
                                .setConfiguration()
                                .buildRoutine();
@@ -236,7 +236,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
             final int inputMaxSize =
                     invocationConfiguration.getInputMaxSizeOr(ChannelConfiguration.DEFAULT);
             mInput = JRoutineCore.io()
-                                 .channelConfiguration()
+                                 .getChannelConfiguration()
                                  .withRunner(runner)
                                  .withChannelOrder(inputOrderType)
                                  .withChannelLimit(inputLimit)
@@ -255,7 +255,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
             final TimeoutActionType timeoutActionType =
                     invocationConfiguration.getReadTimeoutActionOr(null);
             mOutput = JRoutineCore.io()
-                                  .channelConfiguration()
+                                  .getChannelConfiguration()
                                   .withRunner(AndroidRunners.looperRunner(looper))
                                   .withChannelLimit(outputLimit)
                                   .withChannelMaxDelay(outputMaxDelay)

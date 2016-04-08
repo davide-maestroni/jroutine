@@ -35,8 +35,6 @@ import org.jetbrains.annotations.Nullable;
 public abstract class FilterInvocation<IN, OUT> extends InvocationFactory<IN, OUT>
         implements Invocation<IN, OUT> {
 
-    // TODO: 4/8/16 MapInvocation? FunctionInvocation?
-
     /**
      * Constructor.
      *

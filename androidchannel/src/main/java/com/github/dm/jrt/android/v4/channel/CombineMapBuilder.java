@@ -78,7 +78,7 @@ class CombineMapBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<? exten
         }
 
         final IOChannel<Selectable<? extends IN>> ioChannel = JRoutineCore.io()
-                                                                          .channelConfiguration()
+                                                                          .getChannelConfiguration()
                                                                           .with(configuration)
                                                                           .setConfiguration()
                                                                           .buildChannel();

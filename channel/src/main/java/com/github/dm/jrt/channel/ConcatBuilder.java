@@ -67,7 +67,7 @@ class ConcatBuilder<OUT> extends AbstractBuilder<OutputChannel<OUT>> {
     protected OutputChannel<OUT> build(@NotNull final ChannelConfiguration configuration) {
 
         final IOChannel<OUT> ioChannel = JRoutineCore.io()
-                                                     .channelConfiguration()
+                                                     .getChannelConfiguration()
                                                      .with(configuration)
                                                      .withChannelOrder(OrderType.BY_CALL)
                                                      .setConfiguration()

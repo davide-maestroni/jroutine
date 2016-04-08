@@ -136,8 +136,9 @@ class DefaultTargetRoutineBuilder implements TargetRoutineBuilder {
     }
 
     @NotNull
-    public InvocationConfiguration.Builder<? extends TargetRoutineBuilder>
-    invocationConfiguration() {
+    public InvocationConfiguration.Builder<? extends TargetRoutineBuilder> getInvocationConfiguration() {
+
+
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<DefaultTargetRoutineBuilder>(
@@ -145,7 +146,7 @@ class DefaultTargetRoutineBuilder implements TargetRoutineBuilder {
     }
 
     @NotNull
-    public ProxyConfiguration.Builder<? extends TargetRoutineBuilder> proxyConfiguration() {
+    public ProxyConfiguration.Builder<? extends TargetRoutineBuilder> getProxyConfiguration() {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<DefaultTargetRoutineBuilder>(mProxyConfigurable,
@@ -163,10 +164,10 @@ class DefaultTargetRoutineBuilder implements TargetRoutineBuilder {
     private ObjectRoutineBuilder newObjectBuilder() {
 
         return JRoutineObject.on(mTarget)
-                             .invocationConfiguration()
+                             .getInvocationConfiguration()
                              .with(mInvocationConfiguration)
                              .setConfiguration()
-                             .proxyConfiguration()
+                             .getProxyConfiguration()
                              .with(mProxyConfiguration)
                              .setConfiguration();
     }
@@ -175,10 +176,10 @@ class DefaultTargetRoutineBuilder implements TargetRoutineBuilder {
     private ProxyRoutineBuilder newProxyBuilder() {
 
         return JRoutineProxy.on(mTarget)
-                            .invocationConfiguration()
+                            .getInvocationConfiguration()
                             .with(mInvocationConfiguration)
                             .setConfiguration()
-                            .proxyConfiguration()
+                            .getProxyConfiguration()
                             .with(mProxyConfiguration)
                             .setConfiguration();
     }

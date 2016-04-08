@@ -84,7 +84,7 @@ class CombineBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<? extends 
         }
 
         final IOChannel<Selectable<? extends IN>> ioChannel = JRoutineCore.io()
-                                                                          .channelConfiguration()
+                                                                          .getChannelConfiguration()
                                                                           .with(configuration)
                                                                           .setConfiguration()
                                                                           .buildChannel();

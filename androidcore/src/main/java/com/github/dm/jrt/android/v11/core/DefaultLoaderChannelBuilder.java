@@ -109,10 +109,10 @@ class DefaultLoaderChannelBuilder
             logger.wrn("the specified results stale time will be ignored: %s", resultStaleTime);
         }
 
-        return builder.invocationConfiguration()
+        return builder.getInvocationConfiguration()
                       .with(invocationConfiguration)
                       .setConfiguration()
-                      .loaderConfiguration()
+                      .getLoaderConfiguration()
                       .with(loaderConfiguration)
                       .withClashResolution(ClashResolutionType.JOIN)
                       .withInputClashResolution(ClashResolutionType.JOIN)
@@ -122,7 +122,7 @@ class DefaultLoaderChannelBuilder
     }
 
     @NotNull
-    public LoaderConfiguration.Builder<? extends LoaderChannelBuilder> loaderConfiguration() {
+    public LoaderConfiguration.Builder<? extends LoaderChannelBuilder> getLoaderConfiguration() {
 
         final LoaderConfiguration config = mLoaderConfiguration;
         return new LoaderConfiguration.Builder<LoaderChannelBuilder>(this, config);
@@ -190,7 +190,7 @@ class DefaultLoaderChannelBuilder
     }
 
     @NotNull
-    public ChannelConfiguration.Builder<? extends LoaderChannelBuilder> channelConfiguration() {
+    public ChannelConfiguration.Builder<? extends LoaderChannelBuilder> getChannelConfiguration() {
 
         final ChannelConfiguration config = mChannelConfiguration;
         return new ChannelConfiguration.Builder<LoaderChannelBuilder>(this, config);

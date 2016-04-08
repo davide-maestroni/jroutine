@@ -63,7 +63,7 @@ public class LoaderRoutineRotationTest
         final Routine<String, String> routine = JRoutineLoaderCompat.with(loaderFrom(getActivity()))
                                                                     .on(factoryOf(
                                                                             ToUpperCase.class))
-                                                                    .loaderConfiguration()
+                                                                    .getLoaderConfiguration()
                                                                     .withLoaderId(0)
                                                                     .withClashResolution(
                                                                             ClashResolutionType
@@ -89,10 +89,10 @@ public class LoaderRoutineRotationTest
         final TimeDuration timeout = TimeDuration.seconds(10);
         JRoutineLoaderCompat.with(loaderFrom(getActivity()))
                             .on(factoryOf(ToUpperCase.class))
-                            .invocationConfiguration()
+                            .getInvocationConfiguration()
                             .withOutputOrder(OrderType.BY_CALL)
                             .setConfiguration()
-                            .loaderConfiguration()
+                            .getLoaderConfiguration()
                             .withLoaderId(0)
                             .setConfiguration()
                             .asyncCall("test1", "test2");
@@ -171,7 +171,7 @@ public class LoaderRoutineRotationTest
         final Routine<String, String> routine = JRoutineLoaderCompat.with(loaderFrom(getActivity()))
                                                                     .on(factoryOf(
                                                                             ToUpperCase.class))
-                                                                    .loaderConfiguration()
+                                                                    .getLoaderConfiguration()
                                                                     .withLoaderId(0)
                                                                     .withClashResolution(
                                                                             ClashResolutionType

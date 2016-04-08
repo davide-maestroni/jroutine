@@ -670,7 +670,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
             final InvocationLoader<?, OUT> internalLoader = mLoader;
             final ArrayList<IOChannel<OUT>> channels = mNewChannels;
             final IOChannel<OUT> channel = JRoutineCore.io()
-                                                       .channelConfiguration()
+                                                       .getChannelConfiguration()
                                                        .withLog(logger.getLog())
                                                        .withLogLevel(logger.getLogLevel())
                                                        .setConfiguration()
@@ -680,7 +680,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
                     internalLoader.getInvocationCount()));
             if ((looper != null) && (looper != Looper.getMainLooper())) {
                 return JRoutineCore.on(PassingInvocation.<OUT>factoryOf())
-                                   .invocationConfiguration()
+                                   .getInvocationConfiguration()
                                    .withRunner(AndroidRunners.looperRunner(looper))
                                    .withLog(logger.getLog())
                                    .withLogLevel(logger.getLogLevel())

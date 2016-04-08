@@ -67,7 +67,7 @@ class DefaultIOChannelBuilder implements IOChannelBuilder, Configurable<IOChanne
     }
 
     @NotNull
-    public Builder<? extends IOChannelBuilder> channelConfiguration() {
+    public Builder<? extends IOChannelBuilder> getChannelConfiguration() {
 
         return new Builder<IOChannelBuilder>(this, mConfiguration);
     }

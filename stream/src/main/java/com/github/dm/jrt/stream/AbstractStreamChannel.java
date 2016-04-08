@@ -245,7 +245,7 @@ public abstract class AbstractStreamChannel<OUT>
     public StreamChannel<OUT> backPressureOn(@Nullable final Runner runner, final int maxInputs,
             @Nullable final TimeDuration maxDelay) {
 
-        return invocationConfiguration().withRunner(runner)
+        return getInvocationConfiguration().withRunner(runner)
                                         .withInputLimit(maxInputs)
                                         .withInputMaxDelay(maxDelay)
                                         .setConfiguration();
@@ -286,7 +286,7 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
-    public Builder<? extends StreamChannel<OUT>> invocationConfiguration() {
+    public Builder<? extends StreamChannel<OUT>> getInvocationConfiguration() {
 
         return new Builder<StreamChannel<OUT>>(this, mConfiguration);
     }
@@ -337,7 +337,7 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public StreamChannel<OUT> maxParallelInvocations(final int maxInvocations) {
 
-        return invocationConfiguration().withMaxInstances(maxInvocations).setConfiguration();
+        return getInvocationConfiguration().withMaxInstances(maxInvocations).setConfiguration();
     }
 
     @NotNull
@@ -372,7 +372,7 @@ public abstract class AbstractStreamChannel<OUT>
 
         final ChannelConfiguration configuration = buildChannelConfiguration();
         final OutputChannel<OUT> channel = Channels.repeat(this)
-                                                   .channelConfiguration()
+                                                   .getChannelConfiguration()
                                                    .with(configuration)
                                                    .setConfiguration()
                                                    .buildChannels();
@@ -499,7 +499,7 @@ public abstract class AbstractStreamChannel<OUT>
 
         final ChannelConfiguration configuration = buildChannelConfiguration();
         final OutputChannel<? extends Selectable<OUT>> channel = Channels.toSelectable(this, index)
-                                                                         .channelConfiguration()
+                                                                         .getChannelConfiguration()
                                                                          .with(configuration)
                                                                          .setConfiguration()
                                                                          .buildChannels();
@@ -513,7 +513,7 @@ public abstract class AbstractStreamChannel<OUT>
 
         ConstantConditions.notNull("consumer instance", consumer);
         final IOChannel<OUT> ioChannel = JRoutineCore.io()
-                                                     .channelConfiguration()
+                                                     .getChannelConfiguration()
                                                      .with(buildChannelConfiguration())
                                                      .setConfiguration()
                                                      .buildChannel();

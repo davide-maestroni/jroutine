@@ -86,7 +86,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         final TestStatic testStatic =
                 JRoutineServiceProxy.with(serviceFrom(getActivity(), TestService.class))
                                     .on(classOfType(TestClass.class))
-                                    .invocationConfiguration()
+                                    .getInvocationConfiguration()
                                     .withRunner(Runners.poolRunner())
                                     .withLogLevel(Level.DEBUG)
                                     .withLog(new NullLog())
@@ -111,7 +111,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         final ServiceProxyRoutineBuilder builder =
                 JRoutineServiceProxy.with(serviceFrom(getActivity(), TestService.class))
                                     .on(instanceOf(TestList.class))
-                                    .invocationConfiguration()
+                                    .getInvocationConfiguration()
                                     .withReadTimeout(seconds(10))
                                     .setConfiguration();
 
@@ -182,7 +182,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         final TestStatic testStatic =
                 JRoutineServiceProxy.with(serviceFrom(getActivity(), TestService.class))
                                     .on(instanceOf(TestClass.class))
-                                    .invocationConfiguration()
+                                    .getInvocationConfiguration()
                                     .withRunner(Runners.poolRunner())
                                     .withLogLevel(Level.DEBUG)
                                     .withLog(new NullLog())
@@ -199,7 +199,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         final TestProxy testProxy =
                 JRoutineServiceProxy.with(serviceFrom(getActivity(), TestService.class))
                                     .on(instanceOf(TestClass.class))
-                                    .invocationConfiguration()
+                                    .getInvocationConfiguration()
                                     .withRunner(Runners.poolRunner())
                                     .withLogLevel(Level.DEBUG)
                                     .withLog(log)
@@ -229,10 +229,10 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         final ServiceProxyObjectBuilder<TestProxy> builder =
                 com.github.dm.jrt.android.proxy.ServiceProxy_Test.with(serviceContext)
                                                                  .on(instanceOf(TestClass.class));
-        final TestProxy testProxy = builder.invocationConfiguration()
+        final TestProxy testProxy = builder.getInvocationConfiguration()
                                            .with(configuration)
                                            .setConfiguration()
-                                           .serviceConfiguration()
+                                           .getServiceConfiguration()
                                            .withRunnerClass(MyRunner.class)
                                            .setConfiguration()
                                            .buildProxy();
@@ -252,10 +252,10 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
 
         assertThat(JRoutineServiceProxy.with(serviceFrom(getActivity(), TestService.class))
                                        .on(instanceOf(TestClass.class))
-                                       .invocationConfiguration()
+                                       .getInvocationConfiguration()
                                        .with(configuration)
                                        .setConfiguration()
-                                       .serviceConfiguration()
+                                       .getServiceConfiguration()
                                        .withRunnerClass(MyRunner.class)
                                        .setConfiguration()
                                        .buildProxy(ClassToken.tokenOf(TestProxy.class))).isSameAs(
@@ -273,14 +273,14 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         final TestProxy testProxy =
                 JRoutineServiceProxy.with(serviceFrom(getActivity(), TestService.class))
                                     .on(instanceOf(TestClass.class))
-                                    .invocationConfiguration()
+                                    .getInvocationConfiguration()
                                     .with(configuration)
                                     .setConfiguration()
                                     .buildProxy(ClassToken.tokenOf(TestProxy.class));
 
         assertThat(JRoutineServiceProxy.with(serviceFrom(getActivity(), TestService.class))
                                        .on(instanceOf(TestClass.class))
-                                       .invocationConfiguration()
+                                       .getInvocationConfiguration()
                                        .with(configuration)
                                        .setConfiguration()
                                        .buildProxy(ClassToken.tokenOf(TestProxy.class))).isSameAs(
@@ -319,18 +319,18 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
         final ServiceProxyRoutineBuilder builder =
                 JRoutineServiceProxy.with(serviceFrom(getActivity(), TestService.class))
                                     .on(instanceOf(TestClass2.class))
-                                    .invocationConfiguration()
+                                    .getInvocationConfiguration()
                                     .withReadTimeout(seconds(10))
                                     .setConfiguration();
 
         long startTime = System.currentTimeMillis();
 
-        OutputChannel<Integer> getOne = builder.proxyConfiguration()
+        OutputChannel<Integer> getOne = builder.getProxyConfiguration()
                                                .withSharedFields("1")
                                                .setConfiguration()
                                                .buildProxy(TestClassAsync.class)
                                                .getOne();
-        OutputChannel<Integer> getTwo = builder.proxyConfiguration()
+        OutputChannel<Integer> getTwo = builder.getProxyConfiguration()
                                                .withSharedFields("2")
                                                .setConfiguration()
                                                .buildProxy(TestClassAsync.class)
@@ -356,7 +356,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
 
         final Itf itf = JRoutineServiceProxy.with(serviceFrom(getActivity(), TestService.class))
                                             .on(instanceOf(Impl.class))
-                                            .invocationConfiguration()
+                                            .getInvocationConfiguration()
                                             .withReadTimeout(INFINITY)
                                             .setConfiguration()
                                             .buildProxy(Itf.class);
@@ -567,7 +567,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
 
         assertThat(JRoutineServiceProxy.with(serviceFrom(getActivity(), TestService.class))
                                        .on(instanceOf(TestTimeout.class))
-                                       .invocationConfiguration()
+                                       .getInvocationConfiguration()
                                        .withReadTimeout(seconds(10))
                                        .setConfiguration()
                                        .buildProxy(TestTimeoutItf.class)
@@ -577,7 +577,7 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
 
             JRoutineServiceProxy.with(serviceFrom(getActivity(), TestService.class))
                                 .on(instanceOf(TestTimeout.class))
-                                .invocationConfiguration()
+                                .getInvocationConfiguration()
                                 .withReadTimeoutAction(TimeoutActionType.THROW)
                                 .setConfiguration()
                                 .buildProxy(TestTimeoutItf.class)

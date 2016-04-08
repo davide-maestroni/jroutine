@@ -44,13 +44,13 @@ public interface LoaderTargetRoutineBuilder
      * {@inheritDoc}
      */
     @NotNull
-    InvocationConfiguration.Builder<? extends LoaderTargetRoutineBuilder> invocationConfiguration();
+    InvocationConfiguration.Builder<? extends LoaderTargetRoutineBuilder> getInvocationConfiguration();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    ProxyConfiguration.Builder<? extends LoaderTargetRoutineBuilder> proxyConfiguration();
+    ProxyConfiguration.Builder<? extends LoaderTargetRoutineBuilder> getProxyConfiguration();
 
     /**
      * {@inheritDoc}
@@ -62,5 +62,5 @@ public interface LoaderTargetRoutineBuilder
      * {@inheritDoc}
      */
     @NotNull
-    LoaderConfiguration.Builder<? extends LoaderTargetRoutineBuilder> loaderConfiguration();
+    LoaderConfiguration.Builder<? extends LoaderTargetRoutineBuilder> getLoaderConfiguration();
 }

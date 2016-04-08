@@ -41,10 +41,10 @@
 
                 final Main main = new Main();
                 final AsyncMain proxy = JRoutineProxy.on(instance(main))
-                                                     .proxyConfiguration()
+                                                     .getProxyConfiguration()
                                                      .withSharedFields()
                                                      .setConfiguration()
-                                                     .invocationConfiguration()
+                                                     .getInvocationConfiguration()
                                                      .withReadTimeout(seconds(3))
                                                      .setConfiguration()
                                                      .buildProxy(AsyncMain.class);
@@ -107,10 +107,10 @@
 
                 final Main main = new Main();
                 final AsyncMain proxy = Proxy_Main_AsyncMain.on(instance(main))
-                                                            .proxyConfiguration()
+                                                            .getProxyConfiguration()
                                                             .withSharedFields()
                                                             .setConfiguration()
-                                                            .invocationConfiguration()
+                                                            .getInvocationConfiguration()
                                                             .withReadTimeout(seconds(3))
                                                             .setConfiguration()
                                                             .buildProxy();

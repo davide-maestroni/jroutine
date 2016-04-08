@@ -135,15 +135,16 @@ class DefaultObjectRoutineBuilder
     }
 
     @NotNull
-    public InvocationConfiguration.Builder<? extends ObjectRoutineBuilder>
-    invocationConfiguration() {
+    public InvocationConfiguration.Builder<? extends ObjectRoutineBuilder> getInvocationConfiguration() {
+
+
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ObjectRoutineBuilder>(this, config);
     }
 
     @NotNull
-    public ProxyConfiguration.Builder<? extends ObjectRoutineBuilder> proxyConfiguration() {
+    public ProxyConfiguration.Builder<? extends ObjectRoutineBuilder> getProxyConfiguration() {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<ObjectRoutineBuilder>(this, config);
@@ -196,7 +197,7 @@ class DefaultObjectRoutineBuilder
                         new MethodInvocationFactory(proxyConfiguration, target, method, inputMode,
                                 outputMode);
                 routine = JRoutineCore.on(factory)
-                                      .invocationConfiguration()
+                                      .getInvocationConfiguration()
                                       .with(invocationConfiguration)
                                       .setConfiguration()
                                       .buildRoutine();

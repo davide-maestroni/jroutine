@@ -43,13 +43,13 @@ public interface TargetRoutineBuilder extends ObjectRoutineBuilder {
      * {@inheritDoc}
      */
     @NotNull
-    InvocationConfiguration.Builder<? extends TargetRoutineBuilder> invocationConfiguration();
+    InvocationConfiguration.Builder<? extends TargetRoutineBuilder> getInvocationConfiguration();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    ProxyConfiguration.Builder<? extends TargetRoutineBuilder> proxyConfiguration();
+    ProxyConfiguration.Builder<? extends TargetRoutineBuilder> getProxyConfiguration();
 
     /**
      * Force the type of builder to be employed to create the proxy instance.

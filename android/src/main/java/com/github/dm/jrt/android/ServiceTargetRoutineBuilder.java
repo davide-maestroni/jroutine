@@ -44,14 +44,13 @@ public interface ServiceTargetRoutineBuilder
      * {@inheritDoc}
      */
     @NotNull
-    InvocationConfiguration.Builder<? extends ServiceTargetRoutineBuilder>
-    invocationConfiguration();
+    InvocationConfiguration.Builder<? extends ServiceTargetRoutineBuilder> getInvocationConfiguration();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    ProxyConfiguration.Builder<? extends ServiceTargetRoutineBuilder> proxyConfiguration();
+    ProxyConfiguration.Builder<? extends ServiceTargetRoutineBuilder> getProxyConfiguration();
 
     /**
      * {@inheritDoc}
@@ -63,5 +62,5 @@ public interface ServiceTargetRoutineBuilder
      * {@inheritDoc}
      */
     @NotNull
-    ServiceConfiguration.Builder<? extends ServiceTargetRoutineBuilder> serviceConfiguration();
+    ServiceConfiguration.Builder<? extends ServiceTargetRoutineBuilder> getServiceConfiguration();
 }

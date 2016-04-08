@@ -524,7 +524,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         final LoaderStreamChannelCompat<String> channel2 =
                 LoaderStreamsCompat.streamOf("test4", "test5", "test6");
         assertThat(LoaderStreamsCompat.blend(channel2, channel1)
-                                      .channelConfiguration()
+                                      .getChannelConfiguration()
                                       .withChannelOrder(OrderType.BY_CALL)
                                       .withReadTimeout(seconds(10))
                                       .setConfiguration()
@@ -725,7 +725,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
         assertThat(LoaderStreamsCompat.streamOf("test2")
                                       .with(context)
-                                      .loaderConfiguration()
+                                      .getLoaderConfiguration()
                                       .withFactoryId(11)
                                       .setConfiguration()
                                       .async()
@@ -1404,7 +1404,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                                        .next()).isEqualTo("TEST1");
         LoaderStreamsCompat.streamOf("test2")
                            .with(context)
-                           .loaderConfiguration()
+                           .getLoaderConfiguration()
                            .withLoaderId(21)
                            .setConfiguration()
                            .async()
@@ -1431,7 +1431,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
     public void testMap() {
 
         final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .channelConfiguration()
+                                                     .getChannelConfiguration()
                                                      .withChannelOrder(OrderType.BY_CALL)
                                                      .setConfiguration();
         final IOChannel<String> channel1 = builder.buildChannel();
@@ -1443,7 +1443,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         final OutputChannel<ParcelableSelectable<Object>> output =
                 JRoutineLoaderCompat.with(loaderFrom(getActivity()))
                                     .on(factoryFrom(new Sort()))
-                                    .invocationConfiguration()
+                                    .getInvocationConfiguration()
                                     .withInputOrder(OrderType.BY_CALL)
                                     .setConfiguration()
                                     .asyncCall(channel);
@@ -1477,7 +1477,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
     public void testMerge() {
 
         final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .channelConfiguration()
+                                                     .getChannelConfiguration()
                                                      .withChannelOrder(OrderType.BY_CALL)
                                                      .setConfiguration();
         IOChannel<String> channel1;
@@ -1537,7 +1537,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
     public void testMerge4() {
 
         final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .channelConfiguration()
+                                                     .getChannelConfiguration()
                                                      .withChannelOrder(OrderType.BY_CALL)
                                                      .setConfiguration();
         final IOChannel<String> channel1 = builder.buildChannel();
@@ -1573,7 +1573,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
     public void testMergeAbort() {
 
         final IOChannelBuilder builder = JRoutineCore.io()
-                                                     .channelConfiguration()
+                                                     .getChannelConfiguration()
                                                      .withChannelOrder(OrderType.BY_CALL)
                                                      .setConfiguration();
         IOChannel<String> channel1;
@@ -1857,14 +1857,14 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                 routine.asyncCall(inputChannel);
         final StreamChannel<Object> intChannel =
                 LoaderStreamsCompat.selectParcelable(outputChannel, Sort.INTEGER, Sort.STRING)
-                                   .channelConfiguration()
+                                   .getChannelConfiguration()
                                    .withLogLevel(Level.WARNING)
                                    .setConfiguration()
                                    .buildChannels()
                                    .get(Sort.INTEGER);
         final StreamChannel<Object> strChannel = LoaderStreamsCompat.selectParcelable(outputChannel,
                 Arrays.asList(Sort.STRING, Sort.INTEGER))
-                                                                    .channelConfiguration()
+                                                                    .getChannelConfiguration()
                                                                     .withLogLevel(Level.WARNING)
                                                                     .setConfiguration()
                                                                     .buildChannels()

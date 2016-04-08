@@ -42,7 +42,7 @@ public abstract class AbstractBuilder<TYPE>
     }
 
     @NotNull
-    public Builder<ChannelsBuilder<TYPE>> channelConfiguration() {
+    public Builder<ChannelsBuilder<TYPE>> getChannelConfiguration() {
 
         return new Builder<ChannelsBuilder<TYPE>>(this, mConfiguration);
     }

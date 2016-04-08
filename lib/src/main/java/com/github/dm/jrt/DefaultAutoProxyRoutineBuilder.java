@@ -37,7 +37,7 @@ import java.lang.reflect.Method;
  * <p>
  * Created by davide-maestroni on 03/03/2016.
  */
-class DefaultTargetRoutineBuilder implements TargetRoutineBuilder {
+class DefaultAutoProxyRoutineBuilder implements AutoProxyRoutineBuilder {
 
     private final InvocationTarget<?> mTarget;
 
@@ -46,30 +46,30 @@ class DefaultTargetRoutineBuilder implements TargetRoutineBuilder {
     private InvocationConfiguration mInvocationConfiguration =
             InvocationConfiguration.defaultConfiguration();
 
-    private final InvocationConfiguration.Configurable<DefaultTargetRoutineBuilder>
+    private final InvocationConfiguration.Configurable<DefaultAutoProxyRoutineBuilder>
             mInvocationConfigurable =
-            new InvocationConfiguration.Configurable<DefaultTargetRoutineBuilder>() {
+            new InvocationConfiguration.Configurable<DefaultAutoProxyRoutineBuilder>() {
 
                 @NotNull
-                public DefaultTargetRoutineBuilder setConfiguration(
+                public DefaultAutoProxyRoutineBuilder setConfiguration(
                         @NotNull final InvocationConfiguration configuration) {
 
                     mInvocationConfiguration = configuration;
-                    return DefaultTargetRoutineBuilder.this;
+                    return DefaultAutoProxyRoutineBuilder.this;
                 }
             };
 
     private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.defaultConfiguration();
 
-    private final ProxyConfiguration.Configurable<DefaultTargetRoutineBuilder> mProxyConfigurable =
-            new ProxyConfiguration.Configurable<DefaultTargetRoutineBuilder>() {
+    private final ProxyConfiguration.Configurable<DefaultAutoProxyRoutineBuilder> mProxyConfigurable =
+            new ProxyConfiguration.Configurable<DefaultAutoProxyRoutineBuilder>() {
 
                 @NotNull
-                public DefaultTargetRoutineBuilder setConfiguration(
+                public DefaultAutoProxyRoutineBuilder setConfiguration(
                         @NotNull final ProxyConfiguration configuration) {
 
                     mProxyConfiguration = configuration;
-                    return DefaultTargetRoutineBuilder.this;
+                    return DefaultAutoProxyRoutineBuilder.this;
                 }
             };
 
@@ -80,7 +80,7 @@ class DefaultTargetRoutineBuilder implements TargetRoutineBuilder {
      * @throws java.lang.IllegalArgumentException if the class of specified target represents an
      *                                            interface.
      */
-    DefaultTargetRoutineBuilder(@NotNull final InvocationTarget<?> target) {
+    DefaultAutoProxyRoutineBuilder(@NotNull final InvocationTarget<?> target) {
 
         final Class<?> targetClass = target.getTargetClass();
         if (targetClass.isInterface()) {
@@ -136,24 +136,24 @@ class DefaultTargetRoutineBuilder implements TargetRoutineBuilder {
     }
 
     @NotNull
-    public InvocationConfiguration.Builder<? extends TargetRoutineBuilder>
+    public InvocationConfiguration.Builder<? extends AutoProxyRoutineBuilder>
     getInvocationConfiguration() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
-        return new InvocationConfiguration.Builder<DefaultTargetRoutineBuilder>(
+        return new InvocationConfiguration.Builder<DefaultAutoProxyRoutineBuilder>(
                 mInvocationConfigurable, config);
     }
 
     @NotNull
-    public ProxyConfiguration.Builder<? extends TargetRoutineBuilder> getProxyConfiguration() {
+    public ProxyConfiguration.Builder<? extends AutoProxyRoutineBuilder> getProxyConfiguration() {
 
         final ProxyConfiguration config = mProxyConfiguration;
-        return new ProxyConfiguration.Builder<DefaultTargetRoutineBuilder>(mProxyConfigurable,
+        return new ProxyConfiguration.Builder<DefaultAutoProxyRoutineBuilder>(mProxyConfigurable,
                 config);
     }
 
     @NotNull
-    public TargetRoutineBuilder withType(@Nullable final BuilderType builderType) {
+    public AutoProxyRoutineBuilder withType(@Nullable final BuilderType builderType) {
 
         mBuilderType = builderType;
         return this;

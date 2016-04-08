@@ -40,7 +40,7 @@ import java.lang.reflect.Method;
  * <p>
  * Created by davide-maestroni on 03/06/2016.
  */
-class DefaultServiceTargetRoutineBuilder implements ServiceTargetRoutineBuilder {
+class DefaultServiceAutoProxyRoutineBuilder implements ServiceAutoProxyRoutineBuilder {
 
     private final ServiceContext mContext;
 
@@ -51,47 +51,47 @@ class DefaultServiceTargetRoutineBuilder implements ServiceTargetRoutineBuilder 
     private InvocationConfiguration mInvocationConfiguration =
             InvocationConfiguration.defaultConfiguration();
 
-    private final InvocationConfiguration.Configurable<DefaultServiceTargetRoutineBuilder>
+    private final InvocationConfiguration.Configurable<DefaultServiceAutoProxyRoutineBuilder>
             mInvocationConfigurable =
-            new InvocationConfiguration.Configurable<DefaultServiceTargetRoutineBuilder>() {
+            new InvocationConfiguration.Configurable<DefaultServiceAutoProxyRoutineBuilder>() {
 
                 @NotNull
-                public DefaultServiceTargetRoutineBuilder setConfiguration(
+                public DefaultServiceAutoProxyRoutineBuilder setConfiguration(
                         @NotNull final InvocationConfiguration configuration) {
 
                     mInvocationConfiguration = configuration;
-                    return DefaultServiceTargetRoutineBuilder.this;
+                    return DefaultServiceAutoProxyRoutineBuilder.this;
                 }
             };
 
     private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.defaultConfiguration();
 
-    private final ProxyConfiguration.Configurable<DefaultServiceTargetRoutineBuilder>
+    private final ProxyConfiguration.Configurable<DefaultServiceAutoProxyRoutineBuilder>
             mProxyConfigurable =
-            new ProxyConfiguration.Configurable<DefaultServiceTargetRoutineBuilder>() {
+            new ProxyConfiguration.Configurable<DefaultServiceAutoProxyRoutineBuilder>() {
 
                 @NotNull
-                public DefaultServiceTargetRoutineBuilder setConfiguration(
+                public DefaultServiceAutoProxyRoutineBuilder setConfiguration(
                         @NotNull final ProxyConfiguration configuration) {
 
                     mProxyConfiguration = configuration;
-                    return DefaultServiceTargetRoutineBuilder.this;
+                    return DefaultServiceAutoProxyRoutineBuilder.this;
                 }
             };
 
     private ServiceConfiguration mServiceConfiguration =
             ServiceConfiguration.defaultConfiguration();
 
-    private final ServiceConfiguration.Configurable<DefaultServiceTargetRoutineBuilder>
+    private final ServiceConfiguration.Configurable<DefaultServiceAutoProxyRoutineBuilder>
             mServiceConfigurable =
-            new ServiceConfiguration.Configurable<DefaultServiceTargetRoutineBuilder>() {
+            new ServiceConfiguration.Configurable<DefaultServiceAutoProxyRoutineBuilder>() {
 
                 @NotNull
-                public DefaultServiceTargetRoutineBuilder setConfiguration(
+                public DefaultServiceAutoProxyRoutineBuilder setConfiguration(
                         @NotNull final ServiceConfiguration configuration) {
 
                     mServiceConfiguration = configuration;
-                    return DefaultServiceTargetRoutineBuilder.this;
+                    return DefaultServiceAutoProxyRoutineBuilder.this;
                 }
             };
 
@@ -101,7 +101,7 @@ class DefaultServiceTargetRoutineBuilder implements ServiceTargetRoutineBuilder 
      * @param context the service context.
      * @param target  the invocation target.
      */
-    DefaultServiceTargetRoutineBuilder(@NotNull final ServiceContext context,
+    DefaultServiceAutoProxyRoutineBuilder(@NotNull final ServiceContext context,
             @NotNull final ContextInvocationTarget<?> target) {
 
         mContext = ConstantConditions.notNull("service context", context);
@@ -153,33 +153,33 @@ class DefaultServiceTargetRoutineBuilder implements ServiceTargetRoutineBuilder 
     }
 
     @NotNull
-    public InvocationConfiguration.Builder<? extends ServiceTargetRoutineBuilder>
+    public InvocationConfiguration.Builder<? extends ServiceAutoProxyRoutineBuilder>
     getInvocationConfiguration() {
 
-        return new InvocationConfiguration.Builder<DefaultServiceTargetRoutineBuilder>(
+        return new InvocationConfiguration.Builder<DefaultServiceAutoProxyRoutineBuilder>(
                 mInvocationConfigurable, mInvocationConfiguration);
     }
 
     @NotNull
-    public ProxyConfiguration.Builder<? extends ServiceTargetRoutineBuilder>
+    public ProxyConfiguration.Builder<? extends ServiceAutoProxyRoutineBuilder>
     getProxyConfiguration() {
 
-        return new ProxyConfiguration.Builder<DefaultServiceTargetRoutineBuilder>(
+        return new ProxyConfiguration.Builder<DefaultServiceAutoProxyRoutineBuilder>(
                 mProxyConfigurable, mProxyConfiguration);
     }
 
     @NotNull
-    public ServiceTargetRoutineBuilder withType(@Nullable final BuilderType builderType) {
+    public ServiceAutoProxyRoutineBuilder withType(@Nullable final BuilderType builderType) {
 
         mBuilderType = builderType;
         return this;
     }
 
     @NotNull
-    public ServiceConfiguration.Builder<? extends ServiceTargetRoutineBuilder>
+    public ServiceConfiguration.Builder<? extends ServiceAutoProxyRoutineBuilder>
     getServiceConfiguration() {
 
-        return new ServiceConfiguration.Builder<DefaultServiceTargetRoutineBuilder>(
+        return new ServiceConfiguration.Builder<DefaultServiceAutoProxyRoutineBuilder>(
                 mServiceConfigurable, mServiceConfiguration);
     }
 

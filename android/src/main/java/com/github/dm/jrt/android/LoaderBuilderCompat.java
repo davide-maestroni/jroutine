@@ -71,7 +71,7 @@ public class LoaderBuilderCompat {
      * @return the routine builder instance.
      */
     @NotNull
-    public LoaderTargetRoutineBuilder classOfType(@NotNull final Class<?> targetClass) {
+    public LoaderAutoProxyRoutineBuilder classOfType(@NotNull final Class<?> targetClass) {
 
         return on(ContextInvocationTarget.classOfType(targetClass));
     }
@@ -92,7 +92,7 @@ public class LoaderBuilderCompat {
      * @return the routine builder instance.
      */
     @NotNull
-    public LoaderTargetRoutineBuilder instanceOf(@NotNull final Class<?> targetClass) {
+    public LoaderAutoProxyRoutineBuilder instanceOf(@NotNull final Class<?> targetClass) {
 
         return on(ContextInvocationTarget.instanceOf(targetClass));
     }
@@ -114,7 +114,7 @@ public class LoaderBuilderCompat {
      * @return the routine builder instance.
      */
     @NotNull
-    public LoaderTargetRoutineBuilder instanceOf(@NotNull final Class<?> targetClass,
+    public LoaderAutoProxyRoutineBuilder instanceOf(@NotNull final Class<?> targetClass,
             @Nullable final Object... factoryArgs) {
 
         return on(ContextInvocationTarget.instanceOf(targetClass, factoryArgs));
@@ -340,9 +340,9 @@ public class LoaderBuilderCompat {
      * @return the routine builder instance.
      */
     @NotNull
-    public LoaderTargetRoutineBuilder on(@NotNull final ContextInvocationTarget<?> target) {
+    public LoaderAutoProxyRoutineBuilder on(@NotNull final ContextInvocationTarget<?> target) {
 
-        return new DefaultLoaderTargetRoutineBuilderCompat(mContext, target);
+        return new DefaultLoaderAutoProxyRoutineBuilderCompat(mContext, target);
     }
 
     /**

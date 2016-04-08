@@ -66,7 +66,7 @@ public class ServiceBuilder {
      * @return the routine builder instance.
      */
     @NotNull
-    public ServiceTargetRoutineBuilder classOfType(@NotNull final Class<?> targetClass) {
+    public ServiceAutoProxyRoutineBuilder classOfType(@NotNull final Class<?> targetClass) {
 
         return on(ContextInvocationTarget.classOfType(targetClass));
     }
@@ -86,7 +86,7 @@ public class ServiceBuilder {
      * @return the routine builder instance.
      */
     @NotNull
-    public ServiceTargetRoutineBuilder instanceOf(@NotNull final Class<?> targetClass) {
+    public ServiceAutoProxyRoutineBuilder instanceOf(@NotNull final Class<?> targetClass) {
 
         return on(ContextInvocationTarget.instanceOf(targetClass));
     }
@@ -107,7 +107,7 @@ public class ServiceBuilder {
      * @return the routine builder instance.
      */
     @NotNull
-    public ServiceTargetRoutineBuilder instanceOf(@NotNull final Class<?> targetClass,
+    public ServiceAutoProxyRoutineBuilder instanceOf(@NotNull final Class<?> targetClass,
             @Nullable final Object... factoryArgs) {
 
         return on(ContextInvocationTarget.instanceOf(targetClass, factoryArgs));
@@ -265,9 +265,9 @@ public class ServiceBuilder {
      * @return the routine builder instance.
      */
     @NotNull
-    public ServiceTargetRoutineBuilder on(@NotNull final ContextInvocationTarget<?> target) {
+    public ServiceAutoProxyRoutineBuilder on(@NotNull final ContextInvocationTarget<?> target) {
 
-        return new DefaultServiceTargetRoutineBuilder(mContext, target);
+        return new DefaultServiceAutoProxyRoutineBuilder(mContext, target);
     }
 
     /**

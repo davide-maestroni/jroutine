@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt;
 
-import com.github.dm.jrt.TargetRoutineBuilder.BuilderType;
+import com.github.dm.jrt.AutoProxyRoutineBuilder.BuilderType;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.InvocationChannel;

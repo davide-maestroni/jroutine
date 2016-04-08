@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.android;
 
-import com.github.dm.jrt.TargetRoutineBuilder;
+import com.github.dm.jrt.AutoProxyRoutineBuilder;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.object.builder.LoaderObjectRoutineBuilder;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
@@ -37,31 +37,31 @@ import org.jetbrains.annotations.Nullable;
  * <p>
  * Created by davide-maestroni on 03/06/2016.
  */
-public interface LoaderTargetRoutineBuilder
-        extends TargetRoutineBuilder, LoaderObjectRoutineBuilder {
+public interface LoaderAutoProxyRoutineBuilder
+        extends AutoProxyRoutineBuilder, LoaderObjectRoutineBuilder {
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    InvocationConfiguration.Builder<? extends LoaderTargetRoutineBuilder>
+    InvocationConfiguration.Builder<? extends LoaderAutoProxyRoutineBuilder>
     getInvocationConfiguration();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    ProxyConfiguration.Builder<? extends LoaderTargetRoutineBuilder> getProxyConfiguration();
+    ProxyConfiguration.Builder<? extends LoaderAutoProxyRoutineBuilder> getProxyConfiguration();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderTargetRoutineBuilder withType(@Nullable BuilderType builderType);
+    LoaderAutoProxyRoutineBuilder withType(@Nullable BuilderType builderType);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderConfiguration.Builder<? extends LoaderTargetRoutineBuilder> getLoaderConfiguration();
+    LoaderConfiguration.Builder<? extends LoaderAutoProxyRoutineBuilder> getLoaderConfiguration();
 }

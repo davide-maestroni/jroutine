@@ -101,9 +101,9 @@ public class JRoutine extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified class represents an interface.
      */
     @NotNull
-    public static TargetRoutineBuilder classOfType(@NotNull final Class<?> targetClass) {
+    public static AutoProxyRoutineBuilder classOfType(@NotNull final Class<?> targetClass) {
 
-        return new DefaultTargetRoutineBuilder(InvocationTarget.classOfType(targetClass));
+        return new DefaultAutoProxyRoutineBuilder(InvocationTarget.classOfType(targetClass));
     }
 
     /**
@@ -207,9 +207,9 @@ public class JRoutine extends Streams {
      * @return the routine builder instance.
      */
     @NotNull
-    public static TargetRoutineBuilder instance(@NotNull final Object object) {
+    public static AutoProxyRoutineBuilder instance(@NotNull final Object object) {
 
-        return new DefaultTargetRoutineBuilder(InvocationTarget.instance(object));
+        return new DefaultAutoProxyRoutineBuilder(InvocationTarget.instance(object));
     }
 
     /**
@@ -414,9 +414,9 @@ public class JRoutine extends Streams {
      *                                            interface.
      */
     @NotNull
-    public static TargetRoutineBuilder on(@NotNull final InvocationTarget<?> target) {
+    public static AutoProxyRoutineBuilder on(@NotNull final InvocationTarget<?> target) {
 
-        return new DefaultTargetRoutineBuilder(target);
+        return new DefaultAutoProxyRoutineBuilder(target);
     }
 
     /**
@@ -438,7 +438,7 @@ public class JRoutine extends Streams {
      *                                            interface.
      */
     @NotNull
-    public static TargetRoutineBuilder on(@NotNull final Object object) {
+    public static AutoProxyRoutineBuilder on(@NotNull final Object object) {
 
         return (object instanceof Class) ? classOfType((Class<?>) object) : instance(object);
     }

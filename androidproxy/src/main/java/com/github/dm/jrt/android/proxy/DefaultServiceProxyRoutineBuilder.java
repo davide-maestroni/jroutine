@@ -107,25 +107,24 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
     }
 
     @NotNull
-    public InvocationConfiguration.Builder<? extends ServiceProxyRoutineBuilder> getInvocationConfiguration() {
-
-
+    public InvocationConfiguration.Builder<? extends ServiceProxyRoutineBuilder>
+    getInvocationConfiguration() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ServiceProxyRoutineBuilder>(this, config);
     }
 
     @NotNull
-    public ProxyConfiguration.Builder<? extends ServiceProxyRoutineBuilder> getProxyConfiguration() {
+    public ProxyConfiguration.Builder<? extends ServiceProxyRoutineBuilder> getProxyConfiguration
+            () {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<ServiceProxyRoutineBuilder>(this, config);
     }
 
     @NotNull
-    public ServiceConfiguration.Builder<? extends ServiceProxyRoutineBuilder> getServiceConfiguration() {
-
-
+    public ServiceConfiguration.Builder<? extends ServiceProxyRoutineBuilder>
+    getServiceConfiguration() {
 
         final ServiceConfiguration config = mServiceConfiguration;
         return new ServiceConfiguration.Builder<ServiceProxyRoutineBuilder>(this, config);

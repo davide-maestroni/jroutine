@@ -116,9 +116,8 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
     }
 
     @NotNull
-    public LoaderConfiguration.Builder<? extends LoaderRoutineBuilder<IN, OUT>> getLoaderConfiguration() {
-
-
+    public LoaderConfiguration.Builder<? extends LoaderRoutineBuilder<IN, OUT>>
+    getLoaderConfiguration() {
 
         final LoaderConfiguration config = mLoaderConfiguration;
         return new LoaderConfiguration.Builder<LoaderRoutineBuilder<IN, OUT>>(this, config);

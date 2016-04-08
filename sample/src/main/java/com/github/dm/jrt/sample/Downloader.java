@@ -153,16 +153,16 @@ public class Downloader {
             // In such way we can abort the download between two chunks, while they are passed to
             // the specific routine
             // That's why we store the routine output channel in an internal map
-            final Routine<ByteBuffer, Boolean> writeFile =
-                    JRoutineCore.on(factoryOf(WriteFile.class, dstFile)).getInvocationConfiguration()
-                            // Since we want to limit the number of allocated chunks, we have to
-                            // make the writing happen in a dedicated runner, so that waiting for
-                            // available space becomes allowed
-                            .withRunner(sWriteRunner)
-                            .withInputLimit(32)
-                            .withInputMaxDelay(seconds(3))
-                            .setConfiguration()
-                            .buildRoutine();
+            final Routine<ByteBuffer, Boolean> writeFile = JRoutineCore.on(
+                    factoryOf(WriteFile.class, dstFile)).getInvocationConfiguration()
+                    // Since we want to limit the number of allocated chunks, we have to
+                    // make the writing happen in a dedicated runner, so that waiting for
+                    // available space becomes allowed
+                    .withRunner(sWriteRunner)
+                    .withInputLimit(32)
+                    .withInputMaxDelay(seconds(3))
+                    .setConfiguration()
+                    .buildRoutine();
             downloads.put(uri, writeFile.asyncCall(mReadConnection.asyncCall(uri)));
         }
     }

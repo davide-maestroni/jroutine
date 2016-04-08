@@ -98,7 +98,8 @@ class DefaultProxyRoutineBuilder
     }
 
     @NotNull
-    public InvocationConfiguration.Builder<? extends ProxyRoutineBuilder> getInvocationConfiguration() {
+    public InvocationConfiguration.Builder<? extends ProxyRoutineBuilder>
+    getInvocationConfiguration() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ProxyRoutineBuilder>(this, config);

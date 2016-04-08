@@ -71,9 +71,8 @@ class MapBuilderWrapper<OUT>
     }
 
     @NotNull
-    public Builder<? extends ChannelsBuilder<SparseArrayCompat<LoaderStreamChannelCompat<OUT>>>> getChannelConfiguration() {
-
-
+    public Builder<? extends ChannelsBuilder<SparseArrayCompat<LoaderStreamChannelCompat<OUT>>>>
+    getChannelConfiguration() {
 
         final ChannelConfiguration config = mConfiguration;
         return new Builder<ChannelsBuilder<SparseArrayCompat<LoaderStreamChannelCompat<OUT>>>>(this,

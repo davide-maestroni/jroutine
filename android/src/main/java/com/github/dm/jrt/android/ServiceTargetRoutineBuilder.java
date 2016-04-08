@@ -44,7 +44,8 @@ public interface ServiceTargetRoutineBuilder
      * {@inheritDoc}
      */
     @NotNull
-    InvocationConfiguration.Builder<? extends ServiceTargetRoutineBuilder> getInvocationConfiguration();
+    InvocationConfiguration.Builder<? extends ServiceTargetRoutineBuilder>
+    getInvocationConfiguration();
 
     /**
      * {@inheritDoc}

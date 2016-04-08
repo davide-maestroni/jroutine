@@ -224,25 +224,24 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     @NotNull
-    public InvocationConfiguration.Builder<? extends ServiceObjectRoutineBuilder> getInvocationConfiguration() {
-
-
+    public InvocationConfiguration.Builder<? extends ServiceObjectRoutineBuilder>
+    getInvocationConfiguration() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ServiceObjectRoutineBuilder>(this, config);
     }
 
     @NotNull
-    public ProxyConfiguration.Builder<? extends ServiceObjectRoutineBuilder> getProxyConfiguration() {
+    public ProxyConfiguration.Builder<? extends ServiceObjectRoutineBuilder>
+    getProxyConfiguration() {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<ServiceObjectRoutineBuilder>(this, config);
     }
 
     @NotNull
-    public ServiceConfiguration.Builder<? extends ServiceObjectRoutineBuilder> getServiceConfiguration() {
-
-
+    public ServiceConfiguration.Builder<? extends ServiceObjectRoutineBuilder>
+    getServiceConfiguration() {
 
         final ServiceConfiguration config = mServiceConfiguration;
         return new ServiceConfiguration.Builder<ServiceObjectRoutineBuilder>(this, config);

@@ -135,9 +135,8 @@ class DefaultObjectRoutineBuilder
     }
 
     @NotNull
-    public InvocationConfiguration.Builder<? extends ObjectRoutineBuilder> getInvocationConfiguration() {
-
-
+    public InvocationConfiguration.Builder<? extends ObjectRoutineBuilder>
+    getInvocationConfiguration() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ObjectRoutineBuilder>(this, config);

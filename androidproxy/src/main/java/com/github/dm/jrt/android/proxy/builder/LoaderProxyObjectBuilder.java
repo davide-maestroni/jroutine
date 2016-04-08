@@ -62,7 +62,8 @@ public interface LoaderProxyObjectBuilder<TYPE> extends ProxyObjectBuilder<TYPE>
      * @return the invocation configuration builder.
      */
     @NotNull
-    InvocationConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>> getInvocationConfiguration();
+    InvocationConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>>
+    getInvocationConfiguration();
 
     /**
      * {@inheritDoc}

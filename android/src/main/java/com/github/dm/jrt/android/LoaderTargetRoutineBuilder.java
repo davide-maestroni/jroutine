@@ -44,7 +44,8 @@ public interface LoaderTargetRoutineBuilder
      * {@inheritDoc}
      */
     @NotNull
-    InvocationConfiguration.Builder<? extends LoaderTargetRoutineBuilder> getInvocationConfiguration();
+    InvocationConfiguration.Builder<? extends LoaderTargetRoutineBuilder>
+    getInvocationConfiguration();
 
     /**
      * {@inheritDoc}

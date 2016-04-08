@@ -173,23 +173,24 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     }
 
     @NotNull
-    public InvocationConfiguration.Builder<? extends LoaderObjectRoutineBuilder> getInvocationConfiguration() {
-
-
+    public InvocationConfiguration.Builder<? extends LoaderObjectRoutineBuilder>
+    getInvocationConfiguration() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<LoaderObjectRoutineBuilder>(this, config);
     }
 
     @NotNull
-    public ProxyConfiguration.Builder<? extends LoaderObjectRoutineBuilder> getProxyConfiguration() {
+    public ProxyConfiguration.Builder<? extends LoaderObjectRoutineBuilder> getProxyConfiguration
+            () {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<LoaderObjectRoutineBuilder>(this, config);
     }
 
     @NotNull
-    public LoaderConfiguration.Builder<? extends LoaderObjectRoutineBuilder> getLoaderConfiguration() {
+    public LoaderConfiguration.Builder<? extends LoaderObjectRoutineBuilder>
+    getLoaderConfiguration() {
 
         final LoaderConfiguration config = mLoaderConfiguration;
         return new LoaderConfiguration.Builder<LoaderObjectRoutineBuilder>(this, config);

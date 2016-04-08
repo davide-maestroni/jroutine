@@ -153,16 +153,16 @@ class DefaultServiceTargetRoutineBuilder implements ServiceTargetRoutineBuilder 
     }
 
     @NotNull
-    public InvocationConfiguration.Builder<? extends ServiceTargetRoutineBuilder> getInvocationConfiguration() {
-
-
+    public InvocationConfiguration.Builder<? extends ServiceTargetRoutineBuilder>
+    getInvocationConfiguration() {
 
         return new InvocationConfiguration.Builder<DefaultServiceTargetRoutineBuilder>(
                 mInvocationConfigurable, mInvocationConfiguration);
     }
 
     @NotNull
-    public ProxyConfiguration.Builder<? extends ServiceTargetRoutineBuilder> getProxyConfiguration() {
+    public ProxyConfiguration.Builder<? extends ServiceTargetRoutineBuilder>
+    getProxyConfiguration() {
 
         return new ProxyConfiguration.Builder<DefaultServiceTargetRoutineBuilder>(
                 mProxyConfigurable, mProxyConfiguration);
@@ -176,9 +176,8 @@ class DefaultServiceTargetRoutineBuilder implements ServiceTargetRoutineBuilder 
     }
 
     @NotNull
-    public ServiceConfiguration.Builder<? extends ServiceTargetRoutineBuilder> getServiceConfiguration() {
-
-
+    public ServiceConfiguration.Builder<? extends ServiceTargetRoutineBuilder>
+    getServiceConfiguration() {
 
         return new ServiceConfiguration.Builder<DefaultServiceTargetRoutineBuilder>(
                 mServiceConfigurable, mServiceConfiguration);

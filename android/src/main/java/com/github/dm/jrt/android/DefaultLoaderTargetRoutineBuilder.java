@@ -160,7 +160,8 @@ class DefaultLoaderTargetRoutineBuilder implements LoaderTargetRoutineBuilder {
     }
 
     @NotNull
-    public ProxyConfiguration.Builder<? extends LoaderTargetRoutineBuilder> getProxyConfiguration() {
+    public ProxyConfiguration.Builder<? extends LoaderTargetRoutineBuilder> getProxyConfiguration
+            () {
 
         return new ProxyConfiguration.Builder<LoaderTargetRoutineBuilder>(mProxyConfigurable,
                 mProxyConfiguration);
@@ -174,7 +175,8 @@ class DefaultLoaderTargetRoutineBuilder implements LoaderTargetRoutineBuilder {
     }
 
     @NotNull
-    public LoaderConfiguration.Builder<? extends LoaderTargetRoutineBuilder> getLoaderConfiguration() {
+    public LoaderConfiguration.Builder<? extends LoaderTargetRoutineBuilder>
+    getLoaderConfiguration() {
 
         return new LoaderConfiguration.Builder<LoaderTargetRoutineBuilder>(mLoaderConfigurable,
                 mLoaderConfiguration);

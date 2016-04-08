@@ -246,9 +246,9 @@ public abstract class AbstractStreamChannel<OUT>
             @Nullable final TimeDuration maxDelay) {
 
         return getInvocationConfiguration().withRunner(runner)
-                                        .withInputLimit(maxInputs)
-                                        .withInputMaxDelay(maxDelay)
-                                        .setConfiguration();
+                                           .withInputLimit(maxInputs)
+                                           .withInputMaxDelay(maxDelay)
+                                           .setConfiguration();
     }
 
     @NotNull

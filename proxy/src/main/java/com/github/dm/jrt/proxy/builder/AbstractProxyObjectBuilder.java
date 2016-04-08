@@ -80,9 +80,8 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
     }
 
     @NotNull
-    public InvocationConfiguration.Builder<? extends ProxyObjectBuilder<TYPE>> getInvocationConfiguration() {
-
-
+    public InvocationConfiguration.Builder<? extends ProxyObjectBuilder<TYPE>>
+    getInvocationConfiguration() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ProxyObjectBuilder<TYPE>>(this, config);

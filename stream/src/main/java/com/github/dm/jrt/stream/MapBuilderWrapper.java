@@ -68,9 +68,8 @@ class MapBuilderWrapper<OUT> implements ChannelsBuilder<Map<Integer, StreamChann
     }
 
     @NotNull
-    public Builder<? extends ChannelsBuilder<Map<Integer, StreamChannel<OUT>>>> getChannelConfiguration() {
-
-
+    public Builder<? extends ChannelsBuilder<Map<Integer, StreamChannel<OUT>>>>
+    getChannelConfiguration() {
 
         final ChannelConfiguration config = mConfiguration;
         return new Builder<ChannelsBuilder<Map<Integer, StreamChannel<OUT>>>>(this, config);

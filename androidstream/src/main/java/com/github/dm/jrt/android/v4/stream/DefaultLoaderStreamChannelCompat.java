@@ -332,9 +332,8 @@ class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel<OUT>
 
     @NotNull
     @Override
-    public InvocationConfiguration.Builder<? extends LoaderStreamChannelCompat<OUT>> getInvocationConfiguration() {
-
-
+    public InvocationConfiguration.Builder<? extends LoaderStreamChannelCompat<OUT>>
+    getInvocationConfiguration() {
 
         final InvocationConfiguration config = getConfiguration();
         return new InvocationConfiguration.Builder<LoaderStreamChannelCompat<OUT>>(
@@ -602,9 +601,8 @@ class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel<OUT>
     }
 
     @NotNull
-    public LoaderConfiguration.Builder<? extends LoaderStreamChannelCompat<OUT>> getLoaderConfiguration() {
-
-
+    public LoaderConfiguration.Builder<? extends LoaderStreamChannelCompat<OUT>>
+    getLoaderConfiguration() {
 
         final LoaderConfiguration config = mConfiguration;
         return new LoaderConfiguration.Builder<LoaderStreamChannelCompat<OUT>>(this, config);

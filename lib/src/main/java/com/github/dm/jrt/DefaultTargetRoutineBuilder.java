@@ -136,9 +136,8 @@ class DefaultTargetRoutineBuilder implements TargetRoutineBuilder {
     }
 
     @NotNull
-    public InvocationConfiguration.Builder<? extends TargetRoutineBuilder> getInvocationConfiguration() {
-
-
+    public InvocationConfiguration.Builder<? extends TargetRoutineBuilder>
+    getInvocationConfiguration() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<DefaultTargetRoutineBuilder>(

@@ -38,7 +38,8 @@ public interface ServiceObjectRoutineBuilder
      * {@inheritDoc}
      */
     @NotNull
-    InvocationConfiguration.Builder<? extends ServiceObjectRoutineBuilder> getInvocationConfiguration();
+    InvocationConfiguration.Builder<? extends ServiceObjectRoutineBuilder>
+    getInvocationConfiguration();
 
     /**
      * {@inheritDoc}

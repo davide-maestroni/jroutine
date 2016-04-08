@@ -105,27 +105,24 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
     }
 
     @NotNull
-    public InvocationConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>> getInvocationConfiguration() {
-
-
+    public InvocationConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
+    getInvocationConfiguration() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ServiceProxyObjectBuilder<TYPE>>(this, config);
     }
 
     @NotNull
-    public ProxyConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>> getProxyConfiguration() {
-
-
+    public ProxyConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
+    getProxyConfiguration() {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<ServiceProxyObjectBuilder<TYPE>>(this, config);
     }
 
     @NotNull
-    public ServiceConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>> getServiceConfiguration() {
-
-
+    public ServiceConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
+    getServiceConfiguration() {
 
         final ServiceConfiguration config = mServiceConfiguration;
         return new ServiceConfiguration.Builder<ServiceProxyObjectBuilder<TYPE>>(this, config);

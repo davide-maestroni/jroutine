@@ -182,7 +182,8 @@ public interface LoaderStreamChannel<OUT>
      * {@inheritDoc}
      */
     @NotNull
-    InvocationConfiguration.Builder<? extends LoaderStreamChannel<OUT>> getInvocationConfiguration();
+    InvocationConfiguration.Builder<? extends LoaderStreamChannel<OUT>>
+    getInvocationConfiguration();
 
     /**
      * {@inheritDoc}
@@ -352,7 +353,8 @@ public interface LoaderStreamChannel<OUT>
             @NotNull Function<? super RoutineException, ? extends OUT> function);
 
     /**
-     * Short for {@code getLoaderConfiguration().withCacheStrategy(strategyType).setConfiguration()}.
+     * Short for {@code getLoaderConfiguration().withCacheStrategy(strategyType)
+     * .setConfiguration()}.
      *
      * @param strategyType the cache strategy type.
      * @return the configured stream.

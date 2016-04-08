@@ -104,9 +104,8 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
     }
 
     @NotNull
-    public InvocationConfiguration.Builder<? extends LoaderProxyRoutineBuilder> getInvocationConfiguration() {
-
-
+    public InvocationConfiguration.Builder<? extends LoaderProxyRoutineBuilder>
+    getInvocationConfiguration() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<LoaderProxyRoutineBuilder>(this, config);
@@ -120,7 +119,8 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
     }
 
     @NotNull
-    public LoaderConfiguration.Builder<? extends LoaderProxyRoutineBuilder> getLoaderConfiguration() {
+    public LoaderConfiguration.Builder<? extends LoaderProxyRoutineBuilder>
+    getLoaderConfiguration() {
 
         final LoaderConfiguration config = mLoaderConfiguration;
         return new LoaderConfiguration.Builder<LoaderProxyRoutineBuilder>(this, config);

@@ -34,23 +34,29 @@ import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
 /**
  * Class storing the channel configuration.
  * <p>
- * Each instance is immutable, thus, in order to modify a configuration parameter, a new builder
- * must be created starting from the specific configuration.
+ * Each instance is immutable, thus, in order to modify an existing configuration, a new builder
+ * must be created from it.
  * <p>
- * The configuration has an asynchronous runner associated.
- * <br>
- * The number of input data buffered in the channel can be limited in order to avoid excessive
- * memory consumption. In case the maximum number is reached when passing an input, the call will
- * block until enough data are consumed or the specified delay elapses.
- * <br>
- * A maximum size can additionally be set so that, when the number of buffered data exceeds it, a
- * {@link com.github.dm.jrt.core.common.DeadlockException DeadlockException} will be thrown.
- * <br>
- * By default the timeout is set to 0.
- * <br>
- * The order of input data is not guaranteed. Nevertheless, it is possible to force data to be
- * delivered in the same order as they are passed to the channels, at the cost of a slightly
- * increase in memory usage and computation.
+ * The configuration allows to set:
+ * <ul>
+ * <li>The asynchronous runner used to dispatch delayed data.</li>
+ * <li>The order in which data are dispatched through the channel. The order of input data is not
+ * guaranteed. Nevertheless, it is possible to force data to be delivered in the same order as they
+ * are passed to the channels, at the cost of a slightly increase in memory usage and computation.
+ * </li>
+ * <li>The core number of input data buffered in the channel. The channel buffer can be limited in
+ * order to avoid excessive memory consumption. In case the maximum number is reached when passing
+ * an input, the call will block until enough data are consumed or the specified delay elapses.</li>
+ * <li>The maximum delay to be applied to the calling thread when the buffered data exceed the
+ * channel core limit.</li>
+ * <li>The maximum number of input data buffered in the channel.When the number of data exceeds it,
+ * a {@link com.github.dm.jrt.core.common.DeadlockException DeadlockException} will be thrown.</li>
+ * <li>The maximum timeout while waiting for a new output to be available before performing the
+ * specified action.</li>
+ * <li>The action to be taken when no output becomes available before the timeout elapses.</li>
+ * <li>The log instance to be used to trace the log messages.</li>
+ * <li>The log level to be used to filter the log messages.</li>
+ * </ul>
  * <p>
  * Created by davide-maestroni on 07/03/2015.
  */

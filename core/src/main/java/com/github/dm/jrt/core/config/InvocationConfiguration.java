@@ -33,43 +33,53 @@ import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
 /**
  * Class storing the invocation configuration.
  * <p>
- * Each instance is immutable, thus, in order to modify a configuration parameter, a new builder
- * must be created starting from the specific configuration.
+ * Each instance is immutable, thus, in order to modify an existing configuration, a new builder
+ * must be created from it.
  * <p>
- * The configuration has an asynchronous runner associated.
- * <br>
- * The default runner is shared among all the routines.
- * <p>
- * A specific priority can be set. Every invocation will age each time an higher priority one takes
+ * The configuration allows to set:
+ * <ul>
+ * <li>The asynchronous runner used to execute the invocations.</li>
+ * <li>The invocations priority. Every invocation will age each time an higher priority one takes
  * the precedence, so that older invocations slowly increases their priority. Such mechanism has
- * been implemented to avoid starvation of low priority invocations. Hence, when assigning
- * priority values, it is important to keep in mind that the difference between two priorities
- * corresponds to the maximum age the lower priority invocation will have, before getting precedence
- * over the higher priority one.
- * <p>
- * Additionally, a recycling mechanism is provided so that, when an invocation successfully
- * completes, the instance is retained for future executions. Moreover, the maximum running
- * invocation instances at one time can be limited by calling the specific builder method. When the
- * limit is reached and an additional instance is required, the call is delayed until one becomes
- * available.
- * <p>
- * The maximum time of execution can also be set so that, if no result is produced before the
- * timeout elapses, an action will be taken choosing between throwing an
- * {@link com.github.dm.jrt.core.channel.ExecutionTimeoutException ExecutionTimeoutException},
- * aborting the invocation, or continuing with the execution.
- * <p>
- * Finally, the number of input and output data buffered in the corresponding channel can be
- * limited in order to avoid excessive memory consumption. In case the limit is reached when passing
- * an input or output, the call blocks until enough data are consumed or the specified maximum delay
- * elapses. A maximum size can additionally be set so that, when the number of buffered data
- * exceeds it, a {@link com.github.dm.jrt.core.common.DeadlockException DeadlockException} will be
- * thrown.
- * <br>
- * By default the delay is set to 0.
- * <p>
- * The order of input and output data is not guaranteed. Nevertheless, it is possible to force data
- * to be delivered in the same order as they are passed to the channels, at the cost of a slightly
- * increase in memory usage and computation time.
+ * been implemented to avoid starvation of low priority invocations. Hence, when assigning priority
+ * values, it is important to keep in mind that the difference between two priorities corresponds to
+ * the maximum age the lower priority invocation will have, before getting precedence over the
+ * higher priority one.</li>
+ * <li>The core number of invocation instances to be retained in order to be re-used when needed.
+ * When an invocation completes without being destroyed, the instance is retained for future
+ * executions.</li>
+ * <li>The maximum number of invocation instances running at the same time. When the limit is
+ * exceeded, the new invocation execution is delayed until one instance becomes available.</li>
+ * <li>The order in which data are dispatched through the input channel. The order of input data is
+ * not guaranteed. Nevertheless, it is possible to force data to be delivered in the same order as
+ * they are passed to the channels, at the cost of a slightly increase in memory usage and
+ * computation.</li>
+ * <li>The core number of input data buffered in the channel. The channel buffer can be limited in
+ * order to avoid excessive memory consumption. In case the maximum number is reached when passing
+ * an input, the call will block until enough data are consumed or the specified delay elapses.</li>
+ * <li>The maximum delay to be applied to the calling thread when the buffered input data exceed the
+ * channel core limit.</li>
+ * <li>The maximum number of input data buffered in the channel. When the number of data exceeds it,
+ * a {@link com.github.dm.jrt.core.common.DeadlockException DeadlockException} will be thrown.</li>
+ * <li>The order in which data are dispatched through the output channel. The order of input data is
+ * not guaranteed. Nevertheless, it is possible to force data to be delivered in the same order as
+ * they are passed to the channels, at the cost of a slightly increase in memory usage and
+ * computation.</li>
+ * <li>The core number of output data buffered in the channel. The channel buffer can be limited in
+ * order to avoid excessive memory consumption. In case the maximum number is reached when passing
+ * an output, the call will block until enough data are consumed or the specified delay elapses.
+ * </li>
+ * <li>The maximum delay to be applied to the calling thread when the buffered output data exceed
+ * the channel core limit.</li>
+ * <li>The maximum number of output data buffered in the channel. When the number of data exceeds
+ * it, a {@link com.github.dm.jrt.core.common.DeadlockException DeadlockException} will be thrown.
+ * </li>
+ * <li>The maximum timeout while waiting for a new output to be available before performing the
+ * specified action.</li>
+ * <li>The action to be taken when no output becomes available before the timeout elapses.</li>
+ * <li>The log instance to be used to trace the log messages.</li>
+ * <li>The log level to be used to filter the log messages.</li>
+ * </ul>
  * <p>
  * Created by davide-maestroni on 11/15/2014.
  */

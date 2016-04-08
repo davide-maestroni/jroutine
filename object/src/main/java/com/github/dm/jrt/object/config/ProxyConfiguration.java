@@ -29,14 +29,15 @@ import java.util.List;
 /**
  * Class storing the proxy configuration.
  * <p>
- * Each instance is immutable, thus, in order to modify a configuration parameter, a new builder
- * must be created starting from the specific configuration.
+ * Each instance is immutable, thus, in order to modify an existing configuration, a new builder
+ * must be created from it.
  * <p>
- * The configuration has a list of shared fields associated. Every method accessing a specific
- * set of fields is protected so that the related variables can be accessed in a thread safe way.
- * By default all fields are protected.
- * <br>
- * Note, however, that methods sharing the same fields cannot be executed in parallel.
+ * The configuration allows to set:
+ * <ul>
+ * <li>The set of fields which are shared by the target methods and need to be synchronized. By
+ * default the access to all the fields is protected. Note, however, that methods sharing the same
+ * fields will never be executed in parallel.</li>
+ * </ul>
  * <p>
  * Created by davide-maestroni on 04/20/2015.
  */

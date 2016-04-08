@@ -29,8 +29,17 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Class storing the service configuration.
  * <p>
- * Each instance is immutable, thus, in order to modify a configuration parameter, a new builder
- * must be created starting from the specific configuration instance.
+ * Each instance is immutable, thus, in order to modify an existing configuration, a new builder
+ * must be created from it.
+ * <p>
+ * The configuration allows to set:
+ * <ul>
+ * <li>The class of the runner to be employed to execute the invocation in the configured service.
+ * It must declare a default constructor to be correctly instantiated.</li>
+ * <li>The class of the logger to be employed by the invocations executed in the configured service.
+ * It must declare a default constructor to be correctly instantiated.</li>
+ * <li>The looper to employ to deliver the invocation result (by default the main thread one).</li>
+ * </ul>
  * <p>
  * Created by davide-maestroni on 04/20/2015.
  */

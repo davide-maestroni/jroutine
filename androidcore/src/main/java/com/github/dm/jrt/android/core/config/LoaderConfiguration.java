@@ -31,22 +31,24 @@ import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
 /**
  * Class storing the invocation loader configuration.
  * <p>
- * Each instance is immutable, thus, in order to modify a configuration parameter, a new builder
- * must be created starting from the specific configuration instance.
+ * Each instance is immutable, thus, in order to modify an existing configuration, a new builder
+ * must be created from it.
  * <p>
- * The configuration is used to set a specific loader ID to each invocation created by a routine, or
- * to override the factory {@code equals()} and {@code hashCode()} by specifying a factory ID.
- * <br>
- * Moreover, it is possible to set a specific type of resolution when two invocations clashes, that
- * is, they share the same loader ID, and to set a specific type of caching of the invocation
- * results.
- * <br>
- * In case a clash is resolved by joining the two invocations, it is possible to specify a maximum
- * time after which the results of the first invocation are considered to be stale, and thus the
- * invocation is repeated.
- * <br>
- * Finally, a specific looper, other than the main thread one, can be chosen to dispatch the results
- * coming from the invocations.
+ * The configuration allows to set:
+ * <ul>
+ * <li>The loader ID backing the routine invocation. If set to {@link #AUTO} (the default behavior)
+ * the invocation factory and the inputs {@code hashCode()} will be used to compute the ID.</li>
+ * <li>The factory ID which will override the factory {@code hashCode()} in the loader ID
+ * computation.</li>
+ * <li>The clash resolution to apply in case a loader with the same ID is running at the moment the
+ * routine is invoked.</li>
+ * <li>The clash resolution to apply in case a loader with the same ID and with the same inputs is
+ * running at the moment the routine is invoked.</li>
+ * <li>The cache strategy to adopt on the invocation results.</li>
+ * <li>The maximum time after which a cached result is considered to be stale and need to be
+ * refreshed.</li>
+ * <li>The looper to employ to deliver the invocation result (by default the main thread one).</li>
+ * </ul>
  * <p>
  * Created by davide-maestroni on 04/19/2015.
  */

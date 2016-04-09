@@ -16,23 +16,21 @@
 
 package com.github.dm.jrt.android.core.runner;
 
+import android.os.Handler;
 import android.os.Looper;
 
 /**
  * Implementation of a runner employing the main UI thread looper.
  * <p>
- * Note that, when the invocation runs in the main thread, the executions with a delay of 0 will be
- * performed synchronously, while the ones with a positive delay will be posted on the UI thread.
- * <p>
  * Created by davide-maestroni on 12/17/2014.
  */
-public class MainRunner extends LooperRunner {
+public class MainRunner extends HandlerRunner {
 
     /**
      * Constructor.
      */
     public MainRunner() {
 
-        super(Looper.getMainLooper());
+        super(new Handler(Looper.getMainLooper()));
     }
 }

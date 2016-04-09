@@ -50,10 +50,6 @@ public class AndroidRunners {
 
     /**
      * Returns a runner employing the specified handler thread.
-     * <p>
-     * Note that, when the invocation runs in the handler thread, the executions with a delay of 0
-     * will be performed synchronously, while the ones with a positive delay will be posted on the
-     * same thread.
      *
      * @param thread the thread.
      * @return the runner instance.
@@ -70,10 +66,6 @@ public class AndroidRunners {
 
     /**
      * Returns a runner employing the specified looper.
-     * <p>
-     * Note that, when the invocation runs in the looper thread, the executions with a delay of 0
-     * will be performed synchronously, while the ones with a positive delay will be posted on the
-     * same thread.
      *
      * @param looper the looper instance.
      * @return the runner instance.
@@ -81,15 +73,11 @@ public class AndroidRunners {
     @NotNull
     public static Runner looperRunner(@NotNull final Looper looper) {
 
-        return new LooperRunner(looper);
+        return new HandlerRunner(new Handler(looper));
     }
 
     /**
      * Returns the shared runner employing the main thread looper.
-     * <p>
-     * Note that, when the invocation runs in the main thread, the executions with a delay of 0 will
-     * be performed synchronously, while the ones with a positive delay will be posted on the main
-     * thread.
      *
      * @return the runner instance.
      */

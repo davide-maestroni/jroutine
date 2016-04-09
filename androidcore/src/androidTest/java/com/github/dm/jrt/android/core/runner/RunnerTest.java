@@ -151,7 +151,7 @@ public class RunnerTest extends AndroidTestCase {
 
         try {
 
-            new LooperRunner(null);
+            AndroidRunners.looperRunner(null);
 
             fail();
 
@@ -268,7 +268,7 @@ public class RunnerTest extends AndroidTestCase {
 
                     try {
 
-                        testRunner(new LooperRunner((Looper) objects.get(0)));
+                        testRunner(AndroidRunners.looperRunner((Looper) objects.get(0)));
                         testRunner((Runner) objects.get(1));
 
                         result.pass(true);

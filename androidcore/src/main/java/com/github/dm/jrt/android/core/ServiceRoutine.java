@@ -62,6 +62,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryOf;
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.fromFactory;
+import static com.github.dm.jrt.android.core.runner.AndroidRunners.looperRunner;
 import static com.github.dm.jrt.android.core.service.InvocationService.getAbortError;
 import static com.github.dm.jrt.android.core.service.InvocationService.getValue;
 import static com.github.dm.jrt.android.core.service.InvocationService.putAsyncInvocation;
@@ -69,6 +70,7 @@ import static com.github.dm.jrt.android.core.service.InvocationService.putError;
 import static com.github.dm.jrt.android.core.service.InvocationService.putInvocationId;
 import static com.github.dm.jrt.android.core.service.InvocationService.putParallelInvocation;
 import static com.github.dm.jrt.android.core.service.InvocationService.putValue;
+import static com.github.dm.jrt.core.runner.Runners.zeroDelayRunner;
 import static java.util.UUID.randomUUID;
 
 /**
@@ -256,7 +258,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
                     invocationConfiguration.getReadTimeoutActionOr(null);
             mOutput = JRoutineCore.io()
                                   .getChannelConfiguration()
-                                  .withRunner(AndroidRunners.looperRunner(looper))
+                                  .withRunner(zeroDelayRunner(looperRunner(looper)))
                                   .withChannelLimit(outputLimit)
                                   .withChannelMaxDelay(outputMaxDelay)
                                   .withChannelMaxSize(outputMaxSize)

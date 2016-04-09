@@ -34,7 +34,6 @@ import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.InvocationClashException;
 import com.github.dm.jrt.android.core.invocation.InvocationTypeException;
 import com.github.dm.jrt.android.core.invocation.StaleResultException;
-import com.github.dm.jrt.android.core.runner.AndroidRunners;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
@@ -57,6 +56,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.fromFactory;
+import static com.github.dm.jrt.android.core.runner.AndroidRunners.looperRunner;
 
 /**
  * Invocation implementation employing loaders to perform background operations.
@@ -681,7 +681,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
             if ((looper != null) && (looper != Looper.getMainLooper())) {
                 return JRoutineCore.on(PassingInvocation.<OUT>factoryOf())
                                    .getInvocationConfiguration()
-                                   .withRunner(AndroidRunners.looperRunner(looper))
+                                   .withRunner(looperRunner(looper))
                                    .withLog(logger.getLog())
                                    .withLogLevel(logger.getLogLevel())
                                    .setConfiguration()

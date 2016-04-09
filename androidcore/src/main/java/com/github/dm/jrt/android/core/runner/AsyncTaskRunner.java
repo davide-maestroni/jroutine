@@ -23,6 +23,7 @@ import android.os.Build.VERSION_CODES;
 import android.os.Looper;
 
 import com.github.dm.jrt.core.runner.Execution;
+import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
@@ -40,9 +41,11 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * Created by davide-maestroni on 09/28/2014.
  */
-class AsyncTaskRunner extends MainRunner {
+class AsyncTaskRunner implements Runner {
 
     private static final Void[] NO_PARAMS = new Void[0];
+
+    private static final MainRunner sMainRunner = new MainRunner();
 
     private final Executor mExecutor;
 
@@ -64,27 +67,24 @@ class AsyncTaskRunner extends MainRunner {
         mExecutor = executor;
     }
 
-    @Override
     public void cancel(@NotNull final Execution execution) {
 
         synchronized (mTasks) {
             final WeakHashMap<ExecutionTask, Void> executionTasks = mTasks.remove(execution);
             if (executionTasks != null) {
                 for (final ExecutionTask task : executionTasks.keySet()) {
-                    super.cancel(task);
+                    sMainRunner.cancel(task);
                     task.cancel(false);
                 }
             }
         }
     }
 
-    @Override
     public boolean isExecutionThread() {
 
         return mThreads.containsKey(Thread.currentThread());
     }
 
-    @Override
     public void run(@NotNull final Execution execution, final long delay,
             @NotNull final TimeUnit timeUnit) {
 
@@ -100,8 +100,8 @@ class AsyncTaskRunner extends MainRunner {
             executionTasks.put(task, null);
         }
 
-        // The super method is called to ensure that a task is always started from the main thread
-        super.run(task, delay, timeUnit);
+        // We need to ensure that a task is always started from the main thread
+        sMainRunner.run(task, delay, timeUnit);
     }
 
     /**

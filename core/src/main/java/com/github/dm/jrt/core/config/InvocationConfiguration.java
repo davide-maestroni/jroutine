@@ -60,7 +60,7 @@ import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
  * <li>The maximum delay to be applied to the calling thread when the buffered input data exceed the
  * channel core limit.</li>
  * <li>The maximum number of input data buffered in the channel. When the number of data exceeds it,
- * a {@link com.github.dm.jrt.core.common.DeadlockException DeadlockException} will be thrown.</li>
+ * a {@link com.github.dm.jrt.core.error.DeadlockException DeadlockException} will be thrown.</li>
  * <li>The order in which data are dispatched through the output channel. The order of input data is
  * not guaranteed. Nevertheless, it is possible to force data to be delivered in the same order as
  * they are passed to the channels, at the cost of a slightly increase in memory usage and
@@ -72,7 +72,7 @@ import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
  * <li>The maximum delay to be applied to the calling thread when the buffered output data exceed
  * the channel core limit.</li>
  * <li>The maximum number of output data buffered in the channel. When the number of data exceeds
- * it, a {@link com.github.dm.jrt.core.common.DeadlockException DeadlockException} will be thrown.
+ * it, a {@link com.github.dm.jrt.core.error.DeadlockException DeadlockException} will be thrown.
  * </li>
  * <li>The maximum timeout while waiting for a new output to be available before performing the
  * specified action.</li>

@@ -20,9 +20,9 @@ import android.content.Context;
 
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
-import com.github.dm.jrt.core.util.AutoComparable;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.core.util.ParameterizedObject;
 import com.github.dm.jrt.core.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
@@ -42,7 +42,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public abstract class ContextInvocationFactory<IN, OUT> extends AutoComparable {
+public abstract class ContextInvocationFactory<IN, OUT> extends ParameterizedObject {
 
     /**
      * Constructor.

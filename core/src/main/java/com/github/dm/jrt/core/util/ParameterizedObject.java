@@ -21,14 +21,14 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 
 /**
- * Base abstract class providing a default implementation of @code equals()}, {@code hashCode()} and
- * {@code toString()} based on the list of objects passed as the constructor arguments.
+ * Base abstract class providing a default implementation of {@code equals()}, {@code hashCode()}
+ * and {@code toString()} based on the list of objects passed as the constructor arguments.
  * <br>
  * Note that the inheriting class and the argument instances are expected to be immutable.
  * <p>
  * Created by davide-maestroni on 03/31/2016.
  */
-public abstract class AutoComparable {
+public abstract class ParameterizedObject {
 
     private final Object[] mArgs;
 
@@ -37,7 +37,7 @@ public abstract class AutoComparable {
      *
      * @param args the constructor arguments.
      */
-    protected AutoComparable(@Nullable final Object[] args) {
+    protected ParameterizedObject(@Nullable final Object[] args) {
 
         mArgs = (args != null) ? args.clone() : Reflection.NO_ARGS;
     }
@@ -48,7 +48,7 @@ public abstract class AutoComparable {
      * Forces the inheriting classes to explicitly pass the arguments.
      */
     @SuppressWarnings("unused")
-    private AutoComparable() {
+    private ParameterizedObject() {
 
         this(null);
     }
@@ -70,7 +70,7 @@ public abstract class AutoComparable {
             return false;
         }
 
-        final AutoComparable that = (AutoComparable) o;
+        final ParameterizedObject that = (ParameterizedObject) o;
         return Arrays.deepEquals(mArgs, that.mArgs);
     }
 

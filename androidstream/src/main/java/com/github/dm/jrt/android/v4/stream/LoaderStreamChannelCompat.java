@@ -23,9 +23,9 @@ import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyTy
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.channel.ResultChannel;
-import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
+import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;

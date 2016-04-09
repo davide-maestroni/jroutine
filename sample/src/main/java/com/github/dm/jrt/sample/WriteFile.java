@@ -20,7 +20,7 @@ import com.github.dm.jrt.channel.ByteChannel;
 import com.github.dm.jrt.channel.ByteChannel.BufferInputStream;
 import com.github.dm.jrt.channel.ByteChannel.ByteBuffer;
 import com.github.dm.jrt.core.channel.ResultChannel;
-import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 
 import org.jetbrains.annotations.NotNull;

@@ -17,7 +17,7 @@
 package com.github.dm.jrt.core.invocation;
 
 import com.github.dm.jrt.core.channel.ResultChannel;
-import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.error.RoutineException;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -31,25 +31,25 @@ import org.jetbrains.annotations.NotNull;
  *                       &lt;init&gt;
  *
  *        ---------------      |     |
- *       |               |     |     |--------------------------------
- *       |               V     V     |                                |
- *       |             -----------------                              |
- *       |    ---------| onInitialize()|---------------               |
- *       |   |         -----------------               |              |
- *       |   |    -------      |                       |              |
- *       |   |   |       |     |                       |              |
+ *       |               |     |      --(*)---------------------------
+ *       |               V     V                  |                   |
+ *       |             -----------------          |                   |
+ *       |    ---------| onInitialize()|---(*)----                    |
+ *       |   |         -----------------                              |
+ *       |   |    -------      |     |                                |
+ *       |   |   |       |     |      -----------------               |
  *       |   |   |       V     V                       |              |
  *       |   |   |     -----------------               |              |
  *       |   |    -----|   onInput()   |---------      |              |
  *       |   |         -----------------   |     V     V              |
  *       |    -----------      |           |   -----------------      |
  *       |               |     |           |   |   onAbort()   |      |
- *       |               V     V           |   -----------------      |
+ *       |               V     V          (*)  -----------------      |
  *       |             -----------------   |       |       |          |
  *       |             |   onResult()  |---        |       |          |
- *       |             -----------------           |       |          |
+ *       |             -----------------           |      (*)         |
  *       |                     |      -------------        |          |
- *       |                     |     |                (* exception is thrown)
+ *       |                     |     |                     |          |
  *       |                     V     V                     |          |
  *       |             ------------------                  |          |
  *        -------------|  onTerminate() |                  |          |
@@ -60,6 +60,9 @@ import org.jetbrains.annotations.NotNull;
  *                     ------------------
  *                     |   onDestroy()  |
  *                     ------------------
+ *
+ *
+ *      (*) if exception is thrown
  *     </code>
  * </pre>
  * The routine invocation interface is designed so to allow recycling of instantiated objects.
@@ -94,7 +97,7 @@ import org.jetbrains.annotations.NotNull;
  * might return one or more output for each input, or no output at all.
  * <p>
  * Any exception escaping the invocation methods, unless it extends the base
- * {@link com.github.dm.jrt.core.common.RoutineException RoutineException}, will be wrapped as the
+ * {@link com.github.dm.jrt.core.error.RoutineException RoutineException}, will be wrapped as the
  * cause of an {@link com.github.dm.jrt.core.invocation.InvocationException InvocationException}
  * instance.
  * <p>

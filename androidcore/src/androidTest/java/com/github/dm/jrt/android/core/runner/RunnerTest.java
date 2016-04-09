@@ -16,6 +16,7 @@
 
 package com.github.dm.jrt.android.core.runner;
 
+import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.test.AndroidTestCase;
@@ -24,6 +25,8 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.invocation.CallInvocation;
+import com.github.dm.jrt.core.invocation.CommandInvocation;
+import com.github.dm.jrt.core.invocation.FilterInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
@@ -31,7 +34,6 @@ import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.RunnerDecorator;
-import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.TimeDuration;
 
 import org.jetbrains.annotations.NotNull;
@@ -149,7 +151,7 @@ public class RunnerTest extends AndroidTestCase {
 
         try {
 
-            new LooperRunner(null, null);
+            new LooperRunner(null);
 
             fail();
 
@@ -158,11 +160,28 @@ public class RunnerTest extends AndroidTestCase {
         }
     }
 
-    @SuppressWarnings("ConstantConditions")
-    public void testLooperRunner() throws InterruptedException {
+    public void testHandlerRunner() throws InterruptedException {
 
-        testRunner(new LooperRunner(Looper.myLooper(), Runners.syncRunner()));
-        testRunner(AndroidRunners.myRunner());
+        final CommandInvocation<Handler> invocation = new CommandInvocation<Handler>(null) {
+
+            public void onResult(@NotNull final ResultChannel<Handler> result) {
+
+                result.pass(new Handler());
+            }
+        };
+        final OutputChannel<Handler> channel = JRoutineCore.on(factoryOf(invocation, this, null))
+                                                           .getInvocationConfiguration()
+                                                           .withRunner(AndroidRunners.handlerRunner(
+                                                                   new HandlerThread("test")))
+                                                           .setConfiguration()
+                                                           .asyncCall();
+        assertThat(JRoutineCore.on(new HandlerInvocationFactory())
+                               .asyncCall(channel)
+                               .afterMax(seconds(30))
+                               .next()).isEqualTo(true);
+    }
+
+    public void testLooperRunner() {
 
         final TemplateInvocation<Object, Object> invocation =
                 new TemplateInvocation<Object, Object>() {
@@ -192,9 +211,6 @@ public class RunnerTest extends AndroidTestCase {
         testRunner(new MainRunner());
         testRunner(AndroidRunners.looperRunner(Looper.getMainLooper()));
         testRunner(new RunnerDecorator(AndroidRunners.looperRunner(Looper.getMainLooper())));
-        testRunner(AndroidRunners.looperRunner(Looper.getMainLooper(), Runners.syncRunner()));
-        testRunner(new RunnerDecorator(
-                AndroidRunners.looperRunner(Looper.getMainLooper(), Runners.syncRunner())));
     }
 
     public void testTaskRunner() throws InterruptedException {
@@ -209,6 +225,25 @@ public class RunnerTest extends AndroidTestCase {
     public void testThreadRunner() throws InterruptedException {
 
         testRunner(AndroidRunners.handlerRunner(new HandlerThread("test")));
+    }
+
+    private static class HandlerInvocationFactory extends FilterInvocation<Handler, Object> {
+
+        /**
+         * Constructor.
+         */
+        protected HandlerInvocationFactory() {
+
+            super(null);
+        }
+
+        public void onInput(final Handler input, @NotNull final ResultChannel<Object> result) throws
+                Exception {
+
+            testRunner(new HandlerRunner(input));
+            testRunner(AndroidRunners.handlerRunner(input));
+            result.pass(true);
+        }
     }
 
     private static class LooperInvocationFactory extends InvocationFactory<Object, Object> {
@@ -233,7 +268,7 @@ public class RunnerTest extends AndroidTestCase {
 
                     try {
 
-                        testRunner(new LooperRunner((Looper) objects.get(0), null));
+                        testRunner(new LooperRunner((Looper) objects.get(0)));
                         testRunner((Runner) objects.get(1));
 
                         result.pass(true);

@@ -14,41 +14,24 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.core.common;
+package com.github.dm.jrt.core.error;
 
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Common base exception class.
+ * Exception indicating that a timeout occurred.
  * <p>
- * Created by davide-maestroni on 01/23/2015.
+ * Created by davide-maestroni on 11/25/2014.
  */
-public class RoutineException extends RuntimeException {
-
-    /**
-     * Constructor.
-     */
-    public RoutineException() {
-
-    }
+public class TimeoutException extends RoutineException {
 
     /**
      * Constructor.
      *
      * @param message the error message.
      */
-    public RoutineException(@Nullable final String message) {
+    public TimeoutException(@Nullable final String message) {
 
         super(message);
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param cause the error cause.
-     */
-    public RoutineException(@Nullable final Throwable cause) {
-
-        super(cause);
     }
 }

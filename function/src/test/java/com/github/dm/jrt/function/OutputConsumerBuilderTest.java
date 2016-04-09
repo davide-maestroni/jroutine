@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.function;
 
-import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.error.RoutineException;
 
 import org.junit.Test;
 

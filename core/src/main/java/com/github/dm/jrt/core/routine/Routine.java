@@ -58,7 +58,7 @@ import org.jetbrains.annotations.Nullable;
  * are employed. Additionally, to prevent deadlock or starvation issues, it is encouraged the use of
  * finite timeouts when performing blocking calls.
  * <p>
- * The routine object provides three different ways to be invoked:
+ * The routine object provides four different ways to be invoked:
  * <p>
  * <b>Synchronous invocation</b><br>
  * The routine starts an invocation employing a synchronous runner. The result is similar to a
@@ -80,9 +80,10 @@ import org.jetbrains.annotations.Nullable;
  * meaningful results only for routines which takes a single input parameter and computes the
  * relative output results.
  * <p>
- * <b>serial invocation</b><br>
- * The serial invocation behaves exactly in the same way as the parallel one, with the exception
- * that the routine is invoked synchronously for each input instead of asynchronously.
+ * <b>Serial invocation</b><br>
+ * The serial invocation behaves exactly in the same way as the parallel one, that is, a new
+ * invocation is issued for each input, with the exception that the routine is synchronously
+ * invoked, thus effectively serializing the data processing.
  * <p>
  * It is worth noting how the library has been designed only through interfaces, so that, as far as
  * the implementation honors the specific contracts, it is possible to seamlessly combine different

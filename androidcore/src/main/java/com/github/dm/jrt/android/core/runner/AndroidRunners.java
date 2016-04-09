@@ -16,12 +16,11 @@
 
 package com.github.dm.jrt.android.core.runner;
 
+import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 
 import com.github.dm.jrt.core.runner.Runner;
-import com.github.dm.jrt.core.runner.Runners;
-import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -38,7 +37,23 @@ public class AndroidRunners {
     private static final Runner sMainRunner = new MainRunner();
 
     /**
+     * Returns a runner employing the specified handler.
+     *
+     * @param handler the handler.
+     * @return the runner instance.
+     */
+    @NotNull
+    public static Runner handlerRunner(@NotNull final Handler handler) {
+
+        return new HandlerRunner(handler);
+    }
+
+    /**
      * Returns a runner employing the specified handler thread.
+     * <p>
+     * Note that, when the invocation runs in the handler thread, the executions with a delay of 0
+     * will be performed synchronously, while the ones with a positive delay will be posted on the
+     * same thread.
      *
      * @param thread the thread.
      * @return the runner instance.
@@ -50,7 +65,7 @@ public class AndroidRunners {
             thread.start();
         }
 
-        return looperRunner(thread.getLooper(), Runners.syncRunner());
+        return looperRunner(thread.getLooper());
     }
 
     /**
@@ -67,25 +82,6 @@ public class AndroidRunners {
     public static Runner looperRunner(@NotNull final Looper looper) {
 
         return new LooperRunner(looper);
-    }
-
-    /**
-     * Returns a runner employing the specified looper.
-     * <p>
-     * Note that, based on the choice of the runner to be used when the invocation runs in the
-     * looper thread, waiting for results in the very same thread may result in a deadlock
-     * exception.
-     *
-     * @param looper           the looper instance.
-     * @param sameThreadRunner the runner to be used when the specified looper is called on its own
-     *                         thread. If null, the invocation will be posted on the same looper.
-     * @return the runner instance.
-     */
-    @NotNull
-    public static Runner looperRunner(@NotNull final Looper looper,
-            @Nullable final Runner sameThreadRunner) {
-
-        return new LooperRunner(looper, sameThreadRunner);
     }
 
     /**
@@ -109,10 +105,10 @@ public class AndroidRunners {
      * @return the runner instance.
      */
     @NotNull
+    @SuppressWarnings("ConstantConditions")
     public static Runner myRunner() {
 
-        return looperRunner(ConstantConditions.notNull("thread looper", Looper.myLooper()),
-                Runners.syncRunner());
+        return looperRunner(Looper.myLooper());
     }
 
     /**

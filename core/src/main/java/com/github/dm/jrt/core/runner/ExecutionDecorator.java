@@ -14,34 +14,33 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.core.common;
+package com.github.dm.jrt.core.runner;
 
-import org.junit.Test;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.jetbrains.annotations.NotNull;
 
 /**
- * Exception unit tests.
+ * Execution decorator implementation.
  * <p>
- * Created by davide-maestroni on 01/30/2016.
+ * Created by davide-maestroni on 04/09/2016.
  */
-public class ExceptionTest {
+public class ExecutionDecorator implements Execution {
 
-    @Test
-    public void testDeadlockException() {
+    private final Execution mExecution;
 
-        assertThat(new DeadlockException("")).hasNoCause();
+    /**
+     * Constructor.
+     *
+     * @param wrapped the wrapped instance.
+     */
+    public ExecutionDecorator(@NotNull final Execution wrapped) {
+
+        mExecution = ConstantConditions.notNull("execution instance", wrapped);
     }
 
-    @Test
-    public void testRoutineException() {
+    public void run() {
 
-        assertThat(new RoutineException()).hasNoCause();
-    }
-
-    @Test
-    public void testTimeoutException() {
-
-        assertThat(new TimeoutException("")).hasNoCause();
+        mExecution.run();
     }
 }

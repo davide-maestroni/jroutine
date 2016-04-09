@@ -24,7 +24,7 @@ import com.github.dm.jrt.android.core.runner.AndroidRunners;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.TemplateOutputConsumer;
-import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.Execution;

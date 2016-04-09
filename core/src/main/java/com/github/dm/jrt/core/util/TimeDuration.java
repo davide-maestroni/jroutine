@@ -294,8 +294,6 @@ public class TimeDuration extends Time {
      * Returns a new instance whose time value is decremented by the specified one.
      * <p>
      * Note that the unit of the returned time will match the one with the highest precision.
-     * <br>
-     * Note also that, if the resulting time is negative, the value will be clipped to 0.
      *
      * @param time the time to subtract.
      * @return the time duration instance.
@@ -305,10 +303,13 @@ public class TimeDuration extends Time {
     public TimeDuration minus(@NotNull final Time time) {
 
         if (unit.compareTo(time.unit) > 0) {
-            return fromUnit(Math.max(0, time.unit.convert(this.time, unit) - time.time), time.unit);
+            final long newTime = time.unit.convert(this.time, unit) - time.time;
+            return (newTime >= 0) ? fromUnit(newTime, time.unit)
+                    : fromUnit(newTime - Long.MIN_VALUE, time.unit);
         }
 
-        return fromUnit(Math.max(0, this.time - unit.convert(time.time, time.unit)), unit);
+        final long newTime = this.time - unit.convert(time.time, time.unit);
+        return (newTime >= 0) ? fromUnit(newTime, unit) : fromUnit(newTime - Long.MIN_VALUE, unit);
     }
 
     /**
@@ -339,8 +340,6 @@ public class TimeDuration extends Time {
      * Returns a new instance whose time value is incremented by the specified one.
      * <p>
      * Note that the unit of the returned time will match the one with the highest precision.
-     * <br>
-     * Note also that, if the resulting time is negative, the value will be clipped to 0.
      *
      * @param time the time to add.
      * @return the time duration instance.
@@ -350,10 +349,13 @@ public class TimeDuration extends Time {
     public TimeDuration plus(@NotNull final Time time) {
 
         if (unit.compareTo(time.unit) > 0) {
-            return fromUnit(Math.max(0, time.unit.convert(this.time, unit) + time.time), time.unit);
+            final long newTime = time.unit.convert(this.time, unit) + time.time;
+            return (newTime >= 0) ? fromUnit(newTime, time.unit)
+                    : fromUnit(newTime - Long.MIN_VALUE, time.unit);
         }
 
-        return fromUnit(Math.max(0, this.time + unit.convert(time.time, time.unit)), unit);
+        final long newTime = this.time + unit.convert(time.time, time.unit);
+        return (newTime >= 0) ? fromUnit(newTime, unit) : fromUnit(newTime - Long.MIN_VALUE, unit);
     }
 
     /**
@@ -401,7 +403,7 @@ public class TimeDuration extends Time {
 
     /**
      * Performs a {@link java.lang.Thread#sleep(long, int)} using this duration as timeout, ensuring
-     * that the sleep time is respected even if spurious wake ups happen in the while.
+     * that the sleep time is respected even if spurious wake-ups happen in the while.
      *
      * @throws java.lang.InterruptedException if the current thread is interrupted.
      */

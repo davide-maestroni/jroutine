@@ -14,27 +14,34 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.core.invocation;
+package com.github.dm.jrt.core.error;
 
-import com.github.dm.jrt.core.error.DeadlockException;
+import org.junit.Test;
 
-import org.jetbrains.annotations.Nullable;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Exception indicating a possible deadlock while waiting for an invocation instance to become
- * available.
+ * Exception unit tests.
  * <p>
- * Created by davide-maestroni on 07/19/2015.
+ * Created by davide-maestroni on 01/30/2016.
  */
-public class InvocationDeadlockException extends DeadlockException {
+public class ExceptionTest {
 
-    /**
-     * Constructor.
-     *
-     * @param message the error message.
-     */
-    public InvocationDeadlockException(@Nullable final String message) {
+    @Test
+    public void testDeadlockException() {
 
-        super(message);
+        assertThat(new DeadlockException("")).hasNoCause();
+    }
+
+    @Test
+    public void testRoutineException() {
+
+        assertThat(new com.github.dm.jrt.core.error.RoutineException()).hasNoCause();
+    }
+
+    @Test
+    public void testTimeoutException() {
+
+        assertThat(new com.github.dm.jrt.core.error.TimeoutException("")).hasNoCause();
     }
 }

@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * Created by davide-maestroni on 09/09/2014.
  */
-public class Time {
+public class Time implements Comparable<Time> {
 
     /**
      * The number of hours in a day.
@@ -227,6 +227,24 @@ public class Time {
     public static Time seconds(final long seconds) {
 
         return new Time(seconds, TimeUnit.SECONDS);
+    }
+
+    private static int compareLong(final long l1, final long l2) {
+
+        return (l1 < l2) ? -1 : ((l1 == l2) ? 0 : 1);
+    }
+
+    public int compareTo(@NotNull final Time o) {
+
+        if (unit.compareTo(o.unit) > 0) {
+            final int coarseComparison = compareLong(time, unit.convert(o.time, o.unit));
+            return (coarseComparison != 0) ? coarseComparison
+                    : compareLong(o.unit.convert(time, unit), o.time);
+        }
+
+        final int coarseComparison = compareLong(o.unit.convert(time, unit), o.time);
+        return (coarseComparison != 0) ? coarseComparison
+                : compareLong(time, unit.convert(o.time, o.unit));
     }
 
     /**

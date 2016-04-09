@@ -17,7 +17,7 @@
 package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.core.channel.ResultChannel;
-import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
 import com.github.dm.jrt.core.invocation.FilterInvocation;

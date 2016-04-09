@@ -32,9 +32,9 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
-import com.github.dm.jrt.core.common.RoutineException;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
+import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
@@ -816,9 +816,9 @@ public class InvocationService extends Service {
         /**
          * Binds the specified consumer to the output channel.
          *
-         * @throws com.github.dm.jrt.core.common.RoutineException if the execution has been aborted.
-         * @throws java.lang.IllegalStateException                if the channel is already closed
-         *                                                        or already bound to a consumer.
+         * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
+         * @throws java.lang.IllegalStateException               if the channel is already closed
+         *                                                       or already bound to a consumer.
          */
         void bind(@NotNull final OutputConsumer<Object> consumer) {
 
@@ -837,8 +837,8 @@ public class InvocationService extends Service {
          * Passes the specified input to the invocation channel.
          *
          * @param input the input.
-         * @throws com.github.dm.jrt.core.common.RoutineException if the execution has been aborted.
-         * @throws java.lang.IllegalStateException                if the channel is already closed.
+         * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
+         * @throws java.lang.IllegalStateException               if the channel is already closed.
          */
         void pass(@Nullable final Object input) {
 

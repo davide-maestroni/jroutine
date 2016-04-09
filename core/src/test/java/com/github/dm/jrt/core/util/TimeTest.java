@@ -73,6 +73,17 @@ public class TimeTest {
     }
 
     @Test
+    public void testCompare() {
+
+        assertThat(Time.millis(0).compareTo(Time.seconds(0))).isEqualTo(0);
+        assertThat(Time.millis(0).compareTo(Time.seconds(-1))).isEqualTo(1);
+        assertThat(Time.millis(-1).compareTo(Time.seconds(0))).isEqualTo(-1);
+        assertThat(Time.days(0).compareTo(Time.seconds(0))).isEqualTo(0);
+        assertThat(Time.days(0).compareTo(Time.seconds(-1))).isEqualTo(1);
+        assertThat(Time.days(-1).compareTo(Time.seconds(0))).isEqualTo(-1);
+    }
+
+    @Test
     public void testConstants() {
 
         assertThat(Time.SECONDS_IN_MINUTE).isEqualTo(60);

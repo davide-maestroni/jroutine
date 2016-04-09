@@ -29,6 +29,7 @@ import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static com.github.dm.jrt.core.util.Time.current;
 import static com.github.dm.jrt.core.util.TimeDuration.ZERO;
@@ -241,7 +242,6 @@ public class RunnerTest {
     }
 
     @Test
-    @SuppressWarnings("ConstantConditions")
     public void testThrottlingRunnerCancel() throws InterruptedException {
 
         final TestExecution execution = new TestExecution();
@@ -348,6 +348,78 @@ public class RunnerTest {
         }
     }
 
+    @Test
+    public void testZeroDelayRunner() throws InterruptedException {
+
+        testRunner(new ZeroDelayRunner(Runners.sharedRunner()));
+        testRunner(Runners.zeroDelayRunner(Runners.poolRunner()));
+        testRunner(new RunnerDecorator(new ZeroDelayRunner(Runners.sharedRunner())));
+    }
+
+    @Test
+    public void testZeroDelayRunnerCancel() throws InterruptedException {
+
+        final AtomicReference<Runner> runner = new AtomicReference<Runner>();
+        runner.set(Runners.zeroDelayRunner(Runners.syncRunner()));
+        final Execution execution = new Execution() {
+
+            private boolean mIsFirst = true;
+
+            public void run() {
+
+                if (mIsFirst) {
+                    mIsFirst = false;
+                    runner.get().run(this, 0, TimeUnit.MILLISECONDS);
+                    runner.get().cancel(this);
+
+                } else {
+                    throw new IllegalStateException();
+                }
+            }
+        };
+        runner.get().run(execution, 0, TimeUnit.MILLISECONDS);
+
+        final TestExecution testExecution = new TestExecution() {
+
+            private boolean mIsFirst = true;
+
+            public void run() {
+
+                if (mIsFirst) {
+                    mIsFirst = false;
+                    runner.get().run(this, 0, TimeUnit.MILLISECONDS);
+                    Runners.syncRunner().cancel(this);
+
+                } else {
+                    super.run();
+                }
+            }
+        };
+        runner.get().run(testExecution, 0, TimeUnit.MILLISECONDS);
+        assertThat(testExecution.isRun()).isTrue();
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testZeroDelayRunnerError() {
+
+        try {
+            new ZeroDelayRunner(null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+            Runners.zeroDelayRunner(null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
     private void testRunner(final Runner runner) throws InterruptedException {
 
         final Random random = new Random(System.currentTimeMillis());
@@ -439,11 +511,6 @@ public class RunnerTest {
 
         private boolean mIsRun;
 
-        public void run() {
-
-            mIsRun = true;
-        }
-
         private boolean isRun() {
 
             return mIsRun;
@@ -452,7 +519,14 @@ public class RunnerTest {
         private void reset() {
 
             mIsRun = false;
+        }        public void run() {
+
+            mIsRun = true;
         }
+
+
+
+
     }
 
     private static class TestRecursiveExecution extends TestRunExecution {

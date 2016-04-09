@@ -21,7 +21,7 @@ import android.util.SparseArray;
 import com.github.dm.jrt.channel.Selectable;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
-import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.error.RoutineException;
 
 import org.jetbrains.annotations.NotNull;
 

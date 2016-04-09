@@ -160,4 +160,17 @@ public class Runners {
 
         return new ThrottlingRunner(wrapped, maxExecutions);
     }
+
+    /**
+     * Returns a runner employing a shared synchronous runner, when executions are enqueued with a 0
+     * delay on one of the managed threads.
+     *
+     * @param wrapped the wrapped instance.
+     * @return the runner instance.
+     */
+    @NotNull
+    public static Runner zeroDelayRunner(@NotNull final Runner wrapped) {
+
+        return new ZeroDelayRunner(wrapped);
+    }
 }

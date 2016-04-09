@@ -33,8 +33,8 @@ import java.util.Locale;
  * <p>
  * A standard format is applied to the log messages.
  * <br>
- * The inheriting class may just implement the writing of the formatted message, or customize it
- * at any level.
+ * The inheriting class may just implement the writing of the formatted message, or customize its
+ * composition.
  * <p>
  * Created by davide-maestroni on 10/03/2014.
  */

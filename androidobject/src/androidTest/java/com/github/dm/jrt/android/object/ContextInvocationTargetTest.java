@@ -25,7 +25,7 @@ import android.os.Parcelable;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.object.builder.FactoryContext;
-import com.github.dm.jrt.core.common.RoutineException;
+import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.object.InvocationTarget;
 
 import org.jetbrains.annotations.NotNull;

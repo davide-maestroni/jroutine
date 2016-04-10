@@ -73,9 +73,7 @@ Project.metaClass.conditionalDependencies = { Closure closure ->
 afterEvaluate { project ->
 
     def artifactPackaging = 'jar'
-
     if (isJavaProject(project)) {
-
         if (project.plugins.hasPlugin('jacoco')) {
             project.task('jacocoTest', dependsOn: 'test') {
                 description = 'Runs the tests and generates the JaCoCo report files.'
@@ -120,9 +118,7 @@ afterEvaluate { project ->
     }
 
     if (isAndroidProject(project)) {
-
         artifactPackaging = 'aar'
-
         if (project.plugins.hasPlugin('jacoco')) {
             project.task('jacocoTest', dependsOn: 'connectedCheck') {
                 description = 'Runs the tests and generates the JaCoCo report files.'
@@ -143,7 +139,6 @@ afterEvaluate { project ->
         variants.all { variant ->
 
             def buildTypeName = variant.buildType.name
-
             if (buildTypeName.equals("debug")) {
                 if (project.plugins.hasPlugin('findbugs')) {
                     project.task('findbugsMain', type: FindBugs, dependsOn: "assemble${buildTypeName.capitalize()}") {
@@ -167,7 +162,6 @@ afterEvaluate { project ->
 
             def variantName = variant.name.capitalize()
             addJavadocTask(project, variant, "javadoc${variantName}")
-
             if (variantName.equalsIgnoreCase('release')) {
                 addJavadocTask(project, variant, 'javadoc')
             }
@@ -200,7 +194,6 @@ afterEvaluate { project ->
 
     if (project.hasProperty('uploadEnabled') && project.hasProperty('repoUser')
             && project.hasProperty('repoName')) {
-
         signing {
             sign configurations.archives
         }
@@ -208,13 +201,11 @@ afterEvaluate { project ->
         def repoUser = project.getProperty('repoUser')
         def repoName = project.getProperty('repoName')
         def repoDescription = ""
-
         if (project.hasProperty('repoDescription')) {
             repoDescription = project.getProperty('repoDescription')
         }
 
         def userName = ""
-
         if (project.hasProperty('userName')) {
             userName = project.getProperty('userName')
         }
@@ -225,9 +216,7 @@ afterEvaluate { project ->
                     beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
                     def localRepoUrl = mavenLocal().url.toString()
-
                     if (file(localRepoUrl).exists()) {
-
                         // Upload the artifacts to the local repository
                         repository(url: localRepoUrl)
                     }
@@ -299,7 +288,6 @@ def getAndroidVariants(project) {
 def addJavadocTask(project, variant, taskName) {
 
     def variantName = variant.name.capitalize()
-
     project.task(taskName, type: Javadoc, dependsOn: "assemble${variantName}") {
         description "Generates Javadoc from the ${variantName} build"
         source = variant.javaCompile.source

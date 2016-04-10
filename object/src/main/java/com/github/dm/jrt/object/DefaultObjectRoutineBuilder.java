@@ -28,9 +28,9 @@ import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.Reflection;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
-import com.github.dm.jrt.object.Builders.MethodInfo;
 import com.github.dm.jrt.object.annotation.AsyncIn.InputMode;
 import com.github.dm.jrt.object.annotation.AsyncOut.OutputMode;
+import com.github.dm.jrt.object.builder.Builders.MethodInfo;
 import com.github.dm.jrt.object.builder.ObjectRoutineBuilder;
 import com.github.dm.jrt.object.common.Mutex;
 import com.github.dm.jrt.object.config.ProxyConfiguration;
@@ -46,12 +46,12 @@ import java.util.HashMap;
 import java.util.List;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
-import static com.github.dm.jrt.object.Builders.callFromInvocation;
-import static com.github.dm.jrt.object.Builders.getAnnotatedMethod;
-import static com.github.dm.jrt.object.Builders.getSharedMutex;
-import static com.github.dm.jrt.object.Builders.getTargetMethodInfo;
-import static com.github.dm.jrt.object.Builders.invokeRoutine;
-import static com.github.dm.jrt.object.Builders.withAnnotations;
+import static com.github.dm.jrt.object.builder.Builders.callFromInvocation;
+import static com.github.dm.jrt.object.builder.Builders.getAnnotatedMethod;
+import static com.github.dm.jrt.object.builder.Builders.getSharedMutex;
+import static com.github.dm.jrt.object.builder.Builders.getTargetMethodInfo;
+import static com.github.dm.jrt.object.builder.Builders.invokeRoutine;
+import static com.github.dm.jrt.object.builder.Builders.withAnnotations;
 
 /**
  * Class implementing a builder of routines wrapping an object methods.

@@ -42,7 +42,7 @@
 
             super.onContext(context);
             final com.github.dm.jrt.object.InvocationTarget<?> target = mContextTarget.getInvocationTarget(context);
-            mMutex = com.github.dm.jrt.object.Builders.getSharedMutex(${mutexTarget}, mSharedFields);
+            mMutex = com.github.dm.jrt.object.builder.Builders.getSharedMutex(${mutexTarget}, mSharedFields);
             mTarget = target;
             mInstance = target.getTarget();
         }

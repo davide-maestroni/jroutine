@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android.object;
+package com.github.dm.jrt.android.object.builder;
 
 import android.test.AndroidTestCase;
 
@@ -30,7 +30,7 @@ import com.github.dm.jrt.android.object.annotation.ResultStaleTime;
 import com.github.dm.jrt.core.util.TimeDuration;
 
 import static com.github.dm.jrt.android.core.config.LoaderConfiguration.builder;
-import static com.github.dm.jrt.android.object.AndroidBuilders.withAnnotations;
+import static com.github.dm.jrt.android.object.builder.AndroidBuilders.withAnnotations;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

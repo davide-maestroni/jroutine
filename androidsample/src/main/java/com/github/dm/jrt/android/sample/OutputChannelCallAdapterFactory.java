@@ -18,13 +18,13 @@ package com.github.dm.jrt.android.sample;
 
 import com.github.dm.jrt.android.JRoutineAndroidCompat;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
-import com.github.dm.jrt.android.object.AndroidBuilders;
+import com.github.dm.jrt.android.object.builder.AndroidBuilders;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.object.Builders;
+import com.github.dm.jrt.object.builder.Builders;
 import com.github.dm.jrt.retrofit.AbstractCallAdapterFactory;
 import com.github.dm.jrt.retrofit.ComparableCall;
 import com.github.dm.jrt.retrofit.ExecuteCall;

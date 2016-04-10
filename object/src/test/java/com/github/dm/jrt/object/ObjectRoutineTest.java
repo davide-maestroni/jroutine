@@ -77,9 +77,9 @@ import java.util.concurrent.TimeUnit;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
 import static com.github.dm.jrt.core.util.TimeDuration.INFINITY;
 import static com.github.dm.jrt.core.util.TimeDuration.seconds;
-import static com.github.dm.jrt.object.Builders.withAnnotations;
 import static com.github.dm.jrt.object.InvocationTarget.classOfType;
 import static com.github.dm.jrt.object.InvocationTarget.instance;
+import static com.github.dm.jrt.object.builder.Builders.withAnnotations;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 

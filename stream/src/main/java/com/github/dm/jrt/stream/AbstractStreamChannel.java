@@ -292,6 +292,12 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
+    public Builder<? extends StreamChannel<OUT>> getStreamInvocationConfiguration() {
+
+        return new Builder<StreamChannel<OUT>>(mStreamConfigurable, getStreamConfiguration());
+    }
+
+    @NotNull
     public <AFTER> StreamChannel<AFTER> map(
             @NotNull final BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer) {
 
@@ -343,7 +349,7 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public StreamChannel<OUT> ordered(@Nullable final OrderType orderType) {
 
-        return streamInvocationConfiguration().withOutputOrder(orderType).setConfiguration();
+        return getStreamInvocationConfiguration().withOutputOrder(orderType).setConfiguration();
     }
 
     @NotNull
@@ -384,10 +390,10 @@ public abstract class AbstractStreamChannel<OUT>
 
         final DelegationType delegationType = mDelegationType;
         final FilterInvocation<OUT, OUT> factory = PassingInvocation.factoryOf();
-        final StreamChannel<OUT> channel = streamInvocationConfiguration().withRunner(runner)
-                                                                          .setConfiguration()
-                                                                          .async()
-                                                                          .map(factory);
+        final StreamChannel<OUT> channel = getStreamInvocationConfiguration().withRunner(runner)
+                                                                             .setConfiguration()
+                                                                             .async()
+                                                                             .map(factory);
         if (delegationType == DelegationType.ASYNC) {
             return channel.async();
         }
@@ -414,12 +420,6 @@ public abstract class AbstractStreamChannel<OUT>
 
         mDelegationType = DelegationType.SERIAL;
         return this;
-    }
-
-    @NotNull
-    public Builder<? extends StreamChannel<OUT>> streamInvocationConfiguration() {
-
-        return new Builder<StreamChannel<OUT>>(mStreamConfigurable, getStreamConfiguration());
     }
 
     @NotNull

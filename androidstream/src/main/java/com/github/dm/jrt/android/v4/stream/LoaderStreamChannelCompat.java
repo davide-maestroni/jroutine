@@ -18,7 +18,7 @@ package com.github.dm.jrt.android.v4.stream;
 
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
 import com.github.dm.jrt.android.core.builder.LoaderConfigurableBuilder;
-import com.github.dm.jrt.android.core.config.LoaderConfiguration.Builder;
+import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.core.channel.OutputConsumer;
@@ -189,6 +189,13 @@ public interface LoaderStreamChannelCompat<OUT>
      * {@inheritDoc}
      */
     @NotNull
+    InvocationConfiguration.Builder<? extends LoaderStreamChannelCompat<OUT>>
+    getStreamInvocationConfiguration();
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
     <AFTER> LoaderStreamChannelCompat<AFTER> map(
             @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
 
@@ -268,13 +275,6 @@ public interface LoaderStreamChannelCompat<OUT>
      */
     @NotNull
     LoaderStreamChannelCompat<OUT> serial();
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    InvocationConfiguration.Builder<? extends LoaderStreamChannelCompat<OUT>>
-    streamInvocationConfiguration();
 
     /**
      * {@inheritDoc}
@@ -388,7 +388,22 @@ public interface LoaderStreamChannelCompat<OUT>
      * @return the invocation configuration builder.
      */
     @NotNull
-    Builder<? extends LoaderStreamChannelCompat<OUT>> getLoaderConfiguration();
+    LoaderConfiguration.Builder<? extends LoaderStreamChannelCompat<OUT>> getLoaderConfiguration();
+
+    /**
+     * Gets the loader configuration builder related to the whole stream.
+     * <br>
+     * The configuration options will be applied to all the next concatenated routines unless
+     * overwritten by specific ones.
+     * <p>
+     * Note that the configuration builder will be initialized with the current stream
+     * configuration.
+     *
+     * @return the invocation configuration builder.
+     */
+    @NotNull
+    LoaderConfiguration.Builder<? extends LoaderStreamChannelCompat<OUT>>
+    getStreamLoaderConfiguration();
 
     /**
      * Short for {@code getLoaderConfiguration().withLoaderId(loaderId).setConfiguration()}.
@@ -421,20 +436,6 @@ public interface LoaderStreamChannelCompat<OUT>
      */
     @NotNull
     LoaderStreamChannelCompat<OUT> staleAfter(long time, @NotNull TimeUnit timeUnit);
-
-    /**
-     * Gets the loader configuration builder related to the whole stream.
-     * <br>
-     * The configuration options will be applied to all the next concatenated routines unless
-     * overwritten by specific ones.
-     * <p>
-     * Note that the configuration builder will be initialized with the current stream
-     * configuration.
-     *
-     * @return the invocation configuration builder.
-     */
-    @NotNull
-    Builder<? extends LoaderStreamChannelCompat<OUT>> streamLoaderConfiguration();
 
     /**
      * Sets the stream loader context.

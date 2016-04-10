@@ -62,7 +62,8 @@ import org.jetbrains.annotations.Nullable;
  * <p>
  * <b>Synchronous invocation</b><br>
  * The routine starts an invocation employing a synchronous runner. The result is similar to a
- * classic method call where the processing completes as soon as the function exits.
+ * classic method call, however, be aware that, based on the invocation implementation, results
+ * might not be immediately available when inputs complete.
  * <p>
  * <b>Asynchronous invocation</b><br>
  * The routine starts an invocation employing an asynchronous runner. In this case the processing

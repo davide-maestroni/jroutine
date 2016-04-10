@@ -93,7 +93,7 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
                 public LoaderStreamChannel<OUT> setConfiguration(
                         @NotNull final InvocationConfiguration configuration) {
 
-                    DefaultLoaderStreamChannel.super.streamInvocationConfiguration()
+                    DefaultLoaderStreamChannel.super.getStreamInvocationConfiguration()
                                                     .with(null)
                                                     .with(configuration)
                                                     .setConfiguration();
@@ -330,6 +330,16 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
 
     @NotNull
     @Override
+    public InvocationConfiguration.Builder<? extends LoaderStreamChannel<OUT>>
+    getStreamInvocationConfiguration() {
+
+        final InvocationConfiguration config = getStreamConfiguration();
+        return new InvocationConfiguration.Builder<LoaderStreamChannel<OUT>>(
+                mStreamInvocationConfigurable, config);
+    }
+
+    @NotNull
+    @Override
     public <AFTER> LoaderStreamChannel<AFTER> map(
             @NotNull final BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer) {
 
@@ -435,16 +445,6 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
     public LoaderStreamChannel<OUT> serial() {
 
         return (LoaderStreamChannel<OUT>) super.serial();
-    }
-
-    @NotNull
-    @Override
-    public InvocationConfiguration.Builder<? extends LoaderStreamChannel<OUT>>
-    streamInvocationConfiguration() {
-
-        final InvocationConfiguration config = getStreamConfiguration();
-        return new InvocationConfiguration.Builder<LoaderStreamChannel<OUT>>(
-                mStreamInvocationConfigurable, config);
     }
 
     @NotNull
@@ -596,6 +596,15 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
     }
 
     @NotNull
+    public LoaderConfiguration.Builder<? extends LoaderStreamChannel<OUT>>
+    getStreamLoaderConfiguration() {
+
+        final LoaderConfiguration config = mStreamConfiguration;
+        return new LoaderConfiguration.Builder<LoaderStreamChannel<OUT>>(mStreamConfigurable,
+                config);
+    }
+
+    @NotNull
     public LoaderStreamChannel<OUT> loaderId(final int loaderId) {
 
         return getLoaderConfiguration().withLoaderId(loaderId).setConfiguration();
@@ -611,15 +620,6 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
     public LoaderStreamChannel<OUT> staleAfter(final long time, @NotNull final TimeUnit timeUnit) {
 
         return getLoaderConfiguration().withResultStaleTime(time, timeUnit).setConfiguration();
-    }
-
-    @NotNull
-    public LoaderConfiguration.Builder<? extends LoaderStreamChannel<OUT>>
-    streamLoaderConfiguration() {
-
-        final LoaderConfiguration config = mStreamConfiguration;
-        return new LoaderConfiguration.Builder<LoaderStreamChannel<OUT>>(mStreamConfigurable,
-                config);
     }
 
     @NotNull

@@ -1531,7 +1531,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                                  .next()).isEqualTo("TEST2");
         LoaderStreams.streamOf("test3")
                      .with(context)
-                     .streamLoaderConfiguration()
+                     .getStreamLoaderConfiguration()
                      .withLoaderId(31)
                      .setConfiguration()
                      .async()

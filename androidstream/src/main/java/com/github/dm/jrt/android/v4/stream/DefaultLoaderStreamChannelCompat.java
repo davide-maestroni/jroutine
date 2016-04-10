@@ -93,7 +93,7 @@ class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel<OUT>
                 public LoaderStreamChannelCompat<OUT> setConfiguration(
                         @NotNull final InvocationConfiguration configuration) {
 
-                    DefaultLoaderStreamChannelCompat.super.streamInvocationConfiguration()
+                    DefaultLoaderStreamChannelCompat.super.getStreamInvocationConfiguration()
                                                           .with(null)
                                                           .with(configuration)
                                                           .setConfiguration();
@@ -342,6 +342,16 @@ class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel<OUT>
 
     @NotNull
     @Override
+    public InvocationConfiguration.Builder<? extends LoaderStreamChannelCompat<OUT>>
+    getStreamInvocationConfiguration() {
+
+        final InvocationConfiguration config = getStreamConfiguration();
+        return new InvocationConfiguration.Builder<LoaderStreamChannelCompat<OUT>>(
+                mStreamInvocationConfigurable, config);
+    }
+
+    @NotNull
+    @Override
     public <AFTER> LoaderStreamChannelCompat<AFTER> map(
             @NotNull final BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer) {
 
@@ -447,16 +457,6 @@ class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel<OUT>
     public LoaderStreamChannelCompat<OUT> serial() {
 
         return (LoaderStreamChannelCompat<OUT>) super.serial();
-    }
-
-    @NotNull
-    @Override
-    public InvocationConfiguration.Builder<? extends LoaderStreamChannelCompat<OUT>>
-    streamInvocationConfiguration() {
-
-        final InvocationConfiguration config = getStreamConfiguration();
-        return new InvocationConfiguration.Builder<LoaderStreamChannelCompat<OUT>>(
-                mStreamInvocationConfigurable, config);
     }
 
     @NotNull
@@ -609,6 +609,15 @@ class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel<OUT>
     }
 
     @NotNull
+    public LoaderConfiguration.Builder<? extends LoaderStreamChannelCompat<OUT>>
+    getStreamLoaderConfiguration() {
+
+        final LoaderConfiguration config = mStreamConfiguration;
+        return new LoaderConfiguration.Builder<LoaderStreamChannelCompat<OUT>>(mStreamConfigurable,
+                config);
+    }
+
+    @NotNull
     public LoaderStreamChannelCompat<OUT> loaderId(final int loaderId) {
 
         return getLoaderConfiguration().withLoaderId(loaderId).setConfiguration();
@@ -625,15 +634,6 @@ class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel<OUT>
             @NotNull final TimeUnit timeUnit) {
 
         return getLoaderConfiguration().withResultStaleTime(time, timeUnit).setConfiguration();
-    }
-
-    @NotNull
-    public LoaderConfiguration.Builder<? extends LoaderStreamChannelCompat<OUT>>
-    streamLoaderConfiguration() {
-
-        final LoaderConfiguration config = mStreamConfiguration;
-        return new LoaderConfiguration.Builder<LoaderStreamChannelCompat<OUT>>(mStreamConfigurable,
-                config);
     }
 
     @NotNull

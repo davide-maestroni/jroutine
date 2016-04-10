@@ -24,6 +24,8 @@ import org.jetbrains.annotations.NotNull;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -43,7 +45,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * age the lower priority execution will have, before getting precedence over the higher priority
  * one.
  * <p>
- * Note that the queue is not shared between different instances of this class.
+ * Note that applying a priority to a synchronous runner will have no effect.
  * <p>
  * Created by davide-maestroni on 04/28/2015.
  */
@@ -52,30 +54,31 @@ public class PriorityRunner {
     private static final PriorityExecutionComparator PRIORITY_EXECUTION_COMPARATOR =
             new PriorityExecutionComparator();
 
+    private static final ThreadLocal<HashSet<PriorityExecution>> sLocalExecutions =
+            new ThreadLocal<HashSet<PriorityExecution>>() {
+
+                @Override
+                protected HashSet<PriorityExecution> initialValue() {
+
+                    return new HashSet<PriorityExecution>();
+                }
+            };
+
     private static final WeakIdentityHashMap<Runner, PriorityRunner> sRunners =
             new WeakIdentityHashMap<Runner, PriorityRunner>();
 
     private final AtomicLong mAge = new AtomicLong(Long.MAX_VALUE - Integer.MAX_VALUE);
 
     private final Map<PriorityExecution, DelayedExecution> mDelayedExecutions =
-            Collections.synchronizedMap(
-                    new WeakIdentityHashMap<PriorityExecution, DelayedExecution>());
+            Collections.synchronizedMap(new HashMap<PriorityExecution, DelayedExecution>());
 
     private final WeakIdentityHashMap<Execution, WeakHashMap<PriorityExecution, Void>> mExecutions =
             new WeakIdentityHashMap<Execution, WeakHashMap<PriorityExecution, Void>>();
 
+    private final Map<PriorityExecution, ImmediateExecution> mImmediateExecutions =
+            Collections.synchronizedMap(new HashMap<PriorityExecution, ImmediateExecution>());
+
     private final PriorityBlockingQueue<PriorityExecution> mQueue;
-
-    private final Execution mExecution = new Execution() {
-
-        public void run() {
-
-            final PriorityExecution execution = mQueue.poll();
-            if (execution != null) {
-                execution.run();
-            }
-        }
-    };
 
     private final Runner mRunner;
 
@@ -149,39 +152,6 @@ public class PriorityRunner {
     }
 
     /**
-     * Execution implementation delaying the enqueuing of the priority execution.
-     */
-    private static class DelayedExecution implements Execution {
-
-        private final PriorityExecution mExecution;
-
-        private final PriorityBlockingQueue<PriorityExecution> mQueue;
-
-        /**
-         * Constructor.
-         *
-         * @param queue     the queue.
-         * @param execution the priority execution.
-         */
-        private DelayedExecution(@NotNull final PriorityBlockingQueue<PriorityExecution> queue,
-                @NotNull final PriorityExecution execution) {
-
-            mQueue = queue;
-            mExecution = execution;
-        }
-
-        public void run() {
-
-            final PriorityBlockingQueue<PriorityExecution> queue = mQueue;
-            queue.put(mExecution);
-            final PriorityExecution execution = queue.poll();
-            if (execution != null) {
-                execution.run();
-            }
-        }
-    }
-
-    /**
      * Execution implementation providing a comparison based on priority and the wrapped execution
      * age.
      */
@@ -235,6 +205,75 @@ public class PriorityRunner {
     }
 
     /**
+     * Execution implementation delaying the enqueuing of the priority execution.
+     */
+    private class DelayedExecution implements Execution {
+
+        private final PriorityExecution mExecution;
+
+        /**
+         * Constructor.
+         *
+         * @param execution the priority execution.
+         */
+        private DelayedExecution(@NotNull final PriorityExecution execution) {
+
+            mExecution = execution;
+        }
+
+        public void run() {
+
+            final PriorityExecution execution = mExecution;
+            mDelayedExecutions.remove(execution);
+            final PriorityBlockingQueue<PriorityExecution> queue = mQueue;
+            if (sLocalExecutions.get().contains(execution)) {
+                execution.run();
+
+            } else {
+                queue.put(execution);
+                final PriorityExecution priorityExecution = queue.poll();
+                if (priorityExecution != null) {
+                    priorityExecution.run();
+                }
+            }
+        }
+    }
+
+    /**
+     * Execution implementation handling the immediate enqueuing of the priority execution.
+     */
+    private class ImmediateExecution implements Execution {
+
+        private final PriorityExecution mExecution;
+
+        /**
+         * Constructor.
+         *
+         * @param execution the priority execution.
+         */
+        private ImmediateExecution(@NotNull final PriorityExecution execution) {
+
+            mExecution = execution;
+        }
+
+        public void run() {
+
+            final PriorityExecution execution = mExecution;
+            mImmediateExecutions.remove(execution);
+            final PriorityBlockingQueue<PriorityExecution> queue = mQueue;
+            if (sLocalExecutions.get().contains(execution) && queue.remove(execution)) {
+                execution.run();
+
+            } else {
+                final PriorityExecution priorityExecution = queue.poll();
+                if (priorityExecution != null) {
+                    priorityExecution.run();
+                }
+            }
+        }
+    }
+
+    /**
      * Enqueuing runner implementation.
      */
     private class QueuingRunner implements Runner {
@@ -259,11 +298,24 @@ public class PriorityRunner {
                 if (priorityExecutions != null) {
                     final Runner runner = mRunner;
                     final PriorityBlockingQueue<PriorityExecution> queue = mQueue;
+                    final Map<PriorityExecution, ImmediateExecution> immediateExecutions =
+                            mImmediateExecutions;
                     final Map<PriorityExecution, DelayedExecution> delayedExecutions =
                             mDelayedExecutions;
                     for (final PriorityExecution priorityExecution : priorityExecutions.keySet()) {
-                        if (!queue.remove(priorityExecution)) {
-                            runner.cancel(delayedExecutions.remove(priorityExecution));
+                        if (queue.remove(priorityExecution)) {
+                            final ImmediateExecution immediateExecution =
+                                    immediateExecutions.remove(priorityExecution);
+                            if (immediateExecution != null) {
+                                runner.cancel(immediateExecution);
+                            }
+
+                        } else {
+                            final DelayedExecution delayedExecution =
+                                    delayedExecutions.remove(priorityExecution);
+                            if (delayedExecution != null) {
+                                runner.cancel(delayedExecution);
+                            }
                         }
                     }
                 }
@@ -292,18 +344,25 @@ public class PriorityRunner {
                 priorityExecutions.put(priorityExecution, null);
             }
 
+            final HashSet<PriorityExecution> localExecutions = sLocalExecutions.get();
+            localExecutions.add(priorityExecution);
             if (delay == 0) {
+                final ImmediateExecution immediateExecution =
+                        new ImmediateExecution(priorityExecution);
+                mImmediateExecutions.put(priorityExecution, immediateExecution);
                 mQueue.put(priorityExecution);
-                mRunner.run(mExecution, 0, timeUnit);
+                mRunner.run(immediateExecution, 0, timeUnit);
 
             } else {
-                final DelayedExecution delayedExecution =
-                        new DelayedExecution(mQueue, priorityExecution);
+                final DelayedExecution delayedExecution = new DelayedExecution(priorityExecution);
                 mDelayedExecutions.put(priorityExecution, delayedExecution);
                 mRunner.run(delayedExecution, delay, timeUnit);
             }
+
+            localExecutions.remove(priorityExecution);
         }
 
+        @NotNull
         private PriorityRunner enclosingRunner() {
 
             return PriorityRunner.this;

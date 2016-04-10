@@ -93,7 +93,7 @@ public class Runners {
     /**
      * Returns a runner providing ordering of executions based on priority.
      * <p>
-     * Note that wrapping a synchronous runner may lead to unpredictable results.
+     * Note that wrapping a synchronous runner will not modify the execution order.
      *
      * @param wrapped the wrapped runner instance.
      * @return the runner instance.

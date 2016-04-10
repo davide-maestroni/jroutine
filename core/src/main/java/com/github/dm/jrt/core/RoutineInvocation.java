@@ -37,9 +37,9 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public class DelegatingInvocation<IN, OUT> implements Invocation<IN, OUT> {
+public class RoutineInvocation<IN, OUT> implements Invocation<IN, OUT> {
 
-    private final DelegationType mDelegationType;
+    private final InvocationMode mInvocationMode;
 
     private final Routine<IN, OUT> mRoutine;
 
@@ -51,13 +51,13 @@ public class DelegatingInvocation<IN, OUT> implements Invocation<IN, OUT> {
      * Constructor.
      *
      * @param routine        the routine used to execute this invocation.
-     * @param delegationType the type of routine invocation.
+     * @param invocationMode the type of routine invocation.
      */
-    private DelegatingInvocation(@NotNull final Routine<IN, OUT> routine,
-            @NotNull final DelegationType delegationType) {
+    private RoutineInvocation(@NotNull final Routine<IN, OUT> routine,
+            @NotNull final InvocationMode invocationMode) {
 
         mRoutine = routine;
-        mDelegationType = delegationType;
+        mInvocationMode = invocationMode;
         mInputChannel = null;
         mOutputChannel = null;
     }
@@ -66,16 +66,16 @@ public class DelegatingInvocation<IN, OUT> implements Invocation<IN, OUT> {
      * Returns a factory of delegating invocations.
      *
      * @param routine        the routine used to execute this invocation.
-     * @param delegationType the type of routine invocation.
+     * @param invocationMode the type of routine invocation.
      * @param <IN>           the input data type.
      * @param <OUT>          the output data type.
      * @return the factory.
      */
     @NotNull
     public static <IN, OUT> InvocationFactory<IN, OUT> factoryFrom(
-            @NotNull final Routine<IN, OUT> routine, @NotNull final DelegationType delegationType) {
+            @NotNull final Routine<IN, OUT> routine, @NotNull final InvocationMode invocationMode) {
 
-        return new DelegatingInvocationFactory<IN, OUT>(routine, delegationType);
+        return new RoutineInvocationFactory<IN, OUT>(routine, invocationMode);
     }
 
     public void onAbort(@NotNull final RoutineException reason) {
@@ -90,12 +90,12 @@ public class DelegatingInvocation<IN, OUT> implements Invocation<IN, OUT> {
 
     public void onInitialize() {
 
-        final DelegationType delegationType = mDelegationType;
+        final InvocationMode invocationMode = mInvocationMode;
         final IOChannel<IN> inputChannel = JRoutineCore.io().buildChannel();
         mInputChannel = inputChannel;
-        mOutputChannel = (delegationType == DelegationType.ASYNC) ? mRoutine.asyncCall(inputChannel)
-                : (delegationType == DelegationType.PARALLEL) ? mRoutine.parallelCall(inputChannel)
-                        : (delegationType == DelegationType.SYNC) ? mRoutine.syncCall(inputChannel)
+        mOutputChannel = (invocationMode == InvocationMode.ASYNC) ? mRoutine.asyncCall(inputChannel)
+                : (invocationMode == InvocationMode.PARALLEL) ? mRoutine.parallelCall(inputChannel)
+                        : (invocationMode == InvocationMode.SYNC) ? mRoutine.syncCall(inputChannel)
                                 : mRoutine.serialCall(inputChannel);
     }
 
@@ -126,30 +126,32 @@ public class DelegatingInvocation<IN, OUT> implements Invocation<IN, OUT> {
     }
 
     /**
-     * Delegation type enumeration.
+     * Routine invocation mode type.
+     * <br>
+     * The mode indicates in which way the routine should be invoked.
      */
-    public enum DelegationType {
+    public enum InvocationMode {
 
         /**
-         * The delegated routine is invoked in synchronous mode.
+         * Synchronous mode.
          *
          * @see com.github.dm.jrt.core.routine.Routine Routine
          */
         SYNC,
         /**
-         * The delegated routine is invoked in asynchronous mode.
+         * Asynchronous mode.
          *
          * @see com.github.dm.jrt.core.routine.Routine Routine
          */
         ASYNC,
         /**
-         * The delegated routine is invoked in parallel mode.
+         * Parallel mode.
          *
          * @see com.github.dm.jrt.core.routine.Routine Routine
          */
         PARALLEL,
         /**
-         * The delegated routine is invoked in serial mode.
+         * Serial mode.
          *
          * @see com.github.dm.jrt.core.routine.Routine Routine
          */
@@ -162,9 +164,9 @@ public class DelegatingInvocation<IN, OUT> implements Invocation<IN, OUT> {
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class DelegatingInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
+    private static class RoutineInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
-        private final DelegationType mDelegationType;
+        private final InvocationMode mInvocationMode;
 
         private final Routine<IN, OUT> mRoutine;
 
@@ -172,21 +174,21 @@ public class DelegatingInvocation<IN, OUT> implements Invocation<IN, OUT> {
          * Constructor.
          *
          * @param routine        the delegated routine.
-         * @param delegationType the type of routine invocation.
+         * @param invocationMode the type of routine invocation.
          */
-        private DelegatingInvocationFactory(@NotNull final Routine<IN, OUT> routine,
-                @NotNull final DelegationType delegationType) {
+        private RoutineInvocationFactory(@NotNull final Routine<IN, OUT> routine,
+                @NotNull final InvocationMode invocationMode) {
 
-            super(asArgs(routine, delegationType));
+            super(asArgs(routine, invocationMode));
             mRoutine = ConstantConditions.notNull("routine instance", routine);
-            mDelegationType = ConstantConditions.notNull("delegation type", delegationType);
+            mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
         }
 
         @NotNull
         @Override
         public Invocation<IN, OUT> newInvocation() {
 
-            return new DelegatingInvocation<IN, OUT>(mRoutine, mDelegationType);
+            return new RoutineInvocation<IN, OUT>(mRoutine, mInvocationMode);
         }
     }
 }

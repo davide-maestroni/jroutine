@@ -26,8 +26,8 @@ import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.channel.ChannelsBuilder;
 import com.github.dm.jrt.channel.Selectable;
-import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.RoutineInvocation.InvocationMode;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.Channel.InputChannel;
@@ -45,7 +45,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import static com.github.dm.jrt.android.core.invocation.DelegatingContextInvocation.factoryFrom;
+import static com.github.dm.jrt.android.core.RoutineContextInvocation.factoryFrom;
 
 /**
  * Utility class acting as a factory of stream output channels.
@@ -308,7 +308,7 @@ public class LoaderStreamsCompat extends Streams {
             @NotNull final Function<? super StreamChannel<IN>, ? extends
                     StreamChannel<? extends OUT>> function) {
 
-        return factoryFrom(onStream(function), wrap(function).hashCode(), DelegationType.SYNC);
+        return factoryFrom(onStream(function), wrap(function).hashCode(), InvocationMode.SYNC);
     }
 
     /**

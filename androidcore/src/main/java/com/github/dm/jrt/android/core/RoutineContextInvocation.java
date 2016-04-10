@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android.core.invocation;
+package com.github.dm.jrt.android.core;
 
-import com.github.dm.jrt.core.DelegatingInvocation;
-import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
+import com.github.dm.jrt.android.core.invocation.ContextInvocation;
+import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
+import com.github.dm.jrt.android.core.invocation.ContextInvocationWrapper;
+import com.github.dm.jrt.core.RoutineInvocation;
+import com.github.dm.jrt.core.RoutineInvocation.InvocationMode;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.Routine;
@@ -27,21 +30,21 @@ import org.jetbrains.annotations.NotNull;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Call invocation implementation delegating the execution to another routine.
+ * Context invocation implementation delegating the execution to another routine.
  * <p>
  * Created by davide-maestroni on 10/07/2015.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public class DelegatingContextInvocation<IN, OUT> extends ContextInvocationWrapper<IN, OUT> {
+public class RoutineContextInvocation<IN, OUT> extends ContextInvocationWrapper<IN, OUT> {
 
     /**
      * Constructor.
      *
      * @param invocation the wrapped invocation.
      */
-    private DelegatingContextInvocation(@NotNull final Invocation<IN, OUT> invocation) {
+    private RoutineContextInvocation(@NotNull final Invocation<IN, OUT> invocation) {
 
         super(invocation);
     }
@@ -55,7 +58,7 @@ public class DelegatingContextInvocation<IN, OUT> extends ContextInvocationWrapp
      *
      * @param routine        the routine used to execute this invocation.
      * @param routineId      the routine identifier.
-     * @param delegationType the type of routine invocation.
+     * @param invocationMode the type of routine invocation.
      * @param <IN>           the input data type.
      * @param <OUT>          the output data type.
      * @return the factory.
@@ -63,9 +66,9 @@ public class DelegatingContextInvocation<IN, OUT> extends ContextInvocationWrapp
     @NotNull
     public static <IN, OUT> ContextInvocationFactory<IN, OUT> factoryFrom(
             @NotNull final Routine<IN, OUT> routine, final int routineId,
-            @NotNull final DelegationType delegationType) {
+            @NotNull final InvocationMode invocationMode) {
 
-        return new DelegatingContextInvocationFactory<IN, OUT>(routine, routineId, delegationType);
+        return new DelegatingContextInvocationFactory<IN, OUT>(routine, routineId, invocationMode);
     }
 
     /**
@@ -84,19 +87,19 @@ public class DelegatingContextInvocation<IN, OUT> extends ContextInvocationWrapp
          *
          * @param routine        the delegated routine.
          * @param routineId      the routine identifier.
-         * @param delegationType the type of routine invocation.
+         * @param invocationMode the type of routine invocation.
          */
         private DelegatingContextInvocationFactory(@NotNull final Routine<IN, OUT> routine,
-                final int routineId, @NotNull final DelegationType delegationType) {
+                final int routineId, @NotNull final InvocationMode invocationMode) {
 
-            super(asArgs(routineId, delegationType));
-            mFactory = DelegatingInvocation.factoryFrom(routine, delegationType);
+            super(asArgs(routineId, invocationMode));
+            mFactory = RoutineInvocation.factoryFrom(routine, invocationMode);
         }
 
         @NotNull
         public ContextInvocation<IN, OUT> newInvocation() throws Exception {
 
-            return new DelegatingContextInvocation<IN, OUT>(mFactory.newInvocation());
+            return new RoutineContextInvocation<IN, OUT>(mFactory.newInvocation());
         }
     }
 }

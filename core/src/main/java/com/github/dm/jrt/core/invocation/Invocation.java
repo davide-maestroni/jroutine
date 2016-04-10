@@ -28,7 +28,7 @@ import org.jetbrains.annotations.NotNull;
  * <pre>
  *     <code>
  *
- *                       &lt;init&gt;
+ *                           &lt;init&gt;
  *
  *        ---------------      |     |
  *       |               |     |      --(*)---------------------------

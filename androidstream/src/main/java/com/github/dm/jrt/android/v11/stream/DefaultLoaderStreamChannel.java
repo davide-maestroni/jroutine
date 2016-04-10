@@ -25,8 +25,8 @@ import com.github.dm.jrt.android.v11.channel.SparseChannels;
 import com.github.dm.jrt.android.v11.core.JRoutineLoader;
 import com.github.dm.jrt.android.v11.core.JRoutineLoader.LoaderBuilder;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
-import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.RoutineInvocation.InvocationMode;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.channel.ResultChannel;
@@ -56,7 +56,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.dm.jrt.android.core.invocation.DelegatingContextInvocation.factoryFrom;
+import static com.github.dm.jrt.android.core.RoutineContextInvocation.factoryFrom;
 import static com.github.dm.jrt.function.Functions.wrap;
 
 /**
@@ -155,7 +155,7 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
             @NotNull final OutputChannel<OUT> channel, @Nullable final Binder binder) {
 
         this(builder, channel, InvocationConfiguration.defaultConfiguration(),
-                LoaderConfiguration.defaultConfiguration(), DelegationType.ASYNC, binder);
+                LoaderConfiguration.defaultConfiguration(), InvocationMode.ASYNC, binder);
     }
 
     /**
@@ -165,16 +165,16 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
      * @param channel                 the wrapped output channel.
      * @param invocationConfiguration the initial invocation configuration.
      * @param loaderConfiguration     the initial loader configuration.
-     * @param delegationType          the delegation type.
+     * @param invocationMode          the invocation mode.
      * @param binder                  the binder instance.
      */
     private DefaultLoaderStreamChannel(@Nullable final LoaderBuilder builder,
             @NotNull final OutputChannel<OUT> channel,
             @NotNull final InvocationConfiguration invocationConfiguration,
             @NotNull final LoaderConfiguration loaderConfiguration,
-            @NotNull final DelegationType delegationType, @Nullable final Binder binder) {
+            @NotNull final InvocationMode invocationMode, @Nullable final Binder binder) {
 
-        super(channel, invocationConfiguration, delegationType, binder);
+        super(channel, invocationConfiguration, invocationMode, binder);
         mContextBuilder = builder;
         mStreamConfiguration =
                 ConstantConditions.notNull("loader configuration", loaderConfiguration);
@@ -523,7 +523,7 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
                               .with(configuration)
                               .setConfiguration()
                               .buildChannels();
-        return newChannel(channel, getStreamConfiguration(), getDelegationType(), getBinder());
+        return newChannel(channel, getStreamConfiguration(), getInvocationMode(), getBinder());
     }
 
     @NotNull
@@ -559,9 +559,9 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
     protected <AFTER> LoaderStreamChannel<AFTER> newChannel(
             @NotNull final OutputChannel<AFTER> channel,
             @NotNull final InvocationConfiguration configuration,
-            @NotNull final DelegationType delegationType, @Nullable final Binder binder) {
+            @NotNull final InvocationMode invocationMode, @Nullable final Binder binder) {
 
-        return newChannel(channel, configuration, mConfiguration, delegationType, binder);
+        return newChannel(channel, configuration, mConfiguration, invocationMode, binder);
     }
 
     @NotNull
@@ -643,10 +643,10 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
             @NotNull final OutputChannel<AFTER> channel,
             @NotNull final InvocationConfiguration invocationConfiguration,
             @NotNull final LoaderConfiguration loaderConfiguration,
-            @NotNull final DelegationType delegationType, @Nullable final Binder binder) {
+            @NotNull final InvocationMode invocationMode, @Nullable final Binder binder) {
 
         return new DefaultLoaderStreamChannel<AFTER>(mContextBuilder, channel,
-                invocationConfiguration, loaderConfiguration, delegationType, binder);
+                invocationConfiguration, loaderConfiguration, invocationMode, binder);
     }
 
     @NotNull
@@ -666,7 +666,7 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
 
         final ContextInvocationFactory<? super OUT, ? extends AFTER> invocationFactory =
                 factoryFrom(JRoutineCore.on(factory).buildRoutine(), factory.hashCode(),
-                        DelegationType.SYNC);
+                        InvocationMode.SYNC);
         return contextBuilder.on(invocationFactory)
                              .getInvocationConfiguration()
                              .with(invocationConfiguration)

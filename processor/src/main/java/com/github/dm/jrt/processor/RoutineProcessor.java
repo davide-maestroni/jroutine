@@ -16,6 +16,8 @@
 
 package com.github.dm.jrt.processor;
 
+import com.github.dm.jrt.core.RoutineInvocation;
+import com.github.dm.jrt.core.RoutineInvocation.InvocationMode;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
@@ -34,7 +36,6 @@ import com.github.dm.jrt.object.annotation.InputMaxDelay;
 import com.github.dm.jrt.object.annotation.InputMaxSize;
 import com.github.dm.jrt.object.annotation.InputOrder;
 import com.github.dm.jrt.object.annotation.Invoke;
-import com.github.dm.jrt.object.annotation.Invoke.InvocationMode;
 import com.github.dm.jrt.object.annotation.LogLevel;
 import com.github.dm.jrt.object.annotation.MaxInstances;
 import com.github.dm.jrt.object.annotation.OutputLimit;
@@ -977,8 +978,8 @@ public class RoutineProcessor extends AbstractProcessor {
             @NotNull final Invoke annotation) {
 
         final InvocationMode invocationMode = annotation.value();
-        if (((invocationMode == InvocationMode.PARALLEL) || (invocationMode
-                == InvocationMode.SERIAL)) && (methodElement.getParameters().size() > 1)) {
+        if (((invocationMode == RoutineInvocation.InvocationMode.PARALLEL) || (invocationMode
+                == RoutineInvocation.InvocationMode.SERIAL)) && (methodElement.getParameters().size() > 1)) {
             throw new IllegalArgumentException(
                     "methods annotated with invocation mode " + invocationMode
                             + " must have at maximum one input parameter: " + methodElement);
@@ -1883,8 +1884,8 @@ public class RoutineProcessor extends AbstractProcessor {
             outputMode = getOutputMode(methodElement, targetMethod);
         }
 
-        if (((invocationMode == InvocationMode.PARALLEL) || (invocationMode
-                == InvocationMode.SERIAL)) && (targetMethod.getParameters().size() > 1)) {
+        if (((invocationMode == RoutineInvocation.InvocationMode.PARALLEL) || (invocationMode
+                == RoutineInvocation.InvocationMode.SERIAL)) && (targetMethod.getParameters().size() > 1)) {
             throw new IllegalArgumentException(
                     "methods annotated with invocation mode " + invocationMode
                             + " must have no input parameters: " + methodElement);
@@ -1940,9 +1941,9 @@ public class RoutineProcessor extends AbstractProcessor {
         method = method.replace("${inputParams}",
                 buildInputParams(annotationElement, element, targetElement, methodElement));
         method = method.replace("${invokeMethod}",
-                (invocationMode == InvocationMode.SYNC) ? "syncInvoke"
-                        : (invocationMode == InvocationMode.PARALLEL) ? "parallelInvoke"
-                                : (invocationMode == InvocationMode.SERIAL) ? "serialInvoke"
+                (invocationMode == RoutineInvocation.InvocationMode.SYNC) ? "syncInvoke"
+                        : (invocationMode == RoutineInvocation.InvocationMode.PARALLEL) ? "parallelInvoke"
+                                : (invocationMode == RoutineInvocation.InvocationMode.SERIAL) ? "serialInvoke"
                                         : "asyncInvoke");
         writer.append(method);
         String methodInvocationHeader;

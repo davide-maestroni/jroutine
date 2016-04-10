@@ -16,8 +16,8 @@
 
 package com.github.dm.jrt.stream;
 
-import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.RoutineInvocation.InvocationMode;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
@@ -68,7 +68,7 @@ class DefaultStreamChannel<OUT> extends AbstractStreamChannel<OUT> {
     private DefaultStreamChannel(@NotNull final OutputChannel<OUT> channel,
             @Nullable final Binder binder) {
 
-        super(channel, InvocationConfiguration.defaultConfiguration(), DelegationType.ASYNC,
+        super(channel, InvocationConfiguration.defaultConfiguration(), InvocationMode.ASYNC,
                 binder);
     }
 
@@ -77,23 +77,23 @@ class DefaultStreamChannel<OUT> extends AbstractStreamChannel<OUT> {
      *
      * @param channel        the wrapped output channel.
      * @param configuration  the initial invocation configuration.
-     * @param delegationType the delegation type.
+     * @param invocationMode the invocation mode.
      * @param binder         the binder instance.
      */
     private DefaultStreamChannel(@NotNull final OutputChannel<OUT> channel,
             @NotNull final InvocationConfiguration configuration,
-            @NotNull final DelegationType delegationType, @Nullable final Binder binder) {
+            @NotNull final InvocationMode invocationMode, @Nullable final Binder binder) {
 
-        super(channel, configuration, delegationType, binder);
+        super(channel, configuration, invocationMode, binder);
     }
 
     @NotNull
     @Override
     protected <AFTER> StreamChannel<AFTER> newChannel(@NotNull final OutputChannel<AFTER> channel,
             @NotNull final InvocationConfiguration configuration,
-            @NotNull final DelegationType delegationType, @Nullable final Binder binder) {
+            @NotNull final InvocationMode invocationMode, @Nullable final Binder binder) {
 
-        return new DefaultStreamChannel<AFTER>(channel, configuration, delegationType, binder);
+        return new DefaultStreamChannel<AFTER>(channel, configuration, invocationMode, binder);
     }
 
     @NotNull

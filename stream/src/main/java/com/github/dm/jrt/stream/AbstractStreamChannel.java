@@ -18,8 +18,8 @@ package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.channel.Channels;
 import com.github.dm.jrt.channel.Selectable;
-import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.RoutineInvocation.InvocationMode;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
@@ -96,7 +96,7 @@ public abstract class AbstractStreamChannel<OUT>
 
     private InvocationConfiguration mConfiguration = InvocationConfiguration.defaultConfiguration();
 
-    private DelegationType mDelegationType;
+    private InvocationMode mInvocationMode;
 
     private InvocationConfiguration mStreamConfiguration =
             InvocationConfiguration.defaultConfiguration();
@@ -118,16 +118,16 @@ public abstract class AbstractStreamChannel<OUT>
      *
      * @param channel        the wrapped output channel.
      * @param configuration  the initial invocation configuration.
-     * @param delegationType the delegation type.
+     * @param invocationMode the delegation type.
      * @param binder         the binding runnable.
      */
     protected AbstractStreamChannel(@NotNull final OutputChannel<OUT> channel,
             @NotNull final InvocationConfiguration configuration,
-            @NotNull final DelegationType delegationType, @Nullable final Binder binder) {
+            @NotNull final InvocationMode invocationMode, @Nullable final Binder binder) {
 
         mStreamConfiguration =
                 ConstantConditions.notNull("invocation configuration", configuration);
-        mDelegationType = ConstantConditions.notNull("delegation type", delegationType);
+        mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
         mChannel = ConstantConditions.notNull("output channel", channel);
         mBinder = (binder != null) ? binder : NO_OP;
     }
@@ -230,7 +230,7 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public StreamChannel<OUT> async() {
 
-        mDelegationType = DelegationType.ASYNC;
+        mInvocationMode = InvocationMode.ASYNC;
         return this;
     }
 
@@ -322,15 +322,15 @@ public abstract class AbstractStreamChannel<OUT>
     public <AFTER> StreamChannel<AFTER> map(
             @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
 
-        final DelegationType delegationType = mDelegationType;
+        final InvocationMode invocationMode = mInvocationMode;
         final InvocationChannel<? super OUT, ? extends AFTER> channel;
-        if (delegationType == DelegationType.ASYNC) {
+        if (invocationMode == InvocationMode.ASYNC) {
             channel = routine.asyncInvoke();
 
-        } else if (delegationType == DelegationType.PARALLEL) {
+        } else if (invocationMode == InvocationMode.PARALLEL) {
             channel = routine.parallelInvoke();
 
-        } else if (delegationType == DelegationType.SYNC) {
+        } else if (invocationMode == InvocationMode.SYNC) {
             channel = routine.syncInvoke();
 
         } else {
@@ -355,7 +355,7 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public StreamChannel<OUT> parallel() {
 
-        mDelegationType = DelegationType.PARALLEL;
+        mInvocationMode = InvocationMode.PARALLEL;
         return this;
     }
 
@@ -382,27 +382,27 @@ public abstract class AbstractStreamChannel<OUT>
                                                    .with(configuration)
                                                    .setConfiguration()
                                                    .buildChannels();
-        return newChannel(channel, getStreamConfiguration(), mDelegationType, mBinder);
+        return newChannel(channel, getStreamConfiguration(), mInvocationMode, mBinder);
     }
 
     @NotNull
     public StreamChannel<OUT> runOn(@Nullable final Runner runner) {
 
-        final DelegationType delegationType = mDelegationType;
+        final InvocationMode invocationMode = mInvocationMode;
         final FilterInvocation<OUT, OUT> factory = PassingInvocation.factoryOf();
         final StreamChannel<OUT> channel = getStreamInvocationConfiguration().withRunner(runner)
                                                                              .setConfiguration()
                                                                              .async()
                                                                              .map(factory);
-        if (delegationType == DelegationType.ASYNC) {
+        if (invocationMode == InvocationMode.ASYNC) {
             return channel.async();
         }
 
-        if (delegationType == DelegationType.PARALLEL) {
+        if (invocationMode == InvocationMode.PARALLEL) {
             return channel.parallel();
         }
 
-        if (delegationType == DelegationType.SYNC) {
+        if (invocationMode == InvocationMode.SYNC) {
             return channel.sync();
         }
 
@@ -418,14 +418,14 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public StreamChannel<OUT> serial() {
 
-        mDelegationType = DelegationType.SERIAL;
+        mInvocationMode = InvocationMode.SERIAL;
         return this;
     }
 
     @NotNull
     public StreamChannel<OUT> sync() {
 
-        mDelegationType = DelegationType.SYNC;
+        mInvocationMode = InvocationMode.SYNC;
         return this;
     }
 
@@ -503,7 +503,7 @@ public abstract class AbstractStreamChannel<OUT>
                                                                          .with(configuration)
                                                                          .setConfiguration()
                                                                          .buildChannels();
-        return newChannel(channel, getStreamConfiguration(), mDelegationType, mBinder);
+        return newChannel(channel, getStreamConfiguration(), mInvocationMode, mBinder);
     }
 
     @NotNull
@@ -518,7 +518,7 @@ public abstract class AbstractStreamChannel<OUT>
                                                      .setConfiguration()
                                                      .buildChannel();
         mChannel.bind(new TryCatchOutputConsumer<OUT>(consumer, ioChannel));
-        return newChannel(ioChannel, getStreamConfiguration(), mDelegationType, mBinder);
+        return newChannel(ioChannel, getStreamConfiguration(), mInvocationMode, mBinder);
     }
 
     @NotNull
@@ -657,14 +657,14 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     /**
-     * Returns the delegation type used by all the routines concatenated to the stream.
+     * Returns the invocation mode used by all the routines concatenated to the stream.
      *
-     * @return the delegation type.
+     * @return the invocation mode.
      */
     @NotNull
-    protected DelegationType getDelegationType() {
+    protected InvocationMode getInvocationMode() {
 
-        return mDelegationType;
+        return mInvocationMode;
     }
 
     /**
@@ -684,14 +684,14 @@ public abstract class AbstractStreamChannel<OUT>
      * @param <AFTER>        the concatenation output type.
      * @param channel        the wrapped output channel.
      * @param configuration  the stream configuration.
-     * @param delegationType the delegation type.
+     * @param invocationMode the invocation mode.
      * @param binder         the binder instance.
      * @return the newly created channel instance.
      */
     @NotNull
     protected abstract <AFTER> StreamChannel<AFTER> newChannel(
             @NotNull OutputChannel<AFTER> channel, @NotNull InvocationConfiguration configuration,
-            @NotNull DelegationType delegationType, @Nullable Binder binder);
+            @NotNull InvocationMode invocationMode, @Nullable Binder binder);
 
     /**
      * Creates a new routine instance based on the specified factory.
@@ -719,7 +719,7 @@ public abstract class AbstractStreamChannel<OUT>
             @NotNull final InvocationChannel<? super OUT, ? extends AFTER> channel) {
 
         return newChannel((OutputChannel<AFTER>) mChannel.bind(channel).result(),
-                getStreamConfiguration(), mDelegationType, mBinder);
+                getStreamConfiguration(), mInvocationMode, mBinder);
     }
 
     /**

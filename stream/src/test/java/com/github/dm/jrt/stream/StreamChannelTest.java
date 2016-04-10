@@ -17,8 +17,8 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.channel.Selectable;
-import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.core.JRoutineCore;
+import com.github.dm.jrt.core.RoutineInvocation.InvocationMode;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
@@ -431,11 +431,11 @@ public class StreamChannelTest {
         final IOChannel<Object> channel = JRoutineCore.io().buildChannel();
         final TestStreamChannel streamChannel =
                 new TestStreamChannel(channel, InvocationConfiguration.defaultConfiguration(),
-                        DelegationType.ASYNC, null);
+                        InvocationMode.ASYNC, null);
         assertThat(streamChannel.getBinder()).isNotNull();
         assertThat(streamChannel.getConfiguration()).isNotNull();
         assertThat(streamChannel.getStreamConfiguration()).isNotNull();
-        assertThat(streamChannel.getDelegationType()).isNotNull();
+        assertThat(streamChannel.getInvocationMode()).isNotNull();
     }
 
     @Test
@@ -444,7 +444,7 @@ public class StreamChannelTest {
 
         try {
             new TestStreamChannel(null, InvocationConfiguration.defaultConfiguration(),
-                    DelegationType.ASYNC, null);
+                    InvocationMode.ASYNC, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -453,7 +453,7 @@ public class StreamChannelTest {
 
         final IOChannel<Object> channel = JRoutineCore.io().buildChannel();
         try {
-            new TestStreamChannel(channel, null, DelegationType.ASYNC, null);
+            new TestStreamChannel(channel, null, InvocationMode.ASYNC, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -471,7 +471,7 @@ public class StreamChannelTest {
 
         try {
             new TestStreamChannel(channel, InvocationConfiguration.defaultConfiguration(),
-                    DelegationType.ASYNC, null).setConfiguration(null);
+                    InvocationMode.ASYNC, null).setConfiguration(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -2092,14 +2092,14 @@ public class StreamChannelTest {
          *
          * @param channel        the wrapped output channel.
          * @param configuration  the initial invocation configuration.
-         * @param delegationType the delegation type.
+         * @param invocationMode the delegation type.
          * @param binder         the binding runnable.
          */
         protected TestStreamChannel(@NotNull final OutputChannel<Object> channel,
                 @NotNull final InvocationConfiguration configuration,
-                @NotNull final DelegationType delegationType, @Nullable final Binder binder) {
+                @NotNull final InvocationMode invocationMode, @Nullable final Binder binder) {
 
-            super(channel, configuration, delegationType, binder);
+            super(channel, configuration, invocationMode, binder);
         }
 
         @NotNull
@@ -2107,7 +2107,7 @@ public class StreamChannelTest {
         protected <AFTER> StreamChannel<AFTER> newChannel(
                 @NotNull final OutputChannel<AFTER> channel,
                 @NotNull final InvocationConfiguration configuration,
-                @NotNull final DelegationType delegationType, @Nullable final Binder binder) {
+                @NotNull final InvocationMode invocationMode, @Nullable final Binder binder) {
 
             return null;
         }

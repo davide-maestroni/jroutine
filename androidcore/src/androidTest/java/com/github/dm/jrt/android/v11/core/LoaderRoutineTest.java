@@ -38,7 +38,7 @@ import com.github.dm.jrt.android.core.invocation.PassingContextInvocation;
 import com.github.dm.jrt.android.core.log.AndroidLogs;
 import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.android.core.runner.AndroidRunners;
-import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
+import com.github.dm.jrt.core.RoutineInvocation.InvocationMode;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.InvocationChannel;
@@ -62,8 +62,8 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
+import static com.github.dm.jrt.android.core.RoutineContextInvocation.factoryFrom;
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryOf;
-import static com.github.dm.jrt.android.core.invocation.DelegatingContextInvocation.factoryFrom;
 import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
 import static com.github.dm.jrt.core.util.TimeDuration.seconds;
@@ -475,7 +475,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final Routine<Object, Object> routine2 = JRoutineLoader.with(loaderFrom(getActivity()))
                                                                .on(factoryFrom(routine1,
                                                                        TEST_ROUTINE_ID,
-                                                                       DelegationType.SYNC))
+                                                                       InvocationMode.SYNC))
                                                                .buildRoutine();
 
         assertThat(routine2.asyncCall("test1").afterMax(timeout).all()).containsExactly("test1");
@@ -1308,7 +1308,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final Routine<Object, Object> routine2 = JRoutineLoader.with(loaderFrom(fragment))
                                                                .on(factoryFrom(routine1,
                                                                        TEST_ROUTINE_ID,
-                                                                       DelegationType.ASYNC))
+                                                                       InvocationMode.ASYNC))
                                                                .buildRoutine();
 
         assertThat(routine2.asyncCall("test1").afterMax(timeout).all()).containsExactly("test1");

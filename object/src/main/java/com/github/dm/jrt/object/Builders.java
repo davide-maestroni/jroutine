@@ -16,6 +16,8 @@
 
 package com.github.dm.jrt.object;
 
+import com.github.dm.jrt.core.RoutineInvocation;
+import com.github.dm.jrt.core.RoutineInvocation.InvocationMode;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
@@ -36,7 +38,6 @@ import com.github.dm.jrt.object.annotation.InputMaxDelay;
 import com.github.dm.jrt.object.annotation.InputMaxSize;
 import com.github.dm.jrt.object.annotation.InputOrder;
 import com.github.dm.jrt.object.annotation.Invoke;
-import com.github.dm.jrt.object.annotation.Invoke.InvocationMode;
 import com.github.dm.jrt.object.annotation.LogLevel;
 import com.github.dm.jrt.object.annotation.MaxInstances;
 import com.github.dm.jrt.object.annotation.OutputLimit;
@@ -446,8 +447,8 @@ public class Builders {
         }
 
         final InvocationMode invocationMode = invokeAnnotation.value();
-        if (((invocationMode == InvocationMode.PARALLEL) || (invocationMode
-                == InvocationMode.SERIAL)) && (method.getParameterTypes().length > 1)) {
+        if (((invocationMode == RoutineInvocation.InvocationMode.PARALLEL) || (invocationMode
+                == RoutineInvocation.InvocationMode.SERIAL)) && (method.getParameterTypes().length > 1)) {
             throw new IllegalArgumentException(
                     "methods annotated with invocation mode " + invocationMode
                             + " must have at maximum one input parameter: " + method);
@@ -622,8 +623,8 @@ public class Builders {
                     }
                 }
 
-                if (((invocationMode == InvocationMode.PARALLEL) || (invocationMode
-                        == InvocationMode.SERIAL)) && (targetParameterTypes.length > 1)) {
+                if (((invocationMode == RoutineInvocation.InvocationMode.PARALLEL) || (invocationMode
+                        == RoutineInvocation.InvocationMode.SERIAL)) && (targetParameterTypes.length > 1)) {
                     throw new IllegalArgumentException(
                             "methods annotated with invocation mode " + invocationMode
                                     + " must have no input parameters: " + proxyMethod);
@@ -785,9 +786,9 @@ public class Builders {
             @NotNull final Routine<Object, Object> routine,
             @Nullable final InvocationMode invocationMode) {
 
-        return (invocationMode == InvocationMode.SYNC) ? routine.syncInvoke()
-                : (invocationMode == InvocationMode.PARALLEL) ? routine.parallelInvoke()
-                        : (invocationMode == InvocationMode.SERIAL) ? routine.serialInvoke()
+        return (invocationMode == RoutineInvocation.InvocationMode.SYNC) ? routine.syncInvoke()
+                : (invocationMode == RoutineInvocation.InvocationMode.PARALLEL) ? routine.parallelInvoke()
+                        : (invocationMode == RoutineInvocation.InvocationMode.SERIAL) ? routine.serialInvoke()
                                 : routine.asyncInvoke();
     }
 

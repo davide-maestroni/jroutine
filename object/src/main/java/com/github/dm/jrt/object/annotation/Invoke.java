@@ -16,6 +16,8 @@
 
 package com.github.dm.jrt.object.annotation;
 
+import com.github.dm.jrt.core.RoutineInvocation.InvocationMode;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -29,7 +31,7 @@ import java.lang.annotation.Target;
  * of another class methods. The annotation will indicate the type of invocation to be applied to
  * the wrapping routine.
  * <p>
- * Note that, unless the {@link Invoke.InvocationMode#PARALLEL} is specified, to each call to a
+ * Note that, unless the {@link InvocationMode#PARALLEL} is specified, to each call to a
  * method of the proxy interface will correspond a single invocation of the wrapping routine.
  * <br>
  * In case this annotation is absent, the asynchronous invocation mode will be employed.
@@ -67,29 +69,4 @@ public @interface Invoke {
      * @return the invocation mode.
      */
     InvocationMode value() default InvocationMode.ASYNC;
-
-    /**
-     * Routine invocation mode type.
-     * <br>
-     * The mode indicates in which way the wrapping routine should be invoked.
-     */
-    enum InvocationMode {
-
-        /**
-         * Synchronous mode.
-         */
-        SYNC,
-        /**
-         * Asynchronous mode.
-         */
-        ASYNC,
-        /**
-         * Parallel mode.
-         */
-        PARALLEL,
-        /**
-         * Serial mode.
-         */
-        SERIAL
-    }
 }

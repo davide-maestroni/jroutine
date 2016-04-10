@@ -136,7 +136,9 @@ public class RunnerTest {
         runner.run(execution, 0, TimeUnit.MILLISECONDS);
         runner.cancel(execution);
         assertThat(execution.isRun()).isFalse();
-        assertThat(testRunner.getLastCancelExecution()).isNull();
+        assertThat(testRunner.getLastCancelExecution()).isNotNull();
+        testRunner.cancel(null);
+        execution.reset();
         runner.run(execution, 0, TimeUnit.MILLISECONDS);
         testRunner.getLastExecution().run();
         runner.cancel(execution);
@@ -519,14 +521,12 @@ public class RunnerTest {
         private void reset() {
 
             mIsRun = false;
-        }        public void run() {
+        }
+
+        public void run() {
 
             mIsRun = true;
         }
-
-
-
-
     }
 
     private static class TestRecursiveExecution extends TestRunExecution {

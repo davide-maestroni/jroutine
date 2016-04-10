@@ -17,8 +17,8 @@
 package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.core.DefaultResultChannel.AbortHandler;
-import com.github.dm.jrt.core.DelegatingInvocation.DelegationType;
 import com.github.dm.jrt.core.InvocationExecution.InputIterator;
+import com.github.dm.jrt.core.RoutineInvocation.InvocationMode;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
@@ -887,7 +887,7 @@ public class RoutineTest {
         final Routine<Object, Object> routine1 =
                 JRoutineCore.on(PassingInvocation.factoryOf()).buildRoutine();
         final Routine<Object, Object> routine2 =
-                JRoutineCore.on(DelegatingInvocation.factoryFrom(routine1, DelegationType.SYNC))
+                JRoutineCore.on(RoutineInvocation.factoryFrom(routine1, InvocationMode.SYNC))
                             .buildRoutine();
 
         assertThat(routine2.asyncCall("test1").afterMax(timeout).all()).containsExactly("test1");
@@ -908,19 +908,19 @@ public class RoutineTest {
         final Routine<String, String> routine3 =
                 JRoutineCore.on(factoryOf(TestDestroy.class)).buildRoutine();
         final Routine<String, String> routine4 =
-                JRoutineCore.on(DelegatingInvocation.factoryFrom(routine3, DelegationType.ASYNC))
+                JRoutineCore.on(RoutineInvocation.factoryFrom(routine3, InvocationMode.ASYNC))
                             .buildRoutine();
         assertThat(routine4.asyncCall("test4").afterMax(timeout).all()).containsExactly("test4");
         routine4.purge();
         assertThat(TestDestroy.getInstanceCount()).isZero();
         final Routine<String, String> routine5 =
-                JRoutineCore.on(DelegatingInvocation.factoryFrom(routine3, DelegationType.PARALLEL))
+                JRoutineCore.on(RoutineInvocation.factoryFrom(routine3, InvocationMode.PARALLEL))
                             .buildRoutine();
         assertThat(routine5.asyncCall("test5").afterMax(timeout).all()).containsExactly("test5");
         routine5.purge();
         assertThat(TestDestroy.getInstanceCount()).isZero();
         final Routine<String, String> routine6 =
-                JRoutineCore.on(DelegatingInvocation.factoryFrom(routine3, DelegationType.SERIAL))
+                JRoutineCore.on(RoutineInvocation.factoryFrom(routine3, InvocationMode.SERIAL))
                             .buildRoutine();
         assertThat(routine6.asyncCall("test5").afterMax(timeout).all()).containsExactly("test5");
         routine6.purge();
@@ -1919,7 +1919,7 @@ public class RoutineTest {
 
         try {
 
-            DelegatingInvocation.factoryFrom(null, DelegationType.ASYNC);
+            RoutineInvocation.factoryFrom(null, InvocationMode.ASYNC);
 
             fail();
 
@@ -1929,7 +1929,7 @@ public class RoutineTest {
 
         try {
 
-            DelegatingInvocation.factoryFrom(JRoutineCore.on(PassingInvocation.factoryOf()), null);
+            RoutineInvocation.factoryFrom(JRoutineCore.on(PassingInvocation.factoryOf()), null);
 
             fail();
 

@@ -97,7 +97,7 @@ afterEvaluate { project ->
 
         project.javadoc {
             title = "${project.archivesBaseName} ${version}"
-            options.links('http://docs.oracle.com/javase/7/docs/api/')
+            options.links('http://docs.oracle.com/javase/8/docs/api/')
             options.windowTitle("Javadoc - ${project.archivesBaseName}")
             options.setMemberLevel(JavadocMemberLevel.PUBLIC)
         }
@@ -295,7 +295,7 @@ def addJavadocTask(project, variant, taskName) {
                 "${project.android.sdkDirectory}/platforms/${project.android.compileSdkVersion}/android.jar"
         classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
         title = "${project.archivesBaseName} ${project.version}"
-        options.links('http://docs.oracle.com/javase/7/docs/api/')
+        options.links('http://docs.oracle.com/javase/8/docs/api/')
         options.linksOffline('http://developer.android.com/reference/', "${project.android.sdkDirectory}/docs/reference/")
         options.windowTitle("Javadoc - ${project.archivesBaseName}")
         options.setMemberLevel(JavadocMemberLevel.PUBLIC)

@@ -61,7 +61,8 @@ class DefaultAutoProxyRoutineBuilder implements AutoProxyRoutineBuilder {
 
     private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.defaultConfiguration();
 
-    private final ProxyConfiguration.Configurable<DefaultAutoProxyRoutineBuilder> mProxyConfigurable =
+    private final ProxyConfiguration.Configurable<DefaultAutoProxyRoutineBuilder>
+            mProxyConfigurable =
             new ProxyConfiguration.Configurable<DefaultAutoProxyRoutineBuilder>() {
 
                 @NotNull

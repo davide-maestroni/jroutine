@@ -17,7 +17,7 @@
 package com.github.dm.jrt.object;
 
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.RoutineInvocation;
+import com.github.dm.jrt.core.RoutineInvocation.InvocationMode;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
@@ -1650,12 +1650,12 @@ public class ObjectRoutineTest {
         Routine<Character, Integer> add10();
 
         @Alias("a")
-        @Invoke(RoutineInvocation.InvocationMode.PARALLEL)
+        @Invoke(InvocationMode.PARALLEL)
         @AsyncMethod(char.class)
         Routine<Character, Integer> add11();
 
         @Alias("a")
-        @Invoke(RoutineInvocation.InvocationMode.PARALLEL)
+        @Invoke(InvocationMode.PARALLEL)
         int add2(@AsyncIn(value = char.class, mode = InputMode.VALUE) OutputChannel<Character> c);
 
         @Alias("a")
@@ -1668,7 +1668,7 @@ public class ObjectRoutineTest {
                 @AsyncIn(value = char.class, mode = InputMode.VALUE) OutputChannel<Character> c);
 
         @Alias("a")
-        @Invoke(RoutineInvocation.InvocationMode.PARALLEL)
+        @Invoke(InvocationMode.PARALLEL)
         @AsyncOut(OutputMode.VALUE)
         OutputChannel<Integer> add5(
                 @AsyncIn(value = char.class, mode = InputMode.VALUE) OutputChannel<Character> c);
@@ -1678,7 +1678,7 @@ public class ObjectRoutineTest {
         InvocationChannel<Character, Integer> add6();
 
         @Alias("a")
-        @Invoke(RoutineInvocation.InvocationMode.PARALLEL)
+        @Invoke(InvocationMode.PARALLEL)
         @AsyncMethod(char.class)
         InvocationChannel<Character, Integer> add7();
 
@@ -1694,7 +1694,7 @@ public class ObjectRoutineTest {
                 mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("aa")
-        @Invoke(RoutineInvocation.InvocationMode.PARALLEL)
+        @Invoke(InvocationMode.PARALLEL)
         int[] addA03(@AsyncIn(value = char[].class,
                 mode = InputMode.VALUE) OutputChannel<char[]> c);
 
@@ -1713,7 +1713,7 @@ public class ObjectRoutineTest {
                 mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("aa")
-        @Invoke(RoutineInvocation.InvocationMode.PARALLEL)
+        @Invoke(InvocationMode.PARALLEL)
         @AsyncOut(OutputMode.VALUE)
         OutputChannel<int[]> addA07(@AsyncIn(value = char[].class,
                 mode = InputMode.VALUE) OutputChannel<char[]> c);
@@ -1733,7 +1733,7 @@ public class ObjectRoutineTest {
                 mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("aa")
-        @Invoke(RoutineInvocation.InvocationMode.PARALLEL)
+        @Invoke(InvocationMode.PARALLEL)
         @AsyncOut(OutputMode.ELEMENT)
         OutputChannel<Integer> addA11(@AsyncIn(value = char[].class,
                 mode = InputMode.VALUE) OutputChannel<char[]> c);
@@ -1743,7 +1743,7 @@ public class ObjectRoutineTest {
         InvocationChannel<char[], int[]> addA12();
 
         @Alias("aa")
-        @Invoke(RoutineInvocation.InvocationMode.PARALLEL)
+        @Invoke(InvocationMode.PARALLEL)
         @AsyncMethod(char[].class)
         InvocationChannel<char[], int[]> addA13();
 
@@ -1752,7 +1752,7 @@ public class ObjectRoutineTest {
         Routine<char[], int[]> addA14();
 
         @Alias("aa")
-        @Invoke(RoutineInvocation.InvocationMode.PARALLEL)
+        @Invoke(InvocationMode.PARALLEL)
         @AsyncMethod(char[].class)
         Routine<char[], int[]> addA15();
 
@@ -1761,7 +1761,7 @@ public class ObjectRoutineTest {
         InvocationChannel<char[], Integer> addA16();
 
         @Alias("aa")
-        @Invoke(RoutineInvocation.InvocationMode.PARALLEL)
+        @Invoke(InvocationMode.PARALLEL)
         @AsyncMethod(value = char[].class, mode = OutputMode.ELEMENT)
         InvocationChannel<char[], Integer> addA17();
 
@@ -1770,7 +1770,7 @@ public class ObjectRoutineTest {
         Routine<char[], Integer> addA18();
 
         @Alias("aa")
-        @Invoke(RoutineInvocation.InvocationMode.PARALLEL)
+        @Invoke(InvocationMode.PARALLEL)
         @AsyncMethod(value = char[].class, mode = OutputMode.ELEMENT)
         Routine<char[], Integer> addA19();
 
@@ -1786,7 +1786,7 @@ public class ObjectRoutineTest {
                 mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("al")
-        @Invoke(RoutineInvocation.InvocationMode.PARALLEL)
+        @Invoke(InvocationMode.PARALLEL)
         List<Integer> addL03(@AsyncIn(value = List.class,
                 mode = InputMode.VALUE) OutputChannel<List<Character>> c);
 
@@ -1805,7 +1805,7 @@ public class ObjectRoutineTest {
                 mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("al")
-        @Invoke(RoutineInvocation.InvocationMode.PARALLEL)
+        @Invoke(InvocationMode.PARALLEL)
         @AsyncOut(OutputMode.VALUE)
         OutputChannel<List<Integer>> addL07(@AsyncIn(value = List.class,
                 mode = InputMode.VALUE) OutputChannel<List<Character>> c);
@@ -1825,7 +1825,7 @@ public class ObjectRoutineTest {
                 mode = InputMode.COLLECTION) OutputChannel<Character> c);
 
         @Alias("al")
-        @Invoke(RoutineInvocation.InvocationMode.PARALLEL)
+        @Invoke(InvocationMode.PARALLEL)
         @AsyncOut(OutputMode.ELEMENT)
         OutputChannel<Integer> addL11(@AsyncIn(value = List.class,
                 mode = InputMode.VALUE) OutputChannel<List<Character>> c);
@@ -1835,7 +1835,7 @@ public class ObjectRoutineTest {
         InvocationChannel<List<Character>, List<Integer>> addL12();
 
         @Alias("al")
-        @Invoke(RoutineInvocation.InvocationMode.PARALLEL)
+        @Invoke(InvocationMode.PARALLEL)
         @AsyncMethod(List.class)
         InvocationChannel<List<Character>, List<Integer>> addL13();
 
@@ -1844,7 +1844,7 @@ public class ObjectRoutineTest {
         Routine<List<Character>, List<Integer>> addL14();
 
         @Alias("al")
-        @Invoke(RoutineInvocation.InvocationMode.PARALLEL)
+        @Invoke(InvocationMode.PARALLEL)
         @AsyncMethod(List.class)
         Routine<List<Character>, List<Integer>> addL15();
 
@@ -1853,7 +1853,7 @@ public class ObjectRoutineTest {
         InvocationChannel<List<Character>, Integer> addL16();
 
         @Alias("al")
-        @Invoke(RoutineInvocation.InvocationMode.PARALLEL)
+        @Invoke(InvocationMode.PARALLEL)
         @AsyncMethod(value = List.class, mode = OutputMode.ELEMENT)
         InvocationChannel<List<Character>, Integer> addL17();
 
@@ -1862,7 +1862,7 @@ public class ObjectRoutineTest {
         Routine<List<Character>, Integer> addL18();
 
         @Alias("al")
-        @Invoke(RoutineInvocation.InvocationMode.PARALLEL)
+        @Invoke(InvocationMode.PARALLEL)
         @AsyncMethod(value = List.class, mode = OutputMode.ELEMENT)
         Routine<List<Character>, Integer> addL19();
 
@@ -1884,7 +1884,7 @@ public class ObjectRoutineTest {
         InvocationChannel<Void, Integer> get2();
 
         @Alias("s")
-        @Invoke(RoutineInvocation.InvocationMode.PARALLEL)
+        @Invoke(InvocationMode.PARALLEL)
         void set2(@AsyncIn(value = int.class, mode = InputMode.VALUE) OutputChannel<Integer> i);
 
         @Alias("g")
@@ -1917,7 +1917,7 @@ public class ObjectRoutineTest {
         Routine<Void, int[]> getA3();
 
         @Alias("sa")
-        @Invoke(RoutineInvocation.InvocationMode.PARALLEL)
+        @Invoke(InvocationMode.PARALLEL)
         void setA3(@AsyncIn(value = int[].class, mode = InputMode.VALUE) OutputChannel<int[]> i);
 
         @Alias("ga")
@@ -1955,7 +1955,7 @@ public class ObjectRoutineTest {
         Routine<Void, List<Integer>> getL3();
 
         @Alias("sl")
-        @Invoke(RoutineInvocation.InvocationMode.PARALLEL)
+        @Invoke(InvocationMode.PARALLEL)
         void setL3(@AsyncIn(value = List.class,
                 mode = InputMode.VALUE) OutputChannel<List<Integer>> i);
 
@@ -2004,7 +2004,7 @@ public class ObjectRoutineTest {
         InputChannel<Integer> compute2();
 
         @Alias("compute")
-        @Invoke(RoutineInvocation.InvocationMode.PARALLEL)
+        @Invoke(InvocationMode.PARALLEL)
         @AsyncMethod({int.class, int.class})
         InputChannel<Integer> compute3();
 
@@ -2092,7 +2092,7 @@ public class ObjectRoutineTest {
 
         @SharedFields({})
         @Alias("compute")
-        @Invoke(RoutineInvocation.InvocationMode.PARALLEL)
+        @Invoke(InvocationMode.PARALLEL)
         @AsyncOut
         OutputChannel<Integer> computeParallel(@AsyncIn(int.class) OutputChannel<Integer> i);
     }
@@ -2114,7 +2114,7 @@ public class ObjectRoutineTest {
         int compute(int a, @AsyncIn(value = int[].class,
                 mode = InputMode.COLLECTION) OutputChannel<Integer> b);
 
-        @Invoke(RoutineInvocation.InvocationMode.PARALLEL)
+        @Invoke(InvocationMode.PARALLEL)
         int compute(String text,
                 @AsyncIn(value = int.class, mode = InputMode.VALUE) OutputChannel<Integer> ints);
     }

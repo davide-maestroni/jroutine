@@ -16,7 +16,6 @@
 
 package com.github.dm.jrt.processor;
 
-import com.github.dm.jrt.core.RoutineInvocation;
 import com.github.dm.jrt.core.RoutineInvocation.InvocationMode;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.InvocationChannel;
@@ -978,8 +977,8 @@ public class RoutineProcessor extends AbstractProcessor {
             @NotNull final Invoke annotation) {
 
         final InvocationMode invocationMode = annotation.value();
-        if (((invocationMode == RoutineInvocation.InvocationMode.PARALLEL) || (invocationMode
-                == RoutineInvocation.InvocationMode.SERIAL)) && (methodElement.getParameters().size() > 1)) {
+        if (((invocationMode == InvocationMode.PARALLEL) || (invocationMode
+                == InvocationMode.SERIAL)) && (methodElement.getParameters().size() > 1)) {
             throw new IllegalArgumentException(
                     "methods annotated with invocation mode " + invocationMode
                             + " must have at maximum one input parameter: " + methodElement);
@@ -1884,8 +1883,8 @@ public class RoutineProcessor extends AbstractProcessor {
             outputMode = getOutputMode(methodElement, targetMethod);
         }
 
-        if (((invocationMode == RoutineInvocation.InvocationMode.PARALLEL) || (invocationMode
-                == RoutineInvocation.InvocationMode.SERIAL)) && (targetMethod.getParameters().size() > 1)) {
+        if (((invocationMode == InvocationMode.PARALLEL) || (invocationMode
+                == InvocationMode.SERIAL)) && (targetMethod.getParameters().size() > 1)) {
             throw new IllegalArgumentException(
                     "methods annotated with invocation mode " + invocationMode
                             + " must have no input parameters: " + methodElement);
@@ -1941,9 +1940,9 @@ public class RoutineProcessor extends AbstractProcessor {
         method = method.replace("${inputParams}",
                 buildInputParams(annotationElement, element, targetElement, methodElement));
         method = method.replace("${invokeMethod}",
-                (invocationMode == RoutineInvocation.InvocationMode.SYNC) ? "syncInvoke"
-                        : (invocationMode == RoutineInvocation.InvocationMode.PARALLEL) ? "parallelInvoke"
-                                : (invocationMode == RoutineInvocation.InvocationMode.SERIAL) ? "serialInvoke"
+                (invocationMode == InvocationMode.SYNC) ? "syncInvoke"
+                        : (invocationMode == InvocationMode.PARALLEL) ? "parallelInvoke"
+                                : (invocationMode == InvocationMode.SERIAL) ? "serialInvoke"
                                         : "asyncInvoke");
         writer.append(method);
         String methodInvocationHeader;

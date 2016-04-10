@@ -1,8 +1,8 @@
 com.github.dm.jrt.core
 com.github.dm.jrt.core.builder
 com.github.dm.jrt.core.channel
-com.github.dm.jrt.core.common
 com.github.dm.jrt.core.config
+com.github.dm.jrt.core.error
 com.github.dm.jrt.core.invocation
 com.github.dm.jrt.core.log
 com.github.dm.jrt.core.routine

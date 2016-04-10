@@ -57,11 +57,11 @@ import static com.github.dm.jrt.android.core.invocation.TargetInvocationFactory.
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.Reflection.findMethod;
 import static com.github.dm.jrt.object.Builders.callFromInvocation;
-import static com.github.dm.jrt.object.Builders.configurationWithAnnotations;
 import static com.github.dm.jrt.object.Builders.getAnnotatedMethod;
 import static com.github.dm.jrt.object.Builders.getSharedMutex;
 import static com.github.dm.jrt.object.Builders.getTargetMethodInfo;
 import static com.github.dm.jrt.object.Builders.invokeRoutine;
+import static com.github.dm.jrt.object.Builders.withAnnotations;
 
 /**
  * Class implementing a builder of routines wrapping an object methods.
@@ -184,8 +184,8 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         final ServiceRoutineBuilder<Object, Object> builder =
                 JRoutineService.with(mContext).on(factory);
         return (Routine<IN, OUT>) builder.getInvocationConfiguration()
-                                         .with(configurationWithAnnotations(
-                                                 mInvocationConfiguration, targetMethod))
+                                         .with(withAnnotations(mInvocationConfiguration,
+                                                 targetMethod))
                                          .setConfiguration()
                                          .getServiceConfiguration()
                                          .with(mServiceConfiguration)
@@ -208,8 +208,8 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         final ServiceRoutineBuilder<Object, Object> builder =
                 JRoutineService.with(mContext).on(factory);
         return (Routine<IN, OUT>) builder.getInvocationConfiguration()
-                                         .with(configurationWithAnnotations(
-                                                 mInvocationConfiguration, targetMethod))
+                                         .with(withAnnotations(mInvocationConfiguration,
+                                                 targetMethod))
                                          .setConfiguration()
                                          .getServiceConfiguration()
                                          .with(mServiceConfiguration)
@@ -540,7 +540,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             final TargetInvocationFactory<Object, Object> factory =
                     factoryOf(ProxyInvocation.class, factoryArgs);
             final InvocationConfiguration invocationConfiguration =
-                    configurationWithAnnotations(mInvocationConfiguration, method);
+                    withAnnotations(mInvocationConfiguration, method);
             final ServiceRoutineBuilder<Object, Object> builder =
                     JRoutineService.with(mContext).on(factory);
             final Routine<Object, Object> routine = builder.getInvocationConfiguration()

@@ -62,7 +62,7 @@ public class AndroidBuilders {
      * @see com.github.dm.jrt.android.object.annotation.ResultStaleTime ResultStaleTime
      */
     @NotNull
-    public static LoaderConfiguration configurationWithAnnotations(
+    public static LoaderConfiguration withAnnotations(
             @Nullable final LoaderConfiguration configuration,
             @Nullable final Annotation... annotations) {
 
@@ -113,9 +113,9 @@ public class AndroidBuilders {
      * @see com.github.dm.jrt.android.object.annotation.ResultStaleTime ResultStaleTime
      */
     @NotNull
-    public static LoaderConfiguration configurationWithAnnotations(
+    public static LoaderConfiguration withAnnotations(
             @Nullable final LoaderConfiguration configuration, @NotNull final Method method) {
 
-        return configurationWithAnnotations(configuration, method.getDeclaredAnnotations());
+        return withAnnotations(configuration, method.getDeclaredAnnotations());
     }
 }

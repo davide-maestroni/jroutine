@@ -47,11 +47,11 @@ import java.util.List;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.object.Builders.callFromInvocation;
-import static com.github.dm.jrt.object.Builders.configurationWithAnnotations;
 import static com.github.dm.jrt.object.Builders.getAnnotatedMethod;
 import static com.github.dm.jrt.object.Builders.getSharedMutex;
 import static com.github.dm.jrt.object.Builders.getTargetMethodInfo;
 import static com.github.dm.jrt.object.Builders.invokeRoutine;
+import static com.github.dm.jrt.object.Builders.withAnnotations;
 
 /**
  * Class implementing a builder of routines wrapping an object methods.
@@ -130,8 +130,8 @@ class DefaultObjectRoutineBuilder
     @NotNull
     public <IN, OUT> Routine<IN, OUT> method(@NotNull final Method method) {
 
-        return getRoutine(configurationWithAnnotations(mInvocationConfiguration, method),
-                configurationWithAnnotations(mProxyConfiguration, method), method, null, null);
+        return getRoutine(withAnnotations(mInvocationConfiguration, method),
+                withAnnotations(mProxyConfiguration, method), method, null, null);
     }
 
     @NotNull
@@ -395,9 +395,9 @@ class DefaultObjectRoutineBuilder
             final InputMode inputMode = methodInfo.inputMode;
             final OutputMode outputMode = methodInfo.outputMode;
             final Routine<Object, Object> routine =
-                    getRoutine(configurationWithAnnotations(mInvocationConfiguration, method),
-                            configurationWithAnnotations(mProxyConfiguration, method),
-                            methodInfo.method, inputMode, outputMode);
+                    getRoutine(withAnnotations(mInvocationConfiguration, method),
+                            withAnnotations(mProxyConfiguration, method), methodInfo.method,
+                            inputMode, outputMode);
             return invokeRoutine(routine, method, asArgs(args), methodInfo.invocationMode,
                     inputMode, outputMode);
         }

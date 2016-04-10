@@ -77,7 +77,7 @@ import java.util.concurrent.TimeUnit;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
 import static com.github.dm.jrt.core.util.TimeDuration.INFINITY;
 import static com.github.dm.jrt.core.util.TimeDuration.seconds;
-import static com.github.dm.jrt.object.Builders.configurationWithAnnotations;
+import static com.github.dm.jrt.object.Builders.withAnnotations;
 import static com.github.dm.jrt.object.InvocationTarget.classOfType;
 import static com.github.dm.jrt.object.InvocationTarget.instance;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -233,7 +233,7 @@ public class ObjectRoutineTest {
     @Test
     public void testBuilderConfigurationThroughAnnotations() throws NoSuchMethodException {
 
-        assertThat(configurationWithAnnotations(InvocationConfiguration.defaultConfiguration(),
+        assertThat(withAnnotations(InvocationConfiguration.defaultConfiguration(),
                 AnnotationItf.class.getMethod("toString"))).isEqualTo(builder().withCoreInstances(3)
                                                                                .withInputOrder(
                                                                                        OrderType

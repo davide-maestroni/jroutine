@@ -30,7 +30,7 @@ import com.github.dm.jrt.android.object.annotation.ResultStaleTime;
 import com.github.dm.jrt.core.util.TimeDuration;
 
 import static com.github.dm.jrt.android.core.config.LoaderConfiguration.builder;
-import static com.github.dm.jrt.android.object.AndroidBuilders.configurationWithAnnotations;
+import static com.github.dm.jrt.android.object.AndroidBuilders.withAnnotations;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -42,7 +42,7 @@ public class AndroidBuildersTest extends AndroidTestCase {
 
     public void testBuilderConfigurationThroughAnnotations() throws NoSuchMethodException {
 
-        assertThat(configurationWithAnnotations(LoaderConfiguration.defaultConfiguration(),
+        assertThat(withAnnotations(LoaderConfiguration.defaultConfiguration(),
                 AnnotationItf.class.getMethod("toString"))).isEqualTo(
                 builder().withCacheStrategy(CacheStrategyType.CACHE_IF_ERROR)
                          .withClashResolution(ClashResolutionType.ABORT)

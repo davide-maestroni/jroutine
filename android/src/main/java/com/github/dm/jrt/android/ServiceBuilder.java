@@ -116,7 +116,10 @@ public class ServiceBuilder {
     /**
      * Returns a routine builder based on an invocation factory creating instances of the
      * specified class.
-     *
+     * <br>
+     * The method accepts also classes implementing
+     * {@link com.github.dm.jrt.android.core.invocation.ContextInvocation ContextInvocation}.
+    *
      * @param invocationClass the invocation class.
      * @param <IN>            the input data type.
      * @param <OUT>           the output data type.
@@ -133,12 +136,9 @@ public class ServiceBuilder {
     /**
      * Returns a routine builder based on an invocation factory creating instances of the
      * specified class by passing the specified arguments to the class constructor.
-     * <p>
-     * Note that inner and anonymous classes can be passed as well. Remember however that Java
-     * creates synthetic constructors for such classes, so be sure to specify the correct
-     * arguments to guarantee proper instantiation. In fact, inner classes always have the outer
-     * instance as first constructor parameter, and anonymous classes have both the outer
-     * instance and all the variables captured in the closure.
+     * <br>
+     * The method accepts also classes implementing
+     * {@link com.github.dm.jrt.android.core.invocation.ContextInvocation ContextInvocation}.
      *
      * @param invocationClass the invocation class.
      * @param args            the invocation constructor arguments.
@@ -159,6 +159,9 @@ public class ServiceBuilder {
     /**
      * Returns a routine builder based on an invocation factory creating instances of the
      * specified class token.
+     * <br>
+     * The method accepts also classes implementing
+     * {@link com.github.dm.jrt.android.core.invocation.ContextInvocation ContextInvocation}.
      *
      * @param invocationToken the invocation class token.
      * @param <IN>            the input data type.
@@ -176,12 +179,9 @@ public class ServiceBuilder {
     /**
      * Returns a routine builder based on an invocation factory creating instances of the
      * specified class token by passing the specified arguments to the class constructor.
-     * <p>
-     * Note that class tokens of inner and anonymous classes can be passed as well. Remember
-     * however that Java creates synthetic constructors for such classes, so be sure to specify
-     * the correct arguments to guarantee proper instantiation. In fact, inner classes always
-     * have the outer instance as first constructor parameter, and anonymous classes have both
-     * the outer instance and all the variables captured in the closure.
+     * <br>
+     * The method accepts also classes implementing
+     * {@link com.github.dm.jrt.android.core.invocation.ContextInvocation ContextInvocation}.
      *
      * @param invocationToken the invocation class token.
      * @param args            the invocation constructor arguments.
@@ -202,10 +202,9 @@ public class ServiceBuilder {
     /**
      * Returns a routine builder based on an invocation factory creating instances of the
      * specified object.
-     * <p>
-     * Note that inner and anonymous objects can be passed as well. Remember however that Java
-     * creates synthetic constructors for such classes, so be sure to specify the correct
-     * arguments to guarantee proper instantiation.
+     * <br>
+     * The method accepts also instances implementing
+     * {@link com.github.dm.jrt.android.core.invocation.ContextInvocation ContextInvocation}.
      *
      * @param invocation the invocation instance.
      * @param <IN>       the input data type.
@@ -224,10 +223,9 @@ public class ServiceBuilder {
     /**
      * Returns a routine builder based on an invocation factory creating instances of the
      * specified object.
-     * <p>
-     * Note that inner and anonymous objects can be passed as well. Remember however that Java
-     * creates synthetic constructors for such classes, so be sure to specify the correct
-     * arguments to guarantee proper instantiation.
+     * <br>
+     * The method accepts also instances implementing
+     * {@link com.github.dm.jrt.android.core.invocation.ContextInvocation ContextInvocation}.
      *
      * @param invocation the invocation instance.
      * @param args       the invocation constructor arguments.

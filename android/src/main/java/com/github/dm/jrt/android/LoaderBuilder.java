@@ -123,6 +123,9 @@ public class LoaderBuilder {
     /**
      * Returns a routine builder based on an invocation factory creating instances of the specified
      * class.
+     * <br>
+     * The method accepts also classes implementing
+     * {@link com.github.dm.jrt.android.core.invocation.ContextInvocation ContextInvocation}.
      * <p>
      * Note that inner and anonymous classes can be passed as well. Remember however that Java
      * creates synthetic constructors for such classes, so be sure to specify the correct arguments
@@ -146,6 +149,9 @@ public class LoaderBuilder {
     /**
      * Returns a routine builder based on an invocation factory creating instances of the specified
      * class by passing the specified arguments to the class constructor.
+     * <br>
+     * The method accepts also classes implementing
+     * {@link com.github.dm.jrt.android.core.invocation.ContextInvocation ContextInvocation}.
      * <p>
      * Note that inner and anonymous classes can be passed as well. Remember however that Java
      * creates synthetic constructors for such classes, so be sure to specify the correct arguments
@@ -172,6 +178,9 @@ public class LoaderBuilder {
     /**
      * Returns a routine builder based on an invocation factory creating instances of the specified
      * class token.
+     * <br>
+     * The method accepts also classes implementing
+     * {@link com.github.dm.jrt.android.core.invocation.ContextInvocation ContextInvocation}.
      * <p>
      * Note that inner and anonymous classes can be passed as well. Remember however that Java
      * creates synthetic constructors for such classes, so be sure to specify the correct arguments
@@ -195,6 +204,9 @@ public class LoaderBuilder {
     /**
      * Returns a routine builder based on an invocation factory creating instances of the specified
      * class token by passing the specified arguments to the class constructor.
+     * <br>
+     * The method accepts also classes implementing
+     * {@link com.github.dm.jrt.android.core.invocation.ContextInvocation ContextInvocation}.
      * <p>
      * Note that inner and anonymous classes can be passed as well. Remember however that Java
      * creates synthetic constructors for such classes, so be sure to specify the correct
@@ -254,6 +266,9 @@ public class LoaderBuilder {
     /**
      * Returns a routine builder based on an invocation factory creating instances of the specified
      * object.
+     * <br>
+     * The method accepts also instances implementing
+     * {@link com.github.dm.jrt.android.core.invocation.ContextInvocation ContextInvocation}.
      * <p>
      * Note that inner and anonymous objects can be passed as well. Remember however that Java
      * creates synthetic constructors for such classes, so be sure to specify the correct arguments
@@ -276,6 +291,9 @@ public class LoaderBuilder {
     /**
      * Returns a routine builder based on an invocation factory creating instances of the specified
      * object.
+     * <br>
+     * The method accepts also instances implementing
+     * {@link com.github.dm.jrt.android.core.invocation.ContextInvocation ContextInvocation}.
      * <p>
      * Note that inner and anonymous objects can be passed as well. Remember however that Java
      * creates synthetic constructors for such classes, so be sure to specify the correct arguments

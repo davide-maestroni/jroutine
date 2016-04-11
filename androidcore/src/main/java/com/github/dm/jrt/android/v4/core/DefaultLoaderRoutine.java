@@ -28,19 +28,16 @@ import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.log.Logger;
-import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import static com.github.dm.jrt.android.core.runner.AndroidRunners.mainRunner;
-import static com.github.dm.jrt.android.v4.core.LoaderInvocation.purgeLoader;
 import static com.github.dm.jrt.android.v4.core.LoaderInvocation.purgeLoaders;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
@@ -96,8 +93,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
         super.purge();
         final LoaderContextCompat context = mContext;
         if (context.getComponent() != null) {
-            mainRunner().run(new PurgeExecution(context, mFactory, mLoaderId), 0,
-                    TimeUnit.MILLISECONDS);
+            purgeLoaders(context, mLoaderId, mFactory);
         }
     }
 
@@ -144,10 +140,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
 
         final LoaderContextCompat context = mContext;
         if (context.getComponent() != null) {
-            final List<IN> inputList = Collections.singletonList(input);
-            final PurgeInputsExecution<IN> execution =
-                    new PurgeInputsExecution<IN>(context, mFactory, mLoaderId, inputList);
-            mainRunner().run(execution, 0, TimeUnit.MILLISECONDS);
+            purgeLoaders(context, mLoaderId, mFactory, Collections.singletonList(input));
         }
     }
 
@@ -160,13 +153,10 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
                 inputList = Collections.emptyList();
 
             } else {
-                inputList = new ArrayList<IN>(inputs.length);
-                Collections.addAll(inputList, inputs);
+                inputList = Arrays.asList(inputs);
             }
 
-            final PurgeInputsExecution<IN> execution =
-                    new PurgeInputsExecution<IN>(context, mFactory, mLoaderId, inputList);
-            mainRunner().run(execution, 0, TimeUnit.MILLISECONDS);
+            purgeLoaders(context, mLoaderId, mFactory, inputList);
         }
     }
 
@@ -185,9 +175,7 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
                 }
             }
 
-            final PurgeInputsExecution<IN> execution =
-                    new PurgeInputsExecution<IN>(context, mFactory, mLoaderId, inputList);
-            mainRunner().run(execution, 0, TimeUnit.MILLISECONDS);
+            purgeLoaders(context, mLoaderId, mFactory, inputList);
         }
     }
 
@@ -220,77 +208,6 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
         public ContextInvocation<IN, OUT> newInvocation() throws Exception {
 
             return mFactory.newInvocation();
-        }
-    }
-
-    /**
-     * Execution implementation purging all loaders with a specific invocation factory.
-     */
-    private static class PurgeExecution implements Execution {
-
-        private final LoaderContextCompat mContext;
-
-        private final ContextInvocationFactory<?, ?> mFactory;
-
-        private final int mLoaderId;
-
-        /**
-         * Constructor.
-         *
-         * @param context  the context instance.
-         * @param factory  the invocation factory.
-         * @param loaderId the loader ID.
-         */
-        private PurgeExecution(@NotNull final LoaderContextCompat context,
-                @NotNull final ContextInvocationFactory<?, ?> factory, final int loaderId) {
-
-            mContext = context;
-            mFactory = factory;
-            mLoaderId = loaderId;
-        }
-
-        public void run() {
-
-            purgeLoaders(mContext, mLoaderId, mFactory);
-        }
-    }
-
-    /**
-     * Execution implementation purging the loader with a specific invocation factory and inputs.
-     *
-     * @param <IN> the input data type.
-     */
-    private static class PurgeInputsExecution<IN> implements Execution {
-
-        private final LoaderContextCompat mContext;
-
-        private final ContextInvocationFactory<?, ?> mFactory;
-
-        private final List<IN> mInputs;
-
-        private final int mLoaderId;
-
-        /**
-         * Constructor.
-         *
-         * @param context  the context instance.
-         * @param factory  the invocation factory.
-         * @param loaderId the loader ID.
-         * @param inputs   the list of inputs.
-         */
-        private PurgeInputsExecution(@NotNull final LoaderContextCompat context,
-                @NotNull final ContextInvocationFactory<?, ?> factory, final int loaderId,
-                @NotNull final List<IN> inputs) {
-
-            mContext = context;
-            mFactory = factory;
-            mLoaderId = loaderId;
-            mInputs = inputs;
-        }
-
-        public void run() {
-
-            purgeLoader(mContext, mLoaderId, mFactory, mInputs);
         }
     }
 }

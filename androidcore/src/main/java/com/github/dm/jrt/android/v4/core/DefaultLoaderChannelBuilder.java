@@ -26,7 +26,6 @@ import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.log.Logger;
-import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.TimeDuration;
 
@@ -34,11 +33,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import static com.github.dm.jrt.android.core.runner.AndroidRunners.mainRunner;
 import static com.github.dm.jrt.android.v4.core.LoaderInvocation.purgeLoader;
 
 /**
@@ -132,9 +130,7 @@ class DefaultLoaderChannelBuilder
 
         final LoaderContextCompat context = mContext;
         if (context.getComponent() != null) {
-            mainRunner().run(new PurgeExecution(context,
-                            mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO)), 0,
-                    TimeUnit.MILLISECONDS);
+            purgeLoader(context, mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO));
         }
     }
 
@@ -142,10 +138,8 @@ class DefaultLoaderChannelBuilder
 
         final LoaderContextCompat context = mContext;
         if (context.getComponent() != null) {
-            final List<Object> inputList = Collections.singletonList(input);
-            final int loaderId = mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO);
-            mainRunner().run(new PurgeInputsExecution(context, loaderId, inputList), 0,
-                    TimeUnit.MILLISECONDS);
+            purgeLoader(context, mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO),
+                    Collections.singletonList(input));
         }
     }
 
@@ -158,13 +152,11 @@ class DefaultLoaderChannelBuilder
                 inputList = Collections.emptyList();
 
             } else {
-                inputList = new ArrayList<Object>(inputs.length);
-                Collections.addAll(inputList, inputs);
+                inputList = Arrays.asList(inputs);
             }
 
-            final int loaderId = mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO);
-            mainRunner().run(new PurgeInputsExecution(context, loaderId, inputList), 0,
-                    TimeUnit.MILLISECONDS);
+            purgeLoader(context, mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO),
+                    inputList);
         }
     }
 
@@ -183,9 +175,8 @@ class DefaultLoaderChannelBuilder
                 }
             }
 
-            final int loaderId = mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO);
-            mainRunner().run(new PurgeInputsExecution(context, loaderId, inputList), 0,
-                    TimeUnit.MILLISECONDS);
+            purgeLoader(context, mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO),
+                    inputList);
         }
     }
 
@@ -209,64 +200,5 @@ class DefaultLoaderChannelBuilder
 
         mChannelConfiguration = ConstantConditions.notNull("channel configuration", configuration);
         return this;
-    }
-
-    /**
-     * Execution implementation purging the loader with a specific ID.
-     */
-    private static class PurgeExecution implements Execution {
-
-        private final LoaderContextCompat mContext;
-
-        private final int mLoaderId;
-
-        /**
-         * Constructor.
-         *
-         * @param context  the context instance.
-         * @param loaderId the loader ID.
-         */
-        private PurgeExecution(@NotNull final LoaderContextCompat context, final int loaderId) {
-
-            mContext = context;
-            mLoaderId = loaderId;
-        }
-
-        public void run() {
-
-            purgeLoader(mContext, mLoaderId);
-        }
-    }
-
-    /**
-     * Execution implementation purging the loader with a specific ID and inputs.
-     */
-    private static class PurgeInputsExecution implements Execution {
-
-        private final LoaderContextCompat mContext;
-
-        private final List<Object> mInputs;
-
-        private final int mLoaderId;
-
-        /**
-         * Constructor.
-         *
-         * @param context  the context instance.
-         * @param loaderId the loader ID.
-         * @param inputs   the list of inputs.
-         */
-        private PurgeInputsExecution(@NotNull final LoaderContextCompat context, final int loaderId,
-                @NotNull final List<Object> inputs) {
-
-            mContext = context;
-            mLoaderId = loaderId;
-            mInputs = inputs;
-        }
-
-        public void run() {
-
-            purgeLoader(mContext, mLoaderId, mInputs);
-        }
     }
 }

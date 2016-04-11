@@ -388,8 +388,8 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
                         serviceContext.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
                 if (!mIsBound) {
                     throw new RoutineException("failed to bind to service: " + intent
-                            + ", remember to add the service "
-                            + "declaration to the Android manifest " + "file!");
+                            + ", remember to add the service declaration to the Android manifest "
+                            + "file!");
                 }
             }
         }

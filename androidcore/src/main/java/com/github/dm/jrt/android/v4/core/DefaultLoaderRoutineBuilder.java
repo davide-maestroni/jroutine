@@ -20,7 +20,6 @@ import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.core.routine.LoaderRoutine;
-import com.github.dm.jrt.android.core.runner.AndroidRunners;
 import com.github.dm.jrt.core.builder.TemplateRoutineBuilder;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.runner.Runner;
@@ -29,6 +28,9 @@ import com.github.dm.jrt.core.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import static com.github.dm.jrt.android.core.runner.AndroidRunners.mainRunner;
+import static com.github.dm.jrt.core.runner.Runners.zeroDelayRunner;
 
 /**
  * Default implementation of a loader routine builder.
@@ -85,15 +87,14 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
     public LoaderRoutine<IN, OUT> buildRoutine() {
 
         final InvocationConfiguration configuration = getConfiguration();
-        final Runner mainRunner = AndroidRunners.mainRunner();
-        final Runner asyncRunner = configuration.getRunnerOr(mainRunner);
-        if (asyncRunner != mainRunner) {
+        final Runner asyncRunner = configuration.getRunnerOr(null);
+        if (asyncRunner != null) {
             configuration.newLogger(this)
                          .wrn("the specified async runner will be ignored: %s", asyncRunner);
         }
 
         final InvocationConfiguration.Builder<InvocationConfiguration> builder =
-                configuration.builderFrom().withRunner(mainRunner);
+                configuration.builderFrom().withRunner(zeroDelayRunner(mainRunner()));
         return new DefaultLoaderRoutine<IN, OUT>(mContext, mFactory, builder.setConfiguration(),
                 mLoaderConfiguration);
     }

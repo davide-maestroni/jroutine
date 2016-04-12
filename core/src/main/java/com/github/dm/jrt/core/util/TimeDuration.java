@@ -303,12 +303,12 @@ public class TimeDuration extends Time {
     public TimeDuration minus(@NotNull final Time time) {
 
         if (unit.compareTo(time.unit) > 0) {
-            final long newTime = time.unit.convert(this.time, unit) - time.time;
+            final long newTime = to(time.unit) - time.time;
             return (newTime >= 0) ? fromUnit(newTime, time.unit)
                     : fromUnit(newTime - Long.MIN_VALUE, time.unit);
         }
 
-        final long newTime = this.time - unit.convert(time.time, time.unit);
+        final long newTime = this.time - time.to(unit);
         return (newTime >= 0) ? fromUnit(newTime, unit) : fromUnit(newTime - Long.MIN_VALUE, unit);
     }
 
@@ -349,12 +349,12 @@ public class TimeDuration extends Time {
     public TimeDuration plus(@NotNull final Time time) {
 
         if (unit.compareTo(time.unit) > 0) {
-            final long newTime = time.unit.convert(this.time, unit) + time.time;
+            final long newTime = to(time.unit) + time.time;
             return (newTime >= 0) ? fromUnit(newTime, time.unit)
                     : fromUnit(newTime - Long.MIN_VALUE, time.unit);
         }
 
-        final long newTime = this.time + unit.convert(time.time, time.unit);
+        final long newTime = this.time + time.to(unit);
         return (newTime >= 0) ? fromUnit(newTime, unit) : fromUnit(newTime - Long.MIN_VALUE, unit);
     }
 

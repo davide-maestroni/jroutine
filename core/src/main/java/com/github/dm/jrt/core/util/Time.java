@@ -237,14 +237,12 @@ public class Time implements Comparable<Time> {
     public int compareTo(@NotNull final Time o) {
 
         if (unit.compareTo(o.unit) > 0) {
-            final int coarseComparison = compareLong(time, unit.convert(o.time, o.unit));
-            return (coarseComparison != 0) ? coarseComparison
-                    : compareLong(o.unit.convert(time, unit), o.time);
+            final int coarseComparison = compareLong(time, o.to(unit));
+            return (coarseComparison != 0) ? coarseComparison : compareLong(to(o.unit), o.time);
         }
 
-        final int coarseComparison = compareLong(o.unit.convert(time, unit), o.time);
-        return (coarseComparison != 0) ? coarseComparison
-                : compareLong(time, unit.convert(o.time, o.unit));
+        final int coarseComparison = compareLong(to(o.unit), o.time);
+        return (coarseComparison != 0) ? coarseComparison : compareLong(time, o.to(unit));
     }
 
     /**
@@ -346,10 +344,10 @@ public class Time implements Comparable<Time> {
     public Time minus(@NotNull final Time time) {
 
         if (unit.compareTo(time.unit) > 0) {
-            return fromUnit(time.unit.convert(this.time, unit) - time.time, time.unit);
+            return fromUnit(to(time.unit) - time.time, time.unit);
         }
 
-        return fromUnit(this.time - unit.convert(time.time, time.unit), unit);
+        return fromUnit(this.time - time.to(unit), unit);
     }
 
     /**
@@ -386,10 +384,10 @@ public class Time implements Comparable<Time> {
     public Time plus(@NotNull final Time time) {
 
         if (unit.compareTo(time.unit) > 0) {
-            return fromUnit(time.unit.convert(this.time, unit) + time.time, time.unit);
+            return fromUnit(to(time.unit) + time.time, time.unit);
         }
 
-        return fromUnit(this.time + unit.convert(time.time, time.unit), unit);
+        return fromUnit(this.time + time.to(unit), unit);
     }
 
     /**

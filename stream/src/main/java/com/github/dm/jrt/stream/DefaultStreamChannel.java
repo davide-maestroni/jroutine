@@ -17,10 +17,10 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.RoutineInvocation.InvocationMode;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
+import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;

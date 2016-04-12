@@ -16,12 +16,12 @@
 
 package com.github.dm.jrt.object.builder;
 
-import com.github.dm.jrt.core.RoutineInvocation.InvocationMode;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.invocation.InvocationException;
+import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.Reflection;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;

@@ -20,9 +20,9 @@ import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationWrapper;
 import com.github.dm.jrt.core.RoutineInvocation;
-import com.github.dm.jrt.core.RoutineInvocation.InvocationMode;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
+import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 
 import org.jetbrains.annotations.NotNull;

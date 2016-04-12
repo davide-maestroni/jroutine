@@ -17,7 +17,6 @@
 package com.github.dm.jrt.object;
 
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.RoutineInvocation.InvocationMode;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
@@ -31,6 +30,7 @@ import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.NullLog;
+import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;

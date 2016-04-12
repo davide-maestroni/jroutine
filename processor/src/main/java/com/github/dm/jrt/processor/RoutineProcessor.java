@@ -16,12 +16,12 @@
 
 package com.github.dm.jrt.processor;
 
-import com.github.dm.jrt.core.RoutineInvocation.InvocationMode;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.log.Log.Level;
+import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.object.annotation.Alias;
 import com.github.dm.jrt.object.annotation.AsyncIn;

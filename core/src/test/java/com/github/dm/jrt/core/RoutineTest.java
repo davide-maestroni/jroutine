@@ -18,7 +18,6 @@ package com.github.dm.jrt.core;
 
 import com.github.dm.jrt.core.DefaultResultChannel.AbortHandler;
 import com.github.dm.jrt.core.InvocationExecution.InputIterator;
-import com.github.dm.jrt.core.RoutineInvocation.InvocationMode;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
@@ -50,6 +49,7 @@ import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.log.NullLog;
+import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;

@@ -22,6 +22,7 @@ import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
+import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
@@ -123,39 +124,6 @@ public class RoutineInvocation<IN, OUT> implements Invocation<IN, OUT> {
 
         mInputChannel = null;
         mOutputChannel = null;
-    }
-
-    /**
-     * Routine invocation mode type.
-     * <br>
-     * The mode indicates in which way the routine should be invoked.
-     */
-    public enum InvocationMode {
-
-        /**
-         * Synchronous mode.
-         *
-         * @see com.github.dm.jrt.core.routine.Routine Routine
-         */
-        SYNC,
-        /**
-         * Asynchronous mode.
-         *
-         * @see com.github.dm.jrt.core.routine.Routine Routine
-         */
-        ASYNC,
-        /**
-         * Parallel mode.
-         *
-         * @see com.github.dm.jrt.core.routine.Routine Routine
-         */
-        PARALLEL,
-        /**
-         * Serial mode.
-         *
-         * @see com.github.dm.jrt.core.routine.Routine Routine
-         */
-        SERIAL
     }
 
     /**

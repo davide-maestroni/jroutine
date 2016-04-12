@@ -119,7 +119,7 @@ public class ServiceBuilder {
      * <br>
      * The method accepts also classes implementing
      * {@link com.github.dm.jrt.android.core.invocation.ContextInvocation ContextInvocation}.
-    *
+     *
      * @param invocationClass the invocation class.
      * @param <IN>            the input data type.
      * @param <OUT>           the output data type.
@@ -273,7 +273,7 @@ public class ServiceBuilder {
      * <br>
      * In order to customize the invocation creation, the caller must override the method
      * {@link com.github.dm.jrt.android.core.service.InvocationService#getInvocationFactory(
-     * Class, Object...) getInvocationFactory(Class, Object...)} of the routine service.
+     *Class, Object...) getInvocationFactory(Class, Object...)} of the routine service.
      * <p>
      * Note that the built routine results will be dispatched into the configured looper, thus,
      * waiting for the outputs on the very same looper thread, immediately after its invocation,

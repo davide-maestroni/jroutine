@@ -16,7 +16,7 @@
 
 package com.github.dm.jrt.object.annotation;
 
-import com.github.dm.jrt.core.RoutineInvocation.InvocationMode;
+import com.github.dm.jrt.core.routine.InvocationMode;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

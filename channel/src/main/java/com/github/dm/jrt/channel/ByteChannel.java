@@ -284,6 +284,13 @@ public class ByteChannel {
     public static abstract class BufferInputStream extends InputStream {
 
         /**
+         * Constructor.
+         */
+        protected BufferInputStream() {
+
+        }
+
+        /**
          * Reads some bytes from the input stream and writes them into the specified output stream.
          *
          * @param out the output stream.
@@ -355,6 +362,13 @@ public class ByteChannel {
      * Output stream used to write data into the buffer channel.
      */
     public static abstract class BufferOutputStream extends OutputStream {
+
+        /**
+         * Constructor.
+         */
+        protected BufferOutputStream() {
+
+        }
 
         /**
          * Writes some bytes into the output stream by reading them from the specified input stream.

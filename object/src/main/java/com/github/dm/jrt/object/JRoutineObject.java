@@ -38,11 +38,6 @@ import org.jetbrains.annotations.NotNull;
  * A mirror interface adds the possibility to override input and output parameters with output
  * channels, so that data are transferred asynchronously, avoiding the need to block execution while
  * waiting for them to be available.
- * <br>
- * Finally, it also possible to create a wrapper class to enable asynchronous invocation of methods,
- * through annotation pre-processing and compile-time code generation. In order to activate the
- * processing of annotations, it is simply necessary to include the proxy artifact or module in the
- * project dependencies.
  * <p>
  * <b>Some usage examples</b>
  * <p>

@@ -21,6 +21,7 @@ import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.TimeDuration;
 
 import org.jetbrains.annotations.NotNull;
@@ -28,6 +29,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.TimeUnit;
 
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
 
 /**
@@ -83,7 +85,7 @@ import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
  * <p>
  * Created by davide-maestroni on 11/15/2014.
  */
-public final class InvocationConfiguration {
+public final class InvocationConfiguration extends DeepEqualObject {
 
     /**
      * Constant indicating the default value of an integer attribute.
@@ -162,6 +164,9 @@ public final class InvocationConfiguration {
             @Nullable final TimeDuration outputMaxDelay, final int outputMaxSize,
             @Nullable final Log log, @Nullable final Level logLevel) {
 
+        super(asArgs(runner, priority, maxInstances, coreInstances, readTimeout, actionType,
+                inputOrderType, inputLimit, inputMaxDelay, inputMaxSize, outputOrderType,
+                outputLimit, outputMaxDelay, outputMaxSize, log, logLevel));
         mRunner = runner;
         mPriority = priority;
         mMaxInstances = maxInstances;
@@ -424,133 +429,6 @@ public final class InvocationConfiguration {
 
         final Runner runner = mRunner;
         return (runner != null) ? runner : valueIfNotSet;
-    }
-
-    @Override
-    public int hashCode() {
-
-        // AUTO-GENERATED CODE
-        int result = mCoreInstances;
-        result = 31 * result + mInputLimit;
-        result = 31 * result + (mInputMaxDelay != null ? mInputMaxDelay.hashCode() : 0);
-        result = 31 * result + mInputMaxSize;
-        result = 31 * result + (mInputOrderType != null ? mInputOrderType.hashCode() : 0);
-        result = 31 * result + (mLog != null ? mLog.hashCode() : 0);
-        result = 31 * result + (mLogLevel != null ? mLogLevel.hashCode() : 0);
-        result = 31 * result + mMaxInstances;
-        result = 31 * result + mOutputLimit;
-        result = 31 * result + (mOutputMaxDelay != null ? mOutputMaxDelay.hashCode() : 0);
-        result = 31 * result + mOutputMaxSize;
-        result = 31 * result + (mOutputOrderType != null ? mOutputOrderType.hashCode() : 0);
-        result = 31 * result + mPriority;
-        result = 31 * result + (mReadTimeout != null ? mReadTimeout.hashCode() : 0);
-        result = 31 * result + (mRunner != null ? mRunner.hashCode() : 0);
-        result = 31 * result + (mTimeoutActionType != null ? mTimeoutActionType.hashCode() : 0);
-        return result;
-    }
-
-    @Override
-    @SuppressWarnings("SimplifiableIfStatement")
-    public boolean equals(final Object o) {
-
-        // AUTO-GENERATED CODE
-        if (this == o) {
-            return true;
-        }
-
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        final InvocationConfiguration that = (InvocationConfiguration) o;
-        if (mCoreInstances != that.mCoreInstances) {
-            return false;
-        }
-
-        if (mInputLimit != that.mInputLimit) {
-            return false;
-        }
-
-        if (mInputMaxSize != that.mInputMaxSize) {
-            return false;
-        }
-
-        if (mMaxInstances != that.mMaxInstances) {
-            return false;
-        }
-
-        if (mOutputLimit != that.mOutputLimit) {
-            return false;
-        }
-
-        if (mOutputMaxSize != that.mOutputMaxSize) {
-            return false;
-        }
-
-        if (mPriority != that.mPriority) {
-            return false;
-        }
-
-        if (mInputMaxDelay != null ? !mInputMaxDelay.equals(that.mInputMaxDelay)
-                : that.mInputMaxDelay != null) {
-            return false;
-        }
-
-        if (mInputOrderType != that.mInputOrderType) {
-            return false;
-        }
-
-        if (mLog != null ? !mLog.equals(that.mLog) : that.mLog != null) {
-            return false;
-        }
-
-        if (mLogLevel != that.mLogLevel) {
-            return false;
-        }
-
-        if (mOutputMaxDelay != null ? !mOutputMaxDelay.equals(that.mOutputMaxDelay)
-                : that.mOutputMaxDelay != null) {
-            return false;
-        }
-
-        if (mOutputOrderType != that.mOutputOrderType) {
-            return false;
-        }
-
-        if (mReadTimeout != null ? !mReadTimeout.equals(that.mReadTimeout)
-                : that.mReadTimeout != null) {
-            return false;
-        }
-
-        if (mRunner != null ? !mRunner.equals(that.mRunner) : that.mRunner != null) {
-            return false;
-        }
-
-        return mTimeoutActionType == that.mTimeoutActionType;
-    }
-
-    @Override
-    public String toString() {
-
-        // AUTO-GENERATED CODE
-        return "InvocationConfiguration{" +
-                "mCoreInstances=" + mCoreInstances +
-                ", mInputLimit=" + mInputLimit +
-                ", mInputMaxDelay=" + mInputMaxDelay +
-                ", mInputMaxSize=" + mInputMaxSize +
-                ", mInputOrderType=" + mInputOrderType +
-                ", mLog=" + mLog +
-                ", mLogLevel=" + mLogLevel +
-                ", mMaxInstances=" + mMaxInstances +
-                ", mOutputLimit=" + mOutputLimit +
-                ", mOutputMaxDelay=" + mOutputMaxDelay +
-                ", mOutputMaxSize=" + mOutputMaxSize +
-                ", mOutputOrderType=" + mOutputOrderType +
-                ", mPriority=" + mPriority +
-                ", mReadTimeout=" + mReadTimeout +
-                ", mRunner=" + mRunner +
-                ", mTimeoutActionType=" + mTimeoutActionType +
-                '}';
     }
 
     /**

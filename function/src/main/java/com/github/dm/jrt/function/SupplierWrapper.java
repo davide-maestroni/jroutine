@@ -17,9 +17,12 @@
 package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
+
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
  * Class wrapping a supplier instance.
@@ -28,7 +31,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <OUT> the output data type.
  */
-public class SupplierWrapper<OUT> implements Supplier<OUT>, Wrapper {
+public class SupplierWrapper<OUT> extends DeepEqualObject implements Supplier<OUT>, Wrapper {
 
     private final FunctionWrapper<?, OUT> mFunction;
 
@@ -54,6 +57,7 @@ public class SupplierWrapper<OUT> implements Supplier<OUT>, Wrapper {
     private SupplierWrapper(@NotNull final Supplier<?> supplier,
             @NotNull final FunctionWrapper<?, OUT> function) {
 
+        super(asArgs(supplier, function));
         mSupplier = supplier;
         mFunction = function;
     }
@@ -99,21 +103,13 @@ public class SupplierWrapper<OUT> implements Supplier<OUT>, Wrapper {
         return Reflection.hasStaticScope(mSupplier) && mFunction.hasStaticScope();
     }
 
-    @Override
-    public int hashCode() {
-
-        // AUTO-GENERATED CODE
-        int result = mFunction.hashCode();
-        result = 31 * result + mSupplier.hashCode();
-        return result;
-    }
-
     /**
      * Supplier implementation returning always the same object.
      *
      * @param <OUT> the output data type.
      */
-    private static class ConstantSupplier<OUT> implements Supplier<OUT> {
+    private static class ConstantSupplier<OUT> extends DeepEqualObject
+            implements Supplier<OUT> {
 
         private final OUT mResult;
 
@@ -124,6 +120,7 @@ public class SupplierWrapper<OUT> implements Supplier<OUT>, Wrapper {
          */
         private ConstantSupplier(final OUT result) {
 
+            super(asArgs(result));
             mResult = result;
         }
 
@@ -131,44 +128,5 @@ public class SupplierWrapper<OUT> implements Supplier<OUT>, Wrapper {
 
             return mResult;
         }
-
-        @Override
-        public int hashCode() {
-
-            // AUTO-GENERATED CODE
-            return mResult != null ? mResult.hashCode() : 0;
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            // AUTO-GENERATED CODE
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof ConstantSupplier)) {
-                return false;
-            }
-
-            final ConstantSupplier<?> that = (ConstantSupplier<?>) o;
-            return (mResult == that.mResult);
-        }
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-
-        // AUTO-GENERATED CODE
-        if (this == o) {
-            return true;
-        }
-
-        if (!(o instanceof SupplierWrapper)) {
-            return false;
-        }
-
-        final SupplierWrapper<?> that = (SupplierWrapper<?>) o;
-        return mFunction.equals(that.mFunction) && mSupplier.equals(that.mSupplier);
     }
 }

@@ -85,6 +85,20 @@ public class Reflection {
     }
 
     /**
+     * Returns a clone of the specified array of argument objects.
+     * <br>
+     * The cloning is safe, that is, if {@code null} is passed, an empty array is returned.
+     *
+     * @param args the argument objects.
+     * @return the array.
+     */
+    @NotNull
+    public static Object[] cloneArgs(@Nullable final Object... args) {
+
+        return (args != null) ? args.clone() : Reflection.NO_ARGS;
+    }
+
+    /**
      * Finds the constructor of the specified class best matching the passed arguments.
      * <p>
      * Note that clashing of signature is automatically avoided, since constructors are not

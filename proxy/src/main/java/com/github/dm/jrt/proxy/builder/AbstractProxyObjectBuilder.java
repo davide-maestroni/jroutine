@@ -18,14 +18,16 @@ package com.github.dm.jrt.proxy.builder;
 
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 import com.github.dm.jrt.object.config.ProxyConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Type;
 import java.util.HashMap;
+
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
  * Abstract implementation of a builder of async proxy objects.
@@ -142,13 +144,7 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
     /**
      * Class used as key to identify a specific proxy instance.
      */
-    private static class ClassInfo {
-
-        private final InvocationConfiguration mInvocationConfiguration;
-
-        private final ProxyConfiguration mProxyConfiguration;
-
-        private final Type mType;
+    private static class ClassInfo extends DeepEqualObject {
 
         /**
          * Constructor.
@@ -161,37 +157,7 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
                 @NotNull final InvocationConfiguration invocationConfiguration,
                 @NotNull final ProxyConfiguration proxyConfiguration) {
 
-            mType = itf;
-            mInvocationConfiguration = invocationConfiguration;
-            mProxyConfiguration = proxyConfiguration;
-        }
-
-        @Override
-        public int hashCode() {
-
-            // AUTO-GENERATED CODE
-            int result = mProxyConfiguration.hashCode();
-            result = 31 * result + mInvocationConfiguration.hashCode();
-            result = 31 * result + mType.hashCode();
-            return result;
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            // AUTO-GENERATED CODE
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof ClassInfo)) {
-                return false;
-            }
-
-            final ClassInfo classInfo = (ClassInfo) o;
-            return mProxyConfiguration.equals(classInfo.mProxyConfiguration)
-                    && mInvocationConfiguration.equals(classInfo.mInvocationConfiguration)
-                    && mType.equals(classInfo.mType);
+            super(asArgs(itf, invocationConfiguration, proxyConfiguration));
         }
     }
 }

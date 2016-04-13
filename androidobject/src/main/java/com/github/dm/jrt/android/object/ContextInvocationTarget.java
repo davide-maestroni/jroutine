@@ -22,14 +22,14 @@ import android.os.Parcelable;
 
 import com.github.dm.jrt.android.object.builder.FactoryContext;
 import com.github.dm.jrt.core.error.RoutineException;
-import com.github.dm.jrt.core.util.Reflection;
+import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.object.InvocationTarget;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
+import static com.github.dm.jrt.core.util.Reflection.cloneArgs;
 import static com.github.dm.jrt.core.util.Reflection.findConstructor;
 
 /**
@@ -41,13 +41,17 @@ import static com.github.dm.jrt.core.util.Reflection.findConstructor;
  *
  * @param <TYPE> the target object type.
  */
-public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
+public abstract class ContextInvocationTarget<TYPE> extends DeepEqualObject
+        implements Parcelable {
 
     /**
-     * Avoid explicit instantiation.
+     * Constructor.
+     *
+     * @param args the constructor arguments.
      */
-    private ContextInvocationTarget() {
+    private ContextInvocationTarget(@Nullable final Object[] args) {
 
+        super(args);
     }
 
     /**
@@ -167,6 +171,7 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
          */
         private ClassContextInvocationTarget(@NotNull final Class<TYPE> targetClass) {
 
+            super(asArgs(targetClass));
             if (targetClass.isPrimitive()) {
                 // The parceling of primitive classes is broken...
                 throw new IllegalArgumentException("the target class cannot be primitive");
@@ -180,34 +185,11 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
             return 0;
         }
 
-        @Override
-        public boolean equals(final Object o) {
-
-            // AUTO-GENERATED CODE
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof ClassContextInvocationTarget)) {
-                return false;
-            }
-
-            final ClassContextInvocationTarget<?> that = (ClassContextInvocationTarget<?>) o;
-            return mTargetClass.equals(that.mTargetClass);
-        }
-
         @NotNull
         @Override
         public InvocationTarget<TYPE> getInvocationTarget(@NotNull final Context context) {
 
             return InvocationTarget.classOfType(mTargetClass);
-        }
-
-        @Override
-        public int hashCode() {
-
-            // AUTO-GENERATED CODE
-            return mTargetClass.hashCode();
         }
 
         @NotNull
@@ -275,37 +257,14 @@ public abstract class ContextInvocationTarget<TYPE> implements Parcelable {
         private ObjectContextInvocationTarget(@NotNull final Class<TYPE> targetClass,
                 @Nullable final Object[] factoryArgs) {
 
+            super(asArgs(targetClass, cloneArgs(factoryArgs)));
             if (targetClass.isPrimitive()) {
                 // The parceling of primitive classes is broken...
                 throw new IllegalArgumentException("the target class cannot be primitive");
             }
 
             mTargetClass = targetClass;
-            mFactoryArgs = (factoryArgs != null) ? factoryArgs.clone() : Reflection.NO_ARGS;
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof ObjectContextInvocationTarget)) {
-                return false;
-            }
-
-            final ObjectContextInvocationTarget that = (ObjectContextInvocationTarget) o;
-            return Arrays.deepEquals(mFactoryArgs, that.mFactoryArgs) && mTargetClass.equals(
-                    that.mTargetClass);
-        }
-
-        @Override
-        public int hashCode() {
-
-            int result = Arrays.deepHashCode(mFactoryArgs);
-            result = 31 * result + mTargetClass.hashCode();
-            return result;
+            mFactoryArgs = cloneArgs(factoryArgs);
         }
 
         @NotNull

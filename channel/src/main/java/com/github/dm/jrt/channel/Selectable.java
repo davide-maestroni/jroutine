@@ -62,8 +62,7 @@ public class Selectable<DATA> {
     @Override
     public int hashCode() {
 
-        // AUTO-GENERATED CODE
-        int result = data != null ? data.hashCode() : 0;
+        int result = (data != null) ? data.hashCode() : 0;
         result = 31 * result + index;
         return result;
     }
@@ -71,7 +70,6 @@ public class Selectable<DATA> {
     @Override
     public boolean equals(final Object o) {
 
-        // AUTO-GENERATED CODE
         if (this == o) {
             return true;
         }
@@ -81,16 +79,13 @@ public class Selectable<DATA> {
         }
 
         final Selectable<?> that = (Selectable<?>) o;
-        return index == that.index && !(data != null ? !data.equals(that.data) : that.data != null);
+        return (index == that.index) && ((data != null) ? data.equals(that.data)
+                : (that.data == null));
     }
 
     @Override
     public String toString() {
 
-        // AUTO-GENERATED CODE
-        return "Selectable{" +
-                "data=" + data +
-                ", index=" + index +
-                '}';
+        return "Selectable{data=" + data + ", index=" + index + "}";
     }
 }

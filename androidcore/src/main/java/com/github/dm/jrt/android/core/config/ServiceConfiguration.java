@@ -21,10 +21,13 @@ import android.os.Looper;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
  * Class storing the service configuration.
@@ -43,7 +46,7 @@ import org.jetbrains.annotations.Nullable;
  * <p>
  * Created by davide-maestroni on 04/20/2015.
  */
-public final class ServiceConfiguration {
+public final class ServiceConfiguration extends DeepEqualObject {
 
     private static final DefaultConfigurable sDefaultConfigurable = new DefaultConfigurable();
 
@@ -67,6 +70,7 @@ public final class ServiceConfiguration {
             @Nullable final Class<? extends Runner> runnerClass,
             @Nullable final Class<? extends Log> logClass) {
 
+        super(asArgs(looper, runnerClass, logClass));
         mLooper = looper;
         mRunnerClass = runnerClass;
         mLogClass = logClass;
@@ -117,53 +121,6 @@ public final class ServiceConfiguration {
     public Builder<ServiceConfiguration> builderFrom() {
 
         return builderFrom(this);
-    }
-
-    @Override
-    @SuppressWarnings("SimplifiableIfStatement")
-    public boolean equals(final Object o) {
-
-        // AUTO-GENERATED CODE
-        if (this == o) {
-            return true;
-        }
-
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        final ServiceConfiguration that = (ServiceConfiguration) o;
-        if (mLogClass != null ? !mLogClass.equals(that.mLogClass) : that.mLogClass != null) {
-            return false;
-        }
-
-        if (mLooper != null ? !mLooper.equals(that.mLooper) : that.mLooper != null) {
-            return false;
-        }
-
-        return !(mRunnerClass != null ? !mRunnerClass.equals(that.mRunnerClass)
-                : that.mRunnerClass != null);
-    }
-
-    @Override
-    public int hashCode() {
-
-        // AUTO-GENERATED CODE
-        int result = mLogClass != null ? mLogClass.hashCode() : 0;
-        result = 31 * result + (mLooper != null ? mLooper.hashCode() : 0);
-        result = 31 * result + (mRunnerClass != null ? mRunnerClass.hashCode() : 0);
-        return result;
-    }
-
-    @Override
-    public String toString() {
-
-        // AUTO-GENERATED CODE
-        return "ServiceConfiguration{" +
-                "mLogClass=" + mLogClass +
-                ", mLooper=" + mLooper +
-                ", mRunnerClass=" + mRunnerClass +
-                '}';
     }
 
     /**

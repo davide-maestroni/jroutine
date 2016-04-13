@@ -21,6 +21,7 @@ import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
@@ -30,6 +31,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
  * Builder implementation returning a map of output channels returning selectable output data.
@@ -126,11 +129,7 @@ class OutputMapBuilder<OUT> extends AbstractBuilder<Map<Integer, OutputChannel<O
     /**
      * Class used as key to identify a specific map of output channels.
      */
-    private static class SelectInfo {
-
-        private final ChannelConfiguration mConfiguration;
-
-        private final HashSet<Integer> mIndexes;
+    private static class SelectInfo extends DeepEqualObject {
 
         /**
          * Constructor.
@@ -141,33 +140,7 @@ class OutputMapBuilder<OUT> extends AbstractBuilder<Map<Integer, OutputChannel<O
         private SelectInfo(@NotNull final ChannelConfiguration configuration,
                 @NotNull final HashSet<Integer> indexes) {
 
-            mConfiguration = configuration;
-            mIndexes = indexes;
-        }
-
-        @Override
-        public int hashCode() {
-
-            // AUTO-GENERATED CODE
-            int result = mConfiguration.hashCode();
-            result = 31 * result + mIndexes.hashCode();
-            return result;
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            // AUTO-GENERATED CODE
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof SelectInfo)) {
-                return false;
-            }
-
-            final SelectInfo that = (SelectInfo) o;
-            return mConfiguration.equals(that.mConfiguration) && mIndexes.equals(that.mIndexes);
+            super(asArgs(configuration, indexes));
         }
     }
 }

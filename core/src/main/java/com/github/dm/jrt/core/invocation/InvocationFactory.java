@@ -17,7 +17,7 @@
 package com.github.dm.jrt.core.invocation;
 
 import com.github.dm.jrt.core.util.ClassToken;
-import com.github.dm.jrt.core.util.ParameterizedObject;
+import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
@@ -27,6 +27,7 @@ import java.lang.reflect.Constructor;
 
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
+import static com.github.dm.jrt.core.util.Reflection.cloneArgs;
 
 /**
  * Abstract class defining an invocation factory.
@@ -69,7 +70,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public abstract class InvocationFactory<IN, OUT> extends ParameterizedObject {
+public abstract class InvocationFactory<IN, OUT> extends DeepEqualObject {
 
     /**
      * Constructor.
@@ -244,9 +245,8 @@ public abstract class InvocationFactory<IN, OUT> extends ParameterizedObject {
                 @NotNull final Class<? extends Invocation<IN, OUT>> invocationClass,
                 @Nullable final Object[] args) {
 
-            super(asArgs(invocationClass, (args != null) ? args.clone() : Reflection.NO_ARGS));
-            final Object[] invocationArgs =
-                    (mArgs = (args != null) ? args.clone() : Reflection.NO_ARGS);
+            super(asArgs(invocationClass, cloneArgs(args)));
+            final Object[] invocationArgs = (mArgs = cloneArgs(args));
             mConstructor = Reflection.findConstructor(invocationClass, invocationArgs);
         }
 

@@ -22,15 +22,15 @@ import android.os.Parcelable;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
+import static com.github.dm.jrt.core.util.Reflection.cloneArgs;
 
 /**
  * Class representing a context invocation factory target.
@@ -62,13 +62,17 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
+public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
+        implements Parcelable {
 
     /**
-     * Avoid explicit instantiation.
+     * Constructor.
+     *
+     * @param args the constructor arguments.
      */
-    private TargetInvocationFactory() {
+    private TargetInvocationFactory(@Nullable final Object[] args) {
 
+        super(args);
     }
 
     /**
@@ -280,8 +284,9 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
                 @NotNull final Class<? extends ContextInvocation<IN, OUT>> targetClass,
                 @Nullable final Object[] factoryArgs) {
 
+            super(asArgs(targetClass, cloneArgs(factoryArgs)));
             mTargetClass = ConstantConditions.notNull("target invocation class", targetClass);
-            mFactoryArgs = (factoryArgs != null) ? factoryArgs.clone() : Reflection.NO_ARGS;
+            mFactoryArgs = cloneArgs(factoryArgs);
         }
 
         public int describeContents() {
@@ -293,31 +298,6 @@ public abstract class TargetInvocationFactory<IN, OUT> implements Parcelable {
 
             dest.writeSerializable(mTargetClass);
             dest.writeArray(mFactoryArgs);
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof DefaultTargetInvocationFactory)) {
-                return false;
-            }
-
-            final DefaultTargetInvocationFactory<?, ?> that =
-                    (DefaultTargetInvocationFactory<?, ?>) o;
-            return Arrays.deepEquals(mFactoryArgs, that.mFactoryArgs) && mTargetClass.equals(
-                    that.mTargetClass);
-        }
-
-        @Override
-        public int hashCode() {
-
-            int result = Arrays.deepHashCode(mFactoryArgs);
-            result = 31 * result + mTargetClass.hashCode();
-            return result;
         }
 
         @NotNull

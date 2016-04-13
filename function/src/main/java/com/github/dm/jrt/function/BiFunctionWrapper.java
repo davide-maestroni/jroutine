@@ -17,12 +17,15 @@
 package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.Reflection;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
+
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
  * Class wrapping a bi-function instance.
@@ -33,7 +36,8 @@ import java.util.Comparator;
  * @param <IN2> the second input data type.
  * @param <OUT> the output data type.
  */
-public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OUT>, Wrapper {
+public class BiFunctionWrapper<IN1, IN2, OUT> extends DeepEqualObject
+        implements BiFunction<IN1, IN2, OUT>, Wrapper {
 
     private static final WeakIdentityHashMap<Comparator<?>, BiFunctionWrapper<?, ?, ?>>
             mMaxFunctions = new WeakIdentityHashMap<Comparator<?>, BiFunctionWrapper<?, ?, ?>>();
@@ -109,6 +113,7 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
     private BiFunctionWrapper(@NotNull final BiFunction<IN1, IN2, ?> biFunction,
             @NotNull final FunctionWrapper<?, ? extends OUT> function) {
 
+        super(asArgs(biFunction, function));
         mBiFunction = biFunction;
         mFunction = function;
     }
@@ -255,21 +260,13 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
         return Reflection.hasStaticScope(mBiFunction) && mFunction.hasStaticScope();
     }
 
-    @Override
-    public int hashCode() {
-
-        // AUTO-GENERATED CODE
-        int result = mBiFunction.hashCode();
-        result = 31 * result + mFunction.hashCode();
-        return result;
-    }
-
     /**
      * Bi-function returning the maximum between the two inputs.
      *
      * @param <IN> the input data type.
      */
-    private static class MaxByFunction<IN> implements BiFunction<IN, IN, IN> {
+    private static class MaxByFunction<IN> extends DeepEqualObject
+            implements BiFunction<IN, IN, IN> {
 
         private final Comparator<? super IN> mComparator;
 
@@ -280,35 +277,13 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
          */
         private MaxByFunction(@NotNull final Comparator<? super IN> comparator) {
 
+            super(asArgs(comparator));
             mComparator = comparator;
         }
 
         public IN apply(final IN in1, final IN in2) {
 
             return (mComparator.compare(in1, in2) > 0) ? in1 : in2;
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            // AUTO-GENERATED CODE
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof MaxByFunction)) {
-                return false;
-            }
-
-            final MaxByFunction<?> that = (MaxByFunction<?>) o;
-            return mComparator.equals(that.mComparator);
-        }
-
-        @Override
-        public int hashCode() {
-
-            // AUTO-GENERATED CODE
-            return mComparator.hashCode();
         }
     }
 
@@ -317,7 +292,8 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
      *
      * @param <IN> the input data type.
      */
-    private static class MinByFunction<IN> implements BiFunction<IN, IN, IN> {
+    private static class MinByFunction<IN> extends DeepEqualObject
+            implements BiFunction<IN, IN, IN> {
 
         private final Comparator<? super IN> mComparator;
 
@@ -328,6 +304,7 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
          */
         private MinByFunction(@NotNull final Comparator<? super IN> comparator) {
 
+            super(asArgs(comparator));
             mComparator = comparator;
         }
 
@@ -335,45 +312,6 @@ public class BiFunctionWrapper<IN1, IN2, OUT> implements BiFunction<IN1, IN2, OU
 
             return (mComparator.compare(in1, in2) < 0) ? in1 : in2;
         }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            // AUTO-GENERATED CODE
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof MinByFunction)) {
-                return false;
-            }
-
-            final MinByFunction<?> that = (MinByFunction<?>) o;
-            return mComparator.equals(that.mComparator);
-        }
-
-        @Override
-        public int hashCode() {
-
-            // AUTO-GENERATED CODE
-            return mComparator.hashCode();
-        }
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-
-        // AUTO-GENERATED CODE
-        if (this == o) {
-            return true;
-        }
-
-        if (!(o instanceof BiFunctionWrapper)) {
-            return false;
-        }
-
-        final BiFunctionWrapper<?, ?, ?> that = (BiFunctionWrapper<?, ?, ?>) o;
-        return mBiFunction.equals(that.mBiFunction) && mFunction.equals(that.mFunction);
     }
 
     @SuppressWarnings("unchecked")

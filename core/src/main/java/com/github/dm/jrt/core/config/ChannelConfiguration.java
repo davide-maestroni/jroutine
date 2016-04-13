@@ -22,6 +22,7 @@ import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.TimeDuration;
 
 import org.jetbrains.annotations.NotNull;
@@ -29,6 +30,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.TimeUnit;
 
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
 
 /**
@@ -60,7 +62,7 @@ import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
  * <p>
  * Created by davide-maestroni on 07/03/2015.
  */
-public final class ChannelConfiguration {
+public final class ChannelConfiguration extends DeepEqualObject {
 
     /**
      * Constant indicating the default value of an integer attribute.
@@ -112,6 +114,8 @@ public final class ChannelConfiguration {
             @Nullable final TimeDuration channelMaxDelay, final int channelMaxSize,
             @Nullable final Log log, @Nullable final Level logLevel) {
 
+        super(asArgs(runner, readTimeout, actionType, channelOrderType, channelLimit,
+                channelMaxDelay, channelMaxSize, log, logLevel));
         mRunner = runner;
         mReadTimeout = readTimeout;
         mTimeoutActionType = actionType;
@@ -347,90 +351,6 @@ public final class ChannelConfiguration {
 
         final Runner runner = mRunner;
         return (runner != null) ? runner : valueIfNotSet;
-    }
-
-    @Override
-    public int hashCode() {
-
-        // AUTO-GENERATED CODE
-        int result = mChannelLimit;
-        result = 31 * result + (mChannelMaxDelay != null ? mChannelMaxDelay.hashCode() : 0);
-        result = 31 * result + mChannelMaxSize;
-        result = 31 * result + (mChannelOrderType != null ? mChannelOrderType.hashCode() : 0);
-        result = 31 * result + (mLog != null ? mLog.hashCode() : 0);
-        result = 31 * result + (mLogLevel != null ? mLogLevel.hashCode() : 0);
-        result = 31 * result + (mReadTimeout != null ? mReadTimeout.hashCode() : 0);
-        result = 31 * result + (mRunner != null ? mRunner.hashCode() : 0);
-        result = 31 * result + (mTimeoutActionType != null ? mTimeoutActionType.hashCode() : 0);
-        return result;
-    }
-
-    @Override
-    @SuppressWarnings("SimplifiableIfStatement")
-    public boolean equals(final Object o) {
-
-        // AUTO-GENERATED CODE
-        if (this == o) {
-            return true;
-        }
-
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        final ChannelConfiguration that = (ChannelConfiguration) o;
-        if (mChannelLimit != that.mChannelLimit) {
-            return false;
-        }
-
-        if (mChannelMaxSize != that.mChannelMaxSize) {
-            return false;
-        }
-
-        if (mChannelMaxDelay != null ? !mChannelMaxDelay.equals(that.mChannelMaxDelay)
-                : that.mChannelMaxDelay != null) {
-            return false;
-        }
-
-        if (mChannelOrderType != that.mChannelOrderType) {
-            return false;
-        }
-
-        if (mLog != null ? !mLog.equals(that.mLog) : that.mLog != null) {
-            return false;
-        }
-
-        if (mLogLevel != that.mLogLevel) {
-            return false;
-        }
-
-        if (mReadTimeout != null ? !mReadTimeout.equals(that.mReadTimeout)
-                : that.mReadTimeout != null) {
-            return false;
-        }
-
-        if (mRunner != null ? !mRunner.equals(that.mRunner) : that.mRunner != null) {
-            return false;
-        }
-
-        return mTimeoutActionType == that.mTimeoutActionType;
-    }
-
-    @Override
-    public String toString() {
-
-        // AUTO-GENERATED CODE
-        return "ChannelConfiguration{" +
-                "mChannelLimit=" + mChannelLimit +
-                ", mChannelMaxDelay=" + mChannelMaxDelay +
-                ", mChannelMaxSize=" + mChannelMaxSize +
-                ", mChannelOrderType=" + mChannelOrderType +
-                ", mLog=" + mLog +
-                ", mLogLevel=" + mLogLevel +
-                ", mReadTimeout=" + mReadTimeout +
-                ", mRunner=" + mRunner +
-                ", mTimeoutActionType=" + mTimeoutActionType +
-                '}';
     }
 
     /**

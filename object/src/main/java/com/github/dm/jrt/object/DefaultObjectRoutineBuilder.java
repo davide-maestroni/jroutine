@@ -26,6 +26,7 @@ import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.Reflection;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 import com.github.dm.jrt.object.annotation.AsyncIn.InputMode;
@@ -306,17 +307,7 @@ class DefaultObjectRoutineBuilder
     /**
      * Class used as key to identify a specific routine instance.
      */
-    private static final class RoutineInfo {
-
-        private final InputMode mInputMode;
-
-        private final InvocationConfiguration mInvocationConfiguration;
-
-        private final Method mMethod;
-
-        private final OutputMode mOutputMode;
-
-        private final ProxyConfiguration mProxyConfiguration;
+    private static final class RoutineInfo extends DeepEqualObject {
 
         /**
          * Constructor.
@@ -331,42 +322,8 @@ class DefaultObjectRoutineBuilder
                 @NotNull final ProxyConfiguration proxyConfiguration, @NotNull final Method method,
                 @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
-            mInvocationConfiguration = invocationConfiguration;
-            mProxyConfiguration = proxyConfiguration;
-            mMethod = method;
-            mInputMode = inputMode;
-            mOutputMode = outputMode;
-        }
-
-        @Override
-        public int hashCode() {
-
-            // AUTO-GENERATED CODE
-            int result = mInputMode != null ? mInputMode.hashCode() : 0;
-            result = 31 * result + mInvocationConfiguration.hashCode();
-            result = 31 * result + mMethod.hashCode();
-            result = 31 * result + (mOutputMode != null ? mOutputMode.hashCode() : 0);
-            result = 31 * result + mProxyConfiguration.hashCode();
-            return result;
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            // AUTO-GENERATED CODE
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof RoutineInfo)) {
-                return false;
-            }
-
-            final RoutineInfo that = (RoutineInfo) o;
-            return mInputMode == that.mInputMode && mInvocationConfiguration.equals(
-                    that.mInvocationConfiguration) && mMethod.equals(that.mMethod)
-                    && mOutputMode == that.mOutputMode && mProxyConfiguration.equals(
-                    that.mProxyConfiguration);
+            super(asArgs(invocationConfiguration, proxyConfiguration, method, inputMode,
+                    outputMode));
         }
     }
 

@@ -22,13 +22,14 @@ import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.core.util.ParameterizedObject;
+import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
+import static com.github.dm.jrt.core.util.Reflection.cloneArgs;
 
 /**
  * Abstract class defining a factory of context invocations.
@@ -42,7 +43,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public abstract class ContextInvocationFactory<IN, OUT> extends ParameterizedObject {
+public abstract class ContextInvocationFactory<IN, OUT> extends DeepEqualObject {
 
     /**
      * Constructor.
@@ -270,7 +271,7 @@ public abstract class ContextInvocationFactory<IN, OUT> extends ParameterizedObj
                 @NotNull final Class<? extends ContextInvocation<IN, OUT>> invocationClass,
                 @Nullable final Object[] args) {
 
-            super(asArgs(invocationClass, (args != null) ? args.clone() : Reflection.NO_ARGS));
+            super(asArgs(invocationClass, cloneArgs(args)));
             if (!Reflection.hasStaticScope(invocationClass)) {
                 throw new IllegalArgumentException("the invocation class must have a static scope: "
                         + invocationClass.getName());

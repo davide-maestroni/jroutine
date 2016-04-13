@@ -17,6 +17,7 @@
 package com.github.dm.jrt.object.config;
 
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.core.util.DeepEqualObject;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,6 +26,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
  * Class storing the proxy configuration.
@@ -41,7 +44,7 @@ import java.util.List;
  * <p>
  * Created by davide-maestroni on 04/20/2015.
  */
-public final class ProxyConfiguration {
+public final class ProxyConfiguration extends DeepEqualObject {
 
     private static final DefaultConfigurable sDefaultConfigurable = new DefaultConfigurable();
 
@@ -56,6 +59,7 @@ public final class ProxyConfiguration {
      */
     private ProxyConfiguration(@Nullable final List<String> fieldNames) {
 
+        super(asArgs(fieldNames));
         mFieldNames = fieldNames;
     }
 
@@ -116,39 +120,6 @@ public final class ProxyConfiguration {
 
         final List<String> fieldNames = mFieldNames;
         return (fieldNames != null) ? fieldNames : valueIfNotSet;
-    }
-
-    @Override
-    public int hashCode() {
-
-        // AUTO-GENERATED CODE
-        return mFieldNames != null ? mFieldNames.hashCode() : 0;
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-
-        // AUTO-GENERATED CODE
-        if (this == o) {
-            return true;
-        }
-
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        final ProxyConfiguration that = (ProxyConfiguration) o;
-        return !(mFieldNames != null ? !mFieldNames.equals(that.mFieldNames)
-                : that.mFieldNames != null);
-    }
-
-    @Override
-    public String toString() {
-
-        // AUTO-GENERATED CODE
-        return "ProxyConfiguration{" +
-                "mFieldNames='" + mFieldNames + '\'' +
-                '}';
     }
 
     /**

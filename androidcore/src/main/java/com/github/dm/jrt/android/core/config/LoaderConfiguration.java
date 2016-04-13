@@ -19,6 +19,7 @@ package com.github.dm.jrt.android.core.config;
 import android.os.Looper;
 
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.TimeDuration;
 
 import org.jetbrains.annotations.NotNull;
@@ -26,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.TimeUnit;
 
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
 
 /**
@@ -52,7 +54,7 @@ import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
  * <p>
  * Created by davide-maestroni on 04/19/2015.
  */
-public final class LoaderConfiguration {
+public final class LoaderConfiguration extends DeepEqualObject {
 
     /**
      * Constant identifying a loader ID computed from the factory class and the input parameters.
@@ -94,6 +96,8 @@ public final class LoaderConfiguration {
             @Nullable final CacheStrategyType strategyType,
             @Nullable final TimeDuration staleTime) {
 
+        super(asArgs(looper, loaderId, factoryId, resolutionType, inputResolutionType, strategyType,
+                staleTime));
         mLooper = looper;
         mLoaderId = loaderId;
         mFactoryId = factoryId;
@@ -148,76 +152,6 @@ public final class LoaderConfiguration {
     public Builder<LoaderConfiguration> builderFrom() {
 
         return builderFrom(this);
-    }
-
-    @Override
-    @SuppressWarnings("SimplifiableIfStatement")
-    public boolean equals(final Object o) {
-
-        // AUTO-GENERATED CODE
-        if (this == o) {
-            return true;
-        }
-
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        final LoaderConfiguration that = (LoaderConfiguration) o;
-        if (mFactoryId != that.mFactoryId) {
-            return false;
-        }
-
-        if (mLoaderId != that.mLoaderId) {
-            return false;
-        }
-
-        if (mInputResolutionType != that.mInputResolutionType) {
-            return false;
-        }
-
-        if (mLooper != null ? !mLooper.equals(that.mLooper) : that.mLooper != null) {
-            return false;
-        }
-
-        if (mResolutionType != that.mResolutionType) {
-            return false;
-        }
-
-        if (mStaleTime != null ? !mStaleTime.equals(that.mStaleTime) : that.mStaleTime != null) {
-            return false;
-        }
-
-        return mStrategyType == that.mStrategyType;
-    }
-
-    @Override
-    public int hashCode() {
-
-        // AUTO-GENERATED CODE
-        int result = mFactoryId;
-        result = 31 * result + (mInputResolutionType != null ? mInputResolutionType.hashCode() : 0);
-        result = 31 * result + mLoaderId;
-        result = 31 * result + (mLooper != null ? mLooper.hashCode() : 0);
-        result = 31 * result + (mResolutionType != null ? mResolutionType.hashCode() : 0);
-        result = 31 * result + (mStaleTime != null ? mStaleTime.hashCode() : 0);
-        result = 31 * result + (mStrategyType != null ? mStrategyType.hashCode() : 0);
-        return result;
-    }
-
-    @Override
-    public String toString() {
-
-        // AUTO-GENERATED CODE
-        return "LoaderConfiguration{" +
-                "mFactoryId=" + mFactoryId +
-                ", mInputResolutionType=" + mInputResolutionType +
-                ", mLoaderId=" + mLoaderId +
-                ", mLooper=" + mLooper +
-                ", mResolutionType=" + mResolutionType +
-                ", mStaleTime=" + mStaleTime +
-                ", mStrategyType=" + mStrategyType +
-                '}';
     }
 
     /**

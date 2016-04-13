@@ -28,7 +28,7 @@ import java.util.Arrays;
  * <p>
  * Created by davide-maestroni on 03/31/2016.
  */
-public abstract class ParameterizedObject {
+public abstract class DeepEqualObject {
 
     private final Object[] mArgs;
 
@@ -37,7 +37,7 @@ public abstract class ParameterizedObject {
      *
      * @param args the constructor arguments.
      */
-    protected ParameterizedObject(@Nullable final Object[] args) {
+    protected DeepEqualObject(@Nullable final Object[] args) {
 
         mArgs = (args != null) ? args.clone() : Reflection.NO_ARGS;
     }
@@ -48,7 +48,7 @@ public abstract class ParameterizedObject {
      * Forces the inheriting classes to explicitly pass the arguments.
      */
     @SuppressWarnings("unused")
-    private ParameterizedObject() {
+    private DeepEqualObject() {
 
         this(null);
     }
@@ -70,7 +70,7 @@ public abstract class ParameterizedObject {
             return false;
         }
 
-        final ParameterizedObject that = (ParameterizedObject) o;
+        final DeepEqualObject that = (DeepEqualObject) o;
         return Arrays.deepEquals(mArgs, that.mArgs);
     }
 

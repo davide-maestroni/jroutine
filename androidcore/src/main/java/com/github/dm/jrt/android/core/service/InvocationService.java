@@ -41,6 +41,7 @@ import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
@@ -48,10 +49,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryOf;
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.Reflection.findConstructor;
 
 /**
@@ -599,19 +600,7 @@ public class InvocationService extends Service {
     /**
      * Class storing the routine information.
      */
-    private static class RoutineInfo {
-
-        private final Object[] mFactoryArgs;
-
-        private final Class<? extends ContextInvocation<?, ?>> mInvocationClass;
-
-        private final Class<? extends Log> mLogClass;
-
-        private final Level mLogLevel;
-
-        private final OrderType mOutputOrder;
-
-        private final Class<? extends Runner> mRunnerClass;
+    private static class RoutineInfo extends DeepEqualObject {
 
         /**
          * Constructor.
@@ -628,45 +617,8 @@ public class InvocationService extends Service {
                 @Nullable final Class<? extends Runner> runnerClass,
                 @Nullable final Class<? extends Log> logClass, @Nullable final Level logLevel) {
 
-            mInvocationClass = invocationClass;
-            mFactoryArgs = factoryArgs;
-            mOutputOrder = outputOrder;
-            mRunnerClass = runnerClass;
-            mLogClass = logClass;
-            mLogLevel = logLevel;
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            // AUTO-GENERATED CODE
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof RoutineInfo)) {
-                return false;
-            }
-
-            final RoutineInfo that = (RoutineInfo) o;
-            return Arrays.deepEquals(mFactoryArgs, that.mFactoryArgs) && mInvocationClass.equals(
-                    that.mInvocationClass) && !(mLogClass != null ? !mLogClass.equals(
-                    that.mLogClass) : that.mLogClass != null) && mLogLevel == that.mLogLevel
-                    && mOutputOrder == that.mOutputOrder && !(mRunnerClass != null
-                    ? !mRunnerClass.equals(that.mRunnerClass) : that.mRunnerClass != null);
-        }
-
-        @Override
-        public int hashCode() {
-
-            // AUTO-GENERATED CODE
-            int result = Arrays.deepHashCode(mFactoryArgs);
-            result = 31 * result + mInvocationClass.hashCode();
-            result = 31 * result + (mLogClass != null ? mLogClass.hashCode() : 0);
-            result = 31 * result + (mLogLevel != null ? mLogLevel.hashCode() : 0);
-            result = 31 * result + (mOutputOrder != null ? mOutputOrder.hashCode() : 0);
-            result = 31 * result + (mRunnerClass != null ? mRunnerClass.hashCode() : 0);
-            return result;
+            super(asArgs(invocationClass, factoryArgs, outputOrder, runnerClass, logClass,
+                    logLevel));
         }
     }
 

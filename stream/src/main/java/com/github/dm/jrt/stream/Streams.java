@@ -28,6 +28,7 @@ import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
@@ -39,6 +40,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
  * Utility class acting as a factory of stream output channels.
@@ -1268,7 +1271,7 @@ public class Streams extends Functions {
      *
      * @param <OUT> the output data type.
      */
-    public static class RangeConsumer<OUT extends Comparable<OUT>>
+    public static class RangeConsumer<OUT extends Comparable<OUT>> extends DeepEqualObject
             implements Consumer<ResultChannel<OUT>> {
 
         private final OUT mEnd;
@@ -1287,6 +1290,7 @@ public class Streams extends Functions {
         private RangeConsumer(@NotNull final OUT start, @NotNull final OUT end,
                 @NotNull final Function<OUT, OUT> increment) {
 
+            super(asArgs(start, end, increment));
             mStart = ConstantConditions.notNull("start element", start);
             mEnd = ConstantConditions.notNull("end element", end);
             mIncrement = increment;
@@ -1310,34 +1314,6 @@ public class Streams extends Functions {
                     current = increment.apply(current);
                 }
             }
-        }
-
-        @Override
-        public int hashCode() {
-
-            // AUTO-GENERATED CODE
-            int result = mEnd.hashCode();
-            result = 31 * result + mIncrement.hashCode();
-            result = 31 * result + mStart.hashCode();
-            return result;
-        }
-
-        @Override
-        @SuppressWarnings("EqualsBetweenInconvertibleTypes")
-        public boolean equals(final Object o) {
-
-            // AUTO-GENERATED CODE
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof RangeConsumer)) {
-                return false;
-            }
-
-            final RangeConsumer<?> that = (RangeConsumer<?>) o;
-            return mEnd.equals(that.mEnd) && mIncrement.equals(that.mIncrement) && mStart.equals(
-                    that.mStart);
         }
     }
 
@@ -1466,9 +1442,8 @@ public class Streams extends Functions {
      * <br>
      * It provides an implementation for {@code equals()} and {@code hashCode()} methods.
      */
-    private static abstract class NumberInc<N extends Number> implements Function<N, N> {
-
-        private final N mIncValue;
+    private static abstract class NumberInc<N extends Number> extends DeepEqualObject
+            implements Function<N, N> {
 
         /**
          * Constructor.
@@ -1477,30 +1452,7 @@ public class Streams extends Functions {
          */
         private NumberInc(@NotNull final N incValue) {
 
-            mIncValue = incValue;
-        }
-
-        @Override
-        public int hashCode() {
-
-            // AUTO-GENERATED CODE
-            return mIncValue.hashCode();
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            // AUTO-GENERATED CODE
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof NumberInc)) {
-                return false;
-            }
-
-            final NumberInc<?> numberInc = (NumberInc<?>) o;
-            return mIncValue.equals(numberInc.mIncValue);
+            super(asArgs(incValue));
         }
     }
 

@@ -17,6 +17,7 @@
 package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
@@ -25,6 +26,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
+
 /**
  * Class wrapping a consumer instance.
  * <p>
@@ -32,7 +35,7 @@ import java.util.List;
  *
  * @param <IN> the input data type.
  */
-public class ConsumerWrapper<IN> implements Consumer<IN>, Wrapper {
+public class ConsumerWrapper<IN> extends DeepEqualObject implements Consumer<IN>, Wrapper {
 
     private static final ConsumerWrapper<Object> sSink =
             new ConsumerWrapper<Object>(new Consumer<Object>() {
@@ -60,6 +63,7 @@ public class ConsumerWrapper<IN> implements Consumer<IN>, Wrapper {
      */
     private ConsumerWrapper(@NotNull final List<Consumer<?>> consumers) {
 
+        super(asArgs(consumers));
         mConsumers = consumers;
     }
 
@@ -111,29 +115,6 @@ public class ConsumerWrapper<IN> implements Consumer<IN>, Wrapper {
         }
 
         return true;
-    }
-
-    @Override
-    public int hashCode() {
-
-        // AUTO-GENERATED CODE
-        return mConsumers.hashCode();
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-
-        // AUTO-GENERATED CODE
-        if (this == o) {
-            return true;
-        }
-
-        if (!(o instanceof ConsumerWrapper)) {
-            return false;
-        }
-
-        final ConsumerWrapper<?> that = (ConsumerWrapper<?>) o;
-        return mConsumers.equals(that.mConsumers);
     }
 
     @SuppressWarnings("unchecked")

@@ -21,14 +21,16 @@ import android.content.Context;
 import com.github.dm.jrt.android.core.config.ServiceConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 import com.github.dm.jrt.object.config.ProxyConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Type;
 import java.util.HashMap;
+
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
  * Abstract implementation of a builder of async proxy objects, whose methods are executed in a
@@ -196,15 +198,7 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
     /**
      * Class used as key to identify a specific proxy instance.
      */
-    private static class ProxyInfo {
-
-        private final InvocationConfiguration mInvocationConfiguration;
-
-        private final ProxyConfiguration mProxyConfiguration;
-
-        private final ServiceConfiguration mServiceConfiguration;
-
-        private final Type mType;
+    private static class ProxyInfo extends DeepEqualObject {
 
         /**
          * Constructor.
@@ -219,40 +213,7 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
                 @NotNull final ProxyConfiguration proxyConfiguration,
                 @NotNull final ServiceConfiguration serviceConfiguration) {
 
-            mType = itf;
-            mInvocationConfiguration = invocationConfiguration;
-            mProxyConfiguration = proxyConfiguration;
-            mServiceConfiguration = serviceConfiguration;
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            // AUTO-GENERATED CODE
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof ProxyInfo)) {
-                return false;
-            }
-
-            final ProxyInfo proxyInfo = (ProxyInfo) o;
-            return mInvocationConfiguration.equals(proxyInfo.mInvocationConfiguration)
-                    && mProxyConfiguration.equals(proxyInfo.mProxyConfiguration)
-                    && mServiceConfiguration.equals(proxyInfo.mServiceConfiguration)
-                    && mType.equals(proxyInfo.mType);
-        }
-
-        @Override
-        public int hashCode() {
-
-            // AUTO-GENERATED CODE
-            int result = mInvocationConfiguration.hashCode();
-            result = 31 * result + mProxyConfiguration.hashCode();
-            result = 31 * result + mServiceConfiguration.hashCode();
-            result = 31 * result + mType.hashCode();
-            return result;
+            super(asArgs(itf, invocationConfiguration, proxyConfiguration, serviceConfiguration));
         }
     }
 }

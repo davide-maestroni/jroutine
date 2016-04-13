@@ -18,13 +18,14 @@ package com.github.dm.jrt.android.object;
 
 import com.github.dm.jrt.android.core.service.InvocationService;
 import com.github.dm.jrt.android.object.builder.FactoryContext;
+import com.github.dm.jrt.core.util.DeepEqualObject;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
 import java.util.HashMap;
 
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.Reflection.findConstructor;
 
 /**
@@ -52,39 +53,11 @@ public class RemoteTestService extends InvocationService implements FactoryConte
         return (TYPE) instance;
     }
 
-    private static class InstanceInfo {
-
-        private final Object[] mArgs;
-
-        private final Class<?> mType;
+    private static class InstanceInfo extends DeepEqualObject {
 
         private InstanceInfo(@NotNull final Class<?> type, @NotNull final Object[] args) {
 
-            mType = type;
-            mArgs = args;
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof InstanceInfo)) {
-                return false;
-            }
-
-            final InstanceInfo that = (InstanceInfo) o;
-            return Arrays.deepEquals(mArgs, that.mArgs) && mType.equals(that.mType);
-        }
-
-        @Override
-        public int hashCode() {
-
-            int result = Arrays.deepHashCode(mArgs);
-            result = 31 * result + mType.hashCode();
-            return result;
+            super(asArgs(type, args));
         }
     }
 }

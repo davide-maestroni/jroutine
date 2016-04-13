@@ -17,6 +17,7 @@
 package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
@@ -24,6 +25,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
  * Class wrapping a bi-consumer instance.
@@ -33,7 +36,8 @@ import java.util.List;
  * @param <IN1> the first input data type.
  * @param <IN2> the second input data type.
  */
-public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2>, Wrapper {
+public class BiConsumerWrapper<IN1, IN2> extends DeepEqualObject
+        implements BiConsumer<IN1, IN2>, Wrapper {
 
     private static final BiConsumerWrapper<Object, Object> sBiSink =
             new BiConsumerWrapper<Object, Object>(new BiConsumer<Object, Object>() {
@@ -61,6 +65,7 @@ public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2>, Wrappe
      */
     private BiConsumerWrapper(@NotNull final List<BiConsumer<?, ?>> consumers) {
 
+        super(asArgs(consumers));
         mConsumers = consumers;
     }
 
@@ -114,29 +119,6 @@ public class BiConsumerWrapper<IN1, IN2> implements BiConsumer<IN1, IN2>, Wrappe
         }
 
         return true;
-    }
-
-    @Override
-    public int hashCode() {
-
-        // AUTO-GENERATED CODE
-        return mConsumers.hashCode();
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-
-        // AUTO-GENERATED CODE
-        if (this == o) {
-            return true;
-        }
-
-        if (!(o instanceof BiConsumerWrapper)) {
-            return false;
-        }
-
-        final BiConsumerWrapper<?, ?> that = (BiConsumerWrapper<?, ?>) o;
-        return mConsumers.equals(that.mConsumers);
     }
 
     @SuppressWarnings("unchecked")

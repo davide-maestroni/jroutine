@@ -30,6 +30,7 @@ import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.channel.TemplateOutputConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
@@ -40,6 +41,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
  * Utility class focused on the optimization of the transfer of byte chunks through routine
@@ -326,7 +329,7 @@ public class ParcelableByteChannel {
      * @see ParcelableByteChannel#inputStream(ParcelableByteBuffer...)
      * @see ParcelableByteChannel#inputStream(List)
      */
-    public static class ParcelableByteBuffer implements Parcelable {
+    public static class ParcelableByteBuffer extends DeepEqualObject implements Parcelable {
 
         /**
          * Creator instance needed by the parcelable protocol.
@@ -372,6 +375,7 @@ public class ParcelableByteChannel {
          */
         private ParcelableByteBuffer(@Nullable final ByteBuffer buffer) {
 
+            super(asArgs(buffer));
             mBuffer = buffer;
         }
 
@@ -399,29 +403,6 @@ public class ParcelableByteChannel {
             } else {
                 dest.writeByteArray(EMPTY_ARRAY);
             }
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            // AUTO-GENERATED CODE
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof ParcelableByteBuffer)) {
-                return false;
-            }
-
-            final ParcelableByteBuffer that = (ParcelableByteBuffer) o;
-            return !(mBuffer != null ? !mBuffer.equals(that.mBuffer) : that.mBuffer != null);
-        }
-
-        @Override
-        public int hashCode() {
-
-            // AUTO-GENERATED CODE
-            return mBuffer != null ? mBuffer.hashCode() : 0;
         }
 
         /**

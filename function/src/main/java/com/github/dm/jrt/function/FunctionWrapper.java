@@ -18,6 +18,7 @@ package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
@@ -25,6 +26,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
  * Class wrapping a function instance.
@@ -34,7 +37,8 @@ import java.util.List;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public class FunctionWrapper<IN, OUT> implements Function<IN, OUT>, Wrapper {
+public class FunctionWrapper<IN, OUT> extends DeepEqualObject
+        implements Function<IN, OUT>, Wrapper {
 
     private static final FunctionWrapper<Object, Object> sIdentity =
             new FunctionWrapper<Object, Object>(new Function<Object, Object>() {
@@ -65,6 +69,7 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT>, Wrapper {
      */
     private FunctionWrapper(@NotNull final List<Function<?, ?>> functions) {
 
+        super(asArgs(functions));
         mFunctions = functions;
     }
 
@@ -181,20 +186,14 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT>, Wrapper {
         return true;
     }
 
-    @Override
-    public int hashCode() {
-
-        // AUTO-GENERATED CODE
-        return mFunctions.hashCode();
-    }
-
     /**
      * Function implementation casting inputs to the specified class.
      *
      * @param <IN>  the input data type.
      * @param <OUT> the output data type.
      */
-    private static class ClassCastFunction<IN, OUT> implements Function<IN, OUT> {
+    private static class ClassCastFunction<IN, OUT> extends DeepEqualObject
+            implements Function<IN, OUT> {
 
         private final Class<? extends OUT> mType;
 
@@ -205,6 +204,7 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT>, Wrapper {
          */
         private ClassCastFunction(@NotNull final Class<? extends OUT> type) {
 
+            super(asArgs(type));
             mType = type;
         }
 
@@ -212,45 +212,6 @@ public class FunctionWrapper<IN, OUT> implements Function<IN, OUT>, Wrapper {
 
             return mType.cast(in);
         }
-
-        @Override
-        public int hashCode() {
-
-            // AUTO-GENERATED CODE
-            return mType.hashCode();
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            // AUTO-GENERATED CODE
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof ClassCastFunction)) {
-                return false;
-            }
-
-            final ClassCastFunction<?, ?> that = (ClassCastFunction<?, ?>) o;
-            return mType.equals(that.mType);
-        }
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-
-        // AUTO-GENERATED CODE
-        if (this == o) {
-            return true;
-        }
-
-        if (!(o instanceof FunctionWrapper)) {
-            return false;
-        }
-
-        final FunctionWrapper<?, ?> that = (FunctionWrapper<?, ?>) o;
-        return mFunctions.equals(that.mFunctions);
     }
 
     @SuppressWarnings("unchecked")

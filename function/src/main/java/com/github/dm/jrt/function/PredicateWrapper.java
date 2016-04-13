@@ -17,6 +17,7 @@
 package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.Reflection;
 
 import org.jetbrains.annotations.NotNull;
@@ -26,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
+
 /**
  * Class wrapping a predicate instance.
  * <p>
@@ -33,7 +36,7 @@ import java.util.List;
  *
  * @param <IN> the input data type.
  */
-public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
+public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<IN>, Wrapper {
 
     private static final LogicalPredicate AND_PREDICATE = new LogicalPredicate();
 
@@ -91,6 +94,7 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
     private PredicateWrapper(@NotNull final Predicate<? super IN> predicate,
             @NotNull final List<Predicate<?>> predicates) {
 
+        super(asArgs(predicates));
         mPredicate = predicate;
         mPredicates = predicates;
     }
@@ -248,13 +252,6 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
         return true;
     }
 
-    @Override
-    public int hashCode() {
-
-        // AUTO-GENERATED CODE
-        return mPredicates.hashCode();
-    }
-
     /**
      * Returns a predicate wrapper that represents the logical negation of this predicate.
      *
@@ -371,7 +368,7 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
      *
      * @param <IN> the input data type.
      */
-    private static class EqualToPredicate<IN> implements Predicate<IN> {
+    private static class EqualToPredicate<IN> extends DeepEqualObject implements Predicate<IN> {
 
         private final Object mOther;
 
@@ -382,35 +379,13 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
          */
         private EqualToPredicate(@NotNull final Object other) {
 
+            super(asArgs(other));
             mOther = other;
-        }
-
-        @Override
-        public int hashCode() {
-
-            // AUTO-GENERATED CODE
-            return mOther.hashCode();
         }
 
         public boolean test(final IN in) {
 
             return mOther.equals(in);
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            // AUTO-GENERATED CODE
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof EqualToPredicate)) {
-                return false;
-            }
-
-            final EqualToPredicate<?> that = (EqualToPredicate<?>) o;
-            return mOther.equals(that.mOther);
         }
     }
 
@@ -419,7 +394,8 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
      *
      * @param <IN> the input data type.
      */
-    private static class InstanceOfPredicate<IN> implements Predicate<IN> {
+    private static class InstanceOfPredicate<IN> extends DeepEqualObject
+            implements Predicate<IN> {
 
         private final Class<?> mType;
 
@@ -430,35 +406,13 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
          */
         private InstanceOfPredicate(@NotNull final Class<?> type) {
 
+            super(asArgs(type));
             mType = type;
-        }
-
-        @Override
-        public int hashCode() {
-
-            // AUTO-GENERATED CODE
-            return mType.hashCode();
         }
 
         public boolean test(final IN in) {
 
             return mType.isInstance(in);
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-
-            // AUTO-GENERATED CODE
-            if (this == o) {
-                return true;
-            }
-
-            if (!(o instanceof InstanceOfPredicate)) {
-                return false;
-            }
-
-            final InstanceOfPredicate<?> that = (InstanceOfPredicate<?>) o;
-            return mType.equals(that.mType);
         }
     }
 
@@ -547,22 +501,15 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
             mOther = other;
         }
 
-        public boolean test(final IN in) {
-
-            return (mOther == in);
-        }
-
         @Override
         public int hashCode() {
 
-            // AUTO-GENERATED CODE
             return mOther.hashCode();
         }
 
         @Override
         public boolean equals(final Object o) {
 
-            // AUTO-GENERATED CODE
             if (this == o) {
                 return true;
             }
@@ -574,22 +521,11 @@ public class PredicateWrapper<IN> implements Predicate<IN>, Wrapper {
             final SameAsPredicate<?> that = (SameAsPredicate<?>) o;
             return (mOther == that.mOther);
         }
-    }
 
-    @Override
-    public boolean equals(final Object o) {
+        public boolean test(final IN in) {
 
-        // AUTO-GENERATED CODE
-        if (this == o) {
-            return true;
+            return (mOther == in);
         }
-
-        if (!(o instanceof PredicateWrapper)) {
-            return false;
-        }
-
-        final PredicateWrapper<?> that = (PredicateWrapper<?>) o;
-        return mPredicates.equals(that.mPredicates);
     }
 
     public boolean test(final IN in) {

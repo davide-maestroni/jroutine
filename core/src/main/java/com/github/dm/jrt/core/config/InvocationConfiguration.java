@@ -696,7 +696,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
 
             if ((coreInstances != DEFAULT) && (coreInstances < 0)) {
                 throw new IllegalArgumentException(
-                        "the maximum number of retained instances cannot be negative: "
+                        "the maximum number of retained instances must not be negative: "
                                 + coreInstances);
             }
 
@@ -723,7 +723,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
 
             if ((inputLimit != DEFAULT) && (inputLimit < 0)) {
                 throw new IllegalArgumentException(
-                        "the input limit cannot be negative: " + inputLimit);
+                        "the input limit must not be negative: " + inputLimit);
             }
 
             mInputLimit = inputLimit;
@@ -784,7 +784,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
 
             if ((inputMaxSize != DEFAULT) && (inputMaxSize <= 0)) {
                 throw new IllegalArgumentException(
-                        "the input buffer size cannot be 0 or negative: " + inputMaxSize);
+                        "the input buffer size must be positive: " + inputMaxSize);
             }
 
             mInputMaxSize = inputMaxSize;
@@ -877,7 +877,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
 
             if ((outputLimit != DEFAULT) && (outputLimit < 0)) {
                 throw new IllegalArgumentException(
-                        "the output limit cannot be negative: " + outputLimit);
+                        "the output limit must not be negative: " + outputLimit);
             }
 
             mOutputLimit = outputLimit;
@@ -939,7 +939,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
 
             if ((outputMaxSize != DEFAULT) && (outputMaxSize <= 0)) {
                 throw new IllegalArgumentException(
-                        "the output buffer size cannot be 0 or negative: " + outputMaxSize);
+                        "the output buffer size must be positive: " + outputMaxSize);
             }
 
             mOutputMaxSize = outputMaxSize;

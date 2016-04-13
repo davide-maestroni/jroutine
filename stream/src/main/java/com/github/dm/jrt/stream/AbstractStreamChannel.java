@@ -910,10 +910,7 @@ public abstract class AbstractStreamChannel<OUT>
                 @NotNull final ConsumerWrapper<? super ResultChannel<OUT>> consumer) {
 
             super(asArgs(count, consumer));
-            if (count <= 0) {
-                throw new IllegalArgumentException("the count number must be positive: " + count);
-            }
-
+            ConstantConditions.positive("count number", count);
             mCount = count;
             mConsumer = consumer;
         }
@@ -949,10 +946,7 @@ public abstract class AbstractStreamChannel<OUT>
                 @NotNull final SupplierWrapper<? extends OUT> supplier) {
 
             super(asArgs(count, supplier));
-            if (count <= 0) {
-                throw new IllegalArgumentException("the count number must be positive: " + count);
-            }
-
+            ConstantConditions.positive("count number", count);
             mCount = count;
             mSupplier = supplier;
         }

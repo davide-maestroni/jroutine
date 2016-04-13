@@ -939,10 +939,7 @@ public class Channels {
             final int startIndex, final int rangeSize,
             @NotNull final InputChannel<? super Selectable<DATA>> channel) {
 
-        if (rangeSize <= 0) {
-            throw new IllegalArgumentException("invalid range size: " + rangeSize);
-        }
-
+        ConstantConditions.positive("range size", rangeSize);
         final HashSet<Integer> indexSet = new HashSet<Integer>();
         final int endIndex = startIndex + rangeSize;
         for (int i = startIndex; i < endIndex; i++) {
@@ -982,10 +979,7 @@ public class Channels {
             final int startIndex, final int rangeSize,
             @NotNull final OutputChannel<? extends Selectable<? extends OUT>> channel) {
 
-        if (rangeSize <= 0) {
-            throw new IllegalArgumentException("invalid range size: " + rangeSize);
-        }
-
+        ConstantConditions.positive("range size", rangeSize);
         final HashSet<Integer> indexSet = new HashSet<Integer>();
         final int endIndex = startIndex + rangeSize;
         for (int i = startIndex; i < endIndex; i++) {

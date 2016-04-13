@@ -265,9 +265,9 @@ public class Functions {
      * @return the predicate wrapper.
      */
     @NotNull
-    public static <IN> PredicateWrapper<IN> isEqual(@Nullable final Object targetRef) {
+    public static <IN> PredicateWrapper<IN> isEqualTo(@Nullable final Object targetRef) {
 
-        return PredicateWrapper.isEqual(targetRef);
+        return PredicateWrapper.isEqualTo(targetRef);
     }
 
     /**
@@ -284,6 +284,20 @@ public class Functions {
     public static <IN> PredicateWrapper<IN> isInstanceOf(@NotNull final Class<?> type) {
 
         return PredicateWrapper.isInstanceOf(type);
+    }
+
+    /**
+     * Returns a predicate wrapper returning true when the passed argument is not null.
+     * <br>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN> the input data type.
+     * @return the predicate wrapper.
+     */
+    @NotNull
+    public static <IN> PredicateWrapper<IN> isNotNull() {
+
+        return PredicateWrapper.isNotNull();
     }
 
     /**
@@ -310,9 +324,9 @@ public class Functions {
      * @return the predicate wrapper.
      */
     @NotNull
-    public static <IN> PredicateWrapper<IN> isSame(@Nullable final Object targetRef) {
+    public static <IN> PredicateWrapper<IN> isSameAs(@Nullable final Object targetRef) {
 
-        return PredicateWrapper.isSame(targetRef);
+        return PredicateWrapper.isSameAs(targetRef);
     }
 
     /**
@@ -389,20 +403,6 @@ public class Functions {
     public static <IN> PredicateWrapper<IN> negative() {
 
         return PredicateWrapper.negative();
-    }
-
-    /**
-     * Returns a predicate wrapper returning true when the passed argument is not null.
-     * <br>
-     * The returned object will support concatenation and comparison.
-     *
-     * @param <IN> the input data type.
-     * @return the predicate wrapper.
-     */
-    @NotNull
-    public static <IN> PredicateWrapper<IN> notNull() {
-
-        return PredicateWrapper.notNull();
     }
 
     /**

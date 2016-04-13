@@ -109,7 +109,7 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
      * @return the predicate wrapper.
      */
     @NotNull
-    public static <IN> PredicateWrapper<IN> isEqual(@Nullable final Object targetRef) {
+    public static <IN> PredicateWrapper<IN> isEqualTo(@Nullable final Object targetRef) {
 
         if (targetRef == null) {
             return isNull();
@@ -133,6 +133,21 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
 
         return new PredicateWrapper<IN>(
                 new InstanceOfPredicate<IN>(ConstantConditions.notNull("type", type)));
+    }
+
+    /**
+     * Returns a predicate wrapper returning true when the passed argument is not null.
+     * <br>
+     * The returned object will support concatenation and comparison.
+     *
+     * @param <IN> the input data type.
+     * @return the predicate wrapper.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <IN> PredicateWrapper<IN> isNotNull() {
+
+        return (PredicateWrapper<IN>) sNotNull;
     }
 
     /**
@@ -160,7 +175,7 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
      * @return the predicate wrapper.
      */
     @NotNull
-    public static <IN> PredicateWrapper<IN> isSame(@Nullable final Object targetRef) {
+    public static <IN> PredicateWrapper<IN> isSameAs(@Nullable final Object targetRef) {
 
         if (targetRef == null) {
             return isNull();
@@ -182,21 +197,6 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
     public static <IN> PredicateWrapper<IN> negative() {
 
         return (PredicateWrapper<IN>) sNegative;
-    }
-
-    /**
-     * Returns a predicate wrapper returning true when the passed argument is not null.
-     * <br>
-     * The returned object will support concatenation and comparison.
-     *
-     * @param <IN> the input data type.
-     * @return the predicate wrapper.
-     */
-    @NotNull
-    @SuppressWarnings("unchecked")
-    public static <IN> PredicateWrapper<IN> notNull() {
-
-        return (PredicateWrapper<IN>) sNotNull;
     }
 
     /**
@@ -394,8 +394,7 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
      *
      * @param <IN> the input data type.
      */
-    private static class InstanceOfPredicate<IN> extends DeepEqualObject
-            implements Predicate<IN> {
+    private static class InstanceOfPredicate<IN> extends DeepEqualObject implements Predicate<IN> {
 
         private final Class<?> mType;
 

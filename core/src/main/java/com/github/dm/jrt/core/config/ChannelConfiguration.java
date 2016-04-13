@@ -570,7 +570,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
 
             if ((limit != DEFAULT) && (limit < 0)) {
                 throw new IllegalArgumentException(
-                        "the channel limit cannot be negative: " + limit);
+                        "the channel limit must not be negative: " + limit);
             }
 
             mChannelLimit = limit;
@@ -627,7 +627,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
 
             if ((maxSize != DEFAULT) && (maxSize <= 0)) {
                 throw new IllegalArgumentException(
-                        "the channel buffer size cannot be 0 or negative: " + maxSize);
+                        "the channel buffer size must be positive: " + maxSize);
             }
 
             mChannelMaxSize = maxSize;

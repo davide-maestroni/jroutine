@@ -296,7 +296,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                         return LoaderStreams.streamOf(s)
                                                             .with(loaderFrom(activity))
                                                             .sync()
-                                                            .filter(Functions.<String>notNull());
+                                                            .filter(Functions.<String>isNotNull());
                                     }
                                 })
                                 .all()).containsExactly("test1", "test2");
@@ -310,7 +310,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                         return LoaderStreams.streamOf(s)
                                                             .with(loaderFrom(activity))
                                                             .sync()
-                                                            .filter(Functions.<String>notNull());
+                                                            .filter(Functions.<String>isNotNull());
                                     }
                                 })
                                 .afterMax(seconds(10))
@@ -325,7 +325,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                         return LoaderStreams.streamOf(s)
                                                             .with(loaderFrom(activity))
                                                             .sync()
-                                                            .filter(Functions.<String>notNull());
+                                                            .filter(Functions.<String>isNotNull());
                                     }
                                 })
                                 .afterMax(seconds(10))
@@ -340,7 +340,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                         return LoaderStreams.streamOf(s)
                                                             .with(loaderFrom(activity))
                                                             .sync()
-                                                            .filter(Functions.<String>notNull());
+                                                            .filter(Functions.<String>isNotNull());
                                     }
                                 })
                                 .afterMax(seconds(10))
@@ -1071,24 +1071,24 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(LoaderStreams.streamOf(null, "test")
                                 .with(loaderFrom(getActivity()))
                                 .async()
-                                .filter(Functions.notNull())
+                                .filter(Functions.isNotNull())
                                 .afterMax(seconds(10))
                                 .all()).containsExactly("test");
         assertThat(LoaderStreams.streamOf(null, "test")
                                 .with(loaderFrom(getActivity()))
                                 .parallel()
-                                .filter(Functions.notNull())
+                                .filter(Functions.isNotNull())
                                 .afterMax(seconds(10))
                                 .all()).containsExactly("test");
         assertThat(LoaderStreams.streamOf(null, "test")
                                 .with(loaderFrom(getActivity()))
                                 .sync()
-                                .filter(Functions.notNull())
+                                .filter(Functions.isNotNull())
                                 .all()).containsExactly("test");
         assertThat(LoaderStreams.streamOf(null, "test")
                                 .with(loaderFrom(getActivity()))
                                 .serial()
-                                .filter(Functions.notNull())
+                                .filter(Functions.isNotNull())
                                 .afterMax(seconds(10))
                                 .all()).containsExactly("test");
     }

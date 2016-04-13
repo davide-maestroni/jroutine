@@ -20,6 +20,7 @@ import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -45,10 +46,7 @@ class LimitInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
     LimitInvocationFactory(final int count) {
 
         super(asArgs(count));
-        if (count < 0) {
-            throw new IllegalArgumentException("the count must not be negative: " + count);
-        }
-
+        ConstantConditions.notNegative("count", count);
         mCount = count;
     }
 

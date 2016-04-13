@@ -36,6 +36,7 @@ import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.function.BiConsumerWrapper;
+import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.stream.Streams.RangeConsumer;
@@ -54,6 +55,7 @@ import static com.github.dm.jrt.core.util.TimeDuration.millis;
 import static com.github.dm.jrt.core.util.TimeDuration.seconds;
 import static com.github.dm.jrt.function.Functions.wrap;
 import static com.github.dm.jrt.stream.Streams.range;
+import static com.github.dm.jrt.stream.Streams.series;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -1992,6 +1994,93 @@ public class StreamsTest {
             fail();
 
         } catch (final AbortException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testSeries() {
+
+        assertThat(Streams.streamOf()
+                          .async()
+                          .then(series('a', 5, new Function<Character, Character>() {
+
+                              public Character apply(final Character character) {
+
+                                  return (char) (character + 1);
+                              }
+                          }))
+                          .afterMax(seconds(3))
+                          .all()).containsExactly('a', 'b', 'c', 'd', 'e');
+        assertThat(Streams.streamOf()
+                          .ordered(OrderType.BY_CALL)
+                          .parallel()
+                          .then(series('a', 5, new Function<Character, Character>() {
+
+                              public Character apply(final Character character) {
+
+                                  return (char) (character + 1);
+                              }
+                          }))
+                          .afterMax(seconds(3))
+                          .all()).containsExactly('a', 'b', 'c', 'd', 'e');
+        assertThat(
+                Streams.streamOf().sync().then(series('a', 5, new Function<Character, Character>() {
+
+                    public Character apply(final Character character) {
+
+                        return (char) (character + 1);
+                    }
+                })).all()).containsExactly('a', 'b', 'c', 'd', 'e');
+    }
+
+    @Test
+    public void testSeriesEquals() {
+
+        final Consumer<InputChannel<Integer>> series1 =
+                Streams.series(1, 10, Functions.<Integer>identity());
+        assertThat(series1).isEqualTo(series1);
+        assertThat(series1).isNotEqualTo(null);
+        assertThat(series1).isNotEqualTo("test");
+        assertThat(series1).isNotEqualTo(Streams.series(1, 9, Functions.<Integer>identity()));
+        assertThat(series1).isEqualTo(Streams.series(1, 10, Functions.<Integer>identity()));
+        assertThat(series1.hashCode()).isEqualTo(
+                Streams.series(1, 10, Functions.<Integer>identity()).hashCode());
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testSeriesError() {
+
+        try {
+            Streams.series(null, 2, new Function<Character, Character>() {
+
+                public Character apply(final Character character) {
+
+                    return (char) (character + 1);
+                }
+            });
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.series('a', 2, null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+
+            Streams.series(1, -1, Functions.<Integer>identity());
+            fail();
+
+        } catch (final IllegalArgumentException ignored) {
 
         }
     }

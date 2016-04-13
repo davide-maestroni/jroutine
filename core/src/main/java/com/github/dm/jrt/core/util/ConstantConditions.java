@@ -33,6 +33,61 @@ public class ConstantConditions {
     }
 
     /**
+     * Asserts that the specified number is not negative.
+     *
+     * @param number the number.
+     * @return the number.
+     * @throws java.lang.IllegalArgumentException if the number is negative.
+     */
+    public static int notNegative(final int number) {
+
+        return notNegative("number", number);
+    }
+
+    /**
+     * Asserts that the specified number is not negative.
+     *
+     * @param name   the name of the parameter used to build the error message.
+     * @param number the number.
+     * @return the number.
+     * @throws java.lang.IllegalArgumentException if the number is negative.
+     */
+    public static int notNegative(final String name, final int number) {
+
+        return (int) notNegative(name, (long) number);
+    }
+
+    /**
+     * Asserts that the specified number is not negative.
+     *
+     * @param number the number.
+     * @return the number.
+     * @throws java.lang.IllegalArgumentException if the number is negative.
+     */
+    public static long notNegative(final long number) {
+
+        return notNegative("number", number);
+    }
+
+    /**
+     * Asserts that the specified number is not negative.
+     *
+     * @param name   the name of the parameter used to build the error message.
+     * @param number the number.
+     * @return the number.
+     * @throws java.lang.IllegalArgumentException if the number is negative.
+     */
+    public static long notNegative(final String name, final long number) {
+
+        if (number < 0) {
+            throw new IllegalArgumentException(
+                    "the " + name + " must not be negative, but is: " + number);
+        }
+
+        return number;
+    }
+
+    /**
      * Asserts that the specified object is not null.
      *
      * @param object the object.
@@ -49,7 +104,7 @@ public class ConstantConditions {
     /**
      * Asserts that the specified object is not null.
      *
-     * @param name   the name of the object used to build the error message.
+     * @param name   the name of the parameter used to build the error message.
      * @param object the object.
      * @param <TYPE> the object type.
      * @return the object.
@@ -63,5 +118,60 @@ public class ConstantConditions {
         }
 
         return object;
+    }
+
+    /**
+     * Asserts that the specified number is positive.
+     *
+     * @param number the number.
+     * @return the number.
+     * @throws java.lang.IllegalArgumentException if the number is 0 or negative.
+     */
+    public static int positive(final int number) {
+
+        return positive("number", number);
+    }
+
+    /**
+     * Asserts that the specified number is positive.
+     *
+     * @param name   the name of the parameter used to build the error message.
+     * @param number the number.
+     * @return the number.
+     * @throws java.lang.IllegalArgumentException if the number is 0 or negative.
+     */
+    public static int positive(final String name, final int number) {
+
+        return (int) positive(name, (long) number);
+    }
+
+    /**
+     * Asserts that the specified number is positive.
+     *
+     * @param number the number.
+     * @return the number.
+     * @throws java.lang.IllegalArgumentException if the number is 0 or negative.
+     */
+    public static long positive(final long number) {
+
+        return positive("number", number);
+    }
+
+    /**
+     * Asserts that the specified number is positive.
+     *
+     * @param name   the name of the parameter used to build the error message.
+     * @param number the number.
+     * @return the number.
+     * @throws java.lang.IllegalArgumentException if the number is 0 or negative.
+     */
+    public static long positive(final String name, final long number) {
+
+        if (number <= 0) {
+            throw new IllegalArgumentException(
+                    "the " + name + " must be positive, but is: " + number);
+        }
+
+        return number;
     }
 }

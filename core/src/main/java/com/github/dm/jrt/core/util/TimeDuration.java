@@ -53,9 +53,7 @@ public class TimeDuration extends Time {
     protected TimeDuration(final long duration, @NotNull final TimeUnit unit) {
 
         super(duration, unit);
-        if (duration < 0) {
-            throw new IllegalArgumentException("the time duration cannot be negative: " + duration);
-        }
+        ConstantConditions.notNegative("time duration", duration);
     }
 
     /**

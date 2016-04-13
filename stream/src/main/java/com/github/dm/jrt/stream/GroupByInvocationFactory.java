@@ -20,6 +20,7 @@ import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
+import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -54,10 +55,7 @@ class GroupByInvocationFactory<DATA> extends InvocationFactory<DATA, List<DATA>>
     GroupByInvocationFactory(final int size) {
 
         super(asArgs(size));
-        if (size <= 0) {
-            throw new IllegalArgumentException("the group size must be positive: " + size);
-        }
-
+        ConstantConditions.positive("group size", size);
         mSize = size;
         mPlaceholder = null;
         mIsPlaceholder = false;
@@ -74,10 +72,7 @@ class GroupByInvocationFactory<DATA> extends InvocationFactory<DATA, List<DATA>>
     GroupByInvocationFactory(final int size, @Nullable final DATA placeholder) {
 
         super(asArgs(size, placeholder));
-        if (size <= 0) {
-            throw new IllegalArgumentException("the group size must be positive: " + size);
-        }
-
+        ConstantConditions.positive("group size", size);
         mSize = size;
         mPlaceholder = placeholder;
         mIsPlaceholder = true;

@@ -536,21 +536,21 @@ public class StreamChannelTest {
 
         assertThat(Streams.streamOf(null, "test")
                           .async()
-                          .filter(Functions.notNull())
+                          .filter(Functions.isNotNull())
                           .afterMax(seconds(3))
                           .all()).containsExactly("test");
         assertThat(Streams.streamOf(null, "test")
                           .parallel()
-                          .filter(Functions.notNull())
+                          .filter(Functions.isNotNull())
                           .afterMax(seconds(3))
                           .all()).containsExactly("test");
         assertThat(Streams.streamOf(null, "test")
                           .sync()
-                          .filter(Functions.notNull())
+                          .filter(Functions.isNotNull())
                           .all()).containsExactly("test");
         assertThat(Streams.streamOf(null, "test")
                           .serial()
-                          .filter(Functions.notNull())
+                          .filter(Functions.isNotNull())
                           .afterMax(seconds(3))
                           .all()).containsExactly("test");
     }
@@ -611,7 +611,7 @@ public class StreamChannelTest {
 
                                   return Streams.streamOf(s)
                                                 .sync()
-                                                .filter(Functions.<String>notNull());
+                                                .filter(Functions.<String>isNotNull());
                               }
                           })
                           .all()).containsExactly("test1", "test2");
@@ -623,7 +623,7 @@ public class StreamChannelTest {
 
                                   return Streams.streamOf(s)
                                                 .sync()
-                                                .filter(Functions.<String>notNull());
+                                                .filter(Functions.<String>isNotNull());
                               }
                           })
                           .afterMax(seconds(3))
@@ -636,7 +636,7 @@ public class StreamChannelTest {
 
                                   return Streams.streamOf(s)
                                                 .sync()
-                                                .filter(Functions.<String>notNull());
+                                                .filter(Functions.<String>isNotNull());
                               }
                           })
                           .afterMax(seconds(3))
@@ -649,7 +649,7 @@ public class StreamChannelTest {
 
                                   return Streams.streamOf(s)
                                                 .sync()
-                                                .filter(Functions.<String>notNull());
+                                                .filter(Functions.<String>isNotNull());
                               }
                           })
                           .afterMax(seconds(3))

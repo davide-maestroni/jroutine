@@ -45,16 +45,16 @@ import static com.github.dm.jrt.function.Functions.consumerFilter;
 import static com.github.dm.jrt.function.Functions.functionCall;
 import static com.github.dm.jrt.function.Functions.functionFilter;
 import static com.github.dm.jrt.function.Functions.identity;
-import static com.github.dm.jrt.function.Functions.isEqual;
+import static com.github.dm.jrt.function.Functions.isEqualTo;
 import static com.github.dm.jrt.function.Functions.isInstanceOf;
+import static com.github.dm.jrt.function.Functions.isNotNull;
 import static com.github.dm.jrt.function.Functions.isNull;
-import static com.github.dm.jrt.function.Functions.isSame;
+import static com.github.dm.jrt.function.Functions.isSameAs;
 import static com.github.dm.jrt.function.Functions.max;
 import static com.github.dm.jrt.function.Functions.maxBy;
 import static com.github.dm.jrt.function.Functions.min;
 import static com.github.dm.jrt.function.Functions.minBy;
 import static com.github.dm.jrt.function.Functions.negative;
-import static com.github.dm.jrt.function.Functions.notNull;
 import static com.github.dm.jrt.function.Functions.positive;
 import static com.github.dm.jrt.function.Functions.predicateFilter;
 import static com.github.dm.jrt.function.Functions.sink;
@@ -691,11 +691,11 @@ public class FunctionsTest {
     @Test
     public void testEqualToPredicate() {
 
-        final PredicateWrapper<Object> predicate = isEqual("test");
+        final PredicateWrapper<Object> predicate = isEqualTo("test");
         assertThat(predicate.test("test")).isTrue();
         assertThat(predicate.test(1)).isFalse();
         assertThat(predicate.test(null)).isFalse();
-        final PredicateWrapper<Object> predicate1 = isEqual(null);
+        final PredicateWrapper<Object> predicate1 = isEqualTo(null);
         assertThat(predicate1.test("test")).isFalse();
         assertThat(predicate1.test(1)).isFalse();
         assertThat(predicate1.test(null)).isTrue();
@@ -704,13 +704,13 @@ public class FunctionsTest {
     @Test
     public void testEqualToPredicateEquals() {
 
-        final PredicateWrapper<Object> predicate = isEqual("test");
+        final PredicateWrapper<Object> predicate = isEqualTo("test");
         assertThat(predicate).isEqualTo(predicate);
-        assertThat(predicate).isEqualTo(isEqual("test"));
-        assertThat(predicate).isNotEqualTo(isEqual(1.1));
+        assertThat(predicate).isEqualTo(isEqualTo("test"));
+        assertThat(predicate).isNotEqualTo(isEqualTo(1.1));
         assertThat(predicate).isNotEqualTo("");
-        assertThat(predicate.hashCode()).isEqualTo(isEqual("test").hashCode());
-        assertThat(isEqual(null)).isEqualTo(isNull());
+        assertThat(predicate.hashCode()).isEqualTo(isEqualTo("test").hashCode());
+        assertThat(isEqualTo(null)).isEqualTo(isNull());
     }
 
     @Test
@@ -1358,8 +1358,8 @@ public class FunctionsTest {
         predicate3.reset();
         assertThat(negative().or(positive()).test(null)).isTrue();
         assertThat(negative().and(positive()).test("test")).isFalse();
-        assertThat(notNull().or(isNull()).test(null)).isTrue();
-        assertThat(notNull().and(isNull()).test("test")).isFalse();
+        assertThat(isNotNull().or(isNull()).test(null)).isTrue();
+        assertThat(isNotNull().and(isNull()).test("test")).isFalse();
     }
 
     @Test
@@ -1442,8 +1442,8 @@ public class FunctionsTest {
         assertThat(predicate2.and(predicate2.or(predicate1)).negate()).isEqualTo(chain);
         assertThat(negative().negate()).isEqualTo(positive());
         assertThat(positive().negate()).isEqualTo(negative());
-        assertThat(notNull().negate()).isEqualTo(isNull());
-        assertThat(isNull().negate()).isEqualTo(notNull());
+        assertThat(isNotNull().negate()).isEqualTo(isNull());
+        assertThat(isNull().negate()).isEqualTo(isNotNull());
     }
 
     @Test
@@ -1515,12 +1515,12 @@ public class FunctionsTest {
     public void testSameAsPredicate() {
 
         final Identity instance = new Identity();
-        final PredicateWrapper<Object> predicate = isSame(instance);
+        final PredicateWrapper<Object> predicate = isSameAs(instance);
         assertThat(predicate.test(instance)).isTrue();
         assertThat(predicate.test(new Identity())).isFalse();
         assertThat(predicate.test(1)).isFalse();
         assertThat(predicate.test(null)).isFalse();
-        final PredicateWrapper<Object> predicate1 = isSame(null);
+        final PredicateWrapper<Object> predicate1 = isSameAs(null);
         assertThat(predicate1.test(instance)).isFalse();
         assertThat(predicate1.test(1)).isFalse();
         assertThat(predicate1.test(null)).isTrue();
@@ -1530,14 +1530,14 @@ public class FunctionsTest {
     public void testSameAsPredicateEquals() {
 
         final Identity instance = new Identity();
-        final PredicateWrapper<Object> predicate = isSame(instance);
+        final PredicateWrapper<Object> predicate = isSameAs(instance);
         assertThat(predicate).isEqualTo(predicate);
-        assertThat(predicate).isEqualTo(isSame(instance));
-        assertThat(predicate).isNotEqualTo(isSame(new Identity()));
-        assertThat(predicate).isNotEqualTo(isSame(1.1));
+        assertThat(predicate).isEqualTo(isSameAs(instance));
+        assertThat(predicate).isNotEqualTo(isSameAs(new Identity()));
+        assertThat(predicate).isNotEqualTo(isSameAs(1.1));
         assertThat(predicate).isNotEqualTo("");
-        assertThat(predicate.hashCode()).isEqualTo(isSame(instance).hashCode());
-        assertThat(isSame(null)).isEqualTo(isNull());
+        assertThat(predicate.hashCode()).isEqualTo(isSameAs(instance).hashCode());
+        assertThat(isSameAs(null)).isEqualTo(isNull());
     }
 
     @Test

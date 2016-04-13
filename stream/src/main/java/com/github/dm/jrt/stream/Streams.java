@@ -25,13 +25,13 @@ import com.github.dm.jrt.core.channel.Channel;
 import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
-import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.function.FunctionWrapper;
 import com.github.dm.jrt.function.Functions;
 
 import org.jetbrains.annotations.NotNull;
@@ -1024,6 +1024,26 @@ public class Streams extends Functions {
     }
 
     /**
+     * Returns a consumer generating the specified series of data.
+     * <br>
+     * The generated data will start from the specified first and will produce the specified number
+     * of elements, by computing each next one through the specified function.
+     *
+     * @param start     the first element of the series.
+     * @param count     the number of generated elements.
+     * @param increment the function incrementing the current element.
+     * @param <AFTER>   the concatenation output type.
+     * @return the consumer instance.
+     */
+    @NotNull
+    public static <AFTER> Consumer<InputChannel<AFTER>> series(@NotNull final AFTER start,
+            final long count, @NotNull final Function<AFTER, AFTER> increment) {
+
+        ConstantConditions.positive("series size", count);
+        return new SeriesConsumer<AFTER>(start, count, wrap(increment));
+    }
+
+    /**
      * Returns an factory of invocations skipping the specified number of input data.
      * <p>
      * Given a numeric sequence of inputs starting from 0, and a skip count of 5, the final output
@@ -1272,7 +1292,7 @@ public class Streams extends Functions {
      * @param <OUT> the output data type.
      */
     public static class RangeConsumer<OUT extends Comparable<OUT>> extends DeepEqualObject
-            implements Consumer<ResultChannel<OUT>> {
+            implements Consumer<InputChannel<OUT>> {
 
         private final OUT mEnd;
 
@@ -1296,7 +1316,7 @@ public class Streams extends Functions {
             mIncrement = increment;
         }
 
-        public void accept(final ResultChannel<OUT> result) {
+        public void accept(final InputChannel<OUT> result) {
 
             final OUT start = mStart;
             final OUT end = mEnd;
@@ -1453,6 +1473,51 @@ public class Streams extends Functions {
         private NumberInc(@NotNull final N incValue) {
 
             super(asArgs(incValue));
+        }
+    }
+
+    /**
+     * Consumer implementation generating a series of data.
+     *
+     * @param <OUT> the output data type.
+     */
+    private static class SeriesConsumer<OUT> extends DeepEqualObject
+            implements Consumer<InputChannel<OUT>> {
+
+        private final long mCount;
+
+        private final FunctionWrapper<OUT, OUT> mIncrement;
+
+        private final OUT mStart;
+
+        /**
+         * Constructor.
+         *
+         * @param start     the first element of the series.
+         * @param count     the size of the series.
+         * @param increment the function incrementing the current element.
+         */
+        private SeriesConsumer(@NotNull final OUT start, final long count,
+                @NotNull final FunctionWrapper<OUT, OUT> increment) {
+
+            super(asArgs(start, count, increment));
+            mStart = ConstantConditions.notNull("start element", start);
+            mCount = count;
+            mIncrement = increment;
+        }
+
+        public void accept(final InputChannel<OUT> result) {
+
+            final FunctionWrapper<OUT, OUT> increment = mIncrement;
+            OUT current = mStart;
+            final long count = mCount;
+            final long last = count - 1;
+            for (long i = 0; i < count; i++) {
+                result.pass(current);
+                if (i < last) {
+                    current = increment.apply(current);
+                }
+            }
         }
     }
 

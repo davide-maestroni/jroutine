@@ -29,6 +29,50 @@ import static org.junit.Assert.fail;
 public class ConstantConditionsTest {
 
     @Test
+    public void testNotNegative() {
+
+        assertThat(ConstantConditions.notNegative("test", 0)).isEqualTo(0);
+        assertThat(ConstantConditions.notNegative(17)).isEqualTo(17);
+        try {
+            ConstantConditions.notNegative("test", -1);
+            fail();
+
+        } catch (final IllegalArgumentException e) {
+            assertThat(e.getMessage()).contains("test");
+        }
+
+        try {
+            ConstantConditions.notNegative(-71);
+            fail();
+
+        } catch (final IllegalArgumentException e) {
+            assertThat(e.getMessage()).contains("number");
+        }
+    }
+
+    @Test
+    public void testNotNegativeLong() {
+
+        assertThat(ConstantConditions.notNegative("test", 0L)).isEqualTo(0L);
+        assertThat(ConstantConditions.notNegative(17L)).isEqualTo(17L);
+        try {
+            ConstantConditions.notNegative("test", -1L);
+            fail();
+
+        } catch (final IllegalArgumentException e) {
+            assertThat(e.getMessage()).contains("test");
+        }
+
+        try {
+            ConstantConditions.notNegative(-71L);
+            fail();
+
+        } catch (final IllegalArgumentException e) {
+            assertThat(e.getMessage()).contains("number");
+        }
+    }
+
+    @Test
     public void testNullity() {
 
         assertThat(ConstantConditions.notNull("test", this)).isEqualTo(this);
@@ -47,6 +91,50 @@ public class ConstantConditionsTest {
 
         } catch (final NullPointerException e) {
             assertThat(e.getMessage()).contains("object");
+        }
+    }
+
+    @Test
+    public void testPositive() {
+
+        assertThat(ConstantConditions.positive("test", 11)).isEqualTo(11);
+        assertThat(ConstantConditions.positive(17)).isEqualTo(17);
+        try {
+            ConstantConditions.positive("test", -13);
+            fail();
+
+        } catch (final IllegalArgumentException e) {
+            assertThat(e.getMessage()).contains("test");
+        }
+
+        try {
+            ConstantConditions.positive(-71);
+            fail();
+
+        } catch (final IllegalArgumentException e) {
+            assertThat(e.getMessage()).contains("number");
+        }
+    }
+
+    @Test
+    public void testPositiveLong() {
+
+        assertThat(ConstantConditions.positive("test", 11L)).isEqualTo(11L);
+        assertThat(ConstantConditions.positive(17L)).isEqualTo(17L);
+        try {
+            ConstantConditions.positive("test", -13L);
+            fail();
+
+        } catch (final IllegalArgumentException e) {
+            assertThat(e.getMessage()).contains("test");
+        }
+
+        try {
+            ConstantConditions.positive(-71L);
+            fail();
+
+        } catch (final IllegalArgumentException e) {
+            assertThat(e.getMessage()).contains("number");
         }
     }
 }

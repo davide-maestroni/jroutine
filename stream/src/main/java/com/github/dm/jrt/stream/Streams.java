@@ -29,9 +29,10 @@ import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.function.BiConsumer;
+import com.github.dm.jrt.function.BiFunction;
+import com.github.dm.jrt.function.BiFunctionWrapper;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
-import com.github.dm.jrt.function.FunctionWrapper;
 import com.github.dm.jrt.function.Functions;
 
 import org.jetbrains.annotations.NotNull;
@@ -1029,18 +1030,18 @@ public class Streams extends Functions {
      * The generated data will start from the specified first and will produce the specified number
      * of elements, by computing each next one through the specified function.
      *
-     * @param start     the first element of the series.
-     * @param count     the number of generated elements.
-     * @param increment the function incrementing the current element.
-     * @param <AFTER>   the concatenation output type.
+     * @param start   the first element of the series.
+     * @param count   the number of generated elements.
+     * @param next    the function computing the next element.
+     * @param <AFTER> the concatenation output type.
      * @return the consumer instance.
+     * @throws java.lang.IllegalArgumentException if the count is not positive.
      */
     @NotNull
     public static <AFTER> Consumer<InputChannel<AFTER>> series(@NotNull final AFTER start,
-            final long count, @NotNull final Function<AFTER, AFTER> increment) {
+            final long count, @NotNull final BiFunction<AFTER, Long, AFTER> next) {
 
-        ConstantConditions.positive("series size", count);
-        return new SeriesConsumer<AFTER>(start, count, wrap(increment));
+        return new SeriesConsumer<AFTER>(start, count, wrap(next));
     }
 
     /**
@@ -1486,36 +1487,36 @@ public class Streams extends Functions {
 
         private final long mCount;
 
-        private final FunctionWrapper<OUT, OUT> mIncrement;
+        private final BiFunctionWrapper<OUT, Long, OUT> mNext;
 
         private final OUT mStart;
 
         /**
          * Constructor.
          *
-         * @param start     the first element of the series.
-         * @param count     the size of the series.
-         * @param increment the function incrementing the current element.
+         * @param start the first element of the series.
+         * @param count the size of the series.
+         * @param next  the function computing the next element.
          */
         private SeriesConsumer(@NotNull final OUT start, final long count,
-                @NotNull final FunctionWrapper<OUT, OUT> increment) {
+                @NotNull final BiFunctionWrapper<OUT, Long, OUT> next) {
 
-            super(asArgs(start, count, increment));
+            super(asArgs(start, count, next));
             mStart = ConstantConditions.notNull("start element", start);
-            mCount = count;
-            mIncrement = increment;
+            mCount = ConstantConditions.positive("series size", count);
+            mNext = next;
         }
 
         public void accept(final InputChannel<OUT> result) {
 
-            final FunctionWrapper<OUT, OUT> increment = mIncrement;
+            final BiFunctionWrapper<OUT, Long, OUT> next = mNext;
             OUT current = mStart;
             final long count = mCount;
             final long last = count - 1;
             for (long i = 0; i < count; i++) {
                 result.pass(current);
                 if (i < last) {
-                    current = increment.apply(current);
+                    current = next.apply(current, i);
                 }
             }
         }

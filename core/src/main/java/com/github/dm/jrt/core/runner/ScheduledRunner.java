@@ -55,13 +55,14 @@ class ScheduledRunner implements Runner {
 
     public void cancel(@NotNull final Execution execution) {
 
+        final WeakHashMap<ScheduledFuture<?>, Void> scheduledFutures;
         synchronized (mFutures) {
-            final WeakHashMap<ScheduledFuture<?>, Void> scheduledFutures =
-                    mFutures.remove(execution);
-            if (scheduledFutures != null) {
-                for (final ScheduledFuture<?> future : scheduledFutures.keySet()) {
-                    future.cancel(false);
-                }
+            scheduledFutures = mFutures.remove(execution);
+        }
+
+        if (scheduledFutures != null) {
+            for (final ScheduledFuture<?> future : scheduledFutures.keySet()) {
+                future.cancel(false);
             }
         }
     }
@@ -75,7 +76,7 @@ class ScheduledRunner implements Runner {
             @NotNull final TimeUnit timeUnit) {
 
         final ScheduledFuture<?> future =
-                mService.schedule(new ExecutionWrapper(execution, mThreads), delay, timeUnit);
+                mService.schedule(new ExecutionWrapper(execution), delay, timeUnit);
         synchronized (mFutures) {
             final WeakIdentityHashMap<Execution, WeakHashMap<ScheduledFuture<?>, Void>> futures =
                     mFutures;
@@ -92,25 +93,20 @@ class ScheduledRunner implements Runner {
     /**
      * Class used to keep track of the threads employed by this runner.
      */
-    private static class ExecutionWrapper implements Runnable {
+    private class ExecutionWrapper implements Runnable {
 
         private final Thread mCurrentThread;
 
         private final Execution mExecution;
 
-        private final Map<Thread, Void> mThreads;
-
         /**
          * Constructor.
          *
          * @param wrapped the wrapped execution.
-         * @param threads the map of runner threads.
          */
-        private ExecutionWrapper(@NotNull final Execution wrapped,
-                @NotNull final Map<Thread, Void> threads) {
+        private ExecutionWrapper(@NotNull final Execution wrapped) {
 
             mExecution = wrapped;
-            mThreads = threads;
             mCurrentThread = Thread.currentThread();
         }
 

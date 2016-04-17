@@ -24,7 +24,7 @@ import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Abstract implementation of a routine creating different type of invocation for synchronous and
+ * Abstract implementation of a routine creating different type of invocations for synchronous and
  * asynchronous mode.
  * <p>
  * Created by davide-maestroni on 04/17/2016.

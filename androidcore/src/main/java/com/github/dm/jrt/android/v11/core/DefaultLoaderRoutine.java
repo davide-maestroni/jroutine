@@ -18,11 +18,11 @@ package com.github.dm.jrt.android.v11.core;
 
 import android.content.Context;
 
-import com.github.dm.jrt.android.core.ConvertingRoutine;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.core.routine.LoaderRoutine;
+import com.github.dm.jrt.core.ConverterRoutine;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.invocation.Invocation;
@@ -48,7 +48,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class DefaultLoaderRoutine<IN, OUT> extends ConvertingRoutine<IN, OUT>
+class DefaultLoaderRoutine<IN, OUT> extends ConverterRoutine<IN, OUT>
         implements LoaderRoutine<IN, OUT> {
 
     private final LoaderConfiguration mConfiguration;

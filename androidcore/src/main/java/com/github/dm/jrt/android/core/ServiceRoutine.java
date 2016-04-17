@@ -34,6 +34,7 @@ import com.github.dm.jrt.android.core.invocation.TargetInvocationFactory;
 import com.github.dm.jrt.android.core.runner.AndroidRunners;
 import com.github.dm.jrt.android.core.service.InvocationService;
 import com.github.dm.jrt.android.core.service.ServiceDisconnectedException;
+import com.github.dm.jrt.core.ConverterRoutine;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
@@ -70,7 +71,7 @@ import static java.util.UUID.randomUUID;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class ServiceRoutine<IN, OUT> extends ConvertingRoutine<IN, OUT> {
+class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
 
     private final ServiceContext mContext;
 

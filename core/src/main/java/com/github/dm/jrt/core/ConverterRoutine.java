@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.android.core;
+package com.github.dm.jrt.core;
 
-import com.github.dm.jrt.core.AbstractRoutine;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
@@ -32,14 +31,14 @@ import org.jetbrains.annotations.NotNull;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public abstract class ConvertingRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
+public abstract class ConverterRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
 
     /**
      * Constructor.
      *
      * @param configuration the invocation configuration.
      */
-    protected ConvertingRoutine(@NotNull final InvocationConfiguration configuration) {
+    protected ConverterRoutine(@NotNull final InvocationConfiguration configuration) {
 
         super(configuration);
     }

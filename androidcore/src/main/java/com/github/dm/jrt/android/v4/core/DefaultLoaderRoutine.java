@@ -18,15 +18,14 @@ package com.github.dm.jrt.android.v4.core;
 
 import android.content.Context;
 
+import com.github.dm.jrt.android.core.ConvertingRoutine;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.invocation.ContextInvocation;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.core.routine.LoaderRoutine;
-import com.github.dm.jrt.core.AbstractRoutine;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.invocation.Invocation;
-import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
@@ -49,7 +48,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
+class DefaultLoaderRoutine<IN, OUT> extends ConvertingRoutine<IN, OUT>
         implements LoaderRoutine<IN, OUT> {
 
     private final LoaderConfiguration mConfiguration;
@@ -95,22 +94,6 @@ class DefaultLoaderRoutine<IN, OUT> extends AbstractRoutine<IN, OUT>
         if (context.getComponent() != null) {
             purgeLoaders(context, mLoaderId, mFactory);
         }
-    }
-
-    @NotNull
-    @Override
-    protected Invocation<IN, OUT> convertInvocation(@NotNull final Invocation<IN, OUT> invocation,
-            @NotNull final InvocationType type) throws Exception {
-
-        try {
-            invocation.onDestroy();
-
-        } catch (final Throwable t) {
-            InvocationInterruptedException.throwIfInterrupt(t);
-            getLogger().wrn(t, "ignoring exception while destroying invocation instance");
-        }
-
-        return newInvocation(type);
     }
 
     @NotNull

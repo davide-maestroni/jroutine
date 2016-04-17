@@ -34,7 +34,6 @@ import com.github.dm.jrt.android.core.invocation.TargetInvocationFactory;
 import com.github.dm.jrt.android.core.runner.AndroidRunners;
 import com.github.dm.jrt.android.core.service.InvocationService;
 import com.github.dm.jrt.android.core.service.ServiceDisconnectedException;
-import com.github.dm.jrt.core.AbstractRoutine;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
@@ -71,7 +70,7 @@ import static java.util.UUID.randomUUID;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
+class ServiceRoutine<IN, OUT> extends ConvertingRoutine<IN, OUT> {
 
     private final ServiceContext mContext;
 
@@ -90,7 +89,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
      * @param target                  the invocation factory target.
      * @param invocationConfiguration the invocation configuration.
      * @param serviceConfiguration    the service configuration.
-     * @throws java.lang.IllegalArgumentException if at least one of the parameter is invalid.
+     * @throws java.lang.IllegalStateException if the specified context is no more valid.
      */
     ServiceRoutine(@NotNull final ServiceContext context,
             @NotNull final TargetInvocationFactory<IN, OUT> target,
@@ -114,22 +113,6 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
         mFactory = fromFactory(serviceContext.getApplicationContext(), factory);
         getLogger().dbg("building service routine on invocation %s with configurations: %s - %s",
                 invocationClass.getName(), invocationConfiguration, serviceConfiguration);
-    }
-
-    @NotNull
-    @Override
-    protected Invocation<IN, OUT> convertInvocation(@NotNull final Invocation<IN, OUT> invocation,
-            @NotNull final InvocationType type) throws Exception {
-
-        try {
-            invocation.onDestroy();
-
-        } catch (final Throwable t) {
-            InvocationInterruptedException.throwIfInterrupt(t);
-            getLogger().wrn(t, "ignoring exception while destroying invocation instance");
-        }
-
-        return newInvocation(type);
     }
 
     @NotNull
@@ -209,11 +192,11 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
 
         private final Logger mLogger;
 
+        private final IOChannel<OUT> mOutputChannel;
+
         private ServiceConnection mConnection;
 
         private boolean mIsUnbound;
-
-        private IOChannel<OUT> mOutputChannel;
 
         /**
          * Constructor.
@@ -308,19 +291,19 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
 
         private final IncomingHandler<OUT> mIncomingHandler;
 
+        private final IOChannel<IN> mInputChannel;
+
         private final InvocationConfiguration mInvocationConfiguration;
 
         private final String mInvocationId;
 
         private final Logger mLogger;
 
+        private final IOChannel<OUT> mOutputChannel;
+
         private final ServiceConfiguration mServiceConfiguration;
 
         private final TargetInvocationFactory<IN, OUT> mTargetFactory;
-
-        private IOChannel<IN> mInputChannel;
-
-        private IOChannel<OUT> mOutputChannel;
 
         /**
          * Constructor.
@@ -432,7 +415,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
         }
 
         @Override
-        public void onAbort(@NotNull final RoutineException reason) throws RemoteException {
+        public void onAbort(@NotNull final RoutineException reason) {
 
             mInputChannel.abort(reason);
         }
@@ -460,8 +443,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
         }
 
         @Override
-        public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) throws
-                RemoteException {
+        public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
 
             final IOChannel<OUT> outputChannel = mOutputChannel;
             if (!outputChannel.isBound()) {
@@ -472,7 +454,7 @@ class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
         }
 
         @Override
-        public void onResult(@NotNull final ResultChannel<OUT> result) throws RemoteException {
+        public void onResult(@NotNull final ResultChannel<OUT> result) {
 
             final IOChannel<OUT> outputChannel = mOutputChannel;
             if (!outputChannel.isBound()) {

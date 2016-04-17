@@ -108,8 +108,7 @@ public class SupplierWrapper<OUT> extends DeepEqualObject implements Supplier<OU
      *
      * @param <OUT> the output data type.
      */
-    private static class ConstantSupplier<OUT> extends DeepEqualObject
-            implements Supplier<OUT> {
+    private static class ConstantSupplier<OUT> extends DeepEqualObject implements Supplier<OUT> {
 
         private final OUT mResult;
 

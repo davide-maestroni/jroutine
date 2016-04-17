@@ -41,8 +41,7 @@ import static com.github.dm.jrt.core.util.Reflection.findConstructor;
  *
  * @param <TYPE> the target object type.
  */
-public abstract class ContextInvocationTarget<TYPE> extends DeepEqualObject
-        implements Parcelable {
+public abstract class ContextInvocationTarget<TYPE> extends DeepEqualObject implements Parcelable {
 
     /**
      * Constructor.

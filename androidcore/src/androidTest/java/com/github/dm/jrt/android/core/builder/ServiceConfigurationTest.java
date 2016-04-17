@@ -43,7 +43,7 @@ public class ServiceConfigurationTest extends AndroidTestCase {
     public void testBuildFrom() {
 
         final ServiceConfiguration configuration =
-                builder().withResultLooper(Looper.getMainLooper())
+                builder().withMessageLooper(Looper.getMainLooper())
                          .withRunnerClass(MainRunner.class)
                          .withLogClass(AndroidLog.class)
                          .setConfiguration();
@@ -80,7 +80,7 @@ public class ServiceConfigurationTest extends AndroidTestCase {
     public void testBuilderFromEquals() {
 
         final ServiceConfiguration configuration =
-                builder().withResultLooper(Looper.getMainLooper())
+                builder().withMessageLooper(Looper.getMainLooper())
                          .withRunnerClass(MainRunner.class)
                          .withLogClass(AndroidLog.class)
                          .setConfiguration();
@@ -117,7 +117,7 @@ public class ServiceConfigurationTest extends AndroidTestCase {
     public void testLogClassEquals() {
 
         final ServiceConfiguration configuration =
-                builder().withResultLooper(Looper.getMainLooper())
+                builder().withMessageLooper(Looper.getMainLooper())
                          .withRunnerClass(MainRunner.class)
                          .withLogClass(AndroidLog.class)
                          .setConfiguration();
@@ -130,20 +130,20 @@ public class ServiceConfigurationTest extends AndroidTestCase {
     public void testLooperEquals() {
 
         final ServiceConfiguration configuration =
-                builder().withResultLooper(Looper.getMainLooper())
+                builder().withMessageLooper(Looper.getMainLooper())
                          .withRunnerClass(MainRunner.class)
                          .withLogClass(AndroidLog.class)
                          .setConfiguration();
         assertThat(configuration).isNotEqualTo(
-                builder().withResultLooper(Looper.myLooper()).setConfiguration());
-        assertThat(builder().withResultLooper(Looper.myLooper()).setConfiguration()).isNotEqualTo(
-                builder().withResultLooper(Looper.getMainLooper()).setConfiguration());
+                builder().withMessageLooper(Looper.myLooper()).setConfiguration());
+        assertThat(builder().withMessageLooper(Looper.myLooper()).setConfiguration()).isNotEqualTo(
+                builder().withMessageLooper(Looper.getMainLooper()).setConfiguration());
     }
 
     public void testRunnerClassEquals() {
 
         final ServiceConfiguration configuration =
-                builder().withResultLooper(Looper.getMainLooper())
+                builder().withMessageLooper(Looper.getMainLooper())
                          .withRunnerClass(MainRunner.class)
                          .withLogClass(AndroidLog.class)
                          .setConfiguration();

@@ -16,8 +16,6 @@
 
 package com.github.dm.jrt.android.core.builder;
 
-import android.os.Handler;
-import android.os.Looper;
 import android.test.AndroidTestCase;
 
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
@@ -48,7 +46,6 @@ public class LoaderConfigurationTest extends AndroidTestCase {
                                                            .withClashResolution(resolutionType)
                                                            .withInputClashResolution(resolutionType)
                                                            .withCacheStrategy(strategyType)
-                                                           .withResultLooper(Looper.getMainLooper())
                                                            .withResultStaleTime(1, TimeUnit.SECONDS)
                                                            .setConfiguration();
         assertThat(configuration.builderFrom().setConfiguration()).isEqualTo(configuration);
@@ -89,7 +86,6 @@ public class LoaderConfigurationTest extends AndroidTestCase {
                                                            .withClashResolution(resolutionType)
                                                            .withInputClashResolution(resolutionType)
                                                            .withCacheStrategy(strategyType)
-                                                           .withResultLooper(Looper.getMainLooper())
                                                            .withResultStaleTime(1, TimeUnit.SECONDS)
                                                            .setConfiguration();
         assertThat(builder().with(configuration).setConfiguration()).isEqualTo(configuration);
@@ -106,7 +102,6 @@ public class LoaderConfigurationTest extends AndroidTestCase {
                                                            .withClashResolution(resolutionType)
                                                            .withInputClashResolution(resolutionType)
                                                            .withCacheStrategy(strategyType)
-                                                           .withResultLooper(Looper.getMainLooper())
                                                            .withResultStaleTime(1, TimeUnit.SECONDS)
                                                            .setConfiguration();
         assertThat(configuration).isNotEqualTo(
@@ -125,7 +120,6 @@ public class LoaderConfigurationTest extends AndroidTestCase {
                                                            .withClashResolution(resolutionType)
                                                            .withInputClashResolution(resolutionType)
                                                            .withCacheStrategy(strategyType)
-                                                           .withResultLooper(Looper.getMainLooper())
                                                            .withResultStaleTime(1, TimeUnit.SECONDS)
                                                            .setConfiguration();
         assertThat(configuration).isNotEqualTo(
@@ -145,7 +139,6 @@ public class LoaderConfigurationTest extends AndroidTestCase {
                                                            .withClashResolution(resolutionType)
                                                            .withInputClashResolution(resolutionType)
                                                            .withCacheStrategy(strategyType)
-                                                           .withResultLooper(Looper.getMainLooper())
                                                            .withResultStaleTime(1, TimeUnit.SECONDS)
                                                            .setConfiguration();
         assertThat(configuration).isNotEqualTo(builder().withFactoryId(3).setConfiguration());
@@ -161,7 +154,6 @@ public class LoaderConfigurationTest extends AndroidTestCase {
                                                            .withClashResolution(resolutionType)
                                                            .withInputClashResolution(resolutionType)
                                                            .withCacheStrategy(strategyType)
-                                                           .withResultLooper(Looper.getMainLooper())
                                                            .withResultStaleTime(1, TimeUnit.SECONDS)
                                                            .setConfiguration();
         assertThat(configuration).isNotEqualTo(builder().withLoaderId(3).setConfiguration());
@@ -177,7 +169,6 @@ public class LoaderConfigurationTest extends AndroidTestCase {
                                                            .withClashResolution(resolutionType)
                                                            .withInputClashResolution(resolutionType)
                                                            .withCacheStrategy(strategyType)
-                                                           .withResultLooper(Looper.getMainLooper())
                                                            .withResultStaleTime(1, TimeUnit.SECONDS)
                                                            .setConfiguration();
         assertThat(configuration).isNotEqualTo(
@@ -189,26 +180,6 @@ public class LoaderConfigurationTest extends AndroidTestCase {
                 builder().withInputClashResolution(ClashResolutionType.JOIN).setConfiguration());
     }
 
-    public void testLooperEquals() {
-
-        final ClashResolutionType resolutionType = ClashResolutionType.ABORT_THAT;
-        final CacheStrategyType strategyType = CacheStrategyType.CACHE;
-        final LoaderConfiguration configuration = builder().withLoaderId(-1)
-                                                           .withClashResolution(resolutionType)
-                                                           .withInputClashResolution(resolutionType)
-                                                           .withCacheStrategy(strategyType)
-                                                           .withResultLooper(Looper.getMainLooper())
-                                                           .withResultStaleTime(1, TimeUnit.SECONDS)
-                                                           .setConfiguration();
-        assertThat(configuration).isNotEqualTo(
-                builder().withResultLooper(new Handler().getLooper()).setConfiguration());
-        final Looper looper = new Handler().getLooper();
-        assertThat(configuration.builderFrom()
-                                .withResultLooper(looper)
-                                .setConfiguration()).isNotEqualTo(
-                builder().withResultLooper(looper).setConfiguration());
-    }
-
     public void testStaleTimeEquals() {
 
         final ClashResolutionType resolutionType = ClashResolutionType.ABORT_THAT;
@@ -217,7 +188,6 @@ public class LoaderConfigurationTest extends AndroidTestCase {
                                                            .withClashResolution(resolutionType)
                                                            .withInputClashResolution(resolutionType)
                                                            .withCacheStrategy(strategyType)
-                                                           .withResultLooper(Looper.getMainLooper())
                                                            .withResultStaleTime(1, TimeUnit.SECONDS)
                                                            .setConfiguration();
         assertThat(configuration).isNotEqualTo(

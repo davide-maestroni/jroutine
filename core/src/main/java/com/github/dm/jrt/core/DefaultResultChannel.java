@@ -110,6 +110,10 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
     private Object mConsumerMutex;
 
+    private FlushExecution mFlushExecution;
+
+    private FlushExecution mForcedFlushExecution;
+
     private boolean mIsWaitingExecution;
 
     private boolean mIsWaitingInvocation;
@@ -259,7 +263,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
 
         if (delay.isZero()) {
-            executeFlush(false);
+            runFlush(false);
 
         } else if (execution != null) {
             runExecution(execution, delay.time, delay.unit);
@@ -285,7 +289,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
 
         if (delay.isZero()) {
-            executeFlush(false);
+            runFlush(false);
 
         } else if (execution != null) {
             runExecution(execution, delay.time, delay.unit);
@@ -311,7 +315,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
 
         if (delay.isZero()) {
-            executeFlush(false);
+            runFlush(false);
 
         } else if (execution != null) {
             runExecution(execution, delay.time, delay.unit);
@@ -371,7 +375,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             channel.abort(abortException);
         }
 
-        executeFlush(false);
+        runFlush(false);
     }
 
     /**
@@ -385,7 +389,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
 
         if (needsFlush) {
-            executeFlush(false);
+            runFlush(false);
         }
     }
 
@@ -485,19 +489,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                 mState = currentState.toDoneState();
                 mMutex.notifyAll();
             }
-        }
-    }
-
-    private void executeFlush(final boolean forceClose) {
-
-        // Need to make sure to pass the outputs to the consumer in the runner thread, so to avoid
-        // deadlock issues
-        final Runner runner = mRunner;
-        if (runner.isExecutionThread()) {
-            flushOutput(forceClose);
-
-        } else {
-            runExecution(new FlushExecution(forceClose), 0, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -823,6 +814,34 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         }
     }
 
+    private void runFlush(final boolean forceClose) {
+
+        // Need to make sure to pass the outputs to the consumer in the runner thread, so to avoid
+        // deadlock issues
+        if (mRunner.isExecutionThread()) {
+            flushOutput(forceClose);
+
+        } else {
+            final FlushExecution execution;
+            if (forceClose) {
+                if (mForcedFlushExecution == null) {
+                    mForcedFlushExecution = new FlushExecution(true);
+                }
+
+                execution = mForcedFlushExecution;
+
+            } else {
+                if (mFlushExecution == null) {
+                    mFlushExecution = new FlushExecution(false);
+                }
+
+                execution = mFlushExecution;
+            }
+
+            runExecution(execution, 0, TimeUnit.MILLISECONDS);
+        }
+    }
+
     private void verifyBound() {
 
         if (mOutputConsumer != null) {
@@ -1138,7 +1157,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
                 mConsumerMutex = getMutex(consumer);
             }
 
-            executeFlush(forceClose);
+            runFlush(forceClose);
             return this;
         }
 
@@ -1489,7 +1508,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             }
 
             if (needsFlush) {
-                executeFlush(false);
+                runFlush(false);
             }
         }
 
@@ -1515,7 +1534,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             }
 
             if (delay.isZero()) {
-                executeFlush(false);
+                runFlush(false);
 
             } else if (execution != null) {
                 runExecution(execution, delay.time, delay.unit);

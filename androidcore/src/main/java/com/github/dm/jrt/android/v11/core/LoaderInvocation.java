@@ -23,7 +23,6 @@ import android.content.Context;
 import android.content.Loader;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
-import android.os.Looper;
 import android.util.SparseArray;
 
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
@@ -41,7 +40,6 @@ import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.CallInvocation;
-import com.github.dm.jrt.core.invocation.PassingInvocation;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Execution;
@@ -60,7 +58,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.fromFactory;
-import static com.github.dm.jrt.android.core.runner.AndroidRunners.looperRunner;
 import static com.github.dm.jrt.android.core.runner.AndroidRunners.mainRunner;
 
 /**
@@ -96,8 +93,6 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
 
     private final Logger mLogger;
 
-    private final Looper mLooper;
-
     private final OrderType mOrderType;
 
     private final long mResultStaleTimeMillis;
@@ -118,7 +113,6 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
 
         mContext = ConstantConditions.notNull("loader context", context);
         mFactory = ConstantConditions.notNull("context invocation factory", factory);
-        mLooper = configuration.getResultLooperOr(null);
         mLoaderId = configuration.getLoaderIdOr(LoaderConfiguration.AUTO);
         mClashResolutionType =
                 configuration.getClashResolutionTypeOr(ClashResolutionType.ABORT_THAT);
@@ -457,7 +451,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         final CacheStrategyType strategyType = mCacheStrategyType;
         logger.dbg("setting result cache type [%d]: %s", loaderId, strategyType);
         callbacks.setCacheStrategy(strategyType);
-        result.pass(callbacks.newChannel(mLooper));
+        result.pass(callbacks.newChannel());
         if ((clashType == ClashType.ABORT_THAT) || isStaleResult) {
             logger.dbg("restarting loader [%d]", loaderId);
             loaderManager.restartLoader(loaderId, Bundle.EMPTY, callbacks);
@@ -826,7 +820,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         }
 
         @NotNull
-        private OutputChannel<OUT> newChannel(@Nullable final Looper looper) {
+        private OutputChannel<OUT> newChannel() {
 
             final Logger logger = mLogger;
             logger.dbg("creating new result channel");
@@ -841,16 +835,6 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
             channels.add(channel);
             internalLoader.setInvocationCount(Math.max(channels.size() + mAbortedChannels.size(),
                     internalLoader.getInvocationCount()));
-            if ((looper != null) && (looper != Looper.getMainLooper())) {
-                return JRoutineCore.on(PassingInvocation.<OUT>factoryOf())
-                                   .getInvocationConfiguration()
-                                   .withRunner(looperRunner(looper))
-                                   .withLog(logger.getLog())
-                                   .withLogLevel(logger.getLogLevel())
-                                   .setConfiguration()
-                                   .asyncCall(channel);
-            }
-
             return channel;
         }
 

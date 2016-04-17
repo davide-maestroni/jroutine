@@ -84,8 +84,6 @@ public class InvocationService extends Service {
 
     private static final String KEY_ABORT_EXCEPTION = "abort_exception";
 
-    private static final String KEY_CORE_INVOCATIONS = "max_retained";
-
     private static final String KEY_DATA_VALUE = "data_value";
 
     private static final String KEY_FACTORY_ARGS = "factory_args";
@@ -96,11 +94,7 @@ public class InvocationService extends Service {
 
     private static final String KEY_LOG_LEVEL = "log_level";
 
-    private static final String KEY_MAX_INVOCATIONS = "max_running";
-
     private static final String KEY_OUTPUT_ORDER = "output_order";
-
-    private static final String KEY_PARALLEL_INVOCATION = "parallel_invocation";
 
     private static final String KEY_RUNNER_CLASS = "runner_class";
 
@@ -176,29 +170,6 @@ public class InvocationService extends Service {
     }
 
     /**
-     * Puts the specified asynchronous invocation info into the passed bundle.
-     *
-     * @param bundle                  the bundle to fill.
-     * @param invocationId            the invocation ID.
-     * @param targetClass             the target invocation class.
-     * @param factoryArgs             the invocation factory arguments.
-     * @param invocationConfiguration the invocation configuration.
-     * @param runnerClass             the invocation runner class.
-     * @param logClass                the invocation log class.
-     */
-    public static void putAsyncInvocation(@NotNull final Bundle bundle,
-            @NotNull final String invocationId,
-            @NotNull final Class<? extends ContextInvocation<?, ?>> targetClass,
-            @Nullable final Object[] factoryArgs,
-            @NotNull final InvocationConfiguration invocationConfiguration,
-            @Nullable final Class<? extends Runner> runnerClass,
-            @Nullable final Class<? extends Log> logClass) {
-
-        putInvocation(bundle, invocationId, targetClass, factoryArgs, invocationConfiguration,
-                runnerClass, logClass, false);
-    }
-
-    /**
      * Puts the specified abort exception into the passed bundle.
      *
      * @param bundle       the bundle to fill.
@@ -213,19 +184,7 @@ public class InvocationService extends Service {
     }
 
     /**
-     * Puts the specified invocation ID into the passed bundle.
-     *
-     * @param bundle       the bundle to fill.
-     * @param invocationId the invocation ID.
-     */
-    public static void putInvocationId(@NotNull final Bundle bundle,
-            @NotNull final String invocationId) {
-
-        bundle.putString(KEY_INVOCATION_ID, invocationId);
-    }
-
-    /**
-     * Puts the specified parallel invocation info into the passed bundle.
+     * Puts the specified asynchronous invocation info into the passed bundle.
      *
      * @param bundle                  the bundle to fill.
      * @param invocationId            the invocation ID.
@@ -235,7 +194,7 @@ public class InvocationService extends Service {
      * @param runnerClass             the invocation runner class.
      * @param logClass                the invocation log class.
      */
-    public static void putParallelInvocation(@NotNull final Bundle bundle,
+    public static void putInvocation(@NotNull final Bundle bundle,
             @NotNull final String invocationId,
             @NotNull final Class<? extends ContextInvocation<?, ?>> targetClass,
             @Nullable final Object[] factoryArgs,
@@ -243,8 +202,29 @@ public class InvocationService extends Service {
             @Nullable final Class<? extends Runner> runnerClass,
             @Nullable final Class<? extends Log> logClass) {
 
-        putInvocation(bundle, invocationId, targetClass, factoryArgs, invocationConfiguration,
-                runnerClass, logClass, true);
+        bundle.putString(KEY_INVOCATION_ID,
+                ConstantConditions.notNull("invocation ID", invocationId));
+        bundle.putSerializable(KEY_TARGET_INVOCATION,
+                ConstantConditions.notNull("target invocation class", targetClass));
+        bundle.putParcelable(KEY_FACTORY_ARGS,
+                (factoryArgs != null) ? new ParcelableValue(factoryArgs) : null);
+        bundle.putSerializable(KEY_OUTPUT_ORDER,
+                invocationConfiguration.getOutputOrderTypeOr(null));
+        bundle.putSerializable(KEY_LOG_LEVEL, invocationConfiguration.getLogLevelOr(null));
+        bundle.putSerializable(KEY_RUNNER_CLASS, runnerClass);
+        bundle.putSerializable(KEY_LOG_CLASS, logClass);
+    }
+
+    /**
+     * Puts the specified invocation ID into the passed bundle.
+     *
+     * @param bundle       the bundle to fill.
+     * @param invocationId the invocation ID.
+     */
+    public static void putInvocationId(@NotNull final Bundle bundle,
+            @NotNull final String invocationId) {
+
+        bundle.putString(KEY_INVOCATION_ID, invocationId);
     }
 
     /**
@@ -264,32 +244,6 @@ public class InvocationService extends Service {
     private static void putError(@NotNull final Bundle bundle, @Nullable final Throwable error) {
 
         bundle.putSerializable(KEY_ABORT_EXCEPTION, error);
-    }
-
-    private static void putInvocation(@NotNull final Bundle bundle,
-            @NotNull final String invocationId,
-            @NotNull final Class<? extends ContextInvocation<?, ?>> targetClass,
-            @Nullable final Object[] factoryArgs,
-            @NotNull final InvocationConfiguration invocationConfiguration,
-            @Nullable final Class<? extends Runner> runnerClass,
-            @Nullable final Class<? extends Log> logClass, boolean isParallel) {
-
-        bundle.putString(KEY_INVOCATION_ID,
-                ConstantConditions.notNull("invocation ID", invocationId));
-        bundle.putSerializable(KEY_TARGET_INVOCATION,
-                ConstantConditions.notNull("target invocation class", targetClass));
-        bundle.putParcelable(KEY_FACTORY_ARGS,
-                (factoryArgs != null) ? new ParcelableValue(factoryArgs) : null);
-        bundle.putInt(KEY_CORE_INVOCATIONS,
-                invocationConfiguration.getCoreInstancesOr(InvocationConfiguration.DEFAULT));
-        bundle.putInt(KEY_MAX_INVOCATIONS,
-                invocationConfiguration.getMaxInstancesOr(InvocationConfiguration.DEFAULT));
-        bundle.putSerializable(KEY_OUTPUT_ORDER,
-                invocationConfiguration.getOutputOrderTypeOr(null));
-        bundle.putSerializable(KEY_LOG_LEVEL, invocationConfiguration.getLogLevelOr(null));
-        bundle.putSerializable(KEY_RUNNER_CLASS, runnerClass);
-        bundle.putSerializable(KEY_LOG_CLASS, logClass);
-        bundle.putBoolean(KEY_PARALLEL_INVOCATION, isParallel);
     }
 
     private static void putValue(@NotNull final Bundle bundle, @Nullable final Object value) {
@@ -356,7 +310,7 @@ public class InvocationService extends Service {
         synchronized (mMutex) {
             final RoutineInvocation invocation = mInvocations.get(invocationId);
             if (invocation == null) {
-                mLogger.err("the service message has no invalid invocation ID: %d", invocationId);
+                mLogger.err("the service message has invalid invocation ID: %s", invocationId);
                 throw new IllegalArgumentException(
                         "[" + getClass().getName() + "] the service message has invalid "
                                 + "invocation ID: " + invocationId);
@@ -401,14 +355,12 @@ public class InvocationService extends Service {
         synchronized (mMutex) {
             final HashMap<String, RoutineInvocation> invocations = mInvocations;
             if (invocations.containsKey(invocationId)) {
-                mLogger.err("an invocation with the same ID is already running: %d", invocationId);
+                mLogger.err("an invocation with the same ID is already running: %s", invocationId);
                 throw new IllegalArgumentException(
                         "[" + getClass().getName() + "] an invocation with the same ID is"
                                 + " already running: " + invocationId);
             }
 
-            final int coreInvocations = data.getInt(KEY_CORE_INVOCATIONS);
-            final int maxInvocations = data.getInt(KEY_MAX_INVOCATIONS);
             final OrderType outputOrderType = (OrderType) data.getSerializable(KEY_OUTPUT_ORDER);
             final Level logLevel = (Level) data.getSerializable(KEY_LOG_LEVEL);
             final Class<? extends Runner> runnerClass =
@@ -443,10 +395,7 @@ public class InvocationService extends Service {
                     }
                 }
 
-                builder.withCoreInstances(coreInvocations)
-                       .withMaxInstances(maxInvocations)
-                       .withOutputOrder(outputOrderType)
-                       .withLogLevel(logLevel);
+                builder.withOutputOrder(outputOrderType).withLogLevel(logLevel);
                 final ContextInvocationFactory<?, ?> factory =
                         getInvocationFactory(targetClass, args);
                 final ContextRoutine contextRoutine =
@@ -455,9 +404,7 @@ public class InvocationService extends Service {
                 routines.put(routineInfo, routineState);
             }
 
-            final boolean isParallel = data.getBoolean(KEY_PARALLEL_INVOCATION);
-            final InvocationChannel<Object, Object> channel =
-                    (isParallel) ? routineState.parallelInvoke() : routineState.asyncInvoke();
+            final InvocationChannel<Object, Object> channel = routineState.invoke();
             final RoutineInvocation routineInvocation =
                     new RoutineInvocation(invocationId, channel, routineInfo, routineState);
             routineInvocation.bind(new ServiceOutputConsumer(routineInvocation, message.replyTo));
@@ -647,22 +594,10 @@ public class InvocationService extends Service {
          * @return the invocation channel.
          */
         @NotNull
-        InvocationChannel<Object, Object> asyncInvoke() {
+        InvocationChannel<Object, Object> invoke() {
 
             ++mInvocationCount;
             return mRoutine.asyncInvoke();
-        }
-
-        /**
-         * Increments the count of the running routines and starts a parallel invocation.
-         *
-         * @return the invocation channel.
-         */
-        @NotNull
-        InvocationChannel<Object, Object> parallelInvoke() {
-
-            ++mInvocationCount;
-            return mRoutine.parallelInvoke();
         }
 
         /**

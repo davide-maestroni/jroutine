@@ -34,43 +34,33 @@ import com.github.dm.jrt.android.core.invocation.TargetInvocationFactory;
 import com.github.dm.jrt.android.core.runner.AndroidRunners;
 import com.github.dm.jrt.android.core.service.InvocationService;
 import com.github.dm.jrt.android.core.service.ServiceDisconnectedException;
+import com.github.dm.jrt.core.AbstractRoutine;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.IOChannel;
-import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
-import com.github.dm.jrt.core.config.ChannelConfiguration;
+import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
-import com.github.dm.jrt.core.config.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.error.RoutineException;
+import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
+import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
-import com.github.dm.jrt.core.log.Log;
-import com.github.dm.jrt.core.log.Log.Level;
+import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.log.Logger;
-import com.github.dm.jrt.core.routine.Routine;
-import com.github.dm.jrt.core.routine.TemplateRoutine;
 import com.github.dm.jrt.core.runner.Execution;
-import com.github.dm.jrt.core.runner.Runner;
-import com.github.dm.jrt.core.runner.Runners;
-import com.github.dm.jrt.core.util.TimeDuration;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryOf;
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.fromFactory;
-import static com.github.dm.jrt.android.core.runner.AndroidRunners.looperRunner;
 import static com.github.dm.jrt.android.core.service.InvocationService.getAbortError;
 import static com.github.dm.jrt.android.core.service.InvocationService.getValue;
-import static com.github.dm.jrt.android.core.service.InvocationService.putAsyncInvocation;
 import static com.github.dm.jrt.android.core.service.InvocationService.putError;
+import static com.github.dm.jrt.android.core.service.InvocationService.putInvocation;
 import static com.github.dm.jrt.android.core.service.InvocationService.putInvocationId;
-import static com.github.dm.jrt.android.core.service.InvocationService.putParallelInvocation;
 import static com.github.dm.jrt.android.core.service.InvocationService.putValue;
-import static com.github.dm.jrt.core.runner.Runners.zeroDelayRunner;
 import static java.util.UUID.randomUUID;
 
 /**
@@ -81,15 +71,13 @@ import static java.util.UUID.randomUUID;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
+class ServiceRoutine<IN, OUT> extends AbstractRoutine<IN, OUT> {
 
     private final ServiceContext mContext;
 
+    private final InvocationFactory<IN, OUT> mFactory;
+
     private final InvocationConfiguration mInvocationConfiguration;
-
-    private final Logger mLogger;
-
-    private final Routine<IN, OUT> mRoutine;
 
     private final ServiceConfiguration mServiceConfiguration;
 
@@ -109,6 +97,7 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
             @NotNull final InvocationConfiguration invocationConfiguration,
             @NotNull final ServiceConfiguration serviceConfiguration) {
 
+        super(invocationConfiguration);
         final Context serviceContext = context.getServiceContext();
         if (serviceContext == null) {
             throw new IllegalStateException("the service context has been destroyed");
@@ -118,292 +107,176 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
         mTargetFactory = target;
         mInvocationConfiguration = invocationConfiguration;
         mServiceConfiguration = serviceConfiguration;
-        mLogger = invocationConfiguration.newLogger(this);
         final Class<? extends ContextInvocation<IN, OUT>> invocationClass =
                 target.getInvocationClass();
         final ContextInvocationFactory<IN, OUT> factory =
                 factoryOf(invocationClass, target.getFactoryArgs());
-        mRoutine = JRoutineCore.on(fromFactory(serviceContext.getApplicationContext(), factory))
-                               .getInvocationConfiguration()
-                               .with(invocationConfiguration)
-                               .setConfiguration()
-                               .buildRoutine();
-        final Logger logger = mLogger;
-        logger.dbg("building service routine on invocation %s with configurations: %s - %s",
+        mFactory = fromFactory(serviceContext.getApplicationContext(), factory);
+        getLogger().dbg("building service routine on invocation %s with configurations: %s - %s",
                 invocationClass.getName(), invocationConfiguration, serviceConfiguration);
     }
 
     @NotNull
-    public InvocationChannel<IN, OUT> asyncInvoke() {
-
-        return new ServiceChannel<IN, OUT>(false, mContext, mTargetFactory,
-                mInvocationConfiguration, mServiceConfiguration, mLogger);
-    }
-
-    @NotNull
-    public InvocationChannel<IN, OUT> parallelInvoke() {
-
-        return new ServiceChannel<IN, OUT>(true, mContext, mTargetFactory, mInvocationConfiguration,
-                mServiceConfiguration, mLogger);
-    }
-
-    @NotNull
-    public InvocationChannel<IN, OUT> serialInvoke() {
-
-        return mRoutine.serialInvoke();
-    }
-
-    @NotNull
-    public InvocationChannel<IN, OUT> syncInvoke() {
-
-        return mRoutine.syncInvoke();
-    }
-
     @Override
-    public void purge() {
+    protected Invocation<IN, OUT> convertInvocation(@NotNull final Invocation<IN, OUT> invocation,
+            @NotNull final InvocationType type) throws Exception {
 
-        mRoutine.purge();
+        try {
+            invocation.onDestroy();
+
+        } catch (final Throwable t) {
+            InvocationInterruptedException.throwIfInterrupt(t);
+            getLogger().wrn(t, "ignoring exception while destroying invocation instance");
+        }
+
+        return newInvocation(type);
+    }
+
+    @NotNull
+    @Override
+    protected Invocation<IN, OUT> newInvocation(@NotNull final InvocationType type) throws
+            Exception {
+
+        if (type == InvocationType.SYNC) {
+            return mFactory.newInvocation();
+        }
+
+        return new ServiceInvocation<IN, OUT>(mContext, mTargetFactory, mInvocationConfiguration,
+                mServiceConfiguration, getLogger());
     }
 
     /**
-     * Service invocation channel implementation.
+     * Output consumer sending messages to the service.
      *
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
+     * @param <IN> the input data type.
      */
-    private static class ServiceChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
-
-        private final ServiceContext mContext;
+    private static class ConnectionOutputConsumer<IN> implements OutputConsumer<IN> {
 
         private final Messenger mInMessenger;
 
-        private final IOChannel<IN> mInput;
+        private final String mInvocationId;
 
-        private final InvocationConfiguration mInvocationConfiguration;
-
-        private final boolean mIsParallel;
-
-        private final Logger mLogger;
-
-        private final Object mMutex = new Object();
-
-        private final IOChannel<OUT> mOutput;
-
-        private final ServiceConfiguration mServiceConfiguration;
-
-        private final TargetInvocationFactory<IN, OUT> mTargetFactory;
-
-        private final String mUUID;
-
-        private RoutineServiceConnection mConnection;
-
-        private boolean mIsBound;
-
-        private boolean mIsUnbound;
-
-        private Messenger mOutMessenger;
+        private final Messenger mOutMessenger;
 
         /**
          * Constructor.
          *
-         * @param isParallel              whether the invocation is parallel.
-         * @param context                 the routine context.
-         * @param target                  the invocation factory target.
-         * @param invocationConfiguration the invocation configuration.
-         * @param serviceConfiguration    the service configuration.
-         * @param logger                  the routine logger.
+         * @param invocationId the invocation ID.
+         * @param inMessenger  the messenger receiving data from the service.
+         * @param outMessenger the messenger sending data to the service.
          */
-        private ServiceChannel(final boolean isParallel, @NotNull final ServiceContext context,
-                @NotNull final TargetInvocationFactory<IN, OUT> target,
-                @NotNull final InvocationConfiguration invocationConfiguration,
-                @NotNull final ServiceConfiguration serviceConfiguration,
-                @NotNull final Logger logger) {
+        private ConnectionOutputConsumer(@NotNull final String invocationId,
+                @NotNull final Messenger inMessenger, @NotNull final Messenger outMessenger) {
 
-            mUUID = randomUUID().toString();
-            mIsParallel = isParallel;
+            mInvocationId = invocationId;
+            mInMessenger = inMessenger;
+            mOutMessenger = outMessenger;
+        }
+
+        public void onComplete() throws RemoteException {
+
+            final Message message = Message.obtain(null, InvocationService.MSG_COMPLETE);
+            putInvocationId(message.getData(), mInvocationId);
+            message.replyTo = mInMessenger;
+            mOutMessenger.send(message);
+        }
+
+        public void onError(@NotNull final RoutineException error) throws RemoteException {
+
+            final Message message = Message.obtain(null, InvocationService.MSG_ABORT);
+            putError(message.getData(), mInvocationId, error);
+            message.replyTo = mInMessenger;
+            mOutMessenger.send(message);
+        }
+
+        public void onOutput(final IN input) throws RemoteException {
+
+            final Message message = Message.obtain(null, InvocationService.MSG_DATA);
+            putValue(message.getData(), mInvocationId, input);
+            message.replyTo = mInMessenger;
+            mOutMessenger.send(message);
+        }
+    }
+
+    /**
+     * Handler implementation managing incoming messages from the service.
+     *
+     * @param <OUT> the output data type.
+     */
+    private static class IncomingHandler<OUT> extends Handler {
+
+        private final ServiceContext mContext;
+
+        private final Logger mLogger;
+
+        private ServiceConnection mConnection;
+
+        private boolean mIsUnbound;
+
+        private IOChannel<OUT> mOutputChannel;
+
+        /**
+         * Constructor.
+         *
+         * @param looper        the message looper.
+         * @param context       the service context.
+         * @param outputChannel the output I/O channel.
+         * @param logger        the logger instance.
+         */
+        private IncomingHandler(@NotNull final Looper looper, @NotNull final ServiceContext context,
+                @NotNull final IOChannel<OUT> outputChannel, @NotNull final Logger logger) {
+
+            super(looper);
             mContext = context;
-            final Looper looper = serviceConfiguration.getResultLooperOr(Looper.getMainLooper());
-            mInMessenger = new Messenger(new IncomingHandler(looper));
-            mTargetFactory = target;
-            mInvocationConfiguration = invocationConfiguration;
-            mServiceConfiguration = serviceConfiguration;
+            mOutputChannel = outputChannel;
             mLogger = logger;
-            final Log log = logger.getLog();
-            final Level logLevel = logger.getLogLevel();
-            final Runner runner = invocationConfiguration.getRunnerOr(Runners.sharedRunner());
-            final OrderType inputOrderType = invocationConfiguration.getInputOrderTypeOr(null);
-            final int inputLimit =
-                    invocationConfiguration.getInputLimitOr(ChannelConfiguration.DEFAULT);
-            final TimeDuration inputMaxDelay = invocationConfiguration.getInputMaxDelayOr(null);
-            final int inputMaxSize =
-                    invocationConfiguration.getInputMaxSizeOr(ChannelConfiguration.DEFAULT);
-            mInput = JRoutineCore.io()
-                                 .getChannelConfiguration()
-                                 .withRunner(runner)
-                                 .withChannelOrder(inputOrderType)
-                                 .withChannelLimit(inputLimit)
-                                 .withChannelMaxDelay(inputMaxDelay)
-                                 .withChannelMaxSize(inputMaxSize)
-                                 .withLog(log)
-                                 .withLogLevel(logLevel)
-                                 .setConfiguration()
-                                 .buildChannel();
-            final int outputLimit =
-                    invocationConfiguration.getOutputLimitOr(ChannelConfiguration.DEFAULT);
-            final TimeDuration outputMaxDelay = invocationConfiguration.getOutputMaxDelayOr(null);
-            final int outputMaxSize =
-                    invocationConfiguration.getOutputMaxSizeOr(ChannelConfiguration.DEFAULT);
-            final TimeDuration executionTimeout = invocationConfiguration.getReadTimeoutOr(null);
-            final TimeoutActionType timeoutActionType =
-                    invocationConfiguration.getReadTimeoutActionOr(null);
-            mOutput = JRoutineCore.io()
-                                  .getChannelConfiguration()
-                                  .withRunner(zeroDelayRunner(looperRunner(looper)))
-                                  .withChannelLimit(outputLimit)
-                                  .withChannelMaxDelay(outputMaxDelay)
-                                  .withChannelMaxSize(outputMaxSize)
-                                  .withReadTimeout(executionTimeout)
-                                  .withReadTimeoutAction(timeoutActionType)
-                                  .withLog(log)
-                                  .withLogLevel(logLevel)
-                                  .setConfiguration()
-                                  .buildChannel();
         }
 
-        public boolean abort() {
+        @Override
+        @SuppressWarnings("unchecked")
+        public void handleMessage(@NotNull final Message msg) {
 
-            bindService();
-            return mInput.abort();
-        }
+            final Logger logger = mLogger;
+            logger.dbg("incoming service message: %s", msg);
+            try {
+                switch (msg.what) {
+                    case InvocationService.MSG_DATA:
+                        mOutputChannel.pass((OUT) getValue(msg));
+                        break;
 
-        public boolean abort(@Nullable final Throwable reason) {
+                    case InvocationService.MSG_COMPLETE:
+                        mOutputChannel.close();
+                        unbindService();
+                        break;
 
-            bindService();
-            return mInput.abort(reason);
-        }
+                    case InvocationService.MSG_ABORT:
+                        mOutputChannel.abort(InvocationException.wrapIfNeeded(getAbortError(msg)));
+                        unbindService();
+                        break;
 
-        public boolean isEmpty() {
-
-            return mInput.isEmpty();
-        }
-
-        public boolean isOpen() {
-
-            return mInput.isOpen();
-        }
-
-        @NotNull
-        public InvocationChannel<IN, OUT> after(@NotNull final TimeDuration delay) {
-
-            mInput.after(delay);
-            return this;
-        }
-
-        @NotNull
-        public InvocationChannel<IN, OUT> after(final long delay,
-                @NotNull final TimeUnit timeUnit) {
-
-            mInput.after(delay, timeUnit);
-            return this;
-        }
-
-        @NotNull
-        public InvocationChannel<IN, OUT> now() {
-
-            mInput.now();
-            return this;
-        }
-
-        @NotNull
-        public InvocationChannel<IN, OUT> orderByCall() {
-
-            mInput.orderByCall();
-            return this;
-        }
-
-        @NotNull
-        public InvocationChannel<IN, OUT> orderByDelay() {
-
-            mInput.orderByDelay();
-            return this;
-        }
-
-        @NotNull
-        public InvocationChannel<IN, OUT> pass(
-                @Nullable final OutputChannel<? extends IN> channel) {
-
-            bindService();
-            mInput.pass(channel);
-            return this;
-        }
-
-        @NotNull
-        public InvocationChannel<IN, OUT> pass(@Nullable final Iterable<? extends IN> inputs) {
-
-            bindService();
-            mInput.pass(inputs);
-            return this;
-        }
-
-        @NotNull
-        public InvocationChannel<IN, OUT> pass(@Nullable final IN input) {
-
-            bindService();
-            mInput.pass(input);
-            return this;
-        }
-
-        @NotNull
-        public InvocationChannel<IN, OUT> pass(@Nullable final IN... inputs) {
-
-            bindService();
-            mInput.pass(inputs);
-            return this;
-        }
-
-        @NotNull
-        public OutputChannel<OUT> result() {
-
-            bindService();
-            mInput.close();
-            return mOutput;
-        }
-
-        private void bindService() {
-
-            synchronized (mMutex) {
-                if (mIsBound) {
-                    return;
+                    default:
+                        super.handleMessage(msg);
                 }
 
-                final ServiceContext context = mContext;
-                final Context serviceContext = context.getServiceContext();
-                if (serviceContext == null) {
-                    throw new IllegalStateException("the service context has been destroyed");
-                }
-
-                final Intent intent = context.getServiceIntent();
-                mConnection = new RoutineServiceConnection();
-                mIsBound =
-                        serviceContext.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-                if (!mIsBound) {
-                    throw new RoutineException("failed to bind to service: " + intent
-                            + ", remember to add the service declaration to the Android manifest "
-                            + "file!");
-                }
+            } catch (final Throwable t) {
+                logger.wrn(t, "error while handling service message");
+                mOutputChannel.abort(t);
+                unbindService();
             }
+        }
+
+        private void setConnection(@NotNull final ServiceConnection connection) {
+
+            mConnection = connection;
         }
 
         private void unbindService() {
 
-            synchronized (mMutex) {
-                if (mIsUnbound) {
-                    return;
-                }
-
-                mIsUnbound = true;
+            if (mIsUnbound) {
+                return;
             }
 
+            mIsUnbound = true;
             // Unbind on main thread to avoid crashing the IPC
             AndroidRunners.mainRunner().run(new Execution() {
 
@@ -423,155 +296,221 @@ class ServiceRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> {
                 }
             }, 0, TimeUnit.MILLISECONDS);
         }
+    }
+
+    /**
+     * Service connection implementation managing the service communication state.
+     *
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
+     */
+    private static class RoutineServiceConnection<IN, OUT> implements ServiceConnection {
+
+        private final IncomingHandler<OUT> mIncomingHandler;
+
+        private final InvocationConfiguration mInvocationConfiguration;
+
+        private final String mInvocationId;
+
+        private final Logger mLogger;
+
+        private final ServiceConfiguration mServiceConfiguration;
+
+        private final TargetInvocationFactory<IN, OUT> mTargetFactory;
+
+        private IOChannel<IN> mInputChannel;
+
+        private IOChannel<OUT> mOutputChannel;
 
         /**
-         * Output consumer sending messages to the service.
+         * Constructor.
+         *
+         * @param invocationId            the invocation ID.
+         * @param target                  the invocation factory target.
+         * @param invocationConfiguration the invocation configuration.
+         * @param serviceConfiguration    the service configuration.
+         * @param handler                 the handler managing messages from the service.
+         * @param inputChannel            the input I/O channel.
+         * @param outputChannel           the output I/O channel.
+         * @param logger                  the logger instance.
          */
-        private class ConnectionOutputConsumer implements OutputConsumer<IN> {
+        private RoutineServiceConnection(@NotNull final String invocationId,
+                @NotNull final TargetInvocationFactory<IN, OUT> target,
+                @NotNull final InvocationConfiguration invocationConfiguration,
+                @NotNull final ServiceConfiguration serviceConfiguration,
+                @NotNull final IncomingHandler<OUT> handler,
+                @NotNull final IOChannel<IN> inputChannel,
+                @NotNull final IOChannel<OUT> outputChannel, @NotNull final Logger logger) {
 
-            public void onComplete() throws Exception {
+            mInvocationId = invocationId;
+            mTargetFactory = target;
+            mInvocationConfiguration = invocationConfiguration;
+            mServiceConfiguration = serviceConfiguration;
+            mIncomingHandler = handler;
+            mInputChannel = inputChannel;
+            mOutputChannel = outputChannel;
+            mLogger = logger;
+        }
 
-                final Message message = Message.obtain(null, InvocationService.MSG_COMPLETE);
-                putInvocationId(message.getData(), mUUID);
-                message.replyTo = mInMessenger;
-                try {
-                    mOutMessenger.send(message);
+        public void onServiceConnected(final ComponentName name, final IBinder service) {
 
-                } catch (final RemoteException e) {
-                    unbindService();
-                    throw e;
-                }
-            }
+            final Logger logger = mLogger;
+            logger.dbg("service connected: %s", name);
+            final Messenger outMessenger = new Messenger(service);
+            final Message message = Message.obtain(null, InvocationService.MSG_INIT);
+            logger.dbg("sending async invocation message");
+            final String invocationId = mInvocationId;
+            final TargetInvocationFactory<IN, OUT> targetFactory = mTargetFactory;
+            final ServiceConfiguration serviceConfiguration = mServiceConfiguration;
+            putInvocation(message.getData(), invocationId, targetFactory.getInvocationClass(),
+                    targetFactory.getFactoryArgs(), mInvocationConfiguration,
+                    serviceConfiguration.getRunnerClassOr(null),
+                    serviceConfiguration.getLogClassOr(null));
+            final Messenger inMessenger = new Messenger(mIncomingHandler);
+            message.replyTo = inMessenger;
+            try {
+                outMessenger.send(message);
+                mInputChannel.bind(
+                        new ConnectionOutputConsumer<IN>(invocationId, inMessenger, outMessenger));
 
-            public void onError(@NotNull final RoutineException error) throws Exception {
-
-                final Message message = Message.obtain(null, InvocationService.MSG_ABORT);
-                putError(message.getData(), mUUID, error);
-                message.replyTo = mInMessenger;
-                try {
-                    mOutMessenger.send(message);
-
-                } catch (final RemoteException e) {
-                    unbindService();
-                    throw e;
-                }
-            }
-
-            public void onOutput(final IN input) throws Exception {
-
-                final Message message = Message.obtain(null, InvocationService.MSG_DATA);
-                putValue(message.getData(), mUUID, input);
-                message.replyTo = mInMessenger;
-                mOutMessenger.send(message);
+            } catch (final RemoteException e) {
+                logger.err(e, "error while sending service invocation message");
+                mIncomingHandler.unbindService();
+                mOutputChannel.abort(e);
             }
         }
 
+        public void onServiceDisconnected(final ComponentName name) {
+
+            mLogger.dbg("service disconnected: %s", name);
+            mOutputChannel.abort(new ServiceDisconnectedException(name));
+        }
+    }
+
+    /**
+     * Invocation implementation delegating the input processing to a dedicated service.
+     *
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
+     */
+    private static class ServiceInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
+
+        private final ServiceContext mContext;
+
+        private final InvocationConfiguration mInvocationConfiguration;
+
+        private final Logger mLogger;
+
+        private final ServiceConfiguration mServiceConfiguration;
+
+        private final TargetInvocationFactory<IN, OUT> mTargetFactory;
+
+        private IOChannel<IN> mInputChannel;
+
+        private IOChannel<OUT> mOutputChannel;
+
         /**
-         * Handler implementation managing incoming messages from the service.
+         * Constructor.
+         *
+         * @param context                 the service context.
+         * @param target                  the invocation factory target.
+         * @param invocationConfiguration the invocation configuration.
+         * @param serviceConfiguration    the service configuration.
+         * @param logger                  the logger instance.
          */
-        private class IncomingHandler extends Handler {
+        private ServiceInvocation(@NotNull final ServiceContext context,
+                @NotNull final TargetInvocationFactory<IN, OUT> target,
+                @NotNull final InvocationConfiguration invocationConfiguration,
+                @NotNull final ServiceConfiguration serviceConfiguration,
+                @NotNull final Logger logger) {
 
-            /**
-             * Constructor.
-             *
-             * @param looper the message looper.
-             */
-            private IncomingHandler(@NotNull final Looper looper) {
-
-                super(looper);
-            }
-
-            @Override
-            @SuppressWarnings("unchecked")
-            public void handleMessage(@NotNull final Message msg) {
-
-                final Logger logger = mLogger;
-                logger.dbg("incoming service message: %s", msg);
-                try {
-                    switch (msg.what) {
-                        case InvocationService.MSG_DATA:
-                            mOutput.pass((OUT) getValue(msg));
-                            break;
-
-                        case InvocationService.MSG_COMPLETE:
-                            mOutput.close();
-                            unbindService();
-                            break;
-
-                        case InvocationService.MSG_ABORT:
-                            mOutput.abort(InvocationException.wrapIfNeeded(getAbortError(msg)));
-                            unbindService();
-                            break;
-
-                        default:
-                            super.handleMessage(msg);
-                    }
-
-                } catch (final Throwable t) {
-                    logger.wrn(t, "error while handling service message");
-                    try {
-                        final Message message = Message.obtain(null, InvocationService.MSG_ABORT);
-                        putError(message.getData(), mUUID, t);
-                        mOutMessenger.send(message);
-
-                    } catch (final Throwable ignored) {
-                        logger.err(ignored, "error while sending service abort message");
-                    }
-
-                    mOutput.abort(t);
-                    unbindService();
-                }
-            }
+            mContext = context;
+            mTargetFactory = target;
+            mInvocationConfiguration = invocationConfiguration;
+            mServiceConfiguration = serviceConfiguration;
+            mLogger = logger;
         }
 
-        /**
-         * Service connection implementation managing the service communication state.
-         */
-        private class RoutineServiceConnection implements ServiceConnection {
+        @Override
+        public void onAbort(@NotNull final RoutineException reason) throws RemoteException {
 
-            private ConnectionOutputConsumer mConsumer;
+            mInputChannel.abort(reason);
+        }
 
-            public void onServiceConnected(final ComponentName name, final IBinder service) {
+        @Override
+        public void onInitialize() {
 
-                final Logger logger = mLogger;
-                logger.dbg("service connected: %s", name);
-                mOutMessenger = new Messenger(service);
-                final ServiceConfiguration serviceConfiguration = mServiceConfiguration;
-                final Message message = Message.obtain(null, InvocationService.MSG_INIT);
-                final TargetInvocationFactory<IN, OUT> targetFactory = mTargetFactory;
-                if (mIsParallel) {
-                    logger.dbg("sending parallel invocation message");
-                    putParallelInvocation(message.getData(), mUUID,
-                            targetFactory.getInvocationClass(), targetFactory.getFactoryArgs(),
-                            mInvocationConfiguration, serviceConfiguration.getRunnerClassOr(null),
-                            serviceConfiguration.getLogClassOr(null));
+            final Logger logger = mLogger;
+            mInputChannel = JRoutineCore.io()
+                                        .getChannelConfiguration()
+                                        .withLog(logger.getLog())
+                                        .withLogLevel(logger.getLogLevel())
+                                        .setConfiguration()
+                                        .buildChannel();
+            mOutputChannel = JRoutineCore.io()
+                                         .getChannelConfiguration()
+                                         .withLog(logger.getLog())
+                                         .withLogLevel(logger.getLogLevel())
+                                         .setConfiguration()
+                                         .buildChannel();
+            final Looper looper = mServiceConfiguration.getMessageLooperOr(Looper.getMainLooper());
+            final IncomingHandler<OUT> handler =
+                    new IncomingHandler<OUT>(looper, mContext, mOutputChannel, logger);
+            handler.setConnection(bindService(handler));
+        }
 
-                } else {
-                    logger.dbg("sending async invocation message");
-                    putAsyncInvocation(message.getData(), mUUID, targetFactory.getInvocationClass(),
-                            targetFactory.getFactoryArgs(), mInvocationConfiguration,
-                            serviceConfiguration.getRunnerClassOr(null),
-                            serviceConfiguration.getLogClassOr(null));
-                }
+        @Override
+        public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) throws
+                RemoteException {
 
-                message.replyTo = mInMessenger;
-                try {
-                    mOutMessenger.send(message);
-                    mConsumer = new ConnectionOutputConsumer();
-                    mInput.bind(mConsumer);
-
-                } catch (final RemoteException e) {
-                    logger.err(e, "error while sending service invocation message");
-                    mOutput.abort(e);
-                    unbindService();
-                }
+            final IOChannel<OUT> outputChannel = mOutputChannel;
+            if (!outputChannel.isBound()) {
+                outputChannel.bind(result);
             }
 
-            public void onServiceDisconnected(final ComponentName name) {
+            mInputChannel.pass(input);
+        }
 
-                mLogger.dbg("service disconnected: %s", name);
-                mInput.abort(new ServiceDisconnectedException(name));
+        @Override
+        public void onResult(@NotNull final ResultChannel<OUT> result) throws RemoteException {
+
+            final IOChannel<OUT> outputChannel = mOutputChannel;
+            if (!outputChannel.isBound()) {
+                outputChannel.bind(result);
             }
+
+            mInputChannel.close();
+        }
+
+        @Override
+        public void onTerminate() throws Exception {
+
+            mInputChannel.close();
+            mInputChannel = null;
+            mOutputChannel = null;
+        }
+
+        @NotNull
+        private ServiceConnection bindService(@NotNull final IncomingHandler<OUT> handler) {
+
+            final ServiceContext context = mContext;
+            final Context serviceContext = context.getServiceContext();
+            if (serviceContext == null) {
+                throw new IllegalStateException("the service context has been destroyed");
+            }
+
+            final Intent intent = context.getServiceIntent();
+            final RoutineServiceConnection<IN, OUT> connection =
+                    new RoutineServiceConnection<IN, OUT>(randomUUID().toString(), mTargetFactory,
+                            mInvocationConfiguration, mServiceConfiguration, handler, mInputChannel,
+                            mOutputChannel, mLogger);
+            if (!serviceContext.bindService(intent, connection, Context.BIND_AUTO_CREATE)) {
+                throw new RoutineException("failed to bind to service: " + intent
+                        + ", remember to add the service declaration to the Android manifest "
+                        + "file!");
+            }
+
+            return connection;
         }
     }
 }

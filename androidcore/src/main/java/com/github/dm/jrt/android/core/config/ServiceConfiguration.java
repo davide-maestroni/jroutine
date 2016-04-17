@@ -41,7 +41,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * It must declare a default constructor to be correctly instantiated.</li>
  * <li>The class of the logger to be employed by the invocations executed in the configured service.
  * It must declare a default constructor to be correctly instantiated.</li>
- * <li>The looper to employ to deliver the invocation result (by default the main thread one).</li>
+ * <li>The looper to employ to deliver the service messages (by default the main thread one).</li>
  * </ul>
  * <p>
  * Created by davide-maestroni on 04/20/2015.
@@ -136,12 +136,12 @@ public final class ServiceConfiguration extends DeepEqualObject {
     }
 
     /**
-     * Returns the looper used for dispatching the results from the service (null by default).
+     * Returns the looper used for dispatching the messages from the service (null by default).
      *
      * @param valueIfNotSet the default value if none was set.
      * @return the looper instance.
      */
-    public Looper getResultLooperOr(@Nullable final Looper valueIfNotSet) {
+    public Looper getMessageLooperOr(@Nullable final Looper valueIfNotSet) {
 
         final Looper looper = mLooper;
         return (looper != null) ? looper : valueIfNotSet;
@@ -244,7 +244,7 @@ public final class ServiceConfiguration extends DeepEqualObject {
 
             final Looper looper = configuration.mLooper;
             if (looper != null) {
-                withResultLooper(looper);
+                withMessageLooper(looper);
             }
 
             final Class<? extends Runner> runnerClass = configuration.mRunnerClass;
@@ -281,14 +281,14 @@ public final class ServiceConfiguration extends DeepEqualObject {
         }
 
         /**
-         * Sets the looper on which the results from the service are dispatched. A null value means
-         * that results will be dispatched on the main thread (as by default).
+         * Sets the looper on which the messages from the service are dispatched. A null value means
+         * that messages will be dispatched on the main thread (as by default).
          *
          * @param looper the looper instance.
          * @return this builder.
          */
         @NotNull
-        public Builder<TYPE> withResultLooper(@Nullable final Looper looper) {
+        public Builder<TYPE> withMessageLooper(@Nullable final Looper looper) {
 
             mLooper = looper;
             return this;

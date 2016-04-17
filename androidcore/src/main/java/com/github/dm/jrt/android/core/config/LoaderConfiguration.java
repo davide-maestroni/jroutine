@@ -16,8 +16,6 @@
 
 package com.github.dm.jrt.android.core.config;
 
-import android.os.Looper;
-
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.TimeDuration;
@@ -49,7 +47,6 @@ import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
  * <li>The cache strategy to adopt on the invocation results.</li>
  * <li>The maximum time after which a cached result is considered to be stale and need to be
  * refreshed.</li>
- * <li>The looper to employ to deliver the invocation result (by default the main thread one).</li>
  * </ul>
  * <p>
  * Created by davide-maestroni on 04/19/2015.
@@ -71,8 +68,6 @@ public final class LoaderConfiguration extends DeepEqualObject {
 
     private final int mLoaderId;
 
-    private final Looper mLooper;
-
     private final ClashResolutionType mResolutionType;
 
     private final TimeDuration mStaleTime;
@@ -82,7 +77,6 @@ public final class LoaderConfiguration extends DeepEqualObject {
     /**
      * Constructor.
      *
-     * @param looper              the looper instance.
      * @param loaderId            the loader ID.
      * @param factoryId           the factory ID.
      * @param resolutionType      the type of resolution.
@@ -90,15 +84,14 @@ public final class LoaderConfiguration extends DeepEqualObject {
      * @param strategyType        the cache strategy type.
      * @param staleTime           the stale time.
      */
-    private LoaderConfiguration(@Nullable final Looper looper, final int loaderId,
-            final int factoryId, @Nullable final ClashResolutionType resolutionType,
+    private LoaderConfiguration(final int loaderId, final int factoryId,
+            @Nullable final ClashResolutionType resolutionType,
             @Nullable final ClashResolutionType inputResolutionType,
             @Nullable final CacheStrategyType strategyType,
             @Nullable final TimeDuration staleTime) {
 
-        super(asArgs(looper, loaderId, factoryId, resolutionType, inputResolutionType, strategyType,
+        super(asArgs(loaderId, factoryId, resolutionType, inputResolutionType, strategyType,
                 staleTime));
-        mLooper = looper;
         mLoaderId = loaderId;
         mFactoryId = factoryId;
         mResolutionType = resolutionType;
@@ -218,18 +211,6 @@ public final class LoaderConfiguration extends DeepEqualObject {
     }
 
     /**
-     * Returns the looper used for dispatching the results from the loader (null by default).
-     *
-     * @param valueIfNotSet the default value if none was set.
-     * @return the looper instance.
-     */
-    public Looper getResultLooperOr(@Nullable final Looper valueIfNotSet) {
-
-        final Looper looper = mLooper;
-        return (looper != null) ? looper : valueIfNotSet;
-    }
-
-    /**
      * Returns the time after which results are considered to be stale (null by default).
      *
      * @param valueIfNotSet the default value if none was set.
@@ -336,8 +317,6 @@ public final class LoaderConfiguration extends DeepEqualObject {
 
         private int mLoaderId;
 
-        private Looper mLooper;
-
         private ClashResolutionType mResolutionType;
 
         private TimeDuration mStaleTime;
@@ -394,11 +373,6 @@ public final class LoaderConfiguration extends DeepEqualObject {
             if (configuration == null) {
                 setConfiguration(defaultConfiguration());
                 return this;
-            }
-
-            final Looper looper = configuration.mLooper;
-            if (looper != null) {
-                withResultLooper(looper);
             }
 
             final int loaderId = configuration.mLoaderId;
@@ -507,20 +481,6 @@ public final class LoaderConfiguration extends DeepEqualObject {
         }
 
         /**
-         * Sets the looper on which the results from the loader are dispatched. A null value means
-         * that results will be dispatched on the main thread (as by default).
-         *
-         * @param looper the looper instance.
-         * @return this builder.
-         */
-        @NotNull
-        public Builder<TYPE> withResultLooper(@Nullable final Looper looper) {
-
-            mLooper = looper;
-            return this;
-        }
-
-        /**
          * Sets the time after which results are considered to be stale. In case a clash is resolved
          * by joining the two invocations, and the results of the running one are stale, the
          * invocation execution is repeated. A null value means that the results are always valid.
@@ -553,13 +513,12 @@ public final class LoaderConfiguration extends DeepEqualObject {
         @NotNull
         private LoaderConfiguration buildConfiguration() {
 
-            return new LoaderConfiguration(mLooper, mLoaderId, mFactoryId, mResolutionType,
+            return new LoaderConfiguration(mLoaderId, mFactoryId, mResolutionType,
                     mInputResolutionType, mStrategyType, mStaleTime);
         }
 
         private void setConfiguration(@NotNull final LoaderConfiguration configuration) {
 
-            mLooper = configuration.mLooper;
             mLoaderId = configuration.mLoaderId;
             mFactoryId = configuration.mFactoryId;
             mResolutionType = configuration.mResolutionType;

@@ -97,7 +97,8 @@ afterEvaluate { project ->
 
         project.javadoc {
             title = "${project.archivesBaseName} ${version}"
-            options.links('http://docs.oracle.com/javase/8/docs/api/')
+            options.links('http://docs.oracle.com/javase/8/docs/api/',
+                    'http://www.atetric.com/atetric/javadoc/org.jetbrains/annotations/15.0/')
             options.windowTitle("Javadoc - ${project.archivesBaseName}")
             options.setMemberLevel(JavadocMemberLevel.PUBLIC)
         }
@@ -295,7 +296,8 @@ def addJavadocTask(project, variant, taskName) {
                 "${project.android.sdkDirectory}/platforms/${project.android.compileSdkVersion}/android.jar"
         classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)
         title = "${project.archivesBaseName} ${project.version}"
-        options.links('http://docs.oracle.com/javase/8/docs/api/')
+        options.links('http://docs.oracle.com/javase/8/docs/api/',
+                'http://www.atetric.com/atetric/javadoc/org.jetbrains/annotations/15.0/')
         options.linksOffline('http://developer.android.com/reference/', "${project.android.sdkDirectory}/docs/reference/")
         options.windowTitle("Javadoc - ${project.archivesBaseName}")
         options.setMemberLevel(JavadocMemberLevel.PUBLIC)

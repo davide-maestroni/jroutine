@@ -41,7 +41,8 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * It must declare a default constructor to be correctly instantiated.</li>
  * <li>The class of the logger to be employed by the invocations executed in the configured service.
  * It must declare a default constructor to be correctly instantiated.</li>
- * <li>The looper to employ to deliver the service messages (by default the main thread one).</li>
+ * <li>The looper to employ to deliver the service messages (by default the main thread one). Note
+ * that, in any case, the outputs will be collected through the configured runner.</li>
  * </ul>
  * <p>
  * Created by davide-maestroni on 04/20/2015.

@@ -69,7 +69,7 @@ class DefaultLoaderChannelBuilder
     public <OUT> OutputChannel<OUT> buildChannel() {
 
         final LoaderConfiguration loaderConfiguration = mLoaderConfiguration;
-        final int loaderId = loaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO);
+        final int loaderId = loaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO);
         if (loaderId == LoaderConfiguration.AUTO) {
             throw new IllegalArgumentException("the loader ID must not be generated");
         }
@@ -90,19 +90,19 @@ class DefaultLoaderChannelBuilder
                 mChannelConfiguration.toOutputChannelConfiguration();
         final Logger logger = invocationConfiguration.newLogger(this);
         final ClashResolutionType resolutionType =
-                loaderConfiguration.getClashResolutionTypeOr(null);
+                loaderConfiguration.getClashResolutionTypeOrElse(null);
         if (resolutionType != null) {
             logger.wrn("the specified clash resolution type will be ignored: %s", resolutionType);
         }
 
         final ClashResolutionType inputResolutionType =
-                loaderConfiguration.getInputClashResolutionTypeOr(null);
+                loaderConfiguration.getInputClashResolutionTypeOrElse(null);
         if (inputResolutionType != null) {
             logger.wrn("the specified input clash resolution type will be ignored: %s",
                     inputResolutionType);
         }
 
-        final TimeDuration resultStaleTime = loaderConfiguration.getResultStaleTimeOr(null);
+        final TimeDuration resultStaleTime = loaderConfiguration.getResultStaleTimeOrElse(null);
         if (resultStaleTime != null) {
             logger.wrn("the specified results stale time will be ignored: %s", resultStaleTime);
         }
@@ -130,7 +130,7 @@ class DefaultLoaderChannelBuilder
 
         final LoaderContextCompat context = mContext;
         if (context.getComponent() != null) {
-            purgeLoader(context, mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO));
+            purgeLoader(context, mLoaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO));
         }
     }
 
@@ -138,7 +138,7 @@ class DefaultLoaderChannelBuilder
 
         final LoaderContextCompat context = mContext;
         if (context.getComponent() != null) {
-            purgeLoader(context, mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO),
+            purgeLoader(context, mLoaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO),
                     Collections.singletonList(input));
         }
     }
@@ -155,7 +155,7 @@ class DefaultLoaderChannelBuilder
                 inputList = Arrays.asList(inputs);
             }
 
-            purgeLoader(context, mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO),
+            purgeLoader(context, mLoaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO),
                     inputList);
         }
     }
@@ -175,7 +175,7 @@ class DefaultLoaderChannelBuilder
                 }
             }
 
-            purgeLoader(context, mLoaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO),
+            purgeLoader(context, mLoaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO),
                     inputList);
         }
     }

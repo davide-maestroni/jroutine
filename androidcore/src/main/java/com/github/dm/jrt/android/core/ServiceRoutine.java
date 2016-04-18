@@ -348,8 +348,8 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
             final ServiceConfiguration serviceConfiguration = mServiceConfiguration;
             putInvocation(message.getData(), invocationId, targetFactory.getInvocationClass(),
                     targetFactory.getFactoryArgs(), mInvocationConfiguration,
-                    serviceConfiguration.getRunnerClassOr(null),
-                    serviceConfiguration.getLogClassOr(null));
+                    serviceConfiguration.getRunnerClassOrElse(null),
+                    serviceConfiguration.getLogClassOrElse(null));
             final Messenger inMessenger = new Messenger(mIncomingHandler);
             message.replyTo = inMessenger;
             try {
@@ -437,7 +437,8 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
                                          .withLogLevel(logger.getLogLevel())
                                          .setConfiguration()
                                          .buildChannel();
-            final Looper looper = mServiceConfiguration.getMessageLooperOr(Looper.getMainLooper());
+            final Looper looper =
+                    mServiceConfiguration.getMessageLooperOrElse(Looper.getMainLooper());
             final IncomingHandler<OUT> handler =
                     new IncomingHandler<OUT>(looper, mContext, mOutputChannel, logger);
             handler.setConnection(bindService(handler));

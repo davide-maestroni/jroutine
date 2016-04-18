@@ -87,7 +87,7 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
     public LoaderRoutine<IN, OUT> buildRoutine() {
 
         final InvocationConfiguration configuration = getConfiguration();
-        final Runner asyncRunner = configuration.getRunnerOr(null);
+        final Runner asyncRunner = configuration.getRunnerOrElse(null);
         if (asyncRunner != null) {
             configuration.newLogger(this)
                          .wrn("the specified async runner will be ignored: %s", asyncRunner);

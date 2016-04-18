@@ -32,7 +32,7 @@ class QueuedRunner implements Runner {
 
     public void cancel(@NotNull final Execution execution) {
 
-        LocalQueue.cancel(execution);
+        LocalRunner.cancel(execution);
     }
 
     public boolean isExecutionThread() {
@@ -43,6 +43,6 @@ class QueuedRunner implements Runner {
     public void run(@NotNull final Execution execution, final long delay,
             @NotNull final TimeUnit timeUnit) {
 
-        LocalQueue.run(execution, delay, timeUnit);
+        LocalRunner.run(execution, delay, timeUnit);
     }
 }

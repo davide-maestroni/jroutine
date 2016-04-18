@@ -30,6 +30,7 @@ import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
+import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.SimpleQueue;
 import com.github.dm.jrt.core.util.TimeDuration;
@@ -55,6 +56,8 @@ import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
  * @param <OUT> the output data type.
  */
 class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
+
+    private static final Runner sSyncRunner = Runners.syncRunner();
 
     private final ArrayList<OutputChannel<?>> mBoundChannels = new ArrayList<OutputChannel<?>>();
 
@@ -110,10 +113,10 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
         mLogger = logger.subContextLogger(this);
         mRunner = runner;
-        mInputOrder = configuration.getInputOrderTypeOr(OrderType.BY_DELAY);
-        mInputLimit = configuration.getInputLimitOr(Integer.MAX_VALUE);
-        mInputMaxDelay = configuration.getInputMaxDelayOr(ZERO);
-        mMaxInput = configuration.getInputMaxSizeOr(Integer.MAX_VALUE);
+        mInputOrder = configuration.getInputOrderTypeOrElse(OrderType.BY_DELAY);
+        mInputLimit = configuration.getInputLimitOrElse(Integer.MAX_VALUE);
+        mInputMaxDelay = configuration.getInputMaxDelayOrElse(ZERO);
+        mMaxInput = configuration.getInputMaxSizeOrElse(Integer.MAX_VALUE);
         mInputQueue = new NestedQueue<IN>() {
 
             @Override
@@ -353,7 +356,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
             }
         }
 
-        execution.run();
+        sSyncRunner.run(execution, 0, TimeUnit.MILLISECONDS);
     }
 
     private void internalAbort(@NotNull final RoutineException abortException) {

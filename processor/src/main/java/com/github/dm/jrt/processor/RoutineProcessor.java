@@ -1919,7 +1919,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
         } else {
             methodHeader = methodHeader.replace("${sharedFields}",
-                    "proxyConfiguration.getSharedFieldsOr(null)");
+                    "proxyConfiguration.getSharedFieldsOrElse(null)");
         }
 
         writer.append(methodHeader);
@@ -1975,7 +1975,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
         } else {
             methodInvocationHeader = methodInvocationHeader.replace("${sharedFields}",
-                    "proxyConfiguration" + ".getSharedFieldsOr" + "(null)");
+                    "proxyConfiguration.getSharedFieldsOrElse(null)");
         }
 
         final boolean isStatic = targetMethod.getModifiers().contains(Modifier.STATIC);

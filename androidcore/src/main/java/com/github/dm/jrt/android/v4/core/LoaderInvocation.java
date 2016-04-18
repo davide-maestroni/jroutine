@@ -110,14 +110,14 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
 
         mContext = ConstantConditions.notNull("loader context", context);
         mFactory = ConstantConditions.notNull("context invocation factory", factory);
-        mLoaderId = configuration.getLoaderIdOr(LoaderConfiguration.AUTO);
+        mLoaderId = configuration.getLoaderIdOrElse(LoaderConfiguration.AUTO);
         mClashResolutionType =
-                configuration.getClashResolutionTypeOr(ClashResolutionType.ABORT_THAT);
+                configuration.getClashResolutionTypeOrElse(ClashResolutionType.ABORT_THAT);
         mInputClashResolutionType =
-                configuration.getInputClashResolutionTypeOr(ClashResolutionType.JOIN);
-        mCacheStrategyType = configuration.getCacheStrategyTypeOr(CacheStrategyType.CLEAR);
+                configuration.getInputClashResolutionTypeOrElse(ClashResolutionType.JOIN);
+        mCacheStrategyType = configuration.getCacheStrategyTypeOrElse(CacheStrategyType.CLEAR);
         mResultStaleTimeMillis =
-                configuration.getResultStaleTimeOr(TimeDuration.INFINITY).toMillis();
+                configuration.getResultStaleTimeOrElse(TimeDuration.INFINITY).toMillis();
         mOrderType = order;
         mLogger = logger.subContextLogger(this);
     }

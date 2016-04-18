@@ -32,6 +32,7 @@ import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
+import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.SimpleQueue;
 import com.github.dm.jrt.core.util.TimeDuration;
@@ -76,6 +77,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             new WeakIdentityHashMap<OutputConsumer<?>, Object>();
 
     private static final LocalMutableBoolean sInsideInvocation = new LocalMutableBoolean();
+
+    private static final Runner sSyncRunner = Runners.syncRunner();
 
     private final ArrayList<OutputChannel<?>> mBoundChannels = new ArrayList<OutputChannel<?>>();
 
@@ -149,12 +152,12 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         mLogger = logger.subContextLogger(this);
         mHandler = ConstantConditions.notNull("abort handler", handler);
         mRunner = ConstantConditions.notNull("runner instance", runner);
-        mResultOrder = configuration.getOutputOrderTypeOr(OrderType.BY_DELAY);
-        mExecutionTimeout = configuration.getReadTimeoutOr(ZERO);
-        mTimeoutActionType = configuration.getReadTimeoutActionOr(TimeoutActionType.THROW);
-        mOutputLimit = configuration.getOutputLimitOr(Integer.MAX_VALUE);
-        mOutputMaxDelay = configuration.getOutputMaxDelayOr(ZERO);
-        mMaxOutput = configuration.getOutputMaxSizeOr(Integer.MAX_VALUE);
+        mResultOrder = configuration.getOutputOrderTypeOrElse(OrderType.BY_DELAY);
+        mExecutionTimeout = configuration.getReadTimeoutOrElse(ZERO);
+        mTimeoutActionType = configuration.getReadTimeoutActionOrElse(TimeoutActionType.THROW);
+        mOutputLimit = configuration.getOutputLimitOrElse(Integer.MAX_VALUE);
+        mOutputMaxDelay = configuration.getOutputMaxDelayOrElse(ZERO);
+        mMaxOutput = configuration.getOutputMaxSizeOrElse(Integer.MAX_VALUE);
         mOutputQueue = new NestedQueue<Object>() {
 
             @Override
@@ -580,7 +583,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             mIsWaitingExecution = true;
         }
 
-        execution.run();
+        sSyncRunner.run(execution, 0, TimeUnit.MILLISECONDS);
         final WrappedExecution nextExecution;
         synchronized (mMutex) {
             if (!queue.isEmpty()) {
@@ -2411,7 +2414,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         public void run() {
 
-            mExecution.run();
+            sSyncRunner.run(mExecution, 0, TimeUnit.MILLISECONDS);
             nextExecution();
         }
     }

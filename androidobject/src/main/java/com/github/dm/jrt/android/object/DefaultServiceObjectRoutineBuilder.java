@@ -110,7 +110,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             return Arrays.asList(sharedFieldsAnnotation.value());
         }
 
-        return configuration.getSharedFieldsOr(null);
+        return configuration.getSharedFieldsOrElse(null);
     }
 
     @NotNull

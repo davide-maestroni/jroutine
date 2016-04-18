@@ -209,8 +209,8 @@ public class InvocationService extends Service {
         bundle.putParcelable(KEY_FACTORY_ARGS,
                 (factoryArgs != null) ? new ParcelableValue(factoryArgs) : null);
         bundle.putSerializable(KEY_OUTPUT_ORDER,
-                invocationConfiguration.getOutputOrderTypeOr(null));
-        bundle.putSerializable(KEY_LOG_LEVEL, invocationConfiguration.getLogLevelOr(null));
+                invocationConfiguration.getOutputOrderTypeOrElse(null));
+        bundle.putSerializable(KEY_LOG_LEVEL, invocationConfiguration.getLogLevelOrElse(null));
         bundle.putSerializable(KEY_RUNNER_CLASS, runnerClass);
         bundle.putSerializable(KEY_LOG_CLASS, logClass);
     }

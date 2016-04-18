@@ -91,7 +91,7 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
                 return (TYPE) instance;
             }
 
-            final Runner asyncRunner = invocationConfiguration.getRunnerOr(null);
+            final Runner asyncRunner = invocationConfiguration.getRunnerOrElse(null);
             if (asyncRunner != null) {
                 invocationConfiguration.newLogger(this)
                                        .wrn("the specified runner will be ignored: %s",

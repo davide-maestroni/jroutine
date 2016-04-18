@@ -98,8 +98,8 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
 
         mConfiguration = configuration;
         mSyncRunner = Runners.syncRunner();
-        final int priority = configuration.getPriorityOr(InvocationConfiguration.DEFAULT);
-        final Runner asyncRunner = configuration.getRunnerOr(Runners.sharedRunner());
+        final int priority = configuration.getPriorityOrElse(InvocationConfiguration.DEFAULT);
+        final Runner asyncRunner = configuration.getRunnerOrElse(Runners.sharedRunner());
         if (priority != InvocationConfiguration.DEFAULT) {
             mAsyncRunner = Runners.priorityRunner(asyncRunner).getRunner(priority);
 
@@ -107,8 +107,8 @@ public abstract class AbstractRoutine<IN, OUT> extends TemplateRoutine<IN, OUT> 
             mAsyncRunner = asyncRunner;
         }
 
-        mMaxInvocations = configuration.getMaxInstancesOr(DEFAULT_MAX_INVOCATIONS);
-        mCoreInvocations = configuration.getCoreInstancesOr(DEFAULT_CORE_INVOCATIONS);
+        mMaxInvocations = configuration.getMaxInstancesOrElse(DEFAULT_MAX_INVOCATIONS);
+        mCoreInvocations = configuration.getCoreInstancesOrElse(DEFAULT_CORE_INVOCATIONS);
         mLogger = configuration.newLogger(this);
         mLogger.dbg("building routine with configuration: %s", configuration);
     }

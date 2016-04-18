@@ -75,14 +75,14 @@ class DefaultLoaderRoutine<IN, OUT> extends ConverterRoutine<IN, OUT>
             @NotNull final LoaderConfiguration loaderConfiguration) {
 
         super(invocationConfiguration);
-        final int factoryId = loaderConfiguration.getFactoryIdOr(LoaderConfiguration.AUTO);
+        final int factoryId = loaderConfiguration.getFactoryIdOrElse(LoaderConfiguration.AUTO);
         mContext = ConstantConditions.notNull("loader context", context);
         ConstantConditions.notNull("context invocation factory", factory);
         mFactory = (factoryId == LoaderConfiguration.AUTO) ? factory
                 : new FactoryWrapper<IN, OUT>(factory, factoryId);
         mConfiguration = loaderConfiguration;
-        mLoaderId = loaderConfiguration.getLoaderIdOr(LoaderConfiguration.AUTO);
-        mOrderType = invocationConfiguration.getOutputOrderTypeOr(null);
+        mLoaderId = loaderConfiguration.getLoaderIdOrElse(LoaderConfiguration.AUTO);
+        mOrderType = invocationConfiguration.getOutputOrderTypeOrElse(null);
         getLogger().dbg("building context routine with configuration: %s", loaderConfiguration);
     }
 

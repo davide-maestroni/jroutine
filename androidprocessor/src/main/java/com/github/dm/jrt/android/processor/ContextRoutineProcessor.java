@@ -247,7 +247,7 @@ public class ContextRoutineProcessor extends RoutineProcessor {
                 getAnnotationValue(methodElement, mInputClashAnnotationType, "value");
         if (inputResolutionType != null) {
             builder.append(".withInputClashResolution(com.github.dm.jrt.android.core.config"
-                    + ".LoaderConfiguration" + ".ClashResolutionType.")
+                    + ".LoaderConfiguration.ClashResolutionType.")
                    .append(resolutionType)
                    .append(")");
         }

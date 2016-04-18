@@ -238,7 +238,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the maximum number.
      */
-    public int getCoreInstancesOr(final int valueIfNotSet) {
+    public int getCoreInstancesOrElse(final int valueIfNotSet) {
 
         final int coreInstances = mCoreInstances;
         return (coreInstances != DEFAULT) ? coreInstances : valueIfNotSet;
@@ -251,7 +251,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the limit.
      */
-    public int getInputLimitOr(final int valueIfNotSet) {
+    public int getInputLimitOrElse(final int valueIfNotSet) {
 
         final int inputLimit = mInputLimit;
         return (inputLimit != DEFAULT) ? inputLimit : valueIfNotSet;
@@ -264,7 +264,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the delay.
      */
-    public TimeDuration getInputMaxDelayOr(@Nullable final TimeDuration valueIfNotSet) {
+    public TimeDuration getInputMaxDelayOrElse(@Nullable final TimeDuration valueIfNotSet) {
 
         final TimeDuration inputMaxDelay = mInputMaxDelay;
         return (inputMaxDelay != null) ? inputMaxDelay : valueIfNotSet;
@@ -276,7 +276,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the maximum size.
      */
-    public int getInputMaxSizeOr(final int valueIfNotSet) {
+    public int getInputMaxSizeOrElse(final int valueIfNotSet) {
 
         final int inputMaxSize = mInputMaxSize;
         return (inputMaxSize != DEFAULT) ? inputMaxSize : valueIfNotSet;
@@ -288,7 +288,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the order type.
      */
-    public OrderType getInputOrderTypeOr(@Nullable final OrderType valueIfNotSet) {
+    public OrderType getInputOrderTypeOrElse(@Nullable final OrderType valueIfNotSet) {
 
         final OrderType inputOrderType = mInputOrderType;
         return (inputOrderType != null) ? inputOrderType : valueIfNotSet;
@@ -300,7 +300,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the log level.
      */
-    public Level getLogLevelOr(@Nullable final Level valueIfNotSet) {
+    public Level getLogLevelOrElse(@Nullable final Level valueIfNotSet) {
 
         final Level logLevel = mLogLevel;
         return (logLevel != null) ? logLevel : valueIfNotSet;
@@ -312,7 +312,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the log instance.
      */
-    public Log getLogOr(@Nullable final Log valueIfNotSet) {
+    public Log getLogOrElse(@Nullable final Log valueIfNotSet) {
 
         final Log log = mLog;
         return (log != null) ? log : valueIfNotSet;
@@ -324,7 +324,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the maximum number.
      */
-    public int getMaxInstancesOr(final int valueIfNotSet) {
+    public int getMaxInstancesOrElse(final int valueIfNotSet) {
 
         final int maxInstances = mMaxInstances;
         return (maxInstances != DEFAULT) ? maxInstances : valueIfNotSet;
@@ -337,7 +337,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the limit.
      */
-    public int getOutputLimitOr(final int valueIfNotSet) {
+    public int getOutputLimitOrElse(final int valueIfNotSet) {
 
         final int outputLimit = mOutputLimit;
         return (outputLimit != DEFAULT) ? outputLimit : valueIfNotSet;
@@ -350,7 +350,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the delay.
      */
-    public TimeDuration getOutputMaxDelayOr(@Nullable final TimeDuration valueIfNotSet) {
+    public TimeDuration getOutputMaxDelayOrElse(@Nullable final TimeDuration valueIfNotSet) {
 
         final TimeDuration outputMaxDelay = mOutputMaxDelay;
         return (outputMaxDelay != null) ? outputMaxDelay : valueIfNotSet;
@@ -362,7 +362,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the maximum size.
      */
-    public int getOutputMaxSizeOr(final int valueIfNotSet) {
+    public int getOutputMaxSizeOrElse(final int valueIfNotSet) {
 
         final int outputMaxSize = mOutputMaxSize;
         return (outputMaxSize != DEFAULT) ? outputMaxSize : valueIfNotSet;
@@ -374,7 +374,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the order type.
      */
-    public OrderType getOutputOrderTypeOr(@Nullable final OrderType valueIfNotSet) {
+    public OrderType getOutputOrderTypeOrElse(@Nullable final OrderType valueIfNotSet) {
 
         final OrderType outputOrderType = mOutputOrderType;
         return (outputOrderType != null) ? outputOrderType : valueIfNotSet;
@@ -386,7 +386,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the priority.
      */
-    public int getPriorityOr(final int valueIfNotSet) {
+    public int getPriorityOrElse(final int valueIfNotSet) {
 
         final int priority = mPriority;
         return (priority != DEFAULT) ? priority : valueIfNotSet;
@@ -399,7 +399,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the action type.
      */
-    public TimeoutActionType getReadTimeoutActionOr(
+    public TimeoutActionType getReadTimeoutActionOrElse(
             @Nullable final TimeoutActionType valueIfNotSet) {
 
         final TimeoutActionType timeoutActionType = mTimeoutActionType;
@@ -413,7 +413,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the timeout.
      */
-    public TimeDuration getReadTimeoutOr(@Nullable final TimeDuration valueIfNotSet) {
+    public TimeDuration getReadTimeoutOrElse(@Nullable final TimeDuration valueIfNotSet) {
 
         final TimeDuration readTimeout = mReadTimeout;
         return (readTimeout != null) ? readTimeout : valueIfNotSet;
@@ -425,7 +425,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the runner instance.
      */
-    public Runner getRunnerOr(@Nullable final Runner valueIfNotSet) {
+    public Runner getRunnerOrElse(@Nullable final Runner valueIfNotSet) {
 
         final Runner runner = mRunner;
         return (runner != null) ? runner : valueIfNotSet;
@@ -440,7 +440,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
     @NotNull
     public Logger newLogger(@NotNull final Object context) {
 
-        return Logger.newLogger(getLogOr(null), getLogLevelOr(null), context);
+        return Logger.newLogger(getLogOrElse(null), getLogLevelOrElse(null), context);
     }
 
     /**

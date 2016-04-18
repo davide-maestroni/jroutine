@@ -153,7 +153,7 @@ public final class LoaderConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the cache strategy type.
      */
-    public CacheStrategyType getCacheStrategyTypeOr(
+    public CacheStrategyType getCacheStrategyTypeOrElse(
             @Nullable final CacheStrategyType valueIfNotSet) {
 
         final CacheStrategyType strategyType = mStrategyType;
@@ -166,7 +166,7 @@ public final class LoaderConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the clash resolution type.
      */
-    public ClashResolutionType getClashResolutionTypeOr(
+    public ClashResolutionType getClashResolutionTypeOrElse(
             @Nullable final ClashResolutionType valueIfNotSet) {
 
         final ClashResolutionType resolutionType = mResolutionType;
@@ -179,7 +179,7 @@ public final class LoaderConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the factory ID.
      */
-    public int getFactoryIdOr(final int valueIfNotSet) {
+    public int getFactoryIdOrElse(final int valueIfNotSet) {
 
         final int factoryId = mFactoryId;
         return (factoryId != AUTO) ? factoryId : valueIfNotSet;
@@ -191,7 +191,7 @@ public final class LoaderConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the clash resolution type.
      */
-    public ClashResolutionType getInputClashResolutionTypeOr(
+    public ClashResolutionType getInputClashResolutionTypeOrElse(
             @Nullable final ClashResolutionType valueIfNotSet) {
 
         final ClashResolutionType resolutionType = mInputResolutionType;
@@ -204,7 +204,7 @@ public final class LoaderConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the loader ID.
      */
-    public int getLoaderIdOr(final int valueIfNotSet) {
+    public int getLoaderIdOrElse(final int valueIfNotSet) {
 
         final int loaderId = mLoaderId;
         return (loaderId != AUTO) ? loaderId : valueIfNotSet;
@@ -216,7 +216,7 @@ public final class LoaderConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the results stale time.
      */
-    public TimeDuration getResultStaleTimeOr(@Nullable final TimeDuration valueIfNotSet) {
+    public TimeDuration getResultStaleTimeOrElse(@Nullable final TimeDuration valueIfNotSet) {
 
         final TimeDuration staleTime = mStaleTime;
         return (staleTime != null) ? staleTime : valueIfNotSet;

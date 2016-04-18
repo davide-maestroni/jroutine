@@ -116,7 +116,7 @@ public final class ProxyConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the field names.
      */
-    public List<String> getSharedFieldsOr(@Nullable final List<String> valueIfNotSet) {
+    public List<String> getSharedFieldsOrElse(@Nullable final List<String> valueIfNotSet) {
 
         final List<String> fieldNames = mFieldNames;
         return (fieldNames != null) ? fieldNames : valueIfNotSet;

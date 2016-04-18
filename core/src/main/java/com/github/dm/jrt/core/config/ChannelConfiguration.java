@@ -168,12 +168,12 @@ public final class ChannelConfiguration extends DeepEqualObject {
         }
 
         final Builder<ChannelConfiguration> builder = builderFromInvocation(initialConfiguration);
-        return builder.withChannelOrder(initialConfiguration.getInputOrderTypeOr(null))
-                      .withChannelLimit(
-                              initialConfiguration.getInputLimitOr(ChannelConfiguration.DEFAULT))
-                      .withChannelMaxDelay(initialConfiguration.getInputMaxDelayOr(null))
-                      .withChannelMaxSize(
-                              initialConfiguration.getInputMaxSizeOr(ChannelConfiguration.DEFAULT));
+        return builder.withChannelOrder(initialConfiguration.getInputOrderTypeOrElse(null))
+                      .withChannelLimit(initialConfiguration.getInputLimitOrElse(
+                              ChannelConfiguration.DEFAULT))
+                      .withChannelMaxDelay(initialConfiguration.getInputMaxDelayOrElse(null))
+                      .withChannelMaxSize(initialConfiguration.getInputMaxSizeOrElse(
+                              ChannelConfiguration.DEFAULT));
     }
 
     /**
@@ -188,11 +188,12 @@ public final class ChannelConfiguration extends DeepEqualObject {
             @Nullable final InvocationConfiguration initialConfiguration) {
 
         return (initialConfiguration == null) ? builder()
-                : builder().withRunner(initialConfiguration.getRunnerOr(null))
-                           .withReadTimeout(initialConfiguration.getReadTimeoutOr(null))
-                           .withReadTimeoutAction(initialConfiguration.getReadTimeoutActionOr(null))
-                           .withLog(initialConfiguration.getLogOr(null))
-                           .withLogLevel(initialConfiguration.getLogLevelOr(null));
+                : builder().withRunner(initialConfiguration.getRunnerOrElse(null))
+                           .withReadTimeout(initialConfiguration.getReadTimeoutOrElse(null))
+                           .withReadTimeoutAction(
+                                   initialConfiguration.getReadTimeoutActionOrElse(null))
+                           .withLog(initialConfiguration.getLogOrElse(null))
+                           .withLogLevel(initialConfiguration.getLogLevelOrElse(null));
     }
 
     /**
@@ -211,11 +212,11 @@ public final class ChannelConfiguration extends DeepEqualObject {
         }
 
         final Builder<ChannelConfiguration> builder = builderFromInvocation(initialConfiguration);
-        return builder.withChannelOrder(initialConfiguration.getOutputOrderTypeOr(null))
-                      .withChannelLimit(
-                              initialConfiguration.getOutputLimitOr(ChannelConfiguration.DEFAULT))
-                      .withChannelMaxDelay(initialConfiguration.getOutputMaxDelayOr(null))
-                      .withChannelMaxSize(initialConfiguration.getOutputMaxSizeOr(
+        return builder.withChannelOrder(initialConfiguration.getOutputOrderTypeOrElse(null))
+                      .withChannelLimit(initialConfiguration.getOutputLimitOrElse(
+                              ChannelConfiguration.DEFAULT))
+                      .withChannelMaxDelay(initialConfiguration.getOutputMaxDelayOrElse(null))
+                      .withChannelMaxSize(initialConfiguration.getOutputMaxSizeOrElse(
                               ChannelConfiguration.DEFAULT));
     }
 
@@ -248,7 +249,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the limit.
      */
-    public int getChannelLimitOr(final int valueIfNotSet) {
+    public int getChannelLimitOrElse(final int valueIfNotSet) {
 
         final int limit = mChannelLimit;
         return (limit != DEFAULT) ? limit : valueIfNotSet;
@@ -261,7 +262,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the delay.
      */
-    public TimeDuration getChannelMaxDelayOr(@Nullable final TimeDuration valueIfNotSet) {
+    public TimeDuration getChannelMaxDelayOrElse(@Nullable final TimeDuration valueIfNotSet) {
 
         final TimeDuration maxDelay = mChannelMaxDelay;
         return (maxDelay != null) ? maxDelay : valueIfNotSet;
@@ -273,7 +274,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the maximum size.
      */
-    public int getChannelMaxSizeOr(final int valueIfNotSet) {
+    public int getChannelMaxSizeOrElse(final int valueIfNotSet) {
 
         final int maxSize = mChannelMaxSize;
         return (maxSize != DEFAULT) ? maxSize : valueIfNotSet;
@@ -285,7 +286,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the order type.
      */
-    public OrderType getChannelOrderTypeOr(@Nullable final OrderType valueIfNotSet) {
+    public OrderType getChannelOrderTypeOrElse(@Nullable final OrderType valueIfNotSet) {
 
         final OrderType orderType = mChannelOrderType;
         return (orderType != null) ? orderType : valueIfNotSet;
@@ -297,7 +298,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the log level.
      */
-    public Level getLogLevelOr(@Nullable final Level valueIfNotSet) {
+    public Level getLogLevelOrElse(@Nullable final Level valueIfNotSet) {
 
         final Level logLevel = mLogLevel;
         return (logLevel != null) ? logLevel : valueIfNotSet;
@@ -309,7 +310,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the log instance.
      */
-    public Log getLogOr(@Nullable final Log valueIfNotSet) {
+    public Log getLogOrElse(@Nullable final Log valueIfNotSet) {
 
         final Log log = mLog;
         return (log != null) ? log : valueIfNotSet;
@@ -322,7 +323,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the action type.
      */
-    public TimeoutActionType getReadTimeoutActionOr(
+    public TimeoutActionType getReadTimeoutActionOrElse(
             @Nullable final TimeoutActionType valueIfNotSet) {
 
         final TimeoutActionType timeoutActionType = mTimeoutActionType;
@@ -335,7 +336,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the timeout.
      */
-    public TimeDuration getReadTimeoutOr(@Nullable final TimeDuration valueIfNotSet) {
+    public TimeDuration getReadTimeoutOrElse(@Nullable final TimeDuration valueIfNotSet) {
 
         final TimeDuration readTimeout = mReadTimeout;
         return (readTimeout != null) ? readTimeout : valueIfNotSet;
@@ -347,7 +348,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the runner instance.
      */
-    public Runner getRunnerOr(@Nullable final Runner valueIfNotSet) {
+    public Runner getRunnerOrElse(@Nullable final Runner valueIfNotSet) {
 
         final Runner runner = mRunner;
         return (runner != null) ? runner : valueIfNotSet;
@@ -363,11 +364,11 @@ public final class ChannelConfiguration extends DeepEqualObject {
     public InvocationConfiguration toInputChannelConfiguration() {
 
         return toInvocationConfiguration().builderFrom()
-                                          .withInputOrder(getChannelOrderTypeOr(null))
-                                          .withInputLimit(getChannelLimitOr(
+                                          .withInputOrder(getChannelOrderTypeOrElse(null))
+                                          .withInputLimit(getChannelLimitOrElse(
                                                   InvocationConfiguration.DEFAULT))
-                                          .withInputMaxDelay(getChannelMaxDelayOr(null))
-                                          .withInputMaxSize(getChannelMaxSizeOr(
+                                          .withInputMaxDelay(getChannelMaxDelayOrElse(null))
+                                          .withInputMaxSize(getChannelMaxSizeOrElse(
                                                   InvocationConfiguration.DEFAULT))
                                           .setConfiguration();
     }
@@ -381,11 +382,11 @@ public final class ChannelConfiguration extends DeepEqualObject {
     public InvocationConfiguration toInvocationConfiguration() {
 
         return InvocationConfiguration.builder()
-                                      .withRunner(getRunnerOr(null))
-                                      .withReadTimeout(getReadTimeoutOr(null))
-                                      .withReadTimeoutAction(getReadTimeoutActionOr(null))
-                                      .withLog(getLogOr(null))
-                                      .withLogLevel(getLogLevelOr(null))
+                                      .withRunner(getRunnerOrElse(null))
+                                      .withReadTimeout(getReadTimeoutOrElse(null))
+                                      .withReadTimeoutAction(getReadTimeoutActionOrElse(null))
+                                      .withLog(getLogOrElse(null))
+                                      .withLogLevel(getLogLevelOrElse(null))
                                       .setConfiguration();
     }
 
@@ -399,11 +400,11 @@ public final class ChannelConfiguration extends DeepEqualObject {
     public InvocationConfiguration toOutputChannelConfiguration() {
 
         return toInvocationConfiguration().builderFrom()
-                                          .withOutputOrder(getChannelOrderTypeOr(null))
-                                          .withOutputLimit(getChannelLimitOr(
+                                          .withOutputOrder(getChannelOrderTypeOrElse(null))
+                                          .withOutputLimit(getChannelLimitOrElse(
                                                   InvocationConfiguration.DEFAULT))
-                                          .withOutputMaxDelay(getChannelMaxDelayOr(null))
-                                          .withOutputMaxSize(getChannelMaxSizeOr(
+                                          .withOutputMaxDelay(getChannelMaxDelayOrElse(null))
+                                          .withOutputMaxSize(getChannelMaxSizeOrElse(
                                                   InvocationConfiguration.DEFAULT))
                                           .setConfiguration();
     }

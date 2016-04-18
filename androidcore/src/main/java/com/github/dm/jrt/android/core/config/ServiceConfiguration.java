@@ -129,7 +129,8 @@ public final class ServiceConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the log class instance.
      */
-    public Class<? extends Log> getLogClassOr(@Nullable final Class<? extends Log> valueIfNotSet) {
+    public Class<? extends Log> getLogClassOrElse(
+            @Nullable final Class<? extends Log> valueIfNotSet) {
 
         final Class<? extends Log> logClass = mLogClass;
         return (logClass != null) ? logClass : valueIfNotSet;
@@ -141,7 +142,7 @@ public final class ServiceConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the looper instance.
      */
-    public Looper getMessageLooperOr(@Nullable final Looper valueIfNotSet) {
+    public Looper getMessageLooperOrElse(@Nullable final Looper valueIfNotSet) {
 
         final Looper looper = mLooper;
         return (looper != null) ? looper : valueIfNotSet;
@@ -153,7 +154,7 @@ public final class ServiceConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the runner class instance.
      */
-    public Class<? extends Runner> getRunnerClassOr(
+    public Class<? extends Runner> getRunnerClassOrElse(
             @Nullable final Class<? extends Runner> valueIfNotSet) {
 
         final Class<? extends Runner> runnerClass = mRunnerClass;

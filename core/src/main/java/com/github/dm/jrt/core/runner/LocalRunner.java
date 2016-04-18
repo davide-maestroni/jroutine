@@ -31,13 +31,13 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * Created by davide-maestroni on 09/18/2014.
  */
-class LocalQueue {
+class LocalRunner {
 
     private static final EmptyExecution EMPTY_EXECUTION = new EmptyExecution();
 
     private static final int INITIAL_CAPACITY = 10;
 
-    private static final LocalQueueThreadLocal sQueue = new LocalQueueThreadLocal();
+    private static final LocalRunnerThreadLocal sRunner = new LocalRunnerThreadLocal();
 
     private TimeUnit[] mDelayUnits;
 
@@ -56,7 +56,7 @@ class LocalQueue {
     /**
      * Constructor.
      */
-    private LocalQueue() {
+    private LocalRunner() {
 
         mExecutionTimeNs = new long[INITIAL_CAPACITY];
         mExecutions = new Execution[INITIAL_CAPACITY];
@@ -71,7 +71,7 @@ class LocalQueue {
      */
     public static void cancel(@NotNull final Execution execution) {
 
-        sQueue.get().removeExecution(execution);
+        sRunner.get().removeExecution(execution);
     }
 
     /**
@@ -84,7 +84,7 @@ class LocalQueue {
     public static void run(@NotNull final Execution execution, final long delay,
             @NotNull final TimeUnit timeUnit) {
 
-        sQueue.get().addExecution(execution, delay, timeUnit);
+        sRunner.get().addExecution(execution, delay, timeUnit);
     }
 
     private static void resizeArray(@NotNull final long[] src, @NotNull final long[] dst,
@@ -288,12 +288,12 @@ class LocalQueue {
     /**
      * Thread local initializing the queue instance.
      */
-    private static class LocalQueueThreadLocal extends ThreadLocal<LocalQueue> {
+    private static class LocalRunnerThreadLocal extends ThreadLocal<LocalRunner> {
 
         @Override
-        protected LocalQueue initialValue() {
+        protected LocalRunner initialValue() {
 
-            return new LocalQueue();
+            return new LocalRunner();
         }
     }
 }

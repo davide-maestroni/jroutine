@@ -59,6 +59,31 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
             ServiceConfiguration.defaultConfiguration();
 
     @NotNull
+    public ServiceProxyObjectBuilder<TYPE> applyConfiguration(
+            @NotNull final ProxyConfiguration configuration) {
+
+        mProxyConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
+        return this;
+    }
+
+    @NotNull
+    public ServiceProxyObjectBuilder<TYPE> applyConfiguration(
+            @NotNull final ServiceConfiguration configuration) {
+
+        mServiceConfiguration = ConstantConditions.notNull("service configuration", configuration);
+        return this;
+    }
+
+    @NotNull
+    public ServiceProxyObjectBuilder<TYPE> applyConfiguration(
+            @NotNull final InvocationConfiguration configuration) {
+
+        mInvocationConfiguration =
+                ConstantConditions.notNull("invocation configuration", configuration);
+        return this;
+    }
+
+    @NotNull
     @SuppressWarnings("unchecked")
     public TYPE buildProxy() {
 
@@ -108,7 +133,7 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
 
     @NotNull
     public InvocationConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
-    getInvocationConfiguration() {
+    invocationConfiguration() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ServiceProxyObjectBuilder<TYPE>>(this, config);
@@ -116,7 +141,7 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
 
     @NotNull
     public ProxyConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
-    getProxyConfiguration() {
+    proxyConfiguration() {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<ServiceProxyObjectBuilder<TYPE>>(this, config);
@@ -124,35 +149,10 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
 
     @NotNull
     public ServiceConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
-    getServiceConfiguration() {
+    serviceConfiguration() {
 
         final ServiceConfiguration config = mServiceConfiguration;
         return new ServiceConfiguration.Builder<ServiceProxyObjectBuilder<TYPE>>(this, config);
-    }
-
-    @NotNull
-    public ServiceProxyObjectBuilder<TYPE> setConfiguration(
-            @NotNull final ProxyConfiguration configuration) {
-
-        mProxyConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
-        return this;
-    }
-
-    @NotNull
-    public ServiceProxyObjectBuilder<TYPE> setConfiguration(
-            @NotNull final ServiceConfiguration configuration) {
-
-        mServiceConfiguration = ConstantConditions.notNull("service configuration", configuration);
-        return this;
-    }
-
-    @NotNull
-    public ServiceProxyObjectBuilder<TYPE> setConfiguration(
-            @NotNull final InvocationConfiguration configuration) {
-
-        mInvocationConfiguration =
-                ConstantConditions.notNull("invocation configuration", configuration);
-        return this;
     }
 
     /**

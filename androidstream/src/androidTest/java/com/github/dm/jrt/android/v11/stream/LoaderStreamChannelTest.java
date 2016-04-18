@@ -354,22 +354,22 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             final Runner runner2 = Runners.poolRunner(1);
             LoaderStreams.streamOf("test")
                          .with(loaderFrom(activity))
-                         .getInvocationConfiguration()
+                         .invocationConfiguration()
                          .withRunner(runner1)
-                         .setConfiguration()
+                         .apply()
                          .map(new Function<String, Object>() {
 
                              public Object apply(final String s) {
 
                                  return LoaderStreams.streamOf(s)
                                                      .with(loaderFrom(activity))
-                                                     .getInvocationConfiguration()
+                                                     .invocationConfiguration()
                                                      .withRunner(runner1)
-                                                     .setConfiguration()
+                                                     .apply()
                                                      .map(Functions.identity())
-                                                     .getInvocationConfiguration()
+                                                     .invocationConfiguration()
                                                      .withRunner(runner2)
-                                                     .setConfiguration()
+                                                     .apply()
                                                      .map(Functions.identity())
                                                      .afterMax(minutes(3))
                                                      .next();
@@ -1536,9 +1536,9 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         }
 
         final Routine<String, String> routine = JRoutineCore.on(new UpperCase())
-                                                            .getInvocationConfiguration()
+                                                            .invocationConfiguration()
                                                             .withOutputOrder(OrderType.BY_CALL)
-                                                            .setConfiguration()
+                                                            .apply()
                                                             .buildRoutine();
         assertThat(LoaderStreams.streamOf("test1", "test2")
                                 .with(loaderFrom(getActivity()))

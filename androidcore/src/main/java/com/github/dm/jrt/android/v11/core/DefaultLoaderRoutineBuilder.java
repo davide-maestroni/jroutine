@@ -53,10 +53,10 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
             new InvocationConfiguration.Configurable<LoaderRoutineBuilder<IN, OUT>>() {
 
                 @NotNull
-                public LoaderRoutineBuilder<IN, OUT> setConfiguration(
+                public LoaderRoutineBuilder<IN, OUT> applyConfiguration(
                         @NotNull final InvocationConfiguration configuration) {
 
-                    return DefaultLoaderRoutineBuilder.this.setConfiguration(configuration);
+                    return DefaultLoaderRoutineBuilder.this.applyConfiguration(configuration);
                 }
             };
 
@@ -84,6 +84,31 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
     }
 
     @NotNull
+    public LoaderRoutineBuilder<IN, OUT> applyConfiguration(
+            @NotNull final InvocationConfiguration configuration) {
+
+        super.applyConfiguration(configuration);
+        return this;
+    }
+
+    @NotNull
+    @Override
+    public InvocationConfiguration.Builder<? extends
+            LoaderRoutineBuilder<IN, OUT>> invocationConfiguration() {
+
+        return new InvocationConfiguration.Builder<LoaderRoutineBuilder<IN, OUT>>(
+                mRoutineConfigurable, getConfiguration());
+    }
+
+    @NotNull
+    public LoaderRoutineBuilder<IN, OUT> applyConfiguration(
+            @NotNull final LoaderConfiguration configuration) {
+
+        mLoaderConfiguration = ConstantConditions.notNull("loader configuration", configuration);
+        return this;
+    }
+
+    @NotNull
     public LoaderRoutine<IN, OUT> buildRoutine() {
 
         final InvocationConfiguration configuration = getConfiguration();
@@ -95,39 +120,16 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
 
         final InvocationConfiguration.Builder<InvocationConfiguration> builder =
                 configuration.builderFrom().withRunner(zeroDelayRunner(mainRunner()));
-        return new DefaultLoaderRoutine<IN, OUT>(mContext, mFactory, builder.setConfiguration(),
+        return new DefaultLoaderRoutine<IN, OUT>(mContext, mFactory, builder.apply(),
                 mLoaderConfiguration);
     }
 
     @NotNull
-    @Override
-    public InvocationConfiguration.Builder<? extends
-            LoaderRoutineBuilder<IN, OUT>> getInvocationConfiguration() {
-
-        return new InvocationConfiguration.Builder<LoaderRoutineBuilder<IN, OUT>>(
-                mRoutineConfigurable, getConfiguration());
-    }
-
-    @NotNull
-    public LoaderRoutineBuilder<IN, OUT> setConfiguration(
-            @NotNull final InvocationConfiguration configuration) {
-
-        super.setConfiguration(configuration);
-        return this;
-    }
-
-    @NotNull
     public LoaderConfiguration.Builder<? extends LoaderRoutineBuilder<IN, OUT>>
-    getLoaderConfiguration() {
+    loaderConfiguration() {
 
         final LoaderConfiguration config = mLoaderConfiguration;
         return new LoaderConfiguration.Builder<LoaderRoutineBuilder<IN, OUT>>(this, config);
-    }
-
-    @Override
-    public void purge() {
-
-        buildRoutine().purge();
     }
 
     public void purge(@Nullable final IN input) {
@@ -145,11 +147,9 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
         buildRoutine().purge(inputs);
     }
 
-    @NotNull
-    public LoaderRoutineBuilder<IN, OUT> setConfiguration(
-            @NotNull final LoaderConfiguration configuration) {
+    @Override
+    public void purge() {
 
-        mLoaderConfiguration = ConstantConditions.notNull("loader configuration", configuration);
-        return this;
+        buildRoutine().purge();
     }
 }

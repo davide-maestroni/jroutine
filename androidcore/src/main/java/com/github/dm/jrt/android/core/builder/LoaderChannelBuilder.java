@@ -52,7 +52,7 @@ public interface LoaderChannelBuilder extends ChannelConfigurableBuilder<LoaderC
      * @return the loader configuration builder.
      */
     @NotNull
-    Builder<? extends LoaderChannelBuilder> getLoaderConfiguration();
+    Builder<? extends LoaderChannelBuilder> loaderConfiguration();
 
     /**
      * Makes the builder destroy all the cached invocation instances.

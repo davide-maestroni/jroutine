@@ -40,5 +40,5 @@ public interface ConfigurableBuilder<TYPE> {
      * @return the invocation configuration builder.
      */
     @NotNull
-    Builder<? extends TYPE> getInvocationConfiguration();
+    Builder<? extends TYPE> invocationConfiguration();
 }

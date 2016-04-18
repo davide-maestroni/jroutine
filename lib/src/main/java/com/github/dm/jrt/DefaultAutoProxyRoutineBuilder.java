@@ -51,7 +51,7 @@ class DefaultAutoProxyRoutineBuilder implements AutoProxyRoutineBuilder {
             new InvocationConfiguration.Configurable<DefaultAutoProxyRoutineBuilder>() {
 
                 @NotNull
-                public DefaultAutoProxyRoutineBuilder setConfiguration(
+                public DefaultAutoProxyRoutineBuilder applyConfiguration(
                         @NotNull final InvocationConfiguration configuration) {
 
                     mInvocationConfiguration = configuration;
@@ -66,7 +66,7 @@ class DefaultAutoProxyRoutineBuilder implements AutoProxyRoutineBuilder {
             new ProxyConfiguration.Configurable<DefaultAutoProxyRoutineBuilder>() {
 
                 @NotNull
-                public DefaultAutoProxyRoutineBuilder setConfiguration(
+                public DefaultAutoProxyRoutineBuilder applyConfiguration(
                         @NotNull final ProxyConfiguration configuration) {
 
                     mProxyConfiguration = configuration;
@@ -138,7 +138,7 @@ class DefaultAutoProxyRoutineBuilder implements AutoProxyRoutineBuilder {
 
     @NotNull
     public InvocationConfiguration.Builder<? extends AutoProxyRoutineBuilder>
-    getInvocationConfiguration() {
+    invocationConfiguration() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<DefaultAutoProxyRoutineBuilder>(
@@ -146,7 +146,7 @@ class DefaultAutoProxyRoutineBuilder implements AutoProxyRoutineBuilder {
     }
 
     @NotNull
-    public ProxyConfiguration.Builder<? extends AutoProxyRoutineBuilder> getProxyConfiguration() {
+    public ProxyConfiguration.Builder<? extends AutoProxyRoutineBuilder> proxyConfiguration() {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<DefaultAutoProxyRoutineBuilder>(mProxyConfigurable,
@@ -164,23 +164,23 @@ class DefaultAutoProxyRoutineBuilder implements AutoProxyRoutineBuilder {
     private ObjectRoutineBuilder newObjectBuilder() {
 
         return JRoutineObject.on(mTarget)
-                             .getInvocationConfiguration()
+                             .invocationConfiguration()
                              .with(mInvocationConfiguration)
-                             .setConfiguration()
-                             .getProxyConfiguration()
+                             .apply()
+                             .proxyConfiguration()
                              .with(mProxyConfiguration)
-                             .setConfiguration();
+                             .apply();
     }
 
     @NotNull
     private ProxyRoutineBuilder newProxyBuilder() {
 
         return JRoutineProxy.on(mTarget)
-                            .getInvocationConfiguration()
+                            .invocationConfiguration()
                             .with(mInvocationConfiguration)
-                            .setConfiguration()
-                            .getProxyConfiguration()
+                            .apply()
+                            .proxyConfiguration()
                             .with(mProxyConfiguration)
-                            .setConfiguration();
+                            .apply();
     }
 }

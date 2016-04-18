@@ -56,6 +56,31 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
     private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.defaultConfiguration();
 
     @NotNull
+    public LoaderProxyObjectBuilder<TYPE> applyConfiguration(
+            @NotNull final LoaderConfiguration configuration) {
+
+        mLoaderConfiguration = ConstantConditions.notNull("loader configuration", configuration);
+        return this;
+    }
+
+    @NotNull
+    public LoaderProxyObjectBuilder<TYPE> applyConfiguration(
+            @NotNull final ProxyConfiguration configuration) {
+
+        mProxyConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
+        return this;
+    }
+
+    @NotNull
+    public LoaderProxyObjectBuilder<TYPE> applyConfiguration(
+            @NotNull final InvocationConfiguration configuration) {
+
+        mInvocationConfiguration =
+                ConstantConditions.notNull("invocation configuration", configuration);
+        return this;
+    }
+
+    @NotNull
     @SuppressWarnings("unchecked")
     public TYPE buildProxy() {
 
@@ -112,7 +137,7 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
 
     @NotNull
     public InvocationConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>>
-    getInvocationConfiguration() {
+    invocationConfiguration() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<LoaderProxyObjectBuilder<TYPE>>(this, config);
@@ -120,7 +145,7 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
 
     @NotNull
     public ProxyConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>>
-    getProxyConfiguration() {
+    proxyConfiguration() {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<LoaderProxyObjectBuilder<TYPE>>(this, config);
@@ -128,35 +153,10 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
 
     @NotNull
     public LoaderConfiguration.Builder<? extends LoaderProxyObjectBuilder<TYPE>>
-    getLoaderConfiguration() {
+    loaderConfiguration() {
 
         final LoaderConfiguration config = mLoaderConfiguration;
         return new LoaderConfiguration.Builder<LoaderProxyObjectBuilder<TYPE>>(this, config);
-    }
-
-    @NotNull
-    public LoaderProxyObjectBuilder<TYPE> setConfiguration(
-            @NotNull final LoaderConfiguration configuration) {
-
-        mLoaderConfiguration = ConstantConditions.notNull("loader configuration", configuration);
-        return this;
-    }
-
-    @NotNull
-    public LoaderProxyObjectBuilder<TYPE> setConfiguration(
-            @NotNull final ProxyConfiguration configuration) {
-
-        mProxyConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
-        return this;
-    }
-
-    @NotNull
-    public LoaderProxyObjectBuilder<TYPE> setConfiguration(
-            @NotNull final InvocationConfiguration configuration) {
-
-        mInvocationConfiguration =
-                ConstantConditions.notNull("invocation configuration", configuration);
-        return this;
     }
 
     /**

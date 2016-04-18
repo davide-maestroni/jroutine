@@ -48,9 +48,9 @@
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.object.config.ProxyConfiguration proxyConfiguration) {
 
         return com.github.dm.jrt.core.JRoutineCore.on(new InvocationFactory${methodCount}${genericTypes}(proxyConfiguration, target))
-                                                  .getInvocationConfiguration()
+                                                  .invocationConfiguration()
                                                   .with(invocationConfiguration)
                                                   ${routineBuilderOptions}
-                                                  .setConfiguration()
+                                                  .apply()
                                                   .buildRoutine();
     }

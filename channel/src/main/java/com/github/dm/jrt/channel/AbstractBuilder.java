@@ -36,23 +36,23 @@ public abstract class AbstractBuilder<TYPE>
     private ChannelConfiguration mConfiguration = ChannelConfiguration.defaultConfiguration();
 
     @NotNull
+    public ChannelsBuilder<TYPE> applyConfiguration(
+            @NotNull final ChannelConfiguration configuration) {
+
+        mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
+        return this;
+    }
+
+    @NotNull
     public TYPE buildChannels() {
 
         return build(mConfiguration);
     }
 
     @NotNull
-    public Builder<ChannelsBuilder<TYPE>> getChannelConfiguration() {
+    public Builder<ChannelsBuilder<TYPE>> channelConfiguration() {
 
         return new Builder<ChannelsBuilder<TYPE>>(this, mConfiguration);
-    }
-
-    @NotNull
-    public ChannelsBuilder<TYPE> setConfiguration(
-            @NotNull final ChannelConfiguration configuration) {
-
-        mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-        return this;
     }
 
     /**

@@ -45,13 +45,13 @@ public interface LoaderAutoProxyRoutineBuilder
      */
     @NotNull
     InvocationConfiguration.Builder<? extends LoaderAutoProxyRoutineBuilder>
-    getInvocationConfiguration();
+    invocationConfiguration();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    ProxyConfiguration.Builder<? extends LoaderAutoProxyRoutineBuilder> getProxyConfiguration();
+    ProxyConfiguration.Builder<? extends LoaderAutoProxyRoutineBuilder> proxyConfiguration();
 
     /**
      * {@inheritDoc}
@@ -63,5 +63,5 @@ public interface LoaderAutoProxyRoutineBuilder
      * {@inheritDoc}
      */
     @NotNull
-    LoaderConfiguration.Builder<? extends LoaderAutoProxyRoutineBuilder> getLoaderConfiguration();
+    LoaderConfiguration.Builder<? extends LoaderAutoProxyRoutineBuilder> loaderConfiguration();
 }

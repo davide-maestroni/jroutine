@@ -50,7 +50,7 @@ public class AndroidBuildersTest extends AndroidTestCase {
                          .withInputClashResolution(ClashResolutionType.ABORT_THIS)
                          .withLoaderId(-77)
                          .withResultStaleTime(TimeDuration.millis(333))
-                         .setConfiguration());
+                         .apply());
     }
 
     public interface AnnotationItf {

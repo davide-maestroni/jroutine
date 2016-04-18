@@ -103,9 +103,9 @@ class DefaultStreamChannel<OUT> extends AbstractStreamChannel<OUT> {
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
 
         return JRoutineCore.on(factory)
-                           .getInvocationConfiguration()
+                           .invocationConfiguration()
                            .with(configuration)
-                           .setConfiguration()
+                           .apply()
                            .buildRoutine();
     }
 }

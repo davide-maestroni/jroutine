@@ -70,6 +70,31 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
     }
 
     @NotNull
+    public LoaderProxyRoutineBuilder applyConfiguration(
+            @NotNull final LoaderConfiguration configuration) {
+
+        mLoaderConfiguration = ConstantConditions.notNull("loader configuration", configuration);
+        return this;
+    }
+
+    @NotNull
+    public LoaderProxyRoutineBuilder applyConfiguration(
+            @NotNull final ProxyConfiguration configuration) {
+
+        mProxyConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
+        return this;
+    }
+
+    @NotNull
+    public LoaderProxyRoutineBuilder applyConfiguration(
+            @NotNull final InvocationConfiguration configuration) {
+
+        mInvocationConfiguration =
+                ConstantConditions.notNull("invocation configuration", configuration);
+        return this;
+    }
+
+    @NotNull
     public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
 
         if (!itf.isInterface()) {
@@ -85,15 +110,15 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
 
         final TargetLoaderProxyObjectBuilder<TYPE> builder =
                 new TargetLoaderProxyObjectBuilder<TYPE>(mContext, mTarget, itf);
-        return builder.getInvocationConfiguration()
+        return builder.invocationConfiguration()
                       .with(mInvocationConfiguration)
-                      .setConfiguration()
-                      .getProxyConfiguration()
+                      .apply()
+                      .proxyConfiguration()
                       .with(mProxyConfiguration)
-                      .setConfiguration()
-                      .getLoaderConfiguration()
+                      .apply()
+                      .loaderConfiguration()
                       .with(mLoaderConfiguration)
-                      .setConfiguration()
+                      .apply()
                       .buildProxy();
     }
 
@@ -105,50 +130,24 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
 
     @NotNull
     public InvocationConfiguration.Builder<? extends LoaderProxyRoutineBuilder>
-    getInvocationConfiguration() {
+    invocationConfiguration() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<LoaderProxyRoutineBuilder>(this, config);
     }
 
     @NotNull
-    public ProxyConfiguration.Builder<? extends LoaderProxyRoutineBuilder> getProxyConfiguration() {
+    public ProxyConfiguration.Builder<? extends LoaderProxyRoutineBuilder> proxyConfiguration() {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<LoaderProxyRoutineBuilder>(this, config);
     }
 
     @NotNull
-    public LoaderConfiguration.Builder<? extends LoaderProxyRoutineBuilder>
-    getLoaderConfiguration() {
+    public LoaderConfiguration.Builder<? extends LoaderProxyRoutineBuilder> loaderConfiguration() {
 
         final LoaderConfiguration config = mLoaderConfiguration;
         return new LoaderConfiguration.Builder<LoaderProxyRoutineBuilder>(this, config);
-    }
-
-    @NotNull
-    public LoaderProxyRoutineBuilder setConfiguration(
-            @NotNull final LoaderConfiguration configuration) {
-
-        mLoaderConfiguration = ConstantConditions.notNull("loader configuration", configuration);
-        return this;
-    }
-
-    @NotNull
-    public LoaderProxyRoutineBuilder setConfiguration(
-            @NotNull final ProxyConfiguration configuration) {
-
-        mProxyConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
-        return this;
-    }
-
-    @NotNull
-    public LoaderProxyRoutineBuilder setConfiguration(
-            @NotNull final InvocationConfiguration configuration) {
-
-        mInvocationConfiguration =
-                ConstantConditions.notNull("invocation configuration", configuration);
-        return this;
     }
 
     /**

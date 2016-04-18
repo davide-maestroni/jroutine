@@ -50,6 +50,15 @@ class BuilderWrapper<OUT> implements ChannelsBuilder<StreamChannel<OUT>>,
     }
 
     @NotNull
+    public ChannelsBuilder<StreamChannel<OUT>> applyConfiguration(
+            @NotNull final ChannelConfiguration configuration) {
+
+        mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
+        mBuilder.channelConfiguration().with(null).with(configuration).apply();
+        return this;
+    }
+
+    @NotNull
     @SuppressWarnings("unchecked")
     public StreamChannel<OUT> buildChannels() {
 
@@ -57,17 +66,8 @@ class BuilderWrapper<OUT> implements ChannelsBuilder<StreamChannel<OUT>>,
     }
 
     @NotNull
-    public Builder<? extends ChannelsBuilder<StreamChannel<OUT>>> getChannelConfiguration() {
+    public Builder<? extends ChannelsBuilder<StreamChannel<OUT>>> channelConfiguration() {
 
         return new Builder<ChannelsBuilder<StreamChannel<OUT>>>(this, mConfiguration);
-    }
-
-    @NotNull
-    public ChannelsBuilder<StreamChannel<OUT>> setConfiguration(
-            @NotNull final ChannelConfiguration configuration) {
-
-        mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-        mBuilder.getChannelConfiguration().with(null).with(configuration).setConfiguration();
-        return this;
     }
 }

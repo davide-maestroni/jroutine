@@ -170,10 +170,10 @@ public class RunnerTest extends AndroidTestCase {
             }
         };
         final OutputChannel<Handler> channel = JRoutineCore.on(factoryOf(invocation, this, null))
-                                                           .getInvocationConfiguration()
+                                                           .invocationConfiguration()
                                                            .withRunner(AndroidRunners.handlerRunner(
                                                                    new HandlerThread("test")))
-                                                           .setConfiguration()
+                                                           .apply()
                                                            .asyncCall();
         assertThat(JRoutineCore.on(new HandlerInvocationFactory())
                                .asyncCall(channel)
@@ -193,10 +193,10 @@ public class RunnerTest extends AndroidTestCase {
                     }
                 };
         final OutputChannel<Object> channel = JRoutineCore.on(factoryOf(invocation, this))
-                                                          .getInvocationConfiguration()
+                                                          .invocationConfiguration()
                                                           .withRunner(AndroidRunners.handlerRunner(
                                                                   new HandlerThread("test")))
-                                                          .setConfiguration()
+                                                          .apply()
                                                           .asyncCall();
 
         assertThat(JRoutineCore.on(new LooperInvocationFactory())

@@ -63,14 +63,14 @@ public class LoaderRoutineRotationTest
         final Routine<String, String> routine = JRoutineLoaderCompat.with(loaderFrom(getActivity()))
                                                                     .on(factoryOf(
                                                                             ToUpperCase.class))
-                                                                    .getLoaderConfiguration()
+                                                                    .loaderConfiguration()
                                                                     .withLoaderId(0)
                                                                     .withClashResolution(
                                                                             ClashResolutionType
                                                                                     .JOIN)
                                                                     .withResultStaleTime(
                                                                             TimeDuration.minutes(1))
-                                                                    .setConfiguration()
+                                                                    .apply()
                                                                     .buildRoutine();
         routine.asyncCall("test1");
 
@@ -89,12 +89,12 @@ public class LoaderRoutineRotationTest
         final TimeDuration timeout = TimeDuration.seconds(10);
         JRoutineLoaderCompat.with(loaderFrom(getActivity()))
                             .on(factoryOf(ToUpperCase.class))
-                            .getInvocationConfiguration()
+                            .invocationConfiguration()
                             .withOutputOrder(OrderType.BY_CALL)
-                            .setConfiguration()
-                            .getLoaderConfiguration()
+                            .apply()
+                            .loaderConfiguration()
                             .withLoaderId(0)
-                            .setConfiguration()
+                            .apply()
                             .asyncCall("test1", "test2");
 
         simulateRotation();
@@ -171,14 +171,14 @@ public class LoaderRoutineRotationTest
         final Routine<String, String> routine = JRoutineLoaderCompat.with(loaderFrom(getActivity()))
                                                                     .on(factoryOf(
                                                                             ToUpperCase.class))
-                                                                    .getLoaderConfiguration()
+                                                                    .loaderConfiguration()
                                                                     .withLoaderId(0)
                                                                     .withClashResolution(
                                                                             ClashResolutionType
                                                                                     .JOIN)
                                                                     .withResultStaleTime(
                                                                             TimeDuration.ZERO)
-                                                                    .setConfiguration()
+                                                                    .apply()
                                                                     .buildRoutine();
         routine.asyncCall("test1");
 

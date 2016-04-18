@@ -66,6 +66,22 @@ class DefaultLoaderChannelBuilder
     }
 
     @NotNull
+    public LoaderChannelBuilder applyConfiguration(
+            @NotNull final LoaderConfiguration configuration) {
+
+        mLoaderConfiguration = ConstantConditions.notNull("loader configuration", configuration);
+        return this;
+    }
+
+    @NotNull
+    public LoaderChannelBuilder applyConfiguration(
+            @NotNull final ChannelConfiguration configuration) {
+
+        mChannelConfiguration = ConstantConditions.notNull("channel configuration", configuration);
+        return this;
+    }
+
+    @NotNull
     public <OUT> OutputChannel<OUT> buildChannel() {
 
         final LoaderConfiguration loaderConfiguration = mLoaderConfiguration;
@@ -107,20 +123,20 @@ class DefaultLoaderChannelBuilder
             logger.wrn("the specified results stale time will be ignored: %s", resultStaleTime);
         }
 
-        return builder.getInvocationConfiguration()
+        return builder.invocationConfiguration()
                       .with(invocationConfiguration)
-                      .setConfiguration()
-                      .getLoaderConfiguration()
+                      .apply()
+                      .loaderConfiguration()
                       .with(loaderConfiguration)
                       .withClashResolution(ClashResolutionType.JOIN)
                       .withInputClashResolution(ClashResolutionType.JOIN)
                       .withResultStaleTime(TimeDuration.INFINITY)
-                      .setConfiguration()
+                      .apply()
                       .asyncCall();
     }
 
     @NotNull
-    public LoaderConfiguration.Builder<? extends LoaderChannelBuilder> getLoaderConfiguration() {
+    public LoaderConfiguration.Builder<? extends LoaderChannelBuilder> loaderConfiguration() {
 
         final LoaderConfiguration config = mLoaderConfiguration;
         return new LoaderConfiguration.Builder<LoaderChannelBuilder>(this, config);
@@ -181,24 +197,9 @@ class DefaultLoaderChannelBuilder
     }
 
     @NotNull
-    public ChannelConfiguration.Builder<? extends LoaderChannelBuilder> getChannelConfiguration() {
+    public ChannelConfiguration.Builder<? extends LoaderChannelBuilder> channelConfiguration() {
 
         final ChannelConfiguration config = mChannelConfiguration;
         return new ChannelConfiguration.Builder<LoaderChannelBuilder>(this, config);
-    }
-
-    @NotNull
-    public LoaderChannelBuilder setConfiguration(@NotNull final LoaderConfiguration configuration) {
-
-        mLoaderConfiguration = ConstantConditions.notNull("loader configuration", configuration);
-        return this;
-    }
-
-    @NotNull
-    public LoaderChannelBuilder setConfiguration(
-            @NotNull final ChannelConfiguration configuration) {
-
-        mChannelConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-        return this;
     }
 }

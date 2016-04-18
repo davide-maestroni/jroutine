@@ -158,12 +158,11 @@ public interface LoaderObjectRoutineBuilder
      * @return the invocation configuration builder.
      */
     @NotNull
-    InvocationConfiguration.Builder<? extends LoaderObjectRoutineBuilder>
-    getInvocationConfiguration();
+    InvocationConfiguration.Builder<? extends LoaderObjectRoutineBuilder> invocationConfiguration();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    ProxyConfiguration.Builder<? extends LoaderObjectRoutineBuilder> getProxyConfiguration();
+    ProxyConfiguration.Builder<? extends LoaderObjectRoutineBuilder> proxyConfiguration();
 }

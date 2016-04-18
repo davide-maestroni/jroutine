@@ -43,6 +43,13 @@ class DefaultIOChannelBuilder implements IOChannelBuilder, Configurable<IOChanne
     }
 
     @NotNull
+    public IOChannelBuilder applyConfiguration(@NotNull final ChannelConfiguration configuration) {
+
+        mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
+        return this;
+    }
+
+    @NotNull
     public <DATA> IOChannel<DATA> buildChannel() {
 
         return new DefaultIOChannel<DATA>(mConfiguration);
@@ -67,15 +74,8 @@ class DefaultIOChannelBuilder implements IOChannelBuilder, Configurable<IOChanne
     }
 
     @NotNull
-    public Builder<? extends IOChannelBuilder> getChannelConfiguration() {
+    public Builder<? extends IOChannelBuilder> channelConfiguration() {
 
         return new Builder<IOChannelBuilder>(this, mConfiguration);
-    }
-
-    @NotNull
-    public IOChannelBuilder setConfiguration(@NotNull final ChannelConfiguration configuration) {
-
-        mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-        return this;
     }
 }

@@ -41,12 +41,12 @@
 
                 final Main main = new Main();
                 final AsyncMain proxy = JRoutineProxy.on(instance(main))
-                                                     .getProxyConfiguration()
+                                                     .proxyConfiguration()
                                                      .withSharedFields()
-                                                     .setConfiguration()
-                                                     .getInvocationConfiguration()
+                                                     .apply()
+                                                     .invocationConfiguration()
                                                      .withReadTimeout(seconds(3))
-                                                     .setConfiguration()
+                                                     .apply()
                                                      .buildProxy(AsyncMain.class);
                 final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(JRoutine.io().of(args))));
                 System.out.println(rms);
@@ -107,12 +107,12 @@
 
                 final Main main = new Main();
                 final AsyncMain proxy = Proxy_Main_AsyncMain.on(instance(main))
-                                                            .getProxyConfiguration()
+                                                            .proxyConfiguration()
                                                             .withSharedFields()
-                                                            .setConfiguration()
-                                                            .getInvocationConfiguration()
+                                                            .apply()
+                                                            .invocationConfiguration()
                                                             .withReadTimeout(seconds(3))
-                                                            .setConfiguration()
+                                                            .apply()
                                                             .buildProxy();
                 final double rms = proxy.squareRootMean(proxy.square(proxy.parseArg(JRoutine.io().of(args))));
                 System.out.println(rms);

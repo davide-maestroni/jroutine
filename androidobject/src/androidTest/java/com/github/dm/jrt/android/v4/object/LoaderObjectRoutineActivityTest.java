@@ -175,14 +175,14 @@ public class LoaderObjectRoutineActivityTest
         final Routine<Object, Object> routine =
                 JRoutineLoaderObjectCompat.with(loaderFrom(getActivity()))
                                           .on(instanceOf(TestClass.class))
-                                          .getInvocationConfiguration()
+                                          .invocationConfiguration()
                                           .withRunner(Runners.poolRunner())
                                           .withMaxInstances(1)
                                           .withCoreInstances(1)
                                           .withReadTimeoutAction(TimeoutActionType.EXIT)
                                           .withLogLevel(Level.DEBUG)
                                           .withLog(new NullLog())
-                                          .setConfiguration()
+                                          .apply()
                                           .method(TestClass.GET);
 
         assertThat(routine.syncCall().afterMax(timeout).all()).containsExactly(-77L);
@@ -203,9 +203,9 @@ public class LoaderObjectRoutineActivityTest
         final TimeDuration timeout = seconds(10);
         final SumItf sumAsync = JRoutineLoaderObjectCompat.with(loaderFrom(getActivity()))
                                                           .on(instanceOf(Sum.class))
-                                                          .getInvocationConfiguration()
+                                                          .invocationConfiguration()
                                                           .withReadTimeout(timeout)
-                                                          .setConfiguration()
+                                                          .apply()
                                                           .buildProxy(SumItf.class);
         final IOChannel<Integer> channel3 = JRoutineCore.io().buildChannel();
         channel3.pass(7).close();
@@ -233,9 +233,9 @@ public class LoaderObjectRoutineActivityTest
         final TimeDuration timeout = seconds(10);
         final CountItf countAsync = JRoutineLoaderObjectCompat.with(loaderFrom(getActivity()))
                                                               .on(instanceOf(Count.class))
-                                                              .getInvocationConfiguration()
+                                                              .invocationConfiguration()
                                                               .withReadTimeout(timeout)
-                                                              .setConfiguration()
+                                                              .apply()
                                                               .buildProxy(CountItf.class);
         assertThat(countAsync.count(3).all()).containsExactly(0, 1, 2);
         assertThat(countAsync.count1(3).all()).containsExactly(new int[]{0, 1, 2});
@@ -250,7 +250,7 @@ public class LoaderObjectRoutineActivityTest
         try {
 
             new DefaultLoaderObjectRoutineBuilder(loaderFrom(getActivity()),
-                    instanceOf(TestClass.class)).setConfiguration((InvocationConfiguration) null);
+                    instanceOf(TestClass.class)).applyConfiguration((InvocationConfiguration) null);
 
             fail();
 
@@ -261,7 +261,7 @@ public class LoaderObjectRoutineActivityTest
         try {
 
             new DefaultLoaderObjectRoutineBuilder(loaderFrom(getActivity()),
-                    instanceOf(TestClass.class)).setConfiguration((ProxyConfiguration) null);
+                    instanceOf(TestClass.class)).applyConfiguration((ProxyConfiguration) null);
 
             fail();
 
@@ -272,7 +272,7 @@ public class LoaderObjectRoutineActivityTest
         try {
 
             new DefaultLoaderObjectRoutineBuilder(loaderFrom(getActivity()),
-                    instanceOf(TestClass.class)).setConfiguration((LoaderConfiguration) null);
+                    instanceOf(TestClass.class)).applyConfiguration((LoaderConfiguration) null);
 
             fail();
 
@@ -295,26 +295,26 @@ public class LoaderObjectRoutineActivityTest
                                                                .withOutputMaxSize(33)
                                                                .withLogLevel(Level.DEBUG)
                                                                .withLog(countLog)
-                                                               .setConfiguration();
+                                                               .apply();
         JRoutineLoaderObjectCompat.with(loaderFrom(getActivity()))
                                   .on(instanceOf(TestClass.class))
-                                  .getInvocationConfiguration()
+                                  .invocationConfiguration()
                                   .with(configuration)
-                                  .setConfiguration()
-                                  .getProxyConfiguration()
+                                  .apply()
+                                  .proxyConfiguration()
                                   .withSharedFields("test")
-                                  .setConfiguration()
+                                  .apply()
                                   .method(TestClass.GET);
         assertThat(countLog.getWrnCount()).isEqualTo(1);
 
         JRoutineLoaderObjectCompat.with(loaderFrom(getActivity()))
                                   .on(instanceOf(Square.class))
-                                  .getInvocationConfiguration()
+                                  .invocationConfiguration()
                                   .with(configuration)
-                                  .setConfiguration()
-                                  .getProxyConfiguration()
+                                  .apply()
+                                  .proxyConfiguration()
                                   .withSharedFields("test")
-                                  .setConfiguration()
+                                  .apply()
                                   .buildProxy(SquareItf.class)
                                   .compute(3);
         assertThat(countLog.getWrnCount()).isEqualTo(2);
@@ -497,9 +497,9 @@ public class LoaderObjectRoutineActivityTest
 
             JRoutineLoaderObjectCompat.with(loaderFrom(getActivity()))
                                       .on(instanceOf(TestClass.class))
-                                      .getInvocationConfiguration()
+                                      .invocationConfiguration()
                                       .withReadTimeout(INFINITY)
-                                      .setConfiguration()
+                                      .apply()
                                       .buildProxy(TestItf.class)
                                       .throwException(null);
 
@@ -513,9 +513,9 @@ public class LoaderObjectRoutineActivityTest
 
             JRoutineLoaderObjectCompat.with(loaderFrom(getActivity()))
                                       .on(instanceOf(TestClass.class))
-                                      .getInvocationConfiguration()
+                                      .invocationConfiguration()
                                       .withReadTimeout(INFINITY)
-                                      .setConfiguration()
+                                      .apply()
                                       .buildProxy(TestItf.class)
                                       .throwException1(null);
 
@@ -529,9 +529,9 @@ public class LoaderObjectRoutineActivityTest
 
             JRoutineLoaderObjectCompat.with(loaderFrom(getActivity()))
                                       .on(instanceOf(TestClass.class))
-                                      .getInvocationConfiguration()
+                                      .invocationConfiguration()
                                       .withReadTimeout(INFINITY)
-                                      .setConfiguration()
+                                      .apply()
                                       .buildProxy(TestItf.class)
                                       .throwException2(null);
 
@@ -603,13 +603,13 @@ public class LoaderObjectRoutineActivityTest
         final Routine<Object, Object> routine2 =
                 JRoutineLoaderObjectCompat.with(loaderFrom(getActivity()))
                                           .on(instanceOf(TestClass.class))
-                                          .getInvocationConfiguration()
+                                          .invocationConfiguration()
                                           .withRunner(Runners.poolRunner())
                                           .withMaxInstances(1)
-                                          .setConfiguration()
-                                          .getProxyConfiguration()
+                                          .apply()
+                                          .proxyConfiguration()
                                           .withSharedFields("test")
-                                          .setConfiguration()
+                                          .apply()
                                           .method(TestClass.class.getMethod("getLong"));
 
         assertThat(routine2.syncCall().afterMax(timeout).all()).containsExactly(-77L);
@@ -622,9 +622,9 @@ public class LoaderObjectRoutineActivityTest
         final Routine<Object, Object> routine1 =
                 JRoutineLoaderObjectCompat.with(loaderFrom(getActivity()))
                                           .on(instanceOf(TestClass.class))
-                                          .getInvocationConfiguration()
+                                          .invocationConfiguration()
                                           .withRunner(Runners.poolRunner())
-                                          .setConfiguration()
+                                          .apply()
                                           .method("getLong");
 
         assertThat(routine1.syncCall().afterMax(timeout).all()).containsExactly(-77L);
@@ -717,9 +717,9 @@ public class LoaderObjectRoutineActivityTest
 
         final Itf itf = JRoutineLoaderObjectCompat.with(loaderFrom(getActivity()))
                                                   .on(instanceOf(Impl.class))
-                                                  .getInvocationConfiguration()
+                                                  .invocationConfiguration()
                                                   .withReadTimeout(seconds(10))
-                                                  .setConfiguration()
+                                                  .apply()
                                                   .buildProxy(Itf.class);
 
         assertThat(itf.add0('c')).isEqualTo((int) 'c');
@@ -948,20 +948,20 @@ public class LoaderObjectRoutineActivityTest
         final LoaderObjectRoutineBuilder builder =
                 JRoutineLoaderObjectCompat.with(loaderFrom(getActivity()))
                                           .on(instanceOf(TestClass2.class))
-                                          .getInvocationConfiguration()
+                                          .invocationConfiguration()
                                           .withReadTimeout(seconds(10))
-                                          .setConfiguration();
+                                          .apply();
 
         long startTime = System.currentTimeMillis();
 
-        OutputChannel<Object> getOne = builder.getProxyConfiguration()
+        OutputChannel<Object> getOne = builder.proxyConfiguration()
                                               .withSharedFields("1")
-                                              .setConfiguration()
+                                              .apply()
                                               .method("getOne")
                                               .asyncCall();
-        OutputChannel<Object> getTwo = builder.getProxyConfiguration()
+        OutputChannel<Object> getTwo = builder.proxyConfiguration()
                                               .withSharedFields("2")
-                                              .setConfiguration()
+                                              .apply()
                                               .method("getTwo")
                                               .asyncCall();
 
@@ -983,12 +983,12 @@ public class LoaderObjectRoutineActivityTest
 
         assertThat(JRoutineLoaderObjectCompat.with(loaderFrom(getActivity()))
                                              .on(instanceOf(TestTimeout.class))
-                                             .getInvocationConfiguration()
+                                             .invocationConfiguration()
                                              .withReadTimeout(seconds(10))
-                                             .setConfiguration()
-                                             .getLoaderConfiguration()
+                                             .apply()
+                                             .loaderConfiguration()
                                              .withLoaderId(0)
-                                             .setConfiguration()
+                                             .apply()
                                              .method("test")
                                              .asyncCall()
                                              .next()).isEqualTo(31);
@@ -997,12 +997,12 @@ public class LoaderObjectRoutineActivityTest
 
             JRoutineLoaderObjectCompat.with(loaderFrom(getActivity()))
                                       .on(instanceOf(TestTimeout.class))
-                                      .getInvocationConfiguration()
+                                      .invocationConfiguration()
                                       .withReadTimeoutAction(TimeoutActionType.THROW)
-                                      .setConfiguration()
-                                      .getLoaderConfiguration()
+                                      .apply()
+                                      .loaderConfiguration()
                                       .withLoaderId(1)
-                                      .setConfiguration()
+                                      .apply()
                                       .method("test")
                                       .asyncCall()
                                       .next();
@@ -1015,12 +1015,12 @@ public class LoaderObjectRoutineActivityTest
 
         assertThat(JRoutineLoaderObjectCompat.with(loaderFrom(getActivity()))
                                              .on(instanceOf(TestTimeout.class))
-                                             .getInvocationConfiguration()
+                                             .invocationConfiguration()
                                              .withReadTimeout(seconds(10))
-                                             .setConfiguration()
-                                             .getLoaderConfiguration()
+                                             .apply()
+                                             .loaderConfiguration()
                                              .withLoaderId(2)
-                                             .setConfiguration()
+                                             .apply()
                                              .method("getInt")
                                              .asyncCall()
                                              .next()).isEqualTo(31);
@@ -1029,12 +1029,12 @@ public class LoaderObjectRoutineActivityTest
 
             JRoutineLoaderObjectCompat.with(loaderFrom(getActivity()))
                                       .on(instanceOf(TestTimeout.class))
-                                      .getInvocationConfiguration()
+                                      .invocationConfiguration()
                                       .withReadTimeoutAction(TimeoutActionType.THROW)
-                                      .setConfiguration()
-                                      .getLoaderConfiguration()
+                                      .apply()
+                                      .loaderConfiguration()
                                       .withLoaderId(3)
-                                      .setConfiguration()
+                                      .apply()
                                       .method("getInt")
                                       .asyncCall()
                                       .next();
@@ -1047,12 +1047,12 @@ public class LoaderObjectRoutineActivityTest
 
         assertThat(JRoutineLoaderObjectCompat.with(loaderFrom(getActivity()))
                                              .on(instanceOf(TestTimeout.class))
-                                             .getInvocationConfiguration()
+                                             .invocationConfiguration()
                                              .withReadTimeout(seconds(10))
-                                             .setConfiguration()
-                                             .getLoaderConfiguration()
+                                             .apply()
+                                             .loaderConfiguration()
                                              .withLoaderId(4)
-                                             .setConfiguration()
+                                             .apply()
                                              .method(TestTimeout.class.getMethod("getInt"))
                                              .asyncCall()
                                              .next()).isEqualTo(31);
@@ -1061,12 +1061,12 @@ public class LoaderObjectRoutineActivityTest
 
             JRoutineLoaderObjectCompat.with(loaderFrom(getActivity()))
                                       .on(instanceOf(TestTimeout.class))
-                                      .getInvocationConfiguration()
+                                      .invocationConfiguration()
                                       .withReadTimeoutAction(TimeoutActionType.THROW)
-                                      .setConfiguration()
-                                      .getLoaderConfiguration()
+                                      .apply()
+                                      .loaderConfiguration()
                                       .withLoaderId(5)
-                                      .setConfiguration()
+                                      .apply()
                                       .method(TestTimeout.class.getMethod("getInt"))
                                       .asyncCall()
                                       .next();
@@ -1079,12 +1079,12 @@ public class LoaderObjectRoutineActivityTest
 
         assertThat(JRoutineLoaderObjectCompat.with(loaderFrom(getActivity()))
                                              .on(instanceOf(TestTimeout.class))
-                                             .getInvocationConfiguration()
+                                             .invocationConfiguration()
                                              .withReadTimeout(seconds(10))
-                                             .setConfiguration()
-                                             .getLoaderConfiguration()
+                                             .apply()
+                                             .loaderConfiguration()
                                              .withLoaderId(6)
-                                             .setConfiguration()
+                                             .apply()
                                              .buildProxy(TestTimeoutItf.class)
                                              .getInt()).isEqualTo(31);
 
@@ -1092,12 +1092,12 @@ public class LoaderObjectRoutineActivityTest
 
             JRoutineLoaderObjectCompat.with(loaderFrom(getActivity()))
                                       .on(instanceOf(TestTimeout.class))
-                                      .getInvocationConfiguration()
+                                      .invocationConfiguration()
                                       .withReadTimeoutAction(TimeoutActionType.THROW)
-                                      .setConfiguration()
-                                      .getLoaderConfiguration()
+                                      .apply()
+                                      .loaderConfiguration()
                                       .withLoaderId(7)
-                                      .setConfiguration()
+                                      .apply()
                                       .buildProxy(TestTimeoutItf.class)
                                       .getInt();
 

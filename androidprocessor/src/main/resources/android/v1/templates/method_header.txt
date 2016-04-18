@@ -48,13 +48,13 @@
             @org.jetbrains.annotations.NotNull final com.github.dm.jrt.android.core.config.LoaderConfiguration loaderConfiguration) {
 
         return getBuilder(mContext, new ContextInvocationFactory${methodCount}${genericTypes}(${sharedFields}, target))
-                                           .getInvocationConfiguration()
+                                           .invocationConfiguration()
                                            .with(invocationConfiguration)
                                            ${routineBuilderOptions}
-                                           .setConfiguration()
-                                           .getLoaderConfiguration()
+                                           .apply()
+                                           .loaderConfiguration()
                                            .with(loaderConfiguration)
                                            ${invocationBuilderOptions}
-                                           .setConfiguration()
+                                           .apply()
                                            .buildRoutine();
     }

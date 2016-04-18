@@ -370,7 +370,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
                                           .withInputMaxDelay(getChannelMaxDelayOrElse(null))
                                           .withInputMaxSize(getChannelMaxSizeOrElse(
                                                   InvocationConfiguration.DEFAULT))
-                                          .setConfiguration();
+                                          .apply();
     }
 
     /**
@@ -387,7 +387,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
                                       .withReadTimeoutAction(getReadTimeoutActionOrElse(null))
                                       .withLog(getLogOrElse(null))
                                       .withLogLevel(getLogLevelOrElse(null))
-                                      .setConfiguration();
+                                      .apply();
     }
 
     /**
@@ -406,7 +406,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
                                           .withOutputMaxDelay(getChannelMaxDelayOrElse(null))
                                           .withOutputMaxSize(getChannelMaxSizeOrElse(
                                                   InvocationConfiguration.DEFAULT))
-                                          .setConfiguration();
+                                          .apply();
     }
 
     /**
@@ -423,7 +423,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
          * @return the configurable instance.
          */
         @NotNull
-        TYPE setConfiguration(@NotNull ChannelConfiguration configuration);
+        TYPE applyConfiguration(@NotNull ChannelConfiguration configuration);
     }
 
     /**
@@ -483,9 +483,9 @@ public final class ChannelConfiguration extends DeepEqualObject {
          * @return the configured object.
          */
         @NotNull
-        public TYPE setConfiguration() {
+        public TYPE apply() {
 
-            return mConfigurable.setConfiguration(buildConfiguration());
+            return mConfigurable.applyConfiguration(buildConfiguration());
         }
 
         /**
@@ -774,7 +774,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
     private static class DefaultConfigurable implements Configurable<ChannelConfiguration> {
 
         @NotNull
-        public ChannelConfiguration setConfiguration(
+        public ChannelConfiguration applyConfiguration(
                 @NotNull final ChannelConfiguration configuration) {
 
             return configuration;

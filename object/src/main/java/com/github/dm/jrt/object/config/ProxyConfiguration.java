@@ -136,7 +136,7 @@ public final class ProxyConfiguration extends DeepEqualObject {
          * @return the configurable instance.
          */
         @NotNull
-        TYPE setConfiguration(@NotNull ProxyConfiguration configuration);
+        TYPE applyConfiguration(@NotNull ProxyConfiguration configuration);
     }
 
     /**
@@ -179,9 +179,9 @@ public final class ProxyConfiguration extends DeepEqualObject {
          * @return the configured object.
          */
         @NotNull
-        public TYPE setConfiguration() {
+        public TYPE apply() {
 
-            return mConfigurable.setConfiguration(buildConfiguration());
+            return mConfigurable.applyConfiguration(buildConfiguration());
         }
 
         /**
@@ -265,7 +265,7 @@ public final class ProxyConfiguration extends DeepEqualObject {
     private static class DefaultConfigurable implements Configurable<ProxyConfiguration> {
 
         @NotNull
-        public ProxyConfiguration setConfiguration(
+        public ProxyConfiguration applyConfiguration(
                 @NotNull final ProxyConfiguration configuration) {
 
             return configuration;

@@ -183,14 +183,7 @@ public interface LoaderStreamChannelCompat<OUT>
      */
     @NotNull
     InvocationConfiguration.Builder<? extends LoaderStreamChannelCompat<OUT>>
-    getInvocationConfiguration();
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    InvocationConfiguration.Builder<? extends LoaderStreamChannelCompat<OUT>>
-    getStreamInvocationConfiguration();
+    invocationConfiguration();
 
     /**
      * {@inheritDoc}
@@ -280,6 +273,13 @@ public interface LoaderStreamChannelCompat<OUT>
      * {@inheritDoc}
      */
     @NotNull
+    InvocationConfiguration.Builder<? extends LoaderStreamChannelCompat<OUT>>
+    streamInvocationConfiguration();
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
     LoaderStreamChannelCompat<OUT> sync();
 
     /**
@@ -354,8 +354,7 @@ public interface LoaderStreamChannelCompat<OUT>
             @NotNull Function<? super RoutineException, ? extends OUT> function);
 
     /**
-     * Short for {@code getLoaderConfiguration().withCacheStrategy(strategyType)
-     * .setConfiguration()}.
+     * Short for {@code loaderConfiguration().withCacheStrategy(strategyType).apply()}.
      *
      * @param strategyType the cache strategy type.
      * @return the configured stream.
@@ -364,7 +363,7 @@ public interface LoaderStreamChannelCompat<OUT>
     LoaderStreamChannelCompat<OUT> cache(@Nullable CacheStrategyType strategyType);
 
     /**
-     * Short for {@code getLoaderConfiguration().withFactoryId(factoryId).setConfiguration()}.
+     * Short for {@code loaderConfiguration().withFactoryId(factoryId).apply()}.
      * <br>
      * This method is useful to easily apply a configuration to the next routine concatenated to the
      * stream, which will force the factory ID to the specified one.
@@ -388,7 +387,38 @@ public interface LoaderStreamChannelCompat<OUT>
      * @return the invocation configuration builder.
      */
     @NotNull
-    LoaderConfiguration.Builder<? extends LoaderStreamChannelCompat<OUT>> getLoaderConfiguration();
+    LoaderConfiguration.Builder<? extends LoaderStreamChannelCompat<OUT>> loaderConfiguration();
+
+    /**
+     * Short for {@code loaderConfiguration().withLoaderId(loaderId).apply()}.
+     * <br>
+     * This method is useful to easily apply a configuration to the next routine concatenated to the
+     * stream, which will force the routine loader ID.
+     *
+     * @param loaderId the loader ID.
+     * @return the configured stream.
+     */
+    @NotNull
+    LoaderStreamChannelCompat<OUT> loaderId(int loaderId);
+
+    /**
+     * Short for {@code loaderConfiguration().withResultStaleTime(staleTime).apply()}.
+     *
+     * @param staleTime the stale time.
+     * @return the configured stream.
+     */
+    @NotNull
+    LoaderStreamChannelCompat<OUT> staleAfter(@Nullable TimeDuration staleTime);
+
+    /**
+     * Short for {@code loaderConfiguration().withResultStaleTime(time, timeUnit).apply()}.
+     *
+     * @param time     the time.
+     * @param timeUnit the time unit.
+     * @return the configured stream.
+     */
+    @NotNull
+    LoaderStreamChannelCompat<OUT> staleAfter(long time, @NotNull TimeUnit timeUnit);
 
     /**
      * Gets the loader configuration builder related to the whole stream.
@@ -403,39 +433,7 @@ public interface LoaderStreamChannelCompat<OUT>
      */
     @NotNull
     LoaderConfiguration.Builder<? extends LoaderStreamChannelCompat<OUT>>
-    getStreamLoaderConfiguration();
-
-    /**
-     * Short for {@code getLoaderConfiguration().withLoaderId(loaderId).setConfiguration()}.
-     * <br>
-     * This method is useful to easily apply a configuration to the next routine concatenated to the
-     * stream, which will force the routine loader ID.
-     *
-     * @param loaderId the loader ID.
-     * @return the configured stream.
-     */
-    @NotNull
-    LoaderStreamChannelCompat<OUT> loaderId(int loaderId);
-
-    /**
-     * Short for {@code getLoaderConfiguration().withResultStaleTime(staleTime).setConfiguration()}.
-     *
-     * @param staleTime the stale time.
-     * @return the configured stream.
-     */
-    @NotNull
-    LoaderStreamChannelCompat<OUT> staleAfter(@Nullable TimeDuration staleTime);
-
-    /**
-     * Short for {@code getLoaderConfiguration().withResultStaleTime(time, timeUnit)
-     * .setConfiguration()}.
-     *
-     * @param time     the time.
-     * @param timeUnit the time unit.
-     * @return the configured stream.
-     */
-    @NotNull
-    LoaderStreamChannelCompat<OUT> staleAfter(long time, @NotNull TimeUnit timeUnit);
+    streamLoaderConfiguration();
 
     /**
      * Sets the stream loader context.

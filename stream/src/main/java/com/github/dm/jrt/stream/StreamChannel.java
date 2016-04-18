@@ -129,8 +129,8 @@ public interface StreamChannel<OUT>
     StreamChannel<OUT> async();
 
     /**
-     * Short for {@code getInvocationConfiguration().withRunner(runner).withInputLimit(maxInputs)
-     * .withInputMaxDelay(maxDelay, timeUnit).setConfiguration()}.
+     * Short for {@code invocationConfiguration().withRunner(runner).withInputLimit(maxInputs)
+     * .withInputMaxDelay(maxDelay, timeUnit).apply()}.
      * <br>
      * This method is useful to easily apply a configuration which will slow down the thread
      * feeding the next routine concatenated to the stream, when the number of buffered inputs
@@ -150,8 +150,8 @@ public interface StreamChannel<OUT>
             @NotNull TimeUnit timeUnit);
 
     /**
-     * Short for {@code getInvocationConfiguration().withRunner(runner).withInputLimit(maxInputs)
-     * .withInputMaxDelay(maxDelay).setConfiguration()}.
+     * Short for {@code invocationConfiguration().withRunner(runner).withInputLimit(maxInputs)
+     * .withInputMaxDelay(maxDelay).apply()}.
      * <br>
      * This method is useful to easily apply a configuration to the next routine concatenated to the
      * stream, which will slow down the thread feeding it, when the number of buffered inputs
@@ -261,21 +261,7 @@ public interface StreamChannel<OUT>
      * @return the invocation configuration builder.
      */
     @NotNull
-    Builder<? extends StreamChannel<OUT>> getInvocationConfiguration();
-
-    /**
-     * Gets the invocation configuration builder related to the whole stream.
-     * <br>
-     * The configuration options will be applied to all the next concatenated routine unless
-     * overwritten by specific ones.
-     * <p>
-     * Note that the configuration builder will be initialized with the current stream
-     * configuration.
-     *
-     * @return the invocation configuration builder.
-     */
-    @NotNull
-    Builder<? extends StreamChannel<OUT>> getStreamInvocationConfiguration();
+    Builder<? extends StreamChannel<OUT>> invocationConfiguration();
 
     /**
      * Concatenates a stream based on the specified mapping consumer to this one.
@@ -338,8 +324,7 @@ public interface StreamChannel<OUT>
     <AFTER> StreamChannel<AFTER> map(@NotNull Routine<? super OUT, ? extends AFTER> routine);
 
     /**
-     * Short for {@code getInvocationConfiguration().withMaxInstances(maxInvocations)
-     * .setConfiguration()}.
+     * Short for {@code invocationConfiguration().withMaxInstances(maxInvocations).apply()}.
      * <br>
      * This method is useful to easily apply a configuration to the next routine concatenated to the
      * stream, which will limit the maximum number of concurrent invocations to the specified value.
@@ -351,8 +336,7 @@ public interface StreamChannel<OUT>
     StreamChannel<OUT> maxParallelInvocations(int maxInvocations);
 
     /**
-     * Short for {@code getStreamInvocationConfiguration().withOutputOrder(orderType)
-     * .setConfiguration()}.
+     * Short for {@code streamInvocationConfiguration().withOutputOrder(orderType).apply()}.
      * <br>
      * This method is useful to easily make the stream ordered or not.
      * <p>
@@ -435,7 +419,7 @@ public interface StreamChannel<OUT>
     StreamChannel<OUT> repeat();
 
     /**
-     * Short for {@code getStreamInvocationConfiguration().withRunner(runner).setConfiguration()
+     * Short for {@code streamInvocationConfiguration().withRunner(runner).apply()
      * .asyncMap(Function.<OUT>identity())}.
      * <br>
      * This method is useful to easily make the stream run on the specified runner.
@@ -465,6 +449,20 @@ public interface StreamChannel<OUT>
      */
     @NotNull
     StreamChannel<OUT> serial();
+
+    /**
+     * Gets the invocation configuration builder related to the whole stream.
+     * <br>
+     * The configuration options will be applied to all the next concatenated routine unless
+     * overwritten by specific ones.
+     * <p>
+     * Note that the configuration builder will be initialized with the current stream
+     * configuration.
+     *
+     * @return the invocation configuration builder.
+     */
+    @NotNull
+    Builder<? extends StreamChannel<OUT>> streamInvocationConfiguration();
 
     /**
      * Makes the stream synchronous, that is, the concatenated routines will be invoked in

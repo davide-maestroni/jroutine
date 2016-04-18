@@ -55,6 +55,15 @@ class MapBuilderWrapper<OUT>
     }
 
     @NotNull
+    public ChannelsBuilder<SparseArrayCompat<LoaderStreamChannelCompat<OUT>>> applyConfiguration(
+            @NotNull final ChannelConfiguration configuration) {
+
+        mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
+        mBuilder.channelConfiguration().with(null).with(configuration).apply();
+        return this;
+    }
+
+    @NotNull
     public SparseArrayCompat<LoaderStreamChannelCompat<OUT>> buildChannels() {
 
         final SparseArrayCompat<OutputChannel<OUT>> channels = mBuilder.buildChannels();
@@ -72,19 +81,10 @@ class MapBuilderWrapper<OUT>
 
     @NotNull
     public Builder<? extends ChannelsBuilder<SparseArrayCompat<LoaderStreamChannelCompat<OUT>>>>
-    getChannelConfiguration() {
+    channelConfiguration() {
 
         final ChannelConfiguration config = mConfiguration;
         return new Builder<ChannelsBuilder<SparseArrayCompat<LoaderStreamChannelCompat<OUT>>>>(this,
                 config);
-    }
-
-    @NotNull
-    public ChannelsBuilder<SparseArrayCompat<LoaderStreamChannelCompat<OUT>>> setConfiguration(
-            @NotNull final ChannelConfiguration configuration) {
-
-        mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-        mBuilder.getChannelConfiguration().with(null).with(configuration).setConfiguration();
-        return this;
     }
 }

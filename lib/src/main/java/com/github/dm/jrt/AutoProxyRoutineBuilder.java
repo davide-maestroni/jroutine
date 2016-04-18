@@ -41,13 +41,13 @@ public interface AutoProxyRoutineBuilder extends ObjectRoutineBuilder {
      * {@inheritDoc}
      */
     @NotNull
-    InvocationConfiguration.Builder<? extends AutoProxyRoutineBuilder> getInvocationConfiguration();
+    InvocationConfiguration.Builder<? extends AutoProxyRoutineBuilder> invocationConfiguration();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    ProxyConfiguration.Builder<? extends AutoProxyRoutineBuilder> getProxyConfiguration();
+    ProxyConfiguration.Builder<? extends AutoProxyRoutineBuilder> proxyConfiguration();
 
     /**
      * Force the type of builder to be employed to create the proxy instance.

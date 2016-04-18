@@ -95,12 +95,12 @@ public class OutputChannelCallAdapterFactory extends AbstractCallAdapterFactory<
                 AndroidBuilders.withAnnotations(null, annotations);
         return JRoutineAndroidCompat.with(mContext)
                                     .on(sFactory)
-                                    .getInvocationConfiguration()
+                                    .invocationConfiguration()
                                     .with(invocationConfiguration)
-                                    .setConfiguration()
-                                    .getLoaderConfiguration()
+                                    .apply()
+                                    .loaderConfiguration()
                                     .with(loaderConfiguration)
-                                    .setConfiguration()
+                                    .apply()
                                     .buildRoutine();
     }
 }

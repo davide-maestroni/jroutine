@@ -45,13 +45,13 @@ public interface ServiceAutoProxyRoutineBuilder
      */
     @NotNull
     InvocationConfiguration.Builder<? extends ServiceAutoProxyRoutineBuilder>
-    getInvocationConfiguration();
+    invocationConfiguration();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    ProxyConfiguration.Builder<? extends ServiceAutoProxyRoutineBuilder> getProxyConfiguration();
+    ProxyConfiguration.Builder<? extends ServiceAutoProxyRoutineBuilder> proxyConfiguration();
 
     /**
      * {@inheritDoc}
@@ -63,6 +63,5 @@ public interface ServiceAutoProxyRoutineBuilder
      * {@inheritDoc}
      */
     @NotNull
-    ServiceConfiguration.Builder<? extends ServiceAutoProxyRoutineBuilder>
-    getServiceConfiguration();
+    ServiceConfiguration.Builder<? extends ServiceAutoProxyRoutineBuilder> serviceConfiguration();
 }

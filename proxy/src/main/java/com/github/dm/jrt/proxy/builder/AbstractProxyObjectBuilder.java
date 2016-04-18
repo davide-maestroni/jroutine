@@ -49,6 +49,23 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
     private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.defaultConfiguration();
 
     @NotNull
+    public ProxyObjectBuilder<TYPE> applyConfiguration(
+            @NotNull final InvocationConfiguration configuration) {
+
+        mInvocationConfiguration =
+                ConstantConditions.notNull("invocation configuration", configuration);
+        return this;
+    }
+
+    @NotNull
+    public ProxyObjectBuilder<TYPE> applyConfiguration(
+            @NotNull final ProxyConfiguration configuration) {
+
+        mProxyConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
+        return this;
+    }
+
+    @NotNull
     @SuppressWarnings("unchecked")
     public TYPE buildProxy() {
 
@@ -83,34 +100,17 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
 
     @NotNull
     public InvocationConfiguration.Builder<? extends ProxyObjectBuilder<TYPE>>
-    getInvocationConfiguration() {
+    invocationConfiguration() {
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ProxyObjectBuilder<TYPE>>(this, config);
     }
 
     @NotNull
-    public ProxyConfiguration.Builder<? extends ProxyObjectBuilder<TYPE>> getProxyConfiguration() {
+    public ProxyConfiguration.Builder<? extends ProxyObjectBuilder<TYPE>> proxyConfiguration() {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<ProxyObjectBuilder<TYPE>>(this, config);
-    }
-
-    @NotNull
-    public ProxyObjectBuilder<TYPE> setConfiguration(
-            @NotNull final InvocationConfiguration configuration) {
-
-        mInvocationConfiguration =
-                ConstantConditions.notNull("invocation configuration", configuration);
-        return this;
-    }
-
-    @NotNull
-    public ProxyObjectBuilder<TYPE> setConfiguration(
-            @NotNull final ProxyConfiguration configuration) {
-
-        mProxyConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
-        return this;
     }
 
     /**

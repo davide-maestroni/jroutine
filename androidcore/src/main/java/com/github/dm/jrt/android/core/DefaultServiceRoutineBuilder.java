@@ -43,10 +43,10 @@ class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, O
             new InvocationConfiguration.Configurable<ServiceRoutineBuilder<IN, OUT>>() {
 
                 @NotNull
-                public ServiceRoutineBuilder<IN, OUT> setConfiguration(
+                public ServiceRoutineBuilder<IN, OUT> applyConfiguration(
                         @NotNull final InvocationConfiguration configuration) {
 
-                    return DefaultServiceRoutineBuilder.this.setConfiguration(configuration);
+                    return DefaultServiceRoutineBuilder.this.applyConfiguration(configuration);
                 }
             };
 
@@ -71,16 +71,18 @@ class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, O
     }
 
     @NotNull
-    public Routine<IN, OUT> buildRoutine() {
+    @Override
+    public ServiceRoutineBuilder<IN, OUT> applyConfiguration(
+            @NotNull final InvocationConfiguration configuration) {
 
-        return new ServiceRoutine<IN, OUT>(mContext, mTargetFactory, getConfiguration(),
-                mServiceConfiguration);
+        super.applyConfiguration(configuration);
+        return this;
     }
 
     @NotNull
     @Override
     public InvocationConfiguration.Builder<? extends ServiceRoutineBuilder<IN, OUT>>
-    getInvocationConfiguration() {
+    invocationConfiguration() {
 
         final InvocationConfiguration config = getConfiguration();
         return new InvocationConfiguration.Builder<ServiceRoutineBuilder<IN, OUT>>(mConfigurable,
@@ -88,27 +90,25 @@ class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, O
     }
 
     @NotNull
-    @Override
-    public ServiceRoutineBuilder<IN, OUT> setConfiguration(
-            @NotNull final InvocationConfiguration configuration) {
-
-        super.setConfiguration(configuration);
-        return this;
-    }
-
-    @NotNull
-    public ServiceConfiguration.Builder<? extends ServiceRoutineBuilder<IN, OUT>>
-    getServiceConfiguration() {
-
-        final ServiceConfiguration config = mServiceConfiguration;
-        return new ServiceConfiguration.Builder<ServiceRoutineBuilder<IN, OUT>>(this, config);
-    }
-
-    @NotNull
-    public ServiceRoutineBuilder<IN, OUT> setConfiguration(
+    public ServiceRoutineBuilder<IN, OUT> applyConfiguration(
             @NotNull final ServiceConfiguration configuration) {
 
         mServiceConfiguration = ConstantConditions.notNull("service configuration", configuration);
         return this;
+    }
+
+    @NotNull
+    public Routine<IN, OUT> buildRoutine() {
+
+        return new ServiceRoutine<IN, OUT>(mContext, mTargetFactory, getConfiguration(),
+                mServiceConfiguration);
+    }
+
+    @NotNull
+    public ServiceConfiguration.Builder<? extends ServiceRoutineBuilder<IN, OUT>>
+    serviceConfiguration() {
+
+        final ServiceConfiguration config = mServiceConfiguration;
+        return new ServiceConfiguration.Builder<ServiceRoutineBuilder<IN, OUT>>(this, config);
     }
 }

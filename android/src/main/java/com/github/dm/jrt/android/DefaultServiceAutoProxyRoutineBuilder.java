@@ -56,7 +56,7 @@ class DefaultServiceAutoProxyRoutineBuilder implements ServiceAutoProxyRoutineBu
             new InvocationConfiguration.Configurable<DefaultServiceAutoProxyRoutineBuilder>() {
 
                 @NotNull
-                public DefaultServiceAutoProxyRoutineBuilder setConfiguration(
+                public DefaultServiceAutoProxyRoutineBuilder applyConfiguration(
                         @NotNull final InvocationConfiguration configuration) {
 
                     mInvocationConfiguration = configuration;
@@ -71,7 +71,7 @@ class DefaultServiceAutoProxyRoutineBuilder implements ServiceAutoProxyRoutineBu
             new ProxyConfiguration.Configurable<DefaultServiceAutoProxyRoutineBuilder>() {
 
                 @NotNull
-                public DefaultServiceAutoProxyRoutineBuilder setConfiguration(
+                public DefaultServiceAutoProxyRoutineBuilder applyConfiguration(
                         @NotNull final ProxyConfiguration configuration) {
 
                     mProxyConfiguration = configuration;
@@ -87,7 +87,7 @@ class DefaultServiceAutoProxyRoutineBuilder implements ServiceAutoProxyRoutineBu
             new ServiceConfiguration.Configurable<DefaultServiceAutoProxyRoutineBuilder>() {
 
                 @NotNull
-                public DefaultServiceAutoProxyRoutineBuilder setConfiguration(
+                public DefaultServiceAutoProxyRoutineBuilder applyConfiguration(
                         @NotNull final ServiceConfiguration configuration) {
 
                     mServiceConfiguration = configuration;
@@ -154,7 +154,7 @@ class DefaultServiceAutoProxyRoutineBuilder implements ServiceAutoProxyRoutineBu
 
     @NotNull
     public InvocationConfiguration.Builder<? extends ServiceAutoProxyRoutineBuilder>
-    getInvocationConfiguration() {
+    invocationConfiguration() {
 
         return new InvocationConfiguration.Builder<DefaultServiceAutoProxyRoutineBuilder>(
                 mInvocationConfigurable, mInvocationConfiguration);
@@ -162,7 +162,7 @@ class DefaultServiceAutoProxyRoutineBuilder implements ServiceAutoProxyRoutineBu
 
     @NotNull
     public ProxyConfiguration.Builder<? extends ServiceAutoProxyRoutineBuilder>
-    getProxyConfiguration() {
+    proxyConfiguration() {
 
         return new ProxyConfiguration.Builder<DefaultServiceAutoProxyRoutineBuilder>(
                 mProxyConfigurable, mProxyConfiguration);
@@ -177,7 +177,7 @@ class DefaultServiceAutoProxyRoutineBuilder implements ServiceAutoProxyRoutineBu
 
     @NotNull
     public ServiceConfiguration.Builder<? extends ServiceAutoProxyRoutineBuilder>
-    getServiceConfiguration() {
+    serviceConfiguration() {
 
         return new ServiceConfiguration.Builder<DefaultServiceAutoProxyRoutineBuilder>(
                 mServiceConfigurable, mServiceConfiguration);
@@ -188,15 +188,15 @@ class DefaultServiceAutoProxyRoutineBuilder implements ServiceAutoProxyRoutineBu
 
         return JRoutineServiceObject.with(mContext)
                                     .on(mTarget)
-                                    .getInvocationConfiguration()
+                                    .invocationConfiguration()
                                     .with(mInvocationConfiguration)
-                                    .setConfiguration()
-                                    .getProxyConfiguration()
+                                    .apply()
+                                    .proxyConfiguration()
                                     .with(mProxyConfiguration)
-                                    .setConfiguration()
-                                    .getServiceConfiguration()
+                                    .apply()
+                                    .serviceConfiguration()
                                     .with(mServiceConfiguration)
-                                    .setConfiguration();
+                                    .apply();
     }
 
     @NotNull
@@ -204,14 +204,14 @@ class DefaultServiceAutoProxyRoutineBuilder implements ServiceAutoProxyRoutineBu
 
         return JRoutineServiceProxy.with(mContext)
                                    .on(mTarget)
-                                   .getInvocationConfiguration()
+                                   .invocationConfiguration()
                                    .with(mInvocationConfiguration)
-                                   .setConfiguration()
-                                   .getProxyConfiguration()
+                                   .apply()
+                                   .proxyConfiguration()
                                    .with(mProxyConfiguration)
-                                   .setConfiguration()
-                                   .getServiceConfiguration()
+                                   .apply()
+                                   .serviceConfiguration()
                                    .with(mServiceConfiguration)
-                                   .setConfiguration();
+                                   .apply();
     }
 }

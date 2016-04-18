@@ -67,6 +67,22 @@ class DefaultProxyRoutineBuilder
     }
 
     @NotNull
+    public ProxyRoutineBuilder applyConfiguration(
+            @NotNull final InvocationConfiguration configuration) {
+
+        mInvocationConfiguration =
+                ConstantConditions.notNull("invocation configuration", configuration);
+        return this;
+    }
+
+    @NotNull
+    public ProxyRoutineBuilder applyConfiguration(@NotNull final ProxyConfiguration configuration) {
+
+        mProxyConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
+        return this;
+    }
+
+    @NotNull
     public <TYPE> TYPE buildProxy(@NotNull final Class<TYPE> itf) {
 
         if (!itf.isInterface()) {
@@ -82,12 +98,12 @@ class DefaultProxyRoutineBuilder
 
         final TargetProxyObjectBuilder<TYPE> builder =
                 new TargetProxyObjectBuilder<TYPE>(mTarget, itf);
-        return builder.getInvocationConfiguration()
+        return builder.invocationConfiguration()
                       .with(mInvocationConfiguration)
-                      .setConfiguration()
-                      .getProxyConfiguration()
+                      .apply()
+                      .proxyConfiguration()
                       .with(mProxyConfiguration)
-                      .setConfiguration()
+                      .apply()
                       .buildProxy();
     }
 
@@ -98,34 +114,18 @@ class DefaultProxyRoutineBuilder
     }
 
     @NotNull
-    public InvocationConfiguration.Builder<? extends ProxyRoutineBuilder>
-    getInvocationConfiguration() {
+    public InvocationConfiguration.Builder<? extends ProxyRoutineBuilder> invocationConfiguration
+            () {
 
         final InvocationConfiguration config = mInvocationConfiguration;
         return new InvocationConfiguration.Builder<ProxyRoutineBuilder>(this, config);
     }
 
     @NotNull
-    public ProxyConfiguration.Builder<? extends ProxyRoutineBuilder> getProxyConfiguration() {
+    public ProxyConfiguration.Builder<? extends ProxyRoutineBuilder> proxyConfiguration() {
 
         final ProxyConfiguration config = mProxyConfiguration;
         return new ProxyConfiguration.Builder<ProxyRoutineBuilder>(this, config);
-    }
-
-    @NotNull
-    public ProxyRoutineBuilder setConfiguration(
-            @NotNull final InvocationConfiguration configuration) {
-
-        mInvocationConfiguration =
-                ConstantConditions.notNull("invocation configuration", configuration);
-        return this;
-    }
-
-    @NotNull
-    public ProxyRoutineBuilder setConfiguration(@NotNull final ProxyConfiguration configuration) {
-
-        mProxyConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
-        return this;
     }
 
     /**

@@ -326,9 +326,9 @@ public class SparseChannelsCompat extends AndroidChannels {
             for (final Integer index : indexes) {
                 final IOChannel<IN> ioChannel =
                         SparseChannelsCompat.<DATA, IN>selectParcelable(channel, index)
-                                            .getChannelConfiguration()
+                                            .channelConfiguration()
                                             .with(configuration)
-                                            .setConfiguration()
+                                            .apply()
                                             .buildChannels();
                 channelMap.put(index, ioChannel);
             }

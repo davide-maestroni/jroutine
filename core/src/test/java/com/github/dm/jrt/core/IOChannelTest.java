@@ -228,9 +228,9 @@ public class IOChannelTest {
 
         final TimeDuration timeout = seconds(1);
         final IOChannel<String> ioChannel1 = JRoutineCore.io()
-                                                         .getChannelConfiguration()
+                                                         .channelConfiguration()
                                                          .withChannelOrder(OrderType.BY_CALL)
-                                                         .setConfiguration()
+                                                         .apply()
                                                          .buildChannel();
 
         new Thread() {
@@ -258,7 +258,7 @@ public class IOChannelTest {
 
         try {
 
-            new DefaultIOChannelBuilder().setConfiguration(null);
+            new DefaultIOChannelBuilder().applyConfiguration(null);
 
             fail();
 
@@ -568,7 +568,7 @@ public class IOChannelTest {
 
         final TimeDuration timeout = seconds(1);
         final IOChannel<Object> channel = JRoutineCore.io()
-                                                      .getChannelConfiguration()
+                                                      .channelConfiguration()
                                                       .withChannelOrder(OrderType.BY_CALL)
                                                       .withRunner(Runners.sharedRunner())
                                                       .withChannelMaxSize(1)
@@ -576,7 +576,7 @@ public class IOChannelTest {
                                                       .withChannelMaxDelay(seconds(1))
                                                       .withLogLevel(Level.DEBUG)
                                                       .withLog(new NullLog())
-                                                      .setConfiguration()
+                                                      .apply()
                                                       .buildChannel();
         channel.pass(-77L);
         assertThat(channel.afterMax(timeout).next()).isEqualTo(-77L);
@@ -625,11 +625,11 @@ public class IOChannelTest {
     public void testPassTimeout() {
 
         final IOChannel<Object> channel1 = JRoutineCore.io()
-                                                       .getChannelConfiguration()
+                                                       .channelConfiguration()
                                                        .withReadTimeout(millis(10))
                                                        .withReadTimeoutAction(
                                                                TimeoutActionType.EXIT)
-                                                       .setConfiguration()
+                                                       .apply()
                                                        .buildChannel();
 
         assertThat(channel1.all()).isEmpty();
@@ -639,11 +639,11 @@ public class IOChannelTest {
     public void testPassTimeout2() {
 
         final IOChannel<Object> channel2 = JRoutineCore.io()
-                                                       .getChannelConfiguration()
+                                                       .channelConfiguration()
                                                        .withReadTimeout(millis(10))
                                                        .withReadTimeoutAction(
                                                                TimeoutActionType.ABORT)
-                                                       .setConfiguration()
+                                                       .apply()
                                                        .buildChannel();
 
         try {
@@ -661,11 +661,11 @@ public class IOChannelTest {
     public void testPassTimeout3() {
 
         final IOChannel<Object> channel3 = JRoutineCore.io()
-                                                       .getChannelConfiguration()
+                                                       .channelConfiguration()
                                                        .withReadTimeout(millis(10))
                                                        .withReadTimeoutAction(
                                                                TimeoutActionType.THROW)
-                                                       .setConfiguration()
+                                                       .apply()
                                                        .buildChannel();
 
         try {

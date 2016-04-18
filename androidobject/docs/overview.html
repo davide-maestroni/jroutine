@@ -48,9 +48,9 @@
                 final ImageView imageView = (ImageView) findViewById(R.id.image);
                 JRoutineLoaderObject.with(loaderFrom(this))
                                     .on(instanceOf(BitmapLoader.class))
-                                    .getLoaderConfiguration()
+                                    .loaderConfiguration()
                                     .withCacheStrategy(CacheStrategyType.CACHE_IF_SUCCESS)
-                                    .setConfiguration()
+                                    .apply()
                                     .method(LOAD_BITMAP)
                                     .asyncCall(URI.create(IMAGE_URI))
                                     .bind(new TemplateOutputConsumer&lt;Bitmap&gt;() {

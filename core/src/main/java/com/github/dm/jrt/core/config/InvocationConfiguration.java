@@ -540,7 +540,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
          * @return the configurable instance.
          */
         @NotNull
-        TYPE setConfiguration(@NotNull InvocationConfiguration configuration);
+        TYPE applyConfiguration(@NotNull InvocationConfiguration configuration);
     }
 
     /**
@@ -655,9 +655,9 @@ public final class InvocationConfiguration extends DeepEqualObject {
          * @return the configured object.
          */
         @NotNull
-        public TYPE setConfiguration() {
+        public TYPE apply() {
 
-            return mConfigurable.setConfiguration(buildConfiguration());
+            return mConfigurable.applyConfiguration(buildConfiguration());
         }
 
         /**
@@ -1170,7 +1170,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
     private static class DefaultConfigurable implements Configurable<InvocationConfiguration> {
 
         @NotNull
-        public InvocationConfiguration setConfiguration(
+        public InvocationConfiguration applyConfiguration(
                 @NotNull final InvocationConfiguration configuration) {
 
             return configuration;

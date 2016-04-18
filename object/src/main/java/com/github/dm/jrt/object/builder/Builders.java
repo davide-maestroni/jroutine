@@ -606,7 +606,7 @@ public class Builders {
         final InvocationConfiguration.Builder<InvocationConfiguration> builder =
                 InvocationConfiguration.builderFrom(configuration);
         if (annotations == null) {
-            return builder.setConfiguration();
+            return builder.apply();
         }
 
         for (final Annotation annotation : annotations) {
@@ -658,7 +658,7 @@ public class Builders {
             }
         }
 
-        return builder.setConfiguration();
+        return builder.apply();
     }
 
     /**
@@ -706,7 +706,7 @@ public class Builders {
         final ProxyConfiguration.Builder<ProxyConfiguration> builder =
                 ProxyConfiguration.builderFrom(configuration);
         if (annotations == null) {
-            return builder.setConfiguration();
+            return builder.apply();
         }
 
         for (final Annotation annotation : annotations) {
@@ -716,7 +716,7 @@ public class Builders {
             }
         }
 
-        return builder.setConfiguration();
+        return builder.apply();
     }
 
     /**

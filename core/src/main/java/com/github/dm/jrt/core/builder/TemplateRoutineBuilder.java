@@ -42,6 +42,14 @@ public abstract class TemplateRoutineBuilder<IN, OUT> extends TemplateRoutine<IN
     private InvocationConfiguration mConfiguration = InvocationConfiguration.defaultConfiguration();
 
     @NotNull
+    public RoutineBuilder<IN, OUT> applyConfiguration(
+            @NotNull final InvocationConfiguration configuration) {
+
+        mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
+        return this;
+    }
+
+    @NotNull
     public InvocationChannel<IN, OUT> asyncInvoke() {
 
         return buildRoutine().asyncInvoke();
@@ -66,17 +74,9 @@ public abstract class TemplateRoutineBuilder<IN, OUT> extends TemplateRoutine<IN
     }
 
     @NotNull
-    public Builder<? extends RoutineBuilder<IN, OUT>> getInvocationConfiguration() {
+    public Builder<? extends RoutineBuilder<IN, OUT>> invocationConfiguration() {
 
         return new Builder<RoutineBuilder<IN, OUT>>(this, mConfiguration);
-    }
-
-    @NotNull
-    public RoutineBuilder<IN, OUT> setConfiguration(
-            @NotNull final InvocationConfiguration configuration) {
-
-        mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
-        return this;
     }
 
     /**

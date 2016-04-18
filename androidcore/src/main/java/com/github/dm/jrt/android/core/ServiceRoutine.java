@@ -426,16 +426,16 @@ class ServiceRoutine<IN, OUT> extends ConverterRoutine<IN, OUT> {
 
             final Logger logger = mLogger;
             mInputChannel = JRoutineCore.io()
-                                        .getChannelConfiguration()
+                                        .channelConfiguration()
                                         .withLog(logger.getLog())
                                         .withLogLevel(logger.getLogLevel())
-                                        .setConfiguration()
+                                        .apply()
                                         .buildChannel();
             mOutputChannel = JRoutineCore.io()
-                                         .getChannelConfiguration()
+                                         .channelConfiguration()
                                          .withLog(logger.getLog())
                                          .withLogLevel(logger.getLogLevel())
-                                         .setConfiguration()
+                                         .apply()
                                          .buildChannel();
             final Looper looper =
                     mServiceConfiguration.getMessageLooperOrElse(Looper.getMainLooper());

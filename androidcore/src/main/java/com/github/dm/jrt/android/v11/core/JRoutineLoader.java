@@ -236,9 +236,9 @@ public class JRoutineLoader {
         @NotNull
         public LoaderChannelBuilder onId(final int loaderId) {
 
-            return new DefaultLoaderChannelBuilder(mContext).getLoaderConfiguration()
+            return new DefaultLoaderChannelBuilder(mContext).loaderConfiguration()
                                                             .withLoaderId(loaderId)
-                                                            .setConfiguration();
+                                                            .apply();
         }
     }
 }

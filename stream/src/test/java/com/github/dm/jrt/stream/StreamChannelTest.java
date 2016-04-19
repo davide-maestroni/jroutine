@@ -1353,6 +1353,26 @@ public class StreamChannelTest {
                           })
                           .afterMax(seconds(3))
                           .all()).containsExactly("test1test2test3");
+        assertThat(Streams.streamOf(new StringBuilder("test1"), new StringBuilder("test2"),
+                new StringBuilder("test3"))
+                          .async()
+                          .reduce(new BiConsumer<StringBuilder, StringBuilder>() {
+
+                              public void accept(final StringBuilder builder,
+                                      final StringBuilder builder2) {
+
+                                  builder.append(builder2);
+                              }
+                          })
+                          .map(new Function<StringBuilder, String>() {
+
+                              public String apply(final StringBuilder builder) {
+
+                                  return builder.toString();
+                              }
+                          })
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1test2test3");
         assertThat(Streams.streamOf("test1", "test2", "test3")
                           .sync()
                           .reduce(new BiFunction<String, String, String>() {
@@ -1363,6 +1383,26 @@ public class StreamChannelTest {
                               }
                           })
                           .all()).containsExactly("test1test2test3");
+        assertThat(Streams.streamOf(new StringBuilder("test1"), new StringBuilder("test2"),
+                new StringBuilder("test3"))
+                          .sync()
+                          .reduce(new BiConsumer<StringBuilder, StringBuilder>() {
+
+                              public void accept(final StringBuilder builder,
+                                      final StringBuilder builder2) {
+
+                                  builder.append(builder2);
+                              }
+                          })
+                          .map(new Function<StringBuilder, String>() {
+
+                              public String apply(final StringBuilder builder) {
+
+                                  return builder.toString();
+                              }
+                          })
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1test2test3");
     }
 
     @Test
@@ -1370,7 +1410,7 @@ public class StreamChannelTest {
     public void testReduceNullPointerError() {
 
         try {
-            Streams.streamOf().async().reduce(null);
+            Streams.streamOf().async().reduce((BiConsumer<Object, Object>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -1378,7 +1418,23 @@ public class StreamChannelTest {
         }
 
         try {
-            Streams.streamOf().sync().reduce(null);
+            Streams.streamOf().async().reduce((BiFunction<Object, Object, Object>) null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+            Streams.streamOf().sync().reduce((BiConsumer<Object, Object>) null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+            Streams.streamOf().sync().reduce((BiFunction<Object, Object, Object>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -1414,6 +1470,30 @@ public class StreamChannelTest {
                           .afterMax(seconds(3))
                           .all()).containsExactly("test1test2test3");
         assertThat(Streams.streamOf("test1", "test2", "test3")
+                          .async()
+                          .reduce(new Supplier<StringBuilder>() {
+
+                              public StringBuilder get() {
+
+                                  return new StringBuilder();
+                              }
+                          }, new BiConsumer<StringBuilder, String>() {
+
+                              public void accept(final StringBuilder b, final String s) {
+
+                                  b.append(s);
+                              }
+                          })
+                          .map(new Function<StringBuilder, String>() {
+
+                              public String apply(final StringBuilder builder) {
+
+                                  return builder.toString();
+                              }
+                          })
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1test2test3");
+        assertThat(Streams.streamOf("test1", "test2", "test3")
                           .sync()
                           .reduce(new Supplier<StringBuilder>() {
 
@@ -1436,6 +1516,30 @@ public class StreamChannelTest {
                               }
                           })
                           .all()).containsExactly("test1test2test3");
+        assertThat(Streams.streamOf("test1", "test2", "test3")
+                          .sync()
+                          .reduce(new Supplier<StringBuilder>() {
+
+                              public StringBuilder get() {
+
+                                  return new StringBuilder();
+                              }
+                          }, new BiConsumer<StringBuilder, String>() {
+
+                              public void accept(final StringBuilder b, final String s) {
+
+                                  b.append(s);
+                              }
+                          })
+                          .map(new Function<StringBuilder, String>() {
+
+                              public String apply(final StringBuilder builder) {
+
+                                  return builder.toString();
+                              }
+                          })
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1test2test3");
     }
 
     @Test
@@ -1443,7 +1547,7 @@ public class StreamChannelTest {
     public void testReduceSeedNullPointerError() {
 
         try {
-            Streams.streamOf().async().reduce(null, null);
+            Streams.streamOf().async().reduce(null, (BiConsumer<Object, Object>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -1451,7 +1555,23 @@ public class StreamChannelTest {
         }
 
         try {
-            Streams.streamOf().sync().reduce(null, null);
+            Streams.streamOf().async().reduce(null, (BiFunction<Object, Object, Object>) null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+            Streams.streamOf().sync().reduce(null, (BiConsumer<Object, Object>) null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+            Streams.streamOf().sync().reduce(null, (BiFunction<Object, Object, Object>) null);
             fail();
 
         } catch (final NullPointerException ignored) {

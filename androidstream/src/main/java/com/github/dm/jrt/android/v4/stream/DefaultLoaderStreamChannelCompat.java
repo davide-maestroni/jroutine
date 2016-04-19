@@ -404,10 +404,30 @@ class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel<OUT>
     @NotNull
     @Override
     public LoaderStreamChannelCompat<OUT> reduce(
+            @NotNull final BiConsumer<? super OUT, ? super OUT> consumer) {
+
+        checkStatic(wrap(consumer), consumer);
+        return (LoaderStreamChannelCompat<OUT>) super.reduce(consumer);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannelCompat<OUT> reduce(
             @NotNull final BiFunction<? super OUT, ? super OUT, ? extends OUT> function) {
 
         checkStatic(wrap(function), function);
         return (LoaderStreamChannelCompat<OUT>) super.reduce(function);
+    }
+
+    @NotNull
+    @Override
+    public <AFTER> LoaderStreamChannelCompat<AFTER> reduce(
+            @NotNull final Supplier<? extends AFTER> supplier,
+            @NotNull final BiConsumer<? super AFTER, ? super OUT> consumer) {
+
+        checkStatic(wrap(supplier), supplier);
+        checkStatic(wrap(consumer), consumer);
+        return (LoaderStreamChannelCompat<AFTER>) super.reduce(supplier, consumer);
     }
 
     @NotNull

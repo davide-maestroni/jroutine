@@ -30,9 +30,7 @@ import com.github.dm.jrt.core.config.InvocationConfiguration.Configurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.FilterInvocation;
-import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
-import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
 import com.github.dm.jrt.core.invocation.PassingInvocation;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
@@ -42,12 +40,9 @@ import com.github.dm.jrt.core.util.TimeDuration;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Consumer;
-import com.github.dm.jrt.function.ConsumerWrapper;
 import com.github.dm.jrt.function.Function;
-import com.github.dm.jrt.function.FunctionWrapper;
 import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
-import com.github.dm.jrt.function.SupplierWrapper;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -61,7 +56,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.github.dm.jrt.core.config.ChannelConfiguration.builderFromOutputChannel;
-import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
 import static com.github.dm.jrt.function.Functions.consumerCall;
 import static com.github.dm.jrt.function.Functions.consumerFilter;
@@ -354,17 +348,30 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
+    public StreamChannel<OUT> reduce(@NotNull final BiConsumer<? super OUT, ? super OUT> consumer) {
+
+        return map(AccumulateConsumerInvocation.consumerFactory(consumer));
+    }
+
+    @NotNull
     public StreamChannel<OUT> reduce(
             @NotNull final BiFunction<? super OUT, ? super OUT, ? extends OUT> function) {
 
-        return map(AccumulateInvocation.functionFactory(function));
+        return map(AccumulateFunctionInvocation.functionFactory(function));
+    }
+
+    @NotNull
+    public <AFTER> StreamChannel<AFTER> reduce(@NotNull final Supplier<? extends AFTER> supplier,
+            @NotNull final BiConsumer<? super AFTER, ? super OUT> consumer) {
+
+        return map(AccumulateConsumerInvocation.consumerFactory(supplier, consumer));
     }
 
     @NotNull
     public <AFTER> StreamChannel<AFTER> reduce(@NotNull Supplier<? extends AFTER> supplier,
             @NotNull final BiFunction<? super AFTER, ? super OUT, ? extends AFTER> function) {
 
-        return map(AccumulateInvocation.functionFactory(supplier, function));
+        return map(AccumulateFunctionInvocation.functionFactory(supplier, function));
     }
 
     @NotNull
@@ -786,312 +793,6 @@ public abstract class AbstractStreamChannel<OUT>
                     mInput.bind(mOutput).close();
                 }
             }
-        }
-    }
-
-    /**
-     * Invocation implementation wrapping a consumer accepting output data.
-     *
-     * @param <OUT> the output data type.
-     */
-    private static class ConsumerInvocation<OUT> extends FilterInvocation<OUT, Void> {
-
-        private final ConsumerWrapper<? super OUT> mConsumer;
-
-        /**
-         * Constructor.
-         *
-         * @param consumer the consumer instance.
-         */
-        private ConsumerInvocation(@NotNull final ConsumerWrapper<? super OUT> consumer) {
-
-            super(asArgs(consumer));
-            mConsumer = consumer;
-        }
-
-        public void onInput(final OUT input, @NotNull final ResultChannel<Void> result) {
-
-            mConsumer.accept(input);
-        }
-    }
-
-    /**
-     * Base abstract implementation of an invocation generating output data.
-     *
-     * @param <OUT> the output data type.
-     */
-    private abstract static class GenerateInvocation<OUT> extends InvocationFactory<Object, OUT>
-            implements Invocation<Object, OUT> {
-
-        /**
-         * Constructor.
-         *
-         * @param args the constructor arguments.
-         */
-        private GenerateInvocation(@Nullable final Object[] args) {
-
-            super(args);
-        }
-
-        @NotNull
-        @Override
-        public final Invocation<Object, OUT> newInvocation() {
-
-            return this;
-        }
-
-        public final void onAbort(@NotNull final RoutineException reason) {
-
-        }
-
-        public final void onDestroy() {
-
-        }
-
-        public final void onInitialize() {
-
-        }
-
-        public final void onInput(final Object input, @NotNull final ResultChannel<OUT> result) {
-
-        }
-
-        public final void onTerminate() {
-
-        }
-    }
-
-    /**
-     * Invocation implementation generating a list of outputs.
-     *
-     * @param <OUT> the output data type.
-     */
-    private static class GenerateOutputInvocation<OUT> extends GenerateInvocation<OUT> {
-
-        private final List<OUT> mOutputs;
-
-        /**
-         * Constructor.
-         *
-         * @param outputs the list of outputs.
-         */
-        private GenerateOutputInvocation(@NotNull final List<OUT> outputs) {
-
-            super(asArgs(outputs));
-            mOutputs = outputs;
-        }
-
-        public void onResult(@NotNull final ResultChannel<OUT> result) {
-
-            result.pass(mOutputs);
-        }
-    }
-
-    /**
-     * Generate invocation used to call a consumer a specific number of times.
-     *
-     * @param <OUT> the output data type.
-     */
-    private static class LoopConsumerInvocation<OUT> extends GenerateInvocation<OUT> {
-
-        private final ConsumerWrapper<? super ResultChannel<OUT>> mConsumer;
-
-        private final long mCount;
-
-        /**
-         * Constructor.
-         *
-         * @param count    the loop count.
-         * @param consumer the consumer instance.
-         */
-        private LoopConsumerInvocation(final long count,
-                @NotNull final ConsumerWrapper<? super ResultChannel<OUT>> consumer) {
-
-            super(asArgs(count, consumer));
-            ConstantConditions.positive("count number", count);
-            mCount = count;
-            mConsumer = consumer;
-        }
-
-        public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
-
-            final long count = mCount;
-            final ConsumerWrapper<? super ResultChannel<OUT>> consumer = mConsumer;
-            for (long i = 0; i < count; i++) {
-                consumer.accept(result);
-            }
-        }
-    }
-
-    /**
-     * Generate invocation used to call a supplier a specific number of times.
-     *
-     * @param <OUT> the output data type.
-     */
-    private static class LoopSupplierInvocation<OUT> extends GenerateInvocation<OUT> {
-
-        private final long mCount;
-
-        private final SupplierWrapper<? extends OUT> mSupplier;
-
-        /**
-         * Constructor.
-         *
-         * @param count    the loop count.
-         * @param supplier the supplier instance.
-         */
-        private LoopSupplierInvocation(final long count,
-                @NotNull final SupplierWrapper<? extends OUT> supplier) {
-
-            super(asArgs(count, supplier));
-            ConstantConditions.positive("count number", count);
-            mCount = count;
-            mSupplier = supplier;
-        }
-
-        public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
-
-            final long count = mCount;
-            final SupplierWrapper<? extends OUT> supplier = mSupplier;
-            for (long i = 0; i < count; i++) {
-                result.pass(supplier.get());
-            }
-        }
-    }
-
-    /**
-     * Filter invocation implementation wrapping a map function.
-     *
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
-     */
-    private static class MapInvocation<IN, OUT> extends FilterInvocation<IN, OUT> {
-
-        private final FunctionWrapper<? super IN, ? extends OutputChannel<? extends OUT>> mFunction;
-
-        /**
-         * Constructor.
-         *
-         * @param function the mapping function.
-         */
-        private MapInvocation(
-                @NotNull final FunctionWrapper<? super IN, ? extends OutputChannel<? extends
-                        OUT>> function) {
-
-            super(asArgs(function));
-            mFunction = function;
-        }
-
-        public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
-
-            final OutputChannel<? extends OUT> channel = mFunction.apply(input);
-            if (channel != null) {
-                channel.bind(result);
-            }
-        }
-    }
-
-    /**
-     * Bi-consumer implementation wrapping a try/catch consumer.
-     *
-     * @param <OUT> the output data type.
-     */
-    private static class TryCatchBiConsumerConsumer<OUT>
-            implements BiConsumer<RoutineException, InputChannel<OUT>> {
-
-        private final Consumer<? super RoutineException> mConsumer;
-
-        /**
-         * Constructor.
-         *
-         * @param consumer the consumer instance.
-         */
-        private TryCatchBiConsumerConsumer(
-                @NotNull final Consumer<? super RoutineException> consumer) {
-
-            mConsumer = consumer;
-        }
-
-        public void accept(final RoutineException error, final InputChannel<OUT> channel) {
-
-            mConsumer.accept(error);
-        }
-    }
-
-    /**
-     * Bi-consumer implementation wrapping a try/catch function.
-     *
-     * @param <OUT> the output data type.
-     */
-    private static class TryCatchBiConsumerFunction<OUT>
-            implements BiConsumer<RoutineException, InputChannel<OUT>> {
-
-        private final Function<? super RoutineException, ? extends OUT> mFunction;
-
-        /**
-         * Constructor.
-         *
-         * @param function the function instance.
-         */
-        private TryCatchBiConsumerFunction(
-                @NotNull final Function<? super RoutineException, ? extends OUT> function) {
-
-            mFunction = function;
-        }
-
-        public void accept(final RoutineException error, final InputChannel<OUT> channel) {
-
-            channel.pass(mFunction.apply(error));
-        }
-    }
-
-    /**
-     * Try/catch output consumer implementation.
-     *
-     * @param <OUT> the output data type.
-     */
-    private static class TryCatchOutputConsumer<OUT> implements OutputConsumer<OUT> {
-
-        private final BiConsumer<? super RoutineException, ? super InputChannel<OUT>> mConsumer;
-
-        private final IOChannel<OUT> mOutputChannel;
-
-        /**
-         * Constructor.
-         *
-         * @param consumer      the consumer instance.
-         * @param outputChannel the output channel.
-         */
-        private TryCatchOutputConsumer(
-                @NotNull final BiConsumer<? super RoutineException, ? super InputChannel<OUT>>
-                        consumer,
-                @NotNull final IOChannel<OUT> outputChannel) {
-
-            mConsumer = consumer;
-            mOutputChannel = outputChannel;
-        }
-
-        public void onComplete() {
-
-            mOutputChannel.close();
-        }
-
-        public void onError(@NotNull final RoutineException error) {
-
-            final IOChannel<OUT> channel = mOutputChannel;
-            try {
-                mConsumer.accept(error, channel);
-                channel.close();
-
-            } catch (final Throwable t) {
-                InvocationInterruptedException.throwIfInterrupt(t);
-                channel.abort(t);
-            }
-        }
-
-        public void onOutput(final OUT output) {
-
-            mOutputChannel.pass(output);
         }
     }
 

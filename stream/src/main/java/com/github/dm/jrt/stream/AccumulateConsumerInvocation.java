@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Maestroni
+ * Copyright (c) 2016. Davide Maestroni
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@ import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
-import com.github.dm.jrt.function.BiFunction;
-import com.github.dm.jrt.function.BiFunctionWrapper;
+import com.github.dm.jrt.function.BiConsumer;
+import com.github.dm.jrt.function.BiConsumerWrapper;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.function.SupplierWrapper;
 
@@ -34,14 +34,14 @@ import static com.github.dm.jrt.function.Functions.wrap;
 /**
  * Invocation implementation accumulating the result returned by a bi-function instance.
  * <p>
- * Created by davide-maestroni on 10/18/2015.
+ * Created by davide-maestroni on 04/19/2016.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class AccumulateInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
+class AccumulateConsumerInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
 
-    private final BiFunction<? super OUT, ? super IN, ? extends OUT> mFunction;
+    private final BiConsumerWrapper<? super OUT, ? super IN> mConsumer;
 
     private final SupplierWrapper<? extends OUT> mSupplier;
 
@@ -53,47 +53,47 @@ class AccumulateInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
      * Constructor.
      *
      * @param supplier the supplier of initial accumulation values.
-     * @param function the accumulating bi-function instance.
+     * @param consumer the accumulating bi-consumer instance.
      */
-    private AccumulateInvocation(@Nullable final SupplierWrapper<? extends OUT> supplier,
-            @NotNull final BiFunction<? super OUT, ? super IN, ? extends OUT> function) {
+    private AccumulateConsumerInvocation(@Nullable final SupplierWrapper<? extends OUT> supplier,
+            @NotNull final BiConsumerWrapper<? super OUT, ? super IN> consumer) {
 
         mSupplier = supplier;
-        mFunction = function;
+        mConsumer = consumer;
     }
 
     /**
-     * Builds and returns a new accumulating invocation factory backed by the specified bi-function
+     * Builds and returns a new accumulating invocation factory backed by the specified bi-consumer
      * instance.
      *
-     * @param function the accumulating bi-function instance.
+     * @param consumer the accumulating bi-consumer instance.
      * @param <IN>     the input data type.
      * @return the invocation factory.
      */
     @NotNull
-    public static <IN> InvocationFactory<IN, IN> functionFactory(
-            @NotNull final BiFunction<? super IN, ? super IN, ? extends IN> function) {
+    public static <IN> InvocationFactory<IN, IN> consumerFactory(
+            @NotNull final BiConsumer<? super IN, ? super IN> consumer) {
 
-        return new AccumulateInvocationFactory<IN, IN>(null, wrap(function));
+        return new AccumulateInvocationFactory<IN, IN>(null, wrap(consumer));
     }
 
     /**
-     * Builds and returns a new accumulating invocation factory backed by the specified bi-function
+     * Builds and returns a new accumulating invocation factory backed by the specified bi-consumer
      * instance.
      *
      * @param supplier the supplier of initial accumulation values.
-     * @param function the accumulating bi-function instance.
+     * @param consumer the accumulating bi-consumer instance.
      * @param <IN>     the input data type.
      * @param <OUT>    the output data type.
      * @return the invocation factory.
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <IN, OUT> InvocationFactory<IN, OUT> functionFactory(
+    public static <IN, OUT> InvocationFactory<IN, OUT> consumerFactory(
             @NotNull final Supplier<? extends OUT> supplier,
-            @NotNull final BiFunction<? super OUT, ? super IN, ? extends OUT> function) {
+            @NotNull final BiConsumer<? super OUT, ? super IN> consumer) {
 
-        return new AccumulateInvocationFactory<IN, OUT>(wrap(supplier), wrap(function));
+        return new AccumulateInvocationFactory<IN, OUT>(wrap(supplier), wrap(consumer));
     }
 
     @Override
@@ -110,14 +110,15 @@ class AccumulateInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
             mIsFirst = false;
             final SupplierWrapper<? extends OUT> supplier = mSupplier;
             if (supplier != null) {
-                mAccumulated = mFunction.apply(supplier.get(), input);
+                mAccumulated = supplier.get();
+                mConsumer.accept(mAccumulated, input);
 
             } else {
                 mAccumulated = (OUT) input;
             }
 
         } else {
-            mAccumulated = mFunction.apply(mAccumulated, input);
+            mConsumer.accept(mAccumulated, input);
         }
     }
 
@@ -141,7 +142,7 @@ class AccumulateInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
      */
     private static class AccumulateInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
-        private final BiFunctionWrapper<? super OUT, ? super IN, ? extends OUT> mFunction;
+        private final BiConsumerWrapper<? super OUT, ? super IN> mConsumer;
 
         private final SupplierWrapper<? extends OUT> mSupplier;
 
@@ -149,21 +150,21 @@ class AccumulateInvocation<IN, OUT> extends TemplateInvocation<IN, OUT> {
          * Constructor.
          *
          * @param supplier the supplier of initial accumulation values.
-         * @param function the accumulating bi-function instance.
+         * @param consumer the accumulating bi-consumer instance.
          */
         private AccumulateInvocationFactory(@Nullable final SupplierWrapper<? extends OUT> supplier,
-                @NotNull final BiFunctionWrapper<? super OUT, ? super IN, ? extends OUT> function) {
+                @NotNull final BiConsumerWrapper<? super OUT, ? super IN> consumer) {
 
-            super(asArgs(supplier, function));
+            super(asArgs(supplier, consumer));
             mSupplier = supplier;
-            mFunction = function;
+            mConsumer = consumer;
         }
 
         @NotNull
         @Override
         public Invocation<IN, OUT> newInvocation() {
 
-            return new AccumulateInvocation<IN, OUT>(mSupplier, mFunction);
+            return new AccumulateConsumerInvocation<IN, OUT>(mSupplier, mConsumer);
         }
     }
 }

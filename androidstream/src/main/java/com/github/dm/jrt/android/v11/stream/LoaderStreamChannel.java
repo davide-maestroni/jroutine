@@ -233,8 +233,21 @@ public interface LoaderStreamChannel<OUT>
      * {@inheritDoc}
      */
     @NotNull
+    LoaderStreamChannel<OUT> reduce(@NotNull BiConsumer<? super OUT, ? super OUT> consumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
     LoaderStreamChannel<OUT> reduce(
             @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    <AFTER> LoaderStreamChannel<AFTER> reduce(@NotNull Supplier<? extends AFTER> supplier,
+            @NotNull BiConsumer<? super AFTER, ? super OUT> consumer);
 
     /**
      * {@inheritDoc}

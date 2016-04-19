@@ -358,6 +358,29 @@ public interface StreamChannel<OUT>
     StreamChannel<OUT> parallel();
 
     /**
+     * Concatenates a stream based on the specified accumulating consumer to this one.
+     * <br>
+     * The output will be computed as follows, where the initial accumulated value will be the
+     * the first input:
+     * <pre>
+     *     <code>
+     *
+     *         consumer.accept(acc, input);
+     *     </code>
+     * </pre>
+     * The accumulated value will be passed as result only when the outputs complete.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     * <br>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param consumer the bi-consumer instance.
+     * @return the concatenated stream.
+     */
+    @NotNull
+    StreamChannel<OUT> reduce(@NotNull BiConsumer<? super OUT, ? super OUT> consumer);
+
+    /**
      * Concatenates a stream based on the specified accumulating function to this one.
      * <br>
      * The output will be computed as follows, where the initial accumulated value will be the
@@ -380,6 +403,32 @@ public interface StreamChannel<OUT>
     @NotNull
     StreamChannel<OUT> reduce(
             @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
+
+    /**
+     * Concatenates a stream based on the specified accumulating consumer to this one.
+     * <br>
+     * The output will be computed as follows, where the initial accumulated value will be the
+     * one returned by the specified supplier:
+     * <pre>
+     *     <code>
+     *
+     *         consumer.accept(acc, input);
+     *     </code>
+     * </pre>
+     * The accumulated value will be passed as result only when the outputs complete.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     * <br>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param supplier the supplier of initial accumulation values.
+     * @param consumer the bi-consumer instance.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream.
+     */
+    @NotNull
+    <AFTER> StreamChannel<AFTER> reduce(@NotNull Supplier<? extends AFTER> supplier,
+            @NotNull BiConsumer<? super AFTER, ? super OUT> consumer);
 
     /**
      * Concatenates a stream based on the specified accumulating function to this one.

@@ -24,7 +24,7 @@ import com.github.dm.jrt.function.Supplier;
 import org.junit.Test;
 
 import static com.github.dm.jrt.function.Functions.first;
-import static com.github.dm.jrt.stream.AccumulateInvocation.functionFactory;
+import static com.github.dm.jrt.stream.AccumulateFunctionInvocation.functionFactory;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -32,7 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * <p>
  * Created by davide-maestroni on 10/27/2015.
  */
-public class AccumulateInvocationTest {
+public class AccumulateFunctionInvocationTest {
 
     private static BiFunction<String, String, String> createFunction() {
 

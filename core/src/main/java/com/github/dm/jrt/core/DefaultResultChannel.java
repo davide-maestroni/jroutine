@@ -1358,7 +1358,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             return results;
         }
 
-        public OUT nextOr(final OUT output) {
+        public OUT nextOrElse(final OUT output) {
 
             final TimeDuration timeout;
             final TimeoutActionType timeoutAction;

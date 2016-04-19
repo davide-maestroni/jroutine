@@ -586,10 +586,10 @@ public abstract class AbstractStreamChannel<OUT>
         return mChannel.next(count);
     }
 
-    public OUT nextOr(final OUT output) {
+    public OUT nextOrElse(final OUT output) {
 
         mBinder.bind();
-        return mChannel.nextOr(output);
+        return mChannel.nextOrElse(output);
     }
 
     public void throwError() {

@@ -454,9 +454,10 @@ public class IOChannelTest {
                                .buildChannel()
                                .pass("test1")
                                .afterMax(seconds(1))
-                               .nextOr(2)).isEqualTo("test1");
+                               .nextOrElse(2)).isEqualTo("test1");
 
-        assertThat(JRoutineCore.io().buildChannel().eventuallyExit().afterMax(seconds(1)).nextOr(2))
+        assertThat(JRoutineCore.io().buildChannel().eventuallyExit().afterMax(seconds(1)).nextOrElse(
+                2))
                 .isEqualTo(2);
 
         try {
@@ -465,7 +466,7 @@ public class IOChannelTest {
                         .buildChannel()
                         .eventuallyAbort()
                         .afterMax(millis(100))
-                        .nextOr("test2");
+                        .nextOrElse("test2");
 
             fail();
 
@@ -479,7 +480,7 @@ public class IOChannelTest {
                         .buildChannel()
                         .eventuallyAbort(new IllegalStateException())
                         .afterMax(millis(100))
-                        .nextOr("test2");
+                        .nextOrElse("test2");
 
             fail();
 
@@ -494,7 +495,7 @@ public class IOChannelTest {
                         .buildChannel()
                         .eventuallyThrow()
                         .afterMax(millis(100))
-                        .nextOr("test2");
+                        .nextOrElse("test2");
 
             fail();
 

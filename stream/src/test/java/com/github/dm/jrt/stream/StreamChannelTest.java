@@ -149,7 +149,7 @@ public class StreamChannelTest {
 
         assertThat(channel.skip(1).next(1)).containsExactly("test2");
         assertThat(channel.eventuallyExit().next(4)).containsExactly("test3");
-        assertThat(channel.eventuallyExit().nextOr("test4")).isEqualTo("test4");
+        assertThat(channel.eventuallyExit().nextOrElse("test4")).isEqualTo("test4");
 
         final Iterator<String> iterator = Streams.streamOf("test1", "test2", "test3").iterator();
         assertThat(iterator.hasNext()).isTrue();

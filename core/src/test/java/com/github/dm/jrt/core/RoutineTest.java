@@ -1861,13 +1861,13 @@ public class RoutineTest {
         assertThat(JRoutineCore.on(PassingInvocation.factoryOf())
                                .asyncCall("test1")
                                .afterMax(seconds(1))
-                               .nextOr(2)).isEqualTo("test1");
+                               .nextOrElse(2)).isEqualTo("test1");
 
         assertThat(JRoutineCore.on(PassingInvocation.factoryOf())
                                .asyncCall()
                                .eventuallyExit()
                                .afterMax(seconds(1))
-                               .nextOr(2)).isEqualTo(2);
+                               .nextOrElse(2)).isEqualTo(2);
 
         try {
 
@@ -1875,7 +1875,7 @@ public class RoutineTest {
                         .asyncCall("test1")
                         .eventuallyAbort()
                         .afterMax(millis(100))
-                        .nextOr("test2");
+                        .nextOrElse("test2");
 
             fail();
 
@@ -1889,7 +1889,7 @@ public class RoutineTest {
                         .asyncCall("test1")
                         .eventuallyAbort(new IllegalStateException())
                         .afterMax(millis(100))
-                        .nextOr("test2");
+                        .nextOrElse("test2");
 
             fail();
 
@@ -1904,7 +1904,7 @@ public class RoutineTest {
                         .asyncCall("test1")
                         .eventuallyThrow()
                         .afterMax(millis(100))
-                        .nextOr("test2");
+                        .nextOrElse("test2");
 
             fail();
 

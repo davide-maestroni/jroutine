@@ -571,7 +571,7 @@ public interface Channel {
          * @see #eventuallyExit()
          * @see #eventuallyThrow()
          */
-        OUT nextOr(OUT output);
+        OUT nextOrElse(OUT output);
 
         /**
          * Skips the first {@code count} available results by waiting at the maximum for the set

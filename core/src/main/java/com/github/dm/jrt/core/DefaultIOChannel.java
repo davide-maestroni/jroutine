@@ -289,9 +289,9 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA> {
         return mOutputChannel.next(count);
     }
 
-    public DATA nextOr(final DATA output) {
+    public DATA nextOrElse(final DATA output) {
 
-        return mOutputChannel.nextOr(output);
+        return mOutputChannel.nextOrElse(output);
     }
 
     public void throwError() {

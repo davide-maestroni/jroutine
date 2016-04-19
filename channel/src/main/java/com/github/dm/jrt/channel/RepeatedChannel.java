@@ -281,9 +281,9 @@ class RepeatedChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
         return mOutputChannel.next(count);
     }
 
-    public OUT nextOr(final OUT output) {
+    public OUT nextOrElse(final OUT output) {
 
-        return mOutputChannel.nextOr(output);
+        return mOutputChannel.nextOrElse(output);
     }
 
     @NotNull

@@ -71,13 +71,14 @@ dependencies {
     apt project(':androidprocessor')
     compile 'com.android.support:support-v4:23.2.1'
 }
+
 conditionalDependencies {
-    compile name: 'core', artifact: { "${it.parent.name}-${it.name}" }
-    compile name: 'object', artifact: { "${it.parent.name}-${it.name}" }
-    compile name: 'proxy', artifact: { "${it.parent.name}-${it.name}" }
-    compile name: 'androidcore', artifact: { "${it.parent.name}-${it.name}" }
-    compile name: 'androidobject', artifact: { "${it.parent.name}-${it.name}" }
-    compile name: 'androidprocessor', artifact: { "${it.parent.name}-${it.name}" }
+    compile name: 'core', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'object', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'proxy', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'androidcore', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'androidobject', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'androidprocessor', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
 }
 
 findbugs {

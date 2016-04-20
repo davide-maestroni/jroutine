@@ -17,6 +17,17 @@
 apply plugin: 'maven'
 apply plugin: 'signing'
 
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.jcabi:jcabi-aether:0.10.1'
+        classpath 'org.sonatype.aether:aether-api:1.13.1'
+        classpath 'org.apache.maven:maven-core:3.0.3'
+    }
+}
+
 /*
     EXPORT JAR: ./gradlew eJ -PexportDir=$HOME/javadoc
     UPLOAD ARCHIVE: ./gradlew upA
@@ -317,18 +328,40 @@ class ConditionalDependencySpecs {
 
     def compile(Object config) {
 
-        def dependsOnProject = myProject.parent.subprojects.find { it.name.equals(config.name) };
-        myProject.dependencies {
-            if (!dependsOnProject.hasProperty('previewRelease') && dependsOnProject.hasProperty('releaseVersion')) {
-                delegate.compile group: myProject.group, name: config.artifact(dependsOnProject), version: myProject.toVersionRange(dependsOnProject.getProperty('releaseVersion'))
-            } else {
-                delegate.compile myProject.project(":${config.name}")
+        def name = config.name
+        def dependsOnProject = myProject.parent.subprojects.find { it.name.equals(name) }
+        def artifact = config.artifact(dependsOnProject)
+        def group = dependsOnProject.getProperty('groupName')
+        def version = config.version
+        def packaging = dependsOnProject.hasProperty('releaseVersionCode') ? "aar" : "jar"
+        if ("master".equals(myProject.getWorkingBranch()) ? !myProject.hasProperty("local") : myProject.hasProperty("remote")) {
+            def remotes = [new org.sonatype.aether.repository.RemoteRepository("maven-central", "default", "http://repo1.maven.org/maven2/")]
+            try {
+                new com.jcabi.aether.Aether(remotes, new File(myProject.parent.buildDir, "local-repository")).resolve(
+                        new org.sonatype.aether.util.artifact.DefaultArtifact(group, artifact, "", packaging, config.version),
+                        org.sonatype.aether.util.artifact.JavaScopes.COMPILE)
+                myProject.dependencies {
+                    delegate.compile group: group, name: artifact, version: version
+                }
+                return
+
+            } catch (org.sonatype.aether.resolution.DependencyResolutionException ignored) {
+
             }
+        }
+
+        if (dependsOnProject.hasProperty('releaseVersion') && !dependsOnProject.getProperty('releaseVersion').equals(version)) {
+            throw new IllegalArgumentException("Could not find artifact: ${group}:${artifact}:${version}@${packaging}")
+        }
+
+        myProject.dependencies {
+            delegate.compile myProject.project(":${name}")
         }
     }
 
     def compile(String name) {
 
-        compile(name: name, artifact: { name })
+        def dependsOnProject = myProject.parent.subprojects.find { it.name.equals(name) }
+        compile(name: name, artifact: { name }, version: dependsOnProject.getProperty('releaseVersion'))
     }
 }

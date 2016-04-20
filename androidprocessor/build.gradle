@@ -25,7 +25,7 @@ archivesBaseName = "${project.parent.name}-${project.name}"
 javaCompatibility = JavaVersion.VERSION_1_6
 
 conditionalDependencies {
-    compile name: 'processor', artifact: { "${it.parent.name}-${it.name}" }
+    compile name: 'processor', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
 }
 
 findbugs {

@@ -48,7 +48,6 @@ android {
 }
 
 dependencies {
-    compile project(':android')
     compile 'com.android.support:appcompat-v7:23.2.1'
     compile 'com.squareup.retrofit2:retrofit:2.0.0'
     compile 'com.squareup.retrofit2:converter-gson:2.0.0'
@@ -57,6 +56,10 @@ dependencies {
     androidTestCompile 'com.android.support.test:runner:0.4.1'
     androidTestCompile 'com.android.support.test:rules:0.4.1'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
+}
+
+conditionalDependencies {
+    compile name: 'android', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
 }
 
 tasks.withType(Javadoc) {

@@ -65,8 +65,9 @@ dependencies {
     androidTestCompile 'org.assertj:assertj-core:1.7.1'
     compile 'com.android.support:support-v4:23.2.1'
 }
+
 conditionalDependencies {
-    compile name: 'core', artifact: { "${it.parent.name}-${it.name}" }
+    compile name: 'core', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
 }
 
 findbugs {

@@ -30,9 +30,9 @@ dependencies {
     testCompile 'org.assertj:assertj-core:1.7.1'
 }
 conditionalDependencies {
-    compile name: 'core', artifact: { "${it.parent.name}-${it.name}" }
-    compile name: 'object', artifact: { "${it.parent.name}-${it.name}" }
-    compile name: 'processor', artifact: { "${it.parent.name}-${it.name}" }
+    compile name: 'core', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'object', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'processor', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
 }
 
 jacocoTestReport {

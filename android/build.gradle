@@ -69,13 +69,14 @@ dependencies {
     androidTestCompile 'org.assertj:assertj-core:1.7.1'
     compile 'com.android.support:support-v4:23.2.1'
 }
+
 conditionalDependencies {
-    compile name: 'lib', artifact: { it.parent.name }
-    compile name: 'androidcore', artifact: { "${it.parent.name}-${it.name}" }
-    compile name: 'androidobject', artifact: { "${it.parent.name}-${it.name}" }
-    compile name: 'androidproxy', artifact: { "${it.parent.name}-${it.name}" }
-    compile name: 'androidchannel', artifact: { "${it.parent.name}-${it.name}" }
-    compile name: 'androidstream', artifact: { "${it.parent.name}-${it.name}" }
+    compile name: 'lib', artifact: { it.parent.name }, version: '6.0.0'
+    compile name: 'androidcore', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'androidobject', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'androidproxy', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'androidchannel', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
+    compile name: 'androidstream', artifact: { "${it.parent.name}-${it.name}" }, version: '6.0.0'
 }
 
 findbugs {

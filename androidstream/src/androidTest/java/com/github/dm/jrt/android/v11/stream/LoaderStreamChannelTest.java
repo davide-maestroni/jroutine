@@ -1209,6 +1209,10 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
     @SuppressWarnings("ConstantConditions")
     public void testConsumeErrorNullPointerError() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
+
         try {
             LoaderStreams.streamOf().with(loaderFrom(getActivity())).onError(null);
             fail();
@@ -1633,6 +1637,10 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
 
     @SuppressWarnings("ConstantConditions")
     public void testMapContextFactoryNullPointerError() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
 
         try {
             LoaderStreams.streamOf()

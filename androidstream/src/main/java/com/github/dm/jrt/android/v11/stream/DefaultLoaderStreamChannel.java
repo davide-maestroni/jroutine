@@ -276,32 +276,6 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannel<AFTER> collect(
-            @NotNull final BiConsumer<? super List<OUT>, ? super ResultChannel<AFTER>> consumer) {
-
-        checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannel<AFTER>) super.collect(consumer);
-    }
-
-    @NotNull
-    @Override
-    public <AFTER> LoaderStreamChannel<AFTER> collect(
-            @NotNull final Function<? super List<OUT>, ? extends AFTER> function) {
-
-        checkStatic(wrap(function), function);
-        return (LoaderStreamChannel<AFTER>) super.collect(function);
-    }
-
-    @NotNull
-    @Override
-    public LoaderStreamChannel<Void> consume(@NotNull final Consumer<? super OUT> consumer) {
-
-        checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannel<Void>) super.consume(consumer);
-    }
-
-    @NotNull
-    @Override
     public LoaderStreamChannel<OUT> filter(@NotNull final Predicate<? super OUT> predicate) {
 
         checkStatic(wrap(predicate), predicate);
@@ -370,9 +344,44 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
 
     @NotNull
     @Override
+    public <AFTER> LoaderStreamChannel<AFTER> mapAll(
+            @NotNull final BiConsumer<? super List<OUT>, ? super ResultChannel<AFTER>> consumer) {
+
+        checkStatic(wrap(consumer), consumer);
+        return (LoaderStreamChannel<AFTER>) super.mapAll(consumer);
+    }
+
+    @NotNull
+    @Override
+    public <AFTER> LoaderStreamChannel<AFTER> mapAll(
+            @NotNull final Function<? super List<OUT>, ? extends AFTER> function) {
+
+        checkStatic(wrap(function), function);
+        return (LoaderStreamChannel<AFTER>) super.mapAll(function);
+    }
+
+    @NotNull
+    @Override
     public LoaderStreamChannel<OUT> maxParallelInvocations(final int maxInvocations) {
 
         return (LoaderStreamChannel<OUT>) super.maxParallelInvocations(maxInvocations);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannel<OUT> onError(
+            @NotNull final Consumer<? super RoutineException> consumer) {
+
+        checkStatic(wrap(consumer), consumer);
+        return (LoaderStreamChannel<OUT>) super.onError(consumer);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannel<Void> onOutput(@NotNull final Consumer<? super OUT> consumer) {
+
+        checkStatic(wrap(consumer), consumer);
+        return (LoaderStreamChannel<Void>) super.onOutput(consumer);
     }
 
     @NotNull
@@ -391,11 +400,11 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
 
     @NotNull
     @Override
-    public LoaderStreamChannel<OUT> reduce(
+    public LoaderStreamChannel<OUT> collect(
             @NotNull final BiConsumer<? super OUT, ? super OUT> consumer) {
 
         checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannel<OUT>) super.reduce(consumer);
+        return (LoaderStreamChannel<OUT>) super.collect(consumer);
     }
 
     @NotNull
@@ -409,13 +418,13 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannel<AFTER> reduce(
+    public <AFTER> LoaderStreamChannel<AFTER> collect(
             @NotNull final Supplier<? extends AFTER> supplier,
             @NotNull final BiConsumer<? super AFTER, ? super OUT> consumer) {
 
         checkStatic(wrap(supplier), supplier);
         checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannel<AFTER>) super.reduce(supplier, consumer);
+        return (LoaderStreamChannel<AFTER>) super.collect(supplier, consumer);
     }
 
     @NotNull
@@ -559,19 +568,23 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
     @NotNull
     @Override
     public LoaderStreamChannel<OUT> tryCatch(
-            @NotNull final Consumer<? super RoutineException> consumer) {
-
-        checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannel<OUT>) super.tryCatch(consumer);
-    }
-
-    @NotNull
-    @Override
-    public LoaderStreamChannel<OUT> tryCatch(
             @NotNull final Function<? super RoutineException, ? extends OUT> function) {
 
         checkStatic(wrap(function), function);
         return (LoaderStreamChannel<OUT>) super.tryCatch(function);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannel<OUT> tryFinally(@NotNull final Runnable runnable) {
+
+        if (!Reflection.hasStaticScope(runnable)) {
+            throw new IllegalArgumentException(
+                    "the runnable instance does not have a static scope: " + runnable.getClass()
+                                                                                     .getName());
+        }
+
+        return (LoaderStreamChannel<OUT>) super.tryFinally(runnable);
     }
 
     @NotNull

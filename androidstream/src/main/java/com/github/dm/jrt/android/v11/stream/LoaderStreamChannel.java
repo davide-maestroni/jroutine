@@ -149,21 +149,14 @@ public interface LoaderStreamChannel<OUT>
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> collect(
-            @NotNull BiConsumer<? super List<OUT>, ? super ResultChannel<AFTER>> consumer);
+    LoaderStreamChannel<OUT> collect(@NotNull BiConsumer<? super OUT, ? super OUT> consumer);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> collect(
-            @NotNull Function<? super List<OUT>, ? extends AFTER> function);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    LoaderStreamChannel<Void> consume(@NotNull Consumer<? super OUT> consumer);
+    <AFTER> LoaderStreamChannel<AFTER> collect(@NotNull Supplier<? extends AFTER> supplier,
+            @NotNull BiConsumer<? super AFTER, ? super OUT> consumer);
 
     /**
      * {@inheritDoc}
@@ -215,7 +208,33 @@ public interface LoaderStreamChannel<OUT>
      * {@inheritDoc}
      */
     @NotNull
+    <AFTER> LoaderStreamChannel<AFTER> mapAll(
+            @NotNull BiConsumer<? super List<OUT>, ? super ResultChannel<AFTER>> consumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    <AFTER> LoaderStreamChannel<AFTER> mapAll(
+            @NotNull Function<? super List<OUT>, ? extends AFTER> function);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
     LoaderStreamChannel<OUT> maxParallelInvocations(int maxInvocations);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    LoaderStreamChannel<OUT> onError(@NotNull Consumer<? super RoutineException> consumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    LoaderStreamChannel<Void> onOutput(@NotNull Consumer<? super OUT> consumer);
 
     /**
      * {@inheritDoc}
@@ -233,21 +252,8 @@ public interface LoaderStreamChannel<OUT>
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannel<OUT> reduce(@NotNull BiConsumer<? super OUT, ? super OUT> consumer);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
     LoaderStreamChannel<OUT> reduce(
             @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> reduce(@NotNull Supplier<? extends AFTER> supplier,
-            @NotNull BiConsumer<? super AFTER, ? super OUT> consumer);
 
     /**
      * {@inheritDoc}
@@ -355,14 +361,14 @@ public interface LoaderStreamChannel<OUT>
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannel<OUT> tryCatch(@NotNull Consumer<? super RoutineException> consumer);
+    LoaderStreamChannel<OUT> tryCatch(
+            @NotNull Function<? super RoutineException, ? extends OUT> function);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannel<OUT> tryCatch(
-            @NotNull Function<? super RoutineException, ? extends OUT> function);
+    LoaderStreamChannel<OUT> tryFinally(@NotNull Runnable runnable);
 
     /**
      * Short for {@code loaderConfiguration().withCacheStrategy(strategyType).apply()}.

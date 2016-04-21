@@ -48,7 +48,7 @@ import static com.github.dm.jrt.core.util.TimeDuration.ZERO;
 import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
 
 /**
- * Default implementation of a invocation input channel.
+ * Default implementation of an invocation input channel.
  * <p>
  * Created by davide-maestroni on 06/11/2015.
  *

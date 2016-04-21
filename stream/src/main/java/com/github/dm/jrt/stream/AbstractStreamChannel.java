@@ -246,26 +246,6 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
-    public <AFTER> StreamChannel<AFTER> collect(
-            @NotNull final BiConsumer<? super List<OUT>, ? super ResultChannel<AFTER>> consumer) {
-
-        return map(consumerCall(consumer));
-    }
-
-    @NotNull
-    public <AFTER> StreamChannel<AFTER> collect(
-            @NotNull final Function<? super List<OUT>, ? extends AFTER> function) {
-
-        return map(functionCall(function));
-    }
-
-    @NotNull
-    public StreamChannel<Void> consume(@NotNull final Consumer<? super OUT> consumer) {
-
-        return map(new ConsumerInvocation<OUT>(wrap(consumer)));
-    }
-
-    @NotNull
     public StreamChannel<OUT> filter(@NotNull final Predicate<? super OUT> predicate) {
 
         return map(predicateFilter(predicate));
@@ -329,9 +309,35 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
+    public <AFTER> StreamChannel<AFTER> mapAll(
+            @NotNull final BiConsumer<? super List<OUT>, ? super ResultChannel<AFTER>> consumer) {
+
+        return map(consumerCall(consumer));
+    }
+
+    @NotNull
+    public <AFTER> StreamChannel<AFTER> mapAll(
+            @NotNull final Function<? super List<OUT>, ? extends AFTER> function) {
+
+        return map(functionCall(function));
+    }
+
+    @NotNull
     public StreamChannel<OUT> maxParallelInvocations(final int maxInvocations) {
 
         return invocationConfiguration().withMaxInstances(maxInvocations).apply();
+    }
+
+    @NotNull
+    public StreamChannel<OUT> onError(@NotNull final Consumer<? super RoutineException> consumer) {
+
+        return tryCatch(new TryCatchBiConsumerConsumer<OUT>(consumer));
+    }
+
+    @NotNull
+    public StreamChannel<Void> onOutput(@NotNull final Consumer<? super OUT> consumer) {
+
+        return map(new ConsumerInvocation<OUT>(wrap(consumer)));
     }
 
     @NotNull
@@ -348,7 +354,7 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
-    public StreamChannel<OUT> reduce(@NotNull final BiConsumer<? super OUT, ? super OUT> consumer) {
+    public StreamChannel<OUT> collect(@NotNull final BiConsumer<? super OUT, ? super OUT> consumer) {
 
         return map(AccumulateConsumerInvocation.consumerFactory(consumer));
     }
@@ -361,7 +367,7 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
-    public <AFTER> StreamChannel<AFTER> reduce(@NotNull final Supplier<? extends AFTER> supplier,
+    public <AFTER> StreamChannel<AFTER> collect(@NotNull final Supplier<? extends AFTER> supplier,
             @NotNull final BiConsumer<? super AFTER, ? super OUT> consumer) {
 
         return map(AccumulateConsumerInvocation.consumerFactory(supplier, consumer));
@@ -516,7 +522,6 @@ public abstract class AbstractStreamChannel<OUT>
             @NotNull final BiConsumer<? super RoutineException, ? super InputChannel<OUT>>
                     consumer) {
 
-        ConstantConditions.notNull("consumer instance", consumer);
         final IOChannel<OUT> ioChannel = JRoutineCore.io()
                                                      .channelConfiguration()
                                                      .with(buildChannelConfiguration())
@@ -527,18 +532,22 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
-    public StreamChannel<OUT> tryCatch(@NotNull final Consumer<? super RoutineException> consumer) {
-
-        return tryCatch(new TryCatchBiConsumerConsumer<OUT>(
-                ConstantConditions.notNull("consumer instance", consumer)));
-    }
-
-    @NotNull
     public StreamChannel<OUT> tryCatch(
             @NotNull final Function<? super RoutineException, ? extends OUT> function) {
 
-        return tryCatch(new TryCatchBiConsumerFunction<OUT>(
-                ConstantConditions.notNull("function instance", function)));
+        return tryCatch(new TryCatchBiConsumerFunction<OUT>(function));
+    }
+
+    @NotNull
+    public StreamChannel<OUT> tryFinally(@NotNull final Runnable runnable) {
+
+        final IOChannel<OUT> ioChannel = JRoutineCore.io()
+                                                     .channelConfiguration()
+                                                     .with(buildChannelConfiguration())
+                                                     .apply()
+                                                     .buildChannel();
+        mChannel.bind(new TryFinallyOutputConsumer<OUT>(runnable, ioChannel));
+        return newChannel(ioChannel, getStreamConfiguration(), mInvocationMode, mBinder);
     }
 
     @NotNull

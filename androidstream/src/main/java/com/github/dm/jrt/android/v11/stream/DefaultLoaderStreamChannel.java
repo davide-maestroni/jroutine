@@ -16,6 +16,8 @@
 
 package com.github.dm.jrt.android.v11.stream;
 
+import android.support.annotation.NonNull;
+
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
@@ -276,6 +278,26 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
 
     @NotNull
     @Override
+    public LoaderStreamChannel<OUT> collect(
+            @NotNull final BiConsumer<? super OUT, ? super OUT> consumer) {
+
+        checkStatic(wrap(consumer), consumer);
+        return (LoaderStreamChannel<OUT>) super.collect(consumer);
+    }
+
+    @NotNull
+    @Override
+    public <AFTER> LoaderStreamChannel<AFTER> collect(
+            @NotNull final Supplier<? extends AFTER> supplier,
+            @NotNull final BiConsumer<? super AFTER, ? super OUT> consumer) {
+
+        checkStatic(wrap(supplier), supplier);
+        checkStatic(wrap(consumer), consumer);
+        return (LoaderStreamChannel<AFTER>) super.collect(supplier, consumer);
+    }
+
+    @NotNull
+    @Override
     public LoaderStreamChannel<OUT> filter(@NotNull final Predicate<? super OUT> predicate) {
 
         checkStatic(wrap(predicate), predicate);
@@ -400,11 +422,10 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
 
     @NotNull
     @Override
-    public LoaderStreamChannel<OUT> collect(
-            @NotNull final BiConsumer<? super OUT, ? super OUT> consumer) {
+    public LoaderStreamChannel<OUT> peek(@NotNull final Consumer<? super OUT> consumer) {
 
         checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannel<OUT>) super.collect(consumer);
+        return (LoaderStreamChannel<OUT>) super.peek(consumer);
     }
 
     @NotNull
@@ -414,17 +435,6 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
 
         checkStatic(wrap(function), function);
         return (LoaderStreamChannel<OUT>) super.reduce(function);
-    }
-
-    @NotNull
-    @Override
-    public <AFTER> LoaderStreamChannel<AFTER> collect(
-            @NotNull final Supplier<? extends AFTER> supplier,
-            @NotNull final BiConsumer<? super AFTER, ? super OUT> consumer) {
-
-        checkStatic(wrap(supplier), supplier);
-        checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannel<AFTER>) super.collect(supplier, consumer);
     }
 
     @NotNull
@@ -603,8 +613,7 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
             @NotNull final InvocationConfiguration configuration,
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
 
-        return newRoutine(configuration,
-                mStreamConfiguration.builderFrom().with(mConfiguration).apply(), factory);
+        return newRoutine(configuration, buildLoaderConfiguration(), factory);
     }
 
     @NotNull
@@ -633,6 +642,25 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
     }
 
     @NotNull
+    public <AFTER> LoaderStreamChannel<AFTER> map(
+            @NotNull final ContextInvocationFactory<? super OUT, ? extends AFTER> factory) {
+
+        final LoaderBuilder contextBuilder = mContextBuilder;
+        if (contextBuilder == null) {
+            throw new IllegalStateException("the loader context is null");
+        }
+
+        return map(contextBuilder.on(factory)
+                                 .invocationConfiguration()
+                                 .with(buildConfiguration())
+                                 .apply()
+                                 .loaderConfiguration()
+                                 .with(buildLoaderConfiguration())
+                                 .apply()
+                                 .buildRoutine());
+    }
+
+    @NotNull
     public LoaderStreamChannel<OUT> staleAfter(@Nullable final TimeDuration staleTime) {
 
         return loaderConfiguration().withResultStaleTime(staleTime).apply();
@@ -658,6 +686,12 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
 
         mContextBuilder = (context != null) ? JRoutineLoader.with(context) : null;
         return this;
+    }
+
+    @NonNull
+    private LoaderConfiguration buildLoaderConfiguration() {
+
+        return mStreamConfiguration.builderFrom().with(mConfiguration).apply();
     }
 
     private void checkStatic(@NotNull final Wrapper wrapper, @NotNull final Object function) {

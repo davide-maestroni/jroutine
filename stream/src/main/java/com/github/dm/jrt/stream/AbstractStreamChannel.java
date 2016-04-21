@@ -246,6 +246,20 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
+    public StreamChannel<OUT> collect(
+            @NotNull final BiConsumer<? super OUT, ? super OUT> consumer) {
+
+        return map(AccumulateConsumerInvocation.consumerFactory(consumer));
+    }
+
+    @NotNull
+    public <AFTER> StreamChannel<AFTER> collect(@NotNull final Supplier<? extends AFTER> supplier,
+            @NotNull final BiConsumer<? super AFTER, ? super OUT> consumer) {
+
+        return map(AccumulateConsumerInvocation.consumerFactory(supplier, consumer));
+    }
+
+    @NotNull
     public StreamChannel<OUT> filter(@NotNull final Predicate<? super OUT> predicate) {
 
         return map(predicateFilter(predicate));
@@ -354,9 +368,9 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
-    public StreamChannel<OUT> collect(@NotNull final BiConsumer<? super OUT, ? super OUT> consumer) {
+    public StreamChannel<OUT> peek(@NotNull final Consumer<? super OUT> consumer) {
 
-        return map(AccumulateConsumerInvocation.consumerFactory(consumer));
+        return map(new PeekInvocation<OUT>(wrap(consumer)));
     }
 
     @NotNull
@@ -364,13 +378,6 @@ public abstract class AbstractStreamChannel<OUT>
             @NotNull final BiFunction<? super OUT, ? super OUT, ? extends OUT> function) {
 
         return map(AccumulateFunctionInvocation.functionFactory(function));
-    }
-
-    @NotNull
-    public <AFTER> StreamChannel<AFTER> collect(@NotNull final Supplier<? extends AFTER> supplier,
-            @NotNull final BiConsumer<? super AFTER, ? super OUT> consumer) {
-
-        return map(AccumulateConsumerInvocation.consumerFactory(supplier, consumer));
     }
 
     @NotNull

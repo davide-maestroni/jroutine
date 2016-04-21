@@ -20,6 +20,7 @@ import com.github.dm.jrt.android.channel.ParcelableSelectable;
 import com.github.dm.jrt.android.core.builder.LoaderConfigurableBuilder;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
+import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.channel.ResultChannel;
@@ -254,6 +255,12 @@ public interface LoaderStreamChannelCompat<OUT>
      * {@inheritDoc}
      */
     @NotNull
+    LoaderStreamChannelCompat<OUT> peek(@NotNull Consumer<? super OUT> consumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
     LoaderStreamChannelCompat<OUT> reduce(
             @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
 
@@ -419,6 +426,22 @@ public interface LoaderStreamChannelCompat<OUT>
      */
     @NotNull
     LoaderStreamChannelCompat<OUT> loaderId(int loaderId);
+
+    /**
+     * Concatenates a stream based on the specified mapping invocation factory to this one.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     * <br>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param factory the context invocation factory.
+     * @param <AFTER> the concatenation output type.
+     * @return the concatenated stream.
+     * @throws java.lang.IllegalStateException if the loader context is not set.
+     */
+    @NotNull
+    <AFTER> LoaderStreamChannelCompat<AFTER> map(
+            @NotNull ContextInvocationFactory<? super OUT, ? extends AFTER> factory);
 
     /**
      * Short for {@code loaderConfiguration().withResultStaleTime(staleTime).apply()}.

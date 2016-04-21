@@ -25,7 +25,6 @@ import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * Builder implementation returning a channel concatenating data from a set of output channels.
@@ -42,21 +41,25 @@ class ConcatBuilder<OUT> extends AbstractBuilder<OutputChannel<OUT>> {
      * Constructor.
      *
      * @param channels the output channels to concat.
-     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      */
-    ConcatBuilder(@NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
-
-        if (channels.isEmpty()) {
-            throw new IllegalArgumentException("the collection of channels must not be empty");
-        }
+    ConcatBuilder(@NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
 
         final ArrayList<OutputChannel<? extends OUT>> channelList =
-                new ArrayList<OutputChannel<? extends OUT>>(channels);
-        if (channelList.contains(null)) {
-            throw new NullPointerException(
-                    "the collection of channels must not contain null objects");
+                new ArrayList<OutputChannel<? extends OUT>>();
+        for (final OutputChannel<? extends OUT> channel : channels) {
+            if (channel == null) {
+                throw new NullPointerException(
+                        "the collection of channels must not contain null objects");
+            }
+
+            channelList.add(channel);
+        }
+
+        if (channelList.isEmpty()) {
+            throw new IllegalArgumentException("the collection of channels must not be empty");
         }
 
         mChannels = channelList;

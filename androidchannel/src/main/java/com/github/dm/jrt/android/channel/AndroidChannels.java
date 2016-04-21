@@ -26,7 +26,6 @@ import com.github.dm.jrt.core.channel.IOChannel;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
-import java.util.Collection;
 
 /**
  * Utility class for handling routine channels.
@@ -50,18 +49,18 @@ public class AndroidChannels extends Channels {
      * passed channels will be bound as a result of the creation.
      *
      * @param startIndex the selectable start index.
-     * @param channels   the collection of channels.
+     * @param channels   the iterable of channels.
      * @param <OUT>      the output data type.
      * @return the selectable output channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
-     * @see Channels#merge(int, Collection)
+     * @see Channels#merge(int, Iterable)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends OutputChannel<? extends
             ParcelableSelectable<OUT>>> merge(final int startIndex,
-            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
+            @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
 
         return new MergeBuilder<OUT>(startIndex, channels);
     }
@@ -101,15 +100,15 @@ public class AndroidChannels extends Channels {
      * @param channels the channels to merge.
      * @param <OUT>    the output data type.
      * @return the selectable output channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
-     * @see Channels#merge(Collection)
+     * @see Channels#merge(Iterable)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends OutputChannel<? extends
             ParcelableSelectable<OUT>>> merge(
-            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
+            @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
 
         return merge(0, channels);
     }

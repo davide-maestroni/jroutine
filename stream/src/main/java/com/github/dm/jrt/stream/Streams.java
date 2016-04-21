@@ -80,7 +80,7 @@ public class Streams extends Functions {
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
      * @throws java.lang.NullPointerException     if the specified collection is null or contains a
      *                                            null object.
-     * @see Channels#blend(Collection)
+     * @see Channels#blend(Iterable)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<OUT>> blend(
@@ -168,7 +168,7 @@ public class Streams extends Functions {
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
      * @throws java.lang.NullPointerException     if the specified collection is null or contains a
      *                                            null object.
-     * @see Channels#combine(int, Collection)
+     * @see Channels#combine(int, Iterable)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
@@ -192,7 +192,7 @@ public class Streams extends Functions {
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
      * @throws java.lang.NullPointerException     if the specified collection is null or contains a
      *                                            null object.
-     * @see Channels#combine(Collection)
+     * @see Channels#combine(Iterable)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
@@ -238,7 +238,7 @@ public class Streams extends Functions {
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
      * @throws java.lang.NullPointerException     if the specified collection is null or contains a
      *                                            null object.
-     * @see Channels#concat(Collection)
+     * @see Channels#concat(Iterable)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<OUT>> concat(
@@ -307,7 +307,7 @@ public class Streams extends Functions {
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
      * @throws java.lang.NullPointerException     if the specified collection is null or contains a
      *                                            null object.
-     * @see Channels#distribute(Collection)
+     * @see Channels#distribute(Iterable)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<List<? extends IN>>> distribute(
@@ -359,7 +359,7 @@ public class Streams extends Functions {
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
      * @throws java.lang.NullPointerException     if the specified collection is null or contains a
      *                                            null object.
-     * @see Channels#distribute(Object, Collection)
+     * @see Channels#distribute(Object, Iterable)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<List<? extends IN>>> distribute(
@@ -457,7 +457,7 @@ public class Streams extends Functions {
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
      * @throws java.lang.NullPointerException     if the specified collection is null or contains a
      *                                            null object.
-     * @see Channels#join(Collection)
+     * @see Channels#join(Iterable)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<List<? extends OUT>>> join(
@@ -507,7 +507,7 @@ public class Streams extends Functions {
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
      * @throws java.lang.NullPointerException     if the specified collection is null or contains a
      *                                            null object.
-     * @see Channels#join(Object, Collection)
+     * @see Channels#join(Object, Iterable)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<List<? extends OUT>>> join(
@@ -664,7 +664,7 @@ public class Streams extends Functions {
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
      * @throws java.lang.NullPointerException     if the specified collection is null or contains a
      *                                            null object.
-     * @see Channels#merge(int, Collection)
+     * @see Channels#merge(int, Iterable)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<? extends Selectable<OUT>>> merge(
@@ -708,7 +708,7 @@ public class Streams extends Functions {
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
      * @throws java.lang.NullPointerException     if the specified collection is null or contains a
      *                                            null object.
-     * @see Channels#merge(Collection)
+     * @see Channels#merge(Iterable)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<? extends Selectable<OUT>>> merge(

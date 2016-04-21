@@ -27,7 +27,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -50,23 +49,27 @@ class DistributeBuilder<IN> extends AbstractBuilder<IOChannel<List<? extends IN>
      *
      * @param isFlush     whether to flush data.
      * @param placeholder the placeholder instance.
-     * @param channels    the list of channels.
-     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     * @param channels    the input channels.
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      */
     DistributeBuilder(final boolean isFlush, @Nullable final IN placeholder,
-            @NotNull final Collection<? extends InputChannel<? extends IN>> channels) {
-
-        if (channels.isEmpty()) {
-            throw new IllegalArgumentException("the collection of channels must not be empty");
-        }
+            @NotNull final Iterable<? extends InputChannel<? extends IN>> channels) {
 
         final ArrayList<InputChannel<? extends IN>> channelList =
-                new ArrayList<InputChannel<? extends IN>>(channels);
-        if (channelList.contains(null)) {
-            throw new NullPointerException(
-                    "the collection of channels must not contain null objects");
+                new ArrayList<InputChannel<? extends IN>>();
+        for (final InputChannel<? extends IN> channel : channels) {
+            if (channel == null) {
+                throw new NullPointerException(
+                        "the collection of channels must not contain null objects");
+            }
+
+            channelList.add(channel);
+        }
+
+        if (channelList.isEmpty()) {
+            throw new IllegalArgumentException("the collection of channels must not be empty");
         }
 
         mIsFlush = isFlush;

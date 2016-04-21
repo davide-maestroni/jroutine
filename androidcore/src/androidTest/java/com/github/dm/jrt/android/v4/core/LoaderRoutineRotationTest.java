@@ -75,7 +75,7 @@ public class LoaderRoutineRotationTest
         routine.asyncCall("test1");
 
         simulateRotation();
-        TimeDuration.millis(1000).sleepAtLeast();
+        TimeDuration.seconds(5).sleepAtLeast();
         assertThat(routine.asyncCall("test2").afterMax(timeout).next()).isEqualTo("TEST1");
     }
 
@@ -183,7 +183,7 @@ public class LoaderRoutineRotationTest
         routine.asyncCall("test1");
 
         simulateRotation();
-        TimeDuration.millis(1000).sleepAtLeast();
+        TimeDuration.seconds(5).sleepAtLeast();
         assertThat(routine.asyncCall("test2").afterMax(timeout).next()).isEqualTo("TEST2");
     }
 

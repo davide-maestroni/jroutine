@@ -25,7 +25,6 @@ import com.github.dm.jrt.core.config.ChannelConfiguration;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * Builder implementation merging data from a set of output channels into selectable objects.
@@ -46,22 +45,26 @@ class MergeBuilder<OUT>
      *
      * @param startIndex the selectable start index.
      * @param channels   the input channels to merge.
-     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      */
     MergeBuilder(final int startIndex,
-            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
-
-        if (channels.isEmpty()) {
-            throw new IllegalArgumentException("the collection of channels must not be empty");
-        }
+            @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
 
         final ArrayList<OutputChannel<? extends OUT>> channelList =
-                new ArrayList<OutputChannel<? extends OUT>>(channels);
-        if (channelList.contains(null)) {
-            throw new NullPointerException(
-                    "the collection of channels must not contain null objects");
+                new ArrayList<OutputChannel<? extends OUT>>();
+        for (final OutputChannel<? extends OUT> channel : channels) {
+            if (channel == null) {
+                throw new NullPointerException(
+                        "the collection of channels must not contain null objects");
+            }
+
+            channelList.add(channel);
+        }
+
+        if (channelList.isEmpty()) {
+            throw new IllegalArgumentException("the collection of channels must not be empty");
         }
 
         mStartIndex = startIndex;

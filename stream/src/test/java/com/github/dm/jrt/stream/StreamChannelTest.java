@@ -1529,6 +1529,33 @@ public class StreamChannelTest {
     }
 
     @Test
+    public void testPeek() {
+
+        final ArrayList<String> data = new ArrayList<String>();
+        assertThat(Streams.streamOf("test1", "test2", "test3").async().peek(new Consumer<String>() {
+
+            public void accept(final String s) {
+
+                data.add(s);
+            }
+        }).afterMax(seconds(3)).all()).containsExactly("test1", "test2", "test3");
+        assertThat(data).containsExactly("test1", "test2", "test3");
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testPeekNullPointerError() {
+
+        try {
+            Streams.streamOf().async().peek(null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
     public void testReduce() {
 
         assertThat(Streams.streamOf("test1", "test2", "test3")

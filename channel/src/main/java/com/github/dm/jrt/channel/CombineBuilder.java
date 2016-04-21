@@ -26,7 +26,6 @@ import com.github.dm.jrt.core.error.RoutineException;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * Builder implementation returning a channel combining data from a collection of input channels.
@@ -46,22 +45,26 @@ class CombineBuilder<IN> extends AbstractBuilder<IOChannel<Selectable<? extends 
      *
      * @param startIndex the selectable start index.
      * @param channels   the input channels to combine.
-     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      */
     CombineBuilder(final int startIndex,
-            @NotNull final Collection<? extends InputChannel<? extends IN>> channels) {
-
-        if (channels.isEmpty()) {
-            throw new IllegalArgumentException("the collection of channels must not be empty");
-        }
+            @NotNull final Iterable<? extends InputChannel<? extends IN>> channels) {
 
         final ArrayList<InputChannel<? extends IN>> channelList =
-                new ArrayList<InputChannel<? extends IN>>(channels);
-        if (channelList.contains(null)) {
-            throw new NullPointerException(
-                    "the collection of channels must not contain null objects");
+                new ArrayList<InputChannel<? extends IN>>();
+        for (final InputChannel<? extends IN> channel : channels) {
+            if (channel == null) {
+                throw new NullPointerException(
+                        "the collection of channels must not contain null objects");
+            }
+
+            channelList.add(channel);
+        }
+
+        if (channelList.isEmpty()) {
+            throw new IllegalArgumentException("the collection of channels must not be empty");
         }
 
         mStartIndex = startIndex;

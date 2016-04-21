@@ -31,7 +31,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -70,16 +69,16 @@ public class Channels {
      *     </code>
      * </pre>
      *
-     * @param channels the collection of channels.
+     * @param channels the iterable of channels.
      * @param <OUT>    the output data type.
      * @return the output channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends OutputChannel<OUT>> blend(
-            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
+            @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
 
         return new BlendBuilder<OUT>(channels);
     }
@@ -140,8 +139,8 @@ public class Channels {
      * @param <IN>     the input data type.
      * @return the selectable I/O channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
-     *                                            null object.
+     * @throws java.lang.NullPointerException     if the specified array is null or contains a null
+     *                                            object.
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
@@ -208,17 +207,17 @@ public class Channels {
      * </pre>
      *
      * @param startIndex the selectable start index.
-     * @param channels   the collection of input channels.
+     * @param channels   the iterable of input channels.
      * @param <IN>       the input data type.
      * @return the selectable I/O channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
             final int startIndex,
-            @NotNull final Collection<? extends InputChannel<? extends IN>> channels) {
+            @NotNull final Iterable<? extends InputChannel<? extends IN>> channels) {
 
         return new CombineBuilder<IN>(startIndex, channels);
     }
@@ -241,16 +240,16 @@ public class Channels {
      *     </code>
      * </pre>
      *
-     * @param channels the collection of input channels.
+     * @param channels the iterable of input channels.
      * @param <IN>     the input data type.
      * @return the selectable I/O channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
-            @NotNull final Collection<? extends InputChannel<? extends IN>> channels) {
+            @NotNull final Iterable<? extends InputChannel<? extends IN>> channels) {
 
         return combine(0, channels);
     }
@@ -303,16 +302,16 @@ public class Channels {
      *     </code>
      * </pre>
      *
-     * @param channels the collection of channels.
+     * @param channels the iterable of channels.
      * @param <OUT>    the output data type.
      * @return the output channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends OutputChannel<OUT>> concat(
-            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
+            @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
 
         return new ConcatBuilder<OUT>(channels);
     }
@@ -403,16 +402,16 @@ public class Channels {
      *     </code>
      * </pre>
      *
-     * @param channels the collection of channels.
+     * @param channels the iterable of channels.
      * @param <IN>     the input data type.
      * @return the I/O channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<List<? extends IN>>> distribute(
-            @NotNull final Collection<? extends InputChannel<? extends IN>> channels) {
+            @NotNull final Iterable<? extends InputChannel<? extends IN>> channels) {
 
         return distribute(false, null, channels);
     }
@@ -473,17 +472,17 @@ public class Channels {
      * </pre>
      *
      * @param placeholder the placeholder instance.
-     * @param channels    the collection of channels.
+     * @param channels    the iterable of channels.
      * @param <IN>        the input data type.
      * @return the I/O channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<List<? extends IN>>> distribute(
             @Nullable final IN placeholder,
-            @NotNull final Collection<? extends InputChannel<? extends IN>> channels) {
+            @NotNull final Iterable<? extends InputChannel<? extends IN>> channels) {
 
         return distribute(true, placeholder, channels);
     }
@@ -504,16 +503,16 @@ public class Channels {
      *     </code>
      * </pre>
      *
-     * @param channels the collection of channels.
+     * @param channels the iterable of channels.
      * @param <OUT>    the output data type.
      * @return the output channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends OutputChannel<List<? extends OUT>>> join(
-            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
+            @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
 
         return join(false, null, channels);
     }
@@ -568,17 +567,17 @@ public class Channels {
      * </pre>
      *
      * @param placeholder the placeholder instance.
-     * @param channels    the collection of channels.
+     * @param channels    the iterable of channels.
      * @param <OUT>       the output data type.
      * @return the output channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends OutputChannel<List<? extends OUT>>> join(
             @Nullable final OUT placeholder,
-            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
+            @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
 
         return join(true, placeholder, channels);
     }
@@ -633,17 +632,17 @@ public class Channels {
      * </pre>
      *
      * @param startIndex the selectable start index.
-     * @param channels   the collection of channels.
+     * @param channels   the iterable of channels.
      * @param <OUT>      the output data type.
      * @return the selectable output channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends OutputChannel<? extends Selectable<OUT>>> merge(
             final int startIndex,
-            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
+            @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
 
         return new MergeBuilder<OUT>(startIndex, channels);
     }
@@ -701,13 +700,13 @@ public class Channels {
      * @param channels the channels to merge.
      * @param <OUT>    the output data type.
      * @return the selectable output channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends OutputChannel<? extends Selectable<OUT>>> merge(
-            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
+            @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
 
         return merge(0, channels);
     }
@@ -1141,7 +1140,7 @@ public class Channels {
     @NotNull
     private static <IN> ChannelsBuilder<? extends IOChannel<List<? extends IN>>> distribute(
             final boolean isFlush, @Nullable final IN placeholder,
-            @NotNull final Collection<? extends InputChannel<? extends IN>> channels) {
+            @NotNull final Iterable<? extends InputChannel<? extends IN>> channels) {
 
         return new DistributeBuilder<IN>(isFlush, placeholder, channels);
     }
@@ -1149,7 +1148,7 @@ public class Channels {
     @NotNull
     private static <OUT> ChannelsBuilder<? extends OutputChannel<List<? extends OUT>>> join(
             final boolean isFlush, @Nullable final OUT placeholder,
-            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
+            @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
 
         return new JoinBuilder<OUT>(isFlush, placeholder, channels);
     }
@@ -1245,22 +1244,26 @@ public class Channels {
          * @param isFlush     whether to flush data.
          * @param placeholder the placeholder instance.
          * @param channels    the input channels to join.
-         * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-         * @throws java.lang.NullPointerException     if the specified collection is null or
-         *                                            contains a null object.
+         * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+         * @throws java.lang.NullPointerException     if the specified iterable is null or contains
+         *                                            a null object.
          */
         private JoinBuilder(final boolean isFlush, @Nullable final OUT placeholder,
-                @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
-
-            if (channels.isEmpty()) {
-                throw new IllegalArgumentException("the collection of channels must not be empty");
-            }
+                @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
 
             final ArrayList<OutputChannel<? extends OUT>> channelList =
-                    new ArrayList<OutputChannel<? extends OUT>>(channels);
-            if (channelList.contains(null)) {
-                throw new NullPointerException(
-                        "the collection of channels must not contain null objects");
+                    new ArrayList<OutputChannel<? extends OUT>>();
+            for (final OutputChannel<? extends OUT> channel : channels) {
+                if (channel == null) {
+                    throw new NullPointerException(
+                            "the collection of channels must not contain null objects");
+                }
+
+                channelList.add(channel);
+            }
+
+            if (channelList.isEmpty()) {
+                throw new IllegalArgumentException("the collection of channels must not be empty");
             }
 
             mIsFlush = isFlush;
@@ -1410,22 +1413,26 @@ public class Channels {
          *
          * @param startIndex the selectable start index.
          * @param channels   the input channels to merge.
-         * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-         * @throws java.lang.NullPointerException     if the specified collection is null or
-         *                                            contains a null object.
+         * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+         * @throws java.lang.NullPointerException     if the specified iterable is null or contains
+         *                                            a null object.
          */
         private MergeBuilder(final int startIndex,
-                @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
-
-            if (channels.isEmpty()) {
-                throw new IllegalArgumentException("the collection of channels must not be empty");
-            }
+                @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
 
             final ArrayList<OutputChannel<? extends OUT>> channelList =
-                    new ArrayList<OutputChannel<? extends OUT>>(channels);
-            if (channelList.contains(null)) {
-                throw new NullPointerException(
-                        "the collection of channels must not contain null objects");
+                    new ArrayList<OutputChannel<? extends OUT>>();
+            for (final OutputChannel<? extends OUT> channel : channels) {
+                if (channel == null) {
+                    throw new NullPointerException(
+                            "the collection of channels must not contain null objects");
+                }
+
+                channelList.add(channel);
+            }
+
+            if (channelList.isEmpty()) {
+                throw new IllegalArgumentException("the collection of channels must not be empty");
             }
 
             mStartIndex = startIndex;

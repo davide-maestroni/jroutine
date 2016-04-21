@@ -323,6 +323,8 @@ public interface StreamChannel<OUT>
     @NotNull
     <AFTER> StreamChannel<AFTER> map(@NotNull Routine<? super OUT, ? extends AFTER> routine);
 
+    // TODO: 20/04/16 invocation, invocationClass, invocationToken...
+
     /**
      * Concatenates a stream based on the specified consumer to this one.
      * <br>
@@ -339,8 +341,6 @@ public interface StreamChannel<OUT>
     @NotNull
     <AFTER> StreamChannel<AFTER> mapAll(
             @NotNull BiConsumer<? super List<OUT>, ? super ResultChannel<AFTER>> consumer);
-
-    // TODO: 20/04/16 invocation, invocationClass, invocationToken...
 
     /**
      * Concatenates a stream based on the specified function to this one.
@@ -384,8 +384,6 @@ public interface StreamChannel<OUT>
     @NotNull
     StreamChannel<OUT> onError(@NotNull Consumer<? super RoutineException> consumer);
 
-    // TODO: 21/04/16 peek()
-
     /**
      * Concatenates a stream based on the specified consumer to this one.
      * <br>
@@ -422,6 +420,19 @@ public interface StreamChannel<OUT>
      */
     @NotNull
     StreamChannel<OUT> parallel();
+
+    /**
+     * Concatenates a stream based on the specified peeking consumer.
+     * <br>
+     * Outputs will be automatically passed on.
+     * <p>
+     * Note that the invocation will be aborted if an exception escapes the consumer.
+     *
+     * @param consumer the consumer instance.
+     * @return the concatenated stream.
+     */
+    @NotNull
+    StreamChannel<OUT> peek(@NotNull Consumer<? super OUT> consumer);
 
     /**
      * Concatenates a stream based on the specified accumulating function to this one.

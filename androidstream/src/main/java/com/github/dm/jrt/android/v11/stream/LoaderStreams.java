@@ -18,12 +18,14 @@ package com.github.dm.jrt.android.v11.stream;
 
 import android.util.SparseArray;
 
+import com.github.dm.jrt.android.channel.AndroidChannels;
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
 import com.github.dm.jrt.android.core.builder.LoaderRoutineBuilder;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.v11.channel.SparseChannels;
 import com.github.dm.jrt.android.v11.core.JRoutineLoader;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
+import com.github.dm.jrt.channel.Channels;
 import com.github.dm.jrt.channel.ChannelsBuilder;
 import com.github.dm.jrt.channel.Selectable;
 import com.github.dm.jrt.core.JRoutineCore;
@@ -73,7 +75,7 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
      * @throws java.lang.NullPointerException     if the specified collection is null or contains a
      *                                            null object.
-     * @see SparseChannels#blend(Collection)
+     * @see Channels#blend(Iterable)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<OUT>> blend(
@@ -161,7 +163,7 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
      * @throws java.lang.NullPointerException     if the specified collection is null or contains a
      *                                            null object.
-     * @see SparseChannels#combine(int, Collection)
+     * @see Channels#combine(int, Iterable)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
@@ -185,7 +187,7 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
      * @throws java.lang.NullPointerException     if the specified collection is null or contains a
      *                                            null object.
-     * @see SparseChannels#combine(Collection)
+     * @see Channels#combine(Iterable)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
@@ -254,7 +256,7 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
      * @throws java.lang.NullPointerException     if the specified collection is null or contains a
      *                                            null object.
-     * @see SparseChannels#concat(Collection)
+     * @see Channels#concat(Iterable)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<OUT>> concat(
@@ -348,7 +350,7 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
      * @throws java.lang.NullPointerException     if the specified collection is null or contains a
      *                                            null object.
-     * @see SparseChannels#distribute(Collection)
+     * @see Channels#distribute(Iterable)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<List<? extends IN>>> distribute(
@@ -400,7 +402,7 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
      * @throws java.lang.NullPointerException     if the specified collection is null or contains a
      *                                            null object.
-     * @see SparseChannels#distribute(Object, Collection)
+     * @see Channels#distribute(Object, Iterable)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<List<? extends IN>>> distribute(
@@ -424,7 +426,7 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
      * @throws java.lang.NullPointerException     if the specified collection is null or contains a
      *                                            null object.
-     * @see SparseChannels#join(Collection)
+     * @see Channels#join(Iterable)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<List<? extends OUT>>> join(
@@ -474,7 +476,7 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
      * @throws java.lang.NullPointerException     if the specified collection is null or contains a
      *                                            null object.
-     * @see SparseChannels#join(Object, Collection)
+     * @see Channels#join(Object, Iterable)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<List<? extends OUT>>> join(
@@ -609,7 +611,7 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
      * @throws java.lang.NullPointerException     if the specified collection is null or contains a
      *                                            null object.
-     * @see SparseChannels#merge(int, Collection)
+     * @see AndroidChannels#merge(int, Iterable)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<? extends
@@ -656,7 +658,7 @@ public class LoaderStreams extends Streams {
      * @throws java.lang.IllegalArgumentException if the specified collection is empty.
      * @throws java.lang.NullPointerException     if the specified collection is null or contains a
      *                                            null object.
-     * @see SparseChannels#merge(Collection)
+     * @see AndroidChannels#merge(Iterable)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<? extends

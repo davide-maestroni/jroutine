@@ -24,6 +24,7 @@ import android.os.HandlerThread;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
+import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.core.runner.AndroidRunners;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
@@ -637,6 +638,24 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                 })
                                 .afterMax(seconds(10))
                                 .all()).containsExactly("TEST1", "TEST2");
+    }
+
+    private static void testPeek(@NotNull final Activity activity) {
+
+        final ArrayList<String> data = new ArrayList<String>();
+        assertThat(LoaderStreams.streamOf("test1", "test2", "test3")
+                                .with(loaderFrom(activity))
+                                .async()
+                                .peek(new Consumer<String>() {
+
+                                    public void accept(final String s) {
+
+                                        data.add(s);
+                                    }
+                                })
+                                .afterMax(seconds(10))
+                                .all()).containsExactly("test1", "test2", "test3");
+        assertThat(data).containsExactly("test1", "test2", "test3");
     }
 
     private static void testReduce(@NotNull final Activity activity) {
@@ -1536,6 +1555,130 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         }
     }
 
+    public void testMapContextFactory() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
+
+        final ContextInvocationFactory<String, String> factory =
+                ContextInvocationFactory.factoryOf(UpperCase.class);
+        assertThat(LoaderStreams.streamOf("test1", "test2")
+                                .with(loaderFrom(getActivity()))
+                                .async()
+                                .map(factory)
+                                .afterMax(seconds(10))
+                                .all()).containsExactly("TEST1", "TEST2");
+        assertThat(LoaderStreams.streamOf("test1", "test2")
+                                .with(loaderFrom(getActivity()))
+                                .ordered(OrderType.BY_CALL)
+                                .parallel()
+                                .map(factory)
+                                .afterMax(seconds(10))
+                                .all()).containsExactly("TEST1", "TEST2");
+        assertThat(LoaderStreams.streamOf("test1", "test2")
+                                .with(loaderFrom(getActivity()))
+                                .sync()
+                                .map(factory)
+                                .all()).containsExactly("TEST1", "TEST2");
+        assertThat(LoaderStreams.streamOf("test1", "test2")
+                                .with(loaderFrom(getActivity()))
+                                .ordered(OrderType.BY_CALL)
+                                .serial()
+                                .map(factory)
+                                .afterMax(seconds(10))
+                                .all()).containsExactly("TEST1", "TEST2");
+    }
+
+    public void testMapContextFactoryIllegalState() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
+
+        final ContextInvocationFactory<String, String> factory =
+                ContextInvocationFactory.factoryOf(UpperCase.class);
+        try {
+            LoaderStreams.streamOf("test").async().map(factory);
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+
+        }
+
+        try {
+            LoaderStreams.streamOf("test").sync().map(factory);
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+
+        }
+
+        try {
+            LoaderStreams.streamOf("test").parallel().map(factory);
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+
+        }
+
+        try {
+            LoaderStreams.streamOf("test").serial().map(factory);
+            fail();
+
+        } catch (final IllegalStateException ignored) {
+
+        }
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public void testMapContextFactoryNullPointerError() {
+
+        try {
+            LoaderStreams.streamOf()
+                         .with(loaderFrom(getActivity()))
+                         .async()
+                         .map((ContextInvocationFactory<Object, Object>) null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+            LoaderStreams.streamOf()
+                         .with(loaderFrom(getActivity()))
+                         .parallel()
+                         .map((ContextInvocationFactory<Object, Object>) null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+            LoaderStreams.streamOf()
+                         .with(loaderFrom(getActivity()))
+                         .sync()
+                         .map((ContextInvocationFactory<Object, Object>) null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+            LoaderStreams.streamOf()
+                         .with(loaderFrom(getActivity()))
+                         .serial()
+                         .map((ContextInvocationFactory<Object, Object>) null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
     public void testMapFactory() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
@@ -1893,6 +2036,31 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             fail();
 
         } catch (final AbortException ignored) {
+
+        }
+    }
+
+    public void testPeek() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
+
+        testPeek(getActivity());
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public void testPeekNullPointerError() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
+
+        try {
+            LoaderStreams.streamOf().with(loaderFrom(getActivity())).async().peek(null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
 
         }
     }

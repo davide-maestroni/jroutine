@@ -26,30 +26,29 @@ import org.jetbrains.annotations.NotNull;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Invocation implementation wrapping a consumer accepting output data.
- * <p>
- * Created by davide-maestroni on 04/19/2016.
+ * Created by davide-maestroni on 04/21/2016.
  *
- * @param <IN> the input data type.
+ * @param <DATA> the data type.
  */
-class ConsumerInvocation<IN> extends FilterInvocation<IN, Void> {
+class PeekInvocation<DATA> extends FilterInvocation<DATA, DATA> {
 
-    private final ConsumerWrapper<? super IN> mConsumer;
+    private final ConsumerWrapper<? super DATA> mConsumer;
 
     /**
      * Constructor.
      *
      * @param consumer the consumer instance.
      */
-    ConsumerInvocation(@NotNull final ConsumerWrapper<? super IN> consumer) {
+    PeekInvocation(@NotNull final ConsumerWrapper<? super DATA> consumer) {
 
         super(asArgs(consumer));
         ConstantConditions.notNull("consumer wrapper", consumer);
         mConsumer = consumer;
     }
 
-    public void onInput(final IN input, @NotNull final ResultChannel<Void> result) {
+    public void onInput(final DATA input, @NotNull final ResultChannel<DATA> result) {
 
         mConsumer.accept(input);
+        result.pass(input);
     }
 }

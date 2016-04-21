@@ -29,7 +29,7 @@ import org.jetbrains.annotations.NotNull;
  * <pre>
  *     <code>
  *
- *                           ---------
+ *                     |     ---------
  *                     |    |         |
  *                     V    V         |
  *                ----------------    |
@@ -37,7 +37,7 @@ import org.jetbrains.annotations.NotNull;
  *                ----------------
  *                     |    |
  *                     |    |
- *               ------      ------
+ *       |       ------      ------       |
  *       |      |                  |      |
  *       V      V                  V      V
  *   ----------------          ----------------

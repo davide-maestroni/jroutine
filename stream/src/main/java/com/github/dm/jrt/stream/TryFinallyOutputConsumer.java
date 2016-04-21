@@ -53,14 +53,22 @@ class TryFinallyOutputConsumer<OUT> implements OutputConsumer<OUT> {
 
     public void onComplete() {
 
-        mRunnable.run();
-        mOutputChannel.close();
+        try {
+            mRunnable.run();
+
+        } finally {
+            mOutputChannel.close();
+        }
     }
 
     public void onError(@NotNull final RoutineException error) {
 
-        mRunnable.run();
-        mOutputChannel.abort(error);
+        try {
+            mRunnable.run();
+
+        } finally {
+            mOutputChannel.abort(error);
+        }
     }
 
     public void onOutput(final OUT output) {

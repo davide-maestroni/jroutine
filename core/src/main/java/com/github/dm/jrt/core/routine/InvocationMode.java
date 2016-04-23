@@ -28,25 +28,25 @@ public enum InvocationMode {
     /**
      * Synchronous mode.
      *
-     * @see Routine Routine
+     * @see com.github.dm.jrt.core.routine.Routine Routine
      */
     SYNC,
     /**
      * Asynchronous mode.
      *
-     * @see Routine Routine
+     * @see com.github.dm.jrt.core.routine.Routine Routine
      */
     ASYNC,
     /**
      * Parallel mode.
      *
-     * @see Routine Routine
+     * @see com.github.dm.jrt.core.routine.Routine Routine
      */
     PARALLEL,
     /**
      * Serial mode.
      *
-     * @see Routine Routine
+     * @see com.github.dm.jrt.core.routine.Routine Routine
      */
     SERIAL
 }

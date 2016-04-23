@@ -81,7 +81,6 @@ class ConsumerInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
             mConsumer = consumer;
         }
 
-
         @Override
         protected void onCall(@NotNull final List<? extends IN> inputs,
                 @NotNull final ResultChannel<OUT> result) {

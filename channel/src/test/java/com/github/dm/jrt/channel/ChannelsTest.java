@@ -25,9 +25,9 @@ import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
-import com.github.dm.jrt.core.invocation.FilterInvocation;
+import com.github.dm.jrt.core.invocation.OperationInvocation;
+import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
-import com.github.dm.jrt.core.invocation.PassingInvocation;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.routine.Routine;
@@ -80,7 +80,7 @@ public class ChannelsTest {
 
         final IOChannelBuilder builder = JRoutineCore.io();
         final Routine<Object, Object> routine =
-                JRoutineCore.on(PassingInvocation.factoryOf()).buildRoutine();
+                JRoutineCore.on(IdentityInvocation.factoryOf()).buildRoutine();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
         channel1 = builder.buildChannel();
@@ -186,9 +186,9 @@ public class ChannelsTest {
     public void testCombine() {
 
         final InvocationChannel<String, String> channel1 =
-                JRoutineCore.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
+                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         final InvocationChannel<Integer, Integer> channel2 =
-                JRoutineCore.on(PassingInvocation.<Integer>factoryOf()).asyncInvoke().orderByCall();
+                JRoutineCore.on(IdentityInvocation.<Integer>factoryOf()).asyncInvoke().orderByCall();
         Channels.combine(channel1, channel2)
                 .buildChannels()
                 .pass(new Selectable<String>("test1", 0))
@@ -229,9 +229,9 @@ public class ChannelsTest {
         InvocationChannel<String, String> channel1;
         InvocationChannel<Integer, Integer> channel2;
         channel1 =
-                JRoutineCore.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
+                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         channel2 =
-                JRoutineCore.on(PassingInvocation.<Integer>factoryOf()).asyncInvoke().orderByCall();
+                JRoutineCore.on(IdentityInvocation.<Integer>factoryOf()).asyncInvoke().orderByCall();
         Channels.combine(channel1, channel2).buildChannels().abort();
 
         try {
@@ -255,9 +255,9 @@ public class ChannelsTest {
         }
 
         channel1 =
-                JRoutineCore.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
+                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         channel2 =
-                JRoutineCore.on(PassingInvocation.<Integer>factoryOf()).asyncInvoke().orderByCall();
+                JRoutineCore.on(IdentityInvocation.<Integer>factoryOf()).asyncInvoke().orderByCall();
         Channels.combine(3, channel1, channel2).buildChannels().abort();
 
         try {
@@ -281,9 +281,9 @@ public class ChannelsTest {
         }
 
         channel1 =
-                JRoutineCore.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
+                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         channel2 =
-                JRoutineCore.on(PassingInvocation.<Integer>factoryOf()).asyncInvoke().orderByCall();
+                JRoutineCore.on(IdentityInvocation.<Integer>factoryOf()).asyncInvoke().orderByCall();
         Channels.combine(Arrays.<InvocationChannel<?, ?>>asList(channel1, channel2))
                 .buildChannels()
                 .abort();
@@ -309,9 +309,9 @@ public class ChannelsTest {
         }
 
         channel1 =
-                JRoutineCore.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
+                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         channel2 =
-                JRoutineCore.on(PassingInvocation.<Integer>factoryOf()).asyncInvoke().orderByCall();
+                JRoutineCore.on(IdentityInvocation.<Integer>factoryOf()).asyncInvoke().orderByCall();
         Channels.combine(-5, Arrays.<InvocationChannel<?, ?>>asList(channel1, channel2))
                 .buildChannels()
                 .abort();
@@ -337,9 +337,9 @@ public class ChannelsTest {
         }
 
         channel1 =
-                JRoutineCore.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
+                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         channel2 =
-                JRoutineCore.on(PassingInvocation.<Integer>factoryOf()).asyncInvoke().orderByCall();
+                JRoutineCore.on(IdentityInvocation.<Integer>factoryOf()).asyncInvoke().orderByCall();
         final HashMap<Integer, InvocationChannel<?, ?>> map =
                 new HashMap<Integer, InvocationChannel<?, ?>>(2);
         map.put(31, channel1);
@@ -495,7 +495,7 @@ public class ChannelsTest {
 
         final IOChannelBuilder builder = JRoutineCore.io();
         final Routine<Object, Object> routine =
-                JRoutineCore.on(PassingInvocation.factoryOf()).buildRoutine();
+                JRoutineCore.on(IdentityInvocation.factoryOf()).buildRoutine();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
         channel1 = builder.buildChannel();
@@ -601,9 +601,9 @@ public class ChannelsTest {
     public void testDistribute() {
 
         final InvocationChannel<String, String> channel1 =
-                JRoutineCore.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
+                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         final InvocationChannel<String, String> channel2 =
-                JRoutineCore.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
+                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         Channels.distribute(channel1, channel2)
                 .buildChannels()
                 .pass(Arrays.asList("test1-1", "test1-2"))
@@ -628,9 +628,9 @@ public class ChannelsTest {
         InvocationChannel<String, String> channel1;
         InvocationChannel<String, String> channel2;
         channel1 =
-                JRoutineCore.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
+                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         channel2 =
-                JRoutineCore.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
+                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         Channels.distribute(channel1, channel2).buildChannels().abort();
 
         try {
@@ -654,9 +654,9 @@ public class ChannelsTest {
         }
 
         channel1 =
-                JRoutineCore.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
+                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         channel2 =
-                JRoutineCore.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
+                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         Channels.distribute(Arrays.<InputChannel<?>>asList(channel1, channel2))
                 .buildChannels()
                 .abort();
@@ -686,7 +686,7 @@ public class ChannelsTest {
     public void testDistributeError() {
 
         final InvocationChannel<String, String> channel1 =
-                JRoutineCore.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
+                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         Channels.distribute(channel1)
                 .buildChannels()
                 .pass(Arrays.asList("test1-1", "test1-2"))
@@ -747,7 +747,7 @@ public class ChannelsTest {
     public void testDistributePlaceHolderError() {
 
         final InvocationChannel<String, String> channel1 =
-                JRoutineCore.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
+                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         Channels.distribute((Object) null, channel1)
                 .buildChannels()
                 .pass(Arrays.asList("test1-1", "test1-2"))
@@ -808,9 +808,9 @@ public class ChannelsTest {
     public void testDistributePlaceholder() {
 
         final InvocationChannel<String, String> channel1 =
-                JRoutineCore.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
+                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         final InvocationChannel<String, String> channel2 =
-                JRoutineCore.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
+                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         Channels.distribute((Object) null, channel1, channel2)
                 .buildChannels()
                 .pass(Arrays.asList("test1-1", "test1-2"))
@@ -837,9 +837,9 @@ public class ChannelsTest {
         InvocationChannel<String, String> channel1;
         InvocationChannel<String, String> channel2;
         channel1 =
-                JRoutineCore.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
+                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         channel2 =
-                JRoutineCore.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
+                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         Channels.distribute((Object) null, channel1, channel2).buildChannels().abort();
 
         try {
@@ -863,9 +863,9 @@ public class ChannelsTest {
         }
 
         channel1 =
-                JRoutineCore.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
+                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         channel2 =
-                JRoutineCore.on(PassingInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
+                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         Channels.distribute(null, Arrays.<InputChannel<?>>asList(channel1, channel2))
                 .buildChannels()
                 .abort();
@@ -2095,7 +2095,7 @@ public class ChannelsTest {
         }
     }
 
-    private static class CharAt extends FilterInvocation<List<?>, Character> {
+    private static class CharAt extends OperationInvocation<List<?>, Character> {
 
         /**
          * Constructor.
@@ -2113,7 +2113,7 @@ public class ChannelsTest {
         }
     }
 
-    private static class Sort extends FilterInvocation<Selectable<Object>, Selectable<Object>> {
+    private static class Sort extends OperationInvocation<Selectable<Object>, Selectable<Object>> {
 
         private static final int INTEGER = 1;
 

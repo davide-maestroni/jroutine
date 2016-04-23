@@ -21,9 +21,9 @@ import com.github.dm.jrt.core.builder.IOChannelBuilder;
 import com.github.dm.jrt.core.builder.RoutineBuilder;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
-import com.github.dm.jrt.core.invocation.FilterInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
+import com.github.dm.jrt.core.invocation.OperationInvocation;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.Consumer;
@@ -52,164 +52,6 @@ public class JRoutine extends Streams {
      */
     protected JRoutine() {
 
-    }
-
-    /**
-     * Returns a routine builder based on a call invocation factory backed by the specified
-     * consumer.
-     *
-     * @param consumer the consumer instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> call(
-            @NotNull final BiConsumer<? super List<IN>, ? super ResultChannel<OUT>> consumer) {
-
-        return JRoutineCore.on(consumerCall(consumer));
-    }
-
-    /**
-     * Returns a routine builder based on a call invocation factory backed by the specified
-     * function.
-     *
-     * @param function the function instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> call(
-            @NotNull final Function<? super List<IN>, ? extends OUT> function) {
-
-        return JRoutineCore.on(functionCall(function));
-    }
-
-    /**
-     * Returns a routine builder wrapping the specified class.
-     * <p>
-     * Note that it is responsibility of the caller to retain a strong reference to the target
-     * instance to prevent it from being garbage collected.
-     * <br>
-     * Note also that the invocation input data will be cached, and the results will be produced
-     * only after the invocation channel is closed, so be sure to avoid streaming inputs in
-     * order to prevent starvation or out of memory errors.
-     *
-     * @param targetClass the target class.
-     * @return the routine builder instance.
-     * @throws java.lang.IllegalArgumentException if the specified class represents an interface.
-     */
-    @NotNull
-    public static AutoProxyRoutineBuilder classOfType(@NotNull final Class<?> targetClass) {
-
-        return new DefaultAutoProxyRoutineBuilder(InvocationTarget.classOfType(targetClass));
-    }
-
-    /**
-     * Returns a routine builder based on a command invocation backed by the specified consumer.
-     *
-     * @param consumer the consumer instance.
-     * @param <OUT>    the output data type.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public static <OUT> RoutineBuilder<Void, OUT> command(
-            @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
-
-        return JRoutineCore.on(consumerCommand(consumer));
-    }
-
-    /**
-     * Returns a routine builder based on a command invocation backed by the specified supplier.
-     *
-     * @param supplier the supplier instance.
-     * @param <OUT>    the output data type.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public static <OUT> RoutineBuilder<Void, OUT> command(
-            @NotNull final Supplier<? extends OUT> supplier) {
-
-        return JRoutineCore.on(supplierCommand(supplier));
-    }
-
-    /**
-     * Returns a routine builder based on an invocation factory backed by the specified supplier.
-     *
-     * @param supplier the supplier instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> factory(
-            @NotNull final Supplier<? extends Invocation<? super IN, ? extends OUT>> supplier) {
-
-        return JRoutineCore.on(supplierFactory(supplier));
-    }
-
-    /**
-     * Returns a routine builder based on a filter invocation backed by the specified consumer.
-     *
-     * @param consumer the consumer instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> filter(
-            @NotNull final BiConsumer<? super IN, ? super ResultChannel<OUT>> consumer) {
-
-        return JRoutineCore.on(consumerFilter(consumer));
-    }
-
-    /**
-     * Returns a routine builder based on a filter invocation backed by the specified function.
-     *
-     * @param function the function instance.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public static <IN, OUT> RoutineBuilder<IN, OUT> filter(
-            @NotNull final Function<? super IN, ? extends OUT> function) {
-
-        return JRoutineCore.on(functionFilter(function));
-    }
-
-    /**
-     * Returns a routine builder based on a filter invocation backed by the specified predicate.
-     *
-     * @param predicate the predicate instance.
-     * @param <IN>      the input data type.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public static <IN> RoutineBuilder<IN, IN> filter(
-            @NotNull final Predicate<? super IN> predicate) {
-
-        return JRoutineCore.on(predicateFilter(predicate));
-    }
-
-    /**
-     * Returns a routine builder wrapping the specified object.
-     * <p>
-     * Note that it is responsibility of the caller to retain a strong reference to the target
-     * instance to prevent it from being garbage collected.
-     * <br>
-     * Note also that the invocation input data will be cached, and the results will be produced
-     * only after the invocation channel is closed, so be sure to avoid streaming inputs in
-     * order to prevent starvation or out of memory errors.
-     *
-     * @param object the target object.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public static AutoProxyRoutineBuilder instance(@NotNull final Object object) {
-
-        return new DefaultAutoProxyRoutineBuilder(InvocationTarget.instance(object));
     }
 
     /**
@@ -324,16 +166,16 @@ public class JRoutine extends Streams {
     }
 
     /**
-     * Returns a routine builder based on the specified filter invocation.
+     * Returns a routine builder based on the specified operation invocation.
      *
-     * @param invocation the filter invocation instance.
+     * @param invocation the operation invocation instance.
      * @param <IN>       the input data type.
      * @param <OUT>      the output data type.
      * @return the routine builder instance.
      */
     @NotNull
     public static <IN, OUT> RoutineBuilder<IN, OUT> on(
-            @NotNull final FilterInvocation<IN, OUT> invocation) {
+            @NotNull final OperationInvocation<IN, OUT> invocation) {
 
         return on((InvocationFactory<IN, OUT>) invocation);
     }
@@ -440,6 +282,164 @@ public class JRoutine extends Streams {
     @NotNull
     public static AutoProxyRoutineBuilder on(@NotNull final Object object) {
 
-        return (object instanceof Class) ? classOfType((Class<?>) object) : instance(object);
+        return (object instanceof Class) ? onClassOfType((Class<?>) object) : onInstance(object);
+    }
+
+    /**
+     * Returns a routine builder based on a call invocation factory backed by the specified
+     * consumer.
+     *
+     * @param consumer the consumer instance.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the routine builder instance.
+     */
+    @NotNull
+    public static <IN, OUT> RoutineBuilder<IN, OUT> onCall(
+            @NotNull final BiConsumer<? super List<IN>, ? super ResultChannel<OUT>> consumer) {
+
+        return JRoutineCore.on(consumerCall(consumer));
+    }
+
+    /**
+     * Returns a routine builder based on a call invocation factory backed by the specified
+     * function.
+     *
+     * @param function the function instance.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the routine builder instance.
+     */
+    @NotNull
+    public static <IN, OUT> RoutineBuilder<IN, OUT> onCall(
+            @NotNull final Function<? super List<IN>, ? extends OUT> function) {
+
+        return JRoutineCore.on(functionCall(function));
+    }
+
+    /**
+     * Returns a routine builder wrapping the specified class.
+     * <p>
+     * Note that it is responsibility of the caller to retain a strong reference to the target
+     * instance to prevent it from being garbage collected.
+     * <br>
+     * Note also that the invocation input data will be cached, and the results will be produced
+     * only after the invocation channel is closed, so be sure to avoid streaming inputs in
+     * order to prevent starvation or out of memory errors.
+     *
+     * @param targetClass the target class.
+     * @return the routine builder instance.
+     * @throws java.lang.IllegalArgumentException if the specified class represents an interface.
+     */
+    @NotNull
+    public static AutoProxyRoutineBuilder onClassOfType(@NotNull final Class<?> targetClass) {
+
+        return new DefaultAutoProxyRoutineBuilder(InvocationTarget.classOfType(targetClass));
+    }
+
+    /**
+     * Returns a routine builder based on a command invocation backed by the specified consumer.
+     *
+     * @param consumer the consumer instance.
+     * @param <OUT>    the output data type.
+     * @return the routine builder instance.
+     */
+    @NotNull
+    public static <OUT> RoutineBuilder<Void, OUT> onCommand(
+            @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
+
+        return JRoutineCore.on(consumerCommand(consumer));
+    }
+
+    /**
+     * Returns a routine builder based on a command invocation backed by the specified supplier.
+     *
+     * @param supplier the supplier instance.
+     * @param <OUT>    the output data type.
+     * @return the routine builder instance.
+     */
+    @NotNull
+    public static <OUT> RoutineBuilder<Void, OUT> onCommand(
+            @NotNull final Supplier<? extends OUT> supplier) {
+
+        return JRoutineCore.on(supplierCommand(supplier));
+    }
+
+    /**
+     * Returns a routine builder based on an invocation factory backed by the specified supplier.
+     *
+     * @param supplier the supplier instance.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the routine builder instance.
+     */
+    @NotNull
+    public static <IN, OUT> RoutineBuilder<IN, OUT> onFactory(
+            @NotNull final Supplier<? extends Invocation<? super IN, ? extends OUT>> supplier) {
+
+        return JRoutineCore.on(supplierFactory(supplier));
+    }
+
+    /**
+     * Returns a routine builder based on a operation invocation backed by the specified predicate.
+     *
+     * @param predicate the predicate instance.
+     * @param <IN>      the input data type.
+     * @return the routine builder instance.
+     */
+    @NotNull
+    public static <IN> RoutineBuilder<IN, IN> onFilter(
+            @NotNull final Predicate<? super IN> predicate) {
+
+        return JRoutineCore.on(predicateFilter(predicate));
+    }
+
+    /**
+     * Returns a routine builder wrapping the specified object.
+     * <p>
+     * Note that it is responsibility of the caller to retain a strong reference to the target
+     * instance to prevent it from being garbage collected.
+     * <br>
+     * Note also that the invocation input data will be cached, and the results will be produced
+     * only after the invocation channel is closed, so be sure to avoid streaming inputs in
+     * order to prevent starvation or out of memory errors.
+     *
+     * @param object the target object.
+     * @return the routine builder instance.
+     */
+    @NotNull
+    public static AutoProxyRoutineBuilder onInstance(@NotNull final Object object) {
+
+        return new DefaultAutoProxyRoutineBuilder(InvocationTarget.instance(object));
+    }
+
+    /**
+     * Returns a routine builder based on a operation invocation backed by the specified consumer.
+     *
+     * @param consumer the consumer instance.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the routine builder instance.
+     */
+    @NotNull
+    public static <IN, OUT> RoutineBuilder<IN, OUT> onOperation(
+            @NotNull final BiConsumer<? super IN, ? super ResultChannel<OUT>> consumer) {
+
+        return JRoutineCore.on(consumerOperation(consumer));
+    }
+
+    /**
+     * Returns a routine builder based on a operation invocation backed by the specified function.
+     *
+     * @param function the function instance.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the routine builder instance.
+     */
+    @NotNull
+    public static <IN, OUT> RoutineBuilder<IN, OUT> onOperation(
+            @NotNull final Function<? super IN, ? extends OUT> function) {
+
+        return JRoutineCore.on(functionOperation(function));
     }
 }

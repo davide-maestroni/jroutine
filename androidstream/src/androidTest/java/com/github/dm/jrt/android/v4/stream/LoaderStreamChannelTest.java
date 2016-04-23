@@ -35,7 +35,7 @@ import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.error.TimeoutException;
-import com.github.dm.jrt.core.invocation.FilterInvocation;
+import com.github.dm.jrt.core.invocation.OperationInvocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
@@ -63,7 +63,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
 import static com.github.dm.jrt.core.util.TimeDuration.minutes;
 import static com.github.dm.jrt.core.util.TimeDuration.seconds;
-import static com.github.dm.jrt.function.Functions.functionFilter;
+import static com.github.dm.jrt.function.Functions.functionOperation;
 import static com.github.dm.jrt.stream.Streams.range;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -1723,7 +1723,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
                                .async()
-                               .map((FilterInvocation<Object, Object>) null);
+                               .map((OperationInvocation<Object, Object>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -1734,7 +1734,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
                                .parallel()
-                               .map((FilterInvocation<Object, Object>) null);
+                               .map((OperationInvocation<Object, Object>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -1745,7 +1745,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
                                .sync()
-                               .map((FilterInvocation<Object, Object>) null);
+                               .map((OperationInvocation<Object, Object>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -1756,7 +1756,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             LoaderStreamsCompat.streamOf()
                                .with(loaderFrom(getActivity()))
                                .serial()
-                               .map((FilterInvocation<Object, Object>) null);
+                               .map((OperationInvocation<Object, Object>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -2050,7 +2050,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
     public void testRetry() {
 
         final Routine<Object, String> routine =
-                JRoutineCore.on(functionFilter(new Function<Object, String>() {
+                JRoutineCore.on(functionOperation(new Function<Object, String>() {
 
                     public String apply(final Object o) {
 
@@ -2600,7 +2600,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         }
     }
 
-    private static class UpperCase extends FilterInvocation<String, String> {
+    private static class UpperCase extends OperationInvocation<String, String> {
 
         /**
          * Constructor.

@@ -56,7 +56,7 @@ public class FunctionWrapper<IN, OUT> extends DeepEqualObject
      *
      * @param function the wrapped function.
      */
-    FunctionWrapper(@NotNull final Function<?, ?> function) {
+    private FunctionWrapper(@NotNull final Function<?, ?> function) {
 
         this(Collections.<Function<?, ?>>singletonList(
                 ConstantConditions.notNull("function instance", function)));
@@ -121,6 +121,33 @@ public class FunctionWrapper<IN, OUT> extends DeepEqualObject
     public static <IN> FunctionWrapper<IN, IN> identity() {
 
         return (FunctionWrapper<IN, IN>) sIdentity;
+    }
+
+    /**
+     * Wraps the specified function instance so to provide additional features.
+     * <br>
+     * The returned object will support concatenation and comparison.
+     * <p>
+     * Note that the passed object is expected to behave like a function, that is, it must not
+     * retain a mutable internal state.
+     * <br>
+     * Note also that any external object used inside the function must be synchronized in order to
+     * avoid concurrency issues.
+     *
+     * @param function the function instance.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the wrapped function.
+     */
+    @NotNull
+    public static <IN, OUT> FunctionWrapper<IN, OUT> wrap(
+            @NotNull final Function<IN, OUT> function) {
+
+        if (function instanceof FunctionWrapper) {
+            return (FunctionWrapper<IN, OUT>) function;
+        }
+
+        return new FunctionWrapper<IN, OUT>(function);
     }
 
     /**

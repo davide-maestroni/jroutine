@@ -42,7 +42,7 @@ public class SupplierWrapper<OUT> extends DeepEqualObject implements Supplier<OU
      *
      * @param supplier the initial wrapped supplier.
      */
-    SupplierWrapper(@NotNull final Supplier<?> supplier) {
+    private SupplierWrapper(@NotNull final Supplier<?> supplier) {
 
         this(ConstantConditions.notNull("supplier instance", supplier),
                 FunctionWrapper.<OUT>identity());
@@ -75,6 +75,31 @@ public class SupplierWrapper<OUT> extends DeepEqualObject implements Supplier<OU
     public static <OUT> SupplierWrapper<OUT> constant(final OUT result) {
 
         return new SupplierWrapper<OUT>(new ConstantSupplier<OUT>(result));
+    }
+
+    /**
+     * Wraps the specified supplier instance so to provide additional features.
+     * <br>
+     * The returned object will support concatenation and comparison.
+     * <p>
+     * Note that the passed object is expected to behave like a function, that is, it must not
+     * retain a mutable internal state.
+     * <br>
+     * Note also that any external object used inside the function must be synchronized in order to
+     * avoid concurrency issues.
+     *
+     * @param supplier the supplier instance.
+     * @param <OUT>    the output data type.
+     * @return the wrapped supplier.
+     */
+    @NotNull
+    public static <OUT> SupplierWrapper<OUT> wrap(@NotNull final Supplier<OUT> supplier) {
+
+        if (supplier instanceof SupplierWrapper) {
+            return (SupplierWrapper<OUT>) supplier;
+        }
+
+        return new SupplierWrapper<OUT>(supplier);
     }
 
     /**

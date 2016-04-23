@@ -233,9 +233,10 @@ public abstract class ContextInvocationFactory<IN, OUT> extends DeepEqualObject 
         private AdaptingContextInvocationFactory(@NotNull final Context context,
                 @NotNull final ContextInvocationFactory<IN, OUT> factory) {
 
-            super(asArgs(context, factory));
-            mContext = ConstantConditions.notNull("routine context", context);
-            mFactory = ConstantConditions.notNull("context invocation factory", factory);
+            super(asArgs(ConstantConditions.notNull("routine context", context),
+                    ConstantConditions.notNull("context invocation factory", factory)));
+            mContext = context;
+            mFactory = factory;
         }
 
         @NotNull

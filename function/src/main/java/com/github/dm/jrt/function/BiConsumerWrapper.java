@@ -52,7 +52,7 @@ public class BiConsumerWrapper<IN1, IN2> extends DeepEqualObject
      *
      * @param consumer the wrapped consumer.
      */
-    BiConsumerWrapper(@NotNull final BiConsumer<?, ?> consumer) {
+    private BiConsumerWrapper(@NotNull final BiConsumer<?, ?> consumer) {
 
         this(Collections.<BiConsumer<?, ?>>singletonList(
                 ConstantConditions.notNull("consumer instance", consumer)));
@@ -83,6 +83,33 @@ public class BiConsumerWrapper<IN1, IN2> extends DeepEqualObject
     public static <IN1, IN2> BiConsumerWrapper<IN1, IN2> biSink() {
 
         return (BiConsumerWrapper<IN1, IN2>) sBiSink;
+    }
+
+    /**
+     * Wraps the specified bi-consumer instance so to provide additional features.
+     * <br>
+     * The returned object will support concatenation and comparison.
+     * <p>
+     * Note that the passed object is expected to behave like a function, that is, it must not
+     * retain a mutable internal state.
+     * <br>
+     * Note also that any external object used inside the function must be synchronized in order to
+     * avoid concurrency issues.
+     *
+     * @param consumer the bi-consumer instance.
+     * @param <IN1>    the first input data type.
+     * @param <IN2>    the second input data type.
+     * @return the wrapped bi-consumer.
+     */
+    @NotNull
+    public static <IN1, IN2> BiConsumerWrapper<IN1, IN2> wrap(
+            @NotNull final BiConsumer<IN1, IN2> consumer) {
+
+        if (consumer instanceof BiConsumerWrapper) {
+            return (BiConsumerWrapper<IN1, IN2>) consumer;
+        }
+
+        return new BiConsumerWrapper<IN1, IN2>(consumer);
     }
 
     /**

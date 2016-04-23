@@ -14,41 +14,42 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream;
+package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.invocation.OperationInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.ConsumerWrapper;
 
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Invocation implementation wrapping a consumer accepting output data.
+ * Operation invocation based on a function instance.
  * <p>
- * Created by davide-maestroni on 04/19/2016.
+ * Created by davide-maestroni on 04/23/2016.
  *
- * @param <IN> the input data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-class ConsumerInvocation<IN> extends OperationInvocation<IN, Void> {
+class FunctionOperationInvocation<IN, OUT> extends OperationInvocation<IN, OUT> {
 
-    private final ConsumerWrapper<? super IN> mConsumer;
+    private final FunctionWrapper<? super IN, ? extends OUT> mFunction;
 
     /**
      * Constructor.
      *
-     * @param consumer the consumer instance.
+     * @param function the function instance.
      */
-    ConsumerInvocation(@NotNull final ConsumerWrapper<? super IN> consumer) {
+    FunctionOperationInvocation(
+            @NotNull final FunctionWrapper<? super IN, ? extends OUT> function) {
 
-        super(asArgs(ConstantConditions.notNull("consumer wrapper", consumer)));
-        mConsumer = consumer;
+        super(asArgs(ConstantConditions.notNull("function wrapper", function)));
+        mFunction = function;
     }
 
-    public void onInput(final IN input, @NotNull final ResultChannel<Void> result) {
+    public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
 
-        mConsumer.accept(input);
+        result.pass(mFunction.apply(input));
     }
 }

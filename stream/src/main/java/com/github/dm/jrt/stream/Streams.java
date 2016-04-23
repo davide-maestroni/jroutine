@@ -1311,9 +1311,10 @@ public class Streams extends Functions {
         private RangeConsumer(@NotNull final OUT start, @NotNull final OUT end,
                 @NotNull final Function<OUT, OUT> increment) {
 
-            super(asArgs(start, end, increment));
-            mStart = ConstantConditions.notNull("start element", start);
-            mEnd = ConstantConditions.notNull("end element", end);
+            super(asArgs(ConstantConditions.notNull("start element", start),
+                    ConstantConditions.notNull("end element", end), increment));
+            mStart = start;
+            mEnd = end;
             mIncrement = increment;
         }
 
@@ -1501,9 +1502,10 @@ public class Streams extends Functions {
         private SeriesConsumer(@NotNull final OUT start, final long count,
                 @NotNull final BiFunctionWrapper<OUT, Long, OUT> next) {
 
-            super(asArgs(start, count, next));
-            mStart = ConstantConditions.notNull("start element", start);
-            mCount = ConstantConditions.positive("series size", count);
+            super(asArgs(ConstantConditions.notNull("start element", start),
+                    ConstantConditions.positive("series size", count), next));
+            mStart = start;
+            mCount = count;
             mNext = next;
         }
 

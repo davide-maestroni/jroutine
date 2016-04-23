@@ -46,9 +46,8 @@ class LoopSupplierInvocation<OUT> extends GenerateInvocation<OUT> {
     LoopSupplierInvocation(final long count,
             @NotNull final SupplierWrapper<? extends OUT> supplier) {
 
-        super(asArgs(count, supplier));
-        ConstantConditions.notNull("supplier wrapper", supplier);
-        ConstantConditions.positive("count number", count);
+        super(asArgs(ConstantConditions.notNull("supplier wrapper", supplier),
+                ConstantConditions.positive("count number", count)));
         mCount = count;
         mSupplier = supplier;
     }

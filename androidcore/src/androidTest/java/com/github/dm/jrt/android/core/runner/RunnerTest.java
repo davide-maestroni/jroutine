@@ -26,7 +26,7 @@ import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
-import com.github.dm.jrt.core.invocation.FilterInvocation;
+import com.github.dm.jrt.core.invocation.OperationInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
@@ -227,7 +227,7 @@ public class RunnerTest extends AndroidTestCase {
         testRunner(AndroidRunners.handlerRunner(new HandlerThread("test")));
     }
 
-    private static class HandlerInvocationFactory extends FilterInvocation<Handler, Object> {
+    private static class HandlerInvocationFactory extends OperationInvocation<Handler, Object> {
 
         /**
          * Constructor.

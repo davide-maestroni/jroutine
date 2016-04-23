@@ -120,13 +120,13 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
 
         new TestClass("test");
         assertThat(JRoutineAndroid.with(getActivity())
-                                  .classOfType(TestClass.class)
+                                  .onClassOfType(TestClass.class)
                                   .method("getStringUp")
                                   .asyncCall()
                                   .afterMax(seconds(10))
                                   .all()).containsExactly("TEST");
         assertThat(JRoutineAndroid.with(getActivity())
-                                  .classOfType(TestClass.class)
+                                  .onClassOfType(TestClass.class)
                                   .method(TestClass.class.getMethod("getStringUp"))
                                   .asyncCall()
                                   .afterMax(seconds(10))
@@ -147,7 +147,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
 
         new TestClass("test");
         assertThat(JRoutineAndroid.with(getActivity())
-                                  .instanceOf(TestClass.class)
+                                  .onInstanceOf(TestClass.class)
                                   .loaderConfiguration()
                                   .withLoaderId(33)
                                   .withCacheStrategy(CacheStrategyType.CACHE)
@@ -170,13 +170,13 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         }
 
         assertThat(JRoutineAndroid.with(getActivity())
-                                  .instanceOf(TestClass.class, "TEST")
+                                  .onInstanceOf(TestClass.class, "TEST")
                                   .method(TestClass.class.getMethod("getStringLow"))
                                   .asyncCall()
                                   .afterMax(seconds(10))
                                   .all()).containsExactly("test");
         assertThat(JRoutineAndroid.with(getActivity())
-                                  .instanceOf(TestClass.class)
+                                  .onInstanceOf(TestClass.class)
                                   .method("getStringLow")
                                   .asyncCall()
                                   .afterMax(seconds(10))
@@ -236,35 +236,35 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
 
         new TestClass("TEST");
         assertThat(JRoutineAndroid.with(getActivity())
-                                  .instanceOf(TestClass.class)
+                                  .onInstanceOf(TestClass.class)
                                   .buildProxy(TestAnnotatedProxy.class)
                                   .getStringLow()
                                   .all()).containsExactly("test");
         assertThat(JRoutineAndroid.with(getActivity())
-                                  .instanceOf(TestClass.class)
+                                  .onInstanceOf(TestClass.class)
                                   .buildProxy(tokenOf(TestAnnotatedProxy.class))
                                   .getStringLow()
                                   .all()).containsExactly("test");
         assertThat(JRoutineAndroid.with(getActivity())
-                                  .instanceOf(TestClass.class)
+                                  .onInstanceOf(TestClass.class)
                                   .withType(BuilderType.OBJECT)
                                   .buildProxy(TestProxy.class)
                                   .getStringLow()
                                   .all()).containsExactly("test");
         assertThat(JRoutineAndroid.with(getActivity())
-                                  .instanceOf(TestClass.class)
+                                  .onInstanceOf(TestClass.class)
                                   .withType(BuilderType.OBJECT)
                                   .buildProxy(tokenOf(TestProxy.class))
                                   .getStringLow()
                                   .all()).containsExactly("test");
         assertThat(JRoutineAndroid.with(getActivity())
-                                  .instanceOf(TestClass.class)
+                                  .onInstanceOf(TestClass.class)
                                   .withType(BuilderType.PROXY)
                                   .buildProxy(TestAnnotatedProxy.class)
                                   .getStringLow()
                                   .all()).containsExactly("test");
         assertThat(JRoutineAndroid.with(getActivity())
-                                  .instanceOf(TestClass.class)
+                                  .onInstanceOf(TestClass.class)
                                   .withType(BuilderType.PROXY)
                                   .buildProxy(tokenOf(TestAnnotatedProxy.class))
                                   .getStringLow()
@@ -279,7 +279,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
 
         new TestClass("TEST");
         assertThat(JRoutineAndroid.with(getActivity())
-                                  .instanceOf(TestClass.class)
+                                  .onInstanceOf(TestClass.class)
                                   .invocationConfiguration()
                                   .withLog(AndroidLogs.androidLog())
                                   .apply()
@@ -348,13 +348,13 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
 
         new TestClass("test");
         assertThat(JRoutineAndroid.with((Context) getActivity())
-                                  .classOfType(TestClass.class)
+                                  .onClassOfType(TestClass.class)
                                   .method("getStringUp")
                                   .asyncCall()
                                   .afterMax(seconds(10))
                                   .all()).containsExactly("TEST");
         assertThat(JRoutineAndroid.with((Context) getActivity())
-                                  .classOfType(TestClass.class)
+                                  .onClassOfType(TestClass.class)
                                   .method(TestClass.class.getMethod("getStringUp"))
                                   .asyncCall()
                                   .afterMax(seconds(10))
@@ -374,13 +374,13 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
         }
 
         assertThat(JRoutineAndroid.with((Context) getActivity())
-                                  .instanceOf(TestClass.class, "TEST")
+                                  .onInstanceOf(TestClass.class, "TEST")
                                   .method(TestClass.class.getMethod("getStringLow"))
                                   .asyncCall()
                                   .afterMax(seconds(10))
                                   .all()).containsExactly("test");
         assertThat(JRoutineAndroid.with((Context) getActivity())
-                                  .instanceOf(TestClass.class)
+                                  .onInstanceOf(TestClass.class)
                                   .method("getStringLow")
                                   .asyncCall()
                                   .afterMax(seconds(10))
@@ -440,35 +440,35 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
 
         new TestClass("TEST");
         assertThat(JRoutineAndroid.with((Context) getActivity())
-                                  .instanceOf(TestClass.class)
+                                  .onInstanceOf(TestClass.class)
                                   .buildProxy(TestAnnotatedProxy.class)
                                   .getStringLow()
                                   .all()).containsExactly("test");
         assertThat(JRoutineAndroid.with((Context) getActivity())
-                                  .instanceOf(TestClass.class)
+                                  .onInstanceOf(TestClass.class)
                                   .buildProxy(tokenOf(TestAnnotatedProxy.class))
                                   .getStringLow()
                                   .all()).containsExactly("test");
         assertThat(JRoutineAndroid.with((Context) getActivity())
-                                  .instanceOf(TestClass.class)
+                                  .onInstanceOf(TestClass.class)
                                   .withType(BuilderType.OBJECT)
                                   .buildProxy(TestProxy.class)
                                   .getStringLow()
                                   .all()).containsExactly("test");
         assertThat(JRoutineAndroid.with((Context) getActivity())
-                                  .instanceOf(TestClass.class)
+                                  .onInstanceOf(TestClass.class)
                                   .withType(BuilderType.OBJECT)
                                   .buildProxy(tokenOf(TestProxy.class))
                                   .getStringLow()
                                   .all()).containsExactly("test");
         assertThat(JRoutineAndroid.with((Context) getActivity())
-                                  .instanceOf(TestClass.class)
+                                  .onInstanceOf(TestClass.class)
                                   .withType(BuilderType.PROXY)
                                   .buildProxy(TestAnnotatedProxy.class)
                                   .getStringLow()
                                   .all()).containsExactly("test");
         assertThat(JRoutineAndroid.with((Context) getActivity())
-                                  .instanceOf(TestClass.class)
+                                  .onInstanceOf(TestClass.class)
                                   .withType(BuilderType.PROXY)
                                   .buildProxy(tokenOf(TestAnnotatedProxy.class))
                                   .getStringLow()
@@ -483,7 +483,7 @@ public class JRoutineAndroidTest extends ActivityInstrumentationTestCase2<TestAc
 
         new TestClass("TEST");
         assertThat(JRoutineAndroid.with((Context) getActivity())
-                                  .instanceOf(TestClass.class)
+                                  .onInstanceOf(TestClass.class)
                                   .invocationConfiguration()
                                   .withLog(AndroidLogs.androidLog())
                                   .apply()

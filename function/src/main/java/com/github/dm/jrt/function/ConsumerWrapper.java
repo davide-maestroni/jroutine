@@ -50,7 +50,7 @@ public class ConsumerWrapper<IN> extends DeepEqualObject implements Consumer<IN>
      *
      * @param consumer the wrapped consumer.
      */
-    ConsumerWrapper(@NotNull final Consumer<?> consumer) {
+    private ConsumerWrapper(@NotNull final Consumer<?> consumer) {
 
         this(Collections.<Consumer<?>>singletonList(
                 ConstantConditions.notNull("consumer instance", consumer)));
@@ -80,6 +80,31 @@ public class ConsumerWrapper<IN> extends DeepEqualObject implements Consumer<IN>
     public static <IN> ConsumerWrapper<IN> sink() {
 
         return (ConsumerWrapper<IN>) sSink;
+    }
+
+    /**
+     * Wraps the specified consumer instance so to provide additional features.
+     * <br>
+     * The returned object will support concatenation and comparison.
+     * <p>
+     * Note that the passed object is expected to behave like a function, that is, it must not
+     * retain a mutable internal state.
+     * <br>
+     * Note also that any external object used inside the function must be synchronized in order to
+     * avoid concurrency issues.
+     *
+     * @param consumer the consumer instance.
+     * @param <IN>     the input data type.
+     * @return the wrapped consumer.
+     */
+    @NotNull
+    public static <IN> ConsumerWrapper<IN> wrap(@NotNull final Consumer<IN> consumer) {
+
+        if (consumer instanceof ConsumerWrapper) {
+            return (ConsumerWrapper<IN>) consumer;
+        }
+
+        return new ConsumerWrapper<IN>(consumer);
     }
 
     /**

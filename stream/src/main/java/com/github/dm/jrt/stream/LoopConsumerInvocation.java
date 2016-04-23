@@ -46,9 +46,8 @@ class LoopConsumerInvocation<OUT> extends GenerateInvocation<OUT> {
     LoopConsumerInvocation(final long count,
             @NotNull final ConsumerWrapper<? super ResultChannel<OUT>> consumer) {
 
-        super(asArgs(count, consumer));
-        ConstantConditions.notNull("consumer wrapper", consumer);
-        ConstantConditions.positive("count number", count);
+        super(asArgs(ConstantConditions.notNull("consumer wrapper", consumer),
+                ConstantConditions.positive("count number", count)));
         mCount = count;
         mConsumer = consumer;
     }

@@ -625,7 +625,7 @@ public class ByteChannel {
         public int read(@NotNull final byte[] b, final int off, final int len) {
 
             ConstantConditions.notNull("byte array", b);
-            if ((off < 0) || (len < 0) || (len > b.length - off) || ((off + len) < 0)) {
+            if (outOfBound(off, len, b.length)) {
                 throw new IndexOutOfBoundsException();
 
             } else if (len == 0) {

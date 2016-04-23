@@ -14,41 +14,42 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream;
+package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.invocation.OperationInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.ConsumerWrapper;
 
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Invocation implementation wrapping a consumer accepting output data.
+ * Operation invocation based on a bi-consumer instance.
  * <p>
- * Created by davide-maestroni on 04/19/2016.
+ * Created by davide-maestroni on 04/23/2016.
  *
- * @param <IN> the input data type.
+ * @param <IN>  the input data type.
+ * @param <OUT> the output data type.
  */
-class ConsumerInvocation<IN> extends OperationInvocation<IN, Void> {
+class ConsumerOperationInvocation<IN, OUT> extends OperationInvocation<IN, OUT> {
 
-    private final ConsumerWrapper<? super IN> mConsumer;
+    private final BiConsumerWrapper<? super IN, ? super ResultChannel<OUT>> mConsumer;
 
     /**
      * Constructor.
      *
      * @param consumer the consumer instance.
      */
-    ConsumerInvocation(@NotNull final ConsumerWrapper<? super IN> consumer) {
+    ConsumerOperationInvocation(
+            @NotNull final BiConsumerWrapper<? super IN, ? super ResultChannel<OUT>> consumer) {
 
-        super(asArgs(ConstantConditions.notNull("consumer wrapper", consumer)));
+        super(asArgs(ConstantConditions.notNull("bi-consumer wrapper", consumer)));
         mConsumer = consumer;
     }
 
-    public void onInput(final IN input, @NotNull final ResultChannel<Void> result) {
+    public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
 
-        mConsumer.accept(input);
+        mConsumer.accept(input, result);
     }
 }

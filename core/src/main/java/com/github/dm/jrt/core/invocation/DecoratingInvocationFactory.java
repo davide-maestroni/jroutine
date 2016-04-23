@@ -41,8 +41,8 @@ public abstract class DecoratingInvocationFactory<IN, OUT> extends InvocationFac
      */
     public DecoratingInvocationFactory(@NotNull final InvocationFactory<IN, OUT> wrapped) {
 
-        super(asArgs(wrapped));
-        mFactory = ConstantConditions.notNull("wrapped factory", wrapped);
+        super(asArgs(ConstantConditions.notNull("wrapped factory", wrapped)));
+        mFactory = wrapped;
     }
 
     @NotNull

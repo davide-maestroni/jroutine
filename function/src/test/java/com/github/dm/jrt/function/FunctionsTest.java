@@ -19,10 +19,10 @@ package com.github.dm.jrt.function;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
-import com.github.dm.jrt.core.invocation.FilterInvocation;
+import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
-import com.github.dm.jrt.core.invocation.PassingInvocation;
+import com.github.dm.jrt.core.invocation.OperationInvocation;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.util.ClassToken;
 
@@ -41,9 +41,9 @@ import static com.github.dm.jrt.function.Functions.castTo;
 import static com.github.dm.jrt.function.Functions.constant;
 import static com.github.dm.jrt.function.Functions.consumerCall;
 import static com.github.dm.jrt.function.Functions.consumerCommand;
-import static com.github.dm.jrt.function.Functions.consumerFilter;
+import static com.github.dm.jrt.function.Functions.consumerOperation;
 import static com.github.dm.jrt.function.Functions.functionCall;
-import static com.github.dm.jrt.function.Functions.functionFilter;
+import static com.github.dm.jrt.function.Functions.functionOperation;
 import static com.github.dm.jrt.function.Functions.identity;
 import static com.github.dm.jrt.function.Functions.isEqualTo;
 import static com.github.dm.jrt.function.Functions.isInstanceOf;
@@ -102,7 +102,7 @@ public class FunctionsTest {
 
             public Invocation<Object, String> get() {
 
-                return new FilterInvocation<Object, String>(null) {
+                return new OperationInvocation<Object, String>(null) {
 
                     public void onInput(final Object input,
                             @NotNull final ResultChannel<String> result) {
@@ -110,42 +110,6 @@ public class FunctionsTest {
                         result.pass(input.toString());
                     }
                 };
-            }
-        });
-    }
-
-    @NotNull
-    private static FilterInvocation<Object, String> createFilter() {
-
-        return consumerFilter(new BiConsumer<Object, ResultChannel<String>>() {
-
-            public void accept(final Object o, final ResultChannel<String> result) {
-
-                result.pass(o.toString());
-            }
-        });
-    }
-
-    @NotNull
-    private static FilterInvocation<Object, String> createFilter2() {
-
-        return functionFilter(new Function<Object, String>() {
-
-            public String apply(final Object o) {
-
-                return o.toString();
-            }
-        });
-    }
-
-    @NotNull
-    private static FilterInvocation<String, String> createFilter3() {
-
-        return predicateFilter(new Predicate<String>() {
-
-            public boolean test(final String s) {
-
-                return s.length() > 0;
             }
         });
     }
@@ -180,6 +144,42 @@ public class FunctionsTest {
                 }
 
                 return builder.toString();
+            }
+        });
+    }
+
+    @NotNull
+    private static OperationInvocation<Object, String> createOperation() {
+
+        return consumerOperation(new BiConsumer<Object, ResultChannel<String>>() {
+
+            public void accept(final Object o, final ResultChannel<String> result) {
+
+                result.pass(o.toString());
+            }
+        });
+    }
+
+    @NotNull
+    private static OperationInvocation<Object, String> createOperation2() {
+
+        return functionOperation(new Function<Object, String>() {
+
+            public String apply(final Object o) {
+
+                return o.toString();
+            }
+        });
+    }
+
+    @NotNull
+    private static OperationInvocation<String, String> createOperation3() {
+
+        return predicateFilter(new Predicate<String>() {
+
+            public boolean test(final String s) {
+
+                return s.length() > 0;
             }
         });
     }
@@ -253,7 +253,7 @@ public class FunctionsTest {
 
         try {
 
-            new BiConsumerWrapper<Object, Object>(null);
+            BiConsumerWrapper.wrap(null);
 
             fail();
 
@@ -373,7 +373,7 @@ public class FunctionsTest {
 
         try {
 
-            new BiFunctionWrapper<Object, Object, Object>(null);
+            BiFunctionWrapper.wrap(null);
 
             fail();
 
@@ -659,7 +659,7 @@ public class FunctionsTest {
 
         try {
 
-            new ConsumerWrapper<Object>(null);
+            ConsumerWrapper.wrap(null);
 
             fail();
 
@@ -725,12 +725,12 @@ public class FunctionsTest {
     public void testFactoryEquals() {
 
         final Supplier<Invocation<Object, Object>> supplier =
-                constant(PassingInvocation.factoryOf().newInvocation());
+                constant(IdentityInvocation.factoryOf().newInvocation());
         final InvocationFactory<Object, String> factory = createFactory();
         assertThat(factory).isEqualTo(factory);
         assertThat(factory).isNotEqualTo(createFactory());
         assertThat(factory).isNotEqualTo(supplierFactory(supplier));
-        assertThat(factory).isNotEqualTo(createFilter());
+        assertThat(factory).isNotEqualTo(createOperation());
         assertThat(factory).isNotEqualTo("");
         assertThat(supplierFactory(supplier)).isEqualTo(supplierFactory(supplier));
         assertThat(supplierFactory(supplier).hashCode()).isEqualTo(
@@ -744,118 +744,6 @@ public class FunctionsTest {
         try {
 
             supplierFactory(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-    }
-
-    @Test
-    public void testFilter() {
-
-        final Routine<Object, String> routine = JRoutineCore.on(createFilter()).buildRoutine();
-        assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
-                "1");
-    }
-
-    @Test
-    public void testFilter2() {
-
-        final Routine<Object, String> routine = JRoutineCore.on(createFilter2()).buildRoutine();
-        assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
-                "1");
-    }
-
-    @Test
-    public void testFilter2Equals() {
-
-        final FunctionWrapper<Object, ? super Object> identity = identity();
-        final InvocationFactory<Object, String> factory = createFilter2();
-        assertThat(factory).isEqualTo(factory);
-        assertThat(factory).isNotEqualTo(createFilter2());
-        assertThat(factory).isNotEqualTo(functionFilter(identity));
-        assertThat(factory).isNotEqualTo(createFactory());
-        assertThat(factory).isNotEqualTo("");
-        assertThat(functionFilter(identity)).isEqualTo(functionFilter(identity));
-        assertThat(functionFilter(identity).hashCode()).isEqualTo(
-                functionFilter(identity).hashCode());
-    }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testFilter2Error() {
-
-        try {
-
-            functionFilter((Function<Object, ResultChannel<Object>>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-    }
-
-    @Test
-    public void testFilter3() {
-
-        final Routine<String, String> routine = JRoutineCore.on(createFilter3()).buildRoutine();
-        assertThat(routine.asyncCall("test", "").afterMax(seconds(1)).all()).containsOnly("test");
-    }
-
-    @Test
-    public void testFilter3Equals() {
-
-        final PredicateWrapper<Object> negative = negative();
-        final InvocationFactory<String, String> factory = createFilter3();
-        assertThat(factory).isEqualTo(factory);
-        assertThat(factory).isNotEqualTo(createFilter3());
-        assertThat(factory).isNotEqualTo(predicateFilter(negative));
-        assertThat(factory).isNotEqualTo(createFactory());
-        assertThat(factory).isNotEqualTo("");
-        assertThat(predicateFilter(negative)).isEqualTo(predicateFilter(negative));
-        assertThat(predicateFilter(negative).hashCode()).isEqualTo(
-                predicateFilter(negative).hashCode());
-    }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testFilter3Error() {
-
-        try {
-
-            predicateFilter(null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-    }
-
-    @Test
-    public void testFilterEquals() {
-
-        final InvocationFactory<Object, String> factory = createFilter();
-        final BiConsumerWrapper<Object, ResultChannel<String>> sink = biSink();
-        assertThat(factory).isEqualTo(factory);
-        assertThat(factory).isNotEqualTo(createFilter());
-        assertThat(factory).isNotEqualTo(consumerFilter(sink));
-        assertThat(factory).isNotEqualTo(createFactory());
-        assertThat(factory).isNotEqualTo("");
-        assertThat(consumerFilter(sink)).isEqualTo(consumerFilter(sink));
-        assertThat(consumerFilter(sink).hashCode()).isEqualTo(consumerFilter(sink).hashCode());
-    }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testFilterError() {
-
-        try {
-
-            consumerFilter(null);
 
             fail();
 
@@ -979,7 +867,7 @@ public class FunctionsTest {
 
         try {
 
-            new FunctionWrapper<Object, Object>(null);
+            FunctionWrapper.wrap(null);
 
             fail();
 
@@ -1303,6 +1191,119 @@ public class FunctionsTest {
     }
 
     @Test
+    public void testOperation() {
+
+        final Routine<Object, String> routine = JRoutineCore.on(createOperation()).buildRoutine();
+        assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
+                "1");
+    }
+
+    @Test
+    public void testOperation2() {
+
+        final Routine<Object, String> routine = JRoutineCore.on(createOperation2()).buildRoutine();
+        assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
+                "1");
+    }
+
+    @Test
+    public void testOperation2Equals() {
+
+        final FunctionWrapper<Object, ? super Object> identity = identity();
+        final InvocationFactory<Object, String> factory = createOperation2();
+        assertThat(factory).isEqualTo(factory);
+        assertThat(factory).isNotEqualTo(createOperation2());
+        assertThat(factory).isNotEqualTo(functionOperation(identity));
+        assertThat(factory).isNotEqualTo(createFactory());
+        assertThat(factory).isNotEqualTo("");
+        assertThat(functionOperation(identity)).isEqualTo(functionOperation(identity));
+        assertThat(functionOperation(identity).hashCode()).isEqualTo(
+                functionOperation(identity).hashCode());
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testOperation2Error() {
+
+        try {
+
+            functionOperation((Function<Object, ResultChannel<Object>>) null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testOperation3() {
+
+        final Routine<String, String> routine = JRoutineCore.on(createOperation3()).buildRoutine();
+        assertThat(routine.asyncCall("test", "").afterMax(seconds(1)).all()).containsOnly("test");
+    }
+
+    @Test
+    public void testOperation3Equals() {
+
+        final PredicateWrapper<Object> negative = negative();
+        final InvocationFactory<String, String> factory = createOperation3();
+        assertThat(factory).isEqualTo(factory);
+        assertThat(factory).isNotEqualTo(createOperation3());
+        assertThat(factory).isNotEqualTo(predicateFilter(negative));
+        assertThat(factory).isNotEqualTo(createFactory());
+        assertThat(factory).isNotEqualTo("");
+        assertThat(predicateFilter(negative)).isEqualTo(predicateFilter(negative));
+        assertThat(predicateFilter(negative).hashCode()).isEqualTo(
+                predicateFilter(negative).hashCode());
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testOperation3Error() {
+
+        try {
+
+            predicateFilter(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
+    public void testOperationEquals() {
+
+        final InvocationFactory<Object, String> factory = createOperation();
+        final BiConsumerWrapper<Object, ResultChannel<String>> sink = biSink();
+        assertThat(factory).isEqualTo(factory);
+        assertThat(factory).isNotEqualTo(createOperation());
+        assertThat(factory).isNotEqualTo(consumerOperation(sink));
+        assertThat(factory).isNotEqualTo(createFactory());
+        assertThat(factory).isNotEqualTo("");
+        assertThat(consumerOperation(sink)).isEqualTo(consumerOperation(sink));
+        assertThat(consumerOperation(sink).hashCode()).isEqualTo(
+                consumerOperation(sink).hashCode());
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testOperationError() {
+
+        try {
+
+            consumerOperation(null);
+
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
     public void testPredicate() {
 
         final TestPredicate predicate1 = new TestPredicate();
@@ -1452,7 +1453,7 @@ public class FunctionsTest {
 
         try {
 
-            new PredicateWrapper<Object>(null);
+            PredicateWrapper.wrap(null);
 
             fail();
 
@@ -1634,7 +1635,7 @@ public class FunctionsTest {
 
         try {
 
-            new SupplierWrapper<Object>(null);
+            SupplierWrapper.wrap(null);
 
             fail();
 

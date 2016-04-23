@@ -27,14 +27,14 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <DATA> the data type.
  */
-public class PassingInvocation<DATA> extends FilterInvocation<DATA, DATA> {
+public class IdentityInvocation<DATA> extends OperationInvocation<DATA, DATA> {
 
-    private static final PassingInvocation<Object> sInvocation = new PassingInvocation<Object>();
+    private static final IdentityInvocation<Object> sInvocation = new IdentityInvocation<Object>();
 
     /**
      * Avoid instantiation.
      */
-    private PassingInvocation() {
+    private IdentityInvocation() {
 
         super(null);
     }
@@ -47,9 +47,9 @@ public class PassingInvocation<DATA> extends FilterInvocation<DATA, DATA> {
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <DATA> FilterInvocation<DATA, DATA> factoryOf() {
+    public static <DATA> OperationInvocation<DATA, DATA> factoryOf() {
 
-        return (FilterInvocation<DATA, DATA>) sInvocation;
+        return (OperationInvocation<DATA, DATA>) sInvocation;
     }
 
     public void onInput(final DATA input, @NotNull final ResultChannel<DATA> result) {

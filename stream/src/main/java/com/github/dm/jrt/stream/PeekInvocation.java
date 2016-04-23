@@ -17,7 +17,7 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.channel.ResultChannel;
-import com.github.dm.jrt.core.invocation.FilterInvocation;
+import com.github.dm.jrt.core.invocation.OperationInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.ConsumerWrapper;
 
@@ -30,7 +30,7 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  *
  * @param <DATA> the data type.
  */
-class PeekInvocation<DATA> extends FilterInvocation<DATA, DATA> {
+class PeekInvocation<DATA> extends OperationInvocation<DATA, DATA> {
 
     private final ConsumerWrapper<? super DATA> mConsumer;
 
@@ -41,8 +41,7 @@ class PeekInvocation<DATA> extends FilterInvocation<DATA, DATA> {
      */
     PeekInvocation(@NotNull final ConsumerWrapper<? super DATA> consumer) {
 
-        super(asArgs(consumer));
-        ConstantConditions.notNull("consumer wrapper", consumer);
+        super(asArgs(ConstantConditions.notNull("consumer wrapper", consumer)));
         mConsumer = consumer;
     }
 

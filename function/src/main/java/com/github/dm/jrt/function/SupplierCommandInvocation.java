@@ -14,41 +14,40 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream;
+package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.core.channel.ResultChannel;
-import com.github.dm.jrt.core.invocation.OperationInvocation;
+import com.github.dm.jrt.core.invocation.CommandInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.ConsumerWrapper;
 
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Invocation implementation wrapping a consumer accepting output data.
+ * Command invocation based on a supplier instance.
  * <p>
- * Created by davide-maestroni on 04/19/2016.
+ * Created by davide-maestroni on 04/23/2016.
  *
- * @param <IN> the input data type.
+ * @param <OUT> the output data type.
  */
-class ConsumerInvocation<IN> extends OperationInvocation<IN, Void> {
+class SupplierCommandInvocation<OUT> extends CommandInvocation<OUT> {
 
-    private final ConsumerWrapper<? super IN> mConsumer;
+    private final SupplierWrapper<? extends OUT> mSupplier;
 
     /**
      * Constructor.
      *
-     * @param consumer the consumer instance.
+     * @param supplier the supplier instance.
      */
-    ConsumerInvocation(@NotNull final ConsumerWrapper<? super IN> consumer) {
+    public SupplierCommandInvocation(@NotNull final SupplierWrapper<? extends OUT> supplier) {
 
-        super(asArgs(ConstantConditions.notNull("consumer wrapper", consumer)));
-        mConsumer = consumer;
+        super(asArgs(ConstantConditions.notNull("supplier wrapper", supplier)));
+        mSupplier = supplier;
     }
 
-    public void onInput(final IN input, @NotNull final ResultChannel<Void> result) {
+    public void onResult(@NotNull final ResultChannel<OUT> result) {
 
-        mConsumer.accept(input);
+        result.pass(mSupplier.get());
     }
 }

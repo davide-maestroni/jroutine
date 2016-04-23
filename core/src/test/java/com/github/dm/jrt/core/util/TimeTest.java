@@ -81,6 +81,18 @@ public class TimeTest {
         assertThat(Time.days(0).compareTo(Time.seconds(0))).isEqualTo(0);
         assertThat(Time.days(0).compareTo(Time.seconds(-1))).isEqualTo(1);
         assertThat(Time.days(-1).compareTo(Time.seconds(0))).isEqualTo(-1);
+        assertThat(Time.millis(0).isGreaterThan(Time.seconds(0))).isFalse();
+        assertThat(Time.millis(0).isGreaterThanOrEqualTo(Time.seconds(0))).isTrue();
+        assertThat(Time.millis(0).isLessThan(Time.seconds(0))).isFalse();
+        assertThat(Time.millis(0).isLessThanOrEqualTo(Time.seconds(0))).isTrue();
+        assertThat(Time.millis(0).isGreaterThan(Time.seconds(-1))).isTrue();
+        assertThat(Time.millis(0).isGreaterThanOrEqualTo(Time.seconds(-1))).isTrue();
+        assertThat(Time.millis(0).isLessThan(Time.seconds(-1))).isFalse();
+        assertThat(Time.millis(0).isLessThanOrEqualTo(Time.seconds(-1))).isFalse();
+        assertThat(Time.millis(-1).isGreaterThan(Time.seconds(0))).isFalse();
+        assertThat(Time.millis(-1).isGreaterThanOrEqualTo(Time.seconds(0))).isFalse();
+        assertThat(Time.millis(-1).isLessThan(Time.seconds(0))).isTrue();
+        assertThat(Time.millis(-1).isLessThanOrEqualTo(Time.seconds(0))).isTrue();
     }
 
     @Test

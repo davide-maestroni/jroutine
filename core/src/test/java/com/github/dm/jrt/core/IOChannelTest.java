@@ -23,7 +23,7 @@ import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.error.TimeoutException;
-import com.github.dm.jrt.core.invocation.PassingInvocation;
+import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.NullLog;
@@ -218,7 +218,7 @@ public class IOChannelTest {
         }.start();
 
         final OutputChannel<String> outputChannel =
-                JRoutineCore.on(PassingInvocation.<String>factoryOf()).asyncCall(ioChannel);
+                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).asyncCall(ioChannel);
         assertThat(outputChannel.afterMax(timeout).next()).isEqualTo("test");
         assertThat(outputChannel.hasCompleted()).isTrue();
     }
@@ -247,7 +247,7 @@ public class IOChannelTest {
         }.start();
 
         final OutputChannel<String> outputChannel1 =
-                JRoutineCore.on(PassingInvocation.<String>factoryOf()).asyncCall(ioChannel1);
+                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).asyncCall(ioChannel1);
         assertThat(outputChannel1.afterMax(timeout).all()).containsExactly("test1", "test2",
                 "test3");
     }
@@ -609,7 +609,7 @@ public class IOChannelTest {
         final long startTime = System.currentTimeMillis();
 
         final OutputChannel<String> outputChannel =
-                JRoutineCore.on(PassingInvocation.<String>factoryOf())
+                JRoutineCore.on(IdentityInvocation.<String>factoryOf())
                             .asyncCall(ioChannel)
                             .eventuallyExit();
         assertThat(outputChannel.afterMax(millis(500)).all()).containsExactly("test");
@@ -723,7 +723,7 @@ public class IOChannelTest {
         new WeakThread(ioChannel).start();
 
         final OutputChannel<String> outputChannel =
-                JRoutineCore.on(PassingInvocation.<String>factoryOf()).asyncCall(ioChannel);
+                JRoutineCore.on(IdentityInvocation.<String>factoryOf()).asyncCall(ioChannel);
         assertThat(outputChannel.afterMax(timeout).next()).isEqualTo("test");
     }
 

@@ -323,8 +323,6 @@ public interface StreamChannel<OUT>
     @NotNull
     <AFTER> StreamChannel<AFTER> map(@NotNull Routine<? super OUT, ? extends AFTER> routine);
 
-    // TODO: 20/04/16 invocation, invocationClass, invocationToken...
-
     /**
      * Concatenates a stream based on the specified consumer to this one.
      * <br>

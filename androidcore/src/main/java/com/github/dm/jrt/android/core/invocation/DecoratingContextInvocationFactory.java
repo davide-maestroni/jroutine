@@ -43,8 +43,8 @@ public abstract class DecoratingContextInvocationFactory<IN, OUT>
     public DecoratingContextInvocationFactory(
             @NotNull final ContextInvocationFactory<IN, OUT> wrapped) {
 
-        super(asArgs(wrapped));
-        mFactory = ConstantConditions.notNull("wrapped invocation factory", wrapped);
+        super(asArgs(ConstantConditions.notNull("wrapped invocation factory", wrapped)));
+        mFactory = wrapped;
     }
 
     @NotNull

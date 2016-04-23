@@ -18,9 +18,10 @@ package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
-import com.github.dm.jrt.core.util.ConstantConditions;
 
 import org.jetbrains.annotations.NotNull;
+
+import static com.github.dm.jrt.function.ConsumerWrapper.wrap;
 
 /**
  * Utility class used to build output consumer based on consumer functions.
@@ -44,13 +45,13 @@ public class OutputConsumerBuilder<OUT> implements OutputConsumer<OUT> {
      * @param onError    the error consumer.
      * @param onOutput   the output consumer.
      */
-    OutputConsumerBuilder(@NotNull final ConsumerWrapper<Void> onComplete,
-            @NotNull final ConsumerWrapper<RoutineException> onError,
-            @NotNull final ConsumerWrapper<OUT> onOutput) {
+    OutputConsumerBuilder(@NotNull final Consumer<Void> onComplete,
+            @NotNull final Consumer<RoutineException> onError,
+            @NotNull final Consumer<OUT> onOutput) {
 
-        mOnOutput = ConstantConditions.notNull("output consumer", onOutput);
-        mOnError = ConstantConditions.notNull("error consumer", onError);
-        mOnComplete = ConstantConditions.notNull("complete consumer", onComplete);
+        mOnOutput = wrap(onOutput);
+        mOnError = wrap(onError);
+        mOnComplete = wrap(onComplete);
     }
 
     public void onComplete() {

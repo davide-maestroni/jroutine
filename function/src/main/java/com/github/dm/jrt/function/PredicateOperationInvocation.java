@@ -14,41 +14,42 @@
  * limitations under the License.
  */
 
-package com.github.dm.jrt.stream;
+package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.invocation.OperationInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.function.ConsumerWrapper;
 
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Invocation implementation wrapping a consumer accepting output data.
+ * Operation invocation based on a predicate instance.
  * <p>
- * Created by davide-maestroni on 04/19/2016.
+ * Created by davide-maestroni on 04/23/2016.
  *
  * @param <IN> the input data type.
  */
-class ConsumerInvocation<IN> extends OperationInvocation<IN, Void> {
+class PredicateOperationInvocation<IN> extends OperationInvocation<IN, IN> {
 
-    private final ConsumerWrapper<? super IN> mConsumer;
+    private final PredicateWrapper<? super IN> mPredicate;
 
     /**
      * Constructor.
      *
-     * @param consumer the consumer instance.
+     * @param predicate the predicate instance.
      */
-    ConsumerInvocation(@NotNull final ConsumerWrapper<? super IN> consumer) {
+    PredicateOperationInvocation(@NotNull final PredicateWrapper<? super IN> predicate) {
 
-        super(asArgs(ConstantConditions.notNull("consumer wrapper", consumer)));
-        mConsumer = consumer;
+        super(asArgs(ConstantConditions.notNull("predicate wrapper", predicate)));
+        mPredicate = predicate;
     }
 
-    public void onInput(final IN input, @NotNull final ResultChannel<Void> result) {
+    public void onInput(final IN input, @NotNull final ResultChannel<IN> result) {
 
-        mConsumer.accept(input);
+        if (mPredicate.test(input)) {
+            result.pass(input);
+        }
     }
 }

@@ -40,7 +40,7 @@ import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
-import com.github.dm.jrt.core.invocation.FilterInvocation;
+import com.github.dm.jrt.core.invocation.OperationInvocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
@@ -2297,7 +2297,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         }
     }
 
-    private static class CharAt extends FilterInvocation<List<?>, Character> {
+    private static class CharAt extends OperationInvocation<List<?>, Character> {
 
         /**
          * Constructor.
@@ -2316,7 +2316,8 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
     }
 
     private static class Sort
-            extends FilterInvocation<ParcelableSelectable<Object>, ParcelableSelectable<Object>> {
+            extends
+            OperationInvocation<ParcelableSelectable<Object>, ParcelableSelectable<Object>> {
 
         private static final int INTEGER = 1;
 

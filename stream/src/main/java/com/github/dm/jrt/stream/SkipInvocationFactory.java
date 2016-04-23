@@ -45,8 +45,7 @@ class SkipInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
      */
     SkipInvocationFactory(final int count) {
 
-        super(asArgs(count));
-        ConstantConditions.notNegative("count", count);
+        super(asArgs(ConstantConditions.notNegative("count", count)));
         mCount = count;
     }
 

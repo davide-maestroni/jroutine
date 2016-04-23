@@ -49,10 +49,8 @@ class TryCatchOutputConsumer<OUT> implements OutputConsumer<OUT> {
             @NotNull final BiConsumer<? super RoutineException, ? super InputChannel<OUT>> consumer,
             @NotNull final IOChannel<OUT> outputChannel) {
 
-        ConstantConditions.notNull("bi-consumer instance", consumer);
-        ConstantConditions.notNull("output channel", outputChannel);
-        mConsumer = consumer;
-        mOutputChannel = outputChannel;
+        mConsumer = ConstantConditions.notNull("bi-consumer instance", consumer);
+        mOutputChannel = ConstantConditions.notNull("output channel", outputChannel);
     }
 
     public void onComplete() {

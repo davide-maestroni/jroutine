@@ -25,11 +25,11 @@ import com.github.dm.jrt.core.config.InvocationConfiguration.TimeoutActionType;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
-import com.github.dm.jrt.core.invocation.FilterInvocation;
+import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
-import com.github.dm.jrt.core.invocation.PassingInvocation;
+import com.github.dm.jrt.core.invocation.OperationInvocation;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.NullLog;
 import com.github.dm.jrt.core.routine.Routine;
@@ -56,7 +56,7 @@ import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.TimeDuration.millis;
 import static com.github.dm.jrt.core.util.TimeDuration.seconds;
-import static com.github.dm.jrt.function.Functions.functionFilter;
+import static com.github.dm.jrt.function.Functions.functionOperation;
 import static com.github.dm.jrt.function.Functions.wrap;
 import static com.github.dm.jrt.object.InvocationTarget.classOfType;
 import static com.github.dm.jrt.object.InvocationTarget.instance;
@@ -111,7 +111,7 @@ public class JRoutineTest {
         final Routine<Integer, Integer> sumRoutine =
                 JRoutine.on(factoryOf(execSum, this)).buildRoutine();
         final Routine<Integer, Integer> squareRoutine =
-                JRoutine.on(functionFilter(new Function<Integer, Integer>() {
+                JRoutine.on(functionOperation(new Function<Integer, Integer>() {
 
                     public Integer apply(final Integer integer) {
 
@@ -165,7 +165,7 @@ public class JRoutineTest {
     public void testConsumerCommand() {
 
         final Routine<Void, String> routine =
-                JRoutine.command(new Consumer<ResultChannel<String>>() {
+                JRoutine.onCommand(new Consumer<ResultChannel<String>>() {
 
                     public void accept(final ResultChannel<String> result) {
 
@@ -176,25 +176,10 @@ public class JRoutineTest {
     }
 
     @Test
-    public void testConsumerFilter() {
-
-        final Routine<Object, String> routine =
-                JRoutine.filter(new BiConsumer<Object, ResultChannel<String>>() {
-
-                    public void accept(final Object o, final ResultChannel<String> result) {
-
-                        result.pass(o.toString());
-                    }
-                }).buildRoutine();
-        assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
-                "1");
-    }
-
-    @Test
     public void testConsumerFunction() {
 
         final Routine<String, String> routine =
-                JRoutine.call(new BiConsumer<List<String>, ResultChannel<String>>() {
+                JRoutine.onCall(new BiConsumer<List<String>, ResultChannel<String>>() {
 
                     public void accept(final List<String> strings,
                             final ResultChannel<String> result) {
@@ -211,22 +196,16 @@ public class JRoutineTest {
     }
 
     @Test
-    public void testFilterInvocation() {
+    public void testConsumerOperation() {
 
-        final Routine<String, String> routine = JRoutine.on(new ToCase()).buildRoutine();
-        assertThat(routine.asyncCall("TEST").afterMax(seconds(1)).all()).containsOnly("test");
-    }
+        final Routine<Object, String> routine =
+                JRoutine.onOperation(new BiConsumer<Object, ResultChannel<String>>() {
 
-    @Test
-    public void testFunctionFilter() {
+                    public void accept(final Object o, final ResultChannel<String> result) {
 
-        final Routine<Object, String> routine = JRoutine.filter(new Function<Object, String>() {
-
-            public String apply(final Object o) {
-
-                return o.toString();
-            }
-        }).buildRoutine();
+                        result.pass(o.toString());
+                    }
+                }).buildRoutine();
         assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
                 "1");
     }
@@ -234,19 +213,35 @@ public class JRoutineTest {
     @Test
     public void testFunctionFunction() {
 
-        final Routine<String, String> routine = JRoutine.call(new Function<List<String>, String>() {
+        final Routine<String, String> routine =
+                JRoutine.onCall(new Function<List<String>, String>() {
 
-            public String apply(final List<String> strings) {
+                            public String apply(final List<String> strings) {
 
-                final StringBuilder builder = new StringBuilder();
-                for (final String string : strings) {
-                    builder.append(string);
-                }
+                                final StringBuilder builder = new StringBuilder();
+                                for (final String string : strings) {
+                                    builder.append(string);
+                                }
 
-                return builder.toString();
-            }
-        }).buildRoutine();
+                                return builder.toString();
+                            }
+                        }).buildRoutine();
         assertThat(routine.asyncCall("test", "1").afterMax(seconds(1)).all()).containsOnly("test1");
+    }
+
+    @Test
+    public void testFunctionOperation() {
+
+        final Routine<Object, String> routine =
+                JRoutine.onOperation(new Function<Object, String>() {
+
+                            public String apply(final Object o) {
+
+                                return o.toString();
+                            }
+                        }).buildRoutine();
+        assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
+                "1");
     }
 
     @Test
@@ -584,10 +579,17 @@ public class JRoutineTest {
     }
 
     @Test
+    public void testOperationInvocation() {
+
+        final Routine<String, String> routine = JRoutine.on(new ToCase()).buildRoutine();
+        assertThat(routine.asyncCall("TEST").afterMax(seconds(1)).all()).containsOnly("test");
+    }
+
+    @Test
     public void testPendingInputs() {
 
         final InvocationChannel<Object, Object> channel =
-                JRoutine.on(PassingInvocation.factoryOf()).asyncInvoke();
+                JRoutine.on(IdentityInvocation.factoryOf()).asyncInvoke();
         assertThat(channel.isOpen()).isTrue();
         channel.pass("test");
         assertThat(channel.isOpen()).isTrue();
@@ -605,7 +607,7 @@ public class JRoutineTest {
     @Test
     public void testPredicateFilter() {
 
-        final Routine<String, String> routine = JRoutine.filter(new Predicate<String>() {
+        final Routine<String, String> routine = JRoutine.onFilter(new Predicate<String>() {
 
             public boolean test(final String s) {
 
@@ -647,7 +649,7 @@ public class JRoutineTest {
     @Test
     public void testSupplierCommand() {
 
-        final Routine<Void, String> routine = JRoutine.command(new Supplier<String>() {
+        final Routine<Void, String> routine = JRoutine.onCommand(new Supplier<String>() {
 
             public String get() {
 
@@ -660,7 +662,7 @@ public class JRoutineTest {
     @Test
     public void testSupplierFactory() {
 
-        final Routine<String, String> routine = JRoutine.factory(new Supplier<ToCase>() {
+        final Routine<String, String> routine = JRoutine.onFactory(new Supplier<ToCase>() {
 
             public ToCase get() {
 
@@ -735,7 +737,7 @@ public class JRoutineTest {
         }
     }
 
-    public static class ToCase extends FilterInvocation<String, String> {
+    public static class ToCase extends OperationInvocation<String, String> {
 
         private final boolean mIsUpper;
 

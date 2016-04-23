@@ -18,21 +18,17 @@ package com.github.dm.jrt.function;
 
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.error.RoutineException;
-import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
-import com.github.dm.jrt.core.invocation.FilterInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
+import com.github.dm.jrt.core.invocation.OperationInvocation;
 import com.github.dm.jrt.core.util.ClassToken;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-
-import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
  * Utility class back-porting functional programming.
@@ -158,7 +154,7 @@ public class Functions {
     }
 
     /**
-     * Builds and returns a new filter invocation based on the specified bi-consumer instance.
+     * Builds and returns a new operation invocation based on the specified bi-consumer instance.
      * <br>
      * It's up to the caller to prevent undesired leaks.
      * <p>
@@ -171,13 +167,13 @@ public class Functions {
      * @param consumer the bi-consumer instance.
      * @param <IN>     the input data type.
      * @param <OUT>    the output data type.
-     * @return the filter invocation.
+     * @return the operation invocation.
      */
     @NotNull
-    public static <IN, OUT> FilterInvocation<IN, OUT> consumerFilter(
+    public static <IN, OUT> OperationInvocation<IN, OUT> consumerOperation(
             @NotNull final BiConsumer<? super IN, ? super ResultChannel<OUT>> consumer) {
 
-        return new ConsumerFilterInvocation<IN, OUT>(wrap(consumer));
+        return new ConsumerOperationInvocation<IN, OUT>(wrap(consumer));
     }
 
     /**
@@ -219,7 +215,7 @@ public class Functions {
     }
 
     /**
-     * Builds and returns a new filter invocation based on the specified function instance.
+     * Builds and returns a new operation invocation based on the specified function instance.
      * <br>
      * It's up to the caller to prevent undesired leaks.
      * <p>
@@ -232,13 +228,13 @@ public class Functions {
      * @param function the function instance.
      * @param <IN>     the input data type.
      * @param <OUT>    the output data type.
-     * @return the filter invocation.
+     * @return the operation invocation.
      */
     @NotNull
-    public static <IN, OUT> FilterInvocation<IN, OUT> functionFilter(
+    public static <IN, OUT> OperationInvocation<IN, OUT> functionOperation(
             @NotNull final Function<? super IN, ? extends OUT> function) {
 
-        return new FunctionFilterInvocation<IN, OUT>(wrap(function));
+        return new FunctionOperationInvocation<IN, OUT>(wrap(function));
     }
 
     /**
@@ -415,7 +411,7 @@ public class Functions {
     @NotNull
     public static OutputConsumerBuilder<Object> onComplete(@NotNull final Consumer<Void> consumer) {
 
-        return new OutputConsumerBuilder<Object>(wrap(consumer), Functions.<RoutineException>sink(),
+        return new OutputConsumerBuilder<Object>(consumer, Functions.<RoutineException>sink(),
                 Functions.sink());
     }
 
@@ -430,7 +426,7 @@ public class Functions {
     public static OutputConsumerBuilder<Object> onError(
             @NotNull final Consumer<RoutineException> consumer) {
 
-        return new OutputConsumerBuilder<Object>(Functions.<Void>sink(), wrap(consumer),
+        return new OutputConsumerBuilder<Object>(Functions.<Void>sink(), consumer,
                 Functions.sink());
     }
 
@@ -446,7 +442,7 @@ public class Functions {
     public static <OUT> OutputConsumerBuilder<OUT> onOutput(@NotNull final Consumer<OUT> consumer) {
 
         return new OutputConsumerBuilder<OUT>(Functions.<Void>sink(),
-                Functions.<RoutineException>sink(), wrap(consumer));
+                Functions.<RoutineException>sink(), consumer);
     }
 
     /**
@@ -464,7 +460,7 @@ public class Functions {
     }
 
     /**
-     * Builds and returns a new filter invocation based on the specified predicate instance.
+     * Builds and returns a new operation invocation based on the specified predicate instance.
      * <br>
      * Only the inputs which satisfies the predicate will be passed on, while the others will be
      * filtered out.
@@ -479,13 +475,13 @@ public class Functions {
      *
      * @param predicate the predicate instance.
      * @param <IN>      the input data type.
-     * @return the invocation factory.
+     * @return the operation invocation.
      */
     @NotNull
-    public static <IN> FilterInvocation<IN, IN> predicateFilter(
+    public static <IN> OperationInvocation<IN, IN> predicateFilter(
             @NotNull final Predicate<? super IN> predicate) {
 
-        return new PredicateFilterInvocation<IN>(wrap(predicate));
+        return new PredicateOperationInvocation<IN>(wrap(predicate));
     }
 
     /**
@@ -582,11 +578,7 @@ public class Functions {
     public static <IN1, IN2> BiConsumerWrapper<IN1, IN2> wrap(
             @NotNull final BiConsumer<IN1, IN2> consumer) {
 
-        if (consumer instanceof BiConsumerWrapper) {
-            return (BiConsumerWrapper<IN1, IN2>) consumer;
-        }
-
-        return new BiConsumerWrapper<IN1, IN2>(consumer);
+        return BiConsumerWrapper.wrap(consumer);
     }
 
     /**
@@ -610,11 +602,7 @@ public class Functions {
     public static <IN1, IN2, OUT> BiFunctionWrapper<IN1, IN2, OUT> wrap(
             @NotNull final BiFunction<IN1, IN2, OUT> function) {
 
-        if (function instanceof BiFunctionWrapper) {
-            return (BiFunctionWrapper<IN1, IN2, OUT>) function;
-        }
-
-        return new BiFunctionWrapper<IN1, IN2, OUT>(function);
+        return BiFunctionWrapper.wrap(function);
     }
 
     /**
@@ -635,11 +623,7 @@ public class Functions {
     @NotNull
     public static <IN> ConsumerWrapper<IN> wrap(@NotNull final Consumer<IN> consumer) {
 
-        if (consumer instanceof ConsumerWrapper) {
-            return (ConsumerWrapper<IN>) consumer;
-        }
-
-        return new ConsumerWrapper<IN>(consumer);
+        return ConsumerWrapper.wrap(consumer);
     }
 
     /**
@@ -662,11 +646,7 @@ public class Functions {
     public static <IN, OUT> FunctionWrapper<IN, OUT> wrap(
             @NotNull final Function<IN, OUT> function) {
 
-        if (function instanceof FunctionWrapper) {
-            return (FunctionWrapper<IN, OUT>) function;
-        }
-
-        return new FunctionWrapper<IN, OUT>(function);
+        return FunctionWrapper.wrap(function);
     }
 
     /**
@@ -687,11 +667,7 @@ public class Functions {
     @NotNull
     public static <IN> PredicateWrapper<IN> wrap(@NotNull final Predicate<IN> predicate) {
 
-        if (predicate instanceof PredicateWrapper) {
-            return (PredicateWrapper<IN>) predicate;
-        }
-
-        return new PredicateWrapper<IN>(predicate);
+        return PredicateWrapper.wrap(predicate);
     }
 
     /**
@@ -712,255 +688,6 @@ public class Functions {
     @NotNull
     public static <OUT> SupplierWrapper<OUT> wrap(@NotNull final Supplier<OUT> supplier) {
 
-        if (supplier instanceof SupplierWrapper) {
-            return (SupplierWrapper<OUT>) supplier;
-        }
-
-        return new SupplierWrapper<OUT>(supplier);
-    }
-
-    /**
-     * Command invocation based on a consumer instance.
-     *
-     * @param <OUT> the output data type.
-     */
-    private static class ConsumerCommandInvocation<OUT> extends CommandInvocation<OUT> {
-
-        private final ConsumerWrapper<? super ResultChannel<OUT>> mConsumer;
-
-        /**
-         * Constructor.
-         *
-         * @param consumer the consumer instance.
-         */
-        private ConsumerCommandInvocation(
-                @NotNull final ConsumerWrapper<? super ResultChannel<OUT>> consumer) {
-
-            super(asArgs(consumer));
-            mConsumer = consumer;
-        }
-
-        public void onResult(@NotNull final ResultChannel<OUT> result) {
-
-            mConsumer.accept(result);
-        }
-    }
-
-    /**
-     * Filter invocation based on a bi-consumer instance.
-     *
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
-     */
-    private static class ConsumerFilterInvocation<IN, OUT> extends FilterInvocation<IN, OUT> {
-
-        private final BiConsumerWrapper<? super IN, ? super ResultChannel<OUT>> mConsumer;
-
-        /**
-         * Constructor.
-         *
-         * @param consumer the consumer instance.
-         */
-        private ConsumerFilterInvocation(
-                @NotNull final BiConsumerWrapper<? super IN, ? super ResultChannel<OUT>> consumer) {
-
-            super(asArgs(consumer));
-            mConsumer = consumer;
-        }
-
-        public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
-
-            mConsumer.accept(input, result);
-        }
-    }
-
-    /**
-     * Factory of call invocations based on a bi-consumer instance.
-     *
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
-     */
-    private static class ConsumerInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
-
-        private final CallInvocation<IN, OUT> mInvocation;
-
-        /**
-         * Constructor.
-         *
-         * @param consumer the consumer instance.
-         */
-        private ConsumerInvocationFactory(@NotNull final BiConsumerWrapper<? super List<IN>, ? super
-                ResultChannel<OUT>> consumer) {
-
-            super(asArgs(consumer));
-            mInvocation = new CallInvocation<IN, OUT>() {
-
-                @Override
-                protected void onCall(@NotNull final List<? extends IN> inputs,
-                        @NotNull final ResultChannel<OUT> result) {
-
-                    consumer.accept(new ArrayList<IN>(inputs), result);
-                }
-            };
-        }
-
-        @NotNull
-        @Override
-        public Invocation<IN, OUT> newInvocation() {
-
-            return mInvocation;
-        }
-    }
-
-    /**
-     * Filter invocation based on a function instance.
-     *
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
-     */
-    private static class FunctionFilterInvocation<IN, OUT> extends FilterInvocation<IN, OUT> {
-
-        private final FunctionWrapper<? super IN, ? extends OUT> mFunction;
-
-        /**
-         * Constructor.
-         *
-         * @param function the function instance.
-         */
-        private FunctionFilterInvocation(
-                @NotNull final FunctionWrapper<? super IN, ? extends OUT> function) {
-
-            super(asArgs(function));
-            mFunction = function;
-        }
-
-        public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
-
-            result.pass(mFunction.apply(input));
-        }
-    }
-
-    /**
-     * Factory of call invocations based on a function instance.
-     *
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
-     */
-    private static class FunctionInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
-
-        private final CallInvocation<IN, OUT> mInvocation;
-
-        /**
-         * Constructor.
-         *
-         * @param function the function instance.
-         */
-        private FunctionInvocationFactory(
-                @NotNull final FunctionWrapper<? super List<IN>, ? extends OUT> function) {
-
-            super(asArgs(function));
-            mInvocation = new CallInvocation<IN, OUT>() {
-
-                @Override
-                protected void onCall(@NotNull final List<? extends IN> inputs,
-                        @NotNull final ResultChannel<OUT> result) {
-
-                    result.pass(function.apply(new ArrayList<IN>(inputs)));
-                }
-            };
-        }
-
-        @NotNull
-        @Override
-        public Invocation<IN, OUT> newInvocation() {
-
-            return mInvocation;
-        }
-    }
-
-    /**
-     * Filter invocation based on a predicate instance.
-     *
-     * @param <IN> the input data type.
-     */
-    private static class PredicateFilterInvocation<IN> extends FilterInvocation<IN, IN> {
-
-        private final PredicateWrapper<? super IN> mPredicate;
-
-        /**
-         * Constructor.
-         *
-         * @param predicate the predicate instance.
-         */
-        private PredicateFilterInvocation(@NotNull final PredicateWrapper<? super IN> predicate) {
-
-            super(asArgs(predicate));
-            mPredicate = predicate;
-        }
-
-        public void onInput(final IN input, @NotNull final ResultChannel<IN> result) {
-
-            if (mPredicate.test(input)) {
-                result.pass(input);
-            }
-        }
-    }
-
-    /**
-     * Command invocation based on a supplier instance.
-     *
-     * @param <OUT> the output data type.
-     */
-    private static class SupplierCommandInvocation<OUT> extends CommandInvocation<OUT> {
-
-        private final SupplierWrapper<? extends OUT> mSupplier;
-
-        /**
-         * Constructor.
-         *
-         * @param supplier the supplier instance.
-         */
-        public SupplierCommandInvocation(@NotNull final SupplierWrapper<? extends OUT> supplier) {
-
-            super(asArgs(supplier));
-            mSupplier = supplier;
-        }
-
-        public void onResult(@NotNull final ResultChannel<OUT> result) {
-
-            result.pass(mSupplier.get());
-        }
-    }
-
-    /**
-     * Implementation of an invocation factory based on a supplier function.
-     *
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
-     */
-    private static class SupplierInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
-
-        private final SupplierWrapper<? extends Invocation<? super IN, ? extends OUT>> mSupplier;
-
-        /**
-         * Constructor.
-         *
-         * @param supplier the supplier function.
-         */
-        private SupplierInvocationFactory(
-                @NotNull final SupplierWrapper<? extends Invocation<? super IN, ? extends OUT>>
-                        supplier) {
-
-            super(asArgs(supplier));
-            mSupplier = supplier;
-        }
-
-        @NotNull
-        @Override
-        @SuppressWarnings("unchecked")
-        public Invocation<IN, OUT> newInvocation() {
-
-            return (Invocation<IN, OUT>) mSupplier.get();
-        }
+        return SupplierWrapper.wrap(supplier);
     }
 }

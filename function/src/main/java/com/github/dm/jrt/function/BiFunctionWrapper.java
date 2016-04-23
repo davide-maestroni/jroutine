@@ -98,7 +98,7 @@ public class BiFunctionWrapper<IN1, IN2, OUT> extends DeepEqualObject
      *
      * @param biFunction the wrapped supplier.
      */
-    BiFunctionWrapper(@NotNull final BiFunction<IN1, IN2, ?> biFunction) {
+    private BiFunctionWrapper(@NotNull final BiFunction<IN1, IN2, ?> biFunction) {
 
         this(ConstantConditions.notNull("bi-function instance", biFunction),
                 FunctionWrapper.<OUT>identity());
@@ -238,6 +238,34 @@ public class BiFunctionWrapper<IN1, IN2, OUT> extends DeepEqualObject
     public static <IN1, IN2> BiFunctionWrapper<IN1, IN2, IN2> second() {
 
         return (BiFunctionWrapper<IN1, IN2, IN2>) sSecond;
+    }
+
+    /**
+     * Wraps the specified bi-function instance so to provide additional features.
+     * <br>
+     * The returned object will support concatenation and comparison.
+     * <p>
+     * Note that the passed object is expected to behave like a function, that is, it must not
+     * retain a mutable internal state.
+     * <br>
+     * Note also that any external object used inside the function must be synchronized in order to
+     * avoid concurrency issues.
+     *
+     * @param function the bi-function instance.
+     * @param <IN1>    the first input data type.
+     * @param <IN2>    the second input data type.
+     * @param <OUT>    the output data type.
+     * @return the wrapped bi-function.
+     */
+    @NotNull
+    public static <IN1, IN2, OUT> BiFunctionWrapper<IN1, IN2, OUT> wrap(
+            @NotNull final BiFunction<IN1, IN2, OUT> function) {
+
+        if (function instanceof BiFunctionWrapper) {
+            return (BiFunctionWrapper<IN1, IN2, OUT>) function;
+        }
+
+        return new BiFunctionWrapper<IN1, IN2, OUT>(function);
     }
 
     /**

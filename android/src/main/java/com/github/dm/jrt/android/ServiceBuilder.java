@@ -52,68 +52,6 @@ public class ServiceBuilder {
     }
 
     /**
-     * Returns a builder of routines running in a service, wrapping the specified target class.
-     * <br>
-     * In order to customize the object creation, the caller must employ an implementation of a
-     * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
-     * routine service.
-     * <p>
-     * Note that the built routine results will be always dispatched on the configured looper
-     * thread, thus waiting for the outputs immediately after its invocation may result in a
-     * deadlock.
-     *
-     * @param targetClass the invocation target class.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public ServiceAutoProxyRoutineBuilder classOfType(@NotNull final Class<?> targetClass) {
-
-        return on(ContextInvocationTarget.classOfType(targetClass));
-    }
-
-    /**
-     * Returns a builder of routines running in a service, wrapping the specified target object.
-     * <br>
-     * In order to customize the object creation, the caller must employ an implementation of a
-     * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
-     * routine service.
-     * <p>
-     * Note that the built routine results will be always dispatched on the configured looper
-     * thread, thus waiting for the outputs immediately after its invocation may result in a
-     * deadlock.
-     *
-     * @param targetClass the class of the invocation target.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public ServiceAutoProxyRoutineBuilder instanceOf(@NotNull final Class<?> targetClass) {
-
-        return on(ContextInvocationTarget.instanceOf(targetClass));
-    }
-
-    /**
-     * Returns a builder of routines running in a service, wrapping the specified target object.
-     * <br>
-     * In order to customize the object creation, the caller must employ an implementation of a
-     * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
-     * routine service.
-     * <p>
-     * Note that the built routine results will be always dispatched on the configured looper
-     * thread, thus waiting for the outputs immediately after its invocation may result in a
-     * deadlock.
-     *
-     * @param targetClass the class of the invocation target.
-     * @param factoryArgs the object factory arguments.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public ServiceAutoProxyRoutineBuilder instanceOf(@NotNull final Class<?> targetClass,
-            @Nullable final Object... factoryArgs) {
-
-        return on(ContextInvocationTarget.instanceOf(targetClass, factoryArgs));
-    }
-
-    /**
      * Returns a routine builder based on an invocation factory creating instances of the
      * specified class.
      * <br>
@@ -289,5 +227,67 @@ public class ServiceBuilder {
             @NotNull final TargetInvocationFactory<IN, OUT> target) {
 
         return JRoutineService.with(mContext).on(target);
+    }
+
+    /**
+     * Returns a builder of routines running in a service, wrapping the specified target class.
+     * <br>
+     * In order to customize the object creation, the caller must employ an implementation of a
+     * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
+     * routine service.
+     * <p>
+     * Note that the built routine results will be always dispatched on the configured looper
+     * thread, thus waiting for the outputs immediately after its invocation may result in a
+     * deadlock.
+     *
+     * @param targetClass the invocation target class.
+     * @return the routine builder instance.
+     */
+    @NotNull
+    public ServiceAutoProxyRoutineBuilder onClassOfType(@NotNull final Class<?> targetClass) {
+
+        return on(ContextInvocationTarget.classOfType(targetClass));
+    }
+
+    /**
+     * Returns a builder of routines running in a service, wrapping the specified target object.
+     * <br>
+     * In order to customize the object creation, the caller must employ an implementation of a
+     * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
+     * routine service.
+     * <p>
+     * Note that the built routine results will be always dispatched on the configured looper
+     * thread, thus waiting for the outputs immediately after its invocation may result in a
+     * deadlock.
+     *
+     * @param targetClass the class of the invocation target.
+     * @return the routine builder instance.
+     */
+    @NotNull
+    public ServiceAutoProxyRoutineBuilder onInstanceOf(@NotNull final Class<?> targetClass) {
+
+        return on(ContextInvocationTarget.instanceOf(targetClass));
+    }
+
+    /**
+     * Returns a builder of routines running in a service, wrapping the specified target object.
+     * <br>
+     * In order to customize the object creation, the caller must employ an implementation of a
+     * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
+     * routine service.
+     * <p>
+     * Note that the built routine results will be always dispatched on the configured looper
+     * thread, thus waiting for the outputs immediately after its invocation may result in a
+     * deadlock.
+     *
+     * @param targetClass the class of the invocation target.
+     * @param factoryArgs the object factory arguments.
+     * @return the routine builder instance.
+     */
+    @NotNull
+    public ServiceAutoProxyRoutineBuilder onInstanceOf(@NotNull final Class<?> targetClass,
+            @Nullable final Object... factoryArgs) {
+
+        return on(ContextInvocationTarget.instanceOf(targetClass, factoryArgs));
     }
 }

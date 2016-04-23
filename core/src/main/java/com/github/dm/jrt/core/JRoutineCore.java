@@ -85,7 +85,7 @@ import org.jetbrains.annotations.NotNull;
  *         }.start();
  *
  *         final Routine&lt;Result, Result&gt; routine =
- *                  JRoutineCore.on(PassingInvocation.&lt;Result&gt;factoryOf())
+ *                  JRoutineCore.on(IdentityInvocation.&lt;Result&gt;factoryOf())
  *                              .buildRoutine();
  *         routine.asyncCall(channel).afterMax(seconds(20)).allInto(results);
  *     </code>

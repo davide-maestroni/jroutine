@@ -79,7 +79,7 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
      *
      * @param predicate the core predicate.
      */
-    PredicateWrapper(@NotNull final Predicate<? super IN> predicate) {
+    private PredicateWrapper(@NotNull final Predicate<? super IN> predicate) {
 
         this(predicate, Collections.<Predicate<?>>singletonList(
                 ConstantConditions.notNull("predicate instance", predicate)));
@@ -212,6 +212,31 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
     public static <IN> PredicateWrapper<IN> positive() {
 
         return (PredicateWrapper<IN>) sPositive;
+    }
+
+    /**
+     * Wraps the specified predicate instance so to provide additional features.
+     * <br>
+     * The returned object will support concatenation and comparison.
+     * <p>
+     * Note that the passed object is expected to behave like a function, that is, it must not
+     * retain a mutable internal state.
+     * <br>
+     * Note also that any external object used inside the function must be synchronized in order to
+     * avoid concurrency issues.
+     *
+     * @param predicate the predicate instance.
+     * @param <IN>      the input data type.
+     * @return the wrapped predicate.
+     */
+    @NotNull
+    public static <IN> PredicateWrapper<IN> wrap(@NotNull final Predicate<IN> predicate) {
+
+        if (predicate instanceof PredicateWrapper) {
+            return (PredicateWrapper<IN>) predicate;
+        }
+
+        return new PredicateWrapper<IN>(predicate);
     }
 
     /**

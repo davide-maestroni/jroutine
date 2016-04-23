@@ -284,8 +284,9 @@ public abstract class TargetInvocationFactory<IN, OUT> extends DeepEqualObject
                 @NotNull final Class<? extends ContextInvocation<IN, OUT>> targetClass,
                 @Nullable final Object[] factoryArgs) {
 
-            super(asArgs(targetClass, cloneArgs(factoryArgs)));
-            mTargetClass = ConstantConditions.notNull("target invocation class", targetClass);
+            super(asArgs(ConstantConditions.notNull("target invocation class", targetClass),
+                    cloneArgs(factoryArgs)));
+            mTargetClass = targetClass;
             mFactoryArgs = cloneArgs(factoryArgs);
         }
 

@@ -54,8 +54,7 @@ class GroupByInvocationFactory<DATA> extends InvocationFactory<DATA, List<DATA>>
      */
     GroupByInvocationFactory(final int size) {
 
-        super(asArgs(size));
-        ConstantConditions.positive("group size", size);
+        super(asArgs(ConstantConditions.positive("group size", size)));
         mSize = size;
         mPlaceholder = null;
         mIsPlaceholder = false;
@@ -71,8 +70,7 @@ class GroupByInvocationFactory<DATA> extends InvocationFactory<DATA, List<DATA>>
      */
     GroupByInvocationFactory(final int size, @Nullable final DATA placeholder) {
 
-        super(asArgs(size, placeholder));
-        ConstantConditions.positive("group size", size);
+        super(asArgs(ConstantConditions.positive("group size", size), placeholder));
         mSize = size;
         mPlaceholder = placeholder;
         mIsPlaceholder = true;

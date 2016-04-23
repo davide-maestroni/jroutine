@@ -36,8 +36,8 @@ import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration.TimeoutActionType;
+import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
-import com.github.dm.jrt.core.invocation.PassingInvocation;
 import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.routine.Routine;
@@ -573,7 +573,7 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
 
         public PassingWrapper() {
 
-            super(PassingInvocation.<DATA>factoryOf().newInvocation());
+            super(IdentityInvocation.<DATA>factoryOf().newInvocation());
         }
     }
 

@@ -1014,15 +1014,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
         public OutputChannel<OUT> afterMax(@NotNull final TimeDuration timeout) {
 
             synchronized (mMutex) {
-                try {
-                    ConstantConditions.notNull("output timeout", timeout);
-
-                } catch (final NullPointerException e) {
-                    mSubLogger.err("invalid null timeout");
-                    throw e;
-                }
-
-                mExecutionTimeout = timeout;
+                mExecutionTimeout = ConstantConditions.notNull("output timeout", timeout);
             }
 
             return this;
@@ -1049,15 +1041,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             final Throwable timeoutException;
             synchronized (mMutex) {
                 verifyBound();
+                ConstantConditions.notNull("result collection", results);
                 final Logger logger = mSubLogger;
-                try {
-                    ConstantConditions.notNull("result collection", results);
-
-                } catch (final NullPointerException e) {
-                    logger.err("invalid null result collection");
-                    throw e;
-                }
-
                 final TimeDuration executionTimeout = mExecutionTimeout;
                 final NestedQueue<Object> outputQueue = mOutputQueue;
                 if (executionTimeout.isZero() || mState.isDone()) {
@@ -1147,16 +1132,8 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             final boolean forceClose;
             synchronized (mMutex) {
                 verifyBound();
-                try {
-                    ConstantConditions.notNull("output consumer", consumer);
-
-                } catch (final NullPointerException e) {
-                    mSubLogger.err("invalid null consumer");
-                    throw e;
-                }
-
                 forceClose = mState.isDone();
-                mOutputConsumer = consumer;
+                mOutputConsumer = ConstantConditions.notNull("output consumer", consumer);
                 mConsumerMutex = getMutex(consumer);
             }
 
@@ -1973,15 +1950,7 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
          */
         void after(@NotNull final TimeDuration delay) {
 
-            try {
-                ConstantConditions.notNull("input delay", delay);
-
-            } catch (final NullPointerException e) {
-                mSubLogger.err("invalid null delay");
-                throw e;
-            }
-
-            mResultDelay = delay;
+            mResultDelay = ConstantConditions.notNull("input delay", delay);
         }
 
         /**

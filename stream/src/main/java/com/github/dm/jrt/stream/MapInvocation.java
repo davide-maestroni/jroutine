@@ -18,7 +18,7 @@ package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
-import com.github.dm.jrt.core.invocation.FilterInvocation;
+import com.github.dm.jrt.core.invocation.OperationInvocation;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.FunctionWrapper;
 
@@ -27,14 +27,14 @@ import org.jetbrains.annotations.NotNull;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Filter invocation implementation wrapping a map function.
+ * Operation invocation implementation wrapping a mapping function.
  * <p>
  * Created by davide-maestroni on 04/19/2016.
  *
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-class MapInvocation<IN, OUT> extends FilterInvocation<IN, OUT> {
+class MapInvocation<IN, OUT> extends OperationInvocation<IN, OUT> {
 
     private final FunctionWrapper<? super IN, ? extends OutputChannel<? extends OUT>> mFunction;
 
@@ -46,8 +46,7 @@ class MapInvocation<IN, OUT> extends FilterInvocation<IN, OUT> {
     MapInvocation(@NotNull final FunctionWrapper<? super IN, ? extends OutputChannel<? extends
             OUT>> function) {
 
-        super(asArgs(function));
-        ConstantConditions.notNull("function wrapper", function);
+        super(asArgs(ConstantConditions.notNull("function wrapper", function)));
         mFunction = function;
     }
 

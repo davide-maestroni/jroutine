@@ -30,7 +30,7 @@ import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.error.TimeoutException;
-import com.github.dm.jrt.core.invocation.FilterInvocation;
+import com.github.dm.jrt.core.invocation.OperationInvocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
@@ -59,7 +59,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.github.dm.jrt.core.util.TimeDuration.minutes;
 import static com.github.dm.jrt.core.util.TimeDuration.seconds;
-import static com.github.dm.jrt.function.Functions.functionFilter;
+import static com.github.dm.jrt.function.Functions.functionOperation;
 import static com.github.dm.jrt.stream.Streams.range;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -1152,7 +1152,7 @@ public class StreamChannelTest {
 
         try {
 
-            Streams.streamOf().async().map((FilterInvocation<Object, Object>) null);
+            Streams.streamOf().async().map((OperationInvocation<Object, Object>) null);
 
             fail();
 
@@ -1162,7 +1162,7 @@ public class StreamChannelTest {
 
         try {
 
-            Streams.streamOf().parallel().map((FilterInvocation<Object, Object>) null);
+            Streams.streamOf().parallel().map((OperationInvocation<Object, Object>) null);
 
             fail();
 
@@ -1172,7 +1172,7 @@ public class StreamChannelTest {
 
         try {
 
-            Streams.streamOf().sync().map((FilterInvocation<Object, Object>) null);
+            Streams.streamOf().sync().map((OperationInvocation<Object, Object>) null);
 
             fail();
 
@@ -1182,7 +1182,7 @@ public class StreamChannelTest {
 
         try {
 
-            Streams.streamOf().serial().map((FilterInvocation<Object, Object>) null);
+            Streams.streamOf().serial().map((OperationInvocation<Object, Object>) null);
 
             fail();
 
@@ -1725,7 +1725,7 @@ public class StreamChannelTest {
     public void testRetry() {
 
         final Routine<Object, String> routine =
-                JRoutineCore.on(functionFilter(new Function<Object, String>() {
+                JRoutineCore.on(functionOperation(new Function<Object, String>() {
 
                     public String apply(final Object o) {
 
@@ -2346,7 +2346,7 @@ public class StreamChannelTest {
         }
     }
 
-    private static class UpperCase extends FilterInvocation<String, String> {
+    private static class UpperCase extends OperationInvocation<String, String> {
 
         /**
          * Constructor.

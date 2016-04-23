@@ -38,8 +38,8 @@ public class InvocationFactoryTest {
     @Test
     public void testDecoratingInvocationFactory() throws Exception {
 
-        final InvocationFactory<String, String> factory = PassingInvocation.factoryOf();
-        assertThat(factory.newInvocation()).isExactlyInstanceOf(PassingInvocation.class);
+        final InvocationFactory<String, String> factory = IdentityInvocation.factoryOf();
+        assertThat(factory.newInvocation()).isExactlyInstanceOf(IdentityInvocation.class);
         final TestInvocationFactory decoratedFactory = new TestInvocationFactory(factory);
         assertThat(decoratedFactory.newInvocation()).isExactlyInstanceOf(
                 TestInvocationDecorator.class);
@@ -48,7 +48,7 @@ public class InvocationFactoryTest {
     @Test
     public void testDecoratingInvocationFactoryEquals() {
 
-        final InvocationFactory<String, String> factory = PassingInvocation.factoryOf();
+        final InvocationFactory<String, String> factory = IdentityInvocation.factoryOf();
         final TestInvocationFactory decoratedFactory = new TestInvocationFactory(factory);
         assertThat(decoratedFactory).isEqualTo(decoratedFactory);
         assertThat(decoratedFactory).isNotEqualTo(null);
@@ -78,7 +78,7 @@ public class InvocationFactoryTest {
     @Test
     public void testInvocationDecoratorAbort() {
 
-        final InvocationFactory<String, String> factory = PassingInvocation.factoryOf();
+        final InvocationFactory<String, String> factory = IdentityInvocation.factoryOf();
         final TestInvocationFactory decoratedFactory = new TestInvocationFactory(factory);
         final Routine<String, String> routine = JRoutineCore.on(decoratedFactory).buildRoutine();
         assertThat(routine.asyncInvoke().after(millis(100)).pass("test").result().abort()).isTrue();
@@ -88,7 +88,7 @@ public class InvocationFactoryTest {
     @Test
     public void testInvocationDecoratorLifecycle() {
 
-        final InvocationFactory<String, String> factory = PassingInvocation.factoryOf();
+        final InvocationFactory<String, String> factory = IdentityInvocation.factoryOf();
         final TestInvocationFactory decoratedFactory = new TestInvocationFactory(factory);
         final Routine<String, String> routine = JRoutineCore.on(decoratedFactory).buildRoutine();
         assertThat(routine.asyncCall("test").afterMax(seconds(1)).all()).containsExactly("test");

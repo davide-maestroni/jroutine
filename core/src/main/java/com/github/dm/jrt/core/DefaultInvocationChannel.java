@@ -817,15 +817,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
          */
         void after(@NotNull final TimeDuration delay) {
 
-            try {
-                ConstantConditions.notNull("input delay", delay);
-
-            } catch (final NullPointerException e) {
-                mLogger.err("invalid null delay");
-                throw e;
-            }
-
-            mInputDelay = delay;
+            mInputDelay = ConstantConditions.notNull("input delay", delay);
         }
 
         /**

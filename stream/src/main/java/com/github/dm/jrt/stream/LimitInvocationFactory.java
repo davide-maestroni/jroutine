@@ -45,8 +45,7 @@ class LimitInvocationFactory<DATA> extends InvocationFactory<DATA, DATA> {
      */
     LimitInvocationFactory(final int count) {
 
-        super(asArgs(count));
-        ConstantConditions.notNegative("count", count);
+        super(asArgs(ConstantConditions.notNegative("count", count)));
         mCount = count;
     }
 

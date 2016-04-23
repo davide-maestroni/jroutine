@@ -486,14 +486,11 @@ public class InvocationService extends Service {
                         break;
 
                     case MSG_COMPLETE:
-                        final RoutineInvocation completeInvocation = service.getInvocation(msg);
-                        completeInvocation.close();
+                        service.getInvocation(msg).close();
                         break;
 
                     case MSG_ABORT:
-                        final RoutineInvocation abortInvocation = service.getInvocation(msg);
-                        abortInvocation.abort(getAbortError(msg));
-                        abortInvocation.close();
+                        service.getInvocation(msg).abort(getAbortError(msg));
                         break;
 
                     case MSG_INIT:

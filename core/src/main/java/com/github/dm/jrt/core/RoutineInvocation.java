@@ -147,9 +147,10 @@ public class RoutineInvocation<IN, OUT> implements Invocation<IN, OUT> {
         private RoutineInvocationFactory(@NotNull final Routine<IN, OUT> routine,
                 @NotNull final InvocationMode invocationMode) {
 
-            super(asArgs(routine, invocationMode));
-            mRoutine = ConstantConditions.notNull("routine instance", routine);
-            mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
+            super(asArgs(ConstantConditions.notNull("routine instance", routine),
+                    ConstantConditions.notNull("invocation mode", invocationMode)));
+            mRoutine = routine;
+            mInvocationMode = invocationMode;
         }
 
         @NotNull

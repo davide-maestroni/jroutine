@@ -23,9 +23,9 @@ import com.github.dm.jrt.android.object.ContextInvocationTarget;
 import com.github.dm.jrt.android.v11.core.JRoutineLoader;
 import com.github.dm.jrt.android.v11.core.LoaderContext;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
-import com.github.dm.jrt.core.invocation.FilterInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
+import com.github.dm.jrt.core.invocation.OperationInvocation;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
 
@@ -53,71 +53,6 @@ public class LoaderBuilder {
     LoaderBuilder(@NotNull final LoaderContext context) {
 
         mContext = ConstantConditions.notNull("loader context", context);
-    }
-
-    /**
-     * Returns a builder of routines bound to the builder context, wrapping the specified target
-     * class.
-     * <br>
-     * In order to customize the object creation, the caller must employ an implementation of a
-     * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
-     * application context.
-     * <p>
-     * Note that the built routine results will be always dispatched on the configured looper
-     * thread, thus waiting for the outputs immediately after its invocation may result in a
-     * deadlock.
-     *
-     * @param targetClass the invocation target class.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public LoaderAutoProxyRoutineBuilder classOfType(@NotNull final Class<?> targetClass) {
-
-        return on(ContextInvocationTarget.classOfType(targetClass));
-    }
-
-    /**
-     * Returns a builder of routines bound to the builder context, wrapping the specified target
-     * object.
-     * <br>
-     * In order to customize the object creation, the caller must employ an implementation of a
-     * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
-     * application context.
-     * <p>
-     * Note that the built routine results will be always dispatched on the configured looper
-     * thread, thus waiting for the outputs immediately after its invocation may result in a
-     * deadlock.
-     *
-     * @param targetClass the class of the invocation target.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public LoaderAutoProxyRoutineBuilder instanceOf(@NotNull final Class<?> targetClass) {
-
-        return on(ContextInvocationTarget.instanceOf(targetClass));
-    }
-
-    /**
-     * Returns a builder of routines bound to the builder context, wrapping the specified target
-     * object.
-     * <br>
-     * In order to customize the object creation, the caller must employ an implementation of a
-     * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
-     * application context.
-     * <p>
-     * Note that the built routine results will be always dispatched on the configured looper
-     * thread, thus waiting for the outputs immediately after its invocation may result in a
-     * deadlock.
-     *
-     * @param targetClass the class of the invocation target.
-     * @param factoryArgs the object factory arguments.
-     * @return the routine builder instance.
-     */
-    @NotNull
-    public LoaderAutoProxyRoutineBuilder instanceOf(@NotNull final Class<?> targetClass,
-            @Nullable final Object... factoryArgs) {
-
-        return on(ContextInvocationTarget.instanceOf(targetClass, factoryArgs));
     }
 
     /**
@@ -247,9 +182,9 @@ public class LoaderBuilder {
     }
 
     /**
-     * Returns a routine builder based on the specified filter invocation.
+     * Returns a routine builder based on the specified operation invocation.
      *
-     * @param invocation the filter invocation instance.
+     * @param invocation the operation invocation instance.
      * @param <IN>       the input data type.
      * @param <OUT>      the output data type.
      * @return the routine builder instance.
@@ -258,7 +193,7 @@ public class LoaderBuilder {
      */
     @NotNull
     public <IN, OUT> LoaderRoutineBuilder<IN, OUT> on(
-            @NotNull final FilterInvocation<IN, OUT> invocation) {
+            @NotNull final OperationInvocation<IN, OUT> invocation) {
 
         return on((InvocationFactory<IN, OUT>) invocation);
     }
@@ -392,6 +327,27 @@ public class LoaderBuilder {
     }
 
     /**
+     * Returns a builder of routines bound to the builder context, wrapping the specified target
+     * class.
+     * <br>
+     * In order to customize the object creation, the caller must employ an implementation of a
+     * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
+     * application context.
+     * <p>
+     * Note that the built routine results will be always dispatched on the configured looper
+     * thread, thus waiting for the outputs immediately after its invocation may result in a
+     * deadlock.
+     *
+     * @param targetClass the invocation target class.
+     * @return the routine builder instance.
+     */
+    @NotNull
+    public LoaderAutoProxyRoutineBuilder onClassOfType(@NotNull final Class<?> targetClass) {
+
+        return on(ContextInvocationTarget.classOfType(targetClass));
+    }
+
+    /**
      * Returns a builder of output channels bound to the loader identified by the specified ID.
      * <br>
      * If no invocation with the specified ID is running at the time of the channel creation, the
@@ -410,5 +366,49 @@ public class LoaderBuilder {
     public LoaderChannelBuilder onId(final int loaderId) {
 
         return JRoutineLoader.with(mContext).onId(loaderId);
+    }
+
+    /**
+     * Returns a builder of routines bound to the builder context, wrapping the specified target
+     * object.
+     * <br>
+     * In order to customize the object creation, the caller must employ an implementation of a
+     * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
+     * application context.
+     * <p>
+     * Note that the built routine results will be always dispatched on the configured looper
+     * thread, thus waiting for the outputs immediately after its invocation may result in a
+     * deadlock.
+     *
+     * @param targetClass the class of the invocation target.
+     * @return the routine builder instance.
+     */
+    @NotNull
+    public LoaderAutoProxyRoutineBuilder onInstanceOf(@NotNull final Class<?> targetClass) {
+
+        return on(ContextInvocationTarget.instanceOf(targetClass));
+    }
+
+    /**
+     * Returns a builder of routines bound to the builder context, wrapping the specified target
+     * object.
+     * <br>
+     * In order to customize the object creation, the caller must employ an implementation of a
+     * {@link com.github.dm.jrt.android.object.builder.FactoryContext FactoryContext} as the
+     * application context.
+     * <p>
+     * Note that the built routine results will be always dispatched on the configured looper
+     * thread, thus waiting for the outputs immediately after its invocation may result in a
+     * deadlock.
+     *
+     * @param targetClass the class of the invocation target.
+     * @param factoryArgs the object factory arguments.
+     * @return the routine builder instance.
+     */
+    @NotNull
+    public LoaderAutoProxyRoutineBuilder onInstanceOf(@NotNull final Class<?> targetClass,
+            @Nullable final Object... factoryArgs) {
+
+        return on(ContextInvocationTarget.instanceOf(targetClass, factoryArgs));
     }
 }

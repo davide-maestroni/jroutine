@@ -51,8 +51,8 @@ class StreamInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
     StreamInvocationFactory(@NotNull final FunctionWrapper<? super StreamChannel<IN>, ? extends
             StreamChannel<? extends OUT>> function) {
 
-        super(asArgs(function));
-        mFunction = ConstantConditions.notNull("function instance", function);
+        super(asArgs(ConstantConditions.notNull("function instance", function)));
+        mFunction = function;
     }
 
     @NotNull

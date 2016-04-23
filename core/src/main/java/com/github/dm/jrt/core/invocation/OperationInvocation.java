@@ -32,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
-public abstract class FilterInvocation<IN, OUT> extends InvocationFactory<IN, OUT>
+public abstract class OperationInvocation<IN, OUT> extends InvocationFactory<IN, OUT>
         implements Invocation<IN, OUT> {
 
     /**
@@ -40,7 +40,7 @@ public abstract class FilterInvocation<IN, OUT> extends InvocationFactory<IN, OU
      *
      * @param args the constructor arguments.
      */
-    protected FilterInvocation(@Nullable final Object[] args) {
+    protected OperationInvocation(@Nullable final Object[] args) {
 
         super(args);
     }

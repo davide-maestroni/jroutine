@@ -29,9 +29,9 @@ import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Configurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
-import com.github.dm.jrt.core.invocation.FilterInvocation;
+import com.github.dm.jrt.core.invocation.OperationInvocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
-import com.github.dm.jrt.core.invocation.PassingInvocation;
+import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
@@ -58,9 +58,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static com.github.dm.jrt.core.config.ChannelConfiguration.builderFromOutputChannel;
 import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
 import static com.github.dm.jrt.function.Functions.consumerCall;
-import static com.github.dm.jrt.function.Functions.consumerFilter;
+import static com.github.dm.jrt.function.Functions.consumerOperation;
 import static com.github.dm.jrt.function.Functions.functionCall;
-import static com.github.dm.jrt.function.Functions.functionFilter;
+import static com.github.dm.jrt.function.Functions.functionOperation;
 import static com.github.dm.jrt.function.Functions.predicateFilter;
 import static com.github.dm.jrt.function.Functions.wrap;
 
@@ -283,14 +283,14 @@ public abstract class AbstractStreamChannel<OUT>
     public <AFTER> StreamChannel<AFTER> map(
             @NotNull final BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer) {
 
-        return map(consumerFilter(consumer));
+        return map(consumerOperation(consumer));
     }
 
     @NotNull
     public <AFTER> StreamChannel<AFTER> map(
             @NotNull final Function<? super OUT, ? extends AFTER> function) {
 
-        return map(functionFilter(function));
+        return map(functionOperation(function));
     }
 
     @NotNull
@@ -403,7 +403,7 @@ public abstract class AbstractStreamChannel<OUT>
     public StreamChannel<OUT> runOn(@Nullable final Runner runner) {
 
         final InvocationMode invocationMode = mInvocationMode;
-        final FilterInvocation<OUT, OUT> factory = PassingInvocation.factoryOf();
+        final OperationInvocation<OUT, OUT> factory = IdentityInvocation.factoryOf();
         final StreamChannel<OUT> channel =
                 streamInvocationConfiguration().withRunner(runner).apply().async().map(factory);
         if (invocationMode == InvocationMode.ASYNC) {

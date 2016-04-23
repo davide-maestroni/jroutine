@@ -301,6 +301,50 @@ public class Time implements Comparable<Time> {
     }
 
     /**
+     * Checks if this time is greater than the specified one.
+     *
+     * @param other the time to compare.
+     * @return whether this time is greater.
+     */
+    public boolean isGreaterThan(@NotNull final Time other) {
+
+        return compareTo(other) > 0;
+    }
+
+    /**
+     * Checks if this time is greater or equal to the specified one.
+     *
+     * @param other the time to compare.
+     * @return whether this time is greater or equal.
+     */
+    public boolean isGreaterThanOrEqualTo(@NotNull final Time other) {
+
+        return compareTo(other) >= 0;
+    }
+
+    /**
+     * Checks if this time is less than the specified one.
+     *
+     * @param other the time to compare.
+     * @return whether this time is less.
+     */
+    public boolean isLessThan(@NotNull final Time other) {
+
+        return compareTo(other) < 0;
+    }
+
+    /**
+     * Checks if this time is less or equal to the specified one.
+     *
+     * @param other the time to compare.
+     * @return whether this time is less or equal.
+     */
+    public boolean isLessThanOrEqualTo(@NotNull final Time other) {
+
+        return compareTo(other) <= 0;
+    }
+
+    /**
      * Checks if this time is zero.
      *
      * @return whether this time value is zero.

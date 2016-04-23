@@ -43,8 +43,7 @@ class TryCatchBiConsumerFunction<OUT> implements BiConsumer<RoutineException, In
     TryCatchBiConsumerFunction(
             @NotNull final Function<? super RoutineException, ? extends OUT> function) {
 
-        ConstantConditions.notNull("function instance", function);
-        mFunction = function;
+        mFunction = ConstantConditions.notNull("function instance", function);
     }
 
     public void accept(final RoutineException error, final InputChannel<OUT> channel) {

@@ -36,6 +36,7 @@ import java.util.List;
  * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
+@SuppressWarnings("unused")
 public class LifecycleInvocationDecorator<IN, OUT> extends InvocationDecorator<IN, OUT> {
 
     private static final List<State> TO_ABORT_STATES = Arrays.asList(State.INIT, State.RESULT);

@@ -95,24 +95,21 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     }
 
     @NotNull
-    public LoaderObjectRoutineBuilder applyConfiguration(
-            @NotNull final LoaderConfiguration configuration) {
+    public LoaderObjectRoutineBuilder apply(@NotNull final LoaderConfiguration configuration) {
 
         mLoaderConfiguration = ConstantConditions.notNull("loader configuration", configuration);
         return this;
     }
 
     @NotNull
-    public LoaderObjectRoutineBuilder applyConfiguration(
-            @NotNull final ProxyConfiguration configuration) {
+    public LoaderObjectRoutineBuilder apply(@NotNull final ProxyConfiguration configuration) {
 
         mProxyConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
         return this;
     }
 
     @NotNull
-    public LoaderObjectRoutineBuilder applyConfiguration(
-            @NotNull final InvocationConfiguration configuration) {
+    public LoaderObjectRoutineBuilder apply(@NotNull final InvocationConfiguration configuration) {
 
         mInvocationConfiguration =
                 ConstantConditions.notNull("invocation configuration", configuration);
@@ -160,10 +157,10 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 JRoutineLoaderCompat.with(mContext).on(factory);
         return builder.invocationConfiguration()
                       .with(invocationConfiguration)
-                      .apply()
+                      .applyConfiguration()
                       .loaderConfiguration()
                       .with(loaderConfiguration)
-                      .apply()
+                      .applyConfiguration()
                       .buildRoutine();
     }
 
@@ -190,10 +187,10 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                 JRoutineLoaderCompat.with(mContext).on(factory);
         return builder.invocationConfiguration()
                       .with(invocationConfiguration)
-                      .apply()
+                      .applyConfiguration()
                       .loaderConfiguration()
                       .with(loaderConfiguration)
-                      .apply()
+                      .applyConfiguration()
                       .buildRoutine();
     }
 
@@ -271,7 +268,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             mRoutine = JRoutineObject.on(target)
                                      .proxyConfiguration()
                                      .with(mProxyConfiguration)
-                                     .apply()
+                                     .applyConfiguration()
                                      .method(mAliasName);
         }
 
@@ -422,7 +419,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
             mRoutine = JRoutineObject.on(target)
                                      .proxyConfiguration()
                                      .with(mProxyConfiguration)
-                                     .apply()
+                                     .applyConfiguration()
                                      .method(mMethod);
         }
     }
@@ -635,10 +632,10 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
                     JRoutineLoaderCompat.with(mContext).on(factory);
             final LoaderRoutine<Object, Object> routine = builder.invocationConfiguration()
                                                                  .with(invocationConfiguration)
-                                                                 .apply()
+                                                                 .applyConfiguration()
                                                                  .loaderConfiguration()
                                                                  .with(loaderConfiguration)
-                                                                 .apply()
+                                                                 .applyConfiguration()
                                                                  .buildRoutine();
             return Builders.invokeRoutine(routine, method, asArgs(args), methodInfo.invocationMode,
                     inputMode, outputMode);

@@ -66,16 +66,14 @@ class DefaultLoaderChannelBuilder
     }
 
     @NotNull
-    public LoaderChannelBuilder applyConfiguration(
-            @NotNull final LoaderConfiguration configuration) {
+    public LoaderChannelBuilder apply(@NotNull final LoaderConfiguration configuration) {
 
         mLoaderConfiguration = ConstantConditions.notNull("loader configuration", configuration);
         return this;
     }
 
     @NotNull
-    public LoaderChannelBuilder applyConfiguration(
-            @NotNull final ChannelConfiguration configuration) {
+    public LoaderChannelBuilder apply(@NotNull final ChannelConfiguration configuration) {
 
         mChannelConfiguration = ConstantConditions.notNull("channel configuration", configuration);
         return this;
@@ -125,13 +123,13 @@ class DefaultLoaderChannelBuilder
 
         return builder.invocationConfiguration()
                       .with(invocationConfiguration)
-                      .apply()
+                      .applyConfiguration()
                       .loaderConfiguration()
                       .with(loaderConfiguration)
                       .withClashResolution(ClashResolutionType.JOIN)
                       .withInputClashResolution(ClashResolutionType.JOIN)
                       .withResultStaleTime(UnitDuration.INFINITY)
-                      .apply()
+                      .applyConfiguration()
                       .asyncCall();
     }
 

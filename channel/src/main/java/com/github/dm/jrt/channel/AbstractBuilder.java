@@ -36,8 +36,7 @@ public abstract class AbstractBuilder<TYPE>
     private ChannelConfiguration mConfiguration = ChannelConfiguration.defaultConfiguration();
 
     @NotNull
-    public ChannelsBuilder<TYPE> applyConfiguration(
-            @NotNull final ChannelConfiguration configuration) {
+    public ChannelsBuilder<TYPE> apply(@NotNull final ChannelConfiguration configuration) {
 
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
         return this;

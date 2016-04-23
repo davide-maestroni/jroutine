@@ -176,7 +176,7 @@ public final class ServiceConfiguration extends DeepEqualObject {
          * @return the configurable instance.
          */
         @NotNull
-        TYPE applyConfiguration(@NotNull ServiceConfiguration configuration);
+        TYPE apply(@NotNull ServiceConfiguration configuration);
     }
 
     /**
@@ -223,9 +223,9 @@ public final class ServiceConfiguration extends DeepEqualObject {
          * @return the configured object.
          */
         @NotNull
-        public TYPE apply() {
+        public TYPE applyConfiguration() {
 
-            return mConfigurable.applyConfiguration(buildConfiguration());
+            return mConfigurable.apply(buildConfiguration());
         }
 
         /**
@@ -336,8 +336,7 @@ public final class ServiceConfiguration extends DeepEqualObject {
     private static class DefaultConfigurable implements Configurable<ServiceConfiguration> {
 
         @NotNull
-        public ServiceConfiguration applyConfiguration(
-                @NotNull final ServiceConfiguration configuration) {
+        public ServiceConfiguration apply(@NotNull final ServiceConfiguration configuration) {
 
             return configuration;
         }

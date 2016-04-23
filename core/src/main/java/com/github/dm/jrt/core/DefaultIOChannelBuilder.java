@@ -43,7 +43,7 @@ class DefaultIOChannelBuilder implements IOChannelBuilder, Configurable<IOChanne
     }
 
     @NotNull
-    public IOChannelBuilder applyConfiguration(@NotNull final ChannelConfiguration configuration) {
+    public IOChannelBuilder apply(@NotNull final ChannelConfiguration configuration) {
 
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
         return this;

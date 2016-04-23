@@ -148,16 +148,14 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     @NotNull
-    public ServiceObjectRoutineBuilder applyConfiguration(
-            @NotNull final ServiceConfiguration configuration) {
+    public ServiceObjectRoutineBuilder apply(@NotNull final ServiceConfiguration configuration) {
 
         mServiceConfiguration = ConstantConditions.notNull("service configuration", configuration);
         return this;
     }
 
     @NotNull
-    public ServiceObjectRoutineBuilder applyConfiguration(
-            @NotNull final InvocationConfiguration configuration) {
+    public ServiceObjectRoutineBuilder apply(@NotNull final InvocationConfiguration configuration) {
 
         mInvocationConfiguration =
                 ConstantConditions.notNull("invocation configuration", configuration);
@@ -165,8 +163,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     @NotNull
-    public ServiceObjectRoutineBuilder applyConfiguration(
-            @NotNull final ProxyConfiguration configuration) {
+    public ServiceObjectRoutineBuilder apply(@NotNull final ProxyConfiguration configuration) {
 
         mProxyConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
         return this;
@@ -211,10 +208,10 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         return (Routine<IN, OUT>) builder.invocationConfiguration()
                                          .with(withAnnotations(mInvocationConfiguration,
                                                  targetMethod))
-                                         .apply()
+                                         .applyConfiguration()
                                          .serviceConfiguration()
                                          .with(mServiceConfiguration)
-                                         .apply()
+                                         .applyConfiguration()
                                          .buildRoutine();
     }
 
@@ -235,10 +232,10 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         return (Routine<IN, OUT>) builder.invocationConfiguration()
                                          .with(withAnnotations(mInvocationConfiguration,
                                                  targetMethod))
-                                         .apply()
+                                         .applyConfiguration()
                                          .serviceConfiguration()
                                          .with(mServiceConfiguration)
-                                         .apply()
+                                         .applyConfiguration()
                                          .buildRoutine();
     }
 
@@ -313,7 +310,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             mRoutine = JRoutineObject.on(target)
                                      .proxyConfiguration()
                                      .withSharedFields(mSharedFields)
-                                     .apply()
+                                     .applyConfiguration()
                                      .method(mAliasName);
         }
 
@@ -392,7 +389,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             mRoutine = JRoutineObject.on(target)
                                      .proxyConfiguration()
                                      .withSharedFields(mSharedFields)
-                                     .apply()
+                                     .applyConfiguration()
                                      .method(mMethodName, mParameterTypes);
         }
 
@@ -544,10 +541,10 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
                     JRoutineService.with(mContext).on(factory);
             final Routine<Object, Object> routine = builder.invocationConfiguration()
                                                            .with(invocationConfiguration)
-                                                           .apply()
+                                                           .applyConfiguration()
                                                            .serviceConfiguration()
                                                            .with(mServiceConfiguration)
-                                                           .apply()
+                                                           .applyConfiguration()
                                                            .buildRoutine();
             return invokeRoutine(routine, method, asArgs(args), methodInfo.invocationMode,
                     inputMode, outputMode);

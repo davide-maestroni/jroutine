@@ -70,8 +70,11 @@ class MergeMapBuilder<OUT>
             @NotNull final ChannelConfiguration configuration) {
 
         final SparseArrayCompat<? extends OutputChannel<? extends OUT>> channelMap = mChannelMap;
-        final IOChannel<ParcelableSelectable<OUT>> ioChannel =
-                JRoutineCore.io().channelConfiguration().with(configuration).apply().buildChannel();
+        final IOChannel<ParcelableSelectable<OUT>> ioChannel = JRoutineCore.io()
+                                                                           .channelConfiguration()
+                                                                           .with(configuration)
+                                                                           .applyConfiguration()
+                                                                           .buildChannel();
         final int size = channelMap.size();
         for (int i = 0; i < size; ++i) {
             ioChannel.pass(AndroidChannels.toSelectable(channelMap.valueAt(i), channelMap.keyAt(i))

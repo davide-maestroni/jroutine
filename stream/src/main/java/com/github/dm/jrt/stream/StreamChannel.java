@@ -130,7 +130,7 @@ public interface StreamChannel<OUT>
 
     /**
      * Short for {@code invocationConfiguration().withRunner(runner).withInputLimit(maxInputs)
-     * .withInputMaxDelay(maxDelay, timeUnit).apply()}.
+     * .withInputMaxDelay(maxDelay, timeUnit).applyConfiguration()}.
      * <br>
      * This method is useful to easily apply a configuration which will slow down the thread
      * feeding the next routine concatenated to the stream, when the number of buffered inputs
@@ -151,7 +151,7 @@ public interface StreamChannel<OUT>
 
     /**
      * Short for {@code invocationConfiguration().withRunner(runner).withInputLimit(maxInputs)
-     * .withInputMaxDelay(maxDelay).apply()}.
+     * .withInputMaxDelay(maxDelay).applyConfiguration()}.
      * <br>
      * This method is useful to easily apply a configuration to the next routine concatenated to the
      * stream, which will slow down the thread feeding it, when the number of buffered inputs
@@ -358,7 +358,8 @@ public interface StreamChannel<OUT>
             @NotNull Function<? super List<OUT>, ? extends AFTER> function);
 
     /**
-     * Short for {@code invocationConfiguration().withMaxInstances(maxInvocations).apply()}.
+     * Short for
+     * {@code invocationConfiguration().withMaxInstances(maxInvocations).applyConfiguration()}.
      * <br>
      * This method is useful to easily apply a configuration to the next routine concatenated to the
      * stream, which will limit the maximum number of concurrent invocations to the specified value.
@@ -398,7 +399,8 @@ public interface StreamChannel<OUT>
     StreamChannel<Void> onOutput(@NotNull Consumer<? super OUT> consumer);
 
     /**
-     * Short for {@code streamInvocationConfiguration().withOutputOrder(orderType).apply()}.
+     * Short for
+     * {@code streamInvocationConfiguration().withOutputOrder(orderType).applyConfiguration()}.
      * <br>
      * This method is useful to easily make the stream ordered or not.
      * <p>
@@ -494,8 +496,8 @@ public interface StreamChannel<OUT>
     StreamChannel<OUT> repeat();
 
     /**
-     * Short for {@code streamInvocationConfiguration().withRunner(runner).apply()
-     * .asyncMap(Function.<OUT>identity())}.
+     * Short for {@code streamInvocationConfiguration().withRunner(runner).applyConfiguration()
+     * .asyncMap(IdentityInvocation.&lt;OUT&gt;factoryOf())}.
      * <br>
      * This method is useful to easily make the stream run on the specified runner.
      * <p>

@@ -56,7 +56,7 @@ class DefaultServiceAutoProxyRoutineBuilder implements ServiceAutoProxyRoutineBu
             new InvocationConfiguration.Configurable<DefaultServiceAutoProxyRoutineBuilder>() {
 
                 @NotNull
-                public DefaultServiceAutoProxyRoutineBuilder applyConfiguration(
+                public DefaultServiceAutoProxyRoutineBuilder apply(
                         @NotNull final InvocationConfiguration configuration) {
 
                     mInvocationConfiguration = configuration;
@@ -71,7 +71,7 @@ class DefaultServiceAutoProxyRoutineBuilder implements ServiceAutoProxyRoutineBu
             new ProxyConfiguration.Configurable<DefaultServiceAutoProxyRoutineBuilder>() {
 
                 @NotNull
-                public DefaultServiceAutoProxyRoutineBuilder applyConfiguration(
+                public DefaultServiceAutoProxyRoutineBuilder apply(
                         @NotNull final ProxyConfiguration configuration) {
 
                     mProxyConfiguration = configuration;
@@ -87,7 +87,7 @@ class DefaultServiceAutoProxyRoutineBuilder implements ServiceAutoProxyRoutineBu
             new ServiceConfiguration.Configurable<DefaultServiceAutoProxyRoutineBuilder>() {
 
                 @NotNull
-                public DefaultServiceAutoProxyRoutineBuilder applyConfiguration(
+                public DefaultServiceAutoProxyRoutineBuilder apply(
                         @NotNull final ServiceConfiguration configuration) {
 
                     mServiceConfiguration = configuration;
@@ -190,13 +190,13 @@ class DefaultServiceAutoProxyRoutineBuilder implements ServiceAutoProxyRoutineBu
                                     .on(mTarget)
                                     .invocationConfiguration()
                                     .with(mInvocationConfiguration)
-                                    .apply()
+                                    .applyConfiguration()
                                     .proxyConfiguration()
                                     .with(mProxyConfiguration)
-                                    .apply()
+                                    .applyConfiguration()
                                     .serviceConfiguration()
                                     .with(mServiceConfiguration)
-                                    .apply();
+                                    .applyConfiguration();
     }
 
     @NotNull
@@ -206,12 +206,12 @@ class DefaultServiceAutoProxyRoutineBuilder implements ServiceAutoProxyRoutineBu
                                    .on(mTarget)
                                    .invocationConfiguration()
                                    .with(mInvocationConfiguration)
-                                   .apply()
+                                   .applyConfiguration()
                                    .proxyConfiguration()
                                    .with(mProxyConfiguration)
-                                   .apply()
+                                   .applyConfiguration()
                                    .serviceConfiguration()
                                    .with(mServiceConfiguration)
-                                   .apply();
+                                   .applyConfiguration();
     }
 }

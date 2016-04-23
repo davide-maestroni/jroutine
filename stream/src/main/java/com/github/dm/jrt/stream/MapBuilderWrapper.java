@@ -55,11 +55,11 @@ class MapBuilderWrapper<OUT> implements ChannelsBuilder<Map<Integer, StreamChann
     }
 
     @NotNull
-    public ChannelsBuilder<Map<Integer, StreamChannel<OUT>>> applyConfiguration(
+    public ChannelsBuilder<Map<Integer, StreamChannel<OUT>>> apply(
             @NotNull final ChannelConfiguration configuration) {
 
         mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
-        mBuilder.channelConfiguration().with(null).with(configuration).apply();
+        mBuilder.channelConfiguration().with(null).with(configuration).applyConfiguration();
         return this;
     }
 

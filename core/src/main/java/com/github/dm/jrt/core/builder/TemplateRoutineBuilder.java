@@ -42,8 +42,7 @@ public abstract class TemplateRoutineBuilder<IN, OUT> extends TemplateRoutine<IN
     private InvocationConfiguration mConfiguration = InvocationConfiguration.defaultConfiguration();
 
     @NotNull
-    public RoutineBuilder<IN, OUT> applyConfiguration(
-            @NotNull final InvocationConfiguration configuration) {
+    public RoutineBuilder<IN, OUT> apply(@NotNull final InvocationConfiguration configuration) {
 
         mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
         return this;

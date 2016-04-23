@@ -84,7 +84,7 @@ public class JRoutineTest {
                                                                 TimeoutActionType.EXIT)
                                                         .withLogLevel(Level.DEBUG)
                                                         .withLog(new NullLog())
-                                                        .apply()
+                                                        .applyConfiguration()
                                                         .method(TestClass.GET);
         assertThat(routine.syncCall().afterMax(timeout).all()).containsExactly(-77L);
     }
@@ -141,7 +141,7 @@ public class JRoutineTest {
                                               .withRunner(Runners.poolRunner())
                                               .withLogLevel(Level.DEBUG)
                                               .withLog(new NullLog())
-                                              .apply()
+                                              .applyConfiguration()
                                               .buildProxy(TestStatic.class);
         try {
             assertThat(testStatic.getOne().all()).containsExactly(1);
@@ -306,7 +306,7 @@ public class JRoutineTest {
                                               .withRunner(Runners.poolRunner())
                                               .withLogLevel(Level.DEBUG)
                                               .withLog(new NullLog())
-                                              .apply()
+                                              .applyConfiguration()
                                               .buildProxy(TestStatic.class);
         assertThat(testStatic.getOne().all()).containsExactly(1);
         assertThat(testStatic.getTwo().all()).containsExactly(2);
@@ -321,7 +321,7 @@ public class JRoutineTest {
                                                         .withRunner(Runners.poolRunner())
                                                         .withLogLevel(Level.DEBUG)
                                                         .withLog(new NullLog())
-                                                        .apply()
+                                                        .applyConfiguration()
                                                         .method(TestClass.GET);
         assertThat(routine.syncCall().all()).containsExactly(-77L);
     }
@@ -336,7 +336,7 @@ public class JRoutineTest {
                                          .withRunner(Runners.poolRunner())
                                          .withLogLevel(Level.DEBUG)
                                          .withLog(new NullLog())
-                                         .apply()
+                                         .applyConfiguration()
                                          .buildProxy(TestStatic.class);
         assertThat(proxy.getOne().all()).containsExactly(1);
     }
@@ -350,7 +350,7 @@ public class JRoutineTest {
                                          .withRunner(Runners.poolRunner())
                                          .withLogLevel(Level.DEBUG)
                                          .withLog(new NullLog())
-                                         .apply()
+                                         .applyConfiguration()
                                          .buildProxy(tokenOf(TestStatic.class));
         assertThat(proxy.getOne().all()).containsExactly(1);
     }
@@ -362,7 +362,7 @@ public class JRoutineTest {
         final Routine<Object, Object> routine = JRoutine.on(test)
                                                         .proxyConfiguration()
                                                         .withSharedFields()
-                                                        .apply()
+                                                        .applyConfiguration()
                                                         .method(TestClass.class.getMethod(
                                                                 "getLong"));
         assertThat(routine.syncCall().all()).containsExactly(-77L);
@@ -377,7 +377,7 @@ public class JRoutineTest {
                                                         .withRunner(Runners.poolRunner())
                                                         .withLogLevel(Level.DEBUG)
                                                         .withLog(new NullLog())
-                                                        .apply()
+                                                        .applyConfiguration()
                                                         .method("getLong");
         assertThat(routine.syncCall().all()).containsExactly(-77L);
     }
@@ -391,7 +391,7 @@ public class JRoutineTest {
                                       .withRunner(Runners.poolRunner())
                                       .withLogLevel(Level.DEBUG)
                                       .withLog(new NullLog())
-                                      .apply()
+                                      .applyConfiguration()
                                       .buildProxy(TestItf.class);
         assertThat(proxy.getOne().all()).containsExactly(1);
     }
@@ -405,7 +405,7 @@ public class JRoutineTest {
                                       .withRunner(Runners.poolRunner())
                                       .withLogLevel(Level.DEBUG)
                                       .withLog(new NullLog())
-                                      .apply()
+                                      .applyConfiguration()
                                       .buildProxy(tokenOf(TestItf.class));
         assertThat(proxy.getOne().all()).containsExactly(1);
     }
@@ -626,10 +626,10 @@ public class JRoutineTest {
                                       .withRunner(Runners.poolRunner())
                                       .withLogLevel(Level.DEBUG)
                                       .withLog(new NullLog())
-                                      .apply()
+                                      .applyConfiguration()
                                       .proxyConfiguration()
                                       .withSharedFields()
-                                      .apply()
+                                      .applyConfiguration()
                                       .buildProxy(TestItf.class);
         assertThat(proxy.getOne().all()).containsExactly(1);
     }

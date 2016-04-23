@@ -24,8 +24,8 @@ import android.test.ActivityInstrumentationTestCase2;
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
-import com.github.dm.jrt.android.core.invocation.MissingLoaderException;
 import com.github.dm.jrt.android.core.invocation.IdentityContextInvocation;
+import com.github.dm.jrt.android.core.invocation.MissingLoaderException;
 import com.github.dm.jrt.android.v4.channel.SparseChannelsCompat;
 import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
@@ -527,7 +527,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                                       .channelConfiguration()
                                       .withChannelOrder(OrderType.BY_CALL)
                                       .withReadTimeout(seconds(10))
-                                      .apply()
+                                      .applyConfiguration()
                                       .buildChannels()
                                       .all()).containsExactly("test4", "test5", "test6", "test1",
                 "test2", "test3");
@@ -727,7 +727,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                                       .with(context)
                                       .loaderConfiguration()
                                       .withFactoryId(11)
-                                      .apply()
+                                      .applyConfiguration()
                                       .async()
                                       .map(toUpperCase())
                                       .afterMax(seconds(10))
@@ -1406,7 +1406,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                            .with(context)
                            .loaderConfiguration()
                            .withLoaderId(21)
-                           .apply()
+                           .applyConfiguration()
                            .async()
                            .map(toUpperCase());
         assertThat(JRoutineLoaderCompat.with(context)
@@ -1418,7 +1418,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                            .with(context)
                            .streamLoaderConfiguration()
                            .withLoaderId(31)
-                           .apply()
+                           .applyConfiguration()
                            .async()
                            .map(toUpperCase());
         assertThat(JRoutineLoaderCompat.with(context)
@@ -1433,7 +1433,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         final IOChannelBuilder builder = JRoutineCore.io()
                                                      .channelConfiguration()
                                                      .withChannelOrder(OrderType.BY_CALL)
-                                                     .apply();
+                                                     .applyConfiguration();
         final IOChannel<String> channel1 = builder.buildChannel();
         final IOChannel<Integer> channel2 = builder.buildChannel();
 
@@ -1445,7 +1445,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                                     .on(factoryFrom(new Sort()))
                                     .invocationConfiguration()
                                     .withInputOrder(OrderType.BY_CALL)
-                                    .apply()
+                                    .applyConfiguration()
                                     .asyncCall(channel);
         final SparseArrayCompat<OutputChannel<Object>> channelMap =
                 SparseChannelsCompat.selectParcelable(output, Sort.INTEGER, Sort.STRING)
@@ -1479,7 +1479,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         final IOChannelBuilder builder = JRoutineCore.io()
                                                      .channelConfiguration()
                                                      .withChannelOrder(OrderType.BY_CALL)
-                                                     .apply();
+                                                     .applyConfiguration();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
         OutputChannel<? extends ParcelableSelectable<?>> outputChannel;
@@ -1539,7 +1539,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         final IOChannelBuilder builder = JRoutineCore.io()
                                                      .channelConfiguration()
                                                      .withChannelOrder(OrderType.BY_CALL)
-                                                     .apply();
+                                                     .applyConfiguration();
         final IOChannel<String> channel1 = builder.buildChannel();
         final IOChannel<String> channel2 = builder.buildChannel();
         final IOChannel<String> channel3 = builder.buildChannel();
@@ -1575,7 +1575,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         final IOChannelBuilder builder = JRoutineCore.io()
                                                      .channelConfiguration()
                                                      .withChannelOrder(OrderType.BY_CALL)
-                                                     .apply();
+                                                     .applyConfiguration();
         IOChannel<String> channel1;
         IOChannel<Integer> channel2;
         OutputChannel<? extends ParcelableSelectable<?>> outputChannel;
@@ -1859,14 +1859,14 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                 LoaderStreamsCompat.selectParcelable(outputChannel, Sort.INTEGER, Sort.STRING)
                                    .channelConfiguration()
                                    .withLogLevel(Level.WARNING)
-                                   .apply()
+                                   .applyConfiguration()
                                    .buildChannels()
                                    .get(Sort.INTEGER);
         final StreamChannel<Object> strChannel = LoaderStreamsCompat.selectParcelable(outputChannel,
                 Arrays.asList(Sort.STRING, Sort.INTEGER))
                                                                     .channelConfiguration()
                                                                     .withLogLevel(Level.WARNING)
-                                                                    .apply()
+                                                                    .applyConfiguration()
                                                                     .buildChannels()
                                                                     .get(Sort.STRING);
         inputChannel.pass(new ParcelableSelectable<Object>("test21", Sort.STRING),

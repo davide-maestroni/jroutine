@@ -57,7 +57,7 @@ class DefaultLoaderAutoProxyRoutineBuilderCompat implements LoaderAutoProxyRouti
             new InvocationConfiguration.Configurable<DefaultLoaderAutoProxyRoutineBuilderCompat>() {
 
                 @NotNull
-                public DefaultLoaderAutoProxyRoutineBuilderCompat applyConfiguration(
+                public DefaultLoaderAutoProxyRoutineBuilderCompat apply(
                         @NotNull final InvocationConfiguration configuration) {
 
                     mInvocationConfiguration = configuration;
@@ -72,7 +72,7 @@ class DefaultLoaderAutoProxyRoutineBuilderCompat implements LoaderAutoProxyRouti
             new LoaderConfiguration.Configurable<DefaultLoaderAutoProxyRoutineBuilderCompat>() {
 
                 @NotNull
-                public DefaultLoaderAutoProxyRoutineBuilderCompat applyConfiguration(
+                public DefaultLoaderAutoProxyRoutineBuilderCompat apply(
                         @NotNull final LoaderConfiguration configuration) {
 
                     mLoaderConfiguration = configuration;
@@ -87,7 +87,7 @@ class DefaultLoaderAutoProxyRoutineBuilderCompat implements LoaderAutoProxyRouti
             new ProxyConfiguration.Configurable<DefaultLoaderAutoProxyRoutineBuilderCompat>() {
 
                 @NotNull
-                public DefaultLoaderAutoProxyRoutineBuilderCompat applyConfiguration(
+                public DefaultLoaderAutoProxyRoutineBuilderCompat apply(
                         @NotNull final ProxyConfiguration configuration) {
 
                     mProxyConfiguration = configuration;
@@ -189,13 +189,13 @@ class DefaultLoaderAutoProxyRoutineBuilderCompat implements LoaderAutoProxyRouti
                                          .on(mTarget)
                                          .invocationConfiguration()
                                          .with(mInvocationConfiguration)
-                                         .apply()
+                                         .applyConfiguration()
                                          .proxyConfiguration()
                                          .with(mProxyConfiguration)
-                                         .apply()
+                                         .applyConfiguration()
                                          .loaderConfiguration()
                                          .with(mLoaderConfiguration)
-                                         .apply();
+                                         .applyConfiguration();
     }
 
     @NotNull
@@ -205,12 +205,12 @@ class DefaultLoaderAutoProxyRoutineBuilderCompat implements LoaderAutoProxyRouti
                                         .on(mTarget)
                                         .invocationConfiguration()
                                         .with(mInvocationConfiguration)
-                                        .apply()
+                                        .applyConfiguration()
                                         .proxyConfiguration()
                                         .with(mProxyConfiguration)
-                                        .apply()
+                                        .applyConfiguration()
                                         .loaderConfiguration()
                                         .with(mLoaderConfiguration)
-                                        .apply();
+                                        .applyConfiguration();
     }
 }

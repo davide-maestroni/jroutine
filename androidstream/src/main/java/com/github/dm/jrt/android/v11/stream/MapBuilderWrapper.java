@@ -53,11 +53,11 @@ class MapBuilderWrapper<OUT> implements ChannelsBuilder<SparseArray<LoaderStream
     }
 
     @NotNull
-    public ChannelsBuilder<SparseArray<LoaderStreamChannel<OUT>>> applyConfiguration(
+    public ChannelsBuilder<SparseArray<LoaderStreamChannel<OUT>>> apply(
             @NotNull final ChannelConfiguration configuration) {
 
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-        mBuilder.channelConfiguration().with(null).with(configuration).apply();
+        mBuilder.channelConfiguration().with(null).with(configuration).applyConfiguration();
         return this;
     }
 

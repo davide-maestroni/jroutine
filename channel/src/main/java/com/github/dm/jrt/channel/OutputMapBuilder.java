@@ -111,7 +111,7 @@ class OutputMapBuilder<OUT> extends AbstractBuilder<Map<Integer, OutputChannel<O
                     final IOChannel<OUT> ioChannel = JRoutineCore.io()
                                                                  .channelConfiguration()
                                                                  .with(configuration)
-                                                                 .apply()
+                                                                 .applyConfiguration()
                                                                  .buildChannel();
                     inputMap.put(index, ioChannel);
                     channelMap.put(index, ioChannel);

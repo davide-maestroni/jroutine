@@ -53,10 +53,10 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
             new InvocationConfiguration.Configurable<LoaderRoutineBuilder<IN, OUT>>() {
 
                 @NotNull
-                public LoaderRoutineBuilder<IN, OUT> applyConfiguration(
+                public LoaderRoutineBuilder<IN, OUT> apply(
                         @NotNull final InvocationConfiguration configuration) {
 
-                    return DefaultLoaderRoutineBuilder.this.applyConfiguration(configuration);
+                    return DefaultLoaderRoutineBuilder.this.apply(configuration);
                 }
             };
 
@@ -84,10 +84,10 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
     }
 
     @NotNull
-    public LoaderRoutineBuilder<IN, OUT> applyConfiguration(
+    public LoaderRoutineBuilder<IN, OUT> apply(
             @NotNull final InvocationConfiguration configuration) {
 
-        super.applyConfiguration(configuration);
+        super.apply(configuration);
         return this;
     }
 
@@ -101,8 +101,7 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
     }
 
     @NotNull
-    public LoaderRoutineBuilder<IN, OUT> applyConfiguration(
-            @NotNull final LoaderConfiguration configuration) {
+    public LoaderRoutineBuilder<IN, OUT> apply(@NotNull final LoaderConfiguration configuration) {
 
         mLoaderConfiguration = ConstantConditions.notNull("loader configuration", configuration);
         return this;
@@ -120,7 +119,7 @@ class DefaultLoaderRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, OU
 
         final InvocationConfiguration.Builder<InvocationConfiguration> builder =
                 configuration.builderFrom().withRunner(zeroDelayRunner(mainRunner()));
-        return new DefaultLoaderRoutine<IN, OUT>(mContext, mFactory, builder.apply(),
+        return new DefaultLoaderRoutine<IN, OUT>(mContext, mFactory, builder.applyConfiguration(),
                 mLoaderConfiguration);
     }
 

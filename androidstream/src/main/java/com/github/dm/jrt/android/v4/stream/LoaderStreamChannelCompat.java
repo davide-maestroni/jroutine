@@ -380,7 +380,7 @@ public interface LoaderStreamChannelCompat<OUT>
     LoaderStreamChannelCompat<OUT> tryFinally(@NotNull Runnable runnable);
 
     /**
-     * Short for {@code loaderConfiguration().withCacheStrategy(strategyType).apply()}.
+     * Short for {@code loaderConfiguration().withCacheStrategy(strategyType).applyConfiguration()}.
      *
      * @param strategyType the cache strategy type.
      * @return the configured stream.
@@ -389,7 +389,7 @@ public interface LoaderStreamChannelCompat<OUT>
     LoaderStreamChannelCompat<OUT> cache(@Nullable CacheStrategyType strategyType);
 
     /**
-     * Short for {@code loaderConfiguration().withFactoryId(factoryId).apply()}.
+     * Short for {@code loaderConfiguration().withFactoryId(factoryId).applyConfiguration()}.
      * <br>
      * This method is useful to easily apply a configuration to the next routine concatenated to the
      * stream, which will force the factory ID to the specified one.
@@ -416,7 +416,7 @@ public interface LoaderStreamChannelCompat<OUT>
     LoaderConfiguration.Builder<? extends LoaderStreamChannelCompat<OUT>> loaderConfiguration();
 
     /**
-     * Short for {@code loaderConfiguration().withLoaderId(loaderId).apply()}.
+     * Short for {@code loaderConfiguration().withLoaderId(loaderId).applyConfiguration()}.
      * <br>
      * This method is useful to easily apply a configuration to the next routine concatenated to the
      * stream, which will force the routine loader ID.
@@ -444,7 +444,7 @@ public interface LoaderStreamChannelCompat<OUT>
             @NotNull ContextInvocationFactory<? super OUT, ? extends AFTER> factory);
 
     /**
-     * Short for {@code loaderConfiguration().withResultStaleTime(staleTime).apply()}.
+     * Short for {@code loaderConfiguration().withResultStaleTime(staleTime).applyConfiguration()}.
      *
      * @param staleTime the stale time.
      * @return the configured stream.
@@ -453,7 +453,8 @@ public interface LoaderStreamChannelCompat<OUT>
     LoaderStreamChannelCompat<OUT> staleAfter(@Nullable UnitDuration staleTime);
 
     /**
-     * Short for {@code loaderConfiguration().withResultStaleTime(time, timeUnit).apply()}.
+     * Short for
+     * {@code loaderConfiguration().withResultStaleTime(time, timeUnit).applyConfiguration()}.
      *
      * @param time     the time.
      * @param timeUnit the time unit.

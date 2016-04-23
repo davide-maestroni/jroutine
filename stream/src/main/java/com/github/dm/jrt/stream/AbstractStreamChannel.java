@@ -99,7 +99,7 @@ public abstract class AbstractStreamChannel<OUT>
             new Configurable<StreamChannel<OUT>>() {
 
                 @NotNull
-                public StreamChannel<OUT> applyConfiguration(
+                public StreamChannel<OUT> apply(
                         @NotNull final InvocationConfiguration configuration) {
 
                     mStreamConfiguration = configuration;
@@ -242,7 +242,7 @@ public abstract class AbstractStreamChannel<OUT>
         return invocationConfiguration().withRunner(runner)
                                         .withInputLimit(maxInputs)
                                         .withInputMaxDelay(maxDelay)
-                                        .apply();
+                                        .applyConfiguration();
     }
 
     @NotNull
@@ -339,7 +339,7 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public StreamChannel<OUT> maxParallelInvocations(final int maxInvocations) {
 
-        return invocationConfiguration().withMaxInstances(maxInvocations).apply();
+        return invocationConfiguration().withMaxInstances(maxInvocations).applyConfiguration();
     }
 
     @NotNull
@@ -357,7 +357,7 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public StreamChannel<OUT> ordered(@Nullable final OrderType orderType) {
 
-        return streamInvocationConfiguration().withOutputOrder(orderType).apply();
+        return streamInvocationConfiguration().withOutputOrder(orderType).applyConfiguration();
     }
 
     @NotNull
@@ -394,7 +394,7 @@ public abstract class AbstractStreamChannel<OUT>
         final OutputChannel<OUT> channel = Channels.repeat(this)
                                                    .channelConfiguration()
                                                    .with(configuration)
-                                                   .apply()
+                                                   .applyConfiguration()
                                                    .buildChannels();
         return newChannel(channel, getStreamConfiguration(), mInvocationMode, mBinder);
     }
@@ -404,8 +404,10 @@ public abstract class AbstractStreamChannel<OUT>
 
         final InvocationMode invocationMode = mInvocationMode;
         final OperationInvocation<OUT, OUT> factory = IdentityInvocation.factoryOf();
-        final StreamChannel<OUT> channel =
-                streamInvocationConfiguration().withRunner(runner).apply().async().map(factory);
+        final StreamChannel<OUT> channel = streamInvocationConfiguration().withRunner(runner)
+                                                                          .applyConfiguration()
+                                                                          .async()
+                                                                          .map(factory);
         if (invocationMode == InvocationMode.ASYNC) {
             return channel.async();
         }
@@ -519,7 +521,7 @@ public abstract class AbstractStreamChannel<OUT>
         final OutputChannel<? extends Selectable<OUT>> channel = Channels.toSelectable(this, index)
                                                                          .channelConfiguration()
                                                                          .with(configuration)
-                                                                         .apply()
+                                                                         .applyConfiguration()
                                                                          .buildChannels();
         return newChannel(channel, getStreamConfiguration(), mInvocationMode, mBinder);
     }
@@ -532,7 +534,7 @@ public abstract class AbstractStreamChannel<OUT>
         final IOChannel<OUT> ioChannel = JRoutineCore.io()
                                                      .channelConfiguration()
                                                      .with(buildChannelConfiguration())
-                                                     .apply()
+                                                     .applyConfiguration()
                                                      .buildChannel();
         mChannel.bind(new TryCatchOutputConsumer<OUT>(consumer, ioChannel));
         return newChannel(ioChannel, getStreamConfiguration(), mInvocationMode, mBinder);
@@ -551,7 +553,7 @@ public abstract class AbstractStreamChannel<OUT>
         final IOChannel<OUT> ioChannel = JRoutineCore.io()
                                                      .channelConfiguration()
                                                      .with(buildChannelConfiguration())
-                                                     .apply()
+                                                     .applyConfiguration()
                                                      .buildChannel();
         mChannel.bind(new TryFinallyOutputConsumer<OUT>(runnable, ioChannel));
         return newChannel(ioChannel, getStreamConfiguration(), mInvocationMode, mBinder);
@@ -641,7 +643,7 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     protected ChannelConfiguration buildChannelConfiguration() {
 
-        return builderFromOutputChannel(buildConfiguration()).apply();
+        return builderFromOutputChannel(buildConfiguration()).applyConfiguration();
     }
 
     /**
@@ -652,7 +654,7 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     protected InvocationConfiguration buildConfiguration() {
 
-        return getStreamConfiguration().builderFrom().with(getConfiguration()).apply();
+        return getStreamConfiguration().builderFrom().with(getConfiguration()).applyConfiguration();
     }
 
     /**
@@ -813,8 +815,7 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
-    public StreamChannel<OUT> applyConfiguration(
-            @NotNull final InvocationConfiguration configuration) {
+    public StreamChannel<OUT> apply(@NotNull final InvocationConfiguration configuration) {
 
         mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
         return this;

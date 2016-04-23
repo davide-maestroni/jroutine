@@ -43,10 +43,10 @@ class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, O
             new InvocationConfiguration.Configurable<ServiceRoutineBuilder<IN, OUT>>() {
 
                 @NotNull
-                public ServiceRoutineBuilder<IN, OUT> applyConfiguration(
+                public ServiceRoutineBuilder<IN, OUT> apply(
                         @NotNull final InvocationConfiguration configuration) {
 
-                    return DefaultServiceRoutineBuilder.this.applyConfiguration(configuration);
+                    return DefaultServiceRoutineBuilder.this.apply(configuration);
                 }
             };
 
@@ -72,10 +72,10 @@ class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, O
 
     @NotNull
     @Override
-    public ServiceRoutineBuilder<IN, OUT> applyConfiguration(
+    public ServiceRoutineBuilder<IN, OUT> apply(
             @NotNull final InvocationConfiguration configuration) {
 
-        super.applyConfiguration(configuration);
+        super.apply(configuration);
         return this;
     }
 
@@ -90,8 +90,7 @@ class DefaultServiceRoutineBuilder<IN, OUT> extends TemplateRoutineBuilder<IN, O
     }
 
     @NotNull
-    public ServiceRoutineBuilder<IN, OUT> applyConfiguration(
-            @NotNull final ServiceConfiguration configuration) {
+    public ServiceRoutineBuilder<IN, OUT> apply(@NotNull final ServiceConfiguration configuration) {
 
         mServiceConfiguration = ConstantConditions.notNull("service configuration", configuration);
         return this;

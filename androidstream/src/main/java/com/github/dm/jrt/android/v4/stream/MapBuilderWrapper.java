@@ -55,11 +55,11 @@ class MapBuilderWrapper<OUT>
     }
 
     @NotNull
-    public ChannelsBuilder<SparseArrayCompat<LoaderStreamChannelCompat<OUT>>> applyConfiguration(
+    public ChannelsBuilder<SparseArrayCompat<LoaderStreamChannelCompat<OUT>>> apply(
             @NotNull final ChannelConfiguration configuration) {
 
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-        mBuilder.channelConfiguration().with(null).with(configuration).apply();
+        mBuilder.channelConfiguration().with(null).with(configuration).applyConfiguration();
         return this;
     }
 

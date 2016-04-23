@@ -173,7 +173,7 @@ public class RunnerTest extends AndroidTestCase {
                                                            .invocationConfiguration()
                                                            .withRunner(AndroidRunners.handlerRunner(
                                                                    new HandlerThread("test")))
-                                                           .apply()
+                                                           .applyConfiguration()
                                                            .asyncCall();
         assertThat(JRoutineCore.on(new HandlerInvocationFactory())
                                .asyncCall(channel)
@@ -196,7 +196,7 @@ public class RunnerTest extends AndroidTestCase {
                                                           .invocationConfiguration()
                                                           .withRunner(AndroidRunners.handlerRunner(
                                                                   new HandlerThread("test")))
-                                                          .apply()
+                                                          .applyConfiguration()
                                                           .asyncCall();
 
         assertThat(JRoutineCore.on(new LooperInvocationFactory())

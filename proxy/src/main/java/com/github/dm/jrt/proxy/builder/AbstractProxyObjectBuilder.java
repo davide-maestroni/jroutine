@@ -49,8 +49,7 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
     private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.defaultConfiguration();
 
     @NotNull
-    public ProxyObjectBuilder<TYPE> applyConfiguration(
-            @NotNull final InvocationConfiguration configuration) {
+    public ProxyObjectBuilder<TYPE> apply(@NotNull final InvocationConfiguration configuration) {
 
         mInvocationConfiguration =
                 ConstantConditions.notNull("invocation configuration", configuration);
@@ -58,8 +57,7 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
     }
 
     @NotNull
-    public ProxyObjectBuilder<TYPE> applyConfiguration(
-            @NotNull final ProxyConfiguration configuration) {
+    public ProxyObjectBuilder<TYPE> apply(@NotNull final ProxyConfiguration configuration) {
 
         mProxyConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
         return this;

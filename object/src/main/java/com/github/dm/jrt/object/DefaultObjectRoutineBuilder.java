@@ -92,8 +92,7 @@ class DefaultObjectRoutineBuilder
     }
 
     @NotNull
-    public ObjectRoutineBuilder applyConfiguration(
-            @NotNull final InvocationConfiguration configuration) {
+    public ObjectRoutineBuilder apply(@NotNull final InvocationConfiguration configuration) {
 
         mInvocationConfiguration =
                 ConstantConditions.notNull("invocation configuration", configuration);
@@ -101,8 +100,7 @@ class DefaultObjectRoutineBuilder
     }
 
     @NotNull
-    public ObjectRoutineBuilder applyConfiguration(
-            @NotNull final ProxyConfiguration configuration) {
+    public ObjectRoutineBuilder apply(@NotNull final ProxyConfiguration configuration) {
 
         mProxyConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
         return this;
@@ -200,7 +198,7 @@ class DefaultObjectRoutineBuilder
                 routine = JRoutineCore.on(factory)
                                       .invocationConfiguration()
                                       .with(invocationConfiguration)
-                                      .apply()
+                                      .applyConfiguration()
                                       .buildRoutine();
                 routineMap.put(routineInfo, routine);
             }

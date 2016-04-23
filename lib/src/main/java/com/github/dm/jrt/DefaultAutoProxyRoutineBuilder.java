@@ -51,7 +51,7 @@ class DefaultAutoProxyRoutineBuilder implements AutoProxyRoutineBuilder {
             new InvocationConfiguration.Configurable<DefaultAutoProxyRoutineBuilder>() {
 
                 @NotNull
-                public DefaultAutoProxyRoutineBuilder applyConfiguration(
+                public DefaultAutoProxyRoutineBuilder apply(
                         @NotNull final InvocationConfiguration configuration) {
 
                     mInvocationConfiguration = configuration;
@@ -66,7 +66,7 @@ class DefaultAutoProxyRoutineBuilder implements AutoProxyRoutineBuilder {
             new ProxyConfiguration.Configurable<DefaultAutoProxyRoutineBuilder>() {
 
                 @NotNull
-                public DefaultAutoProxyRoutineBuilder applyConfiguration(
+                public DefaultAutoProxyRoutineBuilder apply(
                         @NotNull final ProxyConfiguration configuration) {
 
                     mProxyConfiguration = configuration;
@@ -166,10 +166,10 @@ class DefaultAutoProxyRoutineBuilder implements AutoProxyRoutineBuilder {
         return JRoutineObject.on(mTarget)
                              .invocationConfiguration()
                              .with(mInvocationConfiguration)
-                             .apply()
+                             .applyConfiguration()
                              .proxyConfiguration()
                              .with(mProxyConfiguration)
-                             .apply();
+                             .applyConfiguration();
     }
 
     @NotNull
@@ -178,9 +178,9 @@ class DefaultAutoProxyRoutineBuilder implements AutoProxyRoutineBuilder {
         return JRoutineProxy.on(mTarget)
                             .invocationConfiguration()
                             .with(mInvocationConfiguration)
-                            .apply()
+                            .applyConfiguration()
                             .proxyConfiguration()
                             .with(mProxyConfiguration)
-                            .apply();
+                            .applyConfiguration();
     }
 }

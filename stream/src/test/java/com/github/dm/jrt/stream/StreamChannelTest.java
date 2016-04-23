@@ -486,7 +486,7 @@ public class StreamChannelTest {
 
         try {
             new TestStreamChannel(channel, InvocationConfiguration.defaultConfiguration(),
-                    InvocationMode.ASYNC, null).applyConfiguration(null);
+                    InvocationMode.ASYNC, null).apply(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -774,7 +774,7 @@ public class StreamChannelTest {
             Streams.streamOf("test")
                    .invocationConfiguration()
                    .withRunner(runner1)
-                   .apply()
+                   .applyConfiguration()
                    .map(new Function<String, Object>() {
 
                        public Object apply(final String s) {
@@ -782,11 +782,11 @@ public class StreamChannelTest {
                            return Streams.streamOf(s)
                                          .invocationConfiguration()
                                          .withRunner(runner1)
-                                         .apply()
+                                         .applyConfiguration()
                                          .map(Functions.identity())
                                          .invocationConfiguration()
                                          .withRunner(runner2)
-                                         .apply()
+                                         .applyConfiguration()
                                          .map(Functions.identity())
                                          .afterMax(minutes(3))
                                          .next();
@@ -1280,7 +1280,7 @@ public class StreamChannelTest {
         final Routine<String, String> routine = JRoutineCore.on(new UpperCase())
                                                             .invocationConfiguration()
                                                             .withOutputOrder(OrderType.BY_CALL)
-                                                            .apply()
+                                                            .applyConfiguration()
                                                             .buildRoutine();
         assertThat(Streams.streamOf("test1", "test2")
                           .async()
@@ -1356,7 +1356,7 @@ public class StreamChannelTest {
                               .withInputMaxDelay(seconds(3))
                               .withOutputLimit(2)
                               .withOutputMaxDelay(seconds(3))
-                              .apply()
+                              .applyConfiguration()
                               .map(Functions.<Number>identity())
                               .map(new Function<Number, Double>() {
 
@@ -1407,7 +1407,7 @@ public class StreamChannelTest {
                               .withRunner(mSingleThreadRunner)
                               .withOutputLimit(2)
                               .withOutputMaxDelay(seconds(3))
-                              .apply()
+                              .applyConfiguration()
                               .map(Functions.<Number>identity())
                               .map(new Function<Number, Double>() {
 
@@ -1456,7 +1456,7 @@ public class StreamChannelTest {
                               .withRunner(mSingleThreadRunner)
                               .withInputLimit(2)
                               .withInputMaxDelay(seconds(3))
-                              .apply()
+                              .applyConfiguration()
                               .map(Functions.<Number>identity())
                               .map(new Function<Number, Double>() {
 

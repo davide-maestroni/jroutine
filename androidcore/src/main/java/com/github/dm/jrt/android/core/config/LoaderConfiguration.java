@@ -299,7 +299,7 @@ public final class LoaderConfiguration extends DeepEqualObject {
          * @return the configurable instance.
          */
         @NotNull
-        TYPE applyConfiguration(@NotNull LoaderConfiguration configuration);
+        TYPE apply(@NotNull LoaderConfiguration configuration);
     }
 
     /**
@@ -354,9 +354,9 @@ public final class LoaderConfiguration extends DeepEqualObject {
          * @return the configured object.
          */
         @NotNull
-        public TYPE apply() {
+        public TYPE applyConfiguration() {
 
-            return mConfigurable.applyConfiguration(buildConfiguration());
+            return mConfigurable.apply(buildConfiguration());
         }
 
         /**
@@ -534,8 +534,7 @@ public final class LoaderConfiguration extends DeepEqualObject {
     private static class DefaultConfigurable implements Configurable<LoaderConfiguration> {
 
         @NotNull
-        public LoaderConfiguration applyConfiguration(
-                @NotNull final LoaderConfiguration configuration) {
+        public LoaderConfiguration apply(@NotNull final LoaderConfiguration configuration) {
 
             return configuration;
         }

@@ -56,23 +56,21 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
     private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.defaultConfiguration();
 
     @NotNull
-    public LoaderProxyObjectBuilder<TYPE> applyConfiguration(
-            @NotNull final LoaderConfiguration configuration) {
+    public LoaderProxyObjectBuilder<TYPE> apply(@NotNull final LoaderConfiguration configuration) {
 
         mLoaderConfiguration = ConstantConditions.notNull("loader configuration", configuration);
         return this;
     }
 
     @NotNull
-    public LoaderProxyObjectBuilder<TYPE> applyConfiguration(
-            @NotNull final ProxyConfiguration configuration) {
+    public LoaderProxyObjectBuilder<TYPE> apply(@NotNull final ProxyConfiguration configuration) {
 
         mProxyConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
         return this;
     }
 
     @NotNull
-    public LoaderProxyObjectBuilder<TYPE> applyConfiguration(
+    public LoaderProxyObjectBuilder<TYPE> apply(
             @NotNull final InvocationConfiguration configuration) {
 
         mInvocationConfiguration =

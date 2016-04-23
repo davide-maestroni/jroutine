@@ -59,15 +59,14 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
             ServiceConfiguration.defaultConfiguration();
 
     @NotNull
-    public ServiceProxyObjectBuilder<TYPE> applyConfiguration(
-            @NotNull final ProxyConfiguration configuration) {
+    public ServiceProxyObjectBuilder<TYPE> apply(@NotNull final ProxyConfiguration configuration) {
 
         mProxyConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
         return this;
     }
 
     @NotNull
-    public ServiceProxyObjectBuilder<TYPE> applyConfiguration(
+    public ServiceProxyObjectBuilder<TYPE> apply(
             @NotNull final ServiceConfiguration configuration) {
 
         mServiceConfiguration = ConstantConditions.notNull("service configuration", configuration);
@@ -75,7 +74,7 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
     }
 
     @NotNull
-    public ServiceProxyObjectBuilder<TYPE> applyConfiguration(
+    public ServiceProxyObjectBuilder<TYPE> apply(
             @NotNull final InvocationConfiguration configuration) {
 
         mInvocationConfiguration =

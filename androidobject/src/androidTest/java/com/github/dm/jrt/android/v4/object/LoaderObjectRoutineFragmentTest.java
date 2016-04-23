@@ -46,7 +46,7 @@ import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.Reflection;
-import com.github.dm.jrt.core.util.TimeDuration;
+import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.object.annotation.Alias;
 import com.github.dm.jrt.object.annotation.AsyncIn;
 import com.github.dm.jrt.object.annotation.AsyncIn.InputMode;
@@ -74,8 +74,8 @@ import static com.github.dm.jrt.android.object.ContextInvocationTarget.classOfTy
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceOf;
 import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
-import static com.github.dm.jrt.core.util.TimeDuration.INFINITY;
-import static com.github.dm.jrt.core.util.TimeDuration.seconds;
+import static com.github.dm.jrt.core.util.UnitDuration.INFINITY;
+import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -94,7 +94,7 @@ public class LoaderObjectRoutineFragmentTest
 
     public void testAliasMethod() throws NoSuchMethodException {
 
-        final TimeDuration timeout = seconds(10);
+        final UnitDuration timeout = seconds(10);
         final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
@@ -129,7 +129,7 @@ public class LoaderObjectRoutineFragmentTest
 
     public void testAsyncInputProxyRoutine() {
 
-        final TimeDuration timeout = seconds(10);
+        final UnitDuration timeout = seconds(10);
         final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
@@ -162,7 +162,7 @@ public class LoaderObjectRoutineFragmentTest
 
     public void testAsyncOutputProxyRoutine() {
 
-        final TimeDuration timeout = seconds(10);
+        final UnitDuration timeout = seconds(10);
         final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
@@ -297,7 +297,7 @@ public class LoaderObjectRoutineFragmentTest
 
     public void testException() throws NoSuchMethodException {
 
-        final TimeDuration timeout = seconds(10);
+        final UnitDuration timeout = seconds(10);
         final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
@@ -647,7 +647,7 @@ public class LoaderObjectRoutineFragmentTest
 
     public void testMethod() throws NoSuchMethodException {
 
-        final TimeDuration timeout = seconds(10);
+        final UnitDuration timeout = seconds(10);
         final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
@@ -668,7 +668,7 @@ public class LoaderObjectRoutineFragmentTest
 
     public void testMethodBySignature() throws NoSuchMethodException {
 
-        final TimeDuration timeout = seconds(10);
+        final UnitDuration timeout = seconds(10);
         final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
@@ -998,7 +998,7 @@ public class LoaderObjectRoutineFragmentTest
 
     public void testProxyRoutine() {
 
-        final TimeDuration timeout = seconds(10);
+        final UnitDuration timeout = seconds(10);
         final TestFragment fragment = (TestFragment) getActivity().getSupportFragmentManager()
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
@@ -1942,14 +1942,14 @@ public class LoaderObjectRoutineFragmentTest
 
         public int getOne() throws InterruptedException {
 
-            TimeDuration.millis(2000).sleepAtLeast();
+            UnitDuration.millis(2000).sleepAtLeast();
 
             return 1;
         }
 
         public int getTwo() throws InterruptedException {
 
-            TimeDuration.millis(2000).sleepAtLeast();
+            UnitDuration.millis(2000).sleepAtLeast();
 
             return 2;
         }

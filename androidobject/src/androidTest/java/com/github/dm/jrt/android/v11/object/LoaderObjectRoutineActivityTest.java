@@ -46,7 +46,7 @@ import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.Reflection;
-import com.github.dm.jrt.core.util.TimeDuration;
+import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.object.annotation.Alias;
 import com.github.dm.jrt.object.annotation.AsyncIn;
 import com.github.dm.jrt.object.annotation.AsyncIn.InputMode;
@@ -74,8 +74,8 @@ import static com.github.dm.jrt.android.object.ContextInvocationTarget.classOfTy
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceOf;
 import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
-import static com.github.dm.jrt.core.util.TimeDuration.INFINITY;
-import static com.github.dm.jrt.core.util.TimeDuration.seconds;
+import static com.github.dm.jrt.core.util.UnitDuration.INFINITY;
+import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -181,7 +181,7 @@ public class LoaderObjectRoutineActivityTest
             return;
         }
 
-        final TimeDuration timeout = seconds(10);
+        final UnitDuration timeout = seconds(10);
         final Routine<Object, Object> routine = JRoutineLoaderObject.with(loaderFrom(getActivity()))
                                                                     .on(instanceOf(TestClass.class))
                                                                     .invocationConfiguration()
@@ -221,7 +221,7 @@ public class LoaderObjectRoutineActivityTest
             return;
         }
 
-        final TimeDuration timeout = seconds(10);
+        final UnitDuration timeout = seconds(10);
         final SumItf sumAsync = JRoutineLoaderObject.with(loaderFrom(getActivity()))
                                                     .on(instanceOf(Sum.class))
                                                     .invocationConfiguration()
@@ -256,7 +256,7 @@ public class LoaderObjectRoutineActivityTest
             return;
         }
 
-        final TimeDuration timeout = seconds(10);
+        final UnitDuration timeout = seconds(10);
         final CountItf countAsync = JRoutineLoaderObject.with(loaderFrom(getActivity()))
                                                         .on(instanceOf(Count.class))
                                                         .invocationConfiguration()
@@ -400,7 +400,7 @@ public class LoaderObjectRoutineActivityTest
             return;
         }
 
-        final TimeDuration timeout = seconds(10);
+        final UnitDuration timeout = seconds(10);
         final Routine<Object, Object> routine3 =
                 JRoutineLoaderObject.with(loaderFrom(getActivity()))
                                     .on(instanceOf(TestClass.class))
@@ -675,7 +675,7 @@ public class LoaderObjectRoutineActivityTest
             return;
         }
 
-        final TimeDuration timeout = seconds(10);
+        final UnitDuration timeout = seconds(10);
         final Routine<Object, Object> routine2 =
                 JRoutineLoaderObject.with(loaderFrom(getActivity()))
                                     .on(instanceOf(TestClass.class))
@@ -699,7 +699,7 @@ public class LoaderObjectRoutineActivityTest
             return;
         }
 
-        final TimeDuration timeout = seconds(10);
+        final UnitDuration timeout = seconds(10);
         final Routine<Object, Object> routine1 =
                 JRoutineLoaderObject.with(loaderFrom(getActivity()))
                                     .on(instanceOf(TestClass.class))
@@ -1037,7 +1037,7 @@ public class LoaderObjectRoutineActivityTest
             return;
         }
 
-        final TimeDuration timeout = seconds(10);
+        final UnitDuration timeout = seconds(10);
         final SquareItf squareAsync = JRoutineLoaderObject.with(loaderFrom(getActivity()))
                                                           .on(instanceOf(Square.class))
                                                           .buildProxy(SquareItf.class);
@@ -1982,14 +1982,14 @@ public class LoaderObjectRoutineActivityTest
 
         public int getOne() throws InterruptedException {
 
-            TimeDuration.millis(2000).sleepAtLeast();
+            UnitDuration.millis(2000).sleepAtLeast();
 
             return 1;
         }
 
         public int getTwo() throws InterruptedException {
 
-            TimeDuration.millis(2000).sleepAtLeast();
+            UnitDuration.millis(2000).sleepAtLeast();
 
             return 2;
         }

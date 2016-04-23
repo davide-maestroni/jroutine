@@ -18,7 +18,7 @@ package com.github.dm.jrt.core.channel;
 
 import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
-import com.github.dm.jrt.core.util.TimeDuration;
+import com.github.dm.jrt.core.util.UnitDuration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -48,7 +48,7 @@ public interface IOChannel<DATA> extends InputChannel<DATA>, OutputChannel<DATA>
      * {@inheritDoc}
      */
     @NotNull
-    IOChannel<DATA> after(@NotNull TimeDuration delay);
+    IOChannel<DATA> after(@NotNull UnitDuration delay);
 
     /**
      * {@inheritDoc}
@@ -102,7 +102,7 @@ public interface IOChannel<DATA> extends InputChannel<DATA>, OutputChannel<DATA>
      * {@inheritDoc}
      */
     @NotNull
-    IOChannel<DATA> afterMax(@NotNull TimeDuration timeout);
+    IOChannel<DATA> afterMax(@NotNull UnitDuration timeout);
 
     /**
      * {@inheritDoc}

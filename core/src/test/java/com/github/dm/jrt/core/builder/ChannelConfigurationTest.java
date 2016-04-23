@@ -25,7 +25,7 @@ import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.Logs;
 import com.github.dm.jrt.core.log.NullLog;
 import com.github.dm.jrt.core.runner.Runners;
-import com.github.dm.jrt.core.util.TimeDuration;
+import com.github.dm.jrt.core.util.UnitDuration;
 
 import org.junit.Test;
 
@@ -36,7 +36,7 @@ import static com.github.dm.jrt.core.config.ChannelConfiguration.builderFrom;
 import static com.github.dm.jrt.core.config.ChannelConfiguration.builderFromInputChannel;
 import static com.github.dm.jrt.core.config.ChannelConfiguration.builderFromInvocation;
 import static com.github.dm.jrt.core.config.ChannelConfiguration.builderFromOutputChannel;
-import static com.github.dm.jrt.core.util.TimeDuration.millis;
+import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -98,9 +98,9 @@ public class ChannelConfigurationTest {
                                                             .withChannelMaxSize(100)
                                                             .withLogLevel(Level.SILENT)
                                                             .withChannelMaxDelay(
-                                                                    TimeDuration.seconds(1))
+                                                                    UnitDuration.seconds(1))
                                                             .withReadTimeout(
-                                                                    TimeDuration.seconds(10))
+                                                                    UnitDuration.seconds(10))
                                                             .withReadTimeoutAction(
                                                                     TimeoutActionType.ABORT)
                                                             .apply();
@@ -146,7 +146,7 @@ public class ChannelConfigurationTest {
                                                             .withChannelMaxSize(100)
                                                             .apply();
         assertThat(configuration).isNotEqualTo(
-                builder().withChannelMaxDelay(TimeDuration.ZERO).apply());
+                builder().withChannelMaxDelay(UnitDuration.ZERO).apply());
         assertThat(configuration).isNotEqualTo(
                 builder().withChannelMaxDelay(1, TimeUnit.MILLISECONDS).apply());
         assertThat(configuration.builderFrom().withChannelMaxDelay(millis(1)).apply()).isNotEqualTo(
@@ -362,7 +362,7 @@ public class ChannelConfigurationTest {
                                                             .withChannelMaxSize(100)
                                                             .apply();
         assertThat(configuration).isNotEqualTo(
-                builder().withReadTimeout(TimeDuration.ZERO).apply());
+                builder().withReadTimeout(UnitDuration.ZERO).apply());
         assertThat(configuration).isNotEqualTo(
                 builder().withReadTimeout(1, TimeUnit.MILLISECONDS).apply());
         assertThat(configuration.builderFrom().withReadTimeout(millis(1)).apply()).isNotEqualTo(

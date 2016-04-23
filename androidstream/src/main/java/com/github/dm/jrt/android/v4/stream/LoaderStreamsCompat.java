@@ -43,7 +43,6 @@ import com.github.dm.jrt.stream.Streams;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -69,17 +68,17 @@ public class LoaderStreamsCompat extends Streams {
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
-     * @param channels the collection of channels.
+     * @param channels the iterable of channels.
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      * @see Channels#blend(Iterable)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<OUT>> blend(
-            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
+            @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
 
         return new BuilderWrapper<OUT>(SparseChannelsCompat.blend(channels));
     }
@@ -113,7 +112,7 @@ public class LoaderStreamsCompat extends Streams {
      * @param <IN>     the input data type.
      * @return the selectable I/O channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     * @throws java.lang.NullPointerException     if the specified array is null or contains a
      *                                            null object.
      * @see SparseChannelsCompat#combine(Channel.InputChannel...)
      */
@@ -157,41 +156,41 @@ public class LoaderStreamsCompat extends Streams {
      * invocation lifecycle.
      *
      * @param startIndex the selectable start index.
-     * @param channels   the collection of input channels.
+     * @param channels   the iterable of input channels.
      * @param <IN>       the input data type.
      * @return the selectable I/O channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      * @see Channels#combine(int, Iterable)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
             final int startIndex,
-            @NotNull final Collection<? extends InputChannel<? extends IN>> channels) {
+            @NotNull final Iterable<? extends InputChannel<? extends IN>> channels) {
 
         return SparseChannelsCompat.combine(startIndex, channels);
     }
 
     /**
      * Returns a builder of input channels combining the specified channels into a selectable one.
-     * The selectable indexes will be the position in the collection.
+     * The selectable indexes will be the position in the iterable.
      * <p>
      * Note that the builder will successfully create several input channel instances, and that the
      * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
      * invocation lifecycle.
      *
-     * @param channels the collection of input channels.
+     * @param channels the iterable of input channels.
      * @param <IN>     the input data type.
      * @return the selectable I/O channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      * @see Channels#combine(Iterable)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
-            @NotNull final Collection<? extends InputChannel<? extends IN>> channels) {
+            @NotNull final Iterable<? extends InputChannel<? extends IN>> channels) {
 
         return SparseChannelsCompat.combine(channels);
     }
@@ -250,17 +249,17 @@ public class LoaderStreamsCompat extends Streams {
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
-     * @param channels the collection of channels.
+     * @param channels the iterable of channels.
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      * @see Channels#concat(Iterable)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<OUT>> concat(
-            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
+            @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
 
         return new BuilderWrapper<OUT>(SparseChannelsCompat.concat(channels));
     }
@@ -344,17 +343,17 @@ public class LoaderStreamsCompat extends Streams {
      * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
      * invocation lifecycle.
      *
-     * @param channels the collection of channels.
+     * @param channels the iterable of channels.
      * @param <IN>     the input data type.
      * @return the I/O channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      * @see Channels#distribute(Iterable)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<List<? extends IN>>> distribute(
-            @NotNull final Collection<? extends InputChannel<? extends IN>> channels) {
+            @NotNull final Iterable<? extends InputChannel<? extends IN>> channels) {
 
         return SparseChannelsCompat.distribute(channels);
     }
@@ -396,18 +395,18 @@ public class LoaderStreamsCompat extends Streams {
      * invocation lifecycle.
      *
      * @param placeholder the placeholder instance.
-     * @param channels    the collection of channels.
+     * @param channels    the iterable of channels.
      * @param <IN>        the input data type.
      * @return the I/O channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      * @see Channels#distribute(Object, Iterable)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<List<? extends IN>>> distribute(
             @Nullable final IN placeholder,
-            @NotNull final Collection<? extends InputChannel<? extends IN>> channels) {
+            @NotNull final Iterable<? extends InputChannel<? extends IN>> channels) {
 
         return SparseChannelsCompat.distribute(placeholder, channels);
     }
@@ -420,18 +419,18 @@ public class LoaderStreamsCompat extends Streams {
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
-     * @param channels the collection of channels.
+     * @param channels the iterable of channels.
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      * @see Channels#join(Iterable)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<List<? extends OUT>>>
     join(
-            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
+            @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
 
         return new BuilderWrapper<List<? extends OUT>>(SparseChannelsCompat.join(channels));
     }
@@ -472,11 +471,11 @@ public class LoaderStreamsCompat extends Streams {
      * passed channels will be bound as a result of the creation.
      *
      * @param placeholder the placeholder instance.
-     * @param channels    the collection of channels.
+     * @param channels    the iterable of channels.
      * @param <OUT>       the output data type.
      * @return the stream channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      * @see Channels#join(Object, Iterable)
      */
@@ -484,7 +483,7 @@ public class LoaderStreamsCompat extends Streams {
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<List<? extends OUT>>>
     join(
             @Nullable final OUT placeholder,
-            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
+            @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
 
         return new BuilderWrapper<List<? extends OUT>>(
                 SparseChannelsCompat.join(placeholder, channels));
@@ -612,18 +611,18 @@ public class LoaderStreamsCompat extends Streams {
      * passed channels will be bound as a result of the creation.
      *
      * @param startIndex the selectable start index.
-     * @param channels   the collection of channels.
+     * @param channels   the iterable of channels.
      * @param <OUT>      the output data type.
      * @return the selectable stream channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      * @see AndroidChannels#merge(int, Iterable)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<? extends
             ParcelableSelectable<OUT>>> merge(final int startIndex,
-            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
+            @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
 
         return new BuilderWrapper<ParcelableSelectable<OUT>>(
                 SparseChannelsCompat.merge(startIndex, channels));
@@ -662,15 +661,15 @@ public class LoaderStreamsCompat extends Streams {
      * @param channels the channels to merge.
      * @param <OUT>    the output data type.
      * @return the selectable stream channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      * @see AndroidChannels#merge(Iterable)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<? extends
             ParcelableSelectable<OUT>>> merge(
-            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
+            @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
 
         return new BuilderWrapper<ParcelableSelectable<OUT>>(SparseChannelsCompat.merge(channels));
     }

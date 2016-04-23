@@ -27,7 +27,7 @@ import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.RunnerDecorator;
 import com.github.dm.jrt.core.runner.Runners;
-import com.github.dm.jrt.core.util.TimeDuration;
+import com.github.dm.jrt.core.util.UnitDuration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -94,7 +94,7 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA> {
     }
 
     @NotNull
-    public IOChannel<DATA> after(@NotNull final TimeDuration delay) {
+    public IOChannel<DATA> after(@NotNull final UnitDuration delay) {
 
         mInputChannel.after(delay);
         return this;
@@ -157,7 +157,7 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA> {
     }
 
     @NotNull
-    public IOChannel<DATA> afterMax(@NotNull final TimeDuration timeout) {
+    public IOChannel<DATA> afterMax(@NotNull final UnitDuration timeout) {
 
         mOutputChannel.afterMax(timeout);
         return this;

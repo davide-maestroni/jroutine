@@ -27,7 +27,7 @@ import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
-import com.github.dm.jrt.core.util.TimeDuration;
+import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Consumer;
@@ -63,7 +63,7 @@ public interface StreamChannel<OUT>
      * {@inheritDoc}
      */
     @NotNull
-    StreamChannel<OUT> afterMax(@NotNull TimeDuration timeout);
+    StreamChannel<OUT> afterMax(@NotNull UnitDuration timeout);
 
     /**
      * {@inheritDoc}
@@ -167,7 +167,7 @@ public interface StreamChannel<OUT>
      */
     @NotNull
     StreamChannel<OUT> backPressureOn(@Nullable Runner runner, int maxInputs,
-            @Nullable TimeDuration maxDelay);
+            @Nullable UnitDuration maxDelay);
 
     /**
      * Concatenates a stream based on the specified accumulating consumer to this one.

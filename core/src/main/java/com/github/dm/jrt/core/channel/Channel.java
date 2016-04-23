@@ -17,7 +17,7 @@
 package com.github.dm.jrt.core.channel;
 
 import com.github.dm.jrt.core.error.RoutineException;
-import com.github.dm.jrt.core.util.TimeDuration;
+import com.github.dm.jrt.core.util.UnitDuration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -100,7 +100,7 @@ public interface Channel {
          * @throws java.lang.IllegalStateException               if this channel is already closed.
          */
         @NotNull
-        InputChannel<IN> after(@NotNull TimeDuration delay);
+        InputChannel<IN> after(@NotNull UnitDuration delay);
 
         /**
          * Tells the channel to delay the transfer of data of the specified time duration.
@@ -228,7 +228,7 @@ public interface Channel {
          * @return this channel.
          */
         @NotNull
-        OutputChannel<OUT> afterMax(@NotNull TimeDuration timeout);
+        OutputChannel<OUT> afterMax(@NotNull UnitDuration timeout);
 
         /**
          * Tells the channel to wait at the maximum the specified time duration for the next result
@@ -261,7 +261,7 @@ public interface Channel {
          *                                                                  already bound to a
          *                                                                  consumer or another
          *                                                                  channel.
-         * @see #afterMax(TimeDuration)
+         * @see #afterMax(UnitDuration)
          * @see #afterMax(long, TimeUnit)
          * @see #immediately()
          * @see #eventuallyAbort()
@@ -290,7 +290,7 @@ public interface Channel {
          *                                                                  already bound to a
          *                                                                  consumer or another
          *                                                                  channel.
-         * @see #afterMax(TimeDuration)
+         * @see #afterMax(UnitDuration)
          * @see #afterMax(long, TimeUnit)
          * @see #immediately()
          * @see #eventuallyAbort()
@@ -336,7 +336,7 @@ public interface Channel {
          * ExecutionTimeoutException} exception will be thrown.
          *
          * @return this channel.
-         * @see #afterMax(TimeDuration)
+         * @see #afterMax(UnitDuration)
          * @see #afterMax(long, TimeUnit)
          * @see #immediately()
          * @see #eventuallyAbort(Throwable)
@@ -355,7 +355,7 @@ public interface Channel {
          *
          * @param reason the throwable object identifying the reason of the invocation abortion.
          * @return this channel.
-         * @see #afterMax(TimeDuration)
+         * @see #afterMax(UnitDuration)
          * @see #afterMax(long, TimeUnit)
          * @see #immediately()
          * @see #eventuallyAbort()
@@ -373,7 +373,7 @@ public interface Channel {
          * ExecutionTimeoutException} exception will be thrown.
          *
          * @return this channel.
-         * @see #afterMax(TimeDuration)
+         * @see #afterMax(UnitDuration)
          * @see #afterMax(long, TimeUnit)
          * @see #immediately()
          * @see #eventuallyAbort()
@@ -392,7 +392,7 @@ public interface Channel {
          * This is the default behavior.
          *
          * @return this channel.
-         * @see #afterMax(TimeDuration)
+         * @see #afterMax(UnitDuration)
          * @see #afterMax(long, TimeUnit)
          * @see #immediately()
          * @see #eventuallyAbort()
@@ -410,7 +410,7 @@ public interface Channel {
          * invocation completes or is aborted, or the timeout elapses.
          *
          * @return the invocation error or null.
-         * @see #afterMax(TimeDuration)
+         * @see #afterMax(UnitDuration)
          * @see #afterMax(long, TimeUnit)
          * @see #immediately()
          */
@@ -424,7 +424,7 @@ public interface Channel {
          * invocation completes or is aborted, or the timeout elapses.
          *
          * @return whether the routine execution has complete.
-         * @see #afterMax(TimeDuration)
+         * @see #afterMax(UnitDuration)
          * @see #afterMax(long, TimeUnit)
          * @see #immediately()
          */
@@ -446,7 +446,7 @@ public interface Channel {
          *                                                                  already bound to a
          *                                                                  consumer or another
          *                                                                  channel.
-         * @see #afterMax(TimeDuration)
+         * @see #afterMax(UnitDuration)
          * @see #afterMax(long, TimeUnit)
          * @see #immediately()
          * @see #eventuallyAbort()
@@ -478,7 +478,7 @@ public interface Channel {
          *                                                                  the read timeout elapses
          *                                                                  and no timeout exception
          *                                                                  is set to be thrown).
-         * @see #afterMax(TimeDuration)
+         * @see #afterMax(UnitDuration)
          * @see #afterMax(long, TimeUnit)
          * @see #immediately()
          * @see #eventuallyAbort()
@@ -526,7 +526,7 @@ public interface Channel {
          *                                                                  already bound to a
          *                                                                  consumer or another
          *                                                                  channel.
-         * @see #afterMax(TimeDuration)
+         * @see #afterMax(UnitDuration)
          * @see #afterMax(long, TimeUnit)
          * @see #immediately()
          * @see #eventuallyAbort()
@@ -563,7 +563,7 @@ public interface Channel {
          *                                                                  the read timeout elapses
          *                                                                  and no timeout exception
          *                                                                  is set to be thrown).
-         * @see #afterMax(TimeDuration)
+         * @see #afterMax(UnitDuration)
          * @see #afterMax(long, TimeUnit)
          * @see #immediately()
          * @see #eventuallyAbort()
@@ -592,7 +592,7 @@ public interface Channel {
          *                                                                  already bound to a
          *                                                                  consumer or another
          *                                                                  channel.
-         * @see #afterMax(TimeDuration)
+         * @see #afterMax(UnitDuration)
          * @see #afterMax(long, TimeUnit)
          * @see #immediately()
          * @see #eventuallyAbort()
@@ -611,7 +611,7 @@ public interface Channel {
          * invocation completes or is aborted, or the timeout elapses.
          *
          * @throws com.github.dm.jrt.core.error.RoutineException if the execution has been aborted.
-         * @see #afterMax(TimeDuration)
+         * @see #afterMax(UnitDuration)
          * @see #afterMax(long, TimeUnit)
          * @see #immediately()
          */

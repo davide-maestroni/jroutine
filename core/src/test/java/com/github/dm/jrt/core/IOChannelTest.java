@@ -28,7 +28,7 @@ import com.github.dm.jrt.core.log.Log;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.NullLog;
 import com.github.dm.jrt.core.runner.Runners;
-import com.github.dm.jrt.core.util.TimeDuration;
+import com.github.dm.jrt.core.util.UnitDuration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -41,8 +41,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.dm.jrt.core.util.TimeDuration.millis;
-import static com.github.dm.jrt.core.util.TimeDuration.seconds;
+import static com.github.dm.jrt.core.util.UnitDuration.millis;
+import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -57,7 +57,7 @@ public class IOChannelTest {
     @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
     public void testAbort() {
 
-        final TimeDuration timeout = seconds(1);
+        final UnitDuration timeout = seconds(1);
         final IOChannel<String> ioChannel = JRoutineCore.io().buildChannel();
         ioChannel.abort(new IllegalStateException());
 
@@ -196,7 +196,7 @@ public class IOChannelTest {
     @Test
     public void testAsynchronousInput() {
 
-        final TimeDuration timeout = seconds(1);
+        final UnitDuration timeout = seconds(1);
         final IOChannel<String> ioChannel = JRoutineCore.io().buildChannel();
 
         new Thread() {
@@ -226,7 +226,7 @@ public class IOChannelTest {
     @Test
     public void testAsynchronousInput2() {
 
-        final TimeDuration timeout = seconds(1);
+        final UnitDuration timeout = seconds(1);
         final IOChannel<String> ioChannel1 = JRoutineCore.io()
                                                          .channelConfiguration()
                                                          .withChannelOrder(OrderType.BY_CALL)
@@ -456,9 +456,11 @@ public class IOChannelTest {
                                .afterMax(seconds(1))
                                .nextOrElse(2)).isEqualTo("test1");
 
-        assertThat(JRoutineCore.io().buildChannel().eventuallyExit().afterMax(seconds(1)).nextOrElse(
-                2))
-                .isEqualTo(2);
+        assertThat(JRoutineCore.io()
+                               .buildChannel()
+                               .eventuallyExit()
+                               .afterMax(seconds(1))
+                               .nextOrElse(2)).isEqualTo(2);
 
         try {
 
@@ -567,7 +569,7 @@ public class IOChannelTest {
     @Test
     public void testOrderType() {
 
-        final TimeDuration timeout = seconds(1);
+        final UnitDuration timeout = seconds(1);
         final IOChannel<Object> channel = JRoutineCore.io()
                                                       .channelConfiguration()
                                                       .withChannelOrder(OrderType.BY_CALL)
@@ -717,7 +719,7 @@ public class IOChannelTest {
     @Test
     public void testReadFirst() throws InterruptedException {
 
-        final TimeDuration timeout = seconds(1);
+        final UnitDuration timeout = seconds(1);
         final IOChannel<String> ioChannel = JRoutineCore.io().buildChannel();
 
         new WeakThread(ioChannel).start();

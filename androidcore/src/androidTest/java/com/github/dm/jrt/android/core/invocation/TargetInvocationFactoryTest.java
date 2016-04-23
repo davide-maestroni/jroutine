@@ -38,8 +38,8 @@ import org.jetbrains.annotations.NotNull;
 import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
 import static com.github.dm.jrt.android.core.invocation.TargetInvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
-import static com.github.dm.jrt.core.util.TimeDuration.millis;
-import static com.github.dm.jrt.core.util.TimeDuration.seconds;
+import static com.github.dm.jrt.core.util.UnitDuration.millis;
+import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

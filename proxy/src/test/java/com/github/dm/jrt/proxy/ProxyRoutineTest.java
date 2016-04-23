@@ -34,7 +34,7 @@ import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ClassToken;
-import com.github.dm.jrt.core.util.TimeDuration;
+import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.object.JRoutineObject;
 import com.github.dm.jrt.object.annotation.Alias;
 import com.github.dm.jrt.object.annotation.AsyncIn;
@@ -63,7 +63,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
-import static com.github.dm.jrt.core.util.TimeDuration.seconds;
+import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.object.InvocationTarget.classOfType;
 import static com.github.dm.jrt.object.InvocationTarget.instance;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -1193,14 +1193,14 @@ public class ProxyRoutineTest {
 
         public int getOne() throws InterruptedException {
 
-            TimeDuration.millis(500).sleepAtLeast();
+            UnitDuration.millis(500).sleepAtLeast();
 
             return 1;
         }
 
         public int getTwo() throws InterruptedException {
 
-            TimeDuration.millis(500).sleepAtLeast();
+            UnitDuration.millis(500).sleepAtLeast();
 
             return 2;
         }

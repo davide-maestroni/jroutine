@@ -29,14 +29,14 @@ import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Configurable;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
-import com.github.dm.jrt.core.invocation.OperationInvocation;
-import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
+import com.github.dm.jrt.core.invocation.InvocationFactory;
+import com.github.dm.jrt.core.invocation.OperationInvocation;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.core.util.TimeDuration;
+import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Consumer;
@@ -56,7 +56,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.github.dm.jrt.core.config.ChannelConfiguration.builderFromOutputChannel;
-import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
+import static com.github.dm.jrt.core.util.UnitDuration.fromUnit;
 import static com.github.dm.jrt.function.Functions.consumerCall;
 import static com.github.dm.jrt.function.Functions.consumerOperation;
 import static com.github.dm.jrt.function.Functions.functionCall;
@@ -149,7 +149,7 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
-    public StreamChannel<OUT> afterMax(@NotNull final TimeDuration timeout) {
+    public StreamChannel<OUT> afterMax(@NotNull final UnitDuration timeout) {
 
         mChannel.afterMax(timeout);
         return this;
@@ -237,7 +237,7 @@ public abstract class AbstractStreamChannel<OUT>
 
     @NotNull
     public StreamChannel<OUT> backPressureOn(@Nullable final Runner runner, final int maxInputs,
-            @Nullable final TimeDuration maxDelay) {
+            @Nullable final UnitDuration maxDelay) {
 
         return invocationConfiguration().withRunner(runner)
                                         .withInputLimit(maxInputs)

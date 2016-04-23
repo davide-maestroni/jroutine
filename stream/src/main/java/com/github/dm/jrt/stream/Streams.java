@@ -38,7 +38,6 @@ import com.github.dm.jrt.function.Functions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -74,17 +73,17 @@ public class Streams extends Functions {
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
-     * @param channels the collection of channels.
+     * @param channels the iterable of channels.
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      * @see Channels#blend(Iterable)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<OUT>> blend(
-            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
+            @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
 
         return new BuilderWrapper<OUT>(Channels.blend(channels));
     }
@@ -118,7 +117,7 @@ public class Streams extends Functions {
      * @param <IN>     the input data type.
      * @return the selectable I/O channel builder.
      * @throws java.lang.IllegalArgumentException if the specified array is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     * @throws java.lang.NullPointerException     if the specified array is null or contains a
      *                                            null object.
      * @see Channels#combine(Channel.InputChannel...)
      */
@@ -162,41 +161,41 @@ public class Streams extends Functions {
      * invocation lifecycle.
      *
      * @param startIndex the selectable start index.
-     * @param channels   the collection of input channels.
+     * @param channels   the iterable of input channels.
      * @param <IN>       the input data type.
      * @return the selectable I/O channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      * @see Channels#combine(int, Iterable)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
             final int startIndex,
-            @NotNull final Collection<? extends InputChannel<? extends IN>> channels) {
+            @NotNull final Iterable<? extends InputChannel<? extends IN>> channels) {
 
         return Channels.combine(startIndex, channels);
     }
 
     /**
      * Returns a builder of input channels combining the specified channels into a selectable one.
-     * The selectable indexes will be the position in the collection.
+     * The selectable indexes will be the position in the iterable.
      * <p>
      * Note that the builder will successfully create several input channel instances, and that the
      * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
      * invocation lifecycle.
      *
-     * @param channels the collection of input channels.
+     * @param channels the iterable of input channels.
      * @param <IN>     the input data type.
      * @return the selectable I/O channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      * @see Channels#combine(Iterable)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<Selectable<? extends IN>>> combine(
-            @NotNull final Collection<? extends InputChannel<? extends IN>> channels) {
+            @NotNull final Iterable<? extends InputChannel<? extends IN>> channels) {
 
         return Channels.combine(channels);
     }
@@ -232,17 +231,17 @@ public class Streams extends Functions {
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
-     * @param channels the collection of channels.
+     * @param channels the iterable of channels.
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      * @see Channels#concat(Iterable)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<OUT>> concat(
-            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
+            @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
 
         return new BuilderWrapper<OUT>(Channels.concat(channels));
     }
@@ -301,17 +300,17 @@ public class Streams extends Functions {
      * returned channels <b>must be explicitly closed</b> in order to ensure the completion of the
      * invocation lifecycle.
      *
-     * @param channels the collection of channels.
+     * @param channels the iterable of channels.
      * @param <IN>     the input data type.
      * @return the I/O channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      * @see Channels#distribute(Iterable)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<List<? extends IN>>> distribute(
-            @NotNull final Collection<? extends InputChannel<? extends IN>> channels) {
+            @NotNull final Iterable<? extends InputChannel<? extends IN>> channels) {
 
         return Channels.distribute(channels);
     }
@@ -353,18 +352,18 @@ public class Streams extends Functions {
      * invocation lifecycle.
      *
      * @param placeholder the placeholder instance.
-     * @param channels    the collection of channels.
+     * @param channels    the iterable of channels.
      * @param <IN>        the input data type.
      * @return the I/O channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      * @see Channels#distribute(Object, Iterable)
      */
     @NotNull
     public static <IN> ChannelsBuilder<? extends IOChannel<List<? extends IN>>> distribute(
             @Nullable final IN placeholder,
-            @NotNull final Collection<? extends InputChannel<? extends IN>> channels) {
+            @NotNull final Iterable<? extends InputChannel<? extends IN>> channels) {
 
         return Channels.distribute(placeholder, channels);
     }
@@ -451,17 +450,17 @@ public class Streams extends Functions {
      * Note that the builder will successfully create only one stream channel instance, and that the
      * passed channels will be bound as a result of the creation.
      *
-     * @param channels the collection of channels.
+     * @param channels the iterable of channels.
      * @param <OUT>    the output data type.
      * @return the stream channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      * @see Channels#join(Iterable)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<List<? extends OUT>>> join(
-            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
+            @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
 
         return new BuilderWrapper<List<? extends OUT>>(Channels.join(channels));
     }
@@ -501,18 +500,18 @@ public class Streams extends Functions {
      * passed channels will be bound as a result of the creation.
      *
      * @param placeholder the placeholder instance.
-     * @param channels    the collection of channels.
+     * @param channels    the iterable of channels.
      * @param <OUT>       the output data type.
      * @return the stream channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      * @see Channels#join(Object, Iterable)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<List<? extends OUT>>> join(
             @Nullable final OUT placeholder,
-            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
+            @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
 
         return new BuilderWrapper<List<? extends OUT>>(Channels.join(placeholder, channels));
     }
@@ -658,18 +657,18 @@ public class Streams extends Functions {
      * passed channels will be bound as a result of the creation.
      *
      * @param startIndex the selectable start index.
-     * @param channels   the collection of channels.
+     * @param channels   the iterable of channels.
      * @param <OUT>      the output data type.
      * @return the selectable stream channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      * @see Channels#merge(int, Iterable)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<? extends Selectable<OUT>>> merge(
             final int startIndex,
-            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
+            @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
 
         return new BuilderWrapper<Selectable<OUT>>(Channels.merge(startIndex, channels));
     }
@@ -705,14 +704,14 @@ public class Streams extends Functions {
      * @param channels the channels to merge.
      * @param <OUT>    the output data type.
      * @return the selectable stream channel builder.
-     * @throws java.lang.IllegalArgumentException if the specified collection is empty.
-     * @throws java.lang.NullPointerException     if the specified collection is null or contains a
+     * @throws java.lang.IllegalArgumentException if the specified iterable is empty.
+     * @throws java.lang.NullPointerException     if the specified iterable is null or contains a
      *                                            null object.
      * @see Channels#merge(Iterable)
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends StreamChannel<? extends Selectable<OUT>>> merge(
-            @NotNull final Collection<? extends OutputChannel<? extends OUT>> channels) {
+            @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
 
         return new BuilderWrapper<Selectable<OUT>>(Channels.merge(channels));
     }

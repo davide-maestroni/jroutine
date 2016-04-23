@@ -27,7 +27,7 @@ import com.github.dm.jrt.android.object.annotation.FactoryId;
 import com.github.dm.jrt.android.object.annotation.InputClashResolution;
 import com.github.dm.jrt.android.object.annotation.LoaderId;
 import com.github.dm.jrt.android.object.annotation.ResultStaleTime;
-import com.github.dm.jrt.core.util.TimeDuration;
+import com.github.dm.jrt.core.util.UnitDuration;
 
 import static com.github.dm.jrt.android.core.config.LoaderConfiguration.builder;
 import static com.github.dm.jrt.android.object.builder.AndroidBuilders.withAnnotations;
@@ -49,7 +49,7 @@ public class AndroidBuildersTest extends AndroidTestCase {
                          .withFactoryId(13)
                          .withInputClashResolution(ClashResolutionType.ABORT_THIS)
                          .withLoaderId(-77)
-                         .withResultStaleTime(TimeDuration.millis(333))
+                         .withResultStaleTime(UnitDuration.millis(333))
                          .apply());
     }
 

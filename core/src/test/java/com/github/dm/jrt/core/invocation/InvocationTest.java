@@ -261,24 +261,6 @@ public class InvocationTest {
         }
     }
 
-    private static class TestComparableOperationInvocation
-            extends OperationInvocation<Object, Object> {
-
-        /**
-         * Constructor.
-         *
-         * @param args the constructor arguments.
-         */
-        protected TestComparableOperationInvocation(@Nullable final Object[] args) {
-
-            super(args);
-        }
-
-        public void onInput(final Object input, @NotNull final ResultChannel<Object> result) {
-
-        }
-    }
-
     private static class TestComparableInvocationFactory extends InvocationFactory<Object, Object> {
 
         /**
@@ -296,6 +278,24 @@ public class InvocationTest {
         public Invocation<Object, Object> newInvocation() {
 
             return new TemplateInvocation<Object, Object>() {};
+        }
+    }
+
+    private static class TestComparableOperationInvocation
+            extends OperationInvocation<Object, Object> {
+
+        /**
+         * Constructor.
+         *
+         * @param args the constructor arguments.
+         */
+        protected TestComparableOperationInvocation(@Nullable final Object[] args) {
+
+            super(args);
+        }
+
+        public void onInput(final Object input, @NotNull final ResultChannel<Object> result) {
+
         }
     }
 

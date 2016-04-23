@@ -27,7 +27,7 @@ import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.routine.Routine;
-import com.github.dm.jrt.core.util.TimeDuration;
+import com.github.dm.jrt.core.util.UnitDuration;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -59,7 +59,7 @@ public class LoaderRoutineRotationTest
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(10);
+        final UnitDuration timeout = UnitDuration.seconds(10);
         final Routine<String, String> routine = JRoutineLoader.with(loaderFrom(getActivity()))
                                                               .on(factoryOf(ToUpperCase.class))
                                                               .loaderConfiguration()
@@ -67,13 +67,13 @@ public class LoaderRoutineRotationTest
                                                               .withClashResolution(
                                                                       ClashResolutionType.JOIN)
                                                               .withResultStaleTime(
-                                                                      TimeDuration.minutes(1))
+                                                                      UnitDuration.minutes(1))
                                                               .apply()
                                                               .buildRoutine();
         routine.asyncCall("test1");
 
         simulateRotation();
-        TimeDuration.seconds(5).sleepAtLeast();
+        UnitDuration.seconds(5).sleepAtLeast();
         assertThat(routine.asyncCall("test2").afterMax(timeout).next()).isEqualTo("TEST1");
     }
 
@@ -84,7 +84,7 @@ public class LoaderRoutineRotationTest
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(10);
+        final UnitDuration timeout = UnitDuration.seconds(10);
         JRoutineLoader.with(loaderFrom(getActivity()))
                       .on(factoryOf(ToUpperCase.class))
                       .invocationConfiguration()
@@ -110,7 +110,7 @@ public class LoaderRoutineRotationTest
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(10);
+        final UnitDuration timeout = UnitDuration.seconds(10);
         final Routine<String, String> routine1 = JRoutineLoader.with(loaderFrom(getActivity()))
                                                                .on(factoryOf(ToUpperCase.class))
                                                                .buildRoutine();
@@ -136,7 +136,7 @@ public class LoaderRoutineRotationTest
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(10);
+        final UnitDuration timeout = UnitDuration.seconds(10);
         final Data data1 = new Data();
         final Routine<Data, Data> routine1 = JRoutineLoader.with(loaderFrom(getActivity()))
                                                            .on(factoryOf(Delay.class))
@@ -163,7 +163,7 @@ public class LoaderRoutineRotationTest
             return;
         }
 
-        final TimeDuration timeout = TimeDuration.seconds(10);
+        final UnitDuration timeout = UnitDuration.seconds(10);
         final Routine<String, String> routine = JRoutineLoader.with(loaderFrom(getActivity()))
                                                               .on(factoryOf(ToUpperCase.class))
                                                               .loaderConfiguration()
@@ -171,13 +171,13 @@ public class LoaderRoutineRotationTest
                                                               .withClashResolution(
                                                                       ClashResolutionType.JOIN)
                                                               .withResultStaleTime(
-                                                                      TimeDuration.ZERO)
+                                                                      UnitDuration.ZERO)
                                                               .apply()
                                                               .buildRoutine();
         routine.asyncCall("test1");
 
         simulateRotation();
-        TimeDuration.seconds(5).sleepAtLeast();
+        UnitDuration.seconds(5).sleepAtLeast();
         assertThat(routine.asyncCall("test2").afterMax(timeout).next()).isEqualTo("TEST2");
     }
 
@@ -208,7 +208,7 @@ public class LoaderRoutineRotationTest
         protected void onCall(@NotNull final List<? extends Data> inputs,
                 @NotNull final ResultChannel<Data> result) {
 
-            result.after(TimeDuration.millis(500)).pass(inputs);
+            result.after(UnitDuration.millis(500)).pass(inputs);
         }
     }
 
@@ -218,7 +218,7 @@ public class LoaderRoutineRotationTest
         protected void onCall(@NotNull final List<? extends String> inputs,
                 @NotNull final ResultChannel<String> result) {
 
-            result.after(TimeDuration.millis(500));
+            result.after(UnitDuration.millis(500));
 
             for (final String input : inputs) {
 

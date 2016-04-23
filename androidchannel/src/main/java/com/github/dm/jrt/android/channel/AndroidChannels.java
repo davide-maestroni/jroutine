@@ -92,7 +92,7 @@ public class AndroidChannels extends Channels {
 
     /**
      * Returns a builder of output channels merging the specified channels into a selectable one.
-     * The selectable indexes will be the position in the collection.
+     * The selectable indexes will be the position in the iterable.
      * <p>
      * Note that the builder will successfully create only one output channel instance, and that the
      * passed channels will be bound as a result of the creation.

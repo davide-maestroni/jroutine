@@ -22,7 +22,7 @@ import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.error.RoutineException;
-import com.github.dm.jrt.core.util.TimeDuration;
+import com.github.dm.jrt.core.util.UnitDuration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -112,7 +112,7 @@ class RepeatedChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
     }
 
     @NotNull
-    public OutputChannel<OUT> afterMax(@NotNull final TimeDuration timeout) {
+    public OutputChannel<OUT> afterMax(@NotNull final UnitDuration timeout) {
 
         synchronized (mMutex) {
             mOutputChannel.afterMax(timeout);

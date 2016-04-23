@@ -30,7 +30,7 @@ import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
-import com.github.dm.jrt.core.util.TimeDuration;
+import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Consumer;
@@ -70,7 +70,7 @@ public interface LoaderStreamChannel<OUT>
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannel<OUT> afterMax(@NotNull TimeDuration timeout);
+    LoaderStreamChannel<OUT> afterMax(@NotNull UnitDuration timeout);
 
     /**
      * {@inheritDoc}
@@ -144,7 +144,7 @@ public interface LoaderStreamChannel<OUT>
      */
     @NotNull
     LoaderStreamChannel<OUT> backPressureOn(@Nullable Runner runner, int maxInputs,
-            @Nullable TimeDuration maxDelay);
+            @Nullable UnitDuration maxDelay);
 
     /**
      * {@inheritDoc}
@@ -448,7 +448,7 @@ public interface LoaderStreamChannel<OUT>
      * @return the configured stream.
      */
     @NotNull
-    LoaderStreamChannel<OUT> staleAfter(@Nullable TimeDuration staleTime);
+    LoaderStreamChannel<OUT> staleAfter(@Nullable UnitDuration staleTime);
 
     /**
      * Short for {@code loaderConfiguration().withResultStaleTime(time, timeUnit).apply()}.

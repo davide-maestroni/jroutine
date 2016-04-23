@@ -27,10 +27,10 @@ import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
-import com.github.dm.jrt.core.invocation.OperationInvocation;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
+import com.github.dm.jrt.core.invocation.OperationInvocation;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.routine.Routine;
@@ -52,8 +52,8 @@ import java.util.List;
 import java.util.Map;
 
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
-import static com.github.dm.jrt.core.util.TimeDuration.millis;
-import static com.github.dm.jrt.core.util.TimeDuration.seconds;
+import static com.github.dm.jrt.core.util.UnitDuration.millis;
+import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.function.Functions.wrap;
 import static com.github.dm.jrt.stream.Streams.range;
 import static com.github.dm.jrt.stream.Streams.series;
@@ -199,7 +199,9 @@ public class StreamsTest {
         final InvocationChannel<String, String> channel1 =
                 JRoutineCore.on(IdentityInvocation.<String>factoryOf()).asyncInvoke().orderByCall();
         final InvocationChannel<Integer, Integer> channel2 =
-                JRoutineCore.on(IdentityInvocation.<Integer>factoryOf()).asyncInvoke().orderByCall();
+                JRoutineCore.on(IdentityInvocation.<Integer>factoryOf())
+                            .asyncInvoke()
+                            .orderByCall();
         Streams.combine(channel1, channel2)
                .buildChannels()
                .pass(new Selectable<String>("test1", 0))

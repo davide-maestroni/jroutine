@@ -23,7 +23,7 @@ import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
-import com.github.dm.jrt.core.util.TimeDuration;
+import com.github.dm.jrt.core.util.UnitDuration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -31,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
-import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
+import static com.github.dm.jrt.core.util.UnitDuration.fromUnit;
 
 /**
  * Class storing the channel configuration.
@@ -76,7 +76,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
 
     private final int mChannelLimit;
 
-    private final TimeDuration mChannelMaxDelay;
+    private final UnitDuration mChannelMaxDelay;
 
     private final int mChannelMaxSize;
 
@@ -86,7 +86,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
 
     private final Level mLogLevel;
 
-    private final TimeDuration mReadTimeout;
+    private final UnitDuration mReadTimeout;
 
     private final Runner mRunner;
 
@@ -109,9 +109,9 @@ public final class ChannelConfiguration extends DeepEqualObject {
      * @param logLevel         the log level.
      */
     private ChannelConfiguration(@Nullable final Runner runner,
-            @Nullable final TimeDuration readTimeout, @Nullable final TimeoutActionType actionType,
+            @Nullable final UnitDuration readTimeout, @Nullable final TimeoutActionType actionType,
             @Nullable final OrderType channelOrderType, final int channelLimit,
-            @Nullable final TimeDuration channelMaxDelay, final int channelMaxSize,
+            @Nullable final UnitDuration channelMaxDelay, final int channelMaxSize,
             @Nullable final Log log, @Nullable final Level logLevel) {
 
         super(asArgs(runner, readTimeout, actionType, channelOrderType, channelLimit,
@@ -262,9 +262,9 @@ public final class ChannelConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the delay.
      */
-    public TimeDuration getChannelMaxDelayOrElse(@Nullable final TimeDuration valueIfNotSet) {
+    public UnitDuration getChannelMaxDelayOrElse(@Nullable final UnitDuration valueIfNotSet) {
 
-        final TimeDuration maxDelay = mChannelMaxDelay;
+        final UnitDuration maxDelay = mChannelMaxDelay;
         return (maxDelay != null) ? maxDelay : valueIfNotSet;
     }
 
@@ -336,9 +336,9 @@ public final class ChannelConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the timeout.
      */
-    public TimeDuration getReadTimeoutOrElse(@Nullable final TimeDuration valueIfNotSet) {
+    public UnitDuration getReadTimeoutOrElse(@Nullable final UnitDuration valueIfNotSet) {
 
-        final TimeDuration readTimeout = mReadTimeout;
+        final UnitDuration readTimeout = mReadTimeout;
         return (readTimeout != null) ? readTimeout : valueIfNotSet;
     }
 
@@ -437,7 +437,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
 
         private int mChannelLimit;
 
-        private TimeDuration mChannelMaxDelay;
+        private UnitDuration mChannelMaxDelay;
 
         private int mChannelMaxSize;
 
@@ -447,7 +447,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
 
         private Level mLogLevel;
 
-        private TimeDuration mReadTimeout;
+        private UnitDuration mReadTimeout;
 
         private Runner mRunner;
 
@@ -509,7 +509,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
                 withRunner(runner);
             }
 
-            final TimeDuration readTimeout = configuration.mReadTimeout;
+            final UnitDuration readTimeout = configuration.mReadTimeout;
             if (readTimeout != null) {
                 withReadTimeout(readTimeout);
             }
@@ -529,7 +529,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
                 withChannelLimit(limit);
             }
 
-            final TimeDuration channelTimeout = configuration.mChannelMaxDelay;
+            final UnitDuration channelTimeout = configuration.mChannelMaxDelay;
             if (channelTimeout != null) {
                 withChannelMaxDelay(channelTimeout);
             }
@@ -608,7 +608,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
          * @return this builder.
          */
         @NotNull
-        public Builder<TYPE> withChannelMaxDelay(@Nullable final TimeDuration delay) {
+        public Builder<TYPE> withChannelMaxDelay(@Nullable final UnitDuration delay) {
 
             mChannelMaxDelay = delay;
             return this;
@@ -708,7 +708,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
          * @return this builder.
          */
         @NotNull
-        public Builder<TYPE> withReadTimeout(@Nullable final TimeDuration timeout) {
+        public Builder<TYPE> withReadTimeout(@Nullable final UnitDuration timeout) {
 
             mReadTimeout = timeout;
             return this;

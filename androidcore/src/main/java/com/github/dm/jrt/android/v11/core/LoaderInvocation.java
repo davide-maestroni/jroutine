@@ -46,7 +46,7 @@ import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.core.util.TimeDuration;
+import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
@@ -120,7 +120,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
                 configuration.getInputClashResolutionTypeOrElse(ClashResolutionType.JOIN);
         mCacheStrategyType = configuration.getCacheStrategyTypeOrElse(CacheStrategyType.CLEAR);
         mResultStaleTimeMillis =
-                configuration.getResultStaleTimeOrElse(TimeDuration.INFINITY).toMillis();
+                configuration.getResultStaleTimeOrElse(UnitDuration.INFINITY).toMillis();
         mOrderType = order;
         mLogger = logger.subContextLogger(this);
     }

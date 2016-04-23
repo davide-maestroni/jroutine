@@ -34,7 +34,7 @@ import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.NullLog;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runners;
-import com.github.dm.jrt.core.util.TimeDuration;
+import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
@@ -54,8 +54,8 @@ import java.util.List;
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.ClassToken.tokenOf;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
-import static com.github.dm.jrt.core.util.TimeDuration.millis;
-import static com.github.dm.jrt.core.util.TimeDuration.seconds;
+import static com.github.dm.jrt.core.util.UnitDuration.millis;
+import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.function.Functions.functionOperation;
 import static com.github.dm.jrt.function.Functions.wrap;
 import static com.github.dm.jrt.object.InvocationTarget.classOfType;
@@ -73,7 +73,7 @@ public class JRoutineTest {
     @Test
     public void testAliasMethod() throws NoSuchMethodException {
 
-        final TimeDuration timeout = seconds(1);
+        final UnitDuration timeout = seconds(1);
         final TestClass test = new TestClass();
         final Routine<Object, Object> routine = JRoutine.on(instance(test))
                                                         .invocationConfiguration()
@@ -92,7 +92,7 @@ public class JRoutineTest {
     @Test
     public void testChainedRoutine() {
 
-        final TimeDuration timeout = seconds(1);
+        final UnitDuration timeout = seconds(1);
         final CallInvocation<Integer, Integer> execSum = new CallInvocation<Integer, Integer>() {
 
             @Override
@@ -216,16 +216,16 @@ public class JRoutineTest {
         final Routine<String, String> routine =
                 JRoutine.onCall(new Function<List<String>, String>() {
 
-                            public String apply(final List<String> strings) {
+                    public String apply(final List<String> strings) {
 
-                                final StringBuilder builder = new StringBuilder();
-                                for (final String string : strings) {
-                                    builder.append(string);
-                                }
+                        final StringBuilder builder = new StringBuilder();
+                        for (final String string : strings) {
+                            builder.append(string);
+                        }
 
-                                return builder.toString();
-                            }
-                        }).buildRoutine();
+                        return builder.toString();
+                    }
+                }).buildRoutine();
         assertThat(routine.asyncCall("test", "1").afterMax(seconds(1)).all()).containsOnly("test1");
     }
 
@@ -235,11 +235,11 @@ public class JRoutineTest {
         final Routine<Object, String> routine =
                 JRoutine.onOperation(new Function<Object, String>() {
 
-                            public String apply(final Object o) {
+                    public String apply(final Object o) {
 
-                                return o.toString();
-                            }
-                        }).buildRoutine();
+                        return o.toString();
+                    }
+                }).buildRoutine();
         assertThat(routine.asyncCall("test", 1).afterMax(seconds(1)).all()).containsOnly("test",
                 "1");
     }

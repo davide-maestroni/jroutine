@@ -22,7 +22,7 @@ import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
-import com.github.dm.jrt.core.util.TimeDuration;
+import com.github.dm.jrt.core.util.UnitDuration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
-import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
+import static com.github.dm.jrt.core.util.UnitDuration.fromUnit;
 
 /**
  * Class storing the invocation configuration.
@@ -101,7 +101,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
 
     private final int mInputLimit;
 
-    private final TimeDuration mInputMaxDelay;
+    private final UnitDuration mInputMaxDelay;
 
     private final int mInputMaxSize;
 
@@ -115,7 +115,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
 
     private final int mOutputLimit;
 
-    private final TimeDuration mOutputMaxDelay;
+    private final UnitDuration mOutputMaxDelay;
 
     private final int mOutputMaxSize;
 
@@ -123,7 +123,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
 
     private final int mPriority;
 
-    private final TimeDuration mReadTimeout;
+    private final UnitDuration mReadTimeout;
 
     private final Runner mRunner;
 
@@ -157,11 +157,11 @@ public final class InvocationConfiguration extends DeepEqualObject {
      */
     private InvocationConfiguration(@Nullable final Runner runner, final int priority,
             final int maxInstances, final int coreInstances,
-            @Nullable final TimeDuration readTimeout, @Nullable final TimeoutActionType actionType,
+            @Nullable final UnitDuration readTimeout, @Nullable final TimeoutActionType actionType,
             @Nullable final OrderType inputOrderType, final int inputLimit,
-            @Nullable final TimeDuration inputMaxDelay, final int inputMaxSize,
+            @Nullable final UnitDuration inputMaxDelay, final int inputMaxSize,
             @Nullable final OrderType outputOrderType, final int outputLimit,
-            @Nullable final TimeDuration outputMaxDelay, final int outputMaxSize,
+            @Nullable final UnitDuration outputMaxDelay, final int outputMaxSize,
             @Nullable final Log log, @Nullable final Level logLevel) {
 
         super(asArgs(runner, priority, maxInstances, coreInstances, readTimeout, actionType,
@@ -264,9 +264,9 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the delay.
      */
-    public TimeDuration getInputMaxDelayOrElse(@Nullable final TimeDuration valueIfNotSet) {
+    public UnitDuration getInputMaxDelayOrElse(@Nullable final UnitDuration valueIfNotSet) {
 
-        final TimeDuration inputMaxDelay = mInputMaxDelay;
+        final UnitDuration inputMaxDelay = mInputMaxDelay;
         return (inputMaxDelay != null) ? inputMaxDelay : valueIfNotSet;
     }
 
@@ -350,9 +350,9 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the delay.
      */
-    public TimeDuration getOutputMaxDelayOrElse(@Nullable final TimeDuration valueIfNotSet) {
+    public UnitDuration getOutputMaxDelayOrElse(@Nullable final UnitDuration valueIfNotSet) {
 
-        final TimeDuration outputMaxDelay = mOutputMaxDelay;
+        final UnitDuration outputMaxDelay = mOutputMaxDelay;
         return (outputMaxDelay != null) ? outputMaxDelay : valueIfNotSet;
     }
 
@@ -413,9 +413,9 @@ public final class InvocationConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the timeout.
      */
-    public TimeDuration getReadTimeoutOrElse(@Nullable final TimeDuration valueIfNotSet) {
+    public UnitDuration getReadTimeoutOrElse(@Nullable final UnitDuration valueIfNotSet) {
 
-        final TimeDuration readTimeout = mReadTimeout;
+        final UnitDuration readTimeout = mReadTimeout;
         return (readTimeout != null) ? readTimeout : valueIfNotSet;
     }
 
@@ -591,7 +591,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
 
         private int mInputLimit;
 
-        private TimeDuration mInputMaxDelay;
+        private UnitDuration mInputMaxDelay;
 
         private int mInputMaxSize;
 
@@ -605,7 +605,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
 
         private int mOutputLimit;
 
-        private TimeDuration mOutputMaxDelay;
+        private UnitDuration mOutputMaxDelay;
 
         private int mOutputMaxSize;
 
@@ -613,7 +613,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
 
         private int mPriority;
 
-        private TimeDuration mReadTimeout;
+        private UnitDuration mReadTimeout;
 
         private Runner mRunner;
 
@@ -761,7 +761,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
          * @see #withInputMaxSize(int)
          */
         @NotNull
-        public Builder<TYPE> withInputMaxDelay(@Nullable final TimeDuration delay) {
+        public Builder<TYPE> withInputMaxDelay(@Nullable final UnitDuration delay) {
 
             mInputMaxDelay = delay;
             return this;
@@ -916,7 +916,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
          * @see #withOutputMaxSize(int)
          */
         @NotNull
-        public Builder<TYPE> withOutputMaxDelay(@Nullable final TimeDuration delay) {
+        public Builder<TYPE> withOutputMaxDelay(@Nullable final UnitDuration delay) {
 
             mOutputMaxDelay = delay;
             return this;
@@ -1006,7 +1006,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
          * @return this builder.
          */
         @NotNull
-        public Builder<TYPE> withReadTimeout(@Nullable final TimeDuration timeout) {
+        public Builder<TYPE> withReadTimeout(@Nullable final UnitDuration timeout) {
 
             mReadTimeout = timeout;
             return this;
@@ -1066,7 +1066,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
                 withCoreInstances(coreInvocations);
             }
 
-            final TimeDuration readTimeout = configuration.mReadTimeout;
+            final UnitDuration readTimeout = configuration.mReadTimeout;
             if (readTimeout != null) {
                 withReadTimeout(readTimeout);
             }
@@ -1090,7 +1090,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
                 withInputLimit(inputLimit);
             }
 
-            final TimeDuration inputMaxDelay = configuration.mInputMaxDelay;
+            final UnitDuration inputMaxDelay = configuration.mInputMaxDelay;
             if (inputMaxDelay != null) {
                 withInputMaxDelay(inputMaxDelay);
             }
@@ -1110,7 +1110,7 @@ public final class InvocationConfiguration extends DeepEqualObject {
                 withOutputLimit(outputLimit);
             }
 
-            final TimeDuration outputTimeout = configuration.mOutputMaxDelay;
+            final UnitDuration outputTimeout = configuration.mOutputMaxDelay;
             if (outputTimeout != null) {
                 withOutputMaxDelay(outputTimeout);
             }

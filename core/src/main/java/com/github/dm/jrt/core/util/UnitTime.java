@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * Created by davide-maestroni on 09/09/2014.
  */
-public class Time implements Comparable<Time> {
+public class UnitTime implements Comparable<UnitTime> {
 
     /**
      * The number of hours in a day.
@@ -73,24 +73,24 @@ public class Time implements Comparable<Time> {
     protected static final long MAX_MINUTES = Long.MAX_VALUE / SECONDS_IN_MINUTE;
 
     /**
-     * The time value.
-     */
-    public final long time;
-
-    /**
      * The time unit.
      */
     public final TimeUnit unit;
 
     /**
+     * The time value.
+     */
+    public final long value;
+
+    /**
      * Constructor.
      *
-     * @param time the time value.
-     * @param unit the time unit.
+     * @param value the time value.
+     * @param unit  the time unit.
      */
-    protected Time(final long time, @NotNull final TimeUnit unit) {
+    protected UnitTime(final long value, @NotNull final TimeUnit unit) {
 
-        this.time = time;
+        this.value = value;
         this.unit = unit;
     }
 
@@ -101,7 +101,7 @@ public class Time implements Comparable<Time> {
      * @see System#currentTimeMillis()
      */
     @NotNull
-    public static Time current() {
+    public static UnitTime current() {
 
         return millis(System.currentTimeMillis());
     }
@@ -114,7 +114,7 @@ public class Time implements Comparable<Time> {
      * @see System#nanoTime()
      */
     @NotNull
-    public static Time currentNano() {
+    public static UnitTime currentNano() {
 
         return nanos(System.nanoTime());
     }
@@ -126,13 +126,13 @@ public class Time implements Comparable<Time> {
      * @return the time instance.
      */
     @NotNull
-    public static Time days(final long days) {
+    public static UnitTime days(final long days) {
 
         if ((days > MAX_DAYS) || (days < -MAX_DAYS)) {
             throw new IllegalArgumentException("time value overflow: " + days + " days");
         }
 
-        return new Time(days * SECONDS_IN_DAY, TimeUnit.SECONDS);
+        return new UnitTime(days * SECONDS_IN_DAY, TimeUnit.SECONDS);
     }
 
     /**
@@ -144,9 +144,9 @@ public class Time implements Comparable<Time> {
      * @return the time instance.
      */
     @NotNull
-    public static Time fromUnit(final long time, @NotNull final TimeUnit unit) {
+    public static UnitTime fromUnit(final long time, @NotNull final TimeUnit unit) {
 
-        return new Time(time, ConstantConditions.notNull("time unit", unit));
+        return new UnitTime(time, ConstantConditions.notNull("time unit", unit));
     }
 
     /**
@@ -156,13 +156,13 @@ public class Time implements Comparable<Time> {
      * @return the time instance.
      */
     @NotNull
-    public static Time hours(final long hours) {
+    public static UnitTime hours(final long hours) {
 
         if ((hours > MAX_HOURS) || (hours < -MAX_HOURS)) {
             throw new IllegalArgumentException("time value overflow: " + hours + " hours");
         }
 
-        return new Time(hours * SECONDS_IN_HOUR, TimeUnit.SECONDS);
+        return new UnitTime(hours * SECONDS_IN_HOUR, TimeUnit.SECONDS);
     }
 
     /**
@@ -172,9 +172,9 @@ public class Time implements Comparable<Time> {
      * @return the time instance.
      */
     @NotNull
-    public static Time micros(final long micros) {
+    public static UnitTime micros(final long micros) {
 
-        return new Time(micros, TimeUnit.MICROSECONDS);
+        return new UnitTime(micros, TimeUnit.MICROSECONDS);
     }
 
     /**
@@ -184,9 +184,9 @@ public class Time implements Comparable<Time> {
      * @return the time instance.
      */
     @NotNull
-    public static Time millis(final long millis) {
+    public static UnitTime millis(final long millis) {
 
-        return new Time(millis, TimeUnit.MILLISECONDS);
+        return new UnitTime(millis, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -196,13 +196,13 @@ public class Time implements Comparable<Time> {
      * @return the time instance.
      */
     @NotNull
-    public static Time minutes(final long minutes) {
+    public static UnitTime minutes(final long minutes) {
 
         if ((minutes > MAX_MINUTES) || (minutes < -MAX_MINUTES)) {
             throw new IllegalArgumentException("time value overflow: " + minutes + " minutes");
         }
 
-        return new Time(minutes * SECONDS_IN_MINUTE, TimeUnit.SECONDS);
+        return new UnitTime(minutes * SECONDS_IN_MINUTE, TimeUnit.SECONDS);
     }
 
     /**
@@ -212,9 +212,9 @@ public class Time implements Comparable<Time> {
      * @return the time instance.
      */
     @NotNull
-    public static Time nanos(final long nanos) {
+    public static UnitTime nanos(final long nanos) {
 
-        return new Time(nanos, TimeUnit.NANOSECONDS);
+        return new UnitTime(nanos, TimeUnit.NANOSECONDS);
     }
 
     /**
@@ -224,9 +224,9 @@ public class Time implements Comparable<Time> {
      * @return the time instance.
      */
     @NotNull
-    public static Time seconds(final long seconds) {
+    public static UnitTime seconds(final long seconds) {
 
-        return new Time(seconds, TimeUnit.SECONDS);
+        return new UnitTime(seconds, TimeUnit.SECONDS);
     }
 
     private static int compareLong(final long l1, final long l2) {
@@ -234,15 +234,20 @@ public class Time implements Comparable<Time> {
         return (l1 < l2) ? -1 : ((l1 == l2) ? 0 : 1);
     }
 
-    public int compareTo(@NotNull final Time o) {
+    public int compareTo(@NotNull final UnitTime o) {
 
-        if (unit.compareTo(o.unit) > 0) {
-            final int coarseComparison = compareLong(time, o.to(unit));
-            return (coarseComparison != 0) ? coarseComparison : compareLong(to(o.unit), o.time);
+        final int unitCompare = unit.compareTo(o.unit);
+        if (unitCompare == 0) {
+            return compareLong(value, o.value);
         }
 
-        final int coarseComparison = compareLong(to(o.unit), o.time);
-        return (coarseComparison != 0) ? coarseComparison : compareLong(time, o.to(unit));
+        if (unitCompare > 0) {
+            final int coarseComparison = compareLong(value, o.to(unit));
+            return (coarseComparison != 0) ? coarseComparison : compareLong(to(o.unit), o.value);
+        }
+
+        final int coarseComparison = compareLong(to(o.unit), o.value);
+        return (coarseComparison != 0) ? coarseComparison : compareLong(value, o.to(unit));
     }
 
     /**
@@ -251,7 +256,7 @@ public class Time implements Comparable<Time> {
      * @return the time instance.
      */
     @NotNull
-    public Time daysTime() {
+    public UnitTime daysTime() {
 
         return days(toDays());
     }
@@ -259,7 +264,7 @@ public class Time implements Comparable<Time> {
     @Override
     public int hashCode() {
 
-        int result = (int) (time ^ (time >>> 32));
+        int result = (int) (value ^ (value >>> 32));
         result = 31 * result + unit.hashCode();
         return result;
     }
@@ -267,26 +272,13 @@ public class Time implements Comparable<Time> {
     @Override
     public boolean equals(final Object o) {
 
-        if (this == o) {
-            return true;
-        }
-
-        if (!(o instanceof Time)) {
-            return false;
-        }
-
-        final Time that = (Time) o;
-        if (unit != that.unit) {
-            return (to(that.unit) == that.time) && (that.to(unit) == time);
-        }
-
-        return (time == that.time);
+        return (this == o) || (o instanceof UnitTime) && (compareTo((UnitTime) o) == 0);
     }
 
     @Override
     public String toString() {
 
-        return time + " " + unit.toString();
+        return value + " " + unit.toString();
     }
 
     /**
@@ -295,9 +287,20 @@ public class Time implements Comparable<Time> {
      * @return the time instance.
      */
     @NotNull
-    public Time hoursTime() {
+    public UnitTime hoursTime() {
 
         return hours(toHours());
+    }
+
+    /**
+     * Checks if this time is greater than or equal to the specified one.
+     *
+     * @param other the time to compare.
+     * @return whether this time is greater or equal.
+     */
+    public boolean isGreaterOrEquals(@NotNull final UnitTime other) {
+
+        return compareTo(other) >= 0;
     }
 
     /**
@@ -306,20 +309,20 @@ public class Time implements Comparable<Time> {
      * @param other the time to compare.
      * @return whether this time is greater.
      */
-    public boolean isGreaterThan(@NotNull final Time other) {
+    public boolean isGreaterThan(@NotNull final UnitTime other) {
 
         return compareTo(other) > 0;
     }
 
     /**
-     * Checks if this time is greater or equal to the specified one.
+     * Checks if this time is less than or equal to the specified one.
      *
      * @param other the time to compare.
-     * @return whether this time is greater or equal.
+     * @return whether this time is less or equal.
      */
-    public boolean isGreaterThanOrEqualTo(@NotNull final Time other) {
+    public boolean isLessOrEquals(@NotNull final UnitTime other) {
 
-        return compareTo(other) >= 0;
+        return compareTo(other) <= 0;
     }
 
     /**
@@ -328,20 +331,9 @@ public class Time implements Comparable<Time> {
      * @param other the time to compare.
      * @return whether this time is less.
      */
-    public boolean isLessThan(@NotNull final Time other) {
+    public boolean isLessThan(@NotNull final UnitTime other) {
 
         return compareTo(other) < 0;
-    }
-
-    /**
-     * Checks if this time is less or equal to the specified one.
-     *
-     * @param other the time to compare.
-     * @return whether this time is less or equal.
-     */
-    public boolean isLessThanOrEqualTo(@NotNull final Time other) {
-
-        return compareTo(other) <= 0;
     }
 
     /**
@@ -351,7 +343,7 @@ public class Time implements Comparable<Time> {
      */
     public boolean isZero() {
 
-        return (time == 0);
+        return (value == 0);
     }
 
     /**
@@ -360,7 +352,7 @@ public class Time implements Comparable<Time> {
      * @return the time instance.
      */
     @NotNull
-    public Time microsTime() {
+    public UnitTime microsTime() {
 
         return micros(toMicros());
     }
@@ -371,7 +363,7 @@ public class Time implements Comparable<Time> {
      * @return the time instance.
      */
     @NotNull
-    public Time millisTime() {
+    public UnitTime millisTime() {
 
         return millis(toMillis());
     }
@@ -385,13 +377,13 @@ public class Time implements Comparable<Time> {
      * @return the time instance.
      */
     @NotNull
-    public Time minus(@NotNull final Time time) {
+    public UnitTime minus(@NotNull final UnitTime time) {
 
         if (unit.compareTo(time.unit) > 0) {
-            return fromUnit(to(time.unit) - time.time, time.unit);
+            return fromUnit(to(time.unit) - time.value, time.unit);
         }
 
-        return fromUnit(this.time - time.to(unit), unit);
+        return fromUnit(this.value - time.to(unit), unit);
     }
 
     /**
@@ -400,7 +392,7 @@ public class Time implements Comparable<Time> {
      * @return the time instance.
      */
     @NotNull
-    public Time minutesTime() {
+    public UnitTime minutesTime() {
 
         return minutes(toMinutes());
     }
@@ -411,7 +403,7 @@ public class Time implements Comparable<Time> {
      * @return the time instance.
      */
     @NotNull
-    public Time nanosTime() {
+    public UnitTime nanosTime() {
 
         return nanos(toNanos());
     }
@@ -425,13 +417,13 @@ public class Time implements Comparable<Time> {
      * @return the time instance.
      */
     @NotNull
-    public Time plus(@NotNull final Time time) {
+    public UnitTime plus(@NotNull final UnitTime time) {
 
         if (unit.compareTo(time.unit) > 0) {
-            return fromUnit(to(time.unit) + time.time, time.unit);
+            return fromUnit(to(time.unit) + time.value, time.unit);
         }
 
-        return fromUnit(this.time + time.to(unit), unit);
+        return fromUnit(this.value + time.to(unit), unit);
     }
 
     /**
@@ -440,7 +432,7 @@ public class Time implements Comparable<Time> {
      * @return the time instance.
      */
     @NotNull
-    public Time secondsTime() {
+    public UnitTime secondsTime() {
 
         return seconds(toSeconds());
     }
@@ -453,7 +445,7 @@ public class Time implements Comparable<Time> {
      */
     public long to(@NotNull final TimeUnit timeUnit) {
 
-        return timeUnit.convert(time, unit);
+        return timeUnit.convert(value, unit);
     }
 
     /**
@@ -463,7 +455,7 @@ public class Time implements Comparable<Time> {
      */
     public long toDays() {
 
-        return unit.toSeconds(time) / SECONDS_IN_DAY;
+        return unit.toSeconds(value) / SECONDS_IN_DAY;
     }
 
     /**
@@ -473,7 +465,7 @@ public class Time implements Comparable<Time> {
      */
     public long toHours() {
 
-        return unit.toSeconds(time) / SECONDS_IN_HOUR;
+        return unit.toSeconds(value) / SECONDS_IN_HOUR;
     }
 
     /**
@@ -483,7 +475,7 @@ public class Time implements Comparable<Time> {
      */
     public long toMicros() {
 
-        return unit.toMicros(time);
+        return unit.toMicros(value);
     }
 
     /**
@@ -493,7 +485,7 @@ public class Time implements Comparable<Time> {
      */
     public long toMillis() {
 
-        return unit.toMillis(time);
+        return unit.toMillis(value);
     }
 
     /**
@@ -503,7 +495,7 @@ public class Time implements Comparable<Time> {
      */
     public long toMinutes() {
 
-        return unit.toSeconds(time) / SECONDS_IN_MINUTE;
+        return unit.toSeconds(value) / SECONDS_IN_MINUTE;
     }
 
     /**
@@ -513,7 +505,7 @@ public class Time implements Comparable<Time> {
      */
     public long toNanos() {
 
-        return unit.toNanos(time);
+        return unit.toNanos(value);
     }
 
     /**
@@ -523,6 +515,6 @@ public class Time implements Comparable<Time> {
      */
     public long toSeconds() {
 
-        return unit.toSeconds(time);
+        return unit.toSeconds(value);
     }
 }

@@ -27,7 +27,7 @@ import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.log.Logger;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.core.util.TimeDuration;
+import com.github.dm.jrt.core.util.UnitDuration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -118,7 +118,7 @@ class DefaultLoaderChannelBuilder
                     inputResolutionType);
         }
 
-        final TimeDuration resultStaleTime = loaderConfiguration.getResultStaleTimeOrElse(null);
+        final UnitDuration resultStaleTime = loaderConfiguration.getResultStaleTimeOrElse(null);
         if (resultStaleTime != null) {
             logger.wrn("the specified results stale time will be ignored: %s", resultStaleTime);
         }
@@ -130,7 +130,7 @@ class DefaultLoaderChannelBuilder
                       .with(loaderConfiguration)
                       .withClashResolution(ClashResolutionType.JOIN)
                       .withInputClashResolution(ClashResolutionType.JOIN)
-                      .withResultStaleTime(TimeDuration.INFINITY)
+                      .withResultStaleTime(UnitDuration.INFINITY)
                       .apply()
                       .asyncCall();
     }

@@ -23,7 +23,7 @@ import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
-import com.github.dm.jrt.core.util.TimeDuration;
+import com.github.dm.jrt.core.util.UnitDuration;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +33,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
-import static com.github.dm.jrt.core.util.TimeDuration.seconds;
+import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 
 /**
  * The downloader implementation.
@@ -128,7 +128,7 @@ public class Downloader {
      * @return whether the download was running and has been successfully aborted before the timeout
      * elapsed.
      */
-    public boolean abortAndWait(final URI uri, final TimeDuration timeout) {
+    public boolean abortAndWait(final URI uri, final UnitDuration timeout) {
 
         final OutputChannel<Boolean> channel = mDownloads.remove(uri);
         return (channel != null) && channel.abort() && channel.afterMax(timeout).hasCompleted();
@@ -175,7 +175,7 @@ public class Downloader {
      */
     public boolean isDownloaded(final URI uri) {
 
-        return waitDone(uri, TimeDuration.ZERO);
+        return waitDone(uri, UnitDuration.ZERO);
     }
 
     /**
@@ -196,7 +196,7 @@ public class Downloader {
      * @param timeout the time to wait for the download to complete.
      * @return whether the resource was successfully downloaded.
      */
-    public boolean waitDone(final URI uri, final TimeDuration timeout) {
+    public boolean waitDone(final URI uri, final UnitDuration timeout) {
 
         final HashMap<URI, OutputChannel<Boolean>> downloads = mDownloads;
         final OutputChannel<Boolean> channel = downloads.get(uri);

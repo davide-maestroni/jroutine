@@ -41,7 +41,7 @@ import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.Reflection;
-import com.github.dm.jrt.core.util.TimeDuration;
+import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Consumer;
@@ -184,7 +184,7 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
 
     @NotNull
     @Override
-    public LoaderStreamChannel<OUT> afterMax(@NotNull final TimeDuration timeout) {
+    public LoaderStreamChannel<OUT> afterMax(@NotNull final UnitDuration timeout) {
 
         return (LoaderStreamChannel<OUT>) super.afterMax(timeout);
     }
@@ -271,7 +271,7 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
     @NotNull
     @Override
     public LoaderStreamChannel<OUT> backPressureOn(@Nullable final Runner runner,
-            final int maxInputs, @Nullable final TimeDuration maxDelay) {
+            final int maxInputs, @Nullable final UnitDuration maxDelay) {
 
         return (LoaderStreamChannel<OUT>) super.backPressureOn(runner, maxInputs, maxDelay);
     }
@@ -661,7 +661,7 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
     }
 
     @NotNull
-    public LoaderStreamChannel<OUT> staleAfter(@Nullable final TimeDuration staleTime) {
+    public LoaderStreamChannel<OUT> staleAfter(@Nullable final UnitDuration staleTime) {
 
         return loaderConfiguration().withResultStaleTime(staleTime).apply();
     }

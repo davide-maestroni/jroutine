@@ -37,7 +37,7 @@ import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ClassToken;
-import com.github.dm.jrt.core.util.TimeDuration;
+import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.object.annotation.Alias;
 import com.github.dm.jrt.object.annotation.AsyncIn;
 import com.github.dm.jrt.object.annotation.AsyncIn.InputMode;
@@ -62,8 +62,8 @@ import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceOf;
-import static com.github.dm.jrt.core.util.TimeDuration.INFINITY;
-import static com.github.dm.jrt.core.util.TimeDuration.seconds;
+import static com.github.dm.jrt.core.util.UnitDuration.INFINITY;
+import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -81,7 +81,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
     public void testAliasMethod() throws NoSuchMethodException {
 
-        final TimeDuration timeout = seconds(10);
+        final UnitDuration timeout = seconds(10);
         final Routine<Object, Object> routine =
                 JRoutineServiceObject.with(serviceFrom(getActivity()))
                                      .on(instanceOf(TestClass.class))
@@ -109,7 +109,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
     public void testAsyncInputProxyRoutine() {
 
-        final TimeDuration timeout = seconds(10);
+        final UnitDuration timeout = seconds(10);
         final SumItf sumAsync = JRoutineServiceObject.with(serviceFrom(getActivity()))
                                                      .on(instanceOf(Sum.class))
                                                      .invocationConfiguration()
@@ -139,7 +139,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
     public void testAsyncOutputProxyRoutine() {
 
-        final TimeDuration timeout = seconds(10);
+        final UnitDuration timeout = seconds(10);
         final CountItf countAsync = JRoutineServiceObject.with(serviceFrom(getActivity()))
                                                          .on(instanceOf(Count.class))
                                                          .invocationConfiguration()
@@ -207,7 +207,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
     public void testException() throws NoSuchMethodException {
 
-        final TimeDuration timeout = seconds(10);
+        final UnitDuration timeout = seconds(10);
         final Routine<Object, Object> routine3 =
                 JRoutineServiceObject.with(serviceFrom(getActivity()))
                                      .on(instanceOf(TestClass.class))
@@ -457,7 +457,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
     public void testMethod() throws NoSuchMethodException {
 
-        final TimeDuration timeout = seconds(10);
+        final UnitDuration timeout = seconds(10);
         final Routine<Object, Object> routine2 =
                 JRoutineServiceObject.with(serviceFrom(getActivity()))
                                      .on(instanceOf(TestClass.class))
@@ -475,7 +475,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
     public void testMethodBySignature() throws NoSuchMethodException {
 
-        final TimeDuration timeout = seconds(10);
+        final UnitDuration timeout = seconds(10);
         final Routine<Object, Object> routine1 =
                 JRoutineServiceObject.with(serviceFrom(getActivity()))
                                      .on(instanceOf(TestClass.class))
@@ -784,7 +784,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
     @SuppressWarnings("NullArgumentToVariableArgMethod")
     public void testProxyRoutine() {
 
-        final TimeDuration timeout = seconds(10);
+        final UnitDuration timeout = seconds(10);
         final SquareItf squareAsync = JRoutineServiceObject.with(serviceFrom(getActivity()))
                                                            .on(instanceOf(Square.class))
                                                            .buildProxy(SquareItf.class);
@@ -1665,14 +1665,14 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
 
         public int getOne() throws InterruptedException {
 
-            TimeDuration.millis(1000).sleepAtLeast();
+            UnitDuration.millis(1000).sleepAtLeast();
 
             return 1;
         }
 
         public int getTwo() throws InterruptedException {
 
-            TimeDuration.millis(1000).sleepAtLeast();
+            UnitDuration.millis(1000).sleepAtLeast();
 
             return 2;
         }

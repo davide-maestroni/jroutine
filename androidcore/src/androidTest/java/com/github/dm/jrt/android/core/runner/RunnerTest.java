@@ -26,15 +26,15 @@ import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.invocation.CallInvocation;
 import com.github.dm.jrt.core.invocation.CommandInvocation;
-import com.github.dm.jrt.core.invocation.OperationInvocation;
 import com.github.dm.jrt.core.invocation.Invocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
+import com.github.dm.jrt.core.invocation.OperationInvocation;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.RunnerDecorator;
-import com.github.dm.jrt.core.util.TimeDuration;
+import com.github.dm.jrt.core.util.UnitDuration;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -45,11 +45,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
-import static com.github.dm.jrt.core.util.TimeDuration.ZERO;
-import static com.github.dm.jrt.core.util.TimeDuration.micros;
-import static com.github.dm.jrt.core.util.TimeDuration.millis;
-import static com.github.dm.jrt.core.util.TimeDuration.nanos;
-import static com.github.dm.jrt.core.util.TimeDuration.seconds;
+import static com.github.dm.jrt.core.util.UnitDuration.ZERO;
+import static com.github.dm.jrt.core.util.UnitDuration.micros;
+import static com.github.dm.jrt.core.util.UnitDuration.millis;
+import static com.github.dm.jrt.core.util.UnitDuration.nanos;
+import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -66,7 +66,7 @@ public class RunnerTest extends AndroidTestCase {
 
         for (int i = 0; i < 13; i++) {
 
-            final TimeDuration delay;
+            final UnitDuration delay;
             final int unit = random.nextInt(4);
 
             switch (unit) {
@@ -91,7 +91,7 @@ public class RunnerTest extends AndroidTestCase {
             final TestRunExecution execution = new TestRunExecution(delay);
             executions.add(execution);
 
-            runner.run(execution, delay.time, delay.unit);
+            runner.run(execution, delay.value, delay.unit);
         }
 
         for (final TestRunExecution execution : executions) {
@@ -102,11 +102,11 @@ public class RunnerTest extends AndroidTestCase {
 
         executions.clear();
 
-        final ArrayList<TimeDuration> delays = new ArrayList<TimeDuration>();
+        final ArrayList<UnitDuration> delays = new ArrayList<UnitDuration>();
 
         for (int i = 0; i < 13; i++) {
 
-            final TimeDuration delay;
+            final UnitDuration delay;
             final int unit = random.nextInt(4);
 
             switch (unit) {
@@ -137,7 +137,7 @@ public class RunnerTest extends AndroidTestCase {
         final TestRecursiveExecution recursiveExecution =
                 new TestRecursiveExecution(runner, executions, delays, ZERO);
 
-        runner.run(recursiveExecution, ZERO.time, ZERO.unit);
+        runner.run(recursiveExecution, ZERO.value, ZERO.unit);
 
         for (final TestRunExecution execution : executions) {
 
@@ -284,15 +284,15 @@ public class RunnerTest extends AndroidTestCase {
 
     private static class TestRecursiveExecution extends TestRunExecution {
 
-        private final ArrayList<TimeDuration> mDelays;
+        private final ArrayList<UnitDuration> mDelays;
 
         private final ArrayList<TestRunExecution> mExecutions;
 
         private final Runner mRunner;
 
         public TestRecursiveExecution(final Runner runner,
-                final ArrayList<TestRunExecution> executions, final ArrayList<TimeDuration> delays,
-                final TimeDuration delay) {
+                final ArrayList<TestRunExecution> executions, final ArrayList<UnitDuration> delays,
+                final UnitDuration delay) {
 
             super(delay);
 
@@ -305,14 +305,14 @@ public class RunnerTest extends AndroidTestCase {
         public void run() {
 
             final ArrayList<TestRunExecution> executions = mExecutions;
-            final ArrayList<TimeDuration> delays = mDelays;
+            final ArrayList<UnitDuration> delays = mDelays;
             final Runner runner = mRunner;
             final int size = executions.size();
 
             for (int i = 0; i < size; i++) {
 
-                final TimeDuration delay = delays.get(i);
-                runner.run(executions.get(i), delay.time, delay.unit);
+                final UnitDuration delay = delays.get(i);
+                runner.run(executions.get(i), delay.value, delay.unit);
             }
 
             super.run();
@@ -321,7 +321,7 @@ public class RunnerTest extends AndroidTestCase {
 
     private static class TestRunExecution implements Execution {
 
-        private final TimeDuration mDelay;
+        private final UnitDuration mDelay;
 
         private final Semaphore mSemaphore = new Semaphore(0);
 
@@ -329,7 +329,7 @@ public class RunnerTest extends AndroidTestCase {
 
         private boolean mIsPassed;
 
-        public TestRunExecution(final TimeDuration delay) {
+        public TestRunExecution(final UnitDuration delay) {
 
             mStartTime = System.currentTimeMillis();
             mDelay = delay;

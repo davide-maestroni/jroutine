@@ -40,10 +40,10 @@ import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
-import com.github.dm.jrt.core.invocation.OperationInvocation;
 import com.github.dm.jrt.core.invocation.InvocationException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.InvocationInterruptedException;
+import com.github.dm.jrt.core.invocation.OperationInvocation;
 import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.routine.Routine;
@@ -67,9 +67,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryFrom;
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryOf;
 import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
-import static com.github.dm.jrt.core.util.TimeDuration.ZERO;
-import static com.github.dm.jrt.core.util.TimeDuration.millis;
-import static com.github.dm.jrt.core.util.TimeDuration.seconds;
+import static com.github.dm.jrt.core.util.UnitDuration.ZERO;
+import static com.github.dm.jrt.core.util.UnitDuration.millis;
+import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.stream.Streams.range;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -2315,8 +2315,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         }
     }
 
-    private static class Sort
-            extends
+    private static class Sort extends
             OperationInvocation<ParcelableSelectable<Object>, ParcelableSelectable<Object>> {
 
         private static final int INTEGER = 1;

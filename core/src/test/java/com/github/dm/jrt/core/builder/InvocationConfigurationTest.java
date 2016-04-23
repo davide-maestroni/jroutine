@@ -24,7 +24,7 @@ import com.github.dm.jrt.core.log.Log.Level;
 import com.github.dm.jrt.core.log.Logs;
 import com.github.dm.jrt.core.log.NullLog;
 import com.github.dm.jrt.core.runner.Runners;
-import com.github.dm.jrt.core.util.TimeDuration;
+import com.github.dm.jrt.core.util.UnitDuration;
 
 import org.junit.Test;
 
@@ -156,11 +156,11 @@ public class InvocationConfigurationTest {
                                                                .withOutputMaxSize(100)
                                                                .apply();
         assertThat(configuration).isNotEqualTo(
-                builder().withReadTimeout(TimeDuration.ZERO).apply());
+                builder().withReadTimeout(UnitDuration.ZERO).apply());
         assertThat(configuration).isNotEqualTo(
                 builder().withReadTimeout(1, TimeUnit.MILLISECONDS).apply());
         assertThat(configuration.builderFrom()
-                                .withReadTimeout(TimeDuration.millis(1))
+                                .withReadTimeout(UnitDuration.millis(1))
                                 .apply()).isNotEqualTo(
                 builder().withReadTimeout(1, TimeUnit.MILLISECONDS).apply());
     }
@@ -202,11 +202,11 @@ public class InvocationConfigurationTest {
                                                                .withOutputMaxSize(100)
                                                                .apply();
         assertThat(configuration).isNotEqualTo(
-                builder().withInputMaxDelay(TimeDuration.ZERO).apply());
+                builder().withInputMaxDelay(UnitDuration.ZERO).apply());
         assertThat(configuration).isNotEqualTo(
                 builder().withInputMaxDelay(1, TimeUnit.MILLISECONDS).apply());
         assertThat(configuration.builderFrom()
-                                .withInputMaxDelay(TimeDuration.millis(1))
+                                .withInputMaxDelay(UnitDuration.millis(1))
                                 .apply()).isNotEqualTo(
                 builder().withInputMaxDelay(1, TimeUnit.MILLISECONDS).apply());
     }
@@ -370,11 +370,11 @@ public class InvocationConfigurationTest {
                                                                .withOutputMaxSize(100)
                                                                .apply();
         assertThat(configuration).isNotEqualTo(
-                builder().withOutputMaxDelay(TimeDuration.ZERO).apply());
+                builder().withOutputMaxDelay(UnitDuration.ZERO).apply());
         assertThat(configuration).isNotEqualTo(
                 builder().withOutputMaxDelay(1, TimeUnit.MILLISECONDS).apply());
         assertThat(configuration.builderFrom()
-                                .withOutputMaxDelay(TimeDuration.millis(1))
+                                .withOutputMaxDelay(UnitDuration.millis(1))
                                 .apply()).isNotEqualTo(
                 builder().withOutputMaxDelay(1, TimeUnit.MILLISECONDS).apply());
     }

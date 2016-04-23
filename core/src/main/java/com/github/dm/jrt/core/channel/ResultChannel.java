@@ -17,7 +17,7 @@
 package com.github.dm.jrt.core.channel;
 
 import com.github.dm.jrt.core.channel.Channel.InputChannel;
-import com.github.dm.jrt.core.util.TimeDuration;
+import com.github.dm.jrt.core.util.UnitDuration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -38,7 +38,7 @@ public interface ResultChannel<OUT> extends InputChannel<OUT> {
      * {@inheritDoc}
      */
     @NotNull
-    ResultChannel<OUT> after(@NotNull TimeDuration delay);
+    ResultChannel<OUT> after(@NotNull UnitDuration delay);
 
     /**
      * {@inheritDoc}

@@ -18,7 +18,7 @@ package com.github.dm.jrt.android.core.config;
 
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.DeepEqualObject;
-import com.github.dm.jrt.core.util.TimeDuration;
+import com.github.dm.jrt.core.util.UnitDuration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
-import static com.github.dm.jrt.core.util.TimeDuration.fromUnit;
+import static com.github.dm.jrt.core.util.UnitDuration.fromUnit;
 
 /**
  * Class storing the invocation loader configuration.
@@ -70,7 +70,7 @@ public final class LoaderConfiguration extends DeepEqualObject {
 
     private final ClashResolutionType mResolutionType;
 
-    private final TimeDuration mStaleTime;
+    private final UnitDuration mStaleTime;
 
     private final CacheStrategyType mStrategyType;
 
@@ -88,7 +88,7 @@ public final class LoaderConfiguration extends DeepEqualObject {
             @Nullable final ClashResolutionType resolutionType,
             @Nullable final ClashResolutionType inputResolutionType,
             @Nullable final CacheStrategyType strategyType,
-            @Nullable final TimeDuration staleTime) {
+            @Nullable final UnitDuration staleTime) {
 
         super(asArgs(loaderId, factoryId, resolutionType, inputResolutionType, strategyType,
                 staleTime));
@@ -216,9 +216,9 @@ public final class LoaderConfiguration extends DeepEqualObject {
      * @param valueIfNotSet the default value if none was set.
      * @return the results stale time.
      */
-    public TimeDuration getResultStaleTimeOrElse(@Nullable final TimeDuration valueIfNotSet) {
+    public UnitDuration getResultStaleTimeOrElse(@Nullable final UnitDuration valueIfNotSet) {
 
-        final TimeDuration staleTime = mStaleTime;
+        final UnitDuration staleTime = mStaleTime;
         return (staleTime != null) ? staleTime : valueIfNotSet;
     }
 
@@ -319,7 +319,7 @@ public final class LoaderConfiguration extends DeepEqualObject {
 
         private ClashResolutionType mResolutionType;
 
-        private TimeDuration mStaleTime;
+        private UnitDuration mStaleTime;
 
         private CacheStrategyType mStrategyType;
 
@@ -400,7 +400,7 @@ public final class LoaderConfiguration extends DeepEqualObject {
                 withCacheStrategy(strategyType);
             }
 
-            final TimeDuration staleTime = configuration.mStaleTime;
+            final UnitDuration staleTime = configuration.mStaleTime;
             if (staleTime != null) {
                 withResultStaleTime(staleTime);
             }
@@ -489,7 +489,7 @@ public final class LoaderConfiguration extends DeepEqualObject {
          * @return this builder.
          */
         @NotNull
-        public Builder<TYPE> withResultStaleTime(@Nullable final TimeDuration staleTime) {
+        public Builder<TYPE> withResultStaleTime(@Nullable final UnitDuration staleTime) {
 
             mStaleTime = staleTime;
             return this;

@@ -31,9 +31,9 @@ import static org.junit.Assert.fail;
  * <p>
  * Created by davide-maestroni on 10/02/2014.
  */
-public class TimeTest {
+public class UnitTimeTest {
 
-    private static final long ONE_DAY_NANOS = Time.days(1).toNanos();
+    private static final long ONE_DAY_NANOS = UnitTime.days(1).toNanos();
 
     private static final long MAX_TIME = Long.MAX_VALUE / ONE_DAY_NANOS;
 
@@ -75,57 +75,57 @@ public class TimeTest {
     @Test
     public void testCompare() {
 
-        assertThat(Time.millis(0).compareTo(Time.seconds(0))).isEqualTo(0);
-        assertThat(Time.millis(0).compareTo(Time.seconds(-1))).isEqualTo(1);
-        assertThat(Time.millis(-1).compareTo(Time.seconds(0))).isEqualTo(-1);
-        assertThat(Time.days(0).compareTo(Time.seconds(0))).isEqualTo(0);
-        assertThat(Time.days(0).compareTo(Time.seconds(-1))).isEqualTo(1);
-        assertThat(Time.days(-1).compareTo(Time.seconds(0))).isEqualTo(-1);
-        assertThat(Time.millis(0).isGreaterThan(Time.seconds(0))).isFalse();
-        assertThat(Time.millis(0).isGreaterThanOrEqualTo(Time.seconds(0))).isTrue();
-        assertThat(Time.millis(0).isLessThan(Time.seconds(0))).isFalse();
-        assertThat(Time.millis(0).isLessThanOrEqualTo(Time.seconds(0))).isTrue();
-        assertThat(Time.millis(0).isGreaterThan(Time.seconds(-1))).isTrue();
-        assertThat(Time.millis(0).isGreaterThanOrEqualTo(Time.seconds(-1))).isTrue();
-        assertThat(Time.millis(0).isLessThan(Time.seconds(-1))).isFalse();
-        assertThat(Time.millis(0).isLessThanOrEqualTo(Time.seconds(-1))).isFalse();
-        assertThat(Time.millis(-1).isGreaterThan(Time.seconds(0))).isFalse();
-        assertThat(Time.millis(-1).isGreaterThanOrEqualTo(Time.seconds(0))).isFalse();
-        assertThat(Time.millis(-1).isLessThan(Time.seconds(0))).isTrue();
-        assertThat(Time.millis(-1).isLessThanOrEqualTo(Time.seconds(0))).isTrue();
+        assertThat(UnitTime.millis(0).compareTo(UnitTime.seconds(0))).isEqualTo(0);
+        assertThat(UnitTime.millis(0).compareTo(UnitTime.seconds(-1))).isEqualTo(1);
+        assertThat(UnitTime.millis(-1).compareTo(UnitTime.seconds(0))).isEqualTo(-1);
+        assertThat(UnitTime.days(0).compareTo(UnitTime.seconds(0))).isEqualTo(0);
+        assertThat(UnitTime.days(0).compareTo(UnitTime.seconds(-1))).isEqualTo(1);
+        assertThat(UnitTime.days(-1).compareTo(UnitTime.seconds(0))).isEqualTo(-1);
+        assertThat(UnitTime.millis(0).isGreaterThan(UnitTime.seconds(0))).isFalse();
+        assertThat(UnitTime.millis(0).isGreaterOrEquals(UnitTime.seconds(0))).isTrue();
+        assertThat(UnitTime.millis(0).isLessThan(UnitTime.seconds(0))).isFalse();
+        assertThat(UnitTime.millis(0).isLessOrEquals(UnitTime.seconds(0))).isTrue();
+        assertThat(UnitTime.millis(0).isGreaterThan(UnitTime.seconds(-1))).isTrue();
+        assertThat(UnitTime.millis(0).isGreaterOrEquals(UnitTime.seconds(-1))).isTrue();
+        assertThat(UnitTime.millis(0).isLessThan(UnitTime.seconds(-1))).isFalse();
+        assertThat(UnitTime.millis(0).isLessOrEquals(UnitTime.seconds(-1))).isFalse();
+        assertThat(UnitTime.millis(-1).isGreaterThan(UnitTime.seconds(0))).isFalse();
+        assertThat(UnitTime.millis(-1).isGreaterOrEquals(UnitTime.seconds(0))).isFalse();
+        assertThat(UnitTime.millis(-1).isLessThan(UnitTime.seconds(0))).isTrue();
+        assertThat(UnitTime.millis(-1).isLessOrEquals(UnitTime.seconds(0))).isTrue();
     }
 
     @Test
     public void testConstants() {
 
-        assertThat(Time.SECONDS_IN_MINUTE).isEqualTo(60);
-        assertThat(Time.SECONDS_IN_HOUR).isEqualTo(60 * 60);
-        assertThat(Time.SECONDS_IN_DAY).isEqualTo(60 * 60 * 24);
-        assertThat(Time.MINUTES_IN_HOUR).isEqualTo(60);
-        assertThat(Time.MINUTES_IN_DAY).isEqualTo(60 * 24);
-        assertThat(Time.HOURS_IN_DAY).isEqualTo(24);
+        assertThat(UnitTime.SECONDS_IN_MINUTE).isEqualTo(60);
+        assertThat(UnitTime.SECONDS_IN_HOUR).isEqualTo(60 * 60);
+        assertThat(UnitTime.SECONDS_IN_DAY).isEqualTo(60 * 60 * 24);
+        assertThat(UnitTime.MINUTES_IN_HOUR).isEqualTo(60);
+        assertThat(UnitTime.MINUTES_IN_DAY).isEqualTo(60 * 24);
+        assertThat(UnitTime.HOURS_IN_DAY).isEqualTo(24);
     }
 
     @Test
     public void testCurrentTime() {
 
         final long systemTimeMs = System.currentTimeMillis();
-        assertThat(Time.current().toMillis()).isBetween(systemTimeMs - 50, systemTimeMs + 50);
+        assertThat(UnitTime.current().toMillis()).isBetween(systemTimeMs - 50, systemTimeMs + 50);
 
         final long systemTimeNs = System.nanoTime();
-        assertThat(Time.currentNano().toNanos()).isBetween(systemTimeNs - 50000000,
+        assertThat(UnitTime.currentNano().toNanos()).isBetween(systemTimeNs - 50000000,
                 systemTimeNs + 50000000);
     }
 
     @Test
     public void testDayConversions() throws InvocationTargetException, IllegalAccessException {
 
-        testConversions(Time.days(clip(sRandom.nextInt())), true);
+        testConversions(UnitTime.days(clip(sRandom.nextInt())), true);
 
         final TimeUnit days = getUnit("DAYS");
         if (days != null) {
 
-            testConversions(Time.fromUnit(clip(sRandom.nextInt()), days), true);
+            testConversions(UnitTime.fromUnit(clip(sRandom.nextInt()), days), true);
         }
 
     }
@@ -135,7 +135,7 @@ public class TimeTest {
 
         try {
 
-            Time.days(Long.MAX_VALUE);
+            UnitTime.days(Long.MAX_VALUE);
 
             fail();
 
@@ -145,7 +145,7 @@ public class TimeTest {
 
         try {
 
-            Time.days(Long.MIN_VALUE);
+            UnitTime.days(Long.MIN_VALUE);
 
             fail();
 
@@ -157,7 +157,7 @@ public class TimeTest {
     @Test
     public void testEqualConversions() throws InvocationTargetException, IllegalAccessException {
 
-        final Time time = Time.nanos(clip(sRandom.nextInt()));
+        final UnitTime time = UnitTime.nanos(clip(sRandom.nextInt()));
         assertThat(time).isEqualTo(time);
         assertThat(time).isEqualTo(time.nanosTime());
         assertThat(time).isNotEqualTo(time.millisTime());
@@ -168,12 +168,12 @@ public class TimeTest {
     @Test
     public void testHourConversions() throws InvocationTargetException, IllegalAccessException {
 
-        testConversions(Time.hours(clip(sRandom.nextInt())), true);
+        testConversions(UnitTime.hours(clip(sRandom.nextInt())), true);
 
         final TimeUnit hours = getUnit("HOURS");
         if (hours != null) {
 
-            testConversions(Time.fromUnit(clip(sRandom.nextInt()), hours), true);
+            testConversions(UnitTime.fromUnit(clip(sRandom.nextInt()), hours), true);
         }
     }
 
@@ -182,7 +182,7 @@ public class TimeTest {
 
         try {
 
-            Time.hours(Long.MAX_VALUE);
+            UnitTime.hours(Long.MAX_VALUE);
 
             fail();
 
@@ -192,7 +192,7 @@ public class TimeTest {
 
         try {
 
-            Time.hours(Long.MIN_VALUE);
+            UnitTime.hours(Long.MIN_VALUE);
 
             fail();
 
@@ -204,40 +204,45 @@ public class TimeTest {
     @Test
     public void testMicroConversions() throws InvocationTargetException, IllegalAccessException {
 
-        testConversions(Time.micros(clip(sRandom.nextInt())), true);
-        testConversions(Time.fromUnit(clip(sRandom.nextInt()), TimeUnit.MICROSECONDS), true);
+        testConversions(UnitTime.micros(clip(sRandom.nextInt())), true);
+        testConversions(UnitTime.fromUnit(clip(sRandom.nextInt()), TimeUnit.MICROSECONDS), true);
     }
 
     @Test
     public void testMilliConversions() throws InvocationTargetException, IllegalAccessException {
 
-        testConversions(Time.millis(clip(sRandom.nextInt())), true);
-        testConversions(Time.fromUnit(clip(sRandom.nextInt()), TimeUnit.MILLISECONDS), true);
+        testConversions(UnitTime.millis(clip(sRandom.nextInt())), true);
+        testConversions(UnitTime.fromUnit(clip(sRandom.nextInt()), TimeUnit.MILLISECONDS), true);
     }
 
     @Test
     public void testMinus() {
 
-        final Time current = Time.current();
-        assertThat(current.minus(Time.hours(2).minus(Time.minutes(11)))).isNotEqualTo(
-                current.minus(Time.hours(2)).minus(Time.minutes(11)));
-        assertThat(current.minus(Time.hours(2).minus(Time.minutes(11))).toMillis()).isEqualTo(
-                current.toMillis() - Time.hours(2).toMillis() + Time.minutes(11).toMillis());
-        assertThat(current.minus(Time.hours(2)).minus(Time.minutes(11)).toMillis()).isEqualTo(
-                current.toMillis() - Time.hours(2).toMillis() - Time.minutes(11).toMillis());
-        assertThat(Time.minutes(-2).minus(Time.seconds(31))).isEqualTo(Time.millis(-151000));
-        assertThat(Time.seconds(1).minus(Time.millis(700))).isEqualTo(Time.millis(300));
+        final UnitTime current = UnitTime.current();
+        assertThat(current.minus(UnitTime.hours(2).minus(UnitTime.minutes(11)))).isNotEqualTo(
+                current.minus(UnitTime.hours(2)).minus(UnitTime.minutes(11)));
+        assertThat(
+                current.minus(UnitTime.hours(2).minus(UnitTime.minutes(11))).toMillis()).isEqualTo(
+                current.toMillis() - UnitTime.hours(2).toMillis() + UnitTime.minutes(11)
+                                                                            .toMillis());
+        assertThat(
+                current.minus(UnitTime.hours(2)).minus(UnitTime.minutes(11)).toMillis()).isEqualTo(
+                current.toMillis() - UnitTime.hours(2).toMillis() - UnitTime.minutes(11)
+                                                                            .toMillis());
+        assertThat(UnitTime.minutes(-2).minus(UnitTime.seconds(31))).isEqualTo(
+                UnitTime.millis(-151000));
+        assertThat(UnitTime.seconds(1).minus(UnitTime.millis(700))).isEqualTo(UnitTime.millis(300));
     }
 
     @Test
     public void testMinuteConversions() throws InvocationTargetException, IllegalAccessException {
 
-        testConversions(Time.minutes(clip(sRandom.nextInt())), true);
+        testConversions(UnitTime.minutes(clip(sRandom.nextInt())), true);
 
         final TimeUnit minutes = getUnit("MINUTES");
         if (minutes != null) {
 
-            testConversions(Time.fromUnit(clip(sRandom.nextInt()), minutes), true);
+            testConversions(UnitTime.fromUnit(clip(sRandom.nextInt()), minutes), true);
         }
     }
 
@@ -246,7 +251,7 @@ public class TimeTest {
 
         try {
 
-            Time.minutes(Long.MAX_VALUE);
+            UnitTime.minutes(Long.MAX_VALUE);
 
             fail();
 
@@ -256,7 +261,7 @@ public class TimeTest {
 
         try {
 
-            Time.minutes(Long.MIN_VALUE);
+            UnitTime.minutes(Long.MIN_VALUE);
 
             fail();
 
@@ -268,27 +273,29 @@ public class TimeTest {
     @Test
     public void testNanoConversions() throws InvocationTargetException, IllegalAccessException {
 
-        testConversions(Time.nanos(clip(sRandom.nextInt())), true);
-        testConversions(Time.fromUnit(clip(sRandom.nextInt()), TimeUnit.NANOSECONDS), true);
+        testConversions(UnitTime.nanos(clip(sRandom.nextInt())), true);
+        testConversions(UnitTime.fromUnit(clip(sRandom.nextInt()), TimeUnit.NANOSECONDS), true);
     }
 
     @Test
     public void testPlus() {
 
-        final Time current = Time.current();
-        assertThat(current.plus(Time.hours(2).plus(Time.minutes(11)))).isEqualTo(
-                current.plus(Time.hours(2)).plus(Time.minutes(11)));
-        assertThat(current.plus(Time.hours(2)).plus(Time.minutes(11)).toMillis()).isEqualTo(
-                current.toMillis() + Time.hours(2).toMillis() + Time.minutes(11).toMillis());
-        assertThat(Time.minutes(-2).plus(Time.seconds(31))).isEqualTo(Time.millis(-89000));
-        assertThat(Time.seconds(1).plus(Time.millis(-700))).isEqualTo(Time.millis(300));
+        final UnitTime current = UnitTime.current();
+        assertThat(current.plus(UnitTime.hours(2).plus(UnitTime.minutes(11)))).isEqualTo(
+                current.plus(UnitTime.hours(2)).plus(UnitTime.minutes(11)));
+        assertThat(current.plus(UnitTime.hours(2)).plus(UnitTime.minutes(11)).toMillis()).isEqualTo(
+                current.toMillis() + UnitTime.hours(2).toMillis() + UnitTime.minutes(11)
+                                                                            .toMillis());
+        assertThat(UnitTime.minutes(-2).plus(UnitTime.seconds(31))).isEqualTo(
+                UnitTime.millis(-89000));
+        assertThat(UnitTime.seconds(1).plus(UnitTime.millis(-700))).isEqualTo(UnitTime.millis(300));
     }
 
     @Test
     public void testSecondConversions() throws InvocationTargetException, IllegalAccessException {
 
-        testConversions(Time.seconds(clip(sRandom.nextInt())), true);
-        testConversions(Time.fromUnit(clip(sRandom.nextInt()), TimeUnit.SECONDS), true);
+        testConversions(UnitTime.seconds(clip(sRandom.nextInt())), true);
+        testConversions(UnitTime.fromUnit(clip(sRandom.nextInt()), TimeUnit.SECONDS), true);
     }
 
     @Test
@@ -297,7 +304,7 @@ public class TimeTest {
 
         try {
 
-            Time.seconds(1).to(null);
+            UnitTime.seconds(1).to(null);
 
             fail();
 
@@ -312,7 +319,7 @@ public class TimeTest {
 
         try {
 
-            Time.fromUnit(0, null);
+            UnitTime.fromUnit(0, null);
 
             fail();
 
@@ -324,71 +331,71 @@ public class TimeTest {
     @Test
     public void testZeroDay() {
 
-        assertThat(Time.days(0).isZero()).isTrue();
+        assertThat(UnitTime.days(0).isZero()).isTrue();
 
         final TimeUnit days = getUnit("DAYS");
         if (days != null) {
 
-            assertThat(Time.fromUnit(0, days).isZero()).isTrue();
+            assertThat(UnitTime.fromUnit(0, days).isZero()).isTrue();
         }
     }
 
     @Test
     public void testZeroHour() {
 
-        assertThat(Time.hours(0).isZero()).isTrue();
+        assertThat(UnitTime.hours(0).isZero()).isTrue();
 
         final TimeUnit hours = getUnit("HOURS");
         if (hours != null) {
 
-            assertThat(Time.fromUnit(0, hours).isZero()).isTrue();
+            assertThat(UnitTime.fromUnit(0, hours).isZero()).isTrue();
         }
     }
 
     @Test
     public void testZeroMicro() {
 
-        assertThat(Time.micros(0).isZero()).isTrue();
-        assertThat(Time.fromUnit(0, TimeUnit.MICROSECONDS).isZero()).isTrue();
+        assertThat(UnitTime.micros(0).isZero()).isTrue();
+        assertThat(UnitTime.fromUnit(0, TimeUnit.MICROSECONDS).isZero()).isTrue();
     }
 
     @Test
     public void testZeroMilli() {
 
-        assertThat(Time.millis(0).isZero()).isTrue();
-        assertThat(Time.fromUnit(0, TimeUnit.MILLISECONDS).isZero()).isTrue();
+        assertThat(UnitTime.millis(0).isZero()).isTrue();
+        assertThat(UnitTime.fromUnit(0, TimeUnit.MILLISECONDS).isZero()).isTrue();
     }
 
     @Test
     public void testZeroMinute() {
 
-        assertThat(Time.minutes(0).isZero()).isTrue();
+        assertThat(UnitTime.minutes(0).isZero()).isTrue();
 
         final TimeUnit minutes = getUnit("MINUTES");
         if (minutes != null) {
 
-            assertThat(Time.fromUnit(0, minutes).isZero()).isTrue();
+            assertThat(UnitTime.fromUnit(0, minutes).isZero()).isTrue();
         }
     }
 
     @Test
     public void testZeroNano() {
 
-        assertThat(Time.nanos(0).isZero()).isTrue();
-        assertThat(Time.fromUnit(0, TimeUnit.NANOSECONDS).isZero()).isTrue();
+        assertThat(UnitTime.nanos(0).isZero()).isTrue();
+        assertThat(UnitTime.fromUnit(0, TimeUnit.NANOSECONDS).isZero()).isTrue();
     }
 
     @Test
     public void testZeroSecond() {
 
-        assertThat(Time.seconds(0).isZero()).isTrue();
-        assertThat(Time.fromUnit(0, TimeUnit.SECONDS).isZero()).isTrue();
+        assertThat(UnitTime.seconds(0).isZero()).isTrue();
+        assertThat(UnitTime.fromUnit(0, TimeUnit.SECONDS).isZero()).isTrue();
     }
 
-    private void testConversions(final Time time, final boolean isFirst) throws
+    private void testConversions(final UnitTime time, final boolean isFirst) throws
             InvocationTargetException, IllegalAccessException {
 
-        final long value = time.time;
+        final long value = time.value;
         final TimeUnit unit = time.unit;
 
         assertThat(time.toNanos()).isEqualTo(unit.toNanos(value));
@@ -441,21 +448,21 @@ public class TimeTest {
         }
 
         assertThat(time).isEqualTo(time);
-        assertThat(time).isEqualTo(Time.fromUnit(time.time, time.unit));
+        assertThat(time).isEqualTo(UnitTime.fromUnit(time.value, time.unit));
         assertThat(time.nanosTime()).isEqualTo(
-                Time.fromUnit(time.nanosTime().to(time.unit), time.unit));
+                UnitTime.fromUnit(time.nanosTime().to(time.unit), time.unit));
         assertThat(time.microsTime()).isEqualTo(
-                Time.fromUnit(time.microsTime().to(time.unit), time.unit));
+                UnitTime.fromUnit(time.microsTime().to(time.unit), time.unit));
         assertThat(time.millisTime()).isEqualTo(
-                Time.fromUnit(time.millisTime().to(time.unit), time.unit));
+                UnitTime.fromUnit(time.millisTime().to(time.unit), time.unit));
         assertThat(time.secondsTime()).isEqualTo(
-                Time.fromUnit(time.secondsTime().to(time.unit), time.unit));
+                UnitTime.fromUnit(time.secondsTime().to(time.unit), time.unit));
         assertThat(time.minutesTime()).isEqualTo(
-                Time.fromUnit(time.minutesTime().to(time.unit), time.unit));
+                UnitTime.fromUnit(time.minutesTime().to(time.unit), time.unit));
         assertThat(time.hoursTime()).isEqualTo(
-                Time.fromUnit(time.hoursTime().to(time.unit), time.unit));
+                UnitTime.fromUnit(time.hoursTime().to(time.unit), time.unit));
         assertThat(time.daysTime()).isEqualTo(
-                Time.fromUnit(time.daysTime().to(time.unit), time.unit));
+                UnitTime.fromUnit(time.daysTime().to(time.unit), time.unit));
 
         if (isFirst) {
 

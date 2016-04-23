@@ -18,8 +18,8 @@ package com.github.dm.jrt.core.runner;
 
 import com.github.dm.jrt.core.config.InvocationConfiguration.AgingPriority;
 import com.github.dm.jrt.core.config.InvocationConfiguration.NotAgingPriority;
-import com.github.dm.jrt.core.util.Time;
-import com.github.dm.jrt.core.util.TimeDuration;
+import com.github.dm.jrt.core.util.UnitDuration;
+import com.github.dm.jrt.core.util.UnitTime;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -31,12 +31,12 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static com.github.dm.jrt.core.util.Time.current;
-import static com.github.dm.jrt.core.util.TimeDuration.ZERO;
-import static com.github.dm.jrt.core.util.TimeDuration.micros;
-import static com.github.dm.jrt.core.util.TimeDuration.millis;
-import static com.github.dm.jrt.core.util.TimeDuration.nanos;
-import static com.github.dm.jrt.core.util.TimeDuration.seconds;
+import static com.github.dm.jrt.core.util.UnitDuration.ZERO;
+import static com.github.dm.jrt.core.util.UnitDuration.micros;
+import static com.github.dm.jrt.core.util.UnitDuration.millis;
+import static com.github.dm.jrt.core.util.UnitDuration.nanos;
+import static com.github.dm.jrt.core.util.UnitDuration.seconds;
+import static com.github.dm.jrt.core.util.UnitTime.current;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -429,7 +429,7 @@ public class RunnerTest {
 
         for (int i = 0; i < 13; i++) {
 
-            final TimeDuration delay;
+            final UnitDuration delay;
             final int unit = random.nextInt(4);
 
             switch (unit) {
@@ -454,7 +454,7 @@ public class RunnerTest {
             final TestRunExecution execution = new TestRunExecution(delay);
             executions.add(execution);
 
-            runner.run(execution, delay.time, delay.unit);
+            runner.run(execution, delay.value, delay.unit);
         }
 
         for (final TestRunExecution execution : executions) {
@@ -465,11 +465,11 @@ public class RunnerTest {
 
         executions.clear();
 
-        final ArrayList<TimeDuration> delays = new ArrayList<TimeDuration>();
+        final ArrayList<UnitDuration> delays = new ArrayList<UnitDuration>();
 
         for (int i = 0; i < 13; i++) {
 
-            final TimeDuration delay;
+            final UnitDuration delay;
             final int unit = random.nextInt(4);
 
             switch (unit) {
@@ -500,7 +500,7 @@ public class RunnerTest {
         final TestRecursiveExecution recursiveExecution =
                 new TestRecursiveExecution(runner, executions, delays, ZERO);
 
-        runner.run(recursiveExecution, ZERO.time, ZERO.unit);
+        runner.run(recursiveExecution, ZERO.value, ZERO.unit);
 
         for (final TestRunExecution execution : executions) {
 
@@ -531,15 +531,15 @@ public class RunnerTest {
 
     private static class TestRecursiveExecution extends TestRunExecution {
 
-        private final ArrayList<TimeDuration> mDelays;
+        private final ArrayList<UnitDuration> mDelays;
 
         private final ArrayList<TestRunExecution> mExecutions;
 
         private final Runner mRunner;
 
         public TestRecursiveExecution(final Runner runner,
-                final ArrayList<TestRunExecution> executions, final ArrayList<TimeDuration> delays,
-                final TimeDuration delay) {
+                final ArrayList<TestRunExecution> executions, final ArrayList<UnitDuration> delays,
+                final UnitDuration delay) {
 
             super(delay);
 
@@ -552,16 +552,16 @@ public class RunnerTest {
         public void run() {
 
             final ArrayList<TestRunExecution> executions = mExecutions;
-            final ArrayList<TimeDuration> delays = mDelays;
+            final ArrayList<UnitDuration> delays = mDelays;
             final Runner runner = mRunner;
             final int size = executions.size();
 
             for (int i = 0; i < size; i++) {
 
-                final TimeDuration delay = delays.get(i);
+                final UnitDuration delay = delays.get(i);
                 final TestRunExecution execution = executions.get(i);
 
-                runner.run(execution, delay.time, delay.unit);
+                runner.run(execution, delay.value, delay.unit);
             }
 
             super.run();
@@ -570,15 +570,15 @@ public class RunnerTest {
 
     private static class TestRunExecution implements Execution {
 
-        private final TimeDuration mDelay;
+        private final UnitDuration mDelay;
 
         private final Semaphore mSemaphore = new Semaphore(0);
 
-        private final Time mStartTime;
+        private final UnitTime mStartTime;
 
         private boolean mIsPassed;
 
-        public TestRunExecution(final TimeDuration delay) {
+        public TestRunExecution(final UnitDuration delay) {
 
             mStartTime = current();
             mDelay = delay;

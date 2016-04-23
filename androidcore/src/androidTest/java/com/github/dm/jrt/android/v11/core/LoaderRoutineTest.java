@@ -34,7 +34,7 @@ import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.InvocationClashException;
 import com.github.dm.jrt.android.core.invocation.InvocationTypeException;
 import com.github.dm.jrt.android.core.invocation.MissingLoaderException;
-import com.github.dm.jrt.android.core.invocation.PassingContextInvocation;
+import com.github.dm.jrt.android.core.invocation.IdentityContextInvocation;
 import com.github.dm.jrt.android.core.log.AndroidLogs;
 import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.android.core.runner.AndroidRunners;
@@ -469,7 +469,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         final UnitDuration timeout = seconds(10);
         final Routine<Object, Object> routine1 = JRoutineLoader.with(loaderFrom(getActivity()))
-                                                               .on(PassingContextInvocation
+                                                               .on(IdentityContextInvocation
                                                                        .factoryOf())
                                                                .buildRoutine();
         final Routine<Object, Object> routine2 = JRoutineLoader.with(loaderFrom(getActivity()))
@@ -960,7 +960,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         }
 
         final ContextInvocationFactory<Object, Object> factory =
-                PassingContextInvocation.factoryOf();
+                IdentityContextInvocation.factoryOf();
 
         try {
 
@@ -1302,7 +1302,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                   .findFragmentById(
                                                                           R.id.test_fragment);
         final Routine<Object, Object> routine1 = JRoutineLoader.with(loaderFrom(fragment))
-                                                               .on(PassingContextInvocation
+                                                               .on(IdentityContextInvocation
                                                                        .factoryOf())
                                                                .buildRoutine();
         final Routine<Object, Object> routine2 = JRoutineLoader.with(loaderFrom(fragment))
@@ -1662,7 +1662,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
 
         final UnitDuration timeout = seconds(10);
         final Routine<String, String> routine1 = JRoutineLoader.with(loaderFrom(getActivity()))
-                                                               .on(PassingContextInvocation
+                                                               .on(IdentityContextInvocation
                                                                        .<String>factoryOf())
                                                                .invocationConfiguration()
                                                                .withLog(AndroidLogs.androidLog())

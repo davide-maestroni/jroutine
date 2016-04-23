@@ -40,7 +40,7 @@ public class IdentityInvocation<DATA> extends OperationInvocation<DATA, DATA> {
     }
 
     /**
-     * Returns a factory of passing invocations.
+     * Returns a factory of identity invocations.
      *
      * @param <DATA> the data type.
      * @return the factory.

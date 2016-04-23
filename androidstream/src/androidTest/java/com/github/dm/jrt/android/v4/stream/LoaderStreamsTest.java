@@ -25,7 +25,7 @@ import com.github.dm.jrt.android.channel.ParcelableSelectable;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.MissingLoaderException;
-import com.github.dm.jrt.android.core.invocation.PassingContextInvocation;
+import com.github.dm.jrt.android.core.invocation.IdentityContextInvocation;
 import com.github.dm.jrt.android.v4.channel.SparseChannelsCompat;
 import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
@@ -188,7 +188,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
         final IOChannelBuilder builder = JRoutineCore.io();
         final ContextInvocationFactory<Object, Object> factory =
-                PassingContextInvocation.factoryOf();
+                IdentityContextInvocation.factoryOf();
         final Routine<Object, Object> routine =
                 JRoutineLoaderCompat.with(loaderFrom(getActivity())).on(factory).buildRoutine();
         IOChannel<String> channel1;
@@ -335,12 +335,12 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
         final InvocationChannel<String, String> channel1 =
                 JRoutineLoaderCompat.with(loaderFrom(getActivity()))
-                                    .on(PassingContextInvocation.<String>factoryOf())
+                                    .on(IdentityContextInvocation.<String>factoryOf())
                                     .asyncInvoke()
                                     .orderByCall();
         final InvocationChannel<Integer, Integer> channel2 =
                 JRoutineLoaderCompat.with(loaderFrom(getActivity()))
-                                    .on(PassingContextInvocation.<Integer>factoryOf())
+                                    .on(IdentityContextInvocation.<Integer>factoryOf())
                                     .asyncInvoke()
                                     .orderByCall();
         LoaderStreamsCompat.combine(channel1, channel2)
@@ -413,7 +413,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
         final IOChannelBuilder builder = JRoutineCore.io();
         final ContextInvocationFactory<Object, Object> factory =
-                PassingContextInvocation.factoryOf();
+                IdentityContextInvocation.factoryOf();
         final Routine<Object, Object> routine =
                 JRoutineLoaderCompat.with(loaderFrom(getActivity())).on(factory).buildRoutine();
         IOChannel<String> channel1;
@@ -537,12 +537,12 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
         final InvocationChannel<String, String> channel1 =
                 JRoutineLoaderCompat.with(loaderFrom(getActivity()))
-                                    .on(PassingContextInvocation.<String>factoryOf())
+                                    .on(IdentityContextInvocation.<String>factoryOf())
                                     .asyncInvoke()
                                     .orderByCall();
         final InvocationChannel<String, String> channel2 =
                 JRoutineLoaderCompat.with(loaderFrom(getActivity()))
-                                    .on(PassingContextInvocation.<String>factoryOf())
+                                    .on(IdentityContextInvocation.<String>factoryOf())
                                     .asyncInvoke()
                                     .orderByCall();
         LoaderStreamsCompat.distribute(channel1, channel2)
@@ -567,12 +567,12 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
 
         final InvocationChannel<String, String> channel1 =
                 JRoutineLoaderCompat.with(loaderFrom(getActivity()))
-                                    .on(PassingContextInvocation.<String>factoryOf())
+                                    .on(IdentityContextInvocation.<String>factoryOf())
                                     .asyncInvoke()
                                     .orderByCall();
         final InvocationChannel<String, String> channel2 =
                 JRoutineLoaderCompat.with(loaderFrom(getActivity()))
-                                    .on(PassingContextInvocation.<String>factoryOf())
+                                    .on(IdentityContextInvocation.<String>factoryOf())
                                     .asyncInvoke()
                                     .orderByCall();
         LoaderStreamsCompat.distribute((Object) null, channel1, channel2)

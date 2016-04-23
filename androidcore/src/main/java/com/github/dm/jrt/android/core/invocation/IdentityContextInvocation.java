@@ -27,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <DATA> the data type.
  */
-public class PassingContextInvocation<DATA> extends TemplateContextInvocation<DATA, DATA> {
+public class IdentityContextInvocation<DATA> extends TemplateContextInvocation<DATA, DATA> {
 
     private static final ContextInvocationFactory<Object, Object> sFactory =
             new ContextInvocationFactory<Object, Object>(null) {
@@ -36,19 +36,19 @@ public class PassingContextInvocation<DATA> extends TemplateContextInvocation<DA
                 @Override
                 public ContextInvocation<Object, Object> newInvocation() {
 
-                    return new PassingContextInvocation<Object>();
+                    return new IdentityContextInvocation<Object>();
                 }
             };
 
     /**
      * Avoid instantiation.
      */
-    private PassingContextInvocation() {
+    private IdentityContextInvocation() {
 
     }
 
     /**
-     * Returns a factory of passing invocations.
+     * Returns a factory of identity invocations.
      *
      * @param <DATA> the data type.
      * @return the factory.

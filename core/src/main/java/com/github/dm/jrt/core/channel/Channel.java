@@ -328,7 +328,17 @@ public interface Channel {
         @NotNull
         OutputChannel<OUT> bind(@NotNull OutputConsumer<? super OUT> consumer);
 
-        // TODO: 27/04/16 javadoc
+        /**
+         * Returns an iterator whose lifetime cannot exceed the set timeout.
+         *
+         * @return the iterator instance.
+         * @see #afterMax(UnitDuration)
+         * @see #afterMax(long, TimeUnit)
+         * @see #immediately()
+         * @see #eventuallyAbort(Throwable)
+         * @see #eventuallyExit()
+         * @see #eventuallyThrow()
+         */
         @NotNull
         Iterator<OUT> eventualIterator();
 

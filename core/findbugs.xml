@@ -11,6 +11,11 @@
         <Bug pattern="IT_NO_SUCH_ELEMENT"/>
     </Match>
     <Match>
+        <Class name="com.github.dm.jrt.core.DefaultResultChannel$EventualIterator"/>
+        <Method name="next"/>
+        <Bug pattern="IT_NO_SUCH_ELEMENT"/>
+    </Match>
+    <Match>
         <Class name="com.github.dm.jrt.core.util.UnitDuration"/>
         <Or>
             <Method name="wait"/>

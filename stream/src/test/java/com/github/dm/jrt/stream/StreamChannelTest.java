@@ -50,6 +50,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -148,7 +149,7 @@ public class StreamChannelTest {
 
         }
 
-        assertThat(channel.skip(1).next(1)).containsExactly("test2");
+        assertThat(channel.skipNext(1).next(1)).containsExactly("test2");
         assertThat(channel.eventuallyExit().next(4)).containsExactly("test3");
         assertThat(channel.eventuallyExit().nextOrElse("test4")).isEqualTo("test4");
 
@@ -212,7 +213,7 @@ public class StreamChannelTest {
     }
 
     @Test
-    public void testColect() {
+    public void testCollect() {
 
         assertThat(Streams.streamOf(new StringBuilder("test1"), new StringBuilder("test2"),
                 new StringBuilder("test3"))
@@ -257,11 +258,38 @@ public class StreamChannelTest {
     }
 
     @Test
+    public void testCollectCollection() {
+
+        assertThat(Streams.streamOf("test1", "test2", "test3")
+                          .async()
+                          .collect(new Supplier<List<String>>() {
+
+                              public List<String> get() {
+
+                                  return new ArrayList<String>();
+                              }
+                          })
+                          .afterMax(seconds(3))
+                          .next()).containsExactly("test1", "test2", "test3");
+        assertThat(Streams.streamOf("test1", "test2", "test3")
+                          .sync()
+                          .collect(new Supplier<List<String>>() {
+
+                              public List<String> get() {
+
+                                  return new ArrayList<String>();
+                              }
+                          })
+                          .afterMax(seconds(3))
+                          .next()).containsExactly("test1", "test2", "test3");
+    }
+
+    @Test
     @SuppressWarnings("ConstantConditions")
-    public void testCollectNullPointerError() {
+    public void testCollectCollectionNullPointerError() {
 
         try {
-            Streams.streamOf().async().collect(null);
+            Streams.streamOf().async().collect((Supplier<Collection<Object>>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -269,7 +297,28 @@ public class StreamChannelTest {
         }
 
         try {
-            Streams.streamOf().sync().collect(null);
+            Streams.streamOf().sync().collect((Supplier<Collection<Object>>) null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @Test
+    @SuppressWarnings("ConstantConditions")
+    public void testCollectNullPointerError() {
+
+        try {
+            Streams.streamOf().async().collect((BiConsumer<Object, Object>) null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+            Streams.streamOf().sync().collect((BiConsumer<Object, Object>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -595,6 +644,19 @@ public class StreamChannelTest {
     }
 
     @Test
+    public void testCount() {
+
+        assertThat(Streams.streamOf()
+                          .sync()
+                          .then(range(1, 10))
+                          .async()
+                          .count()
+                          .afterMax(seconds(3))
+                          .next()).isEqualTo(10);
+        assertThat(Streams.streamOf().count().afterMax(seconds(3)).next()).isEqualTo(0);
+    }
+
+    @Test
     public void testFilter() {
 
         assertThat(Streams.streamOf(null, "test")
@@ -831,6 +893,39 @@ public class StreamChannelTest {
         } catch (final NullPointerException ignored) {
 
         }
+    }
+
+    @Test
+    public void testLimit() {
+
+        assertThat(Streams.streamOf()
+                          .sync()
+                          .then(range(1, 10))
+                          .async()
+                          .limit(5)
+                          .afterMax(seconds(3))
+                          .all()).isEqualTo(Arrays.asList(1, 2, 3, 4, 5));
+        assertThat(Streams.streamOf()
+                          .sync()
+                          .then(range(1, 10))
+                          .async()
+                          .limit(0)
+                          .afterMax(seconds(3))
+                          .all()).isEmpty();
+        assertThat(Streams.streamOf()
+                          .sync()
+                          .then(range(1, 10))
+                          .async()
+                          .limit(15)
+                          .afterMax(seconds(3))
+                          .all()).isEqualTo(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+        assertThat(Streams.streamOf()
+                          .sync()
+                          .then(range(1, 10))
+                          .async()
+                          .limit(0)
+                          .afterMax(seconds(3))
+                          .all()).isEmpty();
     }
 
     @Test
@@ -1778,6 +1873,32 @@ public class StreamChannelTest {
 
             assertThat(e.getCause()).isExactlyInstanceOf(NullPointerException.class);
         }
+    }
+
+    @Test
+    public void testSkip() {
+
+        assertThat(Streams.streamOf()
+                          .sync()
+                          .then(range(1, 10))
+                          .async()
+                          .skip(5)
+                          .afterMax(seconds(3))
+                          .all()).isEqualTo(Arrays.asList(6, 7, 8, 9, 10));
+        assertThat(Streams.streamOf()
+                          .sync()
+                          .then(range(1, 10))
+                          .async()
+                          .skip(15)
+                          .afterMax(seconds(3))
+                          .all()).isEmpty();
+        assertThat(Streams.streamOf()
+                          .sync()
+                          .then(range(1, 10))
+                          .async()
+                          .skip(0)
+                          .afterMax(seconds(3))
+                          .all()).isEqualTo(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
     }
 
     @Test

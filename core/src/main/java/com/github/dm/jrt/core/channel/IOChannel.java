@@ -156,7 +156,7 @@ public interface IOChannel<DATA> extends InputChannel<DATA>, OutputChannel<DATA>
      * {@inheritDoc}
      */
     @NotNull
-    IOChannel<DATA> skip(int count);
+    IOChannel<DATA> skipNext(int count);
 
     /**
      * Returns this channel as an input one.

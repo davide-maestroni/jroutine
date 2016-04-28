@@ -56,7 +56,7 @@ import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.function.Functions.wrap;
 import static com.github.dm.jrt.stream.Streams.range;
-import static com.github.dm.jrt.stream.Streams.series;
+import static com.github.dm.jrt.stream.Streams.sequence;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -375,6 +375,20 @@ public class StreamsTest {
                           .buildChannels()
                           .all()).containsExactly("test4", "test5", "test6", "test1", "test2",
                 "test3");
+    }
+
+    @Test
+    public void testCount() {
+
+        assertThat(Streams.streamOf()
+                          .sync()
+                          .then(range(1, 10))
+                          .async()
+                          .map(Streams.count())
+                          .afterMax(seconds(3))
+                          .next()).isEqualTo(10);
+        assertThat(Streams.streamOf().map(Streams.count()).afterMax(seconds(3)).next()).isEqualTo(
+                0);
     }
 
     @Test
@@ -2006,7 +2020,7 @@ public class StreamsTest {
 
         assertThat(Streams.streamOf()
                           .async()
-                          .then(series('a', 5, new BiFunction<Character, Long, Character>() {
+                          .then(sequence('a', 5, new BiFunction<Character, Long, Character>() {
 
                               public Character apply(final Character character, final Long n) {
 
@@ -2018,7 +2032,7 @@ public class StreamsTest {
         assertThat(Streams.streamOf()
                           .ordered(OrderType.BY_CALL)
                           .parallel()
-                          .then(series('a', 5, new BiFunction<Character, Long, Character>() {
+                          .then(sequence('a', 5, new BiFunction<Character, Long, Character>() {
 
                               public Character apply(final Character character, final Long n) {
 
@@ -2029,7 +2043,7 @@ public class StreamsTest {
                           .all()).containsExactly('a', 'b', 'c', 'd', 'e');
         assertThat(Streams.streamOf()
                           .sync()
-                          .then(series('a', 5, new BiFunction<Character, Long, Character>() {
+                          .then(sequence('a', 5, new BiFunction<Character, Long, Character>() {
 
                               public Character apply(final Character character, final Long n) {
 
@@ -2043,14 +2057,14 @@ public class StreamsTest {
     public void testSeriesEquals() {
 
         final Consumer<InputChannel<Integer>> series1 =
-                Streams.series(1, 10, Functions.<Integer, Long>first());
+                Streams.sequence(1, 10, Functions.<Integer, Long>first());
         assertThat(series1).isEqualTo(series1);
         assertThat(series1).isNotEqualTo(null);
         assertThat(series1).isNotEqualTo("test");
-        assertThat(series1).isNotEqualTo(Streams.series(1, 9, Functions.<Integer, Long>first()));
-        assertThat(series1).isEqualTo(Streams.series(1, 10, Functions.<Integer, Long>first()));
+        assertThat(series1).isNotEqualTo(Streams.sequence(1, 9, Functions.<Integer, Long>first()));
+        assertThat(series1).isEqualTo(Streams.sequence(1, 10, Functions.<Integer, Long>first()));
         assertThat(series1.hashCode()).isEqualTo(
-                Streams.series(1, 10, Functions.<Integer, Long>first()).hashCode());
+                Streams.sequence(1, 10, Functions.<Integer, Long>first()).hashCode());
     }
 
     @Test
@@ -2058,7 +2072,7 @@ public class StreamsTest {
     public void testSeriesError() {
 
         try {
-            Streams.series(null, 2, new BiFunction<Character, Long, Character>() {
+            Streams.sequence(null, 2, new BiFunction<Character, Long, Character>() {
 
                 public Character apply(final Character character, final Long n) {
 
@@ -2072,7 +2086,7 @@ public class StreamsTest {
         }
 
         try {
-            Streams.series('a', 2, null);
+            Streams.sequence('a', 2, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -2080,7 +2094,7 @@ public class StreamsTest {
         }
 
         try {
-            Streams.series(1, -1, Functions.<Integer, Long>first());
+            Streams.sequence(1, -1, Functions.<Integer, Long>first());
             fail();
 
         } catch (final IllegalArgumentException ignored) {
@@ -2233,17 +2247,16 @@ public class StreamsTest {
             switch (selectable.index) {
 
                 case INTEGER:
-                    Channels.<Object, Integer>select(result, INTEGER)
-                            .buildChannels()
-                            .pass(selectable.<Integer>data())
-                            .close();
+                    Channels.<Object, Integer>select(result, INTEGER).buildChannels()
+                                                                     .pass(selectable
+                                                                             .<Integer>data())
+                                                                     .close();
                     break;
 
                 case STRING:
-                    Channels.<Object, String>select(result, STRING)
-                            .buildChannels()
-                            .pass(selectable.<String>data())
-                            .close();
+                    Channels.<Object, String>select(result, STRING).buildChannels()
+                                                                   .pass(selectable.<String>data())
+                                                                   .close();
                     break;
             }
         }

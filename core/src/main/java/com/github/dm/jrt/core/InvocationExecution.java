@@ -300,7 +300,9 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
         public void onError(@NotNull final Throwable error) {
 
             synchronized (mMutex) {
-                mResultChannel.close(error);
+                final DefaultResultChannel<OUT> resultChannel = mResultChannel;
+                resultChannel.stopWaitingInvocation();
+                resultChannel.close(error);
             }
         }
 
@@ -336,7 +338,9 @@ class InvocationExecution<IN, OUT> implements Execution, InvocationObserver<IN, 
     public void onError(@NotNull final Throwable error) {
 
         synchronized (mMutex) {
-            mResultChannel.close(error);
+            final DefaultResultChannel<OUT> resultChannel = mResultChannel;
+            resultChannel.stopWaitingInvocation();
+            resultChannel.close(error);
         }
     }
 }

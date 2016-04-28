@@ -264,9 +264,8 @@ public class UnitTime implements Comparable<UnitTime> {
     @Override
     public int hashCode() {
 
-        int result = (int) (value ^ (value >>> 32));
-        result = 31 * result + unit.hashCode();
-        return result;
+        final long value = toNanos();
+        return (int) (value ^ (value >>> 32));
     }
 
     @Override

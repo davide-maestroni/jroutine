@@ -193,6 +193,14 @@ class RepeatedChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
     }
 
     @NotNull
+    public Iterator<OUT> eventualIterator() {
+
+        synchronized (mMutex) {
+            return mOutputChannel.eventualIterator();
+        }
+    }
+
+    @NotNull
     public OutputChannel<OUT> eventuallyAbort() {
 
         synchronized (mMutex) {
@@ -287,9 +295,9 @@ class RepeatedChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
     }
 
     @NotNull
-    public OutputChannel<OUT> skip(final int count) {
+    public OutputChannel<OUT> skipNext(final int count) {
 
-        mOutputChannel.skip(count);
+        mOutputChannel.skipNext(count);
         return this;
     }
 

@@ -328,6 +328,10 @@ public interface Channel {
         @NotNull
         OutputChannel<OUT> bind(@NotNull OutputConsumer<? super OUT> consumer);
 
+        // TODO: 27/04/16 javadoc
+        @NotNull
+        Iterator<OUT> eventualIterator();
+
         /**
          * Tells the channel to abort the invocation execution in case, after a read method is
          * invoked, no result is available before the timeout has elapsed.
@@ -601,7 +605,7 @@ public interface Channel {
          * @see #eventuallyThrow()
          */
         @NotNull
-        OutputChannel<OUT> skip(int count);
+        OutputChannel<OUT> skipNext(int count);
 
         /**
          * Throws the invocation error or abort exception, if the invocation is aborted, waiting at

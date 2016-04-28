@@ -2514,14 +2514,14 @@ public class RoutineTest {
         assertThat(JRoutineCore.on(IdentityInvocation.factoryOf())
                                .asyncCall("test1", "test2", "test3", "test4")
                                .afterMax(seconds(1))
-                               .skip(2)
+                               .skipNext(2)
                                .all()).containsExactly("test3", "test4");
 
         assertThat(JRoutineCore.on(IdentityInvocation.factoryOf())
                                .asyncCall("test1")
                                .eventuallyExit()
                                .afterMax(seconds(1))
-                               .skip(2)
+                               .skipNext(2)
                                .all()).isEmpty();
 
         try {
@@ -2530,7 +2530,7 @@ public class RoutineTest {
                         .asyncCall("test1")
                         .eventuallyAbort()
                         .afterMax(seconds(1))
-                        .skip(2);
+                        .skipNext(2);
 
             fail();
 
@@ -2544,7 +2544,7 @@ public class RoutineTest {
                         .asyncCall("test1")
                         .eventuallyAbort(new IllegalStateException())
                         .afterMax(seconds(1))
-                        .skip(2);
+                        .skipNext(2);
 
             fail();
 
@@ -2559,7 +2559,7 @@ public class RoutineTest {
                         .asyncCall("test1")
                         .eventuallyThrow()
                         .afterMax(seconds(1))
-                        .skip(2);
+                        .skipNext(2);
 
             fail();
 

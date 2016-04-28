@@ -259,9 +259,9 @@ class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel<OUT>
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> skip(final int count) {
+    public LoaderStreamChannelCompat<OUT> skipNext(final int count) {
 
-        return (LoaderStreamChannelCompat<OUT>) super.skip(count);
+        return (LoaderStreamChannelCompat<OUT>) super.skipNext(count);
     }
 
     @NotNull
@@ -299,6 +299,15 @@ class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel<OUT>
 
     @NotNull
     @Override
+    public <AFTER extends Collection<? super OUT>> LoaderStreamChannelCompat<AFTER> collect(
+            @NotNull final Supplier<? extends AFTER> supplier) {
+
+        checkStatic(wrap(supplier), supplier);
+        return (LoaderStreamChannelCompat<AFTER>) super.collect(supplier);
+    }
+
+    @NotNull
+    @Override
     public <AFTER> LoaderStreamChannelCompat<AFTER> collect(
             @NotNull final Supplier<? extends AFTER> supplier,
             @NotNull final BiConsumer<? super AFTER, ? super OUT> consumer) {
@@ -306,6 +315,13 @@ class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel<OUT>
         checkStatic(wrap(supplier), supplier);
         checkStatic(wrap(consumer), consumer);
         return (LoaderStreamChannelCompat<AFTER>) super.collect(supplier, consumer);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannelCompat<Long> count() {
+
+        return (LoaderStreamChannelCompat<Long>) super.count();
     }
 
     @NotNull
@@ -334,6 +350,13 @@ class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel<OUT>
         final InvocationConfiguration config = getConfiguration();
         return new InvocationConfiguration.Builder<LoaderStreamChannelCompat<OUT>>(
                 mInvocationConfigurable, config);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannelCompat<OUT> limit(final int count) {
+
+        return (LoaderStreamChannelCompat<OUT>) super.limit(count);
     }
 
     @NotNull
@@ -486,6 +509,13 @@ class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel<OUT>
     public LoaderStreamChannelCompat<OUT> serial() {
 
         return (LoaderStreamChannelCompat<OUT>) super.serial();
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannelCompat<OUT> skip(final int count) {
+
+        return (LoaderStreamChannelCompat<OUT>) super.skip(count);
     }
 
     @NotNull

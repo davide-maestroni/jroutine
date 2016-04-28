@@ -53,6 +53,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -126,6 +127,34 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                    })
                                    .afterMax(seconds(3))
                                    .all()).containsExactly("test1test2test3");
+    }
+
+    private static void testCollectCollection(@NotNull final FragmentActivity activity) {
+
+        assertThat(LoaderStreamsCompat.streamOf("test1", "test2", "test3")
+                                      .with(loaderFrom(activity))
+                                      .async()
+                                      .collect(new Supplier<List<String>>() {
+
+                                          public List<String> get() {
+
+                                              return new ArrayList<String>();
+                                          }
+                                      })
+                                      .afterMax(seconds(3))
+                                      .next()).containsExactly("test1", "test2", "test3");
+        assertThat(LoaderStreamsCompat.streamOf("test1", "test2", "test3")
+                                      .with(loaderFrom(activity))
+                                      .sync()
+                                      .collect(new Supplier<List<String>>() {
+
+                                          public List<String> get() {
+
+                                              return new ArrayList<String>();
+                                          }
+                                      })
+                                      .afterMax(seconds(3))
+                                      .next()).containsExactly("test1", "test2", "test3");
     }
 
     private static void testCollectSeed(@NotNull final FragmentActivity activity) {
@@ -1070,7 +1099,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
 
         }
 
-        assertThat(channel.skip(1).next(1)).containsExactly("test2");
+        assertThat(channel.skipNext(1).next(1)).containsExactly("test2");
         assertThat(channel.eventuallyExit().next(4)).containsExactly("test3");
         assertThat(channel.eventuallyExit().nextOrElse("test4")).isEqualTo("test4");
         final Iterator<String> iterator = LoaderStreamsCompat.streamOf("test1", "test2", "test3")
@@ -1127,11 +1156,19 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         testCollect(getActivity());
     }
 
+    public void testCollectCollection() {
+
+        testCollectCollection(getActivity());
+    }
+
     @SuppressWarnings("ConstantConditions")
-    public void testCollectNullPointerError() {
+    public void testCollectCollectionNullPointerError() {
 
         try {
-            LoaderStreamsCompat.streamOf().with(loaderFrom(getActivity())).async().collect(null);
+            LoaderStreamsCompat.streamOf()
+                               .async()
+                               .with(loaderFrom(getActivity()))
+                               .collect((Supplier<Collection<Object>>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -1139,7 +1176,36 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         }
 
         try {
-            LoaderStreamsCompat.streamOf().with(loaderFrom(getActivity())).sync().collect(null);
+            LoaderStreamsCompat.streamOf()
+                               .sync()
+                               .with(loaderFrom(getActivity()))
+                               .collect((Supplier<Collection<Object>>) null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public void testCollectNullPointerError() {
+
+        try {
+            LoaderStreamsCompat.streamOf()
+                               .with(loaderFrom(getActivity()))
+                               .async()
+                               .collect((BiConsumer<Object, Object>) null);
+            fail();
+
+        } catch (final NullPointerException ignored) {
+
+        }
+
+        try {
+            LoaderStreamsCompat.streamOf()
+                               .with(loaderFrom(getActivity()))
+                               .sync()
+                               .collect((BiConsumer<Object, Object>) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -1230,6 +1296,23 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         } catch (final NullPointerException ignored) {
 
         }
+    }
+
+    public void testCount() {
+
+        assertThat(LoaderStreamsCompat.streamOf()
+                                      .sync()
+                                      .then(range(1, 10))
+                                      .with(loaderFrom(getActivity()))
+                                      .async()
+                                      .count()
+                                      .afterMax(seconds(3))
+                                      .next()).isEqualTo(10);
+        assertThat(LoaderStreamsCompat.streamOf()
+                                      .with(loaderFrom(getActivity()))
+                                      .count()
+                                      .afterMax(seconds(3))
+                                      .next()).isEqualTo(0);
     }
 
     public void testFilter() {
@@ -1375,6 +1458,43 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         } catch (final NullPointerException ignored) {
 
         }
+    }
+
+    public void testLimit() {
+
+        assertThat(LoaderStreamsCompat.streamOf()
+                                      .sync()
+                                      .then(range(1, 10))
+                                      .with(loaderFrom(getActivity()))
+                                      .async()
+                                      .limit(5)
+                                      .afterMax(seconds(3))
+                                      .all()).isEqualTo(Arrays.asList(1, 2, 3, 4, 5));
+        assertThat(LoaderStreamsCompat.streamOf()
+                                      .sync()
+                                      .then(range(1, 10))
+                                      .with(loaderFrom(getActivity()))
+                                      .async()
+                                      .limit(0)
+                                      .afterMax(seconds(3))
+                                      .all()).isEmpty();
+        assertThat(LoaderStreamsCompat.streamOf()
+                                      .sync()
+                                      .then(range(1, 10))
+                                      .with(loaderFrom(getActivity()))
+                                      .async()
+                                      .limit(15)
+                                      .afterMax(seconds(3))
+                                      .all()).isEqualTo(
+                Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+        assertThat(LoaderStreamsCompat.streamOf()
+                                      .sync()
+                                      .then(range(1, 10))
+                                      .with(loaderFrom(getActivity()))
+                                      .async()
+                                      .limit(0)
+                                      .afterMax(seconds(3))
+                                      .all()).isEmpty();
     }
 
     public void testMapAllConsumer() {
@@ -2069,6 +2189,35 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         } catch (final RoutineException e) {
             assertThat(e.getCause()).isExactlyInstanceOf(NullPointerException.class);
         }
+    }
+
+    public void testSkip() {
+
+        assertThat(LoaderStreamsCompat.streamOf()
+                                      .sync()
+                                      .then(range(1, 10))
+                                      .with(loaderFrom(getActivity()))
+                                      .async()
+                                      .skip(5)
+                                      .afterMax(seconds(3))
+                                      .all()).isEqualTo(Arrays.asList(6, 7, 8, 9, 10));
+        assertThat(LoaderStreamsCompat.streamOf()
+                                      .sync()
+                                      .then(range(1, 10))
+                                      .with(loaderFrom(getActivity()))
+                                      .async()
+                                      .skip(15)
+                                      .afterMax(seconds(3))
+                                      .all()).isEmpty();
+        assertThat(LoaderStreamsCompat.streamOf()
+                                      .sync()
+                                      .then(range(1, 10))
+                                      .with(loaderFrom(getActivity()))
+                                      .async()
+                                      .skip(0)
+                                      .afterMax(seconds(3))
+                                      .all()).isEqualTo(
+                Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
     }
 
     public void testThen() {

@@ -124,7 +124,7 @@ public interface LoaderStreamChannel<OUT>
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannel<OUT> skip(int count);
+    LoaderStreamChannel<OUT> skipNext(int count);
 
     /**
      * {@inheritDoc}
@@ -156,8 +156,21 @@ public interface LoaderStreamChannel<OUT>
      * {@inheritDoc}
      */
     @NotNull
+    <AFTER extends Collection<? super OUT>> LoaderStreamChannel<AFTER> collect(
+            @NotNull Supplier<? extends AFTER> supplier);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
     <AFTER> LoaderStreamChannel<AFTER> collect(@NotNull Supplier<? extends AFTER> supplier,
             @NotNull BiConsumer<? super AFTER, ? super OUT> consumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    LoaderStreamChannel<Long> count();
 
     /**
      * {@inheritDoc}
@@ -177,6 +190,12 @@ public interface LoaderStreamChannel<OUT>
      */
     @NotNull
     InvocationConfiguration.Builder<? extends LoaderStreamChannel<OUT>> invocationConfiguration();
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    LoaderStreamChannel<OUT> limit(int count);
 
     /**
      * {@inheritDoc}
@@ -292,6 +311,12 @@ public interface LoaderStreamChannel<OUT>
      */
     @NotNull
     LoaderStreamChannel<OUT> serial();
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    LoaderStreamChannel<OUT> skip(int count);
 
     /**
      * {@inheritDoc}

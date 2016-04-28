@@ -114,10 +114,12 @@ public interface StreamChannel<OUT>
     StreamChannel<OUT> immediately();
 
     /**
-     * {@inheritDoc}
+     * {@inheritDoc}.
      */
     @NotNull
-    StreamChannel<OUT> skip(int count);
+    StreamChannel<OUT> skipNext(int count);
+
+    // TODO: 26/04/16 match*
 
     /**
      * Makes the stream asynchronous, that is, the concatenated routines will be invoked in
@@ -193,6 +195,23 @@ public interface StreamChannel<OUT>
     StreamChannel<OUT> collect(@NotNull BiConsumer<? super OUT, ? super OUT> consumer);
 
     /**
+     * Concatenates a stream accumulating the outputs by adding them to the collections returned by
+     * the specified supplier to this one.
+     * <br>
+     * The accumulated value will be passed as result only when the outputs complete.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     * <br>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param supplier the supplier of collections.
+     * @return the concatenated stream.
+     */
+    @NotNull
+    <AFTER extends Collection<? super OUT>> StreamChannel<AFTER> collect(
+            @NotNull Supplier<? extends AFTER> supplier);
+
+    /**
      * Concatenates a stream based on the specified accumulating consumer to this one.
      * <br>
      * The output will be computed as follows, where the initial accumulated value will be the
@@ -217,6 +236,18 @@ public interface StreamChannel<OUT>
     @NotNull
     <AFTER> StreamChannel<AFTER> collect(@NotNull Supplier<? extends AFTER> supplier,
             @NotNull BiConsumer<? super AFTER, ? super OUT> consumer);
+
+    /**
+     * Concatenates a stream counting the number of outputs.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     * <br>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @return the concatenated stream.
+     */
+    @NotNull
+    StreamChannel<Long> count();
 
     /**
      * Concatenates a stream based on the specified predicate to this one.
@@ -262,6 +293,20 @@ public interface StreamChannel<OUT>
      */
     @NotNull
     Builder<? extends StreamChannel<OUT>> invocationConfiguration();
+
+    /**
+     * Concatenates a stream limiting the maximum number of outputs to the specified count.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     * <br>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param count the maximum number of outputs.
+     * @return the concatenated stream.
+     * @throws java.lang.IllegalArgumentException if the count is negative.
+     */
+    @NotNull
+    StreamChannel<OUT> limit(int count);
 
     /**
      * Concatenates a stream based on the specified mapping consumer to this one.
@@ -526,6 +571,20 @@ public interface StreamChannel<OUT>
      */
     @NotNull
     StreamChannel<OUT> serial();
+
+    /**
+     * Concatenates a stream skipping the specified number of outputs.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     * <br>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param count the number of outputs to skip.
+     * @return the concatenated stream.
+     * @throws java.lang.IllegalArgumentException if the count is negative.
+     */
+    @NotNull
+    StreamChannel<OUT> skip(int count);
 
     /**
      * Gets the invocation configuration builder related to the whole stream.

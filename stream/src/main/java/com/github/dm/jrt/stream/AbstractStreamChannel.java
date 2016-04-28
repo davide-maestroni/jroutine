@@ -84,6 +84,15 @@ public abstract class AbstractStreamChannel<OUT>
         }
     };
 
+    private static final BiConsumer<? extends Collection<?>, ?> sCollectConsumer =
+            new BiConsumer<Collection<Object>, Object>() {
+
+                public void accept(final Collection<Object> outs, final Object out) {
+
+                    outs.add(out);
+                }
+            };
+
     private final Binder mBinder;
 
     private final OutputChannel<OUT> mChannel;
@@ -214,10 +223,10 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
-    public StreamChannel<OUT> skip(final int count) {
+    public StreamChannel<OUT> skipNext(final int count) {
 
         mBinder.bind();
-        mChannel.skip(count);
+        mChannel.skipNext(count);
         return this;
     }
 
@@ -253,10 +262,24 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
+    @SuppressWarnings("unchecked")
+    public <AFTER extends Collection<? super OUT>> StreamChannel<AFTER> collect(
+            @NotNull final Supplier<? extends AFTER> supplier) {
+
+        return collect(supplier, (BiConsumer<? super AFTER, ? super OUT>) sCollectConsumer);
+    }
+
+    @NotNull
     public <AFTER> StreamChannel<AFTER> collect(@NotNull final Supplier<? extends AFTER> supplier,
             @NotNull final BiConsumer<? super AFTER, ? super OUT> consumer) {
 
         return map(AccumulateConsumerInvocation.consumerFactory(supplier, consumer));
+    }
+
+    @NotNull
+    public StreamChannel<Long> count() {
+
+        return map(new CountInvocationFactory());
     }
 
     @NotNull
@@ -277,6 +300,12 @@ public abstract class AbstractStreamChannel<OUT>
     public Builder<? extends StreamChannel<OUT>> invocationConfiguration() {
 
         return new Builder<StreamChannel<OUT>>(this, mConfiguration);
+    }
+
+    @NotNull
+    public StreamChannel<OUT> limit(final int count) {
+
+        return map(new LimitInvocationFactory<OUT>(count));
     }
 
     @NotNull
@@ -437,6 +466,12 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
+    public StreamChannel<OUT> skip(final int count) {
+
+        return map(new SkipInvocationFactory<OUT>(count));
+    }
+
+    @NotNull
     public Builder<? extends StreamChannel<OUT>> streamInvocationConfiguration() {
 
         return new Builder<StreamChannel<OUT>>(mStreamConfigurable, getStreamConfiguration());
@@ -572,6 +607,13 @@ public abstract class AbstractStreamChannel<OUT>
 
         mBinder.bind();
         return mChannel.bind(channel);
+    }
+
+    @NotNull
+    public Iterator<OUT> eventualIterator() {
+
+        mBinder.bind();
+        return mChannel.eventualIterator();
     }
 
     @Nullable

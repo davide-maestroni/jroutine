@@ -185,6 +185,12 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA> {
     }
 
     @NotNull
+    public Iterator<DATA> eventualIterator() {
+
+        return mOutputChannel.eventualIterator();
+    }
+
+    @NotNull
     public IOChannel<DATA> eventuallyAbort() {
 
         mOutputChannel.eventuallyAbort();
@@ -220,9 +226,9 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA> {
     }
 
     @NotNull
-    public IOChannel<DATA> skip(final int count) {
+    public IOChannel<DATA> skipNext(final int count) {
 
-        mOutputChannel.skip(count);
+        mOutputChannel.skipNext(count);
         return this;
     }
 

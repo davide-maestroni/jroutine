@@ -50,6 +50,7 @@ import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.function.Wrapper;
 import com.github.dm.jrt.stream.AbstractStreamChannel;
+import com.github.dm.jrt.stream.StreamChannel;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -247,9 +248,9 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
 
     @NotNull
     @Override
-    public LoaderStreamChannel<OUT> skip(final int count) {
+    public LoaderStreamChannel<OUT> skipNext(final int count) {
 
-        return (LoaderStreamChannel<OUT>) super.skip(count);
+        return (LoaderStreamChannel<OUT>) super.skipNext(count);
     }
 
     @NotNull
@@ -287,6 +288,15 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
 
     @NotNull
     @Override
+    public <AFTER extends Collection<? super OUT>> LoaderStreamChannel<AFTER> collect(
+            @NotNull final Supplier<? extends AFTER> supplier) {
+
+        checkStatic(wrap(supplier), supplier);
+        return (LoaderStreamChannel<AFTER>) super.collect(supplier);
+    }
+
+    @NotNull
+    @Override
     public <AFTER> LoaderStreamChannel<AFTER> collect(
             @NotNull final Supplier<? extends AFTER> supplier,
             @NotNull final BiConsumer<? super AFTER, ? super OUT> consumer) {
@@ -294,6 +304,13 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
         checkStatic(wrap(supplier), supplier);
         checkStatic(wrap(consumer), consumer);
         return (LoaderStreamChannel<AFTER>) super.collect(supplier, consumer);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannel<Long> count() {
+
+        return (LoaderStreamChannel<Long>) super.count();
     }
 
     @NotNull
@@ -322,6 +339,13 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
         final InvocationConfiguration config = getConfiguration();
         return new InvocationConfiguration.Builder<LoaderStreamChannel<OUT>>(
                 mInvocationConfigurable, config);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannel<OUT> limit(final int count) {
+
+        return (LoaderStreamChannel<OUT>) super.limit(count);
     }
 
     @NotNull
@@ -474,6 +498,13 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
     public LoaderStreamChannel<OUT> serial() {
 
         return (LoaderStreamChannel<OUT>) super.serial();
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannel<OUT> skip(final int count) {
+
+        return (LoaderStreamChannel<OUT>) super.skip(count);
     }
 
     @NotNull

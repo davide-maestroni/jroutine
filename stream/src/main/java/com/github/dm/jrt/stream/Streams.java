@@ -50,15 +50,17 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 public class Streams extends Functions {
 
-    private static final BiConsumer<? extends Iterable<?>, ? extends InputChannel<?>> sUnfold =
-            new BiConsumer<Iterable<?>, InputChannel<?>>() {
+    private static final CountInvocationFactory sCountFactory = new CountInvocationFactory();
 
-                @SuppressWarnings("unchecked")
-                public void accept(final Iterable<?> objects, final InputChannel<?> inputChannel) {
+    private static final BiConsumer<? extends Iterable<?>, ? extends InputChannel<?>>
+            sUnfoldConsumer = new BiConsumer<Iterable<?>, InputChannel<?>>() {
 
-                    inputChannel.pass((Iterable) objects);
-                }
-            };
+        @SuppressWarnings("unchecked")
+        public void accept(final Iterable<?> objects, final InputChannel<?> inputChannel) {
+
+            inputChannel.pass((Iterable) objects);
+        }
+    };
 
     /**
      * Avoid explicit instantiation.
@@ -66,6 +68,8 @@ public class Streams extends Functions {
     protected Streams() {
 
     }
+
+    // TODO: 26/04/16 match*
 
     /**
      * Returns a builder of streams blending the outputs coming from the specified channels.
@@ -267,6 +271,19 @@ public class Streams extends Functions {
             @NotNull final OutputChannel<?>... channels) {
 
         return new BuilderWrapper<OUT>(Channels.<OUT>concat(channels));
+    }
+
+    /**
+     * Returns an factory of invocations counting the number of outputs.
+     *
+     * @param <IN> the input data type.
+     * @return the invocation factory.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <IN> InvocationFactory<IN, Long> count() {
+
+        return (InvocationFactory<IN, Long>) sCountFactory;
     }
 
     /**
@@ -1024,12 +1041,12 @@ public class Streams extends Functions {
     }
 
     /**
-     * Returns a consumer generating the specified series of data.
+     * Returns a consumer generating the specified sequence of data.
      * <br>
      * The generated data will start from the specified first and will produce the specified number
      * of elements, by computing each next one through the specified function.
      *
-     * @param start   the first element of the series.
+     * @param start   the first element of the sequence.
      * @param count   the number of generated elements.
      * @param next    the function computing the next element.
      * @param <AFTER> the concatenation output type.
@@ -1037,10 +1054,10 @@ public class Streams extends Functions {
      * @throws java.lang.IllegalArgumentException if the count is not positive.
      */
     @NotNull
-    public static <AFTER> Consumer<InputChannel<AFTER>> series(@NotNull final AFTER start,
+    public static <AFTER> Consumer<InputChannel<AFTER>> sequence(@NotNull final AFTER start,
             final long count, @NotNull final BiFunction<AFTER, Long, AFTER> next) {
 
-        return new SeriesConsumer<AFTER>(start, count, wrap(next));
+        return new SequenceConsumer<AFTER>(start, count, wrap(next));
     }
 
     /**
@@ -1190,7 +1207,7 @@ public class Streams extends Functions {
     @SuppressWarnings("unchecked")
     public static <OUT> BiConsumer<Iterable<OUT>, InputChannel<OUT>> unfold() {
 
-        return (BiConsumer<Iterable<OUT>, InputChannel<OUT>>) sUnfold;
+        return (BiConsumer<Iterable<OUT>, InputChannel<OUT>>) sUnfoldConsumer;
     }
 
     @NotNull
@@ -1478,11 +1495,11 @@ public class Streams extends Functions {
     }
 
     /**
-     * Consumer implementation generating a series of data.
+     * Consumer implementation generating a sequence of data.
      *
      * @param <OUT> the output data type.
      */
-    private static class SeriesConsumer<OUT> extends DeepEqualObject
+    private static class SequenceConsumer<OUT> extends DeepEqualObject
             implements Consumer<InputChannel<OUT>> {
 
         private final long mCount;
@@ -1494,15 +1511,15 @@ public class Streams extends Functions {
         /**
          * Constructor.
          *
-         * @param start the first element of the series.
-         * @param count the size of the series.
+         * @param start the first element of the sequence.
+         * @param count the size of the sequence.
          * @param next  the function computing the next element.
          */
-        private SeriesConsumer(@NotNull final OUT start, final long count,
+        private SequenceConsumer(@NotNull final OUT start, final long count,
                 @NotNull final BiFunctionWrapper<OUT, Long, OUT> next) {
 
             super(asArgs(ConstantConditions.notNull("start element", start),
-                    ConstantConditions.positive("series size", count), next));
+                    ConstantConditions.positive("sequence size", count), next));
             mStart = start;
             mCount = count;
             mNext = next;

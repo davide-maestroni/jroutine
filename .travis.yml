@@ -22,9 +22,9 @@ android:
 # Env configuration
 env:
   global:
-    - JVM_OPTS=-Xmx2g -XX:MaxPermSize=512m
-    - JAVA_OPTS=-Xmx2g -XX:MaxPermSize=512m
-    - GRADLE_OPTS=-Xmx2g -XX:MaxPermSize=512m
+    - JVM_OPTS=-Xmx2g -XX:MaxPermSize=1g
+    - JAVA_OPTS=-Xmx2g -XX:MaxPermSize=1g
+    - GRADLE_OPTS=-Xmx2g -XX:MaxPermSize=1g
     - ADB_INSTALL_TIMEOUT=10
   matrix:
     - ANDROID_SDKS=android-10            ANDROID_TARGET=android-10  ANDROID_ABI=armeabi

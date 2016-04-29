@@ -52,11 +52,11 @@ class LoopSupplierInvocation<OUT> extends GenerateInvocation<OUT> {
         mSupplier = supplier;
     }
 
-    public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
+    public void onResult(@NotNull final ResultChannel<OUT> result) {
 
         final long count = mCount;
         final SupplierWrapper<? extends OUT> supplier = mSupplier;
-        for (long i = 0; i < count; i++) {
+        for (long i = 0; i < count; ++i) {
             result.pass(supplier.get());
         }
     }

@@ -50,7 +50,6 @@ import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.function.Wrapper;
 import com.github.dm.jrt.stream.AbstractStreamChannel;
-import com.github.dm.jrt.stream.StreamChannel;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -308,9 +307,23 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
 
     @NotNull
     @Override
-    public LoaderStreamChannel<Long> count() {
+    public LoaderStreamChannel<OUT> concat(@Nullable final OUT output) {
 
-        return (LoaderStreamChannel<Long>) super.count();
+        return (LoaderStreamChannel<OUT>) super.concat(output);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannel<OUT> concat(@Nullable final OUT... outputs) {
+
+        return (LoaderStreamChannel<OUT>) super.concat(outputs);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannel<OUT> concat(@Nullable final Iterable<? extends OUT> outputs) {
+
+        return (LoaderStreamChannel<OUT>) super.concat(outputs);
     }
 
     @NotNull
@@ -432,6 +445,62 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
 
     @NotNull
     @Override
+    public LoaderStreamChannel<OUT> orElse(@Nullable final OUT output) {
+
+        return (LoaderStreamChannel<OUT>) super.orElse(output);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannel<OUT> orElse(@Nullable final OUT... outputs) {
+
+        return (LoaderStreamChannel<OUT>) super.orElse(outputs);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannel<OUT> orElse(@Nullable final Iterable<? extends OUT> outputs) {
+
+        return (LoaderStreamChannel<OUT>) super.orElse(outputs);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannel<OUT> orElseGet(final long count,
+            @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
+
+        checkStatic(wrap(consumer), consumer);
+        return (LoaderStreamChannel<OUT>) super.orElseGet(count, consumer);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannel<OUT> orElseGet(
+            @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
+
+        checkStatic(wrap(consumer), consumer);
+        return (LoaderStreamChannel<OUT>) super.orElseGet(consumer);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannel<OUT> orElseGet(final long count,
+            @NotNull final Supplier<? extends OUT> supplier) {
+
+        checkStatic(wrap(supplier), supplier);
+        return (LoaderStreamChannel<OUT>) super.orElseGet(count, supplier);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannel<OUT> orElseGet(@NotNull final Supplier<? extends OUT> supplier) {
+
+        checkStatic(wrap(supplier), supplier);
+        return (LoaderStreamChannel<OUT>) super.orElseGet(supplier);
+    }
+
+    @NotNull
+    @Override
     public LoaderStreamChannel<OUT> ordered(@Nullable final OrderType orderType) {
 
         return (LoaderStreamChannel<OUT>) super.ordered(orderType);
@@ -548,38 +617,38 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannel<AFTER> then(final long count,
+    public <AFTER> LoaderStreamChannel<AFTER> thenGet(final long count,
             @NotNull final Consumer<? super ResultChannel<AFTER>> consumer) {
 
         checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannel<AFTER>) super.then(count, consumer);
+        return (LoaderStreamChannel<AFTER>) super.thenGet(count, consumer);
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannel<AFTER> then(
+    public <AFTER> LoaderStreamChannel<AFTER> thenGet(
             @NotNull final Consumer<? super ResultChannel<AFTER>> consumer) {
 
         checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannel<AFTER>) super.then(consumer);
+        return (LoaderStreamChannel<AFTER>) super.thenGet(consumer);
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannel<AFTER> then(final long count,
+    public <AFTER> LoaderStreamChannel<AFTER> thenGet(final long count,
             @NotNull final Supplier<? extends AFTER> supplier) {
 
         checkStatic(wrap(supplier), supplier);
-        return (LoaderStreamChannel<AFTER>) super.then(count, supplier);
+        return (LoaderStreamChannel<AFTER>) super.thenGet(count, supplier);
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannel<AFTER> then(
+    public <AFTER> LoaderStreamChannel<AFTER> thenGet(
             @NotNull final Supplier<? extends AFTER> supplier) {
 
         checkStatic(wrap(supplier), supplier);
-        return (LoaderStreamChannel<AFTER>) super.then(supplier);
+        return (LoaderStreamChannel<AFTER>) super.thenGet(supplier);
     }
 
     @NotNull
@@ -717,6 +786,18 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
 
         mContextBuilder = (context != null) ? JRoutineLoader.with(context) : null;
         return this;
+    }
+
+    @NotNull
+    public LoaderStreamChannel<OUT> concat(@NotNull final OutputChannel<? extends OUT> channel) {
+
+        final OutputChannel<OUT> outputChannel =
+                SparseChannels.<OUT>concat(this, channel).channelConfiguration()
+                                                         .with(buildChannelConfiguration())
+                                                         .applyConfiguration()
+                                                         .buildChannels();
+        return new DefaultLoaderStreamChannel<OUT>(mContextBuilder, outputChannel,
+                buildConfiguration(), buildLoaderConfiguration(), getInvocationMode(), getBinder());
     }
 
     @NonNull

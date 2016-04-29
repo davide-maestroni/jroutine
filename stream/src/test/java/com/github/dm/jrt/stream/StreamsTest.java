@@ -40,6 +40,7 @@ import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Functions;
+import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.stream.Streams.RangeConsumer;
 
 import org.jetbrains.annotations.NotNull;
@@ -382,7 +383,7 @@ public class StreamsTest {
 
         assertThat(Streams.streamOf()
                           .sync()
-                          .then(range(1, 10))
+                          .thenGet(range(1, 10))
                           .async()
                           .map(Streams.count())
                           .afterMax(seconds(3))
@@ -576,7 +577,7 @@ public class StreamsTest {
 
         assertThat(Streams.streamOf()
                           .sync()
-                          .then(range(1, 10))
+                          .thenGet(range(1, 10))
                           .async()
                           .map(Streams.<Number>groupBy(3))
                           .afterMax(seconds(3))
@@ -585,7 +586,7 @@ public class StreamsTest {
                 Collections.<Number>singletonList(10));
         assertThat(Streams.streamOf()
                           .sync()
-                          .then(range(1, 10))
+                          .thenGet(range(1, 10))
                           .async()
                           .map(Streams.<Number>groupBy(13))
                           .afterMax(seconds(3))
@@ -635,7 +636,7 @@ public class StreamsTest {
 
         assertThat(Streams.streamOf()
                           .sync()
-                          .then(range(1, 10))
+                          .thenGet(range(1, 10))
                           .async()
                           .map(Streams.<Number>groupBy(3, 0))
                           .afterMax(seconds(3))
@@ -644,7 +645,7 @@ public class StreamsTest {
                 Arrays.<Number>asList(10, 0, 0));
         assertThat(Streams.streamOf()
                           .sync()
-                          .then(range(1, 10))
+                          .thenGet(range(1, 10))
                           .async()
                           .map(Streams.<Number>groupBy(13, -1))
                           .afterMax(seconds(3))
@@ -652,7 +653,7 @@ public class StreamsTest {
                 Arrays.<Number>asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, -1, -1, -1));
         assertThat(Streams.streamOf()
                           .sync()
-                          .then(range(1, 10))
+                          .thenGet(range(1, 10))
                           .async()
                           .map(Streams.<Number>groupBy(3, -31))
                           .afterMax(seconds(3))
@@ -661,7 +662,7 @@ public class StreamsTest {
                 Arrays.<Number>asList(10, -31, -31));
         assertThat(Streams.streamOf()
                           .sync()
-                          .then(range(1, 10))
+                          .thenGet(range(1, 10))
                           .async()
                           .map(Streams.<Number>groupBy(13, 71))
                           .afterMax(seconds(3))
@@ -1014,28 +1015,28 @@ public class StreamsTest {
 
         assertThat(Streams.streamOf()
                           .sync()
-                          .then(range(1, 10))
+                          .thenGet(range(1, 10))
                           .async()
                           .map(Streams.limit(5))
                           .afterMax(seconds(3))
                           .all()).containsExactly(1, 2, 3, 4, 5);
         assertThat(Streams.streamOf()
                           .sync()
-                          .then(range(1, 10))
+                          .thenGet(range(1, 10))
                           .async()
                           .map(Streams.limit(0))
                           .afterMax(seconds(3))
                           .all()).isEmpty();
         assertThat(Streams.streamOf()
                           .sync()
-                          .then(range(1, 10))
+                          .thenGet(range(1, 10))
                           .async()
                           .map(Streams.limit(15))
                           .afterMax(seconds(3))
                           .all()).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
         assertThat(Streams.streamOf()
                           .sync()
-                          .then(range(1, 10))
+                          .thenGet(range(1, 10))
                           .async()
                           .map(Streams.limit(0))
                           .afterMax(seconds(3))
@@ -1432,7 +1433,7 @@ public class StreamsTest {
 
         assertThat(Streams.streamOf()
                           .async()
-                          .then(range('a', 'e', new Function<Character, Character>() {
+                          .thenGet(range('a', 'e', new Function<Character, Character>() {
 
                               public Character apply(final Character character) {
 
@@ -1443,80 +1444,80 @@ public class StreamsTest {
                           .all()).containsExactly('a', 'b', 'c', 'd', 'e');
         assertThat(Streams.streamOf()
                           .async()
-                          .then(range(0, -10, -2))
+                          .thenGet(range(0, -10, -2))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0, -2, -4, -6, -8, -10));
         assertThat(Streams.streamOf()
                           .async()
-                          .then(range(0, 2, 0.7))
+                          .thenGet(range(0, 2, 0.7))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0d, 0.7d, 1.4d));
         assertThat(Streams.streamOf()
                           .async()
-                          .then(range(0, 2, 0.7f))
+                          .thenGet(range(0, 2, 0.7f))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0f, 0.7f, 1.4f));
         assertThat(Streams.streamOf()
                           .async()
-                          .then(range(0L, -9, -2))
+                          .thenGet(range(0L, -9, -2))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0L, -2L, -4L, -6L, -8L));
         assertThat(Streams.streamOf()
                           .async()
-                          .then(range(0, (short) 9, 2))
+                          .thenGet(range(0, (short) 9, 2))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0, 2, 4, 6, 8));
         assertThat(Streams.streamOf()
                           .async()
-                          .then(range((byte) 0, (short) 9, (byte) 2))
+                          .thenGet(range((byte) 0, (short) 9, (byte) 2))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(
                 Arrays.asList((short) 0, (short) 2, (short) 4, (short) 6, (short) 8));
         assertThat(Streams.streamOf()
                           .async()
-                          .then(range((byte) 0, (byte) 10, (byte) 2))
+                          .thenGet(range((byte) 0, (byte) 10, (byte) 2))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(
                 Arrays.asList((byte) 0, (byte) 2, (byte) 4, (byte) 6, (byte) 8, (byte) 10));
         assertThat(
-                Streams.streamOf().async().then(range(0, -5)).afterMax(seconds(3)).all()).isEqualTo(
+                Streams.streamOf().async().thenGet(range(0, -5)).afterMax(seconds(3)).all()).isEqualTo(
                 Arrays.asList(0, -1, -2, -3, -4, -5));
         assertThat(Streams.streamOf()
                           .async()
-                          .then(range(0, 2.1))
+                          .thenGet(range(0, 2.1))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0d, 1d, 2d));
         assertThat(Streams.streamOf()
                           .async()
-                          .then(range(0, 1.9f))
+                          .thenGet(range(0, 1.9f))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0f, 1f));
         assertThat(Streams.streamOf()
                           .async()
-                          .then(range(0L, -4))
+                          .thenGet(range(0L, -4))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0L, -1L, -2L, -3L, -4L));
         assertThat(Streams.streamOf()
                           .async()
-                          .then(range(0, (short) 4))
+                          .thenGet(range(0, (short) 4))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0, 1, 2, 3, 4));
         assertThat(Streams.streamOf()
                           .async()
-                          .then(range((byte) 0, (short) 4))
+                          .thenGet(range((byte) 0, (short) 4))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(
                 Arrays.asList((short) 0, (short) 1, (short) 2, (short) 3, (short) 4));
         assertThat(Streams.streamOf()
                           .async()
-                          .then(range((byte) 0, (byte) 5))
+                          .thenGet(range((byte) 0, (byte) 5))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(
                 Arrays.asList((byte) 0, (byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5));
         assertThat(Streams.streamOf()
                           .ordered(OrderType.BY_CALL)
                           .parallel()
-                          .then(range('a', 'e', new Function<Character, Character>() {
+                          .thenGet(range('a', 'e', new Function<Character, Character>() {
 
                               public Character apply(final Character character) {
 
@@ -1528,94 +1529,94 @@ public class StreamsTest {
         assertThat(Streams.streamOf()
                           .ordered(OrderType.BY_CALL)
                           .parallel()
-                          .then(range(0, -10, -2))
+                          .thenGet(range(0, -10, -2))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0, -2, -4, -6, -8, -10));
         assertThat(Streams.streamOf()
                           .ordered(OrderType.BY_CALL)
                           .parallel()
-                          .then(range(0, 2, 0.7))
+                          .thenGet(range(0, 2, 0.7))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0d, 0.7d, 1.4d));
         assertThat(Streams.streamOf()
                           .ordered(OrderType.BY_CALL)
                           .parallel()
-                          .then(range(0, 2, 0.7f))
+                          .thenGet(range(0, 2, 0.7f))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0f, 0.7f, 1.4f));
         assertThat(Streams.streamOf()
                           .ordered(OrderType.BY_CALL)
                           .parallel()
-                          .then(range(0L, -9, -2))
+                          .thenGet(range(0L, -9, -2))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0L, -2L, -4L, -6L, -8L));
         assertThat(Streams.streamOf()
                           .ordered(OrderType.BY_CALL)
                           .parallel()
-                          .then(range(0, (short) 9, 2))
+                          .thenGet(range(0, (short) 9, 2))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0, 2, 4, 6, 8));
         assertThat(Streams.streamOf()
                           .ordered(OrderType.BY_CALL)
                           .parallel()
-                          .then(range((byte) 0, (short) 9, (byte) 2))
+                          .thenGet(range((byte) 0, (short) 9, (byte) 2))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(
                 Arrays.asList((short) 0, (short) 2, (short) 4, (short) 6, (short) 8));
         assertThat(Streams.streamOf()
                           .ordered(OrderType.BY_CALL)
                           .parallel()
-                          .then(range((byte) 0, (byte) 10, (byte) 2))
+                          .thenGet(range((byte) 0, (byte) 10, (byte) 2))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(
                 Arrays.asList((byte) 0, (byte) 2, (byte) 4, (byte) 6, (byte) 8, (byte) 10));
         assertThat(Streams.streamOf()
                           .ordered(OrderType.BY_CALL)
                           .parallel()
-                          .then(range(0, -5))
+                          .thenGet(range(0, -5))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0, -1, -2, -3, -4, -5));
         assertThat(Streams.streamOf()
                           .ordered(OrderType.BY_CALL)
                           .parallel()
-                          .then(range(0, 2.1))
+                          .thenGet(range(0, 2.1))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0d, 1d, 2d));
         assertThat(Streams.streamOf()
                           .ordered(OrderType.BY_CALL)
                           .parallel()
-                          .then(range(0, 1.9f))
+                          .thenGet(range(0, 1.9f))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0f, 1f));
         assertThat(Streams.streamOf()
                           .ordered(OrderType.BY_CALL)
                           .parallel()
-                          .then(range(0L, -4))
+                          .thenGet(range(0L, -4))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0L, -1L, -2L, -3L, -4L));
         assertThat(Streams.streamOf()
                           .ordered(OrderType.BY_CALL)
                           .parallel()
-                          .then(range(0, (short) 4))
+                          .thenGet(range(0, (short) 4))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0, 1, 2, 3, 4));
         assertThat(Streams.streamOf()
                           .ordered(OrderType.BY_CALL)
                           .parallel()
-                          .then(range((byte) 0, (short) 4))
+                          .thenGet(range((byte) 0, (short) 4))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(
                 Arrays.asList((short) 0, (short) 1, (short) 2, (short) 3, (short) 4));
         assertThat(Streams.streamOf()
                           .ordered(OrderType.BY_CALL)
                           .parallel()
-                          .then(range((byte) 0, (byte) 5))
+                          .thenGet(range((byte) 0, (byte) 5))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(
                 Arrays.asList((byte) 0, (byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5));
         assertThat(Streams.streamOf()
                           .sync()
-                          .then(range('a', 'e', new Function<Character, Character>() {
+                          .thenGet(range('a', 'e', new Function<Character, Character>() {
 
                               public Character apply(final Character character) {
 
@@ -1623,39 +1624,39 @@ public class StreamsTest {
                               }
                           }))
                           .all()).containsExactly('a', 'b', 'c', 'd', 'e');
-        assertThat(Streams.streamOf().sync().then(range(0, -10, -2)).all()).isEqualTo(
+        assertThat(Streams.streamOf().sync().thenGet(range(0, -10, -2)).all()).isEqualTo(
                 Arrays.asList(0, -2, -4, -6, -8, -10));
-        assertThat(Streams.streamOf().sync().then(range(0, 2, 0.7)).all()).isEqualTo(
+        assertThat(Streams.streamOf().sync().thenGet(range(0, 2, 0.7)).all()).isEqualTo(
                 Arrays.asList(0d, 0.7d, 1.4d));
-        assertThat(Streams.streamOf().sync().then(range(0, 2, 0.7f)).all()).isEqualTo(
+        assertThat(Streams.streamOf().sync().thenGet(range(0, 2, 0.7f)).all()).isEqualTo(
                 Arrays.asList(0f, 0.7f, 1.4f));
-        assertThat(Streams.streamOf().sync().then(range(0L, -9, -2)).all()).isEqualTo(
+        assertThat(Streams.streamOf().sync().thenGet(range(0L, -9, -2)).all()).isEqualTo(
                 Arrays.asList(0L, -2L, -4L, -6L, -8L));
-        assertThat(Streams.streamOf().sync().then(range(0, (short) 9, 2)).all()).isEqualTo(
+        assertThat(Streams.streamOf().sync().thenGet(range(0, (short) 9, 2)).all()).isEqualTo(
                 Arrays.asList(0, 2, 4, 6, 8));
         assertThat(Streams.streamOf()
                           .sync()
-                          .then(range((byte) 0, (short) 9, (byte) 2))
+                          .thenGet(range((byte) 0, (short) 9, (byte) 2))
                           .all()).isEqualTo(
                 Arrays.asList((short) 0, (short) 2, (short) 4, (short) 6, (short) 8));
         assertThat(Streams.streamOf()
                           .sync()
-                          .then(range((byte) 0, (byte) 10, (byte) 2))
+                          .thenGet(range((byte) 0, (byte) 10, (byte) 2))
                           .all()).isEqualTo(
                 Arrays.asList((byte) 0, (byte) 2, (byte) 4, (byte) 6, (byte) 8, (byte) 10));
-        assertThat(Streams.streamOf().sync().then(range(0, -5)).all()).isEqualTo(
+        assertThat(Streams.streamOf().sync().thenGet(range(0, -5)).all()).isEqualTo(
                 Arrays.asList(0, -1, -2, -3, -4, -5));
-        assertThat(Streams.streamOf().sync().then(range(0, 2.1)).all()).isEqualTo(
+        assertThat(Streams.streamOf().sync().thenGet(range(0, 2.1)).all()).isEqualTo(
                 Arrays.asList(0d, 1d, 2d));
-        assertThat(Streams.streamOf().sync().then(range(0, 1.9f)).all()).isEqualTo(
+        assertThat(Streams.streamOf().sync().thenGet(range(0, 1.9f)).all()).isEqualTo(
                 Arrays.asList(0f, 1f));
-        assertThat(Streams.streamOf().sync().then(range(0L, -4)).all()).isEqualTo(
+        assertThat(Streams.streamOf().sync().thenGet(range(0L, -4)).all()).isEqualTo(
                 Arrays.asList(0L, -1L, -2L, -3L, -4L));
-        assertThat(Streams.streamOf().sync().then(range(0, (short) 4)).all()).isEqualTo(
+        assertThat(Streams.streamOf().sync().thenGet(range(0, (short) 4)).all()).isEqualTo(
                 Arrays.asList(0, 1, 2, 3, 4));
-        assertThat(Streams.streamOf().sync().then(range((byte) 0, (short) 4)).all()).isEqualTo(
+        assertThat(Streams.streamOf().sync().thenGet(range((byte) 0, (short) 4)).all()).isEqualTo(
                 Arrays.asList((short) 0, (short) 1, (short) 2, (short) 3, (short) 4));
-        assertThat(Streams.streamOf().sync().then(range((byte) 0, (byte) 5)).all()).isEqualTo(
+        assertThat(Streams.streamOf().sync().thenGet(range((byte) 0, (byte) 5)).all()).isEqualTo(
                 Arrays.asList((byte) 0, (byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5));
     }
 
@@ -2020,7 +2021,7 @@ public class StreamsTest {
 
         assertThat(Streams.streamOf()
                           .async()
-                          .then(sequence('a', 5, new BiFunction<Character, Long, Character>() {
+                          .thenGet(sequence('a', 5, new BiFunction<Character, Long, Character>() {
 
                               public Character apply(final Character character, final Long n) {
 
@@ -2032,7 +2033,7 @@ public class StreamsTest {
         assertThat(Streams.streamOf()
                           .ordered(OrderType.BY_CALL)
                           .parallel()
-                          .then(sequence('a', 5, new BiFunction<Character, Long, Character>() {
+                          .thenGet(sequence('a', 5, new BiFunction<Character, Long, Character>() {
 
                               public Character apply(final Character character, final Long n) {
 
@@ -2043,7 +2044,7 @@ public class StreamsTest {
                           .all()).containsExactly('a', 'b', 'c', 'd', 'e');
         assertThat(Streams.streamOf()
                           .sync()
-                          .then(sequence('a', 5, new BiFunction<Character, Long, Character>() {
+                          .thenGet(sequence('a', 5, new BiFunction<Character, Long, Character>() {
 
                               public Character apply(final Character character, final Long n) {
 
@@ -2107,25 +2108,64 @@ public class StreamsTest {
 
         assertThat(Streams.streamOf()
                           .sync()
-                          .then(range(1, 10))
+                          .thenGet(range(1, 10))
                           .async()
                           .map(Streams.skip(5))
                           .afterMax(seconds(3))
                           .all()).containsExactly(6, 7, 8, 9, 10);
         assertThat(Streams.streamOf()
                           .sync()
-                          .then(range(1, 10))
+                          .thenGet(range(1, 10))
                           .async()
                           .map(Streams.skip(15))
                           .afterMax(seconds(3))
                           .all()).isEmpty();
         assertThat(Streams.streamOf()
                           .sync()
-                          .then(range(1, 10))
+                          .thenGet(range(1, 10))
                           .async()
                           .map(Streams.skip(0))
                           .afterMax(seconds(3))
                           .all()).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+        assertThat(Streams.streamOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).map(new Function<Integer, Boolean>() {
+
+            public Boolean apply(final Integer integer) {
+
+                return integer > 5;
+            }
+        }).reduce(new BiFunction<Boolean, Boolean, Boolean>() {
+
+            public Boolean apply(final Boolean aBoolean, final Boolean aBoolean2) {
+
+                return aBoolean && aBoolean2;
+            }
+        }).afterMax(seconds(1)).next()).isFalse();
+        assertThat(Streams.streamOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).reduce(new Supplier<Boolean>() {
+
+            public Boolean get() {
+
+                return true;
+            }
+        }, new BiFunction<Boolean, Integer, Boolean>() {
+
+            public Boolean apply(final Boolean aBoolean, final Integer integer) {
+
+                return aBoolean && (integer > 5);
+            }
+        }).afterMax(seconds(1)).next()).isFalse();
+        Streams.streamOf(new Supplier<String>() {
+
+            public String get() {
+
+                return "test";
+            }
+        }).<Supplier<String>>then(new Supplier<String>() {
+
+            public String get() {
+
+                return "test";
+            }
+        });
     }
 
     @Test
@@ -2159,7 +2199,7 @@ public class StreamsTest {
 
         assertThat(Streams.streamOf()
                           .sync()
-                          .then(range(1, 10))
+                          .thenGet(range(1, 10))
                           .async()
                           .map(Streams.<Number>groupBy(3))
                           .parallel()

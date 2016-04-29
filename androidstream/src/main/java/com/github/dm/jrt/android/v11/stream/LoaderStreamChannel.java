@@ -170,7 +170,25 @@ public interface LoaderStreamChannel<OUT>
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannel<Long> count();
+    LoaderStreamChannel<OUT> concat(@Nullable OUT output);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    LoaderStreamChannel<OUT> concat(@Nullable OUT... outputs);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    LoaderStreamChannel<OUT> concat(@Nullable Iterable<? extends OUT> outputs);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    LoaderStreamChannel<OUT> concat(@NotNull OutputChannel<? extends OUT> channel);
 
     /**
      * {@inheritDoc}
@@ -255,6 +273,49 @@ public interface LoaderStreamChannel<OUT>
      */
     @NotNull
     LoaderStreamChannel<Void> onOutput(@NotNull Consumer<? super OUT> consumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    LoaderStreamChannel<OUT> orElse(@Nullable OUT output);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    LoaderStreamChannel<OUT> orElse(@Nullable OUT... outputs);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    LoaderStreamChannel<OUT> orElse(@Nullable Iterable<? extends OUT> outputs);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    LoaderStreamChannel<OUT> orElseGet(long count,
+            @NotNull Consumer<? super ResultChannel<OUT>> consumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    LoaderStreamChannel<OUT> orElseGet(@NotNull Consumer<? super ResultChannel<OUT>> consumer);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    LoaderStreamChannel<OUT> orElseGet(long count, @NotNull Supplier<? extends OUT> supplier);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    LoaderStreamChannel<OUT> orElseGet(@NotNull Supplier<? extends OUT> supplier);
 
     /**
      * {@inheritDoc}
@@ -353,28 +414,28 @@ public interface LoaderStreamChannel<OUT>
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> then(long count,
+    <AFTER> LoaderStreamChannel<AFTER> thenGet(long count,
             @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> then(
+    <AFTER> LoaderStreamChannel<AFTER> thenGet(
             @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> then(long count,
+    <AFTER> LoaderStreamChannel<AFTER> thenGet(long count,
             @NotNull Supplier<? extends AFTER> supplier);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannel<AFTER> then(@NotNull Supplier<? extends AFTER> supplier);
+    <AFTER> LoaderStreamChannel<AFTER> thenGet(@NotNull Supplier<? extends AFTER> supplier);
 
     /**
      * {@inheritDoc}

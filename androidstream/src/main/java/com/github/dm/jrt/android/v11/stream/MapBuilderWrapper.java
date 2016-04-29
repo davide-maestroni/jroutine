@@ -68,7 +68,7 @@ class MapBuilderWrapper<OUT> implements ChannelsBuilder<SparseArray<LoaderStream
         final int size = channels.size();
         final SparseArray<LoaderStreamChannel<OUT>> channelMap =
                 new SparseArray<LoaderStreamChannel<OUT>>(size);
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < size; ++i) {
             final DefaultLoaderStreamChannel<OUT> stream =
                     new DefaultLoaderStreamChannel<OUT>(null, channels.valueAt(i));
             channelMap.append(channels.keyAt(i), stream);

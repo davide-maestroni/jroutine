@@ -941,7 +941,7 @@ public class Channels {
         ConstantConditions.positive("range size", rangeSize);
         final HashSet<Integer> indexSet = new HashSet<Integer>();
         final int endIndex = startIndex + rangeSize;
-        for (int i = startIndex; i < endIndex; i++) {
+        for (int i = startIndex; i < endIndex; ++i) {
             indexSet.add(i);
         }
 
@@ -981,7 +981,7 @@ public class Channels {
         ConstantConditions.positive("range size", rangeSize);
         final HashSet<Integer> indexSet = new HashSet<Integer>();
         final int endIndex = startIndex + rangeSize;
-        for (int i = startIndex; i < endIndex; i++) {
+        for (int i = startIndex; i < endIndex; ++i) {
             indexSet.add(i);
         }
 

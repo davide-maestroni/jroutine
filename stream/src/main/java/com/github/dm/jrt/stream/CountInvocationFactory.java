@@ -40,7 +40,7 @@ class CountInvocationFactory extends InvocationFactory<Object, Long> {
 
     @NotNull
     @Override
-    public Invocation<Object, Long> newInvocation() throws Exception {
+    public Invocation<Object, Long> newInvocation() {
 
         return new CountInvocation();
     }

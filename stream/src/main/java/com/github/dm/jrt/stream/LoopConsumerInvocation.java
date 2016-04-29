@@ -52,11 +52,11 @@ class LoopConsumerInvocation<OUT> extends GenerateInvocation<OUT> {
         mConsumer = consumer;
     }
 
-    public void onResult(@NotNull final ResultChannel<OUT> result) throws Exception {
+    public void onResult(@NotNull final ResultChannel<OUT> result) {
 
         final long count = mCount;
         final ConsumerWrapper<? super ResultChannel<OUT>> consumer = mConsumer;
-        for (long i = 0; i < count; i++) {
+        for (long i = 0; i < count; ++i) {
             consumer.accept(result);
         }
     }

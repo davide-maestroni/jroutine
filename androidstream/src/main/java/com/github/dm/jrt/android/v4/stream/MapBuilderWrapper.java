@@ -70,7 +70,7 @@ class MapBuilderWrapper<OUT>
         final int size = channels.size();
         final SparseArrayCompat<LoaderStreamChannelCompat<OUT>> channelMap =
                 new SparseArrayCompat<LoaderStreamChannelCompat<OUT>>(size);
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < size; ++i) {
             final DefaultLoaderStreamChannelCompat<OUT> stream =
                     new DefaultLoaderStreamChannelCompat<OUT>(null, channels.valueAt(i));
             channelMap.append(channels.keyAt(i), stream);

@@ -277,9 +277,21 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
-    public StreamChannel<Long> count() {
+    public StreamChannel<OUT> concat(@Nullable final OUT output) {
 
-        return map(new CountInvocationFactory());
+        return concat(JRoutineCore.io().of(output));
+    }
+
+    @NotNull
+    public StreamChannel<OUT> concat(@Nullable final OUT... outputs) {
+
+        return concat(JRoutineCore.io().of(outputs));
+    }
+
+    @NotNull
+    public StreamChannel<OUT> concat(@Nullable final Iterable<? extends OUT> outputs) {
+
+        return concat(JRoutineCore.io().of(outputs));
     }
 
     @NotNull
@@ -381,6 +393,70 @@ public abstract class AbstractStreamChannel<OUT>
     public StreamChannel<Void> onOutput(@NotNull final Consumer<? super OUT> consumer) {
 
         return map(new ConsumerInvocation<OUT>(wrap(consumer)));
+    }
+
+    @NotNull
+    public StreamChannel<OUT> orElse(@Nullable final OUT output) {
+
+        return map(new OrElseInvocationFactory<OUT>(Collections.singletonList(output)));
+    }
+
+    @NotNull
+    public StreamChannel<OUT> orElse(@Nullable final OUT... outputs) {
+
+        final List<OUT> list;
+        if (outputs != null) {
+            list = new ArrayList<OUT>();
+            Collections.addAll(list, outputs);
+
+        } else {
+            list = Collections.emptyList();
+        }
+
+        return map(new OrElseInvocationFactory<OUT>(list));
+    }
+
+    @NotNull
+    public StreamChannel<OUT> orElse(@Nullable final Iterable<? extends OUT> outputs) {
+
+        final List<OUT> list;
+        if (outputs != null) {
+            list = new ArrayList<OUT>();
+            for (final OUT output : outputs) {
+                list.add(output);
+            }
+
+        } else {
+            list = Collections.emptyList();
+        }
+
+        return map(new OrElseInvocationFactory<OUT>(list));
+    }
+
+    @NotNull
+    public StreamChannel<OUT> orElseGet(final long count,
+            @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
+
+        return map(new OrElseConsumerInvocationFactory<OUT>(count, wrap(consumer)));
+    }
+
+    @NotNull
+    public StreamChannel<OUT> orElseGet(@NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
+
+        return orElseGet(1, consumer);
+    }
+
+    @NotNull
+    public StreamChannel<OUT> orElseGet(final long count,
+            @NotNull final Supplier<? extends OUT> supplier) {
+
+        return map(new OrElseSupplierInvocationFactory<OUT>(count, wrap(supplier)));
+    }
+
+    @NotNull
+    public StreamChannel<OUT> orElseGet(@NotNull final Supplier<? extends OUT> supplier) {
+
+        return orElseGet(1, supplier);
     }
 
     @NotNull
@@ -523,30 +599,30 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
-    public <AFTER> StreamChannel<AFTER> then(final long count,
+    public <AFTER> StreamChannel<AFTER> thenGet(final long count,
             @NotNull final Consumer<? super ResultChannel<AFTER>> consumer) {
 
         return map(new LoopConsumerInvocation<AFTER>(count, wrap(consumer)));
     }
 
     @NotNull
-    public <AFTER> StreamChannel<AFTER> then(
+    public <AFTER> StreamChannel<AFTER> thenGet(
             @NotNull final Consumer<? super ResultChannel<AFTER>> consumer) {
 
-        return then(1, consumer);
+        return thenGet(1, consumer);
     }
 
     @NotNull
-    public <AFTER> StreamChannel<AFTER> then(final long count,
+    public <AFTER> StreamChannel<AFTER> thenGet(final long count,
             @NotNull final Supplier<? extends AFTER> supplier) {
 
         return map(new LoopSupplierInvocation<AFTER>(count, wrap(supplier)));
     }
 
     @NotNull
-    public <AFTER> StreamChannel<AFTER> then(@NotNull final Supplier<? extends AFTER> supplier) {
+    public <AFTER> StreamChannel<AFTER> thenGet(@NotNull final Supplier<? extends AFTER> supplier) {
 
-        return then(1, supplier);
+        return thenGet(1, supplier);
     }
 
     @NotNull

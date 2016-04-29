@@ -103,7 +103,7 @@ class OutputMapBuilder<OUT> extends AbstractBuilder<SparseArrayCompat<OutputChan
             SparseArrayCompat<OutputChannel<?>> channels = channelMaps.get(selectInfo);
             if (channels != null) {
                 final int channelSize = channels.size();
-                for (int i = 0; i < channelSize; i++) {
+                for (int i = 0; i < channelSize; ++i) {
                     channelMap.append(channels.keyAt(i), (OutputChannel<OUT>) channels.valueAt(i));
                 }
 

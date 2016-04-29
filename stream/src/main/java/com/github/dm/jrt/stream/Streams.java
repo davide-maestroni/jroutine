@@ -69,8 +69,6 @@ public class Streams extends Functions {
 
     }
 
-    // TODO: 26/04/16 match*
-
     /**
      * Returns a builder of streams blending the outputs coming from the specified channels.
      * <p>
@@ -1531,7 +1529,7 @@ public class Streams extends Functions {
             OUT current = mStart;
             final long count = mCount;
             final long last = count - 1;
-            for (long i = 0; i < count; i++) {
+            for (long i = 0; i < count; ++i) {
                 result.pass(current);
                 if (i < last) {
                     current = next.apply(current, i);

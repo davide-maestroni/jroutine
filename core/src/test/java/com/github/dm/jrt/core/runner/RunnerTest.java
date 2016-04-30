@@ -31,11 +31,11 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static com.github.dm.jrt.core.util.UnitDuration.ZERO;
 import static com.github.dm.jrt.core.util.UnitDuration.micros;
 import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.nanos;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
+import static com.github.dm.jrt.core.util.UnitDuration.zero;
 import static com.github.dm.jrt.core.util.UnitTime.current;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -447,7 +447,7 @@ public class RunnerTest {
                     break;
 
                 default:
-                    delay = ZERO;
+                    delay = zero();
                     break;
             }
 
@@ -487,7 +487,7 @@ public class RunnerTest {
                     break;
 
                 default:
-                    delay = ZERO;
+                    delay = zero();
                     break;
             }
 
@@ -498,9 +498,9 @@ public class RunnerTest {
         }
 
         final TestRecursiveExecution recursiveExecution =
-                new TestRecursiveExecution(runner, executions, delays, ZERO);
+                new TestRecursiveExecution(runner, executions, delays, zero());
 
-        runner.run(recursiveExecution, ZERO.value, ZERO.unit);
+        runner.run(recursiveExecution, 0, TimeUnit.MILLISECONDS);
 
         for (final TestRunExecution execution : executions) {
 

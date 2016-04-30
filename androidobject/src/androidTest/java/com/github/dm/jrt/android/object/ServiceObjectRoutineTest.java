@@ -62,7 +62,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceOf;
-import static com.github.dm.jrt.core.util.UnitDuration.INFINITY;
+import static com.github.dm.jrt.core.util.UnitDuration.infinity;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -356,7 +356,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
             JRoutineServiceObject.with(serviceFrom(getActivity()))
                                  .on(instanceOf(TestClass.class))
                                  .invocationConfiguration()
-                                 .withReadTimeout(INFINITY)
+                                 .withReadTimeout(infinity())
                                  .applyConfiguration()
                                  .buildProxy(TestItf.class)
                                  .throwException(null);
@@ -372,7 +372,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
             JRoutineServiceObject.with(serviceFrom(getActivity()))
                                  .on(instanceOf(TestClass.class))
                                  .invocationConfiguration()
-                                 .withReadTimeout(INFINITY)
+                                 .withReadTimeout(infinity())
                                  .applyConfiguration()
                                  .buildProxy(TestItf.class)
                                  .throwException1(null);
@@ -388,7 +388,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
             JRoutineServiceObject.with(serviceFrom(getActivity()))
                                  .on(instanceOf(TestClass.class))
                                  .invocationConfiguration()
-                                 .withReadTimeout(INFINITY)
+                                 .withReadTimeout(infinity())
                                  .applyConfiguration()
                                  .buildProxy(TestItf.class)
                                  .throwException2(null);
@@ -575,7 +575,7 @@ public class ServiceObjectRoutineTest extends ActivityInstrumentationTestCase2<T
         final Itf itf = JRoutineServiceObject.with(serviceFrom(getActivity()))
                                              .on(instanceOf(Impl.class))
                                              .invocationConfiguration()
-                                             .withReadTimeout(INFINITY)
+                                             .withReadTimeout(infinity())
                                              .applyConfiguration()
                                              .buildProxy(Itf.class);
 

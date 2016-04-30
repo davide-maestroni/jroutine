@@ -36,6 +36,7 @@ import java.util.concurrent.Semaphore;
 
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryOf;
 import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
+import static com.github.dm.jrt.core.util.UnitDuration.zero;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -170,8 +171,7 @@ public class LoaderRoutineRotationTest
                                                               .withLoaderId(0)
                                                               .withClashResolution(
                                                                       ClashResolutionType.JOIN)
-                                                              .withResultStaleTime(
-                                                                      UnitDuration.ZERO)
+                                                              .withResultStaleTime(zero())
                                                               .applyConfiguration()
                                                               .buildRoutine();
         routine.asyncCall("test1");

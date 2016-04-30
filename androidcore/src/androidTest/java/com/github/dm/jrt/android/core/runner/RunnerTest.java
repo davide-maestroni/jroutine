@@ -43,13 +43,14 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
-import static com.github.dm.jrt.core.util.UnitDuration.ZERO;
 import static com.github.dm.jrt.core.util.UnitDuration.micros;
 import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.nanos;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
+import static com.github.dm.jrt.core.util.UnitDuration.zero;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -84,7 +85,7 @@ public class RunnerTest extends AndroidTestCase {
                     break;
 
                 default:
-                    delay = ZERO;
+                    delay = zero();
                     break;
             }
 
@@ -124,7 +125,7 @@ public class RunnerTest extends AndroidTestCase {
                     break;
 
                 default:
-                    delay = ZERO;
+                    delay = zero();
                     break;
             }
 
@@ -135,9 +136,9 @@ public class RunnerTest extends AndroidTestCase {
         }
 
         final TestRecursiveExecution recursiveExecution =
-                new TestRecursiveExecution(runner, executions, delays, ZERO);
+                new TestRecursiveExecution(runner, executions, delays, zero());
 
-        runner.run(recursiveExecution, ZERO.value, ZERO.unit);
+        runner.run(recursiveExecution, 0, TimeUnit.MILLISECONDS);
 
         for (final TestRunExecution execution : executions) {
 

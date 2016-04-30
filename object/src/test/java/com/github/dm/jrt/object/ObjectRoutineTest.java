@@ -75,7 +75,7 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
-import static com.github.dm.jrt.core.util.UnitDuration.INFINITY;
+import static com.github.dm.jrt.core.util.UnitDuration.infinity;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.object.InvocationTarget.classOfType;
 import static com.github.dm.jrt.object.InvocationTarget.instance;
@@ -543,7 +543,7 @@ public class ObjectRoutineTest {
 
             JRoutineObject.on(instance(test))
                           .invocationConfiguration()
-                          .withReadTimeout(INFINITY)
+                          .withReadTimeout(infinity())
                           .applyConfiguration()
                           .buildProxy(TestItf.class)
                           .throwException(null);
@@ -558,7 +558,7 @@ public class ObjectRoutineTest {
 
             JRoutineObject.on(instance(test))
                           .invocationConfiguration()
-                          .withReadTimeout(INFINITY)
+                          .withReadTimeout(infinity())
                           .applyConfiguration()
                           .buildProxy(TestItf.class)
                           .throwException1(null);

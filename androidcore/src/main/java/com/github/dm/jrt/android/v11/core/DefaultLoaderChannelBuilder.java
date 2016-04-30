@@ -38,6 +38,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.github.dm.jrt.android.v11.core.LoaderInvocation.purgeLoader;
+import static com.github.dm.jrt.core.util.UnitDuration.infinity;
 
 /**
  * Default implementation of a loader channel builder.
@@ -128,7 +129,7 @@ class DefaultLoaderChannelBuilder
                       .with(loaderConfiguration)
                       .withClashResolution(ClashResolutionType.JOIN)
                       .withInputClashResolution(ClashResolutionType.JOIN)
-                      .withResultStaleTime(UnitDuration.INFINITY)
+                      .withResultStaleTime(infinity())
                       .applyConfiguration()
                       .asyncCall();
     }

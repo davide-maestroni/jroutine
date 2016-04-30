@@ -62,7 +62,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.android.core.ServiceContext.serviceFrom;
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceOf;
-import static com.github.dm.jrt.core.util.UnitDuration.INFINITY;
+import static com.github.dm.jrt.core.util.UnitDuration.infinity;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -366,7 +366,7 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
             JRoutineServiceObject.with(serviceFrom(getActivity(), RemoteInvocationService.class))
                                  .on(instanceOf(TestClass.class))
                                  .invocationConfiguration()
-                                 .withReadTimeout(INFINITY)
+                                 .withReadTimeout(infinity())
                                  .applyConfiguration()
                                  .buildProxy(TestItf.class)
                                  .throwException(null);
@@ -382,7 +382,7 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
             JRoutineServiceObject.with(serviceFrom(getActivity(), RemoteInvocationService.class))
                                  .on(instanceOf(TestClass.class))
                                  .invocationConfiguration()
-                                 .withReadTimeout(INFINITY)
+                                 .withReadTimeout(infinity())
                                  .applyConfiguration()
                                  .buildProxy(TestItf.class)
                                  .throwException1(null);
@@ -398,7 +398,7 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
             JRoutineServiceObject.with(serviceFrom(getActivity(), RemoteInvocationService.class))
                                  .on(instanceOf(TestClass.class))
                                  .invocationConfiguration()
-                                 .withReadTimeout(INFINITY)
+                                 .withReadTimeout(infinity())
                                  .applyConfiguration()
                                  .buildProxy(TestItf.class)
                                  .throwException2(null);
@@ -481,8 +481,8 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
                                                                       .withSharedFields("test")
                                                                       .applyConfiguration()
                                                                       .method(TestClass.class
-                                                                              .getMethod("getLong"
-                                                                                      + ""));
+                                                                              .getMethod(
+                                                                              "getLong" + ""));
 
         assertThat(routine2.syncCall().afterMax(timeout).all()).containsExactly(-77L);
     }
@@ -594,7 +594,7 @@ public class RemoteServiceObjectRoutineTest extends ActivityInstrumentationTestC
                 serviceFrom(getActivity(), RemoteInvocationService.class))
                                              .on(instanceOf(Impl.class))
                                              .invocationConfiguration()
-                                             .withReadTimeout(INFINITY)
+                                             .withReadTimeout(infinity())
                                              .applyConfiguration()
                                              .buildProxy(Itf.class);
 

@@ -37,6 +37,7 @@ import static com.github.dm.jrt.core.config.ChannelConfiguration.builderFromInpu
 import static com.github.dm.jrt.core.config.ChannelConfiguration.builderFromInvocation;
 import static com.github.dm.jrt.core.config.ChannelConfiguration.builderFromOutputChannel;
 import static com.github.dm.jrt.core.util.UnitDuration.millis;
+import static com.github.dm.jrt.core.util.UnitDuration.zero;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -147,7 +148,7 @@ public class ChannelConfigurationTest {
                                                             .withChannelMaxSize(100)
                                                             .applyConfiguration();
         assertThat(configuration).isNotEqualTo(
-                builder().withChannelMaxDelay(UnitDuration.ZERO).applyConfiguration());
+                builder().withChannelMaxDelay(zero()).applyConfiguration());
         assertThat(configuration).isNotEqualTo(
                 builder().withChannelMaxDelay(1, TimeUnit.MILLISECONDS).applyConfiguration());
         assertThat(configuration.builderFrom()
@@ -376,7 +377,7 @@ public class ChannelConfigurationTest {
                                                             .withChannelMaxSize(100)
                                                             .applyConfiguration();
         assertThat(configuration).isNotEqualTo(
-                builder().withReadTimeout(UnitDuration.ZERO).applyConfiguration());
+                builder().withReadTimeout(zero()).applyConfiguration());
         assertThat(configuration).isNotEqualTo(
                 builder().withReadTimeout(1, TimeUnit.MILLISECONDS).applyConfiguration());
         assertThat(configuration.builderFrom()

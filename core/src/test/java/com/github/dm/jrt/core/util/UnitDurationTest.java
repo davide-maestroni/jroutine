@@ -26,6 +26,8 @@ import java.lang.reflect.Method;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+import static com.github.dm.jrt.core.util.UnitDuration.infinity;
+import static com.github.dm.jrt.core.util.UnitDuration.zero;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -263,8 +265,8 @@ public class UnitDurationTest {
     @Test
     public void testInfinite() {
 
-        assertThat(UnitDuration.INFINITY.isZero()).isFalse();
-        assertThat(UnitDuration.INFINITY.isInfinity()).isTrue();
+        assertThat(infinity().isZero()).isFalse();
+        assertThat(infinity().isInfinite()).isTrue();
     }
 
     @Test
@@ -390,8 +392,7 @@ public class UnitDurationTest {
                                                                              .toMillis());
         assertThat(UnitDuration.minutes(2).minus(UnitDuration.seconds((191)))).isEqualTo(
                 UnitDuration.seconds(Long.MAX_VALUE - 70));
-        assertThat(UnitDuration.ZERO.minus(UnitTime.seconds(-2))).isEqualTo(
-                UnitDuration.seconds(2));
+        assertThat(zero().minus(UnitTime.seconds(-2))).isEqualTo(UnitDuration.seconds(2));
         assertThat(UnitDuration.seconds(1).minus(UnitDuration.millis(700))).isEqualTo(
                 UnitDuration.millis(300));
     }
@@ -505,9 +506,8 @@ public class UnitDurationTest {
                                                                              .toMillis());
         assertThat(UnitDuration.minutes(2).plus(UnitTime.seconds(-191))).isEqualTo(
                 UnitDuration.seconds(Long.MAX_VALUE - 70));
-        assertThat(UnitDuration.ZERO.plus(UnitDuration.seconds(3))).isEqualTo(
-                UnitDuration.seconds(3));
-        assertThat(UnitDuration.ZERO.plus(UnitTime.seconds(-3))).isEqualTo(
+        assertThat(zero().plus(UnitDuration.seconds(3))).isEqualTo(UnitDuration.seconds(3));
+        assertThat(zero().plus(UnitTime.seconds(-3))).isEqualTo(
                 UnitDuration.seconds(Long.MAX_VALUE - 2));
         assertThat(UnitDuration.seconds(1).plus(UnitTime.millis(-700))).isEqualTo(
                 UnitDuration.millis(300));
@@ -561,10 +561,9 @@ public class UnitDurationTest {
 
         final long past = System.currentTimeMillis() - 180000;
         assertThat(UnitDuration.timeSinceMillis(past)).isEqualTo(UnitDuration.minutes(3));
-        assertThat(UnitDuration.timeSinceMillis(System.currentTimeMillis())).isEqualTo(
-                UnitDuration.ZERO);
+        assertThat(UnitDuration.timeSinceMillis(System.currentTimeMillis())).isEqualTo(zero());
         final long future = System.currentTimeMillis() + 177777;
-        assertThat(UnitDuration.timeSinceMillis(future)).isEqualTo(UnitDuration.ZERO);
+        assertThat(UnitDuration.timeSinceMillis(future)).isEqualTo(zero());
         UnitDuration.millis(1100).sleepAtLeast();
         assertThat(UnitDuration.timeSinceMillis(past).toSeconds()).isGreaterThanOrEqualTo(181);
     }
@@ -572,43 +571,14 @@ public class UnitDurationTest {
     @Test
     public void testSinceNanos() throws InterruptedException {
 
-        final long past = System.nanoTime() - 180000000000l;
+        final long past = System.nanoTime() - 180000000000L;
         assertThat(UnitDuration.timeSinceNanos(past).millisTime()).isEqualTo(
                 UnitDuration.minutes(3));
-        assertThat(UnitDuration.timeSinceNanos(System.nanoTime()).millisTime()).isEqualTo(
-                UnitDuration.ZERO);
-        final long future = System.nanoTime() + 177777777777l;
-        assertThat(UnitDuration.timeSinceNanos(future)).isEqualTo(UnitDuration.ZERO);
+        assertThat(UnitDuration.timeSinceNanos(System.nanoTime()).millisTime()).isEqualTo(zero());
+        final long future = System.nanoTime() + 177777777777L;
+        assertThat(UnitDuration.timeSinceNanos(future)).isEqualTo(zero());
         UnitDuration.millis(1100).sleepAtLeast();
         assertThat(UnitDuration.timeSinceNanos(past).toSeconds()).isGreaterThanOrEqualTo(181);
-    }
-
-    @Test
-    public void testSleepError() {
-
-        try {
-
-            UnitDuration.INFINITY.sleepSinceMillis(System.currentTimeMillis());
-
-            fail();
-
-        } catch (final IllegalStateException ignored) {
-
-        } catch (final InterruptedException ignored) {
-
-        }
-
-        try {
-
-            UnitDuration.INFINITY.sleepSinceNanos(System.nanoTime());
-
-            fail();
-
-        } catch (final IllegalStateException ignored) {
-
-        } catch (final InterruptedException ignored) {
-
-        }
     }
 
     @Test
@@ -632,10 +602,10 @@ public class UnitDurationTest {
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(100);
 
         startTime = System.currentTimeMillis() - 1000;
-        assertThat(UnitDuration.ZERO.sleepSinceMillis(startTime)).isFalse();
+        assertThat(zero().sleepSinceMillis(startTime)).isFalse();
 
         startTime = System.currentTimeMillis();
-        assertThat(UnitDuration.ZERO.sleepSinceMillis(startTime)).isFalse();
+        assertThat(zero().sleepSinceMillis(startTime)).isFalse();
     }
 
     @Test
@@ -659,10 +629,10 @@ public class UnitDurationTest {
         assertThat(System.nanoTime() - startTime).isGreaterThanOrEqualTo(11573573);
 
         startTime = System.nanoTime() - 100000000;
-        assertThat(UnitDuration.ZERO.sleepSinceNanos(startTime)).isFalse();
+        assertThat(zero().sleepSinceNanos(startTime)).isFalse();
 
         startTime = System.nanoTime();
-        assertThat(UnitDuration.ZERO.sleepSinceNanos(startTime)).isFalse();
+        assertThat(zero().sleepSinceNanos(startTime)).isFalse();
     }
 
     @Test
@@ -670,12 +640,12 @@ public class UnitDurationTest {
 
         long startTime = System.currentTimeMillis();
 
-        UnitDuration.ZERO.sleep();
+        zero().sleep();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(0);
 
         startTime = System.currentTimeMillis();
 
-        UnitDuration.ZERO.sleepAtLeast();
+        zero().sleepAtLeast();
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(0);
     }
 
@@ -699,10 +669,9 @@ public class UnitDurationTest {
 
         final long future = System.currentTimeMillis() + 180000;
         assertThat(UnitDuration.timeUntilMillis(future)).isEqualTo(UnitDuration.minutes(3));
-        assertThat(UnitDuration.timeUntilMillis(System.currentTimeMillis())).isEqualTo(
-                UnitDuration.ZERO);
+        assertThat(UnitDuration.timeUntilMillis(System.currentTimeMillis())).isEqualTo(zero());
         final long past = System.currentTimeMillis() - 177777;
-        assertThat(UnitDuration.timeUntilMillis(past)).isEqualTo(UnitDuration.ZERO);
+        assertThat(UnitDuration.timeUntilMillis(past)).isEqualTo(zero());
         UnitDuration.seconds(1).sleepAtLeast();
         assertThat(UnitDuration.timeUntilMillis(future).toSeconds()).isLessThanOrEqualTo(179);
     }
@@ -710,13 +679,12 @@ public class UnitDurationTest {
     @Test
     public void testUntilNanos() throws InterruptedException {
 
-        final long future = System.nanoTime() + 180000999999l;
+        final long future = System.nanoTime() + 180000999999L;
         assertThat(UnitDuration.timeUntilNanos(future).millisTime()).isEqualTo(
                 UnitDuration.minutes(3));
-        assertThat(UnitDuration.timeUntilNanos(System.nanoTime()).millisTime()).isEqualTo(
-                UnitDuration.ZERO);
-        final long past = System.nanoTime() - 177777777777l;
-        assertThat(UnitDuration.timeUntilNanos(past)).isEqualTo(UnitDuration.ZERO);
+        assertThat(UnitDuration.timeUntilNanos(System.nanoTime()).millisTime()).isEqualTo(zero());
+        final long past = System.nanoTime() - 177777777777L;
+        assertThat(UnitDuration.timeUntilNanos(past)).isEqualTo(zero());
         UnitDuration.seconds(1).sleepAtLeast();
         assertThat(UnitDuration.timeUntilNanos(future).toSeconds()).isLessThanOrEqualTo(179);
     }
@@ -775,7 +743,7 @@ public class UnitDurationTest {
 
         synchronized (thread) {
 
-            UnitDuration.INFINITY.wait(thread);
+            infinity().wait(thread);
         }
 
         startTime = System.currentTimeMillis() - 1000;
@@ -816,7 +784,7 @@ public class UnitDurationTest {
 
         synchronized (thread) {
 
-            UnitDuration.INFINITY.waitSinceMillis(thread, System.currentTimeMillis());
+            infinity().waitSinceMillis(thread, System.currentTimeMillis());
         }
     }
 
@@ -862,7 +830,7 @@ public class UnitDurationTest {
 
         synchronized (thread) {
 
-            UnitDuration.INFINITY.waitSinceNanos(thread, System.nanoTime());
+            infinity().waitSinceNanos(thread, System.nanoTime());
         }
     }
 
@@ -955,7 +923,7 @@ public class UnitDurationTest {
 
         synchronized (thread) {
 
-            assertThat(UnitDuration.INFINITY.waitTrue(thread, new Condition() {
+            assertThat(infinity().waitTrue(thread, new Condition() {
 
                 private boolean mToggle = true;
 
@@ -1026,7 +994,7 @@ public class UnitDurationTest {
 
         synchronized (this) {
 
-            assertThat(UnitDuration.ZERO.waitTrue(this, alwaysFalse)).isFalse();
+            assertThat(zero().waitTrue(this, alwaysFalse)).isFalse();
         }
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(0);
 
@@ -1034,7 +1002,7 @@ public class UnitDurationTest {
 
         synchronized (this) {
 
-            assertThat(UnitDuration.ZERO.waitTrue(this, alwaysTrue)).isTrue();
+            assertThat(zero().waitTrue(this, alwaysTrue)).isTrue();
         }
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(0);
     }
@@ -1047,32 +1015,32 @@ public class UnitDurationTest {
 
         synchronized (this) {
 
-            UnitDuration.ZERO.wait(this);
+            zero().wait(this);
         }
         assertThat(System.currentTimeMillis() - startTime).isGreaterThanOrEqualTo(0);
 
         startTime = System.currentTimeMillis() - 1000;
         synchronized (this) {
 
-            assertThat(UnitDuration.ZERO.waitSinceMillis(this, startTime)).isFalse();
+            assertThat(zero().waitSinceMillis(this, startTime)).isFalse();
         }
 
         startTime = System.currentTimeMillis();
         synchronized (this) {
 
-            assertThat(UnitDuration.ZERO.waitSinceMillis(this, startTime)).isFalse();
+            assertThat(zero().waitSinceMillis(this, startTime)).isFalse();
         }
 
         startTime = System.nanoTime() - 100000000;
         synchronized (this) {
 
-            assertThat(UnitDuration.ZERO.waitSinceNanos(this, startTime)).isFalse();
+            assertThat(zero().waitSinceNanos(this, startTime)).isFalse();
         }
 
         startTime = System.nanoTime();
         synchronized (this) {
 
-            assertThat(UnitDuration.ZERO.waitSinceNanos(this, startTime)).isFalse();
+            assertThat(zero().waitSinceNanos(this, startTime)).isFalse();
         }
     }
 

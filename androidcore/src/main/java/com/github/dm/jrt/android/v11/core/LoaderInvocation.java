@@ -46,7 +46,6 @@ import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.core.util.WeakIdentityHashMap;
 
 import org.jetbrains.annotations.NotNull;
@@ -59,6 +58,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.fromFactory;
 import static com.github.dm.jrt.android.core.runner.AndroidRunners.mainRunner;
+import static com.github.dm.jrt.core.util.UnitDuration.infinity;
 
 /**
  * Invocation implementation employing loaders to perform background operations.
@@ -119,8 +119,7 @@ class LoaderInvocation<IN, OUT> extends CallInvocation<IN, OUT> {
         mInputClashResolutionType =
                 configuration.getInputClashResolutionTypeOrElse(ClashResolutionType.JOIN);
         mCacheStrategyType = configuration.getCacheStrategyTypeOrElse(CacheStrategyType.CLEAR);
-        mResultStaleTimeMillis =
-                configuration.getResultStaleTimeOrElse(UnitDuration.INFINITY).toMillis();
+        mResultStaleTimeMillis = configuration.getResultStaleTimeOrElse(infinity()).toMillis();
         mOrderType = order;
         mLogger = logger.subContextLogger(this);
     }

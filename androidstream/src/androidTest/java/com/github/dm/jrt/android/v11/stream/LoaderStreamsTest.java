@@ -67,9 +67,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryFrom;
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryOf;
 import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
-import static com.github.dm.jrt.core.util.UnitDuration.ZERO;
 import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
+import static com.github.dm.jrt.core.util.UnitDuration.zero;
 import static com.github.dm.jrt.stream.Streams.range;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -2248,7 +2248,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         seconds(5).sleepAtLeast();
         assertThat(LoaderStreams.streamOf("test")
                                 .with(context)
-                                .staleAfter(ZERO)
+                                .staleAfter(zero())
                                 .async()
                                 .map(function)
                                 .afterMax(seconds(10))
@@ -2262,7 +2262,7 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         seconds(5).sleepAtLeast();
         assertThat(LoaderStreams.streamOf("test")
                                 .with(context)
-                                .staleAfter(ZERO)
+                                .staleAfter(zero())
                                 .async()
                                 .map(function)
                                 .afterMax(seconds(10))
@@ -2336,17 +2336,15 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
             switch (selectable.index) {
 
                 case INTEGER:
-                    LoaderStreams.<Object, Integer>selectParcelable(result, INTEGER)
-                                 .buildChannels()
-                                 .pass(selectable.<Integer>data())
-                                 .close();
+                    LoaderStreams.<Object, Integer>selectParcelable(result, INTEGER).buildChannels()
+                                                                                    .pass(selectable.<Integer>data())
+                                                                                    .close();
                     break;
 
                 case STRING:
-                    LoaderStreams.<Object, String>selectParcelable(result, STRING)
-                                 .buildChannels()
-                                 .pass(selectable.<String>data())
-                                 .close();
+                    LoaderStreams.<Object, String>selectParcelable(result, STRING).buildChannels()
+                                                                                  .pass(selectable.<String>data())
+                                                                                  .close();
                     break;
             }
         }

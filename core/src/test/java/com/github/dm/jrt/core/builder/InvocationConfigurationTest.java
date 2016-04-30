@@ -32,6 +32,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builderFrom;
+import static com.github.dm.jrt.core.util.UnitDuration.zero;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -158,7 +159,7 @@ public class InvocationConfigurationTest {
                                                                .withOutputMaxSize(100)
                                                                .applyConfiguration();
         assertThat(configuration).isNotEqualTo(
-                builder().withReadTimeout(UnitDuration.ZERO).applyConfiguration());
+                builder().withReadTimeout(zero()).applyConfiguration());
         assertThat(configuration).isNotEqualTo(
                 builder().withReadTimeout(1, TimeUnit.MILLISECONDS).applyConfiguration());
         assertThat(configuration.builderFrom()
@@ -205,7 +206,7 @@ public class InvocationConfigurationTest {
                                                                .withOutputMaxSize(100)
                                                                .applyConfiguration();
         assertThat(configuration).isNotEqualTo(
-                builder().withInputMaxDelay(UnitDuration.ZERO).applyConfiguration());
+                builder().withInputMaxDelay(zero()).applyConfiguration());
         assertThat(configuration).isNotEqualTo(
                 builder().withInputMaxDelay(1, TimeUnit.MILLISECONDS).applyConfiguration());
         assertThat(configuration.builderFrom()
@@ -383,7 +384,7 @@ public class InvocationConfigurationTest {
                                                                .withOutputMaxSize(100)
                                                                .applyConfiguration();
         assertThat(configuration).isNotEqualTo(
-                builder().withOutputMaxDelay(UnitDuration.ZERO).applyConfiguration());
+                builder().withOutputMaxDelay(zero()).applyConfiguration());
         assertThat(configuration).isNotEqualTo(
                 builder().withOutputMaxDelay(1, TimeUnit.MILLISECONDS).applyConfiguration());
         assertThat(configuration.builderFrom()

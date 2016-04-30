@@ -34,6 +34,7 @@ import java.util.HashSet;
 
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
+import static com.github.dm.jrt.core.util.UnitDuration.zero;
 
 /**
  * The downloader implementation.
@@ -61,13 +62,16 @@ public class Downloader {
     public Downloader(final int maxParallelDownloads) {
 
         // The read connection invocation is stateless so we can just use a single instance of it
-        mReadConnection = JRoutineCore.on(new ReadConnection()).invocationConfiguration()
-                // Since each download may take a long time to complete, we use a dedicated runner
-                .withRunner(sReadRunner)
-                        // By setting the maximum number of parallel invocations we effectively
-                        // limit the
-                        // number of parallel downloads
-                .withMaxInstances(maxParallelDownloads).applyConfiguration().buildRoutine();
+        mReadConnection = JRoutineCore.on(new ReadConnection())
+                                      .invocationConfiguration()
+                                      // Since each download may take a long time to complete, we
+                                      // use a dedicated runner
+                                      .withRunner(sReadRunner)
+                                      // By setting the maximum number of parallel invocations we
+                                      // effectively limit the number of parallel downloads
+                                      .withMaxInstances(maxParallelDownloads)
+                                      .applyConfiguration()
+                                      .buildRoutine();
     }
 
     /**
@@ -154,15 +158,16 @@ public class Downloader {
             // the specific routine
             // That's why we store the routine output channel in an internal map
             final Routine<ByteBuffer, Boolean> writeFile =
-                    JRoutineCore.on(factoryOf(WriteFile.class, dstFile)).invocationConfiguration()
-                            // Since we want to limit the number of allocated chunks, we have to
-                            // make the writing happen in a dedicated runner, so that waiting for
-                            // available space becomes allowed
-                            .withRunner(sWriteRunner)
-                            .withInputLimit(32)
-                            .withInputMaxDelay(seconds(3))
-                            .applyConfiguration()
-                            .buildRoutine();
+                    JRoutineCore.on(factoryOf(WriteFile.class, dstFile))
+                                .invocationConfiguration()
+                                // Since we want to limit the number of allocated chunks, we have to
+                                // make the writing happen in a dedicated runner, so that waiting
+                                // for available space becomes allowed
+                                .withRunner(sWriteRunner)
+                                .withInputLimit(32)
+                                .withInputMaxDelay(seconds(3))
+                                .applyConfiguration()
+                                .buildRoutine();
             downloads.put(uri, writeFile.asyncCall(mReadConnection.asyncCall(uri)));
         }
     }
@@ -175,7 +180,7 @@ public class Downloader {
      */
     public boolean isDownloaded(final URI uri) {
 
-        return waitDone(uri, UnitDuration.ZERO);
+        return waitDone(uri, zero());
     }
 
     /**

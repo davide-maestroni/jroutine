@@ -1154,6 +1154,10 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
 
     public void testApply() {
 
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
+
         assertThat(LoaderStreams.streamOf("test1")
                                 .with(loaderFrom(getActivity()))
                                 .apply(new Function<StreamChannel<String>, StreamChannel<String>>

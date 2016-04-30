@@ -74,7 +74,7 @@ import static com.github.dm.jrt.android.object.ContextInvocationTarget.classOfTy
 import static com.github.dm.jrt.android.object.ContextInvocationTarget.instanceOf;
 import static com.github.dm.jrt.android.v4.core.LoaderContextCompat.loaderFrom;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
-import static com.github.dm.jrt.core.util.UnitDuration.INFINITY;
+import static com.github.dm.jrt.core.util.UnitDuration.infinity;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -542,7 +542,7 @@ public class LoaderObjectRoutineFragmentTest
             JRoutineLoaderObjectCompat.with(loaderFrom(fragment))
                                       .on(instanceOf(TestClass.class))
                                       .invocationConfiguration()
-                                      .withReadTimeout(INFINITY)
+                                      .withReadTimeout(infinity())
                                       .applyConfiguration()
                                       .buildProxy(TestItf.class)
                                       .throwException(null);
@@ -558,7 +558,7 @@ public class LoaderObjectRoutineFragmentTest
             JRoutineLoaderObjectCompat.with(loaderFrom(fragment))
                                       .on(instanceOf(TestClass.class))
                                       .invocationConfiguration()
-                                      .withReadTimeout(INFINITY)
+                                      .withReadTimeout(infinity())
                                       .applyConfiguration()
                                       .buildProxy(TestItf.class)
                                       .throwException1(null);
@@ -574,7 +574,7 @@ public class LoaderObjectRoutineFragmentTest
             JRoutineLoaderObjectCompat.with(loaderFrom(fragment))
                                       .on(instanceOf(TestClass.class))
                                       .invocationConfiguration()
-                                      .withReadTimeout(INFINITY)
+                                      .withReadTimeout(infinity())
                                       .applyConfiguration()
                                       .buildProxy(TestItf.class)
                                       .throwException2(null);

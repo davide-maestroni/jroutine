@@ -18,6 +18,7 @@ package com.github.dm.jrt.core.util;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -27,21 +28,16 @@ import java.util.concurrent.TimeUnit;
  */
 public class UnitDuration extends UnitTime {
 
-    /**
-     * Time duration instance representing the infinity.
-     */
-    public static final UnitDuration INFINITY = seconds(Long.MAX_VALUE);
-
-    /**
-     * Time duration instance representing the zero.
-     */
-    public static final UnitDuration ZERO = seconds(0);
-
-    private static final long MILLI_DAYS_OVERFLOW = 106751991167L;
-
-    private static final long NANO_DAYS_OVERFLOW = 106750L;
-
     private static final long ONE_MILLI_NANOS = TimeUnit.MILLISECONDS.toNanos(1);
+
+    private static final UnitDuration sInfinity = seconds(Long.MAX_VALUE);
+
+    private static final UnitDuration sZero = new UnitDuration(0, TimeUnit.MILLISECONDS);
+
+    private static final HashMap<TimeUnit, UnitDuration> sZeroes =
+            new HashMap<TimeUnit, UnitDuration>() {{
+                put(TimeUnit.MILLISECONDS, sZero);
+            }};
 
     /**
      * Constructor.
@@ -52,8 +48,7 @@ public class UnitDuration extends UnitTime {
      */
     protected UnitDuration(final long duration, @NotNull final TimeUnit unit) {
 
-        super(duration, unit);
-        ConstantConditions.notNegative("time duration", duration);
+        super(ConstantConditions.notNegative("time duration", duration), unit);
     }
 
     /**
@@ -70,7 +65,7 @@ public class UnitDuration extends UnitTime {
             throw new IllegalArgumentException("time value overflow: " + days + " days");
         }
 
-        return new UnitDuration(days * SECONDS_IN_DAY, TimeUnit.SECONDS);
+        return fromUnit(days * SECONDS_IN_DAY, TimeUnit.SECONDS);
     }
 
     /**
@@ -85,7 +80,7 @@ public class UnitDuration extends UnitTime {
     @NotNull
     public static UnitDuration fromUnit(final long time, @NotNull final TimeUnit unit) {
 
-        return new UnitDuration(time, ConstantConditions.notNull("time unit", unit));
+        return new UnitDuration(time, unit);
     }
 
     /**
@@ -102,7 +97,16 @@ public class UnitDuration extends UnitTime {
             throw new IllegalArgumentException("time value overflow: " + hours + " hours");
         }
 
-        return new UnitDuration(hours * SECONDS_IN_HOUR, TimeUnit.SECONDS);
+        return fromUnit(hours * SECONDS_IN_HOUR, TimeUnit.SECONDS);
+    }
+
+    /**
+     * Time duration instance representing the infinity.
+     */
+    @NotNull
+    public static UnitDuration infinity() {
+
+        return sInfinity;
     }
 
     /**
@@ -115,7 +119,7 @@ public class UnitDuration extends UnitTime {
     @NotNull
     public static UnitDuration micros(final long micros) {
 
-        return new UnitDuration(micros, TimeUnit.MICROSECONDS);
+        return fromUnit(micros, TimeUnit.MICROSECONDS);
     }
 
     /**
@@ -128,7 +132,7 @@ public class UnitDuration extends UnitTime {
     @NotNull
     public static UnitDuration millis(final long millis) {
 
-        return new UnitDuration(millis, TimeUnit.MILLISECONDS);
+        return fromUnit(millis, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -145,7 +149,7 @@ public class UnitDuration extends UnitTime {
             throw new IllegalArgumentException("time value overflow: " + minutes + " minutes");
         }
 
-        return new UnitDuration(minutes * SECONDS_IN_MINUTE, TimeUnit.SECONDS);
+        return fromUnit(minutes * SECONDS_IN_MINUTE, TimeUnit.SECONDS);
     }
 
     /**
@@ -158,7 +162,7 @@ public class UnitDuration extends UnitTime {
     @NotNull
     public static UnitDuration nanos(final long nanos) {
 
-        return new UnitDuration(nanos, TimeUnit.NANOSECONDS);
+        return fromUnit(nanos, TimeUnit.NANOSECONDS);
     }
 
     /**
@@ -171,13 +175,13 @@ public class UnitDuration extends UnitTime {
     @NotNull
     public static UnitDuration seconds(final long seconds) {
 
-        return new UnitDuration(seconds, TimeUnit.SECONDS);
+        return fromUnit(seconds, TimeUnit.SECONDS);
     }
 
     /**
      * Creates and returns an object representing the time range between now and a time in the past.
      * <br>
-     * If the specified is in the future, a {@code ZERO} duration will be returned.
+     * If the specified is in the future, a {@code zero()} duration will be returned.
      *
      * @param milliTime the system time in milliseconds.
      * @return the time duration instance.
@@ -186,14 +190,13 @@ public class UnitDuration extends UnitTime {
     @NotNull
     public static UnitDuration timeSinceMillis(final long milliTime) {
 
-        final long millis = System.currentTimeMillis() - milliTime;
-        return (millis > 0) ? millis(millis) : ZERO;
+        return millis(Math.max(0, System.currentTimeMillis() - milliTime));
     }
 
     /**
      * Creates and returns an object representing the time range between now and a time in the past.
      * <br>
-     * If the specified is in the future, a {@code ZERO} duration will be returned.
+     * If the specified is in the future, a {@code zero()} duration will be returned.
      *
      * @param nanoTime the high precision system time in nanoseconds.
      * @return the time duration instance.
@@ -202,15 +205,14 @@ public class UnitDuration extends UnitTime {
     @NotNull
     public static UnitDuration timeSinceNanos(final long nanoTime) {
 
-        final long nanos = System.nanoTime() - nanoTime;
-        return (nanos > 0) ? nanos(nanos) : ZERO;
+        return nanos(Math.max(0, System.nanoTime() - nanoTime));
     }
 
     /**
      * Creates and returns an object representing the time range between now and a time in the
      * future.
      * <br>
-     * If the specified is in the past, a {@code ZERO} duration will be returned.
+     * If the specified is in the past, a {@code zero()} duration will be returned.
      *
      * @param milliTime the system time in milliseconds.
      * @return the time duration instance.
@@ -219,15 +221,14 @@ public class UnitDuration extends UnitTime {
     @NotNull
     public static UnitDuration timeUntilMillis(final long milliTime) {
 
-        final long millis = milliTime - System.currentTimeMillis();
-        return (millis > 0) ? millis(millis) : ZERO;
+        return millis(Math.max(0, milliTime - System.currentTimeMillis()));
     }
 
     /**
      * Creates and returns an object representing the time range between now and a time in the
      * future.
      * <br>
-     * If the specified is in the past, a {@code ZERO} duration will be returned.
+     * If the specified is in the past, a {@code zero()} duration will be returned.
      *
      * @param nanoTime the high precision system time in nanoseconds.
      * @return the time duration instance.
@@ -236,8 +237,181 @@ public class UnitDuration extends UnitTime {
     @NotNull
     public static UnitDuration timeUntilNanos(final long nanoTime) {
 
-        final long nanos = nanoTime - System.nanoTime();
-        return (nanos > 0) ? nanos(nanos) : ZERO;
+        return nanos(Math.max(0, nanoTime - System.nanoTime()));
+    }
+
+    /**
+     * Performs an {@link java.lang.Object#wait()} using the specified time.
+     * <br>
+     * If the specified time is negative, the method will wait indefinitely.
+     *
+     * @param time   the time value.
+     * @param unit   the time unit.
+     * @param target the target object.
+     * @throws java.lang.InterruptedException if the current thread is interrupted.
+     */
+    public static void wait(final long time, @NotNull final TimeUnit unit,
+            @NotNull final Object target) throws InterruptedException {
+
+        if (time == 0) {
+            return;
+        }
+
+        if (time < 0) {
+            target.wait();
+            return;
+        }
+
+        unit.timedWait(target, time);
+    }
+
+    /**
+     * Performs an {@link java.lang.Object#wait()} as if started from the specified system time in
+     * milliseconds, by using the specified time.
+     * <br>
+     * If the specified time is negative, the method will wait indefinitely.
+     *
+     * @param time      the time value.
+     * @param unit      the time unit.
+     * @param target    the target object.
+     * @param milliTime the starting system time in milliseconds.
+     * @return whether the wait happened at all.
+     * @throws java.lang.InterruptedException if the current thread is interrupted.
+     * @see System#currentTimeMillis()
+     */
+    public static boolean waitSinceMillis(final long time, @NotNull final TimeUnit unit,
+            @NotNull final Object target, final long milliTime) throws InterruptedException {
+
+        if (time == 0) {
+            return false;
+        }
+
+        if (time < 0) {
+            target.wait();
+            return true;
+        }
+
+        final long millisToWait = milliTime - System.currentTimeMillis() + unit.toMillis(time);
+        if (millisToWait <= 0) {
+            return false;
+        }
+
+        TimeUnit.MILLISECONDS.timedWait(target, millisToWait);
+        return true;
+    }
+
+    /**
+     * Performs an {@link java.lang.Object#wait()} as if started from the specified high precision
+     * system time in nanoseconds, by using the specified time.
+     * <br>
+     * If the specified time is negative, the method will wait indefinitely.
+     *
+     * @param time     the time value.
+     * @param unit     the time unit.
+     * @param target   the target object.
+     * @param nanoTime the starting system time in nanoseconds.
+     * @return whether the wait happened at all.
+     * @throws java.lang.InterruptedException if the current thread is interrupted.
+     * @see System#nanoTime()
+     */
+    public static boolean waitSinceNanos(final long time, @NotNull final TimeUnit unit,
+            @NotNull final Object target, final long nanoTime) throws InterruptedException {
+
+        if (time == 0) {
+            return false;
+        }
+
+        if (time < 0) {
+            target.wait();
+            return true;
+        }
+
+        final long nanosToWait = nanoTime - System.nanoTime() + unit.toNanos(time);
+        if (nanosToWait <= 0) {
+            return false;
+        }
+
+        TimeUnit.NANOSECONDS.timedWait(target, nanosToWait);
+        return true;
+    }
+
+    /**
+     * Waits for the specified condition to be true by performing an {@link java.lang.Object#wait()}
+     * and using the specified time.
+     * <br>
+     * If the specified time is negative, the method will wait indefinitely.
+     *
+     * @param time      the time value.
+     * @param unit      the time unit.
+     * @param target    the target object.
+     * @param condition the condition to verify.
+     * @return whether the check became true before the timeout elapsed.
+     * @throws java.lang.InterruptedException if the current thread is interrupted.
+     */
+    public static boolean waitTrue(final long time, @NotNull final TimeUnit unit,
+            @NotNull final Object target, @NotNull final Condition condition) throws
+            InterruptedException {
+
+        if (time == 0) {
+            return condition.isTrue();
+        }
+
+        if (time < 0) {
+            while (!condition.isTrue()) {
+                target.wait();
+            }
+
+            return true;
+        }
+
+        if ((unit.toNanos(time) % ONE_MILLI_NANOS) == 0) {
+            final long startMillis = System.currentTimeMillis();
+            while (!condition.isTrue()) {
+                if (!waitSinceMillis(time, unit, target, startMillis)) {
+                    return false;
+                }
+            }
+
+        } else {
+            final long startNanos = System.nanoTime();
+            while (!condition.isTrue()) {
+                if (!waitSinceNanos(time, unit, target, startNanos)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Returns the time duration instance representing the zero.
+     *
+     * @return the zero duration.
+     */
+    @NotNull
+    public static UnitDuration zero() {
+
+        return sZero;
+    }
+
+    /**
+     * Returns the time duration instance representing the zero in the specified unit.
+     *
+     * @param unit the time unit.
+     * @return the zero duration.
+     */
+    @NotNull
+    public static UnitDuration zero(@NotNull final TimeUnit unit) {
+
+        final HashMap<TimeUnit, UnitDuration> zeroes = sZeroes;
+        UnitDuration zero = zeroes.get(unit);
+        if (zero == null) {
+            zero = new UnitDuration(0, unit);
+            zeroes.put(unit, zero);
+        }
+
+        return zero;
     }
 
     /**
@@ -373,9 +547,9 @@ public class UnitDuration extends UnitTime {
      *
      * @return whether this duration is infinite.
      */
-    public boolean isInfinity() {
+    public boolean isInfinite() {
 
-        return equals(INFINITY);
+        return (this == sInfinity);
     }
 
     /**
@@ -411,7 +585,7 @@ public class UnitDuration extends UnitTime {
             return;
         }
 
-        if (((toNanos() % ONE_MILLI_NANOS) == 0) || (toDays() > NANO_DAYS_OVERFLOW)) {
+        if ((unit.compareTo(TimeUnit.MILLISECONDS) >= 0) || ((toNanos() % ONE_MILLI_NANOS) == 0)) {
             final long startMillis = System.currentTimeMillis();
             while (true) {
                 if (!sleepSinceMillis(startMillis)) {
@@ -444,11 +618,6 @@ public class UnitDuration extends UnitTime {
             return false;
         }
 
-        if (toDays() > MILLI_DAYS_OVERFLOW) {
-            throw new IllegalStateException("the duration overflows the maximum sleep time: " +
-                    toDays() + " days");
-        }
-
         final long millisToSleep = milliTime - System.currentTimeMillis() + toMillis();
         if (millisToSleep <= 0) {
             return false;
@@ -474,11 +643,6 @@ public class UnitDuration extends UnitTime {
             return false;
         }
 
-        if (toDays() > NANO_DAYS_OVERFLOW) {
-            throw new IllegalStateException("the duration overflows the maximum sleep time: " +
-                    toDays() + " days");
-        }
-
         final long nanosToSleep = nanoTime - System.nanoTime() + toNanos();
         if (nanosToSleep <= 0) {
             return false;
@@ -496,16 +660,7 @@ public class UnitDuration extends UnitTime {
      */
     public void wait(@NotNull final Object target) throws InterruptedException {
 
-        if (isZero()) {
-            return;
-        }
-
-        if (isInfinity()) {
-            target.wait();
-            return;
-        }
-
-        unit.timedWait(target, value);
+        wait(isInfinite() ? -1 : value, unit, target);
     }
 
     /**
@@ -521,22 +676,7 @@ public class UnitDuration extends UnitTime {
     public boolean waitSinceMillis(@NotNull final Object target, final long milliTime) throws
             InterruptedException {
 
-        if (isZero()) {
-            return false;
-        }
-
-        if (isInfinity() || (toDays() > MILLI_DAYS_OVERFLOW)) {
-            target.wait();
-            return true;
-        }
-
-        final long millisToWait = milliTime - System.currentTimeMillis() + toMillis();
-        if (millisToWait <= 0) {
-            return false;
-        }
-
-        TimeUnit.MILLISECONDS.timedWait(target, millisToWait);
-        return true;
+        return waitSinceMillis(isInfinite() ? -1 : value, unit, target, milliTime);
     }
 
     /**
@@ -552,22 +692,7 @@ public class UnitDuration extends UnitTime {
     public boolean waitSinceNanos(@NotNull final Object target, final long nanoTime) throws
             InterruptedException {
 
-        if (isZero()) {
-            return false;
-        }
-
-        if (isInfinity() || (toDays() > NANO_DAYS_OVERFLOW)) {
-            target.wait();
-            return true;
-        }
-
-        final long nanosToWait = nanoTime - System.nanoTime() + toNanos();
-        if (nanosToWait <= 0) {
-            return false;
-        }
-
-        TimeUnit.NANOSECONDS.timedWait(target, nanosToWait);
-        return true;
+        return waitSinceNanos(isInfinite() ? -1 : value, unit, target, nanoTime);
     }
 
     /**
@@ -582,36 +707,7 @@ public class UnitDuration extends UnitTime {
     public boolean waitTrue(@NotNull final Object target, @NotNull final Condition condition) throws
             InterruptedException {
 
-        if (isZero()) {
-            return condition.isTrue();
-        }
-
-        if (isInfinity()) {
-            while (!condition.isTrue()) {
-                target.wait();
-            }
-
-            return true;
-        }
-
-        if ((toNanos() % ONE_MILLI_NANOS) == 0) {
-            final long startMillis = System.currentTimeMillis();
-            while (!condition.isTrue()) {
-                if (!waitSinceMillis(target, startMillis)) {
-                    return false;
-                }
-            }
-
-        } else {
-            final long startNanos = System.nanoTime();
-            while (!condition.isTrue()) {
-                if (!waitSinceNanos(target, startNanos)) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
+        return waitTrue(isInfinite() ? -1 : value, unit, target, condition);
     }
 
     /**

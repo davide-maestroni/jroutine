@@ -75,9 +75,10 @@ import java.util.concurrent.atomic.AtomicReference;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
 import static com.github.dm.jrt.core.invocation.InvocationFactory.factoryOf;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
-import static com.github.dm.jrt.core.util.UnitDuration.INFINITY;
+import static com.github.dm.jrt.core.util.UnitDuration.infinity;
 import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
+import static com.github.dm.jrt.core.util.UnitDuration.zero;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -723,8 +724,7 @@ public class RoutineTest {
         startTime = System.currentTimeMillis();
 
         final InvocationChannel<String, String> channel4 =
-                JRoutineCore.on(factoryOf(DelayedListInvocation.class, UnitDuration.ZERO, 2))
-                            .asyncInvoke();
+                JRoutineCore.on(factoryOf(DelayedListInvocation.class, zero(), 2)).asyncInvoke();
         channel4.after(100, TimeUnit.MILLISECONDS).pass("test1");
         channel4.after(millis(10).nanosTime()).pass("test2");
         channel4.after(millis(10).microsTime()).pass("test3", "test4");
@@ -737,7 +737,7 @@ public class RoutineTest {
         startTime = System.currentTimeMillis();
 
         final InvocationChannel<String, String> channel5 =
-                JRoutineCore.on(factoryOf(DelayedListInvocation.class, UnitDuration.ZERO, 2))
+                JRoutineCore.on(factoryOf(DelayedListInvocation.class, zero(), 2))
                             .invocationConfiguration()
                             .with(configuration)
                             .applyConfiguration()
@@ -785,8 +785,7 @@ public class RoutineTest {
         startTime = System.currentTimeMillis();
 
         final InvocationChannel<String, String> channel8 =
-                JRoutineCore.on(factoryOf(DelayedChannelInvocation.class, UnitDuration.ZERO))
-                            .asyncInvoke();
+                JRoutineCore.on(factoryOf(DelayedChannelInvocation.class, zero())).asyncInvoke();
         channel8.after(100, TimeUnit.MILLISECONDS).pass("test1");
         channel8.after(millis(10).nanosTime()).pass("test2");
         channel8.after(millis(10).microsTime()).pass("test3", "test4");
@@ -799,7 +798,7 @@ public class RoutineTest {
         startTime = System.currentTimeMillis();
 
         final InvocationChannel<String, String> channel9 =
-                JRoutineCore.on(factoryOf(DelayedChannelInvocation.class, UnitDuration.ZERO))
+                JRoutineCore.on(factoryOf(DelayedChannelInvocation.class, zero()))
                             .invocationConfiguration()
                             .with(configuration)
                             .applyConfiguration()
@@ -1470,7 +1469,7 @@ public class RoutineTest {
                                .invocationConfiguration()
                                .withInputOrder(OrderType.BY_CALL)
                                .withInputLimit(1)
-                               .withInputMaxDelay(UnitDuration.ZERO)
+                               .withInputMaxDelay(zero())
                                .applyConfiguration()
                                .asyncInvoke()
                                .orderByDelay()
@@ -1757,7 +1756,7 @@ public class RoutineTest {
         Thread.sleep(500);
 
         outputChannel.abort();
-        outputChannel.afterMax(INFINITY).hasCompleted();
+        outputChannel.afterMax(infinity()).hasCompleted();
         assertThat(TestLifecycle.sIsError).isFalse();
     }
 
@@ -1998,7 +1997,7 @@ public class RoutineTest {
                 JRoutineCore.on(IdentityInvocation.<String>factoryOf())
                             .invocationConfiguration()
                             .withOutputLimit(1)
-                            .withOutputMaxDelay(UnitDuration.ZERO)
+                            .withOutputMaxDelay(zero())
                             .applyConfiguration()
                             .buildRoutine();
         final OutputChannel<String> outputChannel =
@@ -2209,7 +2208,7 @@ public class RoutineTest {
         }
 
         final OutputChannel<String> channel =
-                JRoutineCore.on(factoryOf(DelayedInvocation.class, UnitDuration.ZERO))
+                JRoutineCore.on(factoryOf(DelayedInvocation.class, zero()))
                             .invocationConfiguration()
                             .withLogLevel(Level.SILENT)
                             .applyConfiguration()
@@ -2454,10 +2453,10 @@ public class RoutineTest {
                                .withCoreInstances(0)
                                .withMaxInstances(1)
                                .withInputLimit(2)
-                               .withInputMaxDelay(UnitDuration.ZERO)
+                               .withInputMaxDelay(zero())
                                .withInputMaxSize(2)
                                .withOutputLimit(2)
-                               .withOutputMaxDelay(UnitDuration.ZERO)
+                               .withOutputMaxDelay(zero())
                                .withOutputMaxSize(2)
                                .withOutputOrder(OrderType.BY_CALL)
                                .applyConfiguration()
@@ -3155,8 +3154,7 @@ public class RoutineTest {
         final UnitDuration timeout = seconds(1);
         final String input = "test";
         final Routine<String, String> routine =
-                JRoutineCore.on(factoryOf(DelayedInvocation.class, UnitDuration.ZERO))
-                            .buildRoutine();
+                JRoutineCore.on(factoryOf(DelayedInvocation.class, zero())).buildRoutine();
 
         assertThat(
                 routine.syncCall(input).bind(consumer).afterMax(timeout).hasCompleted()).isTrue();
@@ -3600,8 +3598,7 @@ public class RoutineTest {
         public DelayedChannelInvocation(final UnitDuration delay) {
 
             mDelay = delay;
-            mRoutine = JRoutineCore.on(factoryOf(DelayedInvocation.class, UnitDuration.ZERO))
-                                   .buildRoutine();
+            mRoutine = JRoutineCore.on(factoryOf(DelayedInvocation.class, zero())).buildRoutine();
         }
 
         @Override
@@ -3753,7 +3750,7 @@ public class RoutineTest {
             JRoutineCore.on(IdentityInvocation.<String>factoryOf())
                         .invocationConfiguration()
                         .withInputMaxSize(1)
-                        .withInputMaxDelay(UnitDuration.INFINITY)
+                        .withInputMaxDelay(infinity())
                         .applyConfiguration()
                         .asyncInvoke()
                         .after(millis(500))
@@ -3781,7 +3778,7 @@ public class RoutineTest {
             result.pass(JRoutineCore.on(IdentityInvocation.<String>factoryOf())
                                     .invocationConfiguration()
                                     .withInputMaxSize(1)
-                                    .withInputMaxDelay(UnitDuration.INFINITY)
+                                    .withInputMaxDelay(infinity())
                                     .applyConfiguration()
                                     .asyncInvoke()
                                     .after(millis(500))
@@ -3806,7 +3803,7 @@ public class RoutineTest {
             JRoutineCore.on(IdentityInvocation.<String>factoryOf())
                         .invocationConfiguration()
                         .withInputMaxSize(1)
-                        .withInputMaxDelay(UnitDuration.INFINITY)
+                        .withInputMaxDelay(infinity())
                         .applyConfiguration()
                         .asyncInvoke()
                         .after(millis(500))
@@ -3833,7 +3830,7 @@ public class RoutineTest {
             JRoutineCore.on(IdentityInvocation.<String>factoryOf())
                         .invocationConfiguration()
                         .withInputMaxSize(1)
-                        .withInputMaxDelay(UnitDuration.INFINITY)
+                        .withInputMaxDelay(infinity())
                         .applyConfiguration()
                         .asyncInvoke()
                         .after(millis(500))

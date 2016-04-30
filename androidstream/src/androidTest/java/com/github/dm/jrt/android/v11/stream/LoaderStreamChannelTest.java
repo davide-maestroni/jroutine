@@ -748,14 +748,17 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                 .afterMax(seconds(10))
                                 .all()).containsExactly("est1", "est2");
         assertThat(LoaderStreams.<String>streamOf().with(loaderFrom(activity))
-                                                   .orElseGet(new Consumer<ResultChannel<String>>() {
+                                                   .orElseGet(
+                                                           new Consumer<ResultChannel<String>>() {
 
-                                                       public void accept(
-                                                               final ResultChannel<String> result) {
+                                                               public void accept(
+                                                                       final
+                                                                       ResultChannel<String>
+                                                                               result) {
 
-                                                           result.pass("est");
-                                                       }
-                                                   })
+                                                                   result.pass("est");
+                                                               }
+                                                           })
                                                    .afterMax(seconds(10))
                                                    .all()).containsExactly("est");
         assertThat(LoaderStreams.<String>streamOf().with(loaderFrom(activity))
@@ -1147,6 +1150,23 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
 
         assertThat(streamChannel.getError().getCause()).isExactlyInstanceOf(
                 IllegalArgumentException.class);
+    }
+
+    public void testApply() {
+
+        assertThat(LoaderStreams.streamOf("test1")
+                                .with(loaderFrom(getActivity()))
+                                .apply(new Function<StreamChannel<String>, StreamChannel<String>>
+                                        () {
+
+                                    public StreamChannel<String> apply(
+                                            final StreamChannel<String> stream) {
+
+                                        return stream.concat("test2");
+                                    }
+                                })
+                                .afterMax(seconds(10))
+                                .all()).containsExactly("test1", "test2");
     }
 
     public void testBuilder() {
@@ -2301,7 +2321,9 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         }
 
         try {
-            LoaderStreams.streamOf().with(loaderFrom(getActivity())).orElseGet(1, (Supplier<?>) null);
+            LoaderStreams.streamOf()
+                         .with(loaderFrom(getActivity()))
+                         .orElseGet(1, (Supplier<?>) null);
             fail();
 
         } catch (final NullPointerException ignored) {

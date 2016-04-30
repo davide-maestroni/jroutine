@@ -50,6 +50,7 @@ import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.function.Wrapper;
 import com.github.dm.jrt.stream.AbstractStreamChannel;
+import com.github.dm.jrt.stream.StreamChannel;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -254,6 +255,15 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
 
     @NotNull
     @Override
+    public <AFTER> LoaderStreamChannel<AFTER> apply(
+            @NotNull final Function<? super StreamChannel<OUT>, ? extends OutputChannel<AFTER>>
+                    function) {
+
+        return (LoaderStreamChannel<AFTER>) super.apply(function);
+    }
+
+    @NotNull
+    @Override
     public LoaderStreamChannel<OUT> async() {
 
         return (LoaderStreamChannel<OUT>) super.async();
@@ -324,6 +334,13 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
     public LoaderStreamChannel<OUT> concat(@Nullable final Iterable<? extends OUT> outputs) {
 
         return (LoaderStreamChannel<OUT>) super.concat(outputs);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannel<OUT> concat(@NotNull final OutputChannel<? extends OUT> channel) {
+
+        return (LoaderStreamChannel<OUT>) super.concat(channel);
     }
 
     @NotNull
@@ -786,18 +803,6 @@ class DefaultLoaderStreamChannel<OUT> extends AbstractStreamChannel<OUT>
 
         mContextBuilder = (context != null) ? JRoutineLoader.with(context) : null;
         return this;
-    }
-
-    @NotNull
-    public LoaderStreamChannel<OUT> concat(@NotNull final OutputChannel<? extends OUT> channel) {
-
-        final OutputChannel<OUT> outputChannel =
-                SparseChannels.<OUT>concat(this, channel).channelConfiguration()
-                                                         .with(buildChannelConfiguration())
-                                                         .applyConfiguration()
-                                                         .buildChannels();
-        return new DefaultLoaderStreamChannel<OUT>(mContextBuilder, outputChannel,
-                buildConfiguration(), buildLoaderConfiguration(), getInvocationMode(), getBinder());
     }
 
     @NonNull

@@ -231,6 +231,19 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
+    public <AFTER> StreamChannel<AFTER> apply(
+            @NotNull final Function<? super StreamChannel<OUT>, ? extends OutputChannel<AFTER>>
+                    function) {
+
+        final OutputChannel<AFTER> outputChannel = function.apply(this);
+        if (getClass().isAssignableFrom(outputChannel.getClass())) {
+            return (StreamChannel<AFTER>) outputChannel;
+        }
+
+        return buildChannel(outputChannel);
+    }
+
+    @NotNull
     public StreamChannel<OUT> async() {
 
         mInvocationMode = InvocationMode.ASYNC;
@@ -292,6 +305,15 @@ public abstract class AbstractStreamChannel<OUT>
     public StreamChannel<OUT> concat(@Nullable final Iterable<? extends OUT> outputs) {
 
         return concat(JRoutineCore.io().of(outputs));
+    }
+
+    @NotNull
+    public StreamChannel<OUT> concat(@NotNull final OutputChannel<? extends OUT> channel) {
+
+        return buildChannel(Channels.<OUT>concat(this, channel).channelConfiguration()
+                                                               .with(buildChannelConfiguration())
+                                                               .applyConfiguration()
+                                                               .buildChannels());
     }
 
     @NotNull
@@ -441,7 +463,8 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
-    public StreamChannel<OUT> orElseGet(@NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
+    public StreamChannel<OUT> orElseGet(
+            @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
 
         return orElseGet(1, consumer);
     }
@@ -495,13 +518,11 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public StreamChannel<OUT> repeat() {
 
-        final ChannelConfiguration configuration = buildChannelConfiguration();
-        final OutputChannel<OUT> channel = Channels.repeat(this)
-                                                   .channelConfiguration()
-                                                   .with(configuration)
-                                                   .applyConfiguration()
-                                                   .buildChannels();
-        return newChannel(channel, getStreamConfiguration(), mInvocationMode, mBinder);
+        return buildChannel(Channels.repeat(this)
+                                    .channelConfiguration()
+                                    .with(buildChannelConfiguration())
+                                    .applyConfiguration()
+                                    .buildChannels());
     }
 
     @NotNull
@@ -550,7 +571,7 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public Builder<? extends StreamChannel<OUT>> streamInvocationConfiguration() {
 
-        return new Builder<StreamChannel<OUT>>(mStreamConfigurable, getStreamConfiguration());
+        return new Builder<StreamChannel<OUT>>(mStreamConfigurable, mStreamConfiguration);
     }
 
     @NotNull
@@ -628,13 +649,11 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public StreamChannel<? extends Selectable<OUT>> toSelectable(final int index) {
 
-        final ChannelConfiguration configuration = buildChannelConfiguration();
-        final OutputChannel<? extends Selectable<OUT>> channel = Channels.toSelectable(this, index)
-                                                                         .channelConfiguration()
-                                                                         .with(configuration)
-                                                                         .applyConfiguration()
-                                                                         .buildChannels();
-        return newChannel(channel, getStreamConfiguration(), mInvocationMode, mBinder);
+        return buildChannel(Channels.toSelectable(this, index)
+                                    .channelConfiguration()
+                                    .with(buildChannelConfiguration())
+                                    .applyConfiguration()
+                                    .buildChannels());
     }
 
     @NotNull
@@ -648,7 +667,7 @@ public abstract class AbstractStreamChannel<OUT>
                                                      .applyConfiguration()
                                                      .buildChannel();
         mChannel.bind(new TryCatchOutputConsumer<OUT>(consumer, ioChannel));
-        return newChannel(ioChannel, getStreamConfiguration(), mInvocationMode, mBinder);
+        return buildChannel(ioChannel);
     }
 
     @NotNull
@@ -667,7 +686,7 @@ public abstract class AbstractStreamChannel<OUT>
                                                      .applyConfiguration()
                                                      .buildChannel();
         mChannel.bind(new TryFinallyOutputConsumer<OUT>(runnable, ioChannel));
-        return newChannel(ioChannel, getStreamConfiguration(), mInvocationMode, mBinder);
+        return buildChannel(ioChannel);
     }
 
     @NotNull
@@ -772,7 +791,7 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     protected InvocationConfiguration buildConfiguration() {
 
-        return getStreamConfiguration().builderFrom().with(getConfiguration()).applyConfiguration();
+        return mStreamConfiguration.builderFrom().with(getConfiguration()).applyConfiguration();
     }
 
     /**
@@ -848,6 +867,12 @@ public abstract class AbstractStreamChannel<OUT>
             @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
 
     @NotNull
+    private <AFTER> StreamChannel<AFTER> buildChannel(@NotNull OutputChannel<AFTER> channel) {
+
+        return newChannel(channel, mStreamConfiguration, mInvocationMode, mBinder);
+    }
+
+    @NotNull
     private <AFTER> Routine<? super OUT, ? extends AFTER> buildRoutine(
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
 
@@ -859,8 +884,7 @@ public abstract class AbstractStreamChannel<OUT>
     private <AFTER> StreamChannel<AFTER> concatRoutine(
             @NotNull final InvocationChannel<? super OUT, ? extends AFTER> channel) {
 
-        return newChannel((OutputChannel<AFTER>) mChannel.bind(channel).result(),
-                getStreamConfiguration(), mInvocationMode, mBinder);
+        return buildChannel((OutputChannel<AFTER>) mChannel.bind(channel).result());
     }
 
     /**

@@ -130,6 +130,13 @@ public interface LoaderStreamChannel<OUT>
      * {@inheritDoc}
      */
     @NotNull
+    <AFTER> LoaderStreamChannel<AFTER> apply(
+            @NotNull Function<? super StreamChannel<OUT>, ? extends OutputChannel<AFTER>> function);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
     LoaderStreamChannel<OUT> async();
 
     /**

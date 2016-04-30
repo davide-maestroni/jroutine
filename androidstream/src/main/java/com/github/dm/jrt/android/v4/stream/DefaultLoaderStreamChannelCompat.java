@@ -50,6 +50,7 @@ import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.function.Wrapper;
 import com.github.dm.jrt.stream.AbstractStreamChannel;
+import com.github.dm.jrt.stream.StreamChannel;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -266,6 +267,15 @@ class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel<OUT>
 
     @NotNull
     @Override
+    public <AFTER> LoaderStreamChannelCompat<AFTER> apply(
+            @NotNull final Function<? super StreamChannel<OUT>, ? extends OutputChannel<AFTER>>
+                    function) {
+
+        return (LoaderStreamChannelCompat<AFTER>) super.apply(function);
+    }
+
+    @NotNull
+    @Override
     public LoaderStreamChannelCompat<OUT> async() {
 
         return (LoaderStreamChannelCompat<OUT>) super.async();
@@ -336,6 +346,14 @@ class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel<OUT>
     public LoaderStreamChannelCompat<OUT> concat(@Nullable final Iterable<? extends OUT> outputs) {
 
         return (LoaderStreamChannelCompat<OUT>) super.concat(outputs);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannelCompat<OUT> concat(
+            @NotNull final OutputChannel<? extends OUT> channel) {
+
+        return (LoaderStreamChannelCompat<OUT>) super.concat(channel);
     }
 
     @NotNull
@@ -505,7 +523,8 @@ class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel<OUT>
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> orElseGet(@NotNull final Supplier<? extends OUT> supplier) {
+    public LoaderStreamChannelCompat<OUT> orElseGet(
+            @NotNull final Supplier<? extends OUT> supplier) {
 
         checkStatic(wrap(supplier), supplier);
         return (LoaderStreamChannelCompat<OUT>) super.orElseGet(supplier);
@@ -801,19 +820,6 @@ class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel<OUT>
 
         mContextBuilder = (context != null) ? JRoutineLoaderCompat.with(context) : null;
         return this;
-    }
-
-    @NotNull
-    public LoaderStreamChannelCompat<OUT> concat(
-            @NotNull final OutputChannel<? extends OUT> channel) {
-
-        final OutputChannel<OUT> outputChannel =
-                SparseChannelsCompat.<OUT>concat(this, channel).channelConfiguration()
-                                                               .with(buildChannelConfiguration())
-                                                               .applyConfiguration()
-                                                               .buildChannels();
-        return new DefaultLoaderStreamChannelCompat<OUT>(mContextBuilder, outputChannel,
-                buildConfiguration(), buildLoaderConfiguration(), getInvocationMode(), getBinder());
     }
 
     @NonNull

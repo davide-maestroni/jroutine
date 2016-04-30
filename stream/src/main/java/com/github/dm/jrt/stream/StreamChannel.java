@@ -120,6 +120,17 @@ public interface StreamChannel<OUT>
     StreamChannel<OUT> skipNext(int count);
 
     /**
+     * Transforms this stream by applying the specified function.
+     *
+     * @param function the transformation function.
+     * @param <AFTER>  the concatenation output type.
+     * @return the transformed stream.
+     */
+    @NotNull
+    <AFTER> StreamChannel<AFTER> apply(
+            @NotNull Function<? super StreamChannel<OUT>, ? extends OutputChannel<AFTER>> function);
+
+    /**
      * Makes the stream asynchronous, that is, the concatenated routines will be invoked in
      * asynchronous mode.
      *
@@ -203,6 +214,7 @@ public interface StreamChannel<OUT>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param supplier the supplier of collections.
+     * @param <AFTER>  the concatenation output type.
      * @return the concatenated stream.
      */
     @NotNull
@@ -481,26 +493,113 @@ public interface StreamChannel<OUT>
     @NotNull
     StreamChannel<Void> onOutput(@NotNull Consumer<? super OUT> consumer);
 
-    // TODO: 26/04/16 javadoc
+    /**
+     * Concatenates a stream producing the specified output in case this one produced none.
+     * <br>
+     * The outputs will be generated only when the previous routine invocations complete.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     * <br>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param output the output to return.
+     * @return the concatenated stream.
+     */
     @NotNull
     StreamChannel<OUT> orElse(@Nullable OUT output);
 
+    /**
+     * Concatenates a stream producing the specified outputs in case this one produced none.
+     * <br>
+     * The outputs will be generated only when the previous routine invocations complete.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     * <br>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param outputs the outputs to return.
+     * @return the concatenated stream.
+     */
     @NotNull
     StreamChannel<OUT> orElse(@Nullable OUT... outputs);
 
+    /**
+     * Concatenates a stream producing the specified outputs in case this one produced none.
+     * <br>
+     * The outputs will be generated only when the previous routine invocations complete.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     * <br>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param outputs the outputs to return.
+     * @return the concatenated stream.
+     */
     @NotNull
     StreamChannel<OUT> orElse(@Nullable Iterable<? extends OUT> outputs);
 
+    /**
+     * Concatenates a stream calling the specified consumer to this one.
+     * <br>
+     * The consumer will be called {@code count} number of times only when the previous routine
+     * invocations complete. The count number must be positive.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     * <br>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param consumer the consumer instance.
+     * @return the concatenated stream.
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+     */
     @NotNull
     StreamChannel<OUT> orElseGet(long count,
             @NotNull Consumer<? super ResultChannel<OUT>> consumer);
 
+    /**
+     * Concatenates a stream calling the specified consumer to this one.
+     * <br>
+     * The consumer will be called only when the previous routine invocations complete.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     * <br>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param consumer the consumer instance.
+     * @return the concatenated stream.
+     */
     @NotNull
     StreamChannel<OUT> orElseGet(@NotNull Consumer<? super ResultChannel<OUT>> consumer);
 
+    /**
+     * Concatenates a stream calling the specified supplier to this one.
+     * <br>
+     * The supplier will be called {@code count} number of times only when the previous routine
+     * invocations complete. The count number must be positive.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     * <br>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param supplier the supplier instance.
+     * @return the concatenated stream.
+     * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
+     */
     @NotNull
     StreamChannel<OUT> orElseGet(long count, @NotNull Supplier<? extends OUT> supplier);
 
+    /**
+     * Concatenates a stream calling the specified supplier to this one.
+     * <br>
+     * The supplier will be called only when the previous routine invocations complete.
+     * <p>
+     * Note that the created routine will be initialized with the current configuration.
+     * <br>
+     * Note also that this stream will be bound as a result of the call.
+     *
+     * @param supplier the supplier instance.
+     * @return the concatenated stream.
+     */
     @NotNull
     StreamChannel<OUT> orElseGet(@NotNull Supplier<? extends OUT> supplier);
 

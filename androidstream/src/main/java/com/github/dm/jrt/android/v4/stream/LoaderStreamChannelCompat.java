@@ -130,6 +130,13 @@ public interface LoaderStreamChannelCompat<OUT>
      * {@inheritDoc}
      */
     @NotNull
+    <AFTER> LoaderStreamChannelCompat<AFTER> apply(
+            @NotNull Function<? super StreamChannel<OUT>, ? extends OutputChannel<AFTER>> function);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
     LoaderStreamChannelCompat<OUT> async();
 
     /**
@@ -305,7 +312,8 @@ public interface LoaderStreamChannelCompat<OUT>
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> orElseGet(@NotNull Consumer<? super ResultChannel<OUT>> consumer);
+    LoaderStreamChannelCompat<OUT> orElseGet(
+            @NotNull Consumer<? super ResultChannel<OUT>> consumer);
 
     /**
      * {@inheritDoc}

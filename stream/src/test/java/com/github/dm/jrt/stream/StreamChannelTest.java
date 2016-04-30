@@ -52,6 +52,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -90,6 +91,22 @@ public class StreamChannelTest {
 
         assertThat(streamChannel.getError().getCause()).isExactlyInstanceOf(
                 IllegalArgumentException.class);
+    }
+
+    @Test
+    public void testApply() {
+
+        assertThat(Streams.streamOf("test1")
+                          .apply(new Function<StreamChannel<String>, StreamChannel<String>>() {
+
+                              public StreamChannel<String> apply(
+                                      final StreamChannel<String> stream) {
+
+                                  return stream.concat("test2");
+                              }
+                          })
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1", "test2");
     }
 
     @Test
@@ -556,7 +573,7 @@ public class StreamChannelTest {
 
         try {
             new TestStreamChannel(channel, InvocationConfiguration.defaultConfiguration(),
-                    InvocationMode.ASYNC, null).apply(null);
+                    InvocationMode.ASYNC, null).apply((InvocationConfiguration) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -2037,13 +2054,14 @@ public class StreamChannelTest {
                 return "TEST2";
             }
         }).afterMax(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
-        assertThat(Streams.streamOf("test1").sync().thenGet(3, new Consumer<ResultChannel<String>>() {
+        assertThat(
+                Streams.streamOf("test1").sync().thenGet(3, new Consumer<ResultChannel<String>>() {
 
-            public void accept(final ResultChannel<String> resultChannel) {
+                    public void accept(final ResultChannel<String> resultChannel) {
 
-                resultChannel.pass("TEST2");
-            }
-        }).all()).containsOnly("TEST2", "TEST2", "TEST2");
+                        resultChannel.pass("TEST2");
+                    }
+                }).all()).containsOnly("TEST2", "TEST2", "TEST2");
         assertThat(Streams.streamOf("test1").async().thenGet(new Supplier<String>() {
 
             public String get() {
@@ -2065,13 +2083,14 @@ public class StreamChannelTest {
                 return "TEST2";
             }
         }).afterMax(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
-        assertThat(Streams.streamOf("test1").async().thenGet(3, new Consumer<ResultChannel<String>>() {
+        assertThat(
+                Streams.streamOf("test1").async().thenGet(3, new Consumer<ResultChannel<String>>() {
 
-            public void accept(final ResultChannel<String> resultChannel) {
+                    public void accept(final ResultChannel<String> resultChannel) {
 
-                resultChannel.pass("TEST2");
-            }
-        }).afterMax(seconds(3)).all()).containsOnly("TEST2", "TEST2", "TEST2");
+                        resultChannel.pass("TEST2");
+                    }
+                }).afterMax(seconds(3)).all()).containsOnly("TEST2", "TEST2", "TEST2");
         assertThat(Streams.streamOf("test1").parallel().thenGet(new Supplier<String>() {
 
             public String get() {
@@ -2079,13 +2098,14 @@ public class StreamChannelTest {
                 return "TEST2";
             }
         }).afterMax(seconds(3)).all()).containsExactly("TEST2");
-        assertThat(Streams.streamOf("test1").parallel().thenGet(new Consumer<ResultChannel<String>>() {
+        assertThat(
+                Streams.streamOf("test1").parallel().thenGet(new Consumer<ResultChannel<String>>() {
 
-            public void accept(final ResultChannel<String> resultChannel) {
+                    public void accept(final ResultChannel<String> resultChannel) {
 
-                resultChannel.pass("TEST2");
-            }
-        }).afterMax(seconds(3)).all()).containsExactly("TEST2");
+                        resultChannel.pass("TEST2");
+                    }
+                }).afterMax(seconds(3)).all()).containsExactly("TEST2");
         assertThat(Streams.streamOf("test1").parallel().thenGet(3, new Supplier<String>() {
 
             public String get() {
@@ -2093,14 +2113,17 @@ public class StreamChannelTest {
                 return "TEST2";
             }
         }).afterMax(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
-        assertThat(
-                Streams.streamOf("test1").parallel().thenGet(3, new Consumer<ResultChannel<String>>() {
+        assertThat(Streams.streamOf("test1")
+                          .parallel()
+                          .thenGet(3, new Consumer<ResultChannel<String>>() {
 
-                    public void accept(final ResultChannel<String> resultChannel) {
+                              public void accept(final ResultChannel<String> resultChannel) {
 
-                        resultChannel.pass("TEST2");
-                    }
-                }).afterMax(seconds(3)).all()).containsExactly("TEST2", "TEST2", "TEST2");
+                                  resultChannel.pass("TEST2");
+                              }
+                          })
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("TEST2", "TEST2", "TEST2");
     }
 
     @Test

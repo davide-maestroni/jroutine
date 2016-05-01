@@ -453,19 +453,6 @@ public interface StreamChannel<OUT>
             @NotNull Function<? super List<OUT>, ? extends AFTER> function);
 
     /**
-     * Short for
-     * {@code invocationConfiguration().withMaxInstances(maxInvocations).applyConfiguration()}.
-     * <br>
-     * This method is useful to easily apply a configuration to the next routine concatenated to the
-     * stream, which will limit the maximum number of concurrent invocations to the specified value.
-     *
-     * @param maxInvocations the maximum number of concurrent invocations.
-     * @return the configured stream.
-     */
-    @NotNull
-    StreamChannel<OUT> maxParallelInvocations(int maxInvocations);
-
-    /**
      * Concatenates a consumer handling an invocation exceptions.
      * <br>
      * The errors will not be automatically further propagated.
@@ -616,6 +603,19 @@ public interface StreamChannel<OUT>
      */
     @NotNull
     StreamChannel<OUT> ordered(@Nullable OrderType orderType);
+
+    /**
+     * Short for {@code parallel().invocationConfiguration().withMaxInstances(maxInvocations)
+     * .applyConfiguration()}.
+     * <br>
+     * This method is useful to easily apply a configuration to the next routine concatenated to the
+     * stream, which will limit the maximum number of concurrent invocations to the specified value.
+     *
+     * @param maxInvocations the maximum number of concurrent invocations.
+     * @return the configured stream.
+     */
+    @NotNull
+    StreamChannel<OUT> parallel(int maxInvocations);
 
     /**
      * Makes the stream parallel, that is, the concatenated routines will be invoked in parallel

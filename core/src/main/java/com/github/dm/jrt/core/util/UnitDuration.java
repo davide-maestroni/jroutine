@@ -32,11 +32,12 @@ public class UnitDuration extends UnitTime {
 
     private static final UnitDuration sInfinity = seconds(Long.MAX_VALUE);
 
-    private static final UnitDuration sZero = new UnitDuration(0, TimeUnit.MILLISECONDS);
+    private static final UnitDuration sZero = millis(0);
 
     private static final HashMap<TimeUnit, UnitDuration> sZeroes =
             new HashMap<TimeUnit, UnitDuration>() {{
-                put(TimeUnit.MILLISECONDS, sZero);
+                final UnitDuration zero = sZero;
+                put(zero.unit, zero);
             }};
 
     /**

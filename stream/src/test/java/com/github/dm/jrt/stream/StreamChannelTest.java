@@ -52,7 +52,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -442,8 +441,7 @@ public class StreamChannelTest {
     public void testConfiguration() {
 
         assertThat(Streams.streamOf("test1", "test2")
-                          .maxParallelInvocations(1)
-                          .parallel()
+                          .parallel(1)
                           .map(new Function<String, String>() {
 
                               public String apply(final String s) {
@@ -455,8 +453,7 @@ public class StreamChannelTest {
                           .all()).containsOnly("TEST1", "TEST2");
         assertThat(Streams.streamOf("test1", "test2")
                           .ordered(OrderType.BY_CALL)
-                          .maxParallelInvocations(1)
-                          .parallel()
+                          .parallel(1)
                           .map(new Function<String, String>() {
 
                               public String apply(final String s) {
@@ -468,8 +465,7 @@ public class StreamChannelTest {
                           .all()).containsExactly("TEST1", "TEST2");
         assertThat(Streams.streamOf("test1", "test2")
                           .ordered(OrderType.BY_CALL)
-                          .maxParallelInvocations(1)
-                          .parallel()
+                          .parallel(1)
                           .map(new Function<String, String>() {
 
                               public String apply(final String s) {

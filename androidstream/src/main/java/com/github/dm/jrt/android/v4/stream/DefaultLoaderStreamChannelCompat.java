@@ -451,9 +451,9 @@ class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel<OUT>
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> maxParallelInvocations(final int maxInvocations) {
+    public LoaderStreamChannelCompat<OUT> parallel(final int maxInvocations) {
 
-        return (LoaderStreamChannelCompat<OUT>) super.maxParallelInvocations(maxInvocations);
+        return (LoaderStreamChannelCompat<OUT>) super.parallel(maxInvocations);
     }
 
     @NotNull

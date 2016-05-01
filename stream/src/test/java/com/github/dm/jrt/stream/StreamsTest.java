@@ -446,7 +446,7 @@ public class StreamsTest {
     @Test
     public void testFactory() {
 
-        final InvocationFactory<String, String> factory = Streams.factory(
+        final InvocationFactory<String, String> factory = Streams.asFactory(
                 new Function<StreamChannel<? extends String>, StreamChannel<String>>() {
 
                     public StreamChannel<String> apply(
@@ -537,13 +537,13 @@ public class StreamsTest {
                         });
                     }
                 };
-        final InvocationFactory<String, String> factory = Streams.factory(function);
+        final InvocationFactory<String, String> factory = Streams.asFactory(function);
         assertThat(factory).isEqualTo(factory);
         assertThat(factory).isNotEqualTo(null);
         assertThat(factory).isNotEqualTo("test");
-        assertThat(factory).isNotEqualTo(Streams.factory(Functions.<StreamChannel<?>>identity()));
-        assertThat(factory).isEqualTo(Streams.factory(function));
-        assertThat(factory.hashCode()).isEqualTo(Streams.factory(function).hashCode());
+        assertThat(factory).isNotEqualTo(Streams.asFactory(Functions.<StreamChannel<?>>identity()));
+        assertThat(factory).isEqualTo(Streams.asFactory(function));
+        assertThat(factory.hashCode()).isEqualTo(Streams.asFactory(function).hashCode());
     }
 
     @Test
@@ -552,7 +552,7 @@ public class StreamsTest {
 
         try {
 
-            Streams.factory(null);
+            Streams.asFactory(null);
 
             fail();
 

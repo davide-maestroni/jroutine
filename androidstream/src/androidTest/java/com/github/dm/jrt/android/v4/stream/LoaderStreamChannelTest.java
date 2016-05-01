@@ -241,8 +241,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
 
         assertThat(LoaderStreamsCompat.streamOf("test1", "test2")
                                       .with(loaderFrom(activity))
-                                      .maxParallelInvocations(1)
-                                      .parallel()
+                                      .parallel(1)
                                       .map(new Function<String, String>() {
 
                                           public String apply(final String s) {
@@ -255,8 +254,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(LoaderStreamsCompat.streamOf("test1", "test2")
                                       .with(loaderFrom(activity))
                                       .ordered(OrderType.BY_CALL)
-                                      .maxParallelInvocations(1)
-                                      .parallel()
+                                      .parallel(1)
                                       .map(new Function<String, String>() {
 
                                           public String apply(final String s) {
@@ -269,8 +267,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(LoaderStreamsCompat.streamOf("test1", "test2")
                                       .with(loaderFrom(activity))
                                       .ordered(OrderType.BY_CALL)
-                                      .maxParallelInvocations(1)
-                                      .parallel()
+                                      .parallel(1)
                                       .map(new Function<String, String>() {
 
                                           public String apply(final String s) {

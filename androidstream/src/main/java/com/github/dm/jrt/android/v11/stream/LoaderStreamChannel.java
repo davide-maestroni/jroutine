@@ -267,7 +267,7 @@ public interface LoaderStreamChannel<OUT>
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannel<OUT> maxParallelInvocations(int maxInvocations);
+    LoaderStreamChannel<OUT> parallel(int maxInvocations);
 
     /**
      * {@inheritDoc}

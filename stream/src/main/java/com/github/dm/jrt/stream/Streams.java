@@ -70,6 +70,26 @@ public class Streams extends Functions {
     }
 
     /**
+     * Returns an invocation factory, whose invocation instances employ the stream output channels,
+     * provided by the specified function, to process input data.
+     * <br>
+     * The function should return a new instance each time it is called, starting from the passed
+     * one.
+     *
+     * @param function the function providing the stream output channels.
+     * @param <IN>     the input data type.
+     * @param <OUT>    the output data type.
+     * @return the invocation factory.
+     */
+    @NotNull
+    public static <IN, OUT> InvocationFactory<IN, OUT> asFactory(
+            @NotNull final Function<? super StreamChannel<IN>, ? extends
+                    StreamChannel<? extends OUT>> function) {
+
+        return new StreamInvocationFactory<IN, OUT>(wrap(function));
+    }
+
+    /**
      * Returns a builder of streams blending the outputs coming from the specified channels.
      * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
@@ -381,26 +401,6 @@ public class Streams extends Functions {
             @NotNull final Iterable<? extends InputChannel<? extends IN>> channels) {
 
         return Channels.distribute(placeholder, channels);
-    }
-
-    /**
-     * Returns an invocation factory, whose invocation instances employ the stream output channels,
-     * provided by the specified function, to process input data.
-     * <br>
-     * The function should return a new instance each time it is called, starting from the passed
-     * one.
-     *
-     * @param function the function providing the stream output channels.
-     * @param <IN>     the input data type.
-     * @param <OUT>    the output data type.
-     * @return the invocation factory.
-     */
-    @NotNull
-    public static <IN, OUT> InvocationFactory<IN, OUT> factory(
-            @NotNull final Function<? super StreamChannel<IN>, ? extends
-                    StreamChannel<? extends OUT>> function) {
-
-        return new StreamInvocationFactory<IN, OUT>(wrap(function));
     }
 
     /**
@@ -790,7 +790,7 @@ public class Streams extends Functions {
             @NotNull final Function<? super StreamChannel<IN>, ? extends
                     StreamChannel<? extends OUT>> function) {
 
-        return JRoutineCore.on(factory(function));
+        return JRoutineCore.on(asFactory(function));
     }
 
     /**

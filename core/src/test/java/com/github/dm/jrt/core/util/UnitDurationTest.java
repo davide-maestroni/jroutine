@@ -506,8 +506,9 @@ public class UnitDurationTest {
                                                                              .toMillis());
         assertThat(UnitDuration.minutes(2).plus(UnitTime.seconds(-191))).isEqualTo(
                 UnitDuration.seconds(Long.MAX_VALUE - 70));
-        assertThat(zero().plus(UnitDuration.seconds(3))).isEqualTo(UnitDuration.seconds(3));
-        assertThat(zero().plus(UnitTime.seconds(-3))).isEqualTo(
+        assertThat(zero(TimeUnit.SECONDS).plus(UnitDuration.seconds(3))).isEqualTo(
+                UnitDuration.seconds(3));
+        assertThat(zero(TimeUnit.SECONDS).plus(UnitTime.seconds(-3))).isEqualTo(
                 UnitDuration.seconds(Long.MAX_VALUE - 2));
         assertThat(UnitDuration.seconds(1).plus(UnitTime.millis(-700))).isEqualTo(
                 UnitDuration.millis(300));

@@ -400,12 +400,6 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
-    public StreamChannel<OUT> maxParallelInvocations(final int maxInvocations) {
-
-        return invocationConfiguration().withMaxInstances(maxInvocations).applyConfiguration();
-    }
-
-    @NotNull
     public StreamChannel<OUT> onError(@NotNull final Consumer<? super RoutineException> consumer) {
 
         return tryCatch(new TryCatchBiConsumerConsumer<OUT>(consumer));
@@ -486,6 +480,14 @@ public abstract class AbstractStreamChannel<OUT>
     public StreamChannel<OUT> ordered(@Nullable final OrderType orderType) {
 
         return streamInvocationConfiguration().withOutputOrder(orderType).applyConfiguration();
+    }
+
+    @NotNull
+    public StreamChannel<OUT> parallel(final int maxInvocations) {
+
+        return parallel().invocationConfiguration()
+                         .withMaxInstances(maxInvocations)
+                         .applyConfiguration();
     }
 
     @NotNull

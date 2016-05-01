@@ -843,16 +843,17 @@ public abstract class AbstractStreamChannel<OUT>
     /**
      * Creates a new channel instance.
      *
-     * @param <AFTER>        the concatenation output type.
-     * @param channel        the wrapped output channel.
-     * @param configuration  the stream configuration.
-     * @param invocationMode the invocation mode.
-     * @param binder         the binder instance.
+     * @param <AFTER>             the concatenation output type.
+     * @param channel             the wrapped output channel.
+     * @param streamConfiguration the stream configuration.
+     * @param invocationMode      the invocation mode.
+     * @param binder              the binder instance.
      * @return the newly created channel instance.
      */
     @NotNull
     protected abstract <AFTER> StreamChannel<AFTER> newChannel(
-            @NotNull OutputChannel<AFTER> channel, @NotNull InvocationConfiguration configuration,
+            @NotNull OutputChannel<AFTER> channel,
+            @NotNull InvocationConfiguration streamConfiguration,
             @NotNull InvocationMode invocationMode, @Nullable Binder binder);
 
     /**

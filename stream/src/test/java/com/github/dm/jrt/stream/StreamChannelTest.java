@@ -58,6 +58,7 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static com.github.dm.jrt.core.util.UnitDuration.days;
 import static com.github.dm.jrt.core.util.UnitDuration.minutes;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.function.Functions.functionOperation;
@@ -184,7 +185,7 @@ public class StreamChannelTest {
         }
 
         final IOChannel<String> ioChannel = JRoutineCore.io().buildChannel();
-        channel = Streams.streamOf(ioChannel.after(1, TimeUnit.DAYS).pass("test"));
+        channel = Streams.streamOf(ioChannel.after(days(1)).pass("test"));
 
         try {
 
@@ -2588,7 +2589,7 @@ public class StreamChannelTest {
         @Override
         protected <AFTER> StreamChannel<AFTER> newChannel(
                 @NotNull final OutputChannel<AFTER> channel,
-                @NotNull final InvocationConfiguration configuration,
+                @NotNull final InvocationConfiguration streamConfiguration,
                 @NotNull final InvocationMode invocationMode, @Nullable final Binder binder) {
 
             return null;

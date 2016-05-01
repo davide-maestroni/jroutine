@@ -451,13 +451,6 @@ class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel<OUT>
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> parallel(final int maxInvocations) {
-
-        return (LoaderStreamChannelCompat<OUT>) super.parallel(maxInvocations);
-    }
-
-    @NotNull
-    @Override
     public LoaderStreamChannelCompat<OUT> onError(
             @NotNull final Consumer<? super RoutineException> consumer) {
 
@@ -535,6 +528,13 @@ class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel<OUT>
     public LoaderStreamChannelCompat<OUT> ordered(@Nullable final OrderType orderType) {
 
         return (LoaderStreamChannelCompat<OUT>) super.ordered(orderType);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannelCompat<OUT> parallel(final int maxInvocations) {
+
+        return (LoaderStreamChannelCompat<OUT>) super.parallel(maxInvocations);
     }
 
     @NotNull
@@ -733,10 +733,11 @@ class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel<OUT>
     @Override
     protected <AFTER> LoaderStreamChannelCompat<AFTER> newChannel(
             @NotNull final OutputChannel<AFTER> channel,
-            @NotNull final InvocationConfiguration configuration,
+            @NotNull final InvocationConfiguration streamConfiguration,
             @NotNull final InvocationMode invocationMode, @Nullable final Binder binder) {
 
-        return newChannel(channel, configuration, mStreamConfiguration, invocationMode, binder);
+        return newChannel(channel, streamConfiguration, mStreamConfiguration, invocationMode,
+                binder);
     }
 
     @NotNull

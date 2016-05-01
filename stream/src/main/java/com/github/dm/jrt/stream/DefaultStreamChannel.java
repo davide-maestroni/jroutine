@@ -90,10 +90,10 @@ class DefaultStreamChannel<OUT> extends AbstractStreamChannel<OUT> {
     @NotNull
     @Override
     protected <AFTER> StreamChannel<AFTER> newChannel(@NotNull final OutputChannel<AFTER> channel,
-            @NotNull final InvocationConfiguration configuration,
+            @NotNull final InvocationConfiguration streamConfiguration,
             @NotNull final InvocationMode invocationMode, @Nullable final Binder binder) {
 
-        return new DefaultStreamChannel<AFTER>(channel, configuration, invocationMode, binder);
+        return new DefaultStreamChannel<AFTER>(channel, streamConfiguration, invocationMode, binder);
     }
 
     @NotNull

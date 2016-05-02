@@ -535,6 +535,7 @@ public interface StreamChannel<OUT>
      * <br>
      * Note also that this stream will be bound as a result of the call.
      *
+     * @param count    the number of generated outputs.
      * @param consumer the consumer instance.
      * @return the concatenated stream.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
@@ -568,6 +569,7 @@ public interface StreamChannel<OUT>
      * <br>
      * Note also that this stream will be bound as a result of the call.
      *
+     * @param count    the number of generated outputs.
      * @param supplier the supplier instance.
      * @return the concatenated stream.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.

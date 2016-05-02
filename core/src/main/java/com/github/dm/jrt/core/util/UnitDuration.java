@@ -102,7 +102,9 @@ public class UnitDuration extends UnitTime {
     }
 
     /**
-     * Time duration instance representing the infinity.
+     * Returns the time duration instance representing the infinity.
+     *
+     * @return the infinity instance.
      */
     @NotNull
     public static UnitDuration infinity() {

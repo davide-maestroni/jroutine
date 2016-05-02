@@ -38,8 +38,11 @@ import com.github.dm.jrt.function.Functions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
@@ -49,8 +52,6 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * Created by davide-maestroni on 11/26/2015.
  */
 public class Streams extends Functions {
-
-    private static final CountInvocationFactory sCountFactory = new CountInvocationFactory();
 
     private static final BiConsumer<? extends Iterable<?>, ? extends InputChannel<?>>
             sUnfoldConsumer = new BiConsumer<Iterable<?>, InputChannel<?>>() {
@@ -301,7 +302,7 @@ public class Streams extends Functions {
     @SuppressWarnings("unchecked")
     public static <IN> InvocationFactory<IN, Long> count() {
 
-        return (InvocationFactory<IN, Long>) sCountFactory;
+        return (InvocationFactory<IN, Long>) CountInvocation.factoryOf();
     }
 
     /**
@@ -1152,6 +1153,18 @@ public class Streams extends Functions {
     }
 
     /**
+     * Returns an factory of invocations collecting outputs into a list.
+     *
+     * @param <OUT> the output data type.
+     * @return the invocation factory instance.
+     */
+    @NotNull
+    public static <OUT> InvocationFactory<? super OUT, List<OUT>> toList() {
+
+        return ToListInvocation.factoryOf();
+    }
+
+    /**
      * Returns a builder of selectable channels feeding the specified one.
      * <br>
      * Each output will be filtered based on the specified index.
@@ -1196,6 +1209,18 @@ public class Streams extends Functions {
     }
 
     /**
+     * Returns an factory of invocations collecting outputs into a set.
+     *
+     * @param <OUT> the output data type.
+     * @return the invocation factory instance.
+     */
+    @NotNull
+    public static <OUT> InvocationFactory<? super OUT, Set<OUT>> toSet() {
+
+        return ToSetInvocation.factoryOf();
+    }
+
+    /**
      * Returns a bi-consumer unfolding iterable inputs into the returned elements.
      *
      * @param <OUT> the output data type.
@@ -1212,7 +1237,26 @@ public class Streams extends Functions {
     private static RangeConsumer<? extends Number> numberRange(@NotNull final Number start,
             @NotNull final Number end) {
 
-        if ((start instanceof Double) || (end instanceof Double)) {
+        if ((start instanceof BigDecimal) || (end instanceof BigDecimal)) {
+            final BigDecimal startValue = toBig(start);
+            final BigDecimal endValue = toBig(end);
+            return numberRange(startValue, endValue,
+                    (startValue.compareTo(endValue) <= 0) ? 1 : -1);
+
+        } else if ((start instanceof BigInteger) || (end instanceof BigInteger)) {
+            final BigDecimal startDecimal = toBig(start);
+            final BigDecimal endDecimal = toBig(end);
+            if ((startDecimal.scale() > 0) || (endDecimal.scale() > 0)) {
+                return numberRange(startDecimal, endDecimal,
+                        (startDecimal.compareTo(endDecimal) <= 0) ? 1 : -1);
+            }
+
+            final BigInteger startValue = startDecimal.toBigInteger();
+            final BigInteger endValue = endDecimal.toBigInteger();
+            return numberRange(startValue, endValue,
+                    (startValue.compareTo(endValue) <= 0) ? 1 : -1);
+
+        } else if ((start instanceof Double) || (end instanceof Double)) {
             final double startValue = start.doubleValue();
             final double endValue = end.doubleValue();
             return numberRange(start, end, (startValue <= endValue) ? 1 : -1);
@@ -1252,7 +1296,31 @@ public class Streams extends Functions {
     private static RangeConsumer<? extends Number> numberRange(@NotNull final Number start,
             @NotNull final Number end, @NotNull final Number increment) {
 
-        if ((start instanceof Double) || (end instanceof Double) || (increment instanceof Double)) {
+        if ((start instanceof BigDecimal) || (end instanceof BigDecimal)
+                || (increment instanceof BigDecimal)) {
+            final BigDecimal startValue = toBig(start);
+            final BigDecimal endValue = toBig(end);
+            final BigDecimal incValue = toBig(increment);
+            return new RangeConsumer<BigDecimal>(startValue, endValue, new BigDecimalInc(incValue));
+
+        } else if ((start instanceof BigInteger) || (end instanceof BigInteger)
+                || (increment instanceof BigInteger)) {
+            final BigDecimal startDecimal = toBig(start);
+            final BigDecimal endDecimal = toBig(end);
+            final BigDecimal incDecimal = toBig(increment);
+            if ((startDecimal.scale() > 0) || (endDecimal.scale() > 0) || (incDecimal.scale()
+                    > 0)) {
+                return new RangeConsumer<BigDecimal>(startDecimal, endDecimal,
+                        new BigDecimalInc(incDecimal));
+            }
+
+            final BigInteger startValue = startDecimal.toBigInteger();
+            final BigInteger endValue = endDecimal.toBigInteger();
+            final BigInteger incValue = incDecimal.toBigInteger();
+            return new RangeConsumer<BigInteger>(startValue, endValue, new BigIntegerInc(incValue));
+
+        } else if ((start instanceof Double) || (end instanceof Double)
+                || (increment instanceof Double)) {
             final double startValue = start.doubleValue();
             final double endValue = end.doubleValue();
             final double incValue = increment.doubleValue();
@@ -1299,6 +1367,38 @@ public class Streams extends Functions {
                         + end.getClass().getCanonicalName() + ", " + increment.getClass()
                                                                               .getCanonicalName()
                         + "]");
+    }
+
+    @NotNull
+    private static BigDecimal toBig(@NotNull final Number number) {
+
+        if (number instanceof Double) {
+            return new BigDecimal(number.doubleValue());
+
+        } else if (number instanceof Float) {
+            return new BigDecimal(number.floatValue());
+
+        } else if (number instanceof Long) {
+            return new BigDecimal(number.longValue());
+
+        } else if (number instanceof Integer) {
+            return new BigDecimal(number.intValue());
+
+        } else if (number instanceof Short) {
+            return new BigDecimal(number.shortValue());
+
+        } else if (number instanceof Byte) {
+            return new BigDecimal(number.byteValue());
+
+        } else if (number instanceof BigInteger) {
+            return new BigDecimal(((BigInteger) number));
+
+        } else if (number instanceof BigDecimal) {
+            return (BigDecimal) number;
+        }
+
+        throw new IllegalArgumentException(
+                "unsupported Number class: [" + number.getClass().getCanonicalName() + "]");
     }
 
     /**
@@ -1350,6 +1450,54 @@ public class Streams extends Functions {
                     current = increment.apply(current);
                 }
             }
+        }
+    }
+
+    /**
+     * Function incrementing a big decimal of a specific value.
+     */
+    private static class BigDecimalInc extends NumberInc<BigDecimal> {
+
+        private final BigDecimal mIncValue;
+
+        /**
+         * Constructor.
+         *
+         * @param incValue the incrementation value.
+         */
+        private BigDecimalInc(final BigDecimal incValue) {
+
+            super(incValue);
+            mIncValue = incValue;
+        }
+
+        public BigDecimal apply(final BigDecimal bigDecimal) {
+
+            return bigDecimal.add(mIncValue);
+        }
+    }
+
+    /**
+     * Function incrementing a big integer of a specific value.
+     */
+    private static class BigIntegerInc extends NumberInc<BigInteger> {
+
+        private final BigInteger mIncValue;
+
+        /**
+         * Constructor.
+         *
+         * @param incValue the incrementation value.
+         */
+        private BigIntegerInc(final BigInteger incValue) {
+
+            super(incValue);
+            mIncValue = incValue;
+        }
+
+        public BigInteger apply(final BigInteger bigInteger) {
+
+            return bigInteger.add(mIncValue);
         }
     }
 

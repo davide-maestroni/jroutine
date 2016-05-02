@@ -441,17 +441,14 @@ public class StreamChannelTest {
     @Test
     public void testConfiguration() {
 
-        assertThat(Streams.streamOf("test1", "test2")
-                          .parallel(1)
-                          .map(new Function<String, String>() {
+        assertThat(
+                Streams.streamOf("test1", "test2").parallel(1).map(new Function<String, String>() {
 
-                              public String apply(final String s) {
+                    public String apply(final String s) {
 
-                                  return s.toUpperCase();
-                              }
-                          })
-                          .afterMax(seconds(3))
-                          .all()).containsOnly("TEST1", "TEST2");
+                        return s.toUpperCase();
+                    }
+                }).afterMax(seconds(3)).all()).containsOnly("TEST1", "TEST2");
         assertThat(Streams.streamOf("test1", "test2")
                           .ordered(OrderType.BY_CALL)
                           .parallel(1)

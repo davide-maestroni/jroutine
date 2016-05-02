@@ -24,50 +24,58 @@ import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Factory of counting invocation.
+ * Invocation computing the number of outputs.
  * <p>
  * Created by davide-maestroni on 04/26/2016.
  */
-class CountInvocationFactory extends InvocationFactory<Object, Long> {
+class CountInvocation extends TemplateInvocation<Object, Long> {
+
+    private static final InvocationFactory<Object, Long> sFactory =
+            new InvocationFactory<Object, Long>(null) {
+
+                @NotNull
+                @Override
+                public Invocation<Object, Long> newInvocation() throws Exception {
+
+                    return new CountInvocation();
+                }
+            };
+
+    private long mCount;
 
     /**
      * Constructor.
      */
-    CountInvocationFactory() {
+    private CountInvocation() {
 
-        super(null);
-    }
-
-    @NotNull
-    @Override
-    public Invocation<Object, Long> newInvocation() {
-
-        return new CountInvocation();
     }
 
     /**
-     * Invocation computing the number of outputs.
+     * Returns the factory of counting invocations.
+     *
+     * @return the factory instance.
      */
-    private static class CountInvocation extends TemplateInvocation<Object, Long> {
+    @NotNull
+    public static InvocationFactory<?, Long> factoryOf() {
 
-        private long mCount;
+        return sFactory;
+    }
 
-        @Override
-        public void onInitialize() {
+    @Override
+    public void onInitialize() {
 
-            mCount = 0;
-        }
+        mCount = 0;
+    }
 
-        @Override
-        public void onInput(final Object input, @NotNull final ResultChannel<Long> result) {
+    @Override
+    public void onInput(final Object input, @NotNull final ResultChannel<Long> result) {
 
-            ++mCount;
-        }
+        ++mCount;
+    }
 
-        @Override
-        public void onResult(@NotNull final ResultChannel<Long> result) {
+    @Override
+    public void onResult(@NotNull final ResultChannel<Long> result) {
 
-            result.pass(mCount);
-        }
+        result.pass(mCount);
     }
 }

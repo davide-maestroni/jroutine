@@ -46,9 +46,12 @@ import com.github.dm.jrt.stream.Streams.RangeConsumer;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -58,6 +61,8 @@ import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.function.Functions.wrap;
 import static com.github.dm.jrt.stream.Streams.range;
 import static com.github.dm.jrt.stream.Streams.sequence;
+import static com.github.dm.jrt.stream.Streams.toList;
+import static com.github.dm.jrt.stream.Streams.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -1444,24 +1449,34 @@ public class StreamsTest {
                           .all()).containsExactly('a', 'b', 'c', 'd', 'e');
         assertThat(Streams.streamOf()
                           .async()
-                          .thenGet(range(0, -10, -2))
+                          .thenGet(range(0, 2, new BigDecimal(0.7)))
                           .afterMax(seconds(3))
-                          .all()).isEqualTo(Arrays.asList(0, -2, -4, -6, -8, -10));
+                          .all()).isEqualTo(Arrays.asList(new BigDecimal(0), new BigDecimal(0.7),
+                new BigDecimal(0.7).add(new BigDecimal(0.7))));
+        assertThat(Streams.streamOf()
+                          .async()
+                          .thenGet(range(0, -10, BigInteger.valueOf(-2)))
+                          .afterMax(seconds(3))
+                          .all()).isEqualTo(
+                Arrays.asList(BigInteger.valueOf(0), BigInteger.valueOf(-2), BigInteger.valueOf(-4),
+                        BigInteger.valueOf(-6), BigInteger.valueOf(-8), BigInteger.valueOf(-10)));
+        assertThat(Streams.streamOf()
+                          .async()
+                          .thenGet(range(0, BigInteger.valueOf(2), 0.7))
+                          .afterMax(seconds(3))
+                          .all()).isEqualTo(Arrays.asList(new BigDecimal(0), new BigDecimal(0.7),
+                new BigDecimal(0.7).add(new BigDecimal(0.7))));
+        assertThat(Streams.streamOf().async().thenGet(range(0, -10, -2)).afterMax(seconds(3)).all())
+                .isEqualTo(Arrays.asList(0, -2, -4, -6, -8, -10));
         assertThat(Streams.streamOf()
                           .async()
                           .thenGet(range(0, 2, 0.7))
                           .afterMax(seconds(3))
                           .all()).isEqualTo(Arrays.asList(0d, 0.7d, 1.4d));
-        assertThat(Streams.streamOf()
-                          .async()
-                          .thenGet(range(0, 2, 0.7f))
-                          .afterMax(seconds(3))
-                          .all()).isEqualTo(Arrays.asList(0f, 0.7f, 1.4f));
-        assertThat(Streams.streamOf()
-                          .async()
-                          .thenGet(range(0L, -9, -2))
-                          .afterMax(seconds(3))
-                          .all()).isEqualTo(Arrays.asList(0L, -2L, -4L, -6L, -8L));
+        assertThat(Streams.streamOf().async().thenGet(range(0, 2, 0.7f)).afterMax(seconds(3)).all())
+                .isEqualTo(Arrays.asList(0f, 0.7f, 1.4f));
+        assertThat(Streams.streamOf().async().thenGet(range(0L, -9, -2)).afterMax(seconds(3)).all())
+                .isEqualTo(Arrays.asList(0L, -2L, -4L, -6L, -8L));
         assertThat(Streams.streamOf()
                           .async()
                           .thenGet(range(0, (short) 9, 2))
@@ -1479,9 +1494,30 @@ public class StreamsTest {
                           .afterMax(seconds(3))
                           .all()).isEqualTo(
                 Arrays.asList((byte) 0, (byte) 2, (byte) 4, (byte) 6, (byte) 8, (byte) 10));
-        assertThat(
-                Streams.streamOf().async().thenGet(range(0, -5)).afterMax(seconds(3)).all()).isEqualTo(
-                Arrays.asList(0, -1, -2, -3, -4, -5));
+        assertThat(Streams.streamOf()
+                          .async()
+                          .thenGet(range(0, new BigDecimal(2)))
+                          .afterMax(seconds(3))
+                          .all()).isEqualTo(
+                Arrays.asList(new BigDecimal(0), new BigDecimal(1), new BigDecimal(2)));
+        assertThat(Streams.streamOf()
+                          .async()
+                          .thenGet(range(0, BigInteger.valueOf(-2)))
+                          .afterMax(seconds(3))
+                          .all()).isEqualTo(
+                Arrays.asList(BigInteger.valueOf(0), BigInteger.valueOf(-1),
+                        BigInteger.valueOf(-2)));
+        assertThat(Streams.streamOf()
+                          .async()
+                          .thenGet(range(0.1, BigInteger.valueOf(2)))
+                          .afterMax(seconds(3))
+                          .all()).isEqualTo(
+                Arrays.asList(new BigDecimal(0.1), new BigDecimal(0.1).add(BigDecimal.ONE)));
+        assertThat(Streams.streamOf()
+                          .async()
+                          .thenGet(range(0, -5))
+                          .afterMax(seconds(3))
+                          .all()).isEqualTo(Arrays.asList(0, -1, -2, -3, -4, -5));
         assertThat(Streams.streamOf()
                           .async()
                           .thenGet(range(0, 2.1))
@@ -1663,21 +1699,37 @@ public class StreamsTest {
     @Test
     public void testRangeEquals() {
 
-        final RangeConsumer<? extends Number> range1 = Streams.range(1, 10);
+        final RangeConsumer<? extends Number> range1 = Streams.range(BigDecimal.ONE, 10);
         assertThat(range1).isEqualTo(range1);
         assertThat(range1).isNotEqualTo(null);
         assertThat(range1).isNotEqualTo("test");
-        assertThat(range1).isNotEqualTo(Streams.range(1, 10, 3));
-        assertThat(range1).isEqualTo(Streams.range(1, 10));
-        assertThat(range1.hashCode()).isEqualTo(Streams.range(1, 10).hashCode());
+        assertThat(range1).isNotEqualTo(Streams.range(BigDecimal.ONE, 10, 3));
+        assertThat(range1).isEqualTo(Streams.range(BigDecimal.ONE, 10));
+        assertThat(range1.hashCode()).isEqualTo(Streams.range(BigDecimal.ONE, 10).hashCode());
 
-        final RangeConsumer<? extends Number> range2 = Streams.range(1, 10, -2);
+        final RangeConsumer<? extends Number> range2 = Streams.range(BigInteger.ONE, 10);
         assertThat(range2).isEqualTo(range2);
         assertThat(range2).isNotEqualTo(null);
         assertThat(range2).isNotEqualTo("test");
-        assertThat(range2).isNotEqualTo(Streams.range(1, 10, 1));
-        assertThat(range2).isEqualTo(Streams.range(1, 10, -2));
-        assertThat(range2.hashCode()).isEqualTo(Streams.range(1, 10, -2).hashCode());
+        assertThat(range2).isNotEqualTo(Streams.range(BigInteger.ONE, 10, 3));
+        assertThat(range2).isEqualTo(Streams.range(BigInteger.ONE, 10));
+        assertThat(range2.hashCode()).isEqualTo(Streams.range(BigInteger.ONE, 10).hashCode());
+
+        final RangeConsumer<? extends Number> range3 = Streams.range(1, 10);
+        assertThat(range3).isEqualTo(range3);
+        assertThat(range3).isNotEqualTo(null);
+        assertThat(range3).isNotEqualTo("test");
+        assertThat(range3).isNotEqualTo(Streams.range(1, 10, 3));
+        assertThat(range3).isEqualTo(Streams.range(1, 10));
+        assertThat(range3.hashCode()).isEqualTo(Streams.range(1, 10).hashCode());
+
+        final RangeConsumer<? extends Number> range4 = Streams.range(1, 10, -2);
+        assertThat(range4).isEqualTo(range4);
+        assertThat(range4).isNotEqualTo(null);
+        assertThat(range4).isNotEqualTo("test");
+        assertThat(range4).isNotEqualTo(Streams.range(1, 10, 1));
+        assertThat(range4).isEqualTo(Streams.range(1, 10, -2));
+        assertThat(range4.hashCode()).isEqualTo(Streams.range(1, 10, -2).hashCode());
 
         final Function<Character, Character> function = new Function<Character, Character>() {
 
@@ -1686,13 +1738,13 @@ public class StreamsTest {
                 return (char) (character + 1);
             }
         };
-        final RangeConsumer<Character> range3 = Streams.range('a', 'f', function);
-        assertThat(range3).isEqualTo(range3);
-        assertThat(range3).isNotEqualTo(null);
-        assertThat(range3).isNotEqualTo("test");
-        assertThat(range3).isNotEqualTo(Streams.range('b', 'f', function));
-        assertThat(range3).isEqualTo(Streams.range('a', 'f', function));
-        assertThat(range3.hashCode()).isEqualTo(Streams.range('a', 'f', function).hashCode());
+        final RangeConsumer<Character> range5 = Streams.range('a', 'f', function);
+        assertThat(range5).isEqualTo(range5);
+        assertThat(range5).isNotEqualTo(null);
+        assertThat(range5).isNotEqualTo("test");
+        assertThat(range5).isNotEqualTo(Streams.range('b', 'f', function));
+        assertThat(range5).isEqualTo(Streams.range('a', 'f', function));
+        assertThat(range5.hashCode()).isEqualTo(Streams.range('a', 'f', function).hashCode());
     }
 
     @Test
@@ -2127,19 +2179,24 @@ public class StreamsTest {
                           .map(Streams.skip(0))
                           .afterMax(seconds(3))
                           .all()).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
-        assertThat(Streams.streamOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).map(new Function<Integer, Boolean>() {
+        assertThat(Streams.streamOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+                          .map(new Function<Integer, Boolean>() {
 
-            public Boolean apply(final Integer integer) {
+                              public Boolean apply(final Integer integer) {
 
-                return integer > 5;
-            }
-        }).reduce(new BiFunction<Boolean, Boolean, Boolean>() {
+                                  return integer > 5;
+                              }
+                          })
+                          .reduce(new BiFunction<Boolean, Boolean, Boolean>() {
 
-            public Boolean apply(final Boolean aBoolean, final Boolean aBoolean2) {
+                              public Boolean apply(final Boolean aBoolean,
+                                      final Boolean aBoolean2) {
 
-                return aBoolean && aBoolean2;
-            }
-        }).afterMax(seconds(1)).next()).isFalse();
+                                  return aBoolean && aBoolean2;
+                              }
+                          })
+                          .afterMax(seconds(1))
+                          .next()).isFalse();
         assertThat(Streams.streamOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).reduce(new Supplier<Boolean>() {
 
             public Boolean get() {
@@ -2192,6 +2249,32 @@ public class StreamsTest {
         } catch (final IllegalArgumentException ignored) {
 
         }
+    }
+
+    @Test
+    public void testToList() {
+
+        assertThat(Streams.streamOf("test", "test")
+                          .map(toList())
+                          .afterMax(seconds(3))
+                          .next()).isEqualTo(Arrays.asList("test", "test"));
+        assertThat(Streams.streamOf("test1", "test2")
+                          .map(toList())
+                          .afterMax(seconds(3))
+                          .next()).isEqualTo(Arrays.asList("test1", "test2"));
+    }
+
+    @Test
+    public void testToSet() {
+
+        assertThat(Streams.streamOf("test", "test")
+                          .map(toSet())
+                          .afterMax(seconds(3))
+                          .next()).isEqualTo(Collections.singleton("test"));
+        assertThat(Streams.streamOf("test1", "test2")
+                          .map(toSet())
+                          .afterMax(seconds(3))
+                          .next()).isEqualTo(new HashSet<String>(Arrays.asList("test1", "test2")));
     }
 
     @Test

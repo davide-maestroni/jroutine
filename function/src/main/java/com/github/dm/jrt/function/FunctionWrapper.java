@@ -162,6 +162,7 @@ public class FunctionWrapper<IN, OUT> extends DeepEqualObject
     public <AFTER> FunctionWrapper<IN, AFTER> andThen(
             @NotNull final Function<? super OUT, ? extends AFTER> after) {
 
+        ConstantConditions.notNull("function instance", after);
         final List<Function<?, ?>> functions = mFunctions;
         final ArrayList<Function<?, ?>> newFunctions =
                 new ArrayList<Function<?, ?>>(functions.size() + 1);
@@ -170,7 +171,7 @@ public class FunctionWrapper<IN, OUT> extends DeepEqualObject
             newFunctions.addAll(((FunctionWrapper<?, ?>) after).mFunctions);
 
         } else {
-            newFunctions.add(ConstantConditions.notNull("function instance", after));
+            newFunctions.add(after);
         }
 
         return new FunctionWrapper<IN, AFTER>(newFunctions);
@@ -188,6 +189,7 @@ public class FunctionWrapper<IN, OUT> extends DeepEqualObject
     public <BEFORE> FunctionWrapper<BEFORE, OUT> compose(
             @NotNull final Function<? super BEFORE, ? extends IN> before) {
 
+        ConstantConditions.notNull("function instance", before);
         final List<Function<?, ?>> functions = mFunctions;
         final ArrayList<Function<?, ?>> newFunctions =
                 new ArrayList<Function<?, ?>>(functions.size() + 1);
@@ -195,7 +197,7 @@ public class FunctionWrapper<IN, OUT> extends DeepEqualObject
             newFunctions.addAll(((FunctionWrapper<?, ?>) before).mFunctions);
 
         } else {
-            newFunctions.add(ConstantConditions.notNull("function instance", before));
+            newFunctions.add(before);
         }
 
         newFunctions.addAll(functions);

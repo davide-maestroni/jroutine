@@ -117,6 +117,7 @@ public class ConsumerWrapper<IN> extends DeepEqualObject implements Consumer<IN>
     @NotNull
     public ConsumerWrapper<IN> andThen(@NotNull final Consumer<? super IN> after) {
 
+        ConstantConditions.notNull("consumer instance", after);
         final List<Consumer<?>> consumers = mConsumers;
         final ArrayList<Consumer<?>> newConsumers =
                 new ArrayList<Consumer<?>>(consumers.size() + 1);
@@ -125,7 +126,7 @@ public class ConsumerWrapper<IN> extends DeepEqualObject implements Consumer<IN>
             newConsumers.addAll(((ConsumerWrapper<?>) after).mConsumers);
 
         } else {
-            newConsumers.add(ConstantConditions.notNull("consumer instance", after));
+            newConsumers.add(after);
         }
 
         return new ConsumerWrapper<IN>(newConsumers);

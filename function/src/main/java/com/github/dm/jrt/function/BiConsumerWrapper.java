@@ -123,6 +123,7 @@ public class BiConsumerWrapper<IN1, IN2> extends DeepEqualObject
     public BiConsumerWrapper<IN1, IN2> andThen(
             @NotNull final BiConsumer<? super IN1, ? super IN2> after) {
 
+        ConstantConditions.notNull("consumer instance", after);
         final List<BiConsumer<?, ?>> consumers = mConsumers;
         final ArrayList<BiConsumer<?, ?>> newConsumers =
                 new ArrayList<BiConsumer<?, ?>>(consumers.size() + 1);
@@ -131,7 +132,7 @@ public class BiConsumerWrapper<IN1, IN2> extends DeepEqualObject
             newConsumers.addAll(((BiConsumerWrapper<?, ?>) after).mConsumers);
 
         } else {
-            newConsumers.add(ConstantConditions.notNull("consumer instance", after));
+            newConsumers.add(after);
         }
 
         return new BiConsumerWrapper<IN1, IN2>(newConsumers);

@@ -249,6 +249,7 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
     @NotNull
     public PredicateWrapper<IN> and(@NotNull final Predicate<? super IN> other) {
 
+        ConstantConditions.notNull("predicate instance", other);
         final List<Predicate<?>> predicates = mPredicates;
         final ArrayList<Predicate<?>> newPredicates =
                 new ArrayList<Predicate<?>>(predicates.size() + 4);
@@ -259,7 +260,7 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
             newPredicates.addAll(((PredicateWrapper<?>) other).mPredicates);
 
         } else {
-            newPredicates.add(ConstantConditions.notNull("predicate instance", other));
+            newPredicates.add(other);
         }
 
         newPredicates.add(CLOSE_PREDICATE);
@@ -341,6 +342,7 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
     @NotNull
     public PredicateWrapper<IN> or(@NotNull final Predicate<? super IN> other) {
 
+        ConstantConditions.notNull("predicate instance", other);
         final List<Predicate<?>> predicates = mPredicates;
         final ArrayList<Predicate<?>> newPredicates =
                 new ArrayList<Predicate<?>>(predicates.size() + 4);
@@ -351,7 +353,7 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
             newPredicates.addAll(((PredicateWrapper<?>) other).mPredicates);
 
         } else {
-            newPredicates.add(ConstantConditions.notNull("predicate instance", other));
+            newPredicates.add(other);
         }
 
         newPredicates.add(CLOSE_PREDICATE);

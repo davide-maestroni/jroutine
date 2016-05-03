@@ -624,7 +624,6 @@ public class ByteChannel {
         @Override
         public int read(@NotNull final byte[] b, final int off, final int len) {
 
-            ConstantConditions.notNull("byte array", b);
             if (outOfBound(off, len, b.length)) {
                 throw new IndexOutOfBoundsException();
 
@@ -991,7 +990,6 @@ public class ByteChannel {
         @Override
         public int read(@NotNull final byte[] b, final int off, final int len) {
 
-            ConstantConditions.notNull("byte array", b);
             if (outOfBound(off, len, b.length)) {
                 throw new IndexOutOfBoundsException();
 
@@ -1266,7 +1264,6 @@ public class ByteChannel {
         public void write(@NotNull final byte[] b, final int off, final int len) throws
                 IOException {
 
-            ConstantConditions.notNull("byte array", b);
             if (outOfBound(off, len, b.length)) {
                 throw new IndexOutOfBoundsException();
 

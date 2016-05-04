@@ -65,7 +65,10 @@ class MergeBuilder<OUT> extends AbstractBuilder<OutputChannel<? extends Selectab
                                                                  .buildChannel();
         int i = mStartIndex;
         for (final OutputChannel<? extends OUT> channel : mChannels) {
-            ioChannel.pass(new SelectableOutputBuilder<OUT>(channel, i++).buildChannels());
+            ioChannel.pass(new SelectableOutputBuilder<OUT>(channel, i++).channelConfiguration()
+                                                                         .with(configuration)
+                                                                         .applyConfiguration()
+                                                                         .buildChannels());
         }
 
         return ioChannel.close();

@@ -75,7 +75,11 @@ class JoinBuilder<OUT> extends AbstractBuilder<OutputChannel<List<? extends OUT>
                                                                      .buildChannel();
         final JoinOutputConsumer<OUT> consumer =
                 new JoinOutputConsumer<OUT>(mIsFlush, channels.size(), mPlaceholder, ioChannel);
-        new MergeBuilder<OUT>(0, channels).buildChannels().bind(consumer);
+        new MergeBuilder<OUT>(0, channels).channelConfiguration()
+                                          .with(configuration)
+                                          .applyConfiguration()
+                                          .buildChannels()
+                                          .bind(consumer);
         return ioChannel;
     }
 

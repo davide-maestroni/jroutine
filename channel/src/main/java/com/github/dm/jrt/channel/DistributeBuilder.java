@@ -86,7 +86,11 @@ class DistributeBuilder<IN> extends AbstractBuilder<IOChannel<List<? extends IN>
         final ArrayList<InputChannel<? extends IN>> channels = mChannels;
         final ArrayList<IOChannel<?>> channelList = new ArrayList<IOChannel<?>>(channels.size());
         for (final InputChannel<?> channel : channels) {
-            final IOChannel<?> ioChannel = JRoutineCore.io().buildChannel();
+            final IOChannel<?> ioChannel = JRoutineCore.io()
+                                                       .channelConfiguration()
+                                                       .with(configuration)
+                                                       .applyConfiguration()
+                                                       .buildChannel();
             ioChannel.bind(((InputChannel<Object>) channel));
             channelList.add(ioChannel);
         }

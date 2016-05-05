@@ -34,6 +34,7 @@ import com.github.dm.jrt.function.BiFunctionWrapper;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Functions;
+import com.github.dm.jrt.function.Predicate;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,6 +46,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
+import static com.github.dm.jrt.stream.util.Numbers.toBigSafe;
 
 /**
  * Utility class acting as a factory of stream output channels.
@@ -71,6 +73,35 @@ public class Streams extends Functions {
     }
 
     /**
+     * Returns a factory of invocations verifying if all the inputs satisfy a specific conditions.
+     *
+     * @param predicate the predicate defining the condition.
+     * @param <IN>      the input data type.
+     * @return the factory instance.
+     */
+    @NotNull
+    public static <IN> InvocationFactory<IN, Boolean> allMatch(
+            @NotNull final Predicate<? super IN> predicate) {
+
+        return new AllMatchInvocationFactory<IN>(wrap(predicate));
+    }
+
+    /**
+     * Returns a factory of invocations verifying if any of the inputs satisfy a specific
+     * conditions.
+     *
+     * @param predicate the predicate defining the condition.
+     * @param <IN>      the input data type.
+     * @return the factory instance.
+     */
+    @NotNull
+    public static <IN> InvocationFactory<IN, Boolean> anyMatch(
+            @NotNull final Predicate<? super IN> predicate) {
+
+        return new AnyMatchInvocationFactory<IN>(wrap(predicate));
+    }
+
+    /**
      * Returns an invocation factory, whose invocation instances employ the stream output channels,
      * provided by the specified function, to process input data.
      * <br>
@@ -88,6 +119,30 @@ public class Streams extends Functions {
                     StreamChannel<? extends OUT>> function) {
 
         return new StreamInvocationFactory<IN, OUT>(wrap(function));
+    }
+
+    /**
+     * Returns a factory of invocations computing the mean of the input numbers by employing a
+     * {@code BigDecimal}.
+     *
+     * @return the factory instance.
+     */
+    @NotNull
+    public static InvocationFactory<Number, BigDecimal> bigMean() {
+
+        return BigMeanInvocation.factoryOf();
+    }
+
+    /**
+     * Returns a factory of invocations computing the sum of the input numbers by employing a
+     * {@code BigDecimal}.
+     *
+     * @return the factory instance.
+     */
+    @NotNull
+    public static InvocationFactory<Number, BigDecimal> bigSum() {
+
+        return BigSumInvocation.factoryOf();
     }
 
     /**
@@ -405,6 +460,22 @@ public class Streams extends Functions {
     }
 
     /**
+     * Returns a factory of invocations computing the mean of the input numbers in floating
+     * precision.
+     * <br>
+     * The result will have the type matching the input with the highest precision.
+     *
+     * @param <N> the number type.
+     * @return the factory instance.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <N extends Number> InvocationFactory<N, Number> floatingMean() {
+
+        return (InvocationFactory<N, Number>) FloatingMeanInvocation.factoryOf();
+    }
+
+    /**
      * Returns a factory of invocations grouping the input data in collections of the specified
      * size.
      * <p>
@@ -584,6 +655,21 @@ public class Streams extends Functions {
     }
 
     /**
+     * Returns a factory of invocations computing the mean of the input numbers.
+     * <br>
+     * The result will have the type matching the input with the highest precision.
+     *
+     * @param <N> the number type.
+     * @return the factory instance.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <N extends Number> InvocationFactory<N, N> mean() {
+
+        return (InvocationFactory<N, N>) MeanInvocation.factoryOf();
+    }
+
+    /**
      * Returns a builder merging the specified channels into a selectable stream.
      * <p>
      * Note that the builder will successfully create only one stream channel instance, and that the
@@ -692,6 +778,36 @@ public class Streams extends Functions {
     }
 
     /**
+     * Returns a factory of invocations verifying if none of the inputs satisfy a specific
+     * conditions.
+     *
+     * @param predicate the predicate defining the condition.
+     * @param <IN>      the input data type.
+     * @return the factory instance.
+     */
+    @NotNull
+    public static <IN> InvocationFactory<IN, Boolean> noneMatch(
+            @NotNull final Predicate<? super IN> predicate) {
+
+        return new AllMatchInvocationFactory<IN>(wrap(predicate).negate());
+    }
+
+    /**
+     * Returns a factory of invocations verifying if not all the inputs satisfy a specific
+     * conditions.
+     *
+     * @param predicate the predicate defining the condition.
+     * @param <IN>      the input data type.
+     * @return the factory instance.
+     */
+    @NotNull
+    public static <IN> InvocationFactory<IN, Boolean> notAllMatch(
+            @NotNull final Predicate<? super IN> predicate) {
+
+        return new AnyMatchInvocationFactory<IN>(wrap(predicate).negate());
+    }
+
+    /**
      * Returns a routine builder, whose invocation instances employ the streams provided by the
      * specified function to process input data.
      * <br>
@@ -786,6 +902,22 @@ public class Streams extends Functions {
             @NotNull final OutputChannel<OUT> channel) {
 
         return new BuilderWrapper<OUT>(Channels.repeat(channel));
+    }
+
+    /**
+     * Returns a factory of invocations computing the mean of the input numbers rounded to nearest
+     * instance.
+     * <br>
+     * The result will have the type matching the input with the highest precision.
+     *
+     * @param <N> the number type.
+     * @return the factory instance.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <N extends Number> InvocationFactory<N, N> roundedMean() {
+
+        return (InvocationFactory<N, N>) RoundedMeanInvocation.factoryOf();
     }
 
     /**
@@ -1001,6 +1133,9 @@ public class Streams extends Functions {
 
     /**
      * Builds and returns a new stream channel.
+     * <p>
+     * Note that the stream will start producing results only when one of the {@link OutputChannel}
+     * methods is called.
      *
      * @param <OUT> the output data type.
      * @return the newly created stream instance.
@@ -1013,6 +1148,9 @@ public class Streams extends Functions {
 
     /**
      * Builds and returns a new stream channel generating the specified outputs.
+     * <p>
+     * Note that the stream will start producing results only when one of the {@link OutputChannel}
+     * methods is called.
      *
      * @param outputs the iterable returning the output data.
      * @param <OUT>   the output data type.
@@ -1026,6 +1164,9 @@ public class Streams extends Functions {
 
     /**
      * Builds and returns a new stream channel generating the specified output.
+     * <p>
+     * Note that the stream will start producing results only when one of the {@link OutputChannel}
+     * methods is called.
      *
      * @param output the output.
      * @param <OUT>  the output data type.
@@ -1039,6 +1180,9 @@ public class Streams extends Functions {
 
     /**
      * Builds and returns a new stream channel generating the specified outputs.
+     * <p>
+     * Note that the stream will start producing results only when one of the {@link OutputChannel}
+     * methods is called.
      *
      * @param outputs the output data.
      * @param <OUT>   the output data type.
@@ -1052,8 +1196,11 @@ public class Streams extends Functions {
 
     /**
      * Builds and returns a new stream channel generating the specified outputs.
+     * <br>
+     * The output channel will be bound as a result of the call.
      * <p>
-     * Note that the output channel will be bound as a result of the call.
+     * Note that the stream will start producing results only when one of the {@link OutputChannel}
+     * methods is called.
      *
      * @param output the output channel returning the output data.
      * @param <OUT>  the output data type.
@@ -1070,15 +1217,44 @@ public class Streams extends Functions {
     }
 
     /**
-     * Returns an factory of invocations collecting outputs into a list.
+     * Returns a factory of invocations computing the sum of the input numbers.
+     * <br>
+     * The result will have the type matching the input with the highest precision.
      *
-     * @param <OUT> the output data type.
+     * @param <N> the number type.
+     * @return the factory instance.
+     */
+    @NotNull
+    @SuppressWarnings("unchecked")
+    public static <N extends Number> InvocationFactory<N, N> sum() {
+
+        return (InvocationFactory<N, N>) SumInvocation.factoryOf();
+    }
+
+    /**
+     * Returns an factory of invocations collecting inputs into a list.
+     *
+     * @param <IN> the input data type.
      * @return the invocation factory instance.
      */
     @NotNull
-    public static <OUT> InvocationFactory<? super OUT, List<OUT>> toList() {
+    public static <IN> InvocationFactory<? super IN, List<IN>> toList() {
 
         return ToListInvocation.factoryOf();
+    }
+
+    /**
+     * Returns an factory of invocations collecting inputs into a map.
+     *
+     * @param <IN>  the input data type.
+     * @param <KEY> the map key type.
+     * @return the invocation factory instance.
+     */
+    @NotNull
+    public static <IN, KEY> InvocationFactory<? super IN, Map<KEY, IN>> toMap(
+            @NotNull final Function<? super IN, KEY> function) {
+
+        return new ToMapInvocationFactory<IN, KEY>(wrap(function));
     }
 
     /**
@@ -1126,13 +1302,13 @@ public class Streams extends Functions {
     }
 
     /**
-     * Returns an factory of invocations collecting outputs into a set.
+     * Returns an factory of invocations collecting inputs into a set.
      *
-     * @param <OUT> the output data type.
+     * @param <IN> the input data type.
      * @return the invocation factory instance.
      */
     @NotNull
-    public static <OUT> InvocationFactory<? super OUT, Set<OUT>> toSet() {
+    public static <IN> InvocationFactory<? super IN, Set<IN>> toSet() {
 
         return ToSetInvocation.factoryOf();
     }
@@ -1140,14 +1316,26 @@ public class Streams extends Functions {
     /**
      * Returns a bi-consumer unfolding iterable inputs into the returned elements.
      *
-     * @param <OUT> the output data type.
+     * @param <DATA> the data type.
      * @return the bi-consumer instance.
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <OUT> BiConsumer<Iterable<OUT>, InputChannel<OUT>> unfold() {
+    public static <DATA> BiConsumer<Iterable<DATA>, InputChannel<DATA>> unfold() {
 
-        return (BiConsumer<Iterable<OUT>, InputChannel<OUT>>) sUnfoldConsumer;
+        return (BiConsumer<Iterable<DATA>, InputChannel<DATA>>) sUnfoldConsumer;
+    }
+
+    /**
+     * Returns a factory of invocations filtering inputs which are not unique.
+     *
+     * @param <DATA> the data type.
+     * @return the factory instance.
+     */
+    @NotNull
+    public static <DATA> InvocationFactory<DATA, DATA> unique() {
+
+        return UniqueInvocation.factoryOf();
     }
 
     @NotNull
@@ -1155,14 +1343,14 @@ public class Streams extends Functions {
             @NotNull final Number end) {
 
         if ((start instanceof BigDecimal) || (end instanceof BigDecimal)) {
-            final BigDecimal startValue = toBig(start);
-            final BigDecimal endValue = toBig(end);
+            final BigDecimal startValue = toBigSafe(start);
+            final BigDecimal endValue = toBigSafe(end);
             return numberRange(startValue, endValue,
                     (startValue.compareTo(endValue) <= 0) ? 1 : -1);
 
         } else if ((start instanceof BigInteger) || (end instanceof BigInteger)) {
-            final BigDecimal startDecimal = toBig(start);
-            final BigDecimal endDecimal = toBig(end);
+            final BigDecimal startDecimal = toBigSafe(start);
+            final BigDecimal endDecimal = toBigSafe(end);
             if ((startDecimal.scale() > 0) || (endDecimal.scale() > 0)) {
                 return numberRange(startDecimal, endDecimal,
                         (startDecimal.compareTo(endDecimal) <= 0) ? 1 : -1);
@@ -1215,16 +1403,16 @@ public class Streams extends Functions {
 
         if ((start instanceof BigDecimal) || (end instanceof BigDecimal)
                 || (increment instanceof BigDecimal)) {
-            final BigDecimal startValue = toBig(start);
-            final BigDecimal endValue = toBig(end);
-            final BigDecimal incValue = toBig(increment);
+            final BigDecimal startValue = toBigSafe(start);
+            final BigDecimal endValue = toBigSafe(end);
+            final BigDecimal incValue = toBigSafe(increment);
             return new RangeConsumer<BigDecimal>(startValue, endValue, new BigDecimalInc(incValue));
 
         } else if ((start instanceof BigInteger) || (end instanceof BigInteger)
                 || (increment instanceof BigInteger)) {
-            final BigDecimal startDecimal = toBig(start);
-            final BigDecimal endDecimal = toBig(end);
-            final BigDecimal incDecimal = toBig(increment);
+            final BigDecimal startDecimal = toBigSafe(start);
+            final BigDecimal endDecimal = toBigSafe(end);
+            final BigDecimal incDecimal = toBigSafe(increment);
             if ((startDecimal.scale() > 0) || (endDecimal.scale() > 0) || (incDecimal.scale()
                     > 0)) {
                 return new RangeConsumer<BigDecimal>(startDecimal, endDecimal,
@@ -1284,38 +1472,6 @@ public class Streams extends Functions {
                         + end.getClass().getCanonicalName() + ", " + increment.getClass()
                                                                               .getCanonicalName()
                         + "]");
-    }
-
-    @NotNull
-    private static BigDecimal toBig(@NotNull final Number number) {
-
-        if (number instanceof Double) {
-            return new BigDecimal(number.doubleValue());
-
-        } else if (number instanceof Float) {
-            return new BigDecimal(number.floatValue());
-
-        } else if (number instanceof Long) {
-            return new BigDecimal(number.longValue());
-
-        } else if (number instanceof Integer) {
-            return new BigDecimal(number.intValue());
-
-        } else if (number instanceof Short) {
-            return new BigDecimal(number.shortValue());
-
-        } else if (number instanceof Byte) {
-            return new BigDecimal(number.byteValue());
-
-        } else if (number instanceof BigInteger) {
-            return new BigDecimal(((BigInteger) number));
-
-        } else if (number instanceof BigDecimal) {
-            return (BigDecimal) number;
-        }
-
-        throw new IllegalArgumentException(
-                "unsupported Number class: [" + number.getClass().getCanonicalName() + "]");
     }
 
     /**

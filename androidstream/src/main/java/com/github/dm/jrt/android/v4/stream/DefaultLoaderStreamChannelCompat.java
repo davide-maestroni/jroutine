@@ -68,6 +68,7 @@ import static com.github.dm.jrt.function.Functions.wrap;
  * <p>
  * Created by davide-maestroni on 01/15/2016.
  *
+ * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
 class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN, OUT>
@@ -844,7 +845,11 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
                              .buildRoutine();
     }
 
-    // TODO: 05/05/16 javadoc
+    /**
+     * Selectable invoke function.
+     *
+     * @param <OUT> the output data type.
+     */
     private static class SelectableInvoke<OUT> extends DeepEqualObject
             implements Function<OutputChannel<OUT>, OutputChannel<ParcelableSelectable<OUT>>> {
 
@@ -852,6 +857,12 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
         private final int mIndex;
 
+        /**
+         * Constructor.
+         *
+         * @param configuration the channel configuration.
+         * @param index         the selectable index.
+         */
         private SelectableInvoke(@NotNull final ChannelConfiguration configuration,
                 final int index) {
 

@@ -23,67 +23,63 @@ import com.github.dm.jrt.core.invocation.TemplateInvocation;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
-import java.util.Set;
+import static com.github.dm.jrt.stream.util.Numbers.addOptimistic;
 
 /**
- * Factory of invocations collecting inputs into sets.
+ * Invocation computing the sum of the input numbers.
+ * <br>
+ * The result will have the type matching the input with the highest precision.
  * <p>
  * Created by davide-maestroni on 05/02/2016.
- *
- * @param <DATA> the data type.
  */
-class ToSetInvocation<DATA> extends TemplateInvocation<DATA, Set<DATA>> {
+class SumInvocation extends TemplateInvocation<Number, Number> {
 
-    private static final InvocationFactory<?, ? extends Set<?>> sFactory =
-            new InvocationFactory<Object, Set<Object>>(null) {
+    private static final InvocationFactory<Number, Number> sFactory =
+            new InvocationFactory<Number, Number>(null) {
 
                 @NotNull
                 @Override
-                public Invocation<Object, Set<Object>> newInvocation() throws Exception {
+                public Invocation<Number, Number> newInvocation() {
 
-                    return new ToSetInvocation<Object>();
+                    return new SumInvocation();
                 }
             };
 
-    private HashSet<DATA> mSet;
+    private Number mSum;
 
     /**
      * Constructor.
      */
-    private ToSetInvocation() {
+    private SumInvocation() {
 
     }
 
     /**
-     * Returns the factory of collecting invocations.
+     * Returns a factory of invocations computing the sum of the input numbers.
      *
-     * @param <DATA> the data type.
      * @return the factory instance.
      */
     @NotNull
-    @SuppressWarnings("unchecked")
-    public static <DATA> InvocationFactory<DATA, Set<DATA>> factoryOf() {
+    public static InvocationFactory<Number, Number> factoryOf() {
 
-        return (InvocationFactory<DATA, Set<DATA>>) sFactory;
+        return sFactory;
     }
 
     @Override
     public void onInitialize() {
 
-        mSet = new HashSet<DATA>();
+        mSum = (byte) 0;
     }
 
     @Override
-    public void onInput(final DATA input, @NotNull final ResultChannel<Set<DATA>> result) {
+    public void onInput(final Number input, @NotNull final ResultChannel<Number> result) {
 
-        mSet.add(input);
+        mSum = addOptimistic(mSum, input);
     }
 
     @Override
-    public void onResult(@NotNull final ResultChannel<Set<DATA>> result) {
+    public void onResult(@NotNull final ResultChannel<Number> result) {
 
-        result.pass(mSet);
-        mSet = null;
+        result.pass(mSum);
     }
 }

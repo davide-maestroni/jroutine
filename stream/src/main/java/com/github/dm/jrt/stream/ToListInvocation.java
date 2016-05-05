@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Factory of invocations collecting outputs into lists.
+ * Factory of invocations collecting inputs into lists.
  * <p>
  * Created by davide-maestroni on 05/02/2016.
  *

@@ -23,67 +23,69 @@ import com.github.dm.jrt.core.invocation.TemplateInvocation;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.math.BigDecimal;
+import java.math.MathContext;
+
+import static com.github.dm.jrt.stream.util.Numbers.toBigOptimistic;
 
 /**
- * Factory of invocations collecting inputs into sets.
+ * Invocation computing the mean of the input numbers by employing a {@code BigDecimal}.
  * <p>
  * Created by davide-maestroni on 05/02/2016.
- *
- * @param <DATA> the data type.
  */
-class ToSetInvocation<DATA> extends TemplateInvocation<DATA, Set<DATA>> {
+class BigMeanInvocation extends TemplateInvocation<Number, BigDecimal> {
 
-    private static final InvocationFactory<?, ? extends Set<?>> sFactory =
-            new InvocationFactory<Object, Set<Object>>(null) {
+    private static final InvocationFactory<Number, BigDecimal> sFactory =
+            new InvocationFactory<Number, BigDecimal>(null) {
 
                 @NotNull
                 @Override
-                public Invocation<Object, Set<Object>> newInvocation() throws Exception {
+                public Invocation<Number, BigDecimal> newInvocation() {
 
-                    return new ToSetInvocation<Object>();
+                    return new BigMeanInvocation();
                 }
             };
 
-    private HashSet<DATA> mSet;
+    private int mCount;
+
+    private BigDecimal mSum;
 
     /**
      * Constructor.
      */
-    private ToSetInvocation() {
+    private BigMeanInvocation() {
 
     }
 
     /**
-     * Returns the factory of collecting invocations.
+     * Returns a factory of invocations computing the mean of the input numbers by employing a
+     * {@code BigDecimal}.
      *
-     * @param <DATA> the data type.
      * @return the factory instance.
      */
     @NotNull
-    @SuppressWarnings("unchecked")
-    public static <DATA> InvocationFactory<DATA, Set<DATA>> factoryOf() {
+    public static InvocationFactory<Number, BigDecimal> factoryOf() {
 
-        return (InvocationFactory<DATA, Set<DATA>>) sFactory;
+        return sFactory;
     }
 
     @Override
     public void onInitialize() {
 
-        mSet = new HashSet<DATA>();
+        mSum = BigDecimal.ZERO;
+        mCount = 0;
     }
 
     @Override
-    public void onInput(final DATA input, @NotNull final ResultChannel<Set<DATA>> result) {
+    public void onInput(final Number input, @NotNull final ResultChannel<BigDecimal> result) {
 
-        mSet.add(input);
+        mSum = mSum.add(toBigOptimistic(input));
+        ++mCount;
     }
 
     @Override
-    public void onResult(@NotNull final ResultChannel<Set<DATA>> result) {
+    public void onResult(@NotNull final ResultChannel<BigDecimal> result) {
 
-        result.pass(mSet);
-        mSet = null;
+        result.pass(mSum.divide(new BigDecimal(mCount), MathContext.UNLIMITED));
     }
 }

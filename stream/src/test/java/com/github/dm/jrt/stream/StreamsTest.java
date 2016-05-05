@@ -40,6 +40,7 @@ import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Functions;
+import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.stream.Streams.RangeConsumer;
 
@@ -62,6 +63,7 @@ import static com.github.dm.jrt.function.Functions.wrap;
 import static com.github.dm.jrt.stream.Streams.range;
 import static com.github.dm.jrt.stream.Streams.sequence;
 import static com.github.dm.jrt.stream.Streams.toList;
+import static com.github.dm.jrt.stream.Streams.toMap;
 import static com.github.dm.jrt.stream.Streams.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -72,6 +74,80 @@ import static org.junit.Assert.fail;
  * Created by davide-maestroni on 12/24/2015.
  */
 public class StreamsTest {
+
+    @Test
+    public void testAllMatch() {
+
+        assertThat(Streams.streamOf("test", "test").map(Streams.allMatch(new Predicate<String>() {
+
+            public boolean test(final String s) {
+
+                return "test1".equals(s);
+            }
+        })).afterMax(seconds(3)).all()).containsExactly(false);
+        assertThat(Streams.streamOf("test", "test").map(Streams.allMatch(new Predicate<String>() {
+
+            public boolean test(final String s) {
+
+                return "test".equals(s);
+            }
+        })).afterMax(seconds(3)).all()).containsExactly(true);
+        assertThat(Streams.streamOf("test1", "test2").map(Streams.allMatch(new Predicate<String>() {
+
+            public boolean test(final String s) {
+
+                return "test1".equals(s);
+            }
+        })).afterMax(seconds(3)).all()).containsExactly(false);
+    }
+
+    @Test
+    public void testAnyMatch() {
+
+        assertThat(Streams.streamOf("test", "test").map(Streams.anyMatch(new Predicate<String>() {
+
+            public boolean test(final String s) {
+
+                return "test1".equals(s);
+            }
+        })).afterMax(seconds(3)).all()).containsExactly(false);
+        assertThat(Streams.streamOf("test", "test").map(Streams.anyMatch(new Predicate<String>() {
+
+            public boolean test(final String s) {
+
+                return "test".equals(s);
+            }
+        })).afterMax(seconds(3)).all()).containsExactly(true);
+        assertThat(Streams.streamOf("test1", "test2").map(Streams.anyMatch(new Predicate<String>() {
+
+            public boolean test(final String s) {
+
+                return "test1".equals(s);
+            }
+        })).afterMax(seconds(3)).all()).containsExactly(true);
+    }
+
+    @Test
+    public void testBigMean() {
+
+        assertThat(Streams.streamOf(1, 2, 3, 4)
+                          .map(Streams.<Integer>bigMean())
+                          .afterMax(seconds(3))
+                          .next()).isEqualTo(new BigDecimal(2.5));
+        assertThat(Streams.streamOf(1f, 2f, 3f, 4f)
+                          .map(Streams.<Float>bigMean())
+                          .afterMax(seconds(3))
+                          .next()).isEqualTo(new BigDecimal(2.5));
+    }
+
+    @Test
+    public void testBigSum() {
+
+        assertThat(Streams.streamOf(1, 2, 3, 4)
+                          .map(Streams.<Integer>bigSum())
+                          .afterMax(seconds(3))
+                          .next()).isEqualTo(new BigDecimal(10));
+    }
 
     @Test
     public void testBlend() {
@@ -574,6 +650,19 @@ public class StreamsTest {
         } catch (final NullPointerException ignored) {
 
         }
+    }
+
+    @Test
+    public void testFloatingMean() {
+
+        assertThat(Streams.streamOf(1, 2, 3, 4)
+                          .map(Streams.<Integer>floatingMean())
+                          .afterMax(seconds(3))
+                          .next()).isEqualTo(2.5f);
+        assertThat(Streams.streamOf(1f, 2f, 3f, 4f)
+                          .map(Streams.<Float>floatingMean())
+                          .afterMax(seconds(3))
+                          .next()).isEqualTo(2.5f);
     }
 
     @Test
@@ -1116,6 +1205,19 @@ public class StreamsTest {
     }
 
     @Test
+    public void testMean() {
+
+        assertThat(Streams.streamOf(1, 2, 3, 4)
+                          .map(Streams.<Integer>mean())
+                          .afterMax(seconds(3))
+                          .next()).isEqualTo(2);
+        assertThat(Streams.streamOf(1f, 2f, 3f, 4f)
+                          .map(Streams.<Float>mean())
+                          .afterMax(seconds(3))
+                          .next()).isEqualTo(2.5f);
+    }
+
+    @Test
     public void testMerge() {
 
         final IOChannelBuilder builder = JRoutineCore.io()
@@ -1403,6 +1505,62 @@ public class StreamsTest {
         } catch (final NullPointerException ignored) {
 
         }
+    }
+
+    @Test
+    public void testNoneMatch() {
+
+        assertThat(Streams.streamOf("test", "test").map(Streams.noneMatch(new Predicate<String>() {
+
+            public boolean test(final String s) {
+
+                return "test1".equals(s);
+            }
+        })).afterMax(seconds(3)).all()).containsExactly(true);
+        assertThat(Streams.streamOf("test", "test").map(Streams.noneMatch(new Predicate<String>() {
+
+            public boolean test(final String s) {
+
+                return "test".equals(s);
+            }
+        })).afterMax(seconds(3)).all()).containsExactly(false);
+        assertThat(
+                Streams.streamOf("test1", "test2").map(Streams.noneMatch(new Predicate<String>() {
+
+                    public boolean test(final String s) {
+
+                        return "test1".equals(s);
+                    }
+                })).afterMax(seconds(3)).all()).containsExactly(false);
+    }
+
+    @Test
+    public void testNotAllMatch() {
+
+        assertThat(
+                Streams.streamOf("test", "test").map(Streams.notAllMatch(new Predicate<String>() {
+
+                    public boolean test(final String s) {
+
+                        return "test1".equals(s);
+                    }
+                })).afterMax(seconds(3)).all()).containsExactly(true);
+        assertThat(
+                Streams.streamOf("test", "test").map(Streams.notAllMatch(new Predicate<String>() {
+
+                    public boolean test(final String s) {
+
+                        return "test".equals(s);
+                    }
+                })).afterMax(seconds(3)).all()).containsExactly(false);
+        assertThat(
+                Streams.streamOf("test1", "test2").map(Streams.notAllMatch(new Predicate<String>() {
+
+                    public boolean test(final String s) {
+
+                        return "test1".equals(s);
+                    }
+                })).afterMax(seconds(3)).all()).containsExactly(true);
     }
 
     @Test
@@ -1918,6 +2076,19 @@ public class StreamsTest {
     }
 
     @Test
+    public void testRoundMean() {
+
+        assertThat(Streams.streamOf(1, 2, 3, 4)
+                          .map(Streams.<Integer>roundedMean())
+                          .afterMax(seconds(3))
+                          .next()).isEqualTo(3);
+        assertThat(Streams.streamOf(1f, 2f, 3f, 4f)
+                          .map(Streams.<Float>roundedMean())
+                          .afterMax(seconds(3))
+                          .next()).isEqualTo(2.5f);
+    }
+
+    @Test
     @SuppressWarnings("unchecked")
     public void testSelectMap() {
 
@@ -2252,6 +2423,15 @@ public class StreamsTest {
     }
 
     @Test
+    public void testSum() {
+
+        assertThat(Streams.streamOf(1, 2, 3, 4)
+                          .map(Streams.<Integer>sum())
+                          .afterMax(seconds(3))
+                          .next()).isEqualTo(10);
+    }
+
+    @Test
     public void testToList() {
 
         assertThat(Streams.streamOf("test", "test")
@@ -2262,6 +2442,29 @@ public class StreamsTest {
                           .map(toList())
                           .afterMax(seconds(3))
                           .next()).isEqualTo(Arrays.asList("test1", "test2"));
+    }
+
+    @Test
+    public void testToMap() {
+
+        assertThat(Streams.streamOf("test", "test").map(toMap(new Function<String, Integer>() {
+
+            public Integer apply(final String s) {
+
+                return s.hashCode();
+            }
+        })).afterMax(seconds(3)).next()).isEqualTo(
+                Collections.singletonMap("test".hashCode(), "test"));
+        assertThat(Streams.streamOf("test1", "test2").map(toMap(new Function<String, Integer>() {
+
+            public Integer apply(final String s) {
+
+                return s.hashCode();
+            }
+        })).afterMax(seconds(3)).next()).isEqualTo(new HashMap<Integer, String>() {{
+            put("test1".hashCode(), "test1");
+            put("test2".hashCode(), "test2");
+        }});
     }
 
     @Test
@@ -2302,6 +2505,19 @@ public class StreamsTest {
         assertThat(consumer).isNotEqualTo(Streams.groupBy(3));
         assertThat(consumer).isEqualTo(wrap(Streams.unfold()));
         assertThat(consumer.hashCode()).isEqualTo(wrap(Streams.unfold()).hashCode());
+    }
+
+    @Test
+    public void testUnique() {
+
+        assertThat(Streams.streamOf("test", "test")
+                          .map(Streams.<String>unique())
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test");
+        assertThat(Streams.streamOf("test1", "test2")
+                          .map(Streams.<String>unique())
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("test1", "test2");
     }
 
     private static class Amb<DATA> extends TemplateInvocation<Selectable<DATA>, DATA> {

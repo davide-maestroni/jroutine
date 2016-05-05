@@ -976,6 +976,9 @@ public class LoaderStreams extends Streams {
 
     /**
      * Builds and returns a new loader stream channel.
+     * <p>
+     * Note that the stream will start producing results only when one of the {@link OutputChannel}
+     * methods is called.
      *
      * @param <OUT> the output data type.
      * @return the newly created stream instance.
@@ -988,6 +991,9 @@ public class LoaderStreams extends Streams {
 
     /**
      * Builds and returns a new loader stream channel generating the specified outputs.
+     * <p>
+     * Note that the stream will start producing results only when one of the {@link OutputChannel}
+     * methods is called.
      *
      * @param outputs the iterable returning the output data.
      * @param <OUT>   the output data type.
@@ -1001,6 +1007,9 @@ public class LoaderStreams extends Streams {
 
     /**
      * Builds and returns a new loader stream channel generating the specified output.
+     * <p>
+     * Note that the stream will start producing results only when one of the {@link OutputChannel}
+     * methods is called.
      *
      * @param output the output.
      * @param <OUT>  the output data type.
@@ -1014,6 +1023,9 @@ public class LoaderStreams extends Streams {
 
     /**
      * Builds and returns a new loader stream channel generating the specified outputs.
+     * <p>
+     * Note that the stream will start producing results only when one of the {@link OutputChannel}
+     * methods is called.
      *
      * @param outputs the output data.
      * @param <OUT>   the output data type.
@@ -1027,8 +1039,11 @@ public class LoaderStreams extends Streams {
 
     /**
      * Builds and returns a new loader stream channel generating the specified outputs.
+     * <br>
+     * The output channel will be bound as a result of the call.
      * <p>
-     * Note that the output channel will be bound as a result of the call.
+     * Note that the stream will start producing results only when one of the {@link OutputChannel}
+     * methods is called.
      *
      * @param output the output channel returning the output data.
      * @param <OUT>  the output data type.

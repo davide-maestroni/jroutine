@@ -75,6 +75,7 @@ import static com.github.dm.jrt.function.Functions.wrap;
  * <p>
  * Created by davide-maestroni on 01/12/2016.
  *
+ * @param <IN>  the input data type.
  * @param <OUT> the output data type.
  */
 public abstract class AbstractStreamChannel<IN, OUT>
@@ -770,14 +771,22 @@ public abstract class AbstractStreamChannel<IN, OUT>
         return mInvocationMode;
     }
 
-    // TODO: 05/05/16 javadoc
+    /**
+     * Returns the invoke function.
+     *
+     * @return the invoke function.
+     */
     @NotNull
     protected FunctionWrapper<OutputChannel<IN>, OutputChannel<OUT>> getInvoke() {
 
         return mInvoke;
     }
 
-    // TODO: 05/05/16 javadoc
+    /**
+     * Return the source channel.
+     *
+     * @return the source channel.
+     */
     @NotNull
     protected OutputChannel<IN> getSourceChannel() {
 
@@ -798,7 +807,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
     /**
      * Creates a new channel instance.
      *
-     * @param <BEFORE>
+     * @param <BEFORE>            the concatenation input type.
      * @param <AFTER>             the concatenation output type.
      * @param streamConfiguration the stream configuration.
      * @param invocationMode      the invocation mode.
@@ -863,7 +872,11 @@ public abstract class AbstractStreamChannel<IN, OUT>
         return mChannel;
     }
 
-    // TODO: 05/05/16 javadoc
+    /**
+     * Concat invoke function.
+     *
+     * @param <OUT> the output data type.
+     */
     private static class ConcatInvoke<OUT> extends DeepEqualObject
             implements Function<OutputChannel<OUT>, OutputChannel<OUT>> {
 
@@ -871,6 +884,12 @@ public abstract class AbstractStreamChannel<IN, OUT>
 
         private final ChannelConfiguration mConfiguration;
 
+        /**
+         * Constructor.
+         *
+         * @param configuration the channel configuration.
+         * @param channel       the output channel to concat.
+         */
         private ConcatInvoke(@NotNull final ChannelConfiguration configuration,
                 @NotNull final OutputChannel<? extends OUT> channel) {
 
@@ -888,15 +907,26 @@ public abstract class AbstractStreamChannel<IN, OUT>
         }
     }
 
-    // TODO: 05/05/16 javadoc
-    private static class MapInvoke<OUT, AFTER> extends DeepEqualObject
-            implements Function<OutputChannel<OUT>, OutputChannel<AFTER>> {
+    /**
+     * Map invoke function.
+     *
+     * @param <IN>  the input data type.
+     * @param <OUT> the output data type.
+     */
+    private static class MapInvoke<IN, OUT> extends DeepEqualObject
+            implements Function<OutputChannel<IN>, OutputChannel<OUT>> {
 
         private final InvocationMode mInvocationMode;
 
         private final Routine mRoutine;
 
-        private MapInvoke(@NotNull final Routine<? super OUT, ? extends AFTER> routine,
+        /**
+         * Constructor.
+         *
+         * @param routine        the routine to invoke.
+         * @param invocationMode the invocation mode.
+         */
+        private MapInvoke(@NotNull final Routine<? super IN, ? extends OUT> routine,
                 @NotNull final InvocationMode invocationMode) {
 
             super(asArgs(routine, invocationMode));
@@ -905,29 +935,38 @@ public abstract class AbstractStreamChannel<IN, OUT>
         }
 
         @SuppressWarnings("unchecked")
-        public OutputChannel<AFTER> apply(final OutputChannel<OUT> channel) {
+        public OutputChannel<OUT> apply(final OutputChannel<IN> channel) {
 
             final InvocationMode invocationMode = mInvocationMode;
             if (invocationMode == InvocationMode.ASYNC) {
-                return (OutputChannel<AFTER>) mRoutine.asyncCall(channel);
+                return (OutputChannel<OUT>) mRoutine.asyncCall(channel);
 
             } else if (invocationMode == InvocationMode.PARALLEL) {
-                return (OutputChannel<AFTER>) mRoutine.parallelCall(channel);
+                return (OutputChannel<OUT>) mRoutine.parallelCall(channel);
 
             } else if (invocationMode == InvocationMode.SYNC) {
-                return (OutputChannel<AFTER>) mRoutine.syncCall(channel);
+                return (OutputChannel<OUT>) mRoutine.syncCall(channel);
             }
 
-            return (OutputChannel<AFTER>) mRoutine.serialCall(channel);
+            return (OutputChannel<OUT>) mRoutine.serialCall(channel);
         }
     }
 
-    // TODO: 05/05/16 javadoc
+    /**
+     * Repeat invoke function.
+     *
+     * @param <OUT> the output data type.
+     */
     private static class RepeatInvoke<OUT> extends DeepEqualObject
             implements Function<OutputChannel<OUT>, OutputChannel<OUT>> {
 
         private final ChannelConfiguration mConfiguration;
 
+        /**
+         * Constructor.
+         *
+         * @param configuration the channel configuration.
+         */
         private RepeatInvoke(@NotNull final ChannelConfiguration configuration) {
 
             super(asArgs(configuration));
@@ -944,7 +983,11 @@ public abstract class AbstractStreamChannel<IN, OUT>
         }
     }
 
-    // TODO: 05/05/16 javadoc
+    /**
+     * Selectable invoke function.
+     *
+     * @param <OUT> the output data type.
+     */
     private static class SelectableInvoke<OUT> extends DeepEqualObject
             implements Function<OutputChannel<OUT>, OutputChannel<Selectable<OUT>>> {
 
@@ -952,6 +995,12 @@ public abstract class AbstractStreamChannel<IN, OUT>
 
         private final int mIndex;
 
+        /**
+         * Constructor.
+         *
+         * @param configuration the channel configuration.
+         * @param index         the selectable index.
+         */
         private SelectableInvoke(@NotNull final ChannelConfiguration configuration,
                 final int index) {
 
@@ -973,7 +1022,11 @@ public abstract class AbstractStreamChannel<IN, OUT>
         }
     }
 
-    // TODO: 05/05/16 javadoc
+    /**
+     * Try/catch invoke function.
+     *
+     * @param <OUT> the output data type.
+     */
     private static class TryCatchInvoke<OUT> extends DeepEqualObject
             implements Function<OutputChannel<OUT>, OutputChannel<OUT>> {
 
@@ -982,6 +1035,12 @@ public abstract class AbstractStreamChannel<IN, OUT>
         private final BiConsumerWrapper<? super RoutineException, ? super InputChannel<OUT>>
                 mConsumer;
 
+        /**
+         * Constructor.
+         *
+         * @param configuration the channel configuration.
+         * @param consumer      the error consumer instance.
+         */
         private TryCatchInvoke(@NotNull final ChannelConfiguration configuration,
                 @NotNull final BiConsumerWrapper<? super RoutineException, ? super
                         InputChannel<OUT>> consumer) {
@@ -1003,7 +1062,11 @@ public abstract class AbstractStreamChannel<IN, OUT>
         }
     }
 
-    // TODO: 05/05/16 javadoc
+    /**
+     * Try/finally invoke function.
+     *
+     * @param <OUT> the output data type.
+     */
     private static class TryFinallyInvoke<OUT> extends DeepEqualObject
             implements Function<OutputChannel<OUT>, OutputChannel<OUT>> {
 
@@ -1011,6 +1074,12 @@ public abstract class AbstractStreamChannel<IN, OUT>
 
         private final Runnable mRunnable;
 
+        /**
+         * Constructor.
+         *
+         * @param configuration the channel configuration.
+         * @param runnable      the final runnable.
+         */
         private TryFinallyInvoke(@NotNull final ChannelConfiguration configuration,
                 @NotNull final Runnable runnable) {
 

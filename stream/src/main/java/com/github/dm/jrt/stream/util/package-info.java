@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Davide Maestroni
+ * Copyright (c) 2016. Davide Maestroni
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 
 /**
- * Streams interfaces and classes.
+ * Streams utility classes.
  * <p>
- * Created by davide-maestroni on 10/22/2015.
+ * Created by davide-maestroni on 05/05/2016.
  */
-package com.github.dm.jrt.stream;
+package com.github.dm.jrt.stream.util;

@@ -24,66 +24,66 @@ import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
-import java.util.Set;
 
 /**
- * Factory of invocations collecting inputs into sets.
+ * Invocation filtering out inputs which are not unique.
  * <p>
- * Created by davide-maestroni on 05/02/2016.
+ * Created by davide-maestroni on 05/01/2016.
  *
  * @param <DATA> the data type.
  */
-class ToSetInvocation<DATA> extends TemplateInvocation<DATA, Set<DATA>> {
+class UniqueInvocation<DATA> extends TemplateInvocation<DATA, DATA> {
 
-    private static final InvocationFactory<?, ? extends Set<?>> sFactory =
-            new InvocationFactory<Object, Set<Object>>(null) {
+    private static final InvocationFactory<?, ?> sFactory =
+            new InvocationFactory<Object, Object>(null) {
 
                 @NotNull
                 @Override
-                public Invocation<Object, Set<Object>> newInvocation() throws Exception {
+                public Invocation<Object, Object> newInvocation() {
 
-                    return new ToSetInvocation<Object>();
+                    return new UniqueInvocation<Object>();
                 }
             };
 
-    private HashSet<DATA> mSet;
+    private final HashSet<DATA> mSet = new HashSet<DATA>();
 
     /**
      * Constructor.
      */
-    private ToSetInvocation() {
+    private UniqueInvocation() {
 
     }
 
     /**
-     * Returns the factory of collecting invocations.
+     * Returns a factory of invocations filtering out inputs which are not unique.
      *
      * @param <DATA> the data type.
      * @return the factory instance.
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <DATA> InvocationFactory<DATA, Set<DATA>> factoryOf() {
+    public static <DATA> InvocationFactory<DATA, DATA> factoryOf() {
 
-        return (InvocationFactory<DATA, Set<DATA>>) sFactory;
+        return (InvocationFactory<DATA, DATA>) sFactory;
     }
 
     @Override
     public void onInitialize() {
 
-        mSet = new HashSet<DATA>();
+        mSet.clear();
     }
 
     @Override
-    public void onInput(final DATA input, @NotNull final ResultChannel<Set<DATA>> result) {
+    public void onInput(final DATA input, @NotNull final ResultChannel<DATA> result) {
 
-        mSet.add(input);
+        if (mSet.add(input)) {
+            result.pass(input);
+        }
     }
 
     @Override
-    public void onResult(@NotNull final ResultChannel<Set<DATA>> result) {
+    public void onTerminate() {
 
-        result.pass(mSet);
-        mSet = null;
+        mSet.clear();
     }
 }

@@ -535,9 +535,9 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
      */
     private class DefaultOutputConsumer implements OutputConsumer<IN> {
 
-        private final TimeUnit mDelayUnit;
-
         private final long mDelay;
+
+        private final TimeUnit mDelayUnit;
 
         private final OrderType mOrderType;
 
@@ -582,8 +582,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
             final Execution execution;
             synchronized (mMutex) {
-                execution = mState.onConsumerOutput(output, mQueue, mDelay, mDelayUnit,
-                        mOrderType);
+                execution = mState.onConsumerOutput(output, mQueue, mDelay, mDelayUnit, mOrderType);
             }
 
             if (execution != null) {

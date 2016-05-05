@@ -1675,8 +1675,8 @@ public class RoutineProcessor extends AbstractProcessor {
                             final TypeMirror typeParameterMirror =
                                     typeParameterElements.get(i).asType();
                             if (!typeUtils.isSameType(typeUtils.erasure(
-                                            (value != null) ? (TypeMirror) value
-                                                    : variableElement.asType()),
+                                    (value != null) ? (TypeMirror) value
+                                            : variableElement.asType()),
                                     typeUtils.erasure(typeParameterMirror))) {
                                 matches = false;
                                 break;
@@ -1741,8 +1741,8 @@ public class RoutineProcessor extends AbstractProcessor {
                     }
 
                     final TypeMirror typeParameterMirror = typeParameterElements.get(i).asType();
-                    if (!typeUtils.isSameType(typeUtils.erasure((value != null) ? (TypeMirror) value
-                                    : variableElement.asType()),
+                    if (!typeUtils.isSameType(typeUtils.erasure(
+                            (value != null) ? (TypeMirror) value : variableElement.asType()),
                             typeUtils.erasure(typeParameterMirror))) {
                         targetMethod = null;
                         break;

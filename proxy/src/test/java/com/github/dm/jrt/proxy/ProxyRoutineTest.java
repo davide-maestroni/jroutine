@@ -256,16 +256,12 @@ public class ProxyRoutineTest {
         final NullLog log = new NullLog();
         final Runner runner = Runners.poolRunner();
         final TestClass test = new TestClass();
-        final InvocationConfiguration configuration = builder().withRunner(runner)
-                                                               .withLogLevel(Level.DEBUG)
-                                                               .withLog(log)
-                                                               .apply();
+        final InvocationConfiguration configuration =
+                builder().withRunner(runner).withLogLevel(Level.DEBUG).withLog(log).apply();
         final ProxyObjectBuilder<TestProxy> builder =
                 com.github.dm.jrt.proxy.Proxy_Test.on(instance(test));
-        final TestProxy testProxy = builder.invocationConfiguration()
-                                           .with(configuration)
-                                           .apply()
-                                           .buildProxy();
+        final TestProxy testProxy =
+                builder.invocationConfiguration().with(configuration).apply().buildProxy();
 
         assertThat(testProxy.getOne().next()).isEqualTo(1);
         assertThat(testProxy.getStringParallel1(JRoutineCore.io().of(1, 2, 3))).isIn("1", "2", "3");
@@ -293,10 +289,8 @@ public class ProxyRoutineTest {
         final NullLog log = new NullLog();
         final Runner runner = Runners.poolRunner();
         final TestClass test = new TestClass();
-        final InvocationConfiguration configuration = builder().withRunner(runner)
-                                                               .withLogLevel(Level.DEBUG)
-                                                               .withLog(log)
-                                                               .apply();
+        final InvocationConfiguration configuration =
+                builder().withRunner(runner).withLogLevel(Level.DEBUG).withLog(log).apply();
         final TestProxy testProxy = JRoutineProxy.on(instance(test))
                                                  .invocationConfiguration()
                                                  .with(configuration)

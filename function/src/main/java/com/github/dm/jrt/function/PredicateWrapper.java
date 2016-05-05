@@ -66,13 +66,13 @@ public class PredicateWrapper<IN> extends DeepEqualObject implements Predicate<I
                 }
             });
 
-    private final Predicate<? super IN> mPredicate;
-
-    private final List<Predicate<?>> mPredicates;
-
     private static final PredicateWrapper<Object> sIsNull = sNotNull.negate();
 
     private static final PredicateWrapper<Object> sPositive = sNegative.negate();
+
+    private final Predicate<? super IN> mPredicate;
+
+    private final List<Predicate<?>> mPredicates;
 
     /**
      * Constructor.

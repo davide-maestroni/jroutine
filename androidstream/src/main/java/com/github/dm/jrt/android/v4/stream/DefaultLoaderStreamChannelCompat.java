@@ -28,7 +28,6 @@ import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
 import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat.LoaderBuilderCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
@@ -40,6 +39,7 @@ import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.Reflection;
 import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.function.BiConsumer;
@@ -60,6 +60,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.android.core.RoutineContextInvocation.factoryFrom;
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.function.Functions.wrap;
 
 /**
@@ -69,7 +70,7 @@ import static com.github.dm.jrt.function.Functions.wrap;
  *
  * @param <OUT> the output data type.
  */
-class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel<OUT>
+class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN, OUT>
         implements LoaderStreamChannelCompat<OUT>, Configurable<LoaderStreamChannelCompat<OUT>> {
 
     private final InvocationConfiguration.Configurable<LoaderStreamChannelCompat<OUT>>
@@ -125,59 +126,37 @@ class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel<OUT>
     /**
      * Constructor.
      *
-     * @param builder the context builder.
-     * @param channel the wrapped output channel.
+     * @param builder       the context builder.
+     * @param sourceChannel the source output channel.
+     * @param invoke        the invoke function.
      */
     DefaultLoaderStreamChannelCompat(@Nullable final LoaderBuilderCompat builder,
-            @NotNull final OutputChannel<OUT> channel) {
+            @NotNull final OutputChannel<IN> sourceChannel,
+            @NotNull final Function<OutputChannel<IN>, OutputChannel<OUT>> invoke) {
 
-        this(builder, channel, (Binder) null);
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param builder the context builder.
-     * @param input   the channel returning the inputs.
-     * @param output  the channel consuming them.
-     */
-    DefaultLoaderStreamChannelCompat(@Nullable final LoaderBuilderCompat builder,
-            @NotNull final OutputChannel<OUT> input, @NotNull final IOChannel<OUT> output) {
-
-        this(builder, output, Binder.binderOf(input, output));
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param builder the context builder.
-     * @param channel the wrapped output channel.
-     * @param binder  the binder instance.
-     */
-    private DefaultLoaderStreamChannelCompat(@Nullable final LoaderBuilderCompat builder,
-            @NotNull final OutputChannel<OUT> channel, @Nullable final Binder binder) {
-
-        this(builder, channel, InvocationConfiguration.defaultConfiguration(),
-                LoaderConfiguration.defaultConfiguration(), InvocationMode.ASYNC, binder);
+        this(builder, InvocationConfiguration.defaultConfiguration(),
+                LoaderConfiguration.defaultConfiguration(), InvocationMode.ASYNC, sourceChannel,
+                invoke);
     }
 
     /**
      * Constructor.
      *
      * @param builder                 the context builder.
-     * @param channel                 the wrapped output channel.
      * @param invocationConfiguration the initial invocation configuration.
      * @param loaderConfiguration     the initial loader configuration.
-     * @param invocationMode          the delegation type.
-     * @param binder                  the binder instance.
+     * @param invocationMode          the invocation mode.
+     * @param sourceChannel           the source output channel.
+     * @param invoke                  the invoke function.
      */
     private DefaultLoaderStreamChannelCompat(@Nullable final LoaderBuilderCompat builder,
-            @NotNull final OutputChannel<OUT> channel,
             @NotNull final InvocationConfiguration invocationConfiguration,
             @NotNull final LoaderConfiguration loaderConfiguration,
-            @NotNull final InvocationMode invocationMode, @Nullable final Binder binder) {
+            @NotNull final InvocationMode invocationMode,
+            @NotNull final OutputChannel<IN> sourceChannel,
+            @NotNull final Function<OutputChannel<IN>, OutputChannel<OUT>> invoke) {
 
-        super(channel, invocationConfiguration, invocationMode, binder);
+        super(invocationConfiguration, invocationMode, sourceChannel, invoke);
         mContextBuilder = builder;
         mStreamConfiguration =
                 ConstantConditions.notNull("loader configuration", loaderConfiguration);
@@ -687,14 +666,8 @@ class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel<OUT>
     public LoaderStreamChannelCompat<? extends ParcelableSelectable<OUT>> toSelectable(
             final int index) {
 
-        final ChannelConfiguration configuration = buildChannelConfiguration();
-        final OutputChannel<? extends ParcelableSelectable<OUT>> channel =
-                SparseChannelsCompat.toSelectable(this, index)
-                                    .channelConfiguration()
-                                    .with(configuration)
-                                    .apply()
-                                    .buildChannels();
-        return newChannel(channel, getStreamConfiguration(), getInvocationMode(), getBinder());
+        return newChannel(getStreamConfiguration(), getInvocationMode(), getSourceChannel(),
+                getInvoke().andThen(new SelectableInvoke<OUT>(buildChannelConfiguration(), index)));
     }
 
     @NotNull
@@ -731,13 +704,14 @@ class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel<OUT>
 
     @NotNull
     @Override
-    protected <AFTER> LoaderStreamChannelCompat<AFTER> newChannel(
-            @NotNull final OutputChannel<AFTER> channel,
+    protected <BEFORE, AFTER> LoaderStreamChannelCompat<AFTER> newChannel(
             @NotNull final InvocationConfiguration streamConfiguration,
-            @NotNull final InvocationMode invocationMode, @Nullable final Binder binder) {
+            @NotNull final InvocationMode invocationMode,
+            @NotNull final OutputChannel<BEFORE> sourceChannel,
+            @NotNull final Function<OutputChannel<BEFORE>, OutputChannel<AFTER>> invoke) {
 
-        return newChannel(channel, streamConfiguration, mStreamConfiguration, invocationMode,
-                binder);
+        return newChannel(streamConfiguration, mStreamConfiguration, invocationMode, sourceChannel,
+                invoke);
     }
 
     @NotNull
@@ -830,14 +804,16 @@ class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel<OUT>
     }
 
     @NotNull
-    private <AFTER> LoaderStreamChannelCompat<AFTER> newChannel(
-            @NotNull final OutputChannel<AFTER> channel,
+    private <BEFORE, AFTER> LoaderStreamChannelCompat<AFTER> newChannel(
             @NotNull final InvocationConfiguration invocationConfiguration,
             @NotNull final LoaderConfiguration loaderConfiguration,
-            @NotNull final InvocationMode invocationMode, @Nullable final Binder binder) {
+            @NotNull final InvocationMode invocationMode,
+            @NotNull final OutputChannel<BEFORE> sourceChannel,
+            @NotNull final Function<OutputChannel<BEFORE>, OutputChannel<AFTER>> invoke) {
 
-        return new DefaultLoaderStreamChannelCompat<AFTER>(mContextBuilder, channel,
-                invocationConfiguration, loaderConfiguration, invocationMode, binder);
+        return new DefaultLoaderStreamChannelCompat<BEFORE, AFTER>(mContextBuilder,
+                invocationConfiguration, loaderConfiguration, invocationMode, sourceChannel,
+                invoke);
     }
 
     @NotNull
@@ -866,6 +842,35 @@ class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel<OUT>
                              .with(loaderConfiguration)
                              .apply()
                              .buildRoutine();
+    }
+
+    // TODO: 05/05/16 javadoc
+    private static class SelectableInvoke<OUT> extends DeepEqualObject
+            implements Function<OutputChannel<OUT>, OutputChannel<ParcelableSelectable<OUT>>> {
+
+        private final ChannelConfiguration mConfiguration;
+
+        private final int mIndex;
+
+        private SelectableInvoke(@NotNull final ChannelConfiguration configuration,
+                final int index) {
+
+            super(asArgs(configuration, index));
+            mConfiguration = configuration;
+            mIndex = index;
+        }
+
+        @SuppressWarnings("unchecked")
+        public OutputChannel<ParcelableSelectable<OUT>> apply(final OutputChannel<OUT> channel) {
+
+            final OutputChannel<? extends ParcelableSelectable<OUT>> outputChannel =
+                    SparseChannelsCompat.toSelectable(channel, mIndex)
+                                        .channelConfiguration()
+                                        .with(mConfiguration)
+                                        .apply()
+                                        .buildChannels();
+            return (OutputChannel<ParcelableSelectable<OUT>>) outputChannel;
+        }
     }
 
     @NotNull

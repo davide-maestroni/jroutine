@@ -35,8 +35,8 @@ import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.routine.InvocationMode;
-import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.stream.StreamChannel;
 import com.github.dm.jrt.stream.Streams;
 
@@ -510,91 +510,6 @@ public class LoaderStreams extends Streams {
             @Nullable final OUT placeholder, @NotNull final OutputChannel<?>... channels) {
 
         return new BuilderWrapper<List<? extends OUT>>(SparseChannels.join(placeholder, channels));
-    }
-
-    /**
-     * Builds and returns a new lazy loader stream channel.
-     * <br>
-     * The stream will start producing results only when it is bound to another channel or an output
-     * consumer, or when any of the read methods is invoked.
-     *
-     * @param <OUT> the output data type.
-     * @return the newly created stream instance.
-     */
-    @NotNull
-    public static <OUT> LoaderStreamChannel<OUT> lazyStreamOf() {
-
-        return lazyStreamOf(JRoutineCore.io().<OUT>buildChannel().close());
-    }
-
-    /**
-     * Builds and returns a new lazy loader stream channel generating the specified outputs.
-     * <br>
-     * The stream will start producing results only when it is bound to another channel or an output
-     * consumer, or when any of the read methods is invoked.
-     *
-     * @param outputs the iterable returning the output data.
-     * @param <OUT>   the output data type.
-     * @return the newly created stream instance.
-     */
-    @NotNull
-    public static <OUT> LoaderStreamChannel<OUT> lazyStreamOf(
-            @Nullable final Iterable<OUT> outputs) {
-
-        return lazyStreamOf(JRoutineCore.io().of(outputs));
-    }
-
-    /**
-     * Builds and returns a new lazy loader stream channel generating the specified output.
-     * <br>
-     * The stream will start producing results only when it is bound to another channel or an output
-     * consumer, or when any of the read methods is invoked.
-     *
-     * @param output the output.
-     * @param <OUT>  the output data type.
-     * @return the newly created stream instance.
-     */
-    @NotNull
-    public static <OUT> LoaderStreamChannel<OUT> lazyStreamOf(@Nullable final OUT output) {
-
-        return lazyStreamOf(JRoutineCore.io().of(output));
-    }
-
-    /**
-     * Builds and returns a new lazy loader stream channel generating the specified outputs.
-     * <br>
-     * The stream will start producing results only when it is bound to another channel or an output
-     * consumer, or when any of the read methods is invoked.
-     *
-     * @param outputs the output data.
-     * @param <OUT>   the output data type.
-     * @return the newly created stream instance.
-     */
-    @NotNull
-    public static <OUT> LoaderStreamChannel<OUT> lazyStreamOf(@Nullable final OUT... outputs) {
-
-        return lazyStreamOf(JRoutineCore.io().of(outputs));
-    }
-
-    /**
-     * Builds and returns a new lazy loader stream channel generating the specified outputs.
-     * <br>
-     * The stream will start producing results only when it is bound to another channel or an output
-     * consumer, or when any of the read methods is invoked.
-     * <p>
-     * Note that the output channel will be bound as a result of the call.
-     *
-     * @param output the output channel returning the output data.
-     * @param <OUT>  the output data type.
-     * @return the newly created stream instance.
-     */
-    @NotNull
-    public static <OUT> LoaderStreamChannel<OUT> lazyStreamOf(
-            @NotNull final OutputChannel<OUT> output) {
-
-        ConstantConditions.notNull("output channel", output);
-        final IOChannel<OUT> ioChannel = JRoutineCore.io().buildChannel();
-        return new DefaultLoaderStreamChannel<OUT>(null, output, ioChannel);
     }
 
     /**
@@ -1127,7 +1042,8 @@ public class LoaderStreams extends Streams {
             return (LoaderStreamChannel<OUT>) output;
         }
 
-        return new DefaultLoaderStreamChannel<OUT>(null, output);
+        return new DefaultLoaderStreamChannel<OUT, OUT>(null, output,
+                Functions.<OutputChannel<OUT>>identity());
     }
 
     /**

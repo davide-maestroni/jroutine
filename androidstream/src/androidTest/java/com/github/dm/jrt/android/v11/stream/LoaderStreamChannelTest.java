@@ -1605,50 +1605,6 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         testInvocationDeadlock(getActivity());
     }
 
-    public void testLazyBuilder() {
-
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-            return;
-        }
-
-        assertThat(LoaderStreams.lazyStreamOf()
-                                .with(loaderFrom(getActivity()))
-                                .afterMax(seconds(10))
-                                .all()).isEmpty();
-        assertThat(LoaderStreams.lazyStreamOf("test")
-                                .with(loaderFrom(getActivity()))
-                                .afterMax(seconds(10))
-                                .all()).containsExactly("test");
-        assertThat(LoaderStreams.lazyStreamOf("test1", "test2", "test3")
-                                .with(loaderFrom(getActivity()))
-                                .afterMax(seconds(10))
-                                .all()).containsExactly("test1", "test2", "test3");
-        assertThat(LoaderStreams.lazyStreamOf(Arrays.asList("test1", "test2", "test3"))
-                                .with(loaderFrom(getActivity()))
-                                .afterMax(seconds(10))
-                                .all()).containsExactly("test1", "test2", "test3");
-        assertThat(LoaderStreams.lazyStreamOf(JRoutineCore.io().of("test1", "test2", "test3"))
-                                .with(loaderFrom(getActivity()))
-                                .afterMax(seconds(10))
-                                .all()).containsExactly("test1", "test2", "test3");
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    public void testLazyBuilderNullPointerError() {
-
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-            return;
-        }
-
-        try {
-            LoaderStreams.lazyStreamOf((OutputChannel<?>) null);
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-    }
-
     public void testLimit() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {

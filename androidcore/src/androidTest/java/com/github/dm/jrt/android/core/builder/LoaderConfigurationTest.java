@@ -49,8 +49,7 @@ public class LoaderConfigurationTest extends AndroidTestCase {
                                                            .withResultStaleTime(1, TimeUnit.SECONDS)
                                                            .apply();
         assertThat(configuration.builderFrom().apply()).isEqualTo(configuration);
-        assertThat(builderFrom(null).apply()).isEqualTo(
-                LoaderConfiguration.defaultConfiguration());
+        assertThat(builderFrom(null).apply()).isEqualTo(LoaderConfiguration.defaultConfiguration());
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -172,8 +171,7 @@ public class LoaderConfigurationTest extends AndroidTestCase {
                                                            .withResultStaleTime(1, TimeUnit.SECONDS)
                                                            .apply();
         assertThat(configuration).isNotEqualTo(
-                builder().withInputClashResolution(ClashResolutionType.ABORT_THIS)
-                         .apply());
+                builder().withInputClashResolution(ClashResolutionType.ABORT_THIS).apply());
         assertThat(configuration.builderFrom()
                                 .withInputClashResolution(ClashResolutionType.JOIN)
                                 .apply()).isNotEqualTo(

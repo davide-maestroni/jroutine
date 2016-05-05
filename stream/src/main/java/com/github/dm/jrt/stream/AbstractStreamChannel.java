@@ -20,7 +20,6 @@ import com.github.dm.jrt.channel.Channels;
 import com.github.dm.jrt.channel.Selectable;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.IOChannel;
-import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
@@ -36,11 +35,15 @@ import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.function.BiConsumer;
+import com.github.dm.jrt.function.BiConsumerWrapper;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
+import com.github.dm.jrt.function.FunctionWrapper;
+import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
 
@@ -53,9 +56,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.github.dm.jrt.core.config.ChannelConfiguration.builderFromOutputChannel;
+import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.UnitDuration.fromUnit;
 import static com.github.dm.jrt.function.Functions.consumerCall;
 import static com.github.dm.jrt.function.Functions.consumerOperation;
@@ -74,15 +77,8 @@ import static com.github.dm.jrt.function.Functions.wrap;
  *
  * @param <OUT> the output data type.
  */
-public abstract class AbstractStreamChannel<OUT>
+public abstract class AbstractStreamChannel<IN, OUT>
         implements StreamChannel<OUT>, Configurable<StreamChannel<OUT>> {
-
-    private static final Binder NO_OP = new Binder() {
-
-        public void bind() {
-
-        }
-    };
 
     private static final BiConsumer<? extends Collection<?>, ?> sCollectConsumer =
             new BiConsumer<Collection<Object>, Object>() {
@@ -93,13 +89,19 @@ public abstract class AbstractStreamChannel<OUT>
                 }
             };
 
-    private final Binder mBinder;
+    private final FunctionWrapper<OutputChannel<IN>, OutputChannel<OUT>> mInvoke;
 
-    private final OutputChannel<OUT> mChannel;
+    private final Object mMutex = new Object();
+
+    private final OutputChannel<IN> mSourceChannel;
+
+    private OutputChannel<OUT> mChannel;
 
     private InvocationConfiguration mConfiguration = InvocationConfiguration.defaultConfiguration();
 
     private InvocationMode mInvocationMode;
+
+    private boolean mIsBound;
 
     private InvocationConfiguration mStreamConfiguration =
             InvocationConfiguration.defaultConfiguration();
@@ -119,114 +121,110 @@ public abstract class AbstractStreamChannel<OUT>
     /**
      * Constructor.
      *
-     * @param channel        the wrapped output channel.
      * @param configuration  the initial invocation configuration.
      * @param invocationMode the delegation type.
-     * @param binder         the binding runnable.
+     * @param sourceChannel  the source output channel.
+     * @param invoke         the invoke function.
      */
-    protected AbstractStreamChannel(@NotNull final OutputChannel<OUT> channel,
-            @NotNull final InvocationConfiguration configuration,
-            @NotNull final InvocationMode invocationMode, @Nullable final Binder binder) {
+    protected AbstractStreamChannel(@NotNull final InvocationConfiguration configuration,
+            @NotNull final InvocationMode invocationMode,
+            @NotNull final OutputChannel<IN> sourceChannel,
+            @NotNull final Function<OutputChannel<IN>, OutputChannel<OUT>> invoke) {
 
         mStreamConfiguration =
                 ConstantConditions.notNull("invocation configuration", configuration);
         mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
-        mChannel = ConstantConditions.notNull("output channel", channel);
-        mBinder = (binder != null) ? binder : NO_OP;
+        mSourceChannel = ConstantConditions.notNull("source channel", sourceChannel);
+        mInvoke = wrap(invoke);
     }
 
     public boolean abort() {
 
-        mBinder.bind();
-        return mChannel.abort();
+        return invoke().abort();
     }
 
     public boolean abort(@Nullable final Throwable reason) {
 
-        mBinder.bind();
-        return mChannel.abort(reason);
+        return invoke().abort(reason);
     }
 
     public boolean isEmpty() {
 
-        return mChannel.isEmpty();
+        return invoke().isEmpty();
     }
 
     public boolean isOpen() {
 
-        return mChannel.isOpen();
+        return invoke().isOpen();
     }
 
     @NotNull
     public StreamChannel<OUT> afterMax(@NotNull final UnitDuration timeout) {
 
-        mChannel.afterMax(timeout);
+        invoke().afterMax(timeout);
         return this;
     }
 
     @NotNull
     public StreamChannel<OUT> afterMax(final long timeout, @NotNull final TimeUnit timeUnit) {
 
-        mChannel.afterMax(timeout, timeUnit);
+        invoke().afterMax(timeout, timeUnit);
         return this;
     }
 
     @NotNull
     public StreamChannel<OUT> allInto(@NotNull final Collection<? super OUT> results) {
 
-        mBinder.bind();
-        mChannel.allInto(results);
+        invoke().allInto(results);
         return this;
     }
 
     @NotNull
     public StreamChannel<OUT> bind(@NotNull final OutputConsumer<? super OUT> consumer) {
 
-        mBinder.bind();
-        mChannel.bind(consumer);
+        invoke().bind(consumer);
         return this;
     }
 
     @NotNull
     public StreamChannel<OUT> eventuallyAbort() {
 
-        mChannel.eventuallyAbort();
+        invoke().eventuallyAbort();
         return this;
     }
 
     @NotNull
     public StreamChannel<OUT> eventuallyAbort(@Nullable final Throwable reason) {
 
-        mChannel.eventuallyAbort(reason);
+        invoke().eventuallyAbort(reason);
         return this;
     }
 
     @NotNull
     public StreamChannel<OUT> eventuallyExit() {
 
-        mChannel.eventuallyExit();
+        invoke().eventuallyExit();
         return this;
     }
 
     @NotNull
     public StreamChannel<OUT> eventuallyThrow() {
 
-        mChannel.eventuallyThrow();
+        invoke().eventuallyThrow();
         return this;
     }
 
     @NotNull
     public StreamChannel<OUT> immediately() {
 
-        mChannel.immediately();
+        invoke().immediately();
         return this;
     }
 
     @NotNull
     public StreamChannel<OUT> skipNext(final int count) {
 
-        mBinder.bind();
-        mChannel.skipNext(count);
+        invoke().skipNext(count);
         return this;
     }
 
@@ -240,7 +238,7 @@ public abstract class AbstractStreamChannel<OUT>
             return (StreamChannel<AFTER>) outputChannel;
         }
 
-        return buildChannel(outputChannel);
+        return buildChannel(outputChannel, Functions.<OutputChannel<AFTER>>identity());
     }
 
     @NotNull
@@ -310,10 +308,8 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public StreamChannel<OUT> concat(@NotNull final OutputChannel<? extends OUT> channel) {
 
-        return buildChannel(Channels.<OUT>concat(this, channel).channelConfiguration()
-                                                               .with(buildChannelConfiguration())
-                                                               .apply()
-                                                               .buildChannels());
+        return buildChannel(mSourceChannel,
+                mInvoke.andThen(new ConcatInvoke<OUT>(buildChannelConfiguration(), channel)));
     }
 
     @NotNull
@@ -367,22 +363,9 @@ public abstract class AbstractStreamChannel<OUT>
     public <AFTER> StreamChannel<AFTER> map(
             @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
 
-        final InvocationMode invocationMode = mInvocationMode;
-        final InvocationChannel<? super OUT, ? extends AFTER> channel;
-        if (invocationMode == InvocationMode.ASYNC) {
-            channel = routine.asyncInvoke();
-
-        } else if (invocationMode == InvocationMode.PARALLEL) {
-            channel = routine.parallelInvoke();
-
-        } else if (invocationMode == InvocationMode.SYNC) {
-            channel = routine.syncInvoke();
-
-        } else {
-            channel = routine.serialInvoke();
-        }
-
-        return concatRoutine(channel);
+        return buildChannel(mSourceChannel, mInvoke.andThen(
+                new MapInvoke<OUT, AFTER>(ConstantConditions.notNull("routine instance", routine),
+                        mInvocationMode)));
     }
 
     @NotNull
@@ -485,9 +468,7 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public StreamChannel<OUT> parallel(final int maxInvocations) {
 
-        return parallel().invocationConfiguration()
-                         .withMaxInstances(maxInvocations)
-                         .apply();
+        return parallel().invocationConfiguration().withMaxInstances(maxInvocations).apply();
     }
 
     @NotNull
@@ -520,11 +501,8 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public StreamChannel<OUT> repeat() {
 
-        return buildChannel(Channels.repeat(this)
-                                    .channelConfiguration()
-                                    .with(buildChannelConfiguration())
-                                    .apply()
-                                    .buildChannels());
+        return buildChannel(mSourceChannel,
+                mInvoke.andThen(new RepeatInvoke<OUT>(buildChannelConfiguration())));
     }
 
     @NotNull
@@ -532,10 +510,8 @@ public abstract class AbstractStreamChannel<OUT>
 
         final InvocationMode invocationMode = mInvocationMode;
         final OperationInvocation<OUT, OUT> factory = IdentityInvocation.factoryOf();
-        final StreamChannel<OUT> channel = streamInvocationConfiguration().withRunner(runner)
-                                                                          .apply()
-                                                                          .async()
-                                                                          .map(factory);
+        final StreamChannel<OUT> channel =
+                streamInvocationConfiguration().withRunner(runner).apply().async().map(factory);
         if (invocationMode == InvocationMode.ASYNC) {
             return channel.async();
         }
@@ -651,11 +627,8 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public StreamChannel<? extends Selectable<OUT>> toSelectable(final int index) {
 
-        return buildChannel(Channels.toSelectable(this, index)
-                                    .channelConfiguration()
-                                    .with(buildChannelConfiguration())
-                                    .apply()
-                                    .buildChannels());
+        return buildChannel(mSourceChannel,
+                mInvoke.andThen(new SelectableInvoke<OUT>(buildChannelConfiguration(), index)));
     }
 
     @NotNull
@@ -663,13 +636,8 @@ public abstract class AbstractStreamChannel<OUT>
             @NotNull final BiConsumer<? super RoutineException, ? super InputChannel<OUT>>
                     consumer) {
 
-        final IOChannel<OUT> ioChannel = JRoutineCore.io()
-                                                     .channelConfiguration()
-                                                     .with(buildChannelConfiguration())
-                                                     .apply()
-                                                     .buildChannel();
-        mChannel.bind(new TryCatchOutputConsumer<OUT>(consumer, ioChannel));
-        return buildChannel(ioChannel);
+        return buildChannel(mSourceChannel, mInvoke.andThen(
+                new TryCatchInvoke<OUT>(buildChannelConfiguration(), wrap(consumer))));
     }
 
     @NotNull
@@ -682,96 +650,80 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public StreamChannel<OUT> tryFinally(@NotNull final Runnable runnable) {
 
-        final IOChannel<OUT> ioChannel = JRoutineCore.io()
-                                                     .channelConfiguration()
-                                                     .with(buildChannelConfiguration())
-                                                     .apply()
-                                                     .buildChannel();
-        mChannel.bind(new TryFinallyOutputConsumer<OUT>(runnable, ioChannel));
-        return buildChannel(ioChannel);
+        return buildChannel(mSourceChannel, mInvoke.andThen(
+                new TryFinallyInvoke<OUT>(buildChannelConfiguration(),
+                        ConstantConditions.notNull("runnable instance", runnable))));
     }
 
     @NotNull
     public List<OUT> all() {
 
-        mBinder.bind();
-        return mChannel.all();
+        return invoke().all();
     }
 
     @NotNull
     public <CHANNEL extends InputChannel<? super OUT>> CHANNEL bind(
             @NotNull final CHANNEL channel) {
 
-        mBinder.bind();
-        return mChannel.bind(channel);
+        return invoke().bind(channel);
     }
 
     @NotNull
     public Iterator<OUT> eventualIterator() {
 
-        mBinder.bind();
-        return mChannel.eventualIterator();
+        return invoke().eventualIterator();
     }
 
     @Nullable
     public RoutineException getError() {
 
-        mBinder.bind();
-        return mChannel.getError();
+        return invoke().getError();
     }
 
     public boolean hasCompleted() {
 
-        mBinder.bind();
-        return mChannel.hasCompleted();
+        return invoke().hasCompleted();
     }
 
     public boolean hasNext() {
 
-        mBinder.bind();
-        return mChannel.hasNext();
+        return invoke().hasNext();
     }
 
     public OUT next() {
 
-        mBinder.bind();
-        return mChannel.next();
+        return invoke().next();
     }
 
     public boolean isBound() {
 
-        return mChannel.isBound();
+        return invoke().isBound();
     }
 
     @NotNull
     public List<OUT> next(final int count) {
 
-        mBinder.bind();
-        return mChannel.next(count);
+        return invoke().next(count);
     }
 
     public OUT nextOrElse(final OUT output) {
 
-        mBinder.bind();
-        return mChannel.nextOrElse(output);
+        return invoke().nextOrElse(output);
     }
 
     public void throwError() {
 
-        mBinder.bind();
-        mChannel.throwError();
+        invoke().throwError();
     }
 
     public Iterator<OUT> iterator() {
 
-        mBinder.bind();
-        return mChannel.iterator();
+        return invoke().iterator();
     }
 
     public void remove() {
 
-        mBinder.bind();
-        mChannel.remove();
+        invoke().remove();
     }
 
     /**
@@ -797,17 +749,6 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     /**
-     * Returns the binder instance.
-     *
-     * @return the binder.
-     */
-    @NotNull
-    protected Binder getBinder() {
-
-        return mBinder;
-    }
-
-    /**
      * Returns the configuration which will be used by the next routine concatenated to the stream.
      *
      * @return the configuration.
@@ -829,6 +770,20 @@ public abstract class AbstractStreamChannel<OUT>
         return mInvocationMode;
     }
 
+    // TODO: 05/05/16 javadoc
+    @NotNull
+    protected FunctionWrapper<OutputChannel<IN>, OutputChannel<OUT>> getInvoke() {
+
+        return mInvoke;
+    }
+
+    // TODO: 05/05/16 javadoc
+    @NotNull
+    protected OutputChannel<IN> getSourceChannel() {
+
+        return mSourceChannel;
+    }
+
     /**
      * Returns the configuration used by all the routines concatenated to the stream.
      *
@@ -843,18 +798,19 @@ public abstract class AbstractStreamChannel<OUT>
     /**
      * Creates a new channel instance.
      *
+     * @param <BEFORE>
      * @param <AFTER>             the concatenation output type.
-     * @param channel             the wrapped output channel.
      * @param streamConfiguration the stream configuration.
      * @param invocationMode      the invocation mode.
-     * @param binder              the binder instance.
+     * @param sourceChannel       the source output channel.
+     * @param invoke              the invoke function.
      * @return the newly created channel instance.
      */
     @NotNull
-    protected abstract <AFTER> StreamChannel<AFTER> newChannel(
-            @NotNull OutputChannel<AFTER> channel,
+    protected abstract <BEFORE, AFTER> StreamChannel<AFTER> newChannel(
             @NotNull InvocationConfiguration streamConfiguration,
-            @NotNull InvocationMode invocationMode, @Nullable Binder binder);
+            @NotNull InvocationMode invocationMode, @NotNull OutputChannel<BEFORE> sourceChannel,
+            @NotNull Function<OutputChannel<BEFORE>, OutputChannel<AFTER>> invoke);
 
     /**
      * Creates a new routine instance based on the specified factory.
@@ -870,9 +826,15 @@ public abstract class AbstractStreamChannel<OUT>
             @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
 
     @NotNull
-    private <AFTER> StreamChannel<AFTER> buildChannel(@NotNull OutputChannel<AFTER> channel) {
+    private <BEFORE, AFTER> StreamChannel<AFTER> buildChannel(
+            @NotNull final OutputChannel<BEFORE> sourceChannel,
+            @NotNull final Function<OutputChannel<BEFORE>, OutputChannel<AFTER>> invoke) {
 
-        return newChannel(channel, mStreamConfiguration, mInvocationMode, mBinder);
+        synchronized (mMutex) {
+            mIsBound = true;
+        }
+
+        return newChannel(mStreamConfiguration, mInvocationMode, sourceChannel, invoke);
     }
 
     @NotNull
@@ -883,79 +845,189 @@ public abstract class AbstractStreamChannel<OUT>
     }
 
     @NotNull
-    @SuppressWarnings("unchecked")
-    private <AFTER> StreamChannel<AFTER> concatRoutine(
-            @NotNull final InvocationChannel<? super OUT, ? extends AFTER> channel) {
+    private OutputChannel<OUT> invoke() {
 
-        return buildChannel((OutputChannel<AFTER>) mChannel.bind(channel).result());
+        final boolean isInvoke;
+        synchronized (mMutex) {
+            if (mIsBound) {
+                throw new IllegalStateException("the channel is already bound");
+            }
+
+            isInvoke = (mChannel == null);
+        }
+
+        if (isInvoke) {
+            mChannel = mInvoke.apply(mSourceChannel);
+        }
+
+        return mChannel;
     }
 
-    /**
-     * Class binding two channels together.
-     */
-    protected static abstract class Binder {
+    // TODO: 05/05/16 javadoc
+    private static class ConcatInvoke<OUT> extends DeepEqualObject
+            implements Function<OutputChannel<OUT>, OutputChannel<OUT>> {
 
-        /**
-         * Avoid instantiation.
-         */
-        private Binder() {
+        private final OutputChannel<? extends OUT> mChannel;
 
+        private final ChannelConfiguration mConfiguration;
+
+        private ConcatInvoke(@NotNull final ChannelConfiguration configuration,
+                @NotNull final OutputChannel<? extends OUT> channel) {
+
+            super(asArgs(configuration, channel));
+            mConfiguration = configuration;
+            mChannel = channel;
         }
 
-        /**
-         * Returns a new binder of the two specified channels.
-         *
-         * @param input  the channel returning the inputs.
-         * @param output the channel consuming them.
-         * @param <DATA> the data type.
-         * @return the binder instance.
-         */
-        public static <DATA> Binder binderOf(@NotNull final OutputChannel<DATA> input,
-                @NotNull final IOChannel<DATA> output) {
+        public OutputChannel<OUT> apply(final OutputChannel<OUT> channel) {
 
-            return new InputBinder<DATA>(ConstantConditions.notNull("input channel", input),
-                    ConstantConditions.notNull("output channel", output));
+            return Channels.<OUT>concat(channel, mChannel).channelConfiguration()
+                                                          .with(mConfiguration)
+                                                          .apply()
+                                                          .buildChannels();
+        }
+    }
+
+    // TODO: 05/05/16 javadoc
+    private static class MapInvoke<OUT, AFTER> extends DeepEqualObject
+            implements Function<OutputChannel<OUT>, OutputChannel<AFTER>> {
+
+        private final InvocationMode mInvocationMode;
+
+        private final Routine mRoutine;
+
+        private MapInvoke(@NotNull final Routine<? super OUT, ? extends AFTER> routine,
+                @NotNull final InvocationMode invocationMode) {
+
+            super(asArgs(routine, invocationMode));
+            mRoutine = routine;
+            mInvocationMode = invocationMode;
         }
 
-        /**
-         * Binds the two channel.
-         * <br>
-         * The call will have no effect if the method has been already invoked at least once.
-         */
-        public abstract void bind();
+        @SuppressWarnings("unchecked")
+        public OutputChannel<AFTER> apply(final OutputChannel<OUT> channel) {
 
-        /**
-         * Default implementation of a binder.
-         *
-         * @param <DATA> the data type.
-         */
-        private static class InputBinder<DATA> extends Binder {
+            final InvocationMode invocationMode = mInvocationMode;
+            if (invocationMode == InvocationMode.ASYNC) {
+                return (OutputChannel<AFTER>) mRoutine.asyncCall(channel);
 
-            private final OutputChannel<DATA> mInput;
+            } else if (invocationMode == InvocationMode.PARALLEL) {
+                return (OutputChannel<AFTER>) mRoutine.parallelCall(channel);
 
-            private final AtomicBoolean mIsBound = new AtomicBoolean();
-
-            private final IOChannel<DATA> mOutput;
-
-            /**
-             * Constructor.
-             *
-             * @param input  the channel returning the inputs.
-             * @param output the channel consuming them.
-             */
-            private InputBinder(@NotNull final OutputChannel<DATA> input,
-                    @NotNull final IOChannel<DATA> output) {
-
-                mInput = input;
-                mOutput = output;
+            } else if (invocationMode == InvocationMode.SYNC) {
+                return (OutputChannel<AFTER>) mRoutine.syncCall(channel);
             }
 
-            public void bind() {
+            return (OutputChannel<AFTER>) mRoutine.serialCall(channel);
+        }
+    }
 
-                if (!mIsBound.getAndSet(true)) {
-                    mInput.bind(mOutput).close();
-                }
-            }
+    // TODO: 05/05/16 javadoc
+    private static class RepeatInvoke<OUT> extends DeepEqualObject
+            implements Function<OutputChannel<OUT>, OutputChannel<OUT>> {
+
+        private final ChannelConfiguration mConfiguration;
+
+        private RepeatInvoke(@NotNull final ChannelConfiguration configuration) {
+
+            super(asArgs(configuration));
+            mConfiguration = configuration;
+        }
+
+        public OutputChannel<OUT> apply(final OutputChannel<OUT> channel) {
+
+            return Channels.repeat(channel)
+                           .channelConfiguration()
+                           .with(mConfiguration)
+                           .apply()
+                           .buildChannels();
+        }
+    }
+
+    // TODO: 05/05/16 javadoc
+    private static class SelectableInvoke<OUT> extends DeepEqualObject
+            implements Function<OutputChannel<OUT>, OutputChannel<Selectable<OUT>>> {
+
+        private final ChannelConfiguration mConfiguration;
+
+        private final int mIndex;
+
+        private SelectableInvoke(@NotNull final ChannelConfiguration configuration,
+                final int index) {
+
+            super(asArgs(configuration, index));
+            mConfiguration = configuration;
+            mIndex = index;
+        }
+
+        @SuppressWarnings("unchecked")
+        public OutputChannel<Selectable<OUT>> apply(final OutputChannel<OUT> channel) {
+
+            final OutputChannel<? extends Selectable<OUT>> outputChannel =
+                    Channels.toSelectable(channel, mIndex)
+                            .channelConfiguration()
+                            .with(mConfiguration)
+                            .apply()
+                            .buildChannels();
+            return (OutputChannel<Selectable<OUT>>) outputChannel;
+        }
+    }
+
+    // TODO: 05/05/16 javadoc
+    private static class TryCatchInvoke<OUT> extends DeepEqualObject
+            implements Function<OutputChannel<OUT>, OutputChannel<OUT>> {
+
+        private final ChannelConfiguration mConfiguration;
+
+        private final BiConsumerWrapper<? super RoutineException, ? super InputChannel<OUT>>
+                mConsumer;
+
+        private TryCatchInvoke(@NotNull final ChannelConfiguration configuration,
+                @NotNull final BiConsumerWrapper<? super RoutineException, ? super
+                        InputChannel<OUT>> consumer) {
+
+            super(asArgs(configuration, consumer));
+            mConfiguration = configuration;
+            mConsumer = consumer;
+        }
+
+        public OutputChannel<OUT> apply(final OutputChannel<OUT> channel) {
+
+            final IOChannel<OUT> ioChannel = JRoutineCore.io()
+                                                         .channelConfiguration()
+                                                         .with(mConfiguration)
+                                                         .apply()
+                                                         .buildChannel();
+            channel.bind(new TryCatchOutputConsumer<OUT>(mConsumer, ioChannel));
+            return ioChannel;
+        }
+    }
+
+    // TODO: 05/05/16 javadoc
+    private static class TryFinallyInvoke<OUT> extends DeepEqualObject
+            implements Function<OutputChannel<OUT>, OutputChannel<OUT>> {
+
+        private final ChannelConfiguration mConfiguration;
+
+        private final Runnable mRunnable;
+
+        private TryFinallyInvoke(@NotNull final ChannelConfiguration configuration,
+                @NotNull final Runnable runnable) {
+
+            super(asArgs(configuration, runnable));
+            mConfiguration = configuration;
+            mRunnable = runnable;
+        }
+
+        public OutputChannel<OUT> apply(final OutputChannel<OUT> channel) {
+
+            final IOChannel<OUT> ioChannel = JRoutineCore.io()
+                                                         .channelConfiguration()
+                                                         .with(mConfiguration)
+                                                         .apply()
+                                                         .buildChannel();
+            channel.bind(new TryFinallyOutputConsumer<OUT>(mRunnable, ioChannel));
+            return ioChannel;
         }
     }
 

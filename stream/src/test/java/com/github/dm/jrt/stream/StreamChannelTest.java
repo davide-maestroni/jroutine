@@ -45,7 +45,6 @@ import com.github.dm.jrt.function.Supplier;
 
 import org.assertj.core.data.Offset;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -526,12 +525,13 @@ public class StreamChannelTest {
 
         final IOChannel<Object> channel = JRoutineCore.io().buildChannel();
         final TestStreamChannel streamChannel =
-                new TestStreamChannel(channel, InvocationConfiguration.defaultConfiguration(),
-                        InvocationMode.ASYNC, null);
-        assertThat(streamChannel.getBinder()).isNotNull();
+                new TestStreamChannel(InvocationConfiguration.defaultConfiguration(),
+                        InvocationMode.ASYNC, channel, Functions.<OutputChannel<Object>>identity());
         assertThat(streamChannel.getConfiguration()).isNotNull();
         assertThat(streamChannel.getStreamConfiguration()).isNotNull();
         assertThat(streamChannel.getInvocationMode()).isNotNull();
+        assertThat(streamChannel.getInvoke()).isNotNull();
+        assertThat((Object) streamChannel.getSourceChannel()).isNotNull();
     }
 
     @Test
@@ -539,8 +539,8 @@ public class StreamChannelTest {
     public void testConstructorError() {
 
         try {
-            new TestStreamChannel(null, InvocationConfiguration.defaultConfiguration(),
-                    InvocationMode.ASYNC, null);
+            new TestStreamChannel(InvocationConfiguration.defaultConfiguration(),
+                    InvocationMode.ASYNC, null, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -549,7 +549,7 @@ public class StreamChannelTest {
 
         final IOChannel<Object> channel = JRoutineCore.io().buildChannel();
         try {
-            new TestStreamChannel(channel, null, InvocationMode.ASYNC, null);
+            new TestStreamChannel(null, InvocationMode.ASYNC, channel, null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -557,7 +557,7 @@ public class StreamChannelTest {
         }
 
         try {
-            new TestStreamChannel(channel, InvocationConfiguration.defaultConfiguration(), null,
+            new TestStreamChannel(InvocationConfiguration.defaultConfiguration(), null, channel,
                     null);
             fail();
 
@@ -566,8 +566,8 @@ public class StreamChannelTest {
         }
 
         try {
-            new TestStreamChannel(channel, InvocationConfiguration.defaultConfiguration(),
-                    InvocationMode.ASYNC, null).apply((InvocationConfiguration) null);
+            new TestStreamChannel(InvocationConfiguration.defaultConfiguration(),
+                    InvocationMode.ASYNC, channel, null).apply((InvocationConfiguration) null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -879,37 +879,6 @@ public class StreamChannelTest {
             fail();
 
         } catch (final ExecutionDeadlockException ignored) {
-
-        }
-    }
-
-    @Test
-    public void testLazyBuilder() {
-
-        assertThat(Streams.lazyStreamOf().afterMax(seconds(1)).all()).isEmpty();
-        assertThat(Streams.lazyStreamOf("test").afterMax(seconds(1)).all()).containsExactly("test");
-        assertThat(Streams.lazyStreamOf("test1", "test2", "test3")
-                          .afterMax(seconds(1))
-                          .all()).containsExactly("test1", "test2", "test3");
-        assertThat(Streams.lazyStreamOf(Arrays.asList("test1", "test2", "test3"))
-                          .afterMax(seconds(1))
-                          .all()).containsExactly("test1", "test2", "test3");
-        assertThat(Streams.lazyStreamOf(JRoutineCore.io().of("test1", "test2", "test3"))
-                          .afterMax(seconds(1))
-                          .all()).containsExactly("test1", "test2", "test3");
-    }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    public void testLazyBuilderNullPointerError() {
-
-        try {
-
-            Streams.lazyStreamOf((OutputChannel<?>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
 
         }
     }
@@ -2559,35 +2528,31 @@ public class StreamChannelTest {
     }
 
     @SuppressWarnings("ConstantConditions")
-    private static class TestStreamChannel extends AbstractStreamChannel<Object> {
+    private static class TestStreamChannel extends AbstractStreamChannel<Object, Object> {
 
         /**
          * Constructor.
          *
-         * @param channel        the wrapped output channel.
          * @param configuration  the initial invocation configuration.
          * @param invocationMode the delegation type.
-         * @param binder         the binding runnable.
+         * @param sourceChannel  the source output channel.
+         * @param invoke         the invoke function.
          */
-        protected TestStreamChannel(@NotNull final OutputChannel<Object> channel,
-                @NotNull final InvocationConfiguration configuration,
-                @NotNull final InvocationMode invocationMode, @Nullable final Binder binder) {
+        protected TestStreamChannel(@NotNull final InvocationConfiguration configuration,
+                @NotNull final InvocationMode invocationMode,
+                @NotNull final OutputChannel<Object> sourceChannel,
+                @NotNull final Function<OutputChannel<Object>, OutputChannel<Object>> invoke) {
 
-            super(channel, configuration, invocationMode, binder);
-        }
-
-        @NotNull
-        public StreamChannel<Object> concat(@NotNull final OutputChannel<?> channel) {
-
-            return null;
+            super(configuration, invocationMode, sourceChannel, invoke);
         }
 
         @NotNull
         @Override
-        protected <AFTER> StreamChannel<AFTER> newChannel(
-                @NotNull final OutputChannel<AFTER> channel,
+        protected <BEFORE, AFTER> StreamChannel<AFTER> newChannel(
                 @NotNull final InvocationConfiguration streamConfiguration,
-                @NotNull final InvocationMode invocationMode, @Nullable final Binder binder) {
+                @NotNull final InvocationMode invocationMode,
+                @NotNull final OutputChannel<BEFORE> sourceChannel,
+                @NotNull final Function<OutputChannel<BEFORE>, OutputChannel<AFTER>> invoke) {
 
             return null;
         }

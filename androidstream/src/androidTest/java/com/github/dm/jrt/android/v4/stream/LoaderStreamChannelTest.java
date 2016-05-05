@@ -1552,42 +1552,6 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         testInvocationDeadlock(getActivity());
     }
 
-    public void testLazyBuilder() {
-
-        assertThat(LoaderStreamsCompat.lazyStreamOf()
-                                      .with(loaderFrom(getActivity()))
-                                      .afterMax(seconds(10))
-                                      .all()).isEmpty();
-        assertThat(LoaderStreamsCompat.lazyStreamOf("test")
-                                      .with(loaderFrom(getActivity()))
-                                      .afterMax(seconds(10))
-                                      .all()).containsExactly("test");
-        assertThat(LoaderStreamsCompat.lazyStreamOf("test1", "test2", "test3")
-                                      .with(loaderFrom(getActivity()))
-                                      .afterMax(seconds(10))
-                                      .all()).containsExactly("test1", "test2", "test3");
-        assertThat(LoaderStreamsCompat.lazyStreamOf(Arrays.asList("test1", "test2", "test3"))
-                                      .with(loaderFrom(getActivity()))
-                                      .afterMax(seconds(10))
-                                      .all()).containsExactly("test1", "test2", "test3");
-        assertThat(LoaderStreamsCompat.lazyStreamOf(JRoutineCore.io().of("test1", "test2", "test3"))
-                                      .with(loaderFrom(getActivity()))
-                                      .afterMax(seconds(10))
-                                      .all()).containsExactly("test1", "test2", "test3");
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    public void testLazyBuilderNullPointerError() {
-
-        try {
-            LoaderStreamsCompat.lazyStreamOf((OutputChannel<?>) null);
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-    }
-
     public void testLimit() {
 
         assertThat(LoaderStreamsCompat.streamOf()

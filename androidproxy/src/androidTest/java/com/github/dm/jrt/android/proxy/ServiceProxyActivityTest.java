@@ -266,10 +266,8 @@ public class ServiceProxyActivityTest extends ActivityInstrumentationTestCase2<T
 
         final NullLog log = new NullLog();
         final Runner runner = Runners.poolRunner();
-        final InvocationConfiguration configuration = builder().withRunner(runner)
-                                                               .withLogLevel(Level.DEBUG)
-                                                               .withLog(log)
-                                                               .apply();
+        final InvocationConfiguration configuration =
+                builder().withRunner(runner).withLogLevel(Level.DEBUG).withLog(log).apply();
         final TestProxy testProxy =
                 JRoutineServiceProxy.with(serviceFrom(getActivity(), TestService.class))
                                     .on(instanceOf(TestClass.class))

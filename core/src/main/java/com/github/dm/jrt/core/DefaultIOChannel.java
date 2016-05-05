@@ -185,12 +185,6 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA> {
     }
 
     @NotNull
-    public Iterator<DATA> eventualIterator() {
-
-        return mOutputChannel.eventualIterator();
-    }
-
-    @NotNull
     public IOChannel<DATA> eventuallyAbort() {
 
         mOutputChannel.eventuallyAbort();
@@ -261,6 +255,12 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA> {
     public <IN extends InputChannel<? super DATA>> IN bind(@NotNull final IN channel) {
 
         return mOutputChannel.bind(channel);
+    }
+
+    @NotNull
+    public Iterator<DATA> eventualIterator() {
+
+        return mOutputChannel.eventualIterator();
     }
 
     @Nullable

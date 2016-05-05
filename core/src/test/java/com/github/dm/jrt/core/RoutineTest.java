@@ -1948,11 +1948,7 @@ public class RoutineTest {
 
                         result.pass(strings);
                     }
-                }, this))
-                            .invocationConfiguration()
-                            .withOutputMaxSize(1)
-                            .apply()
-                            .buildRoutine();
+                }, this)).invocationConfiguration().withOutputMaxSize(1).apply().buildRoutine();
 
         try {
 
@@ -1973,11 +1969,7 @@ public class RoutineTest {
 
                         result.pass(strings.toArray(new String[strings.size()]));
                     }
-                }, this))
-                            .invocationConfiguration()
-                            .withOutputMaxSize(1)
-                            .apply()
-                            .buildRoutine();
+                }, this)).invocationConfiguration().withOutputMaxSize(1).apply().buildRoutine();
 
         try {
 

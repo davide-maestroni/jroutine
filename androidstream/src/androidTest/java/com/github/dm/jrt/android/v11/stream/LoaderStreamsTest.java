@@ -1360,67 +1360,6 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         }
     }
 
-    public void testLazyBuilder() {
-
-        assertThat(LoaderStreams.lazyStreamOf().afterMax(seconds(10)).all()).isEmpty();
-        assertThat(LoaderStreams.lazyStreamOf("test").afterMax(seconds(10)).all()).containsExactly(
-                "test");
-        assertThat(LoaderStreams.lazyStreamOf("test1", "test2", "test3")
-                                .afterMax(seconds(10))
-                                .all()).containsExactly("test1", "test2", "test3");
-        assertThat(LoaderStreams.lazyStreamOf(Arrays.asList("test1", "test2", "test3"))
-                                .afterMax(seconds(10))
-                                .all()).containsExactly("test1", "test2", "test3");
-        assertThat(LoaderStreams.lazyStreamOf(JRoutineCore.io().of("test1", "test2", "test3"))
-                                .afterMax(seconds(10))
-                                .all()).containsExactly("test1", "test2", "test3");
-
-        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
-            return;
-        }
-
-        final LoaderContext context = loaderFrom(getActivity());
-        assertThat(LoaderStreams.lazyStreamOf()
-                                .with(context)
-                                .runOnShared()
-                                .afterMax(seconds(10))
-                                .all()).isEmpty();
-        assertThat(LoaderStreams.lazyStreamOf("test")
-                                .with(context)
-                                .runOnShared()
-                                .afterMax(seconds(10))
-                                .all()).containsExactly("test");
-        assertThat(LoaderStreams.lazyStreamOf("test1", "test2", "test3")
-                                .with(context)
-                                .runOnShared()
-                                .afterMax(seconds(10))
-                                .all()).containsExactly("test1", "test2", "test3");
-        assertThat(LoaderStreams.lazyStreamOf(Arrays.asList("test1", "test2", "test3"))
-                                .with(context)
-                                .runOnShared()
-                                .afterMax(seconds(10))
-                                .all()).containsExactly("test1", "test2", "test3");
-        assertThat(LoaderStreams.lazyStreamOf(JRoutineCore.io().of("test1", "test2", "test3"))
-                                .with(context)
-                                .runOnShared()
-                                .afterMax(seconds(10))
-                                .all()).containsExactly("test1", "test2", "test3");
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    public void testLazyBuilderNullPointerError() {
-
-        try {
-
-            LoaderStreams.lazyStreamOf((OutputChannel<?>) null);
-
-            fail();
-
-        } catch (final NullPointerException ignored) {
-
-        }
-    }
-
     public void testLimit() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
@@ -1511,7 +1450,12 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
         }
 
         final LoaderContext context = loaderFrom(getActivity());
-        LoaderStreams.streamOf("test1").with(context).loaderId(11).async().map(toUpperCase());
+        LoaderStreams.streamOf("test1")
+                     .with(context)
+                     .loaderId(11)
+                     .async()
+                     .map(toUpperCase())
+                     .immediately();
         assertThat(JRoutineLoader.with(context)
                                  .onId(11)
                                  .buildChannel()
@@ -1523,7 +1467,8 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                      .withLoaderId(21)
                      .apply()
                      .async()
-                     .map(toUpperCase());
+                     .map(toUpperCase())
+                     .immediately();
         assertThat(JRoutineLoader.with(context)
                                  .onId(21)
                                  .buildChannel()
@@ -1535,7 +1480,8 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                      .withLoaderId(31)
                      .apply()
                      .async()
-                     .map(toUpperCase());
+                     .map(toUpperCase())
+                     .immediately();
         assertThat(JRoutineLoader.with(context)
                                  .onId(31)
                                  .buildChannel()
@@ -2237,7 +2183,8 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                      .with(context)
                      .async()
                      .cache(CacheStrategyType.CACHE)
-                     .map(function);
+                     .map(function)
+                     .immediately();
         assertThat(LoaderStreams.streamOf("test")
                                 .with(context)
                                 .staleAfter(2000, TimeUnit.MILLISECONDS)
@@ -2258,7 +2205,8 @@ public class LoaderStreamsTest extends ActivityInstrumentationTestCase2<TestActi
                      .with(context)
                      .cache(CacheStrategyType.CACHE_IF_SUCCESS)
                      .async()
-                     .map(function);
+                     .map(function)
+                     .immediately();
         seconds(5).sleepAtLeast();
         assertThat(LoaderStreams.streamOf("test")
                                 .with(context)

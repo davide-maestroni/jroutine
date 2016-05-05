@@ -267,12 +267,6 @@ public interface LoaderStreamChannel<OUT>
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannel<OUT> parallel(int maxInvocations);
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
     LoaderStreamChannel<OUT> onError(@NotNull Consumer<? super RoutineException> consumer);
 
     /**
@@ -329,6 +323,12 @@ public interface LoaderStreamChannel<OUT>
      */
     @NotNull
     LoaderStreamChannel<OUT> ordered(@Nullable OrderType orderType);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    LoaderStreamChannel<OUT> parallel(int maxInvocations);
 
     /**
      * {@inheritDoc}

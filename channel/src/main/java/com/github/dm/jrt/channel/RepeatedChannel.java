@@ -368,10 +368,6 @@ class RepeatedChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
     @NotNull
     private IOChannel<OUT> createOutputChannel() {
 
-        return JRoutineCore.io()
-                           .channelConfiguration()
-                           .with(mConfiguration)
-                           .apply()
-                           .buildChannel();
+        return JRoutineCore.io().channelConfiguration().with(mConfiguration).apply().buildChannel();
     }
 }

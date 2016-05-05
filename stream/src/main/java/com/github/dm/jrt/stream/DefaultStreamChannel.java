@@ -17,16 +17,13 @@
 package com.github.dm.jrt.stream;
 
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
+import com.github.dm.jrt.function.Function;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import static com.github.dm.jrt.stream.AbstractStreamChannel.Binder.binderOf;
 
 /**
  * Default implementation of a stream output channel.
@@ -35,65 +32,47 @@ import static com.github.dm.jrt.stream.AbstractStreamChannel.Binder.binderOf;
  *
  * @param <OUT> the output data type.
  */
-class DefaultStreamChannel<OUT> extends AbstractStreamChannel<OUT> {
+class DefaultStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT> {
 
     /**
      * Constructor.
      *
      * @param channel the wrapped output channel.
+     * @param invoke  the invoke function.
      */
-    DefaultStreamChannel(@NotNull final OutputChannel<OUT> channel) {
+    DefaultStreamChannel(@NotNull final OutputChannel<IN> channel,
+            @NotNull final Function<OutputChannel<IN>, OutputChannel<OUT>> invoke) {
 
-        this(channel, (Binder) null);
+        super(InvocationConfiguration.defaultConfiguration(), InvocationMode.ASYNC, channel,
+                invoke);
     }
 
     /**
      * Constructor.
      *
-     * @param input  the channel returning the inputs.
-     * @param output the channel consuming them.
-     */
-    DefaultStreamChannel(@NotNull final OutputChannel<OUT> input,
-            @NotNull final IOChannel<OUT> output) {
-
-        this(output, binderOf(input, output));
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param channel the wrapped output channel.
-     * @param binder  the binder instance.
-     */
-    private DefaultStreamChannel(@NotNull final OutputChannel<OUT> channel,
-            @Nullable final Binder binder) {
-
-        super(channel, InvocationConfiguration.defaultConfiguration(), InvocationMode.ASYNC,
-                binder);
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param channel        the wrapped output channel.
      * @param configuration  the initial invocation configuration.
      * @param invocationMode the invocation mode.
-     * @param binder         the binder instance.
+     * @param sourceChannel  the source output channel.
+     * @param invoke         the invoke function.
      */
-    private DefaultStreamChannel(@NotNull final OutputChannel<OUT> channel,
-            @NotNull final InvocationConfiguration configuration,
-            @NotNull final InvocationMode invocationMode, @Nullable final Binder binder) {
+    private DefaultStreamChannel(@NotNull final InvocationConfiguration configuration,
+            @NotNull final InvocationMode invocationMode,
+            @NotNull final OutputChannel<IN> sourceChannel,
+            @NotNull final Function<OutputChannel<IN>, OutputChannel<OUT>> invoke) {
 
-        super(channel, configuration, invocationMode, binder);
+        super(configuration, invocationMode, sourceChannel, invoke);
     }
 
     @NotNull
     @Override
-    protected <AFTER> StreamChannel<AFTER> newChannel(@NotNull final OutputChannel<AFTER> channel,
+    protected <BEFORE, AFTER> StreamChannel<AFTER> newChannel(
             @NotNull final InvocationConfiguration streamConfiguration,
-            @NotNull final InvocationMode invocationMode, @Nullable final Binder binder) {
+            @NotNull final InvocationMode invocationMode,
+            @NotNull final OutputChannel<BEFORE> sourceChannel,
+            @NotNull final Function<OutputChannel<BEFORE>, OutputChannel<AFTER>> invoke) {
 
-        return new DefaultStreamChannel<AFTER>(channel, streamConfiguration, invocationMode, binder);
+        return new DefaultStreamChannel<BEFORE, AFTER>(streamConfiguration, invocationMode,
+                sourceChannel, invoke);
     }
 
     @NotNull

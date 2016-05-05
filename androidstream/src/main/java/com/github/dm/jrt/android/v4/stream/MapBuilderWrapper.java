@@ -24,6 +24,7 @@ import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.ChannelConfiguration.Builder;
 import com.github.dm.jrt.core.config.ChannelConfiguration.Configurable;
 import com.github.dm.jrt.core.util.ConstantConditions;
+import com.github.dm.jrt.function.Functions;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -71,8 +72,9 @@ class MapBuilderWrapper<OUT>
         final SparseArrayCompat<LoaderStreamChannelCompat<OUT>> channelMap =
                 new SparseArrayCompat<LoaderStreamChannelCompat<OUT>>(size);
         for (int i = 0; i < size; ++i) {
-            final DefaultLoaderStreamChannelCompat<OUT> stream =
-                    new DefaultLoaderStreamChannelCompat<OUT>(null, channels.valueAt(i));
+            final DefaultLoaderStreamChannelCompat<OUT, OUT> stream =
+                    new DefaultLoaderStreamChannelCompat<OUT, OUT>(null, channels.valueAt(i),
+                            Functions.<OutputChannel<OUT>>identity());
             channelMap.append(channels.keyAt(i), stream);
         }
 

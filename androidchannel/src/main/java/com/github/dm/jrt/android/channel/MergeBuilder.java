@@ -79,7 +79,7 @@ class MergeBuilder<OUT>
         final IOChannel<ParcelableSelectable<OUT>> ioChannel = JRoutineCore.io()
                                                                            .channelConfiguration()
                                                                            .with(configuration)
-                                                                           .applyConfiguration()
+                                                                           .apply()
                                                                            .buildChannel();
         int i = mStartIndex;
         for (final OutputChannel<? extends OUT> channel : mChannels) {

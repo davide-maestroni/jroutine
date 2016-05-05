@@ -89,7 +89,7 @@ class DistributeBuilder<IN> extends AbstractBuilder<IOChannel<List<? extends IN>
             final IOChannel<?> ioChannel = JRoutineCore.io()
                                                        .channelConfiguration()
                                                        .with(configuration)
-                                                       .applyConfiguration()
+                                                       .apply()
                                                        .buildChannel();
             ioChannel.bind(((InputChannel<Object>) channel));
             channelList.add(ioChannel);
@@ -98,7 +98,7 @@ class DistributeBuilder<IN> extends AbstractBuilder<IOChannel<List<? extends IN>
         final IOChannel<List<? extends IN>> ioChannel = JRoutineCore.io()
                                                                     .channelConfiguration()
                                                                     .with(configuration)
-                                                                    .applyConfiguration()
+                                                                    .apply()
                                                                     .buildChannel();
         return ioChannel.bind(new DistributeOutputConsumer(mIsFlush, mPlaceholder, channelList));
     }

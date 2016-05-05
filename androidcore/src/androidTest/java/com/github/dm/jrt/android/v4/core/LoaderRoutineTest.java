@@ -94,7 +94,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                     .withInputClashResolution(
                                                                             ClashResolutionType
                                                                                     .ABORT_THIS)
-                                                                    .applyConfiguration()
+                                                                    .apply()
                                                                     .buildRoutine();
         final OutputChannel<String> result1 = routine.asyncCall("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.asyncCall("test1").afterMax(timeout);
@@ -123,7 +123,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                     .withClashResolution(
                                                                             ClashResolutionType
                                                                                     .ABORT_THIS)
-                                                                    .applyConfiguration()
+                                                                    .apply()
                                                                     .buildRoutine();
         final OutputChannel<String> result1 = routine.asyncCall("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.asyncCall("test2").afterMax(timeout);
@@ -146,18 +146,18 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final InvocationConfiguration invocationConfiguration =
                 builder().withInputOrder(OrderType.BY_CALL)
                          .withOutputOrder(OrderType.BY_CALL)
-                         .applyConfiguration();
+                         .apply();
         final LoaderRoutine<String, String> routine =
                 JRoutineLoaderCompat.with(loaderFrom(getActivity()))
                                     .on(factoryOf(PurgeContextInvocation.class))
                                     .invocationConfiguration()
                                     .with(invocationConfiguration)
                                     .withReadTimeout(seconds(10))
-                                    .applyConfiguration()
+                                    .apply()
                                     .loaderConfiguration()
                                     .withLoaderId(0)
                                     .withCacheStrategy(CacheStrategyType.CACHE)
-                                    .applyConfiguration()
+                                    .apply()
                                     .buildRoutine();
         final OutputChannel<String> channel4 = routine.asyncCall("test");
         assertThat(channel4.next()).isEqualTo("test");
@@ -171,7 +171,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                             .on(factoryOf(PurgeContextInvocation.class))
                             .loaderConfiguration()
                             .withLoaderId(0)
-                            .applyConfiguration()
+                            .apply()
                             .purge("test");
         assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
     }
@@ -181,18 +181,18 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final InvocationConfiguration invocationConfiguration =
                 builder().withInputOrder(OrderType.BY_CALL)
                          .withOutputOrder(OrderType.BY_CALL)
-                         .applyConfiguration();
+                         .apply();
         final LoaderRoutine<String, String> routine =
                 JRoutineLoaderCompat.with(loaderFrom(getActivity()))
                                     .on(factoryOf(PurgeContextInvocation.class))
                                     .invocationConfiguration()
                                     .with(invocationConfiguration)
                                     .withReadTimeout(seconds(10))
-                                    .applyConfiguration()
+                                    .apply()
                                     .loaderConfiguration()
                                     .withLoaderId(0)
                                     .withCacheStrategy(CacheStrategyType.CACHE)
-                                    .applyConfiguration()
+                                    .apply()
                                     .buildRoutine();
         final OutputChannel<String> channel5 = routine.asyncCall("test");
         assertThat(channel5.next()).isEqualTo("test");
@@ -221,7 +221,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                             .on(factoryOf(PurgeContextInvocation.class))
                             .loaderConfiguration()
                             .withLoaderId(0)
-                            .applyConfiguration()
+                            .apply()
                             .purge("test");
         assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
 
@@ -232,7 +232,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                             .on(factoryOf(PurgeContextInvocation.class))
                             .loaderConfiguration()
                             .withLoaderId(0)
-                            .applyConfiguration()
+                            .apply()
                             .purge("test1", "test2");
         assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
 
@@ -243,7 +243,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                             .on(factoryOf(PurgeContextInvocation.class))
                             .loaderConfiguration()
                             .withLoaderId(0)
-                            .applyConfiguration()
+                            .apply()
                             .purge(Arrays.asList("test1", "test2"));
         assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
     }
@@ -259,7 +259,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                 .withCacheStrategy(
                                                                         CacheStrategyType
                                                                                 .CACHE_IF_SUCCESS)
-                                                                .applyConfiguration()
+                                                                .apply()
                                                                 .asyncCall(data1)
                                                                 .afterMax(timeout);
 
@@ -282,7 +282,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                 .withCacheStrategy(
                                                                         CacheStrategyType
                                                                                 .CACHE_IF_SUCCESS)
-                                                                .applyConfiguration()
+                                                                .apply()
                                                                 .asyncCall(data1)
                                                                 .afterMax(timeout);
 
@@ -293,7 +293,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                 .on(factoryOf(Delay.class))
                                                                 .loaderConfiguration()
                                                                 .withLoaderId(0)
-                                                                .applyConfiguration()
+                                                                .apply()
                                                                 .asyncCall(data1)
                                                                 .afterMax(timeout);
 
@@ -312,7 +312,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                 .withCacheStrategy(
                                                                         CacheStrategyType
                                                                                 .CACHE_IF_ERROR)
-                                                                .applyConfiguration()
+                                                                .apply()
                                                                 .asyncCall(data1)
                                                                 .afterMax(timeout);
 
@@ -327,7 +327,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                 .withCacheStrategy(
                                                                         CacheStrategyType
                                                                                 .CACHE_IF_ERROR)
-                                                                .applyConfiguration()
+                                                                .apply()
                                                                 .asyncCall(data1)
                                                                 .afterMax(timeout);
 
@@ -348,7 +348,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                 .on(factoryOf(Abort.class))
                                                                 .loaderConfiguration()
                                                                 .withLoaderId(0)
-                                                                .applyConfiguration()
+                                                                .apply()
                                                                 .asyncCall(data1)
                                                                 .afterMax(timeout);
 
@@ -503,7 +503,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                     .withClashResolution(
                                                                             ClashResolutionType
                                                                                     .JOIN)
-                                                                    .applyConfiguration()
+                                                                    .apply()
                                                                     .buildRoutine();
         final OutputChannel<String> result1 = routine.asyncCall("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.asyncCall("test2").afterMax(timeout);
@@ -575,7 +575,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                     .withInputClashResolution(
                                                                             ClashResolutionType
                                                                                     .ABORT_THAT)
-                                                                    .applyConfiguration()
+                                                                    .apply()
                                                                     .buildRoutine();
         final OutputChannel<String> result1 = routine.asyncCall("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.asyncCall("test1").afterMax(timeout);
@@ -604,7 +604,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                     .withClashResolution(
                                                                             ClashResolutionType
                                                                                     .ABORT_THAT)
-                                                                    .applyConfiguration()
+                                                                    .apply()
                                                                     .buildRoutine();
         final OutputChannel<String> result1 = routine.asyncCall("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.asyncCall("test2").afterMax(timeout);
@@ -632,7 +632,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                 .withLoaderId(0)
                                                                 .withCacheStrategy(
                                                                         CacheStrategyType.CACHE)
-                                                                .applyConfiguration()
+                                                                .apply()
                                                                 .asyncCall(data1)
                                                                 .afterMax(timeout);
 
@@ -643,7 +643,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                 .on(factoryOf(Delay.class))
                                                                 .loaderConfiguration()
                                                                 .withLoaderId(0)
-                                                                .applyConfiguration()
+                                                                .apply()
                                                                 .asyncCall(data1)
                                                                 .afterMax(timeout);
 
@@ -657,7 +657,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                 .withLoaderId(0)
                                                                 .withCacheStrategy(
                                                                         CacheStrategyType.CACHE)
-                                                                .applyConfiguration()
+                                                                .apply()
                                                                 .asyncCall(data1)
                                                                 .afterMax(timeout);
 
@@ -678,7 +678,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                 .on(factoryOf(Abort.class))
                                                                 .loaderConfiguration()
                                                                 .withLoaderId(0)
-                                                                .applyConfiguration()
+                                                                .apply()
                                                                 .asyncCall(data1)
                                                                 .afterMax(timeout);
 
@@ -701,18 +701,18 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         final InvocationConfiguration invocationConfiguration =
                 builder().withInputOrder(OrderType.BY_CALL)
                          .withOutputOrder(OrderType.BY_CALL)
-                         .applyConfiguration();
+                         .apply();
         final LoaderRoutine<String, String> routine =
                 JRoutineLoaderCompat.with(loaderFrom(getActivity()))
                                     .on(factoryOf(PurgeContextInvocation.class))
                                     .invocationConfiguration()
                                     .with(invocationConfiguration)
                                     .withReadTimeout(seconds(10))
-                                    .applyConfiguration()
+                                    .apply()
                                     .loaderConfiguration()
                                     .withLoaderId(0)
                                     .withCacheStrategy(CacheStrategyType.CACHE)
-                                    .applyConfiguration()
+                                    .apply()
                                     .buildRoutine();
         final OutputChannel<String> channel = routine.asyncCall("test");
         assertThat(channel.next()).isEqualTo("test");
@@ -730,11 +730,11 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                     .withInputOrder(OrderType.BY_CALL)
                                     .withOutputOrder(OrderType.BY_CALL)
                                     .withReadTimeout(seconds(10))
-                                    .applyConfiguration()
+                                    .apply()
                                     .loaderConfiguration()
                                     .withLoaderId(0)
                                     .withCacheStrategy(CacheStrategyType.CACHE)
-                                    .applyConfiguration()
+                                    .apply()
                                     .buildRoutine();
         final OutputChannel<String> channel1 = routine.asyncCall("test");
         assertThat(channel1.next()).isEqualTo("test");
@@ -778,12 +778,12 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                           .withChannelMaxDelay(seconds(10))
                                                           .withLogLevel(Level.DEBUG)
                                                           .withLog(countLog)
-                                                          .applyConfiguration();
+                                                          .apply();
         JRoutineLoaderCompat.with(loaderFrom(getActivity()))
                             .onId(0)
                             .channelConfiguration()
                             .with(configuration)
-                            .applyConfiguration()
+                            .apply()
                             .buildChannel();
         assertThat(countLog.getWrnCount()).isEqualTo(1);
 
@@ -794,7 +794,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                             .onId(0)
                             .channelConfiguration()
                             .with(configuration)
-                            .applyConfiguration()
+                            .apply()
                             .buildChannel();
         assertThat(countLog.getWrnCount()).isEqualTo(2);
     }
@@ -809,7 +809,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                 .withLoaderId(0)
                                                                 .withCacheStrategy(
                                                                         CacheStrategyType.CACHE)
-                                                                .applyConfiguration()
+                                                                .apply()
                                                                 .asyncCall(data1)
                                                                 .afterMax(timeout);
 
@@ -820,7 +820,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                 .on(factoryOf(Abort.class))
                                                                 .loaderConfiguration()
                                                                 .withLoaderId(0)
-                                                                .applyConfiguration()
+                                                                .apply()
                                                                 .asyncCall(data1)
                                                                 .afterMax(timeout);
 
@@ -873,7 +873,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                        .loaderConfiguration()
                                        .withFactoryId(0)
                                        .withCacheStrategy(CacheStrategyType.CACHE)
-                                       .applyConfiguration()
+                                       .apply()
                                        .asyncCall("test")
                                        .afterMax(seconds(10))
                                        .all()).containsExactly("test");
@@ -882,7 +882,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                        .loaderConfiguration()
                                        .withFactoryId(0)
                                        .withCacheStrategy(CacheStrategyType.CACHE)
-                                       .applyConfiguration()
+                                       .apply()
                                        .asyncCall("test")
                                        .afterMax(seconds(10))
                                        .all()).containsExactly("test");
@@ -894,7 +894,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                        .loaderConfiguration()
                                        .withFactoryId(0)
                                        .withCacheStrategy(CacheStrategyType.CACHE)
-                                       .applyConfiguration()
+                                       .apply()
                                        .asyncCall("test")
                                        .afterMax(seconds(10))
                                        .all()).containsExactly("TEST");
@@ -903,7 +903,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                        .loaderConfiguration()
                                        .withFactoryId(0)
                                        .withCacheStrategy(CacheStrategyType.CACHE)
-                                       .applyConfiguration()
+                                       .apply()
                                        .asyncCall("test")
                                        .afterMax(seconds(10))
                                        .all()).containsExactly("TEST");
@@ -923,7 +923,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                     .withClashResolution(
                                                                             ClashResolutionType
                                                                                     .ABORT_THIS)
-                                                                    .applyConfiguration()
+                                                                    .apply()
                                                                     .buildRoutine();
         final OutputChannel<String> result1 = routine.asyncCall("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.asyncCall("test2").afterMax(timeout);
@@ -953,11 +953,11 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                     .withInputOrder(OrderType.BY_CALL)
                                     .withOutputOrder(OrderType.BY_CALL)
                                     .withReadTimeout(seconds(10))
-                                    .applyConfiguration()
+                                    .apply()
                                     .loaderConfiguration()
                                     .withLoaderId(0)
                                     .withCacheStrategy(CacheStrategyType.CACHE)
-                                    .applyConfiguration()
+                                    .apply()
                                     .buildRoutine();
         final OutputChannel<String> channel4 = routine.asyncCall("test");
         assertThat(channel4.next()).isEqualTo("test");
@@ -971,7 +971,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                             .on(factoryOf(PurgeContextInvocation.class))
                             .loaderConfiguration()
                             .withLoaderId(0)
-                            .applyConfiguration()
+                            .apply()
                             .purge();
         assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
     }
@@ -988,11 +988,11 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                     .withInputOrder(OrderType.BY_CALL)
                                     .withOutputOrder(OrderType.BY_CALL)
                                     .withReadTimeout(seconds(10))
-                                    .applyConfiguration()
+                                    .apply()
                                     .loaderConfiguration()
                                     .withLoaderId(0)
                                     .withCacheStrategy(CacheStrategyType.CACHE)
-                                    .applyConfiguration()
+                                    .apply()
                                     .buildRoutine();
         final OutputChannel<String> channel5 = routine.asyncCall("test");
         assertThat(channel5.next()).isEqualTo("test");
@@ -1021,7 +1021,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                             .on(factoryOf(PurgeContextInvocation.class))
                             .loaderConfiguration()
                             .withLoaderId(0)
-                            .applyConfiguration()
+                            .apply()
                             .purge("test");
         assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
 
@@ -1032,7 +1032,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                             .on(factoryOf(PurgeContextInvocation.class))
                             .loaderConfiguration()
                             .withLoaderId(0)
-                            .applyConfiguration()
+                            .apply()
                             .purge("test1", "test2");
         assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
 
@@ -1043,7 +1043,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                             .on(factoryOf(PurgeContextInvocation.class))
                             .loaderConfiguration()
                             .withLoaderId(0)
-                            .applyConfiguration()
+                            .apply()
                             .purge(Arrays.asList("test1", "test2"));
         assertThat(PurgeContextInvocation.waitDestroy(1, 1000)).isTrue();
     }
@@ -1059,11 +1059,11 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                             ToUpperCase.class))
                                                                     .loaderConfiguration()
                                                                     .withLoaderId(0)
-                                                                    .applyConfiguration()
+                                                                    .apply()
                                                                     .invocationConfiguration()
                                                                     .withOutputOrder(
                                                                             OrderType.BY_CALL)
-                                                                    .applyConfiguration()
+                                                                    .apply()
                                                                     .buildRoutine();
         final OutputChannel<String> channel1 = routine.asyncCall("test1", "test2");
         final OutputChannel<String> channel2 =
@@ -1228,7 +1228,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                     .withClashResolution(
                                                                             ClashResolutionType
                                                                                     .JOIN)
-                                                                    .applyConfiguration()
+                                                                    .apply()
                                                                     .buildRoutine();
         final OutputChannel<String> result1 = routine.asyncCall("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.asyncCall("test2").afterMax(timeout);
@@ -1310,7 +1310,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                     .withInputClashResolution(
                                                                             ClashResolutionType
                                                                                     .ABORT_THAT)
-                                                                    .applyConfiguration()
+                                                                    .apply()
                                                                     .buildRoutine();
         final OutputChannel<String> result1 = routine.asyncCall("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.asyncCall("test1").afterMax(timeout);
@@ -1342,7 +1342,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                                                     .withClashResolution(
                                                                             ClashResolutionType
                                                                                     .ABORT_THAT)
-                                                                    .applyConfiguration()
+                                                                    .apply()
                                                                     .buildRoutine();
         final OutputChannel<String> result1 = routine.asyncCall("test1").afterMax(timeout);
         final OutputChannel<String> result2 = routine.asyncCall("test2").afterMax(timeout);
@@ -1372,11 +1372,11 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                     .withInputOrder(OrderType.BY_CALL)
                                     .withOutputOrder(OrderType.BY_CALL)
                                     .withReadTimeout(seconds(10))
-                                    .applyConfiguration()
+                                    .apply()
                                     .loaderConfiguration()
                                     .withLoaderId(0)
                                     .withCacheStrategy(CacheStrategyType.CACHE)
-                                    .applyConfiguration()
+                                    .apply()
                                     .buildRoutine();
         final OutputChannel<String> channel = routine.asyncCall("test");
         assertThat(channel.next()).isEqualTo("test");
@@ -1397,11 +1397,11 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                     .withInputOrder(OrderType.BY_CALL)
                                     .withOutputOrder(OrderType.BY_CALL)
                                     .withReadTimeout(seconds(10))
-                                    .applyConfiguration()
+                                    .apply()
                                     .loaderConfiguration()
                                     .withLoaderId(0)
                                     .withCacheStrategy(CacheStrategyType.CACHE)
-                                    .applyConfiguration()
+                                    .apply()
                                     .buildRoutine();
         final OutputChannel<String> channel1 = routine.asyncCall("test");
         assertThat(channel1.next()).isEqualTo("test");
@@ -1448,7 +1448,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                     .invocationConfiguration()
                                     .withLog(AndroidLogs.androidLog())
                                     .withLogLevel(Level.WARNING)
-                                    .applyConfiguration()
+                                    .apply()
                                     .buildRoutine();
         assertThat(routine1.syncCall("1", "2", "3", "4", "5").afterMax(timeout).all()).containsOnly(
                 "1", "2", "3", "4", "5");
@@ -1467,7 +1467,7 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                                     .invocationConfiguration()
                                     .withLog(AndroidLogs.androidLog())
                                     .withLogLevel(Level.WARNING)
-                                    .applyConfiguration()
+                                    .apply()
                                     .buildRoutine();
         assertThat(routine2.syncCall("1", "2", "3", "4", "5").afterMax(timeout).all()).containsOnly(
                 "1", "2", "3", "4", "5");
@@ -1543,16 +1543,16 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                          .withOutputMaxSize(33)
                          .withLogLevel(Level.DEBUG)
                          .withLog(countLog)
-                         .applyConfiguration();
+                         .apply();
         JRoutineLoaderCompat.with(loaderFrom(getActivity()))
                             .on(factoryOf(ToUpperCase.class))
                             .invocationConfiguration()
                             .with(configuration)
-                            .applyConfiguration()
+                            .apply()
                             .loaderConfiguration()
                             .withLoaderId(0)
                             .withInputClashResolution(ClashResolutionType.JOIN)
-                            .applyConfiguration()
+                            .apply()
                             .buildRoutine();
         assertThat(countLog.getWrnCount()).isEqualTo(1);
 
@@ -1563,11 +1563,11 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
                             .on(factoryOf(ToUpperCase.class))
                             .invocationConfiguration()
                             .with(configuration)
-                            .applyConfiguration()
+                            .apply()
                             .loaderConfiguration()
                             .withLoaderId(0)
                             .withInputClashResolution(ClashResolutionType.JOIN)
-                            .applyConfiguration()
+                            .apply()
                             .buildRoutine();
         assertThat(countLog.getWrnCount()).isEqualTo(2);
     }

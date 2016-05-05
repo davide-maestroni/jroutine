@@ -115,7 +115,7 @@ class OutputMapBuilder<OUT> extends AbstractBuilder<SparseArrayCompat<OutputChan
                     final IOChannel<OUT> ioChannel = JRoutineCore.io()
                                                                  .channelConfiguration()
                                                                  .with(configuration)
-                                                                 .applyConfiguration()
+                                                                 .apply()
                                                                  .buildChannel();
                     inputMap.append(index, ioChannel);
                     channelMap.append(index, ioChannel);

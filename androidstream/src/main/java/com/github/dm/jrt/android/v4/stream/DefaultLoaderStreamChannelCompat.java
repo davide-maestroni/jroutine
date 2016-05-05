@@ -83,7 +83,7 @@ class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel<OUT>
                     DefaultLoaderStreamChannelCompat.super.invocationConfiguration()
                                                           .with(null)
                                                           .with(configuration)
-                                                          .applyConfiguration();
+                                                          .apply();
                     return DefaultLoaderStreamChannelCompat.this;
                 }
             };
@@ -99,7 +99,7 @@ class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel<OUT>
                     DefaultLoaderStreamChannelCompat.super.streamInvocationConfiguration()
                                                           .with(null)
                                                           .with(configuration)
-                                                          .applyConfiguration();
+                                                          .apply();
                     return DefaultLoaderStreamChannelCompat.this;
                 }
             };
@@ -692,7 +692,7 @@ class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel<OUT>
                 SparseChannelsCompat.toSelectable(this, index)
                                     .channelConfiguration()
                                     .with(configuration)
-                                    .applyConfiguration()
+                                    .apply()
                                     .buildChannels();
         return newChannel(channel, getStreamConfiguration(), getInvocationMode(), getBinder());
     }
@@ -752,13 +752,13 @@ class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel<OUT>
     @NotNull
     public LoaderStreamChannelCompat<OUT> cache(@Nullable final CacheStrategyType strategyType) {
 
-        return loaderConfiguration().withCacheStrategy(strategyType).applyConfiguration();
+        return loaderConfiguration().withCacheStrategy(strategyType).apply();
     }
 
     @NotNull
     public LoaderStreamChannelCompat<OUT> factoryId(final int factoryId) {
 
-        return loaderConfiguration().withFactoryId(factoryId).applyConfiguration();
+        return loaderConfiguration().withFactoryId(factoryId).apply();
     }
 
     @NotNull
@@ -772,7 +772,7 @@ class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel<OUT>
     @NotNull
     public LoaderStreamChannelCompat<OUT> loaderId(final int loaderId) {
 
-        return loaderConfiguration().withLoaderId(loaderId).applyConfiguration();
+        return loaderConfiguration().withLoaderId(loaderId).apply();
     }
 
     @NotNull
@@ -787,24 +787,24 @@ class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel<OUT>
         return map(contextBuilder.on(factory)
                                  .invocationConfiguration()
                                  .with(buildConfiguration())
-                                 .applyConfiguration()
+                                 .apply()
                                  .loaderConfiguration()
                                  .with(buildLoaderConfiguration())
-                                 .applyConfiguration()
+                                 .apply()
                                  .buildRoutine());
     }
 
     @NotNull
     public LoaderStreamChannelCompat<OUT> staleAfter(@Nullable final UnitDuration staleTime) {
 
-        return loaderConfiguration().withResultStaleTime(staleTime).applyConfiguration();
+        return loaderConfiguration().withResultStaleTime(staleTime).apply();
     }
 
     @NotNull
     public LoaderStreamChannelCompat<OUT> staleAfter(final long time,
             @NotNull final TimeUnit timeUnit) {
 
-        return loaderConfiguration().withResultStaleTime(time, timeUnit).applyConfiguration();
+        return loaderConfiguration().withResultStaleTime(time, timeUnit).apply();
     }
 
     @NotNull
@@ -826,7 +826,7 @@ class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel<OUT>
     @NonNull
     private LoaderConfiguration buildLoaderConfiguration() {
 
-        return mStreamConfiguration.builderFrom().with(mConfiguration).applyConfiguration();
+        return mStreamConfiguration.builderFrom().with(mConfiguration).apply();
     }
 
     @NotNull
@@ -851,7 +851,7 @@ class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel<OUT>
             return JRoutineCore.on(factory)
                                .invocationConfiguration()
                                .with(invocationConfiguration)
-                               .applyConfiguration()
+                               .apply()
                                .buildRoutine();
         }
 
@@ -861,10 +861,10 @@ class DefaultLoaderStreamChannelCompat<OUT> extends AbstractStreamChannel<OUT>
         return contextBuilder.on(invocationFactory)
                              .invocationConfiguration()
                              .with(invocationConfiguration)
-                             .applyConfiguration()
+                             .apply()
                              .loaderConfiguration()
                              .with(loaderConfiguration)
-                             .applyConfiguration()
+                             .apply()
                              .buildRoutine();
     }
 

@@ -179,7 +179,7 @@ public final class ProxyConfiguration extends DeepEqualObject {
          * @return the configured object.
          */
         @NotNull
-        public TYPE applyConfiguration() {
+        public TYPE apply() {
 
             return mConfigurable.apply(buildConfiguration());
         }

@@ -58,7 +58,7 @@ class SelectableOutputBuilder<OUT>
         final IOChannel<Selectable<OUT>> ioChannel = JRoutineCore.io()
                                                                  .channelConfiguration()
                                                                  .with(configuration)
-                                                                 .applyConfiguration()
+                                                                 .apply()
                                                                  .buildChannel();
         mChannel.bind(new SelectableOutputConsumer<OUT, OUT>(ioChannel, mIndex));
         return ioChannel;

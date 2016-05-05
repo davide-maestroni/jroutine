@@ -264,7 +264,7 @@ public abstract class AbstractStreamChannel<OUT>
         return invocationConfiguration().withRunner(runner)
                                         .withInputLimit(maxInputs)
                                         .withInputMaxDelay(maxDelay)
-                                        .applyConfiguration();
+                                        .apply();
     }
 
     @NotNull
@@ -312,7 +312,7 @@ public abstract class AbstractStreamChannel<OUT>
 
         return buildChannel(Channels.<OUT>concat(this, channel).channelConfiguration()
                                                                .with(buildChannelConfiguration())
-                                                               .applyConfiguration()
+                                                               .apply()
                                                                .buildChannels());
     }
 
@@ -479,7 +479,7 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     public StreamChannel<OUT> ordered(@Nullable final OrderType orderType) {
 
-        return streamInvocationConfiguration().withOutputOrder(orderType).applyConfiguration();
+        return streamInvocationConfiguration().withOutputOrder(orderType).apply();
     }
 
     @NotNull
@@ -487,7 +487,7 @@ public abstract class AbstractStreamChannel<OUT>
 
         return parallel().invocationConfiguration()
                          .withMaxInstances(maxInvocations)
-                         .applyConfiguration();
+                         .apply();
     }
 
     @NotNull
@@ -523,7 +523,7 @@ public abstract class AbstractStreamChannel<OUT>
         return buildChannel(Channels.repeat(this)
                                     .channelConfiguration()
                                     .with(buildChannelConfiguration())
-                                    .applyConfiguration()
+                                    .apply()
                                     .buildChannels());
     }
 
@@ -533,7 +533,7 @@ public abstract class AbstractStreamChannel<OUT>
         final InvocationMode invocationMode = mInvocationMode;
         final OperationInvocation<OUT, OUT> factory = IdentityInvocation.factoryOf();
         final StreamChannel<OUT> channel = streamInvocationConfiguration().withRunner(runner)
-                                                                          .applyConfiguration()
+                                                                          .apply()
                                                                           .async()
                                                                           .map(factory);
         if (invocationMode == InvocationMode.ASYNC) {
@@ -654,7 +654,7 @@ public abstract class AbstractStreamChannel<OUT>
         return buildChannel(Channels.toSelectable(this, index)
                                     .channelConfiguration()
                                     .with(buildChannelConfiguration())
-                                    .applyConfiguration()
+                                    .apply()
                                     .buildChannels());
     }
 
@@ -666,7 +666,7 @@ public abstract class AbstractStreamChannel<OUT>
         final IOChannel<OUT> ioChannel = JRoutineCore.io()
                                                      .channelConfiguration()
                                                      .with(buildChannelConfiguration())
-                                                     .applyConfiguration()
+                                                     .apply()
                                                      .buildChannel();
         mChannel.bind(new TryCatchOutputConsumer<OUT>(consumer, ioChannel));
         return buildChannel(ioChannel);
@@ -685,7 +685,7 @@ public abstract class AbstractStreamChannel<OUT>
         final IOChannel<OUT> ioChannel = JRoutineCore.io()
                                                      .channelConfiguration()
                                                      .with(buildChannelConfiguration())
-                                                     .applyConfiguration()
+                                                     .apply()
                                                      .buildChannel();
         mChannel.bind(new TryFinallyOutputConsumer<OUT>(runnable, ioChannel));
         return buildChannel(ioChannel);
@@ -782,7 +782,7 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     protected ChannelConfiguration buildChannelConfiguration() {
 
-        return builderFromOutputChannel(buildConfiguration()).applyConfiguration();
+        return builderFromOutputChannel(buildConfiguration()).apply();
     }
 
     /**
@@ -793,7 +793,7 @@ public abstract class AbstractStreamChannel<OUT>
     @NotNull
     protected InvocationConfiguration buildConfiguration() {
 
-        return mStreamConfiguration.builderFrom().with(getConfiguration()).applyConfiguration();
+        return mStreamConfiguration.builderFrom().with(getConfiguration()).apply();
     }
 
     /**

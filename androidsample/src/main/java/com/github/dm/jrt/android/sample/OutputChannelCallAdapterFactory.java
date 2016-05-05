@@ -97,10 +97,10 @@ public class OutputChannelCallAdapterFactory extends AbstractCallAdapterFactory<
                                     .on(sFactory)
                                     .invocationConfiguration()
                                     .with(invocationConfiguration)
-                                    .applyConfiguration()
+                                    .apply()
                                     .loaderConfiguration()
                                     .with(loaderConfiguration)
-                                    .applyConfiguration()
+                                    .apply()
                                     .buildRoutine();
     }
 }

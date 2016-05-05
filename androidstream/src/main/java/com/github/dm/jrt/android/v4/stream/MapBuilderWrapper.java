@@ -59,7 +59,7 @@ class MapBuilderWrapper<OUT>
             @NotNull final ChannelConfiguration configuration) {
 
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
-        mBuilder.channelConfiguration().with(null).with(configuration).applyConfiguration();
+        mBuilder.channelConfiguration().with(null).with(configuration).apply();
         return this;
     }
 

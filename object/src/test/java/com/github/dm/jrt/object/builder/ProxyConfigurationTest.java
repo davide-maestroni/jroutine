@@ -37,11 +37,11 @@ public class ProxyConfigurationTest {
     public void testBuildFrom() {
 
         final ProxyConfiguration configuration =
-                builder().withSharedFields("test").applyConfiguration();
-        assertThat(configuration.builderFrom().applyConfiguration()).isEqualTo(configuration);
-        assertThat(configuration.builderFrom().applyConfiguration().hashCode()).isEqualTo(
+                builder().withSharedFields("test").apply();
+        assertThat(configuration.builderFrom().apply()).isEqualTo(configuration);
+        assertThat(configuration.builderFrom().apply().hashCode()).isEqualTo(
                 configuration.hashCode());
-        assertThat(builderFrom(null).applyConfiguration()).isEqualTo(
+        assertThat(builderFrom(null).apply()).isEqualTo(
                 ProxyConfiguration.defaultConfiguration());
     }
 
@@ -74,10 +74,10 @@ public class ProxyConfigurationTest {
     public void testBuilderFromEquals() {
 
         final ProxyConfiguration configuration =
-                builder().withSharedFields("test").applyConfiguration();
-        assertThat(builder().with(configuration).applyConfiguration()).isEqualTo(configuration);
-        assertThat(configuration.builderFrom().applyConfiguration()).isEqualTo(configuration);
-        assertThat(configuration.builderFrom().with(null).applyConfiguration()).isEqualTo(
+                builder().withSharedFields("test").apply();
+        assertThat(builder().with(configuration).apply()).isEqualTo(configuration);
+        assertThat(configuration.builderFrom().apply()).isEqualTo(configuration);
+        assertThat(configuration.builderFrom().with(null).apply()).isEqualTo(
                 ProxyConfiguration.defaultConfiguration());
     }
 
@@ -85,22 +85,22 @@ public class ProxyConfigurationTest {
     public void testSharedFieldsEquals() {
 
         final ProxyConfiguration configuration =
-                builder().withSharedFields("group").applyConfiguration();
+                builder().withSharedFields("group").apply();
         assertThat(configuration).isNotEqualTo(
-                builder().withSharedFields("test").applyConfiguration());
+                builder().withSharedFields("test").apply());
         assertThat(configuration.builderFrom()
                                 .withSharedFields("test")
-                                .applyConfiguration()).isEqualTo(
-                builder().withSharedFields("test").applyConfiguration());
+                                .apply()).isEqualTo(
+                builder().withSharedFields("test").apply());
         assertThat(configuration).isNotEqualTo(
-                builder().withSharedFields("test").applyConfiguration());
+                builder().withSharedFields("test").apply());
     }
 
     @Test
     public void testToString() {
 
         assertThat(builder().withSharedFields("testGroupName123")
-                            .applyConfiguration()
+                            .apply()
                             .toString()).contains("testGroupName123");
     }
 }

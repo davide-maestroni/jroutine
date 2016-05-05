@@ -71,7 +71,7 @@ class BlendBuilder<OUT> extends AbstractBuilder<OutputChannel<OUT>> {
         final IOChannel<OUT> ioChannel = JRoutineCore.io()
                                                      .channelConfiguration()
                                                      .with(configuration)
-                                                     .applyConfiguration()
+                                                     .apply()
                                                      .buildChannel();
         for (final OutputChannel<? extends OUT> channel : mChannels) {
             channel.bind(ioChannel);

@@ -198,7 +198,7 @@ class DefaultObjectRoutineBuilder
                 routine = JRoutineCore.on(factory)
                                       .invocationConfiguration()
                                       .with(invocationConfiguration)
-                                      .applyConfiguration()
+                                      .apply()
                                       .buildRoutine();
                 routineMap.put(routineInfo, routine);
             }

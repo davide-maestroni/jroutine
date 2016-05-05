@@ -370,7 +370,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
                                           .withInputMaxDelay(getChannelMaxDelayOrElse(null))
                                           .withInputMaxSize(getChannelMaxSizeOrElse(
                                                   InvocationConfiguration.DEFAULT))
-                                          .applyConfiguration();
+                                          .apply();
     }
 
     /**
@@ -387,7 +387,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
                                       .withReadTimeoutAction(getReadTimeoutActionOrElse(null))
                                       .withLog(getLogOrElse(null))
                                       .withLogLevel(getLogLevelOrElse(null))
-                                      .applyConfiguration();
+                                      .apply();
     }
 
     /**
@@ -406,7 +406,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
                                           .withOutputMaxDelay(getChannelMaxDelayOrElse(null))
                                           .withOutputMaxSize(getChannelMaxSizeOrElse(
                                                   InvocationConfiguration.DEFAULT))
-                                          .applyConfiguration();
+                                          .apply();
     }
 
     /**
@@ -483,7 +483,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
          * @return the configured object.
          */
         @NotNull
-        public TYPE applyConfiguration() {
+        public TYPE apply() {
 
             return mConfigurable.apply(buildConfiguration());
         }

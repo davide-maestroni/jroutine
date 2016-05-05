@@ -325,7 +325,7 @@ public class SparseChannels extends AndroidChannels {
                         SparseChannels.<DATA, IN>selectParcelable(channel, index)
                                       .channelConfiguration()
                                       .with(configuration)
-                                      .applyConfiguration()
+                                      .apply()
                                       .buildChannels();
                 channelMap.put(index, ioChannel);
             }

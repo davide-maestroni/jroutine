@@ -53,14 +53,14 @@ class MergeMapBuilder<OUT> extends AbstractBuilder<OutputChannel<? extends Selec
         final IOChannel<Selectable<OUT>> ioChannel = JRoutineCore.io()
                                                                  .channelConfiguration()
                                                                  .with(configuration)
-                                                                 .applyConfiguration()
+                                                                 .apply()
                                                                  .buildChannel();
         for (final Entry<Integer, ? extends OutputChannel<? extends OUT>> entry : mChannelMap
                 .entrySet()) {
             ioChannel.pass(new SelectableOutputBuilder<OUT>(entry.getValue(),
                     entry.getKey()).channelConfiguration()
                                    .with(configuration)
-                                   .applyConfiguration()
+                                   .apply()
                                    .buildChannels());
         }
 

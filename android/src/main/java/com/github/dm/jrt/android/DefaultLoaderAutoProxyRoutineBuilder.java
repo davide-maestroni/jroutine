@@ -189,13 +189,13 @@ class DefaultLoaderAutoProxyRoutineBuilder implements LoaderAutoProxyRoutineBuil
                                    .on(mTarget)
                                    .invocationConfiguration()
                                    .with(mInvocationConfiguration)
-                                   .applyConfiguration()
+                                   .apply()
                                    .proxyConfiguration()
                                    .with(mProxyConfiguration)
-                                   .applyConfiguration()
+                                   .apply()
                                    .loaderConfiguration()
                                    .with(mLoaderConfiguration)
-                                   .applyConfiguration();
+                                   .apply();
     }
 
     @NotNull
@@ -205,12 +205,12 @@ class DefaultLoaderAutoProxyRoutineBuilder implements LoaderAutoProxyRoutineBuil
                                   .on(mTarget)
                                   .invocationConfiguration()
                                   .with(mInvocationConfiguration)
-                                  .applyConfiguration()
+                                  .apply()
                                   .proxyConfiguration()
                                   .with(mProxyConfiguration)
-                                  .applyConfiguration()
+                                  .apply()
                                   .loaderConfiguration()
                                   .with(mLoaderConfiguration)
-                                  .applyConfiguration();
+                                  .apply();
     }
 }

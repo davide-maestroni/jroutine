@@ -71,13 +71,13 @@ class JoinBuilder<OUT> extends AbstractBuilder<OutputChannel<List<? extends OUT>
         final IOChannel<List<? extends OUT>> ioChannel = JRoutineCore.io()
                                                                      .channelConfiguration()
                                                                      .with(configuration)
-                                                                     .applyConfiguration()
+                                                                     .apply()
                                                                      .buildChannel();
         final JoinOutputConsumer<OUT> consumer =
                 new JoinOutputConsumer<OUT>(mIsFlush, channels.size(), mPlaceholder, ioChannel);
         new MergeBuilder<OUT>(0, channels).channelConfiguration()
                                           .with(configuration)
-                                          .applyConfiguration()
+                                          .apply()
                                           .buildChannels()
                                           .bind(consumer);
         return ioChannel;

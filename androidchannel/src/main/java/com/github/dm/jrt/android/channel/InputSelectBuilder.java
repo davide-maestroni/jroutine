@@ -59,7 +59,7 @@ class InputSelectBuilder<DATA, IN extends DATA> extends AbstractBuilder<IOChanne
         final IOChannel<IN> inputChannel = JRoutineCore.io()
                                                        .channelConfiguration()
                                                        .with(configuration)
-                                                       .applyConfiguration()
+                                                       .apply()
                                                        .buildChannel();
         final IOChannel<ParcelableSelectable<DATA>> ioChannel = JRoutineCore.io().buildChannel();
         ioChannel.bind(mChannel);

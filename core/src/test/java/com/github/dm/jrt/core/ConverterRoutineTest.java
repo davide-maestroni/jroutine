@@ -88,7 +88,7 @@ public class ConverterRoutineTest {
             super(InvocationConfiguration.builder()
                                          .withMaxInstances(1)
                                          .withRunner(Runners.syncRunner())
-                                         .applyConfiguration());
+                                         .apply());
         }
 
         @NotNull

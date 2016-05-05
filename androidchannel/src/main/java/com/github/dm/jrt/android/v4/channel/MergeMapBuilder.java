@@ -73,7 +73,7 @@ class MergeMapBuilder<OUT>
         final IOChannel<ParcelableSelectable<OUT>> ioChannel = JRoutineCore.io()
                                                                            .channelConfiguration()
                                                                            .with(configuration)
-                                                                           .applyConfiguration()
+                                                                           .apply()
                                                                            .buildChannel();
         final int size = channelMap.size();
         for (int i = 0; i < size; ++i) {

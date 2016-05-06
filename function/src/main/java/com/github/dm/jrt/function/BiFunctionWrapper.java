@@ -145,7 +145,7 @@ public class BiFunctionWrapper<IN1, IN2, OUT> extends DeepEqualObject
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <IN extends Comparable<IN>> BiFunctionWrapper<IN, IN, IN> max() {
+    public static <IN extends Comparable<? super IN>> BiFunctionWrapper<IN, IN, IN> max() {
 
         return (BiFunctionWrapper<IN, IN, IN>) sMax;
     }
@@ -190,7 +190,7 @@ public class BiFunctionWrapper<IN1, IN2, OUT> extends DeepEqualObject
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <IN extends Comparable<IN>> BiFunctionWrapper<IN, IN, IN> min() {
+    public static <IN extends Comparable<? super IN>> BiFunctionWrapper<IN, IN, IN> min() {
 
         return (BiFunctionWrapper<IN, IN, IN>) sMin;
     }

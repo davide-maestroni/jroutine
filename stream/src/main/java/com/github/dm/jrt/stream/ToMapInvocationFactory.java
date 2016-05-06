@@ -100,5 +100,11 @@ class ToMapInvocationFactory<IN, KEY> extends InvocationFactory<IN, Map<KEY, IN>
             result.pass(mMap);
             mMap = null;
         }
+
+        @Override
+        public void onTerminate() {
+
+            mMap = null;
+        }
     }
 }

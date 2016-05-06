@@ -63,6 +63,7 @@ import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.function.Functions.wrap;
 import static com.github.dm.jrt.stream.Streams.range;
 import static com.github.dm.jrt.stream.Streams.sequence;
+import static com.github.dm.jrt.stream.Streams.sortBy;
 import static com.github.dm.jrt.stream.Streams.toList;
 import static com.github.dm.jrt.stream.Streams.toMap;
 import static com.github.dm.jrt.stream.Streams.toSet;
@@ -2511,6 +2512,23 @@ public class StreamsTest {
         } catch (final IllegalArgumentException ignored) {
 
         }
+    }
+
+    @Test
+    public void testSort() {
+
+        assertThat(Streams.streamOf(2, 5, 4, 3, 1)
+                          .map(Streams.<Integer>sort())
+                          .afterMax(seconds(3))
+                          .all()).containsExactly(1, 2, 3, 4, 5);
+        assertThat(Streams.streamOf("a", "C", "b")
+                          .map(Streams.<String>sort())
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("C", "a", "b");
+        assertThat(Streams.streamOf("a", "C", "b")
+                          .map(sortBy(String.CASE_INSENSITIVE_ORDER))
+                          .afterMax(seconds(3))
+                          .all()).containsExactly("a", "b", "C");
     }
 
     @Test

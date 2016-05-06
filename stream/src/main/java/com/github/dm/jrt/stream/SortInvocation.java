@@ -24,48 +24,49 @@ import com.github.dm.jrt.core.invocation.TemplateInvocation;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 
 /**
- * Factory of invocations collecting inputs into lists.
+ * Invocation sorting the input in natural ordering.
  * <p>
- * Created by davide-maestroni on 05/02/2016.
+ * Created by davide-maestroni on 05/06/2016.
  *
  * @param <DATA> the data type.
  */
-class ToListInvocation<DATA> extends TemplateInvocation<DATA, List<DATA>> {
+class SortInvocation<DATA extends Comparable<? super DATA>> extends TemplateInvocation<DATA, DATA> {
 
-    private static final InvocationFactory<?, ? extends List<?>> sFactory =
-            new InvocationFactory<Object, List<Object>>(null) {
+    private static final InvocationFactory<? extends Comparable<?>, ? extends Comparable<?>>
+            sFactory = new InvocationFactory<Comparable<Object>, Comparable<Object>>(null) {
 
-                @NotNull
-                @Override
-                public Invocation<Object, List<Object>> newInvocation() throws Exception {
+        @NotNull
+        @Override
+        public Invocation<Comparable<Object>, Comparable<Object>> newInvocation() throws Exception {
 
-                    return new ToListInvocation<Object>();
-                }
-            };
+            return new SortInvocation<Comparable<Object>>();
+        }
+    };
 
     private ArrayList<DATA> mList;
 
     /**
      * Constructor.
      */
-    private ToListInvocation() {
+    private SortInvocation() {
 
     }
 
     /**
-     * Returns the factory of collecting invocations.
+     * Returns the factory of sorting invocations.
      *
      * @param <DATA> the data type.
      * @return the factory instance.
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <DATA> InvocationFactory<DATA, List<DATA>> factoryOf() {
+    public static <DATA extends Comparable<? super DATA>> InvocationFactory<DATA, DATA> factoryOf
+    () {
 
-        return (InvocationFactory<DATA, List<DATA>>) sFactory;
+        return (InvocationFactory<DATA, DATA>) sFactory;
     }
 
     @Override
@@ -75,14 +76,15 @@ class ToListInvocation<DATA> extends TemplateInvocation<DATA, List<DATA>> {
     }
 
     @Override
-    public void onInput(final DATA input, @NotNull final ResultChannel<List<DATA>> result) {
+    public void onInput(final DATA input, @NotNull final ResultChannel<DATA> result) {
 
         mList.add(input);
     }
 
     @Override
-    public void onResult(@NotNull final ResultChannel<List<DATA>> result) {
+    public void onResult(@NotNull final ResultChannel<DATA> result) {
 
+        Collections.sort(mList);
         result.pass(mList);
         mList = null;
     }

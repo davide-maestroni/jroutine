@@ -86,4 +86,10 @@ class ToSetInvocation<DATA> extends TemplateInvocation<DATA, Set<DATA>> {
         result.pass(mSet);
         mSet = null;
     }
+
+    @Override
+    public void onTerminate() {
+
+        mSet = null;
+    }
 }

@@ -335,7 +335,7 @@ public class Functions {
      * @return the bi-function wrapper.
      */
     @NotNull
-    public static <IN extends Comparable<IN>> BiFunctionWrapper<IN, IN, IN> max() {
+    public static <IN extends Comparable<? super IN>> BiFunctionWrapper<IN, IN, IN> max() {
 
         return BiFunctionWrapper.max();
     }
@@ -366,7 +366,7 @@ public class Functions {
      * @return the bi-function wrapper.
      */
     @NotNull
-    public static <IN extends Comparable<IN>> BiFunctionWrapper<IN, IN, IN> min() {
+    public static <IN extends Comparable<? super IN>> BiFunctionWrapper<IN, IN, IN> min() {
 
         return BiFunctionWrapper.min();
     }

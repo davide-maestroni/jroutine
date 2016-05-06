@@ -41,6 +41,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -840,7 +841,7 @@ public class Streams extends Functions {
      * @return the consumer instance.
      */
     @NotNull
-    public static <AFTER extends Comparable<AFTER>> RangeConsumer<AFTER> range(
+    public static <AFTER extends Comparable<? super AFTER>> RangeConsumer<AFTER> range(
             @NotNull final AFTER start, @NotNull final AFTER end,
             @NotNull final Function<AFTER, AFTER> increment) {
 
@@ -1129,6 +1130,32 @@ public class Streams extends Functions {
     public static <DATA> InvocationFactory<DATA, DATA> skip(final int count) {
 
         return new SkipInvocationFactory<DATA>(count);
+    }
+
+    /**
+     * Returns an factory of invocations sorting inputs in their natural order.
+     *
+     * @param <IN> the input data type.
+     * @return the invocation factory instance.
+     */
+    @NotNull
+    public static <IN extends Comparable<? super IN>> InvocationFactory<IN, IN> sort() {
+
+        return SortInvocation.factoryOf();
+    }
+
+    /**
+     * Returns an factory of invocations sorting inputs by the specified comparator.
+     *
+     * @param comparator the comparator instance.
+     * @param <IN>       the input data type.
+     * @return the invocation factory instance.
+     */
+    @NotNull
+    public static <IN> InvocationFactory<IN, IN> sortBy(
+            @NotNull final Comparator<? super IN> comparator) {
+
+        return new SortByInvocationFactory<IN>(comparator);
     }
 
     /**
@@ -1479,7 +1506,7 @@ public class Streams extends Functions {
      *
      * @param <OUT> the output data type.
      */
-    public static class RangeConsumer<OUT extends Comparable<OUT>> extends DeepEqualObject
+    public static class RangeConsumer<OUT extends Comparable<? super OUT>> extends DeepEqualObject
             implements Consumer<InputChannel<OUT>> {
 
         private final OUT mEnd;

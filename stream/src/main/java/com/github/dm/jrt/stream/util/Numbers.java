@@ -82,10 +82,10 @@ public class Numbers {
             return n1.intValue() + n2.intValue();
 
         } else if ((n1 instanceof Short) || (n2 instanceof Short)) {
-            return n1.shortValue() + n2.shortValue();
+            return (short) (n1.shortValue() + n2.shortValue());
 
         } else if ((n1 instanceof Byte) || (n2 instanceof Byte)) {
-            return n1.byteValue() + n2.byteValue();
+            return (byte) (n1.byteValue() + n2.byteValue());
         }
 
         return null;
@@ -214,7 +214,6 @@ public class Numbers {
 
         return bigDecimal;
     }
-
 
     /**
      * Converts the specified number into a {@code BigDecimal}.

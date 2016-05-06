@@ -1843,7 +1843,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             throw exception();
         }
 
-
         @Nullable
         @Override
         RoutineException abortOutputChannel(@Nullable final Throwable reason) {
@@ -1880,7 +1879,6 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
             mSubLogger.dbg("avoiding aborting output since result channel is closed");
             return false;
         }
-
 
         @Override
         boolean isReadyToComplete() {

@@ -89,36 +89,48 @@ class RoundedMeanInvocation extends TemplateInvocation<Number, Number> {
     @Override
     public void onResult(@NotNull final ResultChannel<Number> result) {
 
-        final Number mean;
-        final Number sum = mSum;
-        if (sum instanceof BigDecimal) {
-            mean = ((BigDecimal) sum).divide(new BigDecimal(mCount), RoundingMode.HALF_EVEN);
-
-        } else if (sum instanceof BigInteger) {
-            mean = ((BigInteger) sum).divide(BigInteger.valueOf(mCount));
-
-        } else if (sum instanceof Double) {
-            mean = sum.doubleValue() / mCount;
-
-        } else if (sum instanceof Float) {
-            mean = sum.floatValue() / mCount;
-
-        } else if (sum instanceof Long) {
-            mean = Math.round(sum.doubleValue() / mCount);
-
-        } else if (sum instanceof Integer) {
-            mean = Math.round(sum.floatValue() / mCount);
-
-        } else if (sum instanceof Short) {
-            mean = (short) Math.round(sum.floatValue() / mCount);
-
-        } else if (sum instanceof Byte) {
-            mean = (byte) Math.round(sum.floatValue() / mCount);
+        if (mCount == 0) {
+            result.pass(0);
 
         } else {
-            mean = sum.doubleValue() / mCount;
-        }
+            final Number mean;
+            final Number sum = mSum;
+            if (sum instanceof BigDecimal) {
+                mean = ((BigDecimal) sum).divide(new BigDecimal(mCount), RoundingMode.HALF_UP);
 
-        result.pass(mean);
+            } else if (sum instanceof BigInteger) {
+                final BigInteger[] divideAndRemainder =
+                        ((BigInteger) sum).divideAndRemainder(BigInteger.valueOf(mCount));
+                if (divideAndRemainder[1].longValue() >= ((mCount + 1) >> 1)) {
+                    mean = divideAndRemainder[0].add(BigInteger.ONE);
+
+                } else {
+                    mean = divideAndRemainder[0];
+                }
+
+            } else if (sum instanceof Double) {
+                mean = (double) Math.round(sum.doubleValue() / mCount);
+
+            } else if (sum instanceof Float) {
+                mean = (float) Math.round(sum.floatValue() / mCount);
+
+            } else if (sum instanceof Long) {
+                mean = Math.round(sum.doubleValue() / mCount);
+
+            } else if (sum instanceof Integer) {
+                mean = Math.round(sum.floatValue() / mCount);
+
+            } else if (sum instanceof Short) {
+                mean = (short) Math.round(sum.floatValue() / mCount);
+
+            } else if (sum instanceof Byte) {
+                mean = (byte) Math.round(sum.floatValue() / mCount);
+
+            } else {
+                mean = Math.round(sum.doubleValue() / mCount);
+            }
+
+            result.pass(mean);
+        }
     }
 }

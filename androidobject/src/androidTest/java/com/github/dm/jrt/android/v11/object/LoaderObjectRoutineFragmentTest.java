@@ -58,7 +58,7 @@ import com.github.dm.jrt.object.annotation.Invoke;
 import com.github.dm.jrt.object.annotation.ReadTimeout;
 import com.github.dm.jrt.object.annotation.ReadTimeoutAction;
 import com.github.dm.jrt.object.annotation.SharedFields;
-import com.github.dm.jrt.object.config.ProxyConfiguration;
+import com.github.dm.jrt.object.config.ObjectConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -227,7 +227,7 @@ public class LoaderObjectRoutineFragmentTest
         try {
 
             new DefaultLoaderObjectRoutineBuilder(loaderFrom(fragment), instanceOf(TestClass.class))
-                    .apply((ProxyConfiguration) null);
+                    .apply((ObjectConfiguration) null);
 
             fail();
 
@@ -275,7 +275,7 @@ public class LoaderObjectRoutineFragmentTest
                             .invocationConfiguration()
                             .with(configuration)
                             .apply()
-                            .proxyConfiguration()
+                            .objectConfiguration()
                             .withSharedFields("test")
                             .apply()
                             .method(TestClass.GET);
@@ -286,7 +286,7 @@ public class LoaderObjectRoutineFragmentTest
                             .invocationConfiguration()
                             .with(configuration)
                             .apply()
-                            .proxyConfiguration()
+                            .objectConfiguration()
                             .withSharedFields("test")
                             .apply()
                             .buildProxy(SquareItf.class)
@@ -735,7 +735,7 @@ public class LoaderObjectRoutineFragmentTest
                                                                              Runners.poolRunner())
                                                                      .withMaxInstances(1)
                                                                      .apply()
-                                                                     .proxyConfiguration()
+                                                                     .objectConfiguration()
                                                                      .withSharedFields("test")
                                                                      .apply()
                                                                      .method(TestClass.class
@@ -1152,12 +1152,12 @@ public class LoaderObjectRoutineFragmentTest
 
         long startTime = System.currentTimeMillis();
 
-        OutputChannel<Object> getOne = builder.proxyConfiguration()
+        OutputChannel<Object> getOne = builder.objectConfiguration()
                                               .withSharedFields("1")
                                               .apply()
                                               .method("getOne")
                                               .asyncCall();
-        OutputChannel<Object> getTwo = builder.proxyConfiguration()
+        OutputChannel<Object> getTwo = builder.objectConfiguration()
                                               .withSharedFields("2")
                                               .apply()
                                               .method("getTwo")

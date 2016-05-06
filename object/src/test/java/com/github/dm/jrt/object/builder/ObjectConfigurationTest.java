@@ -16,13 +16,13 @@
 
 package com.github.dm.jrt.object.builder;
 
-import com.github.dm.jrt.object.config.ProxyConfiguration;
-import com.github.dm.jrt.object.config.ProxyConfiguration.Builder;
+import com.github.dm.jrt.object.config.ObjectConfiguration;
+import com.github.dm.jrt.object.config.ObjectConfiguration.Builder;
 
 import org.junit.Test;
 
-import static com.github.dm.jrt.object.config.ProxyConfiguration.builder;
-import static com.github.dm.jrt.object.config.ProxyConfiguration.builderFrom;
+import static com.github.dm.jrt.object.config.ObjectConfiguration.builder;
+import static com.github.dm.jrt.object.config.ObjectConfiguration.builderFrom;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -31,16 +31,16 @@ import static org.junit.Assert.fail;
  * <p>
  * Created by davide-maestroni on 04/21/2015.
  */
-public class ProxyConfigurationTest {
+public class ObjectConfigurationTest {
 
     @Test
     public void testBuildFrom() {
 
-        final ProxyConfiguration configuration = builder().withSharedFields("test").apply();
+        final ObjectConfiguration configuration = builder().withSharedFields("test").apply();
         assertThat(configuration.builderFrom().apply()).isEqualTo(configuration);
         assertThat(configuration.builderFrom().apply().hashCode()).isEqualTo(
                 configuration.hashCode());
-        assertThat(builderFrom(null).apply()).isEqualTo(ProxyConfiguration.defaultConfiguration());
+        assertThat(builderFrom(null).apply()).isEqualTo(ObjectConfiguration.defaultConfiguration());
     }
 
     @Test
@@ -59,7 +59,7 @@ public class ProxyConfigurationTest {
 
         try {
 
-            new Builder<Object>(null, ProxyConfiguration.defaultConfiguration());
+            new Builder<Object>(null, ObjectConfiguration.defaultConfiguration());
 
             fail();
 
@@ -71,17 +71,17 @@ public class ProxyConfigurationTest {
     @Test
     public void testBuilderFromEquals() {
 
-        final ProxyConfiguration configuration = builder().withSharedFields("test").apply();
+        final ObjectConfiguration configuration = builder().withSharedFields("test").apply();
         assertThat(builder().with(configuration).apply()).isEqualTo(configuration);
         assertThat(configuration.builderFrom().apply()).isEqualTo(configuration);
         assertThat(configuration.builderFrom().with(null).apply()).isEqualTo(
-                ProxyConfiguration.defaultConfiguration());
+                ObjectConfiguration.defaultConfiguration());
     }
 
     @Test
     public void testSharedFieldsEquals() {
 
-        final ProxyConfiguration configuration = builder().withSharedFields("group").apply();
+        final ObjectConfiguration configuration = builder().withSharedFields("group").apply();
         assertThat(configuration).isNotEqualTo(builder().withSharedFields("test").apply());
         assertThat(configuration.builderFrom().withSharedFields("test").apply()).isEqualTo(
                 builder().withSharedFields("test").apply());

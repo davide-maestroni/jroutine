@@ -30,7 +30,7 @@ import java.lang.reflect.Method;
  * Created by davide-maestroni on 03/07/2015.
  */
 public interface ObjectRoutineBuilder extends ConfigurableBuilder<ObjectRoutineBuilder>,
-        ProxyConfigurableBuilder<ObjectRoutineBuilder> {
+        ObjectConfigurableBuilder<ObjectRoutineBuilder> {
 
     /**
      * Returns a proxy object enabling asynchronous call of the target instance methods.

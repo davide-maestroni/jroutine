@@ -59,6 +59,8 @@ import java.util.concurrent.TimeUnit;
 public interface StreamChannel<OUT>
         extends OutputChannel<OUT>, ConfigurableBuilder<StreamChannel<OUT>> {
 
+    // TODO: 06/05/16 @StreamTransform, @StreamConfig, @StreamInvoke
+
     /**
      * {@inheritDoc}
      */

@@ -20,7 +20,7 @@ import com.github.dm.jrt.AutoProxyRoutineBuilder;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.object.builder.LoaderObjectRoutineBuilder;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.object.config.ProxyConfiguration;
+import com.github.dm.jrt.object.config.ObjectConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -51,7 +51,7 @@ public interface LoaderAutoProxyRoutineBuilder
      * {@inheritDoc}
      */
     @NotNull
-    ProxyConfiguration.Builder<? extends LoaderAutoProxyRoutineBuilder> proxyConfiguration();
+    ObjectConfiguration.Builder<? extends LoaderAutoProxyRoutineBuilder> objectConfiguration();
 
     /**
      * {@inheritDoc}

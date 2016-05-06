@@ -22,7 +22,7 @@ import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.object.InvocationTarget;
 import com.github.dm.jrt.object.JRoutineObject;
 import com.github.dm.jrt.object.builder.ObjectRoutineBuilder;
-import com.github.dm.jrt.object.config.ProxyConfiguration;
+import com.github.dm.jrt.object.config.ObjectConfiguration;
 import com.github.dm.jrt.proxy.JRoutineProxy;
 import com.github.dm.jrt.proxy.annotation.Proxy;
 import com.github.dm.jrt.proxy.builder.ProxyRoutineBuilder;
@@ -59,17 +59,17 @@ class DefaultAutoProxyRoutineBuilder implements AutoProxyRoutineBuilder {
                 }
             };
 
-    private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.defaultConfiguration();
+    private ObjectConfiguration mObjectConfiguration = ObjectConfiguration.defaultConfiguration();
 
-    private final ProxyConfiguration.Configurable<DefaultAutoProxyRoutineBuilder>
+    private final ObjectConfiguration.Configurable<DefaultAutoProxyRoutineBuilder>
             mProxyConfigurable =
-            new ProxyConfiguration.Configurable<DefaultAutoProxyRoutineBuilder>() {
+            new ObjectConfiguration.Configurable<DefaultAutoProxyRoutineBuilder>() {
 
                 @NotNull
                 public DefaultAutoProxyRoutineBuilder apply(
-                        @NotNull final ProxyConfiguration configuration) {
+                        @NotNull final ObjectConfiguration configuration) {
 
-                    mProxyConfiguration = configuration;
+                    mObjectConfiguration = configuration;
                     return DefaultAutoProxyRoutineBuilder.this;
                 }
             };
@@ -146,10 +146,10 @@ class DefaultAutoProxyRoutineBuilder implements AutoProxyRoutineBuilder {
     }
 
     @NotNull
-    public ProxyConfiguration.Builder<? extends AutoProxyRoutineBuilder> proxyConfiguration() {
+    public ObjectConfiguration.Builder<? extends AutoProxyRoutineBuilder> objectConfiguration() {
 
-        final ProxyConfiguration config = mProxyConfiguration;
-        return new ProxyConfiguration.Builder<DefaultAutoProxyRoutineBuilder>(mProxyConfigurable,
+        final ObjectConfiguration config = mObjectConfiguration;
+        return new ObjectConfiguration.Builder<DefaultAutoProxyRoutineBuilder>(mProxyConfigurable,
                 config);
     }
 
@@ -167,8 +167,8 @@ class DefaultAutoProxyRoutineBuilder implements AutoProxyRoutineBuilder {
                              .invocationConfiguration()
                              .with(mInvocationConfiguration)
                              .apply()
-                             .proxyConfiguration()
-                             .with(mProxyConfiguration)
+                             .objectConfiguration()
+                             .with(mObjectConfiguration)
                              .apply();
     }
 
@@ -179,8 +179,8 @@ class DefaultAutoProxyRoutineBuilder implements AutoProxyRoutineBuilder {
                             .invocationConfiguration()
                             .with(mInvocationConfiguration)
                             .apply()
-                            .proxyConfiguration()
-                            .with(mProxyConfiguration)
+                            .objectConfiguration()
+                            .with(mObjectConfiguration)
                             .apply();
     }
 }

@@ -29,7 +29,7 @@ import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.object.config.ProxyConfiguration;
+import com.github.dm.jrt.object.config.ObjectConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -80,17 +80,17 @@ class DefaultLoaderAutoProxyRoutineBuilderCompat implements LoaderAutoProxyRouti
                 }
             };
 
-    private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.defaultConfiguration();
+    private ObjectConfiguration mObjectConfiguration = ObjectConfiguration.defaultConfiguration();
 
-    private final ProxyConfiguration.Configurable<DefaultLoaderAutoProxyRoutineBuilderCompat>
+    private final ObjectConfiguration.Configurable<DefaultLoaderAutoProxyRoutineBuilderCompat>
             mProxyConfigurable =
-            new ProxyConfiguration.Configurable<DefaultLoaderAutoProxyRoutineBuilderCompat>() {
+            new ObjectConfiguration.Configurable<DefaultLoaderAutoProxyRoutineBuilderCompat>() {
 
                 @NotNull
                 public DefaultLoaderAutoProxyRoutineBuilderCompat apply(
-                        @NotNull final ProxyConfiguration configuration) {
+                        @NotNull final ObjectConfiguration configuration) {
 
-                    mProxyConfiguration = configuration;
+                    mObjectConfiguration = configuration;
                     return DefaultLoaderAutoProxyRoutineBuilderCompat.this;
                 }
             };
@@ -160,11 +160,11 @@ class DefaultLoaderAutoProxyRoutineBuilderCompat implements LoaderAutoProxyRouti
     }
 
     @NotNull
-    public ProxyConfiguration.Builder<? extends LoaderAutoProxyRoutineBuilder> proxyConfiguration
+    public ObjectConfiguration.Builder<? extends LoaderAutoProxyRoutineBuilder> objectConfiguration
             () {
 
-        return new ProxyConfiguration.Builder<LoaderAutoProxyRoutineBuilder>(mProxyConfigurable,
-                mProxyConfiguration);
+        return new ObjectConfiguration.Builder<LoaderAutoProxyRoutineBuilder>(mProxyConfigurable,
+                mObjectConfiguration);
     }
 
     @NotNull
@@ -190,8 +190,8 @@ class DefaultLoaderAutoProxyRoutineBuilderCompat implements LoaderAutoProxyRouti
                                          .invocationConfiguration()
                                          .with(mInvocationConfiguration)
                                          .apply()
-                                         .proxyConfiguration()
-                                         .with(mProxyConfiguration)
+                                         .objectConfiguration()
+                                         .with(mObjectConfiguration)
                                          .apply()
                                          .loaderConfiguration()
                                          .with(mLoaderConfiguration)
@@ -206,8 +206,8 @@ class DefaultLoaderAutoProxyRoutineBuilderCompat implements LoaderAutoProxyRouti
                                         .invocationConfiguration()
                                         .with(mInvocationConfiguration)
                                         .apply()
-                                        .proxyConfiguration()
-                                        .with(mProxyConfiguration)
+                                        .objectConfiguration()
+                                        .with(mObjectConfiguration)
                                         .apply()
                                         .loaderConfiguration()
                                         .with(mLoaderConfiguration)

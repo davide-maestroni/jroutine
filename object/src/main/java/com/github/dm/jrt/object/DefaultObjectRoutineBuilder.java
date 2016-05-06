@@ -34,7 +34,7 @@ import com.github.dm.jrt.object.annotation.AsyncOut.OutputMode;
 import com.github.dm.jrt.object.builder.Builders.MethodInfo;
 import com.github.dm.jrt.object.builder.ObjectRoutineBuilder;
 import com.github.dm.jrt.object.common.Mutex;
-import com.github.dm.jrt.object.config.ProxyConfiguration;
+import com.github.dm.jrt.object.config.ObjectConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -61,7 +61,7 @@ import static com.github.dm.jrt.object.builder.Builders.withAnnotations;
  */
 class DefaultObjectRoutineBuilder
         implements ObjectRoutineBuilder, Configurable<ObjectRoutineBuilder>,
-        ProxyConfiguration.Configurable<ObjectRoutineBuilder> {
+        ObjectConfiguration.Configurable<ObjectRoutineBuilder> {
 
     private static final WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<?, ?>>>
             sRoutines = new WeakIdentityHashMap<Object, HashMap<RoutineInfo, Routine<?, ?>>>();
@@ -71,7 +71,7 @@ class DefaultObjectRoutineBuilder
     private InvocationConfiguration mInvocationConfiguration =
             InvocationConfiguration.defaultConfiguration();
 
-    private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.defaultConfiguration();
+    private ObjectConfiguration mObjectConfiguration = ObjectConfiguration.defaultConfiguration();
 
     /**
      * Constructor.
@@ -100,9 +100,9 @@ class DefaultObjectRoutineBuilder
     }
 
     @NotNull
-    public ObjectRoutineBuilder apply(@NotNull final ProxyConfiguration configuration) {
+    public ObjectRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
 
-        mProxyConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
+        mObjectConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
         return this;
     }
 
@@ -147,7 +147,7 @@ class DefaultObjectRoutineBuilder
     public <IN, OUT> Routine<IN, OUT> method(@NotNull final Method method) {
 
         return getRoutine(withAnnotations(mInvocationConfiguration, method),
-                withAnnotations(mProxyConfiguration, method), method, null, null);
+                withAnnotations(mObjectConfiguration, method), method, null, null);
     }
 
     @NotNull
@@ -159,17 +159,17 @@ class DefaultObjectRoutineBuilder
     }
 
     @NotNull
-    public ProxyConfiguration.Builder<? extends ObjectRoutineBuilder> proxyConfiguration() {
+    public ObjectConfiguration.Builder<? extends ObjectRoutineBuilder> objectConfiguration() {
 
-        final ProxyConfiguration config = mProxyConfiguration;
-        return new ProxyConfiguration.Builder<ObjectRoutineBuilder>(this, config);
+        final ObjectConfiguration config = mObjectConfiguration;
+        return new ObjectConfiguration.Builder<ObjectRoutineBuilder>(this, config);
     }
 
     @NotNull
     @SuppressWarnings("unchecked")
     private <IN, OUT> Routine<IN, OUT> getRoutine(
             @NotNull final InvocationConfiguration invocationConfiguration,
-            @NotNull final ProxyConfiguration proxyConfiguration, @NotNull final Method method,
+            @NotNull final ObjectConfiguration objectConfiguration, @NotNull final Method method,
             @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
         final InvocationTarget<?> target = mTarget;
@@ -188,12 +188,12 @@ class DefaultObjectRoutineBuilder
             }
 
             final RoutineInfo routineInfo =
-                    new RoutineInfo(invocationConfiguration, proxyConfiguration, method, inputMode,
+                    new RoutineInfo(invocationConfiguration, objectConfiguration, method, inputMode,
                             outputMode);
             Routine<?, ?> routine = routineMap.get(routineInfo);
             if (routine == null) {
                 final MethodInvocationFactory factory =
-                        new MethodInvocationFactory(proxyConfiguration, target, method, inputMode,
+                        new MethodInvocationFactory(objectConfiguration, target, method, inputMode,
                                 outputMode);
                 routine = JRoutineCore.on(factory)
                                       .invocationConfiguration()
@@ -225,20 +225,20 @@ class DefaultObjectRoutineBuilder
         /**
          * Constructor.
          *
-         * @param proxyConfiguration the proxy configuration.
+         * @param objectConfiguration the proxy configuration.
          * @param target             the invocation target.
          * @param method             the method to wrap.
          * @param inputMode          the input transfer mode.
          * @param outputMode         the output transfer mode.
          */
-        private MethodCallInvocation(@NotNull final ProxyConfiguration proxyConfiguration,
+        private MethodCallInvocation(@NotNull final ObjectConfiguration objectConfiguration,
                 @NotNull final InvocationTarget<?> target, @NotNull final Method method,
                 @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
             final Object mutexTarget =
                     (Modifier.isStatic(method.getModifiers())) ? target.getTargetClass()
                             : target.getTarget();
-            mMutex = getSharedMutex(mutexTarget, proxyConfiguration.getSharedFieldsOrElse(null));
+            mMutex = getSharedMutex(mutexTarget, objectConfiguration.getSharedFieldsOrElse(null));
             mTarget = target;
             mMethod = method;
             mInputMode = inputMode;
@@ -269,25 +269,25 @@ class DefaultObjectRoutineBuilder
 
         private final OutputMode mOutputMode;
 
-        private final ProxyConfiguration mProxyConfiguration;
+        private final ObjectConfiguration mObjectConfiguration;
 
         private final InvocationTarget<?> mTarget;
 
         /**
          * Constructor.
          *
-         * @param proxyConfiguration the proxy configuration.
+         * @param objectConfiguration the proxy configuration.
          * @param target             the invocation target.
          * @param method             the method to wrap.
          * @param inputMode          the input transfer mode.
          * @param outputMode         the output transfer mode.
          */
-        private MethodInvocationFactory(@NotNull final ProxyConfiguration proxyConfiguration,
+        private MethodInvocationFactory(@NotNull final ObjectConfiguration objectConfiguration,
                 @NotNull final InvocationTarget<?> target, @NotNull final Method method,
                 @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
-            super(asArgs(proxyConfiguration, target, method, inputMode, outputMode));
-            mProxyConfiguration = proxyConfiguration;
+            super(asArgs(objectConfiguration, target, method, inputMode, outputMode));
+            mObjectConfiguration = objectConfiguration;
             mTarget = target;
             mMethod = method;
             mInputMode = inputMode;
@@ -298,7 +298,7 @@ class DefaultObjectRoutineBuilder
         @Override
         public Invocation<Object, Object> newInvocation() {
 
-            return new MethodCallInvocation(mProxyConfiguration, mTarget, mMethod, mInputMode,
+            return new MethodCallInvocation(mObjectConfiguration, mTarget, mMethod, mInputMode,
                     mOutputMode);
         }
     }
@@ -312,16 +312,16 @@ class DefaultObjectRoutineBuilder
          * Constructor.
          *
          * @param invocationConfiguration the invocation configuration.
-         * @param proxyConfiguration      the proxy configuration.
+         * @param objectConfiguration      the proxy configuration.
          * @param method                  the method to wrap.
          * @param inputMode               the input transfer mode.
          * @param outputMode              the output transfer mode.
          */
         private RoutineInfo(@NotNull final InvocationConfiguration invocationConfiguration,
-                @NotNull final ProxyConfiguration proxyConfiguration, @NotNull final Method method,
+                @NotNull final ObjectConfiguration objectConfiguration, @NotNull final Method method,
                 @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
 
-            super(asArgs(invocationConfiguration, proxyConfiguration, method, inputMode,
+            super(asArgs(invocationConfiguration, objectConfiguration, method, inputMode,
                     outputMode));
         }
     }
@@ -333,7 +333,7 @@ class DefaultObjectRoutineBuilder
 
         private final InvocationConfiguration mInvocationConfiguration;
 
-        private final ProxyConfiguration mProxyConfiguration;
+        private final ObjectConfiguration mObjectConfiguration;
 
         /**
          * Constructor.
@@ -341,7 +341,7 @@ class DefaultObjectRoutineBuilder
         private ProxyInvocationHandler() {
 
             mInvocationConfiguration = DefaultObjectRoutineBuilder.this.mInvocationConfiguration;
-            mProxyConfiguration = DefaultObjectRoutineBuilder.this.mProxyConfiguration;
+            mObjectConfiguration = DefaultObjectRoutineBuilder.this.mObjectConfiguration;
         }
 
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws
@@ -352,7 +352,7 @@ class DefaultObjectRoutineBuilder
             final OutputMode outputMode = methodInfo.outputMode;
             final Routine<Object, Object> routine =
                     getRoutine(withAnnotations(mInvocationConfiguration, method),
-                            withAnnotations(mProxyConfiguration, method), methodInfo.method,
+                            withAnnotations(mObjectConfiguration, method), methodInfo.method,
                             inputMode, outputMode);
             return invokeRoutine(routine, method, asArgs(args), methodInfo.invocationMode,
                     inputMode, outputMode);

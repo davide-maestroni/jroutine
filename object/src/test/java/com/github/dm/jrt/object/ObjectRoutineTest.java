@@ -60,7 +60,7 @@ import com.github.dm.jrt.object.annotation.ReadTimeout;
 import com.github.dm.jrt.object.annotation.ReadTimeoutAction;
 import com.github.dm.jrt.object.annotation.SharedFields;
 import com.github.dm.jrt.object.builder.ObjectRoutineBuilder;
-import com.github.dm.jrt.object.config.ProxyConfiguration;
+import com.github.dm.jrt.object.config.ObjectConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -282,7 +282,7 @@ public class ObjectRoutineTest {
         try {
 
             new DefaultObjectRoutineBuilder(classOfType(TestStatic.class)).apply(
-                    (ProxyConfiguration) null);
+                    (ObjectConfiguration) null);
 
             fail();
 
@@ -646,7 +646,7 @@ public class ObjectRoutineTest {
                                                                .withRunner(Runners.poolRunner())
                                                                .withMaxInstances(1)
                                                                .apply()
-                                                               .proxyConfiguration()
+                                                               .objectConfiguration()
                                                                .withSharedFields("test")
                                                                .apply()
                                                                .method(TestClass.class.getMethod(
@@ -1241,12 +1241,12 @@ public class ObjectRoutineTest {
                                                            .apply();
         long startTime = System.currentTimeMillis();
 
-        OutputChannel<Object> getOne = builder.proxyConfiguration()
+        OutputChannel<Object> getOne = builder.objectConfiguration()
                                               .withSharedFields()
                                               .apply()
                                               .method("getOne")
                                               .asyncCall();
-        OutputChannel<Object> getTwo = builder.proxyConfiguration()
+        OutputChannel<Object> getTwo = builder.objectConfiguration()
                                               .withSharedFields()
                                               .apply()
                                               .method("getTwo")
@@ -1258,12 +1258,12 @@ public class ObjectRoutineTest {
 
         startTime = System.currentTimeMillis();
 
-        getOne = builder.proxyConfiguration()
+        getOne = builder.objectConfiguration()
                         .withSharedFields("1")
                         .apply()
                         .method("getOne")
                         .asyncCall();
-        getTwo = builder.proxyConfiguration()
+        getTwo = builder.objectConfiguration()
                         .withSharedFields("2")
                         .apply()
                         .method("getTwo")
@@ -1294,7 +1294,7 @@ public class ObjectRoutineTest {
         long startTime = System.currentTimeMillis();
 
         OutputChannel<Object> getOne = builder.method("getOne").asyncCall();
-        OutputChannel<Object> getTwo = builder.proxyConfiguration()
+        OutputChannel<Object> getTwo = builder.objectConfiguration()
                                               .withSharedFields()
                                               .apply()
                                               .method("getTwo")
@@ -1306,12 +1306,12 @@ public class ObjectRoutineTest {
 
         startTime = System.currentTimeMillis();
 
-        getOne = builder.proxyConfiguration()
+        getOne = builder.objectConfiguration()
                         .withSharedFields("1", "2")
                         .apply()
                         .method("getOne")
                         .asyncCall();
-        getTwo = builder.proxyConfiguration()
+        getTwo = builder.objectConfiguration()
                         .withSharedFields()
                         .apply()
                         .method("getTwo")
@@ -1323,7 +1323,7 @@ public class ObjectRoutineTest {
 
         startTime = System.currentTimeMillis();
 
-        getOne = builder.proxyConfiguration()
+        getOne = builder.objectConfiguration()
                         .withSharedFields("1", "2")
                         .apply()
                         .method("getOne")
@@ -1336,12 +1336,12 @@ public class ObjectRoutineTest {
 
         startTime = System.currentTimeMillis();
 
-        getOne = builder.proxyConfiguration()
+        getOne = builder.objectConfiguration()
                         .withSharedFields("1", "2")
                         .apply()
                         .method("getOne")
                         .asyncCall();
-        getTwo = builder.proxyConfiguration()
+        getTwo = builder.objectConfiguration()
                         .withSharedFields("2")
                         .apply()
                         .method("getTwo")
@@ -1361,12 +1361,12 @@ public class ObjectRoutineTest {
                                                            .apply();
         long startTime = System.currentTimeMillis();
 
-        OutputChannel<Object> getOne = builder.proxyConfiguration()
+        OutputChannel<Object> getOne = builder.objectConfiguration()
                                               .withSharedFields()
                                               .apply()
                                               .method("getOne")
                                               .asyncCall();
-        OutputChannel<Object> getTwo = builder.proxyConfiguration()
+        OutputChannel<Object> getTwo = builder.objectConfiguration()
                                               .withSharedFields()
                                               .apply()
                                               .method("getTwo")
@@ -1378,12 +1378,12 @@ public class ObjectRoutineTest {
 
         startTime = System.currentTimeMillis();
 
-        getOne = builder.proxyConfiguration()
+        getOne = builder.objectConfiguration()
                         .withSharedFields("1")
                         .apply()
                         .method("getOne")
                         .asyncCall();
-        getTwo = builder.proxyConfiguration()
+        getTwo = builder.objectConfiguration()
                         .withSharedFields("2")
                         .apply()
                         .method("getTwo")
@@ -1413,7 +1413,7 @@ public class ObjectRoutineTest {
         long startTime = System.currentTimeMillis();
 
         OutputChannel<Object> getOne = builder.method("getOne").asyncCall();
-        OutputChannel<Object> getTwo = builder.proxyConfiguration()
+        OutputChannel<Object> getTwo = builder.objectConfiguration()
                                               .withSharedFields()
                                               .apply()
                                               .method("getTwo")
@@ -1425,12 +1425,12 @@ public class ObjectRoutineTest {
 
         startTime = System.currentTimeMillis();
 
-        getOne = builder.proxyConfiguration()
+        getOne = builder.objectConfiguration()
                         .withSharedFields("1", "2")
                         .apply()
                         .method("getOne")
                         .asyncCall();
-        getTwo = builder.proxyConfiguration()
+        getTwo = builder.objectConfiguration()
                         .withSharedFields()
                         .apply()
                         .method("getTwo")
@@ -1442,7 +1442,7 @@ public class ObjectRoutineTest {
 
         startTime = System.currentTimeMillis();
 
-        getOne = builder.proxyConfiguration()
+        getOne = builder.objectConfiguration()
                         .withSharedFields("1", "2")
                         .apply()
                         .method("getOne")
@@ -1455,12 +1455,12 @@ public class ObjectRoutineTest {
 
         startTime = System.currentTimeMillis();
 
-        getOne = builder.proxyConfiguration()
+        getOne = builder.objectConfiguration()
                         .withSharedFields("1", "2")
                         .apply()
                         .method("getOne")
                         .asyncCall();
-        getTwo = builder.proxyConfiguration()
+        getTwo = builder.objectConfiguration()
                         .withSharedFields("2")
                         .apply()
                         .method("getTwo")
@@ -1481,7 +1481,7 @@ public class ObjectRoutineTest {
                                                                .withMaxInstances(1)
                                                                .withCoreInstances(0)
                                                                .apply()
-                                                               .proxyConfiguration()
+                                                               .objectConfiguration()
                                                                .withSharedFields("test")
                                                                .apply()
                                                                .method(TestStatic.class.getMethod(

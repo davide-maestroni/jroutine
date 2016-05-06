@@ -30,7 +30,7 @@ import java.util.List;
 import static com.github.dm.jrt.core.util.Reflection.asArgs;
 
 /**
- * Class storing the proxy configuration.
+ * Class storing the object routine configuration.
  * <p>
  * Each instance is immutable, thus, in order to modify an existing configuration, a new builder
  * must be created from it.
@@ -44,11 +44,11 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  * <p>
  * Created by davide-maestroni on 04/20/2015.
  */
-public final class ProxyConfiguration extends DeepEqualObject {
+public final class ObjectConfiguration extends DeepEqualObject {
 
     private static final DefaultConfigurable sDefaultConfigurable = new DefaultConfigurable();
 
-    private static final ProxyConfiguration sDefaultConfiguration = builder().buildConfiguration();
+    private static final ObjectConfiguration sDefaultConfiguration = builder().buildConfiguration();
 
     private final List<String> mFieldNames;
 
@@ -57,35 +57,35 @@ public final class ProxyConfiguration extends DeepEqualObject {
      *
      * @param fieldNames the shared field names.
      */
-    private ProxyConfiguration(@Nullable final List<String> fieldNames) {
+    private ObjectConfiguration(@Nullable final List<String> fieldNames) {
 
         super(asArgs(fieldNames));
         mFieldNames = fieldNames;
     }
 
     /**
-     * Returns a proxy configuration builder.
+     * Returns an object configuration builder.
      *
      * @return the builder.
      */
     @NotNull
-    public static Builder<ProxyConfiguration> builder() {
+    public static Builder<ObjectConfiguration> builder() {
 
-        return new Builder<ProxyConfiguration>(sDefaultConfigurable);
+        return new Builder<ObjectConfiguration>(sDefaultConfigurable);
     }
 
     /**
-     * Returns a proxy configuration builder initialized with the specified configuration.
+     * Returns an object configuration builder initialized with the specified configuration.
      *
-     * @param initialConfiguration the initial proxy configuration.
+     * @param initialConfiguration the initial object configuration.
      * @return the builder.
      */
     @NotNull
-    public static Builder<ProxyConfiguration> builderFrom(
-            @Nullable final ProxyConfiguration initialConfiguration) {
+    public static Builder<ObjectConfiguration> builderFrom(
+            @Nullable final ObjectConfiguration initialConfiguration) {
 
         return (initialConfiguration == null) ? builder()
-                : new Builder<ProxyConfiguration>(sDefaultConfigurable, initialConfiguration);
+                : new Builder<ObjectConfiguration>(sDefaultConfigurable, initialConfiguration);
     }
 
     /**
@@ -94,18 +94,18 @@ public final class ProxyConfiguration extends DeepEqualObject {
      * @return the configuration instance.
      */
     @NotNull
-    public static ProxyConfiguration defaultConfiguration() {
+    public static ObjectConfiguration defaultConfiguration() {
 
         return sDefaultConfiguration;
     }
 
     /**
-     * Returns a proxy configuration builder initialized with this configuration.
+     * Returns an object configuration builder initialized with this configuration.
      *
      * @return the builder.
      */
     @NotNull
-    public Builder<ProxyConfiguration> builderFrom() {
+    public Builder<ObjectConfiguration> builderFrom() {
 
         return builderFrom(this);
     }
@@ -136,11 +136,11 @@ public final class ProxyConfiguration extends DeepEqualObject {
          * @return the configurable instance.
          */
         @NotNull
-        TYPE apply(@NotNull ProxyConfiguration configuration);
+        TYPE apply(@NotNull ObjectConfiguration configuration);
     }
 
     /**
-     * Builder of proxy configurations.
+     * Builder of object configurations.
      *
      * @param <TYPE> the configurable object type.
      */
@@ -164,10 +164,10 @@ public final class ProxyConfiguration extends DeepEqualObject {
          * Constructor.
          *
          * @param configurable         the configurable instance.
-         * @param initialConfiguration the initial proxy configuration.
+         * @param initialConfiguration the initial object configuration.
          */
         public Builder(@NotNull final Configurable<? extends TYPE> configurable,
-                @NotNull final ProxyConfiguration initialConfiguration) {
+                @NotNull final ObjectConfiguration initialConfiguration) {
 
             mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
             setConfiguration(initialConfiguration);
@@ -189,11 +189,11 @@ public final class ProxyConfiguration extends DeepEqualObject {
          * configuration options will be reset to their default, otherwise only the non-default
          * options will be applied.
          *
-         * @param configuration the proxy configuration.
+         * @param configuration the object configuration.
          * @return this builder.
          */
         @NotNull
-        public Builder<TYPE> with(@Nullable final ProxyConfiguration configuration) {
+        public Builder<TYPE> with(@Nullable final ObjectConfiguration configuration) {
 
             if (configuration == null) {
                 setConfiguration(defaultConfiguration());
@@ -248,12 +248,12 @@ public final class ProxyConfiguration extends DeepEqualObject {
         }
 
         @NotNull
-        private ProxyConfiguration buildConfiguration() {
+        private ObjectConfiguration buildConfiguration() {
 
-            return new ProxyConfiguration(mFieldNames);
+            return new ObjectConfiguration(mFieldNames);
         }
 
-        private void setConfiguration(@NotNull final ProxyConfiguration configuration) {
+        private void setConfiguration(@NotNull final ObjectConfiguration configuration) {
 
             mFieldNames = configuration.mFieldNames;
         }
@@ -262,10 +262,10 @@ public final class ProxyConfiguration extends DeepEqualObject {
     /**
      * Default configurable implementation.
      */
-    private static class DefaultConfigurable implements Configurable<ProxyConfiguration> {
+    private static class DefaultConfigurable implements Configurable<ObjectConfiguration> {
 
         @NotNull
-        public ProxyConfiguration apply(@NotNull final ProxyConfiguration configuration) {
+        public ObjectConfiguration apply(@NotNull final ObjectConfiguration configuration) {
 
             return configuration;
         }

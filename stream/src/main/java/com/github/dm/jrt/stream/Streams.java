@@ -664,9 +664,9 @@ public class Streams extends Functions {
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <N extends Number> InvocationFactory<N, N> mean() {
+    public static <N extends Number> InvocationFactory<N, Number> mean() {
 
-        return (InvocationFactory<N, N>) MeanInvocation.factoryOf();
+        return (InvocationFactory<N, Number>) MeanInvocation.factoryOf();
     }
 
     /**
@@ -915,9 +915,9 @@ public class Streams extends Functions {
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    public static <N extends Number> InvocationFactory<N, N> roundedMean() {
+    public static <N extends Number> InvocationFactory<N, Number> roundedMean() {
 
-        return (InvocationFactory<N, N>) RoundedMeanInvocation.factoryOf();
+        return (InvocationFactory<N, Number>) RoundedMeanInvocation.factoryOf();
     }
 
     /**

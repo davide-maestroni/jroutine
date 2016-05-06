@@ -18,7 +18,7 @@ package com.github.dm.jrt;
 
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.object.builder.ObjectRoutineBuilder;
-import com.github.dm.jrt.object.config.ProxyConfiguration;
+import com.github.dm.jrt.object.config.ObjectConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,7 +47,7 @@ public interface AutoProxyRoutineBuilder extends ObjectRoutineBuilder {
      * {@inheritDoc}
      */
     @NotNull
-    ProxyConfiguration.Builder<? extends AutoProxyRoutineBuilder> proxyConfiguration();
+    ObjectConfiguration.Builder<? extends AutoProxyRoutineBuilder> objectConfiguration();
 
     /**
      * Force the type of builder to be employed to create the proxy instance.

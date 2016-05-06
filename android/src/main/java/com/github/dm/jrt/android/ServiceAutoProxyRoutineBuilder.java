@@ -20,7 +20,7 @@ import com.github.dm.jrt.AutoProxyRoutineBuilder;
 import com.github.dm.jrt.android.core.config.ServiceConfiguration;
 import com.github.dm.jrt.android.object.builder.ServiceObjectRoutineBuilder;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.object.config.ProxyConfiguration;
+import com.github.dm.jrt.object.config.ObjectConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -51,7 +51,7 @@ public interface ServiceAutoProxyRoutineBuilder
      * {@inheritDoc}
      */
     @NotNull
-    ProxyConfiguration.Builder<? extends ServiceAutoProxyRoutineBuilder> proxyConfiguration();
+    ObjectConfiguration.Builder<? extends ServiceAutoProxyRoutineBuilder> objectConfiguration();
 
     /**
      * {@inheritDoc}

@@ -89,37 +89,43 @@ class FloatingMeanInvocation extends TemplateInvocation<Number, Number> {
     @Override
     public void onResult(@NotNull final ResultChannel<Number> result) {
 
-        final Number mean;
-        final Number sum = mSum;
-        if (sum instanceof BigDecimal) {
-            mean = ((BigDecimal) sum).divide(new BigDecimal(mCount), RoundingMode.HALF_EVEN);
-
-        } else if (sum instanceof BigInteger) {
-            mean = new BigDecimal((BigInteger) sum).divide(new BigDecimal(mCount),
-                    RoundingMode.HALF_EVEN);
-
-        } else if (sum instanceof Double) {
-            mean = sum.doubleValue() / mCount;
-
-        } else if (sum instanceof Float) {
-            mean = sum.floatValue() / mCount;
-
-        } else if (sum instanceof Long) {
-            mean = sum.doubleValue() / mCount;
-
-        } else if (sum instanceof Integer) {
-            mean = sum.floatValue() / mCount;
-
-        } else if (sum instanceof Short) {
-            mean = sum.floatValue() / mCount;
-
-        } else if (sum instanceof Byte) {
-            mean = sum.floatValue() / mCount;
+        if (mCount == 0) {
+            result.pass(0f);
 
         } else {
-            mean = sum.doubleValue() / mCount;
-        }
+            final Number mean;
+            final Number sum = mSum;
+            if (sum instanceof BigDecimal) {
+                mean = ((BigDecimal) sum).divide(new BigDecimal(mCount), 15,
+                        RoundingMode.HALF_EVEN);
 
-        result.pass(mean);
+            } else if (sum instanceof BigInteger) {
+                mean = new BigDecimal((BigInteger) sum).divide(new BigDecimal(mCount), 15,
+                        RoundingMode.HALF_EVEN);
+
+            } else if (sum instanceof Double) {
+                mean = sum.doubleValue() / mCount;
+
+            } else if (sum instanceof Float) {
+                mean = sum.floatValue() / mCount;
+
+            } else if (sum instanceof Long) {
+                mean = sum.doubleValue() / mCount;
+
+            } else if (sum instanceof Integer) {
+                mean = sum.floatValue() / mCount;
+
+            } else if (sum instanceof Short) {
+                mean = sum.floatValue() / mCount;
+
+            } else if (sum instanceof Byte) {
+                mean = sum.floatValue() / mCount;
+
+            } else {
+                mean = sum.doubleValue() / mCount;
+            }
+
+            result.pass(mean);
+        }
     }
 }

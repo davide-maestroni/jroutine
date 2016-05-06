@@ -48,7 +48,7 @@ import com.github.dm.jrt.object.annotation.ReadTimeout;
 import com.github.dm.jrt.object.annotation.ReadTimeoutAction;
 import com.github.dm.jrt.object.annotation.SharedFields;
 import com.github.dm.jrt.object.common.Mutex;
-import com.github.dm.jrt.object.config.ProxyConfiguration;
+import com.github.dm.jrt.object.config.ObjectConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -699,12 +699,12 @@ public class Builders {
      * @see com.github.dm.jrt.object.annotation.SharedFields SharedFields
      */
     @NotNull
-    public static ProxyConfiguration withAnnotations(
-            @Nullable final ProxyConfiguration configuration,
+    public static ObjectConfiguration withAnnotations(
+            @Nullable final ObjectConfiguration configuration,
             @Nullable final Annotation... annotations) {
 
-        final ProxyConfiguration.Builder<ProxyConfiguration> builder =
-                ProxyConfiguration.builderFrom(configuration);
+        final ObjectConfiguration.Builder<ObjectConfiguration> builder =
+                ObjectConfiguration.builderFrom(configuration);
         if (annotations == null) {
             return builder.apply();
         }
@@ -729,8 +729,8 @@ public class Builders {
      * @see com.github.dm.jrt.object.annotation.SharedFields SharedFields
      */
     @NotNull
-    public static ProxyConfiguration withAnnotations(
-            @Nullable final ProxyConfiguration configuration, @NotNull final Method method) {
+    public static ObjectConfiguration withAnnotations(
+            @Nullable final ObjectConfiguration configuration, @NotNull final Method method) {
 
         return withAnnotations(configuration, method.getDeclaredAnnotations());
     }

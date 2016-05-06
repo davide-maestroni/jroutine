@@ -341,12 +341,12 @@ public class ProxyRoutineTest {
 
         long startTime = System.currentTimeMillis();
 
-        OutputChannel<Integer> getOne = builder.proxyConfiguration()
+        OutputChannel<Integer> getOne = builder.objectConfiguration()
                                                .withSharedFields("1")
                                                .apply()
                                                .buildProxy(TestClassAsync.class)
                                                .getOne();
-        OutputChannel<Integer> getTwo = builder.proxyConfiguration()
+        OutputChannel<Integer> getTwo = builder.objectConfiguration()
                                                .withSharedFields("2")
                                                .apply()
                                                .buildProxy(TestClassAsync.class)

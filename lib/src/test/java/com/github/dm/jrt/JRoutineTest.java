@@ -360,7 +360,7 @@ public class JRoutineTest {
 
         final TestClass test = new TestClass();
         final Routine<Object, Object> routine = JRoutine.on(test)
-                                                        .proxyConfiguration()
+                                                        .objectConfiguration()
                                                         .withSharedFields()
                                                         .apply()
                                                         .method(TestClass.class.getMethod(
@@ -627,7 +627,7 @@ public class JRoutineTest {
                                       .withLogLevel(Level.DEBUG)
                                       .withLog(new NullLog())
                                       .apply()
-                                      .proxyConfiguration()
+                                      .objectConfiguration()
                                       .withSharedFields()
                                       .apply()
                                       .buildProxy(TestItf.class);

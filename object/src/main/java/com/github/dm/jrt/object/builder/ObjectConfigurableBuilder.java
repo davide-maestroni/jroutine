@@ -16,29 +16,29 @@
 
 package com.github.dm.jrt.object.builder;
 
-import com.github.dm.jrt.object.config.ProxyConfiguration.Builder;
+import com.github.dm.jrt.object.config.ObjectConfiguration.Builder;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Interface defining a configurable builder of proxy routines.
+ * Interface defining a configurable builder of object routines.
  * <p>
  * Created by davide-maestroni on 05/01/2015.
  *
  * @param <TYPE> the builder type.
  */
-public interface ProxyConfigurableBuilder<TYPE> {
+public interface ObjectConfigurableBuilder<TYPE> {
 
     /**
-     * Gets the proxy configuration builder related to the routine builder instance.
+     * Gets the object configuration builder related to the routine builder instance.
      * <br>
      * The configuration options not supported by the routine builder implementation might be
      * ignored.
      * <p>
      * Note that the configuration builder will be initialized with the current configuration.
      *
-     * @return the proxy configuration builder.
+     * @return the object configuration builder.
      */
     @NotNull
-    Builder<? extends TYPE> proxyConfiguration();
+    Builder<? extends TYPE> objectConfiguration();
 }

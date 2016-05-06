@@ -21,7 +21,7 @@ import com.github.dm.jrt.android.core.routine.LoaderRoutine;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.object.builder.ObjectRoutineBuilder;
-import com.github.dm.jrt.object.config.ProxyConfiguration;
+import com.github.dm.jrt.object.config.ObjectConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -164,5 +164,5 @@ public interface LoaderObjectRoutineBuilder
      * {@inheritDoc}
      */
     @NotNull
-    ProxyConfiguration.Builder<? extends LoaderObjectRoutineBuilder> proxyConfiguration();
+    ObjectConfiguration.Builder<? extends LoaderObjectRoutineBuilder> objectConfiguration();
 }

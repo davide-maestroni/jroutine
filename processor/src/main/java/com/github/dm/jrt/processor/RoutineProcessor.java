@@ -482,7 +482,7 @@ public class RoutineProcessor extends AbstractProcessor {
                    .append(" = ")
                    .append("initRoutine")
                    .append(i)
-                   .append("(target, invocationConfiguration, proxyConfiguration);")
+                   .append("(target, invocationConfiguration, objectConfiguration);")
                    .append(NEW_LINE);
         }
 
@@ -1919,7 +1919,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
         } else {
             methodHeader = methodHeader.replace("${sharedFields}",
-                    "proxyConfiguration.getSharedFieldsOrElse(null)");
+                    "objectConfiguration.getSharedFieldsOrElse(null)");
         }
 
         writer.append(methodHeader);
@@ -1975,7 +1975,7 @@ public class RoutineProcessor extends AbstractProcessor {
 
         } else {
             methodInvocationHeader = methodInvocationHeader.replace("${sharedFields}",
-                    "proxyConfiguration.getSharedFieldsOrElse(null)");
+                    "objectConfiguration.getSharedFieldsOrElse(null)");
         }
 
         final boolean isStatic = targetMethod.getModifiers().contains(Modifier.STATIC);

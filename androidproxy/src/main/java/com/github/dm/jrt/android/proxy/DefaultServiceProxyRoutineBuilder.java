@@ -27,7 +27,7 @@ import com.github.dm.jrt.android.proxy.builder.ServiceProxyRoutineBuilder;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.object.config.ProxyConfiguration;
+import com.github.dm.jrt.object.config.ObjectConfiguration;
 import com.github.dm.jrt.proxy.annotation.Proxy;
 
 import org.jetbrains.annotations.NotNull;
@@ -44,7 +44,7 @@ import static com.github.dm.jrt.core.util.Reflection.findConstructor;
  */
 class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
         InvocationConfiguration.Configurable<ServiceProxyRoutineBuilder>,
-        ProxyConfiguration.Configurable<ServiceProxyRoutineBuilder>,
+        ObjectConfiguration.Configurable<ServiceProxyRoutineBuilder>,
         ServiceConfiguration.Configurable<ServiceProxyRoutineBuilder> {
 
     private final ServiceContext mContext;
@@ -54,7 +54,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
     private InvocationConfiguration mInvocationConfiguration =
             InvocationConfiguration.defaultConfiguration();
 
-    private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.defaultConfiguration();
+    private ObjectConfiguration mObjectConfiguration = ObjectConfiguration.defaultConfiguration();
 
     private ServiceConfiguration mServiceConfiguration =
             ServiceConfiguration.defaultConfiguration();
@@ -73,9 +73,9 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
     }
 
     @NotNull
-    public ServiceProxyRoutineBuilder apply(@NotNull final ProxyConfiguration configuration) {
+    public ServiceProxyRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
 
-        mProxyConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
+        mObjectConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
         return this;
     }
 
@@ -113,8 +113,8 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
         return builder.invocationConfiguration()
                       .with(mInvocationConfiguration)
                       .apply()
-                      .proxyConfiguration()
-                      .with(mProxyConfiguration)
+                      .objectConfiguration()
+                      .with(mObjectConfiguration)
                       .apply()
                       .serviceConfiguration()
                       .with(mServiceConfiguration)
@@ -137,10 +137,10 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
     }
 
     @NotNull
-    public ProxyConfiguration.Builder<? extends ServiceProxyRoutineBuilder> proxyConfiguration() {
+    public ObjectConfiguration.Builder<? extends ServiceProxyRoutineBuilder> objectConfiguration() {
 
-        final ProxyConfiguration config = mProxyConfiguration;
-        return new ProxyConfiguration.Builder<ServiceProxyRoutineBuilder>(this, config);
+        final ObjectConfiguration config = mObjectConfiguration;
+        return new ObjectConfiguration.Builder<ServiceProxyRoutineBuilder>(this, config);
     }
 
     @NotNull
@@ -206,7 +206,7 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
         @Override
         @SuppressWarnings("unchecked")
         protected TYPE newProxy(@NotNull final InvocationConfiguration invocationConfiguration,
-                @NotNull final ProxyConfiguration proxyConfiguration,
+                @NotNull final ObjectConfiguration objectConfiguration,
                 @NotNull final ServiceConfiguration serviceConfiguration) throws Exception {
 
             final ServiceContext context = mContext;
@@ -236,9 +236,9 @@ class DefaultServiceProxyRoutineBuilder implements ServiceProxyRoutineBuilder,
                     packageName + annotation.classPrefix() + className + annotation.classSuffix();
             final Constructor<?> constructor =
                     findConstructor(Class.forName(fullClassName), context, target,
-                            invocationConfiguration, proxyConfiguration, serviceConfiguration);
+                            invocationConfiguration, objectConfiguration, serviceConfiguration);
             return (TYPE) constructor.newInstance(context, target, invocationConfiguration,
-                    proxyConfiguration, serviceConfiguration);
+                    objectConfiguration, serviceConfiguration);
         }
     }
 }

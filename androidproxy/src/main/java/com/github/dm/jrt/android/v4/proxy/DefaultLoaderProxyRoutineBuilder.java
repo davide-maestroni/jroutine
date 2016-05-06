@@ -25,7 +25,7 @@ import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.util.ClassToken;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.object.config.ProxyConfiguration;
+import com.github.dm.jrt.object.config.ObjectConfiguration;
 import com.github.dm.jrt.proxy.annotation.Proxy;
 
 import org.jetbrains.annotations.NotNull;
@@ -42,7 +42,7 @@ import static com.github.dm.jrt.core.util.Reflection.findConstructor;
  */
 class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
         InvocationConfiguration.Configurable<LoaderProxyRoutineBuilder>,
-        ProxyConfiguration.Configurable<LoaderProxyRoutineBuilder>,
+        ObjectConfiguration.Configurable<LoaderProxyRoutineBuilder>,
         LoaderConfiguration.Configurable<LoaderProxyRoutineBuilder> {
 
     private final LoaderContextCompat mContext;
@@ -54,7 +54,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
 
     private LoaderConfiguration mLoaderConfiguration = LoaderConfiguration.defaultConfiguration();
 
-    private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.defaultConfiguration();
+    private ObjectConfiguration mObjectConfiguration = ObjectConfiguration.defaultConfiguration();
 
     /**
      * Constructor.
@@ -77,9 +77,9 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
     }
 
     @NotNull
-    public LoaderProxyRoutineBuilder apply(@NotNull final ProxyConfiguration configuration) {
+    public LoaderProxyRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
 
-        mProxyConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
+        mObjectConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
         return this;
     }
 
@@ -110,8 +110,8 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
         return builder.invocationConfiguration()
                       .with(mInvocationConfiguration)
                       .apply()
-                      .proxyConfiguration()
-                      .with(mProxyConfiguration)
+                      .objectConfiguration()
+                      .with(mObjectConfiguration)
                       .apply()
                       .loaderConfiguration()
                       .with(mLoaderConfiguration)
@@ -134,10 +134,10 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
     }
 
     @NotNull
-    public ProxyConfiguration.Builder<? extends LoaderProxyRoutineBuilder> proxyConfiguration() {
+    public ObjectConfiguration.Builder<? extends LoaderProxyRoutineBuilder> objectConfiguration() {
 
-        final ProxyConfiguration config = mProxyConfiguration;
-        return new ProxyConfiguration.Builder<LoaderProxyRoutineBuilder>(this, config);
+        final ObjectConfiguration config = mObjectConfiguration;
+        return new ObjectConfiguration.Builder<LoaderProxyRoutineBuilder>(this, config);
     }
 
     @NotNull
@@ -202,7 +202,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
         @Override
         @SuppressWarnings("unchecked")
         protected TYPE newProxy(@NotNull final InvocationConfiguration invocationConfiguration,
-                @NotNull final ProxyConfiguration proxyConfiguration,
+                @NotNull final ObjectConfiguration objectConfiguration,
                 @NotNull final LoaderConfiguration loaderConfiguration) throws Exception {
 
             final LoaderContextCompat context = mContext;
@@ -233,9 +233,9 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
                     packageName + annotation.classPrefix() + className + annotation.classSuffix();
             final Constructor<?> constructor =
                     findConstructor(Class.forName(fullClassName), context, target,
-                            invocationConfiguration, proxyConfiguration, loaderConfiguration);
+                            invocationConfiguration, objectConfiguration, loaderConfiguration);
             return (TYPE) constructor.newInstance(context, target, invocationConfiguration,
-                    proxyConfiguration, loaderConfiguration);
+                    objectConfiguration, loaderConfiguration);
         }
     }
 }

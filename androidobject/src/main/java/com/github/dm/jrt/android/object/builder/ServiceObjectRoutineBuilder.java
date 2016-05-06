@@ -19,7 +19,7 @@ package com.github.dm.jrt.android.object.builder;
 import com.github.dm.jrt.android.core.builder.ServiceConfigurableBuilder;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.object.builder.ObjectRoutineBuilder;
-import com.github.dm.jrt.object.config.ProxyConfiguration;
+import com.github.dm.jrt.object.config.ObjectConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -45,5 +45,5 @@ public interface ServiceObjectRoutineBuilder
      * {@inheritDoc}
      */
     @NotNull
-    ProxyConfiguration.Builder<? extends ServiceObjectRoutineBuilder> proxyConfiguration();
+    ObjectConfiguration.Builder<? extends ServiceObjectRoutineBuilder> objectConfiguration();
 }

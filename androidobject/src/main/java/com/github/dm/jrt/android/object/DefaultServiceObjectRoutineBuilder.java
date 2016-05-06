@@ -40,7 +40,7 @@ import com.github.dm.jrt.object.annotation.AsyncOut.OutputMode;
 import com.github.dm.jrt.object.annotation.SharedFields;
 import com.github.dm.jrt.object.builder.Builders.MethodInfo;
 import com.github.dm.jrt.object.common.Mutex;
-import com.github.dm.jrt.object.config.ProxyConfiguration;
+import com.github.dm.jrt.object.config.ObjectConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -70,7 +70,7 @@ import static com.github.dm.jrt.object.builder.Builders.withAnnotations;
  */
 class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         InvocationConfiguration.Configurable<ServiceObjectRoutineBuilder>,
-        ProxyConfiguration.Configurable<ServiceObjectRoutineBuilder>,
+        ObjectConfiguration.Configurable<ServiceObjectRoutineBuilder>,
         ServiceConfiguration.Configurable<ServiceObjectRoutineBuilder> {
 
     private static final HashMap<String, Class<?>> sPrimitiveClassMap =
@@ -83,7 +83,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     private InvocationConfiguration mInvocationConfiguration =
             InvocationConfiguration.defaultConfiguration();
 
-    private ProxyConfiguration mProxyConfiguration = ProxyConfiguration.defaultConfiguration();
+    private ObjectConfiguration mObjectConfiguration = ObjectConfiguration.defaultConfiguration();
 
     private ServiceConfiguration mServiceConfiguration =
             ServiceConfiguration.defaultConfiguration();
@@ -103,7 +103,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
     @Nullable
     private static List<String> fieldsWithShareAnnotation(
-            @NotNull final ProxyConfiguration configuration, @NotNull final Method method) {
+            @NotNull final ObjectConfiguration configuration, @NotNull final Method method) {
 
         final SharedFields sharedFieldsAnnotation = method.getAnnotation(SharedFields.class);
         if (sharedFieldsAnnotation != null) {
@@ -163,9 +163,9 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     @NotNull
-    public ServiceObjectRoutineBuilder apply(@NotNull final ProxyConfiguration configuration) {
+    public ServiceObjectRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
 
-        mProxyConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
+        mObjectConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
         return this;
     }
 
@@ -199,7 +199,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         }
 
         final List<String> sharedFields =
-                fieldsWithShareAnnotation(mProxyConfiguration, targetMethod);
+                fieldsWithShareAnnotation(mObjectConfiguration, targetMethod);
         final Object[] args = asArgs(sharedFields, target, name);
         final TargetInvocationFactory<Object, Object> factory =
                 factoryOf(MethodAliasInvocation.class, args);
@@ -223,7 +223,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
         final ContextInvocationTarget<?> target = mTarget;
         final Method targetMethod = findMethod(target.getTargetClass(), name, parameterTypes);
         final List<String> sharedFields =
-                fieldsWithShareAnnotation(mProxyConfiguration, targetMethod);
+                fieldsWithShareAnnotation(mObjectConfiguration, targetMethod);
         final Object[] args = asArgs(sharedFields, target, name, toNames(parameterTypes));
         final TargetInvocationFactory<Object, Object> factory =
                 factoryOf(MethodSignatureInvocation.class, args);
@@ -254,10 +254,10 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     @NotNull
-    public ProxyConfiguration.Builder<? extends ServiceObjectRoutineBuilder> proxyConfiguration() {
+    public ObjectConfiguration.Builder<? extends ServiceObjectRoutineBuilder> objectConfiguration() {
 
-        final ProxyConfiguration config = mProxyConfiguration;
-        return new ProxyConfiguration.Builder<ServiceObjectRoutineBuilder>(this, config);
+        final ObjectConfiguration config = mObjectConfiguration;
+        return new ObjectConfiguration.Builder<ServiceObjectRoutineBuilder>(this, config);
     }
 
     @NotNull
@@ -308,7 +308,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             final InvocationTarget target = mTarget.getInvocationTarget(context);
             mInstance = target.getTarget();
             mRoutine = JRoutineObject.on(target)
-                                     .proxyConfiguration()
+                                     .objectConfiguration()
                                      .withSharedFields(mSharedFields)
                                      .apply()
                                      .method(mAliasName);
@@ -387,7 +387,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             final InvocationTarget target = mTarget.getInvocationTarget(context);
             mInstance = target.getTarget();
             mRoutine = JRoutineObject.on(target)
-                                     .proxyConfiguration()
+                                     .objectConfiguration()
                                      .withSharedFields(mSharedFields)
                                      .apply()
                                      .method(mMethodName, mParameterTypes);
@@ -500,7 +500,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
 
         private final InvocationConfiguration mInvocationConfiguration;
 
-        private final ProxyConfiguration mProxyConfiguration;
+        private final ObjectConfiguration mObjectConfiguration;
 
         private final ServiceConfiguration mServiceConfiguration;
 
@@ -516,7 +516,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             mContext = builder.mContext;
             mTarget = builder.mTarget;
             mInvocationConfiguration = builder.mInvocationConfiguration;
-            mProxyConfiguration = builder.mProxyConfiguration;
+            mObjectConfiguration = builder.mObjectConfiguration;
             mServiceConfiguration = builder.mServiceConfiguration;
         }
 
@@ -530,7 +530,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
             final OutputMode outputMode = methodInfo.outputMode;
             final Class<?>[] targetParameterTypes = targetMethod.getParameterTypes();
             final List<String> sharedFields =
-                    fieldsWithShareAnnotation(mProxyConfiguration, method);
+                    fieldsWithShareAnnotation(mObjectConfiguration, method);
             final Object[] factoryArgs = asArgs(sharedFields, target, targetMethod.getName(),
                     toNames(targetParameterTypes), inputMode, outputMode);
             final TargetInvocationFactory<Object, Object> factory =

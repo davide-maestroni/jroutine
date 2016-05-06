@@ -18,7 +18,7 @@ package com.github.dm.jrt.android.proxy.builder;
 
 import com.github.dm.jrt.android.core.builder.ServiceConfigurableBuilder;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
-import com.github.dm.jrt.object.config.ProxyConfiguration;
+import com.github.dm.jrt.object.config.ObjectConfiguration;
 import com.github.dm.jrt.proxy.builder.ProxyObjectBuilder;
 
 import org.jetbrains.annotations.NotNull;
@@ -65,5 +65,5 @@ public interface ServiceProxyObjectBuilder<TYPE> extends ProxyObjectBuilder<TYPE
      * {@inheritDoc}
      */
     @NotNull
-    ProxyConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>> proxyConfiguration();
+    ObjectConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>> objectConfiguration();
 }

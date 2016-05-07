@@ -208,11 +208,7 @@ public class Numbers {
     public static BigDecimal toBigOptimistic(@NotNull final Number n) {
 
         final BigDecimal bigDecimal = toBig(n);
-        if (bigDecimal == null) {
-            return new BigDecimal(n.doubleValue());
-        }
-
-        return bigDecimal;
+        return (bigDecimal == null) ? new BigDecimal(n.doubleValue()) : bigDecimal;
     }
 
     /**

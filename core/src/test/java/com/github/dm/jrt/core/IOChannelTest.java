@@ -275,7 +275,7 @@ public class IOChannelTest {
         assertThat(ioChannel.pass("test").isEmpty()).isFalse();
         ioChannel.afterMax(seconds(1)).next();
         assertThat(ioChannel.isEmpty()).isTrue();
-        assertThat(ioChannel.after(millis(100)).pass("test").isEmpty()).isTrue();
+        assertThat(ioChannel.after(millis(100)).pass("test").isEmpty()).isFalse();
         assertThat(ioChannel.close().afterMax(seconds(10)).hasCompleted()).isTrue();
         assertThat(ioChannel.isEmpty()).isFalse();
     }

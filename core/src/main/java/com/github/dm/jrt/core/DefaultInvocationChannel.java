@@ -377,6 +377,7 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
     private void internalAbort(@NotNull final RoutineException abortException) {
 
+        mInputCount = 0;
         mInputQueue.clear();
         mAbortException = abortException;
         mRunner.cancel(mExecution);

@@ -111,6 +111,13 @@ class RepeatedChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
         return mChannel.isOpen();
     }
 
+    public int size() {
+
+        synchronized (mMutex) {
+            return mOutputChannel.size();
+        }
+    }
+
     @NotNull
     public OutputChannel<OUT> afterMax(@NotNull final UnitDuration timeout) {
 

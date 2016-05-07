@@ -24,12 +24,14 @@ import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.ExecutionDeadlockException;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.InputDeadlockException;
+import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.OutputDeadlockException;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.error.TimeoutException;
+import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.invocation.OperationInvocation;
 import com.github.dm.jrt.core.routine.InvocationMode;
@@ -58,9 +60,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.github.dm.jrt.core.util.UnitDuration.days;
+import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.minutes;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.function.Functions.functionOperation;
+import static com.github.dm.jrt.function.Functions.wrap;
 import static com.github.dm.jrt.stream.Streams.range;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -79,7 +83,7 @@ public class StreamChannelTest {
     public void testAbort() {
 
         final IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
-        final StreamChannel<Object> streamChannel = Streams.streamOf(ioChannel);
+        final StreamChannel<Object, Object> streamChannel = Streams.streamOf(ioChannel);
         ioChannel.abort(new IllegalArgumentException());
         try {
             streamChannel.afterMax(seconds(3)).throwError();
@@ -96,10 +100,11 @@ public class StreamChannelTest {
     public void testApply() {
 
         assertThat(Streams.streamOf("test1")
-                          .apply(new Function<StreamChannel<String>, StreamChannel<String>>() {
+                          .apply(new Function<StreamChannel<String, String>,
+                                  StreamChannel<String, String>>() {
 
-                              public StreamChannel<String> apply(
-                                      final StreamChannel<String> stream) {
+                              public StreamChannel<String, String> apply(
+                                      final StreamChannel<String, String> stream) {
 
                                   return stream.concat("test2");
                               }
@@ -142,7 +147,7 @@ public class StreamChannelTest {
     @Test
     public void testChannel() {
 
-        StreamChannel<String> channel = Streams.streamOf("test");
+        StreamChannel<String, String> channel = Streams.streamOf("test");
         assertThat(channel.abort()).isFalse();
         assertThat(channel.abort(null)).isFalse();
         assertThat(channel.isOpen()).isFalse();
@@ -530,7 +535,7 @@ public class StreamChannelTest {
         assertThat(streamChannel.getConfiguration()).isNotNull();
         assertThat(streamChannel.getStreamConfiguration()).isNotNull();
         assertThat(streamChannel.getInvocationMode()).isNotNull();
-        assertThat(streamChannel.getInvoke()).isNotNull();
+        assertThat(streamChannel.getBind()).isNotNull();
         assertThat((Object) streamChannel.getSourceChannel()).isNotNull();
     }
 
@@ -1919,10 +1924,10 @@ public class StreamChannelTest {
                         return o.toString();
                     }
                 })).buildRoutine();
-        final Function<Object, StreamChannel<String>> retryFunction =
-                new Function<Object, StreamChannel<String>>() {
+        final Function<Object, StreamChannel<Object, String>> retryFunction =
+                new Function<Object, StreamChannel<Object, String>>() {
 
-                    public StreamChannel<String> apply(final Object o) {
+                    public StreamChannel<Object, String> apply(final Object o) {
 
                         final int[] count = {0};
                         return Streams.streamOf(o)
@@ -1968,6 +1973,20 @@ public class StreamChannelTest {
     }
 
     @Test
+    public void testSize() {
+
+        final InvocationChannel<Object, Object> channel =
+                JRoutineCore.on(IdentityInvocation.factoryOf()).asyncInvoke();
+        assertThat(channel.size()).isEqualTo(0);
+        channel.after(millis(500)).pass("test");
+        assertThat(channel.size()).isEqualTo(1);
+        final OutputChannel<Object> result = Streams.streamOf(channel.result());
+        assertThat(result.afterMax(seconds(1)).hasCompleted()).isTrue();
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.skipNext(1).size()).isEqualTo(0);
+    }
+
+    @Test
     public void testSkip() {
 
         assertThat(Streams.streamOf()
@@ -1991,6 +2010,37 @@ public class StreamChannelTest {
                           .skip(0)
                           .afterMax(seconds(3))
                           .all()).isEqualTo(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+    }
+
+    @Test
+    public void testSplit() {
+
+        final Function<StreamChannel<Integer, Integer>, StreamChannel<Integer, Long>> sqr =
+                new Function<StreamChannel<Integer, Integer>, StreamChannel<Integer, Long>>() {
+
+                    public StreamChannel<Integer, Long> apply(
+                            final StreamChannel<Integer, Integer> stream) {
+
+                        return stream.map(new Function<Integer, Long>() {
+
+                            public Long apply(final Integer number) {
+
+                                final long value = number.longValue();
+                                return value * value;
+                            }
+                        });
+                    }
+                };
+        assertThat(Streams.streamOf()
+                          .thenGet(range(1, 3))
+                          .splitBy(2, sqr)
+                          .afterMax(seconds(3))
+                          .all()).containsOnly(1L, 4L, 9L);
+        assertThat(Streams.streamOf()
+                          .thenGet(range(1, 3))
+                          .splitBy(Functions.<Integer>identity(), sqr)
+                          .afterMax(seconds(3))
+                          .all()).containsOnly(1L, 4L, 9L);
     }
 
     @Test
@@ -2390,6 +2440,37 @@ public class StreamChannelTest {
     }
 
     @Test
+    public void testTransform() {
+
+        assertThat(Streams.streamOf("test")
+                          .transform(
+                                  new Function<Function<OutputChannel<String>,
+                                          OutputChannel<String>>, Function<OutputChannel<String>,
+                                          OutputChannel<String>>>() {
+
+                                      public Function<OutputChannel<String>,
+                                              OutputChannel<String>> apply(
+                                              final Function<OutputChannel<String>,
+                                                      OutputChannel<String>> function) {
+
+                                          return wrap(function).andThen(
+                                                  new Function<OutputChannel<String>,
+                                                          OutputChannel<String>>() {
+
+                                                      public OutputChannel<String> apply(
+                                                              final OutputChannel<String> channel) {
+
+                                                          return JRoutineCore.on(new UpperCase())
+                                                                             .asyncCall(channel);
+                                                      }
+                                                  });
+                                      }
+                                  })
+                          .afterMax(seconds(3))
+                          .next()).isEqualTo("TEST");
+    }
+
+    @Test
     public void testTryCatch() {
 
         assertThat(Streams.streamOf("test").sync().map(new Function<Object, Object>() {
@@ -2548,7 +2629,7 @@ public class StreamChannelTest {
 
         @NotNull
         @Override
-        protected <BEFORE, AFTER> StreamChannel<AFTER> newChannel(
+        protected <BEFORE, AFTER> StreamChannel<BEFORE, AFTER> newChannel(
                 @NotNull final InvocationConfiguration streamConfiguration,
                 @NotNull final InvocationMode invocationMode,
                 @NotNull final OutputChannel<BEFORE> sourceChannel,

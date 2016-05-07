@@ -93,6 +93,11 @@ class DefaultIOChannel<DATA> implements IOChannel<DATA> {
         return mInputChannel.isOpen();
     }
 
+    public int size() {
+
+        return mInputChannel.size();
+    }
+
     @NotNull
     public IOChannel<DATA> after(@NotNull final UnitDuration delay) {
 

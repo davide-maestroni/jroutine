@@ -25,13 +25,16 @@ import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
+import com.github.dm.jrt.android.core.invocation.IdentityContextInvocation;
 import com.github.dm.jrt.android.core.runner.AndroidRunners;
+import com.github.dm.jrt.android.v11.core.JRoutineLoader;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel.InputChannel;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.ExecutionDeadlockException;
 import com.github.dm.jrt.core.channel.IOChannel;
+import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
@@ -63,9 +66,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
+import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.minutes;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static com.github.dm.jrt.function.Functions.functionOperation;
+import static com.github.dm.jrt.function.Functions.wrap;
 import static com.github.dm.jrt.stream.Streams.range;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -76,6 +81,43 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @TargetApi(VERSION_CODES.FROYO)
 public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<TestActivity> {
+
+    private static final Function<StreamChannel<Integer, Integer>, StreamChannel<Integer, Long>>
+            sSqr = new Function<StreamChannel<Integer, Integer>, StreamChannel<Integer, Long>>() {
+
+        public StreamChannel<Integer, Long> apply(final StreamChannel<Integer, Integer> stream) {
+
+            return stream.map(new Function<Integer, Long>() {
+
+                public Long apply(final Integer number) {
+
+                    final long value = number.longValue();
+                    return value * value;
+                }
+            });
+        }
+    };
+
+    private static final Function<Function<OutputChannel<String>, OutputChannel<String>>,
+            Function<OutputChannel<String>, OutputChannel<String>>>
+            sTransform =
+            new Function<Function<OutputChannel<String>, OutputChannel<String>>,
+                    Function<OutputChannel<String>, OutputChannel<String>>>() {
+
+                public Function<OutputChannel<String>, OutputChannel<String>> apply(
+                        final Function<OutputChannel<String>, OutputChannel<String>> function) {
+
+                    return wrap(function).andThen(
+                            new Function<OutputChannel<String>, OutputChannel<String>>() {
+
+                                public OutputChannel<String> apply(
+                                        final OutputChannel<String> channel) {
+
+                                    return JRoutineCore.on(new UpperCase()).asyncCall(channel);
+                                }
+                            });
+                }
+            };
 
     public LoaderStreamChannelTest() {
 
@@ -1135,7 +1177,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         }
 
         final IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
-        final LoaderStreamChannel<Object> streamChannel =
+        final LoaderStreamChannel<Object, Object> streamChannel =
                 LoaderStreams.streamOf(ioChannel).with(loaderFrom(getActivity()));
         ioChannel.abort(new IllegalArgumentException());
         try {
@@ -1157,15 +1199,30 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
 
         assertThat(LoaderStreams.streamOf("test1")
                                 .with(loaderFrom(getActivity()))
-                                .apply(new Function<StreamChannel<String>, StreamChannel<String>>
-                                        () {
+                                .apply(new Function<StreamChannel<String, String>,
+                                        StreamChannel<String, String>>() {
 
-                                    public StreamChannel<String> apply(
-                                            final StreamChannel<String> stream) {
+                                    public StreamChannel<String, String> apply(
+                                            final StreamChannel<String, String> stream) {
 
                                         return stream.concat("test2");
                                     }
                                 })
+                                .afterMax(seconds(10))
+                                .all()).containsExactly("test1", "test2");
+        assertThat(LoaderStreams.streamOf("test1")
+                                .with(loaderFrom(getActivity()))
+                                .applyLoader(
+                                        new Function<LoaderStreamChannel<String, String>,
+                                                LoaderStreamChannel<String, String>>() {
+
+                                            public LoaderStreamChannel<String, String> apply(
+                                                    final LoaderStreamChannel<String, String>
+                                                            stream) {
+
+                                                return stream.concat("test2");
+                                            }
+                                        })
                                 .afterMax(seconds(10))
                                 .all()).containsExactly("test1", "test2");
     }
@@ -1216,7 +1273,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             return;
         }
 
-        StreamChannel<String> channel =
+        StreamChannel<String, String> channel =
                 LoaderStreams.streamOf("test").with(loaderFrom(getActivity()));
         assertThat(channel.abort()).isFalse();
         assertThat(channel.abort(null)).isFalse();
@@ -2500,6 +2557,25 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         }
     }
 
+    public void testSize() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
+
+        final InvocationChannel<Object, Object> channel =
+                JRoutineLoader.with(loaderFrom(getActivity()))
+                              .on(IdentityContextInvocation.factoryOf())
+                              .asyncInvoke();
+        assertThat(channel.size()).isEqualTo(0);
+        channel.after(millis(500)).pass("test");
+        assertThat(channel.size()).isEqualTo(1);
+        final OutputChannel<Object> result = LoaderStreams.streamOf(channel.result());
+        assertThat(result.afterMax(seconds(10)).hasCompleted()).isTrue();
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.skipNext(1).size()).isEqualTo(0);
+    }
+
     public void testSkip() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
@@ -2530,6 +2606,40 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                 .skip(0)
                                 .afterMax(seconds(10))
                                 .all()).isEqualTo(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+    }
+
+    public void testSplit() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
+
+        assertThat(LoaderStreams.streamOf()
+                                .with(loaderFrom(getActivity()))
+                                .thenGet(range(1, 3))
+                                .splitBy(2, sSqr)
+                                .afterMax(seconds(3))
+                                .all()).containsOnly(1L, 4L, 9L);
+        assertThat(LoaderStreams.streamOf()
+                                .with(loaderFrom(getActivity()))
+                                .thenGet(range(1, 3))
+                                .splitBy(Functions.<Integer>identity(), sSqr)
+                                .afterMax(seconds(3))
+                                .all()).containsOnly(1L, 4L, 9L);
+        final ContextInvocationFactory<String, String> factory =
+                ContextInvocationFactory.factoryOf(UpperCase.class);
+        assertThat(LoaderStreams.streamOf()
+                                .with(loaderFrom(getActivity()))
+                                .then("test1", "test2", "test3")
+                                .splitBy(2, factory)
+                                .afterMax(seconds(3))
+                                .all()).containsOnly("TEST1", "TEST2", "TEST3");
+        assertThat(LoaderStreams.streamOf()
+                                .with(loaderFrom(getActivity()))
+                                .then("test1", "test2", "test3")
+                                .splitBy(Functions.<String>identity(), factory)
+                                .afterMax(seconds(3))
+                                .all()).containsOnly("TEST1", "TEST2", "TEST3");
     }
 
     public void testThen() {
@@ -2966,6 +3076,19 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         }
     }
 
+    public void testTransform() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
+
+        assertThat(LoaderStreams.streamOf("test")
+                                .with(loaderFrom(getActivity()))
+                                .transform(sTransform)
+                                .afterMax(seconds(10))
+                                .next()).isEqualTo("TEST");
+    }
+
     public void testTryCatch() {
 
         if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
@@ -3028,7 +3151,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         }
     }
 
-    private static class RetryFunction implements Function<Object, StreamChannel<String>> {
+    private static class RetryFunction implements Function<Object, StreamChannel<Object, String>> {
 
         private final Activity mActivity;
 
@@ -3041,8 +3164,9 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
             mRoutine = routine;
         }
 
-        private static StreamChannel<String> apply(final Object o, @NotNull final Activity activity,
-                @NotNull final Routine<Object, String> routine, @NotNull final int[] count) {
+        private static StreamChannel<Object, String> apply(final Object o,
+                @NotNull final Activity activity, @NotNull final Routine<Object, String> routine,
+                @NotNull final int[] count) {
 
             return LoaderStreams.streamOf(o)
                                 .with(loaderFrom(activity))
@@ -3067,7 +3191,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
 
         }
 
-        public StreamChannel<String> apply(final Object o) {
+        public StreamChannel<Object, String> apply(final Object o) {
 
             final int[] count = {0};
             return apply(o, mActivity, mRoutine, count);

@@ -72,14 +72,15 @@ import static com.github.dm.jrt.function.Functions.wrap;
  * @param <OUT> the output data type.
  */
 class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN, OUT>
-        implements LoaderStreamChannelCompat<OUT>, Configurable<LoaderStreamChannelCompat<OUT>> {
+        implements LoaderStreamChannelCompat<IN, OUT>,
+        Configurable<LoaderStreamChannelCompat<IN, OUT>> {
 
-    private final InvocationConfiguration.Configurable<LoaderStreamChannelCompat<OUT>>
+    private final InvocationConfiguration.Configurable<LoaderStreamChannelCompat<IN, OUT>>
             mInvocationConfigurable =
-            new InvocationConfiguration.Configurable<LoaderStreamChannelCompat<OUT>>() {
+            new InvocationConfiguration.Configurable<LoaderStreamChannelCompat<IN, OUT>>() {
 
                 @NotNull
-                public LoaderStreamChannelCompat<OUT> apply(
+                public LoaderStreamChannelCompat<IN, OUT> apply(
                         @NotNull final InvocationConfiguration configuration) {
 
                     DefaultLoaderStreamChannelCompat.super.invocationConfiguration()
@@ -90,12 +91,12 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
                 }
             };
 
-    private final InvocationConfiguration.Configurable<LoaderStreamChannelCompat<OUT>>
+    private final InvocationConfiguration.Configurable<LoaderStreamChannelCompat<IN, OUT>>
             mStreamInvocationConfigurable =
-            new InvocationConfiguration.Configurable<LoaderStreamChannelCompat<OUT>>() {
+            new InvocationConfiguration.Configurable<LoaderStreamChannelCompat<IN, OUT>>() {
 
                 @NotNull
-                public LoaderStreamChannelCompat<OUT> apply(
+                public LoaderStreamChannelCompat<IN, OUT> apply(
                         @NotNull final InvocationConfiguration configuration) {
 
                     DefaultLoaderStreamChannelCompat.super.streamInvocationConfiguration()
@@ -112,11 +113,11 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
     private LoaderConfiguration mStreamConfiguration;
 
-    private final Configurable<LoaderStreamChannelCompat<OUT>> mStreamConfigurable =
-            new Configurable<LoaderStreamChannelCompat<OUT>>() {
+    private final Configurable<LoaderStreamChannelCompat<IN, OUT>> mStreamConfigurable =
+            new Configurable<LoaderStreamChannelCompat<IN, OUT>>() {
 
                 @NotNull
-                public LoaderStreamChannelCompat<OUT> apply(
+                public LoaderStreamChannelCompat<IN, OUT> apply(
                         @NotNull final LoaderConfiguration configuration) {
 
                     mStreamConfiguration = configuration;
@@ -163,6 +164,15 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
                 ConstantConditions.notNull("loader configuration", loaderConfiguration);
     }
 
+    private static void checkStatic(@NotNull final String name, @NotNull final Object obj) {
+
+        if (!Reflection.hasStaticScope(obj)) {
+            throw new IllegalArgumentException(
+                    "the " + name + " instance does not have a static scope: " + obj.getClass()
+                                                                                    .getName());
+        }
+    }
+
     private static void checkStatic(@NotNull final Wrapper wrapper,
             @NotNull final Object function) {
 
@@ -175,537 +185,598 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> afterMax(@NotNull final UnitDuration timeout) {
+    public LoaderStreamChannelCompat<IN, OUT> afterMax(@NotNull final UnitDuration timeout) {
 
-        return (LoaderStreamChannelCompat<OUT>) super.afterMax(timeout);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.afterMax(timeout);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> afterMax(final long timeout,
+    public LoaderStreamChannelCompat<IN, OUT> afterMax(final long timeout,
             @NotNull final TimeUnit timeUnit) {
 
-        return (LoaderStreamChannelCompat<OUT>) super.afterMax(timeout, timeUnit);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.afterMax(timeout, timeUnit);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> allInto(@NotNull final Collection<? super OUT> results) {
+    public LoaderStreamChannelCompat<IN, OUT> allInto(
+            @NotNull final Collection<? super OUT> results) {
 
-        return (LoaderStreamChannelCompat<OUT>) super.allInto(results);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.allInto(results);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> bind(
+    public LoaderStreamChannelCompat<IN, OUT> bind(
             @NotNull final OutputConsumer<? super OUT> consumer) {
 
-        return (LoaderStreamChannelCompat<OUT>) super.bind(consumer);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.bind(consumer);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> eventuallyAbort() {
+    public LoaderStreamChannelCompat<IN, OUT> eventuallyAbort() {
 
-        return (LoaderStreamChannelCompat<OUT>) super.eventuallyAbort();
+        return (LoaderStreamChannelCompat<IN, OUT>) super.eventuallyAbort();
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> eventuallyAbort(@Nullable final Throwable reason) {
+    public LoaderStreamChannelCompat<IN, OUT> eventuallyAbort(@Nullable final Throwable reason) {
 
-        return (LoaderStreamChannelCompat<OUT>) super.eventuallyAbort(reason);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.eventuallyAbort(reason);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> eventuallyExit() {
+    public LoaderStreamChannelCompat<IN, OUT> eventuallyExit() {
 
-        return (LoaderStreamChannelCompat<OUT>) super.eventuallyExit();
+        return (LoaderStreamChannelCompat<IN, OUT>) super.eventuallyExit();
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> eventuallyThrow() {
+    public LoaderStreamChannelCompat<IN, OUT> eventuallyThrow() {
 
-        return (LoaderStreamChannelCompat<OUT>) super.eventuallyThrow();
+        return (LoaderStreamChannelCompat<IN, OUT>) super.eventuallyThrow();
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> immediately() {
+    public LoaderStreamChannelCompat<IN, OUT> immediately() {
 
-        return (LoaderStreamChannelCompat<OUT>) super.immediately();
+        return (LoaderStreamChannelCompat<IN, OUT>) super.immediately();
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> skipNext(final int count) {
+    public LoaderStreamChannelCompat<IN, OUT> skipNext(final int count) {
 
-        return (LoaderStreamChannelCompat<OUT>) super.skipNext(count);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.skipNext(count);
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannelCompat<AFTER> apply(
-            @NotNull final Function<? super StreamChannel<OUT>, ? extends OutputChannel<AFTER>>
-                    function) {
+    public LoaderStreamChannelCompat<IN, OUT> async() {
 
-        return (LoaderStreamChannelCompat<AFTER>) super.apply(function);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.async();
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> async() {
-
-        return (LoaderStreamChannelCompat<OUT>) super.async();
-    }
-
-    @NotNull
-    @Override
-    public LoaderStreamChannelCompat<OUT> backPressureOn(@Nullable final Runner runner,
+    public LoaderStreamChannelCompat<IN, OUT> backPressureOn(@Nullable final Runner runner,
             final int maxInputs, final long maxDelay, @NotNull final TimeUnit timeUnit) {
 
-        return (LoaderStreamChannelCompat<OUT>) super.backPressureOn(runner, maxInputs, maxDelay,
-                timeUnit);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.backPressureOn(runner, maxInputs,
+                maxDelay, timeUnit);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> backPressureOn(@Nullable final Runner runner,
+    public LoaderStreamChannelCompat<IN, OUT> backPressureOn(@Nullable final Runner runner,
             final int maxInputs, @Nullable final UnitDuration maxDelay) {
 
-        return (LoaderStreamChannelCompat<OUT>) super.backPressureOn(runner, maxInputs, maxDelay);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.backPressureOn(runner, maxInputs,
+                maxDelay);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> collect(
+    public LoaderStreamChannelCompat<IN, OUT> collect(
             @NotNull final BiConsumer<? super OUT, ? super OUT> consumer) {
 
         checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannelCompat<OUT>) super.collect(consumer);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.collect(consumer);
     }
 
     @NotNull
     @Override
-    public <AFTER extends Collection<? super OUT>> LoaderStreamChannelCompat<AFTER> collect(
+    public <AFTER extends Collection<? super OUT>> LoaderStreamChannelCompat<IN, AFTER> collect(
             @NotNull final Supplier<? extends AFTER> supplier) {
 
         checkStatic(wrap(supplier), supplier);
-        return (LoaderStreamChannelCompat<AFTER>) super.collect(supplier);
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.collect(supplier);
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannelCompat<AFTER> collect(
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> collect(
             @NotNull final Supplier<? extends AFTER> supplier,
             @NotNull final BiConsumer<? super AFTER, ? super OUT> consumer) {
 
         checkStatic(wrap(supplier), supplier);
         checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannelCompat<AFTER>) super.collect(supplier, consumer);
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.collect(supplier, consumer);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> concat(@Nullable final OUT output) {
+    public LoaderStreamChannelCompat<IN, OUT> concat(@Nullable final OUT output) {
 
-        return (LoaderStreamChannelCompat<OUT>) super.concat(output);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.concat(output);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> concat(@Nullable final OUT... outputs) {
+    public LoaderStreamChannelCompat<IN, OUT> concat(@Nullable final OUT... outputs) {
 
-        return (LoaderStreamChannelCompat<OUT>) super.concat(outputs);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.concat(outputs);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> concat(@Nullable final Iterable<? extends OUT> outputs) {
+    public LoaderStreamChannelCompat<IN, OUT> concat(
+            @Nullable final Iterable<? extends OUT> outputs) {
 
-        return (LoaderStreamChannelCompat<OUT>) super.concat(outputs);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.concat(outputs);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> concat(
+    public LoaderStreamChannelCompat<IN, OUT> concat(
             @NotNull final OutputChannel<? extends OUT> channel) {
 
-        return (LoaderStreamChannelCompat<OUT>) super.concat(channel);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.concat(channel);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> filter(@NotNull final Predicate<? super OUT> predicate) {
+    public LoaderStreamChannelCompat<IN, OUT> filter(
+            @NotNull final Predicate<? super OUT> predicate) {
 
         checkStatic(wrap(predicate), predicate);
-        return (LoaderStreamChannelCompat<OUT>) super.filter(predicate);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.filter(predicate);
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannelCompat<AFTER> flatMap(
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> flatMap(
             @NotNull final Function<? super OUT, ? extends OutputChannel<? extends AFTER>>
                     function) {
 
         checkStatic(wrap(function), function);
-        return (LoaderStreamChannelCompat<AFTER>) super.flatMap(function);
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.flatMap(function);
     }
 
     @NotNull
     @Override
-    public InvocationConfiguration.Builder<? extends LoaderStreamChannelCompat<OUT>>
+    public InvocationConfiguration.Builder<? extends LoaderStreamChannelCompat<IN, OUT>>
     invocationConfiguration() {
 
         final InvocationConfiguration config = getConfiguration();
-        return new InvocationConfiguration.Builder<LoaderStreamChannelCompat<OUT>>(
+        return new InvocationConfiguration.Builder<LoaderStreamChannelCompat<IN, OUT>>(
                 mInvocationConfigurable, config);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> limit(final int count) {
+    public LoaderStreamChannelCompat<IN, OUT> limit(final int count) {
 
-        return (LoaderStreamChannelCompat<OUT>) super.limit(count);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.limit(count);
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannelCompat<AFTER> map(
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> map(
             @NotNull final BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer) {
 
         checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannelCompat<AFTER>) super.map(consumer);
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.map(consumer);
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannelCompat<AFTER> map(
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> map(
             @NotNull final Function<? super OUT, ? extends AFTER> function) {
 
         checkStatic(wrap(function), function);
-        return (LoaderStreamChannelCompat<AFTER>) super.map(function);
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.map(function);
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannelCompat<AFTER> map(
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> map(
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
 
-        if (!Reflection.hasStaticScope(factory)) {
-            throw new IllegalArgumentException(
-                    "the factory instance does not have a static scope: " + factory.getClass()
-                                                                                   .getName());
-        }
-
-        return (LoaderStreamChannelCompat<AFTER>) super.map(factory);
+        checkStatic("factory", factory);
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.map(factory);
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannelCompat<AFTER> map(
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> map(
             @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
 
-        return (LoaderStreamChannelCompat<AFTER>) super.map(routine);
+        checkStatic("routine", routine);
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.map(routine);
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannelCompat<AFTER> mapAll(
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> mapAll(
             @NotNull final BiConsumer<? super List<OUT>, ? super ResultChannel<AFTER>> consumer) {
 
         checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannelCompat<AFTER>) super.mapAll(consumer);
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.mapAll(consumer);
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannelCompat<AFTER> mapAll(
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> mapAll(
             @NotNull final Function<? super List<OUT>, ? extends AFTER> function) {
 
         checkStatic(wrap(function), function);
-        return (LoaderStreamChannelCompat<AFTER>) super.mapAll(function);
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.mapAll(function);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> onError(
+    public LoaderStreamChannelCompat<IN, OUT> onError(
             @NotNull final Consumer<? super RoutineException> consumer) {
 
         checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannelCompat<OUT>) super.onError(consumer);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.onError(consumer);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<Void> onOutput(@NotNull final Consumer<? super OUT> consumer) {
+    public LoaderStreamChannelCompat<IN, Void> onOutput(
+            @NotNull final Consumer<? super OUT> consumer) {
 
         checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannelCompat<Void>) super.onOutput(consumer);
+        return (LoaderStreamChannelCompat<IN, Void>) super.onOutput(consumer);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> orElse(@Nullable final OUT output) {
+    public LoaderStreamChannelCompat<IN, OUT> orElse(@Nullable final OUT output) {
 
-        return (LoaderStreamChannelCompat<OUT>) super.orElse(output);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.orElse(output);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> orElse(@Nullable final OUT... outputs) {
+    public LoaderStreamChannelCompat<IN, OUT> orElse(@Nullable final OUT... outputs) {
 
-        return (LoaderStreamChannelCompat<OUT>) super.orElse(outputs);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.orElse(outputs);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> orElse(@Nullable final Iterable<? extends OUT> outputs) {
+    public LoaderStreamChannelCompat<IN, OUT> orElse(
+            @Nullable final Iterable<? extends OUT> outputs) {
 
-        return (LoaderStreamChannelCompat<OUT>) super.orElse(outputs);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.orElse(outputs);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> orElseGet(final long count,
+    public LoaderStreamChannelCompat<IN, OUT> orElseGet(final long count,
             @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
 
         checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannelCompat<OUT>) super.orElseGet(count, consumer);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.orElseGet(count, consumer);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> orElseGet(
+    public LoaderStreamChannelCompat<IN, OUT> orElseGet(
             @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
 
         checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannelCompat<OUT>) super.orElseGet(consumer);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.orElseGet(consumer);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> orElseGet(final long count,
+    public LoaderStreamChannelCompat<IN, OUT> orElseGet(final long count,
             @NotNull final Supplier<? extends OUT> supplier) {
 
         checkStatic(wrap(supplier), supplier);
-        return (LoaderStreamChannelCompat<OUT>) super.orElseGet(count, supplier);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.orElseGet(count, supplier);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> orElseGet(
+    public LoaderStreamChannelCompat<IN, OUT> orElseGet(
             @NotNull final Supplier<? extends OUT> supplier) {
 
         checkStatic(wrap(supplier), supplier);
-        return (LoaderStreamChannelCompat<OUT>) super.orElseGet(supplier);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.orElseGet(supplier);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> ordered(@Nullable final OrderType orderType) {
+    public LoaderStreamChannelCompat<IN, OUT> ordered(@Nullable final OrderType orderType) {
 
-        return (LoaderStreamChannelCompat<OUT>) super.ordered(orderType);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.ordered(orderType);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> parallel(final int maxInvocations) {
+    public LoaderStreamChannelCompat<IN, OUT> parallel() {
 
-        return (LoaderStreamChannelCompat<OUT>) super.parallel(maxInvocations);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.parallel();
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> parallel() {
+    public LoaderStreamChannelCompat<IN, OUT> parallel(final int maxInvocations) {
 
-        return (LoaderStreamChannelCompat<OUT>) super.parallel();
+        return (LoaderStreamChannelCompat<IN, OUT>) super.parallel(maxInvocations);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> peek(@NotNull final Consumer<? super OUT> consumer) {
+    public LoaderStreamChannelCompat<IN, OUT> peek(@NotNull final Consumer<? super OUT> consumer) {
 
         checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannelCompat<OUT>) super.peek(consumer);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.peek(consumer);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> reduce(
+    public LoaderStreamChannelCompat<IN, OUT> reduce(
             @NotNull final BiFunction<? super OUT, ? super OUT, ? extends OUT> function) {
 
         checkStatic(wrap(function), function);
-        return (LoaderStreamChannelCompat<OUT>) super.reduce(function);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.reduce(function);
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannelCompat<AFTER> reduce(
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> reduce(
             @NotNull final Supplier<? extends AFTER> supplier,
             @NotNull final BiFunction<? super AFTER, ? super OUT, ? extends AFTER> function) {
 
         checkStatic(wrap(supplier), supplier);
         checkStatic(wrap(function), function);
-        return (LoaderStreamChannelCompat<AFTER>) super.reduce(supplier, function);
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.reduce(supplier, function);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> repeat() {
+    public LoaderStreamChannelCompat<IN, OUT> repeat() {
 
-        return (LoaderStreamChannelCompat<OUT>) super.repeat();
+        return (LoaderStreamChannelCompat<IN, OUT>) super.repeat();
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> runOn(@Nullable final Runner runner) {
+    public LoaderStreamChannelCompat<IN, OUT> runOn(@Nullable final Runner runner) {
 
-        return (LoaderStreamChannelCompat<OUT>) super.runOn(runner);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.runOn(runner);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> runOnShared() {
+    public LoaderStreamChannelCompat<IN, OUT> runOnShared() {
 
-        return (LoaderStreamChannelCompat<OUT>) super.runOnShared();
+        return (LoaderStreamChannelCompat<IN, OUT>) super.runOnShared();
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> serial() {
+    public LoaderStreamChannelCompat<IN, OUT> serial() {
 
-        return (LoaderStreamChannelCompat<OUT>) super.serial();
+        return (LoaderStreamChannelCompat<IN, OUT>) super.serial();
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> skip(final int count) {
+    public LoaderStreamChannelCompat<IN, OUT> skip(final int count) {
 
-        return (LoaderStreamChannelCompat<OUT>) super.skip(count);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.skip(count);
     }
 
     @NotNull
     @Override
-    public InvocationConfiguration.Builder<? extends LoaderStreamChannelCompat<OUT>>
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(
+            @NotNull final Function<? super OUT, ?> key,
+            @NotNull final Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<?
+                    super OUT, ? extends AFTER>> function) {
+
+        checkStatic(wrap(key), key);
+        checkStatic(wrap(function), function);
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.splitBy(key, function);
+    }
+
+    @NotNull
+    @Override
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(
+            @NotNull final Function<? super OUT, ?> key,
+            @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
+
+        checkStatic(wrap(key), key);
+        checkStatic("factory", factory);
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.splitBy(key, factory);
+    }
+
+    @NotNull
+    @Override
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(
+            @NotNull final Function<? super OUT, ?> key,
+            @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
+
+        checkStatic(wrap(key), key);
+        checkStatic("routine", routine);
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.splitBy(key, routine);
+    }
+
+    @NotNull
+    @Override
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(final int count,
+            @NotNull final Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<?
+                    super OUT, ? extends AFTER>> function) {
+
+        checkStatic(wrap(function), function);
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.splitBy(count, function);
+    }
+
+    @NotNull
+    @Override
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(final int count,
+            @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
+
+        checkStatic("factory", factory);
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.splitBy(count, factory);
+    }
+
+    @NotNull
+    @Override
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(final int count,
+            @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
+
+        checkStatic("routine", routine);
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.splitBy(count, routine);
+    }
+
+    @NotNull
+    @Override
+    public InvocationConfiguration.Builder<? extends LoaderStreamChannelCompat<IN, OUT>>
     streamInvocationConfiguration() {
 
         final InvocationConfiguration config = getStreamConfiguration();
-        return new InvocationConfiguration.Builder<LoaderStreamChannelCompat<OUT>>(
+        return new InvocationConfiguration.Builder<LoaderStreamChannelCompat<IN, OUT>>(
                 mStreamInvocationConfigurable, config);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> sync() {
+    public LoaderStreamChannelCompat<IN, OUT> sync() {
 
-        return (LoaderStreamChannelCompat<OUT>) super.sync();
+        return (LoaderStreamChannelCompat<IN, OUT>) super.sync();
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannelCompat<AFTER> then(@Nullable final AFTER output) {
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> then(@Nullable final AFTER output) {
 
-        return (LoaderStreamChannelCompat<AFTER>) super.then(output);
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.then(output);
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannelCompat<AFTER> then(@Nullable final AFTER... outputs) {
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> then(@Nullable final AFTER... outputs) {
 
-        return (LoaderStreamChannelCompat<AFTER>) super.then(outputs);
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.then(outputs);
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannelCompat<AFTER> then(
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> then(
             @Nullable final Iterable<? extends AFTER> outputs) {
 
-        return (LoaderStreamChannelCompat<AFTER>) super.then(outputs);
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.then(outputs);
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannelCompat<AFTER> thenGet(final long count,
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> thenGet(final long count,
             @NotNull final Consumer<? super ResultChannel<AFTER>> consumer) {
 
         checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannelCompat<AFTER>) super.thenGet(count, consumer);
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.thenGet(count, consumer);
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannelCompat<AFTER> thenGet(
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> thenGet(
             @NotNull final Consumer<? super ResultChannel<AFTER>> consumer) {
 
         checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannelCompat<AFTER>) super.thenGet(consumer);
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.thenGet(consumer);
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannelCompat<AFTER> thenGet(final long count,
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> thenGet(final long count,
             @NotNull final Supplier<? extends AFTER> supplier) {
 
         checkStatic(wrap(supplier), supplier);
-        return (LoaderStreamChannelCompat<AFTER>) super.thenGet(count, supplier);
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.thenGet(count, supplier);
     }
 
     @NotNull
     @Override
-    public <AFTER> LoaderStreamChannelCompat<AFTER> thenGet(
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> thenGet(
             @NotNull final Supplier<? extends AFTER> supplier) {
 
         checkStatic(wrap(supplier), supplier);
-        return (LoaderStreamChannelCompat<AFTER>) super.thenGet(supplier);
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.thenGet(supplier);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<? extends ParcelableSelectable<OUT>> toSelectable(
+    public LoaderStreamChannelCompat<IN, ? extends ParcelableSelectable<OUT>> toSelectable(
             final int index) {
 
         return newChannel(getStreamConfiguration(), getInvocationMode(), getSourceChannel(),
-                getInvoke().andThen(new SelectableInvoke<OUT>(buildChannelConfiguration(), index)));
+                getBind().andThen(new SelectableInvoke<OUT>(buildChannelConfiguration(), index)));
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> tryCatch(
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> transform(
+            @NotNull final Function<? extends Function<? super OutputChannel<IN>, ? extends
+                    OutputChannel<OUT>>, ? extends Function<? super OutputChannel<IN>, ? extends
+                    OutputChannel<AFTER>>> function) {
+
+        checkStatic(wrap(function), function);
+        return (LoaderStreamChannelCompat<IN, AFTER>) super.transform(function);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannelCompat<IN, OUT> tryCatch(
             @NotNull final BiConsumer<? super RoutineException, ? super InputChannel<OUT>>
                     consumer) {
 
         checkStatic(wrap(consumer), consumer);
-        return (LoaderStreamChannelCompat<OUT>) super.tryCatch(consumer);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.tryCatch(consumer);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> tryCatch(
+    public LoaderStreamChannelCompat<IN, OUT> tryCatch(
             @NotNull final Function<? super RoutineException, ? extends OUT> function) {
 
         checkStatic(wrap(function), function);
-        return (LoaderStreamChannelCompat<OUT>) super.tryCatch(function);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.tryCatch(function);
     }
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<OUT> tryFinally(@NotNull final Runnable runnable) {
+    public LoaderStreamChannelCompat<IN, OUT> tryFinally(@NotNull final Runnable runnable) {
 
-        if (!Reflection.hasStaticScope(runnable)) {
-            throw new IllegalArgumentException(
-                    "the runnable instance does not have a static scope: " + runnable.getClass()
-                                                                                     .getName());
-        }
-
-        return (LoaderStreamChannelCompat<OUT>) super.tryFinally(runnable);
+        checkStatic("runnable", runnable);
+        return (LoaderStreamChannelCompat<IN, OUT>) super.tryFinally(runnable);
     }
 
     @NotNull
     @Override
-    protected <BEFORE, AFTER> LoaderStreamChannelCompat<AFTER> newChannel(
+    protected <BEFORE, AFTER> LoaderStreamChannelCompat<BEFORE, AFTER> newChannel(
             @NotNull final InvocationConfiguration streamConfiguration,
             @NotNull final InvocationMode invocationMode,
             @NotNull final OutputChannel<BEFORE> sourceChannel,
@@ -725,33 +796,42 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     }
 
     @NotNull
-    public LoaderStreamChannelCompat<OUT> cache(@Nullable final CacheStrategyType strategyType) {
+    public <BEFORE, AFTER> LoaderStreamChannelCompat<BEFORE, AFTER> applyLoader(
+            @NotNull final Function<? super LoaderStreamChannelCompat<IN, OUT>, ? extends
+                    LoaderStreamChannelCompat<BEFORE, AFTER>> function) {
+
+        return ConstantConditions.notNull("transformed stream", function.apply(this));
+    }
+
+    @NotNull
+    public LoaderStreamChannelCompat<IN, OUT> cache(
+            @Nullable final CacheStrategyType strategyType) {
 
         return loaderConfiguration().withCacheStrategy(strategyType).apply();
     }
 
     @NotNull
-    public LoaderStreamChannelCompat<OUT> factoryId(final int factoryId) {
+    public LoaderStreamChannelCompat<IN, OUT> factoryId(final int factoryId) {
 
         return loaderConfiguration().withFactoryId(factoryId).apply();
     }
 
     @NotNull
-    public LoaderConfiguration.Builder<? extends LoaderStreamChannelCompat<OUT>>
+    public LoaderConfiguration.Builder<? extends LoaderStreamChannelCompat<IN, OUT>>
     loaderConfiguration() {
 
         final LoaderConfiguration config = mConfiguration;
-        return new LoaderConfiguration.Builder<LoaderStreamChannelCompat<OUT>>(this, config);
+        return new LoaderConfiguration.Builder<LoaderStreamChannelCompat<IN, OUT>>(this, config);
     }
 
     @NotNull
-    public LoaderStreamChannelCompat<OUT> loaderId(final int loaderId) {
+    public LoaderStreamChannelCompat<IN, OUT> loaderId(final int loaderId) {
 
         return loaderConfiguration().withLoaderId(loaderId).apply();
     }
 
     @NotNull
-    public <AFTER> LoaderStreamChannelCompat<AFTER> map(
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> map(
             @NotNull final ContextInvocationFactory<? super OUT, ? extends AFTER> factory) {
 
         final LoaderBuilderCompat contextBuilder = mContextBuilder;
@@ -770,29 +850,71 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     }
 
     @NotNull
-    public LoaderStreamChannelCompat<OUT> staleAfter(@Nullable final UnitDuration staleTime) {
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(
+            @NotNull final Function<? super OUT, ?> key,
+            @NotNull final ContextInvocationFactory<? super OUT, ? extends AFTER> factory) {
+
+        final LoaderBuilderCompat contextBuilder = mContextBuilder;
+        if (contextBuilder == null) {
+            throw new IllegalStateException("the loader context is null");
+        }
+
+        checkStatic(wrap(key), key);
+        checkStatic("factory", factory);
+        return splitBy(key, contextBuilder.on(factory)
+                                          .invocationConfiguration()
+                                          .with(buildConfiguration())
+                                          .apply()
+                                          .loaderConfiguration()
+                                          .with(buildLoaderConfiguration())
+                                          .apply()
+                                          .buildRoutine());
+    }
+
+    @NotNull
+    public <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(final int count,
+            @NotNull final ContextInvocationFactory<? super OUT, ? extends AFTER> factory) {
+
+        final LoaderBuilderCompat contextBuilder = mContextBuilder;
+        if (contextBuilder == null) {
+            throw new IllegalStateException("the loader context is null");
+        }
+
+        checkStatic("factory", factory);
+        return splitBy(count, contextBuilder.on(factory)
+                                            .invocationConfiguration()
+                                            .with(buildConfiguration())
+                                            .apply()
+                                            .loaderConfiguration()
+                                            .with(buildLoaderConfiguration())
+                                            .apply()
+                                            .buildRoutine());
+    }
+
+    @NotNull
+    public LoaderStreamChannelCompat<IN, OUT> staleAfter(@Nullable final UnitDuration staleTime) {
 
         return loaderConfiguration().withResultStaleTime(staleTime).apply();
     }
 
     @NotNull
-    public LoaderStreamChannelCompat<OUT> staleAfter(final long time,
+    public LoaderStreamChannelCompat<IN, OUT> staleAfter(final long time,
             @NotNull final TimeUnit timeUnit) {
 
         return loaderConfiguration().withResultStaleTime(time, timeUnit).apply();
     }
 
     @NotNull
-    public LoaderConfiguration.Builder<? extends LoaderStreamChannelCompat<OUT>>
+    public LoaderConfiguration.Builder<? extends LoaderStreamChannelCompat<IN, OUT>>
     streamLoaderConfiguration() {
 
         final LoaderConfiguration config = mStreamConfiguration;
-        return new LoaderConfiguration.Builder<LoaderStreamChannelCompat<OUT>>(mStreamConfigurable,
-                config);
+        return new LoaderConfiguration.Builder<LoaderStreamChannelCompat<IN, OUT>>(
+                mStreamConfigurable, config);
     }
 
     @NotNull
-    public LoaderStreamChannelCompat<OUT> with(@Nullable final LoaderContextCompat context) {
+    public LoaderStreamChannelCompat<IN, OUT> with(@Nullable final LoaderContextCompat context) {
 
         mContextBuilder = (context != null) ? JRoutineLoaderCompat.with(context) : null;
         return this;
@@ -805,7 +927,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     }
 
     @NotNull
-    private <BEFORE, AFTER> LoaderStreamChannelCompat<AFTER> newChannel(
+    private <BEFORE, AFTER> LoaderStreamChannelCompat<BEFORE, AFTER> newChannel(
             @NotNull final InvocationConfiguration invocationConfiguration,
             @NotNull final LoaderConfiguration loaderConfiguration,
             @NotNull final InvocationMode invocationMode,
@@ -885,7 +1007,8 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     }
 
     @NotNull
-    public LoaderStreamChannelCompat<OUT> apply(@NotNull final LoaderConfiguration configuration) {
+    public LoaderStreamChannelCompat<IN, OUT> apply(
+            @NotNull final LoaderConfiguration configuration) {
 
         mConfiguration = ConstantConditions.notNull("loader configuration", configuration);
         return this;

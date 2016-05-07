@@ -63,415 +63,479 @@ import java.util.concurrent.TimeUnit;
  *
  * @param <OUT> the output data type.
  */
-public interface LoaderStreamChannelCompat<OUT>
-        extends StreamChannel<OUT>, LoaderConfigurableBuilder<LoaderStreamChannelCompat<OUT>> {
+public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OUT>,
+        LoaderConfigurableBuilder<LoaderStreamChannelCompat<IN, OUT>> {
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> afterMax(@NotNull UnitDuration timeout);
+    LoaderStreamChannelCompat<IN, OUT> afterMax(@NotNull UnitDuration timeout);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> afterMax(long timeout, @NotNull TimeUnit timeUnit);
+    LoaderStreamChannelCompat<IN, OUT> afterMax(long timeout, @NotNull TimeUnit timeUnit);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> allInto(@NotNull Collection<? super OUT> results);
+    LoaderStreamChannelCompat<IN, OUT> allInto(@NotNull Collection<? super OUT> results);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> bind(@NotNull OutputConsumer<? super OUT> consumer);
+    LoaderStreamChannelCompat<IN, OUT> bind(@NotNull OutputConsumer<? super OUT> consumer);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> eventuallyAbort();
+    LoaderStreamChannelCompat<IN, OUT> eventuallyAbort();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> eventuallyAbort(@Nullable Throwable reason);
+    LoaderStreamChannelCompat<IN, OUT> eventuallyAbort(@Nullable Throwable reason);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> eventuallyExit();
+    LoaderStreamChannelCompat<IN, OUT> eventuallyExit();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> eventuallyThrow();
+    LoaderStreamChannelCompat<IN, OUT> eventuallyThrow();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> immediately();
+    LoaderStreamChannelCompat<IN, OUT> immediately();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> skipNext(int count);
+    LoaderStreamChannelCompat<IN, OUT> skipNext(int count);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannelCompat<AFTER> apply(
-            @NotNull Function<? super StreamChannel<OUT>, ? extends OutputChannel<AFTER>> function);
+    LoaderStreamChannelCompat<IN, OUT> async();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> async();
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    LoaderStreamChannelCompat<OUT> backPressureOn(@Nullable Runner runner, int maxInputs,
+    LoaderStreamChannelCompat<IN, OUT> backPressureOn(@Nullable Runner runner, int maxInputs,
             long maxDelay, @NotNull TimeUnit timeUnit);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> backPressureOn(@Nullable Runner runner, int maxInputs,
+    LoaderStreamChannelCompat<IN, OUT> backPressureOn(@Nullable Runner runner, int maxInputs,
             @Nullable UnitDuration maxDelay);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> collect(@NotNull BiConsumer<? super OUT, ? super OUT> consumer);
+    LoaderStreamChannelCompat<IN, OUT> collect(
+            @NotNull BiConsumer<? super OUT, ? super OUT> consumer);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER extends Collection<? super OUT>> LoaderStreamChannelCompat<AFTER> collect(
+    <AFTER extends Collection<? super OUT>> LoaderStreamChannelCompat<IN, AFTER> collect(
             @NotNull Supplier<? extends AFTER> supplier);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannelCompat<AFTER> collect(@NotNull Supplier<? extends AFTER> supplier,
+    <AFTER> LoaderStreamChannelCompat<IN, AFTER> collect(
+            @NotNull Supplier<? extends AFTER> supplier,
             @NotNull BiConsumer<? super AFTER, ? super OUT> consumer);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> concat(@Nullable OUT output);
+    LoaderStreamChannelCompat<IN, OUT> concat(@Nullable OUT output);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> concat(@Nullable OUT... outputs);
+    LoaderStreamChannelCompat<IN, OUT> concat(@Nullable OUT... outputs);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> concat(@Nullable Iterable<? extends OUT> outputs);
+    LoaderStreamChannelCompat<IN, OUT> concat(@Nullable Iterable<? extends OUT> outputs);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> concat(@NotNull OutputChannel<? extends OUT> channel);
+    LoaderStreamChannelCompat<IN, OUT> concat(@NotNull OutputChannel<? extends OUT> channel);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> filter(@NotNull Predicate<? super OUT> predicate);
+    LoaderStreamChannelCompat<IN, OUT> filter(@NotNull Predicate<? super OUT> predicate);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannelCompat<AFTER> flatMap(
+    <AFTER> LoaderStreamChannelCompat<IN, AFTER> flatMap(
             @NotNull Function<? super OUT, ? extends OutputChannel<? extends AFTER>> function);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    InvocationConfiguration.Builder<? extends LoaderStreamChannelCompat<OUT>>
+    InvocationConfiguration.Builder<? extends LoaderStreamChannelCompat<IN, OUT>>
     invocationConfiguration();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> limit(int count);
+    LoaderStreamChannelCompat<IN, OUT> limit(int count);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannelCompat<AFTER> map(
+    <AFTER> LoaderStreamChannelCompat<IN, AFTER> map(
             @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannelCompat<AFTER> map(
+    <AFTER> LoaderStreamChannelCompat<IN, AFTER> map(
             @NotNull Function<? super OUT, ? extends AFTER> function);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannelCompat<AFTER> map(
+    <AFTER> LoaderStreamChannelCompat<IN, AFTER> map(
             @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannelCompat<AFTER> map(
+    <AFTER> LoaderStreamChannelCompat<IN, AFTER> map(
             @NotNull Routine<? super OUT, ? extends AFTER> routine);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannelCompat<AFTER> mapAll(
+    <AFTER> LoaderStreamChannelCompat<IN, AFTER> mapAll(
             @NotNull BiConsumer<? super List<OUT>, ? super ResultChannel<AFTER>> consumer);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannelCompat<AFTER> mapAll(
+    <AFTER> LoaderStreamChannelCompat<IN, AFTER> mapAll(
             @NotNull Function<? super List<OUT>, ? extends AFTER> function);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> onError(@NotNull Consumer<? super RoutineException> consumer);
+    LoaderStreamChannelCompat<IN, OUT> onError(
+            @NotNull Consumer<? super RoutineException> consumer);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<Void> onOutput(@NotNull Consumer<? super OUT> consumer);
+    LoaderStreamChannelCompat<IN, Void> onOutput(@NotNull Consumer<? super OUT> consumer);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> orElse(@Nullable OUT output);
+    LoaderStreamChannelCompat<IN, OUT> orElse(@Nullable OUT output);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> orElse(@Nullable OUT... outputs);
+    LoaderStreamChannelCompat<IN, OUT> orElse(@Nullable OUT... outputs);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> orElse(@Nullable Iterable<? extends OUT> outputs);
+    LoaderStreamChannelCompat<IN, OUT> orElse(@Nullable Iterable<? extends OUT> outputs);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> orElseGet(long count,
+    LoaderStreamChannelCompat<IN, OUT> orElseGet(long count,
             @NotNull Consumer<? super ResultChannel<OUT>> consumer);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> orElseGet(
+    LoaderStreamChannelCompat<IN, OUT> orElseGet(
             @NotNull Consumer<? super ResultChannel<OUT>> consumer);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> orElseGet(long count, @NotNull Supplier<? extends OUT> supplier);
+    LoaderStreamChannelCompat<IN, OUT> orElseGet(long count,
+            @NotNull Supplier<? extends OUT> supplier);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> orElseGet(@NotNull Supplier<? extends OUT> supplier);
+    LoaderStreamChannelCompat<IN, OUT> orElseGet(@NotNull Supplier<? extends OUT> supplier);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> ordered(@Nullable OrderType orderType);
+    LoaderStreamChannelCompat<IN, OUT> ordered(@Nullable OrderType orderType);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> parallel(int maxInvocations);
+    LoaderStreamChannelCompat<IN, OUT> parallel();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> parallel();
+    LoaderStreamChannelCompat<IN, OUT> parallel(int maxInvocations);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> peek(@NotNull Consumer<? super OUT> consumer);
+    LoaderStreamChannelCompat<IN, OUT> peek(@NotNull Consumer<? super OUT> consumer);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> reduce(
+    LoaderStreamChannelCompat<IN, OUT> reduce(
             @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannelCompat<AFTER> reduce(@NotNull Supplier<? extends AFTER> supplier,
+    <AFTER> LoaderStreamChannelCompat<IN, AFTER> reduce(@NotNull Supplier<? extends AFTER> supplier,
             @NotNull BiFunction<? super AFTER, ? super OUT, ? extends AFTER> function);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> repeat();
+    LoaderStreamChannelCompat<IN, OUT> repeat();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> runOn(@Nullable Runner runner);
+    LoaderStreamChannelCompat<IN, OUT> runOn(@Nullable Runner runner);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> runOnShared();
+    LoaderStreamChannelCompat<IN, OUT> runOnShared();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> serial();
+    LoaderStreamChannelCompat<IN, OUT> serial();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> skip(int count);
+    LoaderStreamChannelCompat<IN, OUT> skip(int count);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    InvocationConfiguration.Builder<? extends LoaderStreamChannelCompat<OUT>>
+    <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(@NotNull Function<? super OUT, ?> key,
+            @NotNull Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<? super
+                    OUT, ? extends AFTER>> function);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(@NotNull Function<? super OUT, ?> key,
+            @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(@NotNull Function<? super OUT, ?> key,
+            @NotNull Routine<? super OUT, ? extends AFTER> routine);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(int count,
+            @NotNull Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<? super
+                    OUT, ? extends AFTER>> function);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(int count,
+            @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(int count,
+            @NotNull Routine<? super OUT, ? extends AFTER> routine);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    InvocationConfiguration.Builder<? extends LoaderStreamChannelCompat<IN, OUT>>
     streamInvocationConfiguration();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> sync();
+    LoaderStreamChannelCompat<IN, OUT> sync();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannelCompat<AFTER> then(@Nullable AFTER output);
+    <AFTER> LoaderStreamChannelCompat<IN, AFTER> then(@Nullable AFTER output);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannelCompat<AFTER> then(@Nullable AFTER... outputs);
+    <AFTER> LoaderStreamChannelCompat<IN, AFTER> then(@Nullable AFTER... outputs);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannelCompat<AFTER> then(@Nullable Iterable<? extends AFTER> outputs);
+    <AFTER> LoaderStreamChannelCompat<IN, AFTER> then(@Nullable Iterable<? extends AFTER> outputs);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannelCompat<AFTER> thenGet(long count,
+    <AFTER> LoaderStreamChannelCompat<IN, AFTER> thenGet(long count,
             @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannelCompat<AFTER> thenGet(
+    <AFTER> LoaderStreamChannelCompat<IN, AFTER> thenGet(
             @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannelCompat<AFTER> thenGet(long count,
+    <AFTER> LoaderStreamChannelCompat<IN, AFTER> thenGet(long count,
             @NotNull Supplier<? extends AFTER> supplier);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannelCompat<AFTER> thenGet(@NotNull Supplier<? extends AFTER> supplier);
+    <AFTER> LoaderStreamChannelCompat<IN, AFTER> thenGet(
+            @NotNull Supplier<? extends AFTER> supplier);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<? extends ParcelableSelectable<OUT>> toSelectable(int index);
+    LoaderStreamChannelCompat<IN, ? extends ParcelableSelectable<OUT>> toSelectable(int index);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> tryCatch(
+    <AFTER> LoaderStreamChannelCompat<IN, AFTER> transform(
+            @NotNull Function<? extends Function<? super OutputChannel<IN>, ? extends
+                    OutputChannel<OUT>>, ? extends Function<? super OutputChannel<IN>, ? extends
+                    OutputChannel<AFTER>>> function);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    LoaderStreamChannelCompat<IN, OUT> tryCatch(
             @NotNull BiConsumer<? super RoutineException, ? super InputChannel<OUT>> consumer);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> tryCatch(
+    LoaderStreamChannelCompat<IN, OUT> tryCatch(
             @NotNull Function<? super RoutineException, ? extends OUT> function);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> tryFinally(@NotNull Runnable runnable);
+    LoaderStreamChannelCompat<IN, OUT> tryFinally(@NotNull Runnable runnable);
+
+    /**
+     * Transforms this stream by applying the specified function.
+     *
+     * @param function the transformation function.
+     * @param <BEFORE> the concatenation input type.
+     * @param <AFTER>  the concatenation output type.
+     * @return the transformed stream.
+     */
+    @NotNull
+    <BEFORE, AFTER> LoaderStreamChannelCompat<BEFORE, AFTER> applyLoader(
+            @NotNull Function<? super LoaderStreamChannelCompat<IN, OUT>, ? extends
+                    LoaderStreamChannelCompat<BEFORE, AFTER>> function);
 
     /**
      * Short for {@code loaderConfiguration().withCacheStrategy(strategyType).apply()}.
@@ -480,7 +544,7 @@ public interface LoaderStreamChannelCompat<OUT>
      * @return the configured stream.
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> cache(@Nullable CacheStrategyType strategyType);
+    LoaderStreamChannelCompat<IN, OUT> cache(@Nullable CacheStrategyType strategyType);
 
     /**
      * Short for {@code loaderConfiguration().withFactoryId(factoryId).apply()}.
@@ -492,7 +556,7 @@ public interface LoaderStreamChannelCompat<OUT>
      * @return the configured stream.
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> factoryId(int factoryId);
+    LoaderStreamChannelCompat<IN, OUT> factoryId(int factoryId);
 
     /**
      * Gets the loader configuration builder related only to the next concatenated routine instance.
@@ -507,7 +571,7 @@ public interface LoaderStreamChannelCompat<OUT>
      * @return the invocation configuration builder.
      */
     @NotNull
-    LoaderConfiguration.Builder<? extends LoaderStreamChannelCompat<OUT>> loaderConfiguration();
+    LoaderConfiguration.Builder<? extends LoaderStreamChannelCompat<IN, OUT>> loaderConfiguration();
 
     /**
      * Short for {@code loaderConfiguration().withLoaderId(loaderId).apply()}.
@@ -519,7 +583,7 @@ public interface LoaderStreamChannelCompat<OUT>
      * @return the configured stream.
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> loaderId(int loaderId);
+    LoaderStreamChannelCompat<IN, OUT> loaderId(int loaderId);
 
     /**
      * Concatenates a stream based on the specified mapping invocation factory to this one.
@@ -534,7 +598,17 @@ public interface LoaderStreamChannelCompat<OUT>
      * @throws java.lang.IllegalStateException if the loader context is not set.
      */
     @NotNull
-    <AFTER> LoaderStreamChannelCompat<AFTER> map(
+    <AFTER> LoaderStreamChannelCompat<IN, AFTER> map(
+            @NotNull ContextInvocationFactory<? super OUT, ? extends AFTER> factory);
+
+    // TODO: 07/05/16 javadoc
+    @NotNull
+    <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(@NotNull Function<? super OUT, ?> key,
+            @NotNull ContextInvocationFactory<? super OUT, ? extends AFTER> factory);
+
+    // TODO: 07/05/16 javadoc
+    @NotNull
+    <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(int count,
             @NotNull ContextInvocationFactory<? super OUT, ? extends AFTER> factory);
 
     /**
@@ -544,7 +618,7 @@ public interface LoaderStreamChannelCompat<OUT>
      * @return the configured stream.
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> staleAfter(@Nullable UnitDuration staleTime);
+    LoaderStreamChannelCompat<IN, OUT> staleAfter(@Nullable UnitDuration staleTime);
 
     /**
      * Short for {@code loaderConfiguration().withResultStaleTime(time, timeUnit).apply()}.
@@ -554,7 +628,7 @@ public interface LoaderStreamChannelCompat<OUT>
      * @return the configured stream.
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> staleAfter(long time, @NotNull TimeUnit timeUnit);
+    LoaderStreamChannelCompat<IN, OUT> staleAfter(long time, @NotNull TimeUnit timeUnit);
 
     /**
      * Gets the loader configuration builder related to the whole stream.
@@ -568,7 +642,7 @@ public interface LoaderStreamChannelCompat<OUT>
      * @return the invocation configuration builder.
      */
     @NotNull
-    LoaderConfiguration.Builder<? extends LoaderStreamChannelCompat<OUT>>
+    LoaderConfiguration.Builder<? extends LoaderStreamChannelCompat<IN, OUT>>
     streamLoaderConfiguration();
 
     /**
@@ -583,5 +657,5 @@ public interface LoaderStreamChannelCompat<OUT>
      * @return the configured stream.
      */
     @NotNull
-    LoaderStreamChannelCompat<OUT> with(@Nullable LoaderContextCompat context);
+    LoaderStreamChannelCompat<IN, OUT> with(@Nullable LoaderContextCompat context);
 }

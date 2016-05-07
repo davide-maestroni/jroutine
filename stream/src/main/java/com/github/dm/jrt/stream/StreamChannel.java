@@ -56,8 +56,8 @@ import java.util.concurrent.TimeUnit;
  *
  * @param <OUT> the output data type.
  */
-public interface StreamChannel<OUT>
-        extends OutputChannel<OUT>, ConfigurableBuilder<StreamChannel<OUT>> {
+public interface StreamChannel<IN, OUT>
+        extends OutputChannel<OUT>, ConfigurableBuilder<StreamChannel<IN, OUT>> {
 
     // TODO: 06/05/16 @StreamTransform, @StreamConfig, @StreamInvoke
 
@@ -65,72 +65,74 @@ public interface StreamChannel<OUT>
      * {@inheritDoc}
      */
     @NotNull
-    StreamChannel<OUT> afterMax(@NotNull UnitDuration timeout);
+    StreamChannel<IN, OUT> afterMax(@NotNull UnitDuration timeout);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    StreamChannel<OUT> afterMax(long timeout, @NotNull TimeUnit timeUnit);
+    StreamChannel<IN, OUT> afterMax(long timeout, @NotNull TimeUnit timeUnit);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    StreamChannel<OUT> allInto(@NotNull Collection<? super OUT> results);
+    StreamChannel<IN, OUT> allInto(@NotNull Collection<? super OUT> results);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    StreamChannel<OUT> bind(@NotNull OutputConsumer<? super OUT> consumer);
+    StreamChannel<IN, OUT> bind(@NotNull OutputConsumer<? super OUT> consumer);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    StreamChannel<OUT> eventuallyAbort();
+    StreamChannel<IN, OUT> eventuallyAbort();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    StreamChannel<OUT> eventuallyAbort(@Nullable Throwable reason);
+    StreamChannel<IN, OUT> eventuallyAbort(@Nullable Throwable reason);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    StreamChannel<OUT> eventuallyExit();
+    StreamChannel<IN, OUT> eventuallyExit();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    StreamChannel<OUT> eventuallyThrow();
+    StreamChannel<IN, OUT> eventuallyThrow();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    StreamChannel<OUT> immediately();
+    StreamChannel<IN, OUT> immediately();
 
     /**
      * {@inheritDoc}.
      */
     @NotNull
-    StreamChannel<OUT> skipNext(int count);
+    StreamChannel<IN, OUT> skipNext(int count);
 
     /**
      * Transforms this stream by applying the specified function.
      *
      * @param function the transformation function.
+     * @param <BEFORE> the concatenation input type.
      * @param <AFTER>  the concatenation output type.
      * @return the transformed stream.
      */
     @NotNull
-    <AFTER> StreamChannel<AFTER> apply(
-            @NotNull Function<? super StreamChannel<OUT>, ? extends OutputChannel<AFTER>> function);
+    <BEFORE, AFTER> StreamChannel<BEFORE, AFTER> apply(
+            @NotNull Function<? super StreamChannel<IN, OUT>, ? extends StreamChannel<BEFORE,
+                    AFTER>> function);
 
     /**
      * Makes the stream asynchronous, that is, the concatenated routines will be invoked in
@@ -139,7 +141,7 @@ public interface StreamChannel<OUT>
      * @return this stream.
      */
     @NotNull
-    StreamChannel<OUT> async();
+    StreamChannel<IN, OUT> async();
 
     /**
      * Short for {@code invocationConfiguration().withRunner(runner).withInputLimit(maxInputs)
@@ -159,7 +161,7 @@ public interface StreamChannel<OUT>
      * @return the configured stream.
      */
     @NotNull
-    StreamChannel<OUT> backPressureOn(@Nullable Runner runner, int maxInputs, long maxDelay,
+    StreamChannel<IN, OUT> backPressureOn(@Nullable Runner runner, int maxInputs, long maxDelay,
             @NotNull TimeUnit timeUnit);
 
     /**
@@ -179,7 +181,7 @@ public interface StreamChannel<OUT>
      * @return the configured stream.
      */
     @NotNull
-    StreamChannel<OUT> backPressureOn(@Nullable Runner runner, int maxInputs,
+    StreamChannel<IN, OUT> backPressureOn(@Nullable Runner runner, int maxInputs,
             @Nullable UnitDuration maxDelay);
 
     /**
@@ -203,7 +205,7 @@ public interface StreamChannel<OUT>
      * @return the concatenated stream.
      */
     @NotNull
-    StreamChannel<OUT> collect(@NotNull BiConsumer<? super OUT, ? super OUT> consumer);
+    StreamChannel<IN, OUT> collect(@NotNull BiConsumer<? super OUT, ? super OUT> consumer);
 
     /**
      * Concatenates a stream accumulating the outputs by adding them to the collections returned by
@@ -220,7 +222,7 @@ public interface StreamChannel<OUT>
      * @return the concatenated stream.
      */
     @NotNull
-    <AFTER extends Collection<? super OUT>> StreamChannel<AFTER> collect(
+    <AFTER extends Collection<? super OUT>> StreamChannel<IN, AFTER> collect(
             @NotNull Supplier<? extends AFTER> supplier);
 
     /**
@@ -246,7 +248,7 @@ public interface StreamChannel<OUT>
      * @return the concatenated stream.
      */
     @NotNull
-    <AFTER> StreamChannel<AFTER> collect(@NotNull Supplier<? extends AFTER> supplier,
+    <AFTER> StreamChannel<IN, AFTER> collect(@NotNull Supplier<? extends AFTER> supplier,
             @NotNull BiConsumer<? super AFTER, ? super OUT> consumer);
 
     /**
@@ -260,7 +262,7 @@ public interface StreamChannel<OUT>
      * @return the new stream.
      */
     @NotNull
-    StreamChannel<OUT> concat(@Nullable OUT output);
+    StreamChannel<IN, OUT> concat(@Nullable OUT output);
 
     /**
      * Returns a stream concatenating the specified outputs to this stream ones.
@@ -273,7 +275,7 @@ public interface StreamChannel<OUT>
      * @return the new stream.
      */
     @NotNull
-    StreamChannel<OUT> concat(@Nullable OUT... outputs);
+    StreamChannel<IN, OUT> concat(@Nullable OUT... outputs);
 
     /**
      * Returns a stream concatenating the specified outputs to this stream ones.
@@ -286,7 +288,7 @@ public interface StreamChannel<OUT>
      * @return the new stream.
      */
     @NotNull
-    StreamChannel<OUT> concat(@Nullable Iterable<? extends OUT> outputs);
+    StreamChannel<IN, OUT> concat(@Nullable Iterable<? extends OUT> outputs);
 
     /**
      * Returns a stream concatenating the specified channel outputs to this stream ones.
@@ -299,7 +301,7 @@ public interface StreamChannel<OUT>
      * @return the new stream.
      */
     @NotNull
-    StreamChannel<OUT> concat(@NotNull OutputChannel<? extends OUT> channel);
+    StreamChannel<IN, OUT> concat(@NotNull OutputChannel<? extends OUT> channel);
 
     /**
      * Concatenates a stream based on the specified predicate to this one.
@@ -314,7 +316,7 @@ public interface StreamChannel<OUT>
      * @return the concatenated stream.
      */
     @NotNull
-    StreamChannel<OUT> filter(@NotNull Predicate<? super OUT> predicate);
+    StreamChannel<IN, OUT> filter(@NotNull Predicate<? super OUT> predicate);
 
     /**
      * Concatenates a stream mapping this stream outputs by applying the specified function.
@@ -328,7 +330,7 @@ public interface StreamChannel<OUT>
      * @return the concatenated stream.
      */
     @NotNull
-    <AFTER> StreamChannel<AFTER> flatMap(
+    <AFTER> StreamChannel<IN, AFTER> flatMap(
             @NotNull Function<? super OUT, ? extends OutputChannel<? extends AFTER>> function);
 
     /**
@@ -344,7 +346,7 @@ public interface StreamChannel<OUT>
      * @return the invocation configuration builder.
      */
     @NotNull
-    Builder<? extends StreamChannel<OUT>> invocationConfiguration();
+    Builder<? extends StreamChannel<IN, OUT>> invocationConfiguration();
 
     /**
      * Concatenates a stream limiting the maximum number of outputs to the specified count.
@@ -358,7 +360,7 @@ public interface StreamChannel<OUT>
      * @throws java.lang.IllegalArgumentException if the count is negative.
      */
     @NotNull
-    StreamChannel<OUT> limit(int count);
+    StreamChannel<IN, OUT> limit(int count);
 
     /**
      * Concatenates a stream based on the specified mapping consumer to this one.
@@ -372,7 +374,7 @@ public interface StreamChannel<OUT>
      * @return the concatenated stream.
      */
     @NotNull
-    <AFTER> StreamChannel<AFTER> map(
+    <AFTER> StreamChannel<IN, AFTER> map(
             @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
 
     /**
@@ -387,7 +389,7 @@ public interface StreamChannel<OUT>
      * @return the concatenated stream.
      */
     @NotNull
-    <AFTER> StreamChannel<AFTER> map(@NotNull Function<? super OUT, ? extends AFTER> function);
+    <AFTER> StreamChannel<IN, AFTER> map(@NotNull Function<? super OUT, ? extends AFTER> function);
 
     /**
      * Concatenates a stream based on the specified mapping invocation factory to this one.
@@ -401,7 +403,7 @@ public interface StreamChannel<OUT>
      * @return the concatenated stream.
      */
     @NotNull
-    <AFTER> StreamChannel<AFTER> map(
+    <AFTER> StreamChannel<IN, AFTER> map(
             @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
 
     /**
@@ -418,7 +420,7 @@ public interface StreamChannel<OUT>
      * @return the concatenated stream.
      */
     @NotNull
-    <AFTER> StreamChannel<AFTER> map(@NotNull Routine<? super OUT, ? extends AFTER> routine);
+    <AFTER> StreamChannel<IN, AFTER> map(@NotNull Routine<? super OUT, ? extends AFTER> routine);
 
     /**
      * Concatenates a stream based on the specified consumer to this one.
@@ -434,7 +436,7 @@ public interface StreamChannel<OUT>
      * @return the concatenated stream.
      */
     @NotNull
-    <AFTER> StreamChannel<AFTER> mapAll(
+    <AFTER> StreamChannel<IN, AFTER> mapAll(
             @NotNull BiConsumer<? super List<OUT>, ? super ResultChannel<AFTER>> consumer);
 
     /**
@@ -451,7 +453,7 @@ public interface StreamChannel<OUT>
      * @return the concatenated stream.
      */
     @NotNull
-    <AFTER> StreamChannel<AFTER> mapAll(
+    <AFTER> StreamChannel<IN, AFTER> mapAll(
             @NotNull Function<? super List<OUT>, ? extends AFTER> function);
 
     /**
@@ -465,7 +467,7 @@ public interface StreamChannel<OUT>
      * @return the concatenated stream.
      */
     @NotNull
-    StreamChannel<OUT> onError(@NotNull Consumer<? super RoutineException> consumer);
+    StreamChannel<IN, OUT> onError(@NotNull Consumer<? super RoutineException> consumer);
 
     /**
      * Concatenates a stream based on the specified consumer to this one.
@@ -480,7 +482,7 @@ public interface StreamChannel<OUT>
      * @return the concatenated stream.
      */
     @NotNull
-    StreamChannel<Void> onOutput(@NotNull Consumer<? super OUT> consumer);
+    StreamChannel<IN, Void> onOutput(@NotNull Consumer<? super OUT> consumer);
 
     /**
      * Concatenates a stream producing the specified output in case this one produced none.
@@ -495,7 +497,7 @@ public interface StreamChannel<OUT>
      * @return the concatenated stream.
      */
     @NotNull
-    StreamChannel<OUT> orElse(@Nullable OUT output);
+    StreamChannel<IN, OUT> orElse(@Nullable OUT output);
 
     /**
      * Concatenates a stream producing the specified outputs in case this one produced none.
@@ -510,7 +512,7 @@ public interface StreamChannel<OUT>
      * @return the concatenated stream.
      */
     @NotNull
-    StreamChannel<OUT> orElse(@Nullable OUT... outputs);
+    StreamChannel<IN, OUT> orElse(@Nullable OUT... outputs);
 
     /**
      * Concatenates a stream producing the specified outputs in case this one produced none.
@@ -525,7 +527,7 @@ public interface StreamChannel<OUT>
      * @return the concatenated stream.
      */
     @NotNull
-    StreamChannel<OUT> orElse(@Nullable Iterable<? extends OUT> outputs);
+    StreamChannel<IN, OUT> orElse(@Nullable Iterable<? extends OUT> outputs);
 
     /**
      * Concatenates a stream calling the specified consumer to this one.
@@ -543,7 +545,7 @@ public interface StreamChannel<OUT>
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
-    StreamChannel<OUT> orElseGet(long count,
+    StreamChannel<IN, OUT> orElseGet(long count,
             @NotNull Consumer<? super ResultChannel<OUT>> consumer);
 
     /**
@@ -559,7 +561,7 @@ public interface StreamChannel<OUT>
      * @return the concatenated stream.
      */
     @NotNull
-    StreamChannel<OUT> orElseGet(@NotNull Consumer<? super ResultChannel<OUT>> consumer);
+    StreamChannel<IN, OUT> orElseGet(@NotNull Consumer<? super ResultChannel<OUT>> consumer);
 
     /**
      * Concatenates a stream calling the specified supplier to this one.
@@ -577,7 +579,7 @@ public interface StreamChannel<OUT>
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
-    StreamChannel<OUT> orElseGet(long count, @NotNull Supplier<? extends OUT> supplier);
+    StreamChannel<IN, OUT> orElseGet(long count, @NotNull Supplier<? extends OUT> supplier);
 
     /**
      * Concatenates a stream calling the specified supplier to this one.
@@ -592,7 +594,7 @@ public interface StreamChannel<OUT>
      * @return the concatenated stream.
      */
     @NotNull
-    StreamChannel<OUT> orElseGet(@NotNull Supplier<? extends OUT> supplier);
+    StreamChannel<IN, OUT> orElseGet(@NotNull Supplier<? extends OUT> supplier);
 
     /**
      * Short for {@code streamInvocationConfiguration().withOutputOrder(orderType).apply()}.
@@ -605,7 +607,16 @@ public interface StreamChannel<OUT>
      * @return the configured stream.
      */
     @NotNull
-    StreamChannel<OUT> ordered(@Nullable OrderType orderType);
+    StreamChannel<IN, OUT> ordered(@Nullable OrderType orderType);
+
+    /**
+     * Makes the stream parallel, that is, the concatenated routines will be invoked in parallel
+     * mode.
+     *
+     * @return this stream.
+     */
+    @NotNull
+    StreamChannel<IN, OUT> parallel();
 
     /**
      * Short for
@@ -618,16 +629,7 @@ public interface StreamChannel<OUT>
      * @return the configured stream.
      */
     @NotNull
-    StreamChannel<OUT> parallel(int maxInvocations);
-
-    /**
-     * Makes the stream parallel, that is, the concatenated routines will be invoked in parallel
-     * mode.
-     *
-     * @return this stream.
-     */
-    @NotNull
-    StreamChannel<OUT> parallel();
+    StreamChannel<IN, OUT> parallel(int maxInvocations);
 
     /**
      * Concatenates a stream based on the specified peeking consumer.
@@ -640,7 +642,7 @@ public interface StreamChannel<OUT>
      * @return the concatenated stream.
      */
     @NotNull
-    StreamChannel<OUT> peek(@NotNull Consumer<? super OUT> consumer);
+    StreamChannel<IN, OUT> peek(@NotNull Consumer<? super OUT> consumer);
 
     /**
      * Concatenates a stream based on the specified accumulating function to this one.
@@ -663,7 +665,7 @@ public interface StreamChannel<OUT>
      * @return the concatenated stream.
      */
     @NotNull
-    StreamChannel<OUT> reduce(
+    StreamChannel<IN, OUT> reduce(
             @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
 
     /**
@@ -689,7 +691,7 @@ public interface StreamChannel<OUT>
      * @return the concatenated stream.
      */
     @NotNull
-    <AFTER> StreamChannel<AFTER> reduce(@NotNull Supplier<? extends AFTER> supplier,
+    <AFTER> StreamChannel<IN, AFTER> reduce(@NotNull Supplier<? extends AFTER> supplier,
             @NotNull BiFunction<? super AFTER, ? super OUT, ? extends AFTER> function);
 
     /**
@@ -701,7 +703,7 @@ public interface StreamChannel<OUT>
      * @return the repeating stream.
      */
     @NotNull
-    StreamChannel<OUT> repeat();
+    StreamChannel<IN, OUT> repeat();
 
     /**
      * Short for {@code streamInvocationConfiguration().withRunner(runner).apply()
@@ -716,7 +718,7 @@ public interface StreamChannel<OUT>
      * @return the concatenated stream.
      */
     @NotNull
-    StreamChannel<OUT> runOn(@Nullable Runner runner);
+    StreamChannel<IN, OUT> runOn(@Nullable Runner runner);
 
     /**
      * Short for {@code runOn(null)}.
@@ -725,7 +727,7 @@ public interface StreamChannel<OUT>
      * @see #runOn(Runner)
      */
     @NotNull
-    StreamChannel<OUT> runOnShared();
+    StreamChannel<IN, OUT> runOnShared();
 
     /**
      * Makes the stream serial, that is, the concatenated routines will be invoked in serial mode.
@@ -733,7 +735,7 @@ public interface StreamChannel<OUT>
      * @return this stream.
      */
     @NotNull
-    StreamChannel<OUT> serial();
+    StreamChannel<IN, OUT> serial();
 
     /**
      * Concatenates a stream skipping the specified number of outputs.
@@ -747,7 +749,39 @@ public interface StreamChannel<OUT>
      * @throws java.lang.IllegalArgumentException if the count is negative.
      */
     @NotNull
-    StreamChannel<OUT> skip(int count);
+    StreamChannel<IN, OUT> skip(int count);
+
+    // TODO: 07/05/16 javadoc
+    @NotNull
+    <AFTER> StreamChannel<IN, AFTER> splitBy(@NotNull Function<? super OUT, ?> key,
+            @NotNull Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<?
+                    super OUT, ? extends AFTER>> function);
+
+    // TODO: 07/05/16 javadoc
+    @NotNull
+    <AFTER> StreamChannel<IN, AFTER> splitBy(@NotNull Function<? super OUT, ?> key,
+            @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
+
+    // TODO: 07/05/16 javadoc
+    @NotNull
+    <AFTER> StreamChannel<IN, AFTER> splitBy(@NotNull Function<? super OUT, ?> key,
+            @NotNull Routine<? super OUT, ? extends AFTER> routine);
+
+    // TODO: 07/05/16 javadoc
+    @NotNull
+    <AFTER> StreamChannel<IN, AFTER> splitBy(int count,
+            @NotNull Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<?
+                    super OUT, ? extends AFTER>> function);
+
+    // TODO: 07/05/16 javadoc
+    @NotNull
+    <AFTER> StreamChannel<IN, AFTER> splitBy(int count,
+            @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
+
+    // TODO: 07/05/16 javadoc
+    @NotNull
+    <AFTER> StreamChannel<IN, AFTER> splitBy(int count,
+            @NotNull Routine<? super OUT, ? extends AFTER> routine);
 
     /**
      * Gets the invocation configuration builder related to the whole stream.
@@ -761,7 +795,7 @@ public interface StreamChannel<OUT>
      * @return the invocation configuration builder.
      */
     @NotNull
-    Builder<? extends StreamChannel<OUT>> streamInvocationConfiguration();
+    Builder<? extends StreamChannel<IN, OUT>> streamInvocationConfiguration();
 
     /**
      * Makes the stream synchronous, that is, the concatenated routines will be invoked in
@@ -770,7 +804,7 @@ public interface StreamChannel<OUT>
      * @return this stream.
      */
     @NotNull
-    StreamChannel<OUT> sync();
+    StreamChannel<IN, OUT> sync();
 
     /**
      * Concatenates a stream generating the specified output.
@@ -786,7 +820,7 @@ public interface StreamChannel<OUT>
      * @return the concatenated stream.
      */
     @NotNull
-    <AFTER> StreamChannel<AFTER> then(@Nullable AFTER output);
+    <AFTER> StreamChannel<IN, AFTER> then(@Nullable AFTER output);
 
     /**
      * Concatenates a stream generating the specified outputs.
@@ -802,7 +836,7 @@ public interface StreamChannel<OUT>
      * @return the concatenated stream.
      */
     @NotNull
-    <AFTER> StreamChannel<AFTER> then(@Nullable AFTER... outputs);
+    <AFTER> StreamChannel<IN, AFTER> then(@Nullable AFTER... outputs);
 
     /**
      * Concatenates a stream generating the output returned by the specified iterable.
@@ -818,7 +852,7 @@ public interface StreamChannel<OUT>
      * @return the concatenated stream.
      */
     @NotNull
-    <AFTER> StreamChannel<AFTER> then(@Nullable Iterable<? extends AFTER> outputs);
+    <AFTER> StreamChannel<IN, AFTER> then(@Nullable Iterable<? extends AFTER> outputs);
 
     /**
      * Concatenates a stream based on the specified consumer to this one.
@@ -837,7 +871,7 @@ public interface StreamChannel<OUT>
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
-    <AFTER> StreamChannel<AFTER> thenGet(long count,
+    <AFTER> StreamChannel<IN, AFTER> thenGet(long count,
             @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
 
     /**
@@ -854,7 +888,8 @@ public interface StreamChannel<OUT>
      * @return the concatenated stream.
      */
     @NotNull
-    <AFTER> StreamChannel<AFTER> thenGet(@NotNull Consumer<? super ResultChannel<AFTER>> consumer);
+    <AFTER> StreamChannel<IN, AFTER> thenGet(
+            @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
 
     /**
      * Concatenates a stream based on the specified supplier to this one.
@@ -873,7 +908,8 @@ public interface StreamChannel<OUT>
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
-    <AFTER> StreamChannel<AFTER> thenGet(long count, @NotNull Supplier<? extends AFTER> supplier);
+    <AFTER> StreamChannel<IN, AFTER> thenGet(long count,
+            @NotNull Supplier<? extends AFTER> supplier);
 
     /**
      * Concatenates a stream based on the specified supplier to this one.
@@ -889,7 +925,7 @@ public interface StreamChannel<OUT>
      * @return the concatenated stream.
      */
     @NotNull
-    <AFTER> StreamChannel<AFTER> thenGet(@NotNull Supplier<? extends AFTER> supplier);
+    <AFTER> StreamChannel<IN, AFTER> thenGet(@NotNull Supplier<? extends AFTER> supplier);
 
     /**
      * Returns a new stream making this one selectable.
@@ -902,7 +938,14 @@ public interface StreamChannel<OUT>
      * @return the selectable stream.
      */
     @NotNull
-    StreamChannel<? extends Selectable<OUT>> toSelectable(int index);
+    StreamChannel<IN, ? extends Selectable<OUT>> toSelectable(int index);
+
+    // TODO: 06/05/16 javadoc
+    @NotNull
+    <AFTER> StreamChannel<IN, AFTER> transform(
+            @NotNull Function<? extends Function<? super OutputChannel<IN>, ? extends
+                    OutputChannel<OUT>>, ? extends Function<? super OutputChannel<IN>, ? extends
+                    OutputChannel<AFTER>>> function);
 
     /**
      * Concatenates a consumer handling the invocation exceptions.
@@ -915,7 +958,7 @@ public interface StreamChannel<OUT>
      * @return the concatenated stream.
      */
     @NotNull
-    StreamChannel<OUT> tryCatch(
+    StreamChannel<IN, OUT> tryCatch(
             @NotNull BiConsumer<? super RoutineException, ? super InputChannel<OUT>> consumer);
 
     /**
@@ -929,7 +972,7 @@ public interface StreamChannel<OUT>
      * @return the concatenated stream.
      */
     @NotNull
-    StreamChannel<OUT> tryCatch(
+    StreamChannel<IN, OUT> tryCatch(
             @NotNull Function<? super RoutineException, ? extends OUT> function);
 
     /**
@@ -941,5 +984,5 @@ public interface StreamChannel<OUT>
      * @return the concatenated stream.
      */
     @NotNull
-    StreamChannel<OUT> tryFinally(@NotNull Runnable runnable);
+    StreamChannel<IN, OUT> tryFinally(@NotNull Runnable runnable);
 }

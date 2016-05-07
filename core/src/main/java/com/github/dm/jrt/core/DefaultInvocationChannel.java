@@ -184,15 +184,20 @@ class DefaultInvocationChannel<IN, OUT> implements InvocationChannel<IN, OUT> {
 
     public boolean isEmpty() {
 
-        synchronized (mMutex) {
-            return mInputQueue.isEmpty();
-        }
+        return size() == 0;
     }
 
     public boolean isOpen() {
 
         synchronized (mMutex) {
             return mState.isChannelOpen();
+        }
+    }
+
+    public int size() {
+
+        synchronized (mMutex) {
+            return mInputCount;
         }
     }
 

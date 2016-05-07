@@ -102,12 +102,8 @@ public class ByteChannel {
      */
     private ByteChannel(final int dataBufferSize, final int corePoolSize) {
 
-        if (dataBufferSize < 1) {
-            throw new IllegalArgumentException("the data buffer size must be greater than 0");
-        }
-
+        mDataBufferSize = ConstantConditions.positive("data buffer size", dataBufferSize);
         mCorePoolSize = corePoolSize;
-        mDataBufferSize = dataBufferSize;
     }
 
     /**

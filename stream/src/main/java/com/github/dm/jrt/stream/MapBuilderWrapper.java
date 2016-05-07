@@ -36,8 +36,8 @@ import java.util.Map.Entry;
  *
  * @param <OUT> the output data type.
  */
-class MapBuilderWrapper<OUT> implements ChannelsBuilder<Map<Integer, StreamChannel<OUT>>>,
-        Configurable<ChannelsBuilder<Map<Integer, StreamChannel<OUT>>>> {
+class MapBuilderWrapper<OUT> implements ChannelsBuilder<Map<Integer, StreamChannel<OUT, OUT>>>,
+        Configurable<ChannelsBuilder<Map<Integer, StreamChannel<OUT, OUT>>>> {
 
     private final ChannelsBuilder<? extends Map<Integer, OutputChannel<OUT>>> mBuilder;
 
@@ -55,7 +55,7 @@ class MapBuilderWrapper<OUT> implements ChannelsBuilder<Map<Integer, StreamChann
     }
 
     @NotNull
-    public ChannelsBuilder<Map<Integer, StreamChannel<OUT>>> apply(
+    public ChannelsBuilder<Map<Integer, StreamChannel<OUT, OUT>>> apply(
             @NotNull final ChannelConfiguration configuration) {
 
         mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
@@ -64,11 +64,11 @@ class MapBuilderWrapper<OUT> implements ChannelsBuilder<Map<Integer, StreamChann
     }
 
     @NotNull
-    public Map<Integer, StreamChannel<OUT>> buildChannels() {
+    public Map<Integer, StreamChannel<OUT, OUT>> buildChannels() {
 
         final Map<Integer, OutputChannel<OUT>> channels = mBuilder.buildChannels();
-        final HashMap<Integer, StreamChannel<OUT>> channelMap =
-                new HashMap<Integer, StreamChannel<OUT>>(channels.size());
+        final HashMap<Integer, StreamChannel<OUT, OUT>> channelMap =
+                new HashMap<Integer, StreamChannel<OUT, OUT>>(channels.size());
         for (final Entry<Integer, OutputChannel<OUT>> entry : channels.entrySet()) {
             channelMap.put(entry.getKey(), Streams.streamOf(entry.getValue()));
         }
@@ -77,10 +77,10 @@ class MapBuilderWrapper<OUT> implements ChannelsBuilder<Map<Integer, StreamChann
     }
 
     @NotNull
-    public Builder<? extends ChannelsBuilder<Map<Integer, StreamChannel<OUT>>>>
+    public Builder<? extends ChannelsBuilder<Map<Integer, StreamChannel<OUT, OUT>>>>
     channelConfiguration() {
 
         final ChannelConfiguration config = mConfiguration;
-        return new Builder<ChannelsBuilder<Map<Integer, StreamChannel<OUT>>>>(this, config);
+        return new Builder<ChannelsBuilder<Map<Integer, StreamChannel<OUT, OUT>>>>(this, config);
     }
 }

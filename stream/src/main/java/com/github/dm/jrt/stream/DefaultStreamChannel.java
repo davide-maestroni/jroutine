@@ -65,7 +65,7 @@ class DefaultStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT> {
 
     @NotNull
     @Override
-    protected <BEFORE, AFTER> StreamChannel<AFTER> newChannel(
+    protected <BEFORE, AFTER> StreamChannel<BEFORE, AFTER> newChannel(
             @NotNull final InvocationConfiguration streamConfiguration,
             @NotNull final InvocationMode invocationMode,
             @NotNull final OutputChannel<BEFORE> sourceChannel,

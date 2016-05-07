@@ -32,8 +32,8 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <OUT> the output data type.
  */
-class BuilderWrapper<OUT> implements ChannelsBuilder<StreamChannel<OUT>>,
-        Configurable<ChannelsBuilder<StreamChannel<OUT>>> {
+class BuilderWrapper<OUT> implements ChannelsBuilder<StreamChannel<OUT, OUT>>,
+        Configurable<ChannelsBuilder<StreamChannel<OUT, OUT>>> {
 
     private final ChannelsBuilder<? extends OutputChannel<? extends OUT>> mBuilder;
 
@@ -50,7 +50,7 @@ class BuilderWrapper<OUT> implements ChannelsBuilder<StreamChannel<OUT>>,
     }
 
     @NotNull
-    public ChannelsBuilder<StreamChannel<OUT>> apply(
+    public ChannelsBuilder<StreamChannel<OUT, OUT>> apply(
             @NotNull final ChannelConfiguration configuration) {
 
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
@@ -60,14 +60,14 @@ class BuilderWrapper<OUT> implements ChannelsBuilder<StreamChannel<OUT>>,
 
     @NotNull
     @SuppressWarnings("unchecked")
-    public StreamChannel<OUT> buildChannels() {
+    public StreamChannel<OUT, OUT> buildChannels() {
 
-        return (StreamChannel<OUT>) Streams.streamOf(mBuilder.buildChannels());
+        return (StreamChannel<OUT, OUT>) Streams.streamOf(mBuilder.buildChannels());
     }
 
     @NotNull
-    public Builder<? extends ChannelsBuilder<StreamChannel<OUT>>> channelConfiguration() {
+    public Builder<? extends ChannelsBuilder<StreamChannel<OUT, OUT>>> channelConfiguration() {
 
-        return new Builder<ChannelsBuilder<StreamChannel<OUT>>>(this, mConfiguration);
+        return new Builder<ChannelsBuilder<StreamChannel<OUT, OUT>>>(this, mConfiguration);
     }
 }

@@ -569,9 +569,8 @@ public final class ChannelConfiguration extends DeepEqualObject {
         @NotNull
         public Builder<TYPE> withChannelLimit(final int limit) {
 
-            if ((limit != DEFAULT) && (limit < 0)) {
-                throw new IllegalArgumentException(
-                        "the channel limit must not be negative: " + limit);
+            if (limit != DEFAULT) {
+                ConstantConditions.notNegative("channel limit", limit);
             }
 
             mChannelLimit = limit;
@@ -626,9 +625,8 @@ public final class ChannelConfiguration extends DeepEqualObject {
         @NotNull
         public Builder<TYPE> withChannelMaxSize(final int maxSize) {
 
-            if ((maxSize != DEFAULT) && (maxSize <= 0)) {
-                throw new IllegalArgumentException(
-                        "the channel buffer size must be positive: " + maxSize);
+            if (maxSize != DEFAULT) {
+                ConstantConditions.positive("channel buffer size", maxSize);
             }
 
             mChannelMaxSize = maxSize;

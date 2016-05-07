@@ -36,8 +36,8 @@ import org.jetbrains.annotations.NotNull;
  * @param <OUT> the output data type.
  */
 class MapBuilderWrapper<OUT>
-        implements ChannelsBuilder<SparseArrayCompat<LoaderStreamChannelCompat<OUT>>>,
-        Configurable<ChannelsBuilder<SparseArrayCompat<LoaderStreamChannelCompat<OUT>>>> {
+        implements ChannelsBuilder<SparseArrayCompat<LoaderStreamChannelCompat<OUT, OUT>>>,
+        Configurable<ChannelsBuilder<SparseArrayCompat<LoaderStreamChannelCompat<OUT, OUT>>>> {
 
     private final ChannelsBuilder<? extends SparseArrayCompat<OutputChannel<OUT>>> mBuilder;
 
@@ -56,7 +56,7 @@ class MapBuilderWrapper<OUT>
     }
 
     @NotNull
-    public ChannelsBuilder<SparseArrayCompat<LoaderStreamChannelCompat<OUT>>> apply(
+    public ChannelsBuilder<SparseArrayCompat<LoaderStreamChannelCompat<OUT, OUT>>> apply(
             @NotNull final ChannelConfiguration configuration) {
 
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
@@ -65,12 +65,12 @@ class MapBuilderWrapper<OUT>
     }
 
     @NotNull
-    public SparseArrayCompat<LoaderStreamChannelCompat<OUT>> buildChannels() {
+    public SparseArrayCompat<LoaderStreamChannelCompat<OUT, OUT>> buildChannels() {
 
         final SparseArrayCompat<OutputChannel<OUT>> channels = mBuilder.buildChannels();
         final int size = channels.size();
-        final SparseArrayCompat<LoaderStreamChannelCompat<OUT>> channelMap =
-                new SparseArrayCompat<LoaderStreamChannelCompat<OUT>>(size);
+        final SparseArrayCompat<LoaderStreamChannelCompat<OUT, OUT>> channelMap =
+                new SparseArrayCompat<LoaderStreamChannelCompat<OUT, OUT>>(size);
         for (int i = 0; i < size; ++i) {
             final DefaultLoaderStreamChannelCompat<OUT, OUT> stream =
                     new DefaultLoaderStreamChannelCompat<OUT, OUT>(null, channels.valueAt(i),
@@ -82,11 +82,11 @@ class MapBuilderWrapper<OUT>
     }
 
     @NotNull
-    public Builder<? extends ChannelsBuilder<SparseArrayCompat<LoaderStreamChannelCompat<OUT>>>>
-    channelConfiguration() {
+    public Builder<? extends ChannelsBuilder<SparseArrayCompat<LoaderStreamChannelCompat<OUT,
+            OUT>>>> channelConfiguration() {
 
         final ChannelConfiguration config = mConfiguration;
-        return new Builder<ChannelsBuilder<SparseArrayCompat<LoaderStreamChannelCompat<OUT>>>>(this,
-                config);
+        return new Builder<ChannelsBuilder<SparseArrayCompat<LoaderStreamChannelCompat<OUT, OUT>>>>(
+                this, config);
     }
 }

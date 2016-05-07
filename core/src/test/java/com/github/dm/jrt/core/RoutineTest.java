@@ -2500,6 +2500,20 @@ public class RoutineTest {
     }
 
     @Test
+    public void testSize() {
+
+        final InvocationChannel<Object, Object> channel =
+                JRoutineCore.on(IdentityInvocation.factoryOf()).asyncInvoke();
+        assertThat(channel.size()).isEqualTo(0);
+        channel.after(millis(500)).pass("test");
+        assertThat(channel.size()).isEqualTo(1);
+        final OutputChannel<Object> result = channel.result();
+        assertThat(result.afterMax(seconds(1)).hasCompleted()).isTrue();
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.skipNext(1).size()).isEqualTo(0);
+    }
+
+    @Test
     public void testSkip() {
 
         assertThat(JRoutineCore.on(IdentityInvocation.factoryOf())

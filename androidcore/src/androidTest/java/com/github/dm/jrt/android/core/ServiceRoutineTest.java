@@ -32,6 +32,7 @@ import com.github.dm.jrt.android.core.runner.MainRunner;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.ExecutionTimeoutException;
+import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
@@ -397,6 +398,20 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
         assertThat(
                 routine.parallelCall("1", "2", "3", "4", "5").afterMax(timeout).all()).containsOnly(
                 "1", "2", "3", "4", "5");
+    }
+
+    public void testSize() {
+
+        final InvocationChannel<String, String> channel =
+                JRoutineService.with(serviceFrom(getActivity())).on(factoryOf(
+                        StringPassingInvocation.class)).asyncInvoke();
+        assertThat(channel.size()).isEqualTo(0);
+        channel.after(millis(500)).pass("test");
+        assertThat(channel.size()).isEqualTo(1);
+        final OutputChannel<String> result = channel.result();
+        assertThat(result.afterMax(seconds(10)).hasCompleted()).isTrue();
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.skipNext(1).size()).isEqualTo(0);
     }
 
     private static class Abort extends TemplateContextInvocation<Data, Data> {

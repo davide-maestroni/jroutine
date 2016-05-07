@@ -66,6 +66,7 @@ import static com.github.dm.jrt.android.core.RoutineContextInvocation.factoryFro
 import static com.github.dm.jrt.android.core.invocation.ContextInvocationFactory.factoryOf;
 import static com.github.dm.jrt.android.v11.core.LoaderContext.loaderFrom;
 import static com.github.dm.jrt.core.config.InvocationConfiguration.builder;
+import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -1854,6 +1855,25 @@ public class LoaderRoutineTest extends ActivityInstrumentationTestCase2<TestActi
         } catch (final NullPointerException ignored) {
 
         }
+    }
+
+    public void testSize() {
+
+        if (VERSION.SDK_INT < VERSION_CODES.HONEYCOMB) {
+            return;
+        }
+
+        final InvocationChannel<Object, Object> channel =
+                JRoutineLoader.with(loaderFrom(getActivity()))
+                              .on(IdentityContextInvocation.factoryOf())
+                              .asyncInvoke();
+        assertThat(channel.size()).isEqualTo(0);
+        channel.after(millis(500)).pass("test");
+        assertThat(channel.size()).isEqualTo(1);
+        final OutputChannel<Object> result = channel.result();
+        assertThat(result.afterMax(seconds(10)).hasCompleted()).isTrue();
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.skipNext(1).size()).isEqualTo(0);
     }
 
     private static class Abort extends CallContextInvocation<Data, Data> {

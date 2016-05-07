@@ -20,8 +20,10 @@ import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.IOChannel;
+import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.TemplateOutputConsumer;
 import com.github.dm.jrt.core.error.RoutineException;
+import com.github.dm.jrt.core.invocation.IdentityInvocation;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -29,6 +31,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
+import static com.github.dm.jrt.core.util.UnitDuration.millis;
 import static com.github.dm.jrt.core.util.UnitDuration.seconds;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -308,5 +311,19 @@ public class RepeatedChannelTest {
             }
         });
         channel.throwError();
+    }
+
+    @Test
+    public void testSize() {
+
+        final InvocationChannel<Object, Object> channel =
+                JRoutineCore.on(IdentityInvocation.factoryOf()).asyncInvoke();
+        assertThat(channel.size()).isEqualTo(0);
+        channel.after(millis(500)).pass("test");
+        assertThat(channel.size()).isEqualTo(1);
+        final OutputChannel<Object> result = Channels.repeat(channel.result()).buildChannels();
+        assertThat(result.afterMax(seconds(1)).hasCompleted()).isTrue();
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.skipNext(1).size()).isEqualTo(0);
     }
 }

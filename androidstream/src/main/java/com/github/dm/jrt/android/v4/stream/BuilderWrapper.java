@@ -33,8 +33,8 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <OUT> the output data type.
  */
-class BuilderWrapper<OUT> implements ChannelsBuilder<LoaderStreamChannelCompat<OUT>>,
-        Configurable<ChannelsBuilder<LoaderStreamChannelCompat<OUT>>> {
+class BuilderWrapper<OUT> implements ChannelsBuilder<LoaderStreamChannelCompat<OUT, OUT>>,
+        Configurable<ChannelsBuilder<LoaderStreamChannelCompat<OUT, OUT>>> {
 
     private final ChannelsBuilder<? extends OutputChannel<? extends OUT>> mBuilder;
 
@@ -51,7 +51,7 @@ class BuilderWrapper<OUT> implements ChannelsBuilder<LoaderStreamChannelCompat<O
     }
 
     @NotNull
-    public ChannelsBuilder<LoaderStreamChannelCompat<OUT>> apply(
+    public ChannelsBuilder<LoaderStreamChannelCompat<OUT, OUT>> apply(
             @NotNull final ChannelConfiguration configuration) {
 
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
@@ -61,7 +61,7 @@ class BuilderWrapper<OUT> implements ChannelsBuilder<LoaderStreamChannelCompat<O
 
     @NotNull
     @SuppressWarnings("unchecked")
-    public LoaderStreamChannelCompat<OUT> buildChannels() {
+    public LoaderStreamChannelCompat<OUT, OUT> buildChannels() {
 
         return new DefaultLoaderStreamChannelCompat<OUT, OUT>(null,
                 (OutputChannel<OUT>) mBuilder.buildChannels(),
@@ -69,10 +69,10 @@ class BuilderWrapper<OUT> implements ChannelsBuilder<LoaderStreamChannelCompat<O
     }
 
     @NotNull
-    public Builder<? extends ChannelsBuilder<LoaderStreamChannelCompat<OUT>>>
+    public Builder<? extends ChannelsBuilder<LoaderStreamChannelCompat<OUT, OUT>>>
     channelConfiguration() {
 
         final ChannelConfiguration config = mConfiguration;
-        return new Builder<ChannelsBuilder<LoaderStreamChannelCompat<OUT>>>(this, config);
+        return new Builder<ChannelsBuilder<LoaderStreamChannelCompat<OUT, OUT>>>(this, config);
     }
 }

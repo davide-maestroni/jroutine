@@ -694,10 +694,9 @@ public final class InvocationConfiguration extends DeepEqualObject {
         @NotNull
         public Builder<TYPE> withCoreInstances(final int coreInstances) {
 
-            if ((coreInstances != DEFAULT) && (coreInstances < 0)) {
-                throw new IllegalArgumentException(
-                        "the maximum number of retained instances must not be negative: "
-                                + coreInstances);
+            if (coreInstances != DEFAULT) {
+                ConstantConditions.notNegative("maximum number of retained instances",
+                        coreInstances);
             }
 
             mCoreInstances = coreInstances;
@@ -721,9 +720,8 @@ public final class InvocationConfiguration extends DeepEqualObject {
         @NotNull
         public Builder<TYPE> withInputLimit(final int inputLimit) {
 
-            if ((inputLimit != DEFAULT) && (inputLimit < 0)) {
-                throw new IllegalArgumentException(
-                        "the input limit must not be negative: " + inputLimit);
+            if (inputLimit != DEFAULT) {
+                ConstantConditions.notNegative("input limit", inputLimit);
             }
 
             mInputLimit = inputLimit;
@@ -782,9 +780,8 @@ public final class InvocationConfiguration extends DeepEqualObject {
         @NotNull
         public Builder<TYPE> withInputMaxSize(final int inputMaxSize) {
 
-            if ((inputMaxSize != DEFAULT) && (inputMaxSize <= 0)) {
-                throw new IllegalArgumentException(
-                        "the input buffer size must be positive: " + inputMaxSize);
+            if (inputMaxSize != DEFAULT) {
+                ConstantConditions.positive("input buffer size", inputMaxSize);
             }
 
             mInputMaxSize = inputMaxSize;
@@ -848,10 +845,9 @@ public final class InvocationConfiguration extends DeepEqualObject {
         @NotNull
         public Builder<TYPE> withMaxInstances(final int maxInstances) {
 
-            if ((maxInstances != DEFAULT) && (maxInstances < 1)) {
-                throw new IllegalArgumentException(
-                        "the maximum number of concurrently running instances cannot be less than"
-                                + " 1: " + maxInstances);
+            if (maxInstances != DEFAULT) {
+                ConstantConditions.positive("maximum number of concurrently running instances",
+                        maxInstances);
             }
 
             mMaxInstances = maxInstances;
@@ -875,9 +871,8 @@ public final class InvocationConfiguration extends DeepEqualObject {
         @NotNull
         public Builder<TYPE> withOutputLimit(final int outputLimit) {
 
-            if ((outputLimit != DEFAULT) && (outputLimit < 0)) {
-                throw new IllegalArgumentException(
-                        "the output limit must not be negative: " + outputLimit);
+            if (outputLimit != DEFAULT) {
+                ConstantConditions.notNegative("output limit", outputLimit);
             }
 
             mOutputLimit = outputLimit;
@@ -937,9 +932,8 @@ public final class InvocationConfiguration extends DeepEqualObject {
         @NotNull
         public Builder<TYPE> withOutputMaxSize(final int outputMaxSize) {
 
-            if ((outputMaxSize != DEFAULT) && (outputMaxSize <= 0)) {
-                throw new IllegalArgumentException(
-                        "the output buffer size must be positive: " + outputMaxSize);
+            if (outputMaxSize != DEFAULT) {
+                ConstantConditions.positive("output buffer size", outputMaxSize);
             }
 
             mOutputMaxSize = outputMaxSize;

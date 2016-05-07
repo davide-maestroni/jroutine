@@ -40,16 +40,16 @@ import static com.github.dm.jrt.core.util.Reflection.asArgs;
  */
 class StreamInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
-    private final FunctionWrapper<? super StreamChannel<IN>, ? extends
-            StreamChannel<? extends OUT>> mFunction;
+    private final FunctionWrapper<? super StreamChannel<IN, IN>, ? extends StreamChannel<? super
+            IN, ? extends OUT>> mFunction;
 
     /**
      * Constructor.
      *
      * @param function the function used to instantiate the stream output channel.
      */
-    StreamInvocationFactory(@NotNull final FunctionWrapper<? super StreamChannel<IN>, ? extends
-            StreamChannel<? extends OUT>> function) {
+    StreamInvocationFactory(@NotNull final FunctionWrapper<? super StreamChannel<IN, IN>, ? extends
+            StreamChannel<? super IN, ? extends OUT>> function) {
 
         super(asArgs(ConstantConditions.notNull("function instance", function)));
         mFunction = function;
@@ -70,20 +70,21 @@ class StreamInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
      */
     private static class StreamInvocation<IN, OUT> implements Invocation<IN, OUT> {
 
-        private final Function<? super StreamChannel<IN>, ? extends
-                StreamChannel<? extends OUT>> mFunction;
+        private final Function<? super StreamChannel<IN, IN>, ? extends StreamChannel<? super IN,
+                ? extends OUT>>
+                mFunction;
 
         private IOChannel<IN> mInputChannel;
 
-        private StreamChannel<? extends OUT> mOutputChannel;
+        private StreamChannel<? super IN, ? extends OUT> mOutputChannel;
 
         /**
          * Constructor.
          *
          * @param function the function used to instantiate the stream output channel.
          */
-        private StreamInvocation(@NotNull final Function<? super StreamChannel<IN>, ? extends
-                StreamChannel<? extends OUT>> function) {
+        private StreamInvocation(@NotNull final Function<? super StreamChannel<IN, IN>, ? extends
+                StreamChannel<? super IN, ? extends OUT>> function) {
 
             mFunction = function;
         }
@@ -106,7 +107,7 @@ class StreamInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
         public void onInput(final IN input, @NotNull final ResultChannel<OUT> result) {
 
-            final StreamChannel<? extends OUT> outputChannel = mOutputChannel;
+            final StreamChannel<? super IN, ? extends OUT> outputChannel = mOutputChannel;
             if (!outputChannel.isBound()) {
                 outputChannel.bind(result);
             }
@@ -116,7 +117,7 @@ class StreamInvocationFactory<IN, OUT> extends InvocationFactory<IN, OUT> {
 
         public void onResult(@NotNull final ResultChannel<OUT> result) {
 
-            final StreamChannel<? extends OUT> outputChannel = mOutputChannel;
+            final StreamChannel<? super IN, ? extends OUT> outputChannel = mOutputChannel;
             if (!outputChannel.isBound()) {
                 outputChannel.bind(result);
             }

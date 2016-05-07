@@ -1400,16 +1400,17 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
         public boolean isEmpty() {
 
-            synchronized (mMutex) {
-                return mOutputQueue.isEmpty();
-            }
+            return DefaultResultChannel.this.isEmpty();
         }
 
         public boolean isOpen() {
 
-            synchronized (mMutex) {
-                return mState.isOpen();
-            }
+            return DefaultResultChannel.this.isOpen();
+        }
+
+        public int size() {
+
+            return DefaultResultChannel.this.size();
         }
     }
 
@@ -2447,15 +2448,20 @@ class DefaultResultChannel<OUT> implements ResultChannel<OUT> {
 
     public boolean isEmpty() {
 
-        synchronized (mMutex) {
-            return mOutputQueue.isEmpty();
-        }
+        return size() == 0;
     }
 
     public boolean isOpen() {
 
         synchronized (mMutex) {
             return mState.isOpen();
+        }
+    }
+
+    public int size() {
+
+        synchronized (mMutex) {
+            return mOutputCount;
         }
     }
 }

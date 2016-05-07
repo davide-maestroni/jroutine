@@ -35,8 +35,8 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <OUT> the output data type.
  */
-class MapBuilderWrapper<OUT> implements ChannelsBuilder<SparseArray<LoaderStreamChannel<OUT>>>,
-        Configurable<ChannelsBuilder<SparseArray<LoaderStreamChannel<OUT>>>> {
+class MapBuilderWrapper<OUT> implements ChannelsBuilder<SparseArray<LoaderStreamChannel<OUT, OUT>>>,
+        Configurable<ChannelsBuilder<SparseArray<LoaderStreamChannel<OUT, OUT>>>> {
 
     private final ChannelsBuilder<? extends SparseArray<OutputChannel<OUT>>> mBuilder;
 
@@ -54,7 +54,7 @@ class MapBuilderWrapper<OUT> implements ChannelsBuilder<SparseArray<LoaderStream
     }
 
     @NotNull
-    public ChannelsBuilder<SparseArray<LoaderStreamChannel<OUT>>> apply(
+    public ChannelsBuilder<SparseArray<LoaderStreamChannel<OUT, OUT>>> apply(
             @NotNull final ChannelConfiguration configuration) {
 
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
@@ -63,12 +63,12 @@ class MapBuilderWrapper<OUT> implements ChannelsBuilder<SparseArray<LoaderStream
     }
 
     @NotNull
-    public SparseArray<LoaderStreamChannel<OUT>> buildChannels() {
+    public SparseArray<LoaderStreamChannel<OUT, OUT>> buildChannels() {
 
         final SparseArray<OutputChannel<OUT>> channels = mBuilder.buildChannels();
         final int size = channels.size();
-        final SparseArray<LoaderStreamChannel<OUT>> channelMap =
-                new SparseArray<LoaderStreamChannel<OUT>>(size);
+        final SparseArray<LoaderStreamChannel<OUT, OUT>> channelMap =
+                new SparseArray<LoaderStreamChannel<OUT, OUT>>(size);
         for (int i = 0; i < size; ++i) {
             final DefaultLoaderStreamChannel<OUT, OUT> stream =
                     new DefaultLoaderStreamChannel<OUT, OUT>(null, channels.valueAt(i),
@@ -80,10 +80,11 @@ class MapBuilderWrapper<OUT> implements ChannelsBuilder<SparseArray<LoaderStream
     }
 
     @NotNull
-    public Builder<? extends ChannelsBuilder<SparseArray<LoaderStreamChannel<OUT>>>>
+    public Builder<? extends ChannelsBuilder<SparseArray<LoaderStreamChannel<OUT, OUT>>>>
     channelConfiguration() {
 
         final ChannelConfiguration config = mConfiguration;
-        return new Builder<ChannelsBuilder<SparseArray<LoaderStreamChannel<OUT>>>>(this, config);
+        return new Builder<ChannelsBuilder<SparseArray<LoaderStreamChannel<OUT, OUT>>>>(this,
+                config);
     }
 }

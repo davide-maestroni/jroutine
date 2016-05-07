@@ -730,6 +730,19 @@ public class IOChannelTest {
     }
 
     @Test
+    public void testSize() {
+
+        final IOChannel<Object> channel = JRoutineCore.io().buildChannel();
+        assertThat(channel.size()).isEqualTo(0);
+        channel.after(millis(500)).pass("test");
+        assertThat(channel.size()).isEqualTo(1);
+        final OutputChannel<Object> result = channel.close();
+        assertThat(result.afterMax(seconds(1)).hasCompleted()).isTrue();
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.skipNext(1).size()).isEqualTo(0);
+    }
+
+    @Test
     public void testSkip() {
 
         assertThat(JRoutineCore.io()

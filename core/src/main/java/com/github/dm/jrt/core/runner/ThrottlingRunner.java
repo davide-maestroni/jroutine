@@ -56,15 +56,9 @@ class ThrottlingRunner implements Runner {
      */
     ThrottlingRunner(@NotNull final Runner wrapped, final int maxExecutions) {
 
-        ConstantConditions.notNull("wrapped runner", wrapped);
-        if (maxExecutions < 1) {
-            throw new IllegalArgumentException(
-                    "the maximum number of running executions must be at least 1, while it was: "
-                            + maxExecutions);
-        }
-
-        mRunner = wrapped;
-        mMaxRunning = maxExecutions;
+        mRunner = ConstantConditions.notNull("wrapped runner", wrapped);
+        mMaxRunning =
+                ConstantConditions.positive("maximum number of running executions", maxExecutions);
     }
 
     public void cancel(@NotNull final Execution execution) {

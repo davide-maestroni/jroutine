@@ -77,7 +77,7 @@ public class LoaderStreams extends Streams {
      * @see Channels#blend(Iterable)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<OUT>> blend(
+    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<OUT, OUT>> blend(
             @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
 
         return new BuilderWrapper<OUT>(SparseChannels.blend(channels));
@@ -98,7 +98,7 @@ public class LoaderStreams extends Streams {
      * @see SparseChannels#blend(Channel.OutputChannel...)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<OUT>> blend(
+    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<OUT, OUT>> blend(
             @NotNull final OutputChannel<?>... channels) {
 
         return new BuilderWrapper<OUT>(SparseChannels.<OUT>blend(channels));
@@ -258,7 +258,7 @@ public class LoaderStreams extends Streams {
      * @see Channels#concat(Iterable)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<OUT>> concat(
+    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<OUT, OUT>> concat(
             @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
 
         return new BuilderWrapper<OUT>(SparseChannels.concat(channels));
@@ -281,7 +281,7 @@ public class LoaderStreams extends Streams {
      * @see SparseChannels#concat(Channel.OutputChannel...)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<OUT>> concat(
+    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<OUT, OUT>> concat(
             @NotNull final OutputChannel<?>... channels) {
 
         return new BuilderWrapper<OUT>(SparseChannels.<OUT>concat(channels));
@@ -306,8 +306,8 @@ public class LoaderStreams extends Streams {
      */
     @NotNull
     public static <IN, OUT> ContextInvocationFactory<IN, OUT> contextFactory(
-            @NotNull final Function<? super StreamChannel<IN>, ? extends
-                    StreamChannel<? extends OUT>> function) {
+            @NotNull final Function<? super StreamChannel<IN, IN>, ? extends
+                    StreamChannel<? super IN, ? extends OUT>> function) {
 
         return factoryFrom(onStream(function), wrap(function).hashCode(), InvocationMode.SYNC);
     }
@@ -428,7 +428,8 @@ public class LoaderStreams extends Streams {
      * @see Channels#join(Iterable)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<List<? extends OUT>>> join(
+    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<List<? extends OUT>, List<?
+            extends OUT>>> join(
             @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
 
         return new BuilderWrapper<List<? extends OUT>>(SparseChannels.join(channels));
@@ -451,8 +452,8 @@ public class LoaderStreams extends Streams {
      * @see SparseChannels#join(Channel.OutputChannel...)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<List<? extends OUT>>> join(
-            @NotNull final OutputChannel<?>... channels) {
+    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<List<? extends OUT>, List<?
+            extends OUT>>> join(@NotNull final OutputChannel<?>... channels) {
 
         return new BuilderWrapper<List<? extends OUT>>(SparseChannels.<OUT>join(channels));
     }
@@ -478,8 +479,8 @@ public class LoaderStreams extends Streams {
      * @see Channels#join(Object, Iterable)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<List<? extends OUT>>> join(
-            @Nullable final OUT placeholder,
+    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<List<? extends OUT>, List<?
+            extends OUT>>> join(@Nullable final OUT placeholder,
             @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
 
         return new BuilderWrapper<List<? extends OUT>>(SparseChannels.join(placeholder, channels));
@@ -506,8 +507,9 @@ public class LoaderStreams extends Streams {
      * @see SparseChannels#join(Object, Channel.OutputChannel...)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<List<? extends OUT>>> join(
-            @Nullable final OUT placeholder, @NotNull final OutputChannel<?>... channels) {
+    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<List<? extends OUT>, List<?
+            extends OUT>>> join(@Nullable final OUT placeholder,
+            @NotNull final OutputChannel<?>... channels) {
 
         return new BuilderWrapper<List<? extends OUT>>(SparseChannels.join(placeholder, channels));
     }
@@ -529,7 +531,8 @@ public class LoaderStreams extends Streams {
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<? extends
-            ParcelableSelectable<OUT>>> merge(final int startIndex,
+            ParcelableSelectable<OUT>, ? extends ParcelableSelectable<OUT>>> merge(
+            final int startIndex,
             @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
 
         return new BuilderWrapper<ParcelableSelectable<OUT>>(
@@ -553,8 +556,8 @@ public class LoaderStreams extends Streams {
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<? extends
-            ParcelableSelectable<OUT>>> merge(final int startIndex,
-            @NotNull final OutputChannel<?>... channels) {
+            ParcelableSelectable<OUT>, ? extends ParcelableSelectable<OUT>>> merge(
+            final int startIndex, @NotNull final OutputChannel<?>... channels) {
 
         return new BuilderWrapper<ParcelableSelectable<OUT>>(
                 SparseChannels.<OUT>merge(startIndex, channels));
@@ -576,7 +579,7 @@ public class LoaderStreams extends Streams {
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<? extends
-            ParcelableSelectable<OUT>>> merge(
+            ParcelableSelectable<OUT>, ? extends ParcelableSelectable<OUT>>> merge(
             @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
 
         return new BuilderWrapper<ParcelableSelectable<OUT>>(SparseChannels.merge(channels));
@@ -598,7 +601,8 @@ public class LoaderStreams extends Streams {
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<? extends
-            ParcelableSelectable<OUT>>> merge(@NotNull final OutputChannel<?>... channels) {
+            ParcelableSelectable<OUT>, ? extends ParcelableSelectable<OUT>>> merge(
+            @NotNull final OutputChannel<?>... channels) {
 
         return new BuilderWrapper<ParcelableSelectable<OUT>>(SparseChannels.<OUT>merge(channels));
     }
@@ -619,7 +623,7 @@ public class LoaderStreams extends Streams {
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<? extends
-            ParcelableSelectable<OUT>>> merge(
+            ParcelableSelectable<OUT>, ? extends ParcelableSelectable<OUT>>> merge(
             @NotNull final SparseArray<? extends OutputChannel<? extends OUT>> channels) {
 
         return new BuilderWrapper<ParcelableSelectable<OUT>>(SparseChannels.merge(channels));
@@ -644,8 +648,8 @@ public class LoaderStreams extends Streams {
      */
     @NotNull
     public static <IN, OUT> RoutineBuilder<IN, OUT> onStream(
-            @NotNull final Function<? super StreamChannel<IN>, ? extends
-                    StreamChannel<? extends OUT>> function) {
+            @NotNull final Function<? super StreamChannel<IN, IN>, ? extends
+                    StreamChannel<? super IN, ? extends OUT>> function) {
 
         if (!wrap(function).hasStaticScope()) {
             throw new IllegalArgumentException(
@@ -677,8 +681,8 @@ public class LoaderStreams extends Streams {
     @NotNull
     public static <IN, OUT> LoaderRoutineBuilder<IN, OUT> onStreamWith(
             @NotNull final LoaderContext context,
-            @NotNull final Function<? super StreamChannel<IN>, ? extends
-                    StreamChannel<? extends OUT>> function) {
+            @NotNull final Function<? super StreamChannel<IN, IN>, ? extends
+                    StreamChannel<? super IN, ? extends OUT>> function) {
 
         return JRoutineLoader.with(context).on(contextFactory(function));
     }
@@ -696,7 +700,7 @@ public class LoaderStreams extends Streams {
      * @see SparseChannels#repeat(Channel.OutputChannel)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<OUT>> repeat(
+    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<OUT, OUT>> repeat(
             @NotNull final OutputChannel<OUT> channel) {
 
         return new BuilderWrapper<OUT>(SparseChannels.repeat(channel));
@@ -917,7 +921,7 @@ public class LoaderStreams extends Streams {
      * @see SparseChannels#select(int, int, Channel.OutputChannel)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends SparseArray<LoaderStreamChannel<OUT>>>
+    public static <OUT> ChannelsBuilder<? extends SparseArray<LoaderStreamChannel<OUT, OUT>>>
     selectParcelable(
             final int startIndex, final int rangeSize,
             @NotNull final OutputChannel<? extends ParcelableSelectable<? extends OUT>> channel) {
@@ -942,7 +946,7 @@ public class LoaderStreams extends Streams {
      * @see SparseChannels#select(Channel.OutputChannel, int...)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends SparseArray<LoaderStreamChannel<OUT>>>
+    public static <OUT> ChannelsBuilder<? extends SparseArray<LoaderStreamChannel<OUT, OUT>>>
     selectParcelable(
             @NotNull final OutputChannel<? extends ParcelableSelectable<? extends OUT>> channel,
             @NotNull final int... indexes) {
@@ -966,7 +970,7 @@ public class LoaderStreams extends Streams {
      * @see SparseChannels#select(Channel.OutputChannel, Iterable)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends SparseArray<LoaderStreamChannel<OUT>>>
+    public static <OUT> ChannelsBuilder<? extends SparseArray<LoaderStreamChannel<OUT, OUT>>>
     selectParcelable(
             @NotNull final OutputChannel<? extends ParcelableSelectable<? extends OUT>> channel,
             @NotNull final Iterable<Integer> indexes) {
@@ -984,7 +988,7 @@ public class LoaderStreams extends Streams {
      * @return the newly created stream instance.
      */
     @NotNull
-    public static <OUT> LoaderStreamChannel<OUT> streamOf() {
+    public static <OUT> LoaderStreamChannel<OUT, OUT> streamOf() {
 
         return streamOf(JRoutineCore.io().<OUT>buildChannel().close());
     }
@@ -1000,7 +1004,8 @@ public class LoaderStreams extends Streams {
      * @return the newly created stream instance.
      */
     @NotNull
-    public static <OUT> LoaderStreamChannel<OUT> streamOf(@Nullable final Iterable<OUT> outputs) {
+    public static <OUT> LoaderStreamChannel<OUT, OUT> streamOf(
+            @Nullable final Iterable<OUT> outputs) {
 
         return streamOf(JRoutineCore.io().of(outputs));
     }
@@ -1016,7 +1021,7 @@ public class LoaderStreams extends Streams {
      * @return the newly created stream instance.
      */
     @NotNull
-    public static <OUT> LoaderStreamChannel<OUT> streamOf(@Nullable final OUT output) {
+    public static <OUT> LoaderStreamChannel<OUT, OUT> streamOf(@Nullable final OUT output) {
 
         return streamOf(JRoutineCore.io().of(output));
     }
@@ -1032,7 +1037,7 @@ public class LoaderStreams extends Streams {
      * @return the newly created stream instance.
      */
     @NotNull
-    public static <OUT> LoaderStreamChannel<OUT> streamOf(@Nullable final OUT... outputs) {
+    public static <OUT> LoaderStreamChannel<OUT, OUT> streamOf(@Nullable final OUT... outputs) {
 
         return streamOf(JRoutineCore.io().of(outputs));
     }
@@ -1050,11 +1055,11 @@ public class LoaderStreams extends Streams {
      * @return the newly created stream instance.
      */
     @NotNull
-    public static <OUT> LoaderStreamChannel<OUT> streamOf(
+    public static <OUT> LoaderStreamChannel<OUT, OUT> streamOf(
             @NotNull final OutputChannel<OUT> output) {
 
         if (output instanceof LoaderStreamChannel) {
-            return (LoaderStreamChannel<OUT>) output;
+            return (LoaderStreamChannel<OUT, OUT>) output;
         }
 
         return new DefaultLoaderStreamChannel<OUT, OUT>(null, output,
@@ -1099,7 +1104,7 @@ public class LoaderStreams extends Streams {
      */
     @NotNull
     public static <OUT> ChannelsBuilder<? extends LoaderStreamChannel<? extends
-            ParcelableSelectable<OUT>>> toSelectable(
+            ParcelableSelectable<OUT>, ? extends ParcelableSelectable<OUT>>> toSelectable(
             @NotNull final OutputChannel<? extends OUT> channel, final int index) {
 
         return new BuilderWrapper<ParcelableSelectable<OUT>>(

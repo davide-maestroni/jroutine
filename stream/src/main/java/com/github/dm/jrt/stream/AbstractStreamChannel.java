@@ -16,10 +16,8 @@
 
 package com.github.dm.jrt.stream;
 
-import com.github.dm.jrt.channel.Channels;
 import com.github.dm.jrt.channel.Selectable;
 import com.github.dm.jrt.core.JRoutineCore;
-import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.channel.ResultChannel;
 import com.github.dm.jrt.core.config.ChannelConfiguration;
@@ -35,15 +33,12 @@ import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.function.BiConsumer;
-import com.github.dm.jrt.function.BiConsumerWrapper;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.FunctionWrapper;
-import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
 
@@ -58,7 +53,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.core.config.ChannelConfiguration.builderFromOutputChannel;
-import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.core.util.UnitDuration.fromUnit;
 import static com.github.dm.jrt.function.Functions.consumerCall;
 import static com.github.dm.jrt.function.Functions.consumerOperation;
@@ -79,7 +73,7 @@ import static com.github.dm.jrt.function.Functions.wrap;
  * @param <OUT> the output data type.
  */
 public abstract class AbstractStreamChannel<IN, OUT>
-        implements StreamChannel<OUT>, Configurable<StreamChannel<OUT>> {
+        implements StreamChannel<IN, OUT>, Configurable<StreamChannel<IN, OUT>> {
 
     private static final BiConsumer<? extends Collection<?>, ?> sCollectConsumer =
             new BiConsumer<Collection<Object>, Object>() {
@@ -90,7 +84,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
                 }
             };
 
-    private final FunctionWrapper<OutputChannel<IN>, OutputChannel<OUT>> mInvoke;
+    private final FunctionWrapper<OutputChannel<IN>, OutputChannel<OUT>> mBind;
 
     private final Object mMutex = new Object();
 
@@ -107,11 +101,11 @@ public abstract class AbstractStreamChannel<IN, OUT>
     private InvocationConfiguration mStreamConfiguration =
             InvocationConfiguration.defaultConfiguration();
 
-    private final Configurable<StreamChannel<OUT>> mStreamConfigurable =
-            new Configurable<StreamChannel<OUT>>() {
+    private final Configurable<StreamChannel<IN, OUT>> mStreamConfigurable =
+            new Configurable<StreamChannel<IN, OUT>>() {
 
                 @NotNull
-                public StreamChannel<OUT> apply(
+                public StreamChannel<IN, OUT> apply(
                         @NotNull final InvocationConfiguration configuration) {
 
                     mStreamConfiguration = configuration;
@@ -125,139 +119,139 @@ public abstract class AbstractStreamChannel<IN, OUT>
      * @param configuration  the initial invocation configuration.
      * @param invocationMode the delegation type.
      * @param sourceChannel  the source output channel.
-     * @param invoke         the invoke function.
+     * @param bind           the bind function.
      */
     protected AbstractStreamChannel(@NotNull final InvocationConfiguration configuration,
             @NotNull final InvocationMode invocationMode,
             @NotNull final OutputChannel<IN> sourceChannel,
-            @NotNull final Function<OutputChannel<IN>, OutputChannel<OUT>> invoke) {
+            @NotNull final Function<OutputChannel<IN>, OutputChannel<OUT>> bind) {
 
         mStreamConfiguration =
                 ConstantConditions.notNull("invocation configuration", configuration);
         mInvocationMode = ConstantConditions.notNull("invocation mode", invocationMode);
         mSourceChannel = ConstantConditions.notNull("source channel", sourceChannel);
-        mInvoke = wrap(invoke);
+        mBind = wrap(bind);
     }
 
     public boolean abort() {
 
-        return invoke().abort();
+        return bind().abort();
     }
 
     public boolean abort(@Nullable final Throwable reason) {
 
-        return invoke().abort(reason);
+        return bind().abort(reason);
     }
 
     public boolean isEmpty() {
 
-        return invoke().isEmpty();
+        return bind().isEmpty();
     }
 
     public boolean isOpen() {
 
-        return invoke().isOpen();
+        return bind().isOpen();
+    }
+
+    public int size() {
+
+        return bind().size();
     }
 
     @NotNull
-    public StreamChannel<OUT> afterMax(@NotNull final UnitDuration timeout) {
+    public StreamChannel<IN, OUT> afterMax(@NotNull final UnitDuration timeout) {
 
-        invoke().afterMax(timeout);
+        bind().afterMax(timeout);
         return this;
     }
 
     @NotNull
-    public StreamChannel<OUT> afterMax(final long timeout, @NotNull final TimeUnit timeUnit) {
+    public StreamChannel<IN, OUT> afterMax(final long timeout, @NotNull final TimeUnit timeUnit) {
 
-        invoke().afterMax(timeout, timeUnit);
+        bind().afterMax(timeout, timeUnit);
         return this;
     }
 
     @NotNull
-    public StreamChannel<OUT> allInto(@NotNull final Collection<? super OUT> results) {
+    public StreamChannel<IN, OUT> allInto(@NotNull final Collection<? super OUT> results) {
 
-        invoke().allInto(results);
+        bind().allInto(results);
         return this;
     }
 
     @NotNull
-    public StreamChannel<OUT> bind(@NotNull final OutputConsumer<? super OUT> consumer) {
+    public StreamChannel<IN, OUT> bind(@NotNull final OutputConsumer<? super OUT> consumer) {
 
-        invoke().bind(consumer);
+        bind().bind(consumer);
         return this;
     }
 
     @NotNull
-    public StreamChannel<OUT> eventuallyAbort() {
+    public StreamChannel<IN, OUT> eventuallyAbort() {
 
-        invoke().eventuallyAbort();
+        bind().eventuallyAbort();
         return this;
     }
 
     @NotNull
-    public StreamChannel<OUT> eventuallyAbort(@Nullable final Throwable reason) {
+    public StreamChannel<IN, OUT> eventuallyAbort(@Nullable final Throwable reason) {
 
-        invoke().eventuallyAbort(reason);
+        bind().eventuallyAbort(reason);
         return this;
     }
 
     @NotNull
-    public StreamChannel<OUT> eventuallyExit() {
+    public StreamChannel<IN, OUT> eventuallyExit() {
 
-        invoke().eventuallyExit();
+        bind().eventuallyExit();
         return this;
     }
 
     @NotNull
-    public StreamChannel<OUT> eventuallyThrow() {
+    public StreamChannel<IN, OUT> eventuallyThrow() {
 
-        invoke().eventuallyThrow();
+        bind().eventuallyThrow();
         return this;
     }
 
     @NotNull
-    public StreamChannel<OUT> immediately() {
+    public StreamChannel<IN, OUT> immediately() {
 
-        invoke().immediately();
+        bind().immediately();
         return this;
     }
 
     @NotNull
-    public StreamChannel<OUT> skipNext(final int count) {
+    public StreamChannel<IN, OUT> skipNext(final int count) {
 
-        invoke().skipNext(count);
+        bind().skipNext(count);
         return this;
     }
 
     @NotNull
-    public <AFTER> StreamChannel<AFTER> apply(
-            @NotNull final Function<? super StreamChannel<OUT>, ? extends OutputChannel<AFTER>>
-                    function) {
+    public <BEFORE, AFTER> StreamChannel<BEFORE, AFTER> apply(
+            @NotNull final Function<? super StreamChannel<IN, OUT>, ? extends
+                    StreamChannel<BEFORE, AFTER>> function) {
 
-        final OutputChannel<AFTER> outputChannel = function.apply(this);
-        if (getClass().isAssignableFrom(outputChannel.getClass())) {
-            return (StreamChannel<AFTER>) outputChannel;
-        }
-
-        return buildChannel(outputChannel, Functions.<OutputChannel<AFTER>>identity());
+        return ConstantConditions.notNull("transformed stream", function.apply(this));
     }
 
     @NotNull
-    public StreamChannel<OUT> async() {
+    public StreamChannel<IN, OUT> async() {
 
         mInvocationMode = InvocationMode.ASYNC;
         return this;
     }
 
     @NotNull
-    public StreamChannel<OUT> backPressureOn(@Nullable final Runner runner, final int maxInputs,
+    public StreamChannel<IN, OUT> backPressureOn(@Nullable final Runner runner, final int maxInputs,
             final long maxDelay, @NotNull final TimeUnit timeUnit) {
 
         return backPressureOn(runner, maxInputs, fromUnit(maxDelay, timeUnit));
     }
 
     @NotNull
-    public StreamChannel<OUT> backPressureOn(@Nullable final Runner runner, final int maxInputs,
+    public StreamChannel<IN, OUT> backPressureOn(@Nullable final Runner runner, final int maxInputs,
             @Nullable final UnitDuration maxDelay) {
 
         return invocationConfiguration().withRunner(runner)
@@ -267,7 +261,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
-    public StreamChannel<OUT> collect(
+    public StreamChannel<IN, OUT> collect(
             @NotNull final BiConsumer<? super OUT, ? super OUT> consumer) {
 
         return map(AccumulateConsumerInvocation.consumerFactory(consumer));
@@ -275,52 +269,53 @@ public abstract class AbstractStreamChannel<IN, OUT>
 
     @NotNull
     @SuppressWarnings("unchecked")
-    public <AFTER extends Collection<? super OUT>> StreamChannel<AFTER> collect(
+    public <AFTER extends Collection<? super OUT>> StreamChannel<IN, AFTER> collect(
             @NotNull final Supplier<? extends AFTER> supplier) {
 
         return collect(supplier, (BiConsumer<? super AFTER, ? super OUT>) sCollectConsumer);
     }
 
     @NotNull
-    public <AFTER> StreamChannel<AFTER> collect(@NotNull final Supplier<? extends AFTER> supplier,
+    public <AFTER> StreamChannel<IN, AFTER> collect(
+            @NotNull final Supplier<? extends AFTER> supplier,
             @NotNull final BiConsumer<? super AFTER, ? super OUT> consumer) {
 
         return map(AccumulateConsumerInvocation.consumerFactory(supplier, consumer));
     }
 
     @NotNull
-    public StreamChannel<OUT> concat(@Nullable final OUT output) {
+    public StreamChannel<IN, OUT> concat(@Nullable final OUT output) {
 
         return concat(JRoutineCore.io().of(output));
     }
 
     @NotNull
-    public StreamChannel<OUT> concat(@Nullable final OUT... outputs) {
+    public StreamChannel<IN, OUT> concat(@Nullable final OUT... outputs) {
 
         return concat(JRoutineCore.io().of(outputs));
     }
 
     @NotNull
-    public StreamChannel<OUT> concat(@Nullable final Iterable<? extends OUT> outputs) {
+    public StreamChannel<IN, OUT> concat(@Nullable final Iterable<? extends OUT> outputs) {
 
         return concat(JRoutineCore.io().of(outputs));
     }
 
     @NotNull
-    public StreamChannel<OUT> concat(@NotNull final OutputChannel<? extends OUT> channel) {
+    public StreamChannel<IN, OUT> concat(@NotNull final OutputChannel<? extends OUT> channel) {
 
-        return buildChannel(mSourceChannel,
-                mInvoke.andThen(new ConcatInvoke<OUT>(buildChannelConfiguration(), channel)));
+        return buildChannel(
+                mBind.andThen(new BindConcat<OUT>(buildChannelConfiguration(), channel)));
     }
 
     @NotNull
-    public StreamChannel<OUT> filter(@NotNull final Predicate<? super OUT> predicate) {
+    public StreamChannel<IN, OUT> filter(@NotNull final Predicate<? super OUT> predicate) {
 
         return map(predicateFilter(predicate));
     }
 
     @NotNull
-    public <AFTER> StreamChannel<AFTER> flatMap(
+    public <AFTER> StreamChannel<IN, AFTER> flatMap(
             @NotNull final Function<? super OUT, ? extends OutputChannel<? extends AFTER>>
                     function) {
 
@@ -328,81 +323,82 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
-    public Builder<? extends StreamChannel<OUT>> invocationConfiguration() {
+    public Builder<? extends StreamChannel<IN, OUT>> invocationConfiguration() {
 
-        return new Builder<StreamChannel<OUT>>(this, mConfiguration);
+        return new Builder<StreamChannel<IN, OUT>>(this, mConfiguration);
     }
 
     @NotNull
-    public StreamChannel<OUT> limit(final int count) {
+    public StreamChannel<IN, OUT> limit(final int count) {
 
         return map(new LimitInvocationFactory<OUT>(count));
     }
 
     @NotNull
-    public <AFTER> StreamChannel<AFTER> map(
+    public <AFTER> StreamChannel<IN, AFTER> map(
             @NotNull final BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer) {
 
         return map(consumerOperation(consumer));
     }
 
     @NotNull
-    public <AFTER> StreamChannel<AFTER> map(
+    public <AFTER> StreamChannel<IN, AFTER> map(
             @NotNull final Function<? super OUT, ? extends AFTER> function) {
 
         return map(functionOperation(function));
     }
 
     @NotNull
-    public <AFTER> StreamChannel<AFTER> map(
+    public <AFTER> StreamChannel<IN, AFTER> map(
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
 
         return map(buildRoutine(factory));
     }
 
     @NotNull
-    public <AFTER> StreamChannel<AFTER> map(
+    public <AFTER> StreamChannel<IN, AFTER> map(
             @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
 
-        return buildChannel(mSourceChannel, mInvoke.andThen(
-                new MapInvoke<OUT, AFTER>(ConstantConditions.notNull("routine instance", routine),
+        return buildChannel(mBind.andThen(
+                new BindMap<OUT, AFTER>(ConstantConditions.notNull("routine instance", routine),
                         mInvocationMode)));
     }
 
     @NotNull
-    public <AFTER> StreamChannel<AFTER> mapAll(
+    public <AFTER> StreamChannel<IN, AFTER> mapAll(
             @NotNull final BiConsumer<? super List<OUT>, ? super ResultChannel<AFTER>> consumer) {
 
         return map(consumerCall(consumer));
     }
 
     @NotNull
-    public <AFTER> StreamChannel<AFTER> mapAll(
+    public <AFTER> StreamChannel<IN, AFTER> mapAll(
             @NotNull final Function<? super List<OUT>, ? extends AFTER> function) {
 
         return map(functionCall(function));
     }
 
     @NotNull
-    public StreamChannel<OUT> onError(@NotNull final Consumer<? super RoutineException> consumer) {
+    public StreamChannel<IN, OUT> onError(
+            @NotNull final Consumer<? super RoutineException> consumer) {
 
         return tryCatch(new TryCatchBiConsumerConsumer<OUT>(consumer));
     }
 
     @NotNull
-    public StreamChannel<Void> onOutput(@NotNull final Consumer<? super OUT> consumer) {
+    public StreamChannel<IN, Void> onOutput(@NotNull final Consumer<? super OUT> consumer) {
 
         return map(new ConsumerInvocation<OUT>(wrap(consumer)));
     }
 
     @NotNull
-    public StreamChannel<OUT> orElse(@Nullable final OUT output) {
+    public StreamChannel<IN, OUT> orElse(@Nullable final OUT output) {
 
         return map(new OrElseInvocationFactory<OUT>(Collections.singletonList(output)));
     }
 
     @NotNull
-    public StreamChannel<OUT> orElse(@Nullable final OUT... outputs) {
+    public StreamChannel<IN, OUT> orElse(@Nullable final OUT... outputs) {
 
         final List<OUT> list;
         if (outputs != null) {
@@ -417,7 +413,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
-    public StreamChannel<OUT> orElse(@Nullable final Iterable<? extends OUT> outputs) {
+    public StreamChannel<IN, OUT> orElse(@Nullable final Iterable<? extends OUT> outputs) {
 
         final List<OUT> list;
         if (outputs != null) {
@@ -434,84 +430,83 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
-    public StreamChannel<OUT> orElseGet(final long count,
+    public StreamChannel<IN, OUT> orElseGet(final long count,
             @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
 
         return map(new OrElseConsumerInvocationFactory<OUT>(count, wrap(consumer)));
     }
 
     @NotNull
-    public StreamChannel<OUT> orElseGet(
+    public StreamChannel<IN, OUT> orElseGet(
             @NotNull final Consumer<? super ResultChannel<OUT>> consumer) {
 
         return orElseGet(1, consumer);
     }
 
     @NotNull
-    public StreamChannel<OUT> orElseGet(final long count,
+    public StreamChannel<IN, OUT> orElseGet(final long count,
             @NotNull final Supplier<? extends OUT> supplier) {
 
         return map(new OrElseSupplierInvocationFactory<OUT>(count, wrap(supplier)));
     }
 
     @NotNull
-    public StreamChannel<OUT> orElseGet(@NotNull final Supplier<? extends OUT> supplier) {
+    public StreamChannel<IN, OUT> orElseGet(@NotNull final Supplier<? extends OUT> supplier) {
 
         return orElseGet(1, supplier);
     }
 
     @NotNull
-    public StreamChannel<OUT> ordered(@Nullable final OrderType orderType) {
+    public StreamChannel<IN, OUT> ordered(@Nullable final OrderType orderType) {
 
         return streamInvocationConfiguration().withOutputOrder(orderType).apply();
     }
 
     @NotNull
-    public StreamChannel<OUT> parallel(final int maxInvocations) {
-
-        return parallel().invocationConfiguration().withMaxInstances(maxInvocations).apply();
-    }
-
-    @NotNull
-    public StreamChannel<OUT> parallel() {
+    public StreamChannel<IN, OUT> parallel() {
 
         mInvocationMode = InvocationMode.PARALLEL;
         return this;
     }
 
     @NotNull
-    public StreamChannel<OUT> peek(@NotNull final Consumer<? super OUT> consumer) {
+    public StreamChannel<IN, OUT> parallel(final int maxInvocations) {
+
+        return parallel().invocationConfiguration().withMaxInstances(maxInvocations).apply();
+    }
+
+    @NotNull
+    public StreamChannel<IN, OUT> peek(@NotNull final Consumer<? super OUT> consumer) {
 
         return map(new PeekInvocation<OUT>(wrap(consumer)));
     }
 
     @NotNull
-    public StreamChannel<OUT> reduce(
+    public StreamChannel<IN, OUT> reduce(
             @NotNull final BiFunction<? super OUT, ? super OUT, ? extends OUT> function) {
 
         return map(AccumulateFunctionInvocation.functionFactory(function));
     }
 
     @NotNull
-    public <AFTER> StreamChannel<AFTER> reduce(@NotNull Supplier<? extends AFTER> supplier,
+    public <AFTER> StreamChannel<IN, AFTER> reduce(@NotNull Supplier<? extends AFTER> supplier,
             @NotNull final BiFunction<? super AFTER, ? super OUT, ? extends AFTER> function) {
 
         return map(AccumulateFunctionInvocation.functionFactory(supplier, function));
     }
 
     @NotNull
-    public StreamChannel<OUT> repeat() {
+    public StreamChannel<IN, OUT> repeat() {
 
-        return buildChannel(mSourceChannel,
-                mInvoke.andThen(new RepeatInvoke<OUT>(buildChannelConfiguration())));
+        return buildChannel(mBind.andThen(new BindRepeat<OUT>(buildChannelConfiguration())));
     }
 
     @NotNull
-    public StreamChannel<OUT> runOn(@Nullable final Runner runner) {
+    public StreamChannel<IN, OUT> runOn(@Nullable final Runner runner) {
 
         final InvocationMode invocationMode = mInvocationMode;
         final OperationInvocation<OUT, OUT> factory = IdentityInvocation.factoryOf();
-        final StreamChannel<OUT> channel =
+        final StreamChannel<IN, OUT> channel =
                 streamInvocationConfiguration().withRunner(runner).apply().async().map(factory);
         if (invocationMode == InvocationMode.ASYNC) {
             return channel.async();
@@ -529,45 +524,93 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
-    public StreamChannel<OUT> runOnShared() {
+    public StreamChannel<IN, OUT> runOnShared() {
 
         return runOn(null);
     }
 
     @NotNull
-    public StreamChannel<OUT> serial() {
+    public StreamChannel<IN, OUT> serial() {
 
         mInvocationMode = InvocationMode.SERIAL;
         return this;
     }
 
     @NotNull
-    public StreamChannel<OUT> skip(final int count) {
+    public StreamChannel<IN, OUT> skip(final int count) {
 
         return map(new SkipInvocationFactory<OUT>(count));
     }
 
     @NotNull
-    public Builder<? extends StreamChannel<OUT>> streamInvocationConfiguration() {
+    public <AFTER> StreamChannel<IN, AFTER> splitBy(@NotNull final Function<? super OUT, ?> key,
+            @NotNull final Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<?
+                    super OUT, ? extends AFTER>> function) {
 
-        return new Builder<StreamChannel<OUT>>(mStreamConfigurable, mStreamConfiguration);
+        return splitBy(key, new StreamInvocationFactory<OUT, AFTER>(wrap(function)));
     }
 
     @NotNull
-    public StreamChannel<OUT> sync() {
+    public <AFTER> StreamChannel<IN, AFTER> splitBy(@NotNull final Function<? super OUT, ?> key,
+            @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
+
+        return splitBy(key, buildRoutine(factory));
+    }
+
+    @NotNull
+    public <AFTER> StreamChannel<IN, AFTER> splitBy(@NotNull final Function<? super OUT, ?> key,
+            @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
+
+        return buildChannel(mBind.andThen(
+                new BindSplitKey<OUT, AFTER>(buildChannelConfiguration(), key, routine,
+                        mInvocationMode)));
+    }
+
+    @NotNull
+    public <AFTER> StreamChannel<IN, AFTER> splitBy(final int count,
+            @NotNull final Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<?
+                    super OUT, ? extends AFTER>> function) {
+
+        return splitBy(count, new StreamInvocationFactory<OUT, AFTER>(wrap(function)));
+    }
+
+    @NotNull
+    public <AFTER> StreamChannel<IN, AFTER> splitBy(final int count,
+            @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
+
+        return splitBy(count, buildRoutine(factory));
+    }
+
+    @NotNull
+    public <AFTER> StreamChannel<IN, AFTER> splitBy(final int count,
+            @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
+
+        return buildChannel(mBind.andThen(
+                new BindSplitCount<OUT, AFTER>(buildChannelConfiguration(), count, routine,
+                        mInvocationMode)));
+    }
+
+    @NotNull
+    public Builder<? extends StreamChannel<IN, OUT>> streamInvocationConfiguration() {
+
+        return new Builder<StreamChannel<IN, OUT>>(mStreamConfigurable, mStreamConfiguration);
+    }
+
+    @NotNull
+    public StreamChannel<IN, OUT> sync() {
 
         mInvocationMode = InvocationMode.SYNC;
         return this;
     }
 
     @NotNull
-    public <AFTER> StreamChannel<AFTER> then(@Nullable final AFTER output) {
+    public <AFTER> StreamChannel<IN, AFTER> then(@Nullable final AFTER output) {
 
         return map(new GenerateOutputInvocation<AFTER>(Collections.singletonList(output)));
     }
 
     @NotNull
-    public <AFTER> StreamChannel<AFTER> then(@Nullable final AFTER... outputs) {
+    public <AFTER> StreamChannel<IN, AFTER> then(@Nullable final AFTER... outputs) {
 
         final List<AFTER> list;
         if (outputs != null) {
@@ -582,7 +625,8 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
-    public <AFTER> StreamChannel<AFTER> then(@Nullable final Iterable<? extends AFTER> outputs) {
+    public <AFTER> StreamChannel<IN, AFTER> then(
+            @Nullable final Iterable<? extends AFTER> outputs) {
 
         final List<AFTER> list;
         if (outputs != null) {
@@ -599,132 +643,145 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
-    public <AFTER> StreamChannel<AFTER> thenGet(final long count,
+    public <AFTER> StreamChannel<IN, AFTER> thenGet(final long count,
             @NotNull final Consumer<? super ResultChannel<AFTER>> consumer) {
 
         return map(new LoopConsumerInvocation<AFTER>(count, wrap(consumer)));
     }
 
     @NotNull
-    public <AFTER> StreamChannel<AFTER> thenGet(
+    public <AFTER> StreamChannel<IN, AFTER> thenGet(
             @NotNull final Consumer<? super ResultChannel<AFTER>> consumer) {
 
         return thenGet(1, consumer);
     }
 
     @NotNull
-    public <AFTER> StreamChannel<AFTER> thenGet(final long count,
+    public <AFTER> StreamChannel<IN, AFTER> thenGet(final long count,
             @NotNull final Supplier<? extends AFTER> supplier) {
 
         return map(new LoopSupplierInvocation<AFTER>(count, wrap(supplier)));
     }
 
     @NotNull
-    public <AFTER> StreamChannel<AFTER> thenGet(@NotNull final Supplier<? extends AFTER> supplier) {
+    public <AFTER> StreamChannel<IN, AFTER> thenGet(
+            @NotNull final Supplier<? extends AFTER> supplier) {
 
         return thenGet(1, supplier);
     }
 
     @NotNull
-    public StreamChannel<? extends Selectable<OUT>> toSelectable(final int index) {
+    public StreamChannel<IN, ? extends Selectable<OUT>> toSelectable(final int index) {
 
-        return buildChannel(mSourceChannel,
-                mInvoke.andThen(new SelectableInvoke<OUT>(buildChannelConfiguration(), index)));
+        return buildChannel(
+                mBind.andThen(new BindSelectable<OUT>(buildChannelConfiguration(), index)));
     }
 
     @NotNull
-    public StreamChannel<OUT> tryCatch(
+    @SuppressWarnings("unchecked")
+    public <AFTER> StreamChannel<IN, AFTER> transform(
+            @NotNull final Function<? extends Function<? super OutputChannel<IN>, ? extends
+                    OutputChannel<OUT>>, ? extends Function<? super OutputChannel<IN>, ?
+                    extends OutputChannel<AFTER>>> function) {
+
+        return buildChannel(ConstantConditions.notNull("bind function",
+                ((Function<Function<OutputChannel<IN>, OutputChannel<OUT>>,
+                        Function<OutputChannel<IN>, OutputChannel<AFTER>>>) function)
+                        .apply(mBind)));
+    }
+
+    @NotNull
+    public StreamChannel<IN, OUT> tryCatch(
             @NotNull final BiConsumer<? super RoutineException, ? super InputChannel<OUT>>
                     consumer) {
 
-        return buildChannel(mSourceChannel, mInvoke.andThen(
-                new TryCatchInvoke<OUT>(buildChannelConfiguration(), wrap(consumer))));
+        return buildChannel(
+                mBind.andThen(new BindTryCatch<OUT>(buildChannelConfiguration(), wrap(consumer))));
     }
 
     @NotNull
-    public StreamChannel<OUT> tryCatch(
+    public StreamChannel<IN, OUT> tryCatch(
             @NotNull final Function<? super RoutineException, ? extends OUT> function) {
 
         return tryCatch(new TryCatchBiConsumerFunction<OUT>(function));
     }
 
     @NotNull
-    public StreamChannel<OUT> tryFinally(@NotNull final Runnable runnable) {
+    public StreamChannel<IN, OUT> tryFinally(@NotNull final Runnable runnable) {
 
-        return buildChannel(mSourceChannel, mInvoke.andThen(
-                new TryFinallyInvoke<OUT>(buildChannelConfiguration(),
-                        ConstantConditions.notNull("runnable instance", runnable))));
+        return buildChannel(mBind.andThen(new BindTryFinally<OUT>(buildChannelConfiguration(),
+                ConstantConditions.notNull("runnable instance", runnable))));
     }
 
     @NotNull
     public List<OUT> all() {
 
-        return invoke().all();
+        return bind().all();
     }
 
     @NotNull
     public <CHANNEL extends InputChannel<? super OUT>> CHANNEL bind(
             @NotNull final CHANNEL channel) {
 
-        return invoke().bind(channel);
+        return bind().bind(channel);
     }
 
     @NotNull
     public Iterator<OUT> eventualIterator() {
 
-        return invoke().eventualIterator();
+        return bind().eventualIterator();
     }
 
     @Nullable
     public RoutineException getError() {
 
-        return invoke().getError();
+        return bind().getError();
     }
 
     public boolean hasCompleted() {
 
-        return invoke().hasCompleted();
+        return bind().hasCompleted();
     }
 
     public boolean hasNext() {
 
-        return invoke().hasNext();
+        return bind().hasNext();
     }
 
     public OUT next() {
 
-        return invoke().next();
+        return bind().next();
     }
 
     public boolean isBound() {
 
-        return invoke().isBound();
+        return bind().isBound();
     }
 
     @NotNull
     public List<OUT> next(final int count) {
 
-        return invoke().next(count);
+        return bind().next(count);
     }
 
     public OUT nextOrElse(final OUT output) {
 
-        return invoke().nextOrElse(output);
+        return bind().nextOrElse(output);
     }
 
     public void throwError() {
 
-        invoke().throwError();
+        bind().throwError();
     }
 
     public Iterator<OUT> iterator() {
 
-        return invoke().iterator();
+        return bind().iterator();
     }
 
     public void remove() {
 
-        invoke().remove();
+        bind().remove();
     }
 
     /**
@@ -750,6 +807,17 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     /**
+     * Returns the bind function.
+     *
+     * @return the bind function.
+     */
+    @NotNull
+    protected FunctionWrapper<OutputChannel<IN>, OutputChannel<OUT>> getBind() {
+
+        return mBind;
+    }
+
+    /**
      * Returns the configuration which will be used by the next routine concatenated to the stream.
      *
      * @return the configuration.
@@ -769,17 +837,6 @@ public abstract class AbstractStreamChannel<IN, OUT>
     protected InvocationMode getInvocationMode() {
 
         return mInvocationMode;
-    }
-
-    /**
-     * Returns the invoke function.
-     *
-     * @return the invoke function.
-     */
-    @NotNull
-    protected FunctionWrapper<OutputChannel<IN>, OutputChannel<OUT>> getInvoke() {
-
-        return mInvoke;
     }
 
     /**
@@ -812,14 +869,14 @@ public abstract class AbstractStreamChannel<IN, OUT>
      * @param streamConfiguration the stream configuration.
      * @param invocationMode      the invocation mode.
      * @param sourceChannel       the source output channel.
-     * @param invoke              the invoke function.
+     * @param bind                the bind function.
      * @return the newly created channel instance.
      */
     @NotNull
-    protected abstract <BEFORE, AFTER> StreamChannel<AFTER> newChannel(
+    protected abstract <BEFORE, AFTER> StreamChannel<BEFORE, AFTER> newChannel(
             @NotNull InvocationConfiguration streamConfiguration,
             @NotNull InvocationMode invocationMode, @NotNull OutputChannel<BEFORE> sourceChannel,
-            @NotNull Function<OutputChannel<BEFORE>, OutputChannel<AFTER>> invoke);
+            @NotNull Function<OutputChannel<BEFORE>, OutputChannel<AFTER>> bind);
 
     /**
      * Creates a new routine instance based on the specified factory.
@@ -835,15 +892,33 @@ public abstract class AbstractStreamChannel<IN, OUT>
             @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
 
     @NotNull
-    private <BEFORE, AFTER> StreamChannel<AFTER> buildChannel(
-            @NotNull final OutputChannel<BEFORE> sourceChannel,
-            @NotNull final Function<OutputChannel<BEFORE>, OutputChannel<AFTER>> invoke) {
+    private OutputChannel<OUT> bind() {
+
+        final boolean isBind;
+        synchronized (mMutex) {
+            if (mIsBound) {
+                throw new IllegalStateException("the channel is already bound");
+            }
+
+            isBind = (mChannel == null);
+        }
+
+        if (isBind) {
+            mChannel = mBind.apply(mSourceChannel);
+        }
+
+        return mChannel;
+    }
+
+    @NotNull
+    private <AFTER> StreamChannel<IN, AFTER> buildChannel(
+            @NotNull final Function<OutputChannel<IN>, OutputChannel<AFTER>> bind) {
 
         synchronized (mMutex) {
             mIsBound = true;
         }
 
-        return newChannel(mStreamConfiguration, mInvocationMode, sourceChannel, invoke);
+        return newChannel(mStreamConfiguration, mInvocationMode, mSourceChannel, bind);
     }
 
     @NotNull
@@ -854,254 +929,7 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
-    private OutputChannel<OUT> invoke() {
-
-        final boolean isInvoke;
-        synchronized (mMutex) {
-            if (mIsBound) {
-                throw new IllegalStateException("the channel is already bound");
-            }
-
-            isInvoke = (mChannel == null);
-        }
-
-        if (isInvoke) {
-            mChannel = mInvoke.apply(mSourceChannel);
-        }
-
-        return mChannel;
-    }
-
-    /**
-     * Concat invoke function.
-     *
-     * @param <OUT> the output data type.
-     */
-    private static class ConcatInvoke<OUT> extends DeepEqualObject
-            implements Function<OutputChannel<OUT>, OutputChannel<OUT>> {
-
-        private final OutputChannel<? extends OUT> mChannel;
-
-        private final ChannelConfiguration mConfiguration;
-
-        /**
-         * Constructor.
-         *
-         * @param configuration the channel configuration.
-         * @param channel       the output channel to concat.
-         */
-        private ConcatInvoke(@NotNull final ChannelConfiguration configuration,
-                @NotNull final OutputChannel<? extends OUT> channel) {
-
-            super(asArgs(configuration, channel));
-            mConfiguration = configuration;
-            mChannel = channel;
-        }
-
-        public OutputChannel<OUT> apply(final OutputChannel<OUT> channel) {
-
-            return Channels.<OUT>concat(channel, mChannel).channelConfiguration()
-                                                          .with(mConfiguration)
-                                                          .apply()
-                                                          .buildChannels();
-        }
-    }
-
-    /**
-     * Map invoke function.
-     *
-     * @param <IN>  the input data type.
-     * @param <OUT> the output data type.
-     */
-    private static class MapInvoke<IN, OUT> extends DeepEqualObject
-            implements Function<OutputChannel<IN>, OutputChannel<OUT>> {
-
-        private final InvocationMode mInvocationMode;
-
-        private final Routine mRoutine;
-
-        /**
-         * Constructor.
-         *
-         * @param routine        the routine to invoke.
-         * @param invocationMode the invocation mode.
-         */
-        private MapInvoke(@NotNull final Routine<? super IN, ? extends OUT> routine,
-                @NotNull final InvocationMode invocationMode) {
-
-            super(asArgs(routine, invocationMode));
-            mRoutine = routine;
-            mInvocationMode = invocationMode;
-        }
-
-        @SuppressWarnings("unchecked")
-        public OutputChannel<OUT> apply(final OutputChannel<IN> channel) {
-
-            final InvocationMode invocationMode = mInvocationMode;
-            if (invocationMode == InvocationMode.ASYNC) {
-                return (OutputChannel<OUT>) mRoutine.asyncCall(channel);
-
-            } else if (invocationMode == InvocationMode.PARALLEL) {
-                return (OutputChannel<OUT>) mRoutine.parallelCall(channel);
-
-            } else if (invocationMode == InvocationMode.SYNC) {
-                return (OutputChannel<OUT>) mRoutine.syncCall(channel);
-            }
-
-            return (OutputChannel<OUT>) mRoutine.serialCall(channel);
-        }
-    }
-
-    /**
-     * Repeat invoke function.
-     *
-     * @param <OUT> the output data type.
-     */
-    private static class RepeatInvoke<OUT> extends DeepEqualObject
-            implements Function<OutputChannel<OUT>, OutputChannel<OUT>> {
-
-        private final ChannelConfiguration mConfiguration;
-
-        /**
-         * Constructor.
-         *
-         * @param configuration the channel configuration.
-         */
-        private RepeatInvoke(@NotNull final ChannelConfiguration configuration) {
-
-            super(asArgs(configuration));
-            mConfiguration = configuration;
-        }
-
-        public OutputChannel<OUT> apply(final OutputChannel<OUT> channel) {
-
-            return Channels.repeat(channel)
-                           .channelConfiguration()
-                           .with(mConfiguration)
-                           .apply()
-                           .buildChannels();
-        }
-    }
-
-    /**
-     * Selectable invoke function.
-     *
-     * @param <OUT> the output data type.
-     */
-    private static class SelectableInvoke<OUT> extends DeepEqualObject
-            implements Function<OutputChannel<OUT>, OutputChannel<Selectable<OUT>>> {
-
-        private final ChannelConfiguration mConfiguration;
-
-        private final int mIndex;
-
-        /**
-         * Constructor.
-         *
-         * @param configuration the channel configuration.
-         * @param index         the selectable index.
-         */
-        private SelectableInvoke(@NotNull final ChannelConfiguration configuration,
-                final int index) {
-
-            super(asArgs(configuration, index));
-            mConfiguration = configuration;
-            mIndex = index;
-        }
-
-        @SuppressWarnings("unchecked")
-        public OutputChannel<Selectable<OUT>> apply(final OutputChannel<OUT> channel) {
-
-            final OutputChannel<? extends Selectable<OUT>> outputChannel =
-                    Channels.toSelectable(channel, mIndex)
-                            .channelConfiguration()
-                            .with(mConfiguration)
-                            .apply()
-                            .buildChannels();
-            return (OutputChannel<Selectable<OUT>>) outputChannel;
-        }
-    }
-
-    /**
-     * Try/catch invoke function.
-     *
-     * @param <OUT> the output data type.
-     */
-    private static class TryCatchInvoke<OUT> extends DeepEqualObject
-            implements Function<OutputChannel<OUT>, OutputChannel<OUT>> {
-
-        private final ChannelConfiguration mConfiguration;
-
-        private final BiConsumerWrapper<? super RoutineException, ? super InputChannel<OUT>>
-                mConsumer;
-
-        /**
-         * Constructor.
-         *
-         * @param configuration the channel configuration.
-         * @param consumer      the error consumer instance.
-         */
-        private TryCatchInvoke(@NotNull final ChannelConfiguration configuration,
-                @NotNull final BiConsumerWrapper<? super RoutineException, ? super
-                        InputChannel<OUT>> consumer) {
-
-            super(asArgs(configuration, consumer));
-            mConfiguration = configuration;
-            mConsumer = consumer;
-        }
-
-        public OutputChannel<OUT> apply(final OutputChannel<OUT> channel) {
-
-            final IOChannel<OUT> ioChannel = JRoutineCore.io()
-                                                         .channelConfiguration()
-                                                         .with(mConfiguration)
-                                                         .apply()
-                                                         .buildChannel();
-            channel.bind(new TryCatchOutputConsumer<OUT>(mConsumer, ioChannel));
-            return ioChannel;
-        }
-    }
-
-    /**
-     * Try/finally invoke function.
-     *
-     * @param <OUT> the output data type.
-     */
-    private static class TryFinallyInvoke<OUT> extends DeepEqualObject
-            implements Function<OutputChannel<OUT>, OutputChannel<OUT>> {
-
-        private final ChannelConfiguration mConfiguration;
-
-        private final Runnable mRunnable;
-
-        /**
-         * Constructor.
-         *
-         * @param configuration the channel configuration.
-         * @param runnable      the final runnable.
-         */
-        private TryFinallyInvoke(@NotNull final ChannelConfiguration configuration,
-                @NotNull final Runnable runnable) {
-
-            super(asArgs(configuration, runnable));
-            mConfiguration = configuration;
-            mRunnable = runnable;
-        }
-
-        public OutputChannel<OUT> apply(final OutputChannel<OUT> channel) {
-
-            final IOChannel<OUT> ioChannel = JRoutineCore.io()
-                                                         .channelConfiguration()
-                                                         .with(mConfiguration)
-                                                         .apply()
-                                                         .buildChannel();
-            channel.bind(new TryFinallyOutputConsumer<OUT>(mRunnable, ioChannel));
-            return ioChannel;
-        }
-    }
-
-    @NotNull
-    public StreamChannel<OUT> apply(@NotNull final InvocationConfiguration configuration) {
+    public StreamChannel<IN, OUT> apply(@NotNull final InvocationConfiguration configuration) {
 
         mConfiguration = ConstantConditions.notNull("invocation configuration", configuration);
         return this;

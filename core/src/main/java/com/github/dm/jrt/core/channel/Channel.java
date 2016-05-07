@@ -80,6 +80,13 @@ public interface Channel {
     boolean isOpen();
 
     /**
+     * Returns the number of data stored in the channel.
+     *
+     * @return the data size.
+     */
+    int size();
+
+    /**
      * Interface defining an input channel.
      * <p>
      * Note that the delivery order of the input data might not be guaranteed.

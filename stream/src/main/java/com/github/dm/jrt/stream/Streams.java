@@ -116,8 +116,8 @@ public class Streams extends Functions {
      */
     @NotNull
     public static <IN, OUT> InvocationFactory<IN, OUT> asFactory(
-            @NotNull final Function<? super StreamChannel<IN>, ? extends
-                    StreamChannel<? extends OUT>> function) {
+            @NotNull final Function<? super StreamChannel<IN, IN>, ? extends StreamChannel<?
+                    super IN, ? extends OUT>> function) {
 
         return new StreamInvocationFactory<IN, OUT>(wrap(function));
     }
@@ -161,7 +161,7 @@ public class Streams extends Functions {
      * @see Channels#blend(Iterable)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends StreamChannel<OUT>> blend(
+    public static <OUT> ChannelsBuilder<? extends StreamChannel<OUT, OUT>> blend(
             @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
 
         return new BuilderWrapper<OUT>(Channels.blend(channels));
@@ -182,7 +182,7 @@ public class Streams extends Functions {
      * @see Channels#blend(Channel.OutputChannel...)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends StreamChannel<OUT>> blend(
+    public static <OUT> ChannelsBuilder<? extends StreamChannel<OUT, OUT>> blend(
             @NotNull final OutputChannel<?>... channels) {
 
         return new BuilderWrapper<OUT>(Channels.<OUT>blend(channels));
@@ -319,7 +319,7 @@ public class Streams extends Functions {
      * @see Channels#concat(Iterable)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends StreamChannel<OUT>> concat(
+    public static <OUT> ChannelsBuilder<? extends StreamChannel<OUT, OUT>> concat(
             @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
 
         return new BuilderWrapper<OUT>(Channels.concat(channels));
@@ -342,7 +342,7 @@ public class Streams extends Functions {
      * @see Channels#concat(Channel.OutputChannel...)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends StreamChannel<OUT>> concat(
+    public static <OUT> ChannelsBuilder<? extends StreamChannel<OUT, OUT>> concat(
             @NotNull final OutputChannel<?>... channels) {
 
         return new BuilderWrapper<OUT>(Channels.<OUT>concat(channels));
@@ -547,7 +547,8 @@ public class Streams extends Functions {
      * @see Channels#join(Iterable)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends StreamChannel<List<? extends OUT>>> join(
+    public static <OUT> ChannelsBuilder<? extends StreamChannel<List<? extends OUT>, List<?
+            extends OUT>>> join(
             @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
 
         return new BuilderWrapper<List<? extends OUT>>(Channels.join(channels));
@@ -570,8 +571,8 @@ public class Streams extends Functions {
      * @see Channels#join(Channel.OutputChannel...)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends StreamChannel<List<? extends OUT>>> join(
-            @NotNull final OutputChannel<?>... channels) {
+    public static <OUT> ChannelsBuilder<? extends StreamChannel<List<? extends OUT>, List<?
+            extends OUT>>> join(@NotNull final OutputChannel<?>... channels) {
 
         return new BuilderWrapper<List<? extends OUT>>(Channels.<OUT>join(channels));
     }
@@ -597,8 +598,8 @@ public class Streams extends Functions {
      * @see Channels#join(Object, Iterable)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends StreamChannel<List<? extends OUT>>> join(
-            @Nullable final OUT placeholder,
+    public static <OUT> ChannelsBuilder<? extends StreamChannel<List<? extends OUT>, List<?
+            extends OUT>>> join(@Nullable final OUT placeholder,
             @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
 
         return new BuilderWrapper<List<? extends OUT>>(Channels.join(placeholder, channels));
@@ -625,8 +626,9 @@ public class Streams extends Functions {
      * @see Channels#join(Object, Channel.OutputChannel...)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends StreamChannel<List<? extends OUT>>> join(
-            @Nullable final OUT placeholder, @NotNull final OutputChannel<?>... channels) {
+    public static <OUT> ChannelsBuilder<? extends StreamChannel<List<? extends OUT>, List<?
+            extends OUT>>> join(@Nullable final OUT placeholder,
+            @NotNull final OutputChannel<?>... channels) {
 
         return new BuilderWrapper<List<? extends OUT>>(Channels.join(placeholder, channels));
     }
@@ -686,8 +688,8 @@ public class Streams extends Functions {
      * @see Channels#merge(int, Iterable)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends StreamChannel<? extends Selectable<OUT>>> merge(
-            final int startIndex,
+    public static <OUT> ChannelsBuilder<? extends StreamChannel<? extends Selectable<OUT>, ?
+            extends Selectable<OUT>>> merge(final int startIndex,
             @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
 
         return new BuilderWrapper<Selectable<OUT>>(Channels.merge(startIndex, channels));
@@ -709,8 +711,9 @@ public class Streams extends Functions {
      * @see Channels#merge(int, Channel.OutputChannel...)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends StreamChannel<? extends Selectable<OUT>>> merge(
-            final int startIndex, @NotNull final OutputChannel<?>... channels) {
+    public static <OUT> ChannelsBuilder<? extends StreamChannel<? extends Selectable<OUT>, ?
+            extends Selectable<OUT>>> merge(final int startIndex,
+            @NotNull final OutputChannel<?>... channels) {
 
         return new BuilderWrapper<Selectable<OUT>>(Channels.<OUT>merge(startIndex, channels));
     }
@@ -730,7 +733,8 @@ public class Streams extends Functions {
      * @see Channels#merge(Iterable)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends StreamChannel<? extends Selectable<OUT>>> merge(
+    public static <OUT> ChannelsBuilder<? extends StreamChannel<? extends Selectable<OUT>, ?
+            extends Selectable<OUT>>> merge(
             @NotNull final Iterable<? extends OutputChannel<? extends OUT>> channels) {
 
         return new BuilderWrapper<Selectable<OUT>>(Channels.merge(channels));
@@ -751,7 +755,8 @@ public class Streams extends Functions {
      * @see Channels#merge(Map)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends StreamChannel<? extends Selectable<OUT>>> merge(
+    public static <OUT> ChannelsBuilder<? extends StreamChannel<? extends Selectable<OUT>, ?
+            extends Selectable<OUT>>> merge(
             @NotNull final Map<Integer, ? extends OutputChannel<? extends OUT>> channels) {
 
         return new BuilderWrapper<Selectable<OUT>>(Channels.merge(channels));
@@ -772,8 +777,8 @@ public class Streams extends Functions {
      * @see Channels#merge(Channel.OutputChannel...)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends StreamChannel<? extends Selectable<OUT>>> merge(
-            @NotNull final OutputChannel<?>... channels) {
+    public static <OUT> ChannelsBuilder<? extends StreamChannel<? extends Selectable<OUT>, ?
+            extends Selectable<OUT>>> merge(@NotNull final OutputChannel<?>... channels) {
 
         return new BuilderWrapper<Selectable<OUT>>(Channels.<OUT>merge(channels));
     }
@@ -822,8 +827,8 @@ public class Streams extends Functions {
      */
     @NotNull
     public static <IN, OUT> RoutineBuilder<IN, OUT> onStream(
-            @NotNull final Function<? super StreamChannel<IN>, ? extends
-                    StreamChannel<? extends OUT>> function) {
+            @NotNull final Function<? super StreamChannel<IN, IN>, ? extends StreamChannel<?
+                    super IN, ? extends OUT>> function) {
 
         return JRoutineCore.on(asFactory(function));
     }
@@ -841,7 +846,7 @@ public class Streams extends Functions {
      * @return the consumer instance.
      */
     @NotNull
-    public static <AFTER extends Comparable<? super AFTER>> RangeConsumer<AFTER> range(
+    public static <AFTER extends Comparable<? super AFTER>> Consumer<InputChannel<AFTER>> range(
             @NotNull final AFTER start, @NotNull final AFTER end,
             @NotNull final Function<AFTER, AFTER> increment) {
 
@@ -859,13 +864,15 @@ public class Streams extends Functions {
      *
      * @param start the first element of the range.
      * @param end   the last element of the range.
+     * @param <N>   the number type.
      * @return the consumer instance.
      */
     @NotNull
-    public static RangeConsumer<? extends Number> range(@NotNull final Number start,
-            @NotNull final Number end) {
+    @SuppressWarnings("unchecked")
+    public static <N extends Number> Consumer<InputChannel<N>> range(@NotNull final N start,
+            @NotNull final N end) {
 
-        return numberRange(start, end);
+        return (Consumer<InputChannel<N>>) numberRange(start, end);
     }
 
     /**
@@ -877,13 +884,15 @@ public class Streams extends Functions {
      * @param start     the first element of the range.
      * @param end       the last element of the range.
      * @param increment the increment to apply to the current element.
+     * @param <N>       the number type.
      * @return the consumer instance.
      */
     @NotNull
-    public static RangeConsumer<? extends Number> range(@NotNull final Number start,
-            @NotNull final Number end, @NotNull final Number increment) {
+    @SuppressWarnings("unchecked")
+    public static <N extends Number> Consumer<InputChannel<N>> range(@NotNull final N start,
+            @NotNull final N end, @NotNull final N increment) {
 
-        return numberRange(start, end, increment);
+        return (Consumer<InputChannel<N>>) numberRange(start, end, increment);
     }
 
     /**
@@ -899,7 +908,7 @@ public class Streams extends Functions {
      * @see Channels#repeat(Channel.OutputChannel)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends StreamChannel<OUT>> repeat(
+    public static <OUT> ChannelsBuilder<? extends StreamChannel<OUT, OUT>> repeat(
             @NotNull final OutputChannel<OUT> channel) {
 
         return new BuilderWrapper<OUT>(Channels.repeat(channel));
@@ -1036,7 +1045,7 @@ public class Streams extends Functions {
      * @see Channels#select(int, int, Channel.OutputChannel)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends Map<Integer, StreamChannel<OUT>>> select(
+    public static <OUT> ChannelsBuilder<? extends Map<Integer, StreamChannel<OUT, OUT>>> select(
             final int startIndex, final int rangeSize,
             @NotNull final OutputChannel<? extends Selectable<? extends OUT>> channel) {
 
@@ -1059,7 +1068,7 @@ public class Streams extends Functions {
      * @see Channels#select(Channel.OutputChannel, int...)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends Map<Integer, StreamChannel<OUT>>> select(
+    public static <OUT> ChannelsBuilder<? extends Map<Integer, StreamChannel<OUT, OUT>>> select(
             @NotNull final OutputChannel<? extends Selectable<? extends OUT>> channel,
             @NotNull final int... indexes) {
 
@@ -1082,7 +1091,7 @@ public class Streams extends Functions {
      * @see Channels#select(Channel.OutputChannel, Iterable)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends Map<Integer, StreamChannel<OUT>>> select(
+    public static <OUT> ChannelsBuilder<? extends Map<Integer, StreamChannel<OUT, OUT>>> select(
             @NotNull final OutputChannel<? extends Selectable<? extends OUT>> channel,
             @NotNull final Iterable<Integer> indexes) {
 
@@ -1168,7 +1177,7 @@ public class Streams extends Functions {
      * @return the newly created stream instance.
      */
     @NotNull
-    public static <OUT> StreamChannel<OUT> streamOf() {
+    public static <OUT> StreamChannel<OUT, OUT> streamOf() {
 
         return streamOf(JRoutineCore.io().<OUT>buildChannel().close());
     }
@@ -1184,7 +1193,7 @@ public class Streams extends Functions {
      * @return the newly created stream instance.
      */
     @NotNull
-    public static <OUT> StreamChannel<OUT> streamOf(@Nullable final Iterable<OUT> outputs) {
+    public static <OUT> StreamChannel<OUT, OUT> streamOf(@Nullable final Iterable<OUT> outputs) {
 
         return streamOf(JRoutineCore.io().of(outputs));
     }
@@ -1200,7 +1209,7 @@ public class Streams extends Functions {
      * @return the newly created stream instance.
      */
     @NotNull
-    public static <OUT> StreamChannel<OUT> streamOf(@Nullable final OUT output) {
+    public static <OUT> StreamChannel<OUT, OUT> streamOf(@Nullable final OUT output) {
 
         return streamOf(JRoutineCore.io().of(output));
     }
@@ -1216,7 +1225,7 @@ public class Streams extends Functions {
      * @return the newly created stream instance.
      */
     @NotNull
-    public static <OUT> StreamChannel<OUT> streamOf(@Nullable final OUT... outputs) {
+    public static <OUT> StreamChannel<OUT, OUT> streamOf(@Nullable final OUT... outputs) {
 
         return streamOf(JRoutineCore.io().of(outputs));
     }
@@ -1234,10 +1243,10 @@ public class Streams extends Functions {
      * @return the newly created stream instance.
      */
     @NotNull
-    public static <OUT> StreamChannel<OUT> streamOf(@NotNull final OutputChannel<OUT> output) {
+    public static <OUT> StreamChannel<OUT, OUT> streamOf(@NotNull final OutputChannel<OUT> output) {
 
         if (output instanceof StreamChannel) {
-            return (StreamChannel<OUT>) output;
+            return (StreamChannel<OUT, OUT>) output;
         }
 
         return new DefaultStreamChannel<OUT, OUT>(output, Functions.<OutputChannel<OUT>>identity());
@@ -1321,8 +1330,8 @@ public class Streams extends Functions {
      * @see Channels#toSelectable(Channel.OutputChannel, int)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends StreamChannel<? extends Selectable<OUT>>>
-    toSelectable(
+    public static <OUT> ChannelsBuilder<? extends StreamChannel<? extends Selectable<OUT>, ?
+            extends Selectable<OUT>>> toSelectable(
             @NotNull final OutputChannel<? extends OUT> channel, final int index) {
 
         return new BuilderWrapper<Selectable<OUT>>(Channels.toSelectable(channel, index));
@@ -1366,8 +1375,9 @@ public class Streams extends Functions {
     }
 
     @NotNull
-    private static RangeConsumer<? extends Number> numberRange(@NotNull final Number start,
-            @NotNull final Number end) {
+    private static <N extends Number> Consumer<? extends InputChannel<? extends Number>>
+    numberRange(
+            @NotNull final N start, @NotNull final N end) {
 
         if ((start instanceof BigDecimal) || (end instanceof BigDecimal)) {
             final BigDecimal startValue = toBigSafe(start);
@@ -1425,8 +1435,9 @@ public class Streams extends Functions {
     }
 
     @NotNull
-    private static RangeConsumer<? extends Number> numberRange(@NotNull final Number start,
-            @NotNull final Number end, @NotNull final Number increment) {
+    private static <N extends Number> Consumer<? extends InputChannel<? extends Number>>
+    numberRange(
+            @NotNull final N start, @NotNull final N end, @NotNull final N increment) {
 
         if ((start instanceof BigDecimal) || (end instanceof BigDecimal)
                 || (increment instanceof BigDecimal)) {
@@ -1499,58 +1510,6 @@ public class Streams extends Functions {
                         + end.getClass().getCanonicalName() + ", " + increment.getClass()
                                                                               .getCanonicalName()
                         + "]");
-    }
-
-    /**
-     * Consumer implementation generating a range of data.
-     *
-     * @param <OUT> the output data type.
-     */
-    public static class RangeConsumer<OUT extends Comparable<? super OUT>> extends DeepEqualObject
-            implements Consumer<InputChannel<OUT>> {
-
-        private final OUT mEnd;
-
-        private final Function<OUT, OUT> mIncrement;
-
-        private final OUT mStart;
-
-        /**
-         * Constructor.
-         *
-         * @param start     the first element of the range.
-         * @param end       the last element of the range.
-         * @param increment the function incrementing the current element.
-         */
-        private RangeConsumer(@NotNull final OUT start, @NotNull final OUT end,
-                @NotNull final Function<OUT, OUT> increment) {
-
-            super(asArgs(ConstantConditions.notNull("start element", start),
-                    ConstantConditions.notNull("end element", end), increment));
-            mStart = start;
-            mEnd = end;
-            mIncrement = increment;
-        }
-
-        public void accept(final InputChannel<OUT> result) {
-
-            final OUT start = mStart;
-            final OUT end = mEnd;
-            final Function<OUT, OUT> increment = mIncrement;
-            OUT current = start;
-            if (start.compareTo(end) <= 0) {
-                while (current.compareTo(end) <= 0) {
-                    result.pass(current);
-                    current = increment.apply(current);
-                }
-
-            } else {
-                while (current.compareTo(end) >= 0) {
-                    result.pass(current);
-                    current = increment.apply(current);
-                }
-            }
-        }
     }
 
     /**
@@ -1737,6 +1696,58 @@ public class Streams extends Functions {
         private NumberInc(@NotNull final N incValue) {
 
             super(asArgs(incValue));
+        }
+    }
+
+    /**
+     * Consumer implementation generating a range of data.
+     *
+     * @param <OUT> the output data type.
+     */
+    private static class RangeConsumer<OUT extends Comparable<? super OUT>> extends DeepEqualObject
+            implements Consumer<InputChannel<OUT>> {
+
+        private final OUT mEnd;
+
+        private final Function<OUT, OUT> mIncrement;
+
+        private final OUT mStart;
+
+        /**
+         * Constructor.
+         *
+         * @param start     the first element of the range.
+         * @param end       the last element of the range.
+         * @param increment the function incrementing the current element.
+         */
+        private RangeConsumer(@NotNull final OUT start, @NotNull final OUT end,
+                @NotNull final Function<OUT, OUT> increment) {
+
+            super(asArgs(ConstantConditions.notNull("start element", start),
+                    ConstantConditions.notNull("end element", end), increment));
+            mStart = start;
+            mEnd = end;
+            mIncrement = increment;
+        }
+
+        public void accept(final InputChannel<OUT> result) {
+
+            final OUT start = mStart;
+            final OUT end = mEnd;
+            final Function<OUT, OUT> increment = mIncrement;
+            OUT current = start;
+            if (start.compareTo(end) <= 0) {
+                while (current.compareTo(end) <= 0) {
+                    result.pass(current);
+                    current = increment.apply(current);
+                }
+
+            } else {
+                while (current.compareTo(end) >= 0) {
+                    result.pass(current);
+                    current = increment.apply(current);
+                }
+            }
         }
     }
 

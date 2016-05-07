@@ -670,7 +670,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      *
      * @param factory the context invocation factory.
      * @param <AFTER> the concatenation output type.
-     * @return the concatenated stream.
+     * @return the concatenated stream instance.
      * @throws java.lang.IllegalStateException if the loader context is not set.
      */
     @NotNull
@@ -678,13 +678,42 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> map(
             @NotNull ContextInvocationFactory<? super OUT, ? extends AFTER> factory);
 
-    // TODO: 07/05/16 javadoc
+    /**
+     * Splits the outputs produced by this stream, so that each group will be processed by a
+     * different routine invocation.
+     * <br>
+     * Each output will be assigned to a specific group based on the key returned by the specified
+     * function.
+     * <p>
+     * Note that the created routine will employ the same configuration and invocation mode as this
+     * stream.
+     *
+     * @param keyFunction the function assigning a key to each output.
+     * @param factory     the processing invocation factory.
+     * @param <AFTER>     the concatenation output type.
+     * @return the concatenated stream instance.
+     */
     @NotNull
     @StreamTransform(TransformType.BIND)
-    <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(@NotNull Function<? super OUT, ?> key,
+    <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(
+            @NotNull Function<? super OUT, ?> keyFunction,
             @NotNull ContextInvocationFactory<? super OUT, ? extends AFTER> factory);
 
-    // TODO: 07/05/16 javadoc
+    /**
+     * Splits the outputs produced by this stream, so that each group will be processed by a
+     * different routine invocation.
+     * <br>
+     * Each output will be assigned to a specific group based on the load of the available
+     * invocations.
+     * <p>
+     * Note that the created routine will employ the same configuration and invocation mode as this
+     * stream.
+     *
+     * @param count   the number of groups.
+     * @param factory the processing invocation factory.
+     * @param <AFTER> the concatenation output type.
+     * @return the concatenated stream instance.
+     */
     @NotNull
     @StreamTransform(TransformType.BIND)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(int count,

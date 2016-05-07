@@ -64,14 +64,14 @@ public @interface StreamTransform {
          */
         CONFIG,
         /**
-         * The flow of data is stopped so that all incoming inputs are collected before a new output
-         * is produced.
+         * The flow of data is stopped, so that all incoming inputs are collected before a new
+         * output is produced.
          * <br>
          * A new stream instance is returned.
          */
         STOP,
         /**
-         * The flow of input data is started.
+         * The flow of input data is initiated.
          * <br>
          * Note that all the stream instances are lazy, that is, the flow of data will not begin
          * until a method of this type gets called.

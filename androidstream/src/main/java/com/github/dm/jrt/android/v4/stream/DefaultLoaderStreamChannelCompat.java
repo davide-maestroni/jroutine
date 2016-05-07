@@ -851,7 +851,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
     @NotNull
     public <AFTER> LoaderStreamChannelCompat<IN, AFTER> splitBy(
-            @NotNull final Function<? super OUT, ?> key,
+            @NotNull final Function<? super OUT, ?> keyFunction,
             @NotNull final ContextInvocationFactory<? super OUT, ? extends AFTER> factory) {
 
         final LoaderBuilderCompat contextBuilder = mContextBuilder;
@@ -859,16 +859,16 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
             throw new IllegalStateException("the loader context is null");
         }
 
-        checkStatic(wrap(key), key);
+        checkStatic(wrap(keyFunction), keyFunction);
         checkStatic("factory", factory);
-        return splitBy(key, contextBuilder.on(factory)
-                                          .invocationConfiguration()
-                                          .with(buildConfiguration())
-                                          .apply()
-                                          .loaderConfiguration()
-                                          .with(buildLoaderConfiguration())
-                                          .apply()
-                                          .buildRoutine());
+        return splitBy(keyFunction, contextBuilder.on(factory)
+                                                  .invocationConfiguration()
+                                                  .with(buildConfiguration())
+                                                  .apply()
+                                                  .loaderConfiguration()
+                                                  .with(buildLoaderConfiguration())
+                                                  .apply()
+                                                  .buildRoutine());
     }
 
     @NotNull

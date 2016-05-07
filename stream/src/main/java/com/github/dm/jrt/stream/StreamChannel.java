@@ -218,7 +218,7 @@ public interface StreamChannel<IN, OUT>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param consumer the bi-consumer instance.
-     * @return the concatenated stream.
+     * @return the concatenated stream instance.
      */
     @NotNull
     @StreamTransform(TransformType.STOP)
@@ -236,7 +236,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param supplier the supplier of collections.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream.
+     * @return the concatenated stream instance.
      */
     @NotNull
     @StreamTransform(TransformType.STOP)
@@ -263,7 +263,7 @@ public interface StreamChannel<IN, OUT>
      * @param supplier the supplier of initial accumulation values.
      * @param consumer the bi-consumer instance.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream.
+     * @return the concatenated stream instance.
      */
     @NotNull
     @StreamTransform(TransformType.STOP)
@@ -336,7 +336,7 @@ public interface StreamChannel<IN, OUT>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param predicate the predicate instance.
-     * @return the concatenated stream.
+     * @return the concatenated stream instance.
      */
     @NotNull
     @StreamTransform(TransformType.BIND)
@@ -351,7 +351,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param function the function instance.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream.
+     * @return the concatenated stream instance.
      */
     @NotNull
     @StreamTransform(TransformType.BIND)
@@ -381,7 +381,7 @@ public interface StreamChannel<IN, OUT>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param count the maximum number of outputs.
-     * @return the concatenated stream.
+     * @return the concatenated stream instance.
      * @throws java.lang.IllegalArgumentException if the count is negative.
      */
     @NotNull
@@ -397,7 +397,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param consumer the bi-consumer instance.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream.
+     * @return the concatenated stream instance.
      */
     @NotNull
     @StreamTransform(TransformType.BIND)
@@ -413,7 +413,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param function the function instance.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream.
+     * @return the concatenated stream instance.
      */
     @NotNull
     @StreamTransform(TransformType.BIND)
@@ -428,7 +428,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param factory the invocation factory.
      * @param <AFTER> the concatenation output type.
-     * @return the concatenated stream.
+     * @return the concatenated stream instance.
      */
     @NotNull
     @StreamTransform(TransformType.BIND)
@@ -446,7 +446,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param routine the routine instance.
      * @param <AFTER> the concatenation output type.
-     * @return the concatenated stream.
+     * @return the concatenated stream instance.
      */
     @NotNull
     @StreamTransform(TransformType.BIND)
@@ -463,7 +463,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param consumer the bi-consumer instance.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream.
+     * @return the concatenated stream instance.
      */
     @NotNull
     @StreamTransform(TransformType.STOP)
@@ -481,7 +481,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param function the function instance.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream.
+     * @return the concatenated stream instance.
      */
     @NotNull
     @StreamTransform(TransformType.STOP)
@@ -496,7 +496,7 @@ public interface StreamChannel<IN, OUT>
      * Note that this stream will be bound as a result of the call.
      *
      * @param consumer the consumer instance.
-     * @return the concatenated stream.
+     * @return the concatenated stream instance.
      */
     @NotNull
     @StreamTransform(TransformType.BIND)
@@ -512,7 +512,7 @@ public interface StreamChannel<IN, OUT>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param consumer the consumer instance.
-     * @return the concatenated stream.
+     * @return the concatenated stream instance.
      */
     @NotNull
     @StreamTransform(TransformType.BIND)
@@ -528,7 +528,7 @@ public interface StreamChannel<IN, OUT>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param output the output to return.
-     * @return the concatenated stream.
+     * @return the concatenated stream instance.
      */
     @NotNull
     @StreamTransform(TransformType.BIND)
@@ -544,7 +544,7 @@ public interface StreamChannel<IN, OUT>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param outputs the outputs to return.
-     * @return the concatenated stream.
+     * @return the concatenated stream instance.
      */
     @NotNull
     @StreamTransform(TransformType.BIND)
@@ -560,7 +560,7 @@ public interface StreamChannel<IN, OUT>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param outputs the outputs to return.
-     * @return the concatenated stream.
+     * @return the concatenated stream instance.
      */
     @NotNull
     @StreamTransform(TransformType.BIND)
@@ -578,7 +578,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param count    the number of generated outputs.
      * @param consumer the consumer instance.
-     * @return the concatenated stream.
+     * @return the concatenated stream instance.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
@@ -596,7 +596,7 @@ public interface StreamChannel<IN, OUT>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param consumer the consumer instance.
-     * @return the concatenated stream.
+     * @return the concatenated stream instance.
      */
     @NotNull
     @StreamTransform(TransformType.BIND)
@@ -614,7 +614,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param count    the number of generated outputs.
      * @param supplier the supplier instance.
-     * @return the concatenated stream.
+     * @return the concatenated stream instance.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
@@ -631,7 +631,7 @@ public interface StreamChannel<IN, OUT>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param supplier the supplier instance.
-     * @return the concatenated stream.
+     * @return the concatenated stream instance.
      */
     @NotNull
     @StreamTransform(TransformType.BIND)
@@ -683,7 +683,7 @@ public interface StreamChannel<IN, OUT>
      * Note that the invocation will be aborted if an exception escapes the consumer.
      *
      * @param consumer the consumer instance.
-     * @return the concatenated stream.
+     * @return the concatenated stream instance.
      */
     @NotNull
     @StreamTransform(TransformType.BIND)
@@ -707,7 +707,7 @@ public interface StreamChannel<IN, OUT>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param function the bi-function instance.
-     * @return the concatenated stream.
+     * @return the concatenated stream instance.
      */
     @NotNull
     @StreamTransform(TransformType.STOP)
@@ -734,7 +734,7 @@ public interface StreamChannel<IN, OUT>
      * @param supplier the supplier of initial accumulation values.
      * @param function the bi-function instance.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream.
+     * @return the concatenated stream instance.
      */
     @NotNull
     @StreamTransform(TransformType.STOP)
@@ -763,7 +763,7 @@ public interface StreamChannel<IN, OUT>
      * the output data through the specified runner.
      *
      * @param runner the runner instance.
-     * @return the concatenated stream.
+     * @return the concatenated stream instance.
      */
     @NotNull
     @StreamTransform(TransformType.BIND)
@@ -772,7 +772,7 @@ public interface StreamChannel<IN, OUT>
     /**
      * Short for {@code runOn(null)}.
      *
-     * @return the concatenated stream.
+     * @return the concatenated stream instance.
      * @see #runOn(Runner)
      */
     @NotNull
@@ -796,46 +796,123 @@ public interface StreamChannel<IN, OUT>
      * Note also that this stream will be bound as a result of the call.
      *
      * @param count the number of outputs to skip.
-     * @return the concatenated stream.
+     * @return the concatenated stream instance.
      * @throws java.lang.IllegalArgumentException if the count is negative.
      */
     @NotNull
     @StreamTransform(TransformType.BIND)
     StreamChannel<IN, OUT> skip(int count);
 
-    // TODO: 07/05/16 javadoc
+    /**
+     * Splits the outputs produced by this stream, so that each group will be processed by a
+     * different channel instance.
+     * <br>
+     * Each output will be assigned to a specific group based on the key returned by the specified
+     * function.
+     * <p>
+     * Note that the created channels will employ the same configuration and invocation mode as this
+     * stream.
+     *
+     * @param keyFunction the function assigning a key to each output.
+     * @param function    the function creating the processing stream channels.
+     * @param <AFTER>     the concatenation output type.
+     * @return the concatenated stream instance.
+     */
     @NotNull
     @StreamTransform(TransformType.BIND)
     <AFTER> StreamChannel<IN, AFTER> splitBy(@NotNull Function<? super OUT, ?> keyFunction,
             @NotNull Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<?
                     super OUT, ? extends AFTER>> function);
 
-    // TODO: 07/05/16 javadoc
+    /**
+     * Splits the outputs produced by this stream, so that each group will be processed by a
+     * different routine invocation.
+     * <br>
+     * Each output will be assigned to a specific group based on the key returned by the specified
+     * function.
+     * <p>
+     * Note that the created routine will employ the same configuration and invocation mode as this
+     * stream.
+     *
+     * @param keyFunction the function assigning a key to each output.
+     * @param factory     the processing invocation factory.
+     * @param <AFTER>     the concatenation output type.
+     * @return the concatenated stream instance.
+     */
     @NotNull
     @StreamTransform(TransformType.BIND)
     <AFTER> StreamChannel<IN, AFTER> splitBy(@NotNull Function<? super OUT, ?> keyFunction,
             @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
 
-    // TODO: 07/05/16 javadoc
+    /**
+     * Splits the outputs produced by this stream, so that each group will be processed by a
+     * different routine invocation.
+     * <br>
+     * Each output will be assigned to a specific group based on the key returned by the specified
+     * function.
+     *
+     * @param keyFunction the function assigning a key to each output.
+     * @param routine     the processing routine instance.
+     * @param <AFTER>     the concatenation output type.
+     * @return the concatenated stream instance.
+     */
     @NotNull
     @StreamTransform(TransformType.BIND)
     <AFTER> StreamChannel<IN, AFTER> splitBy(@NotNull Function<? super OUT, ?> keyFunction,
             @NotNull Routine<? super OUT, ? extends AFTER> routine);
 
-    // TODO: 07/05/16 javadoc
+    /**
+     * Splits the outputs produced by this stream, so that each group will be processed by a
+     * different channel instance.
+     * <br>
+     * Each output will be assigned to a specific group based on the load of the available channels.
+     * <p>
+     * Note that the created channels will employ the same configuration and invocation mode as this
+     * stream.
+     *
+     * @param count    the number of groups.
+     * @param function the function creating the processing stream channels.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream instance.
+     */
     @NotNull
     @StreamTransform(TransformType.BIND)
     <AFTER> StreamChannel<IN, AFTER> splitBy(int count,
             @NotNull Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<?
                     super OUT, ? extends AFTER>> function);
 
-    // TODO: 07/05/16 javadoc
+    /**
+     * Splits the outputs produced by this stream, so that each group will be processed by a
+     * different routine invocation.
+     * <br>
+     * Each output will be assigned to a specific group based on the load of the available
+     * invocations.
+     * <p>
+     * Note that the created routine will employ the same configuration and invocation mode as this
+     * stream.
+     *
+     * @param count   the number of groups.
+     * @param factory the processing invocation factory.
+     * @param <AFTER> the concatenation output type.
+     * @return the concatenated stream instance.
+     */
     @NotNull
     @StreamTransform(TransformType.BIND)
     <AFTER> StreamChannel<IN, AFTER> splitBy(int count,
             @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
 
-    // TODO: 07/05/16 javadoc
+    /**
+     * Splits the outputs produced by this stream, so that each group will be processed by a
+     * different routine invocation.
+     * <br>
+     * Each output will be assigned to a specific group based on the load of the available
+     * invocations.
+     *
+     * @param count   the number of groups.
+     * @param routine the processing routine instance.
+     * @param <AFTER> the concatenation output type.
+     * @return the concatenated stream instance.
+     */
     @NotNull
     @StreamTransform(TransformType.BIND)
     <AFTER> StreamChannel<IN, AFTER> splitBy(int count,
@@ -876,7 +953,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param output  the output.
      * @param <AFTER> the concatenation output type.
-     * @return the concatenated stream.
+     * @return the concatenated stream instance.
      */
     @NotNull
     @StreamTransform(TransformType.STOP)
@@ -893,7 +970,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param outputs the outputs.
      * @param <AFTER> the concatenation output type.
-     * @return the concatenated stream.
+     * @return the concatenated stream instance.
      */
     @NotNull
     @StreamTransform(TransformType.STOP)
@@ -910,7 +987,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param outputs the iterable returning the outputs.
      * @param <AFTER> the concatenation output type.
-     * @return the concatenated stream.
+     * @return the concatenated stream instance.
      */
     @NotNull
     @StreamTransform(TransformType.STOP)
@@ -929,7 +1006,7 @@ public interface StreamChannel<IN, OUT>
      * @param count    the number of generated outputs.
      * @param consumer the consumer instance.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream.
+     * @return the concatenated stream instance.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
@@ -948,7 +1025,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param consumer the consumer instance.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream.
+     * @return the concatenated stream instance.
      */
     @NotNull
     @StreamTransform(TransformType.STOP)
@@ -968,7 +1045,7 @@ public interface StreamChannel<IN, OUT>
      * @param count    the number of generated outputs.
      * @param supplier the supplier instance.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream.
+     * @return the concatenated stream instance.
      * @throws java.lang.IllegalArgumentException if the specified count number is 0 or negative.
      */
     @NotNull
@@ -987,7 +1064,7 @@ public interface StreamChannel<IN, OUT>
      *
      * @param supplier the supplier instance.
      * @param <AFTER>  the concatenation output type.
-     * @return the concatenated stream.
+     * @return the concatenated stream instance.
      */
     @NotNull
     @StreamTransform(TransformType.STOP)
@@ -1007,7 +1084,16 @@ public interface StreamChannel<IN, OUT>
     @StreamTransform(TransformType.BIND)
     StreamChannel<IN, ? extends Selectable<OUT>> toSelectable(int index);
 
-    // TODO: 06/05/16 javadoc
+    /**
+     * Transforms the stream by modifying the binding function.
+     * <br>
+     * The returned function will be employed when the flow of input data is initiated (see
+     * {@link TransformType#FLOW}).
+     *
+     * @param function the function modifying the binding one.
+     * @param <AFTER>  the concatenation output type.
+     * @return the concatenated stream instance.
+     */
     @NotNull
     @StreamTransform(TransformType.BIND)
     <AFTER> StreamChannel<IN, AFTER> transform(
@@ -1023,7 +1109,7 @@ public interface StreamChannel<IN, OUT>
      * Note that this stream will be bound as a result of the call.
      *
      * @param consumer the bi-consumer instance.
-     * @return the concatenated stream.
+     * @return the concatenated stream instance.
      */
     @NotNull
     @StreamTransform(TransformType.BIND)
@@ -1038,7 +1124,7 @@ public interface StreamChannel<IN, OUT>
      * Note that this stream will be bound as a result of the call.
      *
      * @param function the function instance.
-     * @return the concatenated stream.
+     * @return the concatenated stream instance.
      */
     @NotNull
     @StreamTransform(TransformType.BIND)
@@ -1051,7 +1137,7 @@ public interface StreamChannel<IN, OUT>
      * Both outputs and errors will be automatically passed on.
      *
      * @param runnable the runnable instance.
-     * @return the concatenated stream.
+     * @return the concatenated stream instance.
      */
     @NotNull
     @StreamTransform(TransformType.BIND)

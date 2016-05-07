@@ -81,46 +81,30 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TargetApi(VERSION_CODES.FROYO)
 public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<TestActivity> {
 
-    private static final Function<StreamChannel<Integer, Integer>, StreamChannel<Integer, Long>>
-            sSqr = new Function<StreamChannel<Integer, Integer>, StreamChannel<Integer, Long>>() {
-
-        public StreamChannel<Integer, Long> apply(final StreamChannel<Integer, Integer> stream) {
-
-            return stream.map(new Function<Integer, Long>() {
-
-                public Long apply(final Integer number) {
-
-                    final long value = number.longValue();
-                    return value * value;
-                }
-            });
-        }
-    };
-
-    private static final Function<Function<OutputChannel<String>, OutputChannel<String>>,
-            Function<OutputChannel<String>, OutputChannel<String>>>
-            sTransform =
-            new Function<Function<OutputChannel<String>, OutputChannel<String>>,
-                    Function<OutputChannel<String>, OutputChannel<String>>>() {
-
-                public Function<OutputChannel<String>, OutputChannel<String>> apply(
-                        final Function<OutputChannel<String>, OutputChannel<String>> function) {
-
-                    return wrap(function).andThen(
-                            new Function<OutputChannel<String>, OutputChannel<String>>() {
-
-                                public OutputChannel<String> apply(
-                                        final OutputChannel<String> channel) {
-
-                                    return JRoutineCore.on(new UpperCase()).asyncCall(channel);
-                                }
-                            });
-                }
-            };
-
     public LoaderStreamChannelTest() {
 
         super(TestActivity.class);
+    }
+
+    @NotNull
+    private static Function<StreamChannel<Integer, Integer>, StreamChannel<Integer, Long>>
+    sqrFunction() {
+
+        return new Function<StreamChannel<Integer, Integer>, StreamChannel<Integer, Long>>() {
+
+            public StreamChannel<Integer, Long> apply(
+                    final StreamChannel<Integer, Integer> stream) {
+
+                return stream.map(new Function<Integer, Long>() {
+
+                    public Long apply(final Integer number) {
+
+                        final long value = number.longValue();
+                        return value * value;
+                    }
+                });
+            }
+        };
     }
 
     private static void testCollect(@NotNull final FragmentActivity activity) {
@@ -1184,6 +1168,29 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                       })
                                       .next()).isEqualTo("test");
         assertThat(isRun.getAndSet(false)).isTrue();
+    }
+
+    @NotNull
+    private static Function<Function<OutputChannel<String>, OutputChannel<String>>,
+            Function<OutputChannel<String>, OutputChannel<String>>> transformFunction() {
+
+        return new Function<Function<OutputChannel<String>, OutputChannel<String>>,
+                Function<OutputChannel<String>, OutputChannel<String>>>() {
+
+            public Function<OutputChannel<String>, OutputChannel<String>> apply(
+                    final Function<OutputChannel<String>, OutputChannel<String>> function) {
+
+                return wrap(function).andThen(
+                        new Function<OutputChannel<String>, OutputChannel<String>>() {
+
+                            public OutputChannel<String> apply(
+                                    final OutputChannel<String> channel) {
+
+                                return JRoutineCore.on(new UpperCase()).asyncCall(channel);
+                            }
+                        });
+            }
+        };
     }
 
     @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
@@ -2440,13 +2447,13 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(LoaderStreamsCompat.streamOf()
                                       .with(loaderFrom(getActivity()))
                                       .thenGet(range(1, 3))
-                                      .splitBy(2, sSqr)
+                                      .splitBy(2, sqrFunction())
                                       .afterMax(seconds(3))
                                       .all()).containsOnly(1L, 4L, 9L);
         assertThat(LoaderStreamsCompat.streamOf()
                                       .with(loaderFrom(getActivity()))
                                       .thenGet(range(1, 3))
-                                      .splitBy(Functions.<Integer>identity(), sSqr)
+                                      .splitBy(Functions.<Integer>identity(), sqrFunction())
                                       .afterMax(seconds(3))
                                       .all()).containsOnly(1L, 4L, 9L);
         final ContextInvocationFactory<String, String> factory =
@@ -2889,7 +2896,7 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
 
         assertThat(LoaderStreamsCompat.streamOf("test")
                                       .with(loaderFrom(getActivity()))
-                                      .transform(sTransform)
+                                      .transform(transformFunction())
                                       .afterMax(seconds(10))
                                       .next()).isEqualTo("TEST");
     }

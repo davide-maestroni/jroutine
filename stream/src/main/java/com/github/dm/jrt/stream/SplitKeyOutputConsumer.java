@@ -42,7 +42,7 @@ class SplitKeyOutputConsumer<IN, OUT> extends BindMap<IN, OUT> implements Output
     private final HashMap<Object, IOChannel<IN>> mInputChannels =
             new HashMap<Object, IOChannel<IN>>();
 
-    private final Function<? super IN, ?> mKey;
+    private final Function<? super IN, ?> mKeyFunction;
 
     private final IOChannel<OUT> mOutputChannel;
 
@@ -50,18 +50,18 @@ class SplitKeyOutputConsumer<IN, OUT> extends BindMap<IN, OUT> implements Output
      * Constructor.
      *
      * @param outputChannel  the output channel instance.
-     * @param key            the key function.
+     * @param keyFunction    the key function.
      * @param routine        the routine instance.
      * @param invocationMode the invocation mode.
      */
     SplitKeyOutputConsumer(@NotNull final IOChannel<OUT> outputChannel,
-            @NotNull final Function<? super IN, ?> key,
+            @NotNull final Function<? super IN, ?> keyFunction,
             @NotNull final Routine<? super IN, ? extends OUT> routine,
             @NotNull final InvocationMode invocationMode) {
 
         super(routine, invocationMode);
         mOutputChannel = ConstantConditions.notNull("output channel instance", outputChannel);
-        mKey = ConstantConditions.notNull("key function", key);
+        mKeyFunction = ConstantConditions.notNull("key function", keyFunction);
     }
 
     public void onComplete() {
@@ -80,7 +80,7 @@ class SplitKeyOutputConsumer<IN, OUT> extends BindMap<IN, OUT> implements Output
     public void onOutput(final IN output) {
 
         final HashMap<Object, IOChannel<IN>> channels = mInputChannels;
-        final Object key = mKey.apply(output);
+        final Object key = mKeyFunction.apply(output);
         IOChannel<IN> inputChannel = channels.get(key);
         if (inputChannel == null) {
             inputChannel = JRoutineCore.io().buildChannel();

@@ -584,35 +584,35 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
     @NotNull
     @Override
     public <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(
-            @NotNull final Function<? super OUT, ?> key,
+            @NotNull final Function<? super OUT, ?> keyFunction,
             @NotNull final Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<?
                     super OUT, ? extends AFTER>> function) {
 
-        checkStatic(wrap(key), key);
+        checkStatic(wrap(keyFunction), keyFunction);
         checkStatic(wrap(function), function);
-        return (LoaderStreamChannel<IN, AFTER>) super.splitBy(key, function);
+        return (LoaderStreamChannel<IN, AFTER>) super.splitBy(keyFunction, function);
     }
 
     @NotNull
     @Override
     public <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(
-            @NotNull final Function<? super OUT, ?> key,
+            @NotNull final Function<? super OUT, ?> keyFunction,
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
 
-        checkStatic(wrap(key), key);
+        checkStatic(wrap(keyFunction), keyFunction);
         checkStatic("factory", factory);
-        return (LoaderStreamChannel<IN, AFTER>) super.splitBy(key, factory);
+        return (LoaderStreamChannel<IN, AFTER>) super.splitBy(keyFunction, factory);
     }
 
     @NotNull
     @Override
     public <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(
-            @NotNull final Function<? super OUT, ?> key,
+            @NotNull final Function<? super OUT, ?> keyFunction,
             @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
 
-        checkStatic(wrap(key), key);
+        checkStatic(wrap(keyFunction), keyFunction);
         checkStatic("routine", routine);
-        return (LoaderStreamChannel<IN, AFTER>) super.splitBy(key, routine);
+        return (LoaderStreamChannel<IN, AFTER>) super.splitBy(keyFunction, routine);
     }
 
     @NotNull

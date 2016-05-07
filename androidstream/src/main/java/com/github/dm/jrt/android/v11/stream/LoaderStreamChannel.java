@@ -38,6 +38,8 @@ import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Predicate;
 import com.github.dm.jrt.function.Supplier;
 import com.github.dm.jrt.stream.StreamChannel;
+import com.github.dm.jrt.stream.annotation.StreamTransform;
+import com.github.dm.jrt.stream.annotation.StreamTransform.TransformType;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -70,72 +72,84 @@ public interface LoaderStreamChannel<IN, OUT>
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.FLOW)
     LoaderStreamChannel<IN, OUT> afterMax(@NotNull UnitDuration timeout);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.FLOW)
     LoaderStreamChannel<IN, OUT> afterMax(long timeout, @NotNull TimeUnit timeUnit);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.FLOW)
     LoaderStreamChannel<IN, OUT> allInto(@NotNull Collection<? super OUT> results);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.FLOW)
     LoaderStreamChannel<IN, OUT> bind(@NotNull OutputConsumer<? super OUT> consumer);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.FLOW)
     LoaderStreamChannel<IN, OUT> eventuallyAbort();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.FLOW)
     LoaderStreamChannel<IN, OUT> eventuallyAbort(@Nullable Throwable reason);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.FLOW)
     LoaderStreamChannel<IN, OUT> eventuallyExit();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.FLOW)
     LoaderStreamChannel<IN, OUT> eventuallyThrow();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.FLOW)
     LoaderStreamChannel<IN, OUT> immediately();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.FLOW)
     LoaderStreamChannel<IN, OUT> skipNext(int count);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.CONFIG)
     LoaderStreamChannel<IN, OUT> async();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.CONFIG)
     LoaderStreamChannel<IN, OUT> backPressureOn(@Nullable Runner runner, int maxInputs,
             long maxDelay, @NotNull TimeUnit timeUnit);
 
@@ -143,6 +157,7 @@ public interface LoaderStreamChannel<IN, OUT>
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.CONFIG)
     LoaderStreamChannel<IN, OUT> backPressureOn(@Nullable Runner runner, int maxInputs,
             @Nullable UnitDuration maxDelay);
 
@@ -150,12 +165,14 @@ public interface LoaderStreamChannel<IN, OUT>
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.STOP)
     LoaderStreamChannel<IN, OUT> collect(@NotNull BiConsumer<? super OUT, ? super OUT> consumer);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.STOP)
     <AFTER extends Collection<? super OUT>> LoaderStreamChannel<IN, AFTER> collect(
             @NotNull Supplier<? extends AFTER> supplier);
 
@@ -163,6 +180,7 @@ public interface LoaderStreamChannel<IN, OUT>
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.STOP)
     <AFTER> LoaderStreamChannel<IN, AFTER> collect(@NotNull Supplier<? extends AFTER> supplier,
             @NotNull BiConsumer<? super AFTER, ? super OUT> consumer);
 
@@ -170,36 +188,42 @@ public interface LoaderStreamChannel<IN, OUT>
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.BIND)
     LoaderStreamChannel<IN, OUT> concat(@Nullable OUT output);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.BIND)
     LoaderStreamChannel<IN, OUT> concat(@Nullable OUT... outputs);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.BIND)
     LoaderStreamChannel<IN, OUT> concat(@Nullable Iterable<? extends OUT> outputs);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.BIND)
     LoaderStreamChannel<IN, OUT> concat(@NotNull OutputChannel<? extends OUT> channel);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.BIND)
     LoaderStreamChannel<IN, OUT> filter(@NotNull Predicate<? super OUT> predicate);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.BIND)
     <AFTER> LoaderStreamChannel<IN, AFTER> flatMap(
             @NotNull Function<? super OUT, ? extends OutputChannel<? extends AFTER>> function);
 
@@ -214,12 +238,14 @@ public interface LoaderStreamChannel<IN, OUT>
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.BIND)
     LoaderStreamChannel<IN, OUT> limit(int count);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.BIND)
     <AFTER> LoaderStreamChannel<IN, AFTER> map(
             @NotNull BiConsumer<? super OUT, ? super ResultChannel<AFTER>> consumer);
 
@@ -227,6 +253,7 @@ public interface LoaderStreamChannel<IN, OUT>
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.BIND)
     <AFTER> LoaderStreamChannel<IN, AFTER> map(
             @NotNull Function<? super OUT, ? extends AFTER> function);
 
@@ -234,6 +261,7 @@ public interface LoaderStreamChannel<IN, OUT>
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.BIND)
     <AFTER> LoaderStreamChannel<IN, AFTER> map(
             @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
 
@@ -241,6 +269,7 @@ public interface LoaderStreamChannel<IN, OUT>
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.BIND)
     <AFTER> LoaderStreamChannel<IN, AFTER> map(
             @NotNull Routine<? super OUT, ? extends AFTER> routine);
 
@@ -248,6 +277,7 @@ public interface LoaderStreamChannel<IN, OUT>
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.STOP)
     <AFTER> LoaderStreamChannel<IN, AFTER> mapAll(
             @NotNull BiConsumer<? super List<OUT>, ? super ResultChannel<AFTER>> consumer);
 
@@ -255,6 +285,7 @@ public interface LoaderStreamChannel<IN, OUT>
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.STOP)
     <AFTER> LoaderStreamChannel<IN, AFTER> mapAll(
             @NotNull Function<? super List<OUT>, ? extends AFTER> function);
 
@@ -262,36 +293,42 @@ public interface LoaderStreamChannel<IN, OUT>
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.BIND)
     LoaderStreamChannel<IN, OUT> onError(@NotNull Consumer<? super RoutineException> consumer);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.BIND)
     LoaderStreamChannel<IN, Void> onOutput(@NotNull Consumer<? super OUT> consumer);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.BIND)
     LoaderStreamChannel<IN, OUT> orElse(@Nullable OUT output);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.BIND)
     LoaderStreamChannel<IN, OUT> orElse(@Nullable OUT... outputs);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.BIND)
     LoaderStreamChannel<IN, OUT> orElse(@Nullable Iterable<? extends OUT> outputs);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.BIND)
     LoaderStreamChannel<IN, OUT> orElseGet(long count,
             @NotNull Consumer<? super ResultChannel<OUT>> consumer);
 
@@ -299,48 +336,56 @@ public interface LoaderStreamChannel<IN, OUT>
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.BIND)
     LoaderStreamChannel<IN, OUT> orElseGet(@NotNull Consumer<? super ResultChannel<OUT>> consumer);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.BIND)
     LoaderStreamChannel<IN, OUT> orElseGet(long count, @NotNull Supplier<? extends OUT> supplier);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.BIND)
     LoaderStreamChannel<IN, OUT> orElseGet(@NotNull Supplier<? extends OUT> supplier);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.CONFIG)
     LoaderStreamChannel<IN, OUT> ordered(@Nullable OrderType orderType);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.CONFIG)
     LoaderStreamChannel<IN, OUT> parallel();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.CONFIG)
     LoaderStreamChannel<IN, OUT> parallel(int maxInvocations);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.BIND)
     LoaderStreamChannel<IN, OUT> peek(@NotNull Consumer<? super OUT> consumer);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.STOP)
     LoaderStreamChannel<IN, OUT> reduce(
             @NotNull BiFunction<? super OUT, ? super OUT, ? extends OUT> function);
 
@@ -348,6 +393,7 @@ public interface LoaderStreamChannel<IN, OUT>
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.STOP)
     <AFTER> LoaderStreamChannel<IN, AFTER> reduce(@NotNull Supplier<? extends AFTER> supplier,
             @NotNull BiFunction<? super AFTER, ? super OUT, ? extends AFTER> function);
 
@@ -355,37 +401,43 @@ public interface LoaderStreamChannel<IN, OUT>
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.BIND)
     LoaderStreamChannel<IN, OUT> repeat();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.BIND)
     LoaderStreamChannel<IN, OUT> runOn(@Nullable Runner runner);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.BIND)
     LoaderStreamChannel<IN, OUT> runOnShared();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.CONFIG)
     LoaderStreamChannel<IN, OUT> serial();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.BIND)
     LoaderStreamChannel<IN, OUT> skip(int count);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(@NotNull Function<? super OUT, ?> key,
+    @StreamTransform(TransformType.BIND)
+    <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(@NotNull Function<? super OUT, ?> keyFunction,
             @NotNull Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<? super
                     OUT, ? extends AFTER>> function);
 
@@ -393,20 +445,23 @@ public interface LoaderStreamChannel<IN, OUT>
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(@NotNull Function<? super OUT, ?> key,
+    @StreamTransform(TransformType.BIND)
+    <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(@NotNull Function<? super OUT, ?> keyFunction,
             @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(@NotNull Function<? super OUT, ?> key,
+    @StreamTransform(TransformType.BIND)
+    <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(@NotNull Function<? super OUT, ?> keyFunction,
             @NotNull Routine<? super OUT, ? extends AFTER> routine);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.BIND)
     <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(int count,
             @NotNull Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<? super
                     OUT, ? extends AFTER>> function);
@@ -415,6 +470,7 @@ public interface LoaderStreamChannel<IN, OUT>
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.BIND)
     <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(int count,
             @NotNull InvocationFactory<? super OUT, ? extends AFTER> factory);
 
@@ -422,6 +478,7 @@ public interface LoaderStreamChannel<IN, OUT>
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.BIND)
     <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(int count,
             @NotNull Routine<? super OUT, ? extends AFTER> routine);
 
@@ -436,30 +493,35 @@ public interface LoaderStreamChannel<IN, OUT>
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.CONFIG)
     LoaderStreamChannel<IN, OUT> sync();
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.STOP)
     <AFTER> LoaderStreamChannel<IN, AFTER> then(@Nullable AFTER output);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.STOP)
     <AFTER> LoaderStreamChannel<IN, AFTER> then(@Nullable AFTER... outputs);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.STOP)
     <AFTER> LoaderStreamChannel<IN, AFTER> then(@Nullable Iterable<? extends AFTER> outputs);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.STOP)
     <AFTER> LoaderStreamChannel<IN, AFTER> thenGet(long count,
             @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
 
@@ -467,6 +529,7 @@ public interface LoaderStreamChannel<IN, OUT>
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.STOP)
     <AFTER> LoaderStreamChannel<IN, AFTER> thenGet(
             @NotNull Consumer<? super ResultChannel<AFTER>> consumer);
 
@@ -474,6 +537,7 @@ public interface LoaderStreamChannel<IN, OUT>
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.STOP)
     <AFTER> LoaderStreamChannel<IN, AFTER> thenGet(long count,
             @NotNull Supplier<? extends AFTER> supplier);
 
@@ -481,18 +545,21 @@ public interface LoaderStreamChannel<IN, OUT>
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.STOP)
     <AFTER> LoaderStreamChannel<IN, AFTER> thenGet(@NotNull Supplier<? extends AFTER> supplier);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.BIND)
     LoaderStreamChannel<IN, ? extends ParcelableSelectable<OUT>> toSelectable(int index);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.BIND)
     <AFTER> LoaderStreamChannel<IN, AFTER> transform(
             @NotNull Function<? extends Function<? super OutputChannel<IN>, ? extends
                     OutputChannel<OUT>>, ? extends Function<? super OutputChannel<IN>, ? extends
@@ -502,6 +569,7 @@ public interface LoaderStreamChannel<IN, OUT>
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.BIND)
     LoaderStreamChannel<IN, OUT> tryCatch(
             @NotNull BiConsumer<? super RoutineException, ? super InputChannel<OUT>> consumer);
 
@@ -509,6 +577,7 @@ public interface LoaderStreamChannel<IN, OUT>
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.BIND)
     LoaderStreamChannel<IN, OUT> tryCatch(
             @NotNull Function<? super RoutineException, ? extends OUT> function);
 
@@ -516,6 +585,7 @@ public interface LoaderStreamChannel<IN, OUT>
      * {@inheritDoc}
      */
     @NotNull
+    @StreamTransform(TransformType.BIND)
     LoaderStreamChannel<IN, OUT> tryFinally(@NotNull Runnable runnable);
 
     /**
@@ -538,6 +608,7 @@ public interface LoaderStreamChannel<IN, OUT>
      * @return the configured stream.
      */
     @NotNull
+    @StreamTransform(TransformType.CONFIG)
     LoaderStreamChannel<IN, OUT> cache(@Nullable CacheStrategyType strategyType);
 
     /**
@@ -550,6 +621,7 @@ public interface LoaderStreamChannel<IN, OUT>
      * @return the configured stream.
      */
     @NotNull
+    @StreamTransform(TransformType.CONFIG)
     LoaderStreamChannel<IN, OUT> factoryId(int factoryId);
 
     /**
@@ -577,6 +649,7 @@ public interface LoaderStreamChannel<IN, OUT>
      * @return the configured stream.
      */
     @NotNull
+    @StreamTransform(TransformType.CONFIG)
     LoaderStreamChannel<IN, OUT> loaderId(int loaderId);
 
     /**
@@ -592,16 +665,19 @@ public interface LoaderStreamChannel<IN, OUT>
      * @throws java.lang.IllegalStateException if the loader context is not set.
      */
     @NotNull
+    @StreamTransform(TransformType.BIND)
     <AFTER> LoaderStreamChannel<IN, AFTER> map(
             @NotNull ContextInvocationFactory<? super OUT, ? extends AFTER> factory);
 
     // TODO: 07/05/16 javadoc
     @NotNull
+    @StreamTransform(TransformType.BIND)
     <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(@NotNull Function<? super OUT, ?> key,
             @NotNull ContextInvocationFactory<? super OUT, ? extends AFTER> factory);
 
     // TODO: 07/05/16 javadoc
     @NotNull
+    @StreamTransform(TransformType.BIND)
     <AFTER> LoaderStreamChannel<IN, AFTER> splitBy(int count,
             @NotNull ContextInvocationFactory<? super OUT, ? extends AFTER> factory);
 
@@ -612,6 +688,7 @@ public interface LoaderStreamChannel<IN, OUT>
      * @return the configured stream.
      */
     @NotNull
+    @StreamTransform(TransformType.CONFIG)
     LoaderStreamChannel<IN, OUT> staleAfter(@Nullable UnitDuration staleTime);
 
     /**
@@ -622,6 +699,7 @@ public interface LoaderStreamChannel<IN, OUT>
      * @return the configured stream.
      */
     @NotNull
+    @StreamTransform(TransformType.CONFIG)
     LoaderStreamChannel<IN, OUT> staleAfter(long time, @NotNull TimeUnit timeUnit);
 
     /**
@@ -650,5 +728,6 @@ public interface LoaderStreamChannel<IN, OUT>
      * @return the configured stream.
      */
     @NotNull
+    @StreamTransform(TransformType.CONFIG)
     LoaderStreamChannel<IN, OUT> with(@Nullable LoaderContext context);
 }

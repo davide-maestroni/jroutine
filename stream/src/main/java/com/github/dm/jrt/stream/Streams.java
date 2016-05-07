@@ -1282,15 +1282,16 @@ public class Streams extends Functions {
     /**
      * Returns an factory of invocations collecting inputs into a map.
      *
-     * @param <IN>  the input data type.
-     * @param <KEY> the map key type.
+     * @param keyFunction the key function.
+     * @param <IN>        the input data type.
+     * @param <KEY>       the map key type.
      * @return the invocation factory instance.
      */
     @NotNull
     public static <IN, KEY> InvocationFactory<? super IN, Map<KEY, IN>> toMap(
-            @NotNull final Function<? super IN, KEY> function) {
+            @NotNull final Function<? super IN, KEY> keyFunction) {
 
-        return new ToMapInvocationFactory<IN, KEY>(wrap(function));
+        return new ToMapInvocationFactory<IN, KEY>(wrap(keyFunction));
     }
 
     /**

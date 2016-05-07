@@ -543,26 +543,26 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
-    public <AFTER> StreamChannel<IN, AFTER> splitBy(@NotNull final Function<? super OUT, ?> key,
+    public <AFTER> StreamChannel<IN, AFTER> splitBy(@NotNull final Function<? super OUT, ?> keyFunction,
             @NotNull final Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<?
                     super OUT, ? extends AFTER>> function) {
 
-        return splitBy(key, new StreamInvocationFactory<OUT, AFTER>(wrap(function)));
+        return splitBy(keyFunction, new StreamInvocationFactory<OUT, AFTER>(wrap(function)));
     }
 
     @NotNull
-    public <AFTER> StreamChannel<IN, AFTER> splitBy(@NotNull final Function<? super OUT, ?> key,
+    public <AFTER> StreamChannel<IN, AFTER> splitBy(@NotNull final Function<? super OUT, ?> keyFunction,
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
 
-        return splitBy(key, buildRoutine(factory));
+        return splitBy(keyFunction, buildRoutine(factory));
     }
 
     @NotNull
-    public <AFTER> StreamChannel<IN, AFTER> splitBy(@NotNull final Function<? super OUT, ?> key,
+    public <AFTER> StreamChannel<IN, AFTER> splitBy(@NotNull final Function<? super OUT, ?> keyFunction,
             @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
 
         return buildChannel(mBind.andThen(
-                new BindSplitKey<OUT, AFTER>(buildChannelConfiguration(), key, routine,
+                new BindSplitKey<OUT, AFTER>(buildChannelConfiguration(), keyFunction, routine,
                         mInvocationMode)));
     }
 

@@ -104,7 +104,7 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
     @NotNull
     public LoaderObjectRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
 
-        mObjectConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
+        mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
         return this;
     }
 
@@ -147,8 +147,8 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         final ObjectConfiguration objectConfiguration =
                 Builders.withAnnotations(mObjectConfiguration, targetMethod);
         final AliasContextInvocationFactory<IN, OUT> factory =
-                new AliasContextInvocationFactory<IN, OUT>(targetMethod, objectConfiguration, target,
-                        name);
+                new AliasContextInvocationFactory<IN, OUT>(targetMethod, objectConfiguration,
+                        target, name);
         final InvocationConfiguration invocationConfiguration =
                 Builders.withAnnotations(mInvocationConfiguration, targetMethod);
         final LoaderConfiguration loaderConfiguration =
@@ -237,9 +237,9 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         /**
          * Constructor.
          *
-         * @param objectConfiguration the proxy configuration.
-         * @param target             the invocation target.
-         * @param name               the alias name.
+         * @param objectConfiguration the object configuration.
+         * @param target              the invocation target.
+         * @param name                the alias name.
          */
         private AliasContextInvocation(@NotNull final ObjectConfiguration objectConfiguration,
                 @NotNull final ContextInvocationTarget<?> target, @NotNull final String name) {
@@ -316,10 +316,10 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         /**
          * Constructor.
          *
-         * @param targetMethod       the target method.
-         * @param objectConfiguration the proxy configuration.
-         * @param target             the invocation target.
-         * @param name               the alias name.
+         * @param targetMethod        the target method.
+         * @param objectConfiguration the object configuration.
+         * @param target              the invocation target.
+         * @param name                the alias name.
          */
         private AliasContextInvocationFactory(@NotNull final Method targetMethod,
                 @NotNull final ObjectConfiguration objectConfiguration,
@@ -361,9 +361,9 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         /**
          * Constructor.
          *
-         * @param objectConfiguration the proxy configuration.
-         * @param target             the invocation target.
-         * @param method             the method.
+         * @param objectConfiguration the object configuration.
+         * @param target              the invocation target.
+         * @param method              the method.
          */
         private MethodContextInvocation(@NotNull final ObjectConfiguration objectConfiguration,
                 @NotNull final ContextInvocationTarget<?> target, @NotNull final Method method) {
@@ -440,10 +440,10 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         /**
          * Constructor.
          *
-         * @param targetMethod       the target method.
-         * @param objectConfiguration the proxy configuration.
-         * @param target             the invocation target.
-         * @param method             the method.
+         * @param targetMethod        the target method.
+         * @param objectConfiguration the object configuration.
+         * @param target              the invocation target.
+         * @param method              the method.
          */
         private MethodContextInvocationFactory(@NotNull final Method targetMethod,
                 @NotNull final ObjectConfiguration objectConfiguration,
@@ -469,9 +469,9 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         private final InputMode mInputMode;
 
-        private final OutputMode mOutputMode;
-
         private final ObjectConfiguration mObjectConfiguration;
+
+        private final OutputMode mOutputMode;
 
         private final ContextInvocationTarget<?> mTarget;
 
@@ -484,11 +484,11 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         /**
          * Constructor.
          *
-         * @param targetMethod       the target method.
-         * @param objectConfiguration the proxy configuration.
-         * @param target             the invocation target.
-         * @param inputMode          the input transfer mode.
-         * @param outputMode         the output transfer mode.
+         * @param targetMethod        the target method.
+         * @param objectConfiguration the object configuration.
+         * @param target              the invocation target.
+         * @param inputMode           the input transfer mode.
+         * @param outputMode          the output transfer mode.
          */
         private ProxyInvocation(@NotNull final Method targetMethod,
                 @NotNull final ObjectConfiguration objectConfiguration,
@@ -541,9 +541,9 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
 
         private final InputMode mInputMode;
 
-        private final OutputMode mOutputMode;
-
         private final ObjectConfiguration mObjectConfiguration;
+
+        private final OutputMode mOutputMode;
 
         private final ContextInvocationTarget<?> mTarget;
 
@@ -552,11 +552,11 @@ class DefaultLoaderObjectRoutineBuilder implements LoaderObjectRoutineBuilder,
         /**
          * Constructor.
          *
-         * @param targetMethod       the target method.
-         * @param objectConfiguration the proxy configuration.
-         * @param target             the invocation target.
-         * @param inputMode          the input transfer mode.
-         * @param outputMode         the output transfer mode.
+         * @param targetMethod        the target method.
+         * @param objectConfiguration the object configuration.
+         * @param target              the invocation target.
+         * @param inputMode           the input transfer mode.
+         * @param outputMode          the output transfer mode.
          */
         private ProxyInvocationFactory(@NotNull final Method targetMethod,
                 @NotNull final ObjectConfiguration objectConfiguration,

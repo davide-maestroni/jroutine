@@ -102,7 +102,7 @@ class DefaultObjectRoutineBuilder
     @NotNull
     public ObjectRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
 
-        mObjectConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
+        mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
         return this;
     }
 
@@ -225,11 +225,11 @@ class DefaultObjectRoutineBuilder
         /**
          * Constructor.
          *
-         * @param objectConfiguration the proxy configuration.
-         * @param target             the invocation target.
-         * @param method             the method to wrap.
-         * @param inputMode          the input transfer mode.
-         * @param outputMode         the output transfer mode.
+         * @param objectConfiguration the object configuration.
+         * @param target              the invocation target.
+         * @param method              the method to wrap.
+         * @param inputMode           the input transfer mode.
+         * @param outputMode          the output transfer mode.
          */
         private MethodCallInvocation(@NotNull final ObjectConfiguration objectConfiguration,
                 @NotNull final InvocationTarget<?> target, @NotNull final Method method,
@@ -267,20 +267,20 @@ class DefaultObjectRoutineBuilder
 
         private final Method mMethod;
 
-        private final OutputMode mOutputMode;
-
         private final ObjectConfiguration mObjectConfiguration;
+
+        private final OutputMode mOutputMode;
 
         private final InvocationTarget<?> mTarget;
 
         /**
          * Constructor.
          *
-         * @param objectConfiguration the proxy configuration.
-         * @param target             the invocation target.
-         * @param method             the method to wrap.
-         * @param inputMode          the input transfer mode.
-         * @param outputMode         the output transfer mode.
+         * @param objectConfiguration the object configuration.
+         * @param target              the invocation target.
+         * @param method              the method to wrap.
+         * @param inputMode           the input transfer mode.
+         * @param outputMode          the output transfer mode.
          */
         private MethodInvocationFactory(@NotNull final ObjectConfiguration objectConfiguration,
                 @NotNull final InvocationTarget<?> target, @NotNull final Method method,
@@ -312,14 +312,15 @@ class DefaultObjectRoutineBuilder
          * Constructor.
          *
          * @param invocationConfiguration the invocation configuration.
-         * @param objectConfiguration      the proxy configuration.
+         * @param objectConfiguration     the object configuration.
          * @param method                  the method to wrap.
          * @param inputMode               the input transfer mode.
          * @param outputMode              the output transfer mode.
          */
         private RoutineInfo(@NotNull final InvocationConfiguration invocationConfiguration,
-                @NotNull final ObjectConfiguration objectConfiguration, @NotNull final Method method,
-                @Nullable final InputMode inputMode, @Nullable final OutputMode outputMode) {
+                @NotNull final ObjectConfiguration objectConfiguration,
+                @NotNull final Method method, @Nullable final InputMode inputMode,
+                @Nullable final OutputMode outputMode) {
 
             super(asArgs(invocationConfiguration, objectConfiguration, method, inputMode,
                     outputMode));

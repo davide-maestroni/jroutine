@@ -47,7 +47,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @param <OUT> the output data type.
  */
-class RepeatedChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
+class ReplayChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
 
     private final ArrayList<OUT> mCached = new ArrayList<OUT>();
 
@@ -73,9 +73,9 @@ class RepeatedChannel<OUT> implements OutputChannel<OUT>, OutputConsumer<OUT> {
      * Constructor.
      *
      * @param configuration the channel configuration.
-     * @param channel       the channel to repeat.
+     * @param channel       the channel to replay.
      */
-    RepeatedChannel(@Nullable final ChannelConfiguration configuration,
+    ReplayChannel(@Nullable final ChannelConfiguration configuration,
             @NotNull final OutputChannel<OUT> channel) {
 
         mConfiguration = (configuration != null) ? configuration

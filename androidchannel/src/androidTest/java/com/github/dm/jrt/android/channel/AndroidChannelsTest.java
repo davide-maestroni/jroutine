@@ -1417,17 +1417,14 @@ public class AndroidChannelsTest extends ActivityInstrumentationTestCase2<TestAc
             switch (selectable.index) {
 
                 case INTEGER:
-                    AndroidChannels.<Object, Integer>selectParcelable(result, INTEGER)
-                                   .buildChannels()
-                                   .pass((Integer) selectable.data)
-                                   .close();
+                    AndroidChannels.<Object, Integer>selectParcelable(result,
+                            INTEGER).buildChannels().pass((Integer) selectable.data).close();
                     break;
 
                 case STRING:
-                    AndroidChannels.<Object, String>selectParcelable(result, STRING)
-                                   .buildChannels()
-                                   .pass((String) selectable.data)
-                                   .close();
+                    AndroidChannels.<Object, String>selectParcelable(result, STRING).buildChannels()
+                                                                                    .pass((String) selectable.data)
+                                                                                    .close();
                     break;
             }
         }

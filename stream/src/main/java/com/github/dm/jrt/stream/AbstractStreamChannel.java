@@ -497,9 +497,9 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
-    public StreamChannel<IN, OUT> repeat() {
+    public StreamChannel<IN, OUT> replay() {
 
-        return buildChannel(mBind.andThen(new BindRepeat<OUT>(buildChannelConfiguration())));
+        return buildChannel(mBind.andThen(new BindReplay<OUT>(buildChannelConfiguration())));
     }
 
     @NotNull
@@ -698,15 +698,16 @@ public abstract class AbstractStreamChannel<IN, OUT>
     @NotNull
     @SuppressWarnings("unchecked")
     public <AFTER> StreamChannel<IN, AFTER> transform(
-            @NotNull BiFunction<? super InvocationConfiguration, ? extends Function<? super
+            @NotNull BiFunction<? extends StreamConfiguration, ? extends Function<? super
                     OutputChannel<IN>, ? extends OutputChannel<OUT>>, ? extends Function<? super
                     OutputChannel<IN>, ? extends OutputChannel<AFTER>>> function) {
 
         return buildChannel(ConstantConditions.notNull("bind function",
-                ((BiFunction<InvocationConfiguration, Function<OutputChannel<IN>,
+                ((BiFunction<StreamConfiguration, Function<OutputChannel<IN>,
                         OutputChannel<OUT>>, Function<OutputChannel<IN>, OutputChannel<AFTER>>>)
                         function)
-                        .apply(buildConfiguration(), mBind)));
+                        .apply(newConfiguration(mStreamConfiguration, mConfiguration,
+                                mInvocationMode), mBind)));
     }
 
     @NotNull
@@ -826,17 +827,6 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     /**
-     * Returns the bind function.
-     *
-     * @return the bind function.
-     */
-    @NotNull
-    protected FunctionWrapper<OutputChannel<IN>, OutputChannel<OUT>> getBind() {
-
-        return mBind;
-    }
-
-    /**
      * Returns the configuration which will be used by the next routine concatenated to the stream.
      *
      * @return the configuration.
@@ -859,17 +849,6 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     /**
-     * Return the source channel.
-     *
-     * @return the source channel.
-     */
-    @NotNull
-    protected OutputChannel<IN> getSourceChannel() {
-
-        return mSourceChannel;
-    }
-
-    /**
      * Returns the configuration used by all the routines concatenated to the stream.
      *
      * @return the configuration.
@@ -882,6 +861,8 @@ public abstract class AbstractStreamChannel<IN, OUT>
 
     /**
      * Creates a new channel instance.
+     * <p>
+     * Note that this method should be never directly called by the implementing class.
      *
      * @param <BEFORE>            the concatenation input type.
      * @param <AFTER>             the concatenation output type.
@@ -898,7 +879,28 @@ public abstract class AbstractStreamChannel<IN, OUT>
             @NotNull Function<OutputChannel<BEFORE>, OutputChannel<AFTER>> bind);
 
     /**
+     * Creates a new stream configuration instance.
+     * <p>
+     * Note that this method should be never directly called by the implementing class.
+     *
+     * @param streamConfiguration the stream invocation configuration.
+     * @param configuration       the invocation configuration.
+     * @param invocationMode      the invocation mode.
+     * @return the newly created configuration instance.
+     */
+    @NotNull
+    protected StreamConfiguration newConfiguration(
+            @NotNull final InvocationConfiguration streamConfiguration,
+            @NotNull final InvocationConfiguration configuration,
+            @NotNull final InvocationMode invocationMode) {
+
+        return new DefaultStreamConfiguration(streamConfiguration, configuration, invocationMode);
+    }
+
+    /**
      * Creates a new routine instance based on the specified factory.
+     * <p>
+     * Note that this method should be never directly called by the implementing class.
      *
      * @param <AFTER>       the concatenation output type.
      * @param configuration the routine configuration.
@@ -945,6 +947,67 @@ public abstract class AbstractStreamChannel<IN, OUT>
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
 
         return newRoutine(buildConfiguration(), factory);
+    }
+
+    /**
+     * Default implementation of a stream configuration.
+     */
+    private static class DefaultStreamConfiguration implements StreamConfiguration {
+
+        private final InvocationConfiguration mConfiguration;
+
+        private final InvocationMode mInvocationMode;
+
+        private final InvocationConfiguration mStreamConfiguration;
+
+        private ChannelConfiguration mChannelConfiguration;
+
+        private InvocationConfiguration mInvocationConfiguration;
+
+        /**
+         * Constructor.
+         *
+         * @param streamConfiguration the stream invocation configuration.
+         * @param configuration       the invocation configuration.
+         * @param invocationMode      the invocation mode.
+         */
+        private DefaultStreamConfiguration(
+                @NotNull final InvocationConfiguration streamConfiguration,
+                @NotNull final InvocationConfiguration configuration,
+                @NotNull final InvocationMode invocationMode) {
+
+            mStreamConfiguration = streamConfiguration;
+            mConfiguration = configuration;
+            mInvocationMode = invocationMode;
+        }
+
+        @NotNull
+        public ChannelConfiguration asChannelConfiguration() {
+
+            if (mChannelConfiguration == null) {
+                mChannelConfiguration =
+                        builderFromOutputChannel(asInvocationConfiguration()).apply();
+            }
+
+            return mChannelConfiguration;
+        }
+
+        @NotNull
+        public InvocationConfiguration asInvocationConfiguration() {
+
+            if (mInvocationConfiguration == null) {
+                mInvocationConfiguration =
+                        mStreamConfiguration.builderFrom().with(mConfiguration).apply();
+            }
+
+            return mInvocationConfiguration;
+        }
+
+        @NotNull
+        public InvocationMode getInvocationMode() {
+
+            return mInvocationMode;
+        }
     }
 
     @NotNull

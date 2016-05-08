@@ -846,17 +846,15 @@ public class SparseChannelsTest extends ActivityInstrumentationTestCase2<TestAct
             switch (selectable.index) {
 
                 case INTEGER:
-                    SparseChannels.<Object, Integer>selectParcelable(result, INTEGER)
-                                  .buildChannels()
-                                  .pass((Integer) selectable.data)
-                                  .close();
+                    SparseChannels.<Object, Integer>selectParcelable(result,
+                            INTEGER).buildChannels().pass((Integer) selectable.data).close();
                     break;
 
                 case STRING:
-                    SparseChannels.<Object, String>selectParcelable(result, STRING)
-                                  .buildChannels()
-                                  .pass((String) selectable.data)
-                                  .close();
+                    SparseChannels.<Object, String>selectParcelable(result, STRING).buildChannels()
+                                                                                   .pass((String)
+                                                                                           selectable.data)
+                                                                                   .close();
                     break;
             }
         }

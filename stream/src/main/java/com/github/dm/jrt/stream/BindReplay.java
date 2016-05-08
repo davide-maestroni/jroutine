@@ -25,13 +25,13 @@ import com.github.dm.jrt.function.Function;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Repeat bind function.
+ * Replay bind function.
  * <p>
  * Created by davide-maestroni on 05/07/2016.
  *
  * @param <OUT> the output data type.
  */
-class BindRepeat<OUT> implements Function<OutputChannel<OUT>, OutputChannel<OUT>> {
+class BindReplay<OUT> implements Function<OutputChannel<OUT>, OutputChannel<OUT>> {
 
     private final ChannelConfiguration mConfiguration;
 
@@ -40,14 +40,14 @@ class BindRepeat<OUT> implements Function<OutputChannel<OUT>, OutputChannel<OUT>
      *
      * @param configuration the channel configuration.
      */
-    BindRepeat(@NotNull final ChannelConfiguration configuration) {
+    BindReplay(@NotNull final ChannelConfiguration configuration) {
 
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
     }
 
     public OutputChannel<OUT> apply(final OutputChannel<OUT> channel) {
 
-        return Channels.repeat(channel)
+        return Channels.replay(channel)
                        .channelConfiguration()
                        .with(mConfiguration)
                        .apply()

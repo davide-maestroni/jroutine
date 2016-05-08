@@ -79,7 +79,7 @@ class DefaultLoaderProxyRoutineBuilder implements LoaderProxyRoutineBuilder,
     @NotNull
     public LoaderProxyRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
 
-        mObjectConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
+        mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
         return this;
     }
 

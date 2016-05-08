@@ -16,8 +16,6 @@
 
 package com.github.dm.jrt.object.annotation;
 
-import com.github.dm.jrt.object.config.ObjectConfiguration;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

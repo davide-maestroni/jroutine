@@ -57,12 +57,26 @@ public @interface StreamTransform {
          */
         MAP,
         /**
-         * The flow of data is stopped, so that all incoming inputs are collected before a new
+         * The flow of data is blocked, so that all incoming inputs are collected before a new
          * output is produced.
          * <br>
-         * A new stream instance is returned.
+         * A new stream instance is returned by the method.
          */
         REDUCE,
+        /**
+         * The flow of data is cached, so that all incoming inputs are possibly retained, but
+         * outputs are produced anyway without interruption.
+         * <br>
+         * A new stream instance is returned by the method.
+         */
+        CACHE,
+        /**
+         * The flow of data is blocked and incoming inputs are possibly retained, so that outputs
+         * are produced only when inputs complete.
+         * <br>
+         * A new stream instance is returned by the method.
+         */
+        COLLECT,
         /**
          * The current stream configuration is modified and the same instance is returned.
          * <br>

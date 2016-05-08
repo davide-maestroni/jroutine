@@ -47,10 +47,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.dm.jrt.stream.annotation.StreamTransform.TransformType.MAP;
+import static com.github.dm.jrt.stream.annotation.StreamTransform.TransformType.CACHE;
+import static com.github.dm.jrt.stream.annotation.StreamTransform.TransformType.COLLECT;
 import static com.github.dm.jrt.stream.annotation.StreamTransform.TransformType.CONFIG;
-import static com.github.dm.jrt.stream.annotation.StreamTransform.TransformType.START;
+import static com.github.dm.jrt.stream.annotation.StreamTransform.TransformType.MAP;
 import static com.github.dm.jrt.stream.annotation.StreamTransform.TransformType.REDUCE;
+import static com.github.dm.jrt.stream.annotation.StreamTransform.TransformType.START;
 
 /**
  * Interface defining a stream output channel, that is, a channel concatenating map and reduce
@@ -144,6 +146,17 @@ public interface LoaderStreamChannel<IN, OUT>
 
     /**
      * {@inheritDoc}
+     * <p>
+     * Note that this instance will be passed as input parameter to the specified function, and
+     * a {@code LoaderStreamChannel} is expected as result.
+     */
+    @NotNull
+    <BEFORE, AFTER> LoaderStreamChannel<BEFORE, AFTER> apply(
+            @NotNull Function<? super StreamChannel<IN, OUT>, ? extends StreamChannel<BEFORE,
+                    AFTER>> function);
+
+    /**
+     * {@inheritDoc}
      */
     @NotNull
     @StreamTransform(CONFIG)
@@ -169,14 +182,14 @@ public interface LoaderStreamChannel<IN, OUT>
      * {@inheritDoc}
      */
     @NotNull
-    @StreamTransform(REDUCE)
+    @StreamTransform(COLLECT)
     LoaderStreamChannel<IN, OUT> collect(@NotNull BiConsumer<? super OUT, ? super OUT> consumer);
 
     /**
      * {@inheritDoc}
      */
     @NotNull
-    @StreamTransform(REDUCE)
+    @StreamTransform(COLLECT)
     <AFTER extends Collection<? super OUT>> LoaderStreamChannel<IN, AFTER> collect(
             @NotNull Supplier<? extends AFTER> supplier);
 
@@ -184,7 +197,7 @@ public interface LoaderStreamChannel<IN, OUT>
      * {@inheritDoc}
      */
     @NotNull
-    @StreamTransform(REDUCE)
+    @StreamTransform(COLLECT)
     <AFTER> LoaderStreamChannel<IN, AFTER> collect(@NotNull Supplier<? extends AFTER> supplier,
             @NotNull BiConsumer<? super AFTER, ? super OUT> consumer);
 
@@ -281,7 +294,7 @@ public interface LoaderStreamChannel<IN, OUT>
      * {@inheritDoc}
      */
     @NotNull
-    @StreamTransform(REDUCE)
+    @StreamTransform(COLLECT)
     <AFTER> LoaderStreamChannel<IN, AFTER> mapAll(
             @NotNull BiConsumer<? super List<OUT>, ? super ResultChannel<AFTER>> consumer);
 
@@ -289,7 +302,7 @@ public interface LoaderStreamChannel<IN, OUT>
      * {@inheritDoc}
      */
     @NotNull
-    @StreamTransform(REDUCE)
+    @StreamTransform(COLLECT)
     <AFTER> LoaderStreamChannel<IN, AFTER> mapAll(
             @NotNull Function<? super List<OUT>, ? extends AFTER> function);
 
@@ -405,8 +418,24 @@ public interface LoaderStreamChannel<IN, OUT>
      * {@inheritDoc}
      */
     @NotNull
-    @StreamTransform(MAP)
-    LoaderStreamChannel<IN, OUT> repeat();
+    @StreamTransform(CACHE)
+    LoaderStreamChannel<IN, OUT> replay();
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @StreamTransform(COLLECT)
+    LoaderStreamChannel<IN, OUT> retry(int count);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @StreamTransform(COLLECT)
+    LoaderStreamChannel<IN, OUT> retry(
+            @NotNull BiFunction<? super Integer, ? super RoutineException, ? extends
+                    UnitDuration> function);
 
     /**
      * {@inheritDoc}
@@ -561,11 +590,14 @@ public interface LoaderStreamChannel<IN, OUT>
 
     /**
      * {@inheritDoc}
+     * <p>
+     * Note that a {@link LoaderStreamConfiguration} instance will be passed as input parameter to
+     * the specified function.
      */
     @NotNull
     @StreamTransform(MAP)
     <AFTER> LoaderStreamChannel<IN, AFTER> transform(
-            @NotNull BiFunction<? super InvocationConfiguration, ? extends Function<? super
+            @NotNull BiFunction<? extends StreamConfiguration, ? extends Function<? super
                     OutputChannel<IN>, ? extends OutputChannel<OUT>>, ? extends Function<? super
                     OutputChannel<IN>, ? extends OutputChannel<AFTER>>> function);
 
@@ -591,19 +623,6 @@ public interface LoaderStreamChannel<IN, OUT>
     @NotNull
     @StreamTransform(MAP)
     LoaderStreamChannel<IN, OUT> tryFinally(@NotNull Runnable runnable);
-
-    /**
-     * Transforms this stream by applying the specified function.
-     *
-     * @param function the transformation function.
-     * @param <BEFORE> the concatenation input type.
-     * @param <AFTER>  the concatenation output type.
-     * @return the transformed stream.
-     */
-    @NotNull
-    <BEFORE, AFTER> LoaderStreamChannel<BEFORE, AFTER> applyLoader(
-            @NotNull Function<? super LoaderStreamChannel<IN, OUT>, ? extends
-                    LoaderStreamChannel<BEFORE, AFTER>> function);
 
     /**
      * Short for {@code loaderConfiguration().withCacheStrategy(strategyType).apply()}.
@@ -762,4 +781,26 @@ public interface LoaderStreamChannel<IN, OUT>
     @NotNull
     @StreamTransform(CONFIG)
     LoaderStreamChannel<IN, OUT> with(@Nullable LoaderContext context);
+
+    /**
+     * Interface defining a loader stream configuration.
+     */
+    interface LoaderStreamConfiguration extends StreamConfiguration {
+
+        /**
+         * Gets the stream configuration as a loader one.
+         *
+         * @return the loader configuration.
+         */
+        @NotNull
+        LoaderConfiguration asLoaderConfiguration();
+
+        /**
+         * Gets the stream loader context.
+         *
+         * @return the loader context.
+         */
+        @Nullable
+        LoaderContext getLoaderContext();
+    }
 }

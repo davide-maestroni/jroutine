@@ -69,7 +69,8 @@ class BuilderWrapper<OUT> implements ChannelsBuilder<LoaderStreamChannel<OUT, OU
     }
 
     @NotNull
-    public Builder<? extends ChannelsBuilder<LoaderStreamChannel<OUT, OUT>>> channelConfiguration() {
+    public Builder<? extends ChannelsBuilder<LoaderStreamChannel<OUT, OUT>>> channelConfiguration
+            () {
 
         final ChannelConfiguration config = mConfiguration;
         return new Builder<ChannelsBuilder<LoaderStreamChannel<OUT, OUT>>>(this, config);

@@ -27,6 +27,7 @@ import com.github.dm.jrt.core.channel.InputDeadlockException;
 import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.OutputDeadlockException;
 import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
@@ -44,6 +45,8 @@ import com.github.dm.jrt.function.Consumer;
 import com.github.dm.jrt.function.Function;
 import com.github.dm.jrt.function.Functions;
 import com.github.dm.jrt.function.Supplier;
+import com.github.dm.jrt.stream.StreamChannel.StreamConfiguration;
+import com.github.dm.jrt.stream.annotation.StreamTransform.TransformType;
 
 import org.assertj.core.data.Offset;
 import org.jetbrains.annotations.NotNull;
@@ -94,6 +97,15 @@ public class StreamChannelTest {
 
         assertThat(streamChannel.getError().getCause()).isExactlyInstanceOf(
                 IllegalArgumentException.class);
+    }
+
+    @Test
+    public void testAnnotation() {
+
+        // Just for coverage...
+        assertThat(TransformType.values()).containsOnly(TransformType.START, TransformType.MAP,
+                TransformType.REDUCE, TransformType.CACHE, TransformType.COLLECT,
+                TransformType.CONFIG);
     }
 
     @Test
@@ -532,11 +544,11 @@ public class StreamChannelTest {
         final TestStreamChannel streamChannel =
                 new TestStreamChannel(InvocationConfiguration.defaultConfiguration(),
                         InvocationMode.ASYNC, channel, Functions.<OutputChannel<Object>>identity());
-        assertThat(streamChannel.getConfiguration()).isNotNull();
-        assertThat(streamChannel.getStreamConfiguration()).isNotNull();
-        assertThat(streamChannel.getInvocationMode()).isNotNull();
-        assertThat(streamChannel.getBind()).isNotNull();
-        assertThat((Object) streamChannel.getSourceChannel()).isNotNull();
+        assertThat(streamChannel.getConfiguration()).isEqualTo(
+                InvocationConfiguration.defaultConfiguration());
+        assertThat(streamChannel.getStreamConfiguration()).isEqualTo(
+                InvocationConfiguration.defaultConfiguration());
+        assertThat(streamChannel.getInvocationMode()).isEqualTo(InvocationMode.ASYNC);
     }
 
     @Test
@@ -1868,10 +1880,10 @@ public class StreamChannelTest {
     }
 
     @Test
-    public void testRepeat() {
+    public void testReplay() {
 
         final IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
-        final OutputChannel<Object> channel = Streams.streamOf(ioChannel).repeat();
+        final OutputChannel<Object> channel = Streams.streamOf(ioChannel).replay();
         ioChannel.pass("test1", "test2");
         final IOChannel<Object> output1 = JRoutineCore.io().buildChannel();
         channel.bind(output1).close();
@@ -1884,10 +1896,10 @@ public class StreamChannelTest {
     }
 
     @Test
-    public void testRepeatAbort() {
+    public void testReplayAbort() {
 
         final IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
-        final OutputChannel<Object> channel = Streams.streamOf(ioChannel).repeat();
+        final OutputChannel<Object> channel = Streams.streamOf(ioChannel).replay();
         ioChannel.pass("test1", "test2");
         final IOChannel<Object> output1 = JRoutineCore.io().buildChannel();
         channel.bind(output1).close();
@@ -2444,17 +2456,26 @@ public class StreamChannelTest {
 
         assertThat(Streams.streamOf("test")
                           .transform(
-                                  new BiFunction<InvocationConfiguration,
+                                  new BiFunction<StreamConfiguration,
                                           Function<OutputChannel<String>, OutputChannel<String>>,
                                           Function<OutputChannel<String>, OutputChannel<String>>>
                                           () {
 
                                       public Function<OutputChannel<String>,
                                               OutputChannel<String>> apply(
-                                              final InvocationConfiguration configuration,
+                                              final StreamConfiguration configuration,
                                               final Function<OutputChannel<String>,
                                                       OutputChannel<String>> function) {
 
+                                          assertThat(
+                                                  configuration.asChannelConfiguration()).isEqualTo(
+                                                  ChannelConfiguration.defaultConfiguration());
+                                          assertThat(
+                                                  configuration.asInvocationConfiguration())
+                                                  .isEqualTo(
+                                                  InvocationConfiguration.defaultConfiguration());
+                                          assertThat(configuration.getInvocationMode()).isEqualTo(
+                                                  InvocationMode.ASYNC);
                                           return wrap(function).andThen(
                                                   new Function<OutputChannel<String>,
                                                           OutputChannel<String>>() {
@@ -2468,7 +2489,7 @@ public class StreamChannelTest {
                                                   });
                                       }
                                   })
-                          .afterMax(seconds(3))
+                          .afterMax(seconds(30000))
                           .next()).isEqualTo("TEST");
     }
 

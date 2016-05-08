@@ -21,11 +21,13 @@ import com.github.dm.jrt.core.builder.ConfigurableBuilder;
 import com.github.dm.jrt.core.channel.Channel.OutputChannel;
 import com.github.dm.jrt.core.channel.OutputConsumer;
 import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.Builder;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
+import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.UnitDuration;
@@ -45,10 +47,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.dm.jrt.stream.annotation.StreamTransform.TransformType.MAP;
+import static com.github.dm.jrt.stream.annotation.StreamTransform.TransformType.CACHE;
+import static com.github.dm.jrt.stream.annotation.StreamTransform.TransformType.COLLECT;
 import static com.github.dm.jrt.stream.annotation.StreamTransform.TransformType.CONFIG;
-import static com.github.dm.jrt.stream.annotation.StreamTransform.TransformType.START;
+import static com.github.dm.jrt.stream.annotation.StreamTransform.TransformType.MAP;
 import static com.github.dm.jrt.stream.annotation.StreamTransform.TransformType.REDUCE;
+import static com.github.dm.jrt.stream.annotation.StreamTransform.TransformType.START;
 
 /**
  * Interface defining a stream output channel, that is, a channel concatenating map and reduce
@@ -227,7 +231,7 @@ public interface StreamChannel<IN, OUT>
      * @return the concatenated stream instance.
      */
     @NotNull
-    @StreamTransform(REDUCE)
+    @StreamTransform(COLLECT)
     StreamChannel<IN, OUT> collect(@NotNull BiConsumer<? super OUT, ? super OUT> consumer);
 
     /**
@@ -245,7 +249,7 @@ public interface StreamChannel<IN, OUT>
      * @return the concatenated stream instance.
      */
     @NotNull
-    @StreamTransform(REDUCE)
+    @StreamTransform(COLLECT)
     <AFTER extends Collection<? super OUT>> StreamChannel<IN, AFTER> collect(
             @NotNull Supplier<? extends AFTER> supplier);
 
@@ -272,7 +276,7 @@ public interface StreamChannel<IN, OUT>
      * @return the concatenated stream instance.
      */
     @NotNull
-    @StreamTransform(REDUCE)
+    @StreamTransform(COLLECT)
     <AFTER> StreamChannel<IN, AFTER> collect(@NotNull Supplier<? extends AFTER> supplier,
             @NotNull BiConsumer<? super AFTER, ? super OUT> consumer);
 
@@ -472,7 +476,7 @@ public interface StreamChannel<IN, OUT>
      * @return the concatenated stream instance.
      */
     @NotNull
-    @StreamTransform(REDUCE)
+    @StreamTransform(COLLECT)
     <AFTER> StreamChannel<IN, AFTER> mapAll(
             @NotNull BiConsumer<? super List<OUT>, ? super ResultChannel<AFTER>> consumer);
 
@@ -490,7 +494,7 @@ public interface StreamChannel<IN, OUT>
      * @return the concatenated stream instance.
      */
     @NotNull
-    @StreamTransform(REDUCE)
+    @StreamTransform(COLLECT)
     <AFTER> StreamChannel<IN, AFTER> mapAll(
             @NotNull Function<? super List<OUT>, ? extends AFTER> function);
 
@@ -753,20 +757,20 @@ public interface StreamChannel<IN, OUT>
      * <p>
      * Note that this stream will be bound as a result of the call.
      *
-     * @return the repeating stream.
+     * @return the replaying stream.
      */
     @NotNull
-    @StreamTransform(MAP)
-    StreamChannel<IN, OUT> repeat();
+    @StreamTransform(CACHE)
+    StreamChannel<IN, OUT> replay();
 
     // TODO: 07/05/16 javadoc
     @NotNull
-    @StreamTransform(REDUCE)
+    @StreamTransform(COLLECT)
     StreamChannel<IN, OUT> retry(int count);
 
     // TODO: 07/05/16 javadoc
     @NotNull
-    @StreamTransform(REDUCE)
+    @StreamTransform(COLLECT)
     StreamChannel<IN, OUT> retry(
             @NotNull BiFunction<? super Integer, ? super RoutineException, ? extends
                     UnitDuration> function);
@@ -1115,7 +1119,7 @@ public interface StreamChannel<IN, OUT>
     @NotNull
     @StreamTransform(MAP)
     <AFTER> StreamChannel<IN, AFTER> transform(
-            @NotNull BiFunction<? super InvocationConfiguration, ? extends Function<? super
+            @NotNull BiFunction<? extends StreamConfiguration, ? extends Function<? super
                     OutputChannel<IN>, ? extends OutputChannel<OUT>>, ? extends Function<? super
                     OutputChannel<IN>, ? extends OutputChannel<AFTER>>> function);
 
@@ -1160,4 +1164,34 @@ public interface StreamChannel<IN, OUT>
     @NotNull
     @StreamTransform(MAP)
     StreamChannel<IN, OUT> tryFinally(@NotNull Runnable runnable);
+
+    /**
+     * Interface defining a stream configuration.
+     */
+    interface StreamConfiguration {
+
+        /**
+         * Gets the stream configuration as a channel one.
+         *
+         * @return the channel configuration.
+         */
+        @NotNull
+        ChannelConfiguration asChannelConfiguration();
+
+        /**
+         * Gets the stream configuration as an invocation one.
+         *
+         * @return the invocation configuration.
+         */
+        @NotNull
+        InvocationConfiguration asInvocationConfiguration();
+
+        /**
+         * Gets the stream invocation mode.
+         *
+         * @return the invocation mode.
+         */
+        @NotNull
+        InvocationMode getInvocationMode();
+    }
 }

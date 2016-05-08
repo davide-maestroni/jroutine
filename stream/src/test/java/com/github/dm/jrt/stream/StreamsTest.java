@@ -2100,10 +2100,10 @@ public class StreamsTest {
     }
 
     @Test
-    public void testRepeat() {
+    public void testReplay() {
 
         final IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
-        final OutputChannel<Object> channel = Streams.repeat(ioChannel).buildChannels();
+        final OutputChannel<Object> channel = Streams.replay(ioChannel).buildChannels();
         ioChannel.pass("test1", "test2");
         final IOChannel<Object> output1 = JRoutineCore.io().buildChannel();
         channel.bind(output1).close();
@@ -2116,10 +2116,10 @@ public class StreamsTest {
     }
 
     @Test
-    public void testRepeatAbort() {
+    public void testReplayAbort() {
 
         final IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
-        final OutputChannel<Object> channel = Streams.repeat(ioChannel).buildChannels();
+        final OutputChannel<Object> channel = Streams.replay(ioChannel).buildChannels();
         ioChannel.pass("test1", "test2");
         final IOChannel<Object> output1 = JRoutineCore.io().buildChannel();
         channel.bind(output1).close();

@@ -783,13 +783,13 @@ public class Channels {
      *
      * @param channel the output channel.
      * @param <OUT>   the output data type.
-     * @return the repeating channel builder.
+     * @return the replaying channel builder.
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends OutputChannel<OUT>> repeat(
+    public static <OUT> ChannelsBuilder<? extends OutputChannel<OUT>> replay(
             @NotNull final OutputChannel<OUT> channel) {
 
-        return new RepeatedChannelBuilder<OUT>(channel);
+        return new ReplayChannelBuilder<OUT>(channel);
     }
 
     /**

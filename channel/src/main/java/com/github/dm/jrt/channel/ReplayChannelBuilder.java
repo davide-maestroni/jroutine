@@ -23,13 +23,13 @@ import com.github.dm.jrt.core.util.ConstantConditions;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Builder implementation returning a repeating channel.
+ * Builder implementation returning a replaying channel.
  * <p>
  * Created by davide-maestroni on 02/26/2016.
  *
  * @param <OUT> the output data type.
  */
-class RepeatedChannelBuilder<OUT> extends AbstractBuilder<OutputChannel<OUT>> {
+class ReplayChannelBuilder<OUT> extends AbstractBuilder<OutputChannel<OUT>> {
 
     private final OutputChannel<OUT> mChannel;
 
@@ -38,7 +38,7 @@ class RepeatedChannelBuilder<OUT> extends AbstractBuilder<OutputChannel<OUT>> {
      *
      * @param channel the output channel.
      */
-    RepeatedChannelBuilder(@NotNull final OutputChannel<OUT> channel) {
+    ReplayChannelBuilder(@NotNull final OutputChannel<OUT> channel) {
 
         mChannel = ConstantConditions.notNull("output channel", channel);
     }
@@ -47,6 +47,6 @@ class RepeatedChannelBuilder<OUT> extends AbstractBuilder<OutputChannel<OUT>> {
     @Override
     protected OutputChannel<OUT> build(@NotNull final ChannelConfiguration configuration) {
 
-        return new RepeatedChannel<OUT>(configuration, mChannel);
+        return new ReplayChannel<OUT>(configuration, mChannel);
     }
 }

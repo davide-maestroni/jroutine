@@ -47,10 +47,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.dm.jrt.stream.annotation.StreamTransform.TransformType.MAP;
+import static com.github.dm.jrt.stream.annotation.StreamTransform.TransformType.CACHE;
+import static com.github.dm.jrt.stream.annotation.StreamTransform.TransformType.COLLECT;
 import static com.github.dm.jrt.stream.annotation.StreamTransform.TransformType.CONFIG;
-import static com.github.dm.jrt.stream.annotation.StreamTransform.TransformType.START;
+import static com.github.dm.jrt.stream.annotation.StreamTransform.TransformType.MAP;
 import static com.github.dm.jrt.stream.annotation.StreamTransform.TransformType.REDUCE;
+import static com.github.dm.jrt.stream.annotation.StreamTransform.TransformType.START;
 
 /**
  * Interface defining a stream output channel, that is, a channel concatenating map and reduce
@@ -144,6 +146,17 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
 
     /**
      * {@inheritDoc}
+     * <p>
+     * Note that this instance will be passed as input parameter to the specified function, and
+     * a {@code LoaderStreamChannelCompat} is expected as result.
+     */
+    @NotNull
+    <BEFORE, AFTER> LoaderStreamChannelCompat<BEFORE, AFTER> apply(
+            @NotNull Function<? super StreamChannel<IN, OUT>, ? extends StreamChannel<BEFORE,
+                    AFTER>> function);
+
+    /**
+     * {@inheritDoc}
      */
     @NotNull
     @StreamTransform(CONFIG)
@@ -169,7 +182,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      * {@inheritDoc}
      */
     @NotNull
-    @StreamTransform(REDUCE)
+    @StreamTransform(COLLECT)
     LoaderStreamChannelCompat<IN, OUT> collect(
             @NotNull BiConsumer<? super OUT, ? super OUT> consumer);
 
@@ -177,7 +190,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      * {@inheritDoc}
      */
     @NotNull
-    @StreamTransform(REDUCE)
+    @StreamTransform(COLLECT)
     <AFTER extends Collection<? super OUT>> LoaderStreamChannelCompat<IN, AFTER> collect(
             @NotNull Supplier<? extends AFTER> supplier);
 
@@ -185,7 +198,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      * {@inheritDoc}
      */
     @NotNull
-    @StreamTransform(REDUCE)
+    @StreamTransform(COLLECT)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> collect(
             @NotNull Supplier<? extends AFTER> supplier,
             @NotNull BiConsumer<? super AFTER, ? super OUT> consumer);
@@ -283,7 +296,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      * {@inheritDoc}
      */
     @NotNull
-    @StreamTransform(REDUCE)
+    @StreamTransform(COLLECT)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> mapAll(
             @NotNull BiConsumer<? super List<OUT>, ? super ResultChannel<AFTER>> consumer);
 
@@ -291,7 +304,7 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      * {@inheritDoc}
      */
     @NotNull
-    @StreamTransform(REDUCE)
+    @StreamTransform(COLLECT)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> mapAll(
             @NotNull Function<? super List<OUT>, ? extends AFTER> function);
 
@@ -410,8 +423,24 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
      * {@inheritDoc}
      */
     @NotNull
-    @StreamTransform(MAP)
-    LoaderStreamChannelCompat<IN, OUT> repeat();
+    @StreamTransform(CACHE)
+    LoaderStreamChannelCompat<IN, OUT> replay();
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @StreamTransform(COLLECT)
+    LoaderStreamChannelCompat<IN, OUT> retry(int count);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @StreamTransform(COLLECT)
+    LoaderStreamChannelCompat<IN, OUT> retry(
+            @NotNull BiFunction<? super Integer, ? super RoutineException, ? extends
+                    UnitDuration> function);
 
     /**
      * {@inheritDoc}
@@ -570,11 +599,14 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
 
     /**
      * {@inheritDoc}
+     * <p>
+     * Note that a {@link LoaderStreamConfigurationCompat} instance will be passed as input
+     * parameter to the specified function.
      */
     @NotNull
     @StreamTransform(MAP)
     <AFTER> LoaderStreamChannelCompat<IN, AFTER> transform(
-            @NotNull BiFunction<? super InvocationConfiguration, ? extends Function<? super
+            @NotNull BiFunction<? extends StreamConfiguration, ? extends Function<? super
                     OutputChannel<IN>, ? extends OutputChannel<OUT>>, ? extends Function<? super
                     OutputChannel<IN>, ? extends OutputChannel<AFTER>>> function);
 
@@ -600,19 +632,6 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @NotNull
     @StreamTransform(MAP)
     LoaderStreamChannelCompat<IN, OUT> tryFinally(@NotNull Runnable runnable);
-
-    /**
-     * Transforms this stream by applying the specified function.
-     *
-     * @param function the transformation function.
-     * @param <BEFORE> the concatenation input type.
-     * @param <AFTER>  the concatenation output type.
-     * @return the transformed stream.
-     */
-    @NotNull
-    <BEFORE, AFTER> LoaderStreamChannelCompat<BEFORE, AFTER> applyLoader(
-            @NotNull Function<? super LoaderStreamChannelCompat<IN, OUT>, ? extends
-                    LoaderStreamChannelCompat<BEFORE, AFTER>> function);
 
     /**
      * Short for {@code loaderConfiguration().withCacheStrategy(strategyType).apply()}.
@@ -773,4 +792,26 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @NotNull
     @StreamTransform(CONFIG)
     LoaderStreamChannelCompat<IN, OUT> with(@Nullable LoaderContextCompat context);
+
+    /**
+     * Interface defining a loader stream configuration.
+     */
+    interface LoaderStreamConfigurationCompat extends StreamConfiguration {
+
+        /**
+         * Gets the stream configuration as a loader one.
+         *
+         * @return the loader configuration.
+         */
+        @NotNull
+        LoaderConfiguration asLoaderConfiguration();
+
+        /**
+         * Gets the stream loader context.
+         *
+         * @return the loader context.
+         */
+        @Nullable
+        LoaderContextCompat getLoaderContext();
+    }
 }

@@ -904,14 +904,14 @@ public class Streams extends Functions {
      *
      * @param channel the output channel.
      * @param <OUT>   the output data type.
-     * @return the repeating stream channel builder.
-     * @see Channels#repeat(Channel.OutputChannel)
+     * @return the replaying stream channel builder.
+     * @see Channels#replay(Channel.OutputChannel)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends StreamChannel<OUT, OUT>> repeat(
+    public static <OUT> ChannelsBuilder<? extends StreamChannel<OUT, OUT>> replay(
             @NotNull final OutputChannel<OUT> channel) {
 
-        return new BuilderWrapper<OUT>(Channels.repeat(channel));
+        return new BuilderWrapper<OUT>(Channels.replay(channel));
     }
 
     /**

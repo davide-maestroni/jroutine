@@ -61,7 +61,7 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
     @NotNull
     public ServiceProxyObjectBuilder<TYPE> apply(@NotNull final ObjectConfiguration configuration) {
 
-        mObjectConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
+        mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
         return this;
     }
 
@@ -119,8 +119,8 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
             }
 
             try {
-                final TYPE newInstance =
-                        newProxy(invocationConfiguration, objectConfiguration, serviceConfiguration);
+                final TYPE newInstance = newProxy(invocationConfiguration, objectConfiguration,
+                        serviceConfiguration);
                 proxies.put(proxyInfo, newInstance);
                 return newInstance;
 
@@ -139,7 +139,8 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
     }
 
     @NotNull
-    public ObjectConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>> objectConfiguration() {
+    public ObjectConfiguration.Builder<? extends ServiceProxyObjectBuilder<TYPE>>
+    objectConfiguration() {
 
         final ObjectConfiguration config = mObjectConfiguration;
         return new ObjectConfiguration.Builder<ServiceProxyObjectBuilder<TYPE>>(this, config);
@@ -183,7 +184,7 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
      * Creates and return a new proxy instance.
      *
      * @param invocationConfiguration the invocation configuration.
-     * @param objectConfiguration      the proxy configuration.
+     * @param objectConfiguration     the object configuration.
      * @param serviceConfiguration    the service configuration.
      * @return the proxy instance.
      * @throws java.lang.Exception if an unexpected error occurs.
@@ -203,7 +204,7 @@ public abstract class AbstractServiceProxyObjectBuilder<TYPE>
          *
          * @param itf                     the proxy interface class.
          * @param invocationConfiguration the invocation configuration.
-         * @param objectConfiguration      the proxy configuration.
+         * @param objectConfiguration     the object configuration.
          * @param serviceConfiguration    the service configuration.
          */
         private ProxyInfo(@NotNull final Class<?> itf,

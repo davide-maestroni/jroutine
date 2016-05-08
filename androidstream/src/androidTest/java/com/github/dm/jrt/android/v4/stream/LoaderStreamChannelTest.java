@@ -23,10 +23,14 @@ import android.support.v4.app.FragmentActivity;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.github.dm.jrt.android.channel.ParcelableSelectable;
+import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
 import com.github.dm.jrt.android.core.invocation.IdentityContextInvocation;
 import com.github.dm.jrt.android.core.runner.AndroidRunners;
 import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
+import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
+import com.github.dm.jrt.android.v4.stream.LoaderStreamChannelCompat
+        .LoaderStreamConfigurationCompat;
 import com.github.dm.jrt.core.JRoutineCore;
 import com.github.dm.jrt.core.channel.AbortException;
 import com.github.dm.jrt.core.channel.Channel.InputChannel;
@@ -35,7 +39,6 @@ import com.github.dm.jrt.core.channel.ExecutionDeadlockException;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
-import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.error.TimeoutException;
@@ -1172,17 +1175,21 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
     }
 
     @NotNull
-    private static BiFunction<InvocationConfiguration, Function<OutputChannel<String>,
+    private static BiFunction<LoaderStreamConfigurationCompat, Function<OutputChannel<String>,
             OutputChannel<String>>, Function<OutputChannel<String>, OutputChannel<String>>>
     transformFunction() {
 
-        return new BiFunction<InvocationConfiguration, Function<OutputChannel<String>,
+        return new BiFunction<LoaderStreamConfigurationCompat, Function<OutputChannel<String>,
                 OutputChannel<String>>, Function<OutputChannel<String>, OutputChannel<String>>>() {
 
             public Function<OutputChannel<String>, OutputChannel<String>> apply(
-                    final InvocationConfiguration configuration,
+                    final LoaderStreamConfigurationCompat configuration,
                     final Function<OutputChannel<String>, OutputChannel<String>> function) {
 
+                assertThat(configuration.asLoaderConfiguration()).isEqualTo(
+                        LoaderConfiguration.defaultConfiguration());
+                assertThat(configuration.getLoaderContext()).isInstanceOf(
+                        LoaderContextCompat.class);
                 return wrap(function).andThen(
                         new Function<OutputChannel<String>, OutputChannel<String>>() {
 
@@ -1231,19 +1238,17 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
                                       .all()).containsExactly("test1", "test2");
         assertThat(LoaderStreamsCompat.streamOf("test1")
                                       .with(loaderFrom(getActivity()))
-                                      .applyLoader(
-                                              new Function<LoaderStreamChannelCompat<String,
-                                                      String>, LoaderStreamChannelCompat<String,
-                                                      String>>() {
+                                      .apply(new Function<StreamChannel<String, String>,
+                                              LoaderStreamChannelCompat<String, String>>() {
 
-                                                  public LoaderStreamChannelCompat<String,
-                                                          String> apply(
-                                                          final LoaderStreamChannelCompat<String,
-                                                                  String> stream) {
+                                          public LoaderStreamChannelCompat<String, String> apply(
+                                                  final StreamChannel<String, String> stream) {
 
-                                                      return stream.concat("test2");
-                                                  }
-                                              })
+                                              return ((LoaderStreamChannelCompat<String, String>)
+                                                      stream)
+                                                      .concat("test2");
+                                          }
+                                      })
                                       .afterMax(seconds(10))
                                       .all()).containsExactly("test1", "test2");
     }
@@ -2332,11 +2337,11 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         }
     }
 
-    public void testRepeat() {
+    public void testReplay() {
 
         final IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
         final OutputChannel<Object> channel =
-                LoaderStreamsCompat.streamOf(ioChannel).with(loaderFrom(getActivity())).repeat();
+                LoaderStreamsCompat.streamOf(ioChannel).with(loaderFrom(getActivity())).replay();
         ioChannel.pass("test1", "test2");
         final IOChannel<Object> output1 = JRoutineCore.io().buildChannel();
         channel.bind(output1).close();
@@ -2348,11 +2353,11 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(output1.all()).containsExactly("test2", "test3");
     }
 
-    public void testRepeatAbort() {
+    public void testReplayAbort() {
 
         final IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
         final OutputChannel<Object> channel =
-                LoaderStreamsCompat.streamOf(ioChannel).with(loaderFrom(getActivity())).repeat();
+                LoaderStreamsCompat.streamOf(ioChannel).with(loaderFrom(getActivity())).replay();
         ioChannel.pass("test1", "test2");
         final IOChannel<Object> output1 = JRoutineCore.io().buildChannel();
         channel.bind(output1).close();

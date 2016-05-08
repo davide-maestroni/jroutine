@@ -701,14 +701,14 @@ public class LoaderStreamsCompat extends Streams {
      *
      * @param channel the output channel.
      * @param <OUT>   the output data type.
-     * @return the repeating stream channel builder.
-     * @see SparseChannelsCompat#repeat(Channel.OutputChannel)
+     * @return the replaying stream channel builder.
+     * @see SparseChannelsCompat#replay(Channel.OutputChannel)
      */
     @NotNull
-    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<OUT, OUT>> repeat(
+    public static <OUT> ChannelsBuilder<? extends LoaderStreamChannelCompat<OUT, OUT>> replay(
             @NotNull final OutputChannel<OUT> channel) {
 
-        return new BuilderWrapper<OUT>(SparseChannelsCompat.repeat(channel));
+        return new BuilderWrapper<OUT>(SparseChannelsCompat.replay(channel));
     }
 
     /**

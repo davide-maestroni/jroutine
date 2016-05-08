@@ -165,7 +165,7 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     @NotNull
     public ServiceObjectRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
 
-        mObjectConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
+        mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
         return this;
     }
 
@@ -254,7 +254,8 @@ class DefaultServiceObjectRoutineBuilder implements ServiceObjectRoutineBuilder,
     }
 
     @NotNull
-    public ObjectConfiguration.Builder<? extends ServiceObjectRoutineBuilder> objectConfiguration() {
+    public ObjectConfiguration.Builder<? extends ServiceObjectRoutineBuilder> objectConfiguration
+            () {
 
         final ObjectConfiguration config = mObjectConfiguration;
         return new ObjectConfiguration.Builder<ServiceObjectRoutineBuilder>(this, config);

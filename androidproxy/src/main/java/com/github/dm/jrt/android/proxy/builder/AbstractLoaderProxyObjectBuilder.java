@@ -65,7 +65,7 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
     @NotNull
     public LoaderProxyObjectBuilder<TYPE> apply(@NotNull final ObjectConfiguration configuration) {
 
-        mObjectConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
+        mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
         return this;
     }
 
@@ -187,7 +187,7 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
      * Creates and return a new proxy instance.
      *
      * @param invocationConfiguration the invocation configuration.
-     * @param objectConfiguration     the proxy configuration.
+     * @param objectConfiguration     the object configuration.
      * @param loaderConfiguration     the loader configuration.
      * @return the proxy instance.
      * @throws java.lang.Exception if an unexpected error occurs.
@@ -207,7 +207,7 @@ public abstract class AbstractLoaderProxyObjectBuilder<TYPE>
          *
          * @param itf                     the proxy interface class.
          * @param invocationConfiguration the invocation configuration.
-         * @param objectConfiguration     the proxy configuration.
+         * @param objectConfiguration     the object configuration.
          * @param loaderConfiguration     the loader configuration.
          */
         private ProxyInfo(@NotNull final Class<?> itf,

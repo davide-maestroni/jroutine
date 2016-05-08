@@ -160,8 +160,8 @@ class DefaultLoaderAutoProxyRoutineBuilderCompat implements LoaderAutoProxyRouti
     }
 
     @NotNull
-    public ObjectConfiguration.Builder<? extends LoaderAutoProxyRoutineBuilder> objectConfiguration
-            () {
+    public ObjectConfiguration.Builder<? extends LoaderAutoProxyRoutineBuilder>
+    objectConfiguration() {
 
         return new ObjectConfiguration.Builder<LoaderAutoProxyRoutineBuilder>(mProxyConfigurable,
                 mObjectConfiguration);

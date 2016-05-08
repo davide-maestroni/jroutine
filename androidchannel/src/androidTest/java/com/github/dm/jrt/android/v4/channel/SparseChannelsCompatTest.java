@@ -767,17 +767,13 @@ public class SparseChannelsCompatTest extends ActivityInstrumentationTestCase2<T
             switch (selectable.index) {
 
                 case INTEGER:
-                    SparseChannelsCompat.<Object, Integer>selectParcelable(result, INTEGER)
-                                        .buildChannels()
-                                        .pass((Integer) selectable.data)
-                                        .close();
+                    SparseChannelsCompat.<Object, Integer>selectParcelable(result,
+                            INTEGER).buildChannels().pass((Integer) selectable.data).close();
                     break;
 
                 case STRING:
-                    SparseChannelsCompat.<Object, String>selectParcelable(result, STRING)
-                                        .buildChannels()
-                                        .pass((String) selectable.data)
-                                        .close();
+                    SparseChannelsCompat.<Object, String>selectParcelable(result,
+                            STRING).buildChannels().pass((String) selectable.data).close();
                     break;
             }
         }

@@ -461,6 +461,7 @@ public final class ChannelConfiguration extends DeepEqualObject {
         public Builder(@NotNull final Configurable<? extends TYPE> configurable) {
 
             mConfigurable = ConstantConditions.notNull("configurable instance", configurable);
+            mChannelLimit = DEFAULT;
             mChannelMaxSize = DEFAULT;
         }
 

@@ -77,7 +77,7 @@ class DefaultProxyRoutineBuilder
     @NotNull
     public ProxyRoutineBuilder apply(@NotNull final ObjectConfiguration configuration) {
 
-        mObjectConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
+        mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
         return this;
     }
 

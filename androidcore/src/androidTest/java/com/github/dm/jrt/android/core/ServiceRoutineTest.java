@@ -403,8 +403,9 @@ public class ServiceRoutineTest extends ActivityInstrumentationTestCase2<TestAct
     public void testSize() {
 
         final InvocationChannel<String, String> channel =
-                JRoutineService.with(serviceFrom(getActivity())).on(factoryOf(
-                        StringPassingInvocation.class)).asyncInvoke();
+                JRoutineService.with(serviceFrom(getActivity()))
+                               .on(factoryOf(StringPassingInvocation.class))
+                               .asyncInvoke();
         assertThat(channel.size()).isEqualTo(0);
         channel.after(millis(500)).pass("test");
         assertThat(channel.size()).isEqualTo(1);

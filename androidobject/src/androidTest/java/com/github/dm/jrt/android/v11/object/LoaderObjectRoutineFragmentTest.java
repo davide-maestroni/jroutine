@@ -739,7 +739,8 @@ public class LoaderObjectRoutineFragmentTest
                                                                      .withSharedFields("test")
                                                                      .apply()
                                                                      .method(TestClass.class
-                                                                             .getMethod("getLong"));
+                                                                             .getMethod(
+                                                                             "getLong"));
 
         assertThat(routine2.syncCall().afterMax(timeout).all()).containsExactly(-77L);
 

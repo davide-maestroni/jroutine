@@ -1912,10 +1912,10 @@ public class ChannelsTest {
 
     @Test
     @SuppressWarnings("ConstantConditions")
-    public void testRepeatError() {
+    public void testReplayError() {
 
         try {
-            Channels.repeat(null);
+            Channels.replay(null);
             fail();
 
         } catch (final NullPointerException ignored) {
@@ -2140,17 +2140,16 @@ public class ChannelsTest {
             switch (selectable.index) {
 
                 case INTEGER:
-                    Channels.<Object, Integer>select(result, INTEGER)
-                            .buildChannels()
-                            .pass(selectable.<Integer>data())
-                            .close();
+                    Channels.<Object, Integer>select(result, INTEGER).buildChannels()
+                                                                     .pass(selectable
+                                                                             .<Integer>data())
+                                                                     .close();
                     break;
 
                 case STRING:
-                    Channels.<Object, String>select(result, STRING)
-                            .buildChannels()
-                            .pass(selectable.<String>data())
-                            .close();
+                    Channels.<Object, String>select(result, STRING).buildChannels()
+                                                                   .pass(selectable.<String>data())
+                                                                   .close();
                     break;
             }
         }

@@ -37,17 +37,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 /**
- * Repeated channel unit tests.
+ * Replay channel unit tests.
  * <p>
  * Created by davide-maestroni on 10/26/2014.
  */
-public class RepeatedChannelTest {
+public class ReplayChannelTest {
 
     @Test
-    public void testRepeat() {
+    public void testReplay() {
 
         final IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
-        final OutputChannel<Object> channel = Channels.repeat(ioChannel).buildChannels();
+        final OutputChannel<Object> channel = Channels.replay(ioChannel).buildChannels();
         assertThat(channel.isBound()).isFalse();
         assertThat(channel.isEmpty()).isTrue();
         ioChannel.pass("test1", "test2");
@@ -68,10 +68,10 @@ public class RepeatedChannelTest {
 
     @Test
     @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
-    public void testRepeatAbort() {
+    public void testReplayAbort() {
 
         IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
-        OutputChannel<Object> channel = Channels.repeat(ioChannel).buildChannels();
+        OutputChannel<Object> channel = Channels.replay(ioChannel).buildChannels();
         ioChannel.pass("test1", "test2");
         final IOChannel<Object> output1 = JRoutineCore.io().buildChannel();
         channel.bind(output1).close();
@@ -97,7 +97,7 @@ public class RepeatedChannelTest {
         }
 
         ioChannel = JRoutineCore.io().buildChannel();
-        channel = Channels.repeat(ioChannel).buildChannels();
+        channel = Channels.replay(ioChannel).buildChannels();
         ioChannel.pass("test").close();
         channel.bind(new TemplateOutputConsumer<Object>() {
 
@@ -112,10 +112,10 @@ public class RepeatedChannelTest {
 
     @Test
     @SuppressWarnings({"ConstantConditions", "ThrowableResultOfMethodCallIgnored"})
-    public void testRepeatAbortException() {
+    public void testReplayAbortException() {
 
         IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
-        OutputChannel<Object> channel = Channels.repeat(ioChannel).buildChannels();
+        OutputChannel<Object> channel = Channels.replay(ioChannel).buildChannels();
         channel.bind(new TemplateOutputConsumer<Object>() {
 
             @Override
@@ -127,7 +127,7 @@ public class RepeatedChannelTest {
         ioChannel.abort();
         assertThat(channel.getError().getCause()).isNull();
         ioChannel = JRoutineCore.io().buildChannel();
-        channel = Channels.repeat(ioChannel).buildChannels();
+        channel = Channels.replay(ioChannel).buildChannels();
         channel.bind(new TemplateOutputConsumer<Object>() {
 
             @Override
@@ -140,7 +140,7 @@ public class RepeatedChannelTest {
         assertThat(channel.getError().getCause()).isNull();
 
         ioChannel = JRoutineCore.io().buildChannel();
-        channel = Channels.repeat(ioChannel).buildChannels();
+        channel = Channels.replay(ioChannel).buildChannels();
         ioChannel.abort();
         channel.bind(new TemplateOutputConsumer<Object>() {
 
@@ -152,7 +152,7 @@ public class RepeatedChannelTest {
         });
         assertThat(channel.getError().getCause()).isNull();
         ioChannel = JRoutineCore.io().buildChannel();
-        channel = Channels.repeat(ioChannel).buildChannels();
+        channel = Channels.replay(ioChannel).buildChannels();
         ioChannel.abort();
         channel.bind(new TemplateOutputConsumer<Object>() {
 
@@ -166,10 +166,10 @@ public class RepeatedChannelTest {
     }
 
     @Test
-    public void testRepeatConsumer() {
+    public void testReplayConsumer() {
 
         final IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
-        final OutputChannel<Object> channel = Channels.repeat(ioChannel).buildChannels();
+        final OutputChannel<Object> channel = Channels.replay(ioChannel).buildChannels();
         assertThat(channel.isBound()).isFalse();
         assertThat(channel.isEmpty()).isTrue();
         ioChannel.pass("test1", "test2");
@@ -193,10 +193,10 @@ public class RepeatedChannelTest {
     }
 
     @Test
-    public void testRepeatError() {
+    public void testReplayError() {
 
         final IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
-        final OutputChannel<Object> channel = Channels.repeat(ioChannel).buildChannels();
+        final OutputChannel<Object> channel = Channels.replay(ioChannel).buildChannels();
         channel.eventuallyExit();
         try {
             channel.remove();
@@ -262,10 +262,10 @@ public class RepeatedChannelTest {
     }
 
     @Test
-    public void testRepeatException() {
+    public void testReplayException() {
 
         IOChannel<Object> ioChannel = JRoutineCore.io().buildChannel();
-        OutputChannel<Object> channel = Channels.repeat(ioChannel).buildChannels();
+        OutputChannel<Object> channel = Channels.replay(ioChannel).buildChannels();
         channel.bind(new TemplateOutputConsumer<Object>() {
 
             @Override
@@ -276,7 +276,7 @@ public class RepeatedChannelTest {
         });
         ioChannel.pass("test").close().throwError();
         ioChannel = JRoutineCore.io().buildChannel();
-        channel = Channels.repeat(ioChannel).buildChannels();
+        channel = Channels.replay(ioChannel).buildChannels();
         channel.bind(new TemplateOutputConsumer<Object>() {
 
             @Override
@@ -288,7 +288,7 @@ public class RepeatedChannelTest {
         ioChannel.pass("test").close().throwError();
 
         ioChannel = JRoutineCore.io().buildChannel();
-        channel = Channels.repeat(ioChannel).buildChannels();
+        channel = Channels.replay(ioChannel).buildChannels();
         ioChannel.pass("test").close();
         channel.bind(new TemplateOutputConsumer<Object>() {
 
@@ -300,7 +300,7 @@ public class RepeatedChannelTest {
         });
         channel.throwError();
         ioChannel = JRoutineCore.io().buildChannel();
-        channel = Channels.repeat(ioChannel).buildChannels();
+        channel = Channels.replay(ioChannel).buildChannels();
         ioChannel.pass("test").close();
         channel.bind(new TemplateOutputConsumer<Object>() {
 
@@ -321,7 +321,7 @@ public class RepeatedChannelTest {
         assertThat(channel.size()).isEqualTo(0);
         channel.after(millis(500)).pass("test");
         assertThat(channel.size()).isEqualTo(1);
-        final OutputChannel<Object> result = Channels.repeat(channel.result()).buildChannels();
+        final OutputChannel<Object> result = Channels.replay(channel.result()).buildChannels();
         assertThat(result.afterMax(seconds(1)).hasCompleted()).isTrue();
         assertThat(result.size()).isEqualTo(1);
         assertThat(result.skipNext(1).size()).isEqualTo(0);

@@ -32,6 +32,8 @@ import static com.github.dm.jrt.core.util.UnitDuration.fromUnit;
  */
 public abstract class Backoff implements BiFunction<Integer, RoutineException, UnitDuration> {
 
+    // TODO: 08/05/16 jitter
+
     @NotNull
     public static ConstantBackoff times(final int count) {
 

@@ -59,7 +59,7 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
     @NotNull
     public ProxyObjectBuilder<TYPE> apply(@NotNull final ObjectConfiguration configuration) {
 
-        mObjectConfiguration = ConstantConditions.notNull("proxy configuration", configuration);
+        mObjectConfiguration = ConstantConditions.notNull("object configuration", configuration);
         return this;
     }
 
@@ -78,8 +78,8 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
 
             final InvocationConfiguration invocationConfiguration = mInvocationConfiguration;
             final ObjectConfiguration objectConfiguration = mObjectConfiguration;
-            final ClassInfo classInfo =
-                    new ClassInfo(getInterfaceClass(), invocationConfiguration, objectConfiguration);
+            final ClassInfo classInfo = new ClassInfo(getInterfaceClass(), invocationConfiguration,
+                    objectConfiguration);
             final Object instance = proxyMap.get(classInfo);
             if (instance != null) {
                 return (TYPE) instance;
@@ -131,7 +131,7 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
      * Creates and return a new proxy instance.
      *
      * @param invocationConfiguration the invocation configuration.
-     * @param objectConfiguration      the proxy configuration.
+     * @param objectConfiguration     the object configuration.
      * @return the proxy instance.
      * @throws java.lang.Exception if an unexpected error occurs.
      */
@@ -149,7 +149,7 @@ public abstract class AbstractProxyObjectBuilder<TYPE> implements ProxyObjectBui
          *
          * @param itf                     the proxy interface class.
          * @param invocationConfiguration the invocation configuration.
-         * @param objectConfiguration      the proxy configuration.
+         * @param objectConfiguration     the object configuration.
          */
         private ClassInfo(@NotNull final Class<?> itf,
                 @NotNull final InvocationConfiguration invocationConfiguration,

@@ -23,7 +23,6 @@ import com.github.dm.jrt.android.core.config.LoaderConfiguration;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.CacheStrategyType;
 import com.github.dm.jrt.android.core.config.LoaderConfiguration.Configurable;
 import com.github.dm.jrt.android.core.invocation.ContextInvocationFactory;
-import com.github.dm.jrt.android.v4.channel.SparseChannelsCompat;
 import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat;
 import com.github.dm.jrt.android.v4.core.JRoutineLoaderCompat.LoaderBuilderCompat;
 import com.github.dm.jrt.android.v4.core.LoaderContextCompat;
@@ -39,7 +38,6 @@ import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.core.util.DeepEqualObject;
 import com.github.dm.jrt.core.util.Reflection;
 import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.function.BiConsumer;
@@ -60,7 +58,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.dm.jrt.android.core.RoutineContextInvocation.factoryFrom;
-import static com.github.dm.jrt.core.util.Reflection.asArgs;
 import static com.github.dm.jrt.function.Functions.wrap;
 
 /**
@@ -110,6 +107,8 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     private LoaderConfiguration mConfiguration = LoaderConfiguration.defaultConfiguration();
 
     private LoaderBuilderCompat mContextBuilder;
+
+    private LoaderContextCompat mLoaderContext;
 
     private LoaderConfiguration mStreamConfiguration;
 
@@ -254,6 +253,15 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     public LoaderStreamChannelCompat<IN, OUT> skipNext(final int count) {
 
         return (LoaderStreamChannelCompat<IN, OUT>) super.skipNext(count);
+    }
+
+    @NotNull
+    @Override
+    public <BEFORE, AFTER> LoaderStreamChannelCompat<BEFORE, AFTER> apply(
+            @NotNull final Function<? super StreamChannel<IN, OUT>, ? extends
+                    StreamChannel<BEFORE, AFTER>> function) {
+
+        return (LoaderStreamChannelCompat<BEFORE, AFTER>) super.apply(function);
     }
 
     @NotNull
@@ -557,9 +565,25 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
     @NotNull
     @Override
-    public LoaderStreamChannelCompat<IN, OUT> repeat() {
+    public LoaderStreamChannelCompat<IN, OUT> replay() {
 
-        return (LoaderStreamChannelCompat<IN, OUT>) super.repeat();
+        return (LoaderStreamChannelCompat<IN, OUT>) super.replay();
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannelCompat<IN, OUT> retry(final int count) {
+
+        return (LoaderStreamChannelCompat<IN, OUT>) super.retry(count);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannelCompat<IN, OUT> retry(
+            @NotNull final BiFunction<? super Integer, ? super RoutineException, ? extends
+                    UnitDuration> function) {
+
+        return (LoaderStreamChannelCompat<IN, OUT>) super.retry(function);
     }
 
     @NotNull
@@ -732,14 +756,14 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     public LoaderStreamChannelCompat<IN, ? extends ParcelableSelectable<OUT>> toSelectable(
             final int index) {
 
-        return newChannel(getStreamConfiguration(), getInvocationMode(), getSourceChannel(),
-                getBind().andThen(new SelectableInvoke<OUT>(buildChannelConfiguration(), index)));
+        return transform(new SelectableTransform<IN, OUT>(index));
     }
 
     @NotNull
     @Override
+    @SuppressWarnings("unchecked")
     public <AFTER> LoaderStreamChannelCompat<IN, AFTER> transform(
-            @NotNull final BiFunction<? super InvocationConfiguration, ? extends Function<? super
+            @NotNull final BiFunction<? extends StreamConfiguration, ? extends Function<? super
                     OutputChannel<IN>, ? extends OutputChannel<OUT>>, ? extends Function<? super
                     OutputChannel<IN>, ? extends OutputChannel<AFTER>>> function) {
 
@@ -788,19 +812,23 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
 
     @NotNull
     @Override
+    protected StreamConfiguration newConfiguration(
+            @NotNull final InvocationConfiguration streamConfiguration,
+            @NotNull final InvocationConfiguration configuration,
+            @NotNull final InvocationMode invocationMode) {
+
+        return new DefaultLoaderStreamConfigurationCompat(mLoaderContext, mStreamConfiguration,
+                mConfiguration,
+                super.newConfiguration(streamConfiguration, configuration, invocationMode));
+    }
+
+    @NotNull
+    @Override
     protected <AFTER> Routine<? super OUT, ? extends AFTER> newRoutine(
             @NotNull final InvocationConfiguration configuration,
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
 
         return newRoutine(configuration, buildLoaderConfiguration(), factory);
-    }
-
-    @NotNull
-    public <BEFORE, AFTER> LoaderStreamChannelCompat<BEFORE, AFTER> applyLoader(
-            @NotNull final Function<? super LoaderStreamChannelCompat<IN, OUT>, ? extends
-                    LoaderStreamChannelCompat<BEFORE, AFTER>> function) {
-
-        return ConstantConditions.notNull("transformed stream", function.apply(this));
     }
 
     @NotNull
@@ -916,6 +944,7 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     @NotNull
     public LoaderStreamChannelCompat<IN, OUT> with(@Nullable final LoaderContextCompat context) {
 
+        mLoaderContext = context;
         mContextBuilder = (context != null) ? JRoutineLoaderCompat.with(context) : null;
         return this;
     }
@@ -968,41 +997,74 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     }
 
     /**
-     * Selectable invoke function.
-     *
-     * @param <OUT> the output data type.
+     * Default implementation of a loader stream configuration.
      */
-    private static class SelectableInvoke<OUT> extends DeepEqualObject
-            implements Function<OutputChannel<OUT>, OutputChannel<ParcelableSelectable<OUT>>> {
+    protected static class DefaultLoaderStreamConfigurationCompat
+            implements LoaderStreamConfigurationCompat {
 
-        private final ChannelConfiguration mConfiguration;
+        private final LoaderConfiguration mConfiguration;
 
-        private final int mIndex;
+        private final LoaderContextCompat mLoaderContext;
+
+        private final LoaderConfiguration mStreamConfiguration;
+
+        private final StreamConfiguration mWrappedConfiguration;
+
+        private LoaderConfiguration mLoaderConfiguration;
 
         /**
          * Constructor.
          *
-         * @param configuration the channel configuration.
-         * @param index         the selectable index.
+         * @param context                   the loader context.
+         * @param streamLoaderConfiguration the stream loader configuration.
+         * @param loaderConfiguration       the loader configuration.
+         * @param streamConfiguration       the stream invocation configuration.
          */
-        private SelectableInvoke(@NotNull final ChannelConfiguration configuration,
-                final int index) {
+        protected DefaultLoaderStreamConfigurationCompat(
+                @Nullable final LoaderContextCompat context,
+                @NotNull final LoaderConfiguration streamLoaderConfiguration,
+                @NotNull final LoaderConfiguration loaderConfiguration,
+                @NotNull final StreamConfiguration streamConfiguration) {
 
-            super(asArgs(configuration, index));
-            mConfiguration = configuration;
-            mIndex = index;
+            mLoaderContext = context;
+            mStreamConfiguration = streamLoaderConfiguration;
+            mConfiguration = loaderConfiguration;
+            mWrappedConfiguration = streamConfiguration;
         }
 
-        @SuppressWarnings("unchecked")
-        public OutputChannel<ParcelableSelectable<OUT>> apply(final OutputChannel<OUT> channel) {
+        @NotNull
+        public ChannelConfiguration asChannelConfiguration() {
 
-            final OutputChannel<? extends ParcelableSelectable<OUT>> outputChannel =
-                    SparseChannelsCompat.toSelectable(channel, mIndex)
-                                        .channelConfiguration()
-                                        .with(mConfiguration)
-                                        .apply()
-                                        .buildChannels();
-            return (OutputChannel<ParcelableSelectable<OUT>>) outputChannel;
+            return mWrappedConfiguration.asChannelConfiguration();
+        }
+
+        @NotNull
+        public InvocationConfiguration asInvocationConfiguration() {
+
+            return mWrappedConfiguration.asInvocationConfiguration();
+        }
+
+        @NotNull
+        public InvocationMode getInvocationMode() {
+
+            return mWrappedConfiguration.getInvocationMode();
+        }
+
+        @NotNull
+        public LoaderConfiguration asLoaderConfiguration() {
+
+            if (mLoaderConfiguration == null) {
+                mLoaderConfiguration =
+                        mStreamConfiguration.builderFrom().with(mConfiguration).apply();
+            }
+
+            return mLoaderConfiguration;
+        }
+
+        @Nullable
+        public LoaderContextCompat getLoaderContext() {
+
+            return mLoaderContext;
         }
     }
 

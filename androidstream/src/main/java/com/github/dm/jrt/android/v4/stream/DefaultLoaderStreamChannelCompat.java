@@ -580,8 +580,8 @@ class DefaultLoaderStreamChannelCompat<IN, OUT> extends AbstractStreamChannel<IN
     @NotNull
     @Override
     public LoaderStreamChannelCompat<IN, OUT> retry(
-            @NotNull final BiFunction<? super Integer, ? super RoutineException, ? extends
-                    UnitDuration> function) {
+            @NotNull final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
+                    function) {
 
         return (LoaderStreamChannelCompat<IN, OUT>) super.retry(function);
     }

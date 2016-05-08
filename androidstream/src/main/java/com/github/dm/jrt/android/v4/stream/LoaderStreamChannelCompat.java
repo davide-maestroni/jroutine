@@ -439,8 +439,8 @@ public interface LoaderStreamChannelCompat<IN, OUT> extends StreamChannel<IN, OU
     @NotNull
     @StreamTransform(COLLECT)
     LoaderStreamChannelCompat<IN, OUT> retry(
-            @NotNull BiFunction<? super Integer, ? super RoutineException, ? extends
-                    UnitDuration> function);
+            @NotNull BiFunction<? super Integer, ? super RoutineException, ? extends Long>
+                    function);
 
     /**
      * {@inheritDoc}

@@ -22,6 +22,7 @@ import com.github.dm.jrt.core.channel.ExecutionTimeoutException;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.config.InvocationConfiguration.TimeoutActionType;
+import com.github.dm.jrt.core.error.DeadlockException;
 import com.github.dm.jrt.core.error.TimeoutException;
 import com.github.dm.jrt.core.invocation.IdentityInvocation;
 import com.github.dm.jrt.core.log.Log;
@@ -334,6 +335,23 @@ public class IOChannelTest {
         }
 
         assertThat(ioChannel.hasCompleted()).isFalse();
+    }
+
+    @Test
+    public void testMaxSize() {
+
+        try {
+            JRoutineCore.io()
+                        .channelConfiguration()
+                        .withChannelMaxSize(1)
+                        .apply()
+                        .buildChannel()
+                        .pass("test1", "test2");
+            fail();
+
+        } catch (final DeadlockException ignored) {
+
+        }
     }
 
     @Test

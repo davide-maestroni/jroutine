@@ -24,13 +24,13 @@ import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.runner.Execution;
 import com.github.dm.jrt.core.runner.Runner;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Function;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Retry output consumer.
@@ -44,8 +44,7 @@ class RetryOutputConsumer<IN, OUT> implements Execution, OutputConsumer<OUT> {
 
     private final Function<OutputChannel<IN>, OutputChannel<OUT>> mBind;
 
-    private final BiFunction<? super Integer, ? super RoutineException, ? extends UnitDuration>
-            mFunction;
+    private final BiFunction<? super Integer, ? super RoutineException, ? extends Long> mFunction;
 
     private final OutputChannel<IN> mInputChannel;
 
@@ -69,8 +68,8 @@ class RetryOutputConsumer<IN, OUT> implements Execution, OutputConsumer<OUT> {
     RetryOutputConsumer(@NotNull final OutputChannel<IN> inputChannel,
             @NotNull final IOChannel<OUT> outputChannel, @NotNull final Runner runner,
             @NotNull final Function<OutputChannel<IN>, OutputChannel<OUT>> bindFunction,
-            @NotNull final BiFunction<? super Integer, ? super RoutineException, ? extends
-                    UnitDuration> function) {
+            @NotNull final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
+                    function) {
 
         mInputChannel = ConstantConditions.notNull("input channel instance", inputChannel);
         mOutputChannel = ConstantConditions.notNull("output channel instance", outputChannel);
@@ -86,13 +85,13 @@ class RetryOutputConsumer<IN, OUT> implements Execution, OutputConsumer<OUT> {
 
     public void onError(@NotNull final RoutineException error) {
 
-        UnitDuration delay = null;
+        Long delay = null;
         if (!(error instanceof AbortException)) {
             delay = mFunction.apply(++mCount, error);
         }
 
         if (delay != null) {
-            mRunner.run(this, delay.value, delay.unit);
+            mRunner.run(this, delay, TimeUnit.MILLISECONDS);
 
         } else {
             mOutputChannel.abort(error);

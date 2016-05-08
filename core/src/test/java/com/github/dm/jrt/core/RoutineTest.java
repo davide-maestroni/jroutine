@@ -1999,7 +1999,7 @@ public class RoutineTest {
 
         final IOChannel<String> channel1 = JRoutineCore.io()
                                                        .channelConfiguration()
-                                                       .withChannelMaxSize(1)
+                                                       .withChannelLimit(1)
                                                        .withChannelMaxDelay(millis(1000))
                                                        .apply()
                                                        .buildChannel();
@@ -2016,7 +2016,7 @@ public class RoutineTest {
 
         final IOChannel<String> channel2 = JRoutineCore.io()
                                                        .channelConfiguration()
-                                                       .withChannelMaxSize(1)
+                                                       .withChannelLimit(1)
                                                        .withChannelMaxDelay(millis(1000))
                                                        .apply()
                                                        .buildChannel();
@@ -2033,7 +2033,7 @@ public class RoutineTest {
 
         final IOChannel<String> channel3 = JRoutineCore.io()
                                                        .channelConfiguration()
-                                                       .withChannelMaxSize(1)
+                                                       .withChannelLimit(1)
                                                        .withChannelMaxDelay(millis(1000))
                                                        .apply()
                                                        .buildChannel();
@@ -2050,7 +2050,7 @@ public class RoutineTest {
 
         final IOChannel<String> channel4 = JRoutineCore.io()
                                                        .channelConfiguration()
-                                                       .withChannelMaxSize(1)
+                                                       .withChannelLimit(1)
                                                        .withChannelMaxDelay(millis(1000))
                                                        .apply()
                                                        .buildChannel();

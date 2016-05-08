@@ -23,121 +23,225 @@ import com.github.dm.jrt.function.BiFunction;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
-
-import static com.github.dm.jrt.core.util.UnitDuration.fromUnit;
 
 /**
  * Created by davide-maestroni on 05/07/2016.
  */
-public abstract class Backoff implements BiFunction<Integer, RoutineException, UnitDuration> {
-
-    // TODO: 08/05/16 jitter
+public abstract class Backoff implements BiFunction<Integer, RoutineException, Long> {
 
     @NotNull
     public static ConstantBackoff times(final int count) {
 
-        return new ConstantBackoff(count, UnitDuration.zero());
+        return new ConstantBackoff(count, 0);
     }
 
-    public static class ConstantBackoff extends Backoff {
+    @NotNull
+    public Backoff cappedTo(final long value, @NotNull final TimeUnit unit) {
+
+        return new CappedBackoff(this, unit.toMillis(value));
+    }
+
+    @NotNull
+    public Backoff cappedTo(@NotNull final UnitDuration delay) {
+
+        return new CappedBackoff(this, delay.toMillis());
+    }
+
+    @NotNull
+    public Backoff withJitter(final float percent) {
+
+        return new JitterBackoff(this, percent);
+    }
+
+    public static class ConstantBackoff extends DelayBackoff {
 
         private final int mCount;
 
-        private final UnitDuration mDelay;
+        private ConstantBackoff(final int count, final long delayMillis) {
 
-        private ConstantBackoff(final int count, @NotNull final UnitDuration delay) {
-
-            mCount = ConstantConditions.notNegative("retry count", count);
-            mDelay = ConstantConditions.notNull("backoff delay", delay);
-        }
-
-        public UnitDuration apply(final Integer count, final RoutineException error) {
-
-            if (count <= mCount) {
-                return mDelay;
-            }
-
-            return null;
+            super(count, delayMillis);
+            mCount = count;
         }
 
         @NotNull
         public Backoff constantDelay(final long value, @NotNull final TimeUnit unit) {
 
-            return new ConstantBackoff(mCount, fromUnit(value, unit));
+            return new ConstantBackoff(mCount, unit.toMillis(value));
         }
 
         @NotNull
         public Backoff constantDelay(@NotNull final UnitDuration delay) {
 
-            return new ConstantBackoff(mCount, delay);
+            return new ConstantBackoff(mCount, delay.toMillis());
         }
 
         @NotNull
         public Backoff exponentialDelay(final long value, @NotNull final TimeUnit unit) {
 
-            return new ExponentialBackoff(mCount, fromUnit(value, unit));
+            return new ExponentialBackoff(mCount, unit.toMillis(value));
         }
 
         @NotNull
         public Backoff exponentialDelay(@NotNull final UnitDuration delay) {
 
-            return new ExponentialBackoff(mCount, delay);
+            return new ExponentialBackoff(mCount, delay.toMillis());
+        }
+
+        @NotNull
+        public Backoff jitterDelay(final long value, @NotNull final TimeUnit unit) {
+
+            return new DecorrelatedJitterBackoff(mCount, unit.toMillis(value));
+        }
+
+        @NotNull
+        public Backoff jitterDelay(@NotNull final UnitDuration delay) {
+
+            return new DecorrelatedJitterBackoff(mCount, delay.toMillis());
         }
 
         @NotNull
         public Backoff linearDelay(final long value, @NotNull final TimeUnit unit) {
 
-            return new LinearBackoff(mCount, fromUnit(value, unit));
+            return new LinearBackoff(mCount, unit.toMillis(value));
         }
 
         @NotNull
         public Backoff linearDelay(@NotNull final UnitDuration delay) {
 
-            return new LinearBackoff(mCount, delay);
+            return new LinearBackoff(mCount, delay.toMillis());
+        }
+
+        @Override
+        protected long nexDelay(final Integer count, final long delayMillis) {
+
+            return delayMillis;
         }
     }
 
-    private static class ExponentialBackoff extends Backoff {
+    private static class DecorrelatedJitterBackoff extends DelayBackoff {
+
+        private final Random mRandom = new Random();
+
+        private long mLast;
+
+        private DecorrelatedJitterBackoff(final int count, final long delayMillis) {
+
+            super(count, delayMillis);
+            mLast = delayMillis;
+        }
+
+        @Override
+        protected long nexDelay(final Integer count, final long delayMillis) {
+
+            mLast = delayMillis + Math.round(mLast * 3 * mRandom.nextDouble());
+            return mLast;
+        }
+    }
+
+    private static abstract class DelayBackoff extends Backoff {
 
         private final int mCount;
 
-        private final UnitDuration mDelay;
+        private final long mDelay;
 
-        private ExponentialBackoff(final int count, @NotNull final UnitDuration delay) {
+        private DelayBackoff(final int count, final long delayMillis) {
 
             mCount = ConstantConditions.notNegative("retry count", count);
-            mDelay = ConstantConditions.notNull("backoff delay", delay);
+            mDelay = ConstantConditions.notNegative("backoff delay", delayMillis);
         }
 
-        public UnitDuration apply(final Integer count, final RoutineException error) {
+        public final Long apply(final Integer count, final RoutineException error) {
 
             if (count <= mCount) {
-                final UnitDuration delay = mDelay;
-                return fromUnit(delay.value << (count - 1), delay.unit);
+                return nexDelay(count, mDelay);
+            }
+
+            return null;
+        }
+
+        protected abstract long nexDelay(Integer count, long delayMillis);
+    }
+
+    private static class ExponentialBackoff extends DelayBackoff {
+
+        private ExponentialBackoff(final int count, final long delayMillis) {
+
+            super(count, delayMillis);
+        }
+
+        @Override
+        protected long nexDelay(final Integer count, final long delayMillis) {
+
+            return delayMillis << (count - 1);
+        }
+    }
+
+    private static class LinearBackoff extends DelayBackoff {
+
+        private LinearBackoff(final int count, final long delayMillis) {
+
+            super(count, delayMillis);
+        }
+
+        @Override
+        protected long nexDelay(final Integer count, final long delayMillis) {
+
+            return delayMillis * count;
+        }
+    }
+
+    private class CappedBackoff extends Backoff {
+
+        private final Backoff mBackoff;
+
+        private final long mDelay;
+
+        public CappedBackoff(@NotNull final Backoff wrapped, final long delayMillis) {
+
+            mBackoff = wrapped;
+            mDelay = ConstantConditions.notNegative("backoff delay", delayMillis);
+        }
+
+        public Long apply(final Integer count, final RoutineException error) {
+
+            final Long delay = mBackoff.apply(count, error);
+            if (delay != null) {
+                return Math.min(delay, mDelay);
             }
 
             return null;
         }
     }
 
-    private static class LinearBackoff extends Backoff {
+    private class JitterBackoff extends Backoff {
 
-        private final int mCount;
+        private final Backoff mBackoff;
 
-        private final UnitDuration mDelay;
+        private final float mPercent;
 
-        private LinearBackoff(final int count, @NotNull final UnitDuration delay) {
+        private final Random mRandom = new Random();
 
-            mCount = ConstantConditions.notNegative("retry count", count);
-            mDelay = ConstantConditions.notNull("backoff delay", delay);
+        public JitterBackoff(@NotNull final Backoff wrapped, final float percent) {
+
+            if ((percent < 0) || (percent > 1)) {
+                throw new IllegalArgumentException(
+                        "the jitter percent must be between 0 and 1, but is: " + percent);
+            }
+
+            mBackoff = wrapped;
+            mPercent = percent;
         }
 
-        public UnitDuration apply(final Integer count, final RoutineException error) {
+        public Long apply(final Integer count, final RoutineException error) {
 
-            if (count <= mCount) {
-                final UnitDuration delay = mDelay;
-                return fromUnit(delay.value * count, delay.unit);
+            final Long delay = mBackoff.apply(count, error);
+            if (delay != null) {
+                final float percent = mPercent;
+                final long value = delay;
+                return Math.round(
+                        (value * percent * mRandom.nextDouble()) + (value * (1 - percent)));
             }
 
             return null;

@@ -510,8 +510,8 @@ public abstract class AbstractStreamChannel<IN, OUT>
 
     @NotNull
     public StreamChannel<IN, OUT> retry(
-            @NotNull final BiFunction<? super Integer, ? super RoutineException, ? extends
-                    UnitDuration> function) {
+            @NotNull final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
+                    function) {
 
         return buildChannel(new BindRetry<IN, OUT>(buildChannelConfiguration(), mBind, function));
     }

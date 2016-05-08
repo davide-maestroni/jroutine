@@ -434,8 +434,8 @@ public interface LoaderStreamChannel<IN, OUT>
     @NotNull
     @StreamTransform(COLLECT)
     LoaderStreamChannel<IN, OUT> retry(
-            @NotNull BiFunction<? super Integer, ? super RoutineException, ? extends
-                    UnitDuration> function);
+            @NotNull BiFunction<? super Integer, ? super RoutineException, ? extends Long>
+                    function);
 
     /**
      * {@inheritDoc}

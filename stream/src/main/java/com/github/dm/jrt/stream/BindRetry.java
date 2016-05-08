@@ -24,7 +24,6 @@ import com.github.dm.jrt.core.config.ChannelConfiguration;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.runner.Runners;
 import com.github.dm.jrt.core.util.ConstantConditions;
-import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.function.BiFunction;
 import com.github.dm.jrt.function.Function;
 
@@ -44,8 +43,7 @@ class BindRetry<IN, OUT> implements Function<OutputChannel<IN>, OutputChannel<OU
 
     private final ChannelConfiguration mConfiguration;
 
-    private final BiFunction<? super Integer, ? super RoutineException, ? extends UnitDuration>
-            mFunction;
+    private final BiFunction<? super Integer, ? super RoutineException, ? extends Long> mFunction;
 
     /**
      * Constructor.
@@ -56,8 +54,8 @@ class BindRetry<IN, OUT> implements Function<OutputChannel<IN>, OutputChannel<OU
      */
     BindRetry(@NotNull final ChannelConfiguration configuration,
             @NotNull final Function<OutputChannel<IN>, OutputChannel<OUT>> bindFunction,
-            @NotNull final BiFunction<? super Integer, ? super RoutineException, ? extends
-                    UnitDuration> function) {
+            @NotNull final BiFunction<? super Integer, ? super RoutineException, ? extends Long>
+                    function) {
 
         mConfiguration = ConstantConditions.notNull("channel configuration", configuration);
         mBind = ConstantConditions.notNull("bind function", bindFunction);

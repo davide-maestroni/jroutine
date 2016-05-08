@@ -60,6 +60,7 @@ import static com.github.dm.jrt.function.Functions.functionCall;
 import static com.github.dm.jrt.function.Functions.functionOperation;
 import static com.github.dm.jrt.function.Functions.predicateFilter;
 import static com.github.dm.jrt.function.Functions.wrap;
+import static com.github.dm.jrt.stream.util.Backoff.times;
 
 /**
  * Abstract implementation of a stream output channel.
@@ -502,6 +503,20 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
+    public StreamChannel<IN, OUT> retry(final int count) {
+
+        return retry(times(count));
+    }
+
+    @NotNull
+    public StreamChannel<IN, OUT> retry(
+            @NotNull final BiFunction<? super Integer, ? super RoutineException, ? extends
+                    UnitDuration> function) {
+
+        return buildChannel(new BindRetry<IN, OUT>(buildChannelConfiguration(), mBind, function));
+    }
+
+    @NotNull
     public StreamChannel<IN, OUT> runOn(@Nullable final Runner runner) {
 
         final InvocationMode invocationMode = mInvocationMode;
@@ -543,7 +558,8 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
-    public <AFTER> StreamChannel<IN, AFTER> splitBy(@NotNull final Function<? super OUT, ?> keyFunction,
+    public <AFTER> StreamChannel<IN, AFTER> splitBy(
+            @NotNull final Function<? super OUT, ?> keyFunction,
             @NotNull final Function<? super StreamChannel<OUT, OUT>, ? extends StreamChannel<?
                     super OUT, ? extends AFTER>> function) {
 
@@ -551,14 +567,16 @@ public abstract class AbstractStreamChannel<IN, OUT>
     }
 
     @NotNull
-    public <AFTER> StreamChannel<IN, AFTER> splitBy(@NotNull final Function<? super OUT, ?> keyFunction,
+    public <AFTER> StreamChannel<IN, AFTER> splitBy(
+            @NotNull final Function<? super OUT, ?> keyFunction,
             @NotNull final InvocationFactory<? super OUT, ? extends AFTER> factory) {
 
         return splitBy(keyFunction, buildRoutine(factory));
     }
 
     @NotNull
-    public <AFTER> StreamChannel<IN, AFTER> splitBy(@NotNull final Function<? super OUT, ?> keyFunction,
+    public <AFTER> StreamChannel<IN, AFTER> splitBy(
+            @NotNull final Function<? super OUT, ?> keyFunction,
             @NotNull final Routine<? super OUT, ? extends AFTER> routine) {
 
         return buildChannel(mBind.andThen(
@@ -680,14 +698,15 @@ public abstract class AbstractStreamChannel<IN, OUT>
     @NotNull
     @SuppressWarnings("unchecked")
     public <AFTER> StreamChannel<IN, AFTER> transform(
-            @NotNull final Function<? extends Function<? super OutputChannel<IN>, ? extends
-                    OutputChannel<OUT>>, ? extends Function<? super OutputChannel<IN>, ?
-                    extends OutputChannel<AFTER>>> function) {
+            @NotNull BiFunction<? super InvocationConfiguration, ? extends Function<? super
+                    OutputChannel<IN>, ? extends OutputChannel<OUT>>, ? extends Function<? super
+                    OutputChannel<IN>, ? extends OutputChannel<AFTER>>> function) {
 
         return buildChannel(ConstantConditions.notNull("bind function",
-                ((Function<Function<OutputChannel<IN>, OutputChannel<OUT>>,
-                        Function<OutputChannel<IN>, OutputChannel<AFTER>>>) function)
-                        .apply(mBind)));
+                ((BiFunction<InvocationConfiguration, Function<OutputChannel<IN>,
+                        OutputChannel<OUT>>, Function<OutputChannel<IN>, OutputChannel<AFTER>>>)
+                        function)
+                        .apply(buildConfiguration(), mBind)));
     }
 
     @NotNull

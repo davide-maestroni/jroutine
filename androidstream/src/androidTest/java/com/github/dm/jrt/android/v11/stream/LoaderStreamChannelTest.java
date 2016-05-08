@@ -36,6 +36,7 @@ import com.github.dm.jrt.core.channel.ExecutionDeadlockException;
 import com.github.dm.jrt.core.channel.IOChannel;
 import com.github.dm.jrt.core.channel.InvocationChannel;
 import com.github.dm.jrt.core.channel.ResultChannel;
+import com.github.dm.jrt.core.config.InvocationConfiguration;
 import com.github.dm.jrt.core.config.InvocationConfiguration.OrderType;
 import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.error.TimeoutException;
@@ -1153,14 +1154,17 @@ public class LoaderStreamChannelTest extends ActivityInstrumentationTestCase2<Te
         assertThat(isRun.getAndSet(false)).isTrue();
     }
 
-    @NotNull
-    private static Function<Function<OutputChannel<String>, OutputChannel<String>>,
-            Function<OutputChannel<String>, OutputChannel<String>>> transformFunction() {
 
-        return new Function<Function<OutputChannel<String>, OutputChannel<String>>,
-                Function<OutputChannel<String>, OutputChannel<String>>>() {
+    @NotNull
+    private static BiFunction<InvocationConfiguration, Function<OutputChannel<String>,
+            OutputChannel<String>>, Function<OutputChannel<String>, OutputChannel<String>>>
+    transformFunction() {
+
+        return new BiFunction<InvocationConfiguration, Function<OutputChannel<String>,
+                OutputChannel<String>>, Function<OutputChannel<String>, OutputChannel<String>>>() {
 
             public Function<OutputChannel<String>, OutputChannel<String>> apply(
+                    final InvocationConfiguration configuration,
                     final Function<OutputChannel<String>, OutputChannel<String>> function) {
 
                 return wrap(function).andThen(

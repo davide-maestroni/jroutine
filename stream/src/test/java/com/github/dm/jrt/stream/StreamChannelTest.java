@@ -2444,12 +2444,14 @@ public class StreamChannelTest {
 
         assertThat(Streams.streamOf("test")
                           .transform(
-                                  new Function<Function<OutputChannel<String>,
-                                          OutputChannel<String>>, Function<OutputChannel<String>,
-                                          OutputChannel<String>>>() {
+                                  new BiFunction<InvocationConfiguration,
+                                          Function<OutputChannel<String>, OutputChannel<String>>,
+                                          Function<OutputChannel<String>, OutputChannel<String>>>
+                                          () {
 
                                       public Function<OutputChannel<String>,
                                               OutputChannel<String>> apply(
+                                              final InvocationConfiguration configuration,
                                               final Function<OutputChannel<String>,
                                                       OutputChannel<String>> function) {
 

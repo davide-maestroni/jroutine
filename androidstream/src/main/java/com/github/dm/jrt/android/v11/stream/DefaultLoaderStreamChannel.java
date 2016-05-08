@@ -730,9 +730,9 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
     @NotNull
     @Override
     public <AFTER> LoaderStreamChannel<IN, AFTER> transform(
-            @NotNull final Function<? extends Function<? super OutputChannel<IN>, ? extends
-                    OutputChannel<OUT>>, ? extends Function<? super OutputChannel<IN>, ? extends
-                    OutputChannel<AFTER>>> function) {
+            @NotNull final BiFunction<? super InvocationConfiguration, ? extends Function<? super
+                    OutputChannel<IN>, ? extends OutputChannel<OUT>>, ? extends Function<? super
+                    OutputChannel<IN>, ? extends OutputChannel<AFTER>>> function) {
 
         checkStatic(wrap(function), function);
         return (LoaderStreamChannel<IN, AFTER>) super.transform(function);

@@ -37,6 +37,7 @@ import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
+import com.github.dm.jrt.core.util.Backoff;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.Reflection;
 import com.github.dm.jrt.core.util.UnitDuration;
@@ -566,6 +567,13 @@ class DefaultLoaderStreamChannel<IN, OUT> extends AbstractStreamChannel<IN, OUT>
     public LoaderStreamChannel<IN, OUT> retry(final int count) {
 
         return (LoaderStreamChannel<IN, OUT>) super.retry(count);
+    }
+
+    @NotNull
+    @Override
+    public LoaderStreamChannel<IN, OUT> retry(final int count, @NotNull final Backoff backoff) {
+
+        return (LoaderStreamChannel<IN, OUT>) super.retry(count, backoff);
     }
 
     @NotNull

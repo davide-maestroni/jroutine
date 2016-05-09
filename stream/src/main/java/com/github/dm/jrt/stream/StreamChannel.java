@@ -30,6 +30,7 @@ import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
+import com.github.dm.jrt.core.util.Backoff;
 import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
@@ -767,6 +768,11 @@ public interface StreamChannel<IN, OUT>
     @NotNull
     @StreamTransform(COLLECT)
     StreamChannel<IN, OUT> retry(int count);
+
+    // TODO: 07/05/16 javadoc
+    @NotNull
+    @StreamTransform(COLLECT)
+    StreamChannel<IN, OUT> retry(int count, @NotNull Backoff backoff);
 
     // TODO: 07/05/16 javadoc
     @NotNull

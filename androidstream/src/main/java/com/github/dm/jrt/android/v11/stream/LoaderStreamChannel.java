@@ -30,6 +30,7 @@ import com.github.dm.jrt.core.error.RoutineException;
 import com.github.dm.jrt.core.invocation.InvocationFactory;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
+import com.github.dm.jrt.core.util.Backoff;
 import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.function.BiConsumer;
 import com.github.dm.jrt.function.BiFunction;
@@ -427,6 +428,13 @@ public interface LoaderStreamChannel<IN, OUT>
     @NotNull
     @StreamTransform(COLLECT)
     LoaderStreamChannel<IN, OUT> retry(int count);
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @StreamTransform(COLLECT)
+    LoaderStreamChannel<IN, OUT> retry(int count, @NotNull Backoff backoff);
 
     /**
      * {@inheritDoc}

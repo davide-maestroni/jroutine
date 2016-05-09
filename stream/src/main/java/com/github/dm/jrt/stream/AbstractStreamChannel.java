@@ -32,6 +32,7 @@ import com.github.dm.jrt.core.invocation.OperationInvocation;
 import com.github.dm.jrt.core.routine.InvocationMode;
 import com.github.dm.jrt.core.routine.Routine;
 import com.github.dm.jrt.core.runner.Runner;
+import com.github.dm.jrt.core.util.Backoff;
 import com.github.dm.jrt.core.util.ConstantConditions;
 import com.github.dm.jrt.core.util.UnitDuration;
 import com.github.dm.jrt.function.BiConsumer;
@@ -60,7 +61,6 @@ import static com.github.dm.jrt.function.Functions.functionCall;
 import static com.github.dm.jrt.function.Functions.functionOperation;
 import static com.github.dm.jrt.function.Functions.predicateFilter;
 import static com.github.dm.jrt.function.Functions.wrap;
-import static com.github.dm.jrt.stream.util.Backoff.times;
 
 /**
  * Abstract implementation of a stream output channel.
@@ -505,7 +505,13 @@ public abstract class AbstractStreamChannel<IN, OUT>
     @NotNull
     public StreamChannel<IN, OUT> retry(final int count) {
 
-        return retry(times(count));
+        return retry(count, Backoff.zeroDelay());
+    }
+
+    @NotNull
+    public StreamChannel<IN, OUT> retry(final int count, @NotNull final Backoff backoff) {
+
+        return retry(new RetryBackoff(count, backoff));
     }
 
     @NotNull
